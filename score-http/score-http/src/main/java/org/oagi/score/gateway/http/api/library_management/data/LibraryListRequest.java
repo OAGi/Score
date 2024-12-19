@@ -14,7 +14,7 @@ public class LibraryListRequest {
     private String organization;
     private String description;
     private String domain;
-    private Boolean enabled;
+    private String state;
     private List<String> updaterLoginIds = Collections.emptyList();
     private Date updateStartDate;
     private Date updateEndDate;

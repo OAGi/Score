@@ -21,7 +21,7 @@ public class Library {
 
     private String description;
 
-    private boolean enabled;
+    private String state;
 
     private ScoreUser createdBy;
 

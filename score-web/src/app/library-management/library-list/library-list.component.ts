@@ -122,11 +122,6 @@ export class LibraryListComponent implements OnInit {
             displayedColumns.push('description');
           }
           break;
-        case 'Status':
-          if (column.selected) {
-            displayedColumns.push('status');
-          }
-          break;
         case 'Updated On':
           if (column.selected) {
             displayedColumns.push('lastUpdateTimestamp');

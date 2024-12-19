@@ -315,7 +315,7 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Owner')" (onResize)="onResizeWidth($event)"> Owner</th>
               <td mat-cell *matCellDef="let element">
-                <div class="d-flex align-content-center justify-content-between">
+                <div class="d-flex align-items-center align-content-center justify-content-between">
                   <span class="word-break-all" [matTooltip]="element.owner" [innerHTML]="element.owner"></span>
                   <mat-icon class="pointer align-self-center" style="padding-right: 24px;"
                             *ngIf="isEditable(element) || isAdmin"

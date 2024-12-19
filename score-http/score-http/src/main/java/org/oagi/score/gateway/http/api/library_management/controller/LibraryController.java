@@ -77,7 +77,7 @@ public class LibraryController {
                                                     @RequestParam(name = "organization", required = false) String organization,
                                                     @RequestParam(name = "description", required = false) String description,
                                                     @RequestParam(name = "domain", required = false) String domain,
-                                                    @RequestParam(name = "status", required = false) String status,
+                                                    @RequestParam(name = "state", required = false) String state,
                                                     @RequestParam(name = "updaterLoginIds", required = false) String updaterLoginIds,
                                                     @RequestParam(name = "updateStart", required = false) String updateStart,
                                                     @RequestParam(name = "updateEnd", required = false) String updateEnd,
@@ -91,12 +91,7 @@ public class LibraryController {
         request.setOrganization(organization);
         request.setDescription(description);
         request.setDomain(domain);
-        if (StringUtils.hasLength(status)) {
-            List<String> statusList = Arrays.asList(status.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList());
-            if (statusList.size() == 1) {
-                request.setEnabled("enable".equalsIgnoreCase(statusList.get(0)));
-            }
-        }
+        request.setState(state);
         request.setUpdaterLoginIds(!StringUtils.hasLength(updaterLoginIds) ? Collections.emptyList() :
                 Arrays.asList(updaterLoginIds.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));
 

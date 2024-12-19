@@ -14,7 +14,7 @@ public class LibraryList {
     private String description;
     private String link;
     private String domain;
-    private boolean enabled;
+    private String state;
     private Date lastUpdateTimestamp;
     private String lastUpdateUser;
 

@@ -209,7 +209,6 @@ export class TableColumnsInfo {
     {name: 'Organization', selected: true, width: 400},
     {name: 'Domain', selected: true, width: 200},
     {name: 'Description', selected: true, width: '30%'},
-    {name: 'Status', selected: true, width: 80},
     {name: 'Updated On', selected: true, width: 160}
   ];
 

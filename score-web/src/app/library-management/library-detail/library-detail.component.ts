@@ -34,7 +34,6 @@ export class LibraryDetailComponent {
 
   ngOnInit() {
     this.library = new Library();
-    this.library.enabled = true; // To prevent the 'Discard' button from blinking during initialization.
 
     // load library
     this.route.paramMap.pipe(

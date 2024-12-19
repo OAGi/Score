@@ -6,7 +6,6 @@ import org.oagi.score.gateway.http.api.library_management.data.Library;
 import org.oagi.score.gateway.http.api.library_management.data.LibraryList;
 import org.oagi.score.gateway.http.api.library_management.data.LibraryListRequest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.LibraryRecord;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.NamespaceRecord;
 import org.oagi.score.repo.api.user.model.ScoreRole;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.oagi.score.service.common.data.PageRequest;
@@ -27,7 +26,6 @@ import java.util.Date;
 import java.util.List;
 
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.NAMESPACE;
 import static org.oagi.score.repo.api.user.model.ScoreRole.*;
 
 @Repository
@@ -49,7 +47,7 @@ public class LibraryRepository {
 
     private SelectOnConditionStep<Record19<
             ULong, String, String, String, String,
-            String, Byte, ULong, String, String,
+            String, String, ULong, String, String,
             Byte, Byte, ULong, String, String,
             Byte, Byte, LocalDateTime, LocalDateTime>> selectOnConditionStep() {
         return dslContext.select(
@@ -59,7 +57,7 @@ public class LibraryRepository {
                         LIBRARY.LINK,
                         LIBRARY.DOMAIN,
                         LIBRARY.DESCRIPTION,
-                        LIBRARY.IS_ENABLED,
+                        LIBRARY.STATE,
                         APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
                         APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
                         APP_USER.as("creator").NAME.as("creator_name"),
@@ -88,7 +86,7 @@ public class LibraryRepository {
             library.setLink(record.getValue(LIBRARY.LINK));
             library.setDomain(record.getValue(LIBRARY.DOMAIN));
             library.setDescription(record.getValue(LIBRARY.DESCRIPTION));
-            library.setEnabled(record.getValue(LIBRARY.IS_ENABLED) == (byte) 1);
+            library.setState(record.getValue(LIBRARY.STATE));
 
             ScoreRole creatorRole = (byte) 1 == record.get(APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer")) ? DEVELOPER : END_USER;
             boolean isCreatorAdmin = (byte) 1 == record.get(APP_USER.as("creator").IS_ADMIN.as("creator_is_admin"));
@@ -123,7 +121,7 @@ public class LibraryRepository {
         libraryRecord.setLink(library.getLink());
         libraryRecord.setDomain(library.getDomain());
         libraryRecord.setDescription(library.getDescription());
-        libraryRecord.setIsEnabled((byte) 0);
+        libraryRecord.setState(null);
         libraryRecord.setCreatedBy(userId);
         libraryRecord.setLastUpdatedBy(userId);
         libraryRecord.setCreationTimestamp(timestamp);
@@ -173,7 +171,7 @@ public class LibraryRepository {
                 .set(LIBRARY.LINK, library.getLink())
                 .set(LIBRARY.DOMAIN, library.getDomain())
                 .set(LIBRARY.DESCRIPTION, library.getDescription())
-                .set(LIBRARY.IS_ENABLED, library.isEnabled() ? (byte) 1 : (byte) 0)
+                .set(LIBRARY.STATE, library.getState())
                 .set(LIBRARY.LAST_UPDATED_BY, userId)
                 .set(LIBRARY.LAST_UPDATE_TIMESTAMP, timestamp)
                 .where(LIBRARY.LIBRARY_ID.eq(libraryRecord.getLibraryId()))
@@ -196,10 +194,6 @@ public class LibraryRepository {
             throw new EmptyResultDataAccessException(1);
         }
 
-        if (libraryRecord.getIsEnabled() == (byte) 1) {
-            throw new IllegalArgumentException("An enabled library cannot be discarded.");
-        }
-
         libraryRecord.delete();
     }
 
@@ -209,9 +203,9 @@ public class LibraryRepository {
         PageRequest pageRequest = request.getPageRequest();
         SelectOnConditionStep<Record9<
                 ULong, String, String, String, String,
-                String, Byte, LocalDateTime, String>> selectOnConditionStep =
+                String, String, LocalDateTime, String>> selectOnConditionStep =
                 dslContext.select(LIBRARY.LIBRARY_ID, LIBRARY.NAME, LIBRARY.ORGANIZATION,
-                                LIBRARY.DESCRIPTION, LIBRARY.LINK, LIBRARY.DOMAIN, LIBRARY.IS_ENABLED,
+                                LIBRARY.DESCRIPTION, LIBRARY.LINK, LIBRARY.DOMAIN, LIBRARY.STATE,
                                 LIBRARY.LAST_UPDATE_TIMESTAMP,
                                 APP_USER.as("updater").LOGIN_ID.as("last_update_user"))
                         .from(LIBRARY)
@@ -231,8 +225,8 @@ public class LibraryRepository {
         if (StringUtils.hasLength(request.getDomain())) {
             conditions.add(LIBRARY.DOMAIN.containsIgnoreCase(request.getDomain()));
         }
-        if (request.getEnabled() != null) {
-            conditions.add(LIBRARY.IS_ENABLED.eq(request.getEnabled() ? (byte) 1 : (byte) 0));
+        if (StringUtils.hasLength(request.getState())) {
+            conditions.add(LIBRARY.STATE.containsIgnoreCase(request.getState()));
         }
         if (!request.getUpdaterLoginIds().isEmpty()) {
             conditions.add(APP_USER.as("updater").LOGIN_ID.in(request.getUpdaterLoginIds()));
@@ -248,7 +242,7 @@ public class LibraryRepository {
 
         SelectConditionStep<Record9<
                 ULong, String, String, String, String,
-                String, Byte, LocalDateTime, String>> conditionStep = selectOnConditionStep.where(conditions);
+                String, String, LocalDateTime, String>> conditionStep = selectOnConditionStep.where(conditions);
 
         int length = dslContext.fetchCount(conditionStep);
 
@@ -272,8 +266,8 @@ public class LibraryRepository {
                     field = LIBRARY.DOMAIN;
                     break;
 
-                case "status":
-                    field = LIBRARY.IS_ENABLED;
+                case "state":
+                    field = LIBRARY.STATE;
                     break;
 
                 case "lastUpdateTimestamp":
@@ -292,7 +286,7 @@ public class LibraryRepository {
 
         ResultQuery<Record9<
                 ULong, String, String, String, String,
-                String, Byte, LocalDateTime, String>> query;
+                String, String, LocalDateTime, String>> query;
         if (sortField != null) {
             if (pageRequest.getOffset() >= 0 && pageRequest.getPageSize() >= 0) {
                 query = conditionStep.orderBy(sortField)
@@ -316,7 +310,7 @@ public class LibraryRepository {
             libraryList.setDescription(record.get(LIBRARY.DESCRIPTION));
             libraryList.setLink(record.get(LIBRARY.LINK));
             libraryList.setDomain(record.get(LIBRARY.DOMAIN));
-            libraryList.setEnabled(record.get(LIBRARY.IS_ENABLED) == (byte) 1);
+            libraryList.setState(record.get(LIBRARY.STATE));
             libraryList.setLastUpdateTimestamp(Date.from(record.get(LIBRARY.LAST_UPDATE_TIMESTAMP).atZone(ZoneId.systemDefault()).toInstant()));
             libraryList.setLastUpdateUser(record.get(APP_USER.as("updater").LOGIN_ID.as("last_update_user")));
             return libraryList;

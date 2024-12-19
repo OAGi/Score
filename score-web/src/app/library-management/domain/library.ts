@@ -11,7 +11,7 @@ export class Library {
   link: string;
   domain: string;
   description: string;
-  enabled: boolean;
+  state: string;
   createdBy: ScoreUser;
   lastUpdatedBy: ScoreUser;
   creationTimestamp: Date;
@@ -32,7 +32,7 @@ export class LibraryListRequest {
     organization: string;
     domain: string;
     description: string;
-    status: string[];
+    state: string;
   };
   updaterLoginIds: string[] = [];
   updatedDate: {
@@ -73,7 +73,7 @@ export class LibraryListRequest {
       organization: params.get('organization') || '',
       domain: params.get('domain') || '',
       description: params.get('description') || '',
-      status: (params.get('status')) ? Array.from(params.get('status').split(',')) : [],
+      state: params.get('state') || ''
     };
   }
 
@@ -105,8 +105,8 @@ export class LibraryListRequest {
     if (this.filters.description && this.filters.description.length > 0) {
       params = params.set('description', '' + this.filters.description);
     }
-    if (this.filters.status && this.filters.status.length > 0) {
-      params = params.set('status', this.filters.status.join(','));
+    if (this.filters.state && this.filters.state.length > 0) {
+      params = params.set('state', '' + this.filters.state);
     }
     const str = base64Encode(params.toString());
     return (str) ? 'q=' + str : undefined;

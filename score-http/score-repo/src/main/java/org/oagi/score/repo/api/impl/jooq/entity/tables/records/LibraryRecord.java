@@ -117,19 +117,19 @@ public class LibraryRecord extends UpdatableRecordImpl<LibraryRecord> {
     }
 
     /**
-     * Setter for <code>oagi.library.is_enabled</code>. Indicates whether the
-     * library is active (1) or inactive (0).
+     * Setter for <code>oagi.library.state</code>. Indicates the current status
+     * of the library.
      */
-    public void setIsEnabled(Byte value) {
+    public void setState(String value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.library.is_enabled</code>. Indicates whether the
-     * library is active (1) or inactive (0).
+     * Getter for <code>oagi.library.state</code>. Indicates the current status
+     * of the library.
      */
-    public Byte getIsEnabled() {
-        return (Byte) get(6);
+    public String getState() {
+        return (String) get(6);
     }
 
     /**
@@ -219,7 +219,7 @@ public class LibraryRecord extends UpdatableRecordImpl<LibraryRecord> {
     /**
      * Create a detached, initialised LibraryRecord
      */
-    public LibraryRecord(ULong libraryId, String name, String organization, String description, String link, String domain, Byte isEnabled, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
+    public LibraryRecord(ULong libraryId, String name, String organization, String description, String link, String domain, String state, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
         super(Library.LIBRARY);
 
         setLibraryId(libraryId);
@@ -228,7 +228,7 @@ public class LibraryRecord extends UpdatableRecordImpl<LibraryRecord> {
         setDescription(description);
         setLink(link);
         setDomain(domain);
-        setIsEnabled(isEnabled);
+        setState(state);
         setCreatedBy(createdBy);
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);

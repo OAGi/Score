@@ -98,10 +98,10 @@ public class Library extends TableImpl<LibraryRecord> {
     public final TableField<LibraryRecord, String> DOMAIN = createField(DSL.name("domain"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Specifies the area of focus or application domain of the library (e.g., agriculture, finance, or aerospace).");
 
     /**
-     * The column <code>oagi.library.is_enabled</code>. Indicates whether the
-     * library is active (1) or inactive (0).
+     * The column <code>oagi.library.state</code>. Indicates the current status
+     * of the library.
      */
-    public final TableField<LibraryRecord, Byte> IS_ENABLED = createField(DSL.name("is_enabled"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicates whether the library is active (1) or inactive (0).");
+    public final TableField<LibraryRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Indicates the current status of the library.");
 
     /**
      * The column <code>oagi.library.created_by</code>. Foreign key to the

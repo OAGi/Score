@@ -42,7 +42,7 @@ CREATE TABLE `library`
     `description`           text         DEFAULT NULL COMMENT 'A brief summary or overview of the library''s purpose and functionality.',
     `link`                  text         DEFAULT NULL COMMENT 'A URL directing to the library''s homepage, documentation, or repository for further details.',
     `domain`                varchar(100) DEFAULT NULL COMMENT 'Specifies the area of focus or application domain of the library (e.g., agriculture, finance, or aerospace).',
-    `is_enabled`            tinyint(1)   DEFAULT 0 COMMENT 'Indicates whether the library is active (1) or inactive (0).',
+    `state`                 varchar(20)  DEFAULT NULL COMMENT 'Indicates the current status of the library.',
     `created_by`            bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table referring to the user who creates the record.',
     `last_updated_by`       bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table referring to the last user who updated the record.',
     `creation_timestamp`    datetime(6)         NOT NULL COMMENT 'Timestamp when the record was created.',
@@ -54,10 +54,10 @@ CREATE TABLE `library`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
 
-INSERT INTO `library` (`library_id`, `name`, `organization`, `description`, `link`, `domain`, `is_enabled`, `created_by`, `last_updated_by`, `creation_timestamp`, `last_update_timestamp`)
+INSERT INTO `library` (`library_id`, `name`, `organization`, `description`, `link`, `domain`, `created_by`, `last_updated_by`, `creation_timestamp`, `last_update_timestamp`)
 VALUES
     (1, 'connectSpec', 'OAGi',
-     'OAGi is a US-based non-profit standards organization founded in 1995 to address interoperability challenges among ERP systems. Its scope later expanded to include interoperability across all enterprise systems and business-to-business interactions.', 'https://oagi.org/', 'Enterprise Interoperability', 1,
+     'OAGi is a US-based non-profit standards organization founded in 1995 to address interoperability challenges among ERP systems. Its scope later expanded to include interoperability across all enterprise systems and business-to-business interactions.', 'https://oagi.org/', 'Enterprise Interoperability',
      (SELECT `app_user_id` FROM `app_user` WHERE `login_id` = 'oagis'),
      (SELECT `app_user_id` FROM `app_user` WHERE `login_id` = 'oagis'),
      '2019-10-02 15:27:09.521000',

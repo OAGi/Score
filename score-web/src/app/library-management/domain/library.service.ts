@@ -25,8 +25,7 @@ export class LibraryService {
       organization: library.organization,
       link: library.link,
       domain: library.domain,
-      description: library.description,
-      enabled: false
+      description: library.description
     });
   }
 
@@ -37,7 +36,7 @@ export class LibraryService {
       link: library.link,
       domain: library.domain,
       description: library.description,
-      enabled: library.enabled
+      state: library.state
     });
   }
 
@@ -72,8 +71,8 @@ export class LibraryService {
     if (request.filters.description) {
       params = params.set('description', request.filters.description);
     }
-    if (request.filters.status) {
-      params = params.set('status', request.filters.status.join(','));
+    if (request.filters.state) {
+      params = params.set('state', request.filters.state);
     }
     return this.http.get<PageResponse<LibraryList>>('/api/library_list', {params})
         .pipe(map((resp: PageResponse<LibraryList>) => {

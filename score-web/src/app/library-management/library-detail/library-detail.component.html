@@ -47,8 +47,6 @@
                     [disabled]="!isAdmin"></textarea>
         </mat-form-field>
 
-        <mat-checkbox [checked]="library.enabled" [disabled]="true">Enable</mat-checkbox>
-
       </mat-card-content>
     </mat-card>
   </div>
@@ -62,7 +60,7 @@
                 (click)="update()">
           Update
         </button>
-        <button mat-raised-button color="warn" *ngIf="!library.enabled && isAdmin"
+        <button mat-raised-button color="warn" *ngIf="isAdmin"
                 (click)="discard()">
           Discard
         </button>
