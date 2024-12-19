@@ -34,7 +34,7 @@ import {SearchOptionsService} from '../search-options-dialog/domain/search-optio
 import {SearchOptionsDialogComponent} from '../search-options-dialog/search-options-dialog.component';
 import {FindUsagesDialogComponent} from '../find-usages-dialog/find-usages-dialog.component';
 import {Clipboard} from '@angular/cdk/clipboard';
-import {initFilter, loadBooleanProperty, saveBooleanProperty} from '../../common/utility';
+import {initFilter, loadBooleanProperty, saveBooleanProperty, trim} from '../../common/utility';
 import {RxStompService} from '../../common/score-rx-stomp';
 import {Message} from '@stomp/stompjs';
 import {MatMenuTrigger} from '@angular/material/menu';
@@ -51,6 +51,9 @@ import {SettingsPreferencesService} from '../../settings-management/settings-pre
   styleUrls: ['./bccp-detail.component.css']
 })
 export class BccpDetailComponent implements OnInit {
+
+  protected readonly trim = trim;
+
   title: string;
   _innerHeight: number = window.innerHeight;
   paddingPixel = 12;
@@ -952,5 +955,4 @@ export class BccpDetailComponent implements OnInit {
       this.scrollTree(index);
     });
   }
-
 }

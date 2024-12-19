@@ -50,7 +50,7 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 import {SearchOptionsService} from '../search-options-dialog/domain/search-options-service';
 import {SearchOptionsDialogComponent} from '../search-options-dialog/search-options-dialog.component';
 import {Clipboard} from '@angular/cdk/clipboard';
-import {initFilter, loadBooleanProperty, saveBooleanProperty} from '../../common/utility';
+import {initFilter, loadBooleanProperty, saveBooleanProperty, trim} from '../../common/utility';
 import {RxStompService} from '../../common/score-rx-stomp';
 import {Message} from '@stomp/stompjs';
 import {MatMenuTrigger} from '@angular/material/menu';
@@ -69,6 +69,9 @@ import {SettingsPreferencesService} from '../../settings-management/settings-pre
   styleUrls: ['./bdt-detail.component.css']
 })
 export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
+
+  protected readonly trim = trim;
+
   title: string;
   _innerHeight: number = window.innerHeight;
   paddingPixel = 12;

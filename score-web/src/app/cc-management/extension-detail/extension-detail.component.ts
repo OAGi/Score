@@ -42,7 +42,7 @@ import {
   Semantics,
   UserExtensionGroup
 } from '../domain/core-component-node';
-import {initFilter, loadBooleanProperty, saveBooleanProperty, UnboundedPipe} from '../../common/utility';
+import {initFilter, loadBooleanProperty, saveBooleanProperty, trim, UnboundedPipe} from '../../common/utility';
 import {AppendAssociationDialogComponent} from '../acc-detail/append-association-dialog/append-association-dialog.component';
 import {AbstractControl, FormControl, ValidationErrors, Validators} from '@angular/forms';
 import {AuthService} from '../../authentication/auth.service';
@@ -71,6 +71,9 @@ import {SettingsPreferencesService} from '../../settings-management/settings-pre
   styleUrls: ['./extension-detail.component.css']
 })
 export class ExtensionDetailComponent implements OnInit {
+
+  protected readonly trim = trim;
+
   title: string;
   _innerHeight: number = window.innerHeight;
   paddingPixel = 12;

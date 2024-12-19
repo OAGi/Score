@@ -1126,6 +1126,7 @@
                             <mat-label>{{ 'BCCP_DETAIL.PROPERTY_TERM' | translate }}</mat-label>
                             <input matInput placeholder="{{ 'BCCP_DETAIL.PROPERTY_TERM' | translate }}" maxlength="60"
                                    [(ngModel)]="asBccpDetail().bccp.propertyTerm"
+                                   (focusout)="asBccpDetail().bccp.propertyTerm = trim(asBccpDetail().bccp.propertyTerm)"
                                    [required]="true"
                                    [disabled]="!isEditable() || hasRevision()">
                           </mat-form-field>
@@ -1231,6 +1232,7 @@
                             <mat-label>Definition Source</mat-label>
                             <input matInput placeholder="Definition Source" maxlength="100"
                                    [(ngModel)]="asBccpDetail().bccp.definitionSource"
+                                   (focusout)="asBccpDetail().bccp.definitionSource = trim(asBccpDetail().bccp.definitionSource)"
                                    [disabled]="!isEditable()">
                           </mat-form-field>
                         </div>
@@ -1244,6 +1246,7 @@
                               <textarea matInput rows="6" cols="30"
                                         placeholder="Definition"
                                         [(ngModel)]="asBccpDetail().bccp.definition"
+                                        (focusout)="asBccpDetail().bccp.definition = trim(asBccpDetail().bccp.definition)"
                                         [readonly]="!isEditable()"></textarea>
                               <button mat-icon-button mat-small-icon-button
                                       *ngIf="this.state === 'WIP' && this.access === 'CanEdit' && selectedNode.level !== 0"
