@@ -37,7 +37,7 @@
 
         <mat-form-field>
           <mat-label>Domain</mat-label>
-          <input matInput [(ngModel)]="library.domain" maxlength="100"
+          <input matInput required [(ngModel)]="library.domain" maxlength="100"
                  [disabled]="!isAdmin"/>
         </mat-form-field>
 

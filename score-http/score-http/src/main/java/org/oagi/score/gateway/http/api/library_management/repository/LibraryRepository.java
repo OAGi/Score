@@ -2,14 +2,21 @@ package org.oagi.score.gateway.http.api.library_management.repository;
 
 import org.jooq.*;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.api.bie_management.service.BieService;
 import org.oagi.score.gateway.http.api.library_management.data.Library;
 import org.oagi.score.gateway.http.api.library_management.data.LibraryList;
 import org.oagi.score.gateway.http.api.library_management.data.LibraryListRequest;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.LibraryRecord;
+import org.oagi.score.gateway.http.api.release_management.data.ReleaseDetail;
+import org.oagi.score.gateway.http.api.release_management.data.ReleaseState;
+import org.oagi.score.gateway.http.api.release_management.service.ReleaseService;
+import org.oagi.score.gateway.http.helper.ScoreGuid;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.oagi.score.repo.api.user.model.ScoreRole;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.service.common.data.PageResponse;
+import org.oagi.score.service.log.LogRepository;
+import org.oagi.score.service.log.model.LogAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.access.AccessDeniedException;
@@ -20,10 +27,8 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.user.model.ScoreRole.*;
@@ -33,6 +38,15 @@ public class LibraryRepository {
 
     @Autowired
     private DSLContext dslContext;
+
+    @Autowired
+    private BieService bieService;
+
+    @Autowired
+    private ReleaseService releaseService;
+
+    @Autowired
+    private LogRepository logRepository;
 
     public List<Library> getLibraries() {
         return selectOnConditionStep()
@@ -127,10 +141,92 @@ public class LibraryRepository {
         libraryRecord.setCreationTimestamp(timestamp);
         libraryRecord.setLastUpdateTimestamp(timestamp);
 
-        return dslContext.insertInto(LIBRARY)
+        libraryRecord.setLibraryId(dslContext.insertInto(LIBRARY)
                 .set(libraryRecord)
                 .returning(LIBRARY.LIBRARY_ID)
-                .fetchOne().getLibraryId().toBigInteger();
+                .fetchOne().getLibraryId());
+
+        // Create 'Working' Release.
+        ReleaseDetail releaseDetail = new ReleaseDetail();
+        releaseDetail.setLibraryId(libraryRecord.getLibraryId().toBigInteger());
+        releaseDetail.setGuid(ScoreGuid.randomGuid());
+        releaseDetail.setReleaseNum("Working");
+        releaseDetail = releaseService.createRelease(requester, releaseDetail).getReleaseDetail();
+        ULong releaseId = ULong.valueOf(releaseDetail.getReleaseId());
+        dslContext.update(RELEASE)
+                .set(RELEASE.STATE, ReleaseState.Published.name())
+                .where(RELEASE.RELEASE_ID.eq(releaseId))
+                .execute();
+
+        // Make manifests for CDTs
+        List<DtRecord> cdtList = dslContext.selectFrom(DT)
+                .where(DT.BASED_DT_ID.isNull())
+                .fetch();
+
+        for (DtRecord cdt : cdtList) {
+            DtManifestRecord cdtManifestRecord = new DtManifestRecord();
+            cdtManifestRecord.setReleaseId(releaseId);
+            cdtManifestRecord.setDtId(cdt.getDtId());
+            cdtManifestRecord.setDen(cdt.getDataTypeTerm() + ". Type");
+            LogRecord logRecord = dslContext.selectFrom(LOG)
+                    .where(LOG.REFERENCE.eq(cdt.getGuid()))
+                    .orderBy(LOG.LOG_ID.asc())
+                    .limit(1)
+                    .fetchOptional().orElse(null);
+            cdtManifestRecord.setLogId(logRecord.getLogId());
+
+            cdtManifestRecord.setDtManifestId(dslContext.insertInto(DT_MANIFEST)
+                    .set(cdtManifestRecord)
+                    .returning(DT_MANIFEST.DT_MANIFEST_ID)
+                    .fetchOne().getDtManifestId());
+
+            List<DtScRecord> cdtScRecordList = dslContext.selectFrom(DT_SC)
+                    .where(DT_SC.OWNER_DT_ID.eq(cdt.getDtId()))
+                    .fetch();
+            for (DtScRecord cdtSc : cdtScRecordList) {
+                DtScManifestRecord cdtScManifestRecord = new DtScManifestRecord();
+                cdtScManifestRecord.setReleaseId(releaseId);
+                cdtScManifestRecord.setDtScId(cdtSc.getDtScId());
+                cdtScManifestRecord.setOwnerDtManifestId(cdtManifestRecord.getDtManifestId());
+
+                cdtScManifestRecord.setDtScManifestId(dslContext.insertInto(DT_SC_MANIFEST)
+                        .set(cdtScManifestRecord)
+                        .returning(DT_SC_MANIFEST.DT_SC_MANIFEST_ID)
+                        .fetchOne().getDtScManifestId());
+            }
+
+            if (logRecord == null) {
+                logRecord = logRepository.insertBdtLog(cdtManifestRecord, cdt, LogAction.Added, userId, timestamp);
+                cdtManifestRecord.setLogId(logRecord.getLogId());
+                dslContext.update(DT_MANIFEST)
+                        .set(DT_MANIFEST.LOG_ID, logRecord.getLogId())
+                        .where(DT_MANIFEST.DT_MANIFEST_ID.eq(cdtManifestRecord.getDtManifestId()))
+                        .execute();
+            }
+        }
+
+        List<XbtRecord> defaultXbtList = dslContext.selectFrom(XBT)
+                .where(XBT.BUILTIN_TYPE.startsWith("xsd:"))
+                .fetch();
+
+        for (XbtRecord defaultXbt : defaultXbtList) {
+            XbtManifestRecord xbtManifestRecord = new XbtManifestRecord();
+            xbtManifestRecord.setReleaseId(releaseId);
+            xbtManifestRecord.setXbtId(defaultXbt.getXbtId());
+            LogRecord logRecord = dslContext.selectFrom(LOG)
+                    .where(LOG.REFERENCE.eq(defaultXbt.getGuid()))
+                    .orderBy(LOG.LOG_ID.asc())
+                    .limit(1)
+                    .fetchOptional().orElse(null);
+            xbtManifestRecord.setLogId(logRecord.getLogId());
+            xbtManifestRecord.setXbtManifestId(
+                    dslContext.insertInto(XBT_MANIFEST)
+                            .set(xbtManifestRecord)
+                            .returning(XBT_MANIFEST.XBT_MANIFEST_ID)
+                            .fetchOne().getXbtManifestId());
+        }
+
+        return libraryRecord.getLibraryId().toBigInteger();
     }
 
     private boolean isLibraryNameAlreadyExist(String name, ULong libraryId) {
@@ -192,6 +288,34 @@ public class LibraryRepository {
                 .fetchOptional().orElse(null);
         if (libraryRecord == null) {
             throw new EmptyResultDataAccessException(1);
+        }
+
+        List<ReleaseRecord> releaseRecords = dslContext.selectFrom(RELEASE)
+                .where(RELEASE.LIBRARY_ID.eq(libraryRecord.getLibraryId()))
+                .fetch();
+        if (!releaseRecords.isEmpty()) {
+            Collection<ULong> releaseIdSet = releaseRecords.stream().map(e -> e.getReleaseId()).collect(Collectors.toSet());
+            List<BigInteger> topLevelAsbiepIds = dslContext.select(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID)
+                    .from(TOP_LEVEL_ASBIEP)
+                    .where(TOP_LEVEL_ASBIEP.RELEASE_ID.in(releaseIdSet))
+                    .fetchInto(BigInteger.class);
+            bieService.deleteBieList(requester, topLevelAsbiepIds);
+
+            dslContext.query("SET FOREIGN_KEY_CHECKS = 0").execute();
+            dslContext.deleteFrom(ACC_MANIFEST).where(ACC_MANIFEST.RELEASE_ID.in(releaseIdSet)).execute();
+            dslContext.deleteFrom(ASCC_MANIFEST).where(ASCC_MANIFEST.RELEASE_ID.in(releaseIdSet)).execute();
+            dslContext.deleteFrom(BCC_MANIFEST).where(BCC_MANIFEST.RELEASE_ID.in(releaseIdSet)).execute();
+            dslContext.deleteFrom(ASCCP_MANIFEST).where(ASCCP_MANIFEST.RELEASE_ID.in(releaseIdSet)).execute();
+            dslContext.deleteFrom(BCCP_MANIFEST).where(BCCP_MANIFEST.RELEASE_ID.in(releaseIdSet)).execute();
+            dslContext.deleteFrom(DT_MANIFEST).where(DT_MANIFEST.RELEASE_ID.in(releaseIdSet)).execute();
+            dslContext.deleteFrom(DT_SC_MANIFEST).where(DT_SC_MANIFEST.RELEASE_ID.in(releaseIdSet)).execute();
+            dslContext.deleteFrom(CODE_LIST_MANIFEST).where(CODE_LIST_MANIFEST.RELEASE_ID.in(releaseIdSet)).execute();
+            dslContext.deleteFrom(CODE_LIST_VALUE_MANIFEST).where(CODE_LIST_VALUE_MANIFEST.RELEASE_ID.in(releaseIdSet)).execute();
+            dslContext.deleteFrom(AGENCY_ID_LIST_MANIFEST).where(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.in(releaseIdSet)).execute();
+            dslContext.deleteFrom(AGENCY_ID_LIST_VALUE_MANIFEST).where(AGENCY_ID_LIST_VALUE_MANIFEST.RELEASE_ID.in(releaseIdSet)).execute();
+            dslContext.deleteFrom(XBT_MANIFEST).where(XBT_MANIFEST.RELEASE_ID.in(releaseIdSet)).execute();
+
+            dslContext.deleteFrom(RELEASE).where(RELEASE.RELEASE_ID.in(releaseIdSet)).execute();
         }
 
         libraryRecord.delete();

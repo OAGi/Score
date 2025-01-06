@@ -303,8 +303,8 @@ public class ReleaseService implements InitializingBean {
     }
 
     @Transactional
-    public ReleaseResponse createRelease(AuthenticatedPrincipal user, ReleaseDetail releaseDetail) {
-        BigInteger userId = sessionService.userId(user);
+    public ReleaseResponse createRelease(ScoreUser user, ReleaseDetail releaseDetail) {
+        BigInteger userId = user.getUserId();
         ReleaseResponse response = new ReleaseResponse();
 
         ReleaseRecord releaseRecord = repository.create(userId,

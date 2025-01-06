@@ -123,10 +123,10 @@ export class LibraryDetailComponent {
               this.snackBar.open('Discarded', '', {
                 duration: 3000,
               });
-              this.loading = false;
               this.router.navigateByUrl('/library');
             });
           }
+          this.loading = false;
         }, error => {
           this.loading = false;
           throw error;
