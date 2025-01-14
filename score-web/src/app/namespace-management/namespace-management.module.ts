@@ -37,17 +37,17 @@ const routes: Routes = [
 ];
 
 @NgModule({
-    imports: [
-        RouterModule.forChild(routes),
-        FormsModule,
-        ReactiveFormsModule,
-        MaterialModule,
-        CommonModule,
-        SearchBarModule,
-        ColumnSelectorModule,
-        ScoreCommonModule,
-        TitleWithLibrarySelector
-    ],
+  imports: [
+    RouterModule.forChild(routes),
+    FormsModule,
+    ReactiveFormsModule,
+    MaterialModule,
+    CommonModule,
+    SearchBarModule,
+    ColumnSelectorModule,
+    ScoreCommonModule,
+    TitleWithLibrarySelector
+  ],
   declarations: [
     NamespaceListComponent,
     NamespaceCreateComponent,

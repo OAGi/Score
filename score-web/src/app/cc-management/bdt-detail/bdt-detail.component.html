@@ -509,6 +509,7 @@
                             <mat-label>Qualifier</mat-label>
                             <input matInput placeholder="Qualifier" maxlength="100"
                                    [(ngModel)]="asBdtDetail().qualifier"
+                                   (focusout)="asBdtDetail().qualifier = trim(asBdtDetail().qualifier)"
                                    [disabled]="!isEditable() || hasRevision()"/>
                           </mat-form-field>
                         </div>
@@ -657,7 +658,9 @@
                           <mat-form-field>
                             <mat-label>Definition Source</mat-label>
                             <input matInput placeholder="Definition Source" maxlength="100"
-                                   [(ngModel)]="asBdtDetail().definitionSource" [disabled]="!isEditable()">
+                                   [(ngModel)]="asBdtDetail().definitionSource"
+                                   (focusout)="asBdtDetail().definitionSource = trim(asBdtDetail().definitionSource)"
+                                   [disabled]="!isEditable()">
                           </mat-form-field>
                         </div>
                       </div>
@@ -670,6 +673,7 @@
                               <textarea matInput rows="6" cols="30"
                                         placeholder="Definition"
                                         [(ngModel)]="asBdtDetail().definition"
+                                        (focusout)="asBdtDetail().definition = trim(asBdtDetail().definition)"
                                         [readonly]="!isEditable()"></textarea>
                               <button mat-icon-button mat-small-icon-button
                                       *ngIf="this.state === 'WIP' && this.access === 'CanEdit' && selectedNode.level !== 0"
@@ -690,6 +694,7 @@
                               <textarea matInput rows="6" cols="30"
                                         placeholder="Content Component Definition"
                                         [(ngModel)]="asBdtDetail().contentComponentDefinition"
+                                        (focusout)="asBdtDetail().contentComponentDefinition = trim(asBdtDetail().contentComponentDefinition)"
                                         [readonly]="!isEditable()"></textarea>
                               <button mat-icon-button mat-small-icon-button
                                       *ngIf="this.state === 'WIP' && this.access === 'CanEdit'"
@@ -822,6 +827,7 @@
                             <mat-label>Property Term</mat-label>
                             <input matInput maxlength="60"
                                    [(ngModel)]="asBdtScDetail().propertyTerm"
+                                   (focusout)="asBdtScDetail().propertyTerm = trim(asBdtScDetail().propertyTerm)"
                                    [disabled]="!isEditable() || asBdtScDetail().cardinality === 'Prohibited' || asBdtScDetail().basedDtScId > 0"
                                    [required]="true">
                           </mat-form-field>
@@ -1031,7 +1037,9 @@
                           <mat-form-field>
                             <mat-label>Definition Source</mat-label>
                             <input matInput placeholder="Definition Source" maxlength="100"
-                                   [(ngModel)]="asBdtScDetail().definitionSource" [disabled]="!isEditable()">
+                                   [(ngModel)]="asBdtScDetail().definitionSource"
+                                   (focusout)="asBdtScDetail().definitionSource = trim(asBdtScDetail().definitionSource)"
+                                   [disabled]="!isEditable()">
                           </mat-form-field>
                         </div>
                       </div>
@@ -1044,6 +1052,7 @@
                               <textarea matInput rows="6" cols="30"
                                         placeholder="Definition"
                                         [(ngModel)]="asBdtScDetail().definition"
+                                        (focusout)="asBdtScDetail().definition = trim(asBdtScDetail().definition)"
                                         [readonly]="!isEditable()"></textarea>
                               <button mat-icon-button mat-small-icon-button
                                       *ngIf="this.state === 'WIP' && this.access === 'CanEdit'"

@@ -1,0 +1,46 @@
+.filter-container {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+}
+
+.option-header {
+  border-bottom: 1px solid #e5e5e5;
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+  display: inline-block;
+}
+
+.option-body {
+  padding-top: 13px;
+}
+
+tr.detail-row {
+  height: 0;
+}
+
+tr.element-row:not(.expanded-row):hover {
+  background: #f5f5f5;
+}
+
+tr.element-row:not(.expanded-row):active {
+  background: #efefef;
+}
+
+.element-detail {
+  overflow: hidden;
+  display: flex;
+  font-size: 12px;
+}
+
+.mat-mdc-card-content p {
+  font-family: 'Roboto', 'sans-serif';
+  margin-bottom: 0.5rem;
+}
+
+.mat-mdc-card-content {
+  margin-bottom: 0;
+}
+
+.mat-column-more {
+  width: 40px;
+}

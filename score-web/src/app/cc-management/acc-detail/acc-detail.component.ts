@@ -44,13 +44,12 @@ import {
   Semantics,
   UserExtensionGroup
 } from '../domain/core-component-node';
-import {initFilter, loadBooleanProperty, saveBooleanProperty, UnboundedPipe} from '../../common/utility';
+import {emptyToUndefined, initFilter, loadBooleanProperty, saveBooleanProperty, trim, UnboundedPipe} from '../../common/utility';
 import {RefactorDialogComponent} from '../refactor-dialog/refactor-dialog.component';
 import {AppendAssociationDialogComponent} from './append-association-dialog/append-association-dialog.component';
 import {BasedAccDialogComponent} from './based-acc-dialog/based-acc-dialog.component';
 import {AbstractControl, FormControl, ValidationErrors, Validators} from '@angular/forms';
 import {AuthService} from '../../authentication/auth.service';
-import {WorkingRelease} from '../../release-management/domain/release';
 import {CommentControl} from '../domain/comment-component';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {Location} from '@angular/common';
@@ -76,6 +75,8 @@ import {SettingsPreferencesService} from '../../settings-management/settings-pre
   styleUrls: ['./acc-detail.component.css']
 })
 export class AccDetailComponent implements OnInit {
+
+  protected readonly trim = trim;
 
   faFlask = faFlask;
   title: string;

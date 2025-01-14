@@ -120,14 +120,16 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .fetchOneInto(Release.class);
     }
 
-    private void ensureUniqueReleaseNum(BigInteger releaseId, String releaseNum) {
+    private void ensureUniqueReleaseNum(BigInteger releaseId, BigInteger libraryId, String releaseNum) {
         List<Condition> conditions = new ArrayList();
+        conditions.add(LIBRARY.LIBRARY_ID.eq(ULong.valueOf(libraryId)));
         conditions.add(RELEASE.RELEASE_NUM.eq(releaseNum));
         if (releaseId != null) {
             conditions.add(RELEASE.RELEASE_ID.ne(ULong.valueOf(releaseId)));
         }
         if (dslContext.selectCount()
                 .from(RELEASE)
+                .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .where(conditions)
                 .fetchOptionalInto(Integer.class).orElse(0) > 0) {
             throw new IllegalArgumentException("'" + releaseNum + "' is already exist.");
@@ -141,7 +143,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                                 BigInteger libraryId,
                                 BigInteger namespaceId) {
 
-        ensureUniqueReleaseNum(null, releaseNum);
+        ensureUniqueReleaseNum(null, libraryId, releaseNum);
 
         LocalDateTime timestamp = LocalDateTime.now();
         ReleaseRecord releaseRecord = dslContext.insertInto(RELEASE)
@@ -168,7 +170,14 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                        String releaseLicense,
                        BigInteger namespaceId) {
 
-        ensureUniqueReleaseNum(releaseId, releaseNum);
+        ReleaseRecord releaseRecord = dslContext.selectFrom(RELEASE)
+                .where(RELEASE.RELEASE_ID.eq(ULong.valueOf(releaseId)))
+                .fetchOptional().orElse(null);
+        if (releaseRecord == null) {
+            throw new IllegalArgumentException("The release with the ID [" + releaseId + "] is not exist.");
+        }
+
+        ensureUniqueReleaseNum(releaseId, releaseRecord.getLibraryId().toBigInteger(), releaseNum);
 
         LocalDateTime timestamp = LocalDateTime.now();
         dslContext.update(RELEASE)

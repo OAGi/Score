@@ -757,6 +757,7 @@
                             <mat-label>{{ 'ASCCP_DETAIL.PROPERTY_TERM' | translate }}</mat-label>
                             <input matInput placeholder="{{ 'ASCCP_DETAIL.PROPERTY_TERM' | translate }}" maxlength="100"
                                    [(ngModel)]="asAsccpDetail().asccp.propertyTerm"
+                                   (focusout)="asAsccpDetail().asccp.propertyTerm = trim(asAsccpDetail().asccp.propertyTerm)"
                                    [required]="true"
                                    [disabled]="!isEditable() || hasRevision()">
                           </mat-form-field>
@@ -836,6 +837,7 @@
                             <mat-label>Definition Source</mat-label>
                             <input matInput placeholder="Definition Source" maxlength="100"
                                    [(ngModel)]="asAsccpDetail().asccp.definitionSource"
+                                   (focusout)="asAsccpDetail().asccp.definitionSource = trim(asAsccpDetail().asccp.definitionSource)"
                                    [disabled]="!isEditable()">
                           </mat-form-field>
                         </div>
@@ -849,6 +851,7 @@
                               <textarea matInput rows="6" cols="30"
                                         placeholder="Definition"
                                         [(ngModel)]="asAsccpDetail().asccp.definition"
+                                        (focusout)="asAsccpDetail().asccp.definition = trim(asAsccpDetail().asccp.definition)"
                                         [readonly]="!isEditable()"></textarea>
                               <button mat-icon-button mat-small-icon-button
                                       *ngIf="this.state === 'WIP' && this.access === 'CanEdit' && selectedNode.level !== 0"

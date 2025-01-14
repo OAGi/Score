@@ -224,8 +224,14 @@ export function emptyToUndefined(value: string): string {
   if (!value) {
     return undefined;
   }
-  value = value.trim();
-  return value.length === 0 ? undefined : value;
+  return value.trim().length === 0 ? undefined : value;
+}
+
+export function trim(value: string): string {
+  if (!value) {
+    return value;
+  }
+  return value.trim();
 }
 
 @Pipe({name: 'unbounded'})

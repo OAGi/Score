@@ -253,7 +253,7 @@ public class BieListController {
     public ResponseEntity deleteBieList(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                         @RequestBody DeleteBieListRequest request) {
         List<BigInteger> topLevelAsbiepIds = request.getTopLevelAsbiepIds();
-        bieService.deleteBieList(user, topLevelAsbiepIds);
+        bieService.deleteBieList(sessionService.asScoreUser(user), topLevelAsbiepIds);
 
         for (BigInteger topLevelAsbiepId : topLevelAsbiepIds) {
             BieEvent event = new BieEvent();

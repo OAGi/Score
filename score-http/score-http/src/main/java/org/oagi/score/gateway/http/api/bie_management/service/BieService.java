@@ -340,7 +340,7 @@ public class BieService {
     }
 
     @Transactional
-    public void deleteBieList(AuthenticatedPrincipal requester, List<BigInteger> topLevelAsbiepIds) {
+    public void deleteBieList(ScoreUser requester, List<BigInteger> topLevelAsbiepIds) {
         if (topLevelAsbiepIds == null || topLevelAsbiepIds.isEmpty()) {
             return;
         }
@@ -431,8 +431,7 @@ public class BieService {
                 .execute();
     }
 
-    private void ensureProperDeleteBieRequest(AuthenticatedPrincipal prinpical, List<BigInteger> topLevelAsbiepIds) {
-        ScoreUser requester = sessionService.asScoreUser(prinpical);
+    private void ensureProperDeleteBieRequest(ScoreUser requester, List<BigInteger> topLevelAsbiepIds) {
         // Issue #1569
         // check to see if the BIE is referenced in an OpenAPI document
         Result<Record1<ULong>> resultForOasDocId = dslContext.select(OAS_DOC.OAS_DOC_ID)

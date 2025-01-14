@@ -27,6 +27,7 @@ import {
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {AuthService} from '../../../authentication/auth.service';
 import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
+import {SearchBarComponent} from '../../../common/search-bar/search-bar.component';
 
 @Component({
   selector: 'score-create-bccp-dialog',
@@ -174,6 +175,7 @@ export class CreateBccpDialogComponent implements OnInit {
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
+  @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
 
   constructor(public dialogRef: MatDialogRef<CcListComponent>,
               private auth: AuthService,
@@ -188,7 +190,7 @@ export class CreateBccpDialogComponent implements OnInit {
 
   ngOnInit() {
     this.request = new CcListRequest();
-    this.request.commonlyUsed = [];
+    this.request.commonlyUsed = [true,];
     this.request.library.libraryId = this.data.libraryId;
     this.request.release.releaseId = this.data.releaseId;
     this.action = this.data.action;
@@ -197,6 +199,9 @@ export class CreateBccpDialogComponent implements OnInit {
     this.request.states = ['Published'];
     this.request.excludes = this.data.excludes ? this.data.excludes : [];
     this.request.states = [];
+
+    // Setting 'showAdvancedSearch' to 'true' ensures that the 'Commonly Used' flag is displayed by default.
+    this.searchBar.showAdvancedSearch = true;
 
     this.paginator.pageIndex = 0;
     this.paginator.pageSize = 10;

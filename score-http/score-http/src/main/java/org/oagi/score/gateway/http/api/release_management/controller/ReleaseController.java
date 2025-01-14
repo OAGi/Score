@@ -125,7 +125,7 @@ public class ReleaseController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ReleaseResponse createRelease(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                          @RequestBody ReleaseDetail releaseDetail) {
-        return service.createRelease(user, releaseDetail);
+        return service.createRelease(sessionService.asScoreUser(user), releaseDetail);
     }
 
     @RequestMapping(value = "/release/{id:[\\d]+}", method = RequestMethod.POST,

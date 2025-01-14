@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Get the current date in YYYYMMDD format
+current_date=$(date +%Y%m%d)
+
 if ! [[ -x "$(command -v npm)" ]]; then
   echo "Error: npm is not installed. See https://docs.npmjs.com/downloading-and-installing-node-js-and-npm for details." >&2
   exit 1
@@ -33,9 +36,9 @@ cp -rf ../docs/user_guide/_build/html docker/docs
 
 echo "Building docker image..."
 cd docker
-docker build --no-cache -f Dockerfile -t oagi1docker/srt-web:3.4.0 .
+docker build --no-cache -f Dockerfile -t oagi1docker/srt-web:3.4.0-$current_date .
 
 echo "Scanning vulnerabilities..."
-docker scout cves oagi1docker/srt-web:3.4.0
+docker scout cves oagi1docker/srt-web:3.4.0-$current_date
 
 echo "Done."

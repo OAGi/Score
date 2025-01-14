@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {PreferencesInfo} from './preferences';
+import {PreferencesInfo, TableColumnsProperty} from './preferences';
 import {UserToken} from '../../../authentication/domain/auth';
 import {loadBooleanProperty, loadProperty, saveBooleanProperty, saveProperty} from '../../../common/utility';
 
@@ -31,6 +31,8 @@ export class SettingsPreferencesService {
 
   TABLE_COLUMNS_FOR_MODULE_SET_PAGE_KEY = 'TableColumns-ModuleSetPage';
   TABLE_COLUMNS_FOR_MODULE_SET_RELEASE_PAGE_KEY = 'TableColumns-ModuleSetReleasePage';
+
+  TABLE_COLUMNS_FOR_LIBRARY_PAGE_KEY = 'TableColumns-LibraryPage';
 
   TABLE_COLUMNS_FOR_BIE_PAGE_KEY = 'TableColumns-BiePage';
   TABLE_COLUMNS_FOR_BIE_REUSE_REPORT_PAGE_KEY = 'TableColumns-BieReuseReportPage';
@@ -62,6 +64,11 @@ export class SettingsPreferencesService {
     return new Observable(subscriber => {
       const preferencesInfo = new PreferencesInfo();
 
+      preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode = loadBooleanProperty(
+          userToken, this.PAGE_SETTINGS_BROWSER_VIEW_MODE_PROPERTY_KEY, (userToken.roles.includes('developer') ? false : true));
+      preferencesInfo.viewSettingsInfo.treeSettings.delimiter = loadProperty(
+          userToken, this.TREE_SETTINGS_PATH_DELIMITER_PROPERTY_KEY, '.');
+
       preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage)));
@@ -77,9 +84,19 @@ export class SettingsPreferencesService {
       preferencesInfo.tableColumnsInfo.columnsOfCoreComponentForNounBODPage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_FOR_NOUN_BOD_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfCoreComponentForNounBODPage)));
+      // Issue #1650
+      if (preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode) {
+        preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage.forEach((columnInfo: TableColumnsProperty) => {
+          if ('ASCCP' === columnInfo.name) {
+            columnInfo.selected = true;
+          } else {
+            columnInfo.selected = false;
+          }
+        });
+      }
       preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage =
-        JSON.parse(loadProperty(userToken, this.FILTER_TYPES_FOR_CORE_COMPONENT_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage)));
+          JSON.parse(loadProperty(userToken, this.FILTER_TYPES_FOR_CORE_COMPONENT_PAGE_KEY,
+              JSON.stringify(preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage)));
       preferencesInfo.tableColumnsInfo.columnsOfCoreComponentAccRefactorPage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_ACC_REFACTOR_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfCoreComponentAccRefactorPage)));
@@ -178,11 +195,6 @@ export class SettingsPreferencesService {
       preferencesInfo.tableColumnsInfo.columnsOfAssignedBusinessTermPage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_ASSIGNED_BUSINESS_TERM_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfAssignedBusinessTermPage)));
-
-      preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode = loadBooleanProperty(
-        userToken, this.PAGE_SETTINGS_BROWSER_VIEW_MODE_PROPERTY_KEY, (userToken.roles.includes('developer') ? false : true));
-      preferencesInfo.viewSettingsInfo.treeSettings.delimiter = loadProperty(
-        userToken, this.TREE_SETTINGS_PATH_DELIMITER_PROPERTY_KEY, '.');
 
       subscriber.next(preferencesInfo);
       subscriber.complete();
@@ -301,6 +313,11 @@ export class SettingsPreferencesService {
   updateTableColumnsForModuleSetReleasePage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
     return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_MODULE_SET_RELEASE_PAGE_KEY,
       preferencesInfo.tableColumnsInfo.columnsOfModuleSetReleasePage);
+  }
+
+  updateTableColumnsForLibraryPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_LIBRARY_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfLibraryPage);
   }
 
   updateTableColumnsForBiePage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
