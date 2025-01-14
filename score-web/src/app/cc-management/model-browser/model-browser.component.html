@@ -442,7 +442,7 @@
                               <mat-form-field *ngIf="asBccpDetail().bdt.valueDomainType === 'Primitive'">
                                 <mat-label>Value Domain</mat-label>
                                 <mat-select placeholder="Value Domain" required
-                                            [value]="asBccpDetail().bdt.defaultBdtPriRestri.bdtPriRestriId">
+                                            [value]="asBccpDetail().bdt.defaultBdtPriRestri?.bdtPriRestriId">
                                   <mat-option *ngFor="let xbt of asBccpDetail().bdt.bdtPriRestriList"
                                               [value]="xbt.bdtPriRestriId" [disabled]="true">
                                     {{ xbt.xbtName }}
@@ -572,7 +572,7 @@
                               <mat-form-field *ngIf="asBdtScDetail().bdtSc.valueDomainType === 'Primitive'">
                                 <mat-label>Value Domain</mat-label>
                                 <mat-select placeholder="Value Domain" required
-                                            [value]="asBdtScDetail().bdtSc.defaultBdtScPriRestri.bdtScPriRestriId">
+                                            [value]="asBdtScDetail().bdtSc.defaultBdtScPriRestri?.bdtScPriRestriId">
                                   <mat-option *ngFor="let xbt of asBdtScDetail().bdtSc.bdtScPriRestriList"
                                               [value]="xbt.bdtScPriRestriId" [disabled]="true">
                                     {{ xbt.xbtName }}
