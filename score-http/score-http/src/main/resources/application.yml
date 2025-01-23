@@ -47,3 +47,4 @@ logging:
 
 resource-server:
   jwk-set-uri: ${RS_JWK_SET_URI:}
+  allowed-types: ${RS_ALLOWED_TYPES:JWT,at+jwt}
