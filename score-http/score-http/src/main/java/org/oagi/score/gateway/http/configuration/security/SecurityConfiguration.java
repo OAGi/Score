@@ -1,5 +1,8 @@
 package org.oagi.score.gateway.http.configuration.security;
 
+import com.nimbusds.jose.JOSEObjectType;
+import com.nimbusds.jose.proc.DefaultJOSEObjectTypeVerifier;
+import com.nimbusds.jose.proc.JOSEObjectTypeVerifier;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,6 +31,7 @@ import org.springframework.security.oauth2.client.web.DefaultOAuth2Authorization
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
@@ -42,6 +46,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 @Configuration
 public class SecurityConfiguration {
@@ -66,6 +71,8 @@ public class SecurityConfiguration {
     @Value("${resource-server.jwk-set-uri}")
     private String jwkSetUri;
 
+    @Value("${resource-server.allowed-types}")
+    private String alowedTypes;
 
     @Bean
     public OAuth2AuthorizationRequestResolver oAuth2AuthorizationRequestResolver() {
@@ -144,6 +151,14 @@ public class SecurityConfiguration {
     )
             throws Exception {
         if (!applicationConfigurationService.isTenantEnabled() && StringUtils.hasText(jwkSetUri)) {
+            JOSEObjectTypeVerifier typeVerifier = StringUtils.hasLength(alowedTypes) ?
+                    new DefaultJOSEObjectTypeVerifier<>(
+                            Arrays.stream(alowedTypes.split(","))
+                                    .map(e -> new JOSEObjectType(e.trim()))
+                                    .collect(Collectors.toSet())
+                    ) :
+                    DefaultJOSEObjectTypeVerifier.JWT;
+
             http
                     .securityMatchers((matchers) -> matchers
                             .requestMatchers("/ext/**"))
@@ -157,8 +172,12 @@ public class SecurityConfiguration {
 
                     .cors(cors -> cors.disable())
                     .csrf(csrf -> csrf.disable())
-                    .oauth2ResourceServer((oauth2) -> oauth2.jwt(jwt -> jwt
-                            .jwkSetUri(jwkSetUri)));
+                    .oauth2ResourceServer(oauth2 ->
+                            oauth2.jwt(jwt -> jwt.decoder(
+                                    NimbusJwtDecoder.withJwkSetUri(jwkSetUri)
+                                            .jwtProcessorCustomizer(processor ->
+                                                    processor.setJWSTypeVerifier(typeVerifier)).build()
+                            )));
         } else {
             http
                     .securityMatchers((matchers) -> matchers
