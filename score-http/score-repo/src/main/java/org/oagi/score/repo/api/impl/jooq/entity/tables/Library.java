@@ -34,6 +34,7 @@ import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BiePackage.BiePackagePath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleSet.ModuleSetPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Namespace.NamespacePath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Release.ReleasePath;
@@ -233,6 +234,19 @@ public class Library extends TableImpl<LibraryRecord> {
             _libraryLastUpdatedByFk = new AppUserPath(this, Keys.LIBRARY_LAST_UPDATED_BY_FK, null);
 
         return _libraryLastUpdatedByFk;
+    }
+
+    private transient BiePackagePath _biePackage;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bie_package</code>
+     * table
+     */
+    public BiePackagePath biePackage() {
+        if (_biePackage == null)
+            _biePackage = new BiePackagePath(this, null, Keys.BIE_PACKAGE_LIBRARY_ID_FK.getInverseKey());
+
+        return _biePackage;
     }
 
     private transient ModuleSetPath _moduleSet;

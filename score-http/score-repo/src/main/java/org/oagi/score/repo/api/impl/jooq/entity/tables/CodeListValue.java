@@ -104,7 +104,7 @@ public class CodeListValue extends TableImpl<CodeListValueRecord> {
      * explanation of the code list value, e.g., 'Each' for EA, 'English' for
      * EN.
      */
-    public final TableField<CodeListValueRecord, String> MEANING = createField(DSL.name("meaning"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The description or explanation of the code list value, e.g., 'Each' for EA, 'English' for EN.");
+    public final TableField<CodeListValueRecord, String> MEANING = createField(DSL.name("meaning"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "The description or explanation of the code list value, e.g., 'Each' for EA, 'English' for EN.");
 
     /**
      * The column <code>oagi.code_list_value.definition</code>. Long description

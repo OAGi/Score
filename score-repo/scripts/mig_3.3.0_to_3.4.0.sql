@@ -32,6 +32,9 @@ ALTER TABLE `agency_id_list_value`
 UPDATE `agency_id_list_value` SET `is_developer_default` = 1 WHERE `name` = 'OAGi (Open Applications Group, Incorporated)';
 UPDATE `agency_id_list_value` SET `is_user_default` = 1 WHERE `name` = 'Mutually defined';
 
+-- Increase the size of `code_list_value`.`meaning`
+ALTER TABLE `code_list_value` MODIFY `meaning` TINYTEXT DEFAULT NULL COMMENT 'The description or explanation of the code list value, e.g., ''Each'' for EA, ''English'' for EN.';
+
 -- Support for Multi-Library
 DROP TABLE IF EXISTS `library`;
 CREATE TABLE `library`
@@ -76,3 +79,7 @@ ALTER TABLE `namespace` ADD UNIQUE KEY `namespace_uk1` (`library_id`, `uri`);
 ALTER TABLE `module_set` ADD COLUMN `library_id` bigint(20) unsigned NOT NULL COMMENT 'A foreign key pointed to a library of the current record.' AFTER `module_set_id`;
 UPDATE `module_set` SET `library_id` = 1;
 ALTER TABLE `module_set` ADD CONSTRAINT `module_set_library_id_fk` FOREIGN KEY (`library_id`) REFERENCES `library` (`library_id`);
+
+ALTER TABLE `bie_package` ADD COLUMN `library_id` bigint(20) unsigned NOT NULL COMMENT 'A foreign key pointed to a library of the current record.' AFTER `bie_package_id`;
+UPDATE `bie_package` SET `library_id` = 1;
+ALTER TABLE `bie_package` ADD CONSTRAINT `bie_package_library_id_fk` FOREIGN KEY (`library_id`) REFERENCES `library` (`library_id`);
