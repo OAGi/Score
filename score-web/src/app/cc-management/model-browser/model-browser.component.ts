@@ -245,6 +245,20 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
     });
   }
 
+  openDiagram(node: ModelBrowserNode) {
+    if (!node) {
+      return;
+    }
+
+    if (this.isAccDetail(node)) {
+      window.open('/core_component/browser/asccp/' + this.asAccDetail(node).asccp.manifestId + '/plantuml', '_blank');
+    } else if (this.isAsccpDetail(node)) {
+      window.open('/core_component/browser/asccp/' + this.asAsccpDetail(node).asccp.manifestId + '/plantuml', '_blank');
+    } else {
+      return;
+    }
+  }
+
   copyLink(node: ModelBrowserNode, $event?) {
     if ($event) {
       $event.preventDefault();

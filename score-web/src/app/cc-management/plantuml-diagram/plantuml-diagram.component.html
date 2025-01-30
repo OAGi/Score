@@ -1,0 +1,26 @@
+<div class="d-flex justify-content-center">
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner [diameter]="40"></mat-spinner>
+  </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <mat-tab-group>
+          <mat-tab label="Diagram">
+            <div class="content-wrapper">
+              <div class="content overflow-container" [innerHTML]="sanitizedSvgContent">
+              </div>
+            </div>
+          </mat-tab>
+          <mat-tab label="PlantUML">
+            <div class="plantuml-container">
+              <pre *ngIf="!!plantUmlTxt">
+                <span *ngFor="let line of plantUmlTxt.split('\n')">{{ line | replaceAll: '\t' : '   ' }}</span>
+              </pre>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+    </div>
+  </div>
+</div>

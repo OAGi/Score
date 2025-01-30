@@ -1,0 +1,35 @@
+.content-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: auto;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+}
+
+.overflow-container {
+    display: inline-block; /* Ensure content dimensions are respected */
+    overflow: auto; /* Enable scrolling when the content overflows */
+}
+
+.plantuml-container {
+    background-color: #f8f8f8;
+}
+
+.plantuml-container pre {
+    padding: 0 1rem;
+}
+
+.plantuml-container pre span {
+    display: block;
+    line-height: 1.5rem;
+    counter-increment: line;
+}
+
+.plantuml-container pre span:before {
+    content: counter(line);
+    display: inline-block;
+    width: 40px;
+    color: #888
+}

@@ -410,3 +410,12 @@ export class PastTensePipe implements PipeTransform {
   }
 
 }
+
+@Pipe({
+  name: 'replaceAll'
+})
+export class ReplaceAllPipe implements PipeTransform {
+  transform(value: string, searchValue: string | RegExp, replaceValue: string): string {
+    return value.replaceAll(searchValue, replaceValue);
+  }
+}

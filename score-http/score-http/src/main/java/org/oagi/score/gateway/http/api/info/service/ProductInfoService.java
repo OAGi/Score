@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisServerCommands;
-import org.springframework.data.redis.core.types.RedisClientInfo;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
@@ -22,7 +21,6 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -40,7 +38,6 @@ public class ProductInfoService {
 
     @Autowired
     private RedisConnectionFactory redisConnectionFactory;
-
 
     private InputStream getResourceAsStream(String resourcePath) {
         InputStream inputStream = getClass().getResourceAsStream(resourcePath);

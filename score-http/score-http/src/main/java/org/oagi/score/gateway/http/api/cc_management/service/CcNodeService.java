@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.cc_management.service;
 
+import com.google.common.collect.Streams;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jooq.DSLContext;
 import org.jooq.types.ULong;
@@ -13,6 +14,7 @@ import org.oagi.score.gateway.http.api.graph.service.GraphService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.redis.event.EventHandler;
 import org.oagi.score.repo.CoreComponentRepository;
+import org.oagi.score.repo.api.corecomponent.model.EntityType;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.oagi.score.repo.component.acc.*;
@@ -41,6 +43,7 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.jooq.impl.DSL.and;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.ACC;
@@ -106,6 +109,9 @@ public class CcNodeService extends EventHandler {
 
     @Autowired
     private GraphContextRepository graphContextRepository;
+
+    @Autowired
+    private BdtReadRepository bdtReadRepository;
 
     public CcAccNode getAccNode(AuthenticatedPrincipal user, BigInteger manifestId) {
         return repository.getAccNodeByAccManifestId(user, manifestId);
@@ -1720,4 +1726,145 @@ public class CcNodeService extends EventHandler {
         response.setAccManifestId(accManifestRecord.getAccManifestId().toBigInteger());
         return response;
     }
+
+    private List<String> getPositions(int n) {
+        String[] directions = {"d", "r", "u", "l", "d", "u", "d", "u"};
+
+        return IntStream.range(0, n)
+                .mapToObj(i -> {
+                    return directions[i % 8];
+                })
+                .collect(Collectors.toList());
+    }
+
+    public String generatePlantUmlText(BigInteger asccpManifestId,
+                                       String asccpLinkTemplate,
+                                       String bccpLinkTemplate) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("@startuml\n");
+        sb.append("!pragma layout smetana\n");
+        String styleName = "link_style";
+        sb.append("<style>\n")
+                .append("\t").append("classDiagram {\n")
+                .append("\t\t").append("class {\n")
+                .append("\t\t\t").append("header {\n")
+                .append("\t\t\t\t").append(".").append(styleName).append(" {\n")
+                .append("\t\t\t\t\t").append("FontColor blue\n")
+                .append("\t\t\t\t}\n")
+                .append("\t\t\t}\n")
+                .append("\t\t}\n")
+                .append("\t}\n")
+                .append("</style>\n");
+        sb.append("\n");
+
+        AsccpManifestRecord asccpManifestRecord = asccpReadRepository.getAsccpManifestById(asccpManifestId);
+        AccManifestRecord accManifestRecord = accReadRepository.getAccManifest(asccpManifestRecord.getRoleOfAccManifestId().toBigInteger());
+        AccRecord accRecord = accReadRepository.getAccByManifestId(asccpManifestRecord.getRoleOfAccManifestId().toBigInteger());
+
+        String accObjectClassTerm = accRecord.getObjectClassTerm().replaceAll(" ", "");
+        sb.append("class ").append(accObjectClassTerm).append(" {\n");
+
+        StringBuilder attributesSb = new StringBuilder();
+        StringBuilder propertiesSb = new StringBuilder();
+
+        Stack<AccManifestRecord> accManifestRecordStack = new Stack();
+        accManifestRecordStack.add(accManifestRecord);
+
+        while (accManifestRecord.getBasedAccManifestId() != null) {
+            accManifestRecord = accReadRepository.getAccManifest(
+                    accManifestRecord.getBasedAccManifestId().toBigInteger());
+            accManifestRecordStack.add(accManifestRecord);
+        }
+
+        List<AsccManifestRecord> asccManifestRecordList = new ArrayList<>();
+
+        while (!accManifestRecordStack.isEmpty()) {
+            accManifestRecord = accManifestRecordStack.pop();
+
+            CoreComponentGraphContext coreComponentGraphContext =
+                    graphContextRepository.buildGraphContext(accManifestRecord);
+            List<Node> children = new ArrayList<>(coreComponentGraphContext.findChildren(
+                    coreComponentGraphContext.toNode(accManifestRecord), true));
+
+            while (!children.isEmpty()) {
+                Node child = children.remove(0);
+                if (child.getType() == Node.NodeType.ASCC) {
+                    AsccManifestRecord asccChild =
+                            asccReadRepository.getAsccManifestById(child.getManifestId().toBigInteger());
+                    AsccpManifestRecord toAsccp = asccpReadRepository.getAsccpManifestById(asccChild.getToAsccpManifestId().toBigInteger());
+                    AccRecord roleOfAcc = accReadRepository.getAccByManifestId(toAsccp.getRoleOfAccManifestId().toBigInteger());
+                    if (OagisComponentType.valueOf(roleOfAcc.getOagisComponentType()).isGroup()) {
+                        children.addAll(0, coreComponentGraphContext.findChildren(
+                                coreComponentGraphContext.toNode(
+                                        accReadRepository.getAccManifest(toAsccp.getRoleOfAccManifestId().toBigInteger())
+                                ), true));
+                    } else {
+                        asccManifestRecordList.add(asccChild);
+                    }
+                } else if (child.getType() == Node.NodeType.BCC) {
+                    BccManifestRecord bccChild =
+                            bccReadRepository.getBccManifestById(child.getManifestId().toBigInteger());
+                    BccRecord bcc = bccReadRepository.getBccByManifestId(bccChild.getBccManifestId().toBigInteger());
+                    StringBuilder bccSb;
+                    if (EntityType.valueOf(bcc.getEntityType()) == EntityType.Attribute) {
+                        bccSb = attributesSb;
+                    } else {
+                        bccSb = propertiesSb;
+                    }
+                    BccpManifestRecord bccpManifestRecord = bccpReadRepository.getBccpManifestByManifestId(bccChild.getToBccpManifestId().toBigInteger());
+                    BccpRecord bccpRecord = bccpReadRepository.getBccpByManifestId(bccChild.getToBccpManifestId().toBigInteger());
+                    String bccpPropertyTerm = bccpRecord.getPropertyTerm().replaceAll(" ", "");
+                    DtRecord dtRecord = bdtReadRepository.getDtByDtManifestId(bccpManifestRecord.getBdtManifestId().toBigInteger());
+                    String dtDataTypeTerm = dtRecord.getDataTypeTerm().replaceAll(" ", "");
+
+                    bccSb.append("\t").append(dtDataTypeTerm)
+                            .append(" [[")
+                            .append(bccpLinkTemplate.replaceAll("\\{manifestId\\}", bccpManifestRecord.getBccpManifestId().toString()))
+                            .append(" ").append(bccpPropertyTerm)
+                            .append("]]\n");
+                }
+            }
+        }
+
+        sb.append(attributesSb);
+        sb.append(propertiesSb);
+        sb.append("}\n");
+
+        StringBuilder classesSb = new StringBuilder();
+        StringBuilder relationshipSb = new StringBuilder();
+
+        List<String> positions = getPositions(asccManifestRecordList.size());
+        Streams.zip(asccManifestRecordList.stream(), positions.stream(), (r, s) -> Pair.of(r, s)).forEach(pair -> {
+            AsccManifestRecord asccManifestRecord = pair.getLeft();
+            String pos = pair.getRight();
+
+            AsccRecord asccRecord = asccReadRepository.getAsccByManifestId(asccManifestRecord.getAsccManifestId().toBigInteger());
+            AsccpRecord asccpRecord = asccpReadRepository.getAsccpByManifestId(asccManifestRecord.getToAsccpManifestId().toBigInteger());
+            if ("Extension".equals(asccpRecord.getPropertyTerm())) {
+                pos = "d";
+            }
+            String asccpPropertyTerm = "\"<u>" + asccpRecord.getPropertyTerm().replaceAll(" ", "") + "\"";
+
+            classesSb.append("\n");
+            classesSb.append("class ").append(asccpPropertyTerm).append(" <<").append(styleName).append(">> [[")
+                    .append(asccpLinkTemplate.replaceAll("\\{manifestId\\}", asccManifestRecord.getToAsccpManifestId().toString()))
+                    .append("]] {\n")
+                    .append("}\n");
+
+            relationshipSb.append(accObjectClassTerm).append(" o-").append(pos).append("- \"").append(asccRecord.getCardinalityMin()).append("...")
+                    .append(asccRecord.getCardinalityMax() == -1 ? "∞" : asccRecord.getCardinalityMax()).append("\" ").append(asccpPropertyTerm).append("\n");
+        });
+
+        sb.append(classesSb);
+        sb.append("\n");
+        sb.append(relationshipSb);
+        sb.append("\n");
+
+        sb.append("hide circle\n");
+        sb.append("hide <<").append(styleName).append(">> stereotype\n");
+        sb.append("@enduml");
+
+        return sb.toString();
+    }
+
 }

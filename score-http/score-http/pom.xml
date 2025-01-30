@@ -40,6 +40,7 @@
         <commons-text.version>1.13.0</commons-text.version>
         <fastods.version>0.8.1</fastods.version>
         <poi.version>5.4.0</poi.version>
+        <plantuml.version>1.2025.0</plantuml.version>
         <snakeyaml.version>2.3</snakeyaml.version>
         <saxon.version>10.6</saxon.version>
     </properties>
@@ -214,6 +215,11 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>${poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.plantuml</groupId>
+            <artifactId>plantuml-mit</artifactId>
+            <version>${plantuml.version}</version>
         </dependency>
 
         <dependency>

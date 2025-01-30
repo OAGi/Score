@@ -14,11 +14,19 @@ import {MaterialModule} from '../../material.module';
 import {ConfirmDialogModule} from '../../common/confirm-dialog/confirm-dialog.module';
 import {ScoreCommonModule} from '../../common/score-common.module';
 import {ModelBrowserService} from './domain/model-browser.service';
+import {PlantUmlDiagramComponent} from '../plantuml-diagram/plantuml-diagram.component';
+import {PlantUmlService} from '../plantuml-diagram/domain/plantuml.service';
+import {MarkdownModule} from 'ngx-markdown';
 
 const routes: Routes = [
   {
     path: 'core_component/browser/:type/:manifestId',
     children: [
+      {
+        path: 'plantuml',
+        component: PlantUmlDiagramComponent,
+        canActivate: [AuthService],
+      },
       {
         path: '**',
         component: ModelBrowserComponent,
@@ -42,13 +50,16 @@ const routes: Routes = [
     MatDialogModule,
     NgxMatSelectSearchModule,
     AngularSplitModule,
+    MarkdownModule,
     FontAwesomeModule
   ],
   declarations: [
-    ModelBrowserComponent
+    ModelBrowserComponent,
+    PlantUmlDiagramComponent
   ],
   providers: [
-    ModelBrowserService
+    ModelBrowserService,
+    PlantUmlService
   ]
 })
 export class ModelBrowserModule {
