@@ -108,10 +108,11 @@ public class BiePackageController {
     }
 
     @RequestMapping(value = "/bie_packages", method = RequestMethod.POST)
-    public CreateBiePackageResponse createBiePackage(@AuthenticationPrincipal AuthenticatedPrincipal user)
+    public CreateBiePackageResponse createBiePackage(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                                     @RequestBody CreateBiePackageRequest request)
             throws ScoreDataAccessException {
 
-        CreateBiePackageRequest request = new CreateBiePackageRequest(sessionService.asScoreUser(user));
+        request.setRequester(sessionService.asScoreUser(user));
         return service.createBiePackage(request);
     }
 

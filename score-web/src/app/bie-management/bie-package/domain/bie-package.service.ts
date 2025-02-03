@@ -95,8 +95,10 @@ export class BiePackageService {
     return this.http.get<PageResponse<BieList>>('/api/bie_packages/' + request.biePackageId + '/bie_list', {params});
   }
 
-  create(): Observable<number> {
-    return this.http.post('/api/bie_packages', {}).pipe(map(resp => Number(resp['biePackageId'])));
+  create(libraryId: number): Observable<number> {
+    return this.http.post('/api/bie_packages', {
+      libraryId
+    }).pipe(map(resp => Number(resp['biePackageId'])));
   }
 
   get(biePackageId: number): Observable<BiePackage> {

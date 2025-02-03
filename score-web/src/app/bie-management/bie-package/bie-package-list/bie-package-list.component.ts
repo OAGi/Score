@@ -433,7 +433,7 @@ export class BiePackageListComponent implements OnInit {
   }
 
   create() {
-    this.biePackageService.create().subscribe(biePackageId => {
+    this.biePackageService.create(this.request.library.libraryId).subscribe(biePackageId => {
       this.snackBar.open('Created', '', {
         duration: 3000,
       });

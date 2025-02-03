@@ -698,7 +698,7 @@ export class DtScFlatNode extends CcFlatNodeImpl {
   get name(): string {
     const propertyTerm = this.dtScNode.propertyTerm || '';
     const middle = propertyTerm.replace(this.dtScNode.representationTerm, '').trim();
-    if (middle) {
+    if (middle && this.dtScNode.objectClassTerm !== middle) {
       return this.dtScNode.objectClassTerm + '. '
         + middle + '. '
         + this.dtScNode.representationTerm;

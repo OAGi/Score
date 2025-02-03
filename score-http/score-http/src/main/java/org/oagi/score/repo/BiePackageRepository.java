@@ -1,7 +1,7 @@
 package org.oagi.score.repo;
 
-import org.jooq.Record;
 import org.jooq.*;
+import org.jooq.Record;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.bie_management.data.*;
 import org.oagi.score.gateway.http.api.release_management.data.SimpleRelease;
@@ -65,6 +65,7 @@ public class BiePackageRepository {
     private SelectOnConditionStep<Record> getSelectOnConditionStep(BiePackageListRequest request) {
         return dslContext.selectDistinct(
                         BIE_PACKAGE.BIE_PACKAGE_ID,
+                        BIE_PACKAGE.LIBRARY_ID,
                         BIE_PACKAGE.VERSION_ID,
                         BIE_PACKAGE.VERSION_NAME,
                         BIE_PACKAGE.DESCRIPTION,
@@ -97,11 +98,11 @@ public class BiePackageRepository {
                 .join(APP_USER.as("owner")).on(BIE_PACKAGE.OWNER_USER_ID.eq(APP_USER.as("owner").APP_USER_ID))
                 .join(APP_USER.as("creator")).on(BIE_PACKAGE.CREATED_BY.eq(APP_USER.as("creator").APP_USER_ID))
                 .join(APP_USER.as("updater")).on(BIE_PACKAGE.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID))
+                .join(LIBRARY).on(BIE_PACKAGE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .leftJoin(BIE_PACKAGE.as("source")).on(BIE_PACKAGE.SOURCE_BIE_PACKAGE_ID.eq(BIE_PACKAGE.as("source").BIE_PACKAGE_ID))
                 .leftJoin(BIE_PACKAGE_TOP_LEVEL_ASBIEP).on(BIE_PACKAGE.BIE_PACKAGE_ID.eq(BIE_PACKAGE_TOP_LEVEL_ASBIEP.BIE_PACKAGE_ID))
                 .leftJoin(TOP_LEVEL_ASBIEP).on(BIE_PACKAGE_TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
                 .leftJoin(RELEASE).on(TOP_LEVEL_ASBIEP.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .leftJoin(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .leftJoin(ASBIEP).on(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
                 .leftJoin(ASCCP_MANIFEST).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
                 .leftJoin(BIZ_CTX_ASSIGNMENT).on(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID))
@@ -111,7 +112,9 @@ public class BiePackageRepository {
     private List<Condition> makeConditions(BiePackageListRequest request) {
         List<Condition> conditions = new ArrayList<>();
 
-        conditions.add(LIBRARY.LIBRARY_ID.eq(ULong.valueOf(request.getLibraryId())));
+        if (request.getLibraryId() != null) {
+            conditions.add(LIBRARY.LIBRARY_ID.eq(ULong.valueOf(request.getLibraryId())));
+        }
         if (hasLength(request.getVersionId())) {
             conditions.addAll(contains(request.getVersionId(), BIE_PACKAGE.VERSION_ID));
         }
@@ -205,6 +208,7 @@ public class BiePackageRepository {
         BiePackage biePackage = new BiePackage();
 
         biePackage.setBiePackageId(record.get(BIE_PACKAGE.BIE_PACKAGE_ID).toBigInteger());
+        biePackage.setLibraryId(record.get(BIE_PACKAGE.LIBRARY_ID).toBigInteger());
         biePackage.setVersionId(record.get(BIE_PACKAGE.VERSION_ID));
         biePackage.setVersionName(record.get(BIE_PACKAGE.VERSION_NAME));
         biePackage.setDescription(record.get(BIE_PACKAGE.DESCRIPTION));
@@ -259,6 +263,7 @@ public class BiePackageRepository {
     public BigInteger createBiePackage(CreateBiePackageRequest request) {
         BiePackageRecord biePackageRecord = new BiePackageRecord();
 
+        biePackageRecord.setLibraryId(ULong.valueOf(request.getLibraryId()));
         biePackageRecord.setVersionId(request.getVersionId());
         biePackageRecord.setVersionName(request.getVersionName());
         biePackageRecord.setDescription(request.getDescription());

@@ -5,6 +5,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.oagi.score.gateway.http.api.cc_management.data.*;
 import org.oagi.score.gateway.http.api.cc_management.data.node.*;
 import org.oagi.score.gateway.http.api.cc_management.service.CcNodeService;
+import org.oagi.score.gateway.http.api.plantuml.service.PlantUmlService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.component.asccp.UpdateAsccpRoleOfAccRepositoryResponse;
 import org.oagi.score.repo.component.bccp.UpdateBccpBdtRepositoryResponse;
@@ -17,6 +18,7 @@ import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -32,8 +34,12 @@ public class CcNodeController {
 
     @Autowired
     private ObjectMapper objectMapper;
+
     @Autowired
     private SessionService sessionService;
+
+    @Autowired
+    private PlantUmlService plantUmlService;
 
     @RequestMapping(value = "/core_component/acc/{manifestId:[\\d]+}",
             method = RequestMethod.GET,
@@ -308,24 +314,21 @@ public class CcNodeController {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public CcVerifyAppendResponse verifyAppendNode(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                             @PathVariable("manifestId") BigInteger manifestId,
-                                             @RequestBody CcVerifyAppendRequest request) {
+                                                   @PathVariable("manifestId") BigInteger manifestId,
+                                                   @RequestBody CcVerifyAppendRequest request) {
 
         request.setAccManifestId(manifestId);
 
         if (hasLength(request.getPropertyTerm())) {
             return service.hasSamePropertyTerm(sessionService.asScoreUser(user),
                     request.getAccManifestId(), request.getPropertyTerm());
-        }
-        else if (request.getBasedAccManifestId() != null) {
+        } else if (request.getBasedAccManifestId() != null) {
             return service.verifySetBasedAcc(sessionService.asScoreUser(user),
                     request.getAccManifestId(), request.getBasedAccManifestId());
-        }
-        else if (request.getAsccpManifestId() != null) {
+        } else if (request.getAsccpManifestId() != null) {
             return service.verifyAppendAsccp(sessionService.asScoreUser(user),
                     request.getAccManifestId(), request.getAsccpManifestId());
-        }
-        else if (request.getBccpManifestId() != null) {
+        } else if (request.getBccpManifestId() != null) {
             return service.verifyAppendBccp(sessionService.asScoreUser(user),
                     request.getAccManifestId(), request.getBccpManifestId());
         }
@@ -611,5 +614,19 @@ public class CcNodeController {
         ccUngroupRequest.setAccManifestId(accManifestId);
 
         return service.ungroup(user, ccUngroupRequest);
+    }
+
+    @RequestMapping(value = "/core_component/asccp/{manifestId:[\\d]+}/plantuml",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, String> generatePlantUml(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                                @PathVariable("manifestId") BigInteger asccpManifestId,
+                                                @RequestParam(value = "asccpLinkTemplate", defaultValue = "/core_component/asccp/{manifestId}") String asccpLinkTemplate,
+                                                @RequestParam(value = "bccpLinkTemplate", defaultValue = "/core_component/bccp/{manifestId}") String bccpLinkTemplate) throws IOException {
+
+        String text = service.generatePlantUmlText(asccpManifestId, asccpLinkTemplate, bccpLinkTemplate);
+
+        return Map.of("text", text,
+                "encodedText", plantUmlService.getEncodedText(text));
     }
 }

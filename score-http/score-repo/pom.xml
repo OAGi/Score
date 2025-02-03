@@ -18,14 +18,14 @@
 
         <lombok.version>1.18.36</lombok.version>
         <mariadb-client.version>3.5.1</mariadb-client.version>
-        <jOOQ.version>3.19.15</jOOQ.version>
+        <jOOQ.version>3.19.18</jOOQ.version>
         <jOOQ.configuration.skip>true</jOOQ.configuration.skip>
 
         <junit.version>4.13.2</junit.version>
         <junit.platform.version>1.10.2</junit.platform.version>
         <junit.jupiter.version>5.10.2</junit.jupiter.version>
         <commons-lang.version>3.17.0</commons-lang.version>
-        <org.springframework.version>6.2.0</org.springframework.version>
+        <org.springframework.version>6.2.1</org.springframework.version>
         <gson.version>2.11.0</gson.version>
     </properties>
 

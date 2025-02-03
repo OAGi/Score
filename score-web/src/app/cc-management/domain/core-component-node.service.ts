@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {AccFlatNode, AsccpFlatNode, BccpFlatNode, CcFlatNode, DtFlatNode, DtScFlatNode} from './cc-flat-tree';
 import {
@@ -346,4 +346,17 @@ export class CcNodeService {
       params
     });
   }
+
+  getAsccpNodePlantUml(manifestId: number, options: {}): Observable<any> {
+    let params = new HttpParams();
+    if (!!options) {
+      for (const key in options) {
+        params = params.append(key, options[key]);
+      }
+    }
+    return this.http.get('/api/core_component/asccp/' + manifestId + '/plantuml', {
+      params
+    });
+  }
+
 }

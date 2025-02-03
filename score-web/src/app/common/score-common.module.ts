@@ -5,6 +5,7 @@ import {
   HighlightSearch,
   JoinPipe,
   PastTensePipe,
+  ReplaceAllPipe,
   SeparatePipe,
   TruncatePipe,
   UnboundedPipe,
@@ -30,6 +31,7 @@ import {ScoreTableColumnResizeDirective} from './score-table-column-resize/score
     ArraySortPipe,
     TruncatePipe,
     PastTensePipe,
+    ReplaceAllPipe,
     ScoreTableColumnResizeDirective
   ],
   imports: [
@@ -51,6 +53,7 @@ import {ScoreTableColumnResizeDirective} from './score-table-column-resize/score
     ArraySortPipe,
     TruncatePipe,
     PastTensePipe,
+    ReplaceAllPipe,
     ScoreTableColumnResizeDirective
   ]
 })

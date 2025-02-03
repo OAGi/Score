@@ -225,7 +225,7 @@
                       <span class="context-menu-item">Copy Path</span>
                     </button>
                     <button mat-menu-item (click)="startChangingDisplayName(contextMenuItem, $event)"
-                            *ngIf="canEdit"
+                            *ngIf="canEdit && !!contextMenuItem && contextMenuItem.level === 0"
                             [disabled]="!canChangeDisplayName(contextMenuItem)">
                       <span class="context-menu-item">Change Display Name</span>
                     </button>
