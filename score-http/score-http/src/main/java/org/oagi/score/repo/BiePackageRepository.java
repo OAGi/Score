@@ -65,6 +65,7 @@ public class BiePackageRepository {
     private SelectOnConditionStep<Record> getSelectOnConditionStep(BiePackageListRequest request) {
         return dslContext.selectDistinct(
                         BIE_PACKAGE.BIE_PACKAGE_ID,
+                        BIE_PACKAGE.LIBRARY_ID,
                         BIE_PACKAGE.VERSION_ID,
                         BIE_PACKAGE.VERSION_NAME,
                         BIE_PACKAGE.DESCRIPTION,
@@ -207,6 +208,7 @@ public class BiePackageRepository {
         BiePackage biePackage = new BiePackage();
 
         biePackage.setBiePackageId(record.get(BIE_PACKAGE.BIE_PACKAGE_ID).toBigInteger());
+        biePackage.setLibraryId(record.get(BIE_PACKAGE.LIBRARY_ID).toBigInteger());
         biePackage.setVersionId(record.get(BIE_PACKAGE.VERSION_ID));
         biePackage.setVersionName(record.get(BIE_PACKAGE.VERSION_NAME));
         biePackage.setDescription(record.get(BIE_PACKAGE.DESCRIPTION));

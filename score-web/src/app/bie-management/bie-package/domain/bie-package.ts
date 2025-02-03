@@ -8,6 +8,7 @@ import {Library} from '../../../library-management/domain/library';
 
 export class BiePackage {
   biePackageId: number;
+  libraryId: number;
   versionId: string;
   versionName: string;
   description: string;

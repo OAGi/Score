@@ -342,6 +342,7 @@ export class BiePackageDetailComponent implements OnInit {
     const dialogConfig = new MatDialogConfig();
 
     dialogConfig.data = this.table.dataSource.data;
+    dialogConfig.data.biePackage = this.biePackage;
     dialogConfig.data.webPageInfo = this.webPageInfo;
     dialogConfig.width = '100%';
     dialogConfig.maxWidth = '100%';

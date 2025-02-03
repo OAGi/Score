@@ -199,8 +199,6 @@ export class BiePackageAddBieDialogComponent implements OnInit {
   loginIdList: string[] = [];
   releases: SimpleRelease[] = [];
   selectedRelease: SimpleRelease;
-  libraries: Library[] = [];
-  mappedLibraries: {library: Library, selected: boolean}[] = [];
   releaseListFilterCtrl: FormControl = new FormControl();
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
@@ -345,22 +343,7 @@ export class BiePackageAddBieDialogComponent implements OnInit {
   }
 
   initLibraries(libraries: Library[]) {
-    this.libraries = libraries;
-    if (this.libraries.length > 0) {
-      const savedLibraryId = loadLibrary(this.auth.getUserToken());
-      if (savedLibraryId) {
-        this.request.library = this.libraries.filter(e => e.libraryId === savedLibraryId)[0];
-      }
-      if (!this.request.library || !this.request.library.libraryId) {
-        this.request.library = this.libraries[0];
-      }
-      if (this.request.library) {
-        saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
-      }
-      this.mappedLibraries = this.libraries.map(e => {
-        return {library: e, selected: (this.request.library.libraryId === e.libraryId)};
-      });
-    }
+    this.request.library = libraries.filter(e => e.libraryId === this.data.biePackage.libraryId)[0];
   }
 
   initReleases(releases: SimpleRelease[]) {

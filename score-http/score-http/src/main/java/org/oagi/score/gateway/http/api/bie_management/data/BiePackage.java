@@ -16,6 +16,8 @@ public class BiePackage {
 
     private BigInteger biePackageId;
 
+    private BigInteger libraryId;
+
     private String versionId;
 
     private String versionName;
