@@ -759,7 +759,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   canChangeDisplayName(node: BieFlatNode): boolean {
-    return !!node && this.canEdit && !node.reused && !node.locked;
+    return !!node && this.canEdit && !node.reused && !node.locked && node.level === 0;
   }
 
   canUseBaseBIE(node: BieFlatNode): boolean {
