@@ -42,7 +42,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BizCtxValueRecord
  * provides the associations between a business context and a context scheme
  * value.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class BizCtxValue extends TableImpl<BizCtxValueRecord> {
 
     private static final long serialVersionUID = 1L;

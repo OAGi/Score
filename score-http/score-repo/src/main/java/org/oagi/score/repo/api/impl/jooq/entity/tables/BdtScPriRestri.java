@@ -57,7 +57,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BdtScPriRestriRec
  * BDT SC points directly to the CDT_AWD_PRI_XPS_TYPE_MAP key rather than the
  * BDT_SC_PRI_RESTRI key.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class BdtScPriRestri extends TableImpl<BdtScPriRestriRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -197,7 +197,20 @@ public class BdtScPriRestri extends TableImpl<BdtScPriRestriRecord> {
 
     @Override
     public List<ForeignKey<BdtScPriRestriRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.BDT_SC_PRI_RESTRI_BDT_MANIFEST_ID_FK, Keys.BDT_SC_PRI_RESTRI_CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID_FK, Keys.BDT_SC_PRI_RESTRI_CODE_LIST_MANIFEST_ID_FK, Keys.BDT_SC_PRI_RESTRI_AGENCY_ID_LIST_MANIFEST_ID_FK);
+        return Arrays.asList(Keys.BDT_SC_PRI_RESTRI_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.BDT_SC_PRI_RESTRI_BDT_MANIFEST_ID_FK, Keys.BDT_SC_PRI_RESTRI_CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID_FK, Keys.BDT_SC_PRI_RESTRI_CODE_LIST_MANIFEST_ID_FK);
+    }
+
+    private transient AgencyIdListManifestPath _agencyIdListManifest;
+
+    /**
+     * Get the implicit join path to the
+     * <code>oagi.agency_id_list_manifest</code> table.
+     */
+    public AgencyIdListManifestPath agencyIdListManifest() {
+        if (_agencyIdListManifest == null)
+            _agencyIdListManifest = new AgencyIdListManifestPath(this, Keys.BDT_SC_PRI_RESTRI_AGENCY_ID_LIST_MANIFEST_ID_FK, null);
+
+        return _agencyIdListManifest;
     }
 
     private transient DtScManifestPath _dtScManifest;
@@ -236,19 +249,6 @@ public class BdtScPriRestri extends TableImpl<BdtScPriRestriRecord> {
             _codeListManifest = new CodeListManifestPath(this, Keys.BDT_SC_PRI_RESTRI_CODE_LIST_MANIFEST_ID_FK, null);
 
         return _codeListManifest;
-    }
-
-    private transient AgencyIdListManifestPath _agencyIdListManifest;
-
-    /**
-     * Get the implicit join path to the
-     * <code>oagi.agency_id_list_manifest</code> table.
-     */
-    public AgencyIdListManifestPath agencyIdListManifest() {
-        if (_agencyIdListManifest == null)
-            _agencyIdListManifest = new AgencyIdListManifestPath(this, Keys.BDT_SC_PRI_RESTRI_AGENCY_ID_LIST_MANIFEST_ID_FK, null);
-
-        return _agencyIdListManifest;
     }
 
     private transient BbieScPath _bbieSc;

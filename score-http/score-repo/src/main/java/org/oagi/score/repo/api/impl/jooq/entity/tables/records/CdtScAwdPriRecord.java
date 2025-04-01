@@ -15,7 +15,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.CdtScAwdPri;
  * It also stores the CDT primitives allowed for a SC of a BDT that extends its
  * base (such SC is not defined in the CCTS data type catalog specification).
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class CdtScAwdPriRecord extends UpdatableRecordImpl<CdtScAwdPriRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -118,6 +118,6 @@ public class CdtScAwdPriRecord extends UpdatableRecordImpl<CdtScAwdPriRecord> {
         setCdtScId(cdtScId);
         setCdtPriId(cdtPriId);
         setIsDefault(isDefault);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

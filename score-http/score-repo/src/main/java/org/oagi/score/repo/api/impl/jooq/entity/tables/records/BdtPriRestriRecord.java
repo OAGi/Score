@@ -19,7 +19,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.BdtPriRestri;
  * specifies the primitive which is an agency identification list. Only one
  * column among the three can have a value in a particular record.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class BdtPriRestriRecord extends UpdatableRecordImpl<BdtPriRestriRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -166,6 +166,6 @@ public class BdtPriRestriRecord extends UpdatableRecordImpl<BdtPriRestriRecord> 
         setCodeListManifestId(codeListManifestId);
         setAgencyIdListManifestId(agencyIdListManifestId);
         setIsDefault(isDefault);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

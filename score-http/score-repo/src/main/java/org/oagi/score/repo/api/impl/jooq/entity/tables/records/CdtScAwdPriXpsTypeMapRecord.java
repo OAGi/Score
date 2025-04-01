@@ -16,7 +16,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.CdtScAwdPriXpsTypeMap;
  * allows for the concrete mapping between the CDT Primitives and types in a
  * particular expression such as XML Schema, JSON. 
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class CdtScAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtScAwdPriXpsTypeMapRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -121,6 +121,6 @@ public class CdtScAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtScAwdPri
         setCdtScAwdPriId(cdtScAwdPriId);
         setXbtId(xbtId);
         setIsDefault(isDefault);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

@@ -18,7 +18,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.BbieSc;
  * associated with the DT are stored in the BBIE table, while this table stores
  * the constraints associated with the DT's SCs. 
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -584,6 +584,6 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
         setOwnerTopLevelAsbiepId(ownerTopLevelAsbiepId);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

@@ -43,7 +43,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.CdtScAwdPriRecord
  * It also stores the CDT primitives allowed for a SC of a BDT that extends its
  * base (such SC is not defined in the CCTS data type catalog specification).
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class CdtScAwdPri extends TableImpl<CdtScAwdPriRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -166,19 +166,7 @@ public class CdtScAwdPri extends TableImpl<CdtScAwdPriRecord> {
 
     @Override
     public List<ForeignKey<CdtScAwdPriRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.CDT_SC_AWD_PRI_CDT_SC_ID_FK, Keys.CDT_SC_AWD_PRI_CDT_PRI_ID_FK);
-    }
-
-    private transient DtScPath _dtSc;
-
-    /**
-     * Get the implicit join path to the <code>oagi.dt_sc</code> table.
-     */
-    public DtScPath dtSc() {
-        if (_dtSc == null)
-            _dtSc = new DtScPath(this, Keys.CDT_SC_AWD_PRI_CDT_SC_ID_FK, null);
-
-        return _dtSc;
+        return Arrays.asList(Keys.CDT_SC_AWD_PRI_CDT_PRI_ID_FK, Keys.CDT_SC_AWD_PRI_CDT_SC_ID_FK);
     }
 
     private transient CdtPriPath _cdtPri;
@@ -191,6 +179,18 @@ public class CdtScAwdPri extends TableImpl<CdtScAwdPriRecord> {
             _cdtPri = new CdtPriPath(this, Keys.CDT_SC_AWD_PRI_CDT_PRI_ID_FK, null);
 
         return _cdtPri;
+    }
+
+    private transient DtScPath _dtSc;
+
+    /**
+     * Get the implicit join path to the <code>oagi.dt_sc</code> table.
+     */
+    public DtScPath dtSc() {
+        if (_dtSc == null)
+            _dtSc = new DtScPath(this, Keys.CDT_SC_AWD_PRI_CDT_SC_ID_FK, null);
+
+        return _dtSc;
     }
 
     private transient CdtScAwdPriXpsTypeMapPath _cdtScAwdPriXpsTypeMap;

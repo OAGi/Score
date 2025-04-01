@@ -40,7 +40,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.CdtPriRecord;
 /**
  * This table stores the CDT primitives.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class CdtPri extends TableImpl<CdtPriRecord> {
 
     private static final long serialVersionUID = 1L;

@@ -34,7 +34,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.ConfigurationReco
 /**
  * The table stores configuration properties of the application.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Configuration extends TableImpl<ConfigurationRecord> {
 
     private static final long serialVersionUID = 1L;

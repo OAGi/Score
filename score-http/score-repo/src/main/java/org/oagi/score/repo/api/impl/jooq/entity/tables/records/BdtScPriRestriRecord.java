@@ -27,7 +27,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.BdtScPriRestri;
  * BDT SC points directly to the CDT_AWD_PRI_XPS_TYPE_MAP key rather than the
  * BDT_SC_PRI_RESTRI key.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class BdtScPriRestriRecord extends UpdatableRecordImpl<BdtScPriRestriRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -174,6 +174,6 @@ public class BdtScPriRestriRecord extends UpdatableRecordImpl<BdtScPriRestriReco
         setCodeListManifestId(codeListManifestId);
         setAgencyIdListManifestId(agencyIdListManifestId);
         setIsDefault(isDefault);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

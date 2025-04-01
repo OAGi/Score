@@ -16,7 +16,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.Namespace;
  * This table stores information about a namespace. Namespace is the namespace
  * as in the XML schema specification.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -225,6 +225,6 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> {
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

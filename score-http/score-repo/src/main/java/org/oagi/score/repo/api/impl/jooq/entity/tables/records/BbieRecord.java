@@ -22,7 +22,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.Bbie;
  * primitive to be used in the context. Only one column among the three can have
  * a value in a particular record.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -631,6 +631,6 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
         setIsUsed(isUsed);
         setIsDeprecated(isDeprecated);
         setOwnerTopLevelAsbiepId(ownerTopLevelAsbiepId);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

@@ -122,7 +122,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.XbtManifest;
 /**
  * Convenience access to all tables in oagi.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Tables {
 
     /**

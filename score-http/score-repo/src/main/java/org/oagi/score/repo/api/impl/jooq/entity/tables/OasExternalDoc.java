@@ -42,7 +42,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.OasExternalDocRec
 /**
  * Allows referencing an external resource for extended documentation.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class OasExternalDoc extends TableImpl<OasExternalDocRecord> {
 
     private static final long serialVersionUID = 1L;

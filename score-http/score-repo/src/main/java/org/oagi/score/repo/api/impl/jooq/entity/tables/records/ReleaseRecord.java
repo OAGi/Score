@@ -15,7 +15,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.Release;
 /**
  * The is table store the release information.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -243,6 +243,6 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
         setState(state);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

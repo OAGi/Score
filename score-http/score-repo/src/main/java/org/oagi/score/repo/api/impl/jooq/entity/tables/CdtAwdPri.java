@@ -43,7 +43,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.CdtAwdPriRecord;
  * information in this table is captured from the Allowed Primitive column in
  * each of the CDT Content Component section/table in CCTS DTC3.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class CdtAwdPri extends TableImpl<CdtAwdPriRecord> {
 
     private static final long serialVersionUID = 1L;

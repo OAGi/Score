@@ -43,7 +43,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccBiztermRecord
  * The ascc_bizterm table stores information about the aggregation between the
  * business term and ASCC. TODO: Placeholder, definition is missing.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class AsccBizterm extends TableImpl<AsccBiztermRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -184,19 +184,7 @@ public class AsccBizterm extends TableImpl<AsccBiztermRecord> {
 
     @Override
     public List<ForeignKey<AsccBiztermRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.ASCC_BIZTERM_BUSINESS_TERM_FK, Keys.ASCC_BIZTERM_ASCC_FK);
-    }
-
-    private transient BusinessTermPath _businessTerm;
-
-    /**
-     * Get the implicit join path to the <code>oagi.business_term</code> table.
-     */
-    public BusinessTermPath businessTerm() {
-        if (_businessTerm == null)
-            _businessTerm = new BusinessTermPath(this, Keys.ASCC_BIZTERM_BUSINESS_TERM_FK, null);
-
-        return _businessTerm;
+        return Arrays.asList(Keys.ASCC_BIZTERM_ASCC_FK, Keys.ASCC_BIZTERM_BUSINESS_TERM_FK);
     }
 
     private transient AsccPath _ascc;
@@ -209,6 +197,18 @@ public class AsccBizterm extends TableImpl<AsccBiztermRecord> {
             _ascc = new AsccPath(this, Keys.ASCC_BIZTERM_ASCC_FK, null);
 
         return _ascc;
+    }
+
+    private transient BusinessTermPath _businessTerm;
+
+    /**
+     * Get the implicit join path to the <code>oagi.business_term</code> table.
+     */
+    public BusinessTermPath businessTerm() {
+        if (_businessTerm == null)
+            _businessTerm = new BusinessTermPath(this, Keys.ASCC_BIZTERM_BUSINESS_TERM_FK, null);
+
+        return _businessTerm;
     }
 
     private transient AsbieBiztermPath _asbieBizterm;

@@ -47,7 +47,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BieUsageRuleRecor
  * In a particular record, either only one of the TARGET_ABIE_ID,
  * TARGET_ASBIE_ID, TARGET_ASBIEP_ID, TARGET_BBIE_ID, or TARGET_BBIEP_ID.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
 
     private static final long serialVersionUID = 1L;

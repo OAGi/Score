@@ -54,7 +54,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.CdtAwdPriXpsTypeM
  * expressions, particulary if it does not map well to the XML schema data
  * types. 
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class CdtAwdPriXpsTypeMap extends TableImpl<CdtAwdPriXpsTypeMapRecord> {
 
     private static final long serialVersionUID = 1L;

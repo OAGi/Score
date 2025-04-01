@@ -40,7 +40,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.TenantBusinessCtx
 /**
  * This table captures the tenant role and theirs business contexts.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class TenantBusinessCtx extends TableImpl<TenantBusinessCtxRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -159,19 +159,7 @@ public class TenantBusinessCtx extends TableImpl<TenantBusinessCtxRecord> {
 
     @Override
     public List<ForeignKey<TenantBusinessCtxRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.TENANT_BUSINESS_CTX_TENANT_ID_FK, Keys.ORGANIZATION_BUSINESS_CTX_BIZ_CTX_ID_FK);
-    }
-
-    private transient TenantPath _tenant;
-
-    /**
-     * Get the implicit join path to the <code>oagi.tenant</code> table.
-     */
-    public TenantPath tenant() {
-        if (_tenant == null)
-            _tenant = new TenantPath(this, Keys.TENANT_BUSINESS_CTX_TENANT_ID_FK, null);
-
-        return _tenant;
+        return Arrays.asList(Keys.ORGANIZATION_BUSINESS_CTX_BIZ_CTX_ID_FK, Keys.TENANT_BUSINESS_CTX_TENANT_ID_FK);
     }
 
     private transient BizCtxPath _bizCtx;
@@ -184,6 +172,18 @@ public class TenantBusinessCtx extends TableImpl<TenantBusinessCtxRecord> {
             _bizCtx = new BizCtxPath(this, Keys.ORGANIZATION_BUSINESS_CTX_BIZ_CTX_ID_FK, null);
 
         return _bizCtx;
+    }
+
+    private transient TenantPath _tenant;
+
+    /**
+     * Get the implicit join path to the <code>oagi.tenant</code> table.
+     */
+    public TenantPath tenant() {
+        if (_tenant == null)
+            _tenant = new TenantPath(this, Keys.TENANT_BUSINESS_CTX_TENANT_ID_FK, null);
+
+        return _tenant;
     }
 
     @Override
