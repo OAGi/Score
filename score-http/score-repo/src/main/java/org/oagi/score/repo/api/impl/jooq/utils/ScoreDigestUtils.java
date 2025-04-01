@@ -1,8 +1,7 @@
 package org.oagi.score.repo.api.impl.jooq.utils;
 
-import lombok.SneakyThrows;
-
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public abstract class ScoreDigestUtils {
 
@@ -39,9 +38,13 @@ public abstract class ScoreDigestUtils {
         return result;
     }
 
-    @SneakyThrows
     public static String sha256(String str) {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        MessageDigest digest;
+        try {
+            digest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
         return new String(hexEncode(digest.digest(str.getBytes())));
     }
 
