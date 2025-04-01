@@ -44,7 +44,7 @@ import {
   Semantics,
   UserExtensionGroup
 } from '../domain/core-component-node';
-import {emptyToUndefined, initFilter, loadBooleanProperty, saveBooleanProperty, trim, UnboundedPipe} from '../../common/utility';
+import {initFilter, loadBooleanProperty, saveBooleanProperty, trim, UnboundedPipe} from '../../common/utility';
 import {RefactorDialogComponent} from '../refactor-dialog/refactor-dialog.component';
 import {AppendAssociationDialogComponent} from './append-association-dialog/append-association-dialog.component';
 import {BasedAccDialogComponent} from './based-acc-dialog/based-acc-dialog.component';
@@ -67,7 +67,10 @@ import {ShortTag, Tag} from '../../tag-management/domain/tag';
 import {EditTagsDialogComponent} from '../../tag-management/edit-tags-dialog/edit-tags-dialog.component';
 import {WebPageInfoService} from '../../basis/basis.service';
 import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
-import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {
+  SettingsPreferencesService
+} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {WorkingRelease} from "../../release-management/domain/release";
 
 @Component({
   selector: 'score-acc-detail',
