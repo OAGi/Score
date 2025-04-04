@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {PreferencesInfo, TableColumnsProperty} from './preferences';
+import {PreferencesInfo} from './preferences';
 import {UserToken} from '../../../authentication/domain/auth';
 import {loadBooleanProperty, loadProperty, saveBooleanProperty, saveProperty} from '../../../common/utility';
 
@@ -82,16 +82,6 @@ export class SettingsPreferencesService {
       preferencesInfo.tableColumnsInfo.columnsOfCoreComponentForNounBODPage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_FOR_NOUN_BOD_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfCoreComponentForNounBODPage)));
-      // Issue #1650
-      if (preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode) {
-        preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage.forEach((columnInfo: TableColumnsProperty) => {
-          if ('ASCCP' === columnInfo.name) {
-            columnInfo.selected = true;
-          } else {
-            columnInfo.selected = false;
-          }
-        });
-      }
       preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage =
           JSON.parse(loadProperty(userToken, this.FILTER_TYPES_FOR_CORE_COMPONENT_PAGE_KEY,
               JSON.stringify(preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage)));
