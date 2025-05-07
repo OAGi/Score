@@ -54,6 +54,9 @@ DELETE FROM `blob_content_manifest` WHERE `release_id` > 1;
 -- We will leave it as is; however, since the ASCCP and ACC share the same GUID, we will update the GUID of the ASCCP.
 UPDATE `asccp` SET `guid` = '1d721f70dfc742e8b334063557cfa2eb' WHERE property_term = 'Common Time Reporting';
 
+-- Fix 'Quantity' DT
+UPDATE `dt` SET `guid` = '8bfe6ca1cda44d16b299b1b20d0af80a' WHERE `dt_id` = 313;
+
 -- -------------------------
 -- Support for Multi-Library
 -- -------------------------
