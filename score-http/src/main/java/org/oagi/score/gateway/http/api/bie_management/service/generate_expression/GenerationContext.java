@@ -859,6 +859,7 @@ public class GenerationContext implements InitializingBean, CcDocument {
         }
 
         DtScAwdPriSummaryRecord dtScAwdPri = getDtScAwdPriList(bbieSc.basedDtScManifestId()).stream()
+                .filter(e -> e.isDefault())
                 .filter(e -> e.codeListManifestId() != null).findAny().orElse(null);
         return (dtScAwdPri != null) ? getCodeList(dtScAwdPri.codeListManifestId()) : null;
     }
@@ -884,6 +885,7 @@ public class GenerationContext implements InitializingBean, CcDocument {
         }
 
         DtScAwdPriSummaryRecord dtScAwdPri = getDtScAwdPriList(bbieSc.basedDtScManifestId()).stream()
+                .filter(e -> e.isDefault())
                 .filter(e -> e.agencyIdListManifestId() != null).findAny().orElse(null);
         return (dtScAwdPri != null) ? getAgencyIdList(dtScAwdPri.agencyIdListManifestId()) : null;
     }
