@@ -1,0 +1,60 @@
+server:
+  port: 9000
+  compression:
+    enabled: true
+    mime-types: text/html,text/css,application/javascript,application/json
+
+spring:
+  aop:
+    proxy-target-class: true
+
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_DATABASE:oagi}?useSSL=false&allowMultiQueries=true
+    username: ${DB_USERNAME:oagi}
+    password: ${DB_PASSWORD:oagi}
+
+  jooq:
+    sql-dialect: mariadb
+
+  session:
+    store-type: redis
+
+  cache:
+    type: redis
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      sentinel:
+        master: ${REDIS_SENTINEL_MASTER:}
+        nodes: ${REDIS_SENTINEL_NODES:}
+      cluster:
+        nodes: ${REDIS_CLUSTER_NODES:}
+
+  main:
+    allow-circular-references: true
+
+  ai:
+    ollama:
+      base-url: ${OLLAMA_URL:http://localhost:11434}
+      init:
+        timeout: ${OLLAMA_TIMEOUT:20s}
+
+logging:
+  level:
+    org.springframework: INFO
+    org.springframework.security: DEBUG
+    org.springframework.websocket: DEBUG
+    org.springframework.messaging: DEBUG
+    org.jooq: DEBUG
+    org.oagi.score: DEBUG
+
+resource-server:
+  jwk-set-uri: ${RS_JWK_SET_URI:}
+  allowed-types: ${RS_ALLOWED_TYPES:JWT,at+jwt}
+
+springdoc:
+  swagger-ui:
+    tags-sorter: alpha

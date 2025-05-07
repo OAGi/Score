@@ -16,7 +16,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsbieBizterm;
  * The asbie_bizterm table stores information about the aggregation between the
  * ascc_bizterm and ASBIE. TODO: Placeholder, definition is missing.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class AsbieBiztermRecord extends UpdatableRecordImpl<AsbieBiztermRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -204,6 +204,6 @@ public class AsbieBiztermRecord extends UpdatableRecordImpl<AsbieBiztermRecord> 
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

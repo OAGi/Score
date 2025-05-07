@@ -13,7 +13,6 @@ import {AuthService} from '../../authentication/auth.service';
 import {MaterialModule} from '../../material.module';
 import {ConfirmDialogModule} from '../../common/confirm-dialog/confirm-dialog.module';
 import {ScoreCommonModule} from '../../common/score-common.module';
-import {ModelBrowserService} from './domain/model-browser.service';
 import {PlantUmlDiagramComponent} from '../plantuml-diagram/plantuml-diagram.component';
 import {PlantUmlService} from '../plantuml-diagram/domain/plantuml.service';
 import {MarkdownModule} from 'ngx-markdown';
@@ -58,7 +57,6 @@ const routes: Routes = [
     PlantUmlDiagramComponent
   ],
   providers: [
-    ModelBrowserService,
     PlantUmlService
   ]
 })

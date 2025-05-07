@@ -13,13 +13,13 @@ import {
   AssignableList,
   AssignableMap,
   AssignableNode,
-  ReleaseDetail,
+  ReleaseDetails,
   ReleaseValidationRequest,
   ReleaseValidationResponse,
   ValidationMessage
 } from '../domain/release';
 import {AccountListService} from '../../account-management/domain/account-list.service';
-import {Namespace} from '../../namespace-management/domain/namespace';
+import {NamespaceDetails} from '../../namespace-management/domain/namespace';
 import {filter, hashCode} from '../../common/utility';
 import {WebPageInfoService} from '../../basis/basis.service';
 
@@ -40,8 +40,8 @@ export class ReleaseAssignComponent implements OnInit {
   loginIdListFilterCtrl: FormControl = new FormControl();
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
 
-  releaseDetail = new ReleaseDetail();
-  namespace: Namespace;
+  releaseDetail = new ReleaseDetails();
+  namespace: NamespaceDetails;
   isLoading = false;
   itemsMap: AssignableMap;
   itemsList = new AssignableList();
@@ -236,7 +236,7 @@ export class ReleaseAssignComponent implements OnInit {
       }
     }
     if (this.filter.owner.length > 0) {
-      if (this.filter.owner.indexOf(node.ownerUserId) === -1) {
+      if (this.filter.owner.indexOf(node.ownerUsername) === -1) {
         return false;
       }
     }

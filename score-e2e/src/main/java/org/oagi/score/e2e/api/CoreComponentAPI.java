@@ -147,13 +147,15 @@ public interface CoreComponentAPI {
     /**
      * Create a random BCCP.
      *
+     * @param branch    The branch of the BCCP
      * @param dataType  The data type of the BCCP
      * @param creator   account who creates this BCCP
      * @param namespace namespace
      * @param state     BCCP state
      * @return created BCCP object
      */
-    BCCPObject createRandomBCCP(DTObject dataType, AppUserObject creator,
+    BCCPObject createRandomBCCP(ReleaseObject branch,
+                                DTObject dataType, AppUserObject creator,
                                 NamespaceObject namespace, String state);
 
     /**
@@ -165,21 +167,8 @@ public interface CoreComponentAPI {
      * @param state        BDT state
      * @return created BDT object
      */
-    DTObject createRandomBDT(DTObject baseDataType, AppUserObject creator,
+    DTObject createRandomBDT(ReleaseObject release, DTObject baseDataType, AppUserObject creator,
                              NamespaceObject namespace, String state);
-
-    /**
-     * Create a random BDT.
-     *
-     * @param baseDataType the base data type
-     * @param creator      account who creates this BDT
-     * @param namespace    namespace
-     * @param state        BDT state
-     * @param refSpec      reference specification. Used only if the base data type is CDT.
-     * @return created BDT object
-     */
-    DTObject createRandomBDT(DTObject baseDataType, AppUserObject creator,
-                             NamespaceObject namespace, String state, ReferenceSpec refSpec);
 
     ACCObject createRevisedACC(ACCObject prevAcc, AppUserObject creator, ReleaseObject release, String state);
 

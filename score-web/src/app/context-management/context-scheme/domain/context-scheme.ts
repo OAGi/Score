@@ -1,14 +1,97 @@
-import {PageRequest} from '../../../basis/basis';
+import {PageRequest, WhoAndWhen} from '../../../basis/basis';
 import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
 import {base64Decode, base64Encode} from '../../../common/utility';
 import {ScoreUser} from '../../../authentication/domain/auth';
+import {ContextCategorySummary} from '../../context-category/domain/context-category';
+import {CodeListSummary} from '../../../code-list-management/domain/code-list';
+
+export class ContextSchemeSummary {
+  contextSchemeId: number;
+  guid: string;
+  schemeId: string;
+  schemeName: string;
+  schemeAgencyId: string;
+  schemeVersionId: string;
+  description: string;
+  contextCategory: ContextCategorySummary;
+}
+
+export class ContextSchemeValueSummary {
+  contextSchemeValueId: number;
+  guid: string;
+  value: string;
+  meaning: string;
+  contextSchemeId: number;
+}
+
+export class ContextSchemeListEntry {
+  contextSchemeId: number;
+  guid: string;
+  schemeName: string;
+  schemeId?: string;
+  schemeAgencyId?: string;
+  schemeVersionId?: string;
+  description?: string;
+  used: boolean;
+
+  contextCategory: ContextCategorySummary;
+  codeList?: CodeListSummary;
+
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+}
+
+export class ContextSchemeDetails {
+  contextSchemeId: number;
+  guid: string;
+  schemeName: string;
+  schemeId?: string;
+  schemeAgencyId?: string;
+  schemeVersionId?: string;
+  description?: string;
+  used: boolean;
+
+  contextCategory: ContextCategorySummary;
+  codeList?: CodeListSummary;
+
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+}
+
+export class ContextSchemeCreateRequest {
+  schemeName: string;
+  schemeId?: string;
+  schemeAgencyId?: string;
+  schemeVersionId?: string;
+  description?: string;
+
+  contextCategoryId: number;
+  codeListId: number;
+
+  contextSchemeValueList: ContextSchemeValue[] = [];
+}
+
+export class ContextSchemeUpdateRequest {
+  contextSchemeId: number;
+  schemeName: string;
+  schemeId?: string;
+  schemeAgencyId?: string;
+  schemeVersionId?: string;
+  description?: string;
+  used: boolean;
+
+  contextCategoryId: number;
+  codeListId: number;
+
+  contextSchemeValueList: ContextSchemeValue[] = [];
+}
 
 export class ContextSchemeListRequest {
   filters: {
     name: string;
   };
-  updaterUsernameList: string[] = [];
+  updaterLoginIdList: string[] = [];
   updatedDate: {
     start: Date,
     end: Date,
@@ -38,7 +121,7 @@ export class ContextSchemeListRequest {
       this.page.pageSize = (defaultPageRequest) ? defaultPageRequest.pageSize : 0;
     }
 
-    this.updaterUsernameList = (params.get('updaterUsernameList')) ? Array.from(params.get('updaterUsernameList').split(',')) : [];
+    this.updaterLoginIdList = (params.get('updaterLoginIdList')) ? Array.from(params.get('updaterLoginIdList').split(',')) : [];
     this.updatedDate = {
       start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
       end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
@@ -50,13 +133,13 @@ export class ContextSchemeListRequest {
 
   toQuery(): string {
     let params = new HttpParams()
-      .set('sortActive', this.page.sortActive)
-      .set('sortDirection', this.page.sortDirection)
-      .set('pageIndex', '' + this.page.pageIndex)
-      .set('pageSize', '' + this.page.pageSize);
+        .set('sortActive', this.page.sortActive)
+        .set('sortDirection', this.page.sortDirection)
+        .set('pageIndex', '' + this.page.pageIndex)
+        .set('pageSize', '' + this.page.pageSize);
 
-    if (this.updaterUsernameList && this.updaterUsernameList.length > 0) {
-      params = params.set('updaterUsernameList', this.updaterUsernameList.join(','));
+    if (this.updaterLoginIdList && this.updaterLoginIdList.length > 0) {
+      params = params.set('updaterLoginIdList', this.updaterLoginIdList.join(','));
     }
     if (this.updatedDate.start) {
       params = params.set('updatedDateStart', '' + this.updatedDate.start.toUTCString());
@@ -110,30 +193,4 @@ export class ContextSchemeValue {
   meaning: string;
   used: boolean;
   ownerContextSchemeId: number;
-}
-
-export interface SimpleContextCategory {
-  contextCategoryId: number;
-  name: string;
-}
-
-export interface SimpleContextScheme {
-  contextSchemeId: number;
-  schemeName: string;
-  codeListId: number;
-  codeListIdName: string;
-  schemeId: string;
-  schemeAgencyId: string;
-  schemeVersionId: string;
-}
-
-export interface SimpleContextSchemeValue {
-  contextSchemeValueId: number;
-  value: string;
-  meaning: string;
-}
-
-export interface SimpleCodeList {
-  codeListValueId: number;
-  name: string;
 }

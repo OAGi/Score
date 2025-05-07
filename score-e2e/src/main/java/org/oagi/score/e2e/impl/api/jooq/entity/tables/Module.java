@@ -52,7 +52,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.ModuleRecord;
  * The module table stores information about a physical file, into which CC
  * components will be generated during the expression generation.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Module extends TableImpl<ModuleRecord> {
 
     private static final long serialVersionUID = 1L;

@@ -2,7 +2,7 @@ import {Component, HostListener, OnInit} from '@angular/core';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {of} from 'rxjs';
-import {AccountList} from '../domain/accounts';
+import {AccountDetails} from '../domain/accounts';
 import {AccountListService} from '../domain/account-list.service';
 import {finalize, switchMap} from 'rxjs/operators';
 import {AuthService} from '../../authentication/auth.service';
@@ -16,7 +16,7 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 export class AccountDetailComponent implements OnInit {
   title = 'Edit Account';
   accountId;
-  account: AccountList;
+  account: AccountDetails;
   newPassword: string;
   confirmPassword: string;
   loading: boolean;
@@ -47,7 +47,7 @@ export class AccountDetailComponent implements OnInit {
   }
 
   get isOAuth2User(): boolean {
-    return this.account && (!!this.account.appOauth2UserId && this.account.appOauth2UserId > 0);
+    return this.account && (!!this.account.oAuth2UserId && this.account.oAuth2UserId > 0);
   }
 
   hasMinLengthError(variable: string) {
@@ -97,7 +97,11 @@ export class AccountDetailComponent implements OnInit {
       return;
     }
 
-    this.service.updatePasswordAccount(this.account, this.newPassword).subscribe(_ => {
+    this.service.update(this.account.userId,
+        this.account.username, this.account.organization,
+        this.account.admin,
+        this.newPassword).subscribe(_ => {
+
       this.snackBar.open('Updated', '', {
         duration: 3000,
       });
@@ -106,7 +110,7 @@ export class AccountDetailComponent implements OnInit {
   }
 
   setEnable(val: boolean) {
-    this.service.setEnable(this.account, val).subscribe(_ => {
+    this.service.setEnable(this.account.userId, val).subscribe(_ => {
       this.snackBar.open((val) ? 'Enabled' : 'Disabled', '', {
         duration: 3000,
       });
@@ -127,7 +131,7 @@ export class AccountDetailComponent implements OnInit {
           return;
         }
 
-        this.service.delink(this.account).subscribe(_ => {
+        this.service.delink(this.account.userId).subscribe(_ => {
           this.snackBar.open('Disassociated', '', {
             duration: 3000,
           });
@@ -148,7 +152,7 @@ export class AccountDetailComponent implements OnInit {
           return;
         }
 
-        this.service.remove(this.account).subscribe(_ => {
+        this.service.remove(this.account.userId).subscribe(_ => {
           this.snackBar.open('Removed', '', {
             duration: 3000,
           });

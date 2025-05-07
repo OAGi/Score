@@ -13,7 +13,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.UserTenant;
 /**
  * This table captures the tenant roles of the user
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class UserTenantRecord extends UpdatableRecordImpl<UserTenantRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -93,6 +93,6 @@ public class UserTenantRecord extends UpdatableRecordImpl<UserTenantRecord> {
         setUserTenantId(userTenantId);
         setTenantId(tenantId);
         setAppUserId(appUserId);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

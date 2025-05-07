@@ -198,7 +198,7 @@ table a {
   text-decoration: none;
 }
 
-table a:hover {
+table a:hover, svg a:hover {
   text-decoration: none;
   cursor: pointer;
 }

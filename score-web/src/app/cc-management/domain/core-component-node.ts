@@ -1,116 +1,489 @@
-import {AgencyIdList} from '../../agency-id-list-management/domain/agency-id-list';
-import {ChangeListener} from '../../bie-management/domain/bie-flat-tree';
-import {CodeListForList} from '../../code-list-management/domain/code-list';
-import {compare, emptyToUndefined, hashCode, hashCode4Array,} from '../../common/utility';
+import {AgencyIdList, AgencyIdListSummary} from '../../agency-id-list-management/domain/agency-id-list';
+import {CodeListSummary} from '../../code-list-management/domain/code-list';
+import {compare, emptyToUndefined, hashCode4Array,} from '../../common/utility';
 import {AccFlatNode, AsccpFlatNode, BccpFlatNode, CcFlatNode, DtFlatNode, DtScFlatNode} from './cc-flat-tree';
 import {ShortTag} from '../../tag-management/domain/tag';
+import {LibrarySummary} from '../../library-management/domain/library';
+import {ReleaseSummary} from '../../release-management/domain/release';
+import {NamespaceSummary} from '../../namespace-management/domain/namespace';
+import {LogSummary} from '../../log-management/domain/log';
+import {ScoreUser} from '../../authentication/domain/auth';
+import {Cardinality, Definition, ValueConstraint, WhoAndWhen} from '../../basis/basis';
 
-export class CcNode {
-  type: string;
-  libraryId: number;
-  releaseId: number;
-  releaseNum: string;
-  workingRelease: boolean;
+export class AiGenerationResponse {
+  generation: string;
+}
+
+export class AccDetails {
+  library: LibrarySummary;
+  release: ReleaseSummary;
+
+  accManifestId: number;
+  accId: number;
   guid: string;
-  name: string;
+  type: string;
+
+  based: AccSummary;
+  replacement: AccSummary;
+  since: AccSummary;
+  lastChanged: AccSummary;
+
+  den: string;
+  objectClassTerm: string;
+  objectClassQualifier: string;
+  componentType: string;
+  definition: Definition;
+  namespace: NamespaceSummary;
+  isAbstract: boolean;
+  isGroup: boolean;
+  hasExtension: boolean;
   hasChild: boolean;
+  deprecated: boolean;
   state: string;
   access: string;
-  manifestId: number;
-  revisionNum: number;
-  $hashCode: string;
 
-  listeners: ChangeListener<CcNode>[] = [];
+  associations: (AsccSummary | BccSummary)[];
 
-  constructor(obj?: CcNode) {
-    this.libraryId = obj && obj.libraryId || 0;
-    this.releaseId = obj && obj.releaseId || 0;
-    this.releaseNum = obj && obj.releaseNum || '';
-    this.workingRelease = obj && obj.workingRelease || false;
-    this.type = obj && obj.type || '';
-    this.guid = obj && obj.guid || '';
-    this.name = obj && obj.name || '';
-    this.hasChild = obj && obj.hasChild || false;
-    this.revisionNum = obj && obj.revisionNum || 0;
-    this.manifestId = obj && obj.manifestId || 0;
-    this.access = obj && obj.access || '';
-    this.state = obj && obj.state || '';
-  }
+  log: LogSummary;
 
+  owner: ScoreUser;
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
 
-  get hashCode(): string {
-    return hashCode(this);
-  }
-
-  reset(): void {
-    this.$hashCode = this.hashCode;
-  }
-
-  get isChanged(): boolean {
-    return this.$hashCode !== this.hashCode;
-  }
+  prevAccManifestId: number;
+  nextAccManifestId: number;
 }
 
-export class CcAccNode extends CcNode {
+export class AccSummary {
+  library: LibrarySummary;
+  release: ReleaseSummary;
+
+  accManifestId: number;
   accId: number;
-  objectClassTerm: string;
-  group: boolean;
-  den: string;
-  definition: string;
-  oagisComponentType: number;
-  abstracted: boolean;
-  deprecated: boolean;
-  componentType: number;
+  guid: string;
+  type: string;
+
   basedAccManifestId: number;
-  hasExtension: boolean;
-  accType: string;
+
+  den: string;
+  objectClassTerm: string;
+  objectClassQualifier: string;
+  componentType: number;
+  definition: Definition;
+  namespaceId: number;
+  isAbstract: boolean;
+  deprecated: boolean;
+  state: string;
+
+  owner: ScoreUser;
 }
 
-export class CcAsccpNode extends CcNode {
-  asccpId: number;
-  asccId: number;
+export class AsccDetails {
+  library: LibrarySummary;
+  release: ReleaseSummary;
+
   asccManifestId: number;
-  roleOfAccId: number;
-  seqKey: number;
-  asccpType: string;
-}
-
-export class CcBccpNode extends CcNode {
-  bccpId: number;
-  bccId: number;
-  btdId: number;
-  bccManifestId: number;
-  seqKey: number;
-  attribute: boolean;
-}
-
-export class CcBdtNode extends CcNode {
-  btdId: number;
-}
-
-export class CcAsccNode extends CcNode {
   asccId: number;
-  cardinalityMin: number;
-  cardinalityMax: number;
+  guid: string;
+
+  fromAcc: AccSummary;
+  toAsccp: AsccpSummary;
+  seqKeyId: number;
+  replacement: AsccSummary;
+  since: AsccSummary;
+  lastChanged: AsccSummary;
+
+  den: string;
+  cardinality: Cardinality;
   deprecated: boolean;
+  state: string;
+  definition: Definition;
+
+  log: LogSummary;
+
+  owner: ScoreUser;
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+
+  prevAsccManifestId: number;
+  nextAsccManifestId: number;
 }
 
-export class CcBccNode extends CcNode {
+export class AsccSummary {
+  library: LibrarySummary;
+  release: ReleaseSummary;
+
+  asccManifestId: number;
+  asccId: number;
+  guid: string;
+
+  fromAccManifestId: number;
+  toAsccpManifestId: number;
+  seqKeyId: number;
+
+  den: string;
+  cardinality: Cardinality;
+  deprecated: boolean;
+  state: string;
+  definition: Definition;
+
+  owner: ScoreUser;
+
+  prevAsccManifestId: number;
+  nextAsccManifestId: number;
+}
+
+export class BccDetails {
+  library: LibrarySummary;
+  release: ReleaseSummary;
+
+  bccManifestId: number;
   bccId: number;
-  cardinalityMin: number;
-  cardinalityMax: number;
-  deprecated: boolean;
-  defaultValue: string;
-  fixedValue: string;
+  guid: string;
+
+  fromAcc: AccSummary;
+  toBccp: BccpSummary;
+  seqKeyId: number;
+  replacement: BccSummary;
+  since: BccSummary;
+  lastChanged: BccSummary;
+
   entityType: string;
+  den: string;
+  cardinality: Cardinality;
+  deprecated: boolean;
+  nillable: boolean;
+  state: string;
+  valueConstraint: ValueConstraint;
+  definition: Definition;
+
+  log: LogSummary;
+
+  owner: ScoreUser;
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+
+  prevBccManifestId: number;
+  nextBccManifestId: number;
 }
 
+export class BccSummary {
+  library: LibrarySummary;
+  release: ReleaseSummary;
 
-export class CcBdtScNode extends CcNode {
-  bdtScId: number;
+  bccManifestId: number;
+  bccId: number;
+  guid: string;
+
+  fromAccManifestId: number;
+  toBccpManifestId: number;
+  seqKeyId: number;
+
+  entityType: string;
+  den: string;
+  cardinality: Cardinality;
+  deprecated: boolean;
+  nillable: boolean;
+  valueConstraint: ValueConstraint;
+  definition: Definition;
+
+  owner: ScoreUser;
+
+  prevBccManifestId: number;
+  nextBccManifestId: number;
 }
 
-export abstract class CcNodeDetail {
+export class AsccpDetails {
+  library: LibrarySummary;
+  release: ReleaseSummary;
+
+  asccpManifestId: number;
+  asccpId: number;
+  guid: string;
+  type: string;
+  roleOfAcc: AccSummary;
+  replacement: AsccpSummary;
+  since: AsccpSummary;
+  lastChanged: AsccpSummary;
+
+  den: string;
+  propertyTerm: string;
+  reusable: boolean;
+  deprecated: boolean;
+  nillable: boolean;
+  state: string;
+  namespace: NamespaceSummary;
+  definition: Definition;
+  access: string;
+
+  log: LogSummary;
+
+  owner: ScoreUser;
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+
+  prevAsccpManifestId: number;
+  nextAsccpManifestId: number;
+}
+
+export class AsccpSummary {
+  library: LibrarySummary;
+  release: ReleaseSummary;
+
+  asccpManifestId: number;
+  asccpId: number;
+  guid: string;
+  type: string;
+  roleOfAccManifestId: number;
+
+  den: string;
+  propertyTerm: string;
+  namespaceId: number;
+  reusable: boolean;
+  deprecated: boolean;
+  nillable: boolean;
+  state: string;
+  definition: Definition;
+
+  owner: ScoreUser;
+}
+
+export class BccpDetails {
+  library: LibrarySummary;
+  release: ReleaseSummary;
+
+  bccpManifestId: number;
+  bccpId: number;
+  guid: string;
+  dt: DtSummary;
+  replacement: BccpSummary;
+  since: BccpSummary;
+  lastChanged: BccpSummary;
+
+  den: string;
+  propertyTerm: string;
+  representationTerm: string;
+  namespace: NamespaceSummary;
+  deprecated: boolean;
+  nillable: boolean;
+  state: string;
+  valueConstraint: ValueConstraint;
+  definition: Definition;
+  access: string;
+
+  log: LogSummary;
+
+  owner: ScoreUser;
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+
+  prevBccpManifestId: number;
+  nextBccpManifestId: number;
+}
+
+export class BccpSummary {
+  library: LibrarySummary;
+  release: ReleaseSummary;
+
+  bccpManifestId: number;
+  bccpId: number;
+  guid: string;
+  dtManifestId: number;
+
+  den: string;
+  propertyTerm: string;
+  representationTerm: string;
+  namespaceId: number;
+  deprecated: boolean;
+  nillable: boolean;
+  state: string;
+  valueConstraint: ValueConstraint;
+  definition: Definition;
+
+  owner: ScoreUser;
+}
+
+export class DtDetails {
+  library: LibrarySummary;
+  release: ReleaseSummary;
+
+  dtManifestId: number;
+  dtId: number;
+  guid: string;
+  based: DtSummary;
+  replacement: DtSummary;
+  since: DtSummary;
+  lastChanged: DtSummary;
+
+  den: string;
+  dataTypeTerm: string;
+  qualifier: string;
+  representationTerm: string;
+  sixDigitId: string;
+  commonlyUsed: boolean;
+  hasChild: boolean;
+  deprecated: boolean;
+  state: string;
+  namespace: NamespaceSummary;
+  contentComponentDefinition: string;
+  definition: Definition;
+  dtAwdPriList: DtAwdPriDetails[];
+  access: string;
+
+  log: LogSummary;
+
+  owner: ScoreUser;
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+
+  prevDtManifestId: number;
+  nextDtManifestId: number;
+}
+
+export class DtAwdPriDetails {
+  dtAwdPriId: number;
+  release: ReleaseSummary;
+  dtId: number;
+  xbt: XbtSummary;
+  codeList: CodeListSummary;
+  agencyIdList: AgencyIdListSummary;
+  isDefault: boolean;
+  inherited: boolean;
+}
+
+export class DtSummary {
+  library: LibrarySummary;
+  release: ReleaseSummary;
+
+  dtManifestId: number;
+  dtId: number;
+  guid: string;
+  basedDtManifestId: number;
+
+  den: string;
+  dataTypeTerm: string;
+  qualifier: string;
+  representationTerm: string;
+  sixDigitId: string;
+  commonlyUsed: boolean;
+  deprecated: boolean;
+  state: string;
+  namespaceId: number;
+  contentComponentDefinition: string;
+  definition: Definition;
+  dtAwdPriList: DtAwdPriSummary[];
+
+  owner: ScoreUser;
+}
+
+export class DtAwdPriSummary {
+  dtAwdPriId: number;
+  releaseId: number;
+  dtId: number;
+  xbtManifestId: number;
+  cdtPriName: string;
+  xbtName: string;
+  codeListManifestId: number;
+  codeListName: string;
+  agencyIdListManifestId: number;
+  agencyIdListName: string;
+  isDefault: boolean;
+  inherited: boolean;
+}
+
+export class DtScDetails {
+  library: LibrarySummary;
+  release: ReleaseSummary;
+
+  dtScManifestId: number;
+  dtScId: number;
+  guid: string;
+
+  ownerDt: DtSummary;
+  based: DtScSummary;
+  replacement: DtScSummary;
+  since: DtScSummary;
+  lastChanged: DtScSummary;
+
+  objectClassTerm: string;
+  propertyTerm: string;
+  representationTerm: string;
+  cardinality: Cardinality;
+  prevCardinality: Cardinality; // @TODO: consider eliminating for model simplification.
+  deprecated: boolean;
+  state: string;
+  valueConstraint: ValueConstraint;
+  definition: Definition;
+  dtScAwdPriList: DtScAwdPriDetails[];
+
+  log: LogSummary;
+
+  owner: ScoreUser;
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+
+  prevDtScManifestId: number;
+  nextDtScManifestId: number;
+}
+
+export class DtScAwdPriDetails {
+  dtScAwdPriId: number;
+  release: ReleaseSummary;
+  dtScId: number;
+  xbt: XbtSummary;
+  codeList: CodeListSummary;
+  agencyIdList: AgencyIdListSummary;
+  isDefault: boolean;
+  inherited: boolean;
+}
+
+export class DtScSummary {
+  library: LibrarySummary;
+  release: ReleaseSummary;
+
+  dtScManifestId: number;
+  dtScId: number;
+  guid: string;
+
+  ownerDtManifestId: number;
+  basedDtScManifestId: number;
+
+  objectClassTerm: string;
+  propertyTerm: string;
+  representationTerm: string;
+  cardinality: Cardinality;
+  deprecated: boolean;
+  state: string;
+  valueConstraint: ValueConstraint;
+  definition: Definition;
+  dtScAwdPriList: DtScAwdPriSummary[];
+
+  owner: ScoreUser;
+}
+
+export class DtScAwdPriSummary {
+  dtScAwdPriId: number;
+  releaseId: number;
+  dtScId: number;
+  xbtManifestId: number;
+  cdtPriName: string;
+  xbtName: string;
+  codeListManifestId: number;
+  codeListName: string;
+  agencyIdListManifestId: number;
+  agencyIdListName: string;
+  isDefault: boolean;
+  inherited: boolean;
+}
+
+export class XbtSummary {
+  xbtManifestId: number;
+  xbtId: number;
+  cdtPriName: string;
+  name: string;
+}
+
+export abstract class CcNodeInfo {
   _node: CcFlatNode;
   type: string;
 
@@ -131,7 +504,7 @@ export abstract class CcNodeDetail {
   abstract get hashCode(): number;
 }
 
-export class CcAccNodeDetail extends CcNodeDetail {
+export class CcAccNodeInfo extends CcNodeInfo {
   accId: number;
   manifestId: number;
   guid: string;
@@ -139,109 +512,76 @@ export class CcAccNodeDetail extends CcNodeDetail {
   private _group: boolean;
   private _definition: string;
   private _definitionSource: string;
-  private _oagisComponentType: number;
+  private _oagisComponentType: string;
   private _abstracted: boolean;
   private _deprecated: boolean;
   private _namespaceId: number;
 
   private _state: string;
-  owner: string;
-  libraryId: number;
-  libraryName: string;
-  releaseId: number;
-  releaseNum: string;
-  workingRelease: boolean; // Is 'Working' Branch?
-  revisionId: number;
-  revisionNum: number;
-  revisionTrackingNum: number;
 
-  replacementAccManifestId: number;
-  replacement: CcAccNodeDetail;
+  owner: ScoreUser;
 
-  sinceManifestId: number;
-  sinceReleaseId: number;
-  sinceReleaseNum: string;
-  lastChangedManifestId: number;
-  lastChangedReleaseId: number;
-  lastChangedReleaseNum: string;
+  library: LibrarySummary;
+  release: ReleaseSummary;
+  log: LogSummary;
 
-  constructor(node: AccFlatNode, obj: any) {
+  replacement: AccSummary;
+  since: AccSummary;
+  lastChanged: AccSummary;
+
+  constructor(node: AccFlatNode, obj: AccDetails) {
     super(node);
 
     this.accId = obj.accId;
-    this.manifestId = obj.manifestId;
+    this.manifestId = obj.accManifestId;
     this.guid = obj.guid;
     this.objectClassTerm = obj.objectClassTerm;
-    this.group = obj.group;
-    this.definition = obj.definition;
-    this.definitionSource = obj.definitionSource;
-    this.oagisComponentType = obj.oagisComponentType;
-    this.abstracted = obj.abstracted;
+    this.group = obj.isGroup;
+    this.definition = (!!obj.definition) ? obj.definition.content : undefined;
+    this.definitionSource = (!!obj.definition) ? obj.definition.source : undefined;
+    this.oagisComponentType = obj.componentType;
+    this.abstracted = obj.isAbstract;
     this.deprecated = obj.deprecated;
-    this.replacementAccManifestId = obj.replacementAccManifestId;
     this.replacement = obj.replacement;
-    this.namespaceId = obj.namespaceId;
+    this.namespaceId = (!!obj.namespace) ? obj.namespace.namespaceId : undefined;
     this.state = obj.state;
     this.owner = obj.owner;
-    this.libraryId = obj.libraryId;
-    this.libraryName = obj.libraryName;
-    this.releaseId = obj.releaseId;
-    this.releaseNum = obj.releaseNum;
-    this.revisionId = obj.revisionId;
-    this.revisionNum = obj.revisionNum;
-    this.revisionTrackingNum = obj.revisionTrackingNum;
 
-    this.sinceManifestId = obj.sinceManifestId;
-    this.sinceReleaseId = obj.sinceReleaseId;
-    this.sinceReleaseNum = obj.sinceReleaseNum;
-    this.lastChangedManifestId = obj.lastChangedManifestId;
-    this.lastChangedReleaseId = obj.lastChangedReleaseId;
-    this.lastChangedReleaseNum = obj.lastChangedReleaseNum;
+    this.library = obj.library;
+    this.release = obj.release;
+    this.log = obj.log;
+    this.since = obj.since;
+    this.lastChanged = obj.lastChanged;
 
     this.reset();
   }
 
   get json(): any {
     return {
+      accManifestId: this.manifestId,
       accId: this.accId,
-      manifestId: this.manifestId,
       guid: this.guid,
       type: this.type,
       objectClassTerm: this.objectClassTerm,
-      oagisComponentType: this.oagisComponentType,
-      abstracted: this.abstracted,
-      deprecated: this.deprecated,
-      replacementAccManifestId: this.replacementAccManifestId,
-      replacement: (this.replacement) ? this.replacement.json : undefined,
+      componentType: this.oagisComponentType,
       definition: this.definition,
       definitionSource: this.definitionSource,
+      isAbstract: this.abstracted,
+      deprecated: this.deprecated,
       namespaceId: this.namespaceId,
       state: this.state,
-      owner: this.owner,
-      libraryId: this.libraryId,
-      libraryName: this.libraryName,
-      releaseId: this.releaseId,
-      releaseNum: this.releaseNum,
-      revisionNum: this.revisionNum,
-      revisionTrackingNum: this.revisionTrackingNum,
-      sinceManifestId: this.sinceManifestId,
-      sinceReleaseId: this.sinceReleaseId,
-      sinceReleaseNum: this.sinceReleaseNum,
-      lastChangedManifestId: this.lastChangedManifestId,
-      lastChangedReleaseId: this.lastChangedReleaseId,
-      lastChangedReleaseNum: this.lastChangedReleaseNum,
+      owner: this.owner.loginId
     };
   }
 
   get hashCode(): number {
     return hashCode4Array(
-      this.accId, this.manifestId, this.guid, this.type, this.replacementAccManifestId,
+      this.accId, this.manifestId, this.guid, this.type,
       this.objectClassTerm, this.oagisComponentType,
       this.abstracted, this.deprecated,
       this.namespaceId,
       this.definition, this.definitionSource,
-      this.owner, this.libraryId, this.libraryName, this.releaseId, this.releaseNum,
-      this.revisionNum, this.revisionTrackingNum
+      this.owner.loginId
     );
   }
 
@@ -288,15 +628,15 @@ export class CcAccNodeDetail extends CcNodeDetail {
     this._node.fireChangeEvent('definitionSource', value);
   }
 
-  get oagisComponentType(): number {
+  get oagisComponentType(): string {
     return this._oagisComponentType;
   }
 
-  set oagisComponentType(value: number) {
+  set oagisComponentType(value: string) {
     this._oagisComponentType = value;
-    if (this._oagisComponentType === Base.value) {
+    if (this._oagisComponentType === 'Base') {
       this.abstracted = true;
-    } else if (this._oagisComponentType === Extension.value || this._oagisComponentType === SemanticGroup.value) {
+    } else if (this._oagisComponentType === 'Extension' || this._oagisComponentType === 'SemanticGroup') {
       this.abstracted = false;
     }
     this._node.fireChangeEvent('oagisComponentType', value);
@@ -345,23 +685,23 @@ export class CcState {
 }
 
 export class OagisComponentType {
-  constructor(public value: number, public name: string) {
+  constructor(public value: string, public numericValue: number, public name: string) {
   }
 }
 
-export const Base: OagisComponentType = new OagisComponentType(0, 'Base (Abstract)');
-export const Semantics: OagisComponentType = new OagisComponentType(1, 'Semantics');
-export const Extension: OagisComponentType = new OagisComponentType(2, 'Extension');
-export const SemanticGroup: OagisComponentType = new OagisComponentType(3, 'Semantic Group');
-export const UserExtensionGroup: OagisComponentType = new OagisComponentType(4, 'User Extension Group');
-export const Embedded: OagisComponentType = new OagisComponentType(5, 'Embedded');
-export const OAGIS10Nouns: OagisComponentType = new OagisComponentType(6, 'OAGIS10 Nouns');
-export const OAGIS10BODs: OagisComponentType = new OagisComponentType(7, 'OAGIS10 BODs');
-export const BOD: OagisComponentType = new OagisComponentType(8, 'BOD');
-export const Verb: OagisComponentType = new OagisComponentType(9, 'Verb');
-export const Noun: OagisComponentType = new OagisComponentType(10, 'Noun');
-export const Choice: OagisComponentType = new OagisComponentType(11, 'Choice');
-export const AttributeGroup: OagisComponentType = new OagisComponentType(12, 'Attribute Group');
+export const Base: OagisComponentType = new OagisComponentType('Base', 0, 'Base (Abstract)');
+export const Semantics: OagisComponentType = new OagisComponentType('Semantics', 1, 'Semantics');
+export const Extension: OagisComponentType = new OagisComponentType('Extension', 2, 'Extension');
+export const SemanticGroup: OagisComponentType = new OagisComponentType('SemanticGroup', 3, 'Semantic Group');
+export const UserExtensionGroup: OagisComponentType = new OagisComponentType('UserExtensionGroup', 4, 'User Extension Group');
+export const Embedded: OagisComponentType = new OagisComponentType('Embedded', 5, 'Embedded');
+export const OAGIS10Nouns: OagisComponentType = new OagisComponentType('OAGIS10Nouns', 6, 'OAGIS10 Nouns');
+export const OAGIS10BODs: OagisComponentType = new OagisComponentType('OAGIS10BODs', 7, 'OAGIS10 BODs');
+export const BOD: OagisComponentType = new OagisComponentType('BOD', 8, 'BOD');
+export const Verb: OagisComponentType = new OagisComponentType('Verb', 9, 'Verb');
+export const Noun: OagisComponentType = new OagisComponentType('Noun', 10, 'Noun');
+export const Choice: OagisComponentType = new OagisComponentType('Choice', 11, 'Choice');
+export const AttributeGroup: OagisComponentType = new OagisComponentType('AttributeGroup', 12, 'Attribute Group');
 
 export const OagisComponentTypes: OagisComponentType[] = [
   Base, Semantics, Extension, SemanticGroup, UserExtensionGroup,
@@ -388,7 +728,7 @@ export const OagisComponentTypeMap = {
   12: AttributeGroup
 };
 
-class AsccDetail {
+class AsccNodeInfo {
   private _node: CcFlatNode;
   manifestId: number;
   asccId: number;
@@ -401,56 +741,42 @@ class AsccDetail {
   private _definitionSource: string;
 
   state: string;
-  owner: string;
-  libraryId: number;
-  libraryName: string;
-  releaseId: number;
-  releaseNum: string;
-  workingRelease: boolean; // Is 'Working' Branch?
-  revisionId: number;
-  revisionNum: number;
-  revisionTrackingNum: number;
+  owner: ScoreUser;
 
-  sinceManifestId: number;
-  sinceReleaseId: number;
-  sinceReleaseNum: string;
-  lastChangedManifestId: number;
-  lastChangedReleaseId: number;
-  lastChangedReleaseNum: string;
+  library: LibrarySummary;
+  release: ReleaseSummary;
+  log: LogSummary;
 
-  constructor(node: CcFlatNode, obj: any) {
+  replacement: AsccSummary;
+  since: AsccSummary;
+  lastChanged: AsccSummary;
+
+  constructor(node: CcFlatNode, obj: AsccDetails) {
     this._node = node;
 
-    this.manifestId = obj.manifestId;
+    this.manifestId = obj.asccManifestId;
     this.asccId = obj.asccId;
     this.guid = obj.guid;
     this.den = obj.den;
-    this.cardinalityMin = obj.cardinalityMin;
-    this.cardinalityMax = obj.cardinalityMax;
+    this.cardinalityMin = obj.cardinality.min;
+    this.cardinalityMax = obj.cardinality.max;
     this.deprecated = obj.deprecated;
-    this.definition = obj.definition;
-    this.definitionSource = obj.definitionSource;
+    this.definition = (!!obj.definition) ? obj.definition.content : undefined;
+    this.definitionSource = (!!obj.definition) ? obj.definition.source : undefined;
 
     this.state = obj.state;
     this.owner = obj.owner;
-    this.libraryId = obj.libraryId;
-    this.libraryName = obj.libraryName;
-    this.releaseId = obj.releaseId;
-    this.releaseNum = obj.releaseNum;
-    this.revisionId = obj.revisionId;
-    this.revisionNum = obj.revisionNum;
-    this.revisionTrackingNum = obj.revisionTrackingNum;
 
-    this.sinceManifestId = obj.sinceManifestId;
-    this.sinceReleaseId = obj.sinceReleaseId;
-    this.sinceReleaseNum = obj.sinceReleaseNum;
-    this.lastChangedManifestId = obj.lastChangedManifestId;
-    this.lastChangedReleaseId = obj.lastChangedReleaseId;
-    this.lastChangedReleaseNum = obj.lastChangedReleaseNum;
+    this.library = obj.library;
+    this.release = obj.release;
+    this.log = obj.log;
+    this.since = obj.since;
+    this.lastChanged = obj.lastChanged;
   }
 
   get json(): any {
     return {
+      asccManifestId: this.manifestId,
       asccId: this.asccId,
       guid: this.guid,
       cardinalityMin: this.cardinalityMin,
@@ -458,21 +784,8 @@ class AsccDetail {
       deprecated: this.deprecated,
       definition: this.definition,
       definitionSource: this.definitionSource,
-      manifestId: this.manifestId,
       state: this.state,
-      owner: this.owner,
-      libraryId: this.libraryId,
-      libraryName: this.libraryName,
-      releaseId: this.releaseId,
-      releaseNum: this.releaseNum,
-      revisionNum: this.revisionNum,
-      revisionTrackingNum: this.revisionTrackingNum,
-      sinceManifestId: this.sinceManifestId,
-      sinceReleaseId: this.sinceReleaseId,
-      sinceReleaseNum: this.sinceReleaseNum,
-      lastChangedManifestId: this.lastChangedManifestId,
-      lastChangedReleaseId: this.lastChangedReleaseId,
-      lastChangedReleaseNum: this.lastChangedReleaseNum,
+      owner: this.owner.loginId,
     };
   }
 
@@ -482,8 +795,7 @@ class AsccDetail {
       this.cardinalityMin, this.cardinalityMax,
       this.deprecated,
       this.definition, this.definitionSource,
-      this.owner, this.libraryId, this.libraryName, this.releaseId, this.releaseNum,
-      this.revisionNum, this.revisionTrackingNum
+      this.owner.loginId
     );
   }
 
@@ -537,7 +849,7 @@ class AsccDetail {
   }
 }
 
-class AsccpDetail {
+class AsccpNodeInfo {
   private _node: CcFlatNode;
   manifestId: number;
   asccpId: number;
@@ -551,102 +863,67 @@ class AsccpDetail {
   private _definitionSource: string;
 
   state: string;
-  owner: string;
-  libraryId: number;
-  libraryName: string;
-  releaseId: number;
-  releaseNum: string;
-  workingRelease: boolean; // Is 'Working' Branch?
-  revisionId: number;
-  revisionNum: number;
-  revisionTrackingNum: number;
+  owner: ScoreUser;
+
+  library: LibrarySummary;
+  release: ReleaseSummary;
+  log: LogSummary;
+
+  replacement: AsccpSummary;
+  since: AsccpSummary;
+  lastChanged: AsccpSummary;
+
   _den: string;
 
-  replacementAsccpManifestId: number;
-  replacement: AsccpDetail;
-
-  sinceManifestId: number;
-  sinceReleaseId: number;
-  sinceReleaseNum: string;
-  lastChangedManifestId: number;
-  lastChangedReleaseId: number;
-  lastChangedReleaseNum: string;
-
-  constructor(node: CcFlatNode, obj: any) {
+  constructor(node: CcFlatNode, obj: AsccpDetails) {
     this._node = node;
-    this.manifestId = obj.manifestId;
+    this.manifestId = obj.asccpManifestId;
     this.asccpId = obj.asccpId;
     this.guid = obj.guid;
     this.propertyTerm = obj.propertyTerm;
     this.reusable = obj.reusable;
     this.nillable = obj.nillable;
     this.deprecated = obj.deprecated;
-    this.namespaceId = obj.namespaceId;
-    this.definition = obj.definition;
-    this.definitionSource = obj.definitionSource;
+    this.namespaceId = (!!obj.namespace) ? obj.namespace.namespaceId : undefined;
+    this.definition = (!!obj.definition) ? obj.definition.content : undefined;
+    this.definitionSource = (!!obj.definition) ? obj.definition.source : undefined;
     this._den = obj.den;
 
     this.state = obj.state;
     this.owner = obj.owner;
-    this.libraryId = obj.libraryId;
-    this.libraryName = obj.libraryName;
-    this.releaseId = obj.releaseId;
-    this.releaseNum = obj.releaseNum;
-    this.revisionId = obj.revisionId;
-    this.revisionNum = obj.revisionNum;
-    this.revisionTrackingNum = obj.revisionTrackingNum;
 
-    this.replacementAsccpManifestId = obj.replacementAsccpManifestId;
-    this.replacement = obj.replacement;
-
-    this.sinceManifestId = obj.sinceManifestId;
-    this.sinceReleaseId = obj.sinceReleaseId;
-    this.sinceReleaseNum = obj.sinceReleaseNum;
-    this.lastChangedManifestId = obj.lastChangedManifestId;
-    this.lastChangedReleaseId = obj.lastChangedReleaseId;
-    this.lastChangedReleaseNum = obj.lastChangedReleaseNum;
+    this.library = obj.library;
+    this.release = obj.release;
+    this.log = obj.log;
+    this.since = obj.since;
+    this.lastChanged = obj.lastChanged;
   }
 
   get json(): any {
     return {
+      asccpManifestId: this.manifestId,
       asccpId: this.asccpId,
-      manifestId: this.manifestId,
       guid: this.guid,
       propertyTerm: this.propertyTerm,
       reusable: this.reusable,
       nillable: this.nillable,
       deprecated: this.deprecated,
-      replacementAsccpManifestId: this.replacementAsccpManifestId,
-      replacement: (!!this.replacement) ? this.replacement.json : undefined,
       definition: this.definition,
       definitionSource: this.definitionSource,
       namespaceId: this.namespaceId,
       state: this.state,
-      owner: this.owner,
-      libraryId: this.libraryId,
-      libraryName: this.libraryName,
-      releaseId: this.releaseId,
-      releaseNum: this.releaseNum,
-      revisionNum: this.revisionNum,
-      revisionTrackingNum: this.revisionTrackingNum,
-      sinceManifestId: this.sinceManifestId,
-      sinceReleaseId: this.sinceReleaseId,
-      sinceReleaseNum: this.sinceReleaseNum,
-      lastChangedManifestId: this.lastChangedManifestId,
-      lastChangedReleaseId: this.lastChangedReleaseId,
-      lastChangedReleaseNum: this.lastChangedReleaseNum,
+      owner: this.owner.loginId,
     };
   }
 
   get hashCode(): number {
     return hashCode4Array(
-      this.asccpId, this.manifestId, this.guid, this.replacementAsccpManifestId,
+      this.asccpId, this.manifestId, this.guid,
       this.propertyTerm,
       this.reusable, this.nillable, this.deprecated,
       this.definition, this.definitionSource,
       this.namespaceId,
-      this.owner, this.libraryId, this.libraryName, this.releaseId, this.releaseNum,
-      this.revisionNum, this.revisionTrackingNum
+      this.owner.loginId
     );
   }
 
@@ -733,17 +1010,17 @@ class AsccpDetail {
   }
 }
 
-export class CcAsccpNodeDetail extends CcNodeDetail {
-  ascc: AsccDetail;
-  asccp: AsccpDetail;
+export class CcAsccpNodeInfo extends CcNodeInfo {
+  ascc: AsccNodeInfo;
+  asccp: AsccpNodeInfo;
 
-  constructor(node: AsccpFlatNode, obj: any) {
+  constructor(node: AsccpFlatNode, ascc: AsccDetails, asccp: AsccpDetails) {
     super(node);
-    if (obj.ascc) {
-      this.ascc = new AsccDetail(node, obj.ascc);
+    if (ascc) {
+      this.ascc = new AsccNodeInfo(node, ascc);
     }
-    if (obj.asccp) {
-      this.asccp = new AsccpDetail(node, obj.asccp);
+    if (asccp) {
+      this.asccp = new AsccpNodeInfo(node, asccp);
     }
 
     this.reset();
@@ -755,24 +1032,24 @@ export class CcAsccpNodeDetail extends CcNodeDetail {
 }
 
 export class EntityType {
-  constructor(public value: number, public name: string) {
+  constructor(public value: string, public numericValue: number, public name: string) {
   }
 }
 
-export const Attribute: EntityType = new EntityType(0, 'Attribute');
-export const Element: EntityType = new EntityType(1, 'Element');
+export const Attribute: EntityType = new EntityType('Attribute', 0, 'Attribute');
+export const Element: EntityType = new EntityType('Element', 1, 'Element');
 
 export const EntityTypes: EntityType[] = [
   Attribute, Element
 ];
 
-class BccDetail {
+class BccNodeInfo {
   private _node: CcFlatNode;
   manifestId: number;
   bccId: number;
   guid: string;
   den: string;
-  private _entityType: number;
+  private _entityType: string;
   private _cardinalityMin: number;
   private _cardinalityMax: number;
   private _nillable: boolean;
@@ -784,63 +1061,48 @@ class BccDetail {
   private _definitionSource: string;
 
   state: string;
-  owner: string;
-  libraryId: number;
-  libraryName: string;
-  releaseId: number;
-  releaseNum: string;
-  workingRelease: boolean; // Is 'Working' Branch?
-  revisionId: number;
-  revisionNum: number;
-  revisionTrackingNum: number;
+  owner: ScoreUser;
 
-  sinceManifestId: number;
-  sinceReleaseId: number;
-  sinceReleaseNum: string;
-  lastChangedManifestId: number;
-  lastChangedReleaseId: number;
-  lastChangedReleaseNum: string;
+  library: LibrarySummary;
+  release: ReleaseSummary;
+  log: LogSummary;
 
-  constructor(node: BccpFlatNode, obj: any) {
+  replacement: BccSummary;
+  since: BccSummary;
+  lastChanged: BccSummary;
+
+  constructor(node: BccpFlatNode, obj: BccDetails) {
     this._node = node;
 
-    this.manifestId = obj.manifestId;
+    this.manifestId = obj.bccManifestId;
     this.bccId = obj.bccId;
     this.guid = obj.guid;
     this.den = obj.den;
     this.entityType = obj.entityType;
-    this.cardinalityMin = obj.cardinalityMin;
-    this.cardinalityMax = obj.cardinalityMax;
+    this.cardinalityMin = obj.cardinality.min;
+    this.cardinalityMax = obj.cardinality.max;
     this.deprecated = obj.deprecated;
     this.nillable = obj.nillable;
-    this.defaultValue = obj.defaultValue;
-    this.fixedValue = obj.fixedValue;
-    this.fixedOrDefault = this.defaultValue ? 'default' : this.fixedValue ? 'fixed' : 'none';
-    this.definition = obj.definition;
-    this.definitionSource = obj.definitionSource;
+    this.defaultValue = (!!obj.valueConstraint) ? obj.valueConstraint.defaultValue : undefined;
+    this.fixedValue = (!!obj.valueConstraint) ? obj.valueConstraint.fixedValue : undefined;
+    this.fixedOrDefault = this.fixedValue ? 'fixed' : this.defaultValue ? 'default' : 'none';
+    this.definition = (!!obj.definition) ? obj.definition.content : undefined;
+    this.definitionSource = (!!obj.definition) ? obj.definition.source : undefined;
 
     this.state = obj.state;
     this.owner = obj.owner;
-    this.libraryId = obj.libraryId;
-    this.libraryName = obj.libraryName;
-    this.releaseId = obj.releaseId;
-    this.releaseNum = obj.releaseNum;
-    this.revisionId = obj.revisionId;
-    this.revisionNum = obj.revisionNum;
-    this.revisionTrackingNum = obj.revisionTrackingNum;
 
-    this.sinceManifestId = obj.sinceManifestId;
-    this.sinceReleaseId = obj.sinceReleaseId;
-    this.sinceReleaseNum = obj.sinceReleaseNum;
-    this.lastChangedManifestId = obj.lastChangedManifestId;
-    this.lastChangedReleaseId = obj.lastChangedReleaseId;
-    this.lastChangedReleaseNum = obj.lastChangedReleaseNum;
+    this.library = obj.library;
+    this.release = obj.release;
+    this.log = obj.log;
+    this.since = obj.since;
+    this.lastChanged = obj.lastChanged;
   }
 
   get json(): any {
     return {
+      bccManifestId: this.manifestId,
       bccId: this.bccId,
-      manifestId: this.manifestId,
       guid: this.guid,
       cardinalityMin: this.cardinalityMin,
       cardinalityMax: this.cardinalityMax,
@@ -852,19 +1114,7 @@ class BccDetail {
       definition: this.definition,
       definitionSource: this.definitionSource,
       state: this.state,
-      owner: this.owner,
-      libraryId: this.libraryId,
-      libraryName: this.libraryName,
-      releaseId: this.releaseId,
-      releaseNum: this.releaseNum,
-      revisionNum: this.revisionNum,
-      revisionTrackingNum: this.revisionTrackingNum,
-      sinceManifestId: this.sinceManifestId,
-      sinceReleaseId: this.sinceReleaseId,
-      sinceReleaseNum: this.sinceReleaseNum,
-      lastChangedManifestId: this.lastChangedManifestId,
-      lastChangedReleaseId: this.lastChangedReleaseId,
-      lastChangedReleaseNum: this.lastChangedReleaseNum,
+      owner: this.owner.loginId
     };
   }
 
@@ -875,16 +1125,15 @@ class BccDetail {
       this.nillable, this.deprecated, this.entityType,
       this.defaultValue, this.fixedValue,
       this.definition, this.definitionSource,
-      this.owner, this.libraryId, this.libraryName, this.releaseId, this.releaseNum,
-      this.revisionNum, this.revisionTrackingNum
+      this.owner.loginId
     );
   }
 
-  get entityType(): number {
+  get entityType(): string {
     return this._entityType;
   }
 
-  set entityType(value: number) {
+  set entityType(value: string) {
     this._entityType = value;
     this._node.fireChangeEvent('entityType', value);
   }
@@ -988,7 +1237,7 @@ class BccDetail {
   }
 }
 
-class BccpDetail {
+class BccpNodeInfo {
   private _node: BccpFlatNode;
 
   manifestId: number;
@@ -1005,104 +1254,70 @@ class BccpDetail {
   private _definitionSource: string;
 
   state: string;
-  owner: string;
-  libraryId: number;
-  libraryName: string;
-  releaseId: number;
-  releaseNum: string;
-  workingRelease: boolean; // Is 'Working' Branch?
-  revisionId: number;
-  revisionNum: number;
-  revisionTrackingNum: number;
+  owner: ScoreUser;
 
-  replacementBccpManifestId: number;
-  replacement: BccpDetail;
+  library: LibrarySummary;
+  release: ReleaseSummary;
+  log: LogSummary;
 
-  sinceManifestId: number;
-  sinceReleaseId: number;
-  sinceReleaseNum: string;
-  lastChangedManifestId: number;
-  lastChangedReleaseId: number;
-  lastChangedReleaseNum: string;
+  replacement: BccpSummary;
+  since: BccpSummary;
+  lastChanged: BccpSummary;
 
-  constructor(node: BccpFlatNode, obj: any) {
+  constructor(node: BccpFlatNode, obj: BccpDetails) {
     this._node = node;
 
-    this.manifestId = obj.manifestId;
+    this.manifestId = obj.bccpManifestId;
     this.bccpId = obj.bccpId;
     this.guid = obj.guid;
     this.propertyTerm = obj.propertyTerm;
     this.nillable = obj.nillable;
     this.deprecated = obj.deprecated;
-    this.replacementBccpManifestId = obj.replacementBccpManifestId;
+    this.namespaceId = (!!obj.namespace) ? obj.namespace.namespaceId : undefined;
     this.replacement = obj.replacement;
-    this.namespaceId = obj.namespaceId;
-    this.defaultValue = obj.defaultValue;
-    this.fixedValue = obj.fixedValue;
-    this.fixedOrDefault = this.defaultValue ? 'default' : this.fixedValue ? 'fixed' : 'none';
-    this.definition = obj.definition;
-    this.definitionSource = obj.definitionSource;
+    this.defaultValue = (!!obj.valueConstraint) ? obj.valueConstraint.defaultValue : undefined;
+    this.fixedValue = (!!obj.valueConstraint) ? obj.valueConstraint.fixedValue : undefined;
+    this.fixedOrDefault = this.fixedValue ? 'fixed' : this.defaultValue ? 'default' : 'none';
+    this.definition = (!!obj.definition) ? obj.definition.content : undefined;
+    this.definitionSource = (!!obj.definition) ? obj.definition.source : undefined;
 
     this.state = obj.state;
     this.owner = obj.owner;
-    this.libraryId = obj.libraryId;
-    this.libraryName = obj.libraryName;
-    this.releaseId = obj.releaseId;
-    this.releaseNum = obj.releaseNum;
-    this.revisionId = obj.revisionId;
-    this.revisionNum = obj.revisionNum;
-    this.revisionTrackingNum = obj.revisionTrackingNum;
 
-    this.sinceManifestId = obj.sinceManifestId;
-    this.sinceReleaseId = obj.sinceReleaseId;
-    this.sinceReleaseNum = obj.sinceReleaseNum;
-    this.lastChangedManifestId = obj.lastChangedManifestId;
-    this.lastChangedReleaseId = obj.lastChangedReleaseId;
-    this.lastChangedReleaseNum = obj.lastChangedReleaseNum;
+    this.library = obj.library;
+    this.release = obj.release;
+    this.log = obj.log;
+    this.since = obj.since;
+    this.lastChanged = obj.lastChanged;
   }
 
   get json(): any {
     return {
+      bccpManifestId: this.manifestId,
       bccpId: this.bccpId,
-      manifestId: this.manifestId,
       guid: this.guid,
       propertyTerm: this.propertyTerm,
       nillable: this.nillable,
       deprecated: this.deprecated,
-      replacementBccpManifestId: this.replacementBccpManifestId,
-      replacement: (!!this.replacement) ? this.replacement.json : undefined,
       defaultValue: this.defaultValue,
       fixedValue: this.fixedValue,
       definition: this.definition,
       definitionSource: this.definitionSource,
       namespaceId: this.namespaceId,
       state: this.state,
-      owner: this.owner,
-      libraryId: this.libraryId,
-      libraryName: this.libraryName,
-      releaseId: this.releaseId,
-      releaseNum: this.releaseNum,
-      revisionNum: this.revisionNum,
-      revisionTrackingNum: this.revisionTrackingNum,
-      sinceManifestId: this.sinceManifestId,
-      sinceReleaseId: this.sinceReleaseId,
-      sinceReleaseNum: this.sinceReleaseNum,
-      lastChangedManifestId: this.lastChangedManifestId,
-      lastChangedReleaseId: this.lastChangedReleaseId,
-      lastChangedReleaseNum: this.lastChangedReleaseNum,
+      owner: this.owner.loginId
     };
   }
 
   get hashCode(): number {
     return hashCode4Array(
-      this.bccpId, this.manifestId, this.guid, this.replacementBccpManifestId,
+      this.bccpId, this.manifestId, this.guid,
       this.propertyTerm,
       this.nillable, this.deprecated,
       this.defaultValue, this.fixedValue,
       this.definition, this.definitionSource,
       this.namespaceId,
-      this.owner, this.libraryId, this.libraryName, this.releaseId, this.releaseNum,
-      this.revisionNum, this.revisionTrackingNum
+      this.owner.loginId
     );
   }
 
@@ -1214,7 +1429,7 @@ class BccpDetail {
   }
 }
 
-class BdtDetail {
+class DtNodeInfo {
   private _node: BccpFlatNode;
 
   manifestId: number;
@@ -1230,76 +1445,62 @@ class BdtDetail {
   hasNoSc: boolean;
 
   state: string;
-  owner: string;
-  libraryId: number;
-  libraryName: string;
-  releaseId: number;
-  releaseNum: string;
-  workingRelease: boolean; // Is 'Working' Branch?
-  revisionId: number;
-  revisionNum: number;
-  revisionTrackingNum: number;
+  owner: ScoreUser;
 
-  sinceManifestId: number;
-  sinceReleaseId: number;
-  sinceReleaseNum: string;
-  lastChangedManifestId: number;
-  lastChangedReleaseId: number;
-  lastChangedReleaseNum: string;
+  library: LibrarySummary;
+  release: ReleaseSummary;
+  log: LogSummary;
+
+  replacement: DtSummary;
+  since: DtSummary;
+  lastChanged: DtSummary;
 
   bdtPriRestriList: CcBdtPriRestri[];
 
-  constructor(node: BccpFlatNode, obj: any) {
+  constructor(node: BccpFlatNode, obj: DtDetails) {
     this._node = node;
 
-    this.manifestId = obj.manifestId;
-    this.bdtId = obj.bdtId;
+    this.manifestId = obj.dtManifestId;
+    this.bdtId = obj.dtId;
     this.guid = obj.guid;
     this.dataTypeTerm = obj.dataTypeTerm;
     this.representationTerm = obj.representationTerm;
     this.qualifier = obj.qualifier;
-    this.namespaceId = obj.namespaceId;
+    this.namespaceId = (!!obj.namespace) ? obj.namespace.namespaceId : undefined;
+    this.replacement = obj.replacement;
     this.den = obj.den;
-    this.definition = obj.definition;
-    this.definitionSource = obj.definitionSource;
-    this.hasNoSc = obj.hasNoSc;
+    this.definition = (!!obj.definition) ? obj.definition.content : undefined;
+    this.definitionSource = (!!obj.definition) ? obj.definition.source : undefined;
+    this.hasNoSc = !obj.hasChild;
 
     this.state = obj.state;
     this.owner = obj.owner;
-    this.libraryId = obj.libraryId;
-    this.libraryName = obj.libraryName;
-    this.releaseId = obj.releaseId;
-    this.releaseNum = obj.releaseNum;
-    this.revisionId = obj.revisionId;
-    this.revisionNum = obj.revisionNum;
-    this.revisionTrackingNum = obj.revisionTrackingNum;
 
-    this.sinceManifestId = obj.sinceManifestId;
-    this.sinceReleaseId = obj.sinceReleaseId;
-    this.sinceReleaseNum = obj.sinceReleaseNum;
-    this.lastChangedManifestId = obj.lastChangedManifestId;
-    this.lastChangedReleaseId = obj.lastChangedReleaseId;
-    this.lastChangedReleaseNum = obj.lastChangedReleaseNum;
+    this.library = obj.library;
+    this.release = obj.release;
+    this.log = obj.log;
+    this.since = obj.since;
+    this.lastChanged = obj.lastChanged;
 
-    this.bdtPriRestriList = obj.bdtPriRestriList;
+    this.bdtPriRestriList = [];//obj.bdtPriRestriList;
   }
 }
 
-export class CcBccpNodeDetail extends CcNodeDetail {
-  bcc: BccDetail;
-  bccp: BccpDetail;
-  bdt: BdtDetail;
+export class CcBccpNodeInfo extends CcNodeInfo {
+  bcc: BccNodeInfo;
+  bccp: BccpNodeInfo;
+  bdt: DtNodeInfo;
 
-  constructor(node: BccpFlatNode, obj: any) {
+  constructor(node: BccpFlatNode, bcc: BccDetails, bccp: BccpDetails, dt: DtDetails) {
     super(node);
-    if (obj.bcc) {
-      this.bcc = new BccDetail(node, obj.bcc);
+    if (bcc) {
+      this.bcc = new BccNodeInfo(node, bcc);
     }
-    if (obj.bccp) {
-      this.bccp = new BccpDetail(node, obj.bccp);
+    if (bccp) {
+      this.bccp = new BccpNodeInfo(node, bccp);
     }
-    if (obj.bdt) {
-      this.bdt = new BdtDetail(node, obj.bdt);
+    if (dt) {
+      this.bdt = new DtNodeInfo(node, dt);
     }
     this.reset();
   }
@@ -1310,7 +1511,7 @@ export class CcBccpNodeDetail extends CcNodeDetail {
 }
 
 export class CcBdtPriRestri {
-  parent: CcDtNodeDetail | CcBdtScNodeDetail;
+  parent: CcDtNodeInfo | CcDtScNodeInfo;
   bdtPriRestriId: number;
   bdtScPriRestriId: number;
   type: string;
@@ -1319,6 +1520,7 @@ export class CcBdtPriRestri {
   cdtScAwdPriId: number;
   cdtScAwdPriXpsTypeMapId: number;
   primitiveName: string;
+  xbtManifestId: number;
   xbtId: number;
   xbtName: string;
   codeListManifestId: number;
@@ -1329,12 +1531,12 @@ export class CcBdtPriRestri {
   isSc: boolean;
   inherited: boolean;
 
-  _selectedCodeList: CodeListForList;
-  get selectedCodeList(): CodeListForList {
+  _selectedCodeList: CodeListSummary;
+  get selectedCodeList(): CodeListSummary {
     return this._selectedCodeList;
   }
 
-  set selectedCodeList(val: CodeListForList) {
+  set selectedCodeList(val: CodeListSummary) {
     this._selectedCodeList = val;
     if (!!val) {
       // Changed from 'Agency ID List' to 'Code List'
@@ -1352,19 +1554,19 @@ export class CcBdtPriRestri {
       }
 
       this.codeListManifestId = val.codeListManifestId;
-      this.codeListName = val.codeListName;
+      this.codeListName = val.name;
     } else {
       this.codeListManifestId = undefined;
       this.codeListName = undefined;
     }
   }
 
-  _selectedAgencyIdList: AgencyIdList;
-  get selectedAgencyIdList(): AgencyIdList {
+  _selectedAgencyIdList: AgencyIdListSummary;
+  get selectedAgencyIdList(): AgencyIdListSummary {
     return this._selectedAgencyIdList;
   }
 
-  set selectedAgencyIdList(val: AgencyIdList) {
+  set selectedAgencyIdList(val: AgencyIdListSummary) {
     this._selectedAgencyIdList = val;
     if (!!val) {
       // Changed from 'Code List' to 'Agency ID List'
@@ -1391,7 +1593,7 @@ export class CcBdtPriRestri {
 
   $hashCode: number;
 
-  constructor(detail: CcDtNodeDetail | CcBdtScNodeDetail, obj: CcBdtPriRestri, dtPrimitiveAware: DtPrimitiveAware) {
+  constructor(detail: CcDtNodeInfo | CcDtScNodeInfo, obj: CcBdtPriRestri, dtPrimitiveAware: DtPrimitiveAware) {
     this.parent = detail;
     this.type = obj.type;
     this.bdtPriRestriId = obj.bdtPriRestriId;
@@ -1403,6 +1605,7 @@ export class CcBdtPriRestri {
     this.isSc = !!this.cdtAwdPriId;
 
     this.primitiveName = obj.primitiveName;
+    this.xbtManifestId = obj.xbtManifestId;
     this.xbtId = obj.xbtId;
     this.xbtName = obj.xbtName;
     this.codeListManifestId = obj.codeListManifestId;
@@ -1448,10 +1651,9 @@ export class CcBdtPriRestri {
       this.xbtId, this.xbtName,
       (this.selectedCodeList) ? {
         codeListManifestId: this.selectedCodeList.codeListManifestId,
-        codeListName: this.selectedCodeList.codeListName
+        codeListName: this.selectedCodeList.name
       } : undefined, (this.selectedAgencyIdList) ? {
         agencyIdListManifestId: this.selectedAgencyIdList.agencyIdListManifestId,
-        agencyIdListValueManifestId: this.selectedAgencyIdList.agencyIdListValueManifestId,
         name: this.selectedAgencyIdList.name
       } : undefined);
     return hash;
@@ -1473,6 +1675,7 @@ export class CcBdtPriRestri {
       primitiveName: this.primitiveName,
       codeListManifestId: this.isCodeList ? this.selectedCodeList.codeListManifestId : null,
       agencyIdListManifestId: this.isAgencyIdList ? this.selectedAgencyIdList.agencyIdListManifestId : null,
+      xbtManifestId: this.xbtManifestId,
       xbtId: this.xbtId,
       xbtName: this.xbtName,
       default: this.default,
@@ -1514,9 +1717,9 @@ export class CcXbt {
 }
 
 export interface DtPrimitiveAware {
-  codeLists: CodeListForList[];
-  agencyIdLists: AgencyIdList[];
-  xbtList: CcXbt[];
+  codeLists: CodeListSummary[];
+  agencyIdLists: AgencyIdListSummary[];
+  xbtList: XbtSummary[];
 }
 
 export interface ValueDomainEntity {
@@ -1526,7 +1729,7 @@ export interface ValueDomainEntity {
   default: boolean;
 }
 
-export class CcDtNodeDetail extends CcNodeDetail {
+export class CcDtNodeInfo extends CcNodeInfo {
   bdtId: number;
   private _definition: string;
   private _definitionSource: string;
@@ -1543,68 +1746,53 @@ export class CcDtNodeDetail extends CcNodeDetail {
   commonlyUsed: boolean;
   private _namespaceId: number;
   state: string;
-  owner: string;
-  libraryId: number;
-  libraryName: string;
-  releaseId: number;
-  releaseNum: string;
-  workingRelease: boolean; // Is 'Working' Branch?
-  revisionId: number;
-  revisionNum: number;
-  revisionTrackingNum: number;
-  sinceManifestId: number;
-  sinceReleaseId: number;
-  sinceReleaseNum: string;
-  lastChangedManifestId: number;
-  lastChangedReleaseId: number;
-  lastChangedReleaseNum: string;
-  spec: string;
+  owner: ScoreUser;
 
-  bdtPriRestriList: CcBdtPriRestri[];
-  bdtPriRestriListByGroup: any[];
+  library: LibrarySummary;
+  release: ReleaseSummary;
+  log: LogSummary;
+
+  replacement: DtSummary;
+  since: DtSummary;
+  lastChanged: DtSummary;
+
+  dtAwdPriList: DtAwdPriDetails[];
+  dtAwdPriListByGroup: any[];
 
   // To display value domains on UI
   primitiveMap: Map<string, ValueDomainEntity[]>;
   codeListList: ValueDomainEntity[];
   agencyIdListList: ValueDomainEntity[];
 
-  constructor(node: DtFlatNode, obj: any) {
+  constructor(node: DtFlatNode, obj: DtDetails) {
     super(node);
 
-    this.bdtId = obj.bdtId;
+    this.bdtId = obj.dtId;
     this.guid = obj.guid;
-    this._definition = obj.definition;
-    this._definitionSource = obj.definitionSource;
+    this._definition = (!!obj.definition) ? obj.definition.content : undefined;
+    this._definitionSource = (!!obj.definition) ? obj.definition.source : undefined;
     this._representationTerm = obj.representationTerm;
     this._dataTypeTerm = obj.dataTypeTerm;
     this._qualifier = obj.qualifier;
-    this.basedBdtId = obj.basedBdtId;
-    this.basedBdtManifestId = obj.basedBdtManifestId;
-    this.basedBdtDen = obj.basedBdtDen;
-    this.basedBdtState = obj.basedBdtState;
+    this.basedBdtId = (obj.based) ? obj.based.dtId : undefined;
+    this.basedBdtManifestId = (obj.based) ? obj.based.dtManifestId : undefined;
+    this.basedBdtDen = (obj.based) ? obj.based.den : undefined;
+    this.basedBdtState = (obj.based) ? obj.based.state : undefined;
     this._sixDigitId = obj.sixDigitId;
     this._contentComponentDefinition = obj.contentComponentDefinition;
     this.commonlyUsed = obj.commonlyUsed;
-    this._namespaceId = obj.namespaceId;
+    this._namespaceId = (obj.namespace) ? obj.namespace.namespaceId : undefined;
     this.state = obj.state;
     this.owner = obj.owner;
-    this.libraryId = obj.libraryId;
-    this.libraryName = obj.libraryName;
-    this.releaseId = obj.releaseId;
-    this.releaseNum = obj.releaseNum;
-    this.revisionId = obj.revisionId;
-    this.revisionNum = obj.revisionNum;
-    this.revisionTrackingNum = obj.revisionTrackingNum;
-    this.sinceManifestId = obj.sinceManifestId;
-    this.sinceReleaseId = obj.sinceReleaseId;
-    this.sinceReleaseNum = obj.sinceReleaseNum;
-    this.lastChangedManifestId = obj.lastChangedManifestId;
-    this.lastChangedReleaseId = obj.lastChangedReleaseId;
-    this.lastChangedReleaseNum = obj.lastChangedReleaseNum;
-    this.spec = obj.spec;
 
-    this.bdtPriRestriList = obj.bdtPriRestriList;
-    this.bdtPriRestriListByGroup = [];
+    this.library = obj.library;
+    this.release = obj.release;
+    this.log = obj.log;
+    this.since = obj.since;
+    this.lastChanged = obj.lastChanged;
+
+    this.dtAwdPriList = obj.dtAwdPriList;
+    this.dtAwdPriListByGroup = [];
     this.primitiveMap = new Map<string, ValueDomainEntity[]>();
     this.codeListList = [];
     this.agencyIdListList = [];
@@ -1613,12 +1801,12 @@ export class CcDtNodeDetail extends CcNodeDetail {
   }
 
   update(dtPrimitiveAware: DtPrimitiveAware) {
-    if (this.bdtPriRestriList.length > 0) {
-      if (this.bdtPriRestriList[0] instanceof CcBdtPriRestri) {
-        return;
-      }
-    }
-    this.bdtPriRestriList = this.bdtPriRestriList.map(row => new CcBdtPriRestri(this, row, dtPrimitiveAware));
+    // if (this.dtAwdPriList.length > 0) {
+    //   if (this.dtAwdPriList[0] instanceof CcBdtPriRestri) {
+    //     return;
+    //   }
+    // }
+    // this.dtAwdPriList = this.dtAwdPriList.map(row => new CcBdtPriRestri(this, row, dtPrimitiveAware));
     this.updateValueDomainGroup();
     this.reset();
   }
@@ -1629,147 +1817,139 @@ export class CcDtNodeDetail extends CcNodeDetail {
     this.codeListList = [];
     this.agencyIdListList = [];
 
-    const bdtPriRestriList = this.bdtPriRestriList;
-    for (const valueDomain of bdtPriRestriList) {
-      if (valueDomain.type === 'Primitive') {
-        if (!this.primitiveMap.has(valueDomain.primitiveName)) {
-          this.primitiveMap.set(valueDomain.primitiveName, []);
+    const dtAwdPriList = this.dtAwdPriList;
+    for (const dtAwdPri of dtAwdPriList) {
+      if (!!dtAwdPri.xbt) {
+        if (!this.primitiveMap.has(dtAwdPri.xbt.cdtPriName)) {
+          this.primitiveMap.set(dtAwdPri.xbt.cdtPriName, []);
         }
         const domainEntity = new class implements ValueDomainEntity {
-          get self(): CcBdtPriRestri {
-            return valueDomain;
+          get self(): DtAwdPriDetails {
+            return dtAwdPri;
           }
 
           get type(): string {
-            return valueDomain.type;
+            return 'Primitive';
           }
 
           get id(): number {
-            return valueDomain.xbtId;
+            return dtAwdPri.xbt.xbtManifestId;
           }
 
           set id(id: number) {
-            valueDomain.xbtId = id;
+            dtAwdPri.xbt.xbtManifestId = id;
           }
 
           get name(): string {
-            return valueDomain.xbtName;
+            return dtAwdPri.xbt.name;
           }
 
           set name(name: string) {
-            valueDomain.xbtName = name;
+            dtAwdPri.xbt.name = name;
           }
 
           get default(): boolean {
-            return valueDomain.default;
+            return dtAwdPri.isDefault;
           }
 
           set default(isDefault: boolean) {
-            valueDomain.default = isDefault;
+            dtAwdPri.isDefault = isDefault;
           }
         };
         primitiveList.push(domainEntity);
-        this.primitiveMap.get(valueDomain.primitiveName).push(domainEntity);
+        this.primitiveMap.get(dtAwdPri.xbt.cdtPriName).push(domainEntity);
       }
-      if (valueDomain.type === 'CodeList') {
+      if (!!dtAwdPri.codeList) {
         this.codeListList.push(new class implements ValueDomainEntity {
-          get self(): CcBdtPriRestri {
-            return valueDomain;
+          get self(): DtAwdPriDetails {
+            return dtAwdPri;
           }
 
           get type(): string {
-            return valueDomain.type;
+            return 'Code List';
           }
 
           get id(): number {
-            return (valueDomain.selectedCodeList) ? valueDomain.selectedCodeList.codeListManifestId : undefined;
+            return dtAwdPri.codeList.codeListManifestId;
           }
 
           set id(id: number) {
-            if (valueDomain.selectedCodeList) {
-              valueDomain.selectedCodeList.codeListManifestId = id;
-            }
+            dtAwdPri.codeList.codeListManifestId = id;
           }
 
           get name(): string {
-            return (valueDomain.selectedCodeList) ? valueDomain.selectedCodeList.codeListName : undefined;
+            return dtAwdPri.codeList.name;
           }
 
           set name(name: string) {
-            if (valueDomain.selectedCodeList) {
-              valueDomain.selectedCodeList.codeListName = name;
-            }
+            dtAwdPri.codeList.name = name;
           }
 
           get default(): boolean {
-            return valueDomain.default;
+            return dtAwdPri.isDefault;
           }
 
           set default(isDefault: boolean) {
-            valueDomain.default = isDefault;
+            dtAwdPri.isDefault = isDefault;
           }
         });
       }
-      if (valueDomain.type === 'AgencyIdList') {
+      if (!!dtAwdPri.agencyIdList) {
         this.agencyIdListList.push(new class implements ValueDomainEntity {
-          get self(): CcBdtPriRestri {
-            return valueDomain;
+          get self(): DtAwdPriDetails {
+            return dtAwdPri;
           }
 
           get type(): string {
-            return valueDomain.type;
+            return 'Agency ID List';
           }
 
           get id(): number {
-            return (valueDomain.selectedAgencyIdList) ? valueDomain.selectedAgencyIdList.agencyIdListManifestId : undefined;
+            return dtAwdPri.agencyIdList.agencyIdListManifestId;
           }
 
           set id(id: number) {
-            if (valueDomain.selectedAgencyIdList) {
-              valueDomain.selectedAgencyIdList.agencyIdListManifestId = id;
-            }
+            dtAwdPri.agencyIdList.agencyIdListManifestId = id;
           }
 
           get name(): string {
-            return (valueDomain.selectedAgencyIdList) ? valueDomain.selectedAgencyIdList.name : undefined;
+            return dtAwdPri.agencyIdList.name;
           }
 
           set name(name: string) {
-            if (valueDomain.selectedAgencyIdList) {
-              valueDomain.selectedAgencyIdList.name = name;
-            }
+            dtAwdPri.agencyIdList.name = name;
           }
 
           get default(): boolean {
-            return valueDomain.default;
+            return dtAwdPri.isDefault;
           }
 
           set default(isDefault: boolean) {
-            valueDomain.default = isDefault;
+            dtAwdPri.isDefault = isDefault;
           }
         });
       }
     }
 
-    this.bdtPriRestriListByGroup = [];
+    this.dtAwdPriListByGroup = [];
     if (primitiveList.length > 0) {
-      this.bdtPriRestriListByGroup.push({
+      this.dtAwdPriListByGroup.push({
         label: 'Primitive',
         list: primitiveList.sort((a, b) => {
-          const aName = a.self.primitiveName + ' - ' + a.name;
-          const bName = b.self.primitiveName + ' - ' + b.name;
+          const aName = a.self.xbt.cdtPriName + ' - ' + a.name;
+          const bName = b.self.xbt.cdtPriName + ' - ' + b.name;
           return compare(aName, bName);
         })
       });
     }
     if (this.codeListList.length > 0) {
-      this.bdtPriRestriListByGroup.push({
+      this.dtAwdPriListByGroup.push({
         label: 'Code List',
         list: this.codeListList
       });
     }
     if (this.agencyIdListList.length > 0) {
-      this.bdtPriRestriListByGroup.push({
+      this.dtAwdPriListByGroup.push({
         label: 'Agency ID List',
         list: this.agencyIdListList
       });
@@ -1782,25 +1962,25 @@ export class CcDtNodeDetail extends CcNodeDetail {
       valueDomains.push({
         type: 'Primitive',
         name: primitiveName,
-        xbtList: this.primitiveMap.get(primitiveName).map(e => e.name).sort((a, b) => compare(a, b))
+        xbtList: this.primitiveMap.get(primitiveName)
       });
     }
     valueDomains = valueDomains.sort((a, b) => compare(a.name, b.name));
 
     const userCodeLists = [];
     for (const codeList of this.codeListList.sort((a, b) => compare(a.name, b.name))) {
-      const bdtPriRestri = this.bdtPriRestriList.filter(e => e.type === 'CodeList' && e.codeListName === codeList.name)[0];
-      if (!bdtPriRestri.inherited) {
+      const dtAwdPri = this.dtAwdPriList.filter(e => !!e.codeList && e.codeList.name === codeList.name)[0];
+      if (!dtAwdPri.inherited) {
         userCodeLists.push({
-          type: 'CodeList',
-          name: codeList.name,
-          bdtPriRestri
+          type: 'Code List',
+          name: dtAwdPri.codeList.name,
+          dtAwdPri
         });
       } else {
         valueDomains.push({
-          type: 'CodeList',
-          name: codeList.name,
-          bdtPriRestri
+          type: 'Code List',
+          name: dtAwdPri.codeList.name,
+          dtAwdPri
         });
       }
     }
@@ -1808,18 +1988,18 @@ export class CcDtNodeDetail extends CcNodeDetail {
 
     const userAgencyIdLists = [];
     for (const agencyIdList of this.agencyIdListList.sort((a, b) => compare(a.name, b.name))) {
-      const bdtPriRestri = this.bdtPriRestriList.filter(e => e.type === 'AgencyIdList' && e.agencyIdListName === agencyIdList.name)[0];
-      if (!bdtPriRestri.inherited) {
+      const dtAwdPri = this.dtAwdPriList.filter(e => !!e.agencyIdList && e.agencyIdList.name === agencyIdList.name)[0];
+      if (!dtAwdPri.inherited) {
         userAgencyIdLists.push({
-          type: 'AgencyIdList',
-          name: agencyIdList.name,
-          bdtPriRestri
+          type: 'Agency ID List',
+          name: dtAwdPri.agencyIdList.name,
+          dtAwdPri
         });
       } else {
         valueDomains.push({
-          type: 'AgencyIdList',
-          name: agencyIdList.name,
-          bdtPriRestri
+          type: 'Agency ID List',
+          name: dtAwdPri.agencyIdList.name,
+          dtAwdPri
         });
       }
     }
@@ -1866,8 +2046,8 @@ export class CcDtNodeDetail extends CcNodeDetail {
 
   get json(): any {
     return {
+      dtManifestId: this.manifestId,
       bdtId: this.bdtId,
-      manifestId: this.manifestId,
       guid: this.guid,
       definition: this.definition,
       definitionSource: this.definitionSource,
@@ -1883,25 +2063,25 @@ export class CcDtNodeDetail extends CcNodeDetail {
       commonlyUsed: this.commonlyUsed,
       namespaceId: this._namespaceId,
       state: this.state,
-      owner: this.owner,
-      libraryId: this.libraryId,
-      libraryName: this.libraryName,
-      releaseId: this.releaseId,
-      releaseNum: this.releaseNum,
-      revisionNum: this.revisionNum,
-      revisionTrackingNum: this.revisionTrackingNum,
-      bdtPriRestriList: this.bdtPriRestriList.map(e => e.json),
+      owner: this.owner.loginId,
+      dtAwdPriList: this.dtAwdPriList.map(e => {
+        return {
+          dtAwdPriId: e.dtAwdPriId,
+          xbtManifestId: (!!e.xbt) ? e.xbt.xbtManifestId : undefined,
+          codeListManifestId: (!!e.codeList) ? e.codeList.codeListManifestId : undefined,
+          agencyIdListManifestId: (!!e.agencyIdList) ? e.agencyIdList.agencyIdListManifestId : undefined,
+          isDefault: e.isDefault
+        };
+      }),
       defaultValueDomain: this.defaultValueDomain
     };
   }
 
   get hashCode(): number {
     return hashCode4Array(this.bdtId, this.manifestId, this.guid, this.representationTerm, this.dataTypeTerm, this.qualifier,
-      this.basedBdtId, this.basedBdtManifestId, this.basedBdtDen, this.basedBdtState,
-      this._sixDigitId, this.contentComponentDefinition, this.commonlyUsed,
-      this._namespaceId, this.definition, this.definitionSource,
-      this.libraryId, this.libraryName, this.releaseId, this.releaseNum, this.revisionNum,
-      this.revisionTrackingNum, this.bdtPriRestriList);
+        this.basedBdtId, this.basedBdtManifestId, this.basedBdtDen, this.basedBdtState,
+        this._sixDigitId, this.contentComponentDefinition, this.commonlyUsed,
+        this._namespaceId, this.definition, this.definitionSource, this.dtAwdPriList);
   }
 
   get manifestId(): number {
@@ -2016,43 +2196,37 @@ export class CcDtNodeDetail extends CcNodeDetail {
   }
 }
 
-export class CcBdtScNodeDetail extends CcNodeDetail {
+export class CcDtScNodeInfo extends CcNodeInfo {
   bdtScId: number;
   private _definition: string;
   private _definitionSource: string;
   private _defaultValue: string;
   private _fixedValue: string;
-  fixedOrDefault: string;
+  private _fixedOrDefault: string;
 
   state: string;
-  owner: string;
-  libraryId: number;
-  libraryName: string;
-  releaseId: number;
-  releaseNum: string;
-  revisionId: number;
-  revisionNum: number;
-  revisionTrackingNum: number;
-  sinceManifestId: number;
-  sinceReleaseId: number;
-  sinceReleaseNum: string;
-  lastChangedManifestId: number;
-  lastChangedReleaseId: number;
-  lastChangedReleaseNum: string;
+  owner: ScoreUser;
+
+  library: LibrarySummary;
+  release: ReleaseSummary;
+  log: LogSummary;
+
+  replacement: DtScSummary;
+  since: DtScSummary;
+  lastChanged: DtScSummary;
 
   private _propertyTerm: string;
   private _representationTerm: string;
   objectClassTerm: string;
-  spec: string;
-  basedDtScId: number;
+  based: DtScSummary;
 
   prevCardinalityMin: number;
   prevCardinalityMax: number;
   baseCardinalityMin: number;
   baseCardinalityMax: number;
 
-  bdtScPriRestriList: CcBdtPriRestri[];
-  bdtScPriRestriListByGroup: any[];
+  dtScAwdPriList: DtScAwdPriDetails[];
+  dtScAwdPriListByGroup: any[];
   isCardinalityEditable: boolean;
   allowedCardinalities: any[];
 
@@ -2061,25 +2235,29 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
   codeListList: ValueDomainEntity[];
   agencyIdListList: ValueDomainEntity[];
 
-  constructor(node: DtScFlatNode, obj: any) {
+  constructor(node: DtScFlatNode, obj: DtScDetails) {
     super(node);
 
-    this.bdtScId = obj.bdtScId;
+    this.bdtScId = obj.dtScId;
     this.guid = obj.guid;
-    this._definition = obj.definition;
-    this._definitionSource = obj.definitionSource;
-    this._defaultValue = obj.defaultValue;
-    this._fixedValue = obj.fixedValue;
-    this.cardinalityMax = obj.cardinalityMax;
-    this.cardinalityMin = obj.cardinalityMin;
-    this.prevCardinalityMin = obj.prevCardinalityMin;
-    this.prevCardinalityMax = obj.prevCardinalityMax;
-    this.baseCardinalityMin = obj.baseCardinalityMin;
-    this.baseCardinalityMax = obj.baseCardinalityMax;
+    this._definition = (!!obj.definition) ? obj.definition.content : undefined;
+    this._definitionSource = (!!obj.definition) ? obj.definition.source : undefined;
+    this._defaultValue = (!!obj.valueConstraint) ? obj.valueConstraint.defaultValue : undefined;
+    this._fixedValue = (!!obj.valueConstraint) ? obj.valueConstraint.fixedValue : undefined;
+    this.cardinalityMax = obj.cardinality.max;
+    this.cardinalityMin = obj.cardinality.min;
+    if (obj.prevCardinality) {
+      this.prevCardinalityMin = obj.prevCardinality.min;
+      this.prevCardinalityMax = obj.prevCardinality.max;
+    }
+    if (obj.based) {
+      this.baseCardinalityMin = obj.based.cardinality.min;
+      this.baseCardinalityMax = obj.based.cardinality.max;
+    }
 
     this.isCardinalityEditable = true;
 
-    if (this.prevCardinalityMin === null && this.baseCardinalityMin === null) {
+    if (!this.prevCardinalityMin && !this.baseCardinalityMin) {
       this.allowedCardinalities = [
         {value: 'Prohibited', disabled: true},
         {value: 'Optional', disabled: false},
@@ -2099,40 +2277,32 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
     }
 
     this.fixedOrDefault = this.defaultValue ? 'default' : this.fixedValue ? 'fixed' : 'none';
-    this.state = obj.state;
-    this.owner = obj.owner;
-    this.libraryId = obj.libraryId;
-    this.libraryName = obj.libraryName;
-    this.releaseId = obj.releaseId;
-    this.releaseNum = obj.releaseNum;
-    this.revisionId = obj.revisionId;
-    this.revisionNum = obj.revisionNum;
-    this.revisionTrackingNum = obj.revisionTrackingNum;
-    this.sinceManifestId = obj.sinceManifestId;
-    this.sinceReleaseId = obj.sinceReleaseId;
-    this.sinceReleaseNum = obj.sinceReleaseNum;
-    this.lastChangedManifestId = obj.lastChangedManifestId;
-    this.lastChangedReleaseId = obj.lastChangedReleaseId;
-    this.lastChangedReleaseNum = obj.lastChangedReleaseNum;
     this._propertyTerm = obj.propertyTerm;
     this._representationTerm = obj.representationTerm;
     this.objectClassTerm = obj.objectClassTerm;
-    this.basedDtScId = obj.basedDtScId;
-    this.spec = obj.spec;
+    this.based = obj.based;
+    this.state = obj.state;
+    this.owner = obj.owner;
 
-    this.bdtScPriRestriList = obj.bdtScPriRestriList;
-    this.bdtScPriRestriListByGroup = [];
+    this.library = obj.library;
+    this.release = obj.release;
+    this.log = obj.log;
+    this.since = obj.since;
+    this.lastChanged = obj.lastChanged;
+
+    this.dtScAwdPriList = obj.dtScAwdPriList;
+    this.dtScAwdPriListByGroup = [];
 
     this.reset();
   }
 
   update(dtPrimitiveAware: DtPrimitiveAware) {
-    if (this.bdtScPriRestriList.length > 0) {
-      if (this.bdtScPriRestriList[0] instanceof CcBdtPriRestri) {
-        return;
-      }
-    }
-    this.bdtScPriRestriList = this.bdtScPriRestriList.map(row => new CcBdtPriRestri(this, row, dtPrimitiveAware));
+    // if (this.dtScAwdPriList.length > 0) {
+    //   if (this.dtScAwdPriList[0] instanceof DtScAwdPriDetails) {
+    //     return;
+    //   }
+    // }
+    // this.dtScAwdPriList = this.dtScAwdPriList.map(row => new CcBdtPriRestri(this, row, dtPrimitiveAware));
     this.updateValueDomainGroup();
     this.reset();
   }
@@ -2143,147 +2313,139 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
     this.codeListList = [];
     this.agencyIdListList = [];
 
-    const bdtScPriRestriList = this.bdtScPriRestriList;
-    for (const valueDomain of bdtScPriRestriList) {
-      if (valueDomain.type === 'Primitive') {
-        if (!this.primitiveMap.has(valueDomain.primitiveName)) {
-          this.primitiveMap.set(valueDomain.primitiveName, []);
+    const dtScAwdPriList = this.dtScAwdPriList;
+    for (const dtScAwdPri of dtScAwdPriList) {
+      if (!!dtScAwdPri.xbt) {
+        if (!this.primitiveMap.has(dtScAwdPri.xbt.cdtPriName)) {
+          this.primitiveMap.set(dtScAwdPri.xbt.cdtPriName, []);
         }
         const domainEntity = new class implements ValueDomainEntity {
-          get self(): CcBdtPriRestri {
-            return valueDomain;
+          get self(): DtScAwdPriDetails {
+            return dtScAwdPri;
           }
 
           get type(): string {
-            return valueDomain.type;
+            return 'Primitive';
           }
 
           get id(): number {
-            return valueDomain.xbtId;
+            return dtScAwdPri.xbt.xbtManifestId;
           }
 
           set id(id: number) {
-            valueDomain.xbtId = id;
+            dtScAwdPri.xbt.xbtManifestId = id;
           }
 
           get name(): string {
-            return valueDomain.xbtName;
+            return dtScAwdPri.xbt.name;
           }
 
           set name(name: string) {
-            valueDomain.xbtName = name;
+            dtScAwdPri.xbt.name = name;
           }
 
           get default(): boolean {
-            return valueDomain.default;
+            return dtScAwdPri.isDefault;
           }
 
           set default(isDefault: boolean) {
-            valueDomain.default = isDefault;
+            dtScAwdPri.isDefault = isDefault;
           }
         };
         primitiveList.push(domainEntity);
-        this.primitiveMap.get(valueDomain.primitiveName).push(domainEntity);
+        this.primitiveMap.get(dtScAwdPri.xbt.cdtPriName).push(domainEntity);
       }
-      if (valueDomain.type === 'CodeList') {
+      if (!!dtScAwdPri.codeList) {
         this.codeListList.push(new class implements ValueDomainEntity {
-          get self(): CcBdtPriRestri {
-            return valueDomain;
+          get self(): DtScAwdPriDetails {
+            return dtScAwdPri;
           }
 
           get type(): string {
-            return valueDomain.type;
+            return 'Code List';
           }
 
           get id(): number {
-            return (valueDomain.selectedCodeList) ? valueDomain.selectedCodeList.codeListManifestId : undefined;
+            return dtScAwdPri.codeList.codeListManifestId;
           }
 
           set id(id: number) {
-            if (valueDomain.selectedCodeList) {
-              valueDomain.selectedCodeList.codeListManifestId = id;
-            }
+            dtScAwdPri.codeList.codeListManifestId = id;
           }
 
           get name(): string {
-            return (valueDomain.selectedCodeList) ? valueDomain.selectedCodeList.codeListName : undefined;
+            return dtScAwdPri.codeList.name;
           }
 
           set name(name: string) {
-            if (valueDomain.selectedCodeList) {
-              valueDomain.selectedCodeList.codeListName = name;
-            }
+            dtScAwdPri.codeList.name = name;
           }
 
           get default(): boolean {
-            return valueDomain.default;
+            return dtScAwdPri.isDefault;
           }
 
           set default(isDefault: boolean) {
-            valueDomain.default = isDefault;
+            dtScAwdPri.isDefault = isDefault;
           }
         });
       }
-      if (valueDomain.type === 'AgencyIdList') {
+      if (!!dtScAwdPri.agencyIdList) {
         this.agencyIdListList.push(new class implements ValueDomainEntity {
-          get self(): CcBdtPriRestri {
-            return valueDomain;
+          get self(): DtScAwdPriDetails {
+            return dtScAwdPri;
           }
 
           get type(): string {
-            return valueDomain.type;
+            return 'Agency ID List';
           }
 
           get id(): number {
-            return (valueDomain.selectedAgencyIdList) ? valueDomain.selectedAgencyIdList.agencyIdListManifestId : undefined;
+            return dtScAwdPri.agencyIdList.agencyIdListManifestId;
           }
 
           set id(id: number) {
-            if (valueDomain.selectedAgencyIdList) {
-              valueDomain.selectedAgencyIdList.agencyIdListManifestId = id;
-            }
+            dtScAwdPri.agencyIdList.agencyIdListManifestId = id;
           }
 
           get name(): string {
-            return (valueDomain.selectedAgencyIdList) ? valueDomain.selectedAgencyIdList.name : undefined;
+            return dtScAwdPri.agencyIdList.name;
           }
 
           set name(name: string) {
-            if (valueDomain.selectedAgencyIdList) {
-              valueDomain.selectedAgencyIdList.name = name;
-            }
+            dtScAwdPri.agencyIdList.name = name;
           }
 
           get default(): boolean {
-            return valueDomain.default;
+            return dtScAwdPri.isDefault;
           }
 
           set default(isDefault: boolean) {
-            valueDomain.default = isDefault;
+            dtScAwdPri.isDefault = isDefault;
           }
         });
       }
     }
 
-    this.bdtScPriRestriListByGroup = [];
+    this.dtScAwdPriListByGroup = [];
     if (primitiveList.length > 0) {
-      this.bdtScPriRestriListByGroup.push({
+      this.dtScAwdPriListByGroup.push({
         label: 'Primitive',
         list: primitiveList.sort((a, b) => {
-          const aName = a.self.primitiveName + ' - ' + a.name;
-          const bName = b.self.primitiveName + ' - ' + b.name;
+          const aName = a.self.xbt.cdtPriName + ' - ' + a.name;
+          const bName = b.self.xbt.cdtPriName + ' - ' + b.name;
           return compare(aName, bName);
         })
       });
     }
     if (this.codeListList.length > 0) {
-      this.bdtScPriRestriListByGroup.push({
+      this.dtScAwdPriListByGroup.push({
         label: 'Code List',
         list: this.codeListList
       });
     }
     if (this.agencyIdListList.length > 0) {
-      this.bdtScPriRestriListByGroup.push({
+      this.dtScAwdPriListByGroup.push({
         label: 'Agency ID List',
         list: this.agencyIdListList
       });
@@ -2296,25 +2458,25 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
       valueDomains.push({
         type: 'Primitive',
         name: primitiveName,
-        xbtList: this.primitiveMap.get(primitiveName).map(e => e.name).sort((a, b) => compare(a, b))
+        xbtList: this.primitiveMap.get(primitiveName)
       });
     }
     valueDomains = valueDomains.sort((a, b) => compare(a.name, b.name));
 
     const userCodeLists = [];
     for (const codeList of this.codeListList.sort((a, b) => compare(a.name, b.name))) {
-      const bdtScPriRestri = this.bdtScPriRestriList.filter(e => e.type === 'CodeList' && e.codeListName === codeList.name)[0];
-      if (!bdtScPriRestri.inherited) {
+      const dtScAwdPri = this.dtScAwdPriList.filter(e => !!e.codeList && e.codeList.name === codeList.name)[0];
+      if (!dtScAwdPri.inherited) {
         userCodeLists.push({
-          type: 'CodeList',
+          type: 'Code List',
           name: codeList.name,
-          bdtScPriRestri
+          dtScAwdPri
         });
       } else {
         valueDomains.push({
-          type: 'CodeList',
+          type: 'Code List',
           name: codeList.name,
-          bdtScPriRestri
+          dtScAwdPri
         });
       }
     }
@@ -2322,18 +2484,18 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
 
     const userAgencyIdLists = [];
     for (const agencyIdList of this.agencyIdListList.sort((a, b) => compare(a.name, b.name))) {
-      const bdtScPriRestri = this.bdtScPriRestriList.filter(e => e.type === 'AgencyIdList' && e.agencyIdListName === agencyIdList.name)[0];
-      if (!bdtScPriRestri.inherited) {
+      const dtScAwdPri = this.dtScAwdPriList.filter(e => !!e.agencyIdList && e.agencyIdList.name === agencyIdList.name)[0];
+      if (!dtScAwdPri.inherited) {
         userAgencyIdLists.push({
-          type: 'AgencyIdList',
+          type: 'Agency ID List',
           name: agencyIdList.name,
-          bdtScPriRestri
+          dtScAwdPri
         });
       } else {
         valueDomains.push({
-          type: 'AgencyIdList',
+          type: 'Agency ID List',
           name: agencyIdList.name,
-          bdtScPriRestri
+          dtScAwdPri
         });
       }
     }
@@ -2401,8 +2563,8 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
 
   get json(): any {
     return {
+      dtScManifestId: this.manifestId,
       bdtScId: this.bdtScId,
-      manifestId: this.manifestId,
       guid: this.guid,
       defaultValue: this.defaultValue,
       fixedValue: this.fixedValue,
@@ -2411,32 +2573,26 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
       definition: this.definition,
       definitionSource: this.definitionSource,
       state: this.state,
-      owner: this.owner,
-      libraryId: this.libraryId,
-      libraryName: this.libraryName,
-      releaseId: this.releaseId,
-      releaseNum: this.releaseNum,
-      revisionNum: this.revisionNum,
-      revisionTrackingNum: this.revisionTrackingNum,
-      bdtScPriRestriList: this.bdtScPriRestriList.map(e => e.json),
+      owner: this.owner.loginId,
+      dtScAwdPriList: this.dtScAwdPriList.map(e => {
+        return {
+          dtScAwdPriId: e.dtScAwdPriId,
+          xbtManifestId: (!!e.xbt) ? e.xbt.xbtManifestId : undefined,
+          codeListManifestId: (!!e.codeList) ? e.codeList.codeListManifestId : undefined,
+          agencyIdListManifestId: (!!e.agencyIdList) ? e.agencyIdList.agencyIdListManifestId : undefined,
+          isDefault: e.isDefault
+        };
+      }),
       propertyTerm: this.propertyTerm,
       representationTerm: this.representationTerm,
       objectClassTerm: this.objectClassTerm,
-      sinceManifestId: this.sinceManifestId,
-      sinceReleaseId: this.sinceReleaseId,
-      sinceReleaseNum: this.sinceReleaseNum,
-      lastChangedManifestId: this.lastChangedManifestId,
-      lastChangedReleaseId: this.lastChangedReleaseId,
-      lastChangedReleaseNum: this.lastChangedReleaseNum,
     };
   }
 
   get hashCode(): number {
     return hashCode4Array(this.bdtScId, this.manifestId, this.guid, this.representationTerm, this.objectClassTerm, this.propertyTerm,
-      this.representationTerm, this.cardinalityMin, this.cardinalityMax, this.defaultValue, this.fixedValue,
-      this.definition, this.definitionSource, this.state,
-      this.libraryId, this.libraryName, this.releaseId, this.releaseNum, this.revisionNum,
-      this.revisionTrackingNum, this.bdtScPriRestriList);
+        this.representationTerm, this.cardinalityMin, this.cardinalityMax, this.defaultValue, this.fixedValue,
+        this.definition, this.definitionSource, this.state, this.dtScAwdPriList);
   }
 
   get manifestId(): number {
@@ -2514,6 +2670,23 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
     this._node.fireChangeEvent('fixedValue', value);
   }
 
+  get fixedOrDefault(): string {
+    return this._fixedOrDefault;
+  }
+
+  set fixedOrDefault(value: string) {
+    this._fixedOrDefault = value;
+    if (value === 'fixed') {
+      this.defaultValue = null;
+    } else if (value === 'default') {
+      this.fixedValue = null;
+    } else {
+      this.fixedValue = null;
+      this.defaultValue = null;
+    }
+    this._node.fireChangeEvent('fixedOrDefault', value);
+  }
+
   get den(): string {
     return (this._node as DtScFlatNode).den;
   }
@@ -2542,7 +2715,7 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
   }
 
   get hasTokenValueDomain(): boolean {
-    return this.bdtScPriRestriList.filter(e => e.name === 'Token').length > 0;
+    return this.dtScAwdPriList.filter(e => !!e.xbt && e.xbt.name === 'token').length > 0;
   }
 }
 
@@ -2580,7 +2753,7 @@ export class CcGraphNode {
   entityType?: string;
   cardinalityMin?: number;
   cardinalityMax?: number;
-  basedDtScId?: number;
+  basedDtScManifestId?: number;
   locked?: boolean;
   tagList?: ShortTag[];
 }
@@ -2594,29 +2767,29 @@ export class CcGraphSearch {
   query: string;
 }
 
-export class CcRevisionResponse {
-  type: string;
-  ccId: number;
-  isDeprecated: boolean;
-  isNillable: boolean;
-  isAbstract: boolean;
-  hasBaseCc: boolean;
-  name: string;
-  fixedValue: string;
-  isReusable: boolean;
-  associations: Map<string, CcNode>[];
+export class CommentRecord {
+  commentId: number;
+  text: string;
+
+  hidden: boolean;
+  prevCommentId: number;
+
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
 }
 
 export class Comment {
   commentId: number;
   text: string;
-  loginId: string;
-  timestamp: number[];
+  timestamp: Date;
   hidden: boolean;
   prevCommentId: number;
   isNew: boolean;
   isEditing: boolean;
   textTemp: string;
+
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
 
   constructor() {
     this.isEditing = false;
@@ -2625,27 +2798,31 @@ export class Comment {
   }
 }
 
-export class CcId {
-  type: string;
-  manifestId: number;
+export class AsccpOrBccpManifestId {
+  asccpManifestId: number;
+  bccpManifestId: number;
 
-  constructor(type: string, manifestId: number) {
-    this.type = type;
-    this.manifestId = manifestId;
+  constructor(asccpManifestId: number, bccpManifestId: number) {
+    this.asccpManifestId = asccpManifestId;
+    this.bccpManifestId = bccpManifestId;
   }
 
   get id() {
-    return this.type + '-' + this.manifestId;
+    return (this.asccpManifestId) ? ('ASCCP-' + this.asccpManifestId) : ('BCCP-' + this.bccpManifestId);
   }
 }
 
 export class CcSeqUpdateRequest {
-  item: CcId;
-  after: CcId;
+  item: AsccpOrBccpManifestId;
+  after: AsccpOrBccpManifestId;
 }
 
 export class BodCreateResponse {
   manifestIdList: number[];
+}
+
+export class VerbCreateResponse {
+  basedVerbAsccpManifestId: number;
 }
 
 export class VerifyAppendAssociationResponse {

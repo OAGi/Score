@@ -6,58 +6,68 @@
                                          (libraryChange)="onLibraryChange($event)"/>
       <span class="flex-11-auto"></span>
       <button mat-icon-button class="ml-2" matTooltip="Create Component"
-              *ngIf="hasCreatePermission()"
+              *ngIf="!browserMode && hasCreatePermission()"
               [matMenuTriggerFor]="contextMenu">
         <mat-icon>add</mat-icon>
       </button>
 
       <button mat-icon-button class="ml-2" matTooltip="Move to WIP"
+              *ngIf="!browserMode"
               [hidden]="!canToolbarAction('WIP')"
               (click)="multipleUpdate('WIP')">
         <mat-icon>arrow_forward</mat-icon>
       </button>
       <button mat-icon-button class="ml-2" matTooltip="Move to Draft"
+              *ngIf="!browserMode"
               [hidden]="!canToolbarAction('Draft')"
               (click)="multipleUpdate('Draft')">
         <mat-icon>arrow_forward</mat-icon>
       </button>
       <button mat-icon-button class="ml-2" matTooltip="Move to QA"
+              *ngIf="!browserMode"
               [hidden]="!canToolbarAction('QA')"
               (click)="multipleUpdate('QA')">
         <mat-icon>arrow_forward</mat-icon>
       </button>
       <button mat-icon-button class="ml-2" matTooltip="Move to Candidate"
+              *ngIf="!browserMode"
               [hidden]="!canToolbarAction('Candidate')"
               (click)="multipleUpdate('Candidate')">
         <mat-icon>arrow_forward</mat-icon>
       </button>
       <button mat-icon-button class="ml-2" matTooltip="Move to Production"
+              *ngIf="!browserMode"
               [hidden]="!canToolbarAction('Production')"
               (click)="multipleUpdate('Production')">
         <mat-icon>arrow_forward</mat-icon>
       </button>
       <button mat-icon-button class="ml-2" matTooltip="Back to WIP"
+              *ngIf="!browserMode"
               [hidden]="!canToolbarAction('BackWIP')"
               (click)="multipleUpdate('WIP')">
         <mat-icon>arrow_back</mat-icon>
       </button>
 
       <button mat-icon-button class="ml-2" matTooltip="Delete"
+              *ngIf="!browserMode"
               [hidden]="!canToolbarAction('Delete')"
               (click)="multipleUpdate('Delete')">
         <mat-icon>delete</mat-icon>
       </button>
       <button mat-icon-button class="ml-2" matTooltip="Purge"
+              *ngIf="!browserMode"
               [hidden]="!canToolbarAction('Purge')"
               (click)="multipleUpdate('Purge')">
         <mat-icon>delete_forever</mat-icon>
       </button>
       <button mat-icon-button class="ml-2" matTooltip="Restore"
+              *ngIf="!browserMode"
               [hidden]="!canToolbarAction('Restore')"
               (click)="multipleUpdate('Restore')">
         <mat-icon>restore_from_trash</mat-icon>
       </button>
       <button mat-icon-button class="ml-2" matTooltip="Transfer Ownership"
+              *ngIf="!browserMode"
               [hidden]="!canToolbarAction('Transfer')"
               (click)="openTransferDialogMultiple()">
         <mat-icon>swap_horiz</mat-icon>
@@ -74,21 +84,18 @@
     <button mat-menu-item (click)="createAcc()">
       <span class="context-menu-item">ACC</span>
     </button>
-    <button mat-menu-item (click)="createAsccp('Default')">
+    <button mat-menu-item (click)="createAsccp()">
       <span class="context-menu-item">ASCCP</span>
     </button>
     <button mat-menu-item (click)="createBccp()">
       <span class="context-menu-item">BCCP</span>
-    </button>
-    <button mat-menu-item (click)="createBdt()">
-      <span class="context-menu-item">DT</span>
     </button>
     <mat-divider *ngIf="request.library.name === 'connectSpec' && request.release.workingRelease"></mat-divider>
     <button mat-menu-item (click)="createBOD()"
             *ngIf="request.library.name === 'connectSpec' && request.release.workingRelease">
       <span class="context-menu-item"><fa-icon [icon]="faFlask" style="padding-right: 10px;"></fa-icon> Create OAGi BOD Component</span>
     </button>
-    <button mat-menu-item (click)="createAsccp('Verb')"
+    <button mat-menu-item (click)="createVerb()"
             *ngIf="request.library.name === 'connectSpec' && request.release.workingRelease">
       <span class="context-menu-item"><fa-icon [icon]="faFlask" style="padding-right: 10px;"></fa-icon> Create OAGi Verb Component</span>
     </button>
@@ -195,7 +202,7 @@
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
                   <mat-label>Owner</mat-label>
-                  <mat-select [(ngModel)]="request.ownerLoginIds" multiple>
+                  <mat-select [(ngModel)]="request.ownerLoginIdList" multiple>
                     <mat-option>
                       <ngx-mat-select-search [formControl]="loginIdListFilterCtrl"
                                              [placeholderLabel]="'Search...'"
@@ -211,7 +218,7 @@
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
                   <mat-label>Updater</mat-label>
-                  <mat-select [(ngModel)]="request.updaterLoginIds" multiple>
+                  <mat-select [(ngModel)]="request.updaterLoginIdList" multiple>
                     <mat-option>
                       <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
                                              [placeholderLabel]="'Search...'"
@@ -228,8 +235,7 @@
                 <mat-form-field>
                   <mat-label>Updated start date</mat-label>
                   <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
-                         [max]="request.updatedDate.end"
-                         (dateInput)="onDateEvent('startDate', $event)">
+                         [(ngModel)]="request.updatedDate.start" [max]="request.updatedDate.end">
                   <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
                   <mat-datepicker #dateStart></mat-datepicker>
                 </mat-form-field>
@@ -246,8 +252,7 @@
                 <mat-form-field>
                   <mat-label>Updated end date</mat-label>
                   <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
-                         [min]="request.updatedDate.start"
-                         (dateInput)="onDateEvent('endDate', $event)">
+                         [(ngModel)]="request.updatedDate.end" [min]="request.updatedDate.start">
                   <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
                   <mat-datepicker #dateEnd></mat-datepicker>
                 </mat-form-field>
@@ -313,7 +318,7 @@
             (onReset)="onColumnsReset()">
           </score-column-selector>
 
-          <score-column-selector class="pr-2"
+          <score-column-selector class="pr-2" *ngIf="!browserMode"
                                  [title]="'Types'"
                                  [columns]="filterTypes"
                                  [draggable]="false"
@@ -381,7 +386,7 @@
                   score-table-column-resize [defaultWidth]="width('DEN')" (onResize)="onResizeWidth($event)"> DEN</th>
               <td mat-cell *matCellDef="let element">
                 <div class="den word-break-all">
-                  <span class="new-component mr-2" *ngIf="element.newComponent">New</span>
+                  <span class="new-component mr-2" *ngIf="element.newComponent && !loading && element.libraryId === request.library.libraryId">New</span>
                   <a routerLink="{{ getRouterLink(element) }}" matTooltip="{{ element.den }}">
                     <span>{{ element.den }}</span>
                   </a>
@@ -415,7 +420,7 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Revision')" (onResize)="onResizeWidth($event)"> Revision</th>
               <td mat-cell *matCellDef="let element">
-                <span>{{ element.revision }}</span>
+                <span>{{ element.log.revisionNum }}</span>
               </td>
             </ng-container>
 
@@ -424,7 +429,7 @@
                   score-table-column-resize [defaultWidth]="width('Owner')" (onResize)="onResizeWidth($event)"> Owner</th>
               <td mat-cell *matCellDef="let element" class="ellipsis">
                 <div class="d-flex align-items-center align-content-center justify-content-between">
-                  <span class="word-break-all" [matTooltip]="element.owner" [innerHTML]="element.owner"></span>
+                  <span class="word-break-all" [matTooltip]="element.owner.username" [innerHTML]="element.owner.loginId"></span>
                   <mat-icon class="pointer align-self-center" style="padding-right: 24px;"
                             *ngIf="isEditable(element) && !isAssociation(element)"
                             (click)="openTransferDialog(element, $event)">swap_horiz</mat-icon>
@@ -445,8 +450,8 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
               <td mat-cell *matCellDef="let element">
-                <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-                <div class="description"><span class="pr-1">by</span><b class="word-break-all">{{ element.lastUpdateUser }}</b></div>
+                <div class="ellipsis">{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                <div class="description"><span class="pr-1">by</span><b class="word-break-all">{{ element.lastUpdated.who.loginId }}</b></div>
               </td>
             </ng-container>
 
@@ -456,11 +461,11 @@
                      [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
                   <div class="element-detail-wrapper">
                     <mat-card class="mb-2">
-                      <mat-card-header class="element-detail-header" *ngIf="element.definitionSource">
-                        <mat-card-subtitle class="element-detail-subtitle">{{ element.definitionSource }}</mat-card-subtitle>
+                      <mat-card-header class="element-detail-header" *ngIf="element.definition.source">
+                        <mat-card-subtitle class="element-detail-subtitle">{{ element.definition.source }}</mat-card-subtitle>
                       </mat-card-header>
                       <mat-card-content>
-                        <p [innerHTML]="element.definition | highlight : highlightTextForDefinition : ['bg-warning']"
+                        <p [innerHTML]="element.definition.content | highlight : highlightTextForDefinition : ['bg-warning']"
                            class="element-detail-content"></p>
                       </mat-card-content>
                     </mat-card>

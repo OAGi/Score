@@ -41,7 +41,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.UsageRuleExpressio
  * particular syntax indicated by the CONSTRAINT_TYPE column. One of the
  * syntaxes can be unstructured, which works a description of the usage rule.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class UsageRuleExpression extends TableImpl<UsageRuleExpressionRecord> {
 
     private static final long serialVersionUID = 1L;

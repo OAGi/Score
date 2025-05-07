@@ -10,7 +10,7 @@ import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.DTViewEditPage;
-import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.oagi.score.e2e.page.core_component.ViewEditDataTypePage;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
@@ -51,16 +51,20 @@ public class TC_41_10_EditingRevisionOfAnEndUserDT extends BaseTest {
             AppUserObject endUserB = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserB);
 
-            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
+
+            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
             branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.8");
             NamespaceObject namespaceEUA = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA, library);
             NamespaceObject namespaceEUB = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserB, library);
 
-            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
-            DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, endUserA, namespaceEUA, "Production");
+            DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, baseCDT, endUserA, namespaceEUA, "Production");
             dtForTesting.add(randomBDT);
 
-            randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, endUserB, namespaceEUB, "Production");
+            randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, baseCDT, endUserB, namespaceEUB, "Production");
             dtForTesting.add(randomBDT);
 
             codeList = getAPIFactory().getCodeListAPI().
@@ -69,8 +73,8 @@ public class TC_41_10_EditingRevisionOfAnEndUserDT extends BaseTest {
 
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
         for (DTObject dt : dtForTesting) {
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+            ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+            DTViewEditPage dtViewEditPage = viewEditDataTypePage.openDTViewEditPageByManifestID(dt.getDtManifestId());
             dtViewEditPage.hitAmendButton();
             assertTrue(dtViewEditPage.getStateFieldValue().equals("WIP"));
             assertTrue(Integer.valueOf(dtViewEditPage.getRevisionFieldValue()) > 1);
@@ -78,7 +82,7 @@ public class TC_41_10_EditingRevisionOfAnEndUserDT extends BaseTest {
             /**
              * Test Assertion #41.10.1.a
              */
-            if (dtViewEditPage.getDefinitionFieldValue() == null){
+            if (dtViewEditPage.getDefinitionFieldValue() == null) {
                 click(dtViewEditPage.getUpdateButton(true));
                 assertEquals("Are you sure you want to update this without definitions?",
                         dtViewEditPage.getDefinitionWarningDialogMessage());
@@ -108,7 +112,7 @@ public class TC_41_10_EditingRevisionOfAnEndUserDT extends BaseTest {
             SCPanel.setCardinality("Required");
             SCPanel.setValueConstraintType("Fixed Value");
             SCPanel.setValueConstraint("fixed value");
-            List<String> representationTermsForCDTs = getAPIFactory().getCoreComponentAPI().getRepresentationTermsForCDTs(branch.getReleaseNumber());
+            List<String> representationTermsForCDTs = getAPIFactory().getCoreComponentAPI().getRepresentationTermsForCDTs("3.1");
             String representationTerm = representationTermsForCDTs.get(representationTermsForCDTs.size() - 1);
             SCPanel.selectRepresentationTerm(representationTerm);
             dtSCName = dtSC.getObjectClassTerm() + ". " + dtSC.getPropertyTerm() + ". " + SCPanel.getRepresentationSelectFieldValue();
@@ -118,7 +122,8 @@ public class TC_41_10_EditingRevisionOfAnEndUserDT extends BaseTest {
             /**
              * Test Assertion #41.10.1.d
              */
-            List<DTSCObject> supplementaryComponentsFromTheBaseDT = getAPIFactory().getCoreComponentAPI().getSupplementaryComponentsForDT(baseCDT.getDtId(), branch.getReleaseNumber());
+            List<DTSCObject> supplementaryComponentsFromTheBaseDT = getAPIFactory().getCoreComponentAPI().getSupplementaryComponentsForDT(
+                    baseCDT.getDtId(), getAPIFactory().getReleaseAPI().getReleaseById(baseCDT.getReleaseId()).getReleaseNumber());
             DTSCObject existingDTSC = supplementaryComponentsFromTheBaseDT.get(0);
             String existingDTSCName = existingDTSC.getObjectClassTerm() + ". " + existingDTSC.getPropertyTerm() + ". " + existingDTSC.getRepresentationTerm();
             supplementaryComponentNode = dtViewEditPage.getNodeByPath("/" + revisedDT.getDen() + "/" + existingDTSCName);
@@ -134,7 +139,7 @@ public class TC_41_10_EditingRevisionOfAnEndUserDT extends BaseTest {
              */
             assertThrows(WebDriverException.class, () -> dtViewEditPage.removeSupplementaryComponent("/" + revisedDT.getDen() + "/" + existingDTSCName));
 
-            viewEditCoreComponentPage.openPage();
+            viewEditDataTypePage.openPage();
         }
     }
 
@@ -151,6 +156,11 @@ public class TC_41_10_EditingRevisionOfAnEndUserDT extends BaseTest {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
 
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
+
+            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
+
             library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
             branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.8");
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA, library);
@@ -158,22 +168,21 @@ public class TC_41_10_EditingRevisionOfAnEndUserDT extends BaseTest {
             codeList = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(endUserA, namespace, branch, "WIP");
 
-            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
-            DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, endUserA, namespace, "Production");
+            DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, baseCDT, endUserA, namespace, "Production");
             dtForTesting.add(randomBDT);
         }
 
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
         for (DTObject dt : dtForTesting) {
 
-            homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+            homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+            DTViewEditPage dtViewEditPage = viewEditDataTypePage.openDTViewEditPageByManifestID(dt.getDtManifestId());
             dtViewEditPage.hitAmendButton();
             DTObject revisedDT = getAPIFactory().getCoreComponentAPI().getRevisedDT(dt);
 
-            homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-            viewEditCoreComponentPage.createDT(dt.getDen(), branch.getReleaseNumber());
+            homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+            viewEditDataTypePage.createDT(dt.getDen(), branch.getReleaseNumber());
             String derivedBDTDefinition = "Derived BDT definition";
             String derivedBDTDefinitionSource = "Derived BDT definition source";
             String derivedBDTContentComponentDefinition = "Derived BDT Content Component definition";
@@ -184,8 +193,8 @@ public class TC_41_10_EditingRevisionOfAnEndUserDT extends BaseTest {
             dtViewEditPage.hitUpdateButton();
             DTObject derivedDT = getAPIFactory().getCoreComponentAPI().getBDTByGuidAndReleaseNum(library, dtViewEditPage.getGUIDFieldValue(), branch.getReleaseNumber());
 
-            homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-            viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(revisedDT.getDen(), branch.getReleaseNumber());
+            homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+            viewEditDataTypePage.openDTViewEditPageByManifestID(revisedDT.getDtManifestId());
             String baseBDTDefinition = "Base BDT definition";
             String baseBDTDefinitionSource = "Base BDT definition source";
             String baseBDTContentComponentDefinition = "Base BDT Content Component definition";
@@ -194,9 +203,10 @@ public class TC_41_10_EditingRevisionOfAnEndUserDT extends BaseTest {
             dtViewEditPage.setContentComponentDefinition(baseBDTContentComponentDefinition);
             dtViewEditPage.showValueDomain();
             dtViewEditPage.addCodeListValueDomain(codeList.getName());
-            List<DTSCObject> supplementaryComponentsFromTheBaseDT = getAPIFactory().getCoreComponentAPI().getSupplementaryComponentsForDT(baseCDT.getDtId(), branch.getReleaseNumber());
+            List<DTSCObject> supplementaryComponentsFromTheBaseDT = getAPIFactory().getCoreComponentAPI().getSupplementaryComponentsForDT(
+                    baseCDT.getDtId(), getAPIFactory().getReleaseAPI().getReleaseById(baseCDT.getReleaseId()).getReleaseNumber());
             DTSCObject dtSC = supplementaryComponentsFromTheBaseDT.get(0);
-            String dtSCName = dtSC.getObjectClassTerm() + ". " + dtSC.getPropertyTerm() + ". " +dtSC.getRepresentationTerm();
+            String dtSCName = dtSC.getObjectClassTerm() + ". " + dtSC.getPropertyTerm() + ". " + dtSC.getRepresentationTerm();
             WebElement supplementaryComponentNode = dtViewEditPage.getNodeByPath("/" + dt.getDen() + "/" + dtSCName);
             assertTrue(supplementaryComponentNode.isDisplayed());
             DTViewEditPage.SupplementaryComponentPanel SCPanel = dtViewEditPage.getSCPanel(supplementaryComponentNode);
@@ -205,8 +215,8 @@ public class TC_41_10_EditingRevisionOfAnEndUserDT extends BaseTest {
             SCPanel.setValueConstraint("fixed value");
             dtViewEditPage.hitUpdateButton();
 
-            homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-            viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(derivedDT.getDen(), branch.getReleaseNumber());
+            homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+            viewEditDataTypePage.openDTViewEditPageByManifestID(derivedDT.getDtManifestId());
             assertFalse(dtViewEditPage.getDefinitionFieldValue().equals(baseBDTDefinition));
             assertFalse(dtViewEditPage.getDefinitionSourceFieldValue().equals(baseBDTDefinitionSource));
             assertFalse(dtViewEditPage.getContentComponentDefinitionFieldValue().equals(baseBDTContentComponentDefinition));
@@ -215,7 +225,7 @@ public class TC_41_10_EditingRevisionOfAnEndUserDT extends BaseTest {
             supplementaryComponentNode = dtViewEditPage.getNodeByPath("/" + dtSCName);
             assertTrue(supplementaryComponentNode.isDisplayed());
             SCPanel = dtViewEditPage.getSCPanel(supplementaryComponentNode);
-            
+
         }
     }
 

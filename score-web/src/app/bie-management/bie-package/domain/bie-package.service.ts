@@ -2,9 +2,10 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {PageResponse} from '../../../basis/basis';
-import {BieListInBiePackageRequest, BiePackage, BiePackageListRequest} from './bie-package';
+import {BieListInBiePackageRequest, BiePackageDetails, BiePackageListEntry, BiePackageListRequest} from './bie-package';
 import {map} from 'rxjs/operators';
-import {BieList} from '../../bie-list/domain/bie-list';
+import {BieListEntry} from '../../bie-list/domain/bie-list';
+import {zip} from '../../../common/utility';
 
 @Injectable()
 export class BiePackageService {
@@ -12,13 +13,21 @@ export class BiePackageService {
   constructor(private http: HttpClient) {
   }
 
-  getBiePackageList(request: BiePackageListRequest): Observable<PageResponse<BiePackage>> {
+  getBiePackageList(request: BiePackageListRequest): Observable<PageResponse<BiePackageListEntry>> {
     let params = new HttpParams()
-      .set('libraryId', '' + request.library.libraryId)
-      .set('sortActives', request.page.sortActives.join(','))
-      .set('sortDirections', request.page.sortDirections.join(','))
-      .set('pageIndex', '' + request.page.pageIndex)
-      .set('pageSize', '' + request.page.pageSize);
+        .set('libraryId', '' + request.library.libraryId)
+        .set('pageIndex', '' + request.page.pageIndex)
+        .set('pageSize', '' + request.page.pageSize);
+
+    const { sortActives, sortDirections } = request.page;
+
+    if (sortActives?.length && sortDirections?.length) {
+      const orderBy = zip(sortActives, sortDirections)
+          .map(([active, direction]) => `${direction === 'desc' ? '-' : '+'}${active}`)
+          .join(',');
+
+      params = params.set('orderBy', orderBy);
+    }
     if (request.filters.versionId) {
       params = params.set('versionId', request.filters.versionId);
     }
@@ -46,11 +55,11 @@ export class BiePackageService {
     if (request.releases && request.releases.length > 0) {
       params = params.set('releaseIds', request.releases.map(e => e.releaseId.toString()).join(','));
     }
-    if (request.ownerLoginIds.length > 0) {
-      params = params.set('ownerLoginIds', request.ownerLoginIds.join(','));
+    if (request.ownerLoginIdList.length > 0) {
+      params = params.set('ownerLoginIdList', request.ownerLoginIdList.join(','));
     }
-    if (request.updaterLoginIds.length > 0) {
-      params = params.set('updaterLoginIds', request.updaterLoginIds.join(','));
+    if (request.updaterLoginIdList.length > 0) {
+      params = params.set('updaterLoginIdList', request.updaterLoginIdList.join(','));
     }
     if (request.updatedDate.start) {
       params = params.set('updateStart', '' + request.updatedDate.start.getTime());
@@ -58,20 +67,57 @@ export class BiePackageService {
     if (request.updatedDate.end) {
       params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
     }
-    return this.http.get<PageResponse<BiePackage>>('/api/bie_packages', {params});
+    return this.http.get<PageResponse<BiePackageListEntry>>('/api/bie-packages', {params}).pipe(
+        map((res: PageResponse<BiePackageListEntry>) => ({
+          ...res,
+          list: res.list.map(elm => ({
+            ...elm,
+            created: {
+              ...elm.created,
+              when: new Date(elm.created.when),
+            },
+            lastUpdated: {
+              ...elm.lastUpdated,
+              when: new Date(elm.lastUpdated.when),
+            }
+          }))
+        }))
+    );
   }
 
-  getBieListInBiePackage(request: BieListInBiePackageRequest): Observable<PageResponse<BieList>> {
-    let params = new HttpParams()
-      .set('sortActives', request.page.sortActives.join(','))
-      .set('sortDirections', request.page.sortDirections.join(','))
-      .set('pageIndex', '' + request.page.pageIndex)
-      .set('pageSize', '' + request.page.pageSize);
-    if (request.ownerLoginIds.length > 0) {
-      params = params.set('ownerLoginIds', request.ownerLoginIds.join(','));
+  get(biePackageId: number): Observable<BiePackageDetails> {
+    return this.http.get<BiePackageDetails>('/api/bie-packages/' + biePackageId).pipe(
+        map((res: BiePackageDetails) => ({
+          ...res,
+          created: {
+            ...res.created,
+            when: new Date(res.created.when),
+          },
+          lastUpdated: {
+            ...res.lastUpdated,
+            when: new Date(res.lastUpdated.when),
+          }
+        }))
+    );
+  }
+
+  getBieListInBiePackage(request: BieListInBiePackageRequest): Observable<PageResponse<BieListEntry>> {
+    let params = new HttpParams();
+
+    if (!!request.page.sortActive && !!request.page.sortDirection) {
+      params = params.set('orderBy', ((request.page.sortDirection === 'desc') ? '-' : '+') + request.page.sortActive);
     }
-    if (request.updaterLoginIds.length > 0) {
-      params = params.set('updaterLoginIds', request.updaterLoginIds.join(','));
+    if (request.page.pageIndex >= 0) {
+      params = params.set('pageIndex', request.page.pageIndex);
+    }
+    if (request.page.pageSize > 0) {
+      params = params.set('pageSize', request.page.pageSize);
+    }
+    if (request.ownerLoginIdList.length > 0) {
+      params = params.set('ownerLoginIdList', request.ownerLoginIdList.join(','));
+    }
+    if (request.updaterLoginIdList.length > 0) {
+      params = params.set('updaterLoginIdList', request.updaterLoginIdList.join(','));
     }
     if (request.updatedDate.start) {
       params = params.set('updateStart', '' + request.updatedDate.start.getTime());
@@ -92,21 +138,40 @@ export class BiePackageService {
       params = params.set('remark', request.filters.remark);
     }
 
-    return this.http.get<PageResponse<BieList>>('/api/bie_packages/' + request.biePackageId + '/bie_list', {params});
+    return this.http.get<PageResponse<BieListEntry>>('/api/bie-packages/' + request.biePackageId + '/bies', {params}).pipe(
+        map((res: PageResponse<BieListEntry>) => ({
+          ...res,
+          list: res.list.map(elm => ({
+            ...elm,
+            source: (!!elm.source) ? {
+              ...elm.source,
+              when: new Date(elm.source.when),
+            } : undefined,
+            based: (!!elm.based) ? {
+              ...elm.based,
+              when: new Date(elm.based.when),
+            } : undefined,
+            created: {
+              ...elm.created,
+              when: new Date(elm.created.when),
+            },
+            lastUpdated: {
+              ...elm.lastUpdated,
+              when: new Date(elm.lastUpdated.when),
+            }
+          }))
+        }))
+    );
   }
 
   create(libraryId: number): Observable<number> {
-    return this.http.post('/api/bie_packages', {
+    return this.http.post('/api/bie-packages', {
       libraryId
     }).pipe(map(resp => Number(resp['biePackageId'])));
   }
 
-  get(biePackageId: number): Observable<BiePackage> {
-    return this.http.get<BiePackage>('/api/bie_packages/' + biePackageId);
-  }
-
-  update(biePackage: BiePackage): Observable<any> {
-    return this.http.post<any>('/api/bie_packages/' + biePackage.biePackageId, {
+  update(biePackage: BiePackageDetails): Observable<any> {
+    return this.http.put<any>('/api/bie-packages/' + biePackage.biePackageId, {
       versionId: biePackage.versionId,
       versionName: biePackage.versionName,
       description: biePackage.description
@@ -114,16 +179,16 @@ export class BiePackageService {
   }
 
   updateState(biePackageId: number, state: string): Observable<any> {
-    return this.http.post<any>('/api/bie_packages/' + biePackageId, {
+    return this.http.put<any>('/api/bie-packages/' + biePackageId, {
       state
     });
   }
 
   delete(...biePackageIdList: number[]): Observable<any> {
     if (biePackageIdList.length === 1) {
-      return this.http.delete('/api/bie_packages/' + biePackageIdList[0]);
+      return this.http.delete('/api/bie-packages/' + biePackageIdList[0]);
     } else {
-      return this.http.delete('/api/bie_packages', {
+      return this.http.delete('/api/bie-packages', {
         body: {biePackageIdList}
       });
     }
@@ -131,33 +196,31 @@ export class BiePackageService {
 
   transferOwnership(biePackageId: number, targetLoginId: string,
                     sendNotification?: boolean, mailParameters?: any): Observable<any> {
-    let url = '/api/bie_packages/' + biePackageId + '/transfer_ownership';
-    if (sendNotification !== undefined) {
-      url += '?sendNotification=' + ((sendNotification) ? 'true' : 'false');
-    }
-    return this.http.post<any>(url, {
+    let url = '/api/bie-packages/' + biePackageId + '/transfer';
+    return this.http.patch<any>(url, {
       targetLoginId,
-      parameters: mailParameters
+      sendNotification: ((sendNotification) ? 'true' : 'false'),
+      mailParameters: mailParameters
     });
   }
 
   copy(biePackageId: number): Observable<any> {
-    return this.http.put<any>('/api/bie_packages/copy', {
+    return this.http.put<any>('/api/bie-packages/copy', {
       biePackageIdList: [biePackageId]
     });
   }
 
   addBieToBiePackage(biePackageId: number, ...topLevelAsbiepIdList: number[]): Observable<any> {
-    return this.http.post('/api/bie_packages/' + biePackageId + '/bie', {
+    return this.http.post('/api/bie-packages/' + biePackageId + '/bies', {
       topLevelAsbiepIdList
     });
   }
 
   deleteBieInBiePackage(biePackageId: number, ...topLevelAsbiepIdList: number[]): Observable<any> {
     if (topLevelAsbiepIdList.length === 1) {
-      return this.http.delete('/api/bie_packages/' + biePackageId + '/bie/' + topLevelAsbiepIdList[0]);
+      return this.http.delete('/api/bie-packages/' + biePackageId + '/bies/' + topLevelAsbiepIdList[0]);
     } else {
-      return this.http.delete('/api/bie_packages/' + biePackageId + '/bie', {
+      return this.http.delete('/api/bie-packages/' + biePackageId + '/bies', {
         body: {topLevelAsbiepIdList}
       });
     }
@@ -174,7 +237,7 @@ export class BiePackageService {
       });
     }
 
-    return this.http.get('/api/bie_packages/' + biePackageId + '/generate', {
+    return this.http.get('/api/bie-packages/' + biePackageId + '/generate', {
       params,
       observe: 'response',
       responseType: 'blob'
@@ -182,7 +245,7 @@ export class BiePackageService {
   }
 
   createUpliftBiePackage(biePackageId: number, targetReleaseId: number): Observable<any> {
-    return this.http.post<any>('/api/bie_packages/' + biePackageId + '/uplifting', {
+    return this.http.post<any>('/api/bie-packages/' + biePackageId + '/uplifting', {
       targetReleaseId
     });
   }

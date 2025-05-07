@@ -13,8 +13,8 @@ import {AuthService} from '../../../authentication/auth.service';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 import {WebPageInfoService} from '../../../basis/basis.service';
 import {PageRequest} from '../../../basis/basis';
-import {BieListInBiePackageRequest, BiePackage} from '../domain/bie-package';
-import {BieList} from '../../bie-list/domain/bie-list';
+import {BieListInBiePackageRequest, BiePackage, BiePackageDetails} from '../domain/bie-package';
+import {BieListEntry} from '../../bie-list/domain/bie-list';
 import {BiePackageService} from '../domain/bie-package.service';
 import {BiePackageAddBieDialogComponent} from '../bie-package-add-bie-dialog/bie-package-add-bie-dialog.component';
 import {
@@ -34,7 +34,7 @@ import {forkJoin} from 'rxjs';
 export class BiePackageDetailComponent implements OnInit {
 
   title = 'Edit BIE Package';
-  biePackage: BiePackage = new BiePackage();
+  biePackage: BiePackageDetails = new BiePackageDetails();
   schemaExpression = 'XML';
   hashCode;
   disabled: boolean;
@@ -191,8 +191,8 @@ export class BiePackageDetailComponent implements OnInit {
     return displayedColumns;
   }
 
-  table: TableData<BieList>;
-  selection = new SelectionModel<BieList>(true, []);
+  table: TableData<BieListEntry>;
+  selection = new SelectionModel<BieListEntry>(true, []);
   request: BieListInBiePackageRequest;
   preferencesInfo: PreferencesInfo;
   loading = false;
@@ -214,8 +214,8 @@ export class BiePackageDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.table = new TableData<BieList>(this.defaultDisplayedColumns, {});
-    this.table.dataSource = new MatMultiSortTableDataSource<BieList>(this.sort, false);
+    this.table = new TableData<BieListEntry>(this.defaultDisplayedColumns, {});
+    this.table.dataSource = new MatMultiSortTableDataSource<BieListEntry>(this.sort, false);
 
     // Init BIE list table for BIE package
     this.request = new BieListInBiePackageRequest(this.route.snapshot.queryParamMap,
@@ -274,7 +274,7 @@ export class BiePackageDetailComponent implements OnInit {
     return this.auth.isAdmin();
   }
 
-  init(biePackage: BiePackage) {
+  init(biePackage: BiePackageDetails) {
     this.hashCode = hashCode(biePackage);
     this.biePackage = biePackage;
     this.loading = false;
@@ -304,10 +304,7 @@ export class BiePackageDetailComponent implements OnInit {
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
-      this.table.dataSource.data = resp.list.map((elm: BieList) => {
-        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        return elm;
-      });
+      this.table.dataSource.data = resp.list;
 
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
@@ -362,6 +359,8 @@ export class BiePackageDetailComponent implements OnInit {
         this.snackBar.open('Added', '', {
           duration: 3000,
         });
+
+        this.selection.clear();
         this.loadBieListInBiePackage();
 
         this.loading = false;
@@ -375,15 +374,15 @@ export class BiePackageDetailComponent implements OnInit {
     });
   }
 
-  select(row: BieList) {
+  select(row: BieListEntry) {
     this.selection.select(row);
   }
 
-  isSelected(row: BieList) {
+  isSelected(row: BieListEntry) {
     return this.selection.isSelected(row);
   }
 
-  toggle(row: BieList) {
+  toggle(row: BieListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row);
     } else {
@@ -394,11 +393,12 @@ export class BiePackageDetailComponent implements OnInit {
   removeBieInBiePackage() {
     const bieLists = this.selection.selected;
     this.biePackageService.deleteBieInBiePackage(
-      this.biePackage.biePackageId, ...bieLists.map(e => e.topLevelAsbiepId)).subscribe(_ => {
+        this.biePackage.biePackageId, ...bieLists.map(e => e.topLevelAsbiepId)).subscribe(_ => {
       this.snackBar.open('Removed', '', {
         duration: 3000,
       });
 
+      this.selection.clear();
       this.loadBieListInBiePackage();
     });
   }

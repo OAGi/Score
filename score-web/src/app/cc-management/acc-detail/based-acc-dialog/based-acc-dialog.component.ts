@@ -5,12 +5,12 @@ import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
-import {CcList, CcListRequest} from '../../cc-list/domain/cc-list';
+import {CcListEntry, CcListRequest} from '../../cc-list/domain/cc-list';
 import {SelectionModel} from '@angular/cdk/collections';
 import {ExtensionDetailComponent} from '../../extension-detail/extension-detail.component';
 import {CcListService} from '../../cc-list/domain/cc-list.service';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
-import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker} from '@angular/material/datepicker';
 import {PageRequest} from '../../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
@@ -50,7 +50,7 @@ export class BasedAccDialogComponent implements OnInit {
     if (!this.preferencesInfo) {
       return [];
     }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutTypeAndDtColumnsPage;
+    return this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutTypeColumnPage;
   }
 
   set columns(columns: TableColumnsProperty[]) {
@@ -58,18 +58,18 @@ export class BasedAccDialogComponent implements OnInit {
       return;
     }
 
-    this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutTypeAndDtColumnsPage = columns;
+    this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutTypeColumnPage = columns;
     this.updateTableColumnsForCoreComponentWithoutTypeAndDtColumnsPage();
   }
 
   updateTableColumnsForCoreComponentWithoutTypeAndDtColumnsPage() {
-    this.preferencesService.updateTableColumnsForCoreComponentWithoutTypeAndDtColumnsPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    this.preferencesService.updateTableColumnsForCoreComponentWithoutTypeColumnPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
     });
   }
 
   onColumnsReset() {
     const defaultTableColumnInfo = new TableColumnsInfo();
-    this.columns = defaultTableColumnInfo.columnsOfCoreComponentWithoutTypeAndDtColumnsPage;
+    this.columns = defaultTableColumnInfo.columnsOfCoreComponentWithoutTypeColumnPage;
   }
 
   onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
@@ -151,9 +151,9 @@ export class BasedAccDialogComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<CcList>();
-  expandedElement: CcList | null;
-  selection = new SelectionModel<CcList>(false, []);
+  dataSource = new MatTableDataSource<CcListEntry>();
+  expandedElement: CcListEntry | null;
+  selection = new SelectionModel<CcListEntry>(false, []);
 
   loading = false;
 
@@ -245,10 +245,7 @@ export class BasedAccDialogComponent implements OnInit {
       this.paginator.length = resp.length;
       this.paginator.pageIndex = resp.page;
 
-      this.dataSource.data = resp.list.map((elm: CcList) => {
-        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        return elm;
-      });
+      this.dataSource.data = resp.list;
       this.highlightTextForModule = this.request.filters.module;
       this.highlightTextForDefinition = this.request.filters.definition;
 
@@ -258,17 +255,6 @@ export class BasedAccDialogComponent implements OnInit {
 
   onPageChange(event: PageEvent) {
     this.loadCcList();
-  }
-
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
   }
 
   reset(type: string) {
@@ -332,11 +318,11 @@ export class BasedAccDialogComponent implements OnInit {
     }
   }
 
-  select(row: CcList) {
+  select(row: CcListEntry) {
     this.selection.select(row);
   }
 
-  toggle(row: CcList) {
+  toggle(row: CcListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row);
     } else {
@@ -344,11 +330,11 @@ export class BasedAccDialogComponent implements OnInit {
     }
   }
 
-  isSelected(row: CcList) {
+  isSelected(row: CcListEntry) {
     return this.selection.isSelected(row);
   }
 
-  getRouterLink(ccList: CcList) {
+  getRouterLink(ccList: CcListEntry) {
     switch (ccList.type.toUpperCase()) {
       case 'ACC':
         if (ccList.oagisComponentType === 'UserExtensionGroup') {

@@ -153,7 +153,7 @@
                             </mat-icon>
                             <mat-icon class="context-menu-icon"
                                       [matMenuTriggerFor]="dataSource.isExpandable(node) ? contextMenu : contextMenuForLeaf"
-                                      [matMenuTriggerData]="{'menuId': 'contextMenu'}"
+                                      [matMenuTriggerData]="{'menuId': 'contextMenu', 'hashPath': node.hashPath}"
                                       (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
                             </mat-icon>
                           </div>
@@ -438,18 +438,18 @@
                               <mat-form-field>
                                 <mat-label>Value Domain Restriction</mat-label>
                                 <mat-select placeholder="Value Domain Restriction" required
-                                            [value]="asBccpDetail().bdt.valueDomainType"
+                                            [value]="asBccpDetail().dt.valueDomainType"
                                             [disabled]="true">
                                   <mat-option value="Primitive">Primitive</mat-option>
                                 </mat-select>
                               </mat-form-field>
-                              <mat-form-field *ngIf="asBccpDetail().bdt.valueDomainType === 'Primitive'">
+                              <mat-form-field *ngIf="asBccpDetail().dt.valueDomainType === 'Primitive'">
                                 <mat-label>Value Domain</mat-label>
                                 <mat-select placeholder="Value Domain" required
-                                            [value]="asBccpDetail().bdt.defaultBdtPriRestri?.bdtPriRestriId">
-                                  <mat-option *ngFor="let xbt of asBccpDetail().bdt.bdtPriRestriList"
-                                              [value]="xbt.bdtPriRestriId" [disabled]="true">
-                                    {{ xbt.xbtName }}
+                                            [value]="asBccpDetail().dt.defaultDtAwdPri?.dtAwdPriId">
+                                  <mat-option *ngFor="let dtAwdPri of asBccpDetail().dt.dtAwdPriList"
+                                              [value]="dtAwdPri.dtAwdPriId" [disabled]="true">
+                                    {{ dtAwdPri.xbt.name }}
                                   </mat-option>
                                 </mat-select>
                               </mat-form-field>
@@ -491,7 +491,7 @@
               </div>
 
               <!-- BDT_SC -->
-              <div class="bie-edit-detail-panel scroll" *ngIf="isBdtScDetail()">
+              <div class="bie-edit-detail-panel scroll" *ngIf="isDtScDetail()">
                 <mat-tab-group mat-align-tabs="start">
                   <mat-tab label="{{ selectedNode.name }}">
                     <div class="bie-edit-detail-container">
@@ -499,7 +499,7 @@
                         <div class="col-3">
                           <div class="checkbox">
                             <mat-checkbox color="primary"
-                                          [(ngModel)]="asBdtScDetail().bdtSc.deprecated"
+                                          [(ngModel)]="asDtScDetail().dtSc.deprecated"
                                           [matTooltip]="selectedNode.ccDeprecated ? 'Core Component is deprecated.' : ''"
                                           [disabled]="true">
                               Deprecated
@@ -513,14 +513,14 @@
                           <mat-form-field>
                             <mat-label>Cardinality Min</mat-label>
                             <input matInput placeholder="Cardinality Min" required
-                                   [value]="asBdtScDetail().bdtSc.cardinalityMin">
+                                   [value]="asDtScDetail().dtSc.cardinalityMin">
                           </mat-form-field>
                         </div>
                         <div class="col-6">
                           <mat-form-field>
                             <mat-label>Cardinality Max</mat-label>
-                            <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asBdtScDetail().bdtSc.cardinalityMax | unbounded}})" required
-                                   [value]="asBdtScDetail().bdtSc.cardinalityMax | unbounded">
+                            <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asDtScDetail().dtSc.cardinalityMax | unbounded}})" required
+                                   [value]="asDtScDetail().dtSc.cardinalityMax | unbounded">
                           </mat-form-field>
                         </div>
                       </div>
@@ -532,30 +532,30 @@
                               matTooltip="This value constraint cannot modify by the definition of the Business Information Entity.">
                               <mat-form-field>
                                 <mat-label>Value Constraint</mat-label>
-                                <mat-select [value]="asBdtScDetail().bdtSc.fixedOrDefault"
+                                <mat-select [value]="asDtScDetail().dtSc.fixedOrDefault"
                                             [disabled]="true">
                                   <mat-option value="none">None</mat-option>
                                   <mat-option value="fixed">Fixed Value</mat-option>
                                   <mat-option value="default">Default Value</mat-option>
                                 </mat-select>
                               </mat-form-field>
-                              <mat-form-field *ngIf="asBdtScDetail().bdtSc.fixedOrDefault == 'none'">
+                              <mat-form-field *ngIf="asDtScDetail().dtSc.fixedOrDefault == 'none'">
                                 <mat-label>No value constraints</mat-label>
                                 <input matInput placeholder="No value constraints"
                                        [disabled]="true">
                               </mat-form-field>
 
-                              <mat-form-field *ngIf="asBdtScDetail().bdtSc.fixedOrDefault == 'fixed'">
+                              <mat-form-field *ngIf="asDtScDetail().dtSc.fixedOrDefault == 'fixed'">
                                 <mat-label>Fixed Value</mat-label>
                                 <input matInput placeholder="Fixed Value"
-                                       [(ngModel)]="asBdtScDetail().bdtSc.fixedValue"
+                                       [(ngModel)]="asDtScDetail().dtSc.fixedValue"
                                        [disabled]="true">
                               </mat-form-field>
 
-                              <mat-form-field *ngIf="asBdtScDetail().bdtSc.fixedOrDefault == 'default'">
+                              <mat-form-field *ngIf="asDtScDetail().dtSc.fixedOrDefault == 'default'">
                                 <mat-label>Default Value</mat-label>
                                 <input matInput placeholder="Default Value"
-                                       [(ngModel)]="asBdtScDetail().bdtSc.defaultValue"
+                                       [(ngModel)]="asDtScDetail().dtSc.defaultValue"
                                        [disabled]="true">
                               </mat-form-field>
                             </mat-card-content>
@@ -567,19 +567,19 @@
                               <mat-form-field>
                                 <mat-label>Value Domain Restriction</mat-label>
                                 <mat-select placeholder="Value Domain Restriction" required
-                                            [value]="asBdtScDetail().bdtSc.valueDomainType"
+                                            [value]="asDtScDetail().dtSc.valueDomainType"
                                             [disabled]="true">
                                   <mat-option value="Primitive">Primitive</mat-option>
                                 </mat-select>
                               </mat-form-field>
 
-                              <mat-form-field *ngIf="asBdtScDetail().bdtSc.valueDomainType === 'Primitive'">
+                              <mat-form-field *ngIf="asDtScDetail().dtSc.valueDomainType === 'Primitive'">
                                 <mat-label>Value Domain</mat-label>
                                 <mat-select placeholder="Value Domain" required
-                                            [value]="asBdtScDetail().bdtSc.defaultBdtScPriRestri?.bdtScPriRestriId">
-                                  <mat-option *ngFor="let xbt of asBdtScDetail().bdtSc.bdtScPriRestriList"
-                                              [value]="xbt.bdtScPriRestriId" [disabled]="true">
-                                    {{ xbt.xbtName }}
+                                            [value]="asDtScDetail().dtSc.defaultDtScAwdPri?.dtScAwdPriId">
+                                  <mat-option *ngFor="let dtScAwdPri of asDtScDetail().dtSc.dtScAwdPriList"
+                                              [value]="dtScAwdPri.dtScAwdPriId" [disabled]="true">
+                                    {{ dtScAwdPri.xbt.name }}
                                   </mat-option>
                                 </mat-select>
                               </mat-form-field>
@@ -595,7 +595,7 @@
                             <div class="textarea-container">
                               <textarea matInput rows="6"
                                         placeholder="Component Definition" [readonly]="true"
-                                        value="{{ asBdtScDetail().bdtSc.definition || ' ' }}">
+                                        value="{{ asDtScDetail().dtSc.definition || ' ' }}">
                               </textarea>
                             </div>
                           </mat-form-field>

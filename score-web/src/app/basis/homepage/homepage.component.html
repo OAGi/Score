@@ -63,7 +63,7 @@
                     <a [routerLink]="['/core_component']"
                        [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
-                       {key: 'ownerLoginIds', value: element.username}])}">
+                       {key: 'ownerLoginIdList', value: element.username}])}">
                       <span class="word-break-all">{{ element.username }}</span>
                     </a>
                   </td>
@@ -74,7 +74,7 @@
                     <a [routerLink]="['/core_component']"
                        [queryParams]="{q: q([
                        {key: 'states', value: 'WIP'},
-                       {key: 'ownerLoginIds', value: element.username}]) }">
+                       {key: 'ownerLoginIdList', value: element.username}]) }">
                       {{ element.WIP }}
                     </a>
                   </td>
@@ -85,7 +85,7 @@
                     <a [routerLink]="['/core_component']"
                        [queryParams]="{q: q([
                        {key: 'states', value: 'Draft'},
-                       {key: 'ownerLoginIds', value: element.username}]) }">
+                       {key: 'ownerLoginIdList', value: element.username}]) }">
                       {{ element.Draft }}
                     </a>
                   </td>
@@ -96,7 +96,7 @@
                     <a [routerLink]="['/core_component']"
                        [queryParams]="{q: q([
                        {key: 'states', value: 'Candidate'},
-                       {key: 'ownerLoginIds', value: element.username}]) }">
+                       {key: 'ownerLoginIdList', value: element.username}]) }">
                       {{ element.Candidate }}
                     </a>
                   </td>
@@ -106,7 +106,7 @@
                   <td mat-cell *matCellDef="let element">
                     <a [routerLink]="['/core_component']"
                        [queryParams]="{q: q([
-                       {key: 'ownerLoginIds', value: element.username}]) }">
+                       {key: 'ownerLoginIdList', value: element.username}]) }">
                       {{ element.total }}
                     </a>
                   </td>
@@ -166,7 +166,8 @@
                 <ng-container matColumnDef="lastUpdateTimestamp">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
                   <td mat-cell *matCellDef="let element">
-                    <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                    <div class="ellipsis">{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                    <div class="description"><span class="pr-1">by</span><b class="word-break-all">{{ element.lastUpdated.who.loginId }}</b></div>
                   </td>
                 </ng-container>
 
@@ -252,7 +253,7 @@
                     <a [routerLink]="['/profile_bie']"
                        [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
-                       {key: 'ownerLoginIds', value: element.username},
+                       {key: 'ownerLoginIdList', value: element.username},
                        {key: 'releaseIds', value: selectedRelease.releaseId}])}">
                       <span class="word-break-all">{{ element.username }}</span>
                     </a>
@@ -265,7 +266,7 @@
                        [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
                        {key: 'states', value: 'WIP'},
-                       {key: 'ownerLoginIds', value: element.username},
+                       {key: 'ownerLoginIdList', value: element.username},
                        {key: 'releaseIds', value: selectedRelease.releaseId}]) }">
                       {{ element.WIP }}
                     </a>
@@ -278,7 +279,7 @@
                        [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
                        {key: 'states', value: 'QA'},
-                       {key: 'ownerLoginIds', value: element.username},
+                       {key: 'ownerLoginIdList', value: element.username},
                        {key: 'releaseIds', value: selectedRelease.releaseId}]) }">
                       {{ element.QA }}
                     </a>
@@ -291,7 +292,7 @@
                        [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
                        {key: 'states', value: 'Production'},
-                       {key: 'ownerLoginIds', value: element.username},
+                       {key: 'ownerLoginIdList', value: element.username},
                        {key: 'releaseIds', value: selectedRelease.releaseId}]) }">
                       {{ element.Production }}
                     </a>
@@ -303,7 +304,7 @@
                     <a [routerLink]="['/profile_bie']"
                        [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
-                       {key: 'ownerLoginIds', value: element.username},
+                       {key: 'ownerLoginIdList', value: element.username},
                        {key: 'releaseIds', value: selectedRelease.releaseId}]) }">
                       {{ element.total }}
                     </a>
@@ -355,13 +356,13 @@
 
                 <ng-container matColumnDef="release">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> Release</th>
-                  <td mat-cell *matCellDef="let element">{{ element.releaseNum }}</td>
+                  <td mat-cell *matCellDef="let element">{{ element.release.releaseNum }}</td>
                 </ng-container>
 
                 <ng-container matColumnDef="businessContexts">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Business Contexts</th>
+                  <th mat-header-cell *matHeaderCellDef> Business Contexts</th>
                   <td mat-cell *matCellDef="let element">
-                    <ng-container *ngFor="let businessContext of element.businessContexts">
+                    <ng-container *ngFor="let businessContext of element.businessContextList">
                       <span class="businessContext word-break-all">
                         <a target="_blank" rel="noopener noreferrer"
                            routerLink="/context_management/business_context/{{ businessContext.businessContextId }}">
@@ -375,7 +376,8 @@
                 <ng-container matColumnDef="lastUpdateTimestamp">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
                   <td mat-cell *matCellDef="let element">
-                    <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                    <div class="ellipsis">{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                    <div class="description"><span class="pr-1">by</span><b class="word-break-all">{{ element.lastUpdated.who.loginId }}</b></div>
                   </td>
                 </ng-container>
 
@@ -462,7 +464,7 @@
                     <a [routerLink]="['/core_component']"
                        [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
-                       {key: 'ownerLoginIds', value: element.username},
+                       {key: 'ownerLoginIdList', value: element.username},
                        {key: 'releaseId', value:  selectedRelease.releaseId},
                        {key: 'types', value:  ['ACC']},
                        {key: 'componentTypes', value: [UEGValue]}]) }">
@@ -477,7 +479,7 @@
                        [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
                        {key: 'states', value: 'WIP'},
-                       {key: 'ownerLoginIds', value: element.username},
+                       {key: 'ownerLoginIdList', value: element.username},
                        {key: 'releaseId', value:  selectedRelease.releaseId},
                        {key: 'types', value:  ['ACC']},
                        {key: 'componentTypes', value: [UEGValue]}]) }">
@@ -492,7 +494,7 @@
                        [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
                        {key: 'states', value: 'QA'},
-                       {key: 'ownerLoginIds', value: element.username},
+                       {key: 'ownerLoginIdList', value: element.username},
                        {key: 'releaseId', value:  selectedRelease.releaseId},
                        {key: 'componentType', value: 'User Extension Group'}]) }">
                       {{ element.QA }}
@@ -506,7 +508,7 @@
                        [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
                        {key: 'states', value: 'Production'},
-                       {key: 'ownerLoginIds', value: element.username},
+                       {key: 'ownerLoginIdList', value: element.username},
                        {key: 'releaseId', value:  selectedRelease.releaseId},
                        {key: 'componentType', value: 'User Extension Group'}]) }">
                       {{ element.Production }}
@@ -520,7 +522,7 @@
                        [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
                        {key: 'states', value: 'Deleted'},
-                       {key: 'ownerLoginIds', value: element.username},
+                       {key: 'ownerLoginIdList', value: element.username},
                        {key: 'releaseId', value: selectedRelease.releaseId},
                        {key: 'componentType', value: 'User Extension Group'}]) }">
                       {{ element.Deleted }}
@@ -533,7 +535,7 @@
                     <a [routerLink]="['/core_component']"
                        [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
-                       {key: 'ownerLoginIds', value: element.username},
+                       {key: 'ownerLoginIdList', value: element.username},
                        {key: 'releaseId', value:  selectedRelease.releaseId},
                        {key: 'componentType', value: 'User Extension Group'}]) }">
                       {{ element.total }}
@@ -588,7 +590,8 @@
                 <ng-container matColumnDef="lastUpdateTimestamp">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
                   <td mat-cell *matCellDef="let element">
-                    <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                    <div class="ellipsis">{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                    <div class="description"><span class="pr-1">by</span><b class="word-break-all">{{ element.lastUpdated.who.loginId }}</b></div>
                   </td>
                 </ng-container>
 

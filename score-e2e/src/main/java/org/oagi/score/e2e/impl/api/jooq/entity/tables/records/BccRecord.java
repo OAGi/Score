@@ -16,7 +16,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bcc;
  * A BCC represents a relationship/association between an ACC and a BCCP. It
  * creates a data element for an ACC. 
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class BccRecord extends UpdatableRecordImpl<BccRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -526,6 +526,6 @@ public class BccRecord extends UpdatableRecordImpl<BccRecord> {
         setFixedValue(fixedValue);
         setPrevBccId(prevBccId);
         setNextBccId(nextBccId);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

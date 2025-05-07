@@ -3,7 +3,7 @@ import {Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren} fro
 import {MatSidenav} from '@angular/material/sidenav';
 import {finalize, switchMap} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
-import {SimpleNamespace} from '../../namespace-management/domain/namespace';
+import {NamespaceSummary} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {MatDialog} from '@angular/material/dialog';
@@ -11,12 +11,12 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {BccpFlatNode, CcFlatNode, CcFlatNodeDatabase, CcFlatNodeDataSource, CcFlatNodeDataSourceSearcher} from '../domain/cc-flat-tree';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {
-  CcAccNodeDetail,
-  CcAsccpNodeDetail,
-  CcBccpNodeDetail,
-  CcBdtScNodeDetail,
-  CcNodeDetail,
-  CcRevisionResponse,
+  BccpDetails,
+  CcAccNodeInfo,
+  CcAsccpNodeInfo,
+  CcBccpNodeInfo,
+  CcDtScNodeInfo,
+  CcNodeInfo,
   Comment,
   EntityType,
   EntityTypes,
@@ -25,7 +25,6 @@ import {
 } from '../domain/core-component-node';
 import {CreateBccpDialogComponent} from '../cc-list/create-bccp-dialog/create-bccp-dialog.component';
 import {AuthService} from '../../authentication/auth.service';
-import {WorkingRelease} from '../../release-management/domain/release';
 import {CommentControl} from '../domain/comment-component';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {Location} from '@angular/common';
@@ -67,17 +66,17 @@ export class BccpDetailComponent implements OnInit {
   dataSource: CcFlatNodeDataSource<CcFlatNode>;
   searcher: CcFlatNodeDataSourceSearcher<CcFlatNode>;
 
-  lastRevision: CcRevisionResponse;
+  prevBccpDetails: BccpDetails;
   selectedNode: CcFlatNode;
   cursorNode: CcFlatNode;
 
   workingRelease = false;
-  namespaces: SimpleNamespace[];
+  namespaces: NamespaceSummary[];
   tags: Tag[] = [];
   commentControl: CommentControl;
 
   namespaceListFilterCtrl: FormControl = new FormControl();
-  filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
+  filteredNamespaceList: ReplaySubject<NamespaceSummary[]> = new ReplaySubject<NamespaceSummary[]>(1);
 
   initialExpandDepth = 10;
 
@@ -133,20 +132,31 @@ export class BccpDetailComponent implements OnInit {
         this.manifestId = parseInt(params.get('manifestId'), 10);
         return forkJoin([
           this.service.getGraphNode(this.type, this.manifestId),
-          this.service.getLastPublishedRevision(this.type, this.manifestId),
-          this.service.getBccpNode(this.manifestId),
+          this.service.getBccpDetails(this.manifestId),
           this.tagService.getTags(),
           this.preferencesService.load(this.auth.getUserToken())
         ]);
-      })).subscribe(([ccGraph, revisionResponse, rootNode, tags, preferencesInfo]) => {
+      })).subscribe(([ccGraph, bccpDetails, tags, preferencesInfo]) => {
 
-      this.namespaceService.getSimpleNamespaces(rootNode.libraryId).subscribe(namespaces => {
+      this.namespaceService.getNamespaceSummaries(bccpDetails.library.libraryId).subscribe(namespaces => {
         this.namespaces = namespaces;
         initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList,
           this.getSelectableNamespaces(), (e) => e.uri);
       });
 
-      this.lastRevision = revisionResponse;
+      if (bccpDetails.log.revisionNum > 1) {
+        this.service.getPrevBccpDetails(this.manifestId)
+            .subscribe(prevBccpDetails => {
+              this.prevBccpDetails = prevBccpDetails;
+            }, err => {
+              if (err.status === 404) {
+                // ignore
+              } else {
+                throw err;
+              }
+            });
+      }
+
       this.tags = tags;
       this.preferencesInfo = preferencesInfo;
 
@@ -180,11 +190,11 @@ export class BccpDetailComponent implements OnInit {
       this.dataSource.init();
       this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
 
-      this.workingRelease = rootNode.workingRelease;
+      this.workingRelease = bccpDetails.release.workingRelease;
 
       this.rootNode = this.dataSource.data[0] as BccpFlatNode;
-      this.rootNode.access = rootNode.access;
-      this.rootNode.state = rootNode.state;
+      this.rootNode.access = bccpDetails.access;
+      this.rootNode.state = bccpDetails.state;
       this.rootNode.reset();
 
       // Issue #1254
@@ -232,7 +242,7 @@ export class BccpDetailComponent implements OnInit {
     comment.commentId = evt.properties.commentId;
     comment.prevCommentId = evt.properties.prevCommentId;
     comment.text = evt.properties.text;
-    comment.loginId = evt.properties.actor;
+    comment.created.who.loginId = evt.properties.actor;
     comment.timestamp = evt.properties.timestamp;
     comment.isNew = true;
 
@@ -245,7 +255,7 @@ export class BccpDetailComponent implements OnInit {
     }
   }
 
-  getSelectableNamespaces(namespaceId?: number): SimpleNamespace[] {
+  getSelectableNamespaces(namespaceId?: number): NamespaceSummary[] {
     return this.namespaces.filter(e => {
       if (!!namespaceId && e.namespaceId === namespaceId) {
         return true;
@@ -300,19 +310,19 @@ export class BccpDetailComponent implements OnInit {
 
     this.isUpdating = true;
     forkJoin([
-      this.service.getBccpNode(this.manifestId),
+      this.service.getBccpDetails(this.manifestId),
       this.service.getGraphNode(this.rootNode.type, this.manifestId)
-    ]).subscribe(([rootNode, ccGraph]) => {
+    ]).subscribe(([bccpDetails, ccGraph]) => {
       const database = new CcFlatNodeDatabase<CcFlatNode>(ccGraph, 'BCCP', this.manifestId);
       this.dataSource = new CcFlatNodeDataSource<CcFlatNode>(database, this.service);
       this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
       this.dataSource.init();
 
-      this.workingRelease = rootNode.workingRelease;
+      this.workingRelease = bccpDetails.release.workingRelease;
 
       this.rootNode = this.dataSource.data[0] as BccpFlatNode;
-      this.rootNode.access = rootNode.access;
-      this.rootNode.state = rootNode.state;
+      this.rootNode.access = bccpDetails.access;
+      this.rootNode.state = bccpDetails.state;
       this.rootNode.reset();
 
       this.onClick(this.dataSource.data[0]);
@@ -366,7 +376,7 @@ export class BccpDetailComponent implements OnInit {
   }
 
   hasRevision(): boolean {
-    return this.lastRevision && !!this.lastRevision.ccId;
+    return !!this.prevBccpDetails;
   }
 
   isEditable(): boolean {
@@ -383,7 +393,7 @@ export class BccpDetailComponent implements OnInit {
     }
 
     this.commentControl.closeCommentSlide();
-    this.dataSource.loadDetail(node, (detail: CcNodeDetail) => {
+    this.dataSource.loadDetail(node, (detail: CcNodeInfo) => {
       this.selectedNode = node;
       this.cursorNode = node;
     });
@@ -406,11 +416,11 @@ export class BccpDetailComponent implements OnInit {
     return (node !== undefined) && (node.type.toUpperCase() === 'ACC');
   }
 
-  asAccDetail(node?: CcFlatNode): CcAccNodeDetail {
+  asAccDetail(node?: CcFlatNode): CcAccNodeInfo {
     if (!node) {
       node = this.selectedNode;
     }
-    return node.detail as CcAccNodeDetail;
+    return node.detail as CcAccNodeInfo;
   }
 
   isAsccpDetail(node?: CcFlatNode): boolean {
@@ -420,11 +430,11 @@ export class BccpDetailComponent implements OnInit {
     return (node !== undefined) && (node.type.toUpperCase() === 'ASCCP');
   }
 
-  asAsccpDetail(node?: CcFlatNode): CcAsccpNodeDetail {
+  asAsccpDetail(node?: CcFlatNode): CcAsccpNodeInfo {
     if (!node) {
       node = this.selectedNode;
     }
-    return node.detail as CcAsccpNodeDetail;
+    return node.detail as CcAsccpNodeInfo;
   }
 
   isBccpDetail(node?: CcFlatNode): boolean {
@@ -434,25 +444,25 @@ export class BccpDetailComponent implements OnInit {
     return (node !== undefined) && (node.type.toUpperCase() === 'BCCP');
   }
 
-  asBccpDetail(node?: CcFlatNode): CcBccpNodeDetail {
+  asBccpDetail(node?: CcFlatNode): CcBccpNodeInfo {
     if (!node) {
       node = this.selectedNode;
     }
-    return node.detail as CcBccpNodeDetail;
+    return node.detail as CcBccpNodeInfo;
   }
 
-  isBdtScDetail(node?: CcFlatNode): boolean {
+  isDtScDetail(node?: CcFlatNode): boolean {
     if (!node) {
       node = this.selectedNode;
     }
     return (node !== undefined) && (node.type.toUpperCase() === 'DT_SC');
   }
 
-  asBdtScDetail(node?: CcFlatNode): CcBdtScNodeDetail {
+  asDtScDetail(node?: CcFlatNode): CcDtScNodeInfo {
     if (!node) {
       node = this.selectedNode;
     }
-    return node.detail as CcBdtScNodeDetail;
+    return node.detail as CcDtScNodeInfo;
   }
 
   get isChanged() {
@@ -472,7 +482,7 @@ export class BccpDetailComponent implements OnInit {
 
   _updateDetails(details: CcFlatNode[]) {
     this.isUpdating = true;
-    this.service.updateDetails(this.manifestId, details)
+    this.service.updateNodes(details)
       .pipe(finalize(() => {
         this.isUpdating = false;
       }))
@@ -571,7 +581,7 @@ export class BccpDetailComponent implements OnInit {
     });
   }
 
-  changeBdt(node: CcFlatNode) {
+  changeDt(node: CcFlatNode) {
     const dialogRef = this.dialog.open(CreateBccpDialogComponent, {
       data: {
         libraryId: this.rootNode.libraryId,
@@ -591,7 +601,7 @@ export class BccpDetailComponent implements OnInit {
       if (!bdtManifestId) {
         return;
       }
-      this.service.updateBccpManifest(this.rootNode.manifestId, bdtManifestId).subscribe(bccp => {
+      this.service.updateBccpDt(this.rootNode.manifestId, bdtManifestId).subscribe(bccp => {
         this.reload('Updated');
       });
     });
@@ -608,24 +618,31 @@ export class BccpDetailComponent implements OnInit {
     dialogConfig.data.action = 'Update';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()
-      .pipe(
-        finalize(() => {
-          this.isUpdating = false;
-        })
-      )
-      .subscribe(result => {
-        if (!result) {
-          return;
-        }
-        this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state)
-          .subscribe(resp => {
-            this.afterStateChanged(resp.state, resp.access);
-            this.snackBar.open('Updated', '', {
-              duration: 3000,
-            });
-          }, err => {
+        .pipe(
+            finalize(() => {
+              this.isUpdating = false;
+            })
+        )
+        .subscribe(result => {
+          if (!result) {
+            return;
+          }
+          this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state).subscribe({
+            next: () => {
+              this.snackBar.open('Updated', '', {duration: 3000});
+
+              this.service.getBccpDetails(this.manifestId).subscribe({
+                next: bccpDetails => this.afterStateChanged(bccpDetails.state, bccpDetails.access),
+                error: err => console.error(err),
+                complete: () => (this.isUpdating = false),
+              });
+            },
+            error: err => {
+              this.isUpdating = false;
+              throw err;
+            },
           });
-      });
+        });
   }
 
   updateState(state: string) {
@@ -655,7 +672,7 @@ export class BccpDetailComponent implements OnInit {
     this.rootNode.state = state;
     this.rootNode.access = access;
     const root = this.dataSource.data[0];
-    (root.detail as CcBccpNodeDetail).bccp.state = state;
+    (root.detail as CcBccpNodeInfo).bccp.state = state;
   }
 
   makeNewRevision() {
@@ -666,28 +683,30 @@ export class BccpDetailComponent implements OnInit {
     dialogConfig.data.action = (isDeveloper) ? 'Revise' : 'Amend';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()
-      .subscribe(result => {
-        if (!result) {
-          return;
-        }
+        .subscribe(result => {
+          if (!result) {
+            return;
+          }
 
-        this.isUpdating = true;
-        this.service.makeNewRevision(this.rootNode.type, this.rootNode.manifestId).pipe(
-          finalize(() => {
-            this.isUpdating = false;
-          })
-        ).subscribe(resp => {
-            this.manifestId = resp.manifestId;
-            this.afterStateChanged(resp.state, resp.access);
-            this.service.getLastPublishedRevision(this.type, this.manifestId).subscribe(revision => {
-              this.lastRevision = revision;
+          this.isUpdating = true;
+          this.service.makeNewRevision(this.rootNode.type, this.rootNode.manifestId).subscribe(_ => {
+            forkJoin([
+              this.service.getBccpDetails(this.manifestId),
+              this.service.getPrevBccpDetails(this.manifestId),
+            ]).subscribe(([bccpDetails, prevBccpDetails]) => {
+              this.manifestId = bccpDetails.bccpManifestId;
+              this.afterStateChanged(bccpDetails.state, bccpDetails.access);
+              this.prevBccpDetails = prevBccpDetails;
               this.snackBar.open((isDeveloper) ? 'Revised' : 'Amended', '', {
                 duration: 3000,
               });
+              this.reload();
             });
-            this.reload();
+          }, err => {
+            this.isUpdating = false;
+            throw err;
           });
-      });
+        });
   }
 
   get userRoles(): string[] {
@@ -704,7 +723,7 @@ export class BccpDetailComponent implements OnInit {
     return this.workingRelease;
   }
 
-  deleteNode(): void {
+  markAsDeleteNode(): void {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Delete core component?';
     dialogConfig.data.content = ['Are you sure you want to delete this core component?'];
@@ -716,17 +735,16 @@ export class BccpDetailComponent implements OnInit {
           return;
         }
         this.isUpdating = true;
-        this.service.deleteNode(this.type, this.manifestId)
-          .pipe(
-            finalize(() => {
-              this.isUpdating = false;
-            })
-          )
-          .subscribe(_ => {
+        this.service.updateState(this.type, this.manifestId, 'Deleted').subscribe({
+          next: () => {
             this.snackBar.open('Deleted', '', {duration: 3000});
             this.router.navigateByUrl('/core_component');
-          }, error => {
-          });
+          },
+          error: err => {
+            this.isUpdating = false;
+            throw err;
+          },
+        });
       });
   }
 
@@ -742,19 +760,16 @@ export class BccpDetailComponent implements OnInit {
           return;
         }
         this.isUpdating = true;
-        const state = 'Purge';
-        this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state)
-          .pipe(
-            finalize(() => {
-              this.isUpdating = false;
-            })
-          )
-          .subscribe(resp => {
+        this.service.purge(this.type, this.manifestId).subscribe({
+          next: () => {
             this.snackBar.open('Purged', '', {duration: 3000});
-            this.location.back();
             this.router.navigateByUrl('/core_component');
-          }, err => {
-          });
+          },
+          error: err => {
+            this.isUpdating = false;
+            throw err;
+          },
+        });
       });
   }
 
@@ -770,18 +785,21 @@ export class BccpDetailComponent implements OnInit {
           return;
         }
         this.isUpdating = true;
-        const state = 'WIP';
-        this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state)
-          .pipe(
-            finalize(() => {
-              this.isUpdating = false;
-            })
-          )
-          .subscribe(resp => {
-            this.afterStateChanged(resp.state, resp.access);
+        this.service.updateState(this.rootNode.type, this.rootNode.manifestId, 'WIP').subscribe({
+          next: () => {
             this.snackBar.open('Restored', '', {duration: 3000});
-          }, err => {
-          });
+
+            this.service.getBccpDetails(this.manifestId).subscribe({
+              next: bccpDetails => this.afterStateChanged(bccpDetails.state, bccpDetails.access),
+              error: err => console.error(err),
+              complete: () => (this.isUpdating = false),
+            });
+          },
+          error: err => {
+            this.isUpdating = false;
+            throw err;
+          },
+        });
       });
   }
 
@@ -805,7 +823,14 @@ export class BccpDetailComponent implements OnInit {
       return;
     }
 
-    this.tagService.toggleTag(node.type, node.manifestId, tag.name).subscribe(_ => {
+    let call;
+    if (!this.contains(node, tag)) {
+      call = this.tagService.appendTag(node.type, node.manifestId, tag.tagId);
+    } else {
+      call = this.tagService.removeTag(node.type, node.manifestId, tag.tagId);
+    }
+
+    call.subscribe(_ => {
       if (this.contains(node, tag)) {
         node.tagList.splice(node.tagList.map(e => e.tagId).indexOf(tag.tagId), 1);
       } else {
@@ -875,16 +900,20 @@ export class BccpDetailComponent implements OnInit {
       this.dataSource.toggle(this.cursorNode);
     } else if ($event.key === 'o' || $event.key === 'O') {
       this.menuTriggerList.toArray().filter(e => !!e.menuData)
-        .filter(e => e.menuData.menuId === 'contextMenu').forEach(trigger => {
-        this.contextMenuItem = node;
-        trigger.openMenu();
-      });
+          .filter(e => e.menuData.menuId === 'contextMenu' && e.menuData.hashPath === node.hashPath)
+          .forEach(trigger => {
+            this.contextMenuItem = node;
+            if (!trigger.menuOpen) {
+              trigger.openMenu();
+            }
+          });
     } else if ($event.key === 'c' || $event.key === 'C') {
       this.menuTriggerList.toArray().filter(e => !!e.menuData)
-        .filter(e => e.menuData.menuId === 'contextMenu').forEach(trigger => {
-        this.contextMenuItem = node;
-        this.openComments(node.type, node);
-      });
+          .filter(e => e.menuData.menuId === 'contextMenu' && e.menuData.hashPath === node.hashPath)
+          .forEach(trigger => {
+            this.contextMenuItem = node;
+            this.openComments(node.type, node);
+          });
     } else if ($event.key === 'Enter') {
       this.onClick(this.cursorNode);
     } else {

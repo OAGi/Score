@@ -1,5 +1,6 @@
 export class ScoreUser {
   userId: number;
+  loginId: string;
   username: string;
   roles: string[];
 }

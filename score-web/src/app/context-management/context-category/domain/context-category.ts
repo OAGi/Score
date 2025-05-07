@@ -1,17 +1,35 @@
-import {PageRequest} from '../../../basis/basis';
+import {PageRequest, WhoAndWhen} from '../../../basis/basis';
 import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
 import {base64Decode, base64Encode} from '../../../common/utility';
-import {ScoreUser} from '../../../authentication/domain/auth';
 
-export class ContextCategory {
+export class ContextCategorySummary {
+  contextCategoryId: number;
+  guid: string;
+  name: string;
+  description: string;
+}
+
+export class ContextCategoryListEntry {
   contextCategoryId: number;
   guid: string;
   name: string;
   description?: string;
-  lastUpdateTimestamp: Date;
-  lastUpdatedBy: ScoreUser;
   used: boolean;
+
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+}
+
+export class ContextCategoryDetails {
+  contextCategoryId: number;
+  guid: string;
+  name: string;
+  description?: string;
+  used: boolean;
+
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
 }
 
 export class ContextCategoryListRequest {
@@ -19,7 +37,7 @@ export class ContextCategoryListRequest {
     name: string;
     description: string;
   };
-  updaterUsernameList: string[] = [];
+  updaterLoginIdList: string[] = [];
   updatedDate: {
     start: Date,
     end: Date,
@@ -50,14 +68,14 @@ export class ContextCategoryListRequest {
       this.page.pageSize = (defaultPageRequest) ? defaultPageRequest.pageSize : 0;
     }
 
+    this.updaterLoginIdList = (params.get('updaterLoginIdList')) ? Array.from(params.get('updaterLoginIdList').split(',')) : [];
+    this.updatedDate = {
+      start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
+      end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
+    };
     this.filters = {
       name: params.get('name') || '',
       description: params.get('description') || ''
-    };
-
-    this.updatedDate = {
-      start: undefined,
-      end: undefined
     };
   }
 
@@ -68,6 +86,15 @@ export class ContextCategoryListRequest {
       .set('pageIndex', '' + this.page.pageIndex)
       .set('pageSize', '' + this.page.pageSize);
 
+    if (this.updaterLoginIdList && this.updaterLoginIdList.length > 0) {
+      params = params.set('updaterLoginIdList', this.updaterLoginIdList.join(','));
+    }
+    if (this.updatedDate.start) {
+      params = params.set('updatedDateStart', '' + this.updatedDate.start.toUTCString());
+    }
+    if (this.updatedDate.end) {
+      params = params.set('updatedDateEnd', '' + this.updatedDate.end.toUTCString());
+    }
     if (this.filters.name && this.filters.name.length > 0) {
       params = params.set('name', '' + this.filters.name);
     }

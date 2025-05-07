@@ -15,11 +15,11 @@ export class AboutService {
   }
 
   getWebPageInfo(): Observable<WebPageInfo> {
-    return this.http.get<WebPageInfo>('api/info/webpage');
+    return this.http.get<WebPageInfo>('api/info/webpages');
   }
 
   updateWebPageInfo(webPageInfo: WebPageInfo): Observable<any> {
-    return this.http.post('/api/info/webpage', {
+    return this.http.post('/api/info/webpages', {
       brand: webPageInfo.brand,
       favicon: webPageInfo.favicon,
       signInStatement: webPageInfo.signInStatement,

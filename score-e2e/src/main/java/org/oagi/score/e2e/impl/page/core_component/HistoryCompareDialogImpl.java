@@ -93,7 +93,7 @@ public class HistoryCompareDialogImpl implements HistoryCompareDialog {
 
         private WebElement getInputFieldByName(String name) {
             return this.contentElement.findElement(By.xpath(
-                    "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/input"));
+                    "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]//input"));
         }
 
         @Override

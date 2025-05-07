@@ -128,7 +128,9 @@ public class DSLContextReleaseAPIImpl implements ReleaseAPI {
         release.setReleaseNote(releaseRecord.getReleaseNote());
         release.setReleaseLicence(releaseRecord.getReleaseLicense());
         release.setLibraryId(releaseRecord.getLibraryId().toBigInteger());
-        release.setNamespaceId(releaseRecord.getNamespaceId().toBigInteger());
+        if (releaseRecord.getNamespaceId() != null) {
+            release.setNamespaceId(releaseRecord.getNamespaceId().toBigInteger());
+        }
         release.setCreatedby(releaseRecord.getCreatedBy().toBigInteger());
         release.setLastUpdatedBy(releaseRecord.getLastUpdatedBy().toBigInteger());
         release.setCreationTimestamp(releaseRecord.getCreationTimestamp());

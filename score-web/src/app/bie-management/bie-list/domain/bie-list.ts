@@ -1,14 +1,15 @@
-import {PageRequest} from '../../../basis/basis';
-import {BusinessContext} from '../../../context-management/business-context/domain/business-context';
+import {PageRequest, WhoAndWhen} from '../../../basis/basis';
+import {BusinessContext, BusinessContextSummary} from '../../../context-management/business-context/domain/business-context';
 import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
 import {base64Decode, base64Encode} from '../../../common/utility';
-import {SimpleRelease} from '../../../release-management/domain/release';
-import {Library} from '../../../library-management/domain/library';
+import {ReleaseSummary} from '../../../release-management/domain/release';
+import {LibrarySummary} from '../../../library-management/domain/library';
+import {ScoreUser} from '../../../authentication/domain/auth';
 
 export class BieListRequest {
-  library: Library = new Library();
-  releases: SimpleRelease[] = [];
+  library: LibrarySummary = new LibrarySummary();
+  releases: ReleaseSummary[] = [];
   filters: {
     propertyTerm: string;
     businessContext: string;
@@ -25,8 +26,8 @@ export class BieListRequest {
   states: string[] = [];
   deprecated: boolean[] = [false];
   types: string[] = [];
-  ownerLoginIds: string[] = [];
-  updaterLoginIds: string[] = [];
+  ownerLoginIdList: string[] = [];
+  updaterLoginIdList: string[] = [];
   updatedDate: {
     start: Date,
     end: Date,
@@ -38,12 +39,12 @@ export class BieListRequest {
     const q = (paramMap) ? paramMap.get('q') : undefined;
     const params = (q) ? new HttpParams({fromString: base64Decode(q)}) : new HttpParams();
     this.releases = (params.get('releaseIds')) ? Array.from(params.get('releaseIds').split(',').map(e => {
-      const release = new SimpleRelease();
+      const release = new ReleaseSummary();
       release.releaseId = Number(e);
       return release;
     })) : [];
     if (this.releases.length === 0 && params.get('releaseId')) {
-      const release = new SimpleRelease();
+      const release = new ReleaseSummary();
       release.releaseId = Number(params.get('releaseId'));
       if (release.releaseId >= 0) {
         this.releases = [release];
@@ -76,8 +77,8 @@ export class BieListRequest {
     this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
     this.deprecated = (params.get('deprecated')) ? Array.from(params.get('deprecated').split(',').map(e => e === 'true' ? true : false)) : [];
     this.types = (params.get('types')) ? Array.from(params.get('types').split(',')) : [];
-    this.ownerLoginIds = (params.get('ownerLoginIds')) ? Array.from(params.get('ownerLoginIds').split(',')) : [];
-    this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
+    this.ownerLoginIdList = (params.get('ownerLoginIdList')) ? Array.from(params.get('ownerLoginIdList').split(',')) : [];
+    this.updaterLoginIdList = (params.get('updaterLoginIdList')) ? Array.from(params.get('updaterLoginIdList').split(',')) : [];
     this.updatedDate = {
       start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
       end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
@@ -126,11 +127,11 @@ export class BieListRequest {
     if (this.access && this.access.length > 0) {
       params = params.set('access', this.access);
     }
-    if (this.ownerLoginIds && this.ownerLoginIds.length > 0) {
-      params = params.set('ownerLoginIds', this.ownerLoginIds.join(','));
+    if (this.ownerLoginIdList && this.ownerLoginIdList.length > 0) {
+      params = params.set('ownerLoginIdList', this.ownerLoginIdList.join(','));
     }
-    if (this.updaterLoginIds && this.updaterLoginIds.length > 0) {
-      params = params.set('updaterLoginIds', this.updaterLoginIds.join(','));
+    if (this.updaterLoginIdList && this.updaterLoginIdList.length > 0) {
+      params = params.set('updaterLoginIdList', this.updaterLoginIdList.join(','));
     }
     if (this.updatedDate.start) {
       params = params.set('updatedDateStart', '' + this.updatedDate.start.toUTCString());
@@ -164,6 +165,51 @@ export class BieListRequest {
     const str = base64Encode(params.toString());
     return (str) ? 'q=' + str : undefined;
   }
+}
+
+export class BieListEntry {
+
+  library: LibrarySummary;
+  release: ReleaseSummary;
+
+  topLevelAsbiepId: number;
+  asbiepId: number;
+  guid: string;
+
+  den: string;
+  propertyTerm: string;
+  displayName: string;
+  version: string;
+  status: string;
+  bizTerm: string;
+  remark: string;
+  businessContextList: BusinessContextSummary[];
+  state: string;
+  access: string;
+
+  deprecated: boolean;
+  deprecatedReason: string;
+  deprecatedRemark: string;
+
+  source: SourceTopLevelAsbiep;
+  based: SourceTopLevelAsbiep;
+
+  owner: ScoreUser;
+  ownedByDeveloper: boolean;
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+
+}
+
+export class SourceTopLevelAsbiep {
+
+  release: ReleaseSummary;
+  topLevelAsbiepId: number;
+  den: string;
+  displayName: string;
+  sourceAction: string;
+  when: Date;
+
 }
 
 export class BieList {
@@ -207,29 +253,6 @@ export class BieList {
   basedTopLevelAsbiepDisplayName: string;
 }
 
-export class AsbieBbieList {
-  type: string;
-  bieId: number;
-  guid: string;
-  den: string;
-  state: string;
-  version: string;
-  status: string;
-  bizCtxId: string;
-  bizCtxName: string;
-  releaseId: number;
-  releaseNum: string;
-  remark: string;
-  lastUpdateUser: string;
-  lastUpdateTimestamp: Date;
-  used: string;
-  topLevelAsbiepId: number;
-  topLevelAsccpPropertyTerm: string;
-  businessContexts: BusinessContext[];
-  owner: string;
-  access: string;
-}
-
 export class SummaryBie {
   topLevelAsbiepId: number;
   lastUpdateTimestamp: Date;
@@ -243,5 +266,5 @@ export class SummaryBieInfo {
   numberOfTotalBieByStates: Map<string, number>;
   numberOfMyBieByStates: Map<string, number>;
   bieByUsersAndStates: Map<string, Map<string, number>>;
-  myRecentBIEs: BieList[] = [];
+  myRecentBIEs: BieListEntry[] = [];
 }

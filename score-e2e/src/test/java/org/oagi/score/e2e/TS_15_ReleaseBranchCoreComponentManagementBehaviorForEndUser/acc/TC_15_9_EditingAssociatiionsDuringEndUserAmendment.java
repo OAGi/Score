@@ -674,11 +674,11 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
             acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "WIP");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "Production");
         }
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
@@ -733,11 +733,11 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
             acc = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, anotherUser, namespace, "WIP");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, anotherUser, namespace, "Production");
         }
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
@@ -787,11 +787,11 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
             acc = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, anotherUser, namespace, "WIP");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, anotherUser, namespace, "Production");
         }
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
@@ -825,11 +825,11 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
             acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "WIP");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Published");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "Published");
         }
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
@@ -885,11 +885,11 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
             acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "Production");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "Production");
         }
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
@@ -959,7 +959,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp_endUser = coreComponentAPI.createRandomBCCP(dataType, endUser, enduserNamespace, "Production");
+            bccp_endUser = coreComponentAPI.createRandomBCCP(release, dataType, endUser, enduserNamespace, "Production");
         }
         ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, enduserNamespace, "Production");
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
@@ -969,9 +969,9 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, enduserNamespace, "Production");
-            bccp_before = coreComponentAPI.createRandomBCCP(dataType, endUser, enduserNamespace, "Production");
-            bccp_after = coreComponentAPI.createRandomBCCP(dataType, endUser, enduserNamespace, "Production");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, endUser, enduserNamespace, "Production");
+            bccp_before = coreComponentAPI.createRandomBCCP(release, dataType, endUser, enduserNamespace, "Production");
+            bccp_after = coreComponentAPI.createRandomBCCP(release, dataType, endUser, enduserNamespace, "Production");
         }
 
         viewEditCoreComponentPage.openPage();
@@ -1012,11 +1012,11 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
             acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "WIP");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "Production");
         }
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
@@ -1059,11 +1059,11 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
             acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "WIP");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "Production");
         }
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
@@ -1109,11 +1109,11 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
             acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "WIP");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "Production");
         }
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
@@ -1149,11 +1149,11 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
             acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "WIP");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "Production");
         }
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
@@ -1201,11 +1201,11 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
             acc = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, anotherUser, namespace, "WIP");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, anotherUser, namespace, "Production");
         }
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
@@ -1239,11 +1239,11 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
             acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "WIP");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "Production");
         }
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
@@ -1563,13 +1563,13 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
             acc = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
             accForBase = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, anotherUser, namespace, "Production");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
 
             acc_association = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, anotherUser, namespace, "Production");
             coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Production");
 
             asccp = coreComponentAPI.createRandomASCCP(acc_association, anotherUser, namespace, "Production");
@@ -1674,13 +1674,13 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
 
             acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "Production");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
 
             acc_association = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "Production");
             coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Production");
 
             asccp = coreComponentAPI.createRandomASCCP(acc_association, endUser, namespace, "Production");
@@ -1767,13 +1767,13 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
 
             acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "Production");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
 
             acc_association = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "Production");
             coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Production");
 
             asccp = coreComponentAPI.createRandomASCCP(acc_association, endUser, namespace, "Production");
@@ -2029,7 +2029,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
             coreComponentAPI.updateBasedACC(acc, accForBase);
 
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, anotherUser, namespace, "Production");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
             bcc.setCardinalityMax(1);
             bcc.setDefinition("oldDef");
@@ -2132,13 +2132,13 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
 
                     acc = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
                     DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-                    bccp = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
+                    bccp = coreComponentAPI.createRandomBCCP(release, dataType, this.appUser, namespace, state);
                     BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, state);
                     bcc.setCardinalityMax(1);
                     coreComponentAPI.updateBCC(bcc);
 
                     ACCObject acc_association = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
-                    BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
+                    BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, this.appUser, namespace, state);
                     coreComponentAPI.appendBCC(acc_association, bccp_to_append, state);
 
                     asccp = coreComponentAPI.createRandomASCCP(acc_association, this.appUser, namespace, state);

@@ -23,7 +23,7 @@
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
                   <mat-label>Updater</mat-label>
-                  <mat-select [(ngModel)]="request.updaterLoginIds" multiple>
+                  <mat-select [(ngModel)]="request.updaterLoginIdList" multiple>
                     <mat-option>
                       <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
                                              [noEntriesFoundLabel]="'No matching updater found.'"
@@ -39,9 +39,8 @@
               <div class="col-md-2 col-sm-12 d-flex">
                 <mat-form-field>
                   <mat-label>Updated start date</mat-label>
-                  <input (dateInput)="onDateEvent('startDate', $event)" [matDatepicker]="dateStart" [max]="request.updatedDate.end"
-                         [value]="request.updatedDate.start" matInput
-                         placeholder="Updated start date">
+                  <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
+                         [(ngModel)]="request.updatedDate.start" [max]="request.updatedDate.end">
                   <mat-datepicker-toggle [for]="dateStart" matSuffix></mat-datepicker-toggle>
                   <mat-datepicker #dateStart></mat-datepicker>
                 </mat-form-field>
@@ -57,9 +56,8 @@
               <div class="col-md-2 col-sm-12 d-flex">
                 <mat-form-field>
                   <mat-label>Updated end date</mat-label>
-                  <input (dateInput)="onDateEvent('endDate', $event)" [matDatepicker]="dateEnd" [min]="request.updatedDate.start"
-                         [value]="request.updatedDate.end" matInput
-                         placeholder="Updated end date">
+                  <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
+                         [(ngModel)]="request.updatedDate.end" [min]="request.updatedDate.start">
                   <mat-datepicker-toggle [for]="dateEnd" matSuffix></mat-datepicker-toggle>
                   <mat-datepicker #dateEnd></mat-datepicker>
                 </mat-form-field>
@@ -99,7 +97,7 @@
                   score-table-column-resize [defaultWidth]="width('Name')" (onResize)="onResizeWidth($event)"> Name</th>
               <td *matCellDef="let element" mat-cell>
                 <div class="den word-break-all">
-                  <a routerLink="{{ element.moduleSetReleaseId }}">{{ element.moduleSetReleaseName }}</a>
+                  <a routerLink="{{ element.moduleSetReleaseId }}">{{ element.name }}</a>
                 </div>
               </td>
             </ng-container>
@@ -118,7 +116,7 @@
               <th *matHeaderCellDef mat-header-cell mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Default')" (onResize)="onResizeWidth($event)"> Default</th>
               <td *matCellDef="let element" mat-cell>
-                <div *ngIf="element.default">Y</div>
+                <div *ngIf="element.isDefault">Y</div>
               </td>
             </ng-container>
 
@@ -126,8 +124,8 @@
               <th *matHeaderCellDef mat-header-cell mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
               <td *matCellDef="let element" mat-cell>
-                <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-                <div class="description"><span class="pr-1">by</span><b class="word-break-all">{{ element.lastUpdatedBy.username }}</b></div>
+                <div class="ellipsis">{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                <div class="description"><span class="pr-1">by</span><b class="word-break-all">{{ element.lastUpdated.who.loginId }}</b></div>
               </td>
             </ng-container>
 

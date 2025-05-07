@@ -288,12 +288,12 @@ public class TC_5_1_OAGISDevelopersAuthorizedManagementOfContextCategories exten
                 getAPIFactory().getContextCategoryAPI().createRandomContextCategory(endUserAdmin);
 
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
+        ContextMenu contextMenu = homePage.getContextMenu();
+        ViewEditContextCategoryPage viewEditContextCategoryPage = contextMenu.openViewEditContextCategorySubMenu();
 
         for (ContextCategoryObject contextCategory : Arrays.asList(
                 developerContextCategory, developerAdminContextCategory,
                 endUserContextCategory, endUserAdminContextCategory)) {
-            ContextMenu contextMenu = homePage.getContextMenu();
-            ViewEditContextCategoryPage viewEditContextCategoryPage = contextMenu.openViewEditContextCategorySubMenu();
 
             EditContextCategoryPage editContextCategoryPage =
                     viewEditContextCategoryPage.openEditContextCategoryPageByContextCategoryName(contextCategory.getName());
@@ -302,6 +302,8 @@ public class TC_5_1_OAGISDevelopersAuthorizedManagementOfContextCategories exten
             assertThrows(NoSuchElementException.class, () ->
                     contextMenu.openViewEditContextCategorySubMenu()
                             .openEditContextCategoryPageByContextCategoryName(contextCategory.getName()));
+
+            viewEditContextCategoryPage.openPage();
         }
     }
 

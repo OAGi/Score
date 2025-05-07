@@ -37,9 +37,8 @@ import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bccp.BccpPath;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtAwdPri.CdtAwdPriPath;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtRefSpec.CdtRefSpecPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Dt.DtPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtAwdPri.DtAwdPriPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtManifest.DtManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtSc.DtScPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtUsageRule.DtUsageRulePath;
@@ -51,7 +50,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.DtRecord;
  * The DT table stores both CDT and BDT. The two types of DTs are differentiated
  * by the TYPE column.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Dt extends TableImpl<DtRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -432,30 +431,17 @@ public class Dt extends TableImpl<DtRecord> {
         return _bccp;
     }
 
-    private transient CdtAwdPriPath _cdtAwdPri;
+    private transient DtAwdPriPath _dtAwdPri;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.cdt_awd_pri</code>
+     * Get the implicit to-many join path to the <code>oagi.dt_awd_pri</code>
      * table
      */
-    public CdtAwdPriPath cdtAwdPri() {
-        if (_cdtAwdPri == null)
-            _cdtAwdPri = new CdtAwdPriPath(this, null, Keys.CDT_AWD_PRI_CDT_ID_FK.getInverseKey());
+    public DtAwdPriPath dtAwdPri() {
+        if (_dtAwdPri == null)
+            _dtAwdPri = new DtAwdPriPath(this, null, Keys.DT_AWD_PRI_DT_ID_FK.getInverseKey());
 
-        return _cdtAwdPri;
-    }
-
-    private transient CdtRefSpecPath _cdtRefSpec;
-
-    /**
-     * Get the implicit to-many join path to the <code>oagi.cdt_ref_spec</code>
-     * table
-     */
-    public CdtRefSpecPath cdtRefSpec() {
-        if (_cdtRefSpec == null)
-            _cdtRefSpec = new CdtRefSpecPath(this, null, Keys.CDT_REF_SPEC_CDT_ID_FK.getInverseKey());
-
-        return _cdtRefSpec;
+        return _dtAwdPri;
     }
 
     private transient DtManifestPath _dtManifest;

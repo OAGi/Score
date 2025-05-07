@@ -140,11 +140,11 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
         DTObject bdtForRandomBCCPs = coreComponentAPI.getBDTByDENAndReleaseNum(
                 library, "System Environment_ Code. Type", workingRelease.getReleaseNumber()).get(0);
-        conditions.BCCPreleaseTA3devxwip = coreComponentAPI.createRandomBCCP(bdtForRandomBCCPs,
+        conditions.BCCPreleaseTA3devxwip = coreComponentAPI.createRandomBCCP(workingRelease, bdtForRandomBCCPs,
                 developer, developerNamespace, "WIP");
-        conditions.BCCPreleaseTA3devxdraft = coreComponentAPI.createRandomBCCP(bdtForRandomBCCPs,
+        conditions.BCCPreleaseTA3devxdraft = coreComponentAPI.createRandomBCCP(workingRelease, bdtForRandomBCCPs,
                 developer, developerNamespace, "Draft");
-        conditions.BCCPreleaseTA3devxcandidate = coreComponentAPI.createRandomBCCP(bdtForRandomBCCPs,
+        conditions.BCCPreleaseTA3devxcandidate = coreComponentAPI.createRandomBCCP(workingRelease, bdtForRandomBCCPs,
                 developer, developerNamespace, "Candidate");
 
         //Revision
@@ -178,17 +178,17 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
                 developer, workingRelease, "WIP");
 
         conditions.BCCPreleaseTA3revisionwip = coreComponentAPI.createRevisedBCCP(
-                coreComponentAPI.createRandomBCCP(
+                coreComponentAPI.createRandomBCCP(workingRelease,
                         coreComponentAPI.getBDTByDENAndReleaseNum(library, "Open_ Quantity. Type", workingRelease.getReleaseNumber()).get(0), developer, developerNamespace, "Published"),
                 coreComponentAPI.getBDTByDENAndReleaseNum(library, "Open_ Quantity. Type", workingRelease.getReleaseNumber()).get(0),
                 developer, workingRelease, "WIP");
         conditions.BCCPreleaseTA3revisiondraft = coreComponentAPI.createRevisedBCCP(
-                coreComponentAPI.createRandomBCCP(
+                coreComponentAPI.createRandomBCCP(workingRelease,
                         coreComponentAPI.getBDTByDENAndReleaseNum(library, "Open_ Indicator. Type", workingRelease.getReleaseNumber()).get(0), developer, developerNamespace, "Published"),
                 coreComponentAPI.getBDTByDENAndReleaseNum(library, "Open_ Indicator. Type", workingRelease.getReleaseNumber()).get(0),
                 developer, workingRelease, "Draft");
         conditions.BCCPreleaseTA3revisioncandidate = coreComponentAPI.createRevisedBCCP(
-                coreComponentAPI.createRandomBCCP(
+                coreComponentAPI.createRandomBCCP(workingRelease,
                         coreComponentAPI.getBDTByDENAndReleaseNum(library, "Open_ Indicator. Type", workingRelease.getReleaseNumber()).get(0), developer, developerNamespace, "Published"),
                 coreComponentAPI.getBDTByDENAndReleaseNum(library, "Open_ Indicator. Type", workingRelease.getReleaseNumber()).get(0),
                 developer, workingRelease, "Candidate");

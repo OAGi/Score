@@ -14,8 +14,8 @@ import org.oagi.score.e2e.page.bie.CreateBIEForSelectTopLevelConceptPage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.oagi.score.e2e.page.core_component.*;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.*;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.interactions.Actions;
 
 import java.time.Duration;
@@ -318,11 +318,11 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
             accToAppend = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            BCCPObject bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            BCCPObject bccp = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
             coreComponentAPI.appendBCC(accToAppend, bccp, "Published");
             accBCCPMap.put(accToAppend, bccp);
             asccpToAppend = coreComponentAPI.createRandomASCCP(accToAppend, developer, namespace, "Published");
-            bccpToAppend = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            bccpToAppend = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
@@ -450,7 +450,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
             ACCObject accToAppend = coreComponentAPI.createRandomACC(endUserForCC, release, namespace, "Published");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            BCCPObject bccp = coreComponentAPI.createRandomBCCP(dataType, endUserForCC, namespace, "Published");
+            BCCPObject bccp = coreComponentAPI.createRandomBCCP(release, dataType, endUserForCC, namespace, "Published");
             coreComponentAPI.appendBCC(accToAppend, bccp, "Published");
             accBCCPMap.put(accToAppend, bccp);
             ASCCPObject asccpToAppendWIP = coreComponentAPI.createRandomASCCP(accToAppend, endUserForCC, namespace, "WIP");
@@ -458,7 +458,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
             accToAppend = coreComponentAPI.createRandomACC(endUserForCC, release, namespace, "Published");
             dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, endUserForCC, namespace, "Published");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, endUserForCC, namespace, "Published");
             coreComponentAPI.appendBCC(accToAppend, bccp, "Published");
             accBCCPMap.put(accToAppend, bccp);
             ASCCPObject asccpToAppendQA = coreComponentAPI.createRandomASCCP(accToAppend, endUserForCC, namespace, "QA");
@@ -468,8 +468,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             asccpsForTesting.add(asccpToAppendQA);
 
             dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            BCCPObject bccpToAppendWIP = coreComponentAPI.createRandomBCCP(dataType, endUserForCC, namespace, "WIP");
-            BCCPObject bccpToAppendQA = coreComponentAPI.createRandomBCCP(dataType, endUserForCC, namespace, "QA");
+            BCCPObject bccpToAppendWIP = coreComponentAPI.createRandomBCCP(release, dataType, endUserForCC, namespace, "WIP");
+            BCCPObject bccpToAppendQA = coreComponentAPI.createRandomBCCP(release, dataType, endUserForCC, namespace, "QA");
             bccpsForTesting.add(bccpToAppendWIP);
             bccpsForTesting.add(bccpToAppendQA);
 
@@ -634,7 +634,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
             ACCObject accToAppend = coreComponentAPI.createRandomACC(endUserForCC, release, namespace, "QA");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            BCCPObject bccpToAppend = coreComponentAPI.createRandomBCCP(dataType, endUserForCC, namespace, "QA");
+            BCCPObject bccpToAppend = coreComponentAPI.createRandomBCCP(release, dataType, endUserForCC, namespace, "QA");
             coreComponentAPI.appendBCC(accToAppend, bccpToAppend, "QA");
             accBCCPMap.put(accToAppend, bccpToAppend);
             ASCCPObject asccpToAppendProduction = coreComponentAPI.
@@ -773,7 +773,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
              */
             ACCObject accToAppend = coreComponentAPI.createRandomACC(endUserForCC, release, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            BCCPObject bccpToAppend = coreComponentAPI.createRandomBCCP(dataType, endUserForCC, namespace, "QA");
+            BCCPObject bccpToAppend = coreComponentAPI.createRandomBCCP(release, dataType, endUserForCC, namespace, "QA");
             coreComponentAPI.appendBCC(accToAppend, bccpToAppend, "QA");
             accBCCPMap.put(accToAppend, bccpToAppend);
             /**
@@ -859,7 +859,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
                 // TODO:
                 // Check business term abilities are disabled
             } else {
-                assertDisabled(ASBIEPanel.getBusinessTermField());
+                assertEnabled(ASBIEPanel.getBusinessTermField());
             }
 
             /**
@@ -951,7 +951,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
              */
             ACCObject accToAppend = coreComponentAPI.createRandomACCSemanticGroupType(endUserForCC, release, namespace, "QA");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            BCCPObject bccpToAppend = coreComponentAPI.createRandomBCCP(dataType, endUserForCC, namespace, "QA");
+            BCCPObject bccpToAppend = coreComponentAPI.createRandomBCCP(release, dataType, endUserForCC, namespace, "QA");
             coreComponentAPI.appendBCC(accToAppend, bccpToAppend, "QA");
             accBCCPMap.put(accToAppend, bccpToAppend);
 
@@ -1097,7 +1097,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             accReleaseOne.setDefinition("definition 1");
             coreComponentAPI.updateACC(accReleaseOne);
             DTObject dataTypeReleaseOne = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", this.release);
-            BCCPObject bccpReleaseOne = coreComponentAPI.createRandomBCCP(dataTypeReleaseOne, developer, namespace, "Published");
+            BCCPObject bccpReleaseOne = coreComponentAPI.createRandomBCCP(releaseOne, dataTypeReleaseOne, developer, namespace, "Published");
             BCCObject bccReleaseOne = coreComponentAPI.appendBCC(accReleaseOne, bccpReleaseOne, "Published");
             bccReleaseOne.setDefinitionSource("bcc definition source");
             bccReleaseOne.setCardinalityMax(5);
@@ -1135,7 +1135,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             accReleaseTwo.setDefinition("definition 2");
             coreComponentAPI.updateACC(accReleaseTwo);
             DTObject dataTypeReleaseTwo = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", releaseTwo.getReleaseNumber());
-            BCCPObject bccpReleaseTwo = coreComponentAPI.createRandomBCCP(dataTypeReleaseTwo, developer, namespace, "Published");
+            BCCPObject bccpReleaseTwo = coreComponentAPI.createRandomBCCP(releaseTwo, dataTypeReleaseTwo, developer, namespace, "Published");
             BCCObject bccReleaseTwo = coreComponentAPI.appendBCC(accReleaseTwo, bccpReleaseTwo, "Published");
             bccReleaseTwo.setDefinitionSource("bcc definition source");
             bccReleaseTwo.setCardinalityMax(3);
@@ -1248,7 +1248,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             accReleaseOne.setDefinition("definition 1");
             coreComponentAPI.updateACC(accReleaseOne);
             DTObject dataTypeReleaseOne = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", this.release);
-            BCCPObject bccpReleaseOne = coreComponentAPI.createRandomBCCP(dataTypeReleaseOne, developer, namespace, "Published");
+            BCCPObject bccpReleaseOne = coreComponentAPI.createRandomBCCP(releaseOne, dataTypeReleaseOne, developer, namespace, "Published");
             BCCObject bccReleaseOne = coreComponentAPI.appendBCC(accReleaseOne, bccpReleaseOne, "Published");
             bccReleaseOne.setCardinalityMax(5);
             bccReleaseOne.setCardinalityMin(1);
@@ -1282,7 +1282,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             accReleaseTwo.setDefinition("definition 2");
             coreComponentAPI.updateACC(accReleaseTwo);
             DTObject dataTypeReleaseTwo = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", releaseTwo.getReleaseNumber());
-            BCCPObject bccpReleaseTwo = coreComponentAPI.createRandomBCCP(dataTypeReleaseTwo, developer, namespace, "Published");
+            BCCPObject bccpReleaseTwo = coreComponentAPI.createRandomBCCP(releaseTwo, dataTypeReleaseTwo, developer, namespace, "Published");
             BCCObject bccReleaseTwo = coreComponentAPI.appendBCC(accReleaseTwo, bccpReleaseTwo, "Published");
             bccReleaseTwo.setDefinitionSource("bcc definition source");
             bccReleaseTwo.setCardinalityMax(3);
@@ -1488,7 +1488,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             accReleaseOne.setDefinition("definition 1");
             coreComponentAPI.updateACC(accReleaseOne);
             DTObject dataTypeReleaseOne = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", this.release);
-            BCCPObject bccpReleaseOne = coreComponentAPI.createRandomBCCP(dataTypeReleaseOne, developer, namespace, "Published");
+            BCCPObject bccpReleaseOne = coreComponentAPI.createRandomBCCP(releaseOne, dataTypeReleaseOne, developer, namespace, "Published");
             BCCObject bccReleaseOne = coreComponentAPI.appendBCC(accReleaseOne, bccpReleaseOne, "Published");
             bccReleaseOne.setCardinalityMax(5);
             bccReleaseOne.setCardinalityMin(1);
@@ -1516,7 +1516,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             accReleaseTwo.setDefinition("definition 2");
             coreComponentAPI.updateACC(accReleaseTwo);
             DTObject dataTypeReleaseTwo = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", releaseTwo.getReleaseNumber());
-            BCCPObject bccpReleaseTwo = coreComponentAPI.createRandomBCCP(dataTypeReleaseTwo, developer, namespace, "Published");
+            BCCPObject bccpReleaseTwo = coreComponentAPI.createRandomBCCP(releaseTwo, dataTypeReleaseTwo, developer, namespace, "Published");
             BCCObject bccReleaseTwo = coreComponentAPI.appendBCC(accReleaseTwo, bccpReleaseTwo, "Published");
             bccReleaseTwo.setDefinitionSource("bcc definition source");
             bccReleaseTwo.setCardinalityMax(3);
@@ -1627,7 +1627,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             coreComponentAPI.updateACC(accReleaseOne);
             DTObject dataTypeReleaseOne = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", releaseOne.getReleaseNumber());
             DTObject dataTypeReleaseTwo = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", releaseTwo.getReleaseNumber());
-            BCCPObject bccpReleaseOne = coreComponentAPI.createRandomBCCP(dataTypeReleaseOne, developer, namespace, "Published");
+            BCCPObject bccpReleaseOne = coreComponentAPI.createRandomBCCP(releaseOne, dataTypeReleaseOne, developer, namespace, "Published");
             BCCObject bccReleaseOne = coreComponentAPI.appendBCC(accReleaseOne, bccpReleaseOne, "Published");
             bccReleaseOne.setCardinalityMax(5);
             bccReleaseOne.setCardinalityMin(1);
@@ -1651,7 +1651,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             accToAppend = coreComponentAPI.createRandomACC(developer, releaseOne, namespace, "Published");
             ACCObject accToAppendRevised = coreComponentAPI.createRevisedACC(accToAppend, developer, releaseTwo, "Published");
 
-            BCCPObject bccp = coreComponentAPI.createRandomBCCP(dataTypeReleaseOne, developer, namespace, "Published");
+            BCCPObject bccp = coreComponentAPI.createRandomBCCP(releaseOne, dataTypeReleaseOne, developer, namespace, "Published");
             BCCPObject bccpRevised = coreComponentAPI.createRevisedBCCP(bccp, dataTypeReleaseTwo, developer, releaseTwo, "Published");
             coreComponentAPI.appendBCC(accToAppend, bccp, "Published");
             coreComponentAPI.appendBCC(accToAppendRevised, bccpRevised, "Published");
@@ -1660,7 +1660,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             asccpToAppend = coreComponentAPI.createRandomASCCP(accToAppend, developer, namespace, "Published");
             coreComponentAPI.createRevisedASCCP(asccpToAppend, accToAppendRevised, developer, releaseTwo, "Published");
 
-            bccpToAppend = coreComponentAPI.createRandomBCCP(dataTypeReleaseOne, developer, namespace, "Published");
+            bccpToAppend = coreComponentAPI.createRandomBCCP(releaseOne, dataTypeReleaseOne, developer, namespace, "Published");
 
             coreComponentAPI.createRevisedBCCP(bccpToAppend, dataTypeReleaseTwo, developer, releaseTwo, "Published");
 
@@ -1669,7 +1669,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             coreComponentAPI.appendExtension(accReleaseTwo, developer, namespace, "Published");
             accReleaseTwo.setDefinition("definition 2");
             coreComponentAPI.updateACC(accReleaseTwo);
-            BCCPObject bccpReleaseTwo = coreComponentAPI.createRandomBCCP(dataTypeReleaseTwo, developer, namespace, "Published");
+            BCCPObject bccpReleaseTwo = coreComponentAPI.createRandomBCCP(releaseTwo, dataTypeReleaseTwo, developer, namespace, "Published");
             BCCObject bccReleaseTwo = coreComponentAPI.appendBCC(accReleaseTwo, bccpReleaseTwo, "Published");
             bccReleaseTwo.setDefinitionSource("bcc definition source");
             bccReleaseTwo.setCardinalityMax(3);
@@ -1853,7 +1853,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             coreComponentAPI.updateACC(accReleaseOne);
 
             BCCPObject bccpReleaseOne = coreComponentAPI.
-                    createRandomBCCP(dataTypeReleaseOne, endUserForCC, namespace, "Published");
+                    createRandomBCCP(releaseOne, dataTypeReleaseOne, endUserForCC, namespace, "Published");
             BCCObject bccReleaseOne = coreComponentAPI.appendBCC(accReleaseOne, bccpReleaseOne, "Published");
             bccReleaseOne.setCardinalityMax(5);
             bccReleaseOne.setCardinalityMin(1);
@@ -1879,7 +1879,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
                     createRandomACC(endUserForCC, releaseOne, namespace, "Published");
 
             BCCPObject bccp1ReleaseOne = coreComponentAPI.
-                    createRandomBCCP(dataTypeReleaseOne, endUserForCC, namespace, "Published");
+                    createRandomBCCP(releaseOne, dataTypeReleaseOne, endUserForCC, namespace, "Published");
             coreComponentAPI.appendBCC(accToAppend1ReleaseOne, bccp1ReleaseOne, "Published");
             accBCCPMap.put(accToAppend1ReleaseOne, bccp1ReleaseOne);
             ASCCPObject asccpToAppendWIPReleaseOne = coreComponentAPI.
@@ -1890,7 +1890,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
                     createRandomACC(endUserForCC, releaseOne, namespace, "Published");
 
             BCCPObject bccp2ReleaseOne = coreComponentAPI.
-                    createRandomBCCP(dataTypeReleaseOne, endUserForCC, namespace, "Published");
+                    createRandomBCCP(releaseOne, dataTypeReleaseOne, endUserForCC, namespace, "Published");
             coreComponentAPI.appendBCC(accToAppend2ReleaseOne, bccp2ReleaseOne, "Published");
             accBCCPMap.put(accToAppend2ReleaseOne, bccp2ReleaseOne);
             ASCCPObject asccpToAppendQAReleaseOne = coreComponentAPI.
@@ -1901,9 +1901,9 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             asccpsForTesting.add(asccpToAppendQAReleaseOne);
 
             BCCPObject bccpToAppendWIPReleaseOne = coreComponentAPI.
-                    createRandomBCCP(dataTypeReleaseOne, endUserForCC, namespace, "WIP");
+                    createRandomBCCP(releaseOne, dataTypeReleaseOne, endUserForCC, namespace, "WIP");
             BCCPObject bccpToAppendQAReleaseOne = coreComponentAPI.
-                    createRandomBCCP(dataTypeReleaseOne, endUserForCC, namespace, "QA");
+                    createRandomBCCP(releaseOne, dataTypeReleaseOne, endUserForCC, namespace, "QA");
             bccpsForTesting.add(bccpToAppendWIPReleaseOne);
             bccpsForTesting.add(bccpToAppendQAReleaseOne);
 
@@ -1916,7 +1916,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             accReleaseTwo.setDefinition("definition 2");
             coreComponentAPI.updateACC(accReleaseTwo);
             BCCPObject bccpReleaseTwo = coreComponentAPI.
-                    createRandomBCCP(dataTypeReleaseTwo, endUserForCC, namespace, "Published");
+                    createRandomBCCP(releaseTwo, dataTypeReleaseTwo, endUserForCC, namespace, "Published");
             BCCObject bccReleaseTwo = coreComponentAPI.appendBCC(accReleaseTwo, bccpReleaseTwo, "Published");
             bccReleaseTwo.setDefinitionSource("bcc definition source");
             bccReleaseTwo.setCardinalityMax(3);
@@ -2146,7 +2146,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             accReleaseOne.setDefinition("definition 1");
             coreComponentAPI.updateACC(accReleaseOne);
 
-            BCCPObject bccpReleaseOne = coreComponentAPI.createRandomBCCP(dataTypeReleaseOne, endUserForCC, namespace, "Published");
+            BCCPObject bccpReleaseOne = coreComponentAPI.createRandomBCCP(releaseOne, dataTypeReleaseOne, endUserForCC, namespace, "Published");
             BCCObject bccReleaseOne = coreComponentAPI.appendBCC(accReleaseOne, bccpReleaseOne, "Published");
             bccReleaseOne.setCardinalityMax(5);
             bccReleaseOne.setCardinalityMin(1);
@@ -2168,7 +2168,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
              * Core Components to append
              */
             ACCObject accToAppendReleaseOne = coreComponentAPI.createRandomACC(endUserForCC, releaseOne, namespace, "QA");
-            BCCPObject bccpToAppendReleaseOne = coreComponentAPI.createRandomBCCP(dataTypeReleaseOne, endUserForCC, namespace, "QA");
+            BCCPObject bccpToAppendReleaseOne = coreComponentAPI.createRandomBCCP(releaseOne, dataTypeReleaseOne, endUserForCC, namespace, "QA");
             coreComponentAPI.appendBCC(accToAppendReleaseOne, bccpToAppendReleaseOne, "QA");
             accBCCPMap.put(accToAppendReleaseOne, bccpToAppendReleaseOne);
             ASCCPObject asccpToAppendProductionReleaseOne = coreComponentAPI.
@@ -2364,7 +2364,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             accReleaseOne.setDefinition("definition 1");
             coreComponentAPI.updateACC(accReleaseOne);
 
-            BCCPObject bccpReleaseOne = coreComponentAPI.createRandomBCCP(dataTypeReleaseOne, endUserForCCFirst, namespace, "Published");
+            BCCPObject bccpReleaseOne = coreComponentAPI.createRandomBCCP(releaseOne, dataTypeReleaseOne, endUserForCCFirst, namespace, "Published");
             BCCObject bccReleaseOne = coreComponentAPI.appendBCC(accReleaseOne, bccpReleaseOne, "Published");
             bccReleaseOne.setCardinalityMax(5);
             bccReleaseOne.setCardinalityMin(1);
@@ -2391,7 +2391,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
              */
             ACCObject accToAppendReleaseOne = coreComponentAPI.createRandomACC(endUserForCCFirst, releaseOne, namespace, "Production");
 
-            BCCPObject bccpToAppendReleaseOne = coreComponentAPI.createRandomBCCP(dataTypeReleaseOne, endUserForCCFirst, namespace, "QA");
+            BCCPObject bccpToAppendReleaseOne = coreComponentAPI.createRandomBCCP(releaseOne, dataTypeReleaseOne, endUserForCCFirst, namespace, "QA");
             coreComponentAPI.appendBCC(accToAppendReleaseOne, bccpToAppendReleaseOne, "QA");
             accBCCPMap.put(accToAppendReleaseOne, bccpToAppendReleaseOne);
             /**
@@ -2547,7 +2547,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
                     // TODO:
                     // Check business term abilities are disabled
                 } else {
-                    assertDisabled(ASBIEPanel.getBusinessTermField());
+                    assertEnabled(ASBIEPanel.getBusinessTermField());
                 }
 
                 /**
@@ -2647,7 +2647,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             accReleaseOne.setDefinition("definition 1");
             coreComponentAPI.updateACC(accReleaseOne);
 
-            BCCPObject bccpReleaseOne = coreComponentAPI.createRandomBCCP(dataTypeReleaseOne, endUserForCCFirst, namespace, "Published");
+            BCCPObject bccpReleaseOne = coreComponentAPI.createRandomBCCP(releaseOne, dataTypeReleaseOne, endUserForCCFirst, namespace, "Published");
             BCCObject bccReleaseOne = coreComponentAPI.appendBCC(accReleaseOne, bccpReleaseOne, "Published");
             bccReleaseOne.setCardinalityMax(5);
             bccReleaseOne.setCardinalityMin(1);
@@ -2673,7 +2673,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
              * The end user ACC of the ASCCP has a Group component type and is NOT in the Production state.
              */
             ACCObject accToAppendReleaseOne = coreComponentAPI.createRandomACCSemanticGroupType(endUserForCCFirst, releaseOne, namespace, "QA");
-            BCCPObject bccpToAppendReleaseOne = coreComponentAPI.createRandomBCCP(dataTypeReleaseOne, endUserForCCFirst, namespace, "QA");
+            BCCPObject bccpToAppendReleaseOne = coreComponentAPI.createRandomBCCP(releaseOne, dataTypeReleaseOne, endUserForCCFirst, namespace, "QA");
             coreComponentAPI.appendBCC(accToAppendReleaseOne, bccpToAppendReleaseOne, "QA");
             accBCCPMap.put(accToAppendReleaseOne, bccpToAppendReleaseOne);
 
@@ -2919,8 +2919,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             ACCObject acc = coreComponentAPI.createRandomACC(endUserForCC, olderRelease, namespace, "Published");
             DTObject dataType_bccp_a = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "f1bf224d9da94fbea2d8e98af95c7a0b", olderRelease.getReleaseNumber());
             DTObject dataType_bccp_b = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", olderRelease.getReleaseNumber());
-            BCCPObject bccp_a = coreComponentAPI.createRandomBCCP(dataType_bccp_a, endUserForCC, namespace, "Production");
-            BCCPObject bccp_b = coreComponentAPI.createRandomBCCP(dataType_bccp_b, endUserForCC, namespace, "Production");
+            BCCPObject bccp_a = coreComponentAPI.createRandomBCCP(olderRelease, dataType_bccp_a, endUserForCC, namespace, "Production");
+            BCCPObject bccp_b = coreComponentAPI.createRandomBCCP(olderRelease, dataType_bccp_b, endUserForCC, namespace, "Production");
             bccpForTesting.add(bccp_a);
             bccpForTesting.add(bccp_b);
             bccpDTMap.put(bccp_a, dataType_bccp_a);
@@ -3061,8 +3061,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             ACCObject acc = coreComponentAPI.createRandomACC(endUserForCC, olderRelease, namespace, "Published");
             DTObject dataType_bccp_a = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "f1bf224d9da94fbea2d8e98af95c7a0b", olderRelease.getReleaseNumber());
             DTObject dataType_bccp_b = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", olderRelease.getReleaseNumber());
-            BCCPObject bccp_a = coreComponentAPI.createRandomBCCP(dataType_bccp_a, endUserForCC, namespace, "Production");
-            BCCPObject bccp_b = coreComponentAPI.createRandomBCCP(dataType_bccp_b, endUserForCC, namespace, "Production");
+            BCCPObject bccp_a = coreComponentAPI.createRandomBCCP(olderRelease, dataType_bccp_a, endUserForCC, namespace, "Production");
+            BCCPObject bccp_b = coreComponentAPI.createRandomBCCP(olderRelease, dataType_bccp_b, endUserForCC, namespace, "Production");
             bccpForTesting.add(bccp_a);
             bccpForTesting.add(bccp_b);
             bccpDTMap.put(bccp_a, dataType_bccp_a);
@@ -3194,7 +3194,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
             ACCObject acc = coreComponentAPI.createRandomACC(endUserForCC, release, namespace, "Published");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, endUserForCC, namespace, "Published");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, endUserForCC, namespace, "Published");
             coreComponentAPI.appendBCC(acc, bccp, "Published");
 
             asccp = coreComponentAPI.createRandomASCCP(acc, endUserForCC, namespace, "Published");
@@ -3283,7 +3283,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
              */
             ACCObject acc = coreComponentAPI.createRandomACC(usera, release, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            BCCPObject bccp = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
+            BCCPObject bccp = coreComponentAPI.createRandomBCCP(release, dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(acc, bccp, "Production");
 
             asccp_owner_usera = coreComponentAPI.createRandomASCCP(acc, usera, namespace, "Production");
@@ -3293,7 +3293,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
              */
 
             acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Production");
-            bccp = coreComponentAPI.createRandomBCCP(dataType, userb, namespace, "Production");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, userb, namespace, "Production");
             coreComponentAPI.appendBCC(acc, bccp, "Production");
 
             asccp_owner_userb = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Production");
@@ -3339,7 +3339,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
              */
             ACCObject acc = coreComponentAPI.createRandomACCSemanticGroupType(usera, release, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            BCCPObject bccp = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
+            BCCPObject bccp = coreComponentAPI.createRandomBCCP(release, dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(acc, bccp, "Production");
 
             asccp_owner_usera = coreComponentAPI.createRandomASCCP(acc, usera, namespace, "Production");
@@ -3382,11 +3382,11 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
             ACCObject accTopLevel = coreComponentAPI.createRandomACC(usera, release, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp_ACCTopLevel = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
+            bccp_ACCTopLevel = coreComponentAPI.createRandomBCCP(release, dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(accTopLevel, bccp_ACCTopLevel, "Production");
 
             ACCObject acc = coreComponentAPI.createRandomACC(usera, release, namespace, "Production");
-            bccp = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(acc, bccp, "Production");
             asccp = coreComponentAPI.createRandomASCCP(acc, usera, namespace, "Production");
             coreComponentAPI.appendASCC(accTopLevel, asccp, "Production");
@@ -3537,11 +3537,11 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
             ACCObject accTopLevel = coreComponentAPI.createRandomACC(usera, release, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp_ACCTopLevel = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
+            bccp_ACCTopLevel = coreComponentAPI.createRandomBCCP(release, dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(accTopLevel, bccp_ACCTopLevel, "Production");
 
             ACCObject acc = coreComponentAPI.createRandomACC(usera, release, namespace, "Production");
-            bccp = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(acc, bccp, "Production");
             asccp = coreComponentAPI.createRandomASCCP(acc, usera, namespace, "Production");
             coreComponentAPI.appendASCC(accTopLevel, asccp, "Production");
@@ -3690,11 +3690,11 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
             ACCObject accTopLevel = coreComponentAPI.createRandomACC(usera, release, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp_ACCTopLevel = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
+            bccp_ACCTopLevel = coreComponentAPI.createRandomBCCP(release, dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(accTopLevel, bccp_ACCTopLevel, "Production");
 
             ACCObject acc = coreComponentAPI.createRandomACC(usera, release, namespace, "Production");
-            bccp = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(acc, bccp, "Production");
             asccp = coreComponentAPI.createRandomASCCP(acc, usera, namespace, "Production");
             coreComponentAPI.appendASCC(accTopLevel, asccp, "Production");
@@ -3819,15 +3819,15 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
             ACCObject accTopLevel = coreComponentAPI.createRandomACC(usera, release, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp_ACCTopLevel = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
+            bccp_ACCTopLevel = coreComponentAPI.createRandomBCCP(release, dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(accTopLevel, bccp_ACCTopLevel, "Production");
 
             acc = coreComponentAPI.createRandomACC(usera, release, namespace, "Production");
             basedACC = coreComponentAPI.createRandomACC(usera, release, namespace, "Production");
-            bccpBasedACC = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
+            bccpBasedACC = coreComponentAPI.createRandomBCCP(release, dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(basedACC, bccpBasedACC, "Production");
             coreComponentAPI.updateBasedACC(acc, basedACC);
-            bccp = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(acc, bccp, "Production");
             asccp = coreComponentAPI.createRandomASCCP(acc, usera, namespace, "Production");
             coreComponentAPI.appendASCC(accTopLevel, asccp, "Production");
@@ -3900,6 +3900,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         loginPage().signIn(usera.getLoginId(), usera.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), this.release);
         accViewEditPage.hitAmendButton();
         homePage.logout();
@@ -4013,7 +4014,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             // TODO:
             // Check if Business Term functionality is enabled. Currently, it is disabled.
         } else {
-            assertDisabled(bbiePanel.getBusinessTermField());
+            assertEnabled(bbiePanel.getBusinessTermField());
         }
         homePage.logout();
 
@@ -4023,6 +4024,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         loginPage().signIn(usera.getLoginId(), usera.getPassword());
         coreComponentMenu = homePage.getCoreComponentMenu();
         viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(basedACC.getDen(), this.release);
         bccpViewEditPage.hitAmendButton();
         homePage.logout();
@@ -4065,10 +4067,12 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         loginPage().signIn(usera.getLoginId(), usera.getPassword());
         coreComponentMenu = homePage.getCoreComponentMenu();
         viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(basedACC.getDen(), this.release);
         accViewEditPage.moveToQA();
         accViewEditPage.moveToProduction();
         viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(bccpBasedACC.getDen(), this.release);
         bccpViewEditPage.hitAmendButton();
         homePage.logout();
@@ -4139,11 +4143,11 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
             ACCObject accTopLevel = coreComponentAPI.createRandomACC(usera, release, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp_ACCTopLevel = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
+            bccp_ACCTopLevel = coreComponentAPI.createRandomBCCP(release, dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(accTopLevel, bccp_ACCTopLevel, "Production");
 
             accGroupType = coreComponentAPI.createRandomACCSemanticGroupType(usera, release, namespace, "WIP");
-            bccpFromtheGroup = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
+            bccpFromtheGroup = coreComponentAPI.createRandomBCCP(release, dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(accGroupType, bccpFromtheGroup, "Production");
             asccp = coreComponentAPI.createRandomASCCP(accGroupType, usera, namespace, "Production");
             coreComponentAPI.appendASCC(accTopLevel, asccp, "Production");

@@ -1,7 +1,7 @@
 <mat-toolbar [ngStyle]="{'background-color': webPageInfo.getUserRoleColorSet(userRole).background,
                          'color': webPageInfo.getUserRoleColorSet(userRole).font}">
   <mat-toolbar-row>
-    <a class="navbar-brand" routerLink="">
+    <a class="navbar-brand" routerLink="" id="logo">
       <div [innerHTML]="brand"></div>
     </a>
 
@@ -58,9 +58,10 @@
     <mat-menu #ccMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>
         <button mat-menu-item routerLink="core_component">View/Edit Core Component</button>
+        <button mat-menu-item routerLink="data_type">View/Edit Data Type</button>
         <button mat-menu-item routerLink="code_list">View/Edit Code List</button>
-        <!-- TODO: temporary hide AgencyIdList -->
         <button mat-menu-item routerLink="agency_id_list">View/Edit Agency ID List</button>
+        <mat-divider></mat-divider>
         <button mat-menu-item routerLink="release">View/Edit Release</button>
         <button mat-menu-item routerLink="namespace">View/Edit Namespace</button>
       </ng-template>
@@ -90,7 +91,7 @@
     <button mat-button [matMenuTriggerFor]="adminMenu" *ngIf="roles.includes('admin')">Admin</button>
     <mat-menu #adminMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>
-        <button mat-menu-item routerLink="account">Accounts</button>
+        <button mat-menu-item routerLink="account">Account</button>
         <button mat-menu-item routerLink="account/transfer_ownership">Transfer Ownership</button>
         <button mat-menu-item routerLink="account/pending">Pending SSO</button>
         <button *ngIf="isTenantEnabled" mat-menu-item routerLink="tenant">Tenant</button>
@@ -154,8 +155,5 @@
           stroke="none" fill="#080404" fill-rule="evenodd" />
       </svg>
     </a>
-
-
   </mat-toolbar-row>
-
 </mat-toolbar>

@@ -1,9 +1,18 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {AgencyIdList, AgencyIdListForListRequest} from './agency-id-list';
-import {PaginationResponse} from '../../basis/basis';
-import {CcCreateResponse, Comment} from '../../cc-management/domain/core-component-node';
+import {
+  AgencyIdListCreateResponse,
+  AgencyIdListDetails,
+  AgencyIdListForListRequest,
+  AgencyIdListListEntry,
+  AgencyIdListSummary,
+  AgencyIdListValueSummary
+} from './agency-id-list';
+import {PageResponse} from '../../basis/basis';
+import {Comment} from '../../cc-management/domain/core-component-node';
+import {map} from 'rxjs/operators';
+import {NamespaceSummary} from '../../namespace-management/domain/namespace';
 
 @Injectable()
 export class AgencyIdListService {
@@ -11,26 +20,26 @@ export class AgencyIdListService {
   constructor(private http: HttpClient) {
   }
 
-  getAgencyIdListList(request: AgencyIdListForListRequest): Observable<PaginationResponse<AgencyIdList>> {
+  getAgencyIdListList(request: AgencyIdListForListRequest): Observable<PageResponse<AgencyIdListListEntry>> {
     let params = new HttpParams()
-      .set('libraryId', '' + request.library.libraryId)
-      .set('releaseId', '' + request.release.releaseId)
-      .set('sortActive', request.page.sortActive)
-      .set('sortDirection', request.page.sortDirection)
-      .set('pageIndex', '' + request.page.pageIndex)
-      .set('pageSize', '' + request.page.pageSize);
+        .set('libraryId', '' + request.library.libraryId)
+        .set('releaseId', '' + request.release.releaseId)
+        .set('pageIndex', '' + request.page.pageIndex)
+        .set('pageSize', '' + request.page.pageSize);
 
-    if (request.updaterLoginIds.length > 0) {
-      params = params.set('updaterLoginIds', request.updaterLoginIds.join(','));
+    if (!!request.page.sortActive && !!request.page.sortDirection) {
+      params = params.set('orderBy', ((request.page.sortDirection === 'desc') ? '-' : '+') + request.page.sortActive);
     }
-    if (request.ownerLoginIds.length > 0) {
-      params = params.set('ownerLoginIds', request.ownerLoginIds.join(','));
+    if (request.ownerLoginIdList.length > 0) {
+      params = params.set('ownerLoginIdList', request.ownerLoginIdList.join(','));
     }
-    if (request.updatedDate.start) {
-      params = params.set('updateStart', '' + request.updatedDate.start.getTime());
+    if (request.updaterLoginIdList.length > 0) {
+      params = params.set('updaterLoginIdList', request.updaterLoginIdList.join(','));
     }
-    if (request.updatedDate.end) {
-      params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
+    if (!!request.updatedDate.start || !!request.updatedDate.end) {
+      params = params.set('lastUpdatedOn',
+          '[' + (!!request.updatedDate.start ? request.updatedDate.start.getTime() : '') + '~' +
+          (!!request.updatedDate.end ? request.updatedDate.end.getTime() : '') + ']');
     }
     if (request.filters.name) {
       params = params.set('name', request.filters.name);
@@ -63,123 +72,162 @@ export class AgencyIdListService {
       params = params.set('namespaces', request.namespaces.map(e => '' + e).join(','));
     }
 
-    return this.http.get<PaginationResponse<AgencyIdList>>('/api/agency_id_list', {params});
+    return this.http.get<PageResponse<AgencyIdListListEntry>>('/api/agency-id-lists', {params}).pipe(
+        map((res: PageResponse<AgencyIdListListEntry>) => ({
+          ...res,
+          list: res.list.map(elm => ({
+            ...elm,
+            created: {
+              ...elm.created,
+              when: new Date(elm.created.when),
+            },
+            lastUpdated: {
+              ...elm.lastUpdated,
+              when: new Date(elm.lastUpdated.when),
+            }
+          }))
+        }))
+    );
   }
 
-  getAgencyIdList(manifestId): Observable<AgencyIdList> {
-    return this.http.get<AgencyIdList>('/api/agency_id_list/' + manifestId);
+  getAgencyIdListDetails(manifestId): Observable<AgencyIdListDetails> {
+    return this.http.get<AgencyIdListDetails>('/api/agency-id-lists/' + manifestId).pipe(
+        map((elm: AgencyIdListDetails) => ({
+          ...elm,
+          agencyIdListValue: elm.agencyIdListValue || new AgencyIdListValueSummary(),
+          namespace: elm.namespace || new NamespaceSummary(),
+          created: {
+            ...elm.created,
+            when: new Date(elm.created.when),
+          },
+          lastUpdated: {
+            ...elm.lastUpdated,
+            when: new Date(elm.lastUpdated.when),
+          }
+        }))
+    );
   }
 
-  getSimpleAgencyIdLists(libraryId: number, releaseId: number): Observable<any> {
+  getPrevAgencyIdListDetails(manifestId): Observable<AgencyIdListDetails> {
+    return this.http.get<AgencyIdListDetails>('/api/agency-id-lists/' + manifestId + '/prev').pipe(
+        map((elm: AgencyIdListDetails) => ({
+          ...elm,
+          agencyIdListValue: elm.agencyIdListValue || new AgencyIdListValueSummary(),
+          namespace: elm.namespace || new NamespaceSummary(),
+          created: {
+            ...elm.created,
+            when: new Date(elm.created.when),
+          },
+          lastUpdated: {
+            ...elm.lastUpdated,
+            when: new Date(elm.lastUpdated.when),
+          }
+        }))
+    );
+  }
+
+  getAgencyIdListSummaries(releaseId: number): Observable<AgencyIdListSummary[]> {
     const params = new HttpParams()
-      .set('libraryId', libraryId.toString())
-      .set('releaseId', releaseId.toString())
-      .set('sortActive', '')
-      .set('sortDirection', 'ASC')
-      .set('pageIndex', '-1')
-      .set('pageSize', '-1');
+        .set('releaseId', releaseId.toString());
 
-    return this.http.get<any>('/api/agency_id_list', {params});
+    return this.http.get<AgencyIdListSummary[]>('/api/agency-id-lists/summaries', {params});
   }
 
-  create(releaseId: number, basedAgencyIdListManifestId?: number): Observable<CcCreateResponse> {
-    return this.http.put<CcCreateResponse>('/api/agency_id_list', {
+  create(releaseId: number, basedAgencyIdListManifestId?: number): Observable<AgencyIdListCreateResponse> {
+    return this.http.post<AgencyIdListCreateResponse>('/api/agency-id-lists', {
       releaseId,
       basedAgencyIdListManifestId: basedAgencyIdListManifestId ? basedAgencyIdListManifestId : null
     });
   }
 
-  update(agencyIdList: AgencyIdList, state?: string): Observable<any> {
+  update(agencyIdList: AgencyIdListDetails, state?: string): Observable<any> {
     let body;
     if (state) {
       body = {
-        releaseId: agencyIdList.releaseId,
+        releaseId: agencyIdList.release.releaseId,
         toState: state
       };
-      return this.http.post('/api/agency_id_list/' + agencyIdList.agencyIdListManifestId + '/state', body);
+      return this.http.patch('/api/agency-id-lists/' + agencyIdList.agencyIdListManifestId + '/state', body);
     } else {
       body = {
         agencyIdListManifestId: agencyIdList.agencyIdListManifestId,
-        releaseId: agencyIdList.releaseId,
-        basedAgencyIdListManifestId: agencyIdList.basedAgencyIdListManifestId,
-        agencyIdListValueManifestId: agencyIdList.agencyIdListValueManifestId,
+        releaseId: agencyIdList.release.releaseId,
+        basedAgencyIdListManifestId: (!!agencyIdList.based) ? agencyIdList.based.agencyIdListManifestId : undefined,
+        agencyIdListValueManifestId: (!!agencyIdList.agencyIdListValue) ? agencyIdList.agencyIdListValue.agencyIdListValueManifestId : undefined,
         name: agencyIdList.name,
         listId: agencyIdList.listId,
-        agencyId: agencyIdList.agencyId,
         versionId: agencyIdList.versionId,
-        namespaceId: agencyIdList.namespaceId,
+        namespaceId: (!!agencyIdList.namespace) ? agencyIdList.namespace.namespaceId : undefined,
         definition: agencyIdList.definition,
-        definitionSource: agencyIdList.definitionSource,
         remark: agencyIdList.remark,
-        values: agencyIdList.values,
-        deprecated: agencyIdList.deprecated
+        deprecated: agencyIdList.deprecated,
+        valueList: agencyIdList.valueList
       };
-      return this.http.post('/api/agency_id_list/' + agencyIdList.agencyIdListManifestId, body);
+      return this.http.put('/api/agency-id-lists/' + agencyIdList.agencyIdListManifestId, body);
     }
-
-
   }
 
-  updateState(agencyIdList: AgencyIdList, state: string): Observable<any> {
+  updateState(agencyIdList: AgencyIdListDetails, state: string): Observable<any> {
     return this.update(agencyIdList, state);
   }
 
-  makeNewRevision(agencyIdList: AgencyIdList): Observable<any> {
-    return this.http.post('/api/agency_id_list/' + agencyIdList.agencyIdListManifestId + '/revision', {});
-  }
-
   delete(...agencyIdListManifestIds): Observable<any> {
-    return this.http.post<any>('/api/agency_id_list/delete', {
-      agencyIdListManifestIds
-    });
-  }
-
-  purge(...agencyIdListManifestIds): Observable<any> {
-    return this.http.post<any>('/api/agency_id_list/purge', {
+    return this.http.patch<any>('/api/agency-id-lists/mark-as-deleted', {
       agencyIdListManifestIds
     });
   }
 
   restore(...agencyIdListManifestIds): Observable<any> {
-    return this.http.post<any>('/api/agency_id_list/restore', {
+    return this.http.patch<any>('/api/agency-id-lists/restore', {
       agencyIdListManifestIds
     });
   }
 
-  checkUniqueness(agencyIdList: AgencyIdList): Observable<boolean> {
-    let params = new HttpParams()
-      .set('releaseId', '' + agencyIdList.releaseId)
-      .set('listId', agencyIdList.listId)
-      .set('versionId', agencyIdList.versionId);
-    if (agencyIdList.agencyIdListValueManifestId) {
-      params = params.set('agencyIdListValueManifestId', '' + agencyIdList.agencyIdListValueManifestId);
-    }
-
-    if (agencyIdList.agencyIdListManifestId) {
-      params = params.set('agencyIdListManifestId', '' + agencyIdList.agencyIdListManifestId);
-    }
-
-    return this.http.get<boolean>('/api/agency_id_list/check_uniqueness', {params});
+  purge(...agencyIdListManifestIds): Observable<any> {
+    return this.http.delete<any>('/api/agency-id-lists', {
+      body: {
+        agencyIdListManifestIds
+      }
+    });
   }
 
-  checkNameUniqueness(agencyIdList: AgencyIdList): Observable<boolean> {
+  checkUniqueness(agencyIdList: AgencyIdListDetails): Observable<boolean> {
     let params = new HttpParams()
-      .set('releaseId', '' + agencyIdList.releaseId)
-      .set('agencyIdListName', agencyIdList.name);
+        .set('releaseId', '' + agencyIdList.release.releaseId)
+        .set('listId', agencyIdList.listId)
+        .set('versionId', agencyIdList.versionId);
+    if (!!agencyIdList.agencyIdListValue && !!agencyIdList.agencyIdListValue.agencyIdListValueManifestId) {
+      params = params.set('agencyIdListValueManifestId', '' + agencyIdList.agencyIdListValue.agencyIdListValueManifestId);
+    }
     if (agencyIdList.agencyIdListManifestId) {
       params = params.set('agencyIdListManifestId', '' + agencyIdList.agencyIdListManifestId);
     }
 
-    return this.http.get<boolean>('/api/agency_id_list/check_name_uniqueness', {params});
+    return this.http.get<boolean>('/api/agency-id-lists/check-uniqueness', {params});
+  }
+
+  checkNameUniqueness(agencyIdList: AgencyIdListDetails): Observable<boolean> {
+    let params = new HttpParams()
+        .set('releaseId', '' + agencyIdList.release.releaseId)
+        .set('agencyIdListName', agencyIdList.name);
+    if (agencyIdList.agencyIdListManifestId) {
+      params = params.set('agencyIdListManifestId', '' + agencyIdList.agencyIdListManifestId);
+    }
+
+    return this.http.get<boolean>('/api/agency-id-lists/check-name-uniqueness', {params});
+  }
+
+  makeNewRevision(agencyIdList: AgencyIdListDetails): Observable<any> {
+    return this.http.patch('/api/agency-id-lists/' + agencyIdList.agencyIdListManifestId + '/revise', {});
   }
 
   cancelRevision(manifestId: number): Observable<any> {
-    const url = '/api/agency_id_list/' + manifestId + '/cancel';
-    return this.http.post<any>(url, {});
+    const url = '/api/agency-id-lists/' + manifestId + '/cancel';
+    return this.http.patch<any>(url, {});
   }
 
   postComment(reference: string, text: string, prevCommentId?: number): Observable<any> {
-    return this.http.put('/api/comment/' + reference, {
+    return this.http.post('/api/comments/' + reference, {
       reference,
       text,
       prevCommentId: prevCommentId ? prevCommentId : null
@@ -187,14 +235,14 @@ export class AgencyIdListService {
   }
 
   editComment(commentId: number, text: string): Observable<any> {
-    return this.http.post('/api/comment/' + commentId, {
+    return this.http.post('/api/comments/' + commentId, {
       commentId,
       text,
     });
   }
 
   deleteComment(comment: Comment): Observable<any> {
-    return this.http.post('/api/comment/' + comment.commentId, {
+    return this.http.post('/api/comments/' + comment.commentId, {
       commentId: comment.commentId,
       delete: true,
     });
@@ -205,13 +253,13 @@ export class AgencyIdListService {
   }
 
   transferOwnership(manifestId: number, targetLoginId: string): Observable<any> {
-    return this.http.post<any>('/api/agency_id_list/' + manifestId + '/transfer_ownership', {
+    return this.http.patch<any>('/api/agency-id-lists/' + manifestId + '/transfer', {
       targetLoginId
     });
   }
 
-  uplift(agencyIdList: AgencyIdList, targetReleaseId: number): Observable<any> {
-    return this.http.post<any>('/api/agency_id_list/' + agencyIdList.agencyIdListManifestId + '/uplift', {
+  uplift(agencyIdList: AgencyIdListDetails, targetReleaseId: number): Observable<any> {
+    return this.http.post<any>('/api/agency-id-lists/' + agencyIdList.agencyIdListManifestId + '/uplift', {
       targetReleaseId
     });
   }

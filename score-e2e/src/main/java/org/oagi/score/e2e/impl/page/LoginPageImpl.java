@@ -9,6 +9,7 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.LoginPage;
 import org.openqa.selenium.*;
 
+import static java.time.Duration.ofSeconds;
 import static org.apache.commons.lang3.StringUtils.trim;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
@@ -31,6 +32,7 @@ public class LoginPageImpl extends BasePageImpl implements LoginPage {
     public void openPage() {
         String url = getPageUrl();
         getDriver().get(url);
+        waitFor(ofSeconds(1L));
         assert "Sign in to NIST/OAGi Score".equals(getText(getTitle()));
     }
 
@@ -103,6 +105,12 @@ public class LoginPageImpl extends BasePageImpl implements LoginPage {
                 throw new SignInException(getAlertMessage(), e);
             }
         }
+
+        /*
+         * To make the 'connectSpec' as a default selected library.
+         */
+        homePage.setLibrary("connectSpec");
+
         return homePage;
     }
 }

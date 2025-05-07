@@ -95,6 +95,42 @@ export class AccountListRequest {
   }
 }
 
+export class AccountListEntry {
+  userId: number;
+  loginId: string;
+  username: string;
+  organization: string;
+
+  developer: boolean;
+  admin: boolean;
+  enabled: boolean;
+
+  oAuth2UserId: number;
+}
+
+export class AccountDetails {
+  userId: number;
+  loginId: string;
+  username: string;
+  organization: string;
+  email: string;
+
+  developer: boolean;
+  admin: boolean;
+  enabled: boolean;
+  emailVerified: boolean;
+  hasData: boolean;
+
+  oAuth2UserId: number;
+  providerName: string;
+  sub: string;
+  oidcName: string;
+  oidcEmail: string;
+  nickname: string;
+  preferredUsername: string;
+  phoneNumber: string;
+}
+
 export class AccountList {
   appUserId: number;
   loginId: string;

@@ -14,7 +14,7 @@ import {SearchOptionsDialogModule} from '../search-options-dialog/search-options
 
 const routes: Routes = [
   {
-    path: 'core_component/dt/:manifestId',
+    path: 'data_type/:manifestId',
     children: [
       {
         path: '**',

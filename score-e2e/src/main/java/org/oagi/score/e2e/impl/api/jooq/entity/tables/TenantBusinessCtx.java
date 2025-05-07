@@ -40,7 +40,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.TenantBusinessCtxR
 /**
  * This table captures the tenant role and theirs business contexts.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class TenantBusinessCtx extends TableImpl<TenantBusinessCtxRecord> {
 
     private static final long serialVersionUID = 1L;

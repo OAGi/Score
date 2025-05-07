@@ -15,7 +15,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.Release;
 /**
  * The is table store the release information.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -222,6 +222,38 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
         return (String) get(11);
     }
 
+    /**
+     * Setter for <code>oagi.release.prev_release_id</code>. Foreign key
+     * referencing the previous release record.
+     */
+    public void setPrevReleaseId(ULong value) {
+        set(12, value);
+    }
+
+    /**
+     * Getter for <code>oagi.release.prev_release_id</code>. Foreign key
+     * referencing the previous release record.
+     */
+    public ULong getPrevReleaseId() {
+        return (ULong) get(12);
+    }
+
+    /**
+     * Setter for <code>oagi.release.next_release_id</code>. Foreign key
+     * referencing the next release record.
+     */
+    public void setNextReleaseId(ULong value) {
+        set(13, value);
+    }
+
+    /**
+     * Getter for <code>oagi.release.next_release_id</code>. Foreign key
+     * referencing the next release record.
+     */
+    public ULong getNextReleaseId() {
+        return (ULong) get(13);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -245,7 +277,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
     /**
      * Create a detached, initialised ReleaseRecord
      */
-    public ReleaseRecord(ULong releaseId, ULong libraryId, String guid, String releaseNum, String releaseNote, String releaseLicense, ULong namespaceId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, String state) {
+    public ReleaseRecord(ULong releaseId, ULong libraryId, String guid, String releaseNum, String releaseNote, String releaseLicense, ULong namespaceId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, String state, ULong prevReleaseId, ULong nextReleaseId) {
         super(Release.RELEASE);
 
         setReleaseId(releaseId);
@@ -260,6 +292,8 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
         setState(state);
-        resetChangedOnNotNull();
+        setPrevReleaseId(prevReleaseId);
+        setNextReleaseId(nextReleaseId);
+        resetTouchedOnNotNull();
     }
 }

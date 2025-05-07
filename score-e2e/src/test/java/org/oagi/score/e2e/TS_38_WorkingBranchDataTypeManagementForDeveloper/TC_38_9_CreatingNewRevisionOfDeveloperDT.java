@@ -11,6 +11,7 @@ import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.DTViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.oagi.score.e2e.page.core_component.ViewEditDataTypePage;
 import org.openqa.selenium.TimeoutException;
 
 import java.util.ArrayList;
@@ -46,22 +47,26 @@ public class TC_38_9_CreatingNewRevisionOfDeveloperDT extends BaseTest {
             AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
 
-            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
+
+            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
             branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
-            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
-            DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, developerA, namespace, "Published");
+            DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, baseCDT, developerA, namespace, "Published");
             dtForTesting.add(randomBDT);
 
-            randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, developerB, namespace, "Published");
+            randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, baseCDT, developerB, namespace, "Published");
             dtForTesting.add(randomBDT);
         }
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         for (DTObject dt : dtForTesting) {
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+            ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+            DTViewEditPage dtViewEditPage = viewEditDataTypePage.openDTViewEditPageByManifestID(dt.getDtManifestId());
             assertTrue(dt.getState().equals("Published"));
             dtViewEditPage.hitReviseButton();
             assertTrue(dtViewEditPage.getStateFieldValue().equals("WIP"));
@@ -104,34 +109,38 @@ public class TC_38_9_CreatingNewRevisionOfDeveloperDT extends BaseTest {
             AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
 
-            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
+
+            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
             branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
-            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
-            DTObject randomBDTWIP = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, developerA, namespace, "WIP");
+            DTObject randomBDTWIP = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, baseCDT, developerA, namespace, "WIP");
             dtForTesting.add(randomBDTWIP);
 
-            randomBDTWIP = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, developerB, namespace, "WIP");
+            randomBDTWIP = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, baseCDT, developerB, namespace, "WIP");
             dtForTesting.add(randomBDTWIP);
 
-            DTObject randomBDTDraft = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, developerA, namespace, "Draft");
+            DTObject randomBDTDraft = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, baseCDT, developerA, namespace, "Draft");
             dtForTesting.add(randomBDTDraft);
 
-            randomBDTDraft = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, developerB, namespace, "Draft");
+            randomBDTDraft = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, baseCDT, developerB, namespace, "Draft");
             dtForTesting.add(randomBDTDraft);
 
-            DTObject randomBDTCandidate = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, developerA, namespace, "Candidate");
+            DTObject randomBDTCandidate = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, baseCDT, developerA, namespace, "Candidate");
             dtForTesting.add(randomBDTCandidate);
 
-            randomBDTCandidate = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, developerB, namespace, "Candidate");
+            randomBDTCandidate = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, baseCDT, developerB, namespace, "Candidate");
             dtForTesting.add(randomBDTCandidate);
         }
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         for (DTObject dt : dtForTesting) {
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+            ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+            DTViewEditPage dtViewEditPage = viewEditDataTypePage.openDTViewEditPageByManifestID(dt.getDtManifestId());
             assertFalse(dt.getState().equals("Published"));
             assertThrows(TimeoutException.class, () -> dtViewEditPage.hitReviseButton());
 

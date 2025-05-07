@@ -7,7 +7,7 @@ import org.oagi.score.e2e.obj.BCCPObject;
 import org.oagi.score.e2e.obj.LogObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.code_list.AddCommentDialog;
-import org.oagi.score.e2e.page.core_component.BCCPChangeBDTDialog;
+import org.oagi.score.e2e.page.core_component.BCCPChangeDTDialog;
 import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.HistoryPage;
 import org.openqa.selenium.*;
@@ -16,6 +16,7 @@ import org.openqa.selenium.interactions.Actions;
 import java.time.Duration;
 
 import static java.time.Duration.ofMillis;
+import static java.time.Duration.ofSeconds;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPage {
@@ -42,8 +43,8 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
             By.xpath("//span[contains(text(), \"Delete\")]//ancestor::button[1]");
     private static final By RESTORE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Restore\")]//ancestor::button[1]");
-    private static final By CHANGE_BDT_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Change BDT\")]//ancestor::button[1]");
+    private static final By CHANGE_DT_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Change DT\")]//ancestor::button[1]");
     private static final By SHOW_HISTORY_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Show History\")]//ancestor::button[1]");
     private static final By COMMENTS_OPTION_LOCATOR =
@@ -104,6 +105,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         String url = getPageUrl();
         getDriver().get(url);
         invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofSeconds(2L));
         assert "BCCP".equals(getText(getBCCPPanelContainer().getBCCPPanel().getCoreComponentField()));
         assert getText(getTitle()).startsWith(bccp.getPropertyTerm());
     }
@@ -243,27 +245,24 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
 
     @Override
     public WebElement getNodeByPath(String path) {
-        return retry(() -> {
-            goToNode(path);
-            String[] nodes = path.split("/");
-            return getNodeByName(nodes[nodes.length - 1]);
-        });
+        return retry(() -> goToNode(path));
     }
 
     @Override
     public WebElement getContextMenuIconByNodeName(String nodeName) {
-        return elementToBeClickable(getDriver(), By.xpath(
-                "//*[text() = \"" + nodeName + "\"]//ancestor::div[contains(@class, \"mat-tree-node\")]" +
-                        "//mat-icon[contains(text(), \"more_vert\")]"));
+        WebElement node = getNodeByName(nodeName);
+        return getContextMenuIcon(node);
+    }
+
+    public WebElement getContextMenuIcon(WebElement node) {
+        return node.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
     }
 
     @Override
     public WebElement clickOnDropDownMenuByPath(String path) {
-        goToNode(path);
-        String[] nodes = path.split("/");
-        String nodeName = nodes[nodes.length - 1];
-        WebElement node = getNodeByName(nodeName);
-        click(getDriver(), node);
+        WebElement node = goToNode(path);
+
+        click(node);
         new Actions(getDriver()).sendKeys("O").perform();
         waitFor(ofMillis(1000L));
         try {
@@ -273,7 +272,8 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
             }
         } catch (WebDriverException ignore) {
         }
-        WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
+
+        WebElement contextMenuIcon = getContextMenuIcon(node);
         click(getDriver(), contextMenuIcon);
         waitFor(ofMillis(1000L));
         assert visibilityOfElementLocated(getDriver(),
@@ -282,21 +282,21 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
     }
 
     @Override
-    public BCCPChangeBDTDialog openChangeBDTDialog() {
+    public BCCPChangeDTDialog openChangeDTDialog() {
         return retry(() -> {
             String propertyTerm = getText(getBCCPPanelContainer().getBCCPPanel().getPropertyTermField());
             WebElement node = clickOnDropDownMenuByPath("/" + propertyTerm);
             try {
-                click(elementToBeClickable(getDriver(), CHANGE_BDT_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), CHANGE_DT_OPTION_LOCATOR));
             } catch (TimeoutException e) {
                 click(node);
                 new Actions(getDriver()).sendKeys("O").perform();
-                click(elementToBeClickable(getDriver(), CHANGE_BDT_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), CHANGE_DT_OPTION_LOCATOR));
             }
             waitFor(ofMillis(500L));
-            BCCPChangeBDTDialog bccpChangeBDTDialog = new BCCPChangeBDTDialogImpl(this);
-            assert bccpChangeBDTDialog.isOpened();
-            return bccpChangeBDTDialog;
+            BCCPChangeDTDialog bccpChangeDTDialog = new BCCPChangeDTDialogImpl(this);
+            assert bccpChangeDTDialog.isOpened();
+            return bccpChangeDTDialog;
         });
     }
 
@@ -396,17 +396,19 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
     private WebElement goToNode(String path) {
         WebElement searchInput = getSearchInputTextField();
         click(getDriver(), searchInput);
-        WebElement node = retry(() -> {
-            WebElement e = sendKeys(searchInput, path);
+        retry(() -> {
+            sendKeys(searchInput, path);
             if (!path.equals(getText(searchInput))) {
                 throw new WebDriverException();
             }
-            return e;
         });
-        node.sendKeys(Keys.ENTER);
-        click(node);
+        searchInput.sendKeys(Keys.ENTER);
+        searchInput.sendKeys("");
         clear(searchInput);
-        return node;
+
+        String[] nodes = path.split("/");
+        String nodeName = nodes[nodes.length - 1];
+        return getNodeByName(nodeName);
     }
 
     private WebElement getNodeByName(String nodeName) {
@@ -565,7 +567,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
 
     private WebElement getInputFieldByName(String baseXPath, String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/input"));
+                baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]//input"));
     }
 
     private WebElement getSelectFieldByName(String baseXPath, String name) {

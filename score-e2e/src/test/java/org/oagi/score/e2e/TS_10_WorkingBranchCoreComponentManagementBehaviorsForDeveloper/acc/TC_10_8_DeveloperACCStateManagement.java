@@ -67,13 +67,13 @@ public class TC_10_8_DeveloperACCStateManagement extends BaseTest {
             coreComponentAPI.updateACC(acc);
 
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "WIP");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
 
             acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "WIP");
             coreComponentAPI.appendBCC(acc_association, bccp_to_append, "WIP");
 
             asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
@@ -125,13 +125,13 @@ public class TC_10_8_DeveloperACCStateManagement extends BaseTest {
             coreComponentAPI.updateACC(acc);
 
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Draft");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Draft");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Draft");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
 
             acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "Draft");
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Draft");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Draft");
             coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Draft");
 
             asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "Draft");
@@ -184,13 +184,13 @@ public class TC_10_8_DeveloperACCStateManagement extends BaseTest {
             coreComponentAPI.updateACC(acc);
 
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Candidate");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Candidate");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Candidate");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
 
             acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "Candidate");
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Candidate");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Candidate");
             coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Candidate");
 
             asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "Candidate");
@@ -242,13 +242,13 @@ public class TC_10_8_DeveloperACCStateManagement extends BaseTest {
             coreComponentAPI.updateACC(acc);
 
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Draft");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Draft");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Draft");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
 
             acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "Draft");
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Draft");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Draft");
             coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Draft");
 
             asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "Draft");

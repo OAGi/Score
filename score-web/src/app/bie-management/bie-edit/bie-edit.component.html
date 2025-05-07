@@ -470,10 +470,10 @@
                             <div class="textarea-container">
                               <textarea matInput rows="6"
                                         placeholder="Component Definition" [readonly]="true"
-                                        value="{{ asAbieDetail().asccp.definition || ' ' }}">
+                                        value="{{ asAbieDetail().asccp.definition?.content || ' ' }}">
                               </textarea>
                               <button mat-icon-button mat-small-icon-button *ngIf="used(selectedNode)"
-                                      (click)="copyToDefinition(asAbieDetail().asccp.definition, asAbieDetail().asbiep)"
+                                      (click)="copyToDefinition(asAbieDetail().asccp.definition?.content, asAbieDetail().asbiep)"
                                       matTooltip="Copy to Context Definition">
                                 <mat-icon>content_paste</mat-icon>
                               </button>
@@ -488,10 +488,10 @@
                             <div class="textarea-container">
                               <textarea matInput rows="6"
                                         placeholder="Type Definition" [readonly]="true"
-                                        value="{{ asAbieDetail().acc.definition || ' ' }}">
+                                        value="{{ asAbieDetail().acc.definition?.content || ' ' }}">
                               </textarea>
                               <button mat-icon-button mat-small-icon-button *ngIf="used(selectedNode)"
-                                      (click)="copyToDefinition(asAbieDetail().acc.definition, asAbieDetail().asbiep)"
+                                      (click)="copyToDefinition(asAbieDetail().acc.definition?.content, asAbieDetail().asbiep)"
                                       matTooltip="Copy to Context Definition">
                                 <mat-icon>content_paste</mat-icon>
                               </button>
@@ -631,7 +631,7 @@
                             <div class="textarea-container">
                               <textarea matInput rows="6"
                                         placeholder="Component Definition" [readonly]="true"
-                                        value="{{ asAbieDetail().base.asccp.definition || ' ' }}">
+                                        value="{{ asAbieDetail().base.asccp.definition?.content || ' ' }}">
                               </textarea>
                             </div>
                           </mat-form-field>
@@ -644,7 +644,7 @@
                             <div class="textarea-container">
                               <textarea matInput rows="6"
                                         placeholder="Type Definition" [readonly]="true"
-                                        value="{{ asAbieDetail().base.acc.definition || ' ' }}">
+                                        value="{{ asAbieDetail().base.acc.definition?.content || ' ' }}">
                               </textarea>
                             </div>
                           </mat-form-field>
@@ -722,7 +722,7 @@
                             </mat-error>
                             <mat-error *ngIf="bieCardinalityMin.hasError('min')">
                               Cardinality Min must be greater than or equals
-                              to {{ (asAsbiepDetail().base) ? (asAsbiepDetail().base.asbie.cardinalityMin) : (asAsbiepDetail().ascc && asAsbiepDetail().ascc.cardinalityMin) }}
+                              to {{ (asAsbiepDetail().base) ? (asAsbiepDetail().base.asbie.cardinalityMin) : (asAsbiepDetail().ascc && asAsbiepDetail().ascc.cardinality.min) }}
                             </mat-error>
                             <mat-error *ngIf="bieCardinalityMin.hasError('max')">
                               {{ bieCardinalityMin.getError('max') }}
@@ -732,7 +732,7 @@
                         <div class="col-6">
                           <mat-form-field>
                             <mat-label>Cardinality Max</mat-label>
-                            <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asAsbiepDetail().ascc.cardinalityMax | unbounded}})" required
+                            <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asAsbiepDetail().ascc.cardinality.max | unbounded}})" required
                                    [formControl]="bieCardinalityMax"
                                    [value]="bieCardinalityMax.value | unbounded">
                             <mat-hint *ngIf="bieCardinalityMax.valid && asAsbiepDetail().asbie && asAsbiepDetail().asbie.cardinalityMax === 0 &&
@@ -926,10 +926,10 @@
                             <div class="textarea-container">
                               <textarea matInput rows="6"
                                         placeholder="Association Definition" [readonly]="true"
-                                        value="{{ asAsbiepDetail().ascc.definition || ' ' }}">
+                                        value="{{ asAsbiepDetail().ascc.definition?.content || ' ' }}">
                               </textarea>
                               <button mat-icon-button mat-small-icon-button *ngIf="used(selectedNode)"
-                                      (click)="copyToDefinition(asAsbiepDetail().ascc.definition, asAsbiepDetail().asbie)"
+                                      (click)="copyToDefinition(asAsbiepDetail().ascc.definition?.content, asAsbiepDetail().asbie)"
                                       matTooltip="Copy to Context Definition">
                                 <mat-icon>content_paste</mat-icon>
                               </button>
@@ -945,10 +945,10 @@
                             <div class="textarea-container">
                               <textarea matInput rows="6"
                                         placeholder="Component Definition" [readonly]="true"
-                                        value="{{ asAsbiepDetail().asccp.definition || ' ' }}">
+                                        value="{{ asAsbiepDetail().asccp.definition?.content || ' ' }}">
                               </textarea>
                               <button mat-icon-button mat-small-icon-button *ngIf="used(selectedNode)"
-                                      (click)="copyToDefinition(asAsbiepDetail().asccp.definition, asAsbiepDetail().asbie)"
+                                      (click)="copyToDefinition(asAsbiepDetail().asccp.definition?.content, asAsbiepDetail().asbie)"
                                       matTooltip="Copy to Context Definition">
                                 <mat-icon>content_paste</mat-icon>
                               </button>
@@ -964,10 +964,10 @@
                             <div class="textarea-container">
                               <textarea matInput rows="6"
                                         placeholder="Type Definition" [readonly]="true"
-                                        value="{{ asAsbiepDetail().acc.definition || ' ' }}">
+                                        value="{{ asAsbiepDetail().acc.definition?.content || ' ' }}">
                               </textarea>
                               <button mat-icon-button mat-small-icon-button *ngIf="used(selectedNode)"
-                                      (click)="copyToDefinition(asAsbiepDetail().acc.definition, asAsbiepDetail().asbie)"
+                                      (click)="copyToDefinition(asAsbiepDetail().acc.definition?.content, asAsbiepDetail().asbie)"
                                       matTooltip="Copy to Context Definition">
                                 <mat-icon>content_paste</mat-icon>
                               </button>
@@ -1032,7 +1032,7 @@
                         <div class="col-6">
                           <mat-form-field>
                             <mat-label>Cardinality Max</mat-label>
-                            <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asAsbiepDetail().base.ascc.cardinalityMax | unbounded}})" required
+                            <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asAsbiepDetail().base.ascc.cardinality.max | unbounded}})" required
                                    [value]="asAsbiepDetail().base.asbie.cardinalityMax | unbounded"
                                    [disabled]="true">
                           </mat-form-field>
@@ -1198,7 +1198,7 @@
                             <div class="textarea-container">
                               <textarea matInput rows="6"
                                         placeholder="Association Definition" [readonly]="true"
-                                        value="{{ asAsbiepDetail().base.ascc.definition || ' ' }}">
+                                        value="{{ asAsbiepDetail().base.ascc.definition?.content || ' ' }}">
                               </textarea>
                             </div>
                           </mat-form-field>
@@ -1212,7 +1212,7 @@
                             <div class="textarea-container">
                               <textarea matInput rows="6"
                                         placeholder="Component Definition" [readonly]="true"
-                                        value="{{ asAsbiepDetail().base.asccp.definition || ' ' }}">
+                                        value="{{ asAsbiepDetail().base.asccp.definition?.content || ' ' }}">
                               </textarea>
                             </div>
                           </mat-form-field>
@@ -1226,7 +1226,7 @@
                             <div class="textarea-container">
                               <textarea matInput rows="6"
                                         placeholder="Type Definition" [readonly]="true"
-                                        value="{{ asAsbiepDetail().base.acc.definition || ' ' }}">
+                                        value="{{ asAsbiepDetail().base.acc.definition?.content || ' ' }}">
                               </textarea>
                             </div>
                           </mat-form-field>
@@ -1303,7 +1303,7 @@
                             </mat-error>
                             <mat-error *ngIf="bieCardinalityMin.hasError('min')">
                               Cardinality Min must be greater than or equals
-                              to {{ (asBbiepDetail().base) ? (asBbiepDetail().base.bbie.cardinalityMin) : (asBbiepDetail().bcc && asBbiepDetail().bcc.cardinalityMin) }}
+                              to {{ (asBbiepDetail().base) ? (asBbiepDetail().base.bbie.cardinalityMin) : (asBbiepDetail().bcc && asBbiepDetail().bcc.cardinality.min) }}
                             </mat-error>
                             <mat-error *ngIf="bieCardinalityMin.hasError('max')">
                               {{ bieCardinalityMin.getError('max') }}
@@ -1313,7 +1313,7 @@
                         <div class="col-6">
                           <mat-form-field>
                             <mat-label>Cardinality Max</mat-label>
-                            <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asBbiepDetail().bcc.cardinalityMax | unbounded}})" required
+                            <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asBbiepDetail().bcc.cardinality.max | unbounded}})" required
                                    [formControl]="bieCardinalityMax"
                                    [value]="bieCardinalityMax.value | unbounded">
                             <mat-hint *ngIf="bieCardinalityMax.valid && asBbiepDetail().bbie.cardinalityMax === 0 &&
@@ -1442,7 +1442,7 @@
                               <mat-form-field *ngIf="asBbiepDetail().bbie.valueDomainType === 'Primitive'">
                                 <mat-label>Value Domain</mat-label>
                                 <mat-select placeholder="Value Domain" required
-                                            [(ngModel)]="asBbiepDetail().bbie.bdtPriRestriId"
+                                            [(ngModel)]="asBbiepDetail().bbie.xbtManifestId"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"
                                             [disabled]="!isEditable(selectedNode) || (!!asBbiepDetail().base)">
                                   <mat-option>
@@ -1610,10 +1610,10 @@
                             <div class="textarea-container">
                               <textarea matInput rows="6"
                                         placeholder="Association Definition" [readonly]="true"
-                                        value="{{ asBbiepDetail().bcc.definition || ' ' }}">
+                                        value="{{ asBbiepDetail().bcc.definition?.content || ' ' }}">
                               </textarea>
                               <button mat-icon-button mat-small-icon-button *ngIf="used(selectedNode)"
-                                      (click)="copyToDefinition(asBbiepDetail().bcc.definition, asBbiepDetail().bbie)"
+                                      (click)="copyToDefinition(asBbiepDetail().bcc.definition?.content, asBbiepDetail().bbie)"
                                       matTooltip="Copy to Context Definition">
                                 <mat-icon>content_paste</mat-icon>
                               </button>
@@ -1629,10 +1629,10 @@
                             <div class="textarea-container">
                               <textarea matInput rows="6"
                                         placeholder="Component Definition" [readonly]="true"
-                                        value="{{ asBbiepDetail().bccp.definition || ' ' }}">
+                                        value="{{ asBbiepDetail().bccp.definition?.content || ' ' }}">
                               </textarea>
                               <button mat-icon-button mat-small-icon-button *ngIf="used(selectedNode)"
-                                      (click)="copyToDefinition(asBbiepDetail().bccp.definition, asBbiepDetail().bbie)"
+                                      (click)="copyToDefinition(asBbiepDetail().bccp.definition?.content, asBbiepDetail().bbie)"
                                       matTooltip="Copy to Context Definition">
                                 <mat-icon>content_paste</mat-icon>
                               </button>
@@ -1696,7 +1696,7 @@
                         <div class="col-6">
                           <mat-form-field>
                             <mat-label>Cardinality Max</mat-label>
-                            <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asBbiepDetail().base.bcc.cardinalityMax | unbounded}})" required
+                            <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asBbiepDetail().base.bcc.cardinality.max | unbounded}})" required
                                    [value]="asBbiepDetail().base.bbie.cardinalityMax | unbounded"
                                    [disabled]="true">
                           </mat-form-field>
@@ -1791,7 +1791,7 @@
                               <mat-form-field *ngIf="asBbiepDetail().base.bbie.valueDomainType === 'Primitive'">
                                 <mat-label>Value Domain</mat-label>
                                 <mat-select placeholder="Value Domain" required
-                                            [(ngModel)]="asBbiepDetail().base.bbie.bdtPriRestriId"
+                                            [(ngModel)]="asBbiepDetail().base.bbie.xbtManifestId"
                                             [disabled]="true">
                                   <mat-option *ngFor="let xbt of filteredValueDomains | async"
                                               [value]="xbt.id">
@@ -1902,7 +1902,7 @@
                             <div class="textarea-container">
                               <textarea matInput rows="6"
                                         placeholder="Association Definition" [readonly]="true"
-                                        value="{{ asBbiepDetail().base.bcc.definition || ' ' }}">
+                                        value="{{ asBbiepDetail().base.bcc.definition?.content || ' ' }}">
                               </textarea>
                             </div>
                           </mat-form-field>
@@ -1916,7 +1916,7 @@
                             <div class="textarea-container">
                               <textarea matInput rows="6"
                                         placeholder="Component Definition" [readonly]="true"
-                                        value="{{ asBbiepDetail().base.bccp.definition || ' ' }}">
+                                        value="{{ asBbiepDetail().base.bccp.definition?.content || ' ' }}">
                               </textarea>
                             </div>
                           </mat-form-field>
@@ -1983,7 +1983,7 @@
                             </mat-error>
                             <mat-error *ngIf="bieCardinalityMin.hasError('min')">
                               Cardinality Min must be greater than or equals
-                              to {{ (asBbieScDetail().base) ? (asBbieScDetail().base.bbieSc.cardinalityMin) : (asBbieScDetail().bdtSc && asBbieScDetail().bdtSc.cardinalityMin) }}
+                              to {{ (asBbieScDetail().base) ? (asBbieScDetail().base.bbieSc.cardinalityMin) : (asBbieScDetail().bdtSc && asBbieScDetail().bdtSc.cardinality.min) }}
                             </mat-error>
                             <mat-error *ngIf="bieCardinalityMin.hasError('max')">
                               {{ bieCardinalityMin.getError('max') }}
@@ -1993,7 +1993,7 @@
                         <div class="col-6">
                           <mat-form-field>
                             <mat-label>Cardinality Max</mat-label>
-                            <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asBbieScDetail().bdtSc.cardinalityMax | unbounded}})" required
+                            <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asBbieScDetail().bdtSc.cardinality.max | unbounded}})" required
                                    [formControl]="bieCardinalityMax"
                                    [value]="bieCardinalityMax.value | unbounded">
                             <mat-hint *ngIf="bieCardinalityMax.valid && asBbieScDetail().bbieSc.cardinalityMax === 0 &&
@@ -2113,7 +2113,7 @@
                               <mat-form-field *ngIf="asBbieScDetail().bbieSc.valueDomainType === 'Primitive'">
                                 <mat-label>Value Domain</mat-label>
                                 <mat-select placeholder="Value Domain" required
-                                            [(ngModel)]="asBbieScDetail().bbieSc.bdtScPriRestriId"
+                                            [(ngModel)]="asBbieScDetail().bbieSc.xbtManifestId"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"
                                             [disabled]="!isEditable(selectedNode) || (!!asBbieScDetail().base)">
                                   <mat-option>
@@ -2281,10 +2281,10 @@
                             <div class="textarea-container">
                               <textarea matInput rows="6"
                                         placeholder="Component Definition" [readonly]="true"
-                                        value="{{ asBbieScDetail().bdtSc.definition || ' ' }}">
+                                        value="{{ asBbieScDetail().bdtSc.definition?.content || ' ' }}">
                               </textarea>
                               <button mat-icon-button mat-small-icon-button *ngIf="used(selectedNode)"
-                                      (click)="copyToDefinition(asBbieScDetail().bdtSc.definition, asBbieScDetail().bbieSc)"
+                                      (click)="copyToDefinition(asBbieScDetail().bdtSc.definition?.content, asBbieScDetail().bbieSc)"
                                       matTooltip="Copy to Context Definition">
                                 <mat-icon>content_paste</mat-icon>
                               </button>
@@ -2338,7 +2338,7 @@
                         <div class="col-6">
                           <mat-form-field>
                             <mat-label>Cardinality Max</mat-label>
-                            <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asBbieScDetail().base.bdtSc.cardinalityMax | unbounded}})" required
+                            <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asBbieScDetail().base.bdtSc.cardinality.max | unbounded}})" required
                                    [value]="asBbieScDetail().base.bbieSc.cardinalityMax | unbounded"
                                    [disabled]="true">
                           </mat-form-field>
@@ -2428,7 +2428,7 @@
                               <mat-form-field *ngIf="asBbieScDetail().base.bbieSc.valueDomainType === 'Primitive'">
                                 <mat-label>Value Domain</mat-label>
                                 <mat-select placeholder="Value Domain" required
-                                            [(ngModel)]="asBbieScDetail().base.bbieSc.bdtScPriRestriId"
+                                            [(ngModel)]="asBbieScDetail().base.bbieSc.xbtManifestId"
                                             [disabled]="true">
                                   <mat-option *ngFor="let xbt of filteredValueDomains | async"
                                               [value]="xbt.id">
@@ -2539,7 +2539,7 @@
                             <div class="textarea-container">
                               <textarea matInput rows="6"
                                         placeholder="Component Definition" [readonly]="true"
-                                        value="{{ asBbieScDetail().base.bdtSc.definition || ' ' }}">
+                                        value="{{ asBbieScDetail().base.bdtSc.definition?.content || ' ' }}">
                               </textarea>
                             </div>
                           </mat-form-field>

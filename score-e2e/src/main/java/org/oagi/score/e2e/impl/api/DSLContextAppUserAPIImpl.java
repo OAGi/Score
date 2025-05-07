@@ -5,11 +5,14 @@ import org.jooq.types.ULong;
 import org.oagi.score.e2e.api.AppUserAPI;
 import org.oagi.score.e2e.impl.api.helper.BCryptPasswordEncoder;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AppUserRecord;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.DtManifestRecord;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.DtScManifestRecord;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.ReleaseRecord;
 import org.oagi.score.e2e.obj.AppUserObject;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.jooq.impl.DSL.and;
@@ -351,18 +354,24 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
             return;
         }
 
-        List<ULong> dtScManifestIdList = dslContext.select(DT_SC_MANIFEST.DT_SC_MANIFEST_ID)
-                .from(DT_SC_MANIFEST)
+        List<DtScManifestRecord> dtScManifestList = dslContext.selectFrom(DT_SC_MANIFEST)
                 .where(DT_SC_MANIFEST.DT_SC_ID.in(dtScIdList))
-                .fetchInto(ULong.class);
-        if (!dtScManifestIdList.isEmpty()) {
-            dslContext.deleteFrom(BDT_SC_PRI_RESTRI)
-                    .where(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.in(dtScManifestIdList))
-                    .execute();
+                .fetch();
+        if (!dtScManifestList.isEmpty()) {
+            for (DtScManifestRecord dtScManifest : dtScManifestList) {
+                dslContext.deleteFrom(DT_SC_AWD_PRI)
+                        .where(and(
+                                DT_SC_AWD_PRI.RELEASE_ID.eq(dtScManifest.getReleaseId()),
+                                DT_SC_AWD_PRI.DT_SC_ID.eq(dtScManifest.getDtScId())
+                        ))
+                        .execute();
+            }
         }
 
         dslContext.deleteFrom(DT_SC_MANIFEST)
-                .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.in(dtScManifestIdList))
+                .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.in(
+                        dtScManifestList.stream().map(e -> e.getDtScManifestId()).collect(Collectors.toSet())
+                ))
                 .execute();
         dslContext.deleteFrom(DT_SC)
                 .where(DT_SC.DT_SC_ID.in(dtScIdList))
@@ -381,14 +390,18 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
             return;
         }
 
-        List<ULong> dtManifestIdList = dslContext.select(DT_MANIFEST.DT_MANIFEST_ID)
-                .from(DT_MANIFEST)
+        List<DtManifestRecord> dtManifestList = dslContext.selectFrom(DT_MANIFEST)
                 .where(DT_MANIFEST.DT_ID.in(dtIdList))
-                .fetchInto(ULong.class);
-        if (!dtManifestIdList.isEmpty()) {
-            dslContext.deleteFrom(BDT_PRI_RESTRI)
-                    .where(BDT_PRI_RESTRI.BDT_MANIFEST_ID.in(dtManifestIdList))
-                    .execute();
+                .fetch();
+        if (!dtManifestList.isEmpty()) {
+            for (DtManifestRecord dtManifest : dtManifestList) {
+                dslContext.deleteFrom(DT_AWD_PRI)
+                        .where(and(
+                                DT_AWD_PRI.RELEASE_ID.eq(dtManifest.getReleaseId()),
+                                DT_AWD_PRI.DT_ID.eq(dtManifest.getDtId())
+                        ))
+                        .execute();
+            }
         }
 
         List<String> dtGuidList = dslContext.selectDistinct(DT.GUID)
@@ -397,14 +410,18 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                 .fetchInto(String.class);
         dslContext.update(DT_MANIFEST)
                 .setNull(DT_MANIFEST.LOG_ID)
-                .where(DT_MANIFEST.DT_MANIFEST_ID.in(dtManifestIdList))
+                .where(DT_MANIFEST.DT_MANIFEST_ID.in(
+                        dtManifestList.stream().map(e -> e.getDtManifestId()).collect(Collectors.toSet())
+                ))
                 .execute();
         dslContext.deleteFrom(LOG)
                 .where(LOG.REFERENCE.in(dtGuidList))
                 .execute();
 
         dslContext.deleteFrom(DT_MANIFEST)
-                .where(DT_MANIFEST.DT_MANIFEST_ID.in(dtManifestIdList))
+                .where(DT_MANIFEST.DT_MANIFEST_ID.in(
+                        dtManifestList.stream().map(e -> e.getDtManifestId()).collect(Collectors.toSet())
+                ))
                 .execute();
         dslContext.deleteFrom(DT)
                 .where(DT.DT_ID.in(dtIdList))

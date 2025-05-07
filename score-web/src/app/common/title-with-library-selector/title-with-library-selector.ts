@@ -1,8 +1,6 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewEncapsulation} from '@angular/core';
-import {Library} from '../../library-management/domain/library';
+import {LibrarySummary} from '../../library-management/domain/library';
 import {ColumnSelectorModule} from '../column-selector/column-selector.module';
-import {MatCardSubtitle} from '@angular/material/card';
-import {MatToolbar} from '@angular/material/toolbar';
 import {NgIf} from '@angular/common';
 
 @Component({
@@ -12,8 +10,6 @@ import {NgIf} from '@angular/common';
   encapsulation: ViewEncapsulation.None,
   imports: [
     ColumnSelectorModule,
-    MatCardSubtitle,
-    MatToolbar,
     NgIf
   ],
   standalone: true
@@ -22,8 +18,8 @@ export class TitleWithLibrarySelector implements OnInit, OnChanges {
 
   @Input() title: string;
   @Input() subtitle: string;
-  @Input() libraries: { library: Library, selected: boolean }[] = [];
-  @Output() libraryChange = new EventEmitter<Library>();
+  @Input() libraries: { library: LibrarySummary, selected: boolean }[] = [];
+  @Output() libraryChange = new EventEmitter<LibrarySummary>();
 
   filterLibraries: {
     name: string;
@@ -47,7 +43,7 @@ export class TitleWithLibrarySelector implements OnInit, OnChanges {
     }));
   }
 
-  get selectedLibrary(): Library | undefined {
+  get selectedLibrary(): LibrarySummary | undefined {
     const selectedLibraries = this.libraries.filter(e => e.selected).map(e => e.library);
     return selectedLibraries.length > 0 ? selectedLibraries[0] : undefined;
   }

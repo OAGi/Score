@@ -1,22 +1,25 @@
-import {PageRequest} from '../../../basis/basis';
+import {Definition, PageRequest, WhoAndWhen} from '../../../basis/basis';
 import {OagisComponentType, OagisComponentTypes} from '../../domain/core-component-node';
-import {SimpleRelease} from '../../../release-management/domain/release';
+import {ReleaseSummary} from '../../../release-management/domain/release';
 import {HttpParams} from '@angular/common/http';
 import {ParamMap} from '@angular/router';
 import {base64Decode, base64Encode} from '../../../common/utility';
 import {ShortTag} from '../../../tag-management/domain/tag';
-import {Library} from '../../../library-management/domain/library';
+import {LibrarySummary} from '../../../library-management/domain/library';
+import {ScoreUser} from '../../../authentication/domain/auth';
+import {LogSummary} from '../../../log-management/domain/log';
 
 export class CcListRequest {
-  library: Library = new Library();
-  release: SimpleRelease;
+  library: LibrarySummary = new LibrarySummary();
+  release: ReleaseSummary;
   types: string[] = [];
   states: string[] = [];
+  reusable: boolean[] = [];
   deprecated: boolean[] = [false];
   newComponent: boolean[] = [];
   commonlyUsed: boolean[] = [true];
-  ownerLoginIds: string[] = [];
-  updaterLoginIds: string[] = [];
+  ownerLoginIdList: string[] = [];
+  updaterLoginIdList: string[] = [];
   excludes: string[] = [];
   findUsages: {
     type: string,
@@ -46,7 +49,7 @@ export class CcListRequest {
   constructor(paramMap?: ParamMap, defaultPageRequest?: PageRequest) {
     const q = (paramMap) ? paramMap.get('q') : undefined;
     const params = (q) ? new HttpParams({fromString: base64Decode(q)}) : new HttpParams();
-    this.release = new SimpleRelease();
+    this.release = new ReleaseSummary();
     this.release.releaseId = Number(params.get('releaseId') || 0);
     this.page.sortActive = params.get('sortActive');
     if (this.page.sortActive === 'undefined') {
@@ -73,11 +76,12 @@ export class CcListRequest {
       this.page.pageSize = (defaultPageRequest) ? defaultPageRequest.pageSize : 0;
     }
     this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
+    this.reusable = (params.get('reusable')) ? Array.from(params.get('reusable').split(',').map(e => e === 'true' ? true : false)) : [];
     this.deprecated = (params.get('deprecated')) ? Array.from(params.get('deprecated').split(',').map(e => e === 'true' ? true : false)) : [];
     this.newComponent = (params.get('newComponent')) ? Array.from(params.get('newComponent').split(',').map(e => e === 'true' ? true : false)) : [];
     this.commonlyUsed = (params.get('commonlyUsed')) ? Array.from(params.get('commonlyUsed').split(',').map(e => e === 'true' ? true : false)) : [];
-    this.ownerLoginIds = (params.get('ownerLoginIds')) ? Array.from(params.get('ownerLoginIds').split(',')) : [];
-    this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
+    this.ownerLoginIdList = (params.get('ownerLoginIdList')) ? Array.from(params.get('ownerLoginIdList').split(',')) : [];
+    this.updaterLoginIdList = (params.get('updaterLoginIdList')) ? Array.from(params.get('updaterLoginIdList').split(',')) : [];
     this.tags = (params.get('tags')) ? Array.from(params.get('tags').split(',')) : [];
     this.namespaces = (params.get('namespaces')) ? Array.from(params.get('namespaces').split(',')).map(e => Number(e)) : [];
     this.componentTypes = (params.get('componentTypes')) ? Array.from(params.get('componentTypes').split(','))
@@ -111,6 +115,9 @@ export class CcListRequest {
     if (this.states && this.states.length > 0) {
       params = params.set('states', this.states.join(','));
     }
+    if (this.reusable !== undefined && this.reusable.length > 0) {
+      params = params.set('reusable', this.reusable.map(e => (e) ? 'true' : 'false').join(','));
+    }
     if (this.deprecated !== undefined && this.deprecated.length > 0) {
       params = params.set('deprecated', this.deprecated.map(e => (e) ? 'true' : 'false').join(','));
     }
@@ -120,11 +127,11 @@ export class CcListRequest {
     if (this.commonlyUsed !== undefined && this.commonlyUsed.length > 0) {
       params = params.set('commonlyUsed', this.commonlyUsed.map(e => (e) ? 'true' : 'false').join(','));
     }
-    if (this.ownerLoginIds && this.ownerLoginIds.length > 0) {
-      params = params.set('ownerLoginIds', this.ownerLoginIds.join(','));
+    if (this.ownerLoginIdList && this.ownerLoginIdList.length > 0) {
+      params = params.set('ownerLoginIdList', this.ownerLoginIdList.join(','));
     }
-    if (this.updaterLoginIds && this.updaterLoginIds.length > 0) {
-      params = params.set('updaterLoginIds', this.updaterLoginIds.join(','));
+    if (this.updaterLoginIdList && this.updaterLoginIdList.length > 0) {
+      params = params.set('updaterLoginIdList', this.updaterLoginIdList.join(','));
     }
     if (this.updatedDate.start) {
       params = params.set('updatedDateStart', '' + this.updatedDate.start.toUTCString());
@@ -165,8 +172,47 @@ export class CcListRequest {
   }
 }
 
+
+export class CcListEntry {
+  type: string;
+
+  library: LibrarySummary;
+  release: ReleaseSummary;
+
+  manifestId: number;
+  guid: string;
+  basedManifestId: number;
+  id: number;
+
+  den: string;
+  name: string;
+  definition: Definition;
+  module: string;
+  oagisComponentType: string;
+
+  state: string;
+  deprecated: boolean;
+  newComponent: boolean;
+
+  dtType: string;
+  sixDigitId: string;
+  defaultValueDomain: number;
+  revision: string;
+  releaseNum: string;
+
+  tagList: ShortTag[];
+
+  log: LogSummary;
+  owner: ScoreUser;
+  ownedByDeveloper: boolean;
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+}
+
 export class CcList {
   type: string;
+  libraryId: number;
+  libraryName: string;
   manifestId: number;
   guid: string;
   name: string;
@@ -335,7 +381,7 @@ export class SummaryCcInfo {
   numberOfTotalCcByStates: Map<string, number>;
   numberOfMyCcByStates: Map<string, number>;
   ccByUsersAndStates: Map<string, Map<string, number>>;
-  myRecentCCs: CcList[] = [];
+  myRecentCCs: CcListEntry[] = [];
 }
 
 export class SummaryCcExt {

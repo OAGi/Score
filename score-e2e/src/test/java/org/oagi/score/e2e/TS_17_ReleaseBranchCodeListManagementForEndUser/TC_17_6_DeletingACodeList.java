@@ -13,7 +13,7 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.oagi.score.e2e.page.core_component.DTViewEditPage;
-import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.oagi.score.e2e.page.core_component.ViewEditDataTypePage;
 import org.openqa.selenium.TimeoutException;
 
 import java.util.ArrayList;
@@ -84,8 +84,8 @@ public class TC_17_6_DeletingACodeList extends BaseTest {
         CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(endUser, namespaceEU, branch, "WIP");
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-        DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.createDT("Process Category_ Code. Type", branch.getReleaseNumber());
+        ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+        DTViewEditPage dtViewEditPage = viewEditDataTypePage.createDT("Process Category_ Code. Type", branch.getReleaseNumber());
         dtViewEditPage.showValueDomain();
         dtViewEditPage.addCodeListValueDomain(codeList.getName());
         String qualifier = "testDataType" + RandomStringUtils.secure().nextAlphabetic(5, 10);
@@ -107,8 +107,8 @@ public class TC_17_6_DeletingACodeList extends BaseTest {
         editCodeListPage.hitDeleteButton();
         codeList.setState("Deleted");
 
-        viewEditCoreComponentPage.openPage();
-        DTViewEditPage dtViewEditPageNew = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(qualifier + "_ Code. Type", branch.getReleaseNumber());
+        viewEditDataTypePage.openPage();
+        DTViewEditPage dtViewEditPageNew = viewEditDataTypePage.openDTViewEditPageByDenAndBranch(qualifier + "_ Code. Type", branch.getReleaseNumber());
         dtViewEditPageNew.showValueDomain();
         assertDoesNotThrow(() -> dtViewEditPageNew.codeListIdMarkedAsDeleted(codeList));
         escape(getDriver());

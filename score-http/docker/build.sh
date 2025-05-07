@@ -13,8 +13,8 @@ cd ..
 ./mvnw clean package -DskipTests=true
 
 echo "Preparing files..."
-cp score-http/target/score-http-3.4.0.war docker
-cp ~/.m2/repository/org/mariadb/jdbc/mariadb-java-client/3.5.1/mariadb-java-client-3.5.1.jar docker
+cp target/score-http-3.4.0.war docker
+cp ~/.m2/repository/org/mariadb/jdbc/mariadb-java-client/3.5.3/mariadb-java-client-3.5.3.jar docker
 
 echo "Building docker image..."
 cd docker

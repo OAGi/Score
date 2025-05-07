@@ -7,18 +7,16 @@ import {SelectionModel} from '@angular/cdk/collections';
 import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
 import {ReleaseService} from '../../release-management/domain/release.service';
-import {CcListService} from '../../cc-management/cc-list/domain/cc-list.service';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {PageRequest} from '../../basis/basis';
-import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
-import {SimpleRelease} from '../../release-management/domain/release';
+import {MatDatepicker} from '@angular/material/datepicker';
+import {ReleaseSummary} from '../../release-management/domain/release';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
-import {initFilter, loadBranch, loadLibrary, saveBranch, saveLibrary} from '../../common/utility';
+import {initFilter, loadLibrary, saveBranch, saveLibrary} from '../../common/utility';
 import {Location} from '@angular/common';
 import {AuthService} from '../../authentication/auth.service';
-import {AsbieBbieList, BieListRequest} from '../../bie-management/bie-list/domain/bie-list';
-import {BieListService} from '../../bie-management/bie-list/domain/bie-list.service';
+import {BieListRequest} from '../../bie-management/bie-list/domain/bie-list';
 import {UserToken} from '../../authentication/domain/auth';
 import {BusinessTermService} from '../domain/business-term.service';
 import {WebPageInfoService} from '../../basis/basis.service';
@@ -26,8 +24,9 @@ import {PreferencesInfo, TableColumnsProperty} from '../../settings-management/s
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
-import {Library} from '../../library-management/domain/library';
+import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryService} from '../../library-management/domain/library.service';
+import {AsbieBbieListEntry} from '../domain/business-term';
 
 @Component({
   selector: 'score-bie-create-bie',
@@ -146,18 +145,18 @@ export class AssignBusinessTermBieComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<AsbieBbieList>();
-  selection = new SelectionModel<AsbieBbieList>(true, []);
+  dataSource = new MatTableDataSource<AsbieBbieListEntry>();
+  selection = new SelectionModel<AsbieBbieListEntry>(true, []);
   loading = false;
 
   loginIdList: string[] = [];
-  releases: SimpleRelease[] = [];
-  libraries: Library[] = [];
-  mappedLibraries: { library: Library, selected: boolean }[] = [];
+  releases: ReleaseSummary[] = [];
+  libraries: LibrarySummary[] = [];
+  mappedLibraries: { library: LibrarySummary, selected: boolean }[] = [];
   releaseListFilterCtrl: FormControl = new FormControl();
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
-  filteredReleaseList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
+  filteredReleaseList: ReplaySubject<ReleaseSummary[]> = new ReplaySubject<ReleaseSummary[]>(1);
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   states: string[] = ['WIP', 'QA', 'Production'];
@@ -172,11 +171,9 @@ export class AssignBusinessTermBieComponent implements OnInit {
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
 
-  constructor(private service: BieListService,
-              private businessTermService: BusinessTermService,
+  constructor(private businessTermService: BusinessTermService,
               private releaseService: ReleaseService,
               private libraryService: LibraryService,
-              private ccListService: CcListService,
               private accountService: AccountListService,
               private preferencesService: SettingsPreferencesService,
               private auth: AuthService,
@@ -191,7 +188,7 @@ export class AssignBusinessTermBieComponent implements OnInit {
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.types = ['BBIE', 'ASBIE'];
 
-    this.libraryService.getLibraries().subscribe(libraries => {
+    this.libraryService.getLibrarySummaryList().subscribe(libraries => {
       this.initLibraries(libraries);
 
       // The value should be 'true' unless 'adv_ser' is false.
@@ -220,7 +217,7 @@ export class AssignBusinessTermBieComponent implements OnInit {
 
       forkJoin([
         this.accountService.getAccountNames(),
-        this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Published']),
+        this.releaseService.getReleaseSummaryList(this.request.library.libraryId, ['Published']),
         this.preferencesService.load(this.auth.getUserToken())
       ]).subscribe(([loginIds, releases, preferencesInfo]) => {
         this.preferencesInfo = preferencesInfo;
@@ -264,17 +261,6 @@ export class AssignBusinessTermBieComponent implements OnInit {
     }
   }
 
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
-  }
-
   reset(type: string) {
     switch (type) {
       case 'startDate':
@@ -288,7 +274,7 @@ export class AssignBusinessTermBieComponent implements OnInit {
     }
   }
 
-  initLibraries(libraries: Library[]) {
+  initLibraries(libraries: LibrarySummary[]) {
     this.libraries = libraries;
     if (this.libraries.length > 0) {
       const savedLibraryId = loadLibrary(this.auth.getUserToken());
@@ -307,7 +293,7 @@ export class AssignBusinessTermBieComponent implements OnInit {
     }
   }
 
-  initReleases(releases: SimpleRelease[]) {
+  initReleases(releases: ReleaseSummary[]) {
     this.releases = releases.filter(e => !e.workingRelease);
     initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
     if (this.releases.length > 0) {
@@ -315,9 +301,9 @@ export class AssignBusinessTermBieComponent implements OnInit {
     }
   }
 
-  onLibraryChange(library: Library) {
+  onLibraryChange(library: LibrarySummary) {
     this.request.library = library;
-    this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Published']).subscribe(releases => {
+    this.releaseService.getReleaseSummaryList(this.request.library.libraryId, ['Published']).subscribe(releases => {
       saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
       this.initReleases(releases);
       this.onSearch();
@@ -336,18 +322,15 @@ export class AssignBusinessTermBieComponent implements OnInit {
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
 
-    this.request.ownerLoginIds = [this.username];
+    this.request.ownerLoginIdList = [this.username];
 
-    this.service.getAsbieBbieListWithRequest(this.request).pipe(
+    this.businessTermService.getAsbieBbieListWithRequest(this.request).pipe(
       finalize(() => {
         this.loading = false;
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
-      this.dataSource.data = resp.list.map((elm: AsbieBbieList) => {
-        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        return elm;
-      });
+      this.dataSource.data = resp.list;
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0],
           this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));
@@ -371,11 +354,11 @@ export class AssignBusinessTermBieComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(row: AsbieBbieList) {
+  select(row: AsbieBbieListEntry) {
     this.selection.select(row);
   }
 
-  toggle(row: AsbieBbieList) {
+  toggle(row: AsbieBbieListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row);
     } else {
@@ -383,7 +366,7 @@ export class AssignBusinessTermBieComponent implements OnInit {
     }
   }
 
-  isSelected(row: AsbieBbieList) {
+  isSelected(row: AsbieBbieListEntry) {
     return this.selection.isSelected(row);
   }
 

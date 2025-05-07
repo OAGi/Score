@@ -63,7 +63,7 @@ public class TC_15_18_DeletingEndUserBCCP extends BaseTest {
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "WIP");
 
         BCCPViewEditPage bccpViewEditPage =
                 viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
@@ -94,7 +94,7 @@ public class TC_15_18_DeletingEndUserBCCP extends BaseTest {
 
         // Code. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "WIP");
         coreComponentAPI.appendBCC(randomACC, randomBCCP, "WIP");
 
         BCCPViewEditPage bccpViewEditPage =
@@ -125,7 +125,7 @@ public class TC_15_18_DeletingEndUserBCCP extends BaseTest {
 
         // Code. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "WIP");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(release, dataType, anotherUser, namespace, "WIP");
         coreComponentAPI.appendBCC(randomACC, randomBCCP, "WIP");
 
         HomePage homePage = loginPage().signIn(anotherUser.getLoginId(), anotherUser.getPassword());
@@ -174,7 +174,7 @@ public class TC_15_18_DeletingEndUserBCCP extends BaseTest {
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "Production");
 
         BCCPViewEditPage bccpViewEditPage =
                 viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());

@@ -15,7 +15,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asccp;
 /**
  * An ASCCP specifies a role (or property) an ACC may play under another ACC.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -444,6 +444,6 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
         setIsNillable(isNillable);
         setPrevAsccpId(prevAsccpId);
         setNextAsccpId(nextAsccpId);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

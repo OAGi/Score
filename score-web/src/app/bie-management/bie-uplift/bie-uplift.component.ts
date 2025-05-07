@@ -151,7 +151,7 @@ export class BieUpliftComponent implements OnInit {
 
         const sourceDatabase = new BieUpliftSourceFlatNodeDatabase<BieUpliftSourceFlatNode>(sourceCcGraph,
           sourceRootNode, this.topLevelAsbiepId, sourceUsedBieList, sourceRefBieList);
-        this.sourceDataSource = new BieFlatNodeDataSource<BieUpliftSourceFlatNode>(sourceDatabase, this.bieEditService);
+        this.sourceDataSource = new BieFlatNodeDataSource<BieUpliftSourceFlatNode>(sourceDatabase, this.bieEditService, this.ccNodeService);
         this.sourceSearcher = new BieFlatNodeDataSourceSearcher<BieUpliftSourceFlatNode>(this.sourceDataSource, sourceDatabase);
         this.sourceDataSource.init();
 
@@ -161,7 +161,7 @@ export class BieUpliftComponent implements OnInit {
         targetRootNode.asccpManifestId = this.targetAsccpManifestId;
         const targetDatabase = new BieUpliftTargetFlatNodeDatabase<BieUpliftTargetFlatNode>(targetCcGraph,
           targetRootNode, undefined, [], []);
-        this.targetDataSource = new BieFlatNodeDataSource<BieUpliftTargetFlatNode>(targetDatabase, this.bieEditService);
+        this.targetDataSource = new BieFlatNodeDataSource<BieUpliftTargetFlatNode>(targetDatabase, this.bieEditService, this.ccNodeService);
         this.targetSearcher = new BieFlatNodeDataSourceSearcher<BieUpliftTargetFlatNode>(this.targetDataSource, targetDatabase);
         this.targetDataSource.init();
 

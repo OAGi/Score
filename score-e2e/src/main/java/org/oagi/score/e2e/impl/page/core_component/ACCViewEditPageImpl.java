@@ -156,6 +156,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         String url = getPageUrl();
         getDriver().get(url);
         invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofSeconds(2L));
         assert "ACC".equals(getCoreComponentTypeFieldValue());
         assert getText(getTitle()).equals(acc.getDen());
     }
@@ -320,15 +321,17 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     @Override
     public WebElement getContextMenuIconByNodeName(String nodeName) {
         WebElement node = getNodeByName(nodeName);
+        return getContextMenuIcon(node);
+    }
+
+    public WebElement getContextMenuIcon(WebElement node) {
         return node.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
     }
 
     @Override
     public WebElement clickOnDropDownMenuByPath(String path) {
-        goToNode(path);
-        String[] nodes = path.split("/");
-        String nodeName = nodes[nodes.length - 1];
-        WebElement node = getNodeByName(nodeName);
+        WebElement node = goToNode(path);
+
         click(node);
         new Actions(getDriver()).sendKeys("O").perform();
         waitFor(ofMillis(1000L));
@@ -340,7 +343,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         } catch (WebDriverException ignore) {
         }
 
-        WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
+        WebElement contextMenuIcon = getContextMenuIcon(node);
         click(getDriver(), contextMenuIcon);
         waitFor(ofMillis(1000L));
         assert visibilityOfElementLocated(getDriver(),
@@ -436,14 +439,10 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
     @Override
     public FindWhereUsedDialog findWhereUsed(String path) {
-        WebElement node = clickOnDropDownMenuByPath(path);
-        try {
-            click(elementToBeClickable(getDriver(), WHERE_USED_OPTION_LOCATOR));
-        } catch (TimeoutException e) {
-            click(node);
-            new Actions(getDriver()).sendKeys("O").perform();
-            click(elementToBeClickable(getDriver(), WHERE_USED_OPTION_LOCATOR));
-        }
+        clickOnDropDownMenuByPath(path);
+        WebElement whereUsedMenu = elementToBeClickable(getDriver(), WHERE_USED_OPTION_LOCATOR);
+        click(getDriver(), whereUsedMenu);
+        waitFor(ofMillis(1000L));
         FindWhereUsedDialog findWhereUsedDialog =
                 new FindWhereUsedDialogImpl(this, "Where Used");
         assert findWhereUsedDialog.isOpened();
@@ -683,17 +682,19 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     private WebElement goToNode(String path) {
         WebElement searchInput = getSearchInputTextField();
         click(getDriver(), searchInput);
-        WebElement node = retry(() -> {
-            WebElement e = sendKeys(searchInput, path);
+        retry(() -> {
+            sendKeys(searchInput, path);
             if (!path.equals(getText(searchInput))) {
                 throw new WebDriverException();
             }
-            return e;
         });
-        node.sendKeys(Keys.ENTER);
-        click(node);
+        searchInput.sendKeys(Keys.ENTER);
+        searchInput.sendKeys("");
         clear(searchInput);
-        return node;
+
+        String[] nodes = path.split("/");
+        String nodeName = nodes[nodes.length - 1];
+        return getNodeByName(nodeName);
     }
 
     private WebElement getNodeByName(String nodeName) {
@@ -773,11 +774,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
     @Override
     public WebElement getNodeByPath(String path) {
-        return retry(() -> {
-            goToNode(path);
-            String[] nodes = path.split("/");
-            return getNodeByName(nodes[nodes.length - 1]);
-        });
+        return retry(() -> goToNode(path));
     }
 
     @Override
@@ -844,7 +841,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
     private WebElement getInputFieldByName(String baseXPath, String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/input"));
+                baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]//input"));
     }
 
     private WebElement getSelectFieldByName(String baseXPath, String name) {
@@ -864,7 +861,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
     private WebElement getInputFieldByName(String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/input"));
+                "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]//input"));
     }
 
     @Override

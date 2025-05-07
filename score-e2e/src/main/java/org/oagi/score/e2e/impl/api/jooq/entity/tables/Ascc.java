@@ -48,7 +48,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AsccRecord;
  * An ASCC represents a relationship/association between two ACCs through an
  * ASCCP. 
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Ascc extends TableImpl<AsccRecord> {
 
     private static final long serialVersionUID = 1L;

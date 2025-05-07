@@ -12,7 +12,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.routines.Levenshtein;
 /**
  * Convenience access to all stored procedures and functions in oagi.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Routines {
 
     /**

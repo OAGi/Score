@@ -27,6 +27,7 @@ target
 docker/*.war
 /data/
 /backup
+/lib
 docker/volumes/elasticsearch/
 docker/volumes/logstash/config/queries/*.yml
 .trash

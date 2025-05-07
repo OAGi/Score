@@ -1,4 +1,4 @@
-import {PageRequest} from '../../../basis/basis';
+import {PageRequest, WhoAndWhen} from '../../../basis/basis';
 import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
 import {base64Decode, base64Encode} from '../../../common/utility';
@@ -11,7 +11,7 @@ export class BusinessContextListRequest {
     notConnectedToTenant: boolean;
     isBieEditing: boolean;
   };
-  updaterUsernameList: string[] = [];
+  updaterLoginIdList: string[] = [];
   updatedDate: {
     start: Date,
     end: Date,
@@ -41,7 +41,7 @@ export class BusinessContextListRequest {
       this.page.pageSize = (defaultPageRequest) ? defaultPageRequest.pageSize : 0;
     }
 
-    this.updaterUsernameList = (params.get('updaterUsernameList')) ? Array.from(params.get('updaterUsernameList').split(',')) : [];
+    this.updaterLoginIdList = (params.get('updaterLoginIdList')) ? Array.from(params.get('updaterLoginIdList').split(',')) : [];
     this.updatedDate = {
       start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
       end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
@@ -61,8 +61,8 @@ export class BusinessContextListRequest {
       .set('pageIndex', '' + this.page.pageIndex)
       .set('pageSize', '' + this.page.pageSize);
 
-    if (this.updaterUsernameList && this.updaterUsernameList.length > 0) {
-      params = params.set('updaterUsernameList', this.updaterUsernameList.join(','));
+    if (this.updaterLoginIdList && this.updaterLoginIdList.length > 0) {
+      params = params.set('updaterLoginIdList', this.updaterLoginIdList.join(','));
     }
     if (this.updatedDate.start) {
       params = params.set('updatedDateStart', '' + this.updatedDate.start.toUTCString());
@@ -85,6 +85,34 @@ export class BusinessContextListRequest {
     const str = base64Encode(params.toString());
     return (str) ? 'q=' + str : undefined;
   }
+}
+
+export class BusinessContextSummary {
+  businessContextId: number;
+  guid: string;
+  name: string;
+}
+
+export class BusinessContextListEntry {
+  businessContextId: number;
+  guid: string;
+  name: string;
+  used: boolean;
+
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+}
+
+export class BusinessContextDetails {
+  businessContextId: number;
+  guid: string;
+  name: string;
+  used: boolean;
+
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+
+  businessContextValues: BusinessContextValue[] = [];
 }
 
 export class BusinessContext {

@@ -15,7 +15,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.AgencyIdListValue;
 /**
  * This table captures the values within an agency identification list.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListValueRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -405,6 +405,6 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
         setLastUpdateTimestamp(lastUpdateTimestamp);
         setPrevAgencyIdListValueId(prevAgencyIdListValueId);
         setNextAgencyIdListValueId(nextAgencyIdListValueId);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

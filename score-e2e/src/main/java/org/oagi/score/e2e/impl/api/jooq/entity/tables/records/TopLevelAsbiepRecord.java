@@ -17,7 +17,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.TopLevelAsbiep;
  * owner_top_level_asbiep_id column in all BIE tables allow all related BIEs to
  * be retrieved all at once speeding up the profile BOD transactions.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -351,6 +351,6 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
         setSourceTopLevelAsbiepId(sourceTopLevelAsbiepId);
         setSourceAction(sourceAction);
         setSourceTimestamp(sourceTimestamp);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

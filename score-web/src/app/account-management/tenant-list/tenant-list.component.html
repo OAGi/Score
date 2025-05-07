@@ -45,7 +45,7 @@
             </ng-container>
 
             <ng-container matColumnDef="users">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header
+              <th mat-header-cell *matHeaderCellDef
                   score-table-column-resize [defaultWidth]="width('Users')" (onResize)="onResizeWidth($event)">Users</th>
               <td mat-cell *matCellDef="let element">
                 <button mat-raised-button color="primary" routerLink="users/{{ element.tenantId }}"
@@ -56,7 +56,7 @@
             </ng-container>
 
             <ng-container matColumnDef="businessContexts">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header
+              <th mat-header-cell *matHeaderCellDef
                   score-table-column-resize [defaultWidth]="width('Business Contexts')" (onResize)="onResizeWidth($event)">Business Contexts</th>
               <td mat-cell *matCellDef="let element">
                 <button mat-raised-button color="primary" routerLink="bis-ctx/{{ element.tenantId }}"

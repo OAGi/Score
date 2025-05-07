@@ -105,6 +105,10 @@ public interface HomePage extends Page {
      */
     LoginPage logout();
 
+    WebElement getLibrarySelectorField();
+
+    void setLibrary(String library);
+
     WebElement getBranchSelectField();
 
     void setBranch(String branch);

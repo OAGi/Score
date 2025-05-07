@@ -32,7 +32,7 @@
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
                   <mat-label>Creator</mat-label>
-                  <mat-select [(ngModel)]="request.creatorLoginIds" multiple>
+                  <mat-select [(ngModel)]="request.creatorLoginIdList" multiple>
                     <mat-option>
                       <ngx-mat-select-search [formControl]="creatorIdListFilterCtrl"
                                              [placeholderLabel]="'Search...'"
@@ -49,8 +49,7 @@
                 <mat-form-field>
                   <mat-label>Created start date</mat-label>
                   <input matInput [matDatepicker]="createdDateStart" placeholder="Created start date"
-                         [max]="request.createdDate.end" [value]="request.createdDate.start"
-                         (dateInput)="onDateEvent('created.startDate', $event)">
+                         [(ngModel)]="request.createdDate.start" [max]="request.createdDate.end">
                   <mat-datepicker-toggle matSuffix [for]="createdDateStart"></mat-datepicker-toggle>
                   <mat-datepicker #createdDateStart></mat-datepicker>
                 </mat-form-field>
@@ -67,8 +66,7 @@
                 <mat-form-field>
                   <mat-label>Created end date</mat-label>
                   <input matInput [matDatepicker]="createdDateEnd" placeholder="Created end date"
-                         [min]="request.createdDate.start" [value]="request.createdDate.end"
-                         (dateInput)="onDateEvent('created.endDate', $event)">
+                         [(ngModel)]="request.createdDate.end" [min]="request.createdDate.start">
                   <mat-datepicker-toggle matSuffix [for]="createdDateEnd"></mat-datepicker-toggle>
                   <mat-datepicker #createdDateEnd></mat-datepicker>
                 </mat-form-field>
@@ -102,7 +100,7 @@
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
                   <mat-label>Updater</mat-label>
-                  <mat-select [(ngModel)]="request.updaterLoginIds" multiple>
+                  <mat-select [(ngModel)]="request.updaterLoginIdList" multiple>
                     <mat-option>
                       <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
                                              [placeholderLabel]="'Search...'"
@@ -119,8 +117,7 @@
                 <mat-form-field>
                   <mat-label>Updated start date</mat-label>
                   <input matInput [matDatepicker]="updatedDateStart" placeholder="Updated start date"
-                         [max]="request.updatedDate.end"
-                         (dateInput)="onDateEvent('updated.startDate', $event)">
+                         [(ngModel)]="request.updatedDate.start" [max]="request.updatedDate.end">
                   <mat-datepicker-toggle matSuffix [for]="updatedDateStart"></mat-datepicker-toggle>
                   <mat-datepicker #updatedDateStart></mat-datepicker>
                 </mat-form-field>
@@ -137,8 +134,7 @@
                 <mat-form-field>
                   <mat-label>Updated end date</mat-label>
                   <input matInput [matDatepicker]="updatedDateEnd" placeholder="Updated end date"
-                         [min]="request.updatedDate.start"
-                         (dateInput)="onDateEvent('updated.endDate', $event)">
+                         [(ngModel)]="request.updatedDate.end" [min]="request.updatedDate.start">
                   <mat-datepicker-toggle matSuffix [for]="updatedDateEnd"></mat-datepicker-toggle>
                   <mat-datepicker #updatedDateEnd></mat-datepicker>
                 </mat-form-field>
@@ -203,7 +199,7 @@
                   </div>
                 </ng-template>
                 <ng-template #stateWithLink>
-                  <div class="den word-break-all">
+                  <div class="den word-break-all" (contextmenu)="showUmlDiagram(element, $event)">
                     <a routerLink="{{ element.releaseId }}">{{ element.releaseNum }}</a>
                   </div>
                 </ng-template>
@@ -228,8 +224,8 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Created On')" (onResize)="onResizeWidth($event)"> Created on</th>
               <td mat-cell *matCellDef="let element">
-                <div class="ellipsis">{{ element.creationTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-                <div class="description"><span class="pr-1">by</span><b>{{ element.createdBy }}</b></div>
+                <div class="ellipsis">{{ element.created.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                <div class="description"><span class="pr-1">by</span><b>{{ element.created.who.loginId }}</b></div>
               </td>
             </ng-container>
 
@@ -237,8 +233,8 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
               <td mat-cell *matCellDef="let element">
-                <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-                <div class="description"><span class="pr-1">by</span><b class="word-break-all">{{ element.lastUpdatedBy }}</b></div>
+                <div class="ellipsis">{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                <div class="description"><span class="pr-1">by</span><b class="word-break-all">{{ element.lastUpdated.who.loginId }}</b></div>
               </td>
             </ng-container>
 

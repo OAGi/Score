@@ -57,7 +57,7 @@ public class ContextMenuImpl extends DelegateBasePageImpl implements ContextMenu
 
     @Override
     public ViewEditContextCategoryPage openViewEditContextCategorySubMenu() {
-        retry(() -> click(getViewEditContextCategorySubMenu()));
+        retry(() -> click(getDriver(), getViewEditContextCategorySubMenu()));
         ViewEditContextCategoryPage viewEditContextCategoryPage = new ViewEditContextCategoryPageImpl(this);
         assert viewEditContextCategoryPage.isOpened();
         return viewEditContextCategoryPage;
@@ -73,7 +73,7 @@ public class ContextMenuImpl extends DelegateBasePageImpl implements ContextMenu
 
     @Override
     public ViewEditContextSchemePage openViewEditContextSchemeSubMenu() {
-        retry(() -> click(getViewEditContextSchemeSubMenu()));
+        retry(() -> click(getDriver(), getViewEditContextSchemeSubMenu()));
         ViewEditContextSchemePage viewEditContextSchemePage = new ViewEditContextSchemePageImpl(this);
         assert viewEditContextSchemePage.isOpened();
         return viewEditContextSchemePage;
@@ -89,7 +89,7 @@ public class ContextMenuImpl extends DelegateBasePageImpl implements ContextMenu
 
     @Override
     public ViewEditBusinessContextPage openViewEditBusinessContextSubMenu() {
-        retry(() -> click(getViewEditBusinessContextSubMenu()));
+        retry(() -> click(getDriver(), getViewEditBusinessContextSubMenu()));
         ViewEditBusinessContextPage viewEditBusinessContextPage = new ViewEditBusinessContextPageImpl(this);
         assert viewEditBusinessContextPage.isOpened();
         return viewEditBusinessContextPage;

@@ -5,7 +5,7 @@ import {MatSidenav} from '@angular/material/sidenav';
 import {faFlask} from '@fortawesome/free-solid-svg-icons';
 import {finalize, switchMap} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
-import {SimpleNamespace} from '../../namespace-management/domain/namespace';
+import {NamespaceSummary} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {MatDialog} from '@angular/material/dialog';
@@ -21,16 +21,18 @@ import {
 } from '../domain/cc-flat-tree';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {
+  AccDetails,
+  AsccpOrBccpManifestId,
+  AsccSummary,
   Attribute,
   AttributeGroup,
   Base,
-  CcAccNodeDetail,
-  CcAsccpNodeDetail,
-  CcBccpNodeDetail,
-  CcBdtScNodeDetail,
-  CcId,
-  CcNodeDetail,
-  CcRevisionResponse,
+  BccSummary,
+  CcAccNodeInfo,
+  CcAsccpNodeInfo,
+  CcBccpNodeInfo,
+  CcDtScNodeInfo,
+  CcNodeInfo,
   CcSeqUpdateRequest,
   Comment,
   Embedded,
@@ -44,7 +46,7 @@ import {
   Semantics,
   UserExtensionGroup
 } from '../domain/core-component-node';
-import {emptyToUndefined, initFilter, loadBooleanProperty, saveBooleanProperty, trim, UnboundedPipe} from '../../common/utility';
+import {initFilter, loadBooleanProperty, saveBooleanProperty, trim, UnboundedPipe} from '../../common/utility';
 import {RefactorDialogComponent} from '../refactor-dialog/refactor-dialog.component';
 import {AppendAssociationDialogComponent} from './append-association-dialog/append-association-dialog.component';
 import {BasedAccDialogComponent} from './based-acc-dialog/based-acc-dialog.component';
@@ -85,6 +87,14 @@ export class AccDetailComponent implements OnInit {
   manifestId: number;
   type = 'ACC';
   isUpdating: boolean;
+  availableModels: string[] = [];
+  selectedModel: string;
+
+  isDefinitionGenerating: boolean = false;
+  originalText: string = undefined;
+  isNameGenerating: boolean = false;
+  originalName: string = undefined;
+
   componentTypes: OagisComponentType[] = OagisComponentTypes;
   entityTypes: EntityType[] = EntityTypes;
   private entityTypeChanged: Map<number, boolean> = new Map();
@@ -93,7 +103,7 @@ export class AccDetailComponent implements OnInit {
   dataSource: CcFlatNodeDataSource<CcFlatNode>;
   searcher: CcFlatNodeDataSourceSearcher<CcFlatNode>;
 
-  lastRevision: CcRevisionResponse;
+  prevAccDetails: AccDetails;
   selectedNode: CcFlatNode;
   cursorNode: CcFlatNode;
 
@@ -103,12 +113,12 @@ export class AccDetailComponent implements OnInit {
   /* End cardinality management */
 
   workingRelease = false;
-  namespaces: SimpleNamespace[];
+  namespaces: NamespaceSummary[];
   tags: Tag[] = [];
   commentControl: CommentControl;
 
   namespaceListFilterCtrl: FormControl = new FormControl();
-  filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
+  filteredNamespaceList: ReplaySubject<NamespaceSummary[]> = new ReplaySubject<NamespaceSummary[]>(1);
 
   hasBasedAcc: boolean;
   initialExpandDepth = 10;
@@ -167,22 +177,38 @@ export class AccDetailComponent implements OnInit {
         this.manifestId = parseInt(params.get('manifestId'), 10);
         return forkJoin([
           this.service.getGraphNode(this.type, this.manifestId),
-          this.service.getLastPublishedRevision(this.type, this.manifestId),
-          this.service.getAccNode(this.manifestId),
+          this.service.getAccDetails(this.manifestId),
           this.tagService.getTags(),
-          this.preferencesService.load(this.auth.getUserToken())
+          this.preferencesService.load(this.auth.getUserToken()),
+          this.service.availableModels()
         ]);
-      })).subscribe(([ccGraph, revisionResponse, rootNode, tags, preferencesInfo]) => {
+      })).subscribe(([ccGraph, accDetails, tags, preferencesInfo, models]) => {
 
-      this.namespaceService.getSimpleNamespaces(rootNode.libraryId).subscribe(namespaces => {
+      this.namespaceService.getNamespaceSummaries(accDetails.library.libraryId).subscribe(namespaces => {
         this.namespaces = namespaces;
         initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList,
           this.getSelectableNamespaces(), (e) => e.uri);
       });
 
-      this.lastRevision = revisionResponse;
+      if (accDetails.log.revisionNum > 1) {
+        this.service.getPrevAccDetails(this.manifestId)
+            .subscribe(prevAccDetails => {
+              this.prevAccDetails = prevAccDetails;
+            }, err => {
+              if (err.status === 404) {
+                // ignore
+              } else {
+                throw err;
+              }
+            });
+      }
+
       this.tags = tags;
       this.preferencesInfo = preferencesInfo;
+      this.availableModels = models;
+      this.selectedModel = (!!this.availableModels && this.availableModels.length > 0) ? this.availableModels[0] : undefined;
+      this.isDefinitionGenerating = false;
+      this.isNameGenerating = false;
 
       // subscribe an event
       this.stompService.watch('/topic/acc/' + this.manifestId).subscribe((message: Message) => {
@@ -214,11 +240,11 @@ export class AccDetailComponent implements OnInit {
       this.dataSource.init();
       this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
 
-      this.workingRelease = rootNode.workingRelease;
+      this.workingRelease = accDetails.release.workingRelease;
 
       this.rootNode = this.dataSource.data[0] as AccFlatNode;
-      this.rootNode.access = rootNode.access;
-      this.rootNode.state = rootNode.state;
+      this.rootNode.access = accDetails.access;
+      this.rootNode.state = accDetails.state;
       if (this.rootNode.children && this.rootNode.children.length > 0) {
         this.hasBasedAcc = (this.rootNode.children[0] as CcFlatNode).type === 'ACC';
       }
@@ -271,7 +297,7 @@ export class AccDetailComponent implements OnInit {
     comment.commentId = evt.properties.commentId;
     comment.prevCommentId = evt.properties.prevCommentId;
     comment.text = evt.properties.text;
-    comment.loginId = evt.properties.actor;
+    comment.created.who.loginId = evt.properties.actor;
     comment.timestamp = evt.properties.timestamp;
     comment.isNew = true;
 
@@ -284,7 +310,7 @@ export class AccDetailComponent implements OnInit {
     }
   }
 
-  getSelectableNamespaces(namespaceId?: number): SimpleNamespace[] {
+  getSelectableNamespaces(namespaceId?: number): NamespaceSummary[] {
     return this.namespaces.filter(e => {
       if (!!namespaceId && e.namespaceId === namespaceId) {
         return true;
@@ -339,7 +365,7 @@ export class AccDetailComponent implements OnInit {
 
     this.isUpdating = true;
     forkJoin([
-      this.service.getAccNode(this.manifestId),
+      this.service.getAccDetails(this.manifestId),
       this.service.getGraphNode(this.rootNode.type, this.manifestId)
     ]).subscribe(([rootNode, ccGraph]) => {
       const database = new CcFlatNodeDatabase<CcFlatNode>(ccGraph, 'ACC', this.manifestId);
@@ -347,7 +373,7 @@ export class AccDetailComponent implements OnInit {
       this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
       this.dataSource.init();
 
-      this.workingRelease = rootNode.workingRelease;
+      this.workingRelease = rootNode.release.workingRelease;
 
       this.rootNode = this.dataSource.data[0] as AccFlatNode;
       this.rootNode.access = rootNode.access;
@@ -377,6 +403,10 @@ export class AccDetailComponent implements OnInit {
           }
         }
       }
+
+      // Reset
+      this.originalText = undefined;
+      this.originalName = undefined;
 
       if (snackMsg) {
         this.snackBar.open(snackMsg, '', {duration: 3000});
@@ -408,7 +438,7 @@ export class AccDetailComponent implements OnInit {
   }
 
   hasRevision() {
-    return this.lastRevision && this.lastRevision.ccId !== null;
+    return !!this.prevAccDetails;
   }
 
   isEditable() {
@@ -443,7 +473,7 @@ export class AccDetailComponent implements OnInit {
     }
 
     this.commentControl.closeCommentSlide();
-    this.dataSource.loadDetail(node, (detail: CcNodeDetail) => {
+    this.dataSource.loadDetail(node, (detail: CcNodeInfo) => {
       this.selectedNode = node;
       this.cursorNode = node;
       this.resetCardinalities(node);
@@ -460,23 +490,47 @@ export class AccDetailComponent implements OnInit {
   }
 
   hasRevisionAssociation(node?: CcFlatNode) {
-    node = node || this.selectedNode;
-    const key = this.getKey(node);
-    if (key.length > 0 && this.lastRevision.associations && this.lastRevision.associations[key]) {
-      return this.lastRevision.associations[key] !== undefined;
+    if (!this.prevAccDetails) {
+      return false;
     }
+
+    node = node || this.selectedNode;
+
+    for (const assoc of this.prevAccDetails.associations) {
+      if (node.type === 'ASCCP' && 'toAsccpManifestId' in assoc) {
+        if (node.manifestId === (assoc as AsccSummary).toAsccpManifestId) {
+          return true;
+        }
+      } else if (node.type === 'BCCP' && 'toBccpManifestId' in assoc) {
+        if (node.manifestId === (assoc as BccSummary).toBccpManifestId) {
+          return true;
+        }
+      }
+    }
+
     return false;
   }
 
   isDeprecateAble(node?: CcFlatNode) {
-    node = node || this.selectedNode;
-    const key = this.getKey(node);
-    if (key.length > 0) {
-      if (this.lastRevision.associations && this.lastRevision.associations[key]) {
-        return !this.lastRevision.associations[key].deprecated;
-      }
+    if (!this.prevAccDetails) {
+      return false;
     }
-    return false;
+
+    node = node || this.selectedNode;
+
+    for (const assoc of this.prevAccDetails.associations) {
+      if (node.type === 'ASCCP' && 'toAsccpManifestId' in assoc) {
+        if (node.manifestId === (assoc as AsccSummary).toAsccpManifestId) {
+          return !(assoc as AsccSummary).deprecated;
+        }
+      } else if (node.type === 'BCCP' && 'toBccpManifestId' in assoc) {
+        if (node.manifestId === (assoc as BccSummary).toBccpManifestId) {
+          return !(assoc as BccSummary).deprecated;
+        }
+      }
+
+      return false;
+    }
   }
 
   getKey(node: CcFlatNode) {
@@ -507,11 +561,11 @@ export class AccDetailComponent implements OnInit {
     return (node !== undefined) && (node.type.toUpperCase() === 'ACC');
   }
 
-  asAccDetail(node?: CcFlatNode): CcAccNodeDetail {
+  asAccDetail(node?: CcFlatNode): CcAccNodeInfo {
     if (!node) {
       node = this.selectedNode;
     }
-    return node.detail as CcAccNodeDetail;
+    return node.detail as CcAccNodeInfo;
   }
 
   isAsccpDetail(node?: CcFlatNode): boolean {
@@ -521,11 +575,11 @@ export class AccDetailComponent implements OnInit {
     return (node !== undefined) && (node.type.toUpperCase() === 'ASCCP');
   }
 
-  asAsccpDetail(node?: CcFlatNode): CcAsccpNodeDetail {
+  asAsccpDetail(node?: CcFlatNode): CcAsccpNodeInfo {
     if (!node) {
       node = this.selectedNode;
     }
-    return node.detail as CcAsccpNodeDetail;
+    return node.detail as CcAsccpNodeInfo;
   }
 
   isBccpDetail(node?: CcFlatNode): boolean {
@@ -535,25 +589,25 @@ export class AccDetailComponent implements OnInit {
     return (node !== undefined) && (node.type.toUpperCase() === 'BCCP');
   }
 
-  asBccpDetail(node?: CcFlatNode): CcBccpNodeDetail {
+  asBccpDetail(node?: CcFlatNode): CcBccpNodeInfo {
     if (!node) {
       node = this.selectedNode;
     }
-    return node.detail as CcBccpNodeDetail;
+    return node.detail as CcBccpNodeInfo;
   }
 
-  isBdtScDetail(node?: CcFlatNode): boolean {
+  isDtScDetail(node?: CcFlatNode): boolean {
     if (!node) {
       node = this.selectedNode;
     }
     return (node !== undefined) && (node.type.toUpperCase() === 'DT_SC');
   }
 
-  asBdtScDetail(node?: CcFlatNode): CcBdtScNodeDetail {
+  asDtScDetail(node?: CcFlatNode): CcDtScNodeInfo {
     if (!node) {
       node = this.selectedNode;
     }
-    return node.detail as CcBdtScNodeDetail;
+    return node.detail as CcDtScNodeInfo;
   }
 
   get isChanged() {
@@ -581,9 +635,101 @@ export class AccDetailComponent implements OnInit {
     });
   }
 
-  _updateDetails(details: CcFlatNode[]) {
+  handleMouseDownForGenerateDefinition($event: MouseEvent, matMenuTrigger: MatMenuTrigger): void {
+    if ($event.button === 0) { // left-click
+      if (!this.isDefinitionGenerating && !!this.selectedModel) {
+        this.generateDefinition(this.asAccDetail(), this.selectedModel);
+      }
+    } else if ($event.button === 2) { // right-click
+      $event.preventDefault();
+      $event.stopPropagation();
+      setTimeout(() => {
+        matMenuTrigger.openMenu();
+      }, 0);
+    }
+  }
+
+  generateDefinition(accNodeDetails: CcAccNodeInfo, model: string, $event?: MouseEvent) {
+    this.originalText = undefined;
+    this.isDefinitionGenerating = true;
+    this.selectedModel = model;
+    this.service.generateDefinition('ACC', accNodeDetails.manifestId, model, accNodeDetails.definition).subscribe(gen => {
+      let generatedText = gen.generation || ''; // Ensure it's a valid string
+      const originalText = accNodeDetails.definition;
+      accNodeDetails.definition = ''; // Start with an empty string
+      let i = 0;
+
+      if (generatedText.length === 0) {
+        this.isDefinitionGenerating = false; // No need for animation if nothing to generate
+        return;
+      }
+
+      const interval = setInterval(() => {
+        if (i < generatedText.length) {
+          if (!accNodeDetails.definition) {
+            accNodeDetails.definition = generatedText[i];
+          } else {
+            accNodeDetails.definition += generatedText[i];
+          }
+          i++;
+        } else {
+          clearInterval(interval);
+          this.isDefinitionGenerating = false;
+          this.originalText = (originalText !== undefined) ? originalText : '';
+        }
+      }, 10); // Very fast typing
+    }, err => {
+      this.isDefinitionGenerating = false;
+    });
+  }
+
+  revertDefinition(accNodeDetails: CcAccNodeInfo) {
+    accNodeDetails.definition = this.originalText;
+    this.originalText = undefined;
+  }
+
+  generateName(accNodeDetails: CcAccNodeInfo, model: string) {
+    this.originalName = undefined;
+    this.isNameGenerating = true;
+    this.selectedModel = model;
+    this.service.generateName('ACC', accNodeDetails.manifestId, model, accNodeDetails.objectClassTerm).subscribe(gen => {
+      let generatedText = gen.generation || ''; // Ensure it's a valid string
+      const originalName = accNodeDetails.objectClassTerm;
+      accNodeDetails.objectClassTerm = ''; // Start with an empty string
+      let i = 0;
+
+      if (generatedText.length === 0) {
+        this.isNameGenerating = false; // No need for animation if nothing to generate
+        return;
+      }
+
+      const interval = setInterval(() => {
+        if (i < generatedText.length) {
+          if (!accNodeDetails.objectClassTerm) {
+            accNodeDetails.objectClassTerm = generatedText[i];
+          } else {
+            accNodeDetails.objectClassTerm += generatedText[i];
+          }
+          i++;
+        } else {
+          clearInterval(interval);
+          this.isNameGenerating = false;
+          this.originalName = (originalName !== undefined) ? originalName : '';
+        }
+      }, 10); // Very fast typing
+    }, err => {
+      this.isNameGenerating = false;
+    });
+  }
+
+  revertName(accNodeDetails: CcAccNodeInfo) {
+    accNodeDetails.objectClassTerm = this.originalName;
+    this.originalName = undefined;
+  }
+
+  _updateNodes(nodes: CcFlatNode[]) {
     this.isUpdating = true;
-    this.service.updateDetails(this.manifestId, details)
+    this.service.updateNodes(nodes)
       .pipe(finalize(() => {
         this.isUpdating = false;
       }))
@@ -600,6 +746,9 @@ export class AccDetailComponent implements OnInit {
             duration: 3000,
           });
         }
+
+        this.originalText = undefined;
+        this.originalName = undefined;
 
       }, err => {
       });
@@ -677,11 +826,11 @@ export class AccDetailComponent implements OnInit {
       this.confirmDialogService.open(dialogConfig).afterClosed()
         .subscribe(result => {
           if (result) {
-            this._updateDetails(details);
+            this._updateNodes(details);
           }
         });
     } else {
-      this._updateDetails(details);
+      this._updateNodes(details);
     }
   }
 
@@ -706,7 +855,7 @@ export class AccDetailComponent implements OnInit {
   appendAssociation(node: CcFlatNode, pos: number) {
     if (pos === 0) {
       if (this.hasRevision()) {
-        pos = Object.getOwnPropertyNames(this.lastRevision.associations).length;
+        pos = Object.getOwnPropertyNames(this.prevAccDetails.associations).length;
       }
       if (this.hasBasedAcc) {
         pos += 1;
@@ -761,16 +910,31 @@ export class AccDetailComponent implements OnInit {
 
   _doAppendAssociation(association: CcList, pos: number) {
     this.isUpdating = true;
-    this.service.appendAssociation(
-      this.rootNode.releaseId,
-      this.rootNode.manifestId,
-      association.manifestId,
-      association.type,
-      (this.asAccDetail(this.rootNode).oagisComponentType === AttributeGroup.value) ? true : false,
-      pos !== -1 && this.hasBasedAcc ? pos - 1 : pos).subscribe(_ => {
+    let call;
+    switch (association.type.toUpperCase()) {
+      case 'ASCCP':
+        call = this.service.appendAscc(
+            this.rootNode.manifestId,
+            association.manifestId,
+            pos !== -1 && this.hasBasedAcc ? pos - 1 : pos,
+            (this.asAccDetail(this.rootNode).oagisComponentType === AttributeGroup.value) ? true : false
+        );
+        break;
+      case 'BCCP':
+        call = this.service.appendBcc(
+            this.rootNode.manifestId,
+            association.manifestId,
+            pos !== -1 && this.hasBasedAcc ? pos - 1 : pos,
+            (this.asAccDetail(this.rootNode).oagisComponentType === AttributeGroup.value) ? true : false
+        );
+        break;
+    }
+
+    call.subscribe(_ => {
       this.reload((pos === -1) ? 'Appended' : 'Inserted');
     }, err => {
       this.isUpdating = false;
+      throw err;
     });
   }
 
@@ -813,7 +977,7 @@ export class AccDetailComponent implements OnInit {
           return;
         }
 
-        const initialPropertyTerm = (this.rootNode.detail as CcAccNodeDetail).objectClassTerm;
+        const initialPropertyTerm = (this.rootNode.detail as CcAccNodeInfo).objectClassTerm;
         this.service.createAsccp(this.rootNode.releaseId, this.rootNode.manifestId, initialPropertyTerm, null)
           .pipe(finalize(() => {
             this.isUpdating = false;
@@ -950,24 +1114,27 @@ export class AccDetailComponent implements OnInit {
     dialogConfig.data.action = 'Update';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()
-      .pipe(
-        finalize(() => {
-          this.isUpdating = false;
-        })
-      )
-      .subscribe(result => {
-        if (!result) {
-          return;
-        }
-        this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state)
-          .subscribe(resp => {
-            this.afterStateChanged(resp.state, resp.access);
-            this.snackBar.open('Updated', '', {
-              duration: 3000,
-            });
-          }, err => {
+        .subscribe(result => {
+          if (!result) {
+            return;
+          }
+
+          this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state).subscribe({
+            next: () => {
+              this.snackBar.open('Updated', '', {duration: 3000});
+
+              this.service.getAccDetails(this.manifestId).subscribe({
+                next: accDetails => this.afterStateChanged(accDetails.state, accDetails.access),
+                error: err => console.error(err),
+                complete: () => (this.isUpdating = false),
+              });
+            },
+            error: err => {
+              this.isUpdating = false;
+              throw err;
+            },
           });
-      });
+        });
   }
 
   updateState(state: string) {
@@ -997,12 +1164,12 @@ export class AccDetailComponent implements OnInit {
     this.rootNode.state = state;
     this.rootNode.access = access;
     const root = this.dataSource.data[0];
-    (root.detail as CcAccNodeDetail).state = state;
+    (root.detail as CcAccNodeInfo).state = state;
     root.children.forEach(child => {
       if ((child as CcFlatNode).type === 'ASCCP' && (child as AsccpFlatNode).detail) {
-        ((child as AsccpFlatNode).detail as CcAsccpNodeDetail).ascc.state = state;
+        ((child as AsccpFlatNode).detail as CcAsccpNodeInfo).ascc.state = state;
       } else if ((child as CcFlatNode).type === 'BCCP' && (child as BccpFlatNode).detail) {
-        ((child as BccpFlatNode).detail as CcBccpNodeDetail).bcc.state = state;
+        ((child as BccpFlatNode).detail as CcBccpNodeInfo).bcc.state = state;
       }
     });
   }
@@ -1015,28 +1182,30 @@ export class AccDetailComponent implements OnInit {
     dialogConfig.data.action = (isDeveloper) ? 'Revise' : 'Amend';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()
-      .subscribe(result => {
-        if (!result) {
-          return;
-        }
+        .subscribe(result => {
+          if (!result) {
+            return;
+          }
 
-        this.isUpdating = true;
-        this.service.makeNewRevision(this.rootNode.type, this.rootNode.manifestId).pipe(
-          finalize(() => {
-            this.isUpdating = false;
-          })
-        ).subscribe(resp => {
-          this.manifestId = resp.manifestId;
-          this.afterStateChanged(resp.state, resp.access);
-          this.service.getLastPublishedRevision(this.type, this.manifestId).subscribe(revision => {
-            this.lastRevision = revision;
-            this.snackBar.open((isDeveloper) ? 'Revised' : 'Amended', '', {
-              duration: 3000,
+          this.isUpdating = true;
+          this.service.makeNewRevision(this.rootNode.type, this.rootNode.manifestId).subscribe(_ => {
+            forkJoin([
+              this.service.getAccDetails(this.manifestId),
+              this.service.getPrevAccDetails(this.manifestId),
+            ]).subscribe(([accDetails, prevAccDetails]) => {
+              this.manifestId = accDetails.accManifestId;
+              this.afterStateChanged(accDetails.state, accDetails.access);
+              this.prevAccDetails = prevAccDetails;
+              this.snackBar.open((isDeveloper) ? 'Revised' : 'Amended', '', {
+                duration: 3000,
+              });
+              this.reload();
             });
+          }, err => {
+            this.isUpdating = false;
+            throw err;
           });
-          this.reload();
         });
-      });
   }
 
   discardAble(node: CcFlatNode): boolean {
@@ -1053,11 +1222,11 @@ export class AccDetailComponent implements OnInit {
       return false;
     }
     if (node.type.toUpperCase() === 'ACC') {
-      if (this.hasRevision() && this.lastRevision.hasBaseCc) {
+      if (this.hasRevision() && !!this.prevAccDetails.based) {
         return false;
       }
     }
-    return !(this.hasRevision() && this.lastRevision.associations[this.getKey(node)]);
+    return !(this.hasRevision() && this.hasRevisionAssociation(node));
   }
 
   isExtendable(): boolean {
@@ -1070,7 +1239,7 @@ export class AccDetailComponent implements OnInit {
     if (!this.rootNode.detail) {
       return false;
     }
-    return (this.rootNode.detail as CcAccNodeDetail).oagisComponentType === Semantics.value;
+    return (this.rootNode.detail as CcAccNodeInfo).oagisComponentType === Semantics.value;
   }
 
   get userRoles(): string[] {
@@ -1095,27 +1264,31 @@ export class AccDetailComponent implements OnInit {
           return;
         }
         const type = node.type.toUpperCase();
+        let call;
         switch (type) {
           case 'ASCCP':
-            this.isUpdating = true;
-            this.service.deleteNode('ASCC', (node as AsccpFlatNode).asccManifestId).subscribe(_ => {
-              this.reload('Removed');
-            }, error => {
-            });
+            call = this.service.purge('ASCC', (node as AsccpFlatNode).asccManifestId);
             break;
 
           case 'BCCP':
-            this.isUpdating = true;
-            this.service.deleteNode('BCC', (node as BccpFlatNode).bccManifestId).subscribe(_ => {
-              this.reload('Removed');
-            }, error => {
-            });
+            call = this.service.purge('BCC', (node as BccpFlatNode).bccManifestId);
             break;
         }
+
+        this.isUpdating = true;
+        call.subscribe({
+          next: () => {
+            this.reload('Removed');
+          },
+          error: err => {
+            this.isUpdating = false;
+            throw err;
+          },
+        });
       });
   }
 
-  isValidAttributeGroup(componentType: number): boolean {
+  isValidAttributeGroup(componentType: string): boolean {
     if (componentType !== AttributeGroup.value) {
       // If the type is not attribute group, it's okay to pass validation.
       return true;
@@ -1134,7 +1307,7 @@ export class AccDetailComponent implements OnInit {
     return lenOfChildren === lenOfBccpEntityChildren;
   }
 
-  componentTypeAble(componentType: number) {
+  componentTypeAble(componentType: string) {
     if (this.userRoles.includes('developer')) {
       if ([UserExtensionGroup.value, OAGIS10BODs.value, OAGIS10Nouns.value, Embedded.value, Extension.value].indexOf(componentType) > -1) {
         return false;
@@ -1147,12 +1320,12 @@ export class AccDetailComponent implements OnInit {
     return true;
   }
 
-  abstractAble(detail: CcAccNodeDetail) {
-    if (this.lastRevision && this.lastRevision.ccId) {
+  abstractAble(detail: CcAccNodeInfo) {
+    if (this.prevAccDetails) {
       if (detail.oagisComponentType === Base.value) {
         return false;
       } else {
-        if (this.lastRevision.isAbstract) {
+        if (this.prevAccDetails.isAbstract) {
           return true;
         }
         return false;
@@ -1194,20 +1367,22 @@ export class AccDetailComponent implements OnInit {
     }
 
     let obj;
-    let prevRevision = null;
+    let prevRevision: (AsccSummary | BccSummary) = null;
     if (this.isAsccpDetail(node)) {
-      const detail = node.detail as CcAsccpNodeDetail;
+      const detail = node.detail as CcAsccpNodeInfo;
       obj = detail.ascc;
-      if (this.lastRevision && this.lastRevision.associations) {
-        prevRevision = this.lastRevision.associations[node.type + '-' + detail.asccp.manifestId];
+      if (this.prevAccDetails && this.prevAccDetails.associations) {
+        prevRevision = this.prevAccDetails.associations.filter(assoc =>
+            'nextAsccManifestId' in assoc && (assoc as AsccSummary).nextAsccManifestId === detail.ascc.manifestId)[0];
       }
     } else if (this.isBccpDetail(node)) {
-      const detail = node.detail as CcBccpNodeDetail;
+      const detail = node.detail as CcBccpNodeInfo;
       obj = detail.bcc;
-      if (this.lastRevision && this.lastRevision.associations) {
-        prevRevision = this.lastRevision.associations[node.type + '-' + detail.bccp.manifestId];
+      if (this.prevAccDetails && this.prevAccDetails.associations) {
+        prevRevision = this.prevAccDetails.associations.filter(assoc =>
+            'nextBccManifestId' in assoc && (assoc as BccSummary).nextBccManifestId === detail.bcc.manifestId)[0];
       }
-    } else if (this.isBdtScDetail(node)) {
+    } else if (this.isDtScDetail(node)) {
       obj = node.detail;
     } else {
       return false;
@@ -1218,7 +1393,7 @@ export class AccDetailComponent implements OnInit {
     validators.push(Validators.pattern('[0-9]+'));
     validators.push(this.nonWhitespaceValidator);
     if (this.isBccpDetail(node)) {
-      if (this.asBccpDetail(node).bcc.entityType === 0) { // is_attribute
+      if (this.asBccpDetail(node).bcc.entityType === 'Attribute') {
         validators.push((control: AbstractControl): ValidationErrors | null => {
           if (obj.cardinalityMin > 1) {
             return {min: 'Cardinality Min must be less than or equals to ' + 1};
@@ -1230,15 +1405,15 @@ export class AccDetailComponent implements OnInit {
 
     let disabled = (this.state !== 'WIP' || this.access !== 'CanEdit' || !this.isChildOfUserExtensionGroup());
     if (prevRevision) {
-      if (prevRevision.cardinalityMin === 0) {
+      if (prevRevision.cardinality.min === 0) {
         disabled = true;
       }
       validators.push((control: AbstractControl): ValidationErrors | null => {
         if (Number(control.value) < 0) {
           return {min: 'Cardinality Min must be bigger than or equals to ' + 0};
         }
-        if (Number(control.value) > prevRevision.cardinalityMin) {
-          return {max: 'Cardinality Min must be less than or equals to ' + prevRevision.cardinalityMin};
+        if (Number(control.value) > prevRevision.cardinality.min) {
+          return {max: 'Cardinality Min must be less than or equals to ' + prevRevision.cardinality.min};
         }
         if (obj.cardinalityMax >= 0 && Number(control.value) > obj.cardinalityMax) {
           return {max: 'Cardinality Min must be less than or equals to ' + obj.cardinalityMax};
@@ -1277,20 +1452,22 @@ export class AccDetailComponent implements OnInit {
     }
 
     let obj;
-    let prevRevision = null;
+    let prevRevision: (AsccSummary | BccSummary) = null;
     if (this.isAsccpDetail(node)) {
-      const detail = node.detail as CcAsccpNodeDetail;
+      const detail = node.detail as CcAsccpNodeInfo;
       obj = detail.ascc;
-      if (this.lastRevision && this.lastRevision.associations) {
-        prevRevision = this.lastRevision.associations[node.type + '-' + detail.asccp.manifestId];
+      if (this.prevAccDetails && this.prevAccDetails.associations) {
+        prevRevision = this.prevAccDetails.associations.filter(assoc =>
+            'nextAsccManifestId' in assoc && (assoc as AsccSummary).nextAsccManifestId === detail.ascc.manifestId)[0];
       }
     } else if (this.isBccpDetail(node)) {
-      const detail = node.detail as CcBccpNodeDetail;
+      const detail = node.detail as CcBccpNodeInfo;
       obj = detail.bcc;
-      if (this.lastRevision && this.lastRevision.associations) {
-        prevRevision = this.lastRevision.associations[node.type + '-' + detail.bccp.manifestId];
+      if (this.prevAccDetails && this.prevAccDetails.associations) {
+        prevRevision = this.prevAccDetails.associations.filter(assoc =>
+            'nextBccManifestId' in assoc && (assoc as BccSummary).nextBccManifestId === detail.bcc.manifestId)[0];
       }
-    } else if (this.isBdtScDetail(node)) {
+    } else if (this.isDtScDetail(node)) {
       obj = node.detail;
     } else {
       return false;
@@ -1301,7 +1478,7 @@ export class AccDetailComponent implements OnInit {
     validators.push(Validators.pattern('[0-9]+|-1|unbounded'));
     validators.push(this.nonWhitespaceValidator);
     if (this.isBccpDetail(node)) {
-      if (this.asBccpDetail(node).bcc.entityType === 0) { // is_attribute
+      if (this.asBccpDetail(node).bcc.entityType === 'Attribute') {
         validators.push((control: AbstractControl): ValidationErrors | null => {
           if (Number(control.value) < 0) {
             return {max: 'Cardinality Max must be greater than or equals to ' + 0};
@@ -1316,7 +1493,7 @@ export class AccDetailComponent implements OnInit {
 
     let disabled = (this.state !== 'WIP' || this.access !== 'CanEdit' || !this.isChildOfUserExtensionGroup());
     if (prevRevision) {
-      if (prevRevision.cardinalityMax === -1) {
+      if (prevRevision.cardinality.max === -1) {
         disabled = true;
       }
       validators.push((control: AbstractControl): ValidationErrors | null => {
@@ -1326,11 +1503,11 @@ export class AccDetailComponent implements OnInit {
         if (controlValue === -1) {
           return null;
         }
-        if (prevRevision.cardinalityMax === -1) {
+        if (prevRevision.cardinality.max === -1) {
           return {max: 'Cardinality Max cannot be changed'};
         }
-        if (controlValue < prevRevision.cardinalityMax) {
-          return {min: 'Cardinality Max must be greater than ' + prevRevision.cardinalityMax};
+        if (controlValue < prevRevision.cardinality.max) {
+          return {min: 'Cardinality Max must be greater than ' + prevRevision.cardinality.max};
         }
         if (controlValue < obj.cardinalityMin) {
           return {min: 'Cardinality Max must be greater than ' + obj.cardinalityMin};
@@ -1365,7 +1542,7 @@ export class AccDetailComponent implements OnInit {
     });
   }
 
-  onChangeEntityType(nodeDetail: CcBccpNodeDetail) {
+  onChangeEntityType(nodeDetail: CcBccpNodeInfo) {
     if (this.entityTypeChanged.get(nodeDetail.bcc.manifestId) === undefined) {
       this.entityTypeChanged.set(nodeDetail.bcc.manifestId, true);
     } else {
@@ -1415,30 +1592,29 @@ export class AccDetailComponent implements OnInit {
     return this.auth.getUserToken().username;
   }
 
-  deleteNode(): void {
+  markAsDeleteNode(): void {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Delete core component?';
     dialogConfig.data.content = ['Are you sure you want to delete this core component?'];
     dialogConfig.data.action = 'Delete anyway';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()
-      .subscribe(result => {
-        if (!result) {
-          return;
-        }
-        this.isUpdating = true;
-        this.service.deleteNode(this.type, this.manifestId)
-          .pipe(
-            finalize(() => {
+        .subscribe(result => {
+          if (!result) {
+            return;
+          }
+          this.isUpdating = true;
+          this.service.updateState(this.type, this.manifestId, 'Deleted').subscribe({
+            next: () => {
+              this.snackBar.open('Deleted', '', {duration: 3000});
+              this.router.navigateByUrl('/core_component');
+            },
+            error: err => {
               this.isUpdating = false;
-            })
-          )
-          .subscribe(_ => {
-            this.snackBar.open('Deleted', '', {duration: 3000});
-            this.router.navigateByUrl('/core_component');
-          }, error => {
+              throw err;
+            },
           });
-      });
+        });
   }
 
   purgeNode(): void {
@@ -1448,25 +1624,22 @@ export class AccDetailComponent implements OnInit {
     dialogConfig.data.action = 'Purge';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()
-      .subscribe(result => {
-        if (!result) {
-          return;
-        }
-        this.isUpdating = true;
-        const state = 'Purge';
-        this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state)
-          .pipe(
-            finalize(() => {
+        .subscribe(result => {
+          if (!result) {
+            return;
+          }
+          this.isUpdating = true;
+          this.service.purge(this.type, this.manifestId).subscribe({
+            next: () => {
+              this.snackBar.open('Purged', '', {duration: 3000});
+              this.router.navigateByUrl('/core_component');
+            },
+            error: err => {
               this.isUpdating = false;
-            })
-          )
-          .subscribe(resp => {
-            this.snackBar.open('Purged', '', {duration: 3000});
-            this.location.back();
-            this.router.navigateByUrl('/core_component');
-          }, err => {
+              throw err;
+            },
           });
-      });
+        });
   }
 
   restoreNode(): void {
@@ -1476,24 +1649,27 @@ export class AccDetailComponent implements OnInit {
     dialogConfig.data.action = 'Restore';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()
-      .subscribe(result => {
-        if (!result) {
-          return;
-        }
-        this.isUpdating = true;
-        const state = 'WIP';
-        this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state)
-          .pipe(
-            finalize(() => {
+        .subscribe(result => {
+          if (!result) {
+            return;
+          }
+          this.isUpdating = true;
+          this.service.updateState(this.rootNode.type, this.rootNode.manifestId, 'WIP').subscribe({
+            next: () => {
+              this.snackBar.open('Restored', '', { duration: 3000 });
+
+              this.service.getAccDetails(this.manifestId).subscribe({
+                next: accDetails => this.afterStateChanged(accDetails.state, accDetails.access),
+                error: err => console.error(err),
+                complete: () => (this.isUpdating = false),
+              });
+            },
+            error: err => {
               this.isUpdating = false;
-            })
-          )
-          .subscribe(resp => {
-            this.afterStateChanged(resp.state, resp.access);
-            this.snackBar.open('Restored', '', {duration: 3000});
-          }, err => {
+              throw err;
+            },
           });
-      });
+        });
   }
 
   openCoreComponent(node: CcFlatNode) {
@@ -1516,7 +1692,14 @@ export class AccDetailComponent implements OnInit {
       return;
     }
 
-    this.tagService.toggleTag(node.type, node.manifestId, tag.name).subscribe(_ => {
+    let call;
+    if (!this.contains(node, tag)) {
+      call = this.tagService.appendTag(node.type, node.manifestId, tag.tagId);
+    } else {
+      call = this.tagService.removeTag(node.type, node.manifestId, tag.tagId);
+    }
+
+    call.subscribe(_ => {
       if (this.contains(node, tag)) {
         node.tagList.splice(node.tagList.map(e => e.tagId).indexOf(tag.tagId), 1);
       } else {
@@ -1651,16 +1834,22 @@ export class AccDetailComponent implements OnInit {
     }
     const currentItem = nodes[previousIndex];
     const request = new CcSeqUpdateRequest();
-    request.item = new CcId(currentItem.type, currentItem.manifestId);
+    request.item = new AsccpOrBccpManifestId(
+        (currentItem.type === 'ASCCP') ? currentItem.manifestId : undefined,
+        (currentItem.type === 'BCCP') ? currentItem.manifestId : undefined
+    );
     const after = this.getAfterNodeForSeq(nodes, currentIndex, previousIndex);
     if (after) {
-      request.after = new CcId(after.type, after.manifestId);
+      request.after = new AsccpOrBccpManifestId(
+          (after.type === 'ASCCP') ? after.manifestId : undefined,
+          (after.type === 'BCCP') ? after.manifestId : undefined
+      );
       if (request.item.id === request.after.id) {
         return;
       }
     }
     this.isUpdating = true;
-    this.service.updateCcSeq(request, this.manifestId).subscribe(_ => {
+    this.service.updateAccSequence(request, this.manifestId).subscribe(_ => {
       this.reload('Updated');
     }, error => {
       this.reload('Failed');
@@ -1682,16 +1871,20 @@ export class AccDetailComponent implements OnInit {
       this.dataSource.toggle(this.cursorNode);
     } else if ($event.key === 'o' || $event.key === 'O') {
       this.menuTriggerList.toArray().filter(e => !!e.menuData)
-        .filter(e => e.menuData.menuId === 'contextMenu').forEach(trigger => {
-        this.contextMenuItem = node;
-        trigger.openMenu();
-      });
+          .filter(e => e.menuData.menuId === 'contextMenu' && e.menuData.hashPath === node.hashPath)
+          .forEach(trigger => {
+            this.contextMenuItem = node;
+            if (!trigger.menuOpen) {
+              trigger.openMenu();
+            }
+          });
     } else if ($event.key === 'c' || $event.key === 'C') {
       this.menuTriggerList.toArray().filter(e => !!e.menuData)
-        .filter(e => e.menuData.menuId === 'contextMenu').forEach(trigger => {
-        this.contextMenuItem = node;
-        this.openComments(node.type, node);
-      });
+          .filter(e => e.menuData.menuId === 'contextMenu' && e.menuData.hashPath === node.hashPath)
+          .forEach(trigger => {
+            this.contextMenuItem = node;
+            this.openComments(node.type, node);
+          });
     } else if ($event.key === 'Enter') {
       this.onClick(this.cursorNode);
     } else {
@@ -1793,10 +1986,8 @@ export class AccDetailComponent implements OnInit {
         autoFocus: false
       });
 
-      dialogRef.afterClosed().subscribe(accManifestId => {
-        if (accManifestId) {
-          this.reload('Refactored.');
-        }
+      dialogRef.afterClosed().subscribe(_ => {
+        this.reload('Refactored');
       });
     }
   }
@@ -1804,7 +1995,7 @@ export class AccDetailComponent implements OnInit {
   ungroup(node: CcFlatNode, pos: number): void {
     if (pos === 0) {
       if (this.hasRevision()) {
-        pos = Object.getOwnPropertyNames(this.lastRevision.associations).length;
+        pos = Object.getOwnPropertyNames(this.prevAccDetails.associations).length;
       }
       if (this.hasBasedAcc) {
         pos += 1;

@@ -6,10 +6,9 @@ import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
-import {CcList, CcListRequest} from '../../cc-list/domain/cc-list';
+import {CcListEntry, CcListRequest} from '../../cc-list/domain/cc-list';
 import {CcListService} from '../../cc-list/domain/cc-list.service';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
-import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../../basis/basis';
 import {CcListComponent} from '../cc-list.component';
 import {FormControl} from '@angular/forms';
@@ -227,12 +226,12 @@ export class CreateBodDialogComponent implements OnInit {
     return displayedColumns;
   }
 
-  nounDataSource = new MatTableDataSource<CcList>();
-  verbDataSource = new MatTableDataSource<CcList>();
-  nounExpandedElement: CcList | null;
-  verbExpandedElement: CcList | null;
-  nounSelection = new SelectionModel<CcList>(true, []);
-  verbSelection = new SelectionModel<CcList>(true, []);
+  nounDataSource = new MatTableDataSource<CcListEntry>();
+  verbDataSource = new MatTableDataSource<CcListEntry>();
+  nounExpandedElement: CcListEntry | null;
+  verbExpandedElement: CcListEntry | null;
+  nounSelection = new SelectionModel<CcListEntry>(true, []);
+  verbSelection = new SelectionModel<CcListEntry>(true, []);
   loading = false;
 
   loginIdList: string[] = [];
@@ -351,10 +350,7 @@ export class CreateBodDialogComponent implements OnInit {
         this.verbPaginator.pageIndex, this.verbPaginator.pageSize);
 
       this.ccListService.getCcList(this.verbRequest).subscribe(resp => {
-        this.verbDataSource.data = resp.list.map((elm: CcList) => {
-          elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-          return elm;
-        });
+        this.verbDataSource.data = resp.list;
         this.highlightTextForVerbModule = this.verbRequest.filters.module;
         this.highlightTextForVerbDefinition = this.verbRequest.filters.definition;
 
@@ -381,10 +377,7 @@ export class CreateBodDialogComponent implements OnInit {
         this.nounPaginator.pageIndex, this.nounPaginator.pageSize);
 
       this.ccListService.getCcList(this.nounRequest).subscribe(resp => {
-        this.nounDataSource.data = resp.list.map((elm: CcList) => {
-          elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-          return elm;
-        });
+        this.nounDataSource.data = resp.list;
         this.highlightTextForNounModule = this.nounRequest.filters.module;
         this.highlightTextForNounDefinition = this.nounRequest.filters.definition;
 
@@ -408,23 +401,6 @@ export class CreateBodDialogComponent implements OnInit {
 
   onPageChange(event: PageEvent, type: string) {
     this.loadCcList(type);
-  }
-
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'verbStartDate':
-        this.verbRequest.updatedDate.start = new Date(event.value);
-        break;
-      case 'verbEndDate':
-        this.verbRequest.updatedDate.end = new Date(event.value);
-        break;
-      case 'nounStartDate':
-        this.nounRequest.updatedDate.start = new Date(event.value);
-        break;
-      case 'nounEndDate':
-        this.nounRequest.updatedDate.end = new Date(event.value);
-        break;
-    }
   }
 
   reset(type: string) {
@@ -571,7 +547,7 @@ export class CreateBodDialogComponent implements OnInit {
     event.preventDefault();
   }
 
-  select(row: CcList, type: string) {
+  select(row: CcListEntry, type: string) {
     if (type === 'verb') {
       this.verbSelection.select(row);
     } else {
@@ -579,7 +555,7 @@ export class CreateBodDialogComponent implements OnInit {
     }
   }
 
-  deselect(row: CcList, type: string) {
+  deselect(row: CcListEntry, type: string) {
     if (type === 'verb') {
       this.verbSelection.deselect(row);
     } else {
@@ -587,7 +563,7 @@ export class CreateBodDialogComponent implements OnInit {
     }
   }
 
-  toggle(row: CcList, type: string) {
+  toggle(row: CcListEntry, type: string) {
     if (this.isSelected(row, type)) {
       this.deselect(row, type);
     } else {
@@ -595,7 +571,7 @@ export class CreateBodDialogComponent implements OnInit {
     }
   }
 
-  isSelected(row: CcList, type: string) {
+  isSelected(row: CcListEntry, type: string) {
     if (type === 'verb') {
       return this.verbSelection.isSelected(row);
     } else {

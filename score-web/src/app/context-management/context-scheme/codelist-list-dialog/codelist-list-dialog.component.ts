@@ -1,7 +1,7 @@
 import {SelectionModel} from '@angular/cdk/collections';
 import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {FormControl} from '@angular/forms';
-import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker} from '@angular/material/datepicker';
 import {MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, SortDirection} from '@angular/material/sort';
@@ -13,11 +13,11 @@ import {finalize} from 'rxjs/operators';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
 import {AuthService} from '../../../authentication/auth.service';
 import {PageRequest} from '../../../basis/basis';
-import {CodeListForList, CodeListForListRequest} from '../../../code-list-management/domain/code-list';
+import {CodeListListEntry, CodeListListEntryRequest} from '../../../code-list-management/domain/code-list';
 import {CodeListService} from '../../../code-list-management/domain/code-list.service';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 import {initFilter, loadBranch, loadLibrary, saveBranch, saveLibrary} from '../../../common/utility';
-import {SimpleRelease, WorkingRelease} from '../../../release-management/domain/release';
+import {ReleaseSummary, WorkingRelease} from '../../../release-management/domain/release';
 import {ReleaseService} from '../../../release-management/domain/release.service';
 import {WebPageInfoService} from '../../../basis/basis.service';
 import {
@@ -27,7 +27,7 @@ import {
 } from '../../../settings-management/settings-preferences/domain/preferences';
 import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
-import {Library} from '../../../library-management/domain/library';
+import {LibrarySummary} from '../../../library-management/domain/library';
 import {LibraryService} from '../../../library-management/domain/library.service';
 
 @Component({
@@ -167,21 +167,21 @@ export class CodelistListDialogComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<CodeListForList>();
-  selection = new SelectionModel<CodeListForList>(true, []);
+  dataSource = new MatTableDataSource<CodeListListEntry>();
+  selection = new SelectionModel<CodeListListEntry>(true, []);
   loading = false;
 
-  releases: SimpleRelease[];
-  libraries: Library[] = [];
-  mappedLibraries: { library: Library, selected: boolean }[] = [];
+  releases: ReleaseSummary[];
+  libraries: LibrarySummary[] = [];
+  mappedLibraries: { library: LibrarySummary, selected: boolean }[] = [];
   loginIdList: string[] = [];
   releaseListFilterCtrl: FormControl = new FormControl();
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
-  filteredReleaseList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
+  filteredReleaseList: ReplaySubject<ReleaseSummary[]> = new ReplaySubject<ReleaseSummary[]>(1);
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
-  request: CodeListForListRequest;
+  request: CodeListListEntryRequest;
   highlightTextForModule: string;
   highlightTextForDefinition: string;
   preferencesInfo: PreferencesInfo;
@@ -207,10 +207,10 @@ export class CodelistListDialogComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.request = new CodeListForListRequest(this.route.snapshot.queryParamMap,
+    this.request = new CodeListListEntryRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
 
-    this.libraryService.getLibraries().subscribe(libraries => {
+    this.libraryService.getLibrarySummaryList().subscribe(libraries => {
       this.initLibraries(libraries);
 
       this.paginator.pageIndex = this.request.page.pageIndex;
@@ -236,7 +236,7 @@ export class CodelistListDialogComponent implements OnInit {
       this.releases = [];
 
       forkJoin([
-        this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Published']),
+        this.releaseService.getReleaseSummaryList(this.request.library.libraryId, ['Published']),
         this.accountService.getAccountNames(),
         this.preferencesService.load(this.auth.getUserToken())
       ]).subscribe(([releases, loginIds, preferencesInfo]) => {
@@ -263,17 +263,6 @@ export class CodelistListDialogComponent implements OnInit {
     }
   }
 
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
-  }
-
   reset(type: string) {
     switch (type) {
       case 'startDate':
@@ -287,7 +276,7 @@ export class CodelistListDialogComponent implements OnInit {
     }
   }
 
-  initLibraries(libraries: Library[]) {
+  initLibraries(libraries: LibrarySummary[]) {
     this.libraries = libraries;
     if (this.libraries.length > 0) {
       const savedLibraryId = loadLibrary(this.auth.getUserToken());
@@ -306,7 +295,7 @@ export class CodelistListDialogComponent implements OnInit {
     }
   }
 
-  initReleases(releases: SimpleRelease[]) {
+  initReleases(releases: ReleaseSummary[]) {
     this.releases = [...releases];
     if (this.releases.length > 0) {
       if (this.request.release.releaseId === 0) {
@@ -328,9 +317,9 @@ export class CodelistListDialogComponent implements OnInit {
     initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
   }
 
-  onLibraryChange(library: Library) {
+  onLibraryChange(library: LibrarySummary) {
     this.request.library = library;
-    this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Published']).subscribe(releases => {
+    this.releaseService.getReleaseSummaryList(this.request.library.libraryId, ['Published']).subscribe(releases => {
       saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
       this.initReleases(releases);
       this.onSearch();
@@ -355,10 +344,7 @@ export class CodelistListDialogComponent implements OnInit {
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
-      this.dataSource.data = resp.list.map((elm: CodeListForList) => {
-        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        return elm;
-      });
+      this.dataSource.data = resp.list;
       this.highlightTextForModule = this.request.filters.module;
       this.highlightTextForDefinition = this.request.filters.definition;
 
@@ -376,17 +362,17 @@ export class CodelistListDialogComponent implements OnInit {
 
   onSubmit(): void {
     if (this.selection.selected.length > 0) {
-      this.service.getCodeList(this.selection.selected[0].codeListManifestId).subscribe(codeList => {
+      this.service.getCodeListDetails(this.selection.selected[0].codeListManifestId).subscribe(codeList => {
         return this.dialogRef.close(codeList);
       });
     }
   }
 
-  select(row: CodeListForList) {
+  select(row: CodeListListEntry) {
     this.selection.select(row);
   }
 
-  toggle(row: CodeListForList) {
+  toggle(row: CodeListListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row);
     } else {
@@ -395,7 +381,7 @@ export class CodelistListDialogComponent implements OnInit {
     }
   }
 
-  isSelected(row: CodeListForList) {
+  isSelected(row: CodeListListEntry) {
     return this.selection.isSelected(row);
   }
 }

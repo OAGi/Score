@@ -60,8 +60,8 @@
             </mat-option>
             <mat-option *ngFor="let moduleSetRelease of filteredModuleSetReleaseList | async" [value]="moduleSetRelease.moduleSetReleaseId">
               <div class="d-flex">
-                <span class="release-num">{{moduleSetRelease.moduleSetReleaseName}}</span>
-                &nbsp;<span class="release-num">{{moduleSetRelease.releaseNum}}</span>
+                <span class="release-num">{{moduleSetRelease.name}}</span>
+                &nbsp;<span class="release-num">{{moduleSetRelease.release.releaseNum}}</span>
               </div>
             </mat-option>
           </mat-select>

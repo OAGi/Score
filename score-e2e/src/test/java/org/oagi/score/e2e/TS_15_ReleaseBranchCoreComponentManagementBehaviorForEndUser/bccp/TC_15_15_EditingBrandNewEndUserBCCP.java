@@ -282,9 +282,9 @@ public class TC_15_15_EditingBrandNewEndUserBCCP extends BaseTest {
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         BCCPCreateDialog bccpCreateDialog = viewEditCoreComponentPage.openBCCPCreateDialog(branch);
         BCCPViewEditPage bccpViewEditPage = bccpCreateDialog.create("System Environment_ Code. Type");
-        BCCPChangeBDTDialog bccpChangeBDTDialog = bccpViewEditPage.openChangeBDTDialog();
+        BCCPChangeDTDialog bccpChangeDTDialog = bccpViewEditPage.openChangeDTDialog();
         String nextBDTDen = "Telephone_ Value. Type";
-        bccpChangeBDTDialog.update(nextBDTDen);
+        bccpChangeDTDialog.update(nextBDTDen);
 
         BCCPViewEditPage.DTPanel dtPanel = bccpViewEditPage.getBCCPPanelContainer().getDTPanel();
         assertEquals(nextBDTDen, getText(dtPanel.getDENField()));
@@ -308,7 +308,7 @@ public class TC_15_15_EditingBrandNewEndUserBCCP extends BaseTest {
         ACCObject randomACC2 = coreComponentAPI.createRandomACC(endUser, release, namespace, "WIP");
 
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "WIP");
         coreComponentAPI.appendBCC(randomACC1, randomBCCP, "WIP");
         coreComponentAPI.appendBCC(randomACC2, randomBCCP, "WIP");
 

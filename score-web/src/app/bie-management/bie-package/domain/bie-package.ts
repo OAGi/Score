@@ -1,10 +1,56 @@
-import {PageRequest} from '../../../basis/basis';
+import {PageRequest, WhoAndWhen} from '../../../basis/basis';
 import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
 import {base64Decode, base64Encode} from '../../../common/utility';
 import {ScoreUser} from '../../../authentication/domain/auth';
-import {SimpleRelease} from '../../../release-management/domain/release';
-import {Library} from '../../../library-management/domain/library';
+import {ReleaseSummary} from '../../../release-management/domain/release';
+import {LibrarySummary} from '../../../library-management/domain/library';
+
+export class BiePackageListEntry {
+  biePackageId: number;
+  libraryId: number;
+  versionId: string;
+  versionName: string;
+  description: string;
+  releases: ReleaseSummary[];
+  state: string;
+  access: string;
+  owner: ScoreUser;
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+}
+
+export class BiePackageSummary {
+  biePackageId: number;
+  libraryId: number;
+  versionId: string;
+  versionName: string;
+  description: string;
+  releases: ReleaseSummary[];
+  state: string;
+  owner: ScoreUser;
+}
+
+export class BiePackageDetails {
+  biePackageId: number;
+  libraryId: number;
+  versionId: string;
+  versionName: string;
+  description: string;
+  releases: ReleaseSummary[];
+  state: string;
+  access: string;
+  source: BiePackageSummary;
+  owner: ScoreUser;
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+
+  sourceBiePackageId: number;
+  sourceBiePackageVersionName: string;
+  sourceBiePackageVersionId: string;
+  sourceAction: string;
+  sourceTimestamp: Date;
+}
 
 export class BiePackage {
   biePackageId: number;
@@ -12,7 +58,7 @@ export class BiePackage {
   versionId: string;
   versionName: string;
   description: string;
-  releases: SimpleRelease[];
+  releases: ReleaseSummary[];
   state: string;
   access: string;
   owner: ScoreUser;
@@ -29,8 +75,8 @@ export class BiePackage {
 }
 
 export class BiePackageListRequest {
-  library: Library = new Library();
-  releases: SimpleRelease[] = [];
+  library: LibrarySummary = new LibrarySummary();
+  releases: ReleaseSummary[] = [];
   filters: {
     versionId: string;
     versionName: string;
@@ -42,8 +88,8 @@ export class BiePackageListRequest {
     remark: string;
   };
   states: string[] = [];
-  ownerLoginIds: string[] = [];
-  updaterLoginIds: string[] = [];
+  ownerLoginIdList: string[] = [];
+  updaterLoginIdList: string[] = [];
   updatedDate: {
     start: Date,
     end: Date,
@@ -55,12 +101,12 @@ export class BiePackageListRequest {
     const params = (q) ? new HttpParams({fromString: base64Decode(q)}) : new HttpParams();
 
     this.releases = (params.get('releaseIds')) ? Array.from(params.get('releaseIds').split(',').map(e => {
-      const release = new SimpleRelease();
+      const release = new ReleaseSummary();
       release.releaseId = Number(e);
       return release;
     })) : [];
     if (this.releases.length === 0 && params.get('releaseId')) {
-      const release = new SimpleRelease();
+      const release = new ReleaseSummary();
       release.releaseId = Number(params.get('releaseId'));
       if (release.releaseId >= 0) {
         this.releases = [release];
@@ -87,8 +133,8 @@ export class BiePackageListRequest {
     }
 
     this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
-    this.ownerLoginIds = (params.get('ownerLoginIds')) ? Array.from(params.get('ownerLoginIds').split(',')) : [];
-    this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
+    this.ownerLoginIdList = (params.get('ownerLoginIdList')) ? Array.from(params.get('ownerLoginIdList').split(',')) : [];
+    this.updaterLoginIdList = (params.get('updaterLoginIdList')) ? Array.from(params.get('updaterLoginIdList').split(',')) : [];
     this.updatedDate = {
       start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
       end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
@@ -119,11 +165,11 @@ export class BiePackageListRequest {
     if (this.states && this.states.length > 0) {
       params = params.set('states', this.states.join(','));
     }
-    if (this.ownerLoginIds && this.ownerLoginIds.length > 0) {
-      params = params.set('ownerLoginIds', this.ownerLoginIds.join(','));
+    if (this.ownerLoginIdList && this.ownerLoginIdList.length > 0) {
+      params = params.set('ownerLoginIdList', this.ownerLoginIdList.join(','));
     }
-    if (this.updaterLoginIds && this.updaterLoginIds.length > 0) {
-      params = params.set('updaterLoginIds', this.updaterLoginIds.join(','));
+    if (this.updaterLoginIdList && this.updaterLoginIdList.length > 0) {
+      params = params.set('updaterLoginIdList', this.updaterLoginIdList.join(','));
     }
     if (this.updatedDate.start) {
       params = params.set('updateStart', '' + this.updatedDate.start.getTime());
@@ -177,8 +223,8 @@ export class BieListInBiePackageRequest {
     version: string;
     remark: string;
   };
-  ownerLoginIds: string[] = [];
-  updaterLoginIds: string[] = [];
+  ownerLoginIdList: string[] = [];
+  updaterLoginIdList: string[] = [];
   updatedDate: {
     start: Date,
     end: Date,
@@ -209,8 +255,8 @@ export class BieListInBiePackageRequest {
       this.page.pageSize = (defaultPageRequest) ? defaultPageRequest.pageSize : 0;
     }
 
-    this.ownerLoginIds = (params.get('ownerLoginIds')) ? Array.from(params.get('ownerLoginIds').split(',')) : [];
-    this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
+    this.ownerLoginIdList = (params.get('ownerLoginIdList')) ? Array.from(params.get('ownerLoginIdList').split(',')) : [];
+    this.updaterLoginIdList = (params.get('updaterLoginIdList')) ? Array.from(params.get('updaterLoginIdList').split(',')) : [];
     this.updatedDate = {
       start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
       end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
@@ -232,11 +278,11 @@ export class BieListInBiePackageRequest {
 
     params = params.set('biePackageId', this.biePackageId);
 
-    if (this.ownerLoginIds && this.ownerLoginIds.length > 0) {
-      params = params.set('ownerLoginIds', this.ownerLoginIds.join(','));
+    if (this.ownerLoginIdList && this.ownerLoginIdList.length > 0) {
+      params = params.set('ownerLoginIdList', this.ownerLoginIdList.join(','));
     }
-    if (this.updaterLoginIds && this.updaterLoginIds.length > 0) {
-      params = params.set('updaterLoginIds', this.updaterLoginIds.join(','));
+    if (this.updaterLoginIdList && this.updaterLoginIdList.length > 0) {
+      params = params.set('updaterLoginIdList', this.updaterLoginIdList.join(','));
     }
     if (this.updatedDate.start) {
       params = params.set('updatedDateStart', '' + this.updatedDate.start.toUTCString());

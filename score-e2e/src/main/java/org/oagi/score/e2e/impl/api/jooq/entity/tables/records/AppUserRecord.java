@@ -16,7 +16,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser;
  * This table captures the user information for authentication and authorization
  * purposes.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -222,6 +222,6 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> {
         setIsDeveloper(isDeveloper);
         setIsAdmin(isAdmin);
         setIsEnabled(isEnabled);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

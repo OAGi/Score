@@ -5,7 +5,7 @@ import {MatSort} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {Router} from '@angular/router';
 import {BieListService} from '../../bie-management/bie-list/domain/bie-list.service';
-import {BieList} from '../../bie-management/bie-list/domain/bie-list';
+import {BieListEntry} from '../../bie-management/bie-list/domain/bie-list';
 import {CcListService} from '../../cc-management/cc-list/domain/cc-list.service';
 import {UserExtensionGroup} from '../../cc-management/domain/core-component-node';
 import {StateProgressBarItem} from '../../common/state-progress-bar/state-progress-bar';
@@ -13,11 +13,11 @@ import {AuthService} from '../../authentication/auth.service';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {base64Encode, initFilter, loadBranch, loadLibrary, saveBranch, saveLibrary} from '../../common/utility';
-import {CcList, SummaryCcExt} from '../../cc-management/cc-list/domain/cc-list';
-import {SimpleRelease, WorkingRelease} from '../../release-management/domain/release';
+import {CcListEntry, SummaryCcExt} from '../../cc-management/cc-list/domain/cc-list';
+import {ReleaseSummary, WorkingRelease} from '../../release-management/domain/release';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {WebPageInfoService} from '../basis.service';
-import {Library} from '../../library-management/domain/library';
+import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryService} from '../../library-management/domain/library.service';
 import {UserToken} from '../../authentication/domain/auth';
 
@@ -49,9 +49,9 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     {state: 'Published', color: '#388E3C'},
     {state: 'Deleted', color: '#616161'}];
 
-  library: Library = new Library();
-  libraries: Library[] = [];
-  mappedLibraries: { library: Library, selected: boolean }[] = [];
+  library: LibrarySummary = new LibrarySummary();
+  libraries: LibrarySummary[] = [];
+  mappedLibraries: { library: LibrarySummary, selected: boolean }[] = [];
 
   /* CCs */
   numberOfTotalCCByStates: StateProgressBarItem[];
@@ -68,7 +68,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   numberOfCCsByUsers_usernameFilteredList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   numberOfCCsByUsers_usernameModel: string[] = [];
 
-  myRecentCCs = new MatTableDataSource<CcList>();
+  myRecentCCs = new MatTableDataSource<CcListEntry>();
   @ViewChild('myRecentCCsSort', {static: false})
   myRecentCCsSort: MatSort;
   /* End of CCs */
@@ -88,10 +88,10 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   numberOfBiesByUsers_usernameFilteredList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   numberOfBiesByUsers_usernameModel: string[] = [];
   releaseListFilterCtrl: FormControl = new FormControl();
-  releaseFilteredList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
-  selectedRelease: SimpleRelease;
+  releaseFilteredList: ReplaySubject<ReleaseSummary[]> = new ReplaySubject<ReleaseSummary[]>(1);
+  selectedRelease: ReleaseSummary;
 
-  myRecentBIEs = new MatTableDataSource<BieList>();
+  myRecentBIEs = new MatTableDataSource<BieListEntry>();
   @ViewChild('myRecentBIEsSort', {static: false})
   myRecentBIEsSort: MatSort;
   /* End of BIEs */
@@ -130,7 +130,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    this.libraryService.getLibraries().subscribe(libraries => {
+    this.libraryService.getLibrarySummaryList().subscribe(libraries => {
       this.initLibraries(libraries);
 
       this.loadData();
@@ -149,7 +149,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     return this.userToken.tenant.enabled;
   }
 
-  initLibraries(libraries: Library[]) {
+  initLibraries(libraries: LibrarySummary[]) {
     this.libraries = libraries;
     if (this.libraries.length > 0) {
       const savedLibraryId = loadLibrary(this.auth.getUserToken());
@@ -171,7 +171,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   loadData() {
     const userToken = this.userToken;
     forkJoin([
-      this.releaseService.getSimpleReleases(this.library.libraryId)
+      this.releaseService.getReleaseSummaryList(this.library.libraryId)
     ]).subscribe(([resp]) => {
       resp = [{state: '', releaseId: -1, releaseNum : 'All', workingRelease: false}].concat(resp.filter(e => !e.workingRelease));
       initFilter(this.releaseListFilterCtrl, this.releaseFilteredList, resp, (e) => e.releaseNum);
@@ -189,7 +189,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     });
   }
 
-  onLibraryChange(library: Library) {
+  onLibraryChange(library: LibrarySummary) {
     this.library = library;
     saveLibrary(this.auth.getUserToken(), this.library.libraryId);
     this.loadData();
@@ -222,7 +222,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
         this.numberOfMyCCByStates.push({
           name: item.state,
           value: summaryCcInfo.numberOfMyCcByStates[item.state] || 0,
-          href: ['/core_component', [{key: 'states', value: item.state}, releaseParam, {key: 'ownerLoginIds', value: userToken.username}]],
+          href: ['/core_component', [{key: 'states', value: item.state}, releaseParam, {key: 'ownerLoginIdList', value: userToken.username}]],
           disabled: false,
           style: {
             bg_color: this.webPageInfo.getComponentStateColorSet(item.state).background || item.color,
@@ -277,7 +277,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
         this.numberOfMyBieByStates.push({
           name: item.state,
           value: summaryBieInfo.numberOfMyBieByStates[item.state] || 0,
-          href: ['/profile_bie', [{key: 'states', value: item.state}, {key: 'ownerLoginIds', value: userToken.username}, releaseParam]],
+          href: ['/profile_bie', [{key: 'states', value: item.state}, {key: 'ownerLoginIdList', value: userToken.username}, releaseParam]],
           disabled: false,
           style: {
             bg_color: this.webPageInfo.getComponentStateColorSet(item.state).background || item.color,
@@ -318,7 +318,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       const releaseParam = {key: 'releaseId', value: this.selectedRelease.releaseId};
       const typeParam = {key: 'types', value: 'ACC'};
       const componentTypeParam = {key: 'componentTypes', value: UserExtensionGroup.value};
-      const ownerLoginIdsParam = {key: 'ownerLoginIds', value: userToken.username};
+      const ownerLoginIdListParam = {key: 'ownerLoginIdList', value: userToken.username};
       this.numberOfTotalCcExtByStates = [];
       this.numberOfMyCcExtByStates = [];
       for (const item of this.stateColorList) {
@@ -335,7 +335,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
         this.numberOfMyCcExtByStates.push({
           name: item.state,
           value: summaryCcExtInfo.numberOfMyCcExtByStates[item.state] || 0,
-          href: ['/core_component', [{key: 'states', value: item.state}, releaseParam, typeParam, componentTypeParam, ownerLoginIdsParam]],
+          href: ['/core_component', [{key: 'states', value: item.state}, releaseParam, typeParam, componentTypeParam, ownerLoginIdListParam]],
           disabled: this.selectedRelease.releaseId < 0,
           style: {
             bg_color: this.webPageInfo.getComponentStateColorSet(item.state).background || item.color,

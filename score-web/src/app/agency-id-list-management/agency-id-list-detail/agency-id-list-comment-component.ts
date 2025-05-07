@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
-import {AgencyIdList} from '../domain/agency-id-list';
+import {AgencyIdListDetails} from '../domain/agency-id-list';
 import {AgencyIdListService} from '../domain/agency-id-list.service';
 import {Comment} from '../../cc-management/domain/core-component-node';
 
@@ -18,8 +18,8 @@ export class AgencyIdListCommentControl {
               private service: AgencyIdListService) {
   }
 
-  toggleCommentSlide(codeList: AgencyIdList): void {
-    this.commentReference = 'AGENCY_ID_LIST-' + codeList.agencyIdListManifestId;
+  toggleCommentSlide(agencyIdList: AgencyIdListDetails): void {
+    this.commentReference = 'AGENCY_ID_LIST-' + agencyIdList.agencyIdListManifestId;
 
     if (this.sidenav.opened) {
       this.closeCommentSlide();

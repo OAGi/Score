@@ -1,51 +1,53 @@
-import {PageRequest} from '../../basis/basis';
+import {PageRequest, WhoAndWhen} from '../../basis/basis';
 import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
 import {base64Decode, base64Encode} from '../../common/utility';
-import {Library} from '../../library-management/domain/library';
+import {LibrarySummary} from '../../library-management/domain/library';
 
-export class SimpleRelease {
+export class ReleaseSummary {
   releaseId: number;
   releaseNum: string;
   state: string;
   workingRelease: boolean;
 }
 
-export class ReleaseList {
+export class ReleaseListEntry {
   releaseId: number;
+  guid: string;
   releaseNum: string;
   state: string;
-  createdBy: string;
-  creationTimestamp: Date;
-  lastUpdatedBy: string;
-  lastUpdateTimestamp: Date;
+  namespaceId: number;
+
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
 }
 
-export class ReleaseDetail {
+export class ReleaseDetails {
   releaseId: number;
   releaseNum: string;
   releaseNote: string;
   releaseLicense: string;
   state: string;
   libraryId: number;
+  libraryName: string;
   namespaceId: number;
   latestRelease: boolean;
 }
 
 export class ReleaseListRequest {
-  library: Library = new Library();
+  library: LibrarySummary = new LibrarySummary();
   filters: {
     releaseNum: string;
   };
   excludes: string[] = [];
   states: string[] = [];
   namespaces: number[] = [];
-  creatorLoginIds: string[] = [];
+  creatorLoginIdList: string[] = [];
   createdDate: {
     start: Date,
     end: Date,
   };
-  updaterLoginIds: string[] = [];
+  updaterLoginIdList: string[] = [];
   updatedDate: {
     start: Date,
     end: Date,
@@ -79,13 +81,13 @@ export class ReleaseListRequest {
     this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
     this.namespaces = (params.get('namespaces')) ? Array.from(params.get('namespaces').split(',')).map(e => Number(e)) : [];
 
-    this.creatorLoginIds = (params.get('creatorLoginIds')) ? Array.from(params.get('creatorLoginIds').split(',')) : [];
+    this.creatorLoginIdList = (params.get('creatorLoginIdList')) ? Array.from(params.get('creatorLoginIdList').split(',')) : [];
     this.createdDate = {
       start: (params.get('createdDateStart')) ? new Date(params.get('createdDateStart')) : null,
       end: (params.get('createdDateEnd')) ? new Date(params.get('createdDateEnd')) : null
     };
 
-    this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
+    this.updaterLoginIdList = (params.get('updaterLoginIdList')) ? Array.from(params.get('updaterLoginIdList').split(',')) : [];
     this.updatedDate = {
       start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
       end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
@@ -106,8 +108,8 @@ export class ReleaseListRequest {
     if (this.states && this.states.length > 0) {
       params = params.set('states', this.states.join(','));
     }
-    if (this.creatorLoginIds && this.creatorLoginIds.length > 0) {
-      params = params.set('creatorLoginIds', this.creatorLoginIds.join(','));
+    if (this.creatorLoginIdList && this.creatorLoginIdList.length > 0) {
+      params = params.set('creatorLoginIdList', this.creatorLoginIdList.join(','));
     }
     if (this.createdDate.start) {
       params = params.set('createdDateStart', '' + this.createdDate.start.toUTCString());
@@ -115,8 +117,8 @@ export class ReleaseListRequest {
     if (this.createdDate.end) {
       params = params.set('createdDateEnd', '' + this.createdDate.end.toUTCString());
     }
-    if (this.updaterLoginIds && this.updaterLoginIds.length > 0) {
-      params = params.set('updaterLoginIds', this.updaterLoginIds.join(','));
+    if (this.updaterLoginIdList && this.updaterLoginIdList.length > 0) {
+      params = params.set('updaterLoginIdList', this.updaterLoginIdList.join(','));
     }
     if (this.updatedDate.start) {
       params = params.set('updatedDateStart', '' + this.updatedDate.start.toUTCString());
@@ -136,7 +138,7 @@ export class ReleaseListRequest {
 }
 
 export class ReleaseResponse {
-  release: ReleaseDetail;
+  release: ReleaseDetails;
   status: string;
   statusMessage: string;
 }
@@ -171,10 +173,10 @@ export class AssignableNode {
   manifestId: number;
   den: string;
   type: string;
-  ownerUserId: string;
   state: string;
-  timestamp: number[];
   revision: number;
+  ownerUsername: string;
+  timestamp: Date;
   visible = true;
   errors: ValidationMessage[];
 }

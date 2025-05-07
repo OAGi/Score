@@ -8,18 +8,18 @@ import {SelectionModel} from '@angular/cdk/collections';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {finalize, switchMap} from 'rxjs/operators';
 import {BusinessContextService} from '../../context-management/business-context/domain/business-context.service';
-import {BusinessContext} from '../../context-management/business-context/domain/business-context';
-import {BieList, BieListRequest} from '../bie-list/domain/bie-list';
+import {BusinessContextSummary} from '../../context-management/business-context/domain/business-context';
+import {BieListEntry, BieListRequest} from '../bie-list/domain/bie-list';
 import {BieListService} from '../bie-list/domain/bie-list.service';
 import {AccountListService} from '../../account-management/domain/account-list.service';
-import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {base64Decode, initFilter, loadLibrary, saveBooleanProperty, saveBranch, saveLibrary} from '../../common/utility';
 import {Location} from '@angular/common';
 import {HttpParams} from '@angular/common/http';
-import {SimpleRelease} from '../../release-management/domain/release';
+import {ReleaseSummary} from '../../release-management/domain/release';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {AuthService} from '../../authentication/auth.service';
 import {WebPageInfoService} from '../../basis/basis.service';
@@ -28,7 +28,7 @@ import {SettingsPreferencesService} from '../../settings-management/settings-pre
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
 import {MultiActionsSnackBarComponent} from '../../common/multi-actions-snack-bar/multi-actions-snack-bar.component';
-import {Library} from '../../library-management/domain/library';
+import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryService} from '../../library-management/domain/library.service';
 
 @Component({
@@ -42,7 +42,7 @@ export class BieCopyProfileBieComponent implements OnInit {
   subtitle = 'Select BIE';
 
   bizCtxIds: number[] = [];
-  bizCtxList: BusinessContext[] = [];
+  bizCtxList: BusinessContextSummary[] = [];
 
   get columns(): TableColumnsProperty[] {
     if (!this.preferencesInfo) {
@@ -168,24 +168,24 @@ export class BieCopyProfileBieComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<BieList>();
-  selection = new SelectionModel<BieList>(false, []);
+  dataSource = new MatTableDataSource<BieListEntry>();
+  selection = new SelectionModel<BieListEntry>(false, []);
   loading = false;
 
   loginIdList: string[] = [];
   releaseListFilterCtrl: FormControl = new FormControl();
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
-  filteredReleaseList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
+  filteredReleaseList: ReplaySubject<ReleaseSummary[]> = new ReplaySubject<ReleaseSummary[]>(1);
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   states: string[] = ['WIP', 'QA', 'Production'];
   request: BieListRequest;
   preferencesInfo: PreferencesInfo;
 
-  releases: SimpleRelease[] = [];
-  libraries: Library[] = [];
-  mappedLibraries: {library: Library, selected: boolean}[] = [];
+  releases: ReleaseSummary[] = [];
+  libraries: LibrarySummary[] = [];
+  mappedLibraries: {library: LibrarySummary, selected: boolean}[] = [];
 
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
@@ -216,7 +216,7 @@ export class BieCopyProfileBieComponent implements OnInit {
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.access = 'CanView';
 
-    this.libraryService.getLibraries().subscribe(libraries => {
+    this.libraryService.getLibrarySummaryList().subscribe(libraries => {
       this.initLibraries(libraries);
 
       // The value should be 'true' unless 'adv_ser' is false.
@@ -256,7 +256,7 @@ export class BieCopyProfileBieComponent implements OnInit {
           return forkJoin([
             this.bizCtxService.getBusinessContextsByBizCtxIds(bizCtxIds.split(',').map(e => Number(e))),
             this.accountService.getAccountNames(),
-            this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Published']),
+            this.releaseService.getReleaseSummaryList(this.request.library.libraryId, ['Published']),
             this.preferencesService.load(this.auth.getUserToken())
           ]);
         })).subscribe(([resp, loginIds, releases, preferencesInfo]) => {
@@ -268,8 +268,8 @@ export class BieCopyProfileBieComponent implements OnInit {
 
         this.initReleases(releases);
 
-        this.bizCtxIds = resp.list.map(e => e.businessContextId);
-        this.bizCtxList = resp.list;
+        this.bizCtxIds = resp.map(e => e.businessContextId);
+        this.bizCtxList = resp;
         // Issue #1625
         this.request.filters.businessContext = this.bizCtxList.map(e => e.name).join(', ');
 
@@ -308,17 +308,6 @@ export class BieCopyProfileBieComponent implements OnInit {
     this.loadBieList();
   }
 
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
-  }
-
   reset(type: string) {
     switch (type) {
       case 'startDate':
@@ -340,7 +329,7 @@ export class BieCopyProfileBieComponent implements OnInit {
     }
   }
 
-  initLibraries(libraries: Library[]) {
+  initLibraries(libraries: LibrarySummary[]) {
     this.libraries = libraries;
     if (this.libraries.length > 0) {
       const savedLibraryId = loadLibrary(this.auth.getUserToken());
@@ -359,15 +348,15 @@ export class BieCopyProfileBieComponent implements OnInit {
     }
   }
 
-  initReleases(releases: SimpleRelease[]) {
+  initReleases(releases: ReleaseSummary[]) {
     this.releases = releases.filter(e => !e.workingRelease && e.state === 'Published');
     initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
   }
 
-  onLibraryChange(library: Library) {
+  onLibraryChange(library: LibrarySummary) {
     this.request.library = library;
     this.request.releases = [];
-    this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Published']).subscribe(releases => {
+    this.releaseService.getReleaseSummaryList(this.request.library.libraryId, ['Published']).subscribe(releases => {
       saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
       this.initReleases(releases);
       this.onSearch();
@@ -392,10 +381,7 @@ export class BieCopyProfileBieComponent implements OnInit {
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
-      this.dataSource.data = resp.list.map((elm: BieList) => {
-        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        return elm;
-      });
+      this.dataSource.data = resp.list;
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery({
           bizCtxIds: this.bizCtxIds.map(e => '' + e).join(',')
@@ -410,11 +396,11 @@ export class BieCopyProfileBieComponent implements OnInit {
     this.router.navigateByUrl('/profile_bie/copy');
   }
 
-  select(row: BieList) {
+  select(row: BieListEntry) {
     this.selection.select(row);
   }
 
-  toggle(row: BieList) {
+  toggle(row: BieListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row);
     } else {
@@ -422,7 +408,7 @@ export class BieCopyProfileBieComponent implements OnInit {
     }
   }
 
-  isSelected(row: BieList) {
+  isSelected(row: BieListEntry) {
     return this.selection.isSelected(row);
   }
 

@@ -1,5 +1,5 @@
 import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
-import {ContextScheme, ContextSchemeListRequest} from '../domain/context-scheme';
+import {ContextSchemeListEntry, ContextSchemeListRequest} from '../domain/context-scheme';
 import {ContextSchemeService} from '../domain/context-scheme.service';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -7,7 +7,7 @@ import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {PageRequest} from '../../../basis/basis';
-import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker} from '@angular/material/datepicker';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
@@ -140,7 +140,7 @@ export class ContextSchemeListComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<ContextScheme>();
+  dataSource = new MatTableDataSource<ContextSchemeListEntry>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
 
@@ -214,17 +214,6 @@ export class ContextSchemeListComponent implements OnInit {
   onChange(property?: string, source?) {
   }
 
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
-  }
-
   reset(type: string) {
     switch (type) {
       case 'startDate':
@@ -256,11 +245,7 @@ export class ContextSchemeListComponent implements OnInit {
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
-      this.dataSource.data = resp.list.map((elm: ContextScheme) => {
-        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        elm.contextSchemeValueList = [];
-        return elm;
-      });
+      this.dataSource.data = resp.list;
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0],
           this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));
@@ -284,13 +269,13 @@ export class ContextSchemeListComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(row: ContextScheme) {
+  select(row: ContextSchemeListEntry) {
     if (!row.used) {
       this.selection.select(row.contextSchemeId);
     }
   }
 
-  toggle(row: ContextScheme) {
+  toggle(row: ContextSchemeListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row.contextSchemeId);
     } else {
@@ -298,7 +283,7 @@ export class ContextSchemeListComponent implements OnInit {
     }
   }
 
-  isSelected(row: ContextScheme) {
+  isSelected(row: ContextSchemeListEntry) {
     return this.selection.isSelected(row.contextSchemeId);
   }
 

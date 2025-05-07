@@ -16,6 +16,7 @@ import java.math.BigInteger;
 import java.time.Duration;
 
 import static java.time.Duration.ofMillis;
+import static java.time.Duration.ofSeconds;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEditPage {
@@ -92,6 +93,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         String url = getPageUrl();
         getDriver().get(url);
         invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofSeconds(2L));
         assert "ASCCP".equals(getText(getASCCPPanel().getCoreComponentField()));
         assert getText(getTitle()).startsWith(asccp.getPropertyTerm());
     }
@@ -342,11 +344,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
 
     @Override
     public WebElement getNodeByPath(String path) {
-        return retry(() -> {
-            goToNode(path);
-            String[] nodes = path.split("/");
-            return getNodeByName(nodes[nodes.length - 1]);
-        });
+        return retry(() -> goToNode(path));
     }
 
     @Override
@@ -368,11 +366,9 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
 
     @Override
     public WebElement clickOnDropDownMenuByPath(String path) {
-        goToNode(path);
-        String[] nodes = path.split("/");
-        String nodeName = nodes[nodes.length - 1];
-        WebElement node = getNodeByName(nodeName);
-        click(getDriver(), node);
+        WebElement node = goToNode(path);
+
+        click(node);
         new Actions(getDriver()).sendKeys("O").perform();
         waitFor(ofMillis(1000L));
         try {
@@ -382,7 +378,8 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
             }
         } catch (WebDriverException ignore) {
         }
-        WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
+
+        WebElement contextMenuIcon = getContextMenuIcon(node);
         click(getDriver(), contextMenuIcon);
         waitFor(ofMillis(1000L));
         assert visibilityOfElementLocated(getDriver(),
@@ -393,23 +390,29 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
     @Override
     public WebElement getContextMenuIconByNodeName(String nodeName) {
         WebElement node = getNodeByName(nodeName);
+        return getContextMenuIcon(node);
+    }
+
+    public WebElement getContextMenuIcon(WebElement node) {
         return node.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
     }
 
     private WebElement goToNode(String path) {
         WebElement searchInput = getSearchInputTextField();
         click(getDriver(), searchInput);
-        WebElement node = retry(() -> {
-            WebElement e = sendKeys(searchInput, path);
+        retry(() -> {
+            sendKeys(searchInput, path);
             if (!path.equals(getText(searchInput))) {
                 throw new WebDriverException();
             }
-            return e;
         });
-        node.sendKeys(Keys.ENTER);
-        click(node);
+        searchInput.sendKeys(Keys.ENTER);
+        searchInput.sendKeys("");
         clear(searchInput);
-        return node;
+
+        String[] nodes = path.split("/");
+        String nodeName = nodes[nodes.length - 1];
+        return getNodeByName(nodeName);
     }
 
     private WebElement getNodeByName(String nodeName) {
@@ -546,7 +549,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
 
     private WebElement getInputFieldByName(String baseXPath, String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/input"));
+                baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]//input"));
     }
 
     private WebElement getSelectFieldByName(String baseXPath, String name) {

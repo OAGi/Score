@@ -1,12 +1,12 @@
 import {PageRequest} from '../../../basis/basis';
 import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
-import {SimpleRelease} from 'src/app/release-management/domain/release';
+import {ReleaseSummary} from 'src/app/release-management/domain/release';
 import {base64Decode, base64Encode, hashCode4Array} from '../../../common/utility';
 import {ScoreUser} from '../../../authentication/domain/auth';
 import {BusinessContext} from '../../../context-management/business-context/domain/business-context';
 import {ChangeListener} from '../../domain/bie-flat-tree';
-import {Library} from '../../../library-management/domain/library';
+import {LibrarySummary} from '../../../library-management/domain/library';
 
 export class OasDocListRequest {
   filters: {
@@ -129,8 +129,8 @@ export interface SimpleOasDoc {
 }
 
 export class BieForOasDocListRequest {
-  library: Library = new Library();
-  release: SimpleRelease;
+  library: LibrarySummary = new LibrarySummary();
+  release: ReleaseSummary;
   filters: {
     propertyTerm: string;
     businessContext: string;
@@ -144,13 +144,13 @@ export class BieForOasDocListRequest {
   access: string;
   states: string[] = [];
   types: string[] = [];
-  ownerLoginIds: string[] = [];
+  ownerLoginIdList: string[] = [];
   updaterUsernameList: string[] = [];
   updatedDate: {
     start: Date,
     end: Date,
   };
-  updaterLoginIds: string[] = [];
+  updaterLoginIdList: string[] = [];
   page: PageRequest = new PageRequest();
   ownedByDeveloper: boolean = undefined;
 
@@ -176,15 +176,15 @@ export class BieForOasDocListRequest {
     } else {
       this.page.pageSize = (defaultPageRequest) ? defaultPageRequest.pageSize : 0;
     }
-    this.release = new SimpleRelease();
+    this.release = new ReleaseSummary();
     this.release.releaseId = Number(params.get('releaseId') || 0);
     this.excludePropertyTerms = (params.get('excludePropertyTerms')) ? Array.from(params.get('excludePropertyTerms').split(',')) : [];
     this.excludeTopLevelAsbiepIds = (params.get('excludeTopLevelAsbiepIds')) ? Array.from(params.get('excludeTopLevelAsbiepIds').split(',').map(e => Number(e))) : [];
     this.access = params.get('access') || '';
     this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
     this.types = (params.get('types')) ? Array.from(params.get('types').split(',')) : [];
-    this.ownerLoginIds = (params.get('ownerLoginIds')) ? Array.from(params.get('ownerLoginIds').split(',')) : [];
-    this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
+    this.ownerLoginIdList = (params.get('ownerLoginIdList')) ? Array.from(params.get('ownerLoginIdList').split(',')) : [];
+    this.updaterLoginIdList = (params.get('updaterLoginIdList')) ? Array.from(params.get('updaterLoginIdList').split(',')) : [];
     this.updaterUsernameList = (params.get('updaterUsernameList')) ? Array.from(params.get('updaterUsernameList').split(',')) : [];
     this.updatedDate = {
       start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
@@ -225,11 +225,11 @@ export class BieForOasDocListRequest {
     if (this.access && this.access.length > 0) {
       params = params.set('access', this.access);
     }
-    if (this.ownerLoginIds && this.ownerLoginIds.length > 0) {
-      params = params.set('ownerLoginIds', this.ownerLoginIds.join(','));
+    if (this.ownerLoginIdList && this.ownerLoginIdList.length > 0) {
+      params = params.set('ownerLoginIdList', this.ownerLoginIdList.join(','));
     }
-    if (this.updaterLoginIds && this.updaterLoginIds.length > 0) {
-      params = params.set('updaterLoginIds', this.updaterLoginIds.join(','));
+    if (this.updaterLoginIdList && this.updaterLoginIdList.length > 0) {
+      params = params.set('updaterLoginIdList', this.updaterLoginIdList.join(','));
     }
     if (this.updatedDate.start) {
       params = params.set('updatedDateStart', '' + this.updatedDate.start.toUTCString());

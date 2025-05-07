@@ -15,7 +15,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtxValue;
  * provides the associations between a business context and a context scheme
  * value.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class BizCtxValueRecord extends UpdatableRecordImpl<BizCtxValueRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -97,6 +97,6 @@ public class BizCtxValueRecord extends UpdatableRecordImpl<BizCtxValueRecord> {
         setBizCtxValueId(bizCtxValueId);
         setBizCtxId(bizCtxId);
         setCtxSchemeValueId(ctxSchemeValueId);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

@@ -2,18 +2,21 @@ import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {PaginationResponse} from '../../basis/basis';
+import {PageResponse} from '../../basis/basis';
 import {AssignableMap, AssignableNode} from '../../release-management/domain/release';
 import {
   ModuleElement,
   ModuleSet,
+  ModuleSetListEntry,
   ModuleSetListRequest,
   ModuleSetMetadata,
-  ModuleSetModule,
-  ModuleSetModuleListRequest,
   ModuleSetRelease,
+  ModuleSetReleaseDetails,
+  ModuleSetReleaseListEntry,
   ModuleSetReleaseListRequest,
-  ModuleSetReleaseValidateResponse
+  ModuleSetReleaseSummary,
+  ModuleSetReleaseValidateResponse,
+  ModuleSetSummary
 } from './module';
 
 @Injectable()
@@ -22,28 +25,28 @@ export class ModuleService {
   constructor(private http: HttpClient) {
   }
 
-  getModuleSetList(request?: ModuleSetListRequest): Observable<PaginationResponse<ModuleSet>> {
-    if (!request) {
-      request = new ModuleSetListRequest();
-      request.page.pageIndex = -1;
-      request.page.pageSize = -1;
-    }
-
+  getModuleSetSummaries(libraryId: number): Observable<ModuleSetSummary[]> {
     let params = new HttpParams()
-      .set('libraryId', '' + request.library.libraryId)
-      .set('sortActive', request.page.sortActive)
-      .set('sortDirection', request.page.sortDirection)
-      .set('pageIndex', '' + request.page.pageIndex)
-      .set('pageSize', '' + request.page.pageSize);
+        .set('libraryId', '' + libraryId);
+    return this.http.get<ModuleSetSummary[]>('/api/module-sets/summaries', {params});
+  }
 
-    if (request.updaterLoginIds.length > 0) {
-      params = params.set('updaterLoginIds', request.updaterLoginIds.join(','));
+  getModuleSetList(request?: ModuleSetListRequest): Observable<PageResponse<ModuleSetListEntry>> {
+    let params = new HttpParams()
+        .set('libraryId', '' + request.library.libraryId)
+        .set('pageIndex', '' + request.page.pageIndex)
+        .set('pageSize', '' + request.page.pageSize);
+
+    if (!!request.page.sortActive && !!request.page.sortDirection) {
+      params = params.set('orderBy', ((request.page.sortDirection === 'desc') ? '-' : '+') + request.page.sortActive);
     }
-    if (request.updatedDate.start) {
-      params = params.set('updateStart', '' + request.updatedDate.start.getTime());
+    if (request.updaterLoginIdList.length > 0) {
+      params = params.set('updaterLoginIdList', request.updaterLoginIdList.join(','));
     }
-    if (request.updatedDate.end) {
-      params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
+    if (!!request.updatedDate.start || !!request.updatedDate.end) {
+      params = params.set('lastUpdatedOn',
+          '[' + (!!request.updatedDate.start ? request.updatedDate.start.getTime() : '') + '~' +
+          (!!request.updatedDate.end ? request.updatedDate.end.getTime() : '') + ']');
     }
     if (request.filters.name) {
       params = params.set('name', request.filters.name);
@@ -51,51 +54,39 @@ export class ModuleService {
     if (request.filters.description) {
       params = params.set('description', request.filters.description);
     }
-    return this.http.get<PaginationResponse<ModuleSet>>('/api/module_set', {params})
-      .pipe(map((resp: PaginationResponse<ModuleSet>) => {
-        resp.results.forEach(e => {
-          e.lastUpdateTimestamp = new Date(e.lastUpdateTimestamp);
-        });
-        return resp;
-      }));
-  }
-
-  discardModuleSet(moduleSetId: number): Observable<any> {
-    return this.http.delete<any>('/api/module_set/' + moduleSetId);
-  }
-
-  discardModuleSetRelease(moduleSetReleaseId: number): Observable<any> {
-    return this.http.delete<any>('/api/module_set_release/' + moduleSetReleaseId);
+    return this.http.get<PageResponse<ModuleSetListEntry>>('/api/module-sets', {params}).pipe(
+        map((res: PageResponse<ModuleSetListEntry>) => ({
+          ...res,
+          list: res.list.map(elm => ({
+            ...elm,
+            created: {
+              ...elm.created,
+              when: new Date(elm.created.when),
+            },
+            lastUpdated: {
+              ...elm.lastUpdated,
+              when: new Date(elm.lastUpdated.when),
+            }
+          }))
+        }))
+    );
   }
 
   getModuleSet(moduleSetId: number): Observable<ModuleSet> {
-    return this.http.get<ModuleSet>('/api/module_set/' + moduleSetId);
+    return this.http.get<ModuleSet>('/api/module-sets/' + moduleSetId);
   }
 
   getModuleSetMetadata(moduleSetId: number): Observable<ModuleSetMetadata> {
-    return this.http.get<ModuleSetMetadata>('/api/module_set/' + moduleSetId + '/metadata');
+    return this.http.get<ModuleSetMetadata>('/api/module-sets/' + moduleSetId + '/metadata');
   }
 
-  getModuleSetRelease(moduleSetReleaseId: number): Observable<ModuleSetRelease> {
-    return this.http.get<ModuleSetRelease>('/api/module_set_release/' + moduleSetReleaseId);
-  }
-
-  createModule(module: ModuleElement): Observable<any> {
-    return this.http.put<any>('/api/module_set/' + module.moduleSetId + '/module/create', module);
-  }
-
-  copyModule(element: ModuleElement, moduleSetId: number, copySubModules: boolean, parentModuleId: number): Observable<any> {
-    return this.http.post<any>('/api/module_set/' + moduleSetId + '/module/' + parentModuleId + '/copy', {
-      targetModuleId: element.moduleId,
-      copySubModules,
-      moduleSetId,
-      parentModuleId
-    });
-
+  getModules(moduleSetId: number): Observable<any> {
+    const url = '/api/module-sets/' + moduleSetId + '/modules';
+    return this.http.get<any>(url);
   }
 
   createModuleSet(moduleSet: ModuleSet): Observable<ModuleSet> {
-    return this.http.put<ModuleSet>('/api/module_set', {
+    return this.http.post<ModuleSet>('/api/module-sets', {
       libraryId: moduleSet.libraryId,
       name: moduleSet.name,
       description: moduleSet.description,
@@ -105,93 +96,111 @@ export class ModuleService {
     });
   }
 
-  createModuleSetRelease(moduleSetRelease: ModuleSetRelease, basedModuleSetReleaseId?: number): Observable<ModuleSetRelease> {
+  updateModuleSet(moduleSet: ModuleSet): Observable<any> {
+    return this.http.put<any>('/api/module-sets/' + moduleSet.moduleSetId, {
+      name: moduleSet.name,
+      description: moduleSet.description
+    });
+  }
+
+  discardModuleSet(moduleSetId: number): Observable<any> {
+    return this.http.delete<any>('/api/module-sets/' + moduleSetId);
+  }
+
+  getModule(moduleSetId: number, moduleId: number): Observable<any> {
+    return this.http.get<any>('/api/module-sets/' + moduleSetId + '/modules/' + moduleId, {});
+  }
+
+  createModule(module: ModuleElement): Observable<any> {
+    return this.http.post<any>('/api/module-sets/' + module.moduleSetId + '/modules', module);
+  }
+
+  updateModule(element: ModuleElement): Observable<any> {
+    return this.http.put<any>('/api/module-sets/' + element.moduleSetId + '/modules/' + element.moduleId, {
+      moduleId: element.moduleId,
+      name: element.name,
+      namespaceId: element.namespaceId,
+      versionNum: element.versionNum,
+    });
+  }
+
+  discardModule(element: ModuleElement): Observable<any> {
+    return this.http.delete<any>('/api/module-sets/' + element.moduleSetId + '/modules/' + element.moduleId);
+  }
+
+  copyModule(element: ModuleElement, moduleSetId: number, copySubModules: boolean, parentModuleId: number): Observable<any> {
+    return this.http.post<any>('/api/module-sets/' + moduleSetId + '/modules/' + parentModuleId + '/copy', {
+      targetModuleId: element.moduleId,
+      copySubModules,
+      moduleSetId,
+      parentModuleId
+    });
+  }
+
+  /* for Module Set Release */
+
+  getModuleSetReleaseDetails(moduleSetReleaseId: number): Observable<ModuleSetReleaseDetails> {
+    return this.http.get<ModuleSetReleaseDetails>('/api/module-set-releases/' + moduleSetReleaseId);
+  }
+
+  createModuleSetRelease(moduleSetRelease: ModuleSetRelease, basedModuleSetReleaseId?: number): Observable<any> {
     const params = {
-      moduleSetReleaseName: moduleSetRelease.moduleSetReleaseName,
-      moduleSetReleaseDescription: moduleSetRelease.moduleSetReleaseDescription,
+      name: moduleSetRelease.moduleSetReleaseName,
+      description: moduleSetRelease.moduleSetReleaseDescription,
       releaseId: moduleSetRelease.releaseId,
       moduleSetId: moduleSetRelease.moduleSetId,
-      default: moduleSetRelease.default,
+      isDefault: moduleSetRelease.isDefault,
       baseModuleSetReleaseId: undefined
     };
 
     if (basedModuleSetReleaseId) {
       params.baseModuleSetReleaseId = basedModuleSetReleaseId;
     }
-    return this.http.put<ModuleSetRelease>('/api/module_set_release', params);
+    return this.http.post<any>('/api/module-set-releases', params);
   }
 
-  updateModuleSet(moduleSet: ModuleSet): Observable<any> {
-    return this.http.post<any>('/api/module_set/' + moduleSet.moduleSetId, {
-      name: moduleSet.name,
-      description: moduleSet.description
+  updateModuleSetRelease(moduleSetRelease: ModuleSetReleaseDetails): Observable<any> {
+    return this.http.put<any>('/api/module-set-releases/' + moduleSetRelease.moduleSetReleaseId, {
+      name: moduleSetRelease.name,
+      description: moduleSetRelease.description,
+      releaseId: moduleSetRelease.release.releaseId,
+      moduleSetId: moduleSetRelease.moduleSet.moduleSetId,
+      isDefault: moduleSetRelease.isDefault
     });
   }
 
-  updateModuleSetRelease(moduleSetRelease: ModuleSetRelease): Observable<ModuleSetRelease> {
-    return this.http.post<any>('/api/module_set_release/' + moduleSetRelease.moduleSetReleaseId, {
-      moduleSetReleaseName: moduleSetRelease.moduleSetReleaseName,
-      moduleSetReleaseDescription: moduleSetRelease.moduleSetReleaseDescription,
-      releaseId: moduleSetRelease.releaseId,
-      moduleSetId: moduleSetRelease.moduleSetId,
-      default: moduleSetRelease.default
-    });
+  discardModuleSetRelease(moduleSetReleaseId: number): Observable<any> {
+    return this.http.delete<any>('/api/module-set-releases/' + moduleSetReleaseId);
   }
 
-  getModules(moduleSetId: number): Observable<any> {
-    const url = '/api/module_set/' + moduleSetId + '/modules';
-    return this.http.get<any>(url);
+  getModuleSetReleaseSummaries(libraryId: number,
+                               releaseId?: number, name?: string): Observable<ModuleSetReleaseSummary[]> {
+    let params = new HttpParams().set('libraryId', libraryId);
+    if (!!releaseId) {
+      params = params.set('releaseId', releaseId);
+    }
+    if (!!name) {
+      params = params.set('name', name);
+    }
+    return this.http.get<ModuleSetReleaseSummary[]>('/api/module-set-releases/summaries', {params});
   }
 
-  getModuleSetModuleList(request: ModuleSetModuleListRequest): Observable<PaginationResponse<ModuleSetModule>> {
+  getModuleSetReleaseList(request?: ModuleSetReleaseListRequest): Observable<PageResponse<ModuleSetReleaseListEntry>> {
     let params = new HttpParams()
-      .set('sortActive', request.page.sortActive)
-      .set('sortDirection', request.page.sortDirection)
-      .set('pageIndex', '' + request.page.pageIndex)
-      .set('pageSize', '' + request.page.pageSize);
+        .set('libraryId', '' + request.library.libraryId)
+        .set('pageIndex', '' + request.page.pageIndex)
+        .set('pageSize', '' + request.page.pageSize);
 
-    if (request.filters.path) {
-      params = params.set('path', request.filters.path);
+    if (!!request.page.sortActive && !!request.page.sortDirection) {
+      params = params.set('orderBy', ((request.page.sortDirection === 'desc') ? '-' : '+') + request.page.sortActive);
     }
-    if (request.filters.namespaceUri) {
-      params = params.set('namespaceUri', request.filters.namespaceUri);
+    if (request.updaterLoginIdList.length > 0) {
+      params = params.set('updaterLoginIdList', request.updaterLoginIdList.join(','));
     }
-    if (request.updaterLoginIds.length > 0) {
-      params = params.set('updaterLoginIds', request.updaterLoginIds.join(','));
-    }
-    if (request.updatedDate.start) {
-      params = params.set('updateStart', '' + request.updatedDate.start.getTime());
-    }
-    if (request.updatedDate.end) {
-      params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
-    }
-
-    const uri = '/api/module_set/' + request.moduleSetId + '/module';
-    return this.http.get<PaginationResponse<ModuleSetModule>>(uri, {params});
-  }
-
-  getModuleSetReleaseList(request?: ModuleSetReleaseListRequest): Observable<PaginationResponse<ModuleSetRelease>> {
-    if (!request) {
-      request = new ModuleSetReleaseListRequest();
-      request.page.pageIndex = -1;
-      request.page.pageSize = -1;
-    }
-
-    let params = new HttpParams()
-      .set('libraryId', '' + request.library.libraryId)
-      .set('sortActive', request.page.sortActive)
-      .set('sortDirection', request.page.sortDirection)
-      .set('pageIndex', '' + request.page.pageIndex)
-      .set('pageSize', '' + request.page.pageSize);
-
-    if (request.updaterLoginIds.length > 0) {
-      params = params.set('updaterLoginIds', request.updaterLoginIds.join(','));
-    }
-    if (request.updatedDate.start) {
-      params = params.set('updateStart', '' + request.updatedDate.start.getTime());
-    }
-    if (request.updatedDate.end) {
-      params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
+    if (!!request.updatedDate.start || !!request.updatedDate.end) {
+      params = params.set('lastUpdatedOn',
+          '[' + (!!request.updatedDate.start ? request.updatedDate.start.getTime() : '') + '~' +
+          (!!request.updatedDate.end ? request.updatedDate.end.getTime() : '') + ']');
     }
     if (request.filters.name) {
       params = params.set('name', request.filters.name);
@@ -200,70 +209,110 @@ export class ModuleService {
       params = params.set('releaseId', request.releaseId);
     }
     if (request.isDefault) {
-      params = params.set('default', request.isDefault);
+      params = params.set('isDefault', request.isDefault);
     }
-    return this.http.get<PaginationResponse<ModuleSetRelease>>('/api/module_set_release_list', {params})
-      .pipe(map((resp: PaginationResponse<ModuleSetRelease>) => {
-        resp.results.forEach(e => {
-          e.lastUpdateTimestamp = new Date(e.lastUpdateTimestamp);
-        });
-        return resp;
-      }));
-  }
-
-  deleteModule(element: ModuleElement): Observable<any> {
-    return this.http.delete<any>('/api/module_set/' + element.moduleSetId + '/module/' + element.moduleId);
-  }
-
-  updateModule(element: ModuleElement): Observable<any> {
-    return this.http.post<any>('/api/module_set/' + element.moduleSetId + '/module/' + element.moduleId, {
-      moduleId: element.moduleId,
-      name: element.name,
-      namespaceId: element.namespaceId,
-      versionNum: element.versionNum,
-    });
+    return this.http.get<PageResponse<ModuleSetReleaseListEntry>>('/api/module-set-releases', {params}).pipe(
+        map((res: PageResponse<ModuleSetReleaseListEntry>) => ({
+          ...res,
+          list: res.list.map(elm => ({
+            ...elm,
+            created: {
+              ...elm.created,
+              when: new Date(elm.created.when),
+            },
+            lastUpdated: {
+              ...elm.lastUpdated,
+              when: new Date(elm.lastUpdated.when),
+            }
+          }))
+        }))
+    );
   }
 
   validate(moduleSetReleaseId: number): Observable<ModuleSetReleaseValidateResponse> {
-    return this.http.get<ModuleSetReleaseValidateResponse>('/api/module_set_release/' + moduleSetReleaseId + '/validate');
+    return this.http.get<ModuleSetReleaseValidateResponse>('/api/module-set-releases/' + moduleSetReleaseId + '/validate');
   }
 
   progressValidation(moduleSetReleaseId: number, requestId: string): Observable<ModuleSetReleaseValidateResponse> {
-    return this.http.get<ModuleSetReleaseValidateResponse>('/api/module_set_release/' + moduleSetReleaseId + '/validate/' + requestId);
+    return this.http.get<ModuleSetReleaseValidateResponse>('/api/module-set-releases/' + moduleSetReleaseId + '/validate/' + requestId);
   }
 
   export(moduleSetReleaseId: number): Observable<HttpResponse<Blob>> {
-    return this.http.get('/api/module_set_release/' + moduleSetReleaseId + '/export', {
+    return this.http.get('/api/module-set-releases/' + moduleSetReleaseId + '/export', {
       observe: 'response',
       responseType: 'blob'
     });
   }
 
   getAssignable(moduleSetReleaseId: number): Observable<AssignableMap> {
-    return this.http.get<AssignableMap>('/api/module_set_release/' + moduleSetReleaseId + '/assignable');
+    return this.http.get<AssignableMap>('/api/module-set-releases/' + moduleSetReleaseId + '/assignable');
   }
 
   getAssigned(moduleSetReleaseId: number, moduleId: number): Observable<AssignableMap> {
-    return this.http.get<AssignableMap>('/api/module_set_release/' + moduleSetReleaseId + '/assigned?moduleId=' + moduleId);
+    return this.http.get<AssignableMap>('/api/module-set-releases/' + moduleSetReleaseId + '/assigned?moduleId=' + moduleId);
   }
 
-  createAssign(moduleSetRelease: ModuleSetRelease, moduleId: number, nodes: AssignableNode[]): Observable<any> {
-    return this.http.post<any>('/api/module_set_release/' + moduleSetRelease.moduleSetReleaseId + '/assign', {
-      nodes,
+  createAssign(moduleSetRelease: ModuleSetReleaseDetails, moduleId: number, nodes: AssignableNode[]): Observable<any> {
+    return this.http.post<any>('/api/module-set-releases/' + moduleSetRelease.moduleSetReleaseId + '/assign', {
+      nodes: nodes.map(node => {
+        if ('ACC' === node.type) {
+          return {accManifestId: node.manifestId};
+        }
+        else if ('ASCCP' === node.type) {
+          return {asccpManifestId: node.manifestId};
+        }
+        else if ('BCCP' === node.type) {
+          return {bccpManifestId: node.manifestId};
+        }
+        else if ('DT' === node.type) {
+          return {dtManifestId: node.manifestId};
+        }
+        else if ('CODE_LIST' === node.type) {
+          return {codeListManifestId: node.manifestId};
+        }
+        else if ('AGENCY_ID_LIST' === node.type) {
+          return {agencyIdListManifestId: node.manifestId};
+        }
+        else if ('XBT' === node.type) {
+          return {xbtManifestId: node.manifestId};
+        }
+      }),
       moduleId,
-      moduleSetId: moduleSetRelease.moduleSetId,
+      moduleSetId: moduleSetRelease.moduleSet.moduleSetId,
       moduleSetReleaseId: moduleSetRelease.moduleSetReleaseId,
-      releaseId: moduleSetRelease.releaseId
+      releaseId: moduleSetRelease.release.releaseId
     });
   }
 
-  discardAssign(moduleSetRelease: ModuleSetRelease, moduleId: number, nodes: AssignableNode[]): Observable<any> {
-    return this.http.post<any>('/api/module_set_release/' + moduleSetRelease.moduleSetReleaseId + '/unassign', {
-      nodes,
+  discardAssign(moduleSetRelease: ModuleSetReleaseDetails, moduleId: number, nodes: AssignableNode[]): Observable<any> {
+    return this.http.post<any>('/api/module-set-releases/' + moduleSetRelease.moduleSetReleaseId + '/unassign', {
+      nodes: nodes.map(node => {
+        if ('ACC' === node.type) {
+          return {accManifestId: node.manifestId};
+        }
+        else if ('ASCCP' === node.type) {
+          return {asccpManifestId: node.manifestId};
+        }
+        else if ('BCCP' === node.type) {
+          return {bccpManifestId: node.manifestId};
+        }
+        else if ('DT' === node.type) {
+          return {dtManifestId: node.manifestId};
+        }
+        else if ('CODE_LIST' === node.type) {
+          return {codeListManifestId: node.manifestId};
+        }
+        else if ('AGENCY_ID_LIST' === node.type) {
+          return {agencyIdListManifestId: node.manifestId};
+        }
+        else if ('XBT' === node.type) {
+          return {xbtManifestId: node.manifestId};
+        }
+      }),
       moduleId,
-      moduleSetId: moduleSetRelease.moduleSetId,
+      moduleSetId: moduleSetRelease.moduleSet.moduleSetId,
       moduleSetReleaseId: moduleSetRelease.moduleSetReleaseId,
-      releaseId: moduleSetRelease.releaseId
+      releaseId: moduleSetRelease.release.releaseId
     });
   }
 }

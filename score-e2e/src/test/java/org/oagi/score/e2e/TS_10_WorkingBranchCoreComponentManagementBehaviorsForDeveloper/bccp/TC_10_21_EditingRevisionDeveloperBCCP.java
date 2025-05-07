@@ -11,7 +11,7 @@ import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.core_component.BCCPChangeBDTDialog;
+import org.oagi.score.e2e.page.core_component.BCCPChangeDTDialog;
 import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.By;
@@ -62,7 +62,7 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
         randomBCCP.setNillable(false);
         coreComponentAPI.updateBCCP(randomBCCP);
 
@@ -98,7 +98,7 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
         randomBCCP.setNillable(false);
         randomBCCP.setFixedValue(RandomStringUtils.secure().nextAlphabetic(5, 10));
         coreComponentAPI.updateBCCP(randomBCCP);
@@ -134,7 +134,7 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
         randomBCCP.setDeprecated(true);
         coreComponentAPI.updateBCCP(randomBCCP);
 
@@ -168,7 +168,7 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
         randomBCCP.setDeprecated(false);
         coreComponentAPI.updateBCCP(randomBCCP);
 
@@ -202,7 +202,7 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
         randomBCCP.setNillable(true);
         coreComponentAPI.updateBCCP(randomBCCP);
 
@@ -236,7 +236,7 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
         randomBCCP.setNillable(false);
         coreComponentAPI.updateBCCP(randomBCCP);
 
@@ -270,7 +270,7 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
         randomBCCP.setDefaultValue(RandomStringUtils.secure().nextAlphabetic(5, 10));
         coreComponentAPI.updateBCCP(randomBCCP);
 
@@ -304,7 +304,7 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
         randomBCCP.setDefinitionSource(RandomStringUtils.secure().nextPrint(50, 100).trim());
         randomBCCP.setDefinition(RandomStringUtils.secure().nextPrint(50, 100).trim());
         coreComponentAPI.updateBCCP(randomBCCP);
@@ -354,7 +354,7 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
         randomBCCP.setDefinitionSource(RandomStringUtils.secure().nextPrint(50, 100).trim());
         // No definition
         randomBCCP.setDefinition(null);
@@ -393,7 +393,7 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
@@ -442,7 +442,7 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "fea2278fc93f48b98cf5bb3e32c004e8", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
@@ -455,8 +455,8 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         viewEditCoreComponentPage.openPage();
         bccpViewEditPage =
                 viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
-        BCCPChangeBDTDialog bccpChangeBDTDialog = bccpViewEditPage.openChangeBDTDialog();
-        assertTrue(bccpChangeBDTDialog.isOpened());
+        BCCPChangeDTDialog bccpChangeDTDialog = bccpViewEditPage.openChangeDTDialog();
+        assertTrue(bccpChangeDTDialog.isOpened());
     }
 
     @Test
@@ -472,7 +472,7 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =

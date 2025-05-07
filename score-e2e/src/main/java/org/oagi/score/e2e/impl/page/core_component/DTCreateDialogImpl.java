@@ -12,11 +12,11 @@ public class DTCreateDialogImpl extends SearchBarPageImpl implements DTCreateDia
     private static final By CREATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Create\")]//ancestor::button[1]");
 
-    private ViewEditCoreComponentPageImpl parent;
+    private ViewEditDataTypePageImpl parent;
 
     private String branch;
 
-    public DTCreateDialogImpl(ViewEditCoreComponentPageImpl parent, String branch) {
+    public DTCreateDialogImpl(ViewEditDataTypePageImpl parent, String branch) {
         super(parent.getDriver(), "//mat-dialog-container");
         this.parent = parent;
         this.branch = branch;

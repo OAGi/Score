@@ -57,7 +57,7 @@ public class TC_10_20_CreatingNewRevisionDeveloperBCCP extends BaseTest {
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Indicator. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
         randomBCCP.setNillable(false);
         coreComponentAPI.updateBCCP(randomBCCP);
 

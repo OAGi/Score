@@ -2,19 +2,18 @@ import {SelectionModel} from '@angular/cdk/collections';
 import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {faFlask} from '@fortawesome/free-solid-svg-icons';
 import {forkJoin, ReplaySubject} from 'rxjs';
-import {CreateBdtDialogComponent} from './create-bdt-dialog/create-bdt-dialog.component';
 import {CreateBodDialogComponent} from './create-bod-dialog/create-bod-dialog.component';
 import {CcListService} from './domain/cc-list.service';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort, SortDirection} from '@angular/material/sort';
-import {CcList, CcListRequest} from './domain/cc-list';
+import {CcListEntry, CcListRequest} from './domain/cc-list';
 import {PageRequest} from '../../basis/basis';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {AccountListService} from '../../account-management/domain/account-list.service';
-import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker} from '@angular/material/datepicker';
 import {AuthService} from '../../authentication/auth.service';
 import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {AccountList} from '../../account-management/domain/accounts';
@@ -25,7 +24,7 @@ import {CreateBccpDialogComponent} from './create-bccp-dialog/create-bccp-dialog
 import {MatTableDataSource} from '@angular/material/table';
 import {FormControl} from '@angular/forms';
 import {initFilter, loadBranch, loadLibrary, saveBranch, saveLibrary} from '../../common/utility';
-import {SimpleRelease, WorkingRelease} from '../../release-management/domain/release';
+import {ReleaseSummary, WorkingRelease} from '../../release-management/domain/release';
 import {OagisComponentType, OagisComponentTypes} from '../domain/core-component-node';
 import {finalize} from 'rxjs/operators';
 import {Location} from '@angular/common';
@@ -36,14 +35,14 @@ import {TagService} from '../../tag-management/domain/tag.service';
 import {Tag} from '../../tag-management/domain/tag';
 import {saveAs} from 'file-saver';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
-import {SimpleNamespace} from '../../namespace-management/domain/namespace';
+import {NamespaceSummary} from '../../namespace-management/domain/namespace';
 import {WebPageInfoService} from '../../basis/basis.service';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 import {MatSlideToggleChange} from '@angular/material/slide-toggle';
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
-import {Library} from '../../library-management/domain/library';
+import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryService} from '../../library-management/domain/library.service';
 
 @Component({
@@ -63,7 +62,6 @@ export class CcListComponent implements OnInit {
   faFlask = faFlask;
   title = 'Core Component';
 
-  typeList: string[] = ['ACC', 'ASCCP', 'BCCP', 'CDT', 'BDT', 'ASCC', 'BCC'];
   workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
   releaseStateList = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
   componentTypeList: OagisComponentType[] = OagisComponentTypes;
@@ -78,23 +76,10 @@ export class CcListComponent implements OnInit {
 
   onFilterTypesChange(updatedColumns: { name: string; selected: boolean }[]) {
     this.preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage = updatedColumns;
-    this.preferencesService.updateFilterTypeForCoreComponentPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
+    this.preferencesService.updateFilterTypeForCoreComponentPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
 
     this.request.types = updatedColumns.filter(e => e.selected).map(e => e.name);
     this.onSearch();
-  }
-
-  onFilterTypesOnlyAsccp() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-    defaultTableColumnInfo.filterTypesOfCoreComponentPage.forEach((columnInfo: TableColumnsProperty) => {
-      if ('ASCCP' === columnInfo.name) {
-        columnInfo.selected = true;
-      } else {
-        columnInfo.selected = false;
-      }
-    });
-    this.onFilterTypesChange(defaultTableColumnInfo.filterTypesOfCoreComponentPage);
   }
 
   onFilterTypesReset() {
@@ -187,16 +172,6 @@ export class CcListComponent implements OnInit {
             displayedColumns.push('den');
           }
           break;
-        case 'Value Domain':
-          if (column.selected) {
-            displayedColumns.push('valueDomain');
-          }
-          break;
-        case 'Six Hexadecimal ID':
-          if (column.selected) {
-            displayedColumns.push('sixDigitId');
-          }
-          break;
         case 'Revision':
           if (column.selected) {
             displayedColumns.push('revision');
@@ -222,9 +197,9 @@ export class CcListComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<CcList>();
-  selection = new SelectionModel<CcList>(true, []);
-  expandedElement: CcList | null;
+  dataSource = new MatTableDataSource<CcListEntry>();
+  selection = new SelectionModel<CcListEntry>(true, []);
+  expandedElement: CcListEntry | null;
   loading = false;
   isElasticsearchOn = false;
 
@@ -238,24 +213,19 @@ export class CcListComponent implements OnInit {
 
   onBrowserModeChange($event: MatSlideToggleChange) {
     this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode = $event.checked;
-    // Issue #1650
-    if (this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode) {
-      this.onFilterTypesOnlyAsccp();
-    } else {
-      this.onFilterTypesReset();
-    }
     this.preferencesService.updateViewSettingsInfo(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
     });
+    this.onSearch();
   }
 
-  releases: SimpleRelease[] = [];
-  libraries: Library[] = [];
-  mappedLibraries: { library: Library, selected: boolean }[] = [];
+  releases: ReleaseSummary[] = [];
+  libraries: LibrarySummary[] = [];
+  mappedLibraries: { library: LibrarySummary, selected: boolean }[] = [];
   loginIdList: string[] = [];
   releaseListFilterCtrl: FormControl = new FormControl();
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
-  filteredReleaseList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
+  filteredReleaseList: ReplaySubject<ReleaseSummary[]> = new ReplaySubject<ReleaseSummary[]>(1);
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CcListRequest;
@@ -263,11 +233,11 @@ export class CcListComponent implements OnInit {
   highlightTextForDefinition: string;
   tags: Tag[] = [];
   preferencesInfo: PreferencesInfo;
-  namespaces: SimpleNamespace[] = [];
+  namespaces: NamespaceSummary[] = [];
   namespaceListFilterCtrl: FormControl = new FormControl();
-  filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
+  filteredNamespaceList: ReplaySubject<NamespaceSummary[]> = new ReplaySubject<NamespaceSummary[]>(1);
 
-  contextMenuItem: CcList;
+  contextMenuItem: CcListEntry;
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -316,7 +286,7 @@ export class CcListComponent implements OnInit {
     this.request = new CcListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
 
-    this.libraryService.getLibraries().subscribe(libraries => {
+    this.libraryService.getLibrarySummaryList().subscribe(libraries => {
       this.initLibraries(libraries);
 
       this.searchBar.showAdvancedSearch =
@@ -343,9 +313,9 @@ export class CcListComponent implements OnInit {
 
       this.loading = true;
       forkJoin([
-        this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Draft', 'Published']),
+        this.releaseService.getReleaseSummaryList(this.request.library.libraryId, ['Draft', 'Published']),
         this.accountService.getAccountNames(),
-        this.namespaceService.getSimpleNamespaces(this.request.library.libraryId),
+        this.namespaceService.getNamespaceSummaries(this.request.library.libraryId),
         this.aboutService.getProductInfo(),
         this.tagService.getTags(),
         this.preferencesService.load(this.auth.getUserToken())
@@ -360,7 +330,6 @@ export class CcListComponent implements OnInit {
         this.initReleases(releases);
         this.tags = tags;
         this.preferencesInfo = preferencesInfo;
-        this.request.types = this.preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage.filter(e => e.selected).map(e => e.name);
 
         this.namespaces.push(...namespaces);
         initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList, this.namespaces, (e) => e.uri);
@@ -375,7 +344,7 @@ export class CcListComponent implements OnInit {
     });
   }
 
-  initLibraries(libraries: Library[]) {
+  initLibraries(libraries: LibrarySummary[]) {
     this.libraries = libraries;
     if (this.libraries.length > 0) {
       const savedLibraryId = loadLibrary(this.auth.getUserToken());
@@ -394,7 +363,7 @@ export class CcListComponent implements OnInit {
     }
   }
 
-  initReleases(releases: SimpleRelease[]) {
+  initReleases(releases: ReleaseSummary[]) {
     this.releases = [...releases];
     if (this.releases.length > 0) {
       if (this.request.release.releaseId === 0) {
@@ -416,9 +385,10 @@ export class CcListComponent implements OnInit {
     initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
   }
 
-  onLibraryChange(library: Library) {
+  onLibraryChange(library: LibrarySummary) {
+    this.loading = true;
     this.request.library = library;
-    this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Draft', 'Published']).subscribe(releases => {
+    this.releaseService.getReleaseSummaryList(this.request.library.libraryId, ['Draft', 'Published']).subscribe(releases => {
       saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
       this.initReleases(releases);
       this.onSearch();
@@ -430,35 +400,48 @@ export class CcListComponent implements OnInit {
     this.loadCcList();
   }
 
+  clear() {
+    this.paginator.length = 0;
+    this.paginator.pageIndex = 0;
+    this.dataSource.data = [];
+    this.selection.clear();
+  }
+
   loadCcList(isInit?: boolean) {
     this.loading = true;
 
     this.request.page = new PageRequest(
-      this.sort.active, this.sort.direction,
-      this.paginator.pageIndex, this.paginator.pageSize);
+        this.sort.active, this.sort.direction,
+        this.paginator.pageIndex, this.paginator.pageSize);
 
-    this.service.getCcList(this.request).pipe(
-      finalize(() => {
-        this.loading = false;
-      })
-    ).subscribe(resp => {
+    // Issue #1650
+    if (this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode) {
+      this.request.types = ['ASCCP'];
+    } else {
+      this.request.types = this.preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage
+          .filter(e => e.selected).map(e => e.name);
+    }
+
+    this.service.getCcList(this.request).subscribe(resp => {
       this.paginator.length = resp.length;
       this.paginator.pageIndex = resp.page;
 
-      this.dataSource.data = resp.list.map((elm: CcList) => {
-        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        return elm;
-      });
+      this.dataSource.data = resp.list;
       this.highlightTextForModule = this.request.filters.module;
       this.highlightTextForDefinition = this.request.filters.definition;
 
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0],
-          this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));
+            this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));
       }
       this.selection.clear();
+
+      this.loading = false;
     }, error => {
       this.dataSource.data = [];
+
+      this.loading = false;
+      throw error;
     });
   }
 
@@ -492,17 +475,6 @@ export class CcListComponent implements OnInit {
     }
   }
 
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
-  }
-
   reset(type: string) {
     switch (type) {
       case 'startDate':
@@ -516,7 +488,7 @@ export class CcListComponent implements OnInit {
     }
   }
 
-  getRouterLink(ccList: CcList) {
+  getRouterLink(ccList: CcListEntry) {
     switch (ccList.type.toUpperCase()) {
       case 'ACC':
         if (ccList.oagisComponentType === 'UserExtensionGroup') {
@@ -536,24 +508,29 @@ export class CcListComponent implements OnInit {
         return '/core_component/bccp/' + ccList.manifestId;
 
       case 'DT':
-        return '/core_component/dt/' + ccList.manifestId;
+        return '/data_type/' + ccList.manifestId;
 
       default:
         return window.location.pathname;
     }
   }
 
-  isEditable(element: CcList) {
-    return element.owner === this.currentUser && element.state === 'WIP';
+  isEditable(element: CcListEntry) {
+    return element.owner.loginId === this.currentUser && element.state === 'WIP';
   }
 
-  isAssociation(element: CcList) {
+  isAssociation(element: CcListEntry) {
     return element.type.toUpperCase() === 'ASCC' || element.type.toUpperCase() === 'BCC';
   }
 
-  openTransferDialog(item: CcList, $event) {
+  openTransferDialog(item: CcListEntry, $event) {
     if (!this.isEditable(item)) {
       return;
+    }
+
+    if (!!$event) {
+      $event.preventDefault();
+      $event.stopPropagation();
     }
 
     const dialogConfig = new MatDialogConfig();
@@ -649,23 +626,38 @@ export class CcListComponent implements OnInit {
     }
 
     this.confirmDialogService.open(dialogConfig).afterClosed()
-      .subscribe(result => {
-        if (!result) {
-          return;
-        }
-        this.loading = true;
-        this.service.updateStateOnList(actionType, toState, this.selection.selected).subscribe(_ => {
-          this.loadCcList();
-          this.snackBar.open(notiMsg, '', {
-            duration: 3000
-          });
-          this.selection.clear();
+        .subscribe(result => {
+          if (!result) {
+            return;
+          }
 
-          this.loading = false;
-        }, error => {
-          this.loading = false;
+          this.loading = true;
+          let call;
+          switch (actionType) {
+            case 'Update':
+              call = this.service.updateState(this.selection.selected, toState);
+              break;
+            case 'Delete':
+              call = this.service.delete(this.selection.selected);
+              break;
+            case 'Restore':
+              call = this.service.restore(this.selection.selected);
+              break;
+            case 'Purge':
+              call = this.service.purge(this.selection.selected);
+              break;
+          }
+          call.subscribe(_ => {
+            this.snackBar.open(notiMsg, '', {
+              duration: 3000
+            });
+            this.selection.clear();
+            this.loadCcList();
+          }, err => {
+            this.loading = false;
+            throw err;
+          });
         });
-      });
   }
 
   exportStandaloneSchemas() {
@@ -708,22 +700,23 @@ export class CcListComponent implements OnInit {
 
   createAcc() {
     this.loading = true;
-    this.nodeService.createAcc(this.request.release.releaseId).pipe(finalize(() => {
+    this.nodeService.createAcc(this.request.release.releaseId).subscribe(resp => {
       this.loading = false;
-    })).subscribe(resp => {
+      this.snackBar.open('Created', '', {
+        duration: 3000,
+      });
+
       return this.router.navigateByUrl('/core_component/acc/' + resp.manifestId);
+    }, err => {
+      this.loading = false;
+      throw err;
     });
   }
 
-  createAsccp(asccpType: string) {
-    let component;
-    if ('Verb' === asccpType) {
-      component = CreateVerbDialogComponent;
-    } else {
-      component = CreateAsccpDialogComponent;
-    }
+  createAsccp() {
+    this.loading = true;
 
-    const dialogRef = this.dialog.open(component, {
+    const dialogRef = this.dialog.open(CreateAsccpDialogComponent, {
       data: {
         libraryId: this.request.library.libraryId,
         releaseId: this.request.release.releaseId,
@@ -737,21 +730,25 @@ export class CcListComponent implements OnInit {
       autoFocus: false
     });
 
-    dialogRef.afterClosed().pipe(finalize(() => {
-      this.loading = false;
-    })).subscribe(roleOfAcc => {
+    dialogRef.afterClosed().subscribe(roleOfAcc => {
       if (!roleOfAcc || !roleOfAcc.manifestId || !roleOfAcc.objectClassTerm) {
+        this.loading = false;
         return;
       }
 
-      this.loading = true;
       const initialPropertyTerm = roleOfAcc.objectClassTerm;
-      this.nodeService.createAsccp(this.request.release.releaseId, roleOfAcc.manifestId, initialPropertyTerm, asccpType)
-        .pipe(finalize(() => {
-          this.loading = false;
-        })).subscribe(resp => {
-        return this.router.navigateByUrl('/core_component/asccp/' + resp.manifestId);
-      });
+      this.nodeService.createAsccp(this.request.release.releaseId, roleOfAcc.manifestId, initialPropertyTerm)
+          .subscribe(resp => {
+            this.loading = false;
+            this.snackBar.open('Created', '', {
+              duration: 3000,
+            });
+
+            return this.router.navigateByUrl('/core_component/asccp/' + resp.manifestId);
+          }, err => {
+            this.loading = false;
+            throw err;
+          });
     });
   }
 
@@ -772,52 +769,24 @@ export class CcListComponent implements OnInit {
       autoFocus: false
     });
 
-    dialogRef.afterClosed().pipe(finalize(() => {
-      this.loading = false;
-    })).subscribe(bdtManifestId => {
+    dialogRef.afterClosed().subscribe(bdtManifestId => {
       if (!bdtManifestId) {
+        this.loading = false;
         return;
       }
 
-      this.loading = true;
-      this.nodeService.createBccp(this.request.release.releaseId, bdtManifestId).pipe(finalize(() => {
-        this.loading = false;
-      })).subscribe(resp => {
-        return this.router.navigateByUrl('/core_component/bccp/' + resp.manifestId);
-      });
-    });
-  }
+      this.nodeService.createBccp(this.request.release.releaseId, bdtManifestId)
+          .subscribe(resp => {
+            this.loading = false;
+            this.snackBar.open('Created', '', {
+              duration: 3000,
+            });
 
-  createBdt() {
-    this.loading = true;
-
-    const dialogRef = this.dialog.open(CreateBdtDialogComponent, {
-      data: {
-        libraryId: this.request.library.libraryId,
-        releaseId: this.request.release.releaseId,
-        action: 'create',
-        stateList: (this.request.release.workingRelease) ? this.workingStateList : this.releaseStateList
-      },
-      width: '100%',
-      maxWidth: '100%',
-      height: '100%',
-      maxHeight: '100%',
-      autoFocus: false
-    });
-
-    dialogRef.afterClosed().pipe(finalize(() => {
-      this.loading = false;
-    })).subscribe(data => {
-      if (!data) {
-        return;
-      }
-
-      this.loading = true;
-      this.nodeService.createBdt(this.request.release.releaseId, data.manifestId, data.specId).pipe(finalize(() => {
-        this.loading = false;
-      })).subscribe(resp => {
-        return this.router.navigateByUrl('/core_component/dt/' + resp.manifestId);
-      });
+            return this.router.navigateByUrl('/core_component/bccp/' + resp.manifestId);
+          }, err => {
+            this.loading = false;
+            throw err;
+          });
     });
   }
 
@@ -845,21 +814,55 @@ export class CcListComponent implements OnInit {
         this.loading = false;
         return;
       }
-      this.loading = true;
-      this.nodeService.createBOD(pair.verbManifestIdList, pair.nounManifestIdList).pipe(finalize(() => {
-        this.loading = false;
-      })).subscribe(resp => {
-        if (resp.manifestIdList.length === 1) {
-          this.snackBar.open('A new BOD created.', '', {
-            duration: 3000,
-          });
-        } else {
-          this.snackBar.open(resp.manifestIdList.length + ' new BODs created.', '', {
-            duration: 3000,
-          });
-        }
 
-        this.loadCcList();
+      this.nodeService.createBOD(pair.verbManifestIdList, pair.nounManifestIdList)
+          .subscribe(resp => {
+            if (resp.manifestIdList.length === 1) {
+              this.snackBar.open('A new BOD created.', '', {
+                duration: 3000,
+              });
+            } else {
+              this.snackBar.open(resp.manifestIdList.length + ' new BODs created.', '', {
+                duration: 3000,
+              });
+            }
+
+            this.loadCcList();
+          }, err => {
+            this.loading = false;
+            throw err;
+          });
+    });
+  }
+
+  createVerb() {
+    const dialogRef = this.dialog.open(CreateVerbDialogComponent, {
+      data: {
+        libraryId: this.request.library.libraryId,
+        releaseId: this.request.release.releaseId,
+        action: 'create',
+        stateList: (this.request.release.workingRelease) ? this.workingStateList : this.releaseStateList
+      },
+      width: '100%',
+      maxWidth: '100%',
+      height: '100%',
+      maxHeight: '100%',
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().pipe(finalize(() => {
+      this.loading = false;
+    })).subscribe(roleOfAcc => {
+      if (!roleOfAcc || !roleOfAcc.manifestId || !roleOfAcc.objectClassTerm) {
+        return;
+      }
+
+      this.loading = true;
+      this.nodeService.createVerb(roleOfAcc.manifestId)
+          .pipe(finalize(() => {
+            this.loading = false;
+          })).subscribe(resp => {
+        return this.router.navigateByUrl('/core_component/asccp/' + resp.basedVerbAsccpManifestId);
       });
     });
   }
@@ -882,11 +885,11 @@ export class CcListComponent implements OnInit {
       });
   }
 
-  select(row: CcList) {
+  select(row: CcListEntry) {
     this.selection.select(row);
   }
 
-  toggle(row: CcList) {
+  toggle(row: CcListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row);
     } else {
@@ -894,11 +897,11 @@ export class CcListComponent implements OnInit {
     }
   }
 
-  isSelected(row: CcList) {
+  isSelected(row: CcListEntry) {
     return this.selection.isSelected(row);
   }
 
-  openDetail(ccList: CcList, $event?) {
+  openDetail(ccList: CcListEntry, $event?) {
     if (!!$event) {
       $event.preventDefault();
       $event.stopPropagation();
@@ -908,8 +911,8 @@ export class CcListComponent implements OnInit {
     return;
   }
 
-  isInitialRevision(ccList: CcList): boolean {
-    return !!ccList && ccList.revision === '1';
+  isInitialRevision(ccList: CcListEntry): boolean {
+    return !!ccList && ccList.log.revisionNum === 1;
   }
 
   canToolbarAction(action: string) {
@@ -919,37 +922,37 @@ export class CcListComponent implements OnInit {
     switch (action) {
       case 'BackWIP':
         return this.selection.selected.filter(e => {
-          if (['Draft', 'QA', 'Candidate'].indexOf(e.state) > -1 && e.owner === this.currentUser) {
+          if (['Draft', 'QA', 'Candidate'].indexOf(e.state) > -1 && e.owner.loginId === this.currentUser) {
             return e;
           }
         }).length === this.selection.selected.length;
       case 'Draft':
         return this.selection.selected.filter(e => {
-          if (e.state === 'WIP' && e.owner === this.currentUser && e.releaseNum === this.workingRelease.releaseNum) {
+          if (e.state === 'WIP' && e.owner.loginId === this.currentUser && e.release.releaseNum === this.workingRelease.releaseNum) {
             return e;
           }
         }).length === this.selection.selected.length;
       case 'QA':
         return this.selection.selected.filter(e => {
-          if (e.state === 'WIP' && e.owner === this.currentUser && e.releaseNum !== this.workingRelease.releaseNum) {
+          if (e.state === 'WIP' && e.owner.loginId === this.currentUser && e.release.releaseNum !== this.workingRelease.releaseNum) {
             return e;
           }
         }).length === this.selection.selected.length;
       case 'Transfer':
         return this.selection.selected.filter(e => {
-          if (e.state === 'WIP' && e.owner === this.currentUser) {
+          if (e.state === 'WIP' && e.owner.loginId === this.currentUser) {
             return e;
           }
         }).length === this.selection.selected.length;
       case 'Candidate':
         return this.selection.selected.filter(e => {
-          if (e.state === 'Draft' && e.owner === this.currentUser && e.releaseNum === this.workingRelease.releaseNum) {
+          if (e.state === 'Draft' && e.owner.loginId === this.currentUser && e.release.releaseNum === this.workingRelease.releaseNum) {
             return e;
           }
         }).length === this.selection.selected.length;
       case 'Production':
         return this.selection.selected.filter(e => {
-          if (e.state === 'QA' && e.owner === this.currentUser && e.releaseNum !== this.workingRelease.releaseNum) {
+          if (e.state === 'QA' && e.owner.loginId === this.currentUser && e.release.releaseNum !== this.workingRelease.releaseNum) {
             return e;
           }
         }).length === this.selection.selected.length;
@@ -961,7 +964,7 @@ export class CcListComponent implements OnInit {
         }).length === this.selection.selected.length;
       case 'Delete':
         return this.selection.selected.filter(e => {
-          if (e.state === 'WIP' && e.owner === this.currentUser && this.isInitialRevision(e)) {
+          if (e.state === 'WIP' && e.owner.loginId === this.currentUser && this.isInitialRevision(e)) {
             return e;
           }
         }).length === this.selection.selected.length;
@@ -982,7 +985,7 @@ export class CcListComponent implements OnInit {
     }
   }
 
-  displayType(elem: CcList): string {
+  displayType(elem: CcListEntry): string {
     return (elem.type.toUpperCase() === 'DT') ? elem.dtType : elem.type;
   }
 }

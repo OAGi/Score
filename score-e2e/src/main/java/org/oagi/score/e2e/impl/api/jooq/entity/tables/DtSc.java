@@ -36,10 +36,9 @@ import org.oagi.score.e2e.impl.api.jooq.entity.Indexes;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtScAwdPri.CdtScAwdPriPath;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtScRefSpec.CdtScRefSpecPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Dt.DtPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtSc.DtScPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtScAwdPri.DtScAwdPriPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtScManifest.DtScManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtUsageRule.DtUsageRulePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.DtScRecord;
@@ -51,7 +50,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.DtScRecord;
  * of the DT. In other words, when a new revision of a DT is created a new set
  * of supplementary components is created along with it. 
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class DtSc extends TableImpl<DtScRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -403,30 +402,17 @@ public class DtSc extends TableImpl<DtScRecord> {
         return _dtScReplacementDtScIdFk;
     }
 
-    private transient CdtScAwdPriPath _cdtScAwdPri;
+    private transient DtScAwdPriPath _dtScAwdPri;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.cdt_sc_awd_pri</code> table
+     * Get the implicit to-many join path to the <code>oagi.dt_sc_awd_pri</code>
+     * table
      */
-    public CdtScAwdPriPath cdtScAwdPri() {
-        if (_cdtScAwdPri == null)
-            _cdtScAwdPri = new CdtScAwdPriPath(this, null, Keys.CDT_SC_AWD_PRI_CDT_SC_ID_FK.getInverseKey());
+    public DtScAwdPriPath dtScAwdPri() {
+        if (_dtScAwdPri == null)
+            _dtScAwdPri = new DtScAwdPriPath(this, null, Keys.DT_SC_AWD_PRI_DT_ID_FK.getInverseKey());
 
-        return _cdtScAwdPri;
-    }
-
-    private transient CdtScRefSpecPath _cdtScRefSpec;
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.cdt_sc_ref_spec</code> table
-     */
-    public CdtScRefSpecPath cdtScRefSpec() {
-        if (_cdtScRefSpec == null)
-            _cdtScRefSpec = new CdtScRefSpecPath(this, null, Keys.CDT_SC_REF_SPEC_CDT_SC_ID_FK.getInverseKey());
-
-        return _cdtScRefSpec;
+        return _dtScAwdPri;
     }
 
     private transient DtScManifestPath _dtScManifest;

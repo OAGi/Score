@@ -69,13 +69,13 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
 
             acc = coreComponentAPI.createRandomACC(endUser, release, namespace_endUser, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace_endUser, "Production");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace_endUser, "Production");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
 
             ACCObject acc_association = coreComponentAPI.createRandomACC(endUser, release, namespace_endUser, "Production");
-            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace_endUser, "Production");
+            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace_endUser, "Production");
             coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Production");
 
             asccp = coreComponentAPI.createRandomASCCP(acc_association, endUser, namespace_endUser, "Production");

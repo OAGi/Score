@@ -12,10 +12,10 @@
       <div class="event" *ngFor="let comment of commentControl.comments" [class.new-message]="comment.isNew">
         <div class="content" [class]="comment.prevCommentId ? 'pl-4' : ''">
           <div class="summary">
-            <a>{{ comment.loginId }}</a>
+            <a>{{ comment.created.who.loginId }}</a>
             <div class="date">{{ comment.timestamp | dateAgo }}</div>
             <mat-icon class="pointer icon"
-                      *ngIf="comment.loginId === currentUser && !comment.hidden"
+                      *ngIf="comment.created.who.loginId === currentUser && !comment.hidden"
                       [inline]="true"
                       (click)="commentControl.deleteComment(comment)">close</mat-icon>
           </div>
@@ -24,7 +24,7 @@
               <span *ngIf="!comment.hidden">{{ comment.text }}</span>
               <span *ngIf="comment.hidden" class="text-muted">(This message has been deleted.)</span>
               <mat-icon class="pointer icon mt-1"
-                        *ngIf="comment.loginId === currentUser && !comment.hidden"
+                        *ngIf="comment.created.who.loginId === currentUser && !comment.hidden"
                         [inline]="true"
                         (click)="commentControl.openEditComment(comment)">edit</mat-icon>
             </div>
@@ -260,7 +260,7 @@
                                     cdkDragHandle>drag_handle</mat-icon>
                           <mat-icon [style.visibility]="!node.isCycle ? '' : 'hidden'"
                                     [matMenuTriggerFor]="contextMenu"
-                                    [matMenuTriggerData]="{'menuId': 'contextMenu'}"
+                                    [matMenuTriggerData]="{'menuId': 'contextMenu', 'hashPath': node.hashPath}"
                                     (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
                           </mat-icon>
                         </div>
@@ -345,37 +345,37 @@
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Library</mat-label>
-                            <input matInput [(ngModel)]="asAccDetail().libraryName" [disabled]="true">
+                            <input matInput [(ngModel)]="asAccDetail().library.name" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Release</mat-label>
-                            <input matInput [(ngModel)]="asAccDetail().releaseNum" [disabled]="true">
+                            <input matInput [(ngModel)]="asAccDetail().release.releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="{{ asAccDetail().lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}"
-                             (click)="openInNewTab('/core_component/acc/' + asAccDetail().sinceManifestId)"
+                        <div class="{{ asAccDetail().lastChanged > 0 ? 'col-1' : 'col-2' }}"
+                             (click)="openInNewTab('/core_component/acc/' + asAccDetail().since.accManifestId)"
                              style="cursor: pointer;">
                           <mat-form-field>
                             <mat-label>Since</mat-label>
-                            <input matInput [(ngModel)]="asAccDetail().sinceReleaseNum" [disabled]="true"
+                            <input matInput [(ngModel)]="asAccDetail().since.release.releaseNum" [disabled]="true"
                                    style="pointer-events: none;">
                           </mat-form-field>
                         </div>
-                        <div class="col-1" *ngIf="asAccDetail().lastChangedManifestId > 0"
-                             (click)="openInNewTab('/core_component/acc/' + asAccDetail().lastChangedManifestId)"
+                        <div class="col-1" *ngIf="asAccDetail().lastChanged"
+                             (click)="openInNewTab('/core_component/acc/' + asAccDetail().lastChanged.accManifestId)"
                              style="cursor: pointer;">
                           <mat-form-field>
                             <mat-label>Last Changed</mat-label>
-                            <input matInput [(ngModel)]="asAccDetail().lastChangedReleaseNum" [disabled]="true"
+                            <input matInput [(ngModel)]="asAccDetail().lastChanged.release.releaseNum" [disabled]="true"
                                    style="pointer-events: none;">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Revision</mat-label>
-                            <input matInput [(ngModel)]="asAccDetail().revisionNum" [disabled]="true">
+                            <input matInput [(ngModel)]="asAccDetail().log.revisionNum" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
@@ -387,7 +387,7 @@
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Owner</mat-label>
-                            <input matInput [(ngModel)]="asAccDetail().owner" [disabled]="true">
+                            <input matInput [(ngModel)]="asAccDetail().owner.loginId" [matTooltip]="asAccDetail().owner.username" [disabled]="true">
                           </mat-form-field>
                         </div>
                       </div>
@@ -458,14 +458,14 @@
                           <div class="checkbox">
                             <mat-checkbox color="primary"
                                           [(ngModel)]="asAccDetail().deprecated"
-                                          [disabled]="selectedNode.level !== 0 || !isEditable() || !hasRevision() || this.lastRevision.isDeprecated === true">
+                                          [disabled]="selectedNode.level !== 0 || !isEditable() || !hasRevision() || this.prevAccDetails.isDeprecated === true">
                               <span>Deprecated</span>
                               <span *ngIf="asAccDetail().replacement">, replaced by </span>
                             </mat-checkbox>
                             <div class="ml-1 d-inline-block" style="vertical-align: super" *ngIf="asAccDetail().replacement">
                               <span>
                                 <a target="_blank" rel="noopener noreferrer"
-                                   href="/core_component/acc/{{ asAccDetail().replacement.manifestId }}">{{ asAccDetail().replacement.den }}</a>
+                                   href="/core_component/acc/{{ asAccDetail().replacement.accManifestId }}">{{ asAccDetail().replacement.den }}</a>
                               </span>
                             </div>
                           </div>
@@ -548,31 +548,31 @@
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Library</mat-label>
-                            <input matInput [(ngModel)]="asAsccpDetail().ascc.libraryName" [disabled]="true">
+                            <input matInput [(ngModel)]="asAsccpDetail().ascc.library.name" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Release</mat-label>
-                            <input matInput [(ngModel)]="asAsccpDetail().ascc.releaseNum" [disabled]="true">
+                            <input matInput [(ngModel)]="asAsccpDetail().ascc.release.releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="{{ asAsccpDetail().ascc.lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}">
+                        <div class="{{ asAsccpDetail().ascc.lastChanged ? 'col-1' : 'col-2' }}">
                           <mat-form-field>
                             <mat-label>Since</mat-label>
-                            <input matInput [(ngModel)]="asAsccpDetail().ascc.sinceReleaseNum" [disabled]="true">
+                            <input matInput [(ngModel)]="asAsccpDetail().ascc.since.release.releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="col-1" *ngIf="asAsccpDetail().ascc.lastChangedManifestId > 0">
+                        <div class="col-1" *ngIf="asAsccpDetail().ascc.lastChanged">
                           <mat-form-field>
                             <mat-label>Last Changed</mat-label>
-                            <input matInput [(ngModel)]="asAsccpDetail().ascc.lastChangedReleaseNum" [disabled]="true">
+                            <input matInput [(ngModel)]="asAsccpDetail().ascc.lastChanged.release.releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Revision</mat-label>
-                            <input matInput [(ngModel)]="asAsccpDetail().ascc.revisionNum" [disabled]="true">
+                            <input matInput [(ngModel)]="asAsccpDetail().ascc.log.revisionNum" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
@@ -584,7 +584,7 @@
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Owner</mat-label>
-                            <input matInput [(ngModel)]="asAsccpDetail().ascc.owner" [disabled]="true">
+                            <input matInput [(ngModel)]="asAsccpDetail().ascc.owner.loginId" [matTooltip]="asAsccpDetail().ascc.owner.username" [disabled]="true">
                           </mat-form-field>
                         </div>
                       </div>
@@ -712,37 +712,37 @@
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Library</mat-label>
-                            <input matInput [(ngModel)]="asAsccpDetail().asccp.libraryName" [disabled]="true">
+                            <input matInput [(ngModel)]="asAsccpDetail().asccp.library.name" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Release</mat-label>
-                            <input matInput [(ngModel)]="asAsccpDetail().asccp.releaseNum" [disabled]="true">
+                            <input matInput [(ngModel)]="asAsccpDetail().asccp.release.releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="{{ asAsccpDetail().asccp.lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}"
-                             (click)="openInNewTab('/core_component/asccp/' + asAsccpDetail().asccp.sinceManifestId)"
+                        <div class="{{ asAsccpDetail().asccp.lastChanged ? 'col-1' : 'col-2' }}"
+                             (click)="openInNewTab('/core_component/asccp/' + asAsccpDetail().asccp.since.asccpManifestId)"
                              style="cursor: pointer;">
                           <mat-form-field>
                             <mat-label>Since</mat-label>
-                            <input matInput [(ngModel)]="asAsccpDetail().asccp.sinceReleaseNum" [disabled]="true"
+                            <input matInput [(ngModel)]="asAsccpDetail().asccp.since.release.releaseNum" [disabled]="true"
                                    style="pointer-events: none;">
                           </mat-form-field>
                         </div>
-                        <div class="col-1" *ngIf="asAsccpDetail().asccp.lastChangedManifestId > 0"
-                             (click)="openInNewTab('/core_component/asccp/' + asAsccpDetail().asccp.lastChangedManifestId)"
+                        <div class="col-1" *ngIf="asAsccpDetail().asccp.lastChanged"
+                             (click)="openInNewTab('/core_component/asccp/' + asAsccpDetail().asccp.lastChanged.asccpManifestId)"
                              style="cursor: pointer;">
                           <mat-form-field>
                             <mat-label>Last Changed</mat-label>
-                            <input matInput [(ngModel)]="asAsccpDetail().asccp.lastChangedReleaseNum" [disabled]="true"
+                            <input matInput [(ngModel)]="asAsccpDetail().asccp.lastChanged.release.releaseNum" [disabled]="true"
                                    style="pointer-events: none;">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Revision</mat-label>
-                            <input matInput [(ngModel)]="asAsccpDetail().asccp.revisionNum" [disabled]="true">
+                            <input matInput [(ngModel)]="asAsccpDetail().asccp.log.revisionNum" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
@@ -754,7 +754,7 @@
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Owner</mat-label>
-                            <input matInput [(ngModel)]="asAsccpDetail().asccp.owner" [disabled]="true">
+                            <input matInput [(ngModel)]="asAsccpDetail().asccp.owner.loginId" [matTooltip]="asAsccpDetail().asccp.owner.username" [disabled]="true">
                           </mat-form-field>
                         </div>
                       </div>
@@ -823,7 +823,7 @@
                             <div class="ml-1 d-inline-block" style="vertical-align: super" *ngIf="asAsccpDetail().asccp.replacement">
                               <span>
                                 <a target="_blank" rel="noopener noreferrer"
-                                   href="/core_component/asccp/{{ asAsccpDetail().asccp.replacement.manifestId }}">{{ asAsccpDetail().asccp.replacement.den }}</a>
+                                   href="/core_component/asccp/{{ asAsccpDetail().asccp.replacement.asccpManifestId }}">{{ asAsccpDetail().asccp.replacement.den }}</a>
                               </span>
                             </div>
                           </div>
@@ -889,31 +889,31 @@
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Library</mat-label>
-                            <input matInput [(ngModel)]="asBccpDetail().bcc.libraryName" [disabled]="true">
+                            <input matInput [(ngModel)]="asBccpDetail().bcc.library.name" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Release</mat-label>
-                            <input matInput [(ngModel)]="asBccpDetail().bcc.releaseNum" [disabled]="true">
+                            <input matInput [(ngModel)]="asBccpDetail().bcc.release.releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="{{ asBccpDetail().bcc.lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}">
+                        <div class="{{ asBccpDetail().bcc.lastChanged ? 'col-1' : 'col-2' }}">
                           <mat-form-field>
                             <mat-label>Since</mat-label>
-                            <input matInput [(ngModel)]="asBccpDetail().bcc.sinceReleaseNum" [disabled]="true">
+                            <input matInput [(ngModel)]="asBccpDetail().bcc.since.release.releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="col-1" *ngIf="asBccpDetail().bcc.lastChangedManifestId > 0">
+                        <div class="col-1" *ngIf="asBccpDetail().bcc.lastChanged">
                           <mat-form-field>
                             <mat-label>Last Changed</mat-label>
-                            <input matInput [(ngModel)]="asBccpDetail().bcc.lastChangedReleaseNum" [disabled]="true">
+                            <input matInput [(ngModel)]="asBccpDetail().bcc.lastChanged.release.releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Revision</mat-label>
-                            <input matInput [(ngModel)]="asBccpDetail().bcc.revisionNum" [disabled]="true">
+                            <input matInput [(ngModel)]="asBccpDetail().bcc.log.revisionNum" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
@@ -925,7 +925,7 @@
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Owner</mat-label>
-                            <input matInput [(ngModel)]="asBccpDetail().bcc.owner" [disabled]="true">
+                            <input matInput [(ngModel)]="asBccpDetail().bcc.owner.loginId" [matTooltip]="asBccpDetail().bcc.owner.username" [disabled]="true">
                           </mat-form-field>
                         </div>
                       </div>
@@ -1105,37 +1105,37 @@
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Library</mat-label>
-                            <input matInput [(ngModel)]="asBccpDetail().bccp.libraryName" [disabled]="true">
+                            <input matInput [(ngModel)]="asBccpDetail().bccp.library.name" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Release</mat-label>
-                            <input matInput [(ngModel)]="asBccpDetail().bccp.releaseNum" [disabled]="true">
+                            <input matInput [(ngModel)]="asBccpDetail().bccp.release.releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="{{ asBccpDetail().bccp.lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}"
-                             (click)="openInNewTab('/core_component/bccp/' + asBccpDetail().bccp.sinceManifestId)"
+                        <div class="{{ asBccpDetail().bccp.lastChanged ? 'col-1' : 'col-2' }}"
+                             (click)="openInNewTab('/core_component/bccp/' + asBccpDetail().bccp.since.bccpManifestId)"
                              style="cursor: pointer;">
                           <mat-form-field>
                             <mat-label>Since</mat-label>
-                            <input matInput [(ngModel)]="asBccpDetail().bccp.sinceReleaseNum" [disabled]="true"
+                            <input matInput [(ngModel)]="asBccpDetail().bccp.since.release.releaseNum" [disabled]="true"
                                    style="pointer-events: none;">
                           </mat-form-field>
                         </div>
-                        <div class="col-1" *ngIf="asBccpDetail().bccp.lastChangedManifestId > 0"
-                             (click)="openInNewTab('/core_component/bccp/' + asBccpDetail().bccp.lastChangedManifestId)"
+                        <div class="col-1" *ngIf="asBccpDetail().bccp.lastChanged"
+                             (click)="openInNewTab('/core_component/bccp/' + asBccpDetail().bccp.lastChanged.bccpManifestId)"
                              style="cursor: pointer;">
                           <mat-form-field>
                             <mat-label>Last Changed</mat-label>
-                            <input matInput [(ngModel)]="asBccpDetail().bccp.lastChangedReleaseNum" [disabled]="true"
+                            <input matInput [(ngModel)]="asBccpDetail().bccp.lastChanged.release.releaseNum" [disabled]="true"
                                    style="pointer-events: none;">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Revision</mat-label>
-                            <input matInput [(ngModel)]="asBccpDetail().bccp.revisionNum" [disabled]="true">
+                            <input matInput [(ngModel)]="asBccpDetail().bccp.log.revisionNum" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
@@ -1147,7 +1147,7 @@
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Owner</mat-label>
-                            <input matInput [(ngModel)]="asBccpDetail().bccp.owner" [disabled]="true">
+                            <input matInput [(ngModel)]="asBccpDetail().bccp.owner.loginId" [matTooltip]="asBccpDetail().bccp.owner.username" [disabled]="true">
                           </mat-form-field>
                         </div>
                       </div>
@@ -1206,7 +1206,7 @@
                             <div class="ml-1 d-inline-block" style="vertical-align: super" *ngIf="asBccpDetail().bccp.replacement">
                               <span>
                                 <a target="_blank" rel="noopener noreferrer"
-                                   href="/core_component/bccp/{{ asBccpDetail().bccp.replacement.manifestId }}">{{ asBccpDetail().bccp.replacement.den }}</a>
+                                   href="/core_component/bccp/{{ asBccpDetail().bccp.replacement.bccpManifestId }}">{{ asBccpDetail().bccp.replacement.den }}</a>
                               </span>
                             </div>
                           </div>
@@ -1304,37 +1304,37 @@
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Library</mat-label>
-                            <input matInput [(ngModel)]="asBccpDetail().bdt.libraryName" [disabled]="true">
+                            <input matInput [(ngModel)]="asBccpDetail().bdt.library.name" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Release</mat-label>
-                            <input matInput [(ngModel)]="asBccpDetail().bdt.releaseNum" [disabled]="true">
+                            <input matInput [(ngModel)]="asBccpDetail().bdt.release.releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="{{ asBccpDetail().bdt.lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}"
-                             (click)="openInNewTab('/core_component/dt/' + asBccpDetail().bdt.sinceManifestId)"
+                        <div class="{{ asBccpDetail().bdt.lastChanged ? 'col-1' : 'col-2' }}"
+                             (click)="openInNewTab('/data_type/' + asBccpDetail().bdt.since.dtManifestId)"
                              style="cursor: pointer;">
                           <mat-form-field>
                             <mat-label>Since</mat-label>
-                            <input matInput [(ngModel)]="asBccpDetail().bdt.sinceReleaseNum" [disabled]="true"
+                            <input matInput [(ngModel)]="asBccpDetail().bdt.since.release.releaseNum" [disabled]="true"
                                    style="pointer-events: none;">
                           </mat-form-field>
                         </div>
-                        <div class="col-1" *ngIf="asBccpDetail().bdt.lastChangedManifestId > 0"
-                             (click)="openInNewTab('/core_component/dt/' + asBccpDetail().bdt.lastChangedManifestId)"
+                        <div class="col-1" *ngIf="asBccpDetail().bdt.lastChanged"
+                             (click)="openInNewTab('/data_type/' + asBccpDetail().bdt.lastChanged.dtManifestId)"
                              style="cursor: pointer;">
                           <mat-form-field>
                             <mat-label>Last Changed</mat-label>
-                            <input matInput [(ngModel)]="asBccpDetail().bdt.lastChangedReleaseNum" [disabled]="true"
+                            <input matInput [(ngModel)]="asBccpDetail().bdt.lastChanged.release.releaseNum" [disabled]="true"
                                    style="pointer-events: none;">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Revision</mat-label>
-                            <input matInput [(ngModel)]="asBccpDetail().bdt.revisionNum" [disabled]="true">
+                            <input matInput [(ngModel)]="asBccpDetail().bdt.log.revisionNum" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
@@ -1346,7 +1346,7 @@
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Owner</mat-label>
-                            <input matInput [(ngModel)]="asBccpDetail().bdt.owner" [disabled]="true">
+                            <input matInput [(ngModel)]="asBccpDetail().bdt.owner.loginId" [matTooltip]="asBccpDetail().bdt.owner.username" [disabled]="true">
                           </mat-form-field>
                         </div>
                       </div>
@@ -1448,51 +1448,51 @@
               </div>
 
               <!-- BDT_SC -->
-              <div class="cc-node-detail-panel" *ngIf="isBdtScDetail()">
+              <div class="cc-node-detail-panel" *ngIf="isDtScDetail()">
                 <mat-tab-group mat-align-tabs="start" animationDuration="0ms">
-                  <mat-tab label="{{ asBdtScDetail().den }}">
+                  <mat-tab label="{{ asDtScDetail().den }}">
                     <div class="cc-node-detail-container">
                       <div class="row">
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Library</mat-label>
-                            <input matInput [(ngModel)]="asBdtScDetail().libraryName" [disabled]="true">
+                            <input matInput [(ngModel)]="asDtScDetail().library.name" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Release</mat-label>
-                            <input matInput [(ngModel)]="asBdtScDetail().releaseNum" [disabled]="true">
+                            <input matInput [(ngModel)]="asDtScDetail().release.releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="{{ asBdtScDetail().lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}">
+                        <div class="{{ asDtScDetail().lastChanged ? 'col-1' : 'col-2' }}">
                           <mat-form-field>
                             <mat-label>Since</mat-label>
-                            <input matInput [(ngModel)]="asBdtScDetail().sinceReleaseNum" [disabled]="true">
+                            <input matInput [(ngModel)]="asDtScDetail().since.release.releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="col-1" *ngIf="asBdtScDetail().lastChangedManifestId > 0">
+                        <div class="col-1" *ngIf="asDtScDetail().lastChanged">
                           <mat-form-field>
                             <mat-label>Last Changed</mat-label>
-                            <input matInput [(ngModel)]="asBdtScDetail().lastChangedReleaseNum" [disabled]="true">
+                            <input matInput [(ngModel)]="asDtScDetail().lastChanged.release.releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Revision</mat-label>
-                            <input matInput [(ngModel)]="asBdtScDetail().revisionNum" [disabled]="true">
+                            <input matInput [(ngModel)]="asDtScDetail().log.revisionNum" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>State</mat-label>
-                            <input matInput [(ngModel)]="asBdtScDetail().state" [disabled]="true">
+                            <input matInput [(ngModel)]="asDtScDetail().state" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Owner</mat-label>
-                            <input matInput [(ngModel)]="asBdtScDetail().owner" [disabled]="true">
+                            <input matInput [(ngModel)]="asDtScDetail().owner.loginId" [matTooltip]="asDtScDetail().owner.username" [disabled]="true">
                           </mat-form-field>
                         </div>
                       </div>
@@ -1508,14 +1508,14 @@
                           <mat-form-field>
                             <mat-label>GUID</mat-label>
                             <input matInput maxlength="41"
-                                   [(ngModel)]="asBdtScDetail().guid" [disabled]="true">
+                                   [(ngModel)]="asDtScDetail().guid" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-6">
                           <mat-form-field>
                             <mat-label>{{ 'BDT_SC_DETAIL.DEN' | translate }}</mat-label>
                             <input matInput maxlength="200"
-                                   [(ngModel)]="asBdtScDetail().den" [disabled]="true">
+                                   [(ngModel)]="asDtScDetail().den" [disabled]="true">
                           </mat-form-field>
                         </div>
                       </div>
@@ -1525,7 +1525,7 @@
                           <mat-form-field>
                             <mat-label>Cardinality Min</mat-label>
                             <input matInput placeholder="Cardinality Min"
-                                   [(ngModel)]="asBdtScDetail().cardinalityMin"
+                                   [(ngModel)]="asDtScDetail().cardinalityMin"
                                    [disabled]="true">
                           </mat-form-field>
                         </div>
@@ -1533,7 +1533,7 @@
                           <mat-form-field>
                             <mat-label>{{ 'BDT_SC_DETAIL.MAX' | translate }}</mat-label>
                             <input matInput placeholder="{{ 'BDT_SC_DETAIL.MAX' | translate }}"
-                                   [value]="asBdtScDetail().cardinalityMax | unbounded"
+                                   [value]="asDtScDetail().cardinalityMax | unbounded"
                                    [disabled]="true">
                           </mat-form-field>
                         </div>
@@ -1543,7 +1543,7 @@
                         <div class="col-md-3 col-sm-3">
                           <mat-form-field>
                             <mat-label>Value Constraint</mat-label>
-                            <mat-select [(ngModel)]="asBdtScDetail().fixedOrDefault"
+                            <mat-select [(ngModel)]="asDtScDetail().fixedOrDefault"
                                         [disabled]="true">
                               <mat-option value="none">None</mat-option>
                               <mat-option value="fixed">Fixed Value</mat-option>
@@ -1552,23 +1552,23 @@
                           </mat-form-field>
                         </div>
                         <div class="col-md-9 col-sm-9">
-                          <mat-form-field *ngIf="asBdtScDetail().fixedOrDefault == 'none'">
+                          <mat-form-field *ngIf="asDtScDetail().fixedOrDefault == 'none'">
                             <mat-label>No value constraints</mat-label>
                             <input matInput placeholder="No value constraints"
                                    [disabled]="true">
                           </mat-form-field>
 
-                          <mat-form-field *ngIf="asBdtScDetail().fixedOrDefault == 'fixed'">
+                          <mat-form-field *ngIf="asDtScDetail().fixedOrDefault == 'fixed'">
                             <mat-label>Fixed Value</mat-label>
                             <input matInput placeholder="Fixed Value"
-                                   [(ngModel)]="asBdtScDetail().fixedValue"
+                                   [(ngModel)]="asDtScDetail().fixedValue"
                                    [disabled]="true">
                           </mat-form-field>
 
-                          <mat-form-field *ngIf="asBdtScDetail().fixedOrDefault == 'default'">
+                          <mat-form-field *ngIf="asDtScDetail().fixedOrDefault == 'default'">
                             <mat-label>Default Value</mat-label>
                             <input matInput placeholder="Default Value"
-                                   [(ngModel)]="asBdtScDetail().defaultValue"
+                                   [(ngModel)]="asDtScDetail().defaultValue"
                                    [disabled]="true">
                           </mat-form-field>
                         </div>
@@ -1579,7 +1579,7 @@
                           <mat-form-field>
                             <mat-label>Definition Source</mat-label>
                             <input matInput placeholder="Definition Source" maxlength="100"
-                                   [(ngModel)]="asBdtScDetail().definitionSource" [disabled]="true">
+                                   [(ngModel)]="asDtScDetail().definitionSource" [disabled]="true">
                           </mat-form-field>
                         </div>
                       </div>
@@ -1591,11 +1591,11 @@
                             <div class="textarea-container">
                               <textarea matInput rows="6" cols="30"
                                         placeholder="Definition"
-                                        [(ngModel)]="asBdtScDetail().definition"
+                                        [(ngModel)]="asDtScDetail().definition"
                                         [readonly]="true"></textarea>
                               <button mat-icon-button mat-small-icon-button
                                       *ngIf="this.state === 'WIP' && this.access === 'CanEdit'"
-                                      (click)="copyToDefinition(asBdtScDetail().definition)"
+                                      (click)="copyToDefinition(asDtScDetail().definition)"
                                       matTooltip="Copy to Definition">
                                 <mat-icon>content_paste</mat-icon>
                               </button>

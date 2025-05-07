@@ -47,7 +47,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BizCtxRecord;
  * This table represents a business context. A business context is a combination
  * of one or more business context values.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class BizCtx extends TableImpl<BizCtxRecord> {
 
     private static final long serialVersionUID = 1L;

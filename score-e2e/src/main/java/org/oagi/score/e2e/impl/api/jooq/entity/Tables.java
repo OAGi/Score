@@ -33,8 +33,6 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccManifest;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bccp;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccpManifest;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccpManifestTag;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.BdtPriRestri;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.BdtScPriRestri;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BiePackage;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BiePackageTopLevelAsbiep;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BieUsageRule;
@@ -45,13 +43,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtxValue;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BlobContent;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BlobContentManifest;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BusinessTerm;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtAwdPri;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtAwdPriXpsTypeMap;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtPri;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtRefSpec;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtScAwdPri;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtScAwdPriXpsTypeMap;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtScRefSpec;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeList;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeListManifest;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeListValue;
@@ -62,9 +54,11 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.CtxCategory;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.CtxScheme;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.CtxSchemeValue;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Dt;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtAwdPri;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtManifest;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtManifestTag;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtSc;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtScAwdPri;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtScManifest;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtUsageRule;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Exception;
@@ -105,8 +99,8 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasServerVariable;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasTag;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Oauth2App;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Oauth2AppScope;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.RefSpec;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Release;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ReleaseDep;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.SeqKey;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Tag;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Tenant;
@@ -123,7 +117,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.XbtManifest;
 /**
  * Convenience access to all tables in oagi.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Tables {
 
     /**
@@ -311,37 +305,6 @@ public class Tables {
     public static final BccpManifestTag BCCP_MANIFEST_TAG = BccpManifestTag.BCCP_MANIFEST_TAG;
 
     /**
-     * This table captures the allowed primitives for a BDT. The allowed
-     * primitives are captured by three columns the CDT_AWD_PRI_XPS_TYPE_MAP_ID,
-     * CODE_LIST_ID, and AGENCY_ID_LIST_ID. The first column specifies the
-     * primitive by the built-in type of an expression language such as the XML
-     * Schema built-in type. The second specifies the primitive, which is a code
-     * list, while the last one specifies the primitive which is an agency
-     * identification list. Only one column among the three can have a value in
-     * a particular record.
-     */
-    public static final BdtPriRestri BDT_PRI_RESTRI = BdtPriRestri.BDT_PRI_RESTRI;
-
-    /**
-     * This table is similar to the BDT_PRI_RESTRI table but it is for the BDT
-     * SC. The allowed primitives are captured by three columns the
-     * CDT_SC_AWD_PRI_XPS_TYPE_MAP, CODE_LIST_ID, and AGENCY_ID_LIST_ID. The
-     * first column specifies the primitive by the built-in type of an
-     * expression language such as the XML Schema built-in type. The second
-     * specifies the primitive, which is a code list, while the last one
-     * specifies the primitive which is an agency identification list. Only one
-     * column among the three can have a value in a particular record.
-     * 
-     * It should be noted that the table does not store the fact about primitive
-     * restriction hierarchical relationships. In other words, if a BDT SC is
-     * derived from another BDT SC and the derivative BDT SC applies some
-     * primitive restrictions, that relationship will not be explicitly stored.
-     * The derivative BDT SC points directly to the CDT_AWD_PRI_XPS_TYPE_MAP key
-     * rather than the BDT_SC_PRI_RESTRI key.
-     */
-    public static final BdtScPriRestri BDT_SC_PRI_RESTRI = BdtScPriRestri.BDT_SC_PRI_RESTRI;
-
-    /**
      * The table <code>oagi.bie_package</code>.
      */
     public static final BiePackage BIE_PACKAGE = BiePackage.BIE_PACKAGE;
@@ -409,61 +372,9 @@ public class Tables {
     public static final BusinessTerm BUSINESS_TERM = BusinessTerm.BUSINESS_TERM;
 
     /**
-     * This table capture allowed primitives of the CDT?s Content Component. 
-     * The information in this table is captured from the Allowed Primitive
-     * column in each of the CDT Content Component section/table in CCTS DTC3.
-     */
-    public static final CdtAwdPri CDT_AWD_PRI = CdtAwdPri.CDT_AWD_PRI;
-
-    /**
-     * This table allows for concrete mapping between the CDT Primitives and
-     * types in a particular expression such as XML Schema, JSON. At this point,
-     * it is not clear whether a separate table will be needed for each
-     * expression. The current table holds the map to XML Schema built-in types.
-     * 
-     * 
-     * For each additional expression, a column similar to the XBT_ID column
-     * will need to be added to this table for mapping to data types in another
-     * expression.
-     * 
-     * If we use a separate table for each expression, then we need binding all
-     * the way to BDT (or even BBIE) for every new expression. That would be
-     * almost like just store a BDT file. But using a column may not work with
-     * all kinds of expressions, particulary if it does not map well to the XML
-     * schema data types. 
-     */
-    public static final CdtAwdPriXpsTypeMap CDT_AWD_PRI_XPS_TYPE_MAP = CdtAwdPriXpsTypeMap.CDT_AWD_PRI_XPS_TYPE_MAP;
-
-    /**
      * This table stores the CDT primitives.
      */
     public static final CdtPri CDT_PRI = CdtPri.CDT_PRI;
-
-    /**
-     * The table <code>oagi.cdt_ref_spec</code>.
-     */
-    public static final CdtRefSpec CDT_REF_SPEC = CdtRefSpec.CDT_REF_SPEC;
-
-    /**
-     * This table capture the CDT primitives allowed for a particular SC of a
-     * CDT. It also stores the CDT primitives allowed for a SC of a BDT that
-     * extends its base (such SC is not defined in the CCTS data type catalog
-     * specification).
-     */
-    public static final CdtScAwdPri CDT_SC_AWD_PRI = CdtScAwdPri.CDT_SC_AWD_PRI;
-
-    /**
-     * The purpose of this table is the same as that of the
-     * CDT_AWD_PRI_XPS_TYPE_MAP, but it is for the supplementary component (SC).
-     * It allows for the concrete mapping between the CDT Primitives and types
-     * in a particular expression such as XML Schema, JSON. 
-     */
-    public static final CdtScAwdPriXpsTypeMap CDT_SC_AWD_PRI_XPS_TYPE_MAP = CdtScAwdPriXpsTypeMap.CDT_SC_AWD_PRI_XPS_TYPE_MAP;
-
-    /**
-     * The table <code>oagi.cdt_sc_ref_spec</code>.
-     */
-    public static final CdtScRefSpec CDT_SC_REF_SPEC = CdtScRefSpec.CDT_SC_REF_SPEC;
 
     /**
      * This table stores information about a code list. When a code list is
@@ -528,6 +439,18 @@ public class Tables {
     public static final Dt DT = Dt.DT;
 
     /**
+     * This table captures the allowed primitives for a DT. The allowed
+     * primitives are captured by three columns the XBT_MANIFEST_ID,
+     * CODE_LIST_MANIFEST_ID, and AGENCY_ID_LIST_MANIFEST_ID. The first column
+     * specifies the primitive by the built-in type of an expression language
+     * such as the XML Schema built-in type. The second specifies the primitive,
+     * which is a code list, while the last one specifies the primitive which is
+     * an agency identification list. Only one column among the three can have a
+     * value in a particular record.
+     */
+    public static final DtAwdPri DT_AWD_PRI = DtAwdPri.DT_AWD_PRI;
+
+    /**
      * The table <code>oagi.dt_manifest</code>.
      */
     public static final DtManifest DT_MANIFEST = DtManifest.DT_MANIFEST;
@@ -544,6 +467,18 @@ public class Tables {
      * new set of supplementary components is created along with it. 
      */
     public static final DtSc DT_SC = DtSc.DT_SC;
+
+    /**
+     * This table captures the allowed primitives for a DT_SC. The allowed
+     * primitives are captured by three columns the XBT_MANIFEST_ID,
+     * CODE_LIST_MANIFEST_ID, and AGENCY_ID_LIST_MANIFEST_ID. The first column
+     * specifies the primitive by the built-in type of an expression language
+     * such as the XML Schema built-in type. The second specifies the primitive,
+     * which is a code list, while the last one specifies the primitive which is
+     * an agency identification list. Only one column among the three can have a
+     * value in a particular record.
+     */
+    public static final DtScAwdPri DT_SC_AWD_PRI = DtScAwdPri.DT_SC_AWD_PRI;
 
     /**
      * The table <code>oagi.dt_sc_manifest</code>.
@@ -752,14 +687,14 @@ public class Tables {
     public static final Oauth2AppScope OAUTH2_APP_SCOPE = Oauth2AppScope.OAUTH2_APP_SCOPE;
 
     /**
-     * The table <code>oagi.ref_spec</code>.
-     */
-    public static final RefSpec REF_SPEC = RefSpec.REF_SPEC;
-
-    /**
      * The is table store the release information.
      */
     public static final Release RELEASE = Release.RELEASE;
+
+    /**
+     * This table stores release dependency information.
+     */
+    public static final ReleaseDep RELEASE_DEP = ReleaseDep.RELEASE_DEP;
 
     /**
      * The table <code>oagi.seq_key</code>.

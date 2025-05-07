@@ -13,7 +13,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.Configuration;
 /**
  * The table stores configuration properties of the application.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class ConfigurationRecord extends UpdatableRecordImpl<ConfigurationRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -112,6 +112,6 @@ public class ConfigurationRecord extends UpdatableRecordImpl<ConfigurationRecord
         setName(name);
         setType(type);
         setValue(value);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

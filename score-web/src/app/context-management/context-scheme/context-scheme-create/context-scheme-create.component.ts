@@ -3,7 +3,7 @@ import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {CodelistListDialogComponent} from '../codelist-list-dialog/codelist-list-dialog.component';
 import {ContextSchemeService} from '../domain/context-scheme.service';
-import {ContextScheme, ContextSchemeValue, SimpleContextCategory, SimpleContextScheme} from '../domain/context-scheme';
+import {ContextSchemeCreateRequest, ContextSchemeSummary, ContextSchemeValue} from '../domain/context-scheme';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -11,7 +11,7 @@ import {MatSort} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {ContextSchemeValueDialogComponent} from '../context-scheme-value-dialog/context-scheme-value-dialog.component';
 import {SelectionModel} from '@angular/cdk/collections';
-import {CodeList, CodeListValue} from '../../../code-list-management/domain/code-list';
+import {CodeList, CodeListDetails, CodeListListEntry, CodeListValueDetails} from '../../../code-list-management/domain/code-list';
 import {v4 as uuid} from 'uuid';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {FormControl} from '@angular/forms';
@@ -23,6 +23,9 @@ import {
 } from '../../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {AuthService} from '../../../authentication/auth.service';
+import {ContextCategoryService} from '../../context-category/domain/context-category.service';
+import {ContextCategorySummary} from '../../context-category/domain/context-category';
+import {CodeListService} from '../../../code-list-management/domain/code-list.service';
 
 @Component({
   selector: 'score-context-scheme-create',
@@ -32,18 +35,18 @@ import {AuthService} from '../../../authentication/auth.service';
 export class ContextSchemeCreateComponent implements OnInit {
 
   title = 'Create Context Scheme';
-  ctxCategories: SimpleContextCategory[];
+  ctxCategories: ContextCategorySummary[];
   ctxCategoriesFilterCtrl: FormControl = new FormControl();
-  filteredCtxCategories: ReplaySubject<SimpleContextCategory[]> = new ReplaySubject<SimpleContextCategory[]>(1);
+  filteredCtxCategories: ReplaySubject<ContextCategorySummary[]> = new ReplaySubject<ContextCategorySummary[]>(1);
 
-  contextSchemes: SimpleContextScheme[];
+  contextSchemes: ContextSchemeSummary[];
   codeLists: CodeList[];
   currCodeList: CodeList;
   codeListFilterCtrl: FormControl = new FormControl();
   filteredCodeLists: ReplaySubject<CodeList[]> = new ReplaySubject<CodeList[]>(1);
   disabled: boolean;
 
-  contextScheme: ContextScheme;
+  contextSchemeCreateRequest: ContextSchemeCreateRequest;
   preferencesInfo: PreferencesInfo;
 
   get columns(): TableColumnsProperty[] {
@@ -134,6 +137,8 @@ export class ContextSchemeCreateComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
   constructor(private service: ContextSchemeService,
+              private contextCategoryService: ContextCategoryService,
+              private codeListService: CodeListService,
               private location: Location,
               private route: ActivatedRoute,
               private router: Router,
@@ -146,18 +151,18 @@ export class ContextSchemeCreateComponent implements OnInit {
 
   ngOnInit() {
     this.disabled = false;
-    this.contextScheme = new ContextScheme();
+    this.contextSchemeCreateRequest = new ContextSchemeCreateRequest();
 
     forkJoin([
-      this.service.getSimpleContextCategories(),
-      this.service.getSimpleContextSchemes(),
+      this.contextCategoryService.getContextCategorySummaries(),
+      this.service.getContextSchemeSummaries(),
       this.preferencesService.load(this.auth.getUserToken())
-    ]).subscribe(([simpleContextCategories, simpleContextSchemes, preferencesInfo]) => {
+    ]).subscribe(([contextCategorySummries, contextSchemeSummaries, preferencesInfo]) => {
       this.preferencesInfo = preferencesInfo;
-      this.ctxCategories = simpleContextCategories;
+      this.ctxCategories = contextCategorySummries;
       this.filteredCtxCategories.next(this.ctxCategories.slice());
       this.codeLists = [];
-      this.contextSchemes = simpleContextSchemes;
+      this.contextSchemes = contextSchemeSummaries;
       this.filteredCodeLists.next(this.codeLists.slice());
     });
 
@@ -183,13 +188,13 @@ export class ContextSchemeCreateComponent implements OnInit {
     );
   }
 
-  isDisabled(contextScheme: ContextScheme) {
+  isDisabled() {
     return (this.disabled) ||
-      (contextScheme.contextCategoryId === undefined || contextScheme.contextCategoryId <= 0) ||
-      (contextScheme.schemeName === undefined || contextScheme.schemeName === '') ||
-      (contextScheme.schemeId === undefined || contextScheme.schemeId === '') ||
-      (contextScheme.schemeAgencyId === undefined || contextScheme.schemeAgencyId === '') ||
-      (contextScheme.schemeVersionId === undefined || contextScheme.schemeVersionId === '');
+      (this.contextSchemeCreateRequest.contextCategoryId === undefined || this.contextSchemeCreateRequest.contextCategoryId <= 0) ||
+      (this.contextSchemeCreateRequest.schemeName === undefined || this.contextSchemeCreateRequest.schemeName === '') ||
+      (this.contextSchemeCreateRequest.schemeId === undefined || this.contextSchemeCreateRequest.schemeId === '') ||
+      (this.contextSchemeCreateRequest.schemeAgencyId === undefined || this.contextSchemeCreateRequest.schemeAgencyId === '') ||
+      (this.contextSchemeCreateRequest.schemeVersionId === undefined || this.contextSchemeCreateRequest.schemeVersionId === '');
   }
 
   openDialog(contextSchemeValue?: ContextSchemeValue) {
@@ -244,7 +249,7 @@ export class ContextSchemeCreateComponent implements OnInit {
 
   _updateDataSource(data: ContextSchemeValue[]) {
     this.dataSource.data = data;
-    this.contextScheme.contextSchemeValueList = data;
+    this.contextSchemeCreateRequest.contextSchemeValueList = data;
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
@@ -330,7 +335,7 @@ export class ContextSchemeCreateComponent implements OnInit {
   }
 
   doCreate() {
-    this.service.create(this.contextScheme).subscribe(_ => {
+    this.service.create(this.contextSchemeCreateRequest).subscribe(_ => {
       this.snackBar.open('Created', '', {
         duration: 3000,
       });
@@ -339,15 +344,17 @@ export class ContextSchemeCreateComponent implements OnInit {
   }
 
   create() {
-    this.checkUniqueness(this.contextScheme, (_) => {
-      this.checkSchemeAgencyName(this.contextScheme, (dummy) => {
+    this.checkUniqueness((_) => {
+      this.checkSchemeAgencyName((_) => {
         this.doCreate();
       });
     });
   }
 
-  checkUniqueness(_contextScheme: ContextScheme, callbackFn?) {
-    this.service.checkUniqueness(_contextScheme).subscribe(resp => {
+  checkUniqueness(callbackFn?) {
+    this.service.checkUniqueness(this.contextSchemeCreateRequest.schemeId,
+        this.contextSchemeCreateRequest.schemeAgencyId,
+        this.contextSchemeCreateRequest.schemeVersionId).subscribe(resp => {
       if (resp) {
         this.openDialogContextSchemeCreate();
         return;
@@ -356,8 +363,11 @@ export class ContextSchemeCreateComponent implements OnInit {
     });
   }
 
-  checkSchemeAgencyName(_contextScheme: ContextScheme, callbackFn?) {
-    this.service.checkNameUniqueness(_contextScheme).subscribe(resp => {
+  checkSchemeAgencyName(callbackFn?) {
+    this.service.checkNameUniqueness(this.contextSchemeCreateRequest.schemeName,
+        this.contextSchemeCreateRequest.schemeId,
+        this.contextSchemeCreateRequest.schemeAgencyId,
+        this.contextSchemeCreateRequest.schemeVersionId).subscribe(resp => {
       if (resp) {
         this.openDialogContextSchemeUpdateCreate();
         return;
@@ -366,14 +376,14 @@ export class ContextSchemeCreateComponent implements OnInit {
     });
   }
 
-  convertCodeListValuesIntoContextSchemeValues(codeListValues: CodeListValue[]) {
+  convertCodeListValuesIntoContextSchemeValues(codeListValues: CodeListValueDetails[]): ContextSchemeValue[] {
     let contextSchemeValueList: ContextSchemeValue[];
     contextSchemeValueList = [];
-    for (const codelistvalue of codeListValues) {
+    for (const codeListValue of codeListValues) {
       let contextSchemeValue: ContextSchemeValue;
       contextSchemeValue = new ContextSchemeValue();
-      contextSchemeValue.meaning = codelistvalue.meaning;
-      contextSchemeValue.value = codelistvalue.value;
+      contextSchemeValue.meaning = codeListValue.meaning;
+      contextSchemeValue.value = codeListValue.value;
       contextSchemeValue.guid = uuid();
       contextSchemeValueList.push(contextSchemeValue);
     }
@@ -410,21 +420,23 @@ export class ContextSchemeCreateComponent implements OnInit {
     codeListdialogConfig.width = window.innerWidth + 'px';
 
     const dialogRef = this.dialog.open(CodelistListDialogComponent, codeListdialogConfig);
-    dialogRef.afterClosed().subscribe(codeList => {
+    dialogRef.afterClosed().subscribe((codeList: CodeListListEntry) => {
       if (codeList) {
-        this.contextScheme.schemeId = codeList.listId.toString();
-        this.contextScheme.schemeAgencyId = codeList.agencyIdListValueValue.toString();
-        this.contextScheme.schemeVersionId = codeList.versionId.toString();
-        this._updateDataSource([]);
-        this._updateDataSource(this.convertCodeListValuesIntoContextSchemeValues(codeList.codeListValues));
+        this.codeListService.getCodeListDetails(codeList.codeListManifestId).subscribe((codeListDetails: CodeListDetails) => {
+          this.contextSchemeCreateRequest.schemeId = codeListDetails.listId.toString();
+          this.contextSchemeCreateRequest.schemeAgencyId = codeListDetails.agencyIdListValue.value.toString();
+          this.contextSchemeCreateRequest.schemeVersionId = codeListDetails.versionId.toString();
+          this._updateDataSource([]);
+          this._updateDataSource(this.convertCodeListValuesIntoContextSchemeValues(codeListDetails.valueList));
+        });
       }
     });
   }
 
   isDirty(): boolean {
-    return this.contextScheme.schemeId && this.contextScheme.schemeId.length > 0
-      || this.contextScheme.schemeAgencyId && this.contextScheme.schemeAgencyId.length > 0
-      || this.contextScheme.schemeVersionId && this.contextScheme.schemeVersionId.length > 0
-      || this.contextScheme.contextSchemeValueList && this.contextScheme.contextSchemeValueList.length > 0;
+    return this.contextSchemeCreateRequest.schemeId && this.contextSchemeCreateRequest.schemeId.length > 0
+      || this.contextSchemeCreateRequest.schemeAgencyId && this.contextSchemeCreateRequest.schemeAgencyId.length > 0
+      || this.contextSchemeCreateRequest.schemeVersionId && this.contextSchemeCreateRequest.schemeVersionId.length > 0
+      || this.contextSchemeCreateRequest.contextSchemeValueList && this.contextSchemeCreateRequest.contextSchemeValueList.length > 0;
   }
 }

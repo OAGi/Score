@@ -7,11 +7,11 @@ import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {FormControl} from '@angular/forms';
-import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker} from '@angular/material/datepicker';
 import {TenantListService} from '../domain/tenant-list.service';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {BusinessContextService} from '../../context-management/business-context/domain/business-context.service';
-import {BusinessContext, BusinessContextListRequest} from '../../context-management/business-context/domain/business-context';
+import {BusinessContextListEntry, BusinessContextListRequest} from '../../context-management/business-context/domain/business-context';
 import {PageRequest} from '../../basis/basis';
 import {initFilter} from '../../common/utility';
 
@@ -123,7 +123,7 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<BusinessContext>();
+  dataSource = new MatTableDataSource<BusinessContextListEntry>();
   tenantId: number;
   loading: boolean;
   tenantInfo: TenantList;
@@ -234,11 +234,7 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
-      this.dataSource.data = resp.list.map((elm: BusinessContext) => {
-        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        elm.businessContextValueList = [];
-        return elm;
-      });
+      this.dataSource.data = resp.list;
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0],
           this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));
@@ -253,17 +249,6 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
 
   onPageChange(event: PageEvent) {
     this.loadBusinessContextList();
-  }
-
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
   }
 
   reset(type: string) {

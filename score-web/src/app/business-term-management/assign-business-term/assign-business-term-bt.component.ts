@@ -4,23 +4,20 @@ import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
-import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
-import {PageRequest, PageResponse} from '../../basis/basis';
+import {MatDatepicker} from '@angular/material/datepicker';
+import {PageRequest} from '../../basis/basis';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {base64Decode, initFilter} from '../../common/utility';
 import {Location} from '@angular/common';
 import {finalize, map, switchMap} from 'rxjs/operators';
-import {BieToAssign, BusinessTerm, BusinessTermListRequest, PostAssignBusinessTerm} from '../domain/business-term';
+import {BieToAssign, BusinessTermListEntry, BusinessTermListRequest, PostAssignBusinessTerm} from '../domain/business-term';
 import {BusinessTermService} from '../domain/business-term.service';
 import {HttpParams} from '@angular/common/http';
-import {BieEditService} from '../../bie-management/bie-edit/domain/bie-edit.service';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {BieListService} from '../../bie-management/bie-list/domain/bie-list.service';
-import {AsbieBbieList} from '../../bie-management/bie-list/domain/bie-list';
-import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
+import {PreferencesInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {AuthService} from '../../authentication/auth.service';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
@@ -111,7 +108,7 @@ export class AssignBusinessTermBtComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<BusinessTerm>();
+  dataSource = new MatTableDataSource<BusinessTermListEntry>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
 
@@ -133,8 +130,6 @@ export class AssignBusinessTermBtComponent implements OnInit {
 
   constructor(private businessTermService: BusinessTermService,
               private accountService: AccountListService,
-              private bieService: BieEditService,
-              private bieListService: BieListService,
               private auth: AuthService,
               private location: Location,
               private confirmDialogService: ConfirmDialogService,
@@ -184,7 +179,7 @@ export class AssignBusinessTermBtComponent implements OnInit {
           return bie;
         });
         return forkJoin([
-          this.bieListService.confirmAsbieBbieListByIdAndType(bies),
+          this.businessTermService.confirmAsbieBbieListByIdAndType(bies),
           this.accountService.getAccountNames(),
           this.preferencesService.load(this.auth.getUserToken())
         ]);
@@ -194,10 +189,10 @@ export class AssignBusinessTermBtComponent implements OnInit {
       this.loginIdList.push(...loginIds);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
 
-      if (resp === null) {
+      if (!resp) {
         this.router.navigateByUrl('/business_term_management/assign_business_term/create');
       } else {
-        this.postAssignBtObj.biesToAssign = resp.list.map(e => {
+        this.postAssignBtObj.biesToAssign = resp.map(e => {
           const bie = new BieToAssign();
           bie.bieId = e.bieId;
           bie.bieType = e.type;
@@ -227,17 +222,6 @@ export class AssignBusinessTermBtComponent implements OnInit {
   }
 
   onChange(property?: string, source?) {
-  }
-
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
   }
 
   reset(type: string) {
@@ -271,16 +255,8 @@ export class AssignBusinessTermBtComponent implements OnInit {
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
-      this.dataSource.data = resp.list.map((elm: BusinessTerm) => {
-        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        return elm;
-      });
+      this.dataSource.data = resp.list;
       this.highlightText = this.request.filters.definition;
-
-      if (!isInit) {
-        this.location.replaceState(this.router.url.split('?')[0],
-          this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));
-      }
     }, error => {
       this.dataSource.data = [];
     });
@@ -300,13 +276,13 @@ export class AssignBusinessTermBtComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(row: BusinessTerm) {
+  select(row: BusinessTermListEntry) {
     if (!row.used) {
       this.selection.select(row.businessTermId);
     }
   }
 
-  toggle(row: BusinessTerm) {
+  toggle(row: BusinessTermListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row.businessTermId);
     } else {
@@ -314,7 +290,7 @@ export class AssignBusinessTermBtComponent implements OnInit {
     }
   }
 
-  isSelected(row: BusinessTerm) {
+  isSelected(row: BusinessTermListEntry) {
     return this.selection.isSelected(row.businessTermId);
   }
 
@@ -376,17 +352,17 @@ export class AssignBusinessTermBtComponent implements OnInit {
 
   checkUniqueness(_postAssignBusinessTerm: PostAssignBusinessTerm, callbackFn?) {
     forkJoin(_postAssignBusinessTerm.biesToAssign
-      .map( bie => (
-        this.businessTermService.checkAssignmentUniqueness(bie.bieId, bie.bieType,
-        this.selection.selected[0], _postAssignBusinessTerm.typeCode, _postAssignBusinessTerm.primaryIndicator)
-      )))
-      .subscribe((ifUniques: boolean[]) => {
-        if (ifUniques.filter(isUnique => !isUnique).length > 0) {
-          this.openDialogDisabledAssignment();
-          return;
-        }
-        return callbackFn && callbackFn(_postAssignBusinessTerm);
-      });
+        .map(bie => (
+            this.businessTermService.checkAssignmentUniqueness(bie.bieId, bie.bieType,
+                this.selection.selected[0], _postAssignBusinessTerm.typeCode, _postAssignBusinessTerm.primaryIndicator)
+        )))
+        .subscribe((ifUniques: boolean[]) => {
+          if (ifUniques.filter(isUnique => !isUnique).length > 0) {
+            this.openDialogDisabledAssignment();
+            return;
+          }
+          return callbackFn && callbackFn(_postAssignBusinessTerm);
+        });
   }
 
   openDialogDisabledAssignment() {

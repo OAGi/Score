@@ -40,7 +40,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BusinessTermRecord
  * The Business Term table stores information about the business term, which is
  * usually associated to BIE or CC. TODO: Placeeholder, definition is missing.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class BusinessTerm extends TableImpl<BusinessTermRecord> {
 
     private static final long serialVersionUID = 1L;

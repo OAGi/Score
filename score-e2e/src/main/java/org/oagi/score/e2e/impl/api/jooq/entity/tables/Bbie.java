@@ -43,10 +43,10 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.BbieBizterm.BbieBiztermPat
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BbieSc.BbieScPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bbiep.BbiepPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccManifest.BccManifestPath;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.BdtPriRestri.BdtPriRestriPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BieUsageRule.BieUsageRulePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeListManifest.CodeListManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.TopLevelAsbiep.TopLevelAsbiepPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.XbtManifest.XbtManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BbieRecord;
 
 
@@ -59,7 +59,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BbieRecord;
  * primitive to be used in the context. Only one column among the three can have
  * a value in a particular record.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Bbie extends TableImpl<BbieRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -123,13 +123,13 @@ public class Bbie extends TableImpl<BbieRecord> {
     public final TableField<BbieRecord, ULong> TO_BBIEP_ID = createField(DSL.name("to_bbiep_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "TO_BBIEP_ID is a foreign key to the BBIEP table. TO_BBIEP_ID basically refers to a child data element of the FROM_ABIE_ID. TO_BBIEP_ID must be based on the TO_BCCP_ID in the based BCC.");
 
     /**
-     * The column <code>oagi.bbie.bdt_pri_restri_id</code>. This is the foreign
-     * key to the BDT_PRI_RESTRI table. It indicates the primitive assigned to
-     * the BBIE (or also can be viewed as assigned to the BBIEP for this
-     * specific association). This is assigned by the user who authors the BIE.
-     * The assignment would override the default from the CC side.
+     * The column <code>oagi.bbie.xbt_manifest_id</code>. This is the foreign
+     * key to the XBT_MANIFEST table. It indicates the primitive assigned to the
+     * BBIE (or also can be viewed as assigned to the BBIEP for this specific
+     * association). This is assigned by the user who authors the BIE. The
+     * assignment would override the default from the DT_AWD_PRI side.
      */
-    public final TableField<BbieRecord, ULong> BDT_PRI_RESTRI_ID = createField(DSL.name("bdt_pri_restri_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This is the foreign key to the BDT_PRI_RESTRI table. It indicates the primitive assigned to the BBIE (or also can be viewed as assigned to the BBIEP for this specific association). This is assigned by the user who authors the BIE. The assignment would override the default from the CC side.");
+    public final TableField<BbieRecord, ULong> XBT_MANIFEST_ID = createField(DSL.name("xbt_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This is the foreign key to the XBT_MANIFEST table. It indicates the primitive assigned to the BBIE (or also can be viewed as assigned to the BBIEP for this specific association). This is assigned by the user who authors the BIE. The assignment would override the default from the DT_AWD_PRI side.");
 
     /**
      * The column <code>oagi.bbie.code_list_manifest_id</code>. This is a
@@ -375,7 +375,7 @@ public class Bbie extends TableImpl<BbieRecord> {
 
     @Override
     public List<ForeignKey<BbieRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.BBIE_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.BBIE_BASED_BCC_MANIFEST_ID_FK, Keys.BBIE_BDT_PRI_RESTRI_ID_FK, Keys.BBIE_CODE_LIST_MANIFEST_ID_FK, Keys.BBIE_CREATED_BY_FK, Keys.BBIE_FROM_ABIE_ID_FK, Keys.BBIE_LAST_UPDATED_BY_FK, Keys.BBIE_OWNER_TOP_LEVEL_ASBIEP_ID_FK, Keys.BBIE_TO_BBIEP_ID_FK);
+        return Arrays.asList(Keys.BBIE_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.BBIE_BASED_BCC_MANIFEST_ID_FK, Keys.BBIE_CODE_LIST_MANIFEST_ID_FK, Keys.BBIE_CREATED_BY_FK, Keys.BBIE_FROM_ABIE_ID_FK, Keys.BBIE_LAST_UPDATED_BY_FK, Keys.BBIE_OWNER_TOP_LEVEL_ASBIEP_ID_FK, Keys.BBIE_TO_BBIEP_ID_FK, Keys.BBIE_XBT_MANIFEST_ID_FK);
     }
 
     private transient AgencyIdListManifestPath _agencyIdListManifest;
@@ -401,18 +401,6 @@ public class Bbie extends TableImpl<BbieRecord> {
             _bccManifest = new BccManifestPath(this, Keys.BBIE_BASED_BCC_MANIFEST_ID_FK, null);
 
         return _bccManifest;
-    }
-
-    private transient BdtPriRestriPath _bdtPriRestri;
-
-    /**
-     * Get the implicit join path to the <code>oagi.bdt_pri_restri</code> table.
-     */
-    public BdtPriRestriPath bdtPriRestri() {
-        if (_bdtPriRestri == null)
-            _bdtPriRestri = new BdtPriRestriPath(this, Keys.BBIE_BDT_PRI_RESTRI_ID_FK, null);
-
-        return _bdtPriRestri;
     }
 
     private transient CodeListManifestPath _codeListManifest;
@@ -489,6 +477,18 @@ public class Bbie extends TableImpl<BbieRecord> {
             _bbiep = new BbiepPath(this, Keys.BBIE_TO_BBIEP_ID_FK, null);
 
         return _bbiep;
+    }
+
+    private transient XbtManifestPath _xbtManifest;
+
+    /**
+     * Get the implicit join path to the <code>oagi.xbt_manifest</code> table.
+     */
+    public XbtManifestPath xbtManifest() {
+        if (_xbtManifest == null)
+            _xbtManifest = new XbtManifestPath(this, Keys.BBIE_XBT_MANIFEST_ID_FK, null);
+
+        return _xbtManifest;
     }
 
     private transient BbieBiztermPath _bbieBizterm;

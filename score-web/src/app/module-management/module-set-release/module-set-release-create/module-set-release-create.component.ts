@@ -10,11 +10,11 @@ import {AuthService} from '../../../authentication/auth.service';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 import {hashCode, initFilter, loadLibrary, saveLibrary} from '../../../common/utility';
 import {ReleaseService} from '../../../release-management/domain/release.service';
-import {ModuleSet, ModuleSetListRequest, ModuleSetRelease, ModuleSetReleaseListRequest} from '../../domain/module';
+import {ModuleSetRelease, ModuleSetReleaseListRequest, ModuleSetReleaseSummary, ModuleSetSummary} from '../../domain/module';
 import {ModuleService} from '../../domain/module.service';
 import {PageRequest} from '../../../basis/basis';
-import {SimpleRelease} from '../../../release-management/domain/release';
-import {Library} from '../../../library-management/domain/library';
+import {ReleaseSummary} from '../../../release-management/domain/release';
+import {LibrarySummary} from '../../../library-management/domain/library';
 import {LibraryService} from '../../../library-management/domain/library.service';
 
 @Component({
@@ -33,14 +33,14 @@ export class ModuleSetReleaseCreateComponent implements OnInit {
   moduleSetListFilterCtrl: FormControl = new FormControl();
   releaseListFilterCtrl: FormControl = new FormControl();
   moduleSetReleaseListFilterCtrl: FormControl = new FormControl();
-  filteredModuleSetList: ReplaySubject<ModuleSet[]> = new ReplaySubject<ModuleSet[]>(1);
-  filteredReleaseList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
-  filteredModuleSetReleaseList: ReplaySubject<ModuleSetRelease[]> = new ReplaySubject<ModuleSetRelease[]>(1);
-  moduleSetList: ModuleSet[] = [];
-  releaseList: SimpleRelease[] = [];
-  libraries: Library[] = [];
-  mappedLibraries: { library: Library, selected: boolean }[] = [];
-  moduleSetReleaseList: ModuleSetRelease[] = [];
+  filteredModuleSetList: ReplaySubject<ModuleSetSummary[]> = new ReplaySubject<ModuleSetSummary[]>(1);
+  filteredReleaseList: ReplaySubject<ReleaseSummary[]> = new ReplaySubject<ReleaseSummary[]>(1);
+  filteredModuleSetReleaseList: ReplaySubject<ModuleSetReleaseSummary[]> = new ReplaySubject<ModuleSetReleaseSummary[]>(1);
+  moduleSetList: ModuleSetSummary[] = [];
+  releaseList: ReleaseSummary[] = [];
+  libraries: LibrarySummary[] = [];
+  mappedLibraries: { library: LibrarySummary, selected: boolean }[] = [];
+  moduleSetReleaseList: ModuleSetReleaseSummary[] = [];
   copyTargetModuleSetRelease: ModuleSetRelease;
 
   request = new ModuleSetReleaseListRequest();
@@ -76,7 +76,7 @@ export class ModuleSetReleaseCreateComponent implements OnInit {
     this.request.page.pageIndex = -1;
     this.request.page.pageSize = -1;
 
-    this.libraryService.getLibraries().subscribe(libraries => {
+    this.libraryService.getLibrarySummaryList().subscribe(libraries => {
       this.initLibraries(libraries);
 
       this.loadModuleSetReleaseListAndReleaseList();
@@ -84,26 +84,21 @@ export class ModuleSetReleaseCreateComponent implements OnInit {
   }
 
   loadModuleSetReleaseListAndReleaseList() {
-    const moduleSetListRequest = new ModuleSetListRequest();
-    moduleSetListRequest.library = this.request.library;
-    moduleSetListRequest.page.pageIndex = -1;
-    moduleSetListRequest.page.pageSize = -1;
-
     forkJoin([
-      this.moduleService.getModuleSetList(moduleSetListRequest),
-      this.releaseService.getSimpleReleases(this.request.library.libraryId),
-      this.moduleService.getModuleSetReleaseList(this.request)
+      this.moduleService.getModuleSetSummaries(this.request.library.libraryId),
+      this.releaseService.getReleaseSummaryList(this.request.library.libraryId),
+      this.moduleService.getModuleSetReleaseSummaries(this.request.library.libraryId)
     ]).subscribe(([moduleSetList, releaseList, moduleSetReleaseList]) => {
       // Sorting by ID desc
-      this.moduleSetList = moduleSetList.results.sort((a, b) => b.moduleSetId - a.moduleSetId);
+      this.moduleSetList = moduleSetList.sort((a, b) => b.moduleSetId - a.moduleSetId);
       initFilter(this.moduleSetListFilterCtrl, this.filteredModuleSetList, this.moduleSetList, (e) => e.name);
 
       this.initReleases(releaseList);
 
       // Sorting by ID desc
-      this.moduleSetReleaseList = moduleSetReleaseList.results.sort((a, b) => b.moduleSetReleaseId - a.moduleSetReleaseId);
+      this.moduleSetReleaseList = moduleSetReleaseList.sort((a, b) => b.moduleSetReleaseId - a.moduleSetReleaseId);
       initFilter(this.moduleSetReleaseListFilterCtrl, this.filteredModuleSetReleaseList, this.moduleSetReleaseList,
-        (e) => e.moduleSetReleaseName + ' ' + e.releaseNum);
+        (e) => e.name + ' ' + e.release.releaseNum);
     });
   }
 
@@ -112,7 +107,7 @@ export class ModuleSetReleaseCreateComponent implements OnInit {
     this.$hashCode = hashCode(this.moduleSetRelease);
   }
 
-  initLibraries(libraries: Library[]) {
+  initLibraries(libraries: LibrarySummary[]) {
     this.libraries = libraries;
     if (this.libraries.length > 0) {
       const savedLibraryId = loadLibrary(this.auth.getUserToken());
@@ -131,7 +126,7 @@ export class ModuleSetReleaseCreateComponent implements OnInit {
     }
   }
 
-  initReleases(releases: SimpleRelease[]) {
+  initReleases(releases: ReleaseSummary[]) {
     this.releaseList = releases;
     this.moduleSetRelease.moduleSetId = undefined;
     this.moduleSetRelease.releaseId = undefined;
@@ -139,7 +134,7 @@ export class ModuleSetReleaseCreateComponent implements OnInit {
     initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releaseList, (e) => e.releaseNum);
   }
 
-  onLibraryChange(library: Library) {
+  onLibraryChange(library: LibrarySummary) {
     this.request.library = library;
     saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
     this.loadModuleSetReleaseListAndReleaseList();
@@ -154,7 +149,7 @@ export class ModuleSetReleaseCreateComponent implements OnInit {
      * #1280
      * If there is another default module set release, it shows a dialog to get a confirmation from the user.
      */
-    if (this.moduleSetRelease.default) {
+    if (this.moduleSetRelease.isDefault) {
       const request = new ModuleSetReleaseListRequest();
       request.page = new PageRequest('lastUpdateTimestamp', 'desc', 0, 10);
       request.library = this.request.library;
@@ -165,8 +160,8 @@ export class ModuleSetReleaseCreateComponent implements OnInit {
           const dialogConfig = this.confirmDialogService.newConfig();
           dialogConfig.data.header = 'Create default module set release?';
           dialogConfig.data.content = [
-            'There is another default module set release, \'' + resp.results[0].moduleSetReleaseName + '\' for \'' +
-            resp.results[0].releaseNum + '\' branch.',
+            'There is another default module set release, \'' + resp.list[0].name + '\' for \'' +
+            resp.list[0].releaseNum + '\' branch.',
             'Are you sure you want to create this module set release as a default?',
           ];
           dialogConfig.data.action = 'Create';
@@ -194,13 +189,13 @@ export class ModuleSetReleaseCreateComponent implements OnInit {
     request.filters.name = this.moduleSetRelease.moduleSetReleaseName;
     this.moduleService.getModuleSetReleaseList(request).subscribe(resp => {
       if (resp.length > 0 &&
-        resp.results[0].moduleSetReleaseName === this.moduleSetRelease.moduleSetReleaseName) {
+        resp.list[0].name === this.moduleSetRelease.moduleSetReleaseName) {
 
         const dialogConfig = this.confirmDialogService.newConfig();
         dialogConfig.data.header = 'Create module set release?';
         dialogConfig.data.content = [
-          'There is another same module set release, \'' + resp.results[0].moduleSetReleaseName + '\' for \'' +
-          resp.results[0].releaseNum + '\' branch.',
+          'There is another same module set release, \'' + resp.list[0].name + '\' for \'' +
+          resp.list[0].releaseNum + '\' branch.',
           'Are you sure you want to create this module set release?',
         ];
         dialogConfig.data.action = 'Create';
@@ -229,7 +224,7 @@ export class ModuleSetReleaseCreateComponent implements OnInit {
       .pipe(finalize(() => {
         this.isUpdating = false;
       }))
-      .subscribe(moduleSet => {
+      .subscribe(_ => {
         this.snackBar.open('Created', '', {
           duration: 3000,
         });

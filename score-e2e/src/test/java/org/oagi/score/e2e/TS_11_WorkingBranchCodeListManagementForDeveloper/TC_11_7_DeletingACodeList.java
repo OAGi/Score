@@ -90,8 +90,8 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
         CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "WIP");
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-        DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.createDT("Process Category_ Code. Type", workingBranch.getReleaseNumber());
+        ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+        DTViewEditPage dtViewEditPage = viewEditDataTypePage.createDT("Process Category_ Code. Type", workingBranch.getReleaseNumber());
         dtViewEditPage.showValueDomain();
         dtViewEditPage.addCodeListValueDomain(codeList.getName());
         String qualifier = "testDataType" + RandomStringUtils.secure().nextAlphabetic(5, 10);
@@ -110,8 +110,8 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
         editCodeListPage.hitDeleteButton();
         codeList.setState("Deleted");
 
-        viewEditCoreComponentPage.openPage();
-        DTViewEditPage dtViewEditPageNew = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(qualifier + "_ Code. Type", workingBranch.getReleaseNumber());
+        viewEditDataTypePage.openPage();
+        DTViewEditPage dtViewEditPageNew = viewEditDataTypePage.openDTViewEditPageByDenAndBranch(qualifier + "_ Code. Type", workingBranch.getReleaseNumber());
         dtViewEditPageNew.showValueDomain();
         assertDoesNotThrow(() -> dtViewEditPageNew.codeListIdMarkedAsDeleted(codeList));
         escape(getDriver());
@@ -156,8 +156,8 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
             /**
              * Create BDT that uses the newly created Code List
              */
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.createDT("Process Category_ Code. Type", workingBranch.getReleaseNumber());
+            ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+            DTViewEditPage dtViewEditPage = viewEditDataTypePage.createDT("Process Category_ Code. Type", workingBranch.getReleaseNumber());
             dtViewEditPage.showValueDomain();
             dtViewEditPage.addCodeListValueDomain(codeList.getName());
             dtViewEditPage.setDefaultValueDomain(codeList.getName());
@@ -173,7 +173,7 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
             /**
              * Create new BCCP that uses previously created BDT
              */
-            viewEditCoreComponentPage.openPage();
+            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             BCCPViewEditPage bccpViewEditPage = viewEditCoreComponentPage.createBCCP(qualifier + "_ Code. Type", workingBranch.getReleaseNumber(), developerA);
             String BCCPPropertyTerm = "testBCCPProperty";
             bccpViewEditPage.setPropertyTerm(BCCPPropertyTerm);

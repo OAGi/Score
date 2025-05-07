@@ -16,7 +16,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.CtxScheme;
  * This table represents a context scheme (a classification scheme) for a
  * context category.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -276,6 +276,6 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> {
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

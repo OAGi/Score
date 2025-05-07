@@ -5,7 +5,7 @@ import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
-import {CcList, CcListRequest} from '../cc-list/domain/cc-list';
+import {CcListEntry, CcListRequest} from '../cc-list/domain/cc-list';
 import {ExtensionDetailComponent} from '../extension-detail/extension-detail.component';
 import {RefactorDialogService} from './domain/refactor-dialog.service';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -14,6 +14,7 @@ import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../set
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {AuthService} from '../../authentication/auth.service';
 import {forkJoin} from 'rxjs';
+import {IssuedCc} from './domain/refactor-dialog';
 
 @Component({
   selector: 'score-based-acc-dialog',
@@ -34,7 +35,7 @@ export class RefactorDialogComponent implements OnInit {
     if (!this.preferencesInfo) {
       return [];
     }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutDtColumnsPage;
+    return this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage;
   }
 
   set columns(columns: TableColumnsProperty[]) {
@@ -42,19 +43,19 @@ export class RefactorDialogComponent implements OnInit {
       return;
     }
 
-    this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutDtColumnsPage = columns;
-    this.updateTableColumnsForCoreComponentWithoutDtColumnsPage();
+    this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage = columns;
+    this.updateTableColumnsForCoreComponentPage();
   }
 
-  updateTableColumnsForCoreComponentWithoutDtColumnsPage() {
-    this.preferencesService.updateTableColumnsForCoreComponentWithoutDtColumnsPage(
+  updateTableColumnsForCoreComponentPage() {
+    this.preferencesService.updateTableColumnsForCoreComponentPage(
       this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
     });
   }
 
   onColumnsReset() {
     const defaultTableColumnInfo = new TableColumnsInfo();
-    this.columns = defaultTableColumnInfo.columnsOfCoreComponentWithoutDtColumnsPage;
+    this.columns = defaultTableColumnInfo.columnsOfCoreComponentPage;
   }
 
   onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
@@ -83,7 +84,7 @@ export class RefactorDialogComponent implements OnInit {
     const matched = this.columns.find(c => c.name === name);
     if (matched) {
       matched.width = width;
-      this.updateTableColumnsForCoreComponentWithoutDtColumnsPage();
+      this.updateTableColumnsForCoreComponentPage();
     }
   }
 
@@ -252,14 +253,14 @@ export class RefactorDialogComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<CcList>();
-  expandedElement: CcList | null;
-  selection = new SelectionModel<CcList>(false, []);
+  dataSource = new MatTableDataSource<CcListEntry>();
+  expandedElement: CcListEntry | null;
+  selection = new SelectionModel<CcListEntry>(false, []);
 
   loading = false;
   isValid = false;
 
-  issueDataSource = new MatTableDataSource<CcList>();
+  issueDataSource = new MatTableDataSource<IssuedCc>();
 
   request: CcListRequest;
   preferencesInfo: PreferencesInfo;
@@ -349,12 +350,12 @@ export class RefactorDialogComponent implements OnInit {
     }
   }
 
-  select(row: CcList) {
+  select(row: CcListEntry) {
     this.selection.select(row);
     this.isValid = false;
   }
 
-  toggle(row: CcList) {
+  toggle(row: CcListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row);
     } else {
@@ -362,11 +363,11 @@ export class RefactorDialogComponent implements OnInit {
     }
   }
 
-  isSelected(row: CcList) {
+  isSelected(row: CcListEntry) {
     return this.selection.isSelected(row);
   }
 
-  getRouterLink(ccList: CcList) {
+  getRouterLink(ccList: CcListEntry) {
     if (ccList.oagisComponentType === 'UserExtensionGroup') {
       return 'core_component/extension/' + ccList.manifestId;
     } else {

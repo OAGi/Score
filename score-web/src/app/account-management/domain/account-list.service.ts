@@ -1,7 +1,7 @@
 import {Injectable, OnInit} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {AccountList, AccountListRequest} from './accounts';
+import {AccountDetails, AccountList, AccountListEntry, AccountListRequest} from './accounts';
 import {PageResponse} from '../../basis/basis';
 import {PendingAccount} from './pending-list';
 
@@ -14,17 +14,7 @@ export class AccountListService implements OnInit {
   ngOnInit() {
   }
 
-  getAllAccountList(): Observable<PageResponse<AccountList>> {
-    const params = new HttpParams()
-      .set('sortActive', 'loginId')
-      .set('sortDirection', 'asc')
-      .set('pageIndex', '' + 0)
-      .set('pageSize', '' + 1000);
-
-    return this.http.get<PageResponse<AccountList>>('/api/accounts_list', {params});
-  }
-
-  getAccountsList(request: AccountListRequest, excludeRequester?: boolean): Observable<PageResponse<AccountList>> {
+  getAccountsList(request: AccountListRequest, excludeRequester?: boolean): Observable<PageResponse<AccountListEntry>> {
     let params = new HttpParams()
       .set('sortActive', request.page.sortActive)
       .set('sortDirection', request.page.sortDirection)
@@ -60,26 +50,34 @@ export class AccountListService implements OnInit {
     if (excludeRequester) {
       params = params.set('excludeRequester', 'true');
     }
-    return this.http.get<PageResponse<AccountList>>('/api/accounts_list', {params});
+    return this.http.get<PageResponse<AccountListEntry>>('/api/accounts', {params});
   }
 
-  getAccount(appUserIdOrUsername: number | string): Observable<AccountList> {
-    return this.http.get<AccountList>('/api/account/' + appUserIdOrUsername);
+  getAccount(appUserIdOrUsername: number | string): Observable<AccountDetails> {
+    return this.http.get<AccountDetails>('/api/accounts/' + appUserIdOrUsername);
   }
 
   getAccountNames(): Observable<string[]> {
     return this.http.get<string[]>('/api/accounts/names');
   }
 
-  updatePasswordAccount(account: AccountList, newPassword: string): Observable<any> {
+  update(userId: number,
+         username: string, organization: string,
+         admin: boolean,
+         newPassword: string): Observable<any> {
+
+    return this.http.put('/api/accounts/' + userId, {
+      username, organization, admin, newPassword
+    });
+  }
+
+  updatePassword(userId: number, newPassword: string): Observable<any> {
     if (newPassword !== '') {
-      return this.http.post('/api/account/password', {
-        account,
+      return this.http.put('/api/accounts/' + userId + '/password', {
         newPassword
       });
     } else {
-      return this.http.post('/api/account/password', {
-        account,
+      return this.http.put('/api/accounts/' + userId + '/password', {
         newPassword: ''
       });
     }
@@ -87,17 +85,17 @@ export class AccountListService implements OnInit {
 
   create(account: AccountList, newPassword?: string, pending?: PendingAccount): Observable<any> {
     if (pending && pending.appOauth2UserId !== undefined) {
-      return this.http.put('/api/account', {
+      return this.http.post('/api/accounts', {
         loginId: account.loginId,
         name: account.name,
         organization: account.organization,
         developer: account.developer,
         admin: account.admin,
-        appOauth2UserId: pending.appOauth2UserId,
+        oAuth2UserId: pending.appOauth2UserId,
         sub: pending.sub
       });
     } else {
-      return this.http.put('/api/account', {
+      return this.http.post('/api/accounts', {
         loginId: account.loginId,
         password: newPassword,
         name: account.name,
@@ -108,25 +106,25 @@ export class AccountListService implements OnInit {
     }
   }
 
-  link(pending: PendingAccount, account: AccountList): Observable<any> {
+  link(pending: PendingAccount, userId: number): Observable<any> {
     return this.http.post('/api/pending/link/' + pending.appOauth2UserId, {
-      appUserId: account.appUserId
+      appUserId: userId
     });
   }
 
-  setEnable(account: AccountList, val: boolean): Observable<any> {
-    return this.http.post('/api/accounts/' + account.appUserId + '/' + ((val) ? 'enable' : 'disable'), {});
+  setEnable(userId: number, val: boolean): Observable<any> {
+    return this.http.post('/api/accounts/' + userId + '/' + ((val) ? 'enable' : 'disable'), {});
   }
 
-  transferOwnership(account: AccountList): Observable<any> {
-    return this.http.post('/api/accounts/' + account.appUserId + '/transfer_ownership', {});
+  transferOwnership(userId: number): Observable<any> {
+    return this.http.post('/api/accounts/' + userId + '/transfer', {});
   }
 
-  delink(account: AccountList): Observable<any> {
-    return this.http.post('/api/account/' + account.appUserId + '/delink', {});
+  delink(userId: number): Observable<any> {
+    return this.http.put('/api/accounts/' + userId + '/delink', {});
   }
 
-  remove(account: AccountList): Observable<any> {
-    return this.http.delete('/api/account/' + account.appUserId, {});
+  remove(userId: number): Observable<any> {
+    return this.http.delete('/api/accounts/' + userId, {});
   }
 }

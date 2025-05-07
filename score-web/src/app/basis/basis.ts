@@ -1,3 +1,5 @@
+import {ScoreUser} from '../authentication/domain/auth';
+
 export class PageRequest {
   sortActives: string[];
   sortDirections: string[];
@@ -51,4 +53,36 @@ export class PaginationResponse<T> {
   page: number;
   size: number;
   length: number;
+}
+
+export class WhoAndWhen {
+  who: ScoreUser;
+  when: Date;
+}
+
+export class Definition {
+  content: string;
+  source: string;
+}
+
+export class Cardinality {
+  min: number;
+  max: number;
+}
+
+export class PrimitiveRestriction {
+  xbtManifestId: number;
+  codeListManifestId: number;
+  agencyIdListManifestId: number;
+}
+
+export class ValueConstraint {
+  defaultValue: string;
+  fixedValue: string;
+}
+
+export class Facet {
+  minLength: number;
+  maxLength: number;
+  pattern: string;
 }

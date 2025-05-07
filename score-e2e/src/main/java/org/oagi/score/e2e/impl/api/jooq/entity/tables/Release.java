@@ -44,11 +44,15 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccpManifest.BccpManifestP
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BlobContentManifest.BlobContentManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeListManifest.CodeListManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeListValueManifest.CodeListValueManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtAwdPri.DtAwdPriPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtManifest.DtManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtScAwdPri.DtScAwdPriPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtScManifest.DtScManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Library.LibraryPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleSetRelease.ModuleSetReleasePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Namespace.NamespacePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Release.ReleasePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ReleaseDep.ReleaseDepPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.TopLevelAsbiep.TopLevelAsbiepPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.XbtManifest.XbtManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.ReleaseRecord;
@@ -57,7 +61,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.ReleaseRecord;
 /**
  * The is table store the release information.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Release extends TableImpl<ReleaseRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -152,6 +156,18 @@ public class Release extends TableImpl<ReleaseRecord> {
      */
     public final TableField<ReleaseRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20).defaultValue(DSL.field(DSL.raw("'Initialized'"), SQLDataType.VARCHAR)), this, "This indicates the revision life cycle state of the Release.");
 
+    /**
+     * The column <code>oagi.release.prev_release_id</code>. Foreign key
+     * referencing the previous release record.
+     */
+    public final TableField<ReleaseRecord, ULong> PREV_RELEASE_ID = createField(DSL.name("prev_release_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key referencing the previous release record.");
+
+    /**
+     * The column <code>oagi.release.next_release_id</code>. Foreign key
+     * referencing the next release record.
+     */
+    public final TableField<ReleaseRecord, ULong> NEXT_RELEASE_ID = createField(DSL.name("next_release_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key referencing the next release record.");
+
     private Release(Name alias, Table<ReleaseRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
     }
@@ -231,7 +247,7 @@ public class Release extends TableImpl<ReleaseRecord> {
 
     @Override
     public List<ForeignKey<ReleaseRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.RELEASE_CREATED_BY_FK, Keys.RELEASE_LAST_UPDATED_BY_FK, Keys.RELEASE_LIBRARY_ID_FK, Keys.RELEASE_NAMESPACE_ID_FK);
+        return Arrays.asList(Keys.RELEASE_CREATED_BY_FK, Keys.RELEASE_LAST_UPDATED_BY_FK, Keys.RELEASE_LIBRARY_ID_FK, Keys.RELEASE_NAMESPACE_ID_FK, Keys.RELEASE_NEXT_RELEASE_ID_FK, Keys.RELEASE_PREV_RELEASE_ID_FK);
     }
 
     private transient AppUserPath _releaseCreatedByFk;
@@ -282,6 +298,32 @@ public class Release extends TableImpl<ReleaseRecord> {
             _namespace = new NamespacePath(this, Keys.RELEASE_NAMESPACE_ID_FK, null);
 
         return _namespace;
+    }
+
+    private transient ReleasePath _releaseNextReleaseIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.release</code> table, via
+     * the <code>release_next_release_id_fk</code> key.
+     */
+    public ReleasePath releaseNextReleaseIdFk() {
+        if (_releaseNextReleaseIdFk == null)
+            _releaseNextReleaseIdFk = new ReleasePath(this, Keys.RELEASE_NEXT_RELEASE_ID_FK, null);
+
+        return _releaseNextReleaseIdFk;
+    }
+
+    private transient ReleasePath _releasePrevReleaseIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.release</code> table, via
+     * the <code>release_prev_release_id_fk</code> key.
+     */
+    public ReleasePath releasePrevReleaseIdFk() {
+        if (_releasePrevReleaseIdFk == null)
+            _releasePrevReleaseIdFk = new ReleasePath(this, Keys.RELEASE_PREV_RELEASE_ID_FK, null);
+
+        return _releasePrevReleaseIdFk;
     }
 
     private transient AccManifestPath _accManifest;
@@ -414,6 +456,19 @@ public class Release extends TableImpl<ReleaseRecord> {
         return _codeListValueManifest;
     }
 
+    private transient DtAwdPriPath _dtAwdPri;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.dt_awd_pri</code>
+     * table
+     */
+    public DtAwdPriPath dtAwdPri() {
+        if (_dtAwdPri == null)
+            _dtAwdPri = new DtAwdPriPath(this, null, Keys.DT_AWD_PRI_RELEASE_ID_FK.getInverseKey());
+
+        return _dtAwdPri;
+    }
+
     private transient DtManifestPath _dtManifest;
 
     /**
@@ -425,6 +480,19 @@ public class Release extends TableImpl<ReleaseRecord> {
             _dtManifest = new DtManifestPath(this, null, Keys.DT_MANIFEST_RELEASE_ID_FK.getInverseKey());
 
         return _dtManifest;
+    }
+
+    private transient DtScAwdPriPath _dtScAwdPri;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.dt_sc_awd_pri</code>
+     * table
+     */
+    public DtScAwdPriPath dtScAwdPri() {
+        if (_dtScAwdPri == null)
+            _dtScAwdPri = new DtScAwdPriPath(this, null, Keys.DT_SC_AWD_PRI_RELEASE_ID_FK.getInverseKey());
+
+        return _dtScAwdPri;
     }
 
     private transient DtScManifestPath _dtScManifest;
@@ -451,6 +519,32 @@ public class Release extends TableImpl<ReleaseRecord> {
             _moduleSetRelease = new ModuleSetReleasePath(this, null, Keys.MODULE_SET_RELEASE_RELEASE_ID_FK.getInverseKey());
 
         return _moduleSetRelease;
+    }
+
+    private transient ReleaseDepPath _releaseDepDependOnReleaseIdFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.release_dep</code>
+     * table, via the <code>release_dep_depend_on_release_id_fk</code> key
+     */
+    public ReleaseDepPath releaseDepDependOnReleaseIdFk() {
+        if (_releaseDepDependOnReleaseIdFk == null)
+            _releaseDepDependOnReleaseIdFk = new ReleaseDepPath(this, null, Keys.RELEASE_DEP_DEPEND_ON_RELEASE_ID_FK.getInverseKey());
+
+        return _releaseDepDependOnReleaseIdFk;
+    }
+
+    private transient ReleaseDepPath _releaseDepReleaseIdFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.release_dep</code>
+     * table, via the <code>release_dep_release_id_fk</code> key
+     */
+    public ReleaseDepPath releaseDepReleaseIdFk() {
+        if (_releaseDepReleaseIdFk == null)
+            _releaseDepReleaseIdFk = new ReleaseDepPath(this, null, Keys.RELEASE_DEP_RELEASE_ID_FK.getInverseKey());
+
+        return _releaseDepReleaseIdFk;
     }
 
     private transient TopLevelAsbiepPath _topLevelAsbiep;

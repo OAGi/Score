@@ -21,7 +21,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.BieUserExtRevision;
  * created only when there is a user extension to the the OAGIS extension
  * component/ACC.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class BieUserExtRevisionRecord extends UpdatableRecordImpl<BieUserExtRevisionRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -188,6 +188,6 @@ public class BieUserExtRevisionRecord extends UpdatableRecordImpl<BieUserExtRevi
         setUserExtAccId(userExtAccId);
         setRevisedIndicator(revisedIndicator);
         setTopLevelAsbiepId(topLevelAsbiepId);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

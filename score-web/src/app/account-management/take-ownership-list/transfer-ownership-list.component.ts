@@ -1,6 +1,6 @@
 import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
-import {AccountList, AccountListRequest} from '../domain/accounts';
+import {AccountListEntry, AccountListRequest} from '../domain/accounts';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {AuthService} from '../../authentication/auth.service';
@@ -123,8 +123,8 @@ export class TransferOwnershipListComponent implements OnInit {
     return displayedColumns;
   }
 
-  selection = new SelectionModel<AccountList>(false, []);
-  dataSource = new MatTableDataSource<AccountList>();
+  selection = new SelectionModel<AccountListEntry>(false, []);
+  dataSource = new MatTableDataSource<AccountListEntry>();
   loading = false;
 
   request: AccountListRequest;
@@ -216,7 +216,7 @@ export class TransferOwnershipListComponent implements OnInit {
     });
   }
 
-  toggle(row: AccountList) {
+  toggle(row: AccountListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row);
     } else {
@@ -224,20 +224,20 @@ export class TransferOwnershipListComponent implements OnInit {
     }
   }
 
-  isSelected(row: AccountList) {
+  isSelected(row: AccountListEntry) {
     return this.selection.isSelected(row);
   }
 
-  select(row: AccountList) {
+  select(row: AccountListEntry) {
     this.selection.select(row);
   }
 
-  transferOwnership(row: AccountList): void {
+  transferOwnership(row: AccountListEntry): void {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Transfer Ownership?';
     dialogConfig.data.content = [
       'Are you sure you want to transfer ownership of all components from the user ',
-      '\'' + row.name + ' (' + row.loginId + ')\' to you? This action is irreversible.'
+      '\'' + row.username + ' (' + row.loginId + ')\' to you? This action is irreversible.'
     ];
     dialogConfig.data.action = 'Transfer';
 
@@ -245,7 +245,7 @@ export class TransferOwnershipListComponent implements OnInit {
       .subscribe(result => {
         if (result) {
           this.loading = true;
-          this.service.transferOwnership(row).subscribe(_ => {
+          this.service.transferOwnership(row.userId).subscribe(_ => {
             this.loading = false;
             this.selection.clear();
 

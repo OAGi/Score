@@ -4,7 +4,7 @@ import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {AccountListService} from '../../account-management/domain/account-list.service';
-import {AccountList, AccountListRequest} from '../../account-management/domain/accounts';
+import {AccountListEntry, AccountListRequest} from '../../account-management/domain/accounts';
 import {PageRequest} from '../../basis/basis';
 import {SelectionModel} from '@angular/cdk/collections';
 import {AuthService} from '../../authentication/auth.service';
@@ -118,8 +118,8 @@ export class TransferOwnershipDialogComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<AccountList>();
-  selection = new SelectionModel<AccountList>(false, []);
+  dataSource = new MatTableDataSource<AccountListEntry>();
+  selection = new SelectionModel<AccountListEntry>(false, []);
 
   loginIdList: string[] = [];
   request: AccountListRequest;
@@ -207,11 +207,11 @@ export class TransferOwnershipDialogComponent implements OnInit {
     });
   }
 
-  select(row: AccountList) {
+  select(row: AccountListEntry) {
     this.selection.select(row);
   }
 
-  toggle(row: AccountList) {
+  toggle(row: AccountListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row);
     } else {
@@ -219,7 +219,7 @@ export class TransferOwnershipDialogComponent implements OnInit {
     }
   }
 
-  isSelected(row: AccountList) {
+  isSelected(row: AccountListEntry) {
     return this.selection.isSelected(row);
   }
 

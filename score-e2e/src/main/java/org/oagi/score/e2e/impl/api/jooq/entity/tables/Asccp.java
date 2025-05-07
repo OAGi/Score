@@ -47,7 +47,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AsccpRecord;
 /**
  * An ASCCP specifies a role (or property) an ACC may play under another ACC.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Asccp extends TableImpl<AsccpRecord> {
 
     private static final long serialVersionUID = 1L;

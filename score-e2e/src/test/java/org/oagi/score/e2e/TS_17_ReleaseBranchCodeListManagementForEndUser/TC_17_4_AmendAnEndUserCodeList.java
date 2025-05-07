@@ -575,7 +575,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
              */
             ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, branch, namespace, "Published");
             DTObject dataType = getAPIFactory().getCoreComponentAPI().getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", branch.getReleaseNumber());
-            BCCPObject bccp = getAPIFactory().getCoreComponentAPI().createRandomBCCP(dataType, developer, namespace, "Published");
+            BCCPObject bccp = getAPIFactory().getCoreComponentAPI().createRandomBCCP(branch, dataType, developer, namespace, "Published");
             getAPIFactory().getCoreComponentAPI().appendBCC(acc, bccp, "Published");
             ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().createRandomASCCP(acc, developer, namespace, "Published");
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(endUserA);

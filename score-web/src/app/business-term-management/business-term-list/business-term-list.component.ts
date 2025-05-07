@@ -1,5 +1,5 @@
 import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
-import {BusinessTerm, BusinessTermListRequest} from '../domain/business-term';
+import {BusinessTermListEntry, BusinessTermListRequest} from '../domain/business-term';
 import {BusinessTermService} from '../domain/business-term.service';
 import {MatDialog} from '@angular/material/dialog';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
@@ -8,7 +8,7 @@ import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {PageRequest} from '../../basis/basis';
-import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker} from '@angular/material/datepicker';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
@@ -131,7 +131,7 @@ export class BusinessTermListComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<BusinessTerm>();
+  dataSource = new MatTableDataSource<BusinessTermListEntry>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
 
@@ -207,17 +207,6 @@ export class BusinessTermListComponent implements OnInit {
   onChange(property?: string, source?) {
   }
 
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
-  }
-
   reset(type: string) {
     switch (type) {
       case 'startDate':
@@ -249,10 +238,7 @@ export class BusinessTermListComponent implements OnInit {
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
-      this.dataSource.data = resp.list.map((elm: BusinessTerm) => {
-        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        return elm;
-      });
+      this.dataSource.data = resp.list;
       this.highlightText = this.request.filters.definition;
 
       if (!isInit) {
@@ -278,13 +264,13 @@ export class BusinessTermListComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(row: BusinessTerm) {
+  select(row: BusinessTermListEntry) {
     if (!row.used) {
       this.selection.select(row.businessTermId);
     }
   }
 
-  toggle(row: BusinessTerm) {
+  toggle(row: BusinessTermListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row.businessTermId);
     } else {
@@ -292,7 +278,7 @@ export class BusinessTermListComponent implements OnInit {
     }
   }
 
-  isSelected(row: BusinessTerm) {
+  isSelected(row: BusinessTermListEntry) {
     return this.selection.isSelected(row.businessTermId);
   }
 

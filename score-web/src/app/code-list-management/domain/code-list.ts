@@ -1,13 +1,17 @@
-import {PageRequest} from '../../basis/basis';
-import {SimpleRelease} from '../../release-management/domain/release';
+import {Definition, PageRequest, WhoAndWhen} from '../../basis/basis';
+import {ReleaseSummary} from '../../release-management/domain/release';
 import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
 import {base64Decode, base64Encode} from '../../common/utility';
-import {Library} from '../../library-management/domain/library';
+import {LibrarySummary} from '../../library-management/domain/library';
+import {LogSummary} from '../../log-management/domain/log';
+import {ScoreUser} from '../../authentication/domain/auth';
+import {AgencyIdListValueSummary} from '../../agency-id-list-management/domain/agency-id-list';
+import {NamespaceSummary} from '../../namespace-management/domain/namespace';
 
-export class CodeListForListRequest {
-  library: Library = new Library();
-  release: SimpleRelease;
+export class CodeListListEntryRequest {
+  library: LibrarySummary = new LibrarySummary();
+  release: ReleaseSummary;
   filters: {
     name: string;
     module: string;
@@ -16,9 +20,10 @@ export class CodeListForListRequest {
   access: string;
   states: string[] = [];
   deprecated: boolean[] = [];
+  extensible: boolean[] = [];
   newComponent: boolean[] = [];
-  ownerLoginIds: string[] = [];
-  updaterLoginIds: string[] = [];
+  ownerLoginIdList: string[] = [];
+  updaterLoginIdList: string[] = [];
   updatedDate: {
     start: Date,
     end: Date,
@@ -31,7 +36,7 @@ export class CodeListForListRequest {
   constructor(paramMap?: ParamMap, defaultPageRequest?: PageRequest) {
     const q = (paramMap) ? paramMap.get('q') : undefined;
     const params = (q) ? new HttpParams({fromString: base64Decode(q)}) : new HttpParams();
-    this.release = new SimpleRelease();
+    this.release = new ReleaseSummary();
     this.release.releaseId = Number(params.get('releaseId') || 0);
     this.page.sortActive = params.get('sortActive');
     if (!this.page.sortActive) {
@@ -55,9 +60,10 @@ export class CodeListForListRequest {
     this.access = params.get('access') || '';
     this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
     this.deprecated = (params.get('deprecated')) ? Array.from(params.get('deprecated').split(',').map(e => e === 'true' ? true : false)) : [];
+    this.extensible = (params.get('extensible')) ? Array.from(params.get('extensible').split(',').map(e => e === 'true' ? true : false)) : [];
     this.newComponent = (params.get('newComponent')) ? Array.from(params.get('newComponent').split(',').map(e => e === 'true' ? true : false)) : [];
     this.ownedByDeveloper = (params.get('ownedByDeveloper')) ? (('true' === params.get('ownedByDeveloper'))) : undefined;
-    this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
+    this.updaterLoginIdList = (params.get('updaterLoginIdList')) ? Array.from(params.get('updaterLoginIdList').split(',')) : [];
     this.updatedDate = {
       start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
       end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
@@ -88,14 +94,17 @@ export class CodeListForListRequest {
     if (this.deprecated !== undefined && this.deprecated.length > 0) {
       params = params.set('deprecated', this.deprecated.map(e => (e) ? 'true' : 'false').join(','));
     }
+    if (this.extensible !== undefined && this.extensible.length > 0) {
+      params = params.set('extensible', this.extensible.map(e => (e) ? 'true' : 'false').join(','));
+    }
     if (this.newComponent !== undefined && this.newComponent.length > 0) {
       params = params.set('newComponent', this.newComponent.map(e => (e) ? 'true' : 'false').join(','));
     }
     if (this.ownedByDeveloper !== undefined) {
       params = params.set('ownedByDeveloper', (this.ownedByDeveloper) ? 'true' : 'false');
     }
-    if (this.updaterLoginIds && this.updaterLoginIds.length > 0) {
-      params = params.set('updaterLoginIds', this.updaterLoginIds.join(','));
+    if (this.updaterLoginIdList && this.updaterLoginIdList.length > 0) {
+      params = params.set('updaterLoginIdList', this.updaterLoginIdList.join(','));
     }
     if (this.updatedDate.start) {
       params = params.set('updatedDateStart', '' + this.updatedDate.start.toUTCString());
@@ -118,6 +127,129 @@ export class CodeListForListRequest {
     const str = base64Encode(params.toString());
     return (str) ? 'q=' + str : undefined;
   }
+}
+
+export class CodeListSummary {
+
+  codeListManifestId: number;
+  codeListId: number;
+  guid: string;
+
+  name: string;
+  listId: string;
+  versionId: string;
+
+  deprecated: boolean;
+  state: string;
+
+  valueList: CodeListValueSummary[];
+
+}
+
+export class CodeListValueSummary {
+
+  codeListValueManifestId: number;
+  codeListValueId: number;
+  guid: string;
+
+  value: string;
+  name: string;
+
+}
+
+export class CodeListListEntry {
+
+  library: LibrarySummary;
+  release: ReleaseSummary;
+
+  codeListManifestId: number;
+  codeListId: number;
+  guid: string;
+  enumTypeGuid: string;
+
+  based: CodeListSummary;
+  agencyIdListValue: AgencyIdListValueSummary;
+
+  name: string;
+  listId: string;
+  versionId: string;
+  definition: string;
+  definitionSource: string;
+  remark: string;
+
+  namespaceId: number;
+
+  deprecated: boolean;
+  extensible: boolean;
+  newComponent: boolean;
+  state: string;
+  access: string;
+
+  log: LogSummary;
+  module: string;
+
+  owner: ScoreUser;
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+
+}
+
+export class CodeListDetails {
+
+  library: LibrarySummary = new LibrarySummary();
+  release: ReleaseSummary = new ReleaseSummary();
+
+  codeListManifestId: number;
+  codeListId: number;
+  guid: string;
+  enumTypeGuid: string;
+
+  based: CodeListSummary = new CodeListSummary();
+  agencyIdListValue: AgencyIdListValueSummary = new AgencyIdListValueSummary();
+
+  name: string;
+  listId: string;
+  versionId: string;
+  definition: Definition = new Definition();
+  remark: string;
+
+  namespace: NamespaceSummary = new NamespaceSummary();
+
+  deprecated: boolean;
+  extensible: boolean;
+  newComponent: boolean;
+  state: string;
+  access: string;
+
+  log: LogSummary = new LogSummary();
+  module: string;
+
+  owner: ScoreUser;
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+
+  valueList: CodeListValueDetails[] = [];
+
+}
+
+export class CodeListValueDetails {
+
+  codeListValueManifestId: number;
+  codeListValueId: number;
+  guid: string;
+
+  value: string;
+  meaning: string;
+
+  definition: Definition = new Definition();
+
+  deprecated: boolean;
+  used: boolean;
+
+  owner: ScoreUser;
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+
 }
 
 export class CodeListForList {
@@ -182,8 +314,7 @@ export class CodeListValue {
   guid: string;
   value: string;
   meaning: string;
-  definition: string;
-  definitionSource: string;
+  definition: Definition;
 
   deprecated: boolean;
   derived: boolean;
@@ -206,4 +337,8 @@ export class SimpleAgencyIdListValue {
   agencyIdListValueId: number;
   value: string;
   name: string;
+}
+
+export class CodeListCreateResponse {
+  codeListManifestId: number;
 }

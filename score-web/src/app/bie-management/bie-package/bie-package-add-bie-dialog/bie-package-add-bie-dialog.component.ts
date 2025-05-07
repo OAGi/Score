@@ -6,17 +6,17 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker} from '@angular/material/datepicker';
 import {finalize} from 'rxjs/operators';
-import {SimpleRelease, WorkingRelease} from '../../../release-management/domain/release';
+import {ReleaseSummary, WorkingRelease} from '../../../release-management/domain/release';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
 import {ReleaseService} from '../../../release-management/domain/release.service';
 import {AuthService} from '../../../authentication/auth.service';
 import {WebPageInfoService} from '../../../basis/basis.service';
 import {PageRequest} from '../../../basis/basis';
-import {initFilter, loadBranch, loadLibrary, saveBranch, saveLibrary} from '../../../common/utility';
+import {initFilter, loadBranch, saveBranch, saveLibrary} from '../../../common/utility';
 import {MatMultiSort, MatMultiSortTableDataSource, TableData} from 'ngx-mat-multi-sort';
-import {BieList, BieListRequest} from '../../bie-list/domain/bie-list';
+import {BieListEntry, BieListRequest} from '../../bie-list/domain/bie-list';
 import {BieListService} from '../../bie-list/domain/bie-list.service';
 import {UserToken} from '../../../authentication/domain/auth';
 import {OagisComponentTypes} from '../../../cc-management/domain/core-component-node';
@@ -27,7 +27,7 @@ import {
 } from '../../../settings-management/settings-preferences/domain/preferences';
 import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
-import {Library} from '../../../library-management/domain/library';
+import {LibrarySummary} from '../../../library-management/domain/library';
 import {LibraryService} from '../../../library-management/domain/library.service';
 
 @Component({
@@ -192,17 +192,17 @@ export class BiePackageAddBieDialogComponent implements OnInit {
     return displayedColumns;
   }
 
-  table: TableData<BieList>;
-  selection = new SelectionModel<BieList>(true, []);
+  table: TableData<BieListEntry>;
+  selection = new SelectionModel<BieListEntry>(true, []);
   loading = false;
 
   loginIdList: string[] = [];
-  releases: SimpleRelease[] = [];
-  selectedRelease: SimpleRelease;
+  releases: ReleaseSummary[] = [];
+  selectedRelease: ReleaseSummary;
   releaseListFilterCtrl: FormControl = new FormControl();
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
-  filteredReleaseList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
+  filteredReleaseList: ReplaySubject<ReleaseSummary[]> = new ReplaySubject<ReleaseSummary[]>(1);
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   states: string[] = ['Production'];
@@ -230,14 +230,14 @@ export class BiePackageAddBieDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.table = new TableData<BieList>(this.defaultDisplayedColumns, {});
-    this.table.dataSource = new MatMultiSortTableDataSource<BieList>(this.sort, false);
+    this.table = new TableData<BieListEntry>(this.defaultDisplayedColumns, {});
+    this.table.dataSource = new MatMultiSortTableDataSource<BieListEntry>(this.sort, false);
 
     this.request = new BieListRequest(this.route.snapshot.queryParamMap,
       new PageRequest(['lastUpdateTimestamp'], ['desc'], 0, 10));
     this.request.states = ['Production'];
 
-    this.libraryService.getLibraries().subscribe(libraries => {
+    this.libraryService.getLibrarySummaryList().subscribe(libraries => {
       this.initLibraries(libraries);
 
       this.paginator.pageIndex = this.request.page.pageIndex;
@@ -261,7 +261,7 @@ export class BiePackageAddBieDialogComponent implements OnInit {
 
       forkJoin([
         this.accountService.getAccountNames(),
-        this.releaseService.getSimpleReleases(this.request.library.libraryId),
+        this.releaseService.getReleaseSummaryList(this.request.library.libraryId),
         this.preferencesService.load(this.auth.getUserToken())
       ]).subscribe(([loginIds, releases, preferencesInfo]) => {
         this.preferencesInfo = preferencesInfo;
@@ -310,17 +310,6 @@ export class BiePackageAddBieDialogComponent implements OnInit {
     }
   }
 
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
-  }
-
   reset(type: string) {
     switch (type) {
       case 'startDate':
@@ -342,11 +331,11 @@ export class BiePackageAddBieDialogComponent implements OnInit {
     }
   }
 
-  initLibraries(libraries: Library[]) {
+  initLibraries(libraries: LibrarySummary[]) {
     this.request.library = libraries.filter(e => e.libraryId === this.data.biePackage.libraryId)[0];
   }
 
-  initReleases(releases: SimpleRelease[]) {
+  initReleases(releases: ReleaseSummary[]) {
     this.releases = releases.filter(e => !e.workingRelease);
     initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
     const savedReleaseId = loadBranch(this.auth.getUserToken(), 'BIE');
@@ -361,9 +350,9 @@ export class BiePackageAddBieDialogComponent implements OnInit {
     }
   }
 
-  onLibraryChange(library: Library) {
+  onLibraryChange(library: LibrarySummary) {
     this.request.library = library;
-    this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Published']).subscribe(releases => {
+    this.releaseService.getReleaseSummaryList(this.request.library.libraryId, ['Published']).subscribe(releases => {
       saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
       this.initReleases(releases);
       this.onSearch();
@@ -390,10 +379,7 @@ export class BiePackageAddBieDialogComponent implements OnInit {
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
-      this.table.dataSource.data = resp.list.map((elm: BieList) => {
-        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        return elm;
-      });
+      this.table.dataSource.data = resp.list;
     }, error => {
       this.table.dataSource.data = [];
     });
@@ -413,11 +399,11 @@ export class BiePackageAddBieDialogComponent implements OnInit {
       this.table.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(row: BieList) {
+  select(row: BieListEntry) {
     this.selection.select(row);
   }
 
-  toggle(row: BieList) {
+  toggle(row: BieListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row);
     } else {
@@ -425,7 +411,7 @@ export class BiePackageAddBieDialogComponent implements OnInit {
     }
   }
 
-  isSelected(row: BieList): boolean {
+  isSelected(row: BieListEntry): boolean {
     if (!row) {
       return false;
     }
@@ -433,7 +419,7 @@ export class BiePackageAddBieDialogComponent implements OnInit {
   }
 
   selectionClear() {
-    this.selection = new SelectionModel<BieList>(true, [],
+    this.selection = new SelectionModel<BieListEntry>(true, [],
       true, (a, b) => a.topLevelAsbiepId === b.topLevelAsbiepId);
   }
 
@@ -446,6 +432,6 @@ export class BiePackageAddBieDialogComponent implements OnInit {
     this.dialogRef.close();
   }
 
-    protected readonly workingRelease = WorkingRelease;
+  protected readonly workingRelease = WorkingRelease;
   protected readonly componentTypeList = OagisComponentTypes;
 }

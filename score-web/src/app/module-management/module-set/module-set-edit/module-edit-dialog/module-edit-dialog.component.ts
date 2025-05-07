@@ -4,7 +4,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../../../common/confirm-dialog/confirm-dialog.service';
 import {initFilter, sha256} from '../../../../common/utility';
-import {SimpleNamespace} from '../../../../namespace-management/domain/namespace';
+import {NamespaceSummary} from '../../../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../../../namespace-management/domain/namespace.service';
 import {ModuleElement, ModuleSet} from '../../../domain/module';
 import {ModuleService} from '../../../domain/module.service';
@@ -20,10 +20,10 @@ export class ModuleEditDialogComponent implements OnInit {
 
   $hashCode: string;
 
-  namespaceList: SimpleNamespace[];
+  namespaceList: NamespaceSummary[];
 
   namespaceListFilterCtrl: FormControl = new FormControl();
-  filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
+  filteredNamespaceList: ReplaySubject<NamespaceSummary[]> = new ReplaySubject<NamespaceSummary[]>(1);
 
   title: string;
 
@@ -50,7 +50,7 @@ export class ModuleEditDialogComponent implements OnInit {
       namespaceId: (!!this.element.namespaceId) ? this.element.namespaceId : undefined
     }));
 
-    this.namespaceService.getSimpleNamespaces(this.moduleSet.libraryId).subscribe(resp => {
+    this.namespaceService.getNamespaceSummaries(this.moduleSet.libraryId).subscribe(resp => {
       this.namespaceList = resp.filter(e => e.standard);
       initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList,
         this.namespaceList, (e) => e.uri);
@@ -103,7 +103,7 @@ export class ModuleEditDialogComponent implements OnInit {
         .subscribe(result => {
           if (result) {
             this.isUpdating = true;
-            this.service.deleteModule(this.element)
+            this.service.discardModule(this.element)
               .pipe(finalize(() => {
                 this.isUpdating = false;
               }))
@@ -122,7 +122,7 @@ export class ModuleEditDialogComponent implements OnInit {
         .subscribe(result => {
           if (result) {
             this.isUpdating = true;
-            this.service.deleteModule(this.element)
+            this.service.discardModule(this.element)
               .pipe(finalize(() => {
                 this.isUpdating = false;
               }))

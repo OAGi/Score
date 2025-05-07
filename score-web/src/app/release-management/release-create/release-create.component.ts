@@ -3,13 +3,13 @@ import {AuthService} from '../../authentication/auth.service';
 import {ReleaseService} from '../domain/release.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {Router} from '@angular/router';
-import {ReleaseDetail} from '../domain/release';
+import {ReleaseDetails} from '../domain/release';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {FormControl} from '@angular/forms';
-import {forkJoin, ReplaySubject} from 'rxjs';
-import {NamespaceList, NamespaceListRequest} from '../../namespace-management/domain/namespace';
+import {ReplaySubject} from 'rxjs';
+import {NamespaceSummary} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
-import {Library} from '../../library-management/domain/library';
+import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryService} from '../../library-management/domain/library.service';
 import {loadLibrary, saveLibrary} from '../../common/utility';
 
@@ -22,14 +22,14 @@ export class ReleaseCreateComponent implements OnInit {
 
   title = 'Releases Detail';
 
-  releaseDetail = new ReleaseDetail();
-  library: Library = new Library();
-  libraries: Library[] = [];
-  mappedLibraries: { library: Library, selected: boolean }[] = [];
-  namespaceList: NamespaceList[];
-  selectedNamespace: NamespaceList;
+  releaseDetail = new ReleaseDetails();
+  library: LibrarySummary = new LibrarySummary();
+  libraries: LibrarySummary[] = [];
+  mappedLibraries: { library: LibrarySummary, selected: boolean }[] = [];
+  namespaceList: NamespaceSummary[];
+  selectedNamespace: NamespaceSummary;
   namespaceListFilterCtrl: FormControl = new FormControl();
-  filteredNamespaceList: ReplaySubject<NamespaceList[]> = new ReplaySubject<NamespaceList[]>(1);
+  filteredNamespaceList: ReplaySubject<NamespaceSummary[]> = new ReplaySubject<NamespaceSummary[]>(1);
   loading = false;
   states: string[] = ['Draft', 'Final'];
 
@@ -49,7 +49,7 @@ export class ReleaseCreateComponent implements OnInit {
       this.router.navigateByUrl('/');
     }
 
-    this.libraryService.getLibraries().subscribe(libraries => {
+    this.libraryService.getLibrarySummaryList().subscribe(libraries => {
       this.initLibraries(libraries);
 
       this.loadNamespaces();
@@ -69,7 +69,7 @@ export class ReleaseCreateComponent implements OnInit {
     );
   }
 
-  initLibraries(libraries: Library[]) {
+  initLibraries(libraries: LibrarySummary[]) {
     this.libraries = libraries;
     if (this.libraries.length > 0) {
       const savedLibraryId = loadLibrary(this.auth.getUserToken());
@@ -89,13 +89,8 @@ export class ReleaseCreateComponent implements OnInit {
   }
 
   loadNamespaces() {
-    const request = new NamespaceListRequest();
-    request.library.libraryId = this.library.libraryId;
-    request.page.pageIndex = -1;
-    request.page.pageSize = -1;
-
-    this.namespaceService.getNamespaceList(request).subscribe(namespaceList => {
-      this.namespaceList = namespaceList.list.filter(e => e.std);
+    this.namespaceService.getNamespaceSummaries(this.library.libraryId).subscribe(namespaceList => {
+      this.namespaceList = namespaceList.filter(e => e.standard);
       this.filteredNamespaceList.next(this.namespaceList.slice());
       this.namespaceListFilterCtrl.valueChanges
         .subscribe(() => {
@@ -104,7 +99,7 @@ export class ReleaseCreateComponent implements OnInit {
     });
   }
 
-  onLibraryChange(library: Library) {
+  onLibraryChange(library: LibrarySummary) {
     this.library = library;
     saveLibrary(this.auth.getUserToken(), this.library.libraryId);
     this.loadNamespaces();

@@ -1,0 +1,15 @@
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner [diameter]="40"></mat-spinner>
+  </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <div class="content-wrapper">
+          <div class="content overflow-container" [innerHTML]="sanitizedSvgContent">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

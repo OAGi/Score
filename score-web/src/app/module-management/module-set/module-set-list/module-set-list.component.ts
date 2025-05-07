@@ -2,7 +2,7 @@ import {SelectionModel} from '@angular/cdk/collections';
 import {Location} from '@angular/common';
 import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {FormControl} from '@angular/forms';
-import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker} from '@angular/material/datepicker';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort, SortDirection} from '@angular/material/sort';
@@ -15,7 +15,7 @@ import {AuthService} from '../../../authentication/auth.service';
 import {PageRequest} from '../../../basis/basis';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 import {initFilter, loadLibrary, saveLibrary} from '../../../common/utility';
-import {ModuleSet, ModuleSetListRequest} from '../../domain/module';
+import {ModuleSet, ModuleSetListEntry, ModuleSetListRequest} from '../../domain/module';
 import {ModuleService} from '../../domain/module.service';
 import {UserToken} from '../../../authentication/domain/auth';
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
@@ -26,7 +26,7 @@ import {
 } from '../../../settings-management/settings-preferences/domain/preferences';
 import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SearchBarComponent} from '../../../common/search-bar/search-bar.component';
-import {Library} from '../../../library-management/domain/library';
+import {LibrarySummary} from '../../../library-management/domain/library';
 import {LibraryService} from '../../../library-management/domain/library.service';
 
 @Component({
@@ -131,12 +131,12 @@ export class ModuleSetListComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<ModuleSet>();
+  dataSource = new MatTableDataSource<ModuleSetListEntry>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
 
-  libraries: Library[] = [];
-  mappedLibraries: { library: Library, selected: boolean }[] = [];
+  libraries: LibrarySummary[] = [];
+  mappedLibraries: { library: LibrarySummary, selected: boolean }[] = [];
   loginIdList: string[] = [];
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
@@ -170,7 +170,7 @@ export class ModuleSetListComponent implements OnInit {
     this.request = new ModuleSetListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
 
-    this.libraryService.getLibraries().subscribe(libraries => {
+    this.libraryService.getLibrarySummaryList().subscribe(libraries => {
       this.initLibraries(libraries);
 
       this.searchBar.showAdvancedSearch =
@@ -219,17 +219,6 @@ export class ModuleSetListComponent implements OnInit {
     return (userToken) ? userToken.roles : [];
   }
 
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
-  }
-
   reset(type: string) {
     switch (type) {
       case 'startDate':
@@ -250,7 +239,7 @@ export class ModuleSetListComponent implements OnInit {
     this.loadModuleSetList();
   }
 
-  initLibraries(libraries: Library[]) {
+  initLibraries(libraries: LibrarySummary[]) {
     this.libraries = libraries;
     if (this.libraries.length > 0) {
       const savedLibraryId = loadLibrary(this.auth.getUserToken());
@@ -269,7 +258,7 @@ export class ModuleSetListComponent implements OnInit {
     }
   }
 
-  onLibraryChange(library: Library) {
+  onLibraryChange(library: LibrarySummary) {
     this.request.library = library;
     saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
     this.onSearch();
@@ -293,7 +282,7 @@ export class ModuleSetListComponent implements OnInit {
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
-      this.dataSource.data = resp.results;
+      this.dataSource.data = resp.list;
       this.highlightText = this.request.filters.description;
 
       if (!isInit) {
@@ -323,11 +312,11 @@ export class ModuleSetListComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(row: ModuleSet) {
+  select(row: ModuleSetListEntry) {
     this.selection.select(row.moduleSetId);
   }
 
-  toggle(row: ModuleSet) {
+  toggle(row: ModuleSetListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row.moduleSetId);
     } else {
@@ -335,7 +324,7 @@ export class ModuleSetListComponent implements OnInit {
     }
   }
 
-  isSelected(row: ModuleSet) {
+  isSelected(row: ModuleSetListEntry) {
     return this.selection.isSelected(row.moduleSetId);
   }
 

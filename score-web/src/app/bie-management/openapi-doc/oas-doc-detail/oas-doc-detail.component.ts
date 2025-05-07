@@ -19,9 +19,7 @@ import {SelectionModel} from '@angular/cdk/collections';
 import {finalize} from 'rxjs/operators';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {OasDocAssignDialogComponent} from '../oas-doc-assign-dialog/oas-doc-assign-dialog.component';
-import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {MatMultiSort, MatMultiSortTableDataSource, TableData} from 'ngx-mat-multi-sort';
-import {WorkingRelease} from '../../../release-management/domain/release';
 import {BusinessContext} from '../../../context-management/business-context/domain/business-context';
 import {BieExpressOption} from '../../bie-express/domain/generate-expression';
 import {BusinessContextService} from '../../../context-management/business-context/domain/business-context.service';
@@ -380,17 +378,6 @@ export class OasDocDetailComponent implements OnInit {
       if (source.verb === 'GET' && source.messageBody === 'Request') {
         source.messageBody = 'Response';
       }
-    }
-  }
-
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
     }
   }
 

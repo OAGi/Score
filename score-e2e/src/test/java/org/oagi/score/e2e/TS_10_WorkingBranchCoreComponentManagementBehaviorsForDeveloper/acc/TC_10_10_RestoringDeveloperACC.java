@@ -65,13 +65,13 @@ public class TC_10_10_RestoringDeveloperACC extends BaseTest {
             coreComponentAPI.updateACC(acc);
 
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "WIP");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
 
             acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "WIP");
             coreComponentAPI.appendBCC(acc_association, bccp_to_append, "WIP");
 
             asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");

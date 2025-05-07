@@ -41,19 +41,19 @@ export class TenantListService implements OnInit {
     return this.http.delete('/api/tenants/' + tenantId);
   }
 
-  deleteTenantUser(tenantId: number, appUserId: number): Observable<any> {
-    return this.http.put('/api/tenants/users/' + tenantId, appUserId);
+  addTenantUser(tenantId: number, appUserId: number): Observable<any> {
+    return this.http.post('/api/tenants/' + tenantId + '/users/' + appUserId, {});
   }
 
-  addTenantUser(tenantId: number, appUserId: number): Observable<any> {
-    return this.http.post('/api/tenants/users/' + tenantId, appUserId);
+  deleteTenantUser(tenantId: number, appUserId: number): Observable<any> {
+    return this.http.delete('/api/tenants/' + tenantId + '/users/' + appUserId, {});
   }
 
   addTenantBusinessCtx(tenantId: number, businessCtxId: number): Observable<any> {
-    return this.http.post('/api/tenants/bis-ctx/' + tenantId, businessCtxId);
+    return this.http.post('/api/tenants/' + tenantId + '/business-contexts/' + businessCtxId, {});
   }
 
   deleteTenantBusinessCtx(tenantId: number, businessCtxId: number): Observable<any> {
-    return this.http.put('/api/tenants/bis-ctx/' + tenantId, businessCtxId);
+    return this.http.delete('/api/tenants/' + tenantId + '/business-contexts/' + businessCtxId, {});
   }
 }

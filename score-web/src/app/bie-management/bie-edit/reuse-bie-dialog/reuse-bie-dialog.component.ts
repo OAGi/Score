@@ -4,9 +4,9 @@ import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {AuthService} from '../../../authentication/auth.service';
-import {BieList, BieListRequest} from '../../bie-list/domain/bie-list';
+import {BieListEntry, BieListRequest} from '../../bie-list/domain/bie-list';
 import {SelectionModel} from '@angular/cdk/collections';
-import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker} from '@angular/material/datepicker';
 import {PageRequest} from '../../../basis/basis';
 import {BieListService} from '../../bie-list/domain/bie-list.service';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
@@ -16,7 +16,7 @@ import {initFilter} from '../../../common/utility';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
-import {SimpleRelease} from '../../../release-management/domain/release';
+import {ReleaseSummary} from '../../../release-management/domain/release';
 import {WebPageInfoService} from '../../../basis/basis.service';
 import {
   PreferencesInfo,
@@ -25,7 +25,7 @@ import {
 } from '../../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
-import {Library} from '../../../library-management/domain/library';
+import {LibrarySummary} from '../../../library-management/domain/library';
 
 @Component({
   selector: 'score-reuse-bie-dialog',
@@ -158,7 +158,7 @@ export class ReuseBieDialogComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<BieList>();
+  dataSource = new MatTableDataSource<BieListEntry>();
   selection = new SelectionModel<number>(false, []);
   loading = false;
 
@@ -194,9 +194,9 @@ export class ReuseBieDialogComponent implements OnInit {
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.filters.asccpManifestId = this.data.asccpManifestId;
     this.request.filters.den = this.data.den;
-    this.request.library = new Library();
+    this.request.library = new LibrarySummary();
     this.request.library.libraryId = this.data.libraryId;
-    const release = new SimpleRelease();
+    const release = new ReleaseSummary();
     release.releaseId = this.data.releaseId;
     this.request.releases = [release, ];
     this.request.basedTopLevelAsbiepIds = [this.data.basedTopLevelAsbiepId, ];
@@ -258,17 +258,6 @@ export class ReuseBieDialogComponent implements OnInit {
     }
   }
 
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
-  }
-
   reset(type: string) {
     switch (type) {
       case 'startDate':
@@ -300,10 +289,7 @@ export class ReuseBieDialogComponent implements OnInit {
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
-      this.dataSource.data = resp.list.map((elm: BieList) => {
-        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        return elm;
-      });
+      this.dataSource.data = resp.list;
     }, error => {
       this.dataSource.data = [];
     });
@@ -317,11 +303,11 @@ export class ReuseBieDialogComponent implements OnInit {
     return this.selection.selected.length === 0;
   }
 
-  select(row: BieList) {
+  select(row: BieListEntry) {
     this.selection.select(row.topLevelAsbiepId);
   }
 
-  toggle(row: BieList) {
+  toggle(row: BieListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row.topLevelAsbiepId);
     } else {
@@ -329,7 +315,7 @@ export class ReuseBieDialogComponent implements OnInit {
     }
   }
 
-  isSelected(row: BieList) {
+  isSelected(row: BieListEntry) {
     return this.selection.isSelected(row.topLevelAsbiepId);
   }
 

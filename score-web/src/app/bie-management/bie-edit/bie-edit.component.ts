@@ -17,8 +17,10 @@ import {
 } from '../bie-edit/domain/bie-edit-node';
 import {
   AbieFlatNode,
-  AsbiepFlatNode, BbieDetail,
-  BbiepFlatNode, BbieScDetail,
+  AsbiepFlatNode,
+  BbieDetail,
+  BbiepFlatNode,
+  BbieScDetail,
   BbieScFlatNode,
   BieEditAbieNodeDetail,
   BieEditAsbiepNodeDetail,
@@ -34,7 +36,11 @@ import {
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {AbstractControl, FormControl, FormGroupDirective, NgForm, ValidationErrors, Validators} from '@angular/forms';
-import {BusinessContext, BusinessContextListRequest} from '../../context-management/business-context/domain/business-context';
+import {
+  BusinessContext,
+  BusinessContextListRequest,
+  BusinessContextSummary
+} from '../../context-management/business-context/domain/business-context';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {MatSort} from '@angular/material/sort';
 import {MatPaginator} from '@angular/material/paginator';
@@ -55,6 +61,7 @@ import {BieListDialogComponent} from '../bie-list-dialog/bie-list-dialog.compone
 import {WebPageInfoService} from '../../basis/basis.service';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {CcNodeService} from '../../cc-management/domain/core-component-node.service';
 
 
 @Component({
@@ -142,24 +149,24 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   _changedVersionValue: string;
   /* Begin business context management */
   businessContextCtrl: FormControl;
-  businessContexts: BusinessContext[] = [];
-  allBusinessContexts: BusinessContext[] = [];
-  filteredBusinessContexts: Observable<BusinessContext[]>;
+  businessContexts: BusinessContextSummary[] = [];
+  allBusinessContexts: BusinessContextSummary[] = [];
+  filteredBusinessContexts: Observable<BusinessContextSummary[]>;
   businessContextUpdating = true;
   addOnBlur = true;
   separatorKeysCodes: number[] = [ENTER, COMMA];
 
   /* reused BIE */
-  reusedBusinessContexts: BusinessContext[] = [];
+  reusedBusinessContexts: BusinessContextSummary[] = [];
   reusedNode: BieEditNode;
   reusedNodeDetail: BieEditAsbiepNodeDetail;
 
   /* business contexts in base BIE */
-  basedBusinessContexts?: BusinessContext[] = [];
+  basedBusinessContexts?: BusinessContextSummary[] = [];
   baseNode?: BieEditAbieNode; // If 'rootNode' has basedTopLevelAsbiepId, this must not be null.
 
   /* reused base BIE */
-  reusedBaseBusinessContexts: BusinessContext[] = [];
+  reusedBaseBusinessContexts: BusinessContextSummary[] = [];
   reusedBaseNode: BieEditNode;
   reusedBaseNodeDetail: BieEditAsbiepNodeDetail;
 
@@ -222,6 +229,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   constructor(private service: BieEditService,
+              private ccNodeService: CcNodeService,
               private bizCtxService: BusinessContextService,
               private snackBar: MatSnackBar,
               private location: Location,
@@ -258,7 +266,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
           this.service.getRefBieList(this.topLevelAsbiepId),
           this.service.getRootNode(this.topLevelAsbiepId),
           this.bizCtxService.getBusinessContextsByTopLevelAsbiepId(this.topLevelAsbiepId),
-          this.bizCtxService.getBusinessContextList(businessContextRequest),
+          this.bizCtxService.getBusinessContextSummaries(),
           this.preferencesService.load(this.auth.getUserToken())
         ]);
       })).subscribe(([ccGraph, usedBieList, refBieList, rootNode,
@@ -273,11 +281,11 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         return;
       }
 
-      this.allBusinessContexts = allBizCtxResp.list;
+      this.allBusinessContexts = allBizCtxResp;
       this.businessContextCtrl = new FormControl({
         disabled: false
       });
-      this.businessContexts = bizCtxResp.list;
+      this.businessContexts = bizCtxResp;
       this.businessContextUpdating = false;
       this.filteredBusinessContexts = this.businessContextCtrl.valueChanges.pipe(
         startWith(null),
@@ -288,7 +296,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         this.rootNode, this.topLevelAsbiepId, usedBieList, refBieList);
 
       const doAfter = () => {
-        this.dataSource = new BieFlatNodeDataSource<BieFlatNode>(database, this.service, [this,]);
+        this.dataSource = new BieFlatNodeDataSource<BieFlatNode>(database, this.service, this.ccNodeService, [this,]);
         this.searcher = new BieFlatNodeDataSourceSearcher<BieFlatNode>(this.dataSource, database);
         this.dataSource.init();
         this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
@@ -316,7 +324,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
           this.service.getUsedBieList(rootNode.basedTopLevelAsbiepId)
         ]).subscribe(([baseNode, basedBizCtxResp, baseUsedBieList]) => {
           this.baseNode = new BieEditAbieNode(baseNode);
-          this.basedBusinessContexts = basedBizCtxResp.list;
+          this.basedBusinessContexts = basedBizCtxResp;
           database.setBaseUsedBieList(baseUsedBieList);
           doAfter();
         });
@@ -376,16 +384,23 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     this.rootNode = new BieEditAbieNode(rootNode);
     this.rootNode.reset();
     const that = this;
+
+    const onVersionChange = (version: string) => {
+      that._versionChanged = true;
+      that._changedVersionValue = version;
+
+      that.assignVersionToVersionIdIfPossible();
+    };
     this.rootNode.listeners.push(new class implements ChangeListener<BieEditNode> {
       onChange(entity: BieEditNode, propertyName: string, val: any) {
         if (propertyName === 'version') {
-          that._versionChanged = true;
-          that._changedVersionValue = val;
-
-          that.assignVersionToVersionIdIfPossible();
+          onVersionChange(val);
         }
       }
     });
+    if (!!this.rootNode.version) {
+      onVersionChange(this.rootNode.version);
+    }
   }
 
   toggle(node: BieFlatNode, $event?: MouseEvent) {
@@ -403,7 +418,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       $event.stopPropagation();
     }
 
-    this.dataSource.loadDetail(node, (detailNode: BieFlatNode) => {
+    this.dataSource.loadDetails(node, (detailNode: BieFlatNode) => {
       this.selectedNode = node;
       this.cursorNode = node;
 
@@ -422,7 +437,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         ]).subscribe(([resp, detail, bizCtxResp]) => {
           this.reusedNode = resp as BieEditAbieNode;
           this.reusedNodeDetail = detail as BieEditAsbiepNodeDetail;
-          this.reusedBusinessContexts = bizCtxResp.list;
+          this.reusedBusinessContexts = bizCtxResp;
 
           if (node.inherited) {
             if (this.asAsbiepDetail(node).asbie.toAsbiepId !== this.asAsbiepDetail(node).base.asbie.toAsbiepId) {
@@ -435,7 +450,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
               ]).subscribe(([baseResp, baseDetail, baseBizCtxResp]) => {
                 this.reusedBaseNode = baseResp as BieEditAbieNode;
                 this.reusedBaseNodeDetail = baseDetail as BieEditAsbiepNodeDetail;
-                this.reusedBaseBusinessContexts = baseBizCtxResp.list;
+                this.reusedBaseBusinessContexts = baseBizCtxResp;
               });
             } else {
               this.reusedBaseNode = this.reusedNode;
@@ -825,7 +840,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       this.initRootNode(rootNode);
 
       const doAfter = () => {
-        this.dataSource = new BieFlatNodeDataSource<BieFlatNode>(database, this.service, [this,]);
+        this.dataSource = new BieFlatNodeDataSource<BieFlatNode>(database, this.service, this.ccNodeService, [this,]);
         this.searcher = new BieFlatNodeDataSourceSearcher<BieFlatNode>(this.dataSource, database);
         this.dataSource.init();
 
@@ -860,7 +875,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
           this.service.getUsedBieList(rootNode.basedTopLevelAsbiepId)
         ]).subscribe(([baseNode, basedBizCtxResp, baseUsedBieList]) => {
           this.baseNode = new BieEditAbieNode(baseNode);
-          this.basedBusinessContexts = basedBizCtxResp.list;
+          this.basedBusinessContexts = basedBizCtxResp;
           database.setBaseUsedBieList(baseUsedBieList);
           doAfter();
         });
@@ -1228,7 +1243,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
           return;
         }
 
-        this.dataSource.loadDetail(child, (detailNode: BieFlatNode) => {
+        this.dataSource.loadDetails(child, (detailNode: BieFlatNode) => {
           this.asBbiepDetail(detailNode).bbie.nillable = true;
         });
       }
@@ -1248,7 +1263,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
           return;
         }
 
-        this.dataSource.loadDetail(child, (detailNode: BieFlatNode) => {
+        this.dataSource.loadDetails(child, (detailNode: BieFlatNode) => {
           this.asBbiepDetail(detailNode).bbie.nillable = false;
         });
       }
@@ -1495,6 +1510,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   get versionIdDetail(): BieFlatNode | undefined {
+    if (!this.dataSource || !this.dataSource.data) {
+      return undefined;
+    }
     for (const detailValue of this.dataSource.data[0].children.map(e => e as BieFlatNode)) {
       if (this.isVersionIdNode(detailValue)) {
         return detailValue;
@@ -1584,7 +1602,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       if (detailNode.inherited) {
         ccCardinalityMin = this.asAsbiepDetail(detailNode).base.asbie.cardinalityMin;
       } else {
-        ccCardinalityMin = this.asAsbiepDetail(detailNode).ascc.cardinalityMin;
+        ccCardinalityMin = this.asAsbiepDetail(detailNode).ascc.cardinality.min;
       }
     } else if (this.isBbiepDetail(detailNode)) {
       bieCardinalityMin = this.asBbiepDetail(detailNode).bbie.cardinalityMin;
@@ -1592,7 +1610,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       if (detailNode.inherited) {
         ccCardinalityMin = this.asBbiepDetail(detailNode).base.bbie.cardinalityMin;
       } else {
-        ccCardinalityMin = this.asBbiepDetail(detailNode).bcc.cardinalityMin;
+        ccCardinalityMin = this.asBbiepDetail(detailNode).bcc.cardinality.min;
       }
     } else if (this.isBbieScDetail(detailNode)) {
       bieCardinalityMin = this.asBbieScDetail(detailNode).bbieSc.cardinalityMin;
@@ -1600,7 +1618,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       if (detailNode.inherited) {
         ccCardinalityMin = this.asBbieScDetail(detailNode).base.bbieSc.cardinalityMin;
       } else {
-        ccCardinalityMin = this.asBbieScDetail(detailNode).bdtSc.cardinalityMin;
+        ccCardinalityMin = this.asBbieScDetail(detailNode).bdtSc.cardinality.min;
       }
     } else {
       return;
@@ -1663,7 +1681,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       if (detailNode.inherited) {
         ccCardinalityMax = this.asAsbiepDetail(detailNode).base.asbie.cardinalityMax;
       } else {
-        ccCardinalityMax = this.asAsbiepDetail(detailNode).ascc.cardinalityMax;
+        ccCardinalityMax = this.asAsbiepDetail(detailNode).ascc.cardinality.max;
       }
     } else if (this.isBbiepDetail(detailNode)) {
       bieCardinalityMin = this.asBbiepDetail(detailNode).bbie.cardinalityMin;
@@ -1671,7 +1689,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       if (detailNode.inherited) {
         ccCardinalityMax = this.asBbiepDetail(detailNode).base.bbie.cardinalityMax;
       } else {
-        ccCardinalityMax = this.asBbiepDetail(detailNode).bcc.cardinalityMax;
+        ccCardinalityMax = this.asBbiepDetail(detailNode).bcc.cardinality.max;
       }
     } else if (this.isBbieScDetail(detailNode)) {
       bieCardinalityMin = this.asBbieScDetail(detailNode).bbieSc.cardinalityMin;
@@ -1679,7 +1697,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       if (detailNode.inherited) {
         ccCardinalityMax = this.asBbieScDetail(detailNode).base.bbieSc.cardinalityMax;
       } else {
-        ccCardinalityMax = this.asBbieScDetail(detailNode).bdtSc.cardinalityMax;
+        ccCardinalityMax = this.asBbieScDetail(detailNode).bdtSc.cardinality.max;
       }
     } else {
       return;
@@ -1755,27 +1773,15 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     let bieMaxLength;
     if (this.isBbiepDetail(detailNode)) {
       const bbiepDetail = this.asBbiepDetail(detailNode);
-      if (!!bbiepDetail.bdt.facetMinLength) {
-        bieMinLength = bbiepDetail.bdt.facetMinLength;
-        bieMaxLength = bbiepDetail.bdt.facetMaxLength;
-        disabled = true;
-      } else {
-        bieMinLength = bbiepDetail.bbie.facetMinLength;
-        bieMaxLength = bbiepDetail.bbie.facetMaxLength;
-      }
+      bieMinLength = bbiepDetail.bbie.facetMinLength;
+      bieMaxLength = bbiepDetail.bbie.facetMaxLength;
       if (bbiepDetail.base && (bbiepDetail.base.bbie.facetMinLength || bbiepDetail.base.bbie.facetMaxLength || bbiepDetail.base.bbie.facetPattern)) {
         disabled = true;
       }
     } else if (this.isBbieScDetail(detailNode)) {
       const bbieScDetail = this.asBbieScDetail(detailNode);
-      if (!!bbieScDetail.bdtSc.facetMinLength) {
-        bieMinLength = bbieScDetail.bdtSc.facetMinLength;
-        bieMaxLength = bbieScDetail.bdtSc.facetMaxLength;
-        disabled = true;
-      } else {
-        bieMinLength = bbieScDetail.bbieSc.facetMinLength;
-        bieMaxLength = bbieScDetail.bbieSc.facetMaxLength;
-      }
+      bieMinLength = bbieScDetail.bbieSc.facetMinLength;
+      bieMaxLength = bbieScDetail.bbieSc.facetMaxLength;
       if (bbieScDetail.base && (bbieScDetail.base.bbieSc.facetMinLength || bbieScDetail.base.bbieSc.facetMaxLength || bbieScDetail.base.bbieSc.facetPattern)) {
         disabled = true;
       }
@@ -1838,27 +1844,15 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     let bieMaxLength;
     if (this.isBbiepDetail(detailNode)) {
       const bbiepDetail = this.asBbiepDetail(detailNode);
-      if (!!bbiepDetail.bdt.facetMinLength) {
-        bieMinLength = bbiepDetail.bdt.facetMinLength;
-        bieMaxLength = bbiepDetail.bdt.facetMaxLength;
-        disabled = true;
-      } else {
-        bieMinLength = bbiepDetail.bbie.facetMinLength;
-        bieMaxLength = bbiepDetail.bbie.facetMaxLength;
-      }
+      bieMinLength = bbiepDetail.bbie.facetMinLength;
+      bieMaxLength = bbiepDetail.bbie.facetMaxLength;
       if (bbiepDetail.base && (bbiepDetail.base.bbie.facetMinLength || bbiepDetail.base.bbie.facetMaxLength || bbiepDetail.base.bbie.facetPattern)) {
         disabled = true;
       }
     } else if (this.isBbieScDetail(detailNode)) {
       const bbieScDetail = this.asBbieScDetail(detailNode);
-      if (!!bbieScDetail.bdtSc.facetMinLength) {
-        bieMinLength = bbieScDetail.bdtSc.facetMinLength;
-        bieMaxLength = bbieScDetail.bdtSc.facetMaxLength;
-        disabled = true;
-      } else {
-        bieMinLength = bbieScDetail.bbieSc.facetMinLength;
-        bieMaxLength = bbieScDetail.bbieSc.facetMaxLength;
-      }
+      bieMinLength = bbieScDetail.bbieSc.facetMinLength;
+      bieMaxLength = bbieScDetail.bbieSc.facetMaxLength;
       if (bbieScDetail.base && (bbieScDetail.base.bbieSc.facetMinLength || bbieScDetail.base.bbieSc.facetMaxLength || bbieScDetail.base.bbieSc.facetPattern)) {
         disabled = true;
       }
@@ -1920,23 +1914,13 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     let biePattern;
     if (this.isBbiepDetail(detailNode)) {
       const bbiepDetail = this.asBbiepDetail(detailNode);
-      if (!!bbiepDetail.bdt.facetPattern) {
-        biePattern = bbiepDetail.bdt.facetPattern;
-        disabled = true;
-      } else {
-        biePattern = bbiepDetail.bbie.facetPattern;
-      }
+      biePattern = bbiepDetail.bbie.facetPattern;
       if (bbiepDetail.base && (bbiepDetail.base.bbie.facetMinLength || bbiepDetail.base.bbie.facetMaxLength || bbiepDetail.base.bbie.facetPattern)) {
         disabled = true;
       }
     } else if (this.isBbieScDetail(detailNode)) {
       const bbieScDetail = this.asBbieScDetail(detailNode);
-      if (!!bbieScDetail.bdtSc.facetPattern) {
-        biePattern = bbieScDetail.bdtSc.facetPattern;
-        disabled = true;
-      } else {
-        biePattern = bbieScDetail.bbieSc.facetPattern;
-      }
+      biePattern = bbieScDetail.bbieSc.facetPattern;
       if (bbieScDetail.base && (bbieScDetail.base.bbieSc.facetMinLength || bbieScDetail.base.bbieSc.facetMaxLength || bbieScDetail.base.bbieSc.facetPattern)) {
         disabled = true;
       }
@@ -2020,9 +2004,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     }
 
     if (this.isBbiepDetail(detail)) {
-      return !!(this.asBbiepDetail(detail).bccp.defaultValue || this.asBbiepDetail(detail).bccp.fixedValue);
+      return !!(this.asBbiepDetail(detail).bccp.valueConstraint?.defaultValue || this.asBbiepDetail(detail).bccp.valueConstraint?.fixedValue);
     } else {
-      return !!(this.asBbieScDetail(detail).bdtSc.defaultValue || this.asBbieScDetail(detail).bdtSc.fixedValue);
+      return !!(this.asBbieScDetail(detail).bdtSc.valueConstraint?.defaultValue || this.asBbieScDetail(detail).bdtSc.valueConstraint?.fixedValue);
     }
   }
 
@@ -2033,10 +2017,10 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
           (node.detail as BieEditBbiepNodeDetail).bbie.codeListManifestId = undefined;
           (node.detail as BieEditBbiepNodeDetail).bbie.agencyIdListManifestId = undefined;
         } else if (this.asBbiepDetail(node).bbie.valueDomainType === ValueDomainType.Code.toString()) {
-          (node.detail as BieEditBbiepNodeDetail).bbie.bdtPriRestriId = undefined;
+          (node.detail as BieEditBbiepNodeDetail).bbie.xbtManifestId = undefined;
           (node.detail as BieEditBbiepNodeDetail).bbie.agencyIdListManifestId = undefined;
         } else {
-          (node.detail as BieEditBbiepNodeDetail).bbie.bdtPriRestriId = undefined;
+          (node.detail as BieEditBbiepNodeDetail).bbie.xbtManifestId = undefined;
           (node.detail as BieEditBbiepNodeDetail).bbie.codeListManifestId = undefined;
         }
         break;
@@ -2045,10 +2029,10 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
           (node.detail as BieEditBbieScNodeDetail).bbieSc.codeListManifestId = undefined;
           (node.detail as BieEditBbieScNodeDetail).bbieSc.agencyIdListManifestId = undefined;
         } else if (this.asBbieScDetail(node).bbieSc.valueDomainType === ValueDomainType.Code.toString()) {
-          (node.detail as BieEditBbieScNodeDetail).bbieSc.bdtScPriRestriId = undefined;
+          (node.detail as BieEditBbieScNodeDetail).bbieSc.xbtManifestId = undefined;
           (node.detail as BieEditBbieScNodeDetail).bbieSc.agencyIdListManifestId = undefined;
         } else {
-          (node.detail as BieEditBbieScNodeDetail).bbieSc.bdtScPriRestriId = undefined;
+          (node.detail as BieEditBbieScNodeDetail).bbieSc.xbtManifestId = undefined;
           (node.detail as BieEditBbieScNodeDetail).bbieSc.codeListManifestId = undefined;
         }
         break;
@@ -2061,50 +2045,50 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     let valueDomains: ValueDomain[] = [];
     if (this.isBbiepDetail(detail)) {
       const bbiepNodeDetail = this.asBbiepDetail(detail);
-      const bccpManifestId = bbiepNodeDetail.bccp.bccpManifestId;
+      const dtManifestId = bbiepNodeDetail.bdt.dtManifestId;
       if (bbiepNodeDetail.bbie.valueDomainType === undefined) {
         bbiepNodeDetail.bbie.valueDomainType = 'Primitive';
       }
       if (this.asBbiepDetail(detail).bbie.valueDomainType === 'Code') {
-        this.service.getBbiepCodeList(this.topLevelAsbiepId, bccpManifestId).subscribe(list => {
-          valueDomains = list.map(e => new ValueDomain(e.codeListManifestId, e.codeListName, e.state, e.versionId, e.deprecated));
+        this.service.getDtCodeList(dtManifestId).subscribe(list => {
+          valueDomains = list.map(e => new ValueDomain(e.codeListManifestId, e.name, e.state, e.versionId, e.deprecated));
           this._setFilteredValueDomains(valueDomains);
         });
       } else if (this.asBbiepDetail(detail).bbie.valueDomainType === 'Agency') {
-        this.service.getBbiepAgencyIdList(this.topLevelAsbiepId, bccpManifestId).subscribe(list => {
-          valueDomains = list.map(e => new ValueDomain(e.agencyIdListManifestId, e.agencyIdListName, e.state, e.versionId, e.deprecated));
+        this.service.getDtAgencyIdList(dtManifestId).subscribe(list => {
+          valueDomains = list.map(e => new ValueDomain(e.agencyIdListManifestId, e.name, e.state, e.versionId, e.deprecated));
           this._setFilteredValueDomains(valueDomains);
         });
       } else { // valueDomainType === 'Primitive'
-        this.service.getBbiepBdtPriRestriList(this.topLevelAsbiepId, bccpManifestId).subscribe(list => {
-          if (bbiepNodeDetail.bbie.bdtPriRestriId === null) {
-            bbiepNodeDetail.bbie.bdtPriRestriId = list.find(e => e.default).bdtPriRestriId;
+        this.service.getDtAwdPriList(dtManifestId).subscribe(list => {
+          if (bbiepNodeDetail.bbie.xbtManifestId === null) {
+            bbiepNodeDetail.bbie.xbtManifestId = list.find(e => e.isDefault).xbtManifestId;
           }
-          valueDomains = list.filter(e => !!e.xbtName).map(e => new ValueDomain(e.bdtPriRestriId, e.xbtName));
+          valueDomains = list.filter(e => !!e.xbtName).map(e => new ValueDomain(e.xbtManifestId, e.xbtName));
           this._setFilteredValueDomains(valueDomains);
         });
       }
     } else if (this.isBbieScDetail(detail)) {
-      const bdtScManifestId = this.asBbieScDetail(detail).bdtSc.dtScManifestId;
+      const dtScManifestId = this.asBbieScDetail(detail).bdtSc.dtScManifestId;
       if (this.asBbieScDetail(detail).bbieSc.valueDomainType === undefined) {
         this.asBbieScDetail(detail).bbieSc.valueDomainType = 'Primitive';
       }
       if (this.asBbieScDetail(detail).bbieSc.valueDomainType === 'Code') {
-        this.service.getBbieScCodeList(this.topLevelAsbiepId, bdtScManifestId).subscribe(list => {
-          valueDomains = list.map(e => new ValueDomain(e.codeListManifestId, e.codeListName, e.state, e.versionId, e.deprecated));
+        this.service.getDtScCodeList(dtScManifestId).subscribe(list => {
+          valueDomains = list.map(e => new ValueDomain(e.codeListManifestId, e.name, e.state, e.versionId, e.deprecated));
           this._setFilteredValueDomains(valueDomains);
         });
       } else if (this.asBbieScDetail(detail).bbieSc.valueDomainType === 'Agency') {
-        this.service.getBbieScAgencyIdList(this.topLevelAsbiepId, bdtScManifestId).subscribe(list => {
-          valueDomains = list.map(e => new ValueDomain(e.agencyIdListManifestId, e.agencyIdListName, e.state, e.versionId, e.deprecated));
+        this.service.getDtScAgencyIdList(dtScManifestId).subscribe(list => {
+          valueDomains = list.map(e => new ValueDomain(e.agencyIdListManifestId, e.name, e.state, e.versionId, e.deprecated));
           this._setFilteredValueDomains(valueDomains);
         });
       } else {
-        this.service.getBbieScBdtScPriRestriList(this.topLevelAsbiepId, bdtScManifestId).subscribe(list => {
-          if (this.asBbieScDetail(detail).bbieSc.bdtScPriRestriId === null) {
-            this.asBbieScDetail(detail).bbieSc.bdtScPriRestriId = list.find(e => e.default).bdtScPriRestriId;
+        this.service.getDtScAwdPriList(dtScManifestId).subscribe(list => {
+          if (this.asBbieScDetail(detail).bbieSc.xbtManifestId === null) {
+            this.asBbieScDetail(detail).bbieSc.xbtManifestId = list.find(e => e.isDefault).xbtManifestId;
           }
-          valueDomains = list.filter(e => !!e.xbtName).map(e => new ValueDomain(e.bdtScPriRestriId, e.xbtName));
+          valueDomains = list.filter(e => !!e.xbtName).map(e => new ValueDomain(e.xbtManifestId, e.xbtName));
           this._setFilteredValueDomains(valueDomains);
         });
       }
@@ -2192,7 +2176,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
           if (!node.locked) {
             switch ((node.detail as BieEditBbiepNodeDetail).bbie.valueDomainType) {
               case 'Primitive':
-                if (!((node.detail as BieEditBbiepNodeDetail).bbie.bdtPriRestriId)) {
+                if (!((node.detail as BieEditBbiepNodeDetail).bbie.xbtManifestId)) {
                   const message = 'Value Domain is required in ' + (node.detail as BieEditBbiepNodeDetail).bccp.propertyTerm;
                   this.snackBar.open(message, '', {
                     duration: 3000,
@@ -2227,7 +2211,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
           if (!node.locked) {
             switch ((node.detail as BieEditBbieScNodeDetail).bbieSc.valueDomainType) {
               case 'Primitive':
-                if (!((node.detail as BieEditBbieScNodeDetail).bbieSc.bdtScPriRestriId)) {
+                if (!((node.detail as BieEditBbieScNodeDetail).bbieSc.xbtManifestId)) {
                   // tslint:disable-next-line:max-line-length
                   const message = 'Value Domain is required in ' + (node.detail as BieEditBbieScNodeDetail).bdtSc.propertyTerm + ' ' + (node.detail as BieEditBbieScNodeDetail).bdtSc.representationTerm;
                   this.snackBar.open(message, '', {
@@ -2337,7 +2321,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
             (node.detail as BieEditBbiepNodeDetail).bbie.fixedValue = null;
             (node.detail as BieEditBbiepNodeDetail).bbie.defaultValue = null;
             (node.detail as BieEditBbiepNodeDetail).bbie.valueDomainType = undefined;
-            (node.detail as BieEditBbiepNodeDetail).bbie.bdtPriRestriId = null;
+            (node.detail as BieEditBbiepNodeDetail).bbie.xbtManifestId = null;
             (node.detail as BieEditBbiepNodeDetail).bbie.codeListManifestId = null;
             (node.detail as BieEditBbiepNodeDetail).bbie.agencyIdListManifestId = null;
           } else if (node.bieType === 'BBIE_SC') {
@@ -2349,7 +2333,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
             (node.detail as BieEditBbieScNodeDetail).bbieSc.fixedValue = null;
             (node.detail as BieEditBbieScNodeDetail).bbieSc.defaultValue = null;
             (node.detail as BieEditBbieScNodeDetail).bbieSc.valueDomainType = undefined;
-            (node.detail as BieEditBbieScNodeDetail).bbieSc.bdtScPriRestriId = null;
+            (node.detail as BieEditBbieScNodeDetail).bbieSc.xbtManifestId = null;
             (node.detail as BieEditBbieScNodeDetail).bbieSc.codeListManifestId = null;
             (node.detail as BieEditBbieScNodeDetail).bbieSc.agencyIdListManifestId = null;
           }
@@ -2474,7 +2458,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   removeBusinessContext(businessContext: BusinessContext) {
     this.businessContextUpdating = true;
-    this.bizCtxService.dismiss(this.topLevelAsbiepId, businessContext)
+    this.bizCtxService.unassign(this.topLevelAsbiepId, businessContext)
       .subscribe(_ => {
         this.businessContexts = this.businessContexts.filter(e => e.businessContextId !== businessContext.businessContextId);
         this.businessContextUpdating = false;

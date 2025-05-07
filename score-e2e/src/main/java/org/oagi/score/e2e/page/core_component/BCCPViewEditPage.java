@@ -52,7 +52,7 @@ public interface BCCPViewEditPage extends Page {
      *
      * @return the 'Change BDT' dialog object
      */
-    BCCPChangeBDTDialog openChangeBDTDialog();
+    BCCPChangeDTDialog openChangeDTDialog();
 
     /**
      * Return the UI element of the 'Revise' button. Developers only can see the 'Revise' button.

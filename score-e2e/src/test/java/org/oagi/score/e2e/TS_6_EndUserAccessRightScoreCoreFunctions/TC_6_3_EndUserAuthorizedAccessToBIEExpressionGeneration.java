@@ -1828,7 +1828,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             ACCObject accReusable = coreComponentAPI.createRandomACC(usera, release, namespace, "Published");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            BCCPObject bccp = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Published");
+            BCCPObject bccp = coreComponentAPI.createRandomBCCP(release, dataType, usera, namespace, "Published");
             coreComponentAPI.appendBCC(accReusable, bccp, "Published");
             reusableASCCP = coreComponentAPI.createRandomASCCP(accReusable, usera, namespace, "Published");
 

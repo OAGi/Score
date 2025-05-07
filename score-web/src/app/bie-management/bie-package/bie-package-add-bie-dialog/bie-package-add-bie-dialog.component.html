@@ -84,7 +84,7 @@
                 <div class="col-md-2 col-sm-12">
                   <mat-form-field>
                     <mat-label>Owner</mat-label>
-                    <mat-select [(ngModel)]="request.ownerLoginIds" multiple>
+                    <mat-select [(ngModel)]="request.ownerLoginIdList" multiple>
                       <mat-option>
                         <ngx-mat-select-search [formControl]="loginIdListFilterCtrl"
                                                [placeholderLabel]="'Search...'"
@@ -99,7 +99,7 @@
                 <div class="col-md-2 col-sm-12">
                   <mat-form-field>
                     <mat-label>Updater</mat-label>
-                    <mat-select [(ngModel)]="request.updaterLoginIds" multiple>
+                    <mat-select [(ngModel)]="request.updaterLoginIdList" multiple>
                       <mat-option>
                         <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
                                                [placeholderLabel]="'Search...'"
@@ -115,8 +115,7 @@
                   <mat-form-field>
                     <mat-label>Updated start date</mat-label>
                     <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
-                           [max]="request.updatedDate.end"
-                           (dateInput)="onDateEvent('startDate', $event)">
+                           [(ngModel)]="request.updatedDate.start" [max]="request.updatedDate.end">
                     <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
                     <mat-datepicker #dateStart></mat-datepicker>
                   </mat-form-field>
@@ -133,8 +132,7 @@
                   <mat-form-field>
                     <mat-label>Updated end date</mat-label>
                     <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
-                           [min]="request.updatedDate.start"
-                           (dateInput)="onDateEvent('endDate', $event)">
+                           [(ngModel)]="request.updatedDate.end" [min]="request.updatedDate.start">
                     <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
                     <mat-datepicker #dateEnd></mat-datepicker>
                   </mat-form-field>
@@ -216,7 +214,7 @@
                 <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="branch"
                     score-table-column-resize [defaultWidth]="width('Branch')" (onResize)="onResizeWidth($event)"> Branch</th>
                 <td mat-cell *matCellDef="let element">
-                  <span [matTooltip]="element.releaseNum">{{ element.releaseNum }}</span>
+                  <span [matTooltip]="element.release.releaseNum">{{ element.release.releaseNum }}</span>
                 </td>
               </ng-container>
 
@@ -241,21 +239,21 @@
                 <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="owner"
                     score-table-column-resize [defaultWidth]="width('Owner')" (onResize)="onResizeWidth($event)"> Owner</th>
                 <td mat-cell *matCellDef="let element">
-                  <span class="word-break-all" [matTooltip]="element.owner" [innerHTML]="element.owner"></span>
+                  <span class="word-break-all" [matTooltip]="element.owner.username" [innerHTML]="element.owner.loginId"></span>
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="businessContexts">
-                <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="businessContexts"
+                <th mat-header-cell *matHeaderCellDef
                     score-table-column-resize [defaultWidth]="width('Business Contexts')" (onResize)="onResizeWidth($event)"> Business Contexts</th>
                 <td mat-cell *matCellDef="let element">
-                  <ng-container *ngFor="let businessContext of element.businessContexts">
-                <span class="businessContext word-break-all">
-                  <a target="_blank" rel="noopener noreferrer"
-                     routerLink="/context_management/business_context/{{ businessContext.businessContextId }}">
-                    <span class="word-break-all">{{ businessContext.name }}</span>
-                  </a>
-                </span>
+                  <ng-container *ngFor="let businessContext of element.businessContextList">
+                    <span class="businessContext word-break-all">
+                      <a target="_blank" rel="noopener noreferrer"
+                         routerLink="/context_management/business_context/{{ businessContext.businessContextId }}">
+                        <span class="word-break-all">{{ businessContext.name }}</span>
+                      </a>
+                    </span>
                   </ng-container>
                 </td>
               </ng-container>
@@ -296,8 +294,8 @@
                 <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="lastUpdateTimestamp"
                     score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
                 <td mat-cell *matCellDef="let element">
-                  <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-                  <div class="description"><span class="pr-1">by</span><b class="word-break-all">{{ element.lastUpdateUser }}</b></div>
+                  <div class="ellipsis">{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                  <div class="description"><span class="pr-1">by</span><b class="word-break-all">{{ element.lastUpdated.who.loginId }}</b></div>
                 </td>
               </ng-container>
 

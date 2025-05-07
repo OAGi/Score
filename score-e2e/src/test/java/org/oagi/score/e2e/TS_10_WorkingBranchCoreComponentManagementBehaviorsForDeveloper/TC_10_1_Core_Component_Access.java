@@ -81,21 +81,21 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             bccp = randomCoreComponentWithStateContainer.stateBCCPs.get(state);
             viewEditCoreComponentPage.openPage();
             viewEditCoreComponentPage.setDEN(acc.getDen());
-            waitFor(ofMillis(5000L));
             viewEditCoreComponentPage.hitSearchButton();
             assertTrue(viewEditCoreComponentPage.getTableRecordAtIndex(1).isDisplayed());
+            waitFor(ofMillis(1000L));
 
             viewEditCoreComponentPage.openPage();
             viewEditCoreComponentPage.setDEN(asccp.getDen());
-            waitFor(ofMillis(5000L));
             viewEditCoreComponentPage.hitSearchButton();
             assertTrue(viewEditCoreComponentPage.getTableRecordAtIndex(1).isDisplayed());
+            waitFor(ofMillis(1000L));
 
             viewEditCoreComponentPage.openPage();
             viewEditCoreComponentPage.setDEN(bccp.getDen());
-            waitFor(ofMillis(5000L));
             viewEditCoreComponentPage.hitSearchButton();
             assertTrue(viewEditCoreComponentPage.getTableRecordAtIndex(1).isDisplayed());
+            waitFor(ofMillis(1000L));
         }
     }
 
@@ -118,13 +118,13 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "WIP");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
 
             ACCObject acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
-            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
+            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "WIP");
             coreComponentAPI.appendBCC(acc_association, bccp_to_append, "WIP");
 
             asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
@@ -197,13 +197,13 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "WIP");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
 
             ACCObject acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
-            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
+            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "WIP");
             coreComponentAPI.appendBCC(acc_association, bccp_to_append, "WIP");
 
             asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "WIP");
@@ -697,7 +697,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         viewEditCoreComponentPage.openPage();
         click(viewEditCoreComponentPage.getTypeSelectField());
         List<WebElement> options = getDriver().findElements(By.xpath("//div[@class=\"cdk-overlay-container\"]//div[contains(@class, \"column\")]"));
-        for (String ccState : Arrays.asList("ACC", "ASCCP", "CDT", "BDT")) {
+        for (String ccState : Arrays.asList("ACC", "ASCCP")) {
             List<WebElement> result = options.stream().filter(e -> ccState.equals(getText(e))).collect(Collectors.toList());
             result.get(0).click();
         }
@@ -1317,6 +1317,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Identifier Set. Details", release.getReleaseNumber());
         FindWhereUsedDialog findWhereUsedDialog = accViewEditPage.findWhereUsed("/" + "Identifier Set. Details");
         assertTrue(findWhereUsedDialog.getTableRecordByValue("Item Identifier Set").isDisplayed());
@@ -1391,6 +1392,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
         viewEditCoreComponentPage.openPage();
         waitFor(ofMillis(2000L));
+        viewEditCoreComponentPage.toggleToDevView();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Customer Credit Base. Details", release.getReleaseNumber());
         accViewEditPage.findWhereUsed("/" + "Customer Credit Base. Details");
         assertTrue(findWhereUsedDialog.getTableRecordByValue(ACCForBase.getDen()).isDisplayed());
@@ -1430,13 +1432,13 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
                     acc = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
                     DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-                    bccp = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
+                    bccp = coreComponentAPI.createRandomBCCP(release, dataType, this.appUser, namespace, state);
                     BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, state);
                     bcc.setCardinalityMax(1);
                     coreComponentAPI.updateBCC(bcc);
 
                     ACCObject acc_association = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
-                    BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
+                    BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, this.appUser, namespace, state);
                     coreComponentAPI.appendBCC(acc_association, bccp_to_append, state);
 
                     asccp = coreComponentAPI.createRandomASCCP(acc_association, this.appUser, namespace, state);

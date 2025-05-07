@@ -163,7 +163,7 @@ public class TC_32_1_ACC_History extends BaseTest {
 
         // Indicator. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+        BCCPObject bccp = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
         bccp.setNillable(false);
         coreComponentAPI.updateBCCP(bccp);
 

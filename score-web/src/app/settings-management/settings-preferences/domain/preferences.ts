@@ -33,8 +33,8 @@ export interface TableColumnsProperty {
 }
 
 export class TableColumnsInfo {
-  columnsOfCoreComponentPage: TableColumnsProperty[] = [
-    {name: 'Type', selected: true, width: 80},
+
+  columnsOfDataTypePage: TableColumnsProperty[] = [
     {name: 'State', selected: true, width: 104},
     {name: 'DEN', selected: true, width: 0},
     {name: 'Value Domain', selected: true, width: 126},
@@ -45,7 +45,18 @@ export class TableColumnsInfo {
     {name: 'Updated On', selected: true, width: 160}
   ];
 
-  columnsOfCoreComponentWithoutTypeAndDtColumnsPage: TableColumnsProperty[] = [
+  columnsOfDataTypeWithoutTypeColumnPage: TableColumnsProperty[] = [
+    {name: 'State', selected: true, width: 104},
+    {name: 'DEN', selected: true, width: 0},
+    {name: 'Value Domain', selected: true, width: 126},
+    {name: 'Six Hexadecimal ID', selected: true, width: 140},
+    {name: 'Revision', selected: true, width: 80},
+    {name: 'Owner', selected: true, width: 140},
+    {name: 'Module', selected: true, width: 400},
+    {name: 'Updated On', selected: true, width: 160}
+  ];
+
+  columnsOfCoreComponentWithoutTypeColumnPage: TableColumnsProperty[] = [
     {name: 'State', selected: true, width: 104},
     {name: 'DEN', selected: true, width: 0},
     {name: 'Revision', selected: true, width: 80},
@@ -54,7 +65,7 @@ export class TableColumnsInfo {
     {name: 'Updated On', selected: true, width: 160}
   ];
 
-  columnsOfCoreComponentWithoutDtColumnsPage: TableColumnsProperty[] = [
+  columnsOfCoreComponentPage: TableColumnsProperty[] = [
     {name: 'Type', selected: true, width: 80},
     {name: 'State', selected: true, width: 104},
     {name: 'DEN', selected: true, width: 0},
@@ -83,17 +94,23 @@ export class TableColumnsInfo {
     {name: 'ACC', selected: true},
     {name: 'ASCCP', selected: true},
     {name: 'BCCP', selected: true},
+    // {name: 'ASCC', selected: false},
+    // {name: 'BCC', selected: false}
+  ];
+
+  filterTypesOfDataTypePage: {
+    name: string;
+    selected: boolean;
+  }[] = [
     {name: 'CDT', selected: true},
     {name: 'BDT', selected: true},
-    {name: 'ASCC', selected: false},
-    {name: 'BCC', selected: false}
   ];
 
   columnsOfCoreComponentAccRefactorPage: TableColumnsProperty[] = [
     {name: 'Type', selected: true, width: 80},
     {name: 'State', selected: true, width: 104},
     {name: 'DEN', selected: true, width: 0},
-    {name: 'Issue', selected: true, width: 120},
+    {name: 'Issue', selected: true, width: '30%'},
     {name: 'Revision', selected: true, width: 80},
     {name: 'Owner', selected: true, width: 140},
     {name: 'Updated On', selected: true, width: 160}
@@ -206,6 +223,7 @@ export class TableColumnsInfo {
 
   columnsOfLibraryPage: TableColumnsProperty[] = [
     {name: 'Name', selected: true, width: 0},
+    {name: 'Type', selected: true, width: 140},
     {name: 'Organization', selected: true, width: 400},
     {name: 'Domain', selected: true, width: 200},
     {name: 'Description', selected: true, width: '30%'},
@@ -276,8 +294,7 @@ export class TableColumnsInfo {
   ];
 
   columnsOfMessagePage: TableColumnsProperty[] = [
-    {name: 'Sender', selected: true, width: 0},
-    {name: 'Subject', selected: true, width: '70%'},
+    {name: 'Subject', selected: true, width: 0},
     {name: 'Created On', selected: true, width: 160}
   ];
 

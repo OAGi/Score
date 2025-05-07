@@ -87,6 +87,8 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     public void openPage() {
         String url = getPageUrl();
         getDriver().get(url);
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofSeconds(2L));
         assert "ACC".equals(getCoreComponentTypeFieldValue());
     }
 
@@ -233,11 +235,7 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
 
     @Override
     public WebElement getNodeByPath(String path) {
-        return retry(() -> {
-            goToNode(path);
-            String[] nodes = path.split("/");
-            return getNodeByName(nodes[nodes.length - 1]);
-        });
+        return retry(() -> goToNode(path));
     }
 
     @Override
@@ -269,6 +267,10 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     @Override
     public WebElement getContextMenuIconByNodeName(String nodeName) {
         WebElement node = getNodeByName(nodeName);
+        return getContextMenuIcon(node);
+    }
+
+    public WebElement getContextMenuIcon(WebElement node) {
         return node.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
     }
 
@@ -290,11 +292,9 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
 
     @Override
     public WebElement clickOnDropDownMenuByPath(String path) {
-        goToNode(path);
-        String[] nodes = path.split("/");
-        String nodeName = nodes[nodes.length - 1];
-        WebElement node = getNodeByName(nodeName);
-        click(getDriver(), node);
+        WebElement node = goToNode(path);
+
+        click(node);
         new Actions(getDriver()).sendKeys("O").perform();
         waitFor(ofMillis(1000L));
         try {
@@ -304,7 +304,8 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
             }
         } catch (WebDriverException ignore) {
         }
-        WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
+
+        WebElement contextMenuIcon = getContextMenuIcon(node);
         click(getDriver(), contextMenuIcon);
         waitFor(ofMillis(1000L));
         assert visibilityOfElementLocated(getDriver(),
@@ -337,17 +338,19 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     private WebElement goToNode(String path) {
         WebElement searchInput = getSearchInputTextField();
         click(getDriver(), searchInput);
-        WebElement node = retry(() -> {
-            WebElement e = sendKeys(searchInput, path);
+        retry(() -> {
+            sendKeys(searchInput, path);
             if (!path.equals(getText(searchInput))) {
                 throw new WebDriverException();
             }
-            return e;
         });
-        node.sendKeys(Keys.ENTER);
-        click(node);
+        searchInput.sendKeys(Keys.ENTER);
+        searchInput.sendKeys("");
         clear(searchInput);
-        return node;
+
+        String[] nodes = path.split("/");
+        String nodeName = nodes[nodes.length - 1];
+        return getNodeByName(nodeName);
     }
 
     @Override
@@ -424,7 +427,7 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
 
     private WebElement getInputFieldByName(String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/input"));
+                "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]//input"));
     }
 
     @Override
@@ -558,7 +561,7 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
 
         private WebElement getInputFieldByName(String baseXPath, String name) {
             return visibilityOfElementLocated(getDriver(), By.xpath(
-                    baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/input"));
+                    baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]//input"));
         }
     }
 

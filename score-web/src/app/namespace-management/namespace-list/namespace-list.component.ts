@@ -8,7 +8,7 @@ import {SelectionModel} from '@angular/cdk/collections';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AccountList} from '../../account-management/domain/accounts';
 import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
-import {NamespaceList, NamespaceListRequest} from '../domain/namespace';
+import {NamespaceListEntry, NamespaceListRequest} from '../domain/namespace';
 import {NamespaceService} from '../domain/namespace.service';
 import {PageRequest} from '../../basis/basis';
 import {initFilter, loadLibrary, saveLibrary} from '../../common/utility';
@@ -17,14 +17,14 @@ import {Location} from '@angular/common';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {finalize} from 'rxjs/operators';
-import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker} from '@angular/material/datepicker';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {AuthService} from '../../authentication/auth.service';
 import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
-import {Library} from '../../library-management/domain/library';
+import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryService} from '../../library-management/domain/library.service';
 
 @Component({
@@ -141,12 +141,12 @@ export class NamespaceListComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<NamespaceList>();
+  dataSource = new MatTableDataSource<NamespaceListEntry>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
 
-  libraries: Library[] = [];
-  mappedLibraries: {library: Library, selected: boolean}[] = [];
+  libraries: LibrarySummary[] = [];
+  mappedLibraries: {library: LibrarySummary, selected: boolean}[] = [];
   loginIdList: string[] = [];
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
@@ -156,7 +156,7 @@ export class NamespaceListComponent implements OnInit {
   highlightText: string;
   preferencesInfo: PreferencesInfo;
 
-  contextMenuItem: NamespaceList;
+  contextMenuItem: NamespaceListEntry;
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -181,7 +181,7 @@ export class NamespaceListComponent implements OnInit {
     this.request = new NamespaceListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
 
-    this.libraryService.getLibraries().subscribe(libraries => {
+    this.libraryService.getLibrarySummaryList().subscribe(libraries => {
       this.initLibraries(libraries);
 
       this.searchBar.showAdvancedSearch =
@@ -221,17 +221,6 @@ export class NamespaceListComponent implements OnInit {
     });
   }
 
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
-  }
-
   reset(type: string) {
     switch (type) {
       case 'startDate':
@@ -248,7 +237,7 @@ export class NamespaceListComponent implements OnInit {
   onChange(property?: string, source?) {
   }
 
-  initLibraries(libraries: Library[]) {
+  initLibraries(libraries: LibrarySummary[]) {
     this.libraries = libraries;
     if (this.libraries.length > 0) {
       const savedLibraryId = loadLibrary(this.auth.getUserToken());
@@ -267,7 +256,7 @@ export class NamespaceListComponent implements OnInit {
     }
   }
 
-  onLibraryChange(library: Library) {
+  onLibraryChange(library: LibrarySummary) {
     this.request.library = library;
     saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
     this.onSearch();
@@ -321,11 +310,11 @@ export class NamespaceListComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(row: NamespaceList) {
+  select(row: NamespaceListEntry) {
     this.selection.select(row.namespaceId);
   }
 
-  toggle(row: NamespaceList) {
+  toggle(row: NamespaceListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row.namespaceId);
     } else {
@@ -333,7 +322,7 @@ export class NamespaceListComponent implements OnInit {
     }
   }
 
-  isSelected(row: NamespaceList) {
+  isSelected(row: NamespaceListEntry) {
     return this.selection.isSelected(row.namespaceId);
   }
 
@@ -341,14 +330,14 @@ export class NamespaceListComponent implements OnInit {
     this.router.navigateByUrl('/namespace/create');
   }
 
-  isEditable(item: NamespaceList): boolean {
+  isEditable(item: NamespaceListEntry): boolean {
     if (!item) {
       return false;
     }
-    return (item.owner === this.auth.getUserToken().username);
+    return (item.owner.loginId === this.auth.getUserToken().username);
   }
 
-  discard(item: NamespaceList) {
+  discard(item: NamespaceListEntry) {
     if (!this.isEditable(item)) {
       return;
     }
@@ -378,7 +367,7 @@ export class NamespaceListComponent implements OnInit {
       });
   }
 
-  openTransferDialog(item: NamespaceList) {
+  openTransferDialog(item: NamespaceListEntry) {
     if (!this.isEditable(item)) {
       return;
     }

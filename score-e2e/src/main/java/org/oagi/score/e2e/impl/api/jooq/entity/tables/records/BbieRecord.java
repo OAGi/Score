@@ -22,7 +22,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bbie;
  * primitive to be used in the context. Only one column among the three can have
  * a value in a particular record.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -146,24 +146,24 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
     }
 
     /**
-     * Setter for <code>oagi.bbie.bdt_pri_restri_id</code>. This is the foreign
-     * key to the BDT_PRI_RESTRI table. It indicates the primitive assigned to
-     * the BBIE (or also can be viewed as assigned to the BBIEP for this
-     * specific association). This is assigned by the user who authors the BIE.
-     * The assignment would override the default from the CC side.
+     * Setter for <code>oagi.bbie.xbt_manifest_id</code>. This is the foreign
+     * key to the XBT_MANIFEST table. It indicates the primitive assigned to the
+     * BBIE (or also can be viewed as assigned to the BBIEP for this specific
+     * association). This is assigned by the user who authors the BIE. The
+     * assignment would override the default from the DT_AWD_PRI side.
      */
-    public void setBdtPriRestriId(ULong value) {
+    public void setXbtManifestId(ULong value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie.bdt_pri_restri_id</code>. This is the foreign
-     * key to the BDT_PRI_RESTRI table. It indicates the primitive assigned to
-     * the BBIE (or also can be viewed as assigned to the BBIEP for this
-     * specific association). This is assigned by the user who authors the BIE.
-     * The assignment would override the default from the CC side.
+     * Getter for <code>oagi.bbie.xbt_manifest_id</code>. This is the foreign
+     * key to the XBT_MANIFEST table. It indicates the primitive assigned to the
+     * BBIE (or also can be viewed as assigned to the BBIEP for this specific
+     * association). This is assigned by the user who authors the BIE. The
+     * assignment would override the default from the DT_AWD_PRI side.
      */
-    public ULong getBdtPriRestriId() {
+    public ULong getXbtManifestId() {
         return (ULong) get(7);
     }
 
@@ -598,7 +598,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
     /**
      * Create a detached, initialised BbieRecord
      */
-    public BbieRecord(ULong bbieId, String guid, ULong basedBccManifestId, String path, String hashPath, ULong fromAbieId, ULong toBbiepId, ULong bdtPriRestriId, ULong codeListManifestId, ULong agencyIdListManifestId, Integer cardinalityMin, Integer cardinalityMax, ULong facetMinLength, ULong facetMaxLength, String facetPattern, String defaultValue, Byte isNillable, String fixedValue, Byte isNull, String definition, String example, String remark, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, BigDecimal seqKey, Byte isUsed, Byte isDeprecated, ULong ownerTopLevelAsbiepId) {
+    public BbieRecord(ULong bbieId, String guid, ULong basedBccManifestId, String path, String hashPath, ULong fromAbieId, ULong toBbiepId, ULong xbtManifestId, ULong codeListManifestId, ULong agencyIdListManifestId, Integer cardinalityMin, Integer cardinalityMax, ULong facetMinLength, ULong facetMaxLength, String facetPattern, String defaultValue, Byte isNillable, String fixedValue, Byte isNull, String definition, String example, String remark, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, BigDecimal seqKey, Byte isUsed, Byte isDeprecated, ULong ownerTopLevelAsbiepId) {
         super(Bbie.BBIE);
 
         setBbieId(bbieId);
@@ -608,7 +608,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
         setHashPath(hashPath);
         setFromAbieId(fromAbieId);
         setToBbiepId(toBbiepId);
-        setBdtPriRestriId(bdtPriRestriId);
+        setXbtManifestId(xbtManifestId);
         setCodeListManifestId(codeListManifestId);
         setAgencyIdListManifestId(agencyIdListManifestId);
         setCardinalityMin(cardinalityMin);
@@ -631,6 +631,6 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
         setIsUsed(isUsed);
         setIsDeprecated(isDeprecated);
         setOwnerTopLevelAsbiepId(ownerTopLevelAsbiepId);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

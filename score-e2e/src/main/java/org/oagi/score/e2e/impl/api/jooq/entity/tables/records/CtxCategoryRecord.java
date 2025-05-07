@@ -16,7 +16,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.CtxCategory;
  * This table captures the context category. Examples of context categories as
  * described in the CCTS are business process, industry, etc.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class CtxCategoryRecord extends UpdatableRecordImpl<CtxCategoryRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -185,6 +185,6 @@ public class CtxCategoryRecord extends UpdatableRecordImpl<CtxCategoryRecord> {
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

@@ -5,11 +5,11 @@ import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
-import {CcList, CcListRequest} from '../../cc-list/domain/cc-list';
+import {CcListEntry, CcListRequest} from '../../cc-list/domain/cc-list';
 import {SelectionModel} from '@angular/cdk/collections';
 import {CcListService} from '../../cc-list/domain/cc-list.service';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
-import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker} from '@angular/material/datepicker';
 import {PageRequest} from '../../../basis/basis';
 import {CcNodeService} from '../../domain/core-component-node.service';
 import {FormControl} from '@angular/forms';
@@ -52,7 +52,7 @@ export class AppendAssociationDialogComponent implements OnInit {
     if (!this.preferencesInfo) {
       return [];
     }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutDtColumnsPage;
+    return this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage;
   }
 
   set columns(columns: TableColumnsProperty[]) {
@@ -60,18 +60,18 @@ export class AppendAssociationDialogComponent implements OnInit {
       return;
     }
 
-    this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutDtColumnsPage = columns;
-    this.updateTableColumnsForCoreComponentWithoutDtColumnsPage();
+    this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage = columns;
+    this.updateTableColumnsForCoreComponentPage();
   }
 
-  updateTableColumnsForCoreComponentWithoutDtColumnsPage() {
-    this.preferencesService.updateTableColumnsForCoreComponentWithoutDtColumnsPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+  updateTableColumnsForCoreComponentPage() {
+    this.preferencesService.updateTableColumnsForCoreComponentPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
     });
   }
 
   onColumnsReset() {
     const defaultTableColumnInfo = new TableColumnsInfo();
-    this.columns = defaultTableColumnInfo.columnsOfCoreComponentWithoutDtColumnsPage;
+    this.columns = defaultTableColumnInfo.columnsOfCoreComponentPage;
   }
 
   onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
@@ -100,7 +100,7 @@ export class AppendAssociationDialogComponent implements OnInit {
     const matched = this.columns.find(c => c.name === name);
     if (matched) {
       matched.width = width;
-      this.updateTableColumnsForCoreComponentWithoutDtColumnsPage();
+      this.updateTableColumnsForCoreComponentPage();
     }
   }
 
@@ -158,9 +158,9 @@ export class AppendAssociationDialogComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<CcList>();
-  expandedElement: CcList | null;
-  selection = new SelectionModel<CcList>(false, []);
+  dataSource = new MatTableDataSource<CcListEntry>();
+  expandedElement: CcListEntry | null;
+  selection = new SelectionModel<CcListEntry>(false, []);
   loading = false;
 
   loginIdList: string[] = [];
@@ -255,10 +255,7 @@ export class AppendAssociationDialogComponent implements OnInit {
       this.paginator.length = resp.length;
       this.paginator.pageIndex = resp.page;
 
-      this.dataSource.data = resp.list.map((elm: CcList) => {
-        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        return elm;
-      });
+      this.dataSource.data = resp.list;
       this.highlightTextForModule = this.request.filters.module;
       this.highlightTextForDefinition = this.request.filters.definition;
 
@@ -268,17 +265,6 @@ export class AppendAssociationDialogComponent implements OnInit {
 
   onPageChange(event: PageEvent) {
     this.loadCcList();
-  }
-
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
   }
 
   reset(type: string) {
@@ -342,11 +328,11 @@ export class AppendAssociationDialogComponent implements OnInit {
     }
   }
 
-  select(row: CcList) {
+  select(row: CcListEntry) {
     this.selection.select(row);
   }
 
-  toggle(row: CcList) {
+  toggle(row: CcListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row);
     } else {
@@ -354,11 +340,11 @@ export class AppendAssociationDialogComponent implements OnInit {
     }
   }
 
-  isSelected(row: CcList) {
+  isSelected(row: CcListEntry) {
     return this.selection.isSelected(row);
   }
 
-  getRouterLink(ccList: CcList) {
+  getRouterLink(ccList: CcListEntry) {
     switch (ccList.type.toUpperCase()) {
       case 'ASCCP':
         return 'core_component/asccp/' + ccList.manifestId;

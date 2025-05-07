@@ -458,11 +458,11 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
 
             accToAppend = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            BCCPObject bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            BCCPObject bccp = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
             coreComponentAPI.appendBCC(accToAppend, bccp, "Published");
             accBCCPMap.put(accToAppend, bccp);
             asccpToAppend = coreComponentAPI.createRandomASCCP(accToAppend, developer, namespace, "Published");
-            bccpToAppend = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            bccpToAppend = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
 
         }
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
@@ -537,11 +537,11 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
 
             accToAppend = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            BCCPObject bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            BCCPObject bccp = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
             coreComponentAPI.appendBCC(accToAppend, bccp, "Published");
             accBCCPMap.put(accToAppend, bccp);
             asccpToAppend = coreComponentAPI.createRandomASCCP(accToAppend, developer, namespace, "Published");
-            bccpToAppend = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            bccpToAppend = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
 
         }
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
@@ -758,7 +758,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
 
                     asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
                     DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-                    bccpToAppend = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+                    bccpToAppend = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
 
                 }
                 TopLevelASBIEPObject topLevelAsbiep = getAPIFactory().getBusinessInformationEntityAPI()

@@ -5,7 +5,7 @@ import {Location} from '@angular/common';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {AuthService} from '../../authentication/auth.service';
 import {hashCode} from '../../common/utility';
-import {Namespace} from '../domain/namespace';
+import {NamespaceDetails} from '../domain/namespace';
 import {NamespaceService} from '../domain/namespace.service';
 import {finalize, switchMap} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
@@ -19,7 +19,7 @@ export class NamespaceDetailComponent implements OnInit {
 
   title = 'Namespace Detail';
   disabled: boolean;
-  namespace: Namespace;
+  namespace: NamespaceDetails;
   uriForm = new FormControl('');
   hashCode;
 
@@ -34,12 +34,12 @@ export class NamespaceDetailComponent implements OnInit {
 
   ngOnInit() {
     this.disabled = false;
-    this.namespace = new Namespace();
+    this.namespace = new NamespaceDetails();
 
     // load context scheme
     this.route.paramMap.pipe(
       switchMap((params: ParamMap) =>
-        this.service.getNamespace(params.get('id')))
+        this.service.getNamespaceDetails(params.get('id')))
     ).subscribe(resp => {
       this.namespace = resp;
       this.uriForm = new FormControl({value: this.namespace.uri, disabled: !this.namespace.canEdit},

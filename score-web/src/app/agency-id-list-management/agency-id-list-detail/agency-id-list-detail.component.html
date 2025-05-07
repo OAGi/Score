@@ -12,10 +12,10 @@
       <div class="event" *ngFor="let comment of commentControl.comments" [class.new-message]="comment.isNew">
         <div class="content" [class]="comment.prevCommentId ? 'pl-4' : ''">
           <div class="summary">
-            <a>{{ comment.loginId }}</a>
+            <a>{{ comment.created.who.loginId }}</a>
             <div class="date">{{ comment.timestamp | dateAgo }}</div>
             <mat-icon class="pointer icon"
-                      *ngIf="comment.loginId === currentUser && !comment.hidden"
+                      *ngIf="comment.created.who.loginId === currentUser && !comment.hidden"
                       [inline]="true"
                       (click)="commentControl.deleteComment(comment)">close</mat-icon>
           </div>
@@ -24,7 +24,7 @@
               <span *ngIf="!comment.hidden">{{ comment.text }}</span>
               <span *ngIf="comment.hidden" class="text-muted">(This message has been deleted.)</span>
               <mat-icon class="pointer icon mt-1"
-                        *ngIf="comment.loginId === currentUser && !comment.hidden"
+                        *ngIf="comment.created.who.loginId === currentUser && !comment.hidden"
                         [inline]="true"
                         (click)="commentControl.openEditComment(comment)">edit</mat-icon>
             </div>
@@ -113,7 +113,7 @@
             <div class="actions-wrap" *ngIf="!isWorkingRelease()">
               <button mat-raised-button color="accent" (click)="derive()"
                       *ngIf="agencyIdList.state === 'Published' &&
-                             agencyIdList.releaseState === 'Published' &&
+                             agencyIdList.release.state === 'Published' &&
                              !userRoles.includes('developer')">
                 Derive Agency ID List based on this
               </button>
@@ -180,13 +180,13 @@
               <div class="col-2">
                 <mat-form-field>
                   <mat-label>Release</mat-label>
-                  <input matInput [(ngModel)]="agencyIdList.releaseNum" [disabled]="true">
+                  <input matInput [(ngModel)]="agencyIdList.release.releaseNum" [disabled]="true">
                 </mat-form-field>
               </div>
               <div class="col-2">
                 <mat-form-field>
                   <mat-label>Revision</mat-label>
-                  <input matInput [(ngModel)]="agencyIdList.revisionNum" [disabled]="true">
+                  <input matInput [(ngModel)]="agencyIdList.log.revisionNum" [disabled]="true">
                 </mat-form-field>
               </div>
               <div class="col-2">
@@ -204,11 +204,10 @@
             </div>
 
             <div class="row">
-              <div class="col-2"
-                   *ngIf="agencyIdList.basedAgencyIdListManifestId !== undefined && agencyIdList.basedAgencyIdListManifestId > 0">
+              <div class="col-2" *ngIf="!!agencyIdList.based">
                 <mat-form-field>
                   <mat-label>Based Agency ID List</mat-label>
-                  <input matInput required data-id="agencyIdList.basedAgencyIdList" [(ngModel)]="agencyIdList.basedAgencyIdListName"
+                  <input matInput required data-id="agencyIdList.basedAgencyIdList" [(ngModel)]="agencyIdList.based.name"
                          maxlength="100" [disabled]="true"/>
                 </mat-form-field>
               </div>
@@ -244,7 +243,7 @@
               <div class="col-2" *ngIf="showDeprecateCheckbox">
                 <mat-checkbox color="primary"
                               data-id="agencyIdList.deprecated" [(ngModel)]="agencyIdList.deprecated"
-                              [disabled]="access !== 'CanEdit' || !canDeprecate">
+                              [disabled]="access !== 'CanEdit' || !hasRevision || prevAgencyIdList.deprecated">
                   <span>Deprecated</span>
                 </mat-checkbox>
               </div>
@@ -252,9 +251,9 @@
 
             <div class="row">
               <div class="col-4" style="padding-top: 5px;">
-                <mat-form-field>
+                <mat-form-field *ngIf="agencyIdList.definition">
                   <mat-label>Definition</mat-label>
-                  <textarea rows="4" cols="30" matInput data-id="agencyIdList.definition" [(ngModel)]="agencyIdList.definition"
+                  <textarea rows="4" cols="30" matInput data-id="agencyIdList.definition" [(ngModel)]="agencyIdList.definition.content"
                             [disabled]="access !== 'CanEdit'"></textarea>
                 </mat-form-field>
               </div>
@@ -265,7 +264,8 @@
                   <div class="col-6">
                     <mat-form-field>
                       <mat-label>Agency ID List Value</mat-label>
-                      <mat-select data-id="agencyIdList.agencyIdListValueId" [(ngModel)]="agencyIdList.agencyIdListValueManifestId"
+                      <mat-select data-id="agencyIdList.agencyIdListValueId"
+                                  [(ngModel)]="agencyIdList.agencyIdListValue.agencyIdListValueManifestId"
                                   [disabled]="access !== 'CanEdit' || hasRevision">
                         <mat-option>
                           <ngx-mat-select-search [formControl]="valueFilterCtrl"
@@ -281,9 +281,9 @@
                 </div>
                 <div class="row">
                   <div class="col-6">
-                    <mat-form-field>
+                    <mat-form-field *ngIf="agencyIdList.definition">
                       <mat-label>Definition Source</mat-label>
-                      <input matInput data-id="agencyIdList.definitionSource" [(ngModel)]="agencyIdList.definitionSource" maxlength="100"
+                      <input matInput data-id="agencyIdList.definitionSource" [(ngModel)]="agencyIdList.definition.source" maxlength="100"
                              [disabled]="access !== 'CanEdit'"/>
                     </mat-form-field>
                   </div>
@@ -291,7 +291,7 @@
                     <mat-form-field *ngIf="access === 'CanEdit' && !hasRevision">
                       <mat-label>Namespace</mat-label>
                       <mat-select data-id="agencyIdList.namespace" placeholder="Namespace"
-                                  [(ngModel)]="agencyIdList.namespaceId"
+                                  [(ngModel)]="agencyIdList.namespace.namespaceId"
                                   [required]="true">
                         <mat-option>
                           <ngx-mat-select-search [formControl]="namespaceListFilterCtrl"
@@ -306,9 +306,9 @@
                     <mat-form-field *ngIf="access !== 'CanEdit' || hasRevision">
                       <mat-label>Namespace</mat-label>
                       <mat-select data-id="agencyIdList.namespace" placeholder="Namespace"
-                                  [(ngModel)]="agencyIdList.namespaceId"
+                                  [(ngModel)]="agencyIdList.namespace.namespaceId"
                                   [required]="true" [disabled]="true">
-                        <mat-option *ngFor="let namespace of getSelectableNamespaces(agencyIdList.namespaceId)"
+                        <mat-option *ngFor="let namespace of getSelectableNamespaces(agencyIdList.namespace.namespaceId)"
                                     [value]="namespace.namespaceId">{{ namespace.uri }}</mat-option>
                       </mat-select>
                     </mat-form-field>
@@ -411,14 +411,14 @@
                         score-table-column-resize [defaultWidth]="width('Definition')" (onResize)="onResizeWidth($event)"> Definition</th>
                     <td mat-cell *matCellDef="let element">
                       <div class="description word-break-all"
-                           [innerHTML]="element.definition | highlight : highlightText : ['bg-warning']"></div>
+                           [innerHTML]="element.definition.content | highlight : highlightText : ['bg-warning']"></div>
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="definitionSource">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header
                         score-table-column-resize [defaultWidth]="width('Definition Source')" (onResize)="onResizeWidth($event)"> Definition Source</th>
-                    <td mat-cell *matCellDef="let element"> {{ element.definitionSource }}</td>
+                    <td mat-cell *matCellDef="let element"> {{ element.definition.source }}</td>
                   </ng-container>
 
                   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

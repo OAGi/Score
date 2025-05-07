@@ -2,9 +2,21 @@ import {CollectionViewer, DataSource, SelectionChange} from '@angular/cdk/collec
 import {ChangeListener} from '../../../bie-management/domain/bie-flat-tree';
 import {ExpressionEvaluator, FlatNode, getKey, PathLikeExpressionEvaluator} from '../../../common/flat-tree';
 import {BehaviorSubject, empty, forkJoin, Observable} from 'rxjs';
-import {ModelBrowserService} from './model-browser.service';
-import {CcGraph, CcGraphNode} from '../../domain/core-component-node';
+import {
+  AccDetails,
+  AsccDetails,
+  AsccpDetails,
+  BccDetails,
+  BccpDetails,
+  CcGraph,
+  CcGraphNode,
+  DtAwdPriDetails,
+  DtDetails,
+  DtScAwdPriDetails,
+  DtScDetails
+} from '../../domain/core-component-node';
 import {hashCode4String, sha256} from '../../../common/utility';
+import {CcNodeService} from '../../domain/core-component-node.service';
 
 export interface ModelBrowserNode extends FlatNode {
 
@@ -144,7 +156,7 @@ export abstract class ModelBrowserNodeImpl implements ModelBrowserNode {
       } else if (this.ccType === 'BCCP') {
         this._detail = new ModelBrowserBccpNodeDetail(this);
       } else {
-        this._detail = new ModelBrowserBdtScNodeDetail(this);
+        this._detail = new ModelBrowserDtScNodeDetail(this);
       }
     }
     return this._detail;
@@ -459,7 +471,7 @@ export class ModelBrowserBccpNode extends ModelBrowserNodeImpl {
     return this.bccpNode.manifestId;
   }
 
-  get bdtManifestId(): number {
+  get dtManifestId(): number {
     return this.bdtNode.manifestId;
   }
 
@@ -581,11 +593,11 @@ export class ModelBrowserBdtScNode extends ModelBrowserNodeImpl {
     this.ccType = 'BDT_SC';
   }
 
-  get bdtManifestId(): number {
+  get dtManifestId(): number {
     return this.bdtNode.manifestId;
   }
 
-  get bdtScManifestId(): number {
+  get dtScManifestId(): number {
     return this.bdtScNode.manifestId;
   }
 
@@ -612,8 +624,8 @@ export class ModelBrowserBdtScNode extends ModelBrowserNodeImpl {
   }
 
   get cardinalityMin(): number {
-    if (!!this._detail && !!(this._detail as ModelBrowserBdtScNodeDetail).bdtSc.cardinalityMin) {
-      return (this._detail as ModelBrowserBdtScNodeDetail).bdtSc.cardinalityMin;
+    if (!!this._detail && !!(this._detail as ModelBrowserDtScNodeDetail).dtSc.cardinalityMin) {
+      return (this._detail as ModelBrowserDtScNodeDetail).dtSc.cardinalityMin;
     }
     if (this._cardinalityMin === undefined) {
       return this.bdtScNode.cardinalityMin;
@@ -626,8 +638,8 @@ export class ModelBrowserBdtScNode extends ModelBrowserNodeImpl {
   }
 
   get cardinalityMax(): number {
-    if (!!this._detail && !!(this._detail as ModelBrowserBdtScNodeDetail).bdtSc.cardinalityMax) {
-      return (this._detail as ModelBrowserBdtScNodeDetail).bdtSc.cardinalityMax;
+    if (!!this._detail && !!(this._detail as ModelBrowserDtScNodeDetail).dtSc.cardinalityMax) {
+      return (this._detail as ModelBrowserDtScNodeDetail).dtSc.cardinalityMax;
     }
     if (this._cardinalityMax === undefined) {
       return this.bdtScNode.cardinalityMax;
@@ -886,18 +898,16 @@ export class BccpDetail {
 
 }
 
-export class BdtDetail {
+export class DtDetail {
   private _node: ModelBrowserBccpNode | ModelBrowserBdtScNode;
 
   guid: string;
-  cardinalityMin: number;
-  cardinalityMax: number;
-  propertyTerm: string;
+  dataTypeTerm: string;
   representationTerm: string;
   definition: string;
   state: string;
   den: string;
-  bdtPriRestriList: any[];
+  dtAwdPriList: DtAwdPriDetails[];
 
   constructor(node: ModelBrowserBccpNode | ModelBrowserBdtScNode) {
     this._node = node;
@@ -911,11 +921,11 @@ export class BdtDetail {
     return 'Primitive';
   }
 
-  get defaultBdtPriRestri(): any {
-    if (!this.bdtPriRestriList) {
+  get defaultDtAwdPri(): any {
+    if (!this.dtAwdPriList) {
       return {};
     }
-    return this.bdtPriRestriList.filter(e => e.default)[0];
+    return this.dtAwdPriList.filter(e => e.isDefault)[0];
   }
 
 }
@@ -934,7 +944,7 @@ export class BdtScDetail {
   fixedValue: string;
   defaultValue: string;
   deprecated: boolean;
-  bdtScPriRestriList: any[];
+  dtScAwdPriList: DtScAwdPriDetails[];
 
   constructor(node: ModelBrowserBdtScNode) {
     this._node = node;
@@ -958,11 +968,11 @@ export class BdtScDetail {
     return 'Primitive';
   }
 
-  get defaultBdtScPriRestri(): any {
-    if (!this.bdtScPriRestriList) {
+  get defaultDtScAwdPri(): any {
+    if (!this.dtScAwdPriList) {
       return {};
     }
-    return this.bdtScPriRestriList.filter(e => e.default)[0];
+    return this.dtScAwdPriList.filter(e => e.isDefault)[0];
   }
 
   get path(): string {
@@ -1022,24 +1032,28 @@ export class ModelBrowserAccNodeDetail extends ModelBrowserNodeDetail {
     return this.asccp.hashCode + this.acc.hashCode;
   }
 
-  updateAcc(acc: any) {
-    this.acc.accManifestId = acc.manifestId;
+  updateAcc(acc: AccDetails) {
+    this.acc.accManifestId = acc.accManifestId;
     this.acc.guid = acc.guid;
     this.acc.objectClassTerm = acc.objectClassTerm;
     this.acc.den = acc.den;
-    this.acc.definition = acc.definition;
+    if (!!acc.definition) {
+      this.acc.definition = acc.definition.content;
+    }
     this.acc.state = acc.state;
   }
 
-  updateAsccp(asccp: any) {
-    this.asccp.asccpManifestId = asccp.manifestId;
-    this.asccp.libraryName = asccp.libraryName;
-    this.asccp.releaseNum = asccp.releaseNum;
-    this.asccp.owner = asccp.owner;
+  updateAsccp(asccp: AsccpDetails) {
+    this.asccp.asccpManifestId = asccp.asccpManifestId;
+    this.asccp.libraryName = asccp.library.name;
+    this.asccp.releaseNum = asccp.release.releaseNum;
+    this.asccp.owner = asccp.owner.loginId;
     this.asccp.guid = asccp.guid;
     this.asccp.propertyTerm = asccp.propertyTerm;
     this.asccp.den = asccp.den;
-    this.asccp.definition = asccp.definition;
+    if (!!asccp.definition) {
+      this.asccp.definition = asccp.definition.content;
+    }
     this.asccp.state = asccp.state;
     this.asccp.nillable = asccp.nillable;
     this.asccp.deprecated = asccp.deprecated;
@@ -1073,35 +1087,41 @@ export class ModelBrowserAsccpNodeDetail extends ModelBrowserNodeDetail {
     return this.ascc.hashCode + this.asccp.hashCode + this.acc.hashCode;
   }
 
-  updateAcc(acc: any) {
-    this.acc.accManifestId = acc.manifestId;
+  updateAcc(acc: AccDetails) {
+    this.acc.accManifestId = acc.accManifestId;
     this.acc.guid = acc.guid;
     this.acc.objectClassTerm = acc.objectClassTerm;
     this.acc.den = acc.den;
-    this.acc.definition = acc.definition;
+    if (!!acc.definition) {
+      this.acc.definition = acc.definition.content;
+    }
     this.acc.state = acc.state;
   }
 
-  updateAsccp(asccp: any) {
-    this.asccp.asccpManifestId = asccp.manifestId;
-    this.asccp.releaseNum = asccp.releaseNum;
-    this.asccp.owner = asccp.owner;
+  updateAsccp(asccp: AsccpDetails) {
+    this.asccp.asccpManifestId = asccp.asccpManifestId;
+    this.asccp.releaseNum = asccp.release.releaseNum;
+    this.asccp.owner = asccp.owner.loginId;
     this.asccp.guid = asccp.guid;
     this.asccp.propertyTerm = asccp.propertyTerm;
     this.asccp.den = asccp.den;
-    this.asccp.definition = asccp.definition;
+    if (!!asccp.definition) {
+      this.asccp.definition = asccp.definition.content;
+    }
     this.asccp.state = asccp.state;
     this.asccp.nillable = asccp.nillable;
     this.asccp.deprecated = asccp.deprecated;
   }
 
-  updateAscc(ascc: any) {
-    this.ascc.asccManifestId = ascc.manifestId;
+  updateAscc(ascc: AsccDetails) {
+    this.ascc.asccManifestId = ascc.asccManifestId;
     this.ascc.guid = ascc.guid;
     this.ascc.den = ascc.den;
-    this.ascc.definition = ascc.definition;
-    this.ascc.cardinalityMin = ascc.cardinalityMin;
-    this.ascc.cardinalityMax = ascc.cardinalityMax;
+    if (!ascc.definition) {
+      this.ascc.definition = ascc.definition.content;
+    }
+    this.ascc.cardinalityMin = ascc.cardinality.min;
+    this.ascc.cardinalityMax = ascc.cardinality.max;
     this.ascc.deprecated = ascc.deprecated;
   }
 
@@ -1116,14 +1136,14 @@ export class ModelBrowserBccpNodeDetail extends ModelBrowserNodeDetail {
 
   bcc: BccDetail;
   bccp: BccpDetail;
-  bdt: BdtDetail;
+  dt: DtDetail;
 
   constructor(node: ModelBrowserNode, obj?: any) {
     super();
     this._node = node;
     this.bccp = new BccpDetail(node as ModelBrowserBccpNode);
     this.bcc = new BccDetail(node as ModelBrowserBccpNode);
-    this.bdt = new BdtDetail(node as ModelBrowserBccpNode);
+    this.dt = new DtDetail(node as ModelBrowserBccpNode);
     this.bcc.deprecated = node.deprecated;
     this.reset();
   }
@@ -1132,41 +1152,49 @@ export class ModelBrowserBccpNodeDetail extends ModelBrowserNodeDetail {
     return this.bcc.hashCode + this.bccp.hashCode;
   }
 
-  updateBdt(bdt: any) {
-    this.bdt.guid = bdt.guid;
-    this.bdt.cardinalityMin = bdt.cardinalityMin;
-    this.bdt.cardinalityMax = bdt.cardinalityMax;
-    this.bdt.propertyTerm = bdt.propertyTerm;
-    this.bdt.representationTerm = bdt.representationTerm;
-    this.bdt.definition = bdt.definition;
-    this.bdt.state = bdt.state;
-    this.bdt.den = bdt.den;
-    this.bdt.bdtPriRestriList = bdt.bdtPriRestriList;
+  updateBdt(bdt: DtDetails) {
+    this.dt.guid = bdt.guid;
+    this.dt.dataTypeTerm = bdt.dataTypeTerm;
+    this.dt.representationTerm = bdt.representationTerm;
+    if (!!bdt.definition) {
+      this.dt.definition = bdt.definition.content;
+    }
+    this.dt.state = bdt.state;
+    this.dt.den = bdt.den;
+    this.dt.dtAwdPriList = bdt.dtAwdPriList;
   }
 
-  updateBccp(bccp: any) {
-    this.bccp.bccpManifestId = bccp.manifestId;
+  updateBccp(bccp: BccpDetails) {
+    this.bccp.bccpManifestId = bccp.bccpManifestId;
     this.bccp.guid = bccp.guid;
     this.bccp.propertyTerm = bccp.propertyTerm;
     this.bccp.den = bccp.den;
-    this.bccp.definition = bccp.definition;
+    if (!!bccp.definition) {
+      this.bccp.definition = bccp.definition.content;
+    }
     this.bccp.state = bccp.state;
     this.bccp.nillable = bccp.nillable;
-    this.bccp.defaultValue = bccp.defaultValue;
-    this.bccp.fixedValue = bccp.fixedValue;
+    if (!!bccp.valueConstraint) {
+      this.bccp.defaultValue = bccp.valueConstraint.defaultValue;
+      this.bccp.fixedValue = bccp.valueConstraint.fixedValue;
+    }
   }
 
-  updateBcc(bcc: any) {
-    this.bcc.bccManifestId = bcc.manifestId;
+  updateBcc(bcc: BccDetails) {
+    this.bcc.bccManifestId = bcc.bccManifestId;
     this.bcc.guid = bcc.guid;
     this.bcc.den = bcc.den;
-    this.bcc.definition = bcc.definition;
+    if (!!bcc.definition) {
+      this.bcc.definition = bcc.definition.content;
+    }
     this.bcc.nillable = bcc.nillable;
     this.bcc.deprecated = bcc.deprecated;
-    this.bcc.cardinalityMin = bcc.cardinalityMin;
-    this.bcc.cardinalityMax = bcc.cardinalityMax;
-    this.bcc.defaultValue = bcc.defaultValue;
-    this.bcc.fixedValue = bcc.fixedValue;
+    this.bcc.cardinalityMin = bcc.cardinality.min;
+    this.bcc.cardinalityMax = bcc.cardinality.max;
+    if (!!bcc.valueConstraint) {
+      this.bcc.defaultValue = bcc.valueConstraint.defaultValue;
+      this.bcc.fixedValue = bcc.valueConstraint.fixedValue;
+    }
   }
 
   reset() {
@@ -1175,49 +1203,53 @@ export class ModelBrowserBccpNodeDetail extends ModelBrowserNodeDetail {
   }
 }
 
-export class ModelBrowserBdtScNodeDetail extends ModelBrowserNodeDetail {
+export class ModelBrowserDtScNodeDetail extends ModelBrowserNodeDetail {
   private _node: ModelBrowserNode;
 
-  bdtSc: BdtScDetail;
-  bdt: BdtDetail;
+  dtSc: BdtScDetail;
+  dt: DtDetail;
 
   constructor(node: ModelBrowserNode, obj?: any) {
     super();
     this._node = node;
-    this.bdt = new BdtDetail(node as ModelBrowserBdtScNode);
-    this.bdtSc = new BdtScDetail(node as ModelBrowserBdtScNode);
-    this.bdtSc.deprecated = node.deprecated;
+    this.dt = new DtDetail(node as ModelBrowserBdtScNode);
+    this.dtSc = new BdtScDetail(node as ModelBrowserBdtScNode);
+    this.dtSc.deprecated = node.deprecated;
     this.reset();
   }
 
   get hashCode(): number {
-    return this.bdtSc.hashCode;
+    return this.dtSc.hashCode;
   }
 
-  updateBdt(bdt: any) {
-    this.bdt.guid = bdt.guid;
-    this.bdt.cardinalityMin = bdt.cardinalityMin;
-    this.bdt.cardinalityMax = bdt.cardinalityMax;
-    this.bdt.propertyTerm = bdt.propertyTerm;
-    this.bdt.representationTerm = bdt.representationTerm;
-    this.bdt.definition = bdt.definition;
-    this.bdt.state = bdt.state;
-    this.bdt.den = bdt.den;
-    this.bdt.bdtPriRestriList = bdt.bdtPriRestriList;
+  updateBdt(dt: DtDetails) {
+    this.dt.guid = dt.guid;
+    this.dt.dataTypeTerm = dt.dataTypeTerm;
+    this.dt.representationTerm = dt.representationTerm;
+    if (!!dt.definition) {
+      this.dt.definition = dt.definition.content;
+    }
+    this.dt.state = dt.state;
+    this.dt.den = dt.den;
+    this.dt.dtAwdPriList = dt.dtAwdPriList;
   }
 
-  updateBdtSc(bdtSc: any) {
-    this.bdtSc.dtScManifestId = bdtSc.manifestId;
-    this.bdtSc.cardinalityMin = bdtSc.cardinalityMin;
-    this.bdtSc.cardinalityMax = bdtSc.cardinalityMax;
-    this.bdtSc.propertyTerm = bdtSc.propertyTerm;
-    this.bdtSc.representationTerm = bdtSc.representationTerm;
-    this.bdtSc.definition = bdtSc.definition;
-    this.bdtSc.state = bdtSc.state;
-    this.bdtSc.fixedValue = bdtSc.fixedValue;
-    this.bdtSc.defaultValue = bdtSc.defaultValue;
-    this.bdtSc.deprecated = bdtSc.deprecated;
-    this.bdtSc.bdtScPriRestriList = bdtSc.bdtScPriRestriList;
+  updateBdtSc(dtSc: DtScDetails) {
+    this.dtSc.dtScManifestId = dtSc.dtScManifestId;
+    this.dtSc.cardinalityMin = dtSc.cardinality.min;
+    this.dtSc.cardinalityMax = dtSc.cardinality.max;
+    this.dtSc.propertyTerm = dtSc.propertyTerm;
+    this.dtSc.representationTerm = dtSc.representationTerm;
+    if (!!dtSc.definition) {
+      this.dtSc.definition = dtSc.definition.content;
+    }
+    this.dtSc.state = dtSc.state;
+    if (!!dtSc.valueConstraint) {
+      this.dtSc.fixedValue = dtSc.valueConstraint.fixedValue;
+      this.dtSc.defaultValue = dtSc.valueConstraint.defaultValue;
+    }
+    this.dtSc.deprecated = dtSc.deprecated;
+    this.dtSc.dtScAwdPriList = dtSc.dtScAwdPriList;
   }
 
   reset() {
@@ -1292,7 +1324,7 @@ export class ModelBrowserNodeDataSource<T extends ModelBrowserNode> implements D
 
   constructor(
     private _database: ModelBrowserNodeDatabase<T>,
-    private service: ModelBrowserService,
+    private ccNodeService: CcNodeService,
     private delegatedListeners?: ChangeListener<T>[]
   ) {
     _database.dataSource = this;
@@ -1446,12 +1478,12 @@ export class ModelBrowserNodeDataSource<T extends ModelBrowserNode> implements D
       case 'ACC':
         const accNode = (node as unknown as ModelBrowserAccNode);
         forkJoin([
-          this.service.getAccDetail(accNode.accManifestId),
-          this.service.getAsccpDetail(accNode.asccpManifestId)
+          this.ccNodeService.getAccDetails(accNode.accManifestId),
+          this.ccNodeService.getAsccpDetails(accNode.asccpManifestId)
         ]).subscribe(([ccAcc, ccAsccp]) => {
           const detail = (node.detail as ModelBrowserAccNodeDetail);
           detail.updateAcc(ccAcc);
-          detail.updateAsccp(ccAsccp.asccp);
+          detail.updateAsccp(ccAsccp);
           detail.reset();
           detail.isLoaded = true;
           return callbackFn && callbackFn(node);
@@ -1461,13 +1493,14 @@ export class ModelBrowserNodeDataSource<T extends ModelBrowserNode> implements D
       case 'ASCCP':
         const asccpNode = (node as unknown as ModelBrowserAsccpNode);
         forkJoin([
-          this.service.getAccDetail(asccpNode.accManifestId),
-          this.service.getAsccpDetail(asccpNode.asccpManifestId, asccpNode.asccManifestId)
-        ]).subscribe(([ccAcc, ccAsccp]) => {
+          this.ccNodeService.getAccDetails(asccpNode.accManifestId),
+          this.ccNodeService.getAsccDetails(asccpNode.asccManifestId),
+          this.ccNodeService.getAsccpDetails(asccpNode.asccpManifestId)
+        ]).subscribe(([ccAcc, ccAscc, ccAsccp]) => {
           const detail = (node.detail as ModelBrowserAsccpNodeDetail);
           detail.updateAcc(ccAcc);
-          detail.updateAsccp(ccAsccp.asccp);
-          detail.updateAscc(ccAsccp.ascc);
+          detail.updateAsccp(ccAsccp);
+          detail.updateAscc(ccAscc);
           detail.reset();
           detail.isLoaded = true;
           return callbackFn && callbackFn(node);
@@ -1477,12 +1510,14 @@ export class ModelBrowserNodeDataSource<T extends ModelBrowserNode> implements D
       case 'BCCP':
         const bccpNode = (node as unknown as ModelBrowserBccpNode);
         forkJoin([
-          this.service.getBccpDetail(bccpNode.bccpManifestId, bccpNode.bdtManifestId, bccpNode.bccManifestId)
-        ]).subscribe(([ccBccp]) => {
+          this.ccNodeService.getBccDetails(bccpNode.bccManifestId),
+          this.ccNodeService.getBccpDetails(bccpNode.bccpManifestId),
+          this.ccNodeService.getDtDetails(bccpNode.dtManifestId)
+        ]).subscribe(([ccBcc, ccBccp, ccDt]) => {
           const detail = (node.detail as ModelBrowserBccpNodeDetail);
-          detail.updateBdt(ccBccp.bdt);
-          detail.updateBccp(ccBccp.bccp);
-          detail.updateBcc(ccBccp.bcc);
+          detail.updateBdt(ccDt);
+          detail.updateBccp(ccBccp);
+          detail.updateBcc(ccBcc);
           detail.reset();
           detail.isLoaded = true;
           return callbackFn && callbackFn(node);
@@ -1490,12 +1525,12 @@ export class ModelBrowserNodeDataSource<T extends ModelBrowserNode> implements D
         break;
 
       case 'BDT_SC':
-        const bdtScNode = (node as unknown as ModelBrowserBdtScNode);
+        const dtScNode = (node as unknown as ModelBrowserBdtScNode);
         forkJoin([
-          this.service.getBdtDetail(bdtScNode.bdtManifestId),
-          this.service.getBdtScDetail(bdtScNode.bdtScManifestId)
+          this.ccNodeService.getDtDetails(dtScNode.dtManifestId),
+          this.ccNodeService.getDtScDetails(dtScNode.dtScManifestId)
         ]).subscribe(([ccBdt, ccBdtSc]) => {
-          const detail = (node.detail as ModelBrowserBdtScNodeDetail);
+          const detail = (node.detail as ModelBrowserDtScNodeDetail);
           detail.updateBdt(ccBdt);
           detail.updateBdtSc(ccBdtSc);
           detail.reset();

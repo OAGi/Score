@@ -1,17 +1,12 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {BusinessContextValue} from '../domain/business-context';
-import {
-  ContextScheme,
-  ContextSchemeListRequest,
-  ContextSchemeValue,
-  ContextSchemeValueListRequest
-} from '../../context-scheme/domain/context-scheme';
+import {ContextSchemeSummary, ContextSchemeValueListRequest, ContextSchemeValueSummary} from '../../context-scheme/domain/context-scheme';
 import {ContextSchemeService} from '../../context-scheme/domain/context-scheme.service';
 import {hashCode} from '../../../common/utility';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {ContextCategoryService} from '../../context-category/domain/context-category.service';
-import {ContextCategory, ContextCategoryListRequest} from '../../context-category/domain/context-category';
+import {ContextCategorySummary} from '../../context-category/domain/context-category';
 import {PageRequest} from '../../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {finalize} from 'rxjs/operators';
@@ -28,17 +23,17 @@ export class BusinessContextValueDialogComponent implements OnInit {
   actionName;
   hashCode;
 
-  contextCategoryList: ContextCategory[] = [];
+  contextCategoryList: ContextCategorySummary[] = [];
   contextCategoryListFilterCtrl: FormControl = new FormControl();
-  filteredContextCategoryList: ReplaySubject<ContextCategory[]> = new ReplaySubject<ContextCategory[]>(1);
+  filteredContextCategoryList: ReplaySubject<ContextCategorySummary[]> = new ReplaySubject<ContextCategorySummary[]>(1);
 
-  contextSchemeList: ContextScheme[] = [];
+  contextSchemeList: ContextSchemeSummary[] = [];
   contextSchemeListFilterCtrl: FormControl = new FormControl();
-  filteredContextSchemeList: ReplaySubject<ContextScheme[]> = new ReplaySubject<ContextScheme[]>(1);
+  filteredContextSchemeList: ReplaySubject<ContextSchemeSummary[]> = new ReplaySubject<ContextSchemeSummary[]>(1);
 
-  contextSchemeValueList: ContextSchemeValue[] = [];
+  contextSchemeValueList: ContextSchemeValueSummary[] = [];
   contextSchemeValueListFilterCtrl: FormControl = new FormControl();
-  filteredContextSchemeValueList: ReplaySubject<ContextSchemeValue[]> = new ReplaySubject<ContextSchemeValue[]>(1);
+  filteredContextSchemeValueList: ReplaySubject<ContextSchemeValueSummary[]> = new ReplaySubject<ContextSchemeValueSummary[]>(1);
 
   constructor(
     public dialogRef: MatDialogRef<BusinessContextValueDialogComponent>,
@@ -47,7 +42,7 @@ export class BusinessContextValueDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public businessContextValue: BusinessContextValue) {
   }
 
-  get contextCategory(): ContextCategory {
+  get contextCategory(): ContextCategorySummary {
     if (this.businessContextValue.contextCategoryId) {
       for (const contextCategory of this.contextCategoryList) {
         if (contextCategory.contextCategoryId === this.businessContextValue.contextCategoryId) {
@@ -55,36 +50,36 @@ export class BusinessContextValueDialogComponent implements OnInit {
         }
       }
     }
-    return new ContextCategory();
+    return new ContextCategorySummary();
   }
 
-  get contextScheme(): ContextScheme {
+  get contextScheme(): ContextSchemeSummary {
     if (this.businessContextValue.contextCategoryId &&
       this.businessContextValue.contextSchemeId) {
 
       for (const contextScheme of this.contextSchemeList) {
-        if (contextScheme.contextCategoryId === this.businessContextValue.contextCategoryId &&
+        if (contextScheme.contextCategory.contextCategoryId === this.businessContextValue.contextCategoryId &&
           contextScheme.contextSchemeId === this.businessContextValue.contextSchemeId) {
           return contextScheme;
         }
       }
     }
-    return new ContextScheme();
+    return new ContextSchemeSummary();
   }
 
-  get contextSchemeValue(): ContextSchemeValue {
+  get contextSchemeValue(): ContextSchemeValueSummary {
     if (this.businessContextValue.contextCategoryId &&
       this.businessContextValue.contextSchemeId &&
       this.businessContextValue.contextSchemeValueId) {
 
       for (const contextSchemeValue of this.contextSchemeValueList) {
-        if (contextSchemeValue.ownerContextSchemeId === this.businessContextValue.contextSchemeId &&
+        if (contextSchemeValue.contextSchemeId === this.businessContextValue.contextSchemeId &&
           contextSchemeValue.contextSchemeValueId === this.businessContextValue.contextSchemeValueId) {
           return contextSchemeValue;
         }
       }
     }
-    return new ContextSchemeValue();
+    return new ContextSchemeValueSummary();
   }
 
   onClick(): void {
@@ -103,33 +98,25 @@ export class BusinessContextValueDialogComponent implements OnInit {
       this.actionName = 'Edit';
     }
 
-    const contextCategoryListRequest = new ContextCategoryListRequest();
-    contextCategoryListRequest.page = new PageRequest(
-      'name', 'asc', -1, -1);
-
-    const contextSchemeListRequest = new ContextSchemeListRequest();
-    contextSchemeListRequest.page = new PageRequest(
-      undefined, 'asc', -1, -1);
-
     const contextSchemeValueListRequest = new ContextSchemeValueListRequest();
     contextSchemeValueListRequest.page = new PageRequest(
       undefined, 'asc', -1, -1);
 
     this.isLoading = true;
     forkJoin([
-      this.contextCategoryService.getContextCategoryList(contextCategoryListRequest),
-      this.contextSchemeService.getContextSchemeList(contextSchemeListRequest),
-      this.contextSchemeService.getContextSchemeValueList(contextSchemeValueListRequest),
+      this.contextCategoryService.getContextCategorySummaries(),
+      this.contextSchemeService.getContextSchemeSummaries(),
+      this.contextSchemeService.getContextSchemeValueSummaries()
     ]).pipe(finalize(() => {
       this.isLoading = false;
-    })).subscribe(([contextCategoryPage, contextSchemePage, contextSchemeValuePage]) => {
-      this.contextCategoryList = contextCategoryPage.list;
+    })).subscribe(([contextCategories, contextSchemes, contextSchemeValues]) => {
+      this.contextCategoryList = contextCategories;
       this.resetCtxCategories();
 
-      this.contextSchemeList = contextSchemePage.list;
+      this.contextSchemeList = contextSchemes;
       this.resetCtxSchemes();
 
-      this.contextSchemeValueList = contextSchemeValuePage.list;
+      this.contextSchemeValueList = contextSchemeValues;
       this.resetCtxSchemeValues();
 
       this.hashCode = hashCode(this.businessContextValue);
@@ -173,7 +160,10 @@ export class BusinessContextValueDialogComponent implements OnInit {
       search = search.toLowerCase();
     }
     this.filteredContextSchemeList.next(
-      this.contextSchemeList.filter(contextScheme => contextScheme.schemeName.toLowerCase().indexOf(search) > -1)
+        this.contextSchemeList.filter(contextScheme =>
+            contextScheme.schemeName.toLowerCase().indexOf(search) > -1 ||
+            contextScheme.schemeId.toLowerCase().indexOf(search) > -1 ||
+            contextScheme.schemeAgencyId.toLowerCase().indexOf(search) > -1)
     );
   }
 
@@ -186,7 +176,9 @@ export class BusinessContextValueDialogComponent implements OnInit {
       search = search.toLowerCase();
     }
     this.filteredContextSchemeValueList.next(
-      this.contextSchemeValueList.filter(contextSchemeValue => contextSchemeValue.value.toLowerCase().indexOf(search) > -1)
+        this.contextSchemeValueList.filter(contextSchemeValue =>
+            contextSchemeValue.value.toLowerCase().indexOf(search) > -1 ||
+            contextSchemeValue.meaning.toLowerCase().indexOf(search) > -1)
     );
   }
 
@@ -209,7 +201,7 @@ export class BusinessContextValueDialogComponent implements OnInit {
 
   resetCtxSchemes() {
     const contextScheme = this.contextSchemeList
-      .filter(e => e.contextCategoryId === this.businessContextValue.contextCategoryId);
+      .filter(e => e.contextCategory.contextCategoryId === this.businessContextValue.contextCategoryId);
 
     this.contextSchemeListFilterCtrl.valueChanges
       .subscribe(() => {
@@ -221,7 +213,10 @@ export class BusinessContextValueDialogComponent implements OnInit {
           search = search.toLowerCase();
         }
         this.filteredContextSchemeList.next(
-          contextScheme.filter(e => e.schemeName.toLowerCase().indexOf(search) > -1)
+            contextScheme.filter(e =>
+                e.schemeName.toLowerCase().indexOf(search) > -1 ||
+                e.schemeId.toLowerCase().indexOf(search) > -1 ||
+                e.schemeAgencyId.toLowerCase().indexOf(search) > -1)
         );
       });
     this.filteredContextSchemeList.next(contextScheme.slice());
@@ -229,11 +224,11 @@ export class BusinessContextValueDialogComponent implements OnInit {
 
   resetCtxSchemeValues() {
     const contextSchemeValueList = this.contextSchemeValueList
-      .filter(e => e.ownerContextSchemeId === this.businessContextValue.contextSchemeId);
+      .filter(e => e.contextSchemeId === this.businessContextValue.contextSchemeId);
 
     this.contextSchemeValueListFilterCtrl.valueChanges
       .subscribe(() => {
-        let search = this.contextCategoryListFilterCtrl.value;
+        let search = this.contextSchemeValueListFilterCtrl.value;
         if (!search) {
           this.filteredContextSchemeValueList.next(contextSchemeValueList.slice());
           return;
@@ -241,7 +236,9 @@ export class BusinessContextValueDialogComponent implements OnInit {
           search = search.toLowerCase();
         }
         this.filteredContextSchemeValueList.next(
-          contextSchemeValueList.filter(e => e.value.toLowerCase().indexOf(search) > -1)
+            contextSchemeValueList.filter(e =>
+                e.value.toLowerCase().indexOf(search) > -1 ||
+                e.meaning.toLowerCase().indexOf(search) > -1)
         );
       });
     this.filteredContextSchemeValueList.next(contextSchemeValueList.slice());

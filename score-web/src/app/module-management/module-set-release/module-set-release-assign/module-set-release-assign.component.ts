@@ -12,7 +12,7 @@ import {AuthService} from '../../../authentication/auth.service';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 import {AssignableMap, AssignableNode} from '../../../release-management/domain/release';
 import {ReleaseService} from '../../../release-management/domain/release.service';
-import {ModuleElement, ModuleSetRelease, Tile} from '../../domain/module';
+import {ModuleElement, ModuleSetReleaseDetails, Tile} from '../../domain/module';
 import {ModuleService} from '../../domain/module.service';
 import {MatPaginator} from '@angular/material/paginator';
 import {UserToken} from '../../../authentication/domain/auth';
@@ -30,7 +30,7 @@ export class ModuleSetReleaseAssignComponent implements OnInit {
   ccTypes = ['ACC', 'ASCCP', 'BCCP', 'DT', 'CODE_LIST', 'AGENCY_ID_LIST', 'XBT'];
   workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
   isUpdating: boolean;
-  moduleSetRelease: ModuleSetRelease = new ModuleSetRelease();
+  moduleSetRelease: ModuleSetReleaseDetails = new ModuleSetReleaseDetails();
 
   tiles: Tile[] = [];
   rootElement: ModuleElement;
@@ -77,18 +77,18 @@ export class ModuleSetReleaseAssignComponent implements OnInit {
     this.route.paramMap.pipe(
       switchMap((params: ParamMap) => {
         const moduleSetReleaseId = Number(params.get('moduleSetReleaseId'));
-        return this.moduleService.getModuleSetRelease(moduleSetReleaseId);
+        return this.moduleService.getModuleSetReleaseDetails(moduleSetReleaseId);
       }))
       .subscribe(moduleSetRelease => {
         this.init(moduleSetRelease);
 
         forkJoin([
-          this.moduleService.getModules(this.moduleSetRelease.moduleSetId),
+          this.moduleService.getModules(this.moduleSetRelease.moduleSet.moduleSetId),
           this.moduleService.getAssignable(this.moduleSetRelease.moduleSetReleaseId)
         ]).subscribe(([modules, assignable]) => {
           this.rootElement = modules as ModuleElement;
-          this.tiles.push({elements: this.rootElement.child, current: undefined});
-          if (this.rootElement.child && this.rootElement.child.length > 0) {
+          this.tiles.push({elements: this.rootElement.children, current: undefined});
+          if (this.rootElement.children && this.rootElement.children.length > 0) {
             this.onClickElement(this.tiles[0], this.tiles[0].elements[0]);
           }
           this.leftDataSource.data = this.assignableMapToList(assignable);
@@ -102,7 +102,7 @@ export class ModuleSetReleaseAssignComponent implements OnInit {
     this.rightDataSource.sort = this.rightSort;
   }
 
-  init(moduleSetRelease: ModuleSetRelease) {
+  init(moduleSetRelease: ModuleSetReleaseDetails) {
     this.moduleSetRelease = moduleSetRelease;
   }
 
@@ -155,7 +155,7 @@ export class ModuleSetReleaseAssignComponent implements OnInit {
       this.tiles.splice(tileIndex, this.tiles.length - tileIndex);
     }
     if (element.directory) {
-      this.tiles.push({elements: element.child.sort(this._moduleSort), current: undefined});
+      this.tiles.push({elements: element.children.sort(this._moduleSort), current: undefined});
     } else {
       this.isUpdating = true;
       this.moduleService.getAssigned(this.moduleSetRelease.moduleSetReleaseId, element.moduleId)

@@ -3,7 +3,7 @@ import {Location} from '@angular/common';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {BusinessContextService} from '../domain/business-context.service';
 import {BieListService} from '../../../bie-management/bie-list/domain/bie-list.service';
-import {BusinessContext, BusinessContextValue} from '../domain/business-context';
+import {BusinessContextDetails, BusinessContextValue} from '../domain/business-context';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -35,7 +35,7 @@ export class BusinessContextDetailComponent implements OnInit {
   title = 'Edit Business Context';
   disabled: boolean;
   hashCode;
-  businessContext: BusinessContext;
+  businessContext: BusinessContextDetails;
   preferencesInfo: PreferencesInfo;
 
   get columns(): TableColumnsProperty[] {
@@ -145,24 +145,35 @@ export class BusinessContextDetailComponent implements OnInit {
 
   ngOnInit() {
     this.disabled = false;
-    this.businessContext = new BusinessContext();
+    this.businessContext = new BusinessContextDetails();
     this.businessContext.used = true;
 
     // load business context
     this.route.paramMap.pipe(
-      switchMap((params: ParamMap) => forkJoin([
-          this.service.getBusinessContext(params.get('id')),
-          this.preferencesService.load(this.auth.getUserToken())
-        ])
-      )).subscribe(([resp, preferencesInfo]) => {
+        switchMap((params: ParamMap) => forkJoin([
+              this.service.getBusinessContextDetails(params.get('id')),
+              this.service.getBusinessContextValues(params.get('id')),
+              this.preferencesService.load(this.auth.getUserToken())
+            ])
+        )).subscribe(([businessContextDetails, businessContextValues, preferencesInfo]) => {
       this.preferencesInfo = preferencesInfo;
-      resp.businessContextValueList.forEach((businessContextValue: BusinessContextValue) => {
+
+      if (!businessContextDetails) {
+        this.snackBar.open('Access denied.', '', {
+          duration: 3000
+        });
+        this.router.navigateByUrl('/context_management/business_context');
+        return;
+      }
+
+      businessContextDetails.businessContextValues = businessContextValues;
+      businessContextDetails.businessContextValues.forEach((businessContextValue: BusinessContextValue) => {
         businessContextValue.guid = uuid();
       });
-      this.hashCode = hashCode(resp);
-      this.businessContext = resp;
+      this.hashCode = hashCode(businessContextDetails);
+      this.businessContext = businessContextDetails;
 
-      this._updateDataSource(this.businessContext.businessContextValueList);
+      this._updateDataSource(this.businessContext.businessContextValues);
     });
 
     // Prevent the sorting event from being triggered if any columns are currently resizing.
@@ -184,10 +195,10 @@ export class BusinessContextDetailComponent implements OnInit {
 
   _updateDataSource(data: BusinessContextValue[]) {
     this.dataSource.data = data;
-    this.businessContext.businessContextValueList = data;
+    this.businessContext.businessContextValues = data;
   }
 
-  isDisabled(businessContext: BusinessContext) {
+  isDisabled(businessContext: BusinessContextDetails) {
     return (this.disabled) ||
       (businessContext.name === undefined || businessContext.name === '');
   }
@@ -321,7 +332,8 @@ export class BusinessContextDetailComponent implements OnInit {
       return;
     }
 
-    this.service.update(this.businessContext).subscribe(_ => {
+    this.service.update(this.businessContext.businessContextId, this.businessContext.name,
+        this.businessContext.businessContextValues).subscribe(_ => {
       this.hashCode = hashCode(this.businessContext);
       this.snackBar.open('Updated', '', {
         duration: 3000,

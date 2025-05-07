@@ -14,7 +14,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.BlobContent;
  * This table stores schemas whose content is only imported as a whole and is
  * represented in Blob.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class BlobContentRecord extends UpdatableRecordImpl<BlobContentRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -79,6 +79,6 @@ public class BlobContentRecord extends UpdatableRecordImpl<BlobContentRecord> {
 
         setBlobContentId(blobContentId);
         setContent(content);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

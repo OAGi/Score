@@ -302,13 +302,20 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
         List<Field<?>> fields = new ArrayList();
         fields.addAll(Arrays.asList(CODE_LIST.fields()));
         List<Result<Record>> records = dslContext.select(fields)
-                .from(BDT_PRI_RESTRI)
-                .join(DT_MANIFEST).on(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(DT_MANIFEST.DT_MANIFEST_ID))
+                .from(DT_MANIFEST)
                 .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                 .join(DT).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
-                .join(CODE_LIST_MANIFEST).on(BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID))
+                .join(DT_AWD_PRI).on(and(
+                        RELEASE.RELEASE_ID.eq(DT_AWD_PRI.RELEASE_ID),
+                        DT.DT_ID.eq(DT_AWD_PRI.DT_ID)
+                ))
+                .join(CODE_LIST_MANIFEST).on(DT_AWD_PRI.CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID))
                 .join(CODE_LIST).on(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
-                .where(BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID.isNotNull().and(DT.GUID.eq(guid).and(RELEASE.RELEASE_ID.eq(ULong.valueOf(releaseId)))))
+                .where(and(
+                        DT_AWD_PRI.CODE_LIST_MANIFEST_ID.isNotNull(),
+                        DT.GUID.eq(guid),
+                        RELEASE.RELEASE_ID.eq(ULong.valueOf(releaseId))
+                ))
                 .fetchMany();
         return codeListMapperList(records);
     }

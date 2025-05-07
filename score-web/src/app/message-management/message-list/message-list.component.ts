@@ -12,9 +12,8 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {PageRequest} from '../../basis/basis';
 import {initFilter} from '../../common/utility';
-import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {finalize} from 'rxjs/operators';
-import {MessageList, MessageListRequest} from '../domain/message';
+import {MessageListEntry, MessageListRequest} from '../domain/messageDetails';
 import {MessageService} from '../domain/message.service';
 import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
@@ -95,17 +94,12 @@ export class MessageListComponent implements OnInit {
   }
 
   get displayedColumns(): string[] {
-    let displayedColumns = [];
+    let displayedColumns = ['select'];
     if (!this.preferencesInfo) {
       return displayedColumns;
     }
     for (const column of this.columns) {
       switch (column.name) {
-        case 'Sender':
-          if (column.selected) {
-            displayedColumns.push('sender');
-          }
-          break;
         case 'Subject':
           if (column.selected) {
             displayedColumns.push('subject');
@@ -121,7 +115,7 @@ export class MessageListComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<MessageList>();
+  dataSource = new MatTableDataSource<MessageListEntry>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
 
@@ -193,17 +187,6 @@ export class MessageListComponent implements OnInit {
   onChange(property?: string, source?) {
   }
 
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.createdDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.createdDate.end = new Date(event.value);
-        break;
-    }
-  }
-
   reset(type: string) {
     switch (type) {
       case 'startDate':
@@ -233,10 +216,7 @@ export class MessageListComponent implements OnInit {
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
-      this.dataSource.data = resp.list.map((elm: MessageList) => {
-        elm.timestamp = new Date(elm.timestamp);
-        return elm;
-      });
+      this.dataSource.data = resp.list;
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0],
           this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));
@@ -260,11 +240,11 @@ export class MessageListComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(row: MessageList) {
+  select(row: MessageListEntry) {
     this.selection.select(row.messageId);
   }
 
-  toggle(row: MessageList) {
+  toggle(row: MessageListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row.messageId);
     } else {
@@ -272,7 +252,7 @@ export class MessageListComponent implements OnInit {
     }
   }
 
-  isSelected(row: MessageList) {
+  isSelected(row: MessageListEntry) {
     return this.selection.isSelected(row.messageId);
   }
 

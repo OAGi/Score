@@ -1,9 +1,10 @@
 import {HttpParams} from '@angular/common/http';
 import {ParamMap} from '@angular/router';
 import {ScoreUser} from '../../authentication/domain/auth';
-import {PageRequest} from '../../basis/basis';
+import {PageRequest, WhoAndWhen} from '../../basis/basis';
 import {base64Decode, base64Encode} from '../../common/utility';
-import {Library} from '../../library-management/domain/library';
+import {LibrarySummary} from '../../library-management/domain/library';
+import {ReleaseSummary} from '../../release-management/domain/release';
 
 export class SimpleModule {
   moduleId: number;
@@ -29,16 +30,16 @@ export class ModuleElement {
   directory: boolean;
   moduleSetId: number;
   path: string;
-  child: ModuleElement[];
+  children: ModuleElement[];
 }
 
 export class ModuleSetListRequest {
-  library: Library = new Library();
+  library: LibrarySummary = new LibrarySummary();
   filters: {
     name: string;
     description: string;
   };
-  updaterLoginIds: string[] = [];
+  updaterLoginIdList: string[] = [];
   updatedDate: {
     start: Date,
     end: Date,
@@ -67,7 +68,7 @@ export class ModuleSetListRequest {
       this.page.pageSize = (defaultPageRequest) ? defaultPageRequest.pageSize : 0;
     }
 
-    this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
+    this.updaterLoginIdList = (params.get('updaterLoginIdList')) ? Array.from(params.get('updaterLoginIdList').split(',')) : [];
     this.updatedDate = {
       start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
       end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
@@ -85,8 +86,8 @@ export class ModuleSetListRequest {
       .set('pageIndex', '' + this.page.pageIndex)
       .set('pageSize', '' + this.page.pageSize);
 
-    if (this.updaterLoginIds && this.updaterLoginIds.length > 0) {
-      params = params.set('updaterLoginIds', this.updaterLoginIds.join(','));
+    if (this.updaterLoginIdList && this.updaterLoginIdList.length > 0) {
+      params = params.set('updaterLoginIdList', this.updaterLoginIdList.join(','));
     }
     if (this.updatedDate.start) {
       params = params.set('updatedDateStart', '' + this.updatedDate.start.toUTCString());
@@ -103,6 +104,24 @@ export class ModuleSetListRequest {
     const str = base64Encode(params.toString());
     return (str) ? 'q=' + str : undefined;
   }
+}
+
+export class ModuleSetListEntry {
+  moduleSetId: number;
+  libraryId: number;
+  guid: string;
+  name: string;
+  description: string;
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+}
+
+export class ModuleSetSummary {
+  moduleSetId: number;
+  libraryId: number;
+  guid: string;
+  name: string;
+  description: string;
 }
 
 export class ModuleSet {
@@ -129,7 +148,7 @@ export class ModuleSetModuleListRequest {
     namespaceUri: string;
   };
   moduleSetId: number;
-  updaterLoginIds: string[] = [];
+  updaterLoginIdList: string[] = [];
   updatedDate: {
     start: Date,
     end: Date,
@@ -159,7 +178,7 @@ export class ModuleSetModuleListRequest {
     }
 
     this.moduleSetId = Number(params.get('moduleSetId'));
-    this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
+    this.updaterLoginIdList = (params.get('updaterLoginIdList')) ? Array.from(params.get('updaterLoginIdList').split(',')) : [];
     this.updatedDate = {
       start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
       end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
@@ -178,8 +197,8 @@ export class ModuleSetModuleListRequest {
       .set('pageSize', '' + this.page.pageSize);
 
     params = params.set('moduleSetId', '' + this.moduleSetId);
-    if (this.updaterLoginIds && this.updaterLoginIds.length > 0) {
-      params = params.set('updaterLoginIds', this.updaterLoginIds.join(','));
+    if (this.updaterLoginIdList && this.updaterLoginIdList.length > 0) {
+      params = params.set('updaterLoginIdList', this.updaterLoginIdList.join(','));
     }
     if (this.updatedDate.start) {
       params = params.set('updatedDateStart', '' + this.updatedDate.start.toUTCString());
@@ -208,6 +227,44 @@ export class ModuleSetModule {
   assigned: boolean;
 }
 
+export class ModuleSetReleaseSummary {
+  library: LibrarySummary;
+  release: ReleaseSummary;
+  moduleSet: ModuleSetSummary;
+
+  moduleSetReleaseId: number;
+  name: string;
+  description: string;
+  isDefault: boolean;
+}
+
+export class ModuleSetReleaseListEntry {
+  moduleSetReleaseId: number;
+  moduleSetId: number;
+  libraryId: number;
+  releaseId: number;
+  releaseNum: string;
+  name: string;
+  description: string;
+  isDefault: boolean;
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+}
+
+export class ModuleSetReleaseDetails {
+  library: LibrarySummary;
+  release: ReleaseSummary;
+  moduleSet: ModuleSetSummary;
+
+  moduleSetReleaseId: number;
+  name: string;
+  description: string;
+  isDefault: boolean;
+
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+}
+
 export class ModuleSetRelease {
   moduleSetReleaseId: number;
 
@@ -225,7 +282,7 @@ export class ModuleSetRelease {
   /* library */
   libraryId: number;
 
-  default: boolean;
+  isDefault: boolean;
   createdBy: ScoreUser;
   lastUpdatedBy: ScoreUser;
   creationTimestamp: Date;
@@ -233,13 +290,13 @@ export class ModuleSetRelease {
 }
 
 export class ModuleSetReleaseListRequest {
-  library: Library = new Library();
+  library: LibrarySummary = new LibrarySummary();
   filters: {
     name: string;
   };
   releaseId: number;
   isDefault: boolean;
-  updaterLoginIds: string[] = [];
+  updaterLoginIdList: string[] = [];
   updatedDate: {
     start: Date,
     end: Date,
@@ -268,7 +325,7 @@ export class ModuleSetReleaseListRequest {
       this.page.pageSize = (defaultPageRequest) ? defaultPageRequest.pageSize : 0;
     }
 
-    this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
+    this.updaterLoginIdList = (params.get('updaterLoginIdList')) ? Array.from(params.get('updaterLoginIdList').split(',')) : [];
     this.updatedDate = {
       start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
       end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
@@ -291,8 +348,8 @@ export class ModuleSetReleaseListRequest {
       .set('pageIndex', '' + this.page.pageIndex)
       .set('pageSize', '' + this.page.pageSize);
 
-    if (this.updaterLoginIds && this.updaterLoginIds.length > 0) {
-      params = params.set('updaterLoginIds', this.updaterLoginIds.join(','));
+    if (this.updaterLoginIdList && this.updaterLoginIdList.length > 0) {
+      params = params.set('updaterLoginIdList', this.updaterLoginIdList.join(','));
     }
     if (this.updatedDate.start) {
       params = params.set('updatedDateStart', '' + this.updatedDate.start.toUTCString());

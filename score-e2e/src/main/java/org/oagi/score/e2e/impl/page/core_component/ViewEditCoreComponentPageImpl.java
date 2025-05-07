@@ -1,6 +1,5 @@
 package org.oagi.score.e2e.impl.page.core_component;
 
-import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.impl.page.BaseSearchBarPageImpl;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.BasePage;
@@ -56,6 +55,7 @@ public class ViewEditCoreComponentPageImpl extends BaseSearchBarPageImpl impleme
     public void openPage() {
         String url = getPageUrl();
         getDriver().get(url);
+        waitFor(ofSeconds(2L));
         assert "Core Component".equals(getText(getTitle()));
     }
 
@@ -317,30 +317,6 @@ public class ViewEditCoreComponentPageImpl extends BaseSearchBarPageImpl impleme
     }
 
     @Override
-    public DTViewEditPage openDTViewEditPageByDenAndBranch(String den, String branch) {
-        setBranch(branch);
-        openCoreComponentByDen(den);
-        // @TODO: Retrieve the name of the library from the UI.
-        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
-        List<DTObject> dtList = getAPIFactory().getCoreComponentAPI().getBDTByDENAndReleaseNum(library, den, branch);
-        if (dtList.size() > 1) {
-            throw new IllegalArgumentException("Found out more than one DT record by given arguments [DEN: " + den + ", Branch: " + branch + "]");
-        }
-        DTViewEditPage dtViewEditPage = new DTViewEditPageImpl(this, dtList.get(0));
-        assert dtViewEditPage.isOpened();
-        return dtViewEditPage;
-    }
-
-    @Override
-    public DTViewEditPage openDTViewEditPageByManifestID(BigInteger dtManifestID) {
-        DTObject dt = getAPIFactory().getCoreComponentAPI().getBDTByManifestId(dtManifestID);
-        DTViewEditPage dtViewEditPage = new DTViewEditPageImpl(this, dt);
-        dtViewEditPage.openPage();
-        assert dtViewEditPage.isOpened();
-        return dtViewEditPage;
-    }
-
-    @Override
     public TransferCCOwnershipDialog openTransferCCOwnershipDialog(WebElement tr) {
         WebElement td = getColumnByName(tr, "owner");
         click(td.findElement(By.className("mat-icon")));
@@ -409,23 +385,6 @@ public class ViewEditCoreComponentPageImpl extends BaseSearchBarPageImpl impleme
         BCCPCreateDialog bccpCreateDialog = new BCCPCreateDialogImpl(this, branch);
         assert bccpCreateDialog.isOpened();
         return bccpCreateDialog;
-    }
-
-    @Override
-    public WebElement getCreateDTButton() {
-        click(getDriver(), getCreateComponentButton());
-        return elementToBeClickable(getDriver(),
-                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]//button[contains(@class, \"mat-mdc-menu-item\")]//span[text() = \"DT\"]//ancestor::button"));
-    }
-
-    @Override
-    public DTCreateDialog openDTCreateDialog(String branch) {
-        setBranch(branch);
-        click(getCreateDTButton());
-
-        DTCreateDialog dtCreateDialog = new DTCreateDialogImpl(this, branch);
-        assert dtCreateDialog.isOpened();
-        return dtCreateDialog;
     }
 
     private void openCoreComponentByDen(String den) {
@@ -537,7 +496,7 @@ public class ViewEditCoreComponentPageImpl extends BaseSearchBarPageImpl impleme
             click(getDriver(), getTypeSelectField());
             visibilityOfElementLocated(getDriver(), By.xpath("//div[@class=\"cdk-overlay-container\"]"));
         });
-        List<String> componentTypes = new ArrayList<>(List.of("ACC", "ASCCP", "BCCP", "CDT", "BDT", "ASCC", "BCC"));
+        List<String> componentTypes = new ArrayList<>(List.of("ACC", "ASCCP", "BCCP"));
         boolean selected;
         for (String componentType : componentTypes) {
             WebElement optionField = elementToBeClickable(getDriver(),
@@ -548,27 +507,6 @@ public class ViewEditCoreComponentPageImpl extends BaseSearchBarPageImpl impleme
             }
         }
         escape(getDriver());
-    }
-
-    public DTViewEditPage createDT(String den, String branch) {
-        setBranch(branch);
-        click(getDriver(), getCreateDTButton());
-        waitFor(ofMillis(2000L));
-
-        DTCreateDialog dtCreateDialog = new DTCreateDialogImpl(this, branch);
-        assert dtCreateDialog.isOpened();
-        dtCreateDialog.selectBasedDTByDEN(den);
-        dtCreateDialog.hitCreateButton();
-        waitFor(ofMillis(2000L));
-        invisibilityOfLoadingContainerElement(getDriver());
-
-        String currentUrl = getDriver().getCurrentUrl();
-        BigInteger dtManifestId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
-
-        DTObject dt = getAPIFactory().getCoreComponentAPI().getBDTByManifestId(dtManifestId);
-        DTViewEditPage dtViewEditPage = new DTViewEditPageImpl(this, dt);
-        assert dtViewEditPage.isOpened();
-        return dtViewEditPage;
     }
 
     @Override

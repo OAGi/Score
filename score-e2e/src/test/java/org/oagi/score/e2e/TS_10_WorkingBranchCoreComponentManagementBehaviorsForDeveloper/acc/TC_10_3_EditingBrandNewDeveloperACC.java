@@ -234,7 +234,7 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
         getAPIFactory().getCoreComponentAPI().updateACC(acc);
         {
             viewEditCoreComponentPage.openPage();
-            waitFor(ofMillis(8000L));
+            waitFor(ofMillis(2000L));
             ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(randomASCCP1.getAsccpManifestId());
             ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPPanel();
             String asccpDEN = getText(asccpPanel.getDENField());
@@ -244,7 +244,7 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
 
         {
             viewEditCoreComponentPage.openPage();
-            waitFor(ofMillis(8000L));
+            waitFor(ofMillis(2000L));
             ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(randomASCCP2.getAsccpManifestId());
             ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPPanel();
             String asccpDEN = getText(asccpPanel.getDENField());
