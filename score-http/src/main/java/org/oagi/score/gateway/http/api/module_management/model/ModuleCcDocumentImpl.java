@@ -145,6 +145,11 @@ public class ModuleCcDocumentImpl implements ModuleCcDocument {
     }
 
     @Override
+    public List<DtSummaryRecord> getDtList() {
+        return delegate.getDtList();
+    }
+
+    @Override
     public DtScSummaryRecord getDtSc(DtScManifestId dtScManifestId) {
         return delegate.getDtSc(dtScManifestId);
     }

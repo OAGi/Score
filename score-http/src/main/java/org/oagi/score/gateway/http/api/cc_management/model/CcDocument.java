@@ -50,6 +50,8 @@ public interface CcDocument {
 
     DtSummaryRecord getDt(DtManifestId dtManifestId);
 
+    List<DtSummaryRecord> getDtList();
+
     DtScSummaryRecord getDtSc(DtScManifestId dtScManifestId);
 
     List<DtScSummaryRecord> getDtScList(DtManifestId dtManifestId);

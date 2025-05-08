@@ -33,6 +33,7 @@ import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Oagi;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AgencyIdListManifest.AgencyIdListManifestPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.CdtPri.CdtPriPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.CodeListManifest.CodeListManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtSc.DtScPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Release.ReleasePath;
@@ -85,6 +86,12 @@ public class DtScAwdPri extends TableImpl<DtScAwdPriRecord> {
      * DT_SC table.
      */
     public final TableField<DtScAwdPriRecord, ULong> DT_SC_ID = createField(DSL.name("dt_sc_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the DT_SC table.");
+
+    /**
+     * The column <code>oagi.dt_sc_awd_pri.cdt_pri_id</code>. Foreign key to the
+     * CDT_PRI table.
+     */
+    public final TableField<DtScAwdPriRecord, ULong> CDT_PRI_ID = createField(DSL.name("cdt_pri_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the CDT_PRI table.");
 
     /**
      * The column <code>oagi.dt_sc_awd_pri.xbt_manifest_id</code>. This is a
@@ -189,7 +196,7 @@ public class DtScAwdPri extends TableImpl<DtScAwdPriRecord> {
 
     @Override
     public List<ForeignKey<DtScAwdPriRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.DT_SC_AWD_PRI_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.DT_SC_AWD_PRI_CODE_LIST_MANIFEST_ID_FK, Keys.DT_SC_AWD_PRI_DT_ID_FK, Keys.DT_SC_AWD_PRI_RELEASE_ID_FK, Keys.DT_SC_AWD_PRI_XBT_MANIFEST_ID_FK);
+        return Arrays.asList(Keys.DT_SC_AWD_PRI_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.DT_SC_AWD_PRI_CDT_PRI_ID_FK, Keys.DT_SC_AWD_PRI_CODE_LIST_MANIFEST_ID_FK, Keys.DT_SC_AWD_PRI_DT_SC_ID_FK, Keys.DT_SC_AWD_PRI_RELEASE_ID_FK, Keys.DT_SC_AWD_PRI_XBT_MANIFEST_ID_FK);
     }
 
     private transient AgencyIdListManifestPath _agencyIdListManifest;
@@ -203,6 +210,18 @@ public class DtScAwdPri extends TableImpl<DtScAwdPriRecord> {
             _agencyIdListManifest = new AgencyIdListManifestPath(this, Keys.DT_SC_AWD_PRI_AGENCY_ID_LIST_MANIFEST_ID_FK, null);
 
         return _agencyIdListManifest;
+    }
+
+    private transient CdtPriPath _cdtPri;
+
+    /**
+     * Get the implicit join path to the <code>oagi.cdt_pri</code> table.
+     */
+    public CdtPriPath cdtPri() {
+        if (_cdtPri == null)
+            _cdtPri = new CdtPriPath(this, Keys.DT_SC_AWD_PRI_CDT_PRI_ID_FK, null);
+
+        return _cdtPri;
     }
 
     private transient CodeListManifestPath _codeListManifest;
@@ -225,7 +244,7 @@ public class DtScAwdPri extends TableImpl<DtScAwdPriRecord> {
      */
     public DtScPath dtSc() {
         if (_dtSc == null)
-            _dtSc = new DtScPath(this, Keys.DT_SC_AWD_PRI_DT_ID_FK, null);
+            _dtSc = new DtScPath(this, Keys.DT_SC_AWD_PRI_DT_SC_ID_FK, null);
 
         return _dtSc;
     }

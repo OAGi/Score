@@ -235,13 +235,15 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
                             RELEASE.STATE.as("release_state"),
 
                             DT_AWD_PRI.DT_ID,
+                            CDT_PRI.NAME.as("cdt_pri_name"),
                             DT_AWD_PRI.XBT_MANIFEST_ID,
                             DT_AWD_PRI.CODE_LIST_MANIFEST_ID,
                             DT_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID,
                             DT_AWD_PRI.IS_DEFAULT)
                     .from(DT_AWD_PRI)
                     .join(RELEASE).on(DT_AWD_PRI.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                    .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID));
+                    .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
+                    .join(CDT_PRI).on(DT_AWD_PRI.CDT_PRI_ID.eq(CDT_PRI.CDT_PRI_ID));
         }
 
         private RecordMapper<Record, DtAwdPriDetailsRecord> mapper() {
@@ -264,6 +266,7 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
                 return new DtAwdPriDetailsRecord(dtAwdPriId,
                         release,
                         dtId,
+                        record.get(CDT_PRI.NAME.as("cdt_pri_name")),
                         (xbtManifestId != null) ?
                                 repositoryFactory().xbtQueryRepository(requester()).getXbtSummary(xbtManifestId) : null,
                         (codeListManifestId != null) ?
@@ -773,9 +776,9 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
                             DT_AWD_PRI.IS_DEFAULT)
                     .from(DT_AWD_PRI)
                     .join(RELEASE).on(DT_AWD_PRI.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                    .leftJoin(CDT_PRI).on(DT_AWD_PRI.CDT_PRI_ID.eq(CDT_PRI.CDT_PRI_ID))
                     .leftJoin(XBT_MANIFEST).on(DT_AWD_PRI.XBT_MANIFEST_ID.eq(XBT_MANIFEST.XBT_MANIFEST_ID))
                     .leftJoin(XBT).on(XBT_MANIFEST.XBT_ID.eq(XBT.XBT_ID))
-                    .leftJoin(CDT_PRI).on(XBT_MANIFEST.CDT_PRI_ID.eq(CDT_PRI.CDT_PRI_ID))
                     .leftJoin(CODE_LIST_MANIFEST).on(DT_AWD_PRI.CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID))
                     .leftJoin(CODE_LIST).on(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
                     .leftJoin(AGENCY_ID_LIST_MANIFEST).on(DT_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID))
@@ -797,8 +800,8 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
                 return new DtAwdPriSummaryRecord(dtAwdPriId,
                         releaseId,
                         dtId,
-                        xbtManifestId,
                         record.get(CDT_PRI.NAME.as("cdt_pri_name")),
+                        xbtManifestId,
                         record.get(XBT.NAME.as("xbt_name")),
                         codeListManifestId,
                         record.get(CODE_LIST.NAME.as("code_list_name")),
@@ -1030,13 +1033,15 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
                             RELEASE.STATE.as("release_state"),
 
                             DT_SC_AWD_PRI.DT_SC_ID,
+                            CDT_PRI.NAME.as("cdt_pri_name"),
                             DT_SC_AWD_PRI.XBT_MANIFEST_ID,
                             DT_SC_AWD_PRI.CODE_LIST_MANIFEST_ID,
                             DT_SC_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID,
                             DT_SC_AWD_PRI.IS_DEFAULT)
                     .from(DT_SC_AWD_PRI)
                     .join(RELEASE).on(DT_SC_AWD_PRI.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                    .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID));
+                    .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
+                    .join(CDT_PRI).on(DT_SC_AWD_PRI.CDT_PRI_ID.eq(CDT_PRI.CDT_PRI_ID));
         }
 
         private RecordMapper<Record, DtScAwdPriDetailsRecord> mapper() {
@@ -1059,6 +1064,7 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
                 return new DtScAwdPriDetailsRecord(dtScAwdPriId,
                         release,
                         dtScId,
+                        record.get(CDT_PRI.NAME.as("cdt_pri_name")),
                         (xbtManifestId != null) ?
                                 repositoryFactory().xbtQueryRepository(requester()).getXbtSummary(xbtManifestId) : null,
                         (codeListManifestId != null) ?
@@ -1385,9 +1391,9 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
                             DT_SC_AWD_PRI.IS_DEFAULT)
                     .from(DT_SC_AWD_PRI)
                     .join(RELEASE).on(DT_SC_AWD_PRI.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                    .leftJoin(CDT_PRI).on(DT_SC_AWD_PRI.CDT_PRI_ID.eq(CDT_PRI.CDT_PRI_ID))
                     .leftJoin(XBT_MANIFEST).on(DT_SC_AWD_PRI.XBT_MANIFEST_ID.eq(XBT_MANIFEST.XBT_MANIFEST_ID))
                     .leftJoin(XBT).on(XBT_MANIFEST.XBT_ID.eq(XBT.XBT_ID))
-                    .leftJoin(CDT_PRI).on(XBT_MANIFEST.CDT_PRI_ID.eq(CDT_PRI.CDT_PRI_ID))
                     .leftJoin(CODE_LIST_MANIFEST).on(DT_SC_AWD_PRI.CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID))
                     .leftJoin(CODE_LIST).on(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
                     .leftJoin(AGENCY_ID_LIST_MANIFEST).on(DT_SC_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID))
@@ -1409,8 +1415,8 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
                 return new DtScAwdPriSummaryRecord(dtScAwdPriId,
                         releaseId,
                         dtScId,
-                        xbtManifestId,
                         record.get(CDT_PRI.NAME.as("cdt_pri_name")),
+                        xbtManifestId,
                         record.get(XBT.NAME.as("xbt_name")),
                         codeListManifestId,
                         record.get(CODE_LIST.NAME.as("code_list_name")),

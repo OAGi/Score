@@ -36,11 +36,11 @@ public abstract class AbstractBDTSimple implements BDTSimple {
     }
 
     public String getCdtPriName() {
-        XbtSummaryRecord xbt = getDefaultXbtManifest();
-        if (xbt == null) {
+        DtAwdPriSummaryRecord dtAwdPri = getDefaultDtAwdPri();
+        if (dtAwdPri == null) {
             return null;
         }
-        return xbt.cdtPriName();
+        return dtAwdPri.cdtPriName();
     }
 
     public String getXbtName() {

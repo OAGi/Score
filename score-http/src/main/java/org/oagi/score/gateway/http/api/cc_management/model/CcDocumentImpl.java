@@ -286,6 +286,11 @@ public class CcDocumentImpl implements CcDocument {
     }
 
     @Override
+    public List<DtSummaryRecord> getDtList() {
+        return new ArrayList<>(dtMap.values());
+    }
+
+    @Override
     public DtScSummaryRecord getDtSc(DtScManifestId dtScManifestId) {
         return dtScMap.get(dtScManifestId);
     }

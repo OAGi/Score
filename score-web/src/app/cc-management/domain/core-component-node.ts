@@ -344,6 +344,7 @@ export class DtAwdPriDetails {
   dtAwdPriId: number;
   release: ReleaseSummary;
   dtId: number;
+  cdtPriName: string;
   xbt: XbtSummary;
   codeList: CodeListSummary;
   agencyIdList: AgencyIdListSummary;
@@ -380,8 +381,8 @@ export class DtAwdPriSummary {
   dtAwdPriId: number;
   releaseId: number;
   dtId: number;
-  xbtManifestId: number;
   cdtPriName: string;
+  xbtManifestId: number;
   xbtName: string;
   codeListManifestId: number;
   codeListName: string;
@@ -430,6 +431,7 @@ export class DtScAwdPriDetails {
   dtScAwdPriId: number;
   release: ReleaseSummary;
   dtScId: number;
+  cdtPriName: string;
   xbt: XbtSummary;
   codeList: CodeListSummary;
   agencyIdList: AgencyIdListSummary;
@@ -465,8 +467,8 @@ export class DtScAwdPriSummary {
   dtScAwdPriId: number;
   releaseId: number;
   dtScId: number;
-  xbtManifestId: number;
   cdtPriName: string;
+  xbtManifestId: number;
   xbtName: string;
   codeListManifestId: number;
   codeListName: string;
@@ -479,7 +481,6 @@ export class DtScAwdPriSummary {
 export class XbtSummary {
   xbtManifestId: number;
   xbtId: number;
-  cdtPriName: string;
   name: string;
 }
 
@@ -1820,9 +1821,11 @@ export class CcDtNodeInfo extends CcNodeInfo {
     const dtAwdPriList = this.dtAwdPriList;
     for (const dtAwdPri of dtAwdPriList) {
       if (!!dtAwdPri.xbt) {
-        if (!this.primitiveMap.has(dtAwdPri.xbt.cdtPriName)) {
-          this.primitiveMap.set(dtAwdPri.xbt.cdtPriName, []);
+        if (!this.primitiveMap.has(dtAwdPri.cdtPriName)) {
+          this.primitiveMap.set(dtAwdPri.cdtPriName, []);
         }
+
+        console.log(dtAwdPri.cdtPriName + ', ' + dtAwdPri.xbt.name);
         const domainEntity = new class implements ValueDomainEntity {
           get self(): DtAwdPriDetails {
             return dtAwdPri;
@@ -1857,7 +1860,7 @@ export class CcDtNodeInfo extends CcNodeInfo {
           }
         };
         primitiveList.push(domainEntity);
-        this.primitiveMap.get(dtAwdPri.xbt.cdtPriName).push(domainEntity);
+        this.primitiveMap.get(dtAwdPri.cdtPriName).push(domainEntity);
       }
       if (!!dtAwdPri.codeList) {
         this.codeListList.push(new class implements ValueDomainEntity {
@@ -1936,8 +1939,8 @@ export class CcDtNodeInfo extends CcNodeInfo {
       this.dtAwdPriListByGroup.push({
         label: 'Primitive',
         list: primitiveList.sort((a, b) => {
-          const aName = a.self.xbt.cdtPriName + ' - ' + a.name;
-          const bName = b.self.xbt.cdtPriName + ' - ' + b.name;
+          const aName = a.self.cdtPriName + ' - ' + a.name;
+          const bName = b.self.cdtPriName + ' - ' + b.name;
           return compare(aName, bName);
         })
       });
@@ -2316,8 +2319,8 @@ export class CcDtScNodeInfo extends CcNodeInfo {
     const dtScAwdPriList = this.dtScAwdPriList;
     for (const dtScAwdPri of dtScAwdPriList) {
       if (!!dtScAwdPri.xbt) {
-        if (!this.primitiveMap.has(dtScAwdPri.xbt.cdtPriName)) {
-          this.primitiveMap.set(dtScAwdPri.xbt.cdtPriName, []);
+        if (!this.primitiveMap.has(dtScAwdPri.cdtPriName)) {
+          this.primitiveMap.set(dtScAwdPri.cdtPriName, []);
         }
         const domainEntity = new class implements ValueDomainEntity {
           get self(): DtScAwdPriDetails {
@@ -2353,7 +2356,7 @@ export class CcDtScNodeInfo extends CcNodeInfo {
           }
         };
         primitiveList.push(domainEntity);
-        this.primitiveMap.get(dtScAwdPri.xbt.cdtPriName).push(domainEntity);
+        this.primitiveMap.get(dtScAwdPri.cdtPriName).push(domainEntity);
       }
       if (!!dtScAwdPri.codeList) {
         this.codeListList.push(new class implements ValueDomainEntity {
@@ -2432,8 +2435,8 @@ export class CcDtScNodeInfo extends CcNodeInfo {
       this.dtScAwdPriListByGroup.push({
         label: 'Primitive',
         list: primitiveList.sort((a, b) => {
-          const aName = a.self.xbt.cdtPriName + ' - ' + a.name;
-          const bName = b.self.xbt.cdtPriName + ' - ' + b.name;
+          const aName = a.self.cdtPriName + ' - ' + a.name;
+          const bName = b.self.cdtPriName + ' - ' + b.name;
           return compare(aName, bName);
         })
       });

@@ -249,6 +249,7 @@ public class CcQueryService {
                         null,
                         dtAwdPri.release(),
                         dtSc.dtScId(),
+                        dtAwdPri.cdtPriName(),
                         dtAwdPri.xbt(),
                         dtAwdPri.codeList(),
                         dtAwdPri.agencyIdList(),

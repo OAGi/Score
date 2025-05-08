@@ -410,7 +410,7 @@ public class DtSc extends TableImpl<DtScRecord> {
      */
     public DtScAwdPriPath dtScAwdPri() {
         if (_dtScAwdPri == null)
-            _dtScAwdPri = new DtScAwdPriPath(this, null, Keys.DT_SC_AWD_PRI_DT_ID_FK.getInverseKey());
+            _dtScAwdPri = new DtScAwdPriPath(this, null, Keys.DT_SC_AWD_PRI_DT_SC_ID_FK.getInverseKey());
 
         return _dtScAwdPri;
     }

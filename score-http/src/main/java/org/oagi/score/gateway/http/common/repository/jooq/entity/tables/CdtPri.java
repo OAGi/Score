@@ -32,7 +32,8 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Oagi;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.XbtManifest.XbtManifestPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtAwdPri.DtAwdPriPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtScAwdPri.DtScAwdPriPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.CdtPriRecord;
 
 
@@ -151,17 +152,30 @@ public class CdtPri extends TableImpl<CdtPriRecord> {
         return Arrays.asList(Keys.KEY_CDT_PRI_CDT_PRI_UK1);
     }
 
-    private transient XbtManifestPath _xbtManifest;
+    private transient DtAwdPriPath _dtAwdPri;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.xbt_manifest</code>
+     * Get the implicit to-many join path to the <code>oagi.dt_awd_pri</code>
      * table
      */
-    public XbtManifestPath xbtManifest() {
-        if (_xbtManifest == null)
-            _xbtManifest = new XbtManifestPath(this, null, Keys.XBT_MANIFEST_CDT_PRI_ID_FK.getInverseKey());
+    public DtAwdPriPath dtAwdPri() {
+        if (_dtAwdPri == null)
+            _dtAwdPri = new DtAwdPriPath(this, null, Keys.DT_AWD_PRI_CDT_PRI_ID_FK.getInverseKey());
 
-        return _xbtManifest;
+        return _dtAwdPri;
+    }
+
+    private transient DtScAwdPriPath _dtScAwdPri;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.dt_sc_awd_pri</code>
+     * table
+     */
+    public DtScAwdPriPath dtScAwdPri() {
+        if (_dtScAwdPri == null)
+            _dtScAwdPri = new DtScAwdPriPath(this, null, Keys.DT_SC_AWD_PRI_CDT_PRI_ID_FK.getInverseKey());
+
+        return _dtScAwdPri;
     }
 
     @Override

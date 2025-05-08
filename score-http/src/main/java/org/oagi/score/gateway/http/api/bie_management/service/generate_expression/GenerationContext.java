@@ -132,6 +132,11 @@ public class GenerationContext implements InitializingBean, CcDocument {
     }
 
     @Override
+    public List<DtSummaryRecord> getDtList() {
+        return ccDocument.getDtList();
+    }
+
+    @Override
     public DtScSummaryRecord getDtSc(DtScManifestId dtScManifestId) {
         return ccDocument.getDtSc(dtScManifestId);
     }

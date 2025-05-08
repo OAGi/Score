@@ -1212,9 +1212,9 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                             DT_MANIFEST.DT_ID.eq(DT_AWD_PRI.DT_ID),
                             DT_AWD_PRI.IS_DEFAULT.eq((byte) 1)
                     ))
+                    .leftJoin(CDT_PRI).on(DT_AWD_PRI.CDT_PRI_ID.eq(CDT_PRI.CDT_PRI_ID))
                     .leftJoin(XBT_MANIFEST).on(DT_AWD_PRI.XBT_MANIFEST_ID.eq(XBT_MANIFEST.XBT_MANIFEST_ID))
                     .leftJoin(XBT).on(XBT_MANIFEST.XBT_ID.eq(XBT.XBT_ID))
-                    .leftJoin(CDT_PRI).on(XBT_MANIFEST.CDT_PRI_ID.eq(CDT_PRI.CDT_PRI_ID))
                     .leftJoin(CODE_LIST_MANIFEST).on(DT_AWD_PRI.CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID))
                     .leftJoin(CODE_LIST).on(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
                     .leftJoin(AGENCY_ID_LIST_MANIFEST).on(DT_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID))

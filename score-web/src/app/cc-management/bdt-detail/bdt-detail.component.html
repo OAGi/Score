@@ -649,7 +649,7 @@
                                     <mat-optgroup *ngFor="let valueDomain of asBdtDetail().dtAwdPriListByGroup"
                                                   [label]="valueDomain.label">
                                       <mat-option *ngFor="let item of valueDomain.list" [value]="item" [disabled]="!isEditable()">
-                                        {{ (item.type === 'Primitive') ? item.self.xbt.cdtPriName + ' - ' + item.name : item.name }}
+                                        {{ (item.type === 'Primitive') ? item.self.cdtPriName + ' - ' + item.name : item.name }}
                                       </mat-option>
                                     </mat-optgroup>
                                   </mat-select>
@@ -1006,7 +1006,7 @@
                                     <mat-optgroup *ngFor="let valueDomain of asDtScDetail().dtScAwdPriListByGroup"
                                                   [label]="valueDomain.label">
                                       <mat-option *ngFor="let item of valueDomain.list" [value]="item" [disabled]="!isEditable()">
-                                        {{ (item.type === 'Primitive') ? item.self.xbt.cdtPriName + ' - ' + item.name : item.name }}
+                                        {{ (item.type === 'Primitive') ? item.self.cdtPriName + ' - ' + item.name : item.name }}
                                       </mat-option>
                                     </mat-optgroup>
                                   </mat-select>

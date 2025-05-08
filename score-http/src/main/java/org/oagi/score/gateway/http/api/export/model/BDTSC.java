@@ -83,7 +83,7 @@ public class BDTSC implements Component {
 
     public String getCdtPriName() {
         ensureTypeName();
-        return (xbt != null) ? xbt.cdtPriName() : null;
+        return (dtScAwdPri != null) ? dtScAwdPri.cdtPriName() : null;
     }
 
     public AgencyIdListSummaryRecord getAgencyIdList() {

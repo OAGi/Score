@@ -9,6 +9,7 @@ public record DtAwdPriDetailsRecord(
         DtAwdPriId dtAwdPriId,
         ReleaseSummaryRecord release,
         DtId dtId,
+        String cdtPriName,
         XbtSummaryRecord xbt,
         CodeListSummaryRecord codeList,
         AgencyIdListSummaryRecord agencyIdList,

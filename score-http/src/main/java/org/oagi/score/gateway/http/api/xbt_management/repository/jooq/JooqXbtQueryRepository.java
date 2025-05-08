@@ -68,7 +68,6 @@ public class JooqXbtQueryRepository extends JooqBaseRepository implements XbtQue
                             XBT.XBT_ID,
                             XBT.SUBTYPE_OF_XBT_ID, XBT_MANIFEST.RELEASE_ID,
                             XBT.GUID,
-                            CDT_PRI.NAME.as("cdt_pri_name"),
                             XBT.NAME,
                             XBT.BUILTIN_TYPE,
                             XBT.JBT_DRAFT05_MAP,
@@ -76,8 +75,7 @@ public class JooqXbtQueryRepository extends JooqBaseRepository implements XbtQue
                             XBT.AVRO_MAP,
                             XBT.SCHEMA_DEFINITION)
                     .from(XBT_MANIFEST)
-                    .join(XBT).on(XBT_MANIFEST.XBT_ID.eq(XBT.XBT_ID))
-                    .leftJoin(CDT_PRI).on(XBT_MANIFEST.CDT_PRI_ID.eq(CDT_PRI.CDT_PRI_ID));
+                    .join(XBT).on(XBT_MANIFEST.XBT_ID.eq(XBT.XBT_ID));
         }
 
         private RecordMapper<Record, XbtSummaryRecord> mapper() {
@@ -102,7 +100,6 @@ public class JooqXbtQueryRepository extends JooqBaseRepository implements XbtQue
                                     return new XbtManifestId(r.get(XBT_MANIFEST.XBT_MANIFEST_ID).toBigInteger());
                                 }).orElse(null) : null,
                         new Guid(record.get(XBT.GUID)),
-                        record.get(CDT_PRI.NAME.as("cdt_pri_name")),
                         record.get(XBT.NAME),
                         record.get(XBT.BUILTIN_TYPE),
 

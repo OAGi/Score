@@ -459,17 +459,25 @@ public class XMLExportSchemaModuleVisitor {
 
         DtAwdPriSummaryRecord defaultDtAwdPri = bdtSimple.getDefaultDtAwdPri();
         if (defaultDtAwdPri != null) {
+            boolean defaultIndicator;
             DtSummaryRecord cdt = getCDT(bdtSimple.getBdtManifestId());
-            DtAwdPriSummaryRecord defaultCdtAwdPri = ccDocument.getDtAwdPriList(cdt.dtManifestId()).stream()
-                    .filter(e -> e.isDefault()).findAny().get();
+            if (cdt != null) {
+                DtAwdPriSummaryRecord cdtAwdPri =
+                        this.ccDocument.getDtAwdPriList(cdt.dtManifestId()).stream()
+                                .filter(e -> e.isDefault())
+                                .findAny().orElse(null);
+                defaultIndicator = cdtAwdPri.cdtPriName().equals(defaultDtAwdPri.cdtPriName());
+            } else {
+                defaultIndicator = false;
+            }
 
             Element ccts_DefaultIndicator = new Element("ccts_DefaultIndicator", OAGI_NS);
             ccts_ContentComponentValueDomain.addContent(ccts_DefaultIndicator);
-            ccts_DefaultIndicator.setText(isSamePrimitive(defaultDtAwdPri, defaultCdtAwdPri) ? "True" : "False");
+            ccts_DefaultIndicator.setText(defaultIndicator ? "True" : "False");
 
             Element ccts_PrimitiveTypeName = new Element("ccts_PrimitiveTypeName", OAGI_NS);
             ccts_ContentComponentValueDomain.addContent(ccts_PrimitiveTypeName);
-            String primitiveTypeName = defaultDtAwdPri.cdtPriName();
+            String primitiveTypeName = bdtSimple.getCdtPriName();
             ccts_PrimitiveTypeName.setText(primitiveTypeName);
         }
     }
@@ -671,17 +679,43 @@ public class XMLExportSchemaModuleVisitor {
         Element ccts_SupplementaryComponentValueDomain = new Element("ccts_SupplementaryComponentValueDomain", OAGI_NS);
         documentationElement.addContent(ccts_SupplementaryComponentValueDomain);
 
-        XbtSummaryRecord xbt = dtSc.getXbt();
-        if (xbt != null) {
+        DtScAwdPriSummaryRecord defaultDtScAwdPri = dtSc.getDtScAwdPri();
+        if (defaultDtScAwdPri != null) {
+            DtScSummaryRecord cdtSc = getCDTSC(dtSc.getDtSc().dtScManifestId());
             Element ccts_DefaultIndicator = new Element("ccts_DefaultIndicator", OAGI_NS);
             ccts_SupplementaryComponentValueDomain.addContent(ccts_DefaultIndicator);
-            DtScAwdPriSummaryRecord defaultDtScAwdPri = dtSc.getDtScAwdPri();
+            boolean defaultIndicator;
+            if (cdtSc != null) {
+                DtScAwdPriSummaryRecord cdtScAwdPri =
+                        this.ccDocument.getDtScAwdPriList(cdtSc.dtScManifestId()).stream()
+                                .filter(e -> e.isDefault())
+                                .findAny().orElse(null);
 
-            DtScSummaryRecord cdtSc = getCDTSC(dtSc.getDtSc().dtScManifestId());
-            DtScAwdPriSummaryRecord defaultCdtScAwdPri = ccDocument.getDtScAwdPriList(cdtSc.dtScManifestId()).stream()
-                    .filter(e -> e.isDefault()).findAny().get();
+                defaultIndicator = cdtScAwdPri.cdtPriName().equals(defaultDtScAwdPri.cdtPriName());
+            } else {
 
-            ccts_DefaultIndicator.setText(isSamePrimitive(defaultDtScAwdPri, defaultCdtScAwdPri) ? "True" : "False");
+                // For CDT_SCs not defined in CCTS, the corresponding CDT is identified through the Representation Term,
+                // and the default status is determined based on the CDT_AWD_PRI.
+                List<DtSummaryRecord> dtList = ccDocument.getDtList();
+                DtSummaryRecord cdtByRepresentationTerm = dtList.stream()
+                        .filter(e -> e.library().name().equals("CCTS Data Type Catalogue v3") &&
+                                e.release().releaseNum().equals("3.1"))
+                        .filter(e -> e.dataTypeTerm().equals(dtSc.getDtSc().representationTerm()))
+                        .filter(e -> e.basedDtManifestId() == null)
+                        .findAny().orElse(null);
+                DtAwdPriSummaryRecord defaultCdtAwdPri = null;
+                if (cdtByRepresentationTerm != null) {
+                    defaultCdtAwdPri = this.ccDocument.getDtAwdPriList(cdtByRepresentationTerm.dtManifestId()).stream()
+                            .filter(e -> e.isDefault())
+                            .findAny().orElse(null);
+                }
+
+                // If the CDT for a CDT_SC cannot be found, the default is set to False.
+                defaultIndicator = (defaultCdtAwdPri != null) ?
+                        defaultCdtAwdPri.cdtPriName().equals(defaultDtScAwdPri.cdtPriName()) : false;
+            }
+
+            ccts_DefaultIndicator.setText(defaultIndicator ? "True" : "False");
 
             Element ccts_PrimitiveTypeName = new Element("ccts_PrimitiveTypeName", OAGI_NS);
             ccts_SupplementaryComponentValueDomain.addContent(ccts_PrimitiveTypeName);
@@ -792,7 +826,9 @@ public class XMLExportSchemaModuleVisitor {
     private DtScSummaryRecord getCDTSC(DtScManifestId dtScManifestId) {
         DtScSummaryRecord dtSc = ccDocument.getDtSc(dtScManifestId);
         if (dtSc.basedDtScManifestId() == null) {
-            return dtSc;
+            DtSummaryRecord ownerDt = ccDocument.getDt(dtSc.ownerDtManifestId());
+            // If the ownerDt is not CDT, DT_SC is not a CDT_SC.
+            return (ownerDt.basedDtManifestId() == null) ? dtSc : null;
         }
         return getCDTSC(dtSc.basedDtScManifestId());
     }

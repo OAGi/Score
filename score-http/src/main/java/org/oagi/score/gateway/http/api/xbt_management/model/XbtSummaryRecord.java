@@ -6,7 +6,6 @@ public record XbtSummaryRecord(XbtManifestId xbtManifestId,
                                XbtId xbtId,
                                XbtManifestId subTypeOfXbtId,
                                Guid guid,
-                               String cdtPriName,
                                String name,
                                String builtInType,
 
