@@ -3,7 +3,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
-import {AccountList, AccountListRequest} from '../domain/accounts';
+import {AccountListEntry, AccountListRequest} from '../domain/accounts';
 import {AccountListService} from '../domain/account-list.service';
 import {AuthService} from '../../authentication/auth.service';
 import {PageRequest} from '../../basis/basis';
@@ -120,7 +120,7 @@ export class AccountListComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<AccountList>();
+  dataSource = new MatTableDataSource<AccountListEntry>();
   loading = false;
 
   request: AccountListRequest;

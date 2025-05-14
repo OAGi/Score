@@ -18,7 +18,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.BbieSc;
  * associated with the DT are stored in the BBIE table, while this table stores
  * the constraints associated with the DT's SCs. 
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -122,38 +122,34 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
     }
 
     /**
-     * Setter for <code>oagi.bbie_sc.dt_sc_pri_restri_id</code>. This must be
-     * one of the allowed primitive/code list as specified in the corresponding
-     * SC of the based BCC of the BBIE (referred to by the BBIE_ID column).
+     * Setter for <code>oagi.bbie_sc.xbt_manifest_id</code>. This must be one of
+     * the allowed primitive as specified in the corresponding SC of the based
+     * BCC of the BBIE (referred to by the BBIE_ID column).
      * 
-     * It is the foreign key to the BDT_SC_PRI_RESTRI table. It indicates the
-     * primitive assigned to the BBIE (or also can be viewed as assigned to the
-     * BBIEP for this specific association). This is assigned by the user who
-     * authors the BIE. The assignment would override the default from the CC
-     * side.
+     * It is the foreign key to the XBT_MANIFEST table. This is assigned by the
+     * user who authors the BIE. The assignment would override the default from
+     * the CC side.
      * 
      * This column, the CODE_LIST_ID column, and AGENCY_ID_LIST_ID column cannot
      * have a value at the same time.
      */
-    public void setDtScPriRestriId(ULong value) {
+    public void setXbtManifestId(ULong value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie_sc.dt_sc_pri_restri_id</code>. This must be
-     * one of the allowed primitive/code list as specified in the corresponding
-     * SC of the based BCC of the BBIE (referred to by the BBIE_ID column).
+     * Getter for <code>oagi.bbie_sc.xbt_manifest_id</code>. This must be one of
+     * the allowed primitive as specified in the corresponding SC of the based
+     * BCC of the BBIE (referred to by the BBIE_ID column).
      * 
-     * It is the foreign key to the BDT_SC_PRI_RESTRI table. It indicates the
-     * primitive assigned to the BBIE (or also can be viewed as assigned to the
-     * BBIEP for this specific association). This is assigned by the user who
-     * authors the BIE. The assignment would override the default from the CC
-     * side.
+     * It is the foreign key to the XBT_MANIFEST table. This is assigned by the
+     * user who authors the BIE. The assignment would override the default from
+     * the CC side.
      * 
      * This column, the CODE_LIST_ID column, and AGENCY_ID_LIST_ID column cannot
      * have a value at the same time.
      */
-    public ULong getDtScPriRestriId() {
+    public ULong getXbtManifestId() {
         return (ULong) get(6);
     }
 
@@ -570,7 +566,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
     /**
      * Create a detached, initialised BbieScRecord
      */
-    public BbieScRecord(ULong bbieScId, String guid, ULong basedDtScManifestId, String path, String hashPath, ULong bbieId, ULong dtScPriRestriId, ULong codeListManifestId, ULong agencyIdListManifestId, Integer cardinalityMin, Integer cardinalityMax, ULong facetMinLength, ULong facetMaxLength, String facetPattern, String defaultValue, String fixedValue, String definition, String example, String remark, String bizTerm, String displayName, Byte isUsed, Byte isDeprecated, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, ULong ownerTopLevelAsbiepId) {
+    public BbieScRecord(ULong bbieScId, String guid, ULong basedDtScManifestId, String path, String hashPath, ULong bbieId, ULong xbtManifestId, ULong codeListManifestId, ULong agencyIdListManifestId, Integer cardinalityMin, Integer cardinalityMax, ULong facetMinLength, ULong facetMaxLength, String facetPattern, String defaultValue, String fixedValue, String definition, String example, String remark, String bizTerm, String displayName, Byte isUsed, Byte isDeprecated, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, ULong ownerTopLevelAsbiepId) {
         super(BbieSc.BBIE_SC);
 
         setBbieScId(bbieScId);
@@ -579,7 +575,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
         setPath(path);
         setHashPath(hashPath);
         setBbieId(bbieId);
-        setDtScPriRestriId(dtScPriRestriId);
+        setXbtManifestId(xbtManifestId);
         setCodeListManifestId(codeListManifestId);
         setAgencyIdListManifestId(agencyIdListManifestId);
         setCardinalityMin(cardinalityMin);
@@ -601,6 +597,6 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
         setOwnerTopLevelAsbiepId(ownerTopLevelAsbiepId);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

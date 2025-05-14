@@ -47,7 +47,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BbiepRecord;
  * BBIEP represents the usage of basic property in a specific business context.
  * It is a contextualization of a BCCP.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Bbiep extends TableImpl<BbiepRecord> {
 
     private static final long serialVersionUID = 1L;

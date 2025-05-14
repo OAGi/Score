@@ -319,7 +319,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
             codeListForTesting.add(codeListCandidate);
 
             CodeListObject codeListPublished = getAPIFactory().getCodeListAPI().
-                    createRandomCodeList(endUser, namespace, release, "codeListPublished");
+                    createRandomCodeList(endUser, namespace, release, "Published");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListPublished, endUser);
             codeListForTesting.add(codeListPublished);
         }

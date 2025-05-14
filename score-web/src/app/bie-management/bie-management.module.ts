@@ -45,6 +45,7 @@ import {BiePackageModule} from './bie-package/bie-package.module';
 import {SearchBarModule} from '../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../common/column-selector/column-selector.module';
 import {TitleWithLibrarySelector} from '../common/title-with-library-selector/title-with-library-selector';
+import {BieDiagramDialogComponent} from './bie-diagram-dialog/bie-diagram-dialog.component';
 
 const routes: Routes = [
   {
@@ -166,7 +167,8 @@ const routes: Routes = [
     BieReportComponent,
     BieEditComponent,
     BieDeprecateDialogComponent,
-    ReuseBieDialogComponent
+    ReuseBieDialogComponent,
+    BieDiagramDialogComponent
   ],
   providers: [
     ReleaseService,

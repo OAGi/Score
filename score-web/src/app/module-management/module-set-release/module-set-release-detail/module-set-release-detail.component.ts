@@ -11,14 +11,14 @@ import {AuthService} from '../../../authentication/auth.service';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 import {hashCode} from '../../../common/utility';
 import {ReleaseService} from '../../../release-management/domain/release.service';
-import {ModuleSet, ModuleSetListRequest, ModuleSetRelease, ModuleSetReleaseListRequest} from '../../domain/module';
+import {ModuleSetReleaseDetails, ModuleSetReleaseListRequest, ModuleSetSummary} from '../../domain/module';
 import {ModuleService} from '../../domain/module.service';
 import {UserToken} from '../../../authentication/domain/auth';
 import {PageRequest} from '../../../basis/basis';
 import {
   ModuleSetReleaseValidationDialogComponent
 } from './module-set-release-validation-dialog/module-set-release-validation-dialog.component';
-import {SimpleRelease} from '../../../release-management/domain/release';
+import {ReleaseSummary} from '../../../release-management/domain/release';
 
 @Component({
   selector: 'score-module-set-detail',
@@ -29,14 +29,14 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
 
   title: string;
   isUpdating: boolean;
-  moduleSetRelease: ModuleSetRelease = new ModuleSetRelease();
+  moduleSetRelease: ModuleSetReleaseDetails = new ModuleSetReleaseDetails();
 
   moduleSetListFilterCtrl: FormControl = new FormControl();
   releaseListFilterCtrl: FormControl = new FormControl();
-  filteredModuleSetList: ReplaySubject<ModuleSet[]> = new ReplaySubject<ModuleSet[]>(1);
-  filteredReleaseList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
-  moduleSetList: ModuleSet[] = [];
-  releaseList: SimpleRelease[] = [];
+  filteredModuleSetList: ReplaySubject<ModuleSetSummary[]> = new ReplaySubject<ModuleSetSummary[]>(1);
+  filteredReleaseList: ReplaySubject<ReleaseSummary[]> = new ReplaySubject<ReleaseSummary[]>(1);
+  moduleSetList: ModuleSetSummary[] = [];
+  releaseList: ReleaseSummary[] = [];
 
   private $hashCode: string;
 
@@ -63,21 +63,16 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
     this.route.paramMap.pipe(
       switchMap((params: ParamMap) => {
         const moduleSetReleaseId = Number(params.get('moduleSetReleaseId'));
-        return this.moduleService.getModuleSetRelease(moduleSetReleaseId);
+        return this.moduleService.getModuleSetReleaseDetails(moduleSetReleaseId);
       }))
       .subscribe(moduleSetRelease => {
         this.init(moduleSetRelease);
 
-        const request = new ModuleSetListRequest();
-        request.library.libraryId = moduleSetRelease.libraryId;
-        request.page.pageIndex = -1;
-        request.page.pageSize = -1;
-
-        this.moduleService.getModuleSetList(request).subscribe(resp => {
-          this.initModuleSetList(resp.results);
+        this.moduleService.getModuleSetSummaries(moduleSetRelease.library.libraryId).subscribe(resp => {
+          this.initModuleSetList(resp);
         });
 
-        this.releaseService.getSimpleReleases(moduleSetRelease.libraryId).subscribe(list => {
+        this.releaseService.getReleaseSummaryList(moduleSetRelease.library.libraryId).subscribe(list => {
           this.initReleaseList(list);
         });
       });
@@ -92,12 +87,12 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
     return (userToken) ? userToken.roles : [];
   }
 
-  init(moduleSetRelease: ModuleSetRelease) {
+  init(moduleSetRelease: ModuleSetReleaseDetails) {
     this.moduleSetRelease = moduleSetRelease;
     this.$hashCode = hashCode(this.moduleSetRelease);
   }
 
-  initModuleSetList(list: ModuleSet[]) {
+  initModuleSetList(list: ModuleSetSummary[]) {
     this.moduleSetList.push(...list);
     this.moduleSetListFilterCtrl.valueChanges
       .subscribe(() => {
@@ -115,7 +110,7 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
     this.filteredModuleSetList.next(this.moduleSetList.slice());
   }
 
-  initReleaseList(list: SimpleRelease[]) {
+  initReleaseList(list: ReleaseSummary[]) {
     this.releaseList.push(...list);
     this.releaseListFilterCtrl.valueChanges
       .subscribe(() => {
@@ -190,19 +185,19 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
      * #1280
      * If there is another default module set release, it shows a dialog to get a confirmation from the user.
      */
-    if (this.moduleSetRelease.default) {
+    if (this.moduleSetRelease.isDefault) {
       const request = new ModuleSetReleaseListRequest();
       request.page = new PageRequest('lastUpdateTimestamp', 'desc', 0, 10);
-      request.library.libraryId = this.moduleSetRelease.libraryId;
-      request.releaseId = this.moduleSetRelease.releaseId;
+      request.library.libraryId = this.moduleSetRelease.library.libraryId;
+      request.releaseId = this.moduleSetRelease.release.releaseId;
       request.isDefault = true;
       this.moduleService.getModuleSetReleaseList(request).subscribe(resp => {
-        const results = resp.results.filter(e => this.moduleSetRelease.moduleSetReleaseId !== e.moduleSetReleaseId);
+        const results = resp.list.filter(e => this.moduleSetRelease.moduleSetReleaseId !== e.moduleSetReleaseId);
         if (results.length > 0) {
           const dialogConfig = this.confirmDialogService.newConfig();
           dialogConfig.data.header = 'Update default module set release?';
           dialogConfig.data.content = [
-            'There is another default module set release, \'' + results[0].moduleSetReleaseName + '\' for \'' +
+            'There is another default module set release, \'' + results[0].name + '\' for \'' +
             results[0].releaseNum + '\' branch.',
             'Are you sure you want to update this module set release as a default?',
           ];
@@ -226,18 +221,18 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
   doUpdateModuleSetRelease() {
     const request = new ModuleSetReleaseListRequest();
     request.page = new PageRequest('lastUpdateTimestamp', 'desc', 0, 10);
-    request.library.libraryId = this.moduleSetRelease.libraryId;
-    request.releaseId = this.moduleSetRelease.releaseId;
-    request.filters.name = this.moduleSetRelease.moduleSetReleaseName;
+    request.library.libraryId = this.moduleSetRelease.library.libraryId;
+    request.releaseId = this.moduleSetRelease.release.releaseId;
+    request.filters.name = this.moduleSetRelease.name;
     this.moduleService.getModuleSetReleaseList(request).subscribe(resp => {
-      const results = resp.results.filter(e => this.moduleSetRelease.moduleSetReleaseId !== e.moduleSetReleaseId);
+      const results = resp.list.filter(e => this.moduleSetRelease.moduleSetReleaseId !== e.moduleSetReleaseId);
       if (results.length > 0 &&
-        results[0].moduleSetReleaseName === this.moduleSetRelease.moduleSetReleaseName) {
+        results[0].name === this.moduleSetRelease.name) {
 
         const dialogConfig = this.confirmDialogService.newConfig();
         dialogConfig.data.header = 'Update module set release?';
         dialogConfig.data.content = [
-          'There is another same module set release, \'' + results[0].moduleSetReleaseName + '\' for \'' +
+          'There is another same module set release, \'' + results[0].name + '\' for \'' +
           results[0].releaseNum + '\' branch.',
           'Are you sure you want to update this module set release?',
         ];
@@ -259,16 +254,19 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
     this.isUpdating = true;
 
     this.moduleService.updateModuleSetRelease(this.moduleSetRelease)
-      .pipe(finalize(() => {
-        this.isUpdating = false;
-      }))
-      .subscribe(moduleSetRelease => {
-        this.snackBar.open('Updated', '', {
-          duration: 3000,
+        .pipe(finalize(() => {
+          this.isUpdating = false;
+        }))
+        .subscribe(_ => {
+          this.snackBar.open('Updated', '', {
+            duration: 3000,
+          });
+
+          this.moduleService.getModuleSetReleaseDetails(this.moduleSetRelease.moduleSetReleaseId).subscribe(moduleSetRelease => {
+            this.moduleSetRelease = moduleSetRelease;
+            this.$hashCode = hashCode(this.moduleSetRelease);
+          });
         });
-        this.moduleSetRelease = moduleSetRelease;
-        this.$hashCode = hashCode(this.moduleSetRelease);
-      });
   }
 
   assignCCs() {

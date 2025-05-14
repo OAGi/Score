@@ -21,7 +21,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeListValue;
  * because the USED_INDICATOR of such code list value is FALSE by default and
  * can no longer be changed.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class CodeListValueRecord extends UpdatableRecordImpl<CodeListValueRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -365,6 +365,6 @@ public class CodeListValueRecord extends UpdatableRecordImpl<CodeListValueRecord
         setLastUpdateTimestamp(lastUpdateTimestamp);
         setPrevCodeListValueId(prevCodeListValueId);
         setNextCodeListValueId(nextCodeListValueId);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

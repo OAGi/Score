@@ -1,8 +1,7 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {Namespace, NamespaceList, NamespaceListRequest, SimpleNamespace} from './namespace';
-import {SimpleModule} from '../../module-management/domain/module';
+import {NamespaceDetails, NamespaceListEntry, NamespaceListRequest, NamespaceSummary} from './namespace';
 import {PageResponse} from '../../basis/basis';
 import {map} from 'rxjs/operators';
 
@@ -12,27 +11,17 @@ export class NamespaceService {
   constructor(private http: HttpClient) {
   }
 
-  getNamespaceList(request: NamespaceListRequest): Observable<PageResponse<NamespaceList>> {
+  getNamespaceList(request: NamespaceListRequest): Observable<PageResponse<NamespaceListEntry>> {
     let params = new HttpParams()
-      .set('libraryId', '' + request.library.libraryId)
-      .set('sortActive', request.page.sortActive)
-      .set('sortDirection', request.page.sortDirection)
-      .set('pageIndex', '' + request.page.pageIndex)
-      .set('pageSize', '' + request.page.pageSize);
-    if (request.ownerLoginIds.length > 0) {
-      params = params.set('ownerLoginIds', request.ownerLoginIds.join(','));
-    }
-    if (request.updaterLoginIds.length > 0) {
-      params = params.set('updaterLoginIds', request.updaterLoginIds.join(','));
+        .set('libraryId', '' + request.library.libraryId)
+        .set('pageIndex', '' + request.page.pageIndex)
+        .set('pageSize', '' + request.page.pageSize);
+
+    if (!!request.page.sortActive && !!request.page.sortDirection) {
+      params = params.set('orderBy', ((request.page.sortDirection === 'desc') ? '-' : '+') + request.page.sortActive);
     }
     if (request.standard.length > 0) {
       params = params.set('standard', request.standard.join(','));
-    }
-    if (request.updatedDate.start) {
-      params = params.set('updateStart', '' + request.updatedDate.start.getTime());
-    }
-    if (request.updatedDate.end) {
-      params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
     }
     if (request.filters.uri) {
       params = params.set('uri', request.filters.uri);
@@ -43,30 +32,42 @@ export class NamespaceService {
     if (request.filters.description) {
       params = params.set('description', request.filters.description);
     }
-    return this.http.get<PageResponse<NamespaceList>>('/api/namespace_list', {params})
-      .pipe(map((resp: PageResponse<NamespaceList>) => {
-        resp.list.forEach(e => {
-          e.lastUpdateTimestamp = new Date(e.lastUpdateTimestamp);
-        });
-        return resp;
-      }));
+    if (request.ownerLoginIdList.length > 0) {
+      params = params.set('ownerLoginIdList', request.ownerLoginIdList.join(','));
+    }
+    if (request.updaterLoginIdList.length > 0) {
+      params = params.set('updaterLoginIdList', request.updaterLoginIdList.join(','));
+    }
+    if (!!request.updatedDate.start || !!request.updatedDate.end) {
+      params = params.set('lastUpdatedOn',
+          '[' + (!!request.updatedDate.start ? request.updatedDate.start.getTime() : '') + '~' +
+          (!!request.updatedDate.end ? request.updatedDate.end.getTime() : '') + ']');
+    }
+    return this.http.get<PageResponse<NamespaceListEntry>>('/api/namespaces', {params}).pipe(
+        map((res: PageResponse<NamespaceListEntry>) => ({
+          ...res,
+          list: res.list.map(elm => ({
+            ...elm,
+            lastUpdated: {
+              ...elm.lastUpdated,
+              when: new Date(elm.lastUpdated.when),
+            }
+          }))
+        }))
+    );
   }
 
-  getNamespace(namespaceId): Observable<Namespace> {
-    return this.http.get<Namespace>('/api/namespace/' + namespaceId);
+  getNamespaceDetails(namespaceId): Observable<NamespaceDetails> {
+    return this.http.get<NamespaceDetails>('/api/namespaces/' + namespaceId);
   }
 
-  getSimpleNamespaces(libraryId: number): Observable<SimpleNamespace[]> {
+  getNamespaceSummaries(libraryId: number): Observable<NamespaceSummary[]> {
     const params = new HttpParams().set('libraryId', libraryId);
-    return this.http.get<SimpleNamespace[]>('/api/simple_namespaces', {params});
+    return this.http.get<NamespaceSummary[]>('/api/namespaces/summaries', {params});
   }
 
-  getSimpleModules(): Observable<SimpleModule[]> {
-    return this.http.get<SimpleModule[]>('/api/simple_modules');
-  }
-
-  create(namespace: Namespace): Observable<any> {
-    return this.http.put<any>('/api/namespace', {
+  create(namespace: NamespaceDetails): Observable<any> {
+    return this.http.post<any>('/api/namespaces', {
       libraryId: namespace.libraryId,
       uri: namespace.uri,
       prefix: namespace.prefix,
@@ -74,8 +75,8 @@ export class NamespaceService {
     });
   }
 
-  update(namespace: Namespace): Observable<any> {
-    return this.http.post<any>('/api/namespace/' + namespace.namespaceId, {
+  update(namespace: NamespaceDetails): Observable<any> {
+    return this.http.put<any>('/api/namespaces/' + namespace.namespaceId, {
       uri: namespace.uri,
       prefix: namespace.prefix,
       description: namespace.description
@@ -83,11 +84,11 @@ export class NamespaceService {
   }
 
   discard(namespaceId: number): Observable<any> {
-    return this.http.delete<any>('/api/namespace/' + namespaceId);
+    return this.http.delete<any>('/api/namespaces/' + namespaceId);
   }
 
   transferOwnership(namespaceId: number, targetLoginId: string): Observable<any> {
-    return this.http.post<any>('/api/namespace/' + namespaceId + '/transfer_ownership', {
+    return this.http.patch<any>('/api/namespaces/' + namespaceId + '/transfer', {
       targetLoginId
     });
   }

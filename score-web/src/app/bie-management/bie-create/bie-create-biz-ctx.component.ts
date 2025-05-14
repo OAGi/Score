@@ -4,9 +4,9 @@ import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {BusinessContextService} from '../../context-management/business-context/domain/business-context.service';
-import {BusinessContext, BusinessContextListRequest} from '../../context-management/business-context/domain/business-context';
+import {BusinessContextListEntry, BusinessContextListRequest} from '../../context-management/business-context/domain/business-context';
 import {ActivatedRoute, Router} from '@angular/router';
-import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {AuthService} from '../../authentication/auth.service';
@@ -136,7 +136,7 @@ export class BieCreateBizCtxComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<BusinessContext>();
+  dataSource = new MatTableDataSource<BusinessContextListEntry>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
 
@@ -208,17 +208,6 @@ export class BieCreateBizCtxComponent implements OnInit {
   onChange(property?: string, source?) {
   }
 
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
-  }
-
   reset(type: string) {
     switch (type) {
       case 'startDate':
@@ -253,11 +242,7 @@ export class BieCreateBizCtxComponent implements OnInit {
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
-      this.dataSource.data = resp.list.map((elm: BusinessContext) => {
-        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        elm.businessContextValueList = [];
-        return elm;
-      });
+      this.dataSource.data = resp.list;
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0],
           this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));
@@ -281,11 +266,11 @@ export class BieCreateBizCtxComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(row: BusinessContext) {
+  select(row: BusinessContextListEntry) {
     this.selection.select(row.businessContextId);
   }
 
-  toggle(row: BusinessContext) {
+  toggle(row: BusinessContextListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row.businessContextId);
     } else {
@@ -293,7 +278,7 @@ export class BieCreateBizCtxComponent implements OnInit {
     }
   }
 
-  isSelected(row: BusinessContext) {
+  isSelected(row: BusinessContextListEntry) {
     return this.selection.isSelected(row.businessContextId);
   }
 

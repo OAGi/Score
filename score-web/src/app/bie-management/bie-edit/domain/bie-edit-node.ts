@@ -9,7 +9,7 @@ import {
   BieEditNodeDetail,
   ChangeListener
 } from '../../domain/bie-flat-tree';
-import {hashCode4Array, hashCode4String} from '../../../common/utility';
+import {hashCode4Array} from '../../../common/utility';
 
 export class BieEditNode {
   ccManifestId: number;
@@ -151,18 +151,20 @@ export class ValueDomain {
   }
 }
 
-export class BdtPriRestri {
-  bdtPriRestriId: number;
+export class DtAwdPri {
+  dtAwdPriId: number;
   default: boolean;
+  xbtManifestId: number;
   xbtId: number;
   xbtName: string;
   codeListManifestId: number;
   agencyIdListManifestId: number;
 }
 
-export class BdtScPriRestri {
-  bdtScPriRestriId: number;
+export class DtScAwdPri {
+  dtScAwdPriId: number;
   default: boolean;
+  xbtManifestId: number;
   xbtId: number;
   xbtName: string;
   codeListManifestId: number;

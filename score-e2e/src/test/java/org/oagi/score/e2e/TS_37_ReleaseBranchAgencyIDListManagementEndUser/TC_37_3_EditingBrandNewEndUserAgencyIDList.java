@@ -23,7 +23,6 @@ import org.openqa.selenium.WebElement;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.AssertionHelper.assertEnabled;
@@ -281,11 +280,12 @@ public class TC_37_3_EditingBrandNewEndUserAgencyIDList extends BaseTest {
         AgencyIDListValueObject agencyIDListValue = agencyIDListValueList.get(0);
         EditAgencyIDListValueDialog editAgencyIDListValueDialog = editAgencyIDListPage.openAgencyIDListValueDialogByValue(agencyIDListValue.getValue());
 
+        String value = RandomStringUtils.secure().nextAlphanumeric(5, 10).trim();
         String meaning = RandomStringUtils.secure().nextAlphanumeric(5, 10).trim();
         definition = RandomStringUtils.secure().nextPrint(50, 100).trim();
         definitionSource = RandomStringUtils.secure().nextAlphanumeric(5, 10);
 
-        assertDisabled(editAgencyIDListValueDialog.getValueField());
+        editAgencyIDListValueDialog.setValue(value);
         editAgencyIDListValueDialog.setMeaning(meaning);
         editAgencyIDListValueDialog.setDefinition(definition);
         editAgencyIDListValueDialog.setDefinitionSource(definitionSource);
@@ -296,9 +296,9 @@ public class TC_37_3_EditingBrandNewEndUserAgencyIDList extends BaseTest {
         editAgencyIDListPage =
                 viewEditAgencyIDListPage.openEditAgencyIDListPageByNameAndBranch(name, release.getReleaseNumber());
 
-        editAgencyIDListValueDialog = editAgencyIDListPage.openAgencyIDListValueDialogByValue(agencyIDListValue.getValue());
+        editAgencyIDListValueDialog = editAgencyIDListPage.openAgencyIDListValueDialogByValue(value);
 
-        assertEquals(agencyIDListValue.getValue(), getText(editAgencyIDListValueDialog.getValueField()));
+        assertEquals(value, getText(editAgencyIDListValueDialog.getValueField()));
         assertEquals(meaning, getText(editAgencyIDListValueDialog.getMeaningField()));
         assertEquals(definition, getText(editAgencyIDListValueDialog.getDefinitionField()));
         assertEquals(definitionSource, getText(editAgencyIDListValueDialog.getDefinitionSourceField()));

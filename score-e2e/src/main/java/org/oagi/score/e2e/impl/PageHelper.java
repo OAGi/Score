@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.impl;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.oagi.score.e2e.impl.page.MultiActionSnackBarImpl;
 import org.oagi.score.e2e.page.MultiActionSnackBar;
@@ -9,6 +10,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Wait;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -297,5 +300,15 @@ public abstract class PageHelper {
                 "checked".equals(element.getAttribute("ng-reflect-state")) ||
                 "true".equals(element.getAttribute("aria-checked")) ||
                 (!StringUtils.isEmpty(klass) && klass.contains("mat-mdc-checkbox-checked"));
+    }
+
+    public static void takeScreenshot(WebDriver driver) {
+        TakesScreenshot screenshot = ((TakesScreenshot) driver);
+        File screenshotFile = screenshot.getScreenshotAs(OutputType.FILE);
+        try {
+            FileUtils.moveFileToDirectory(screenshotFile, new File("/Users/hno2/Desktop"), false);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

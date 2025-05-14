@@ -13,14 +13,14 @@ import {Location} from '@angular/common';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {finalize} from 'rxjs/operators';
-import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker} from '@angular/material/datepicker';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {AuthService} from '../../authentication/auth.service';
 import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
-import {Library, LibraryList, LibraryListRequest} from '../../library-management/domain/library';
+import {LibraryListEntry, LibraryListRequest, LibrarySummary} from '../domain/library';
 import {LibraryService} from '../../library-management/domain/library.service';
 
 @Component({
@@ -107,6 +107,11 @@ export class LibraryListComponent implements OnInit {
             displayedColumns.push('name');
           }
           break;
+        case 'Type':
+          if (column.selected) {
+            displayedColumns.push('type');
+          }
+          break;
         case 'Organization':
           if (column.selected) {
             displayedColumns.push('organization');
@@ -132,12 +137,12 @@ export class LibraryListComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<LibraryList>();
+  dataSource = new MatTableDataSource<LibraryListEntry>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
 
-  libraries: Library[] = [];
-  mappedLibraries: { library: Library, selected: boolean }[] = [];
+  libraries: LibrarySummary[] = [];
+  mappedLibraries: { library: LibrarySummary, selected: boolean }[] = [];
   loginIdList: string[] = [];
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
@@ -147,7 +152,7 @@ export class LibraryListComponent implements OnInit {
   highlightText: string;
   preferencesInfo: PreferencesInfo;
 
-  contextMenuItem: LibraryList;
+  contextMenuItem: LibraryListEntry;
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -205,17 +210,6 @@ export class LibraryListComponent implements OnInit {
 
       this.loadLibraryList(true);
     });
-  }
-
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
   }
 
   reset(type: string) {
@@ -278,11 +272,11 @@ export class LibraryListComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(row: LibraryList) {
+  select(row: LibraryListEntry) {
     this.selection.select(row.libraryId);
   }
 
-  toggle(row: LibraryList) {
+  toggle(row: LibraryListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row.libraryId);
     } else {
@@ -290,7 +284,7 @@ export class LibraryListComponent implements OnInit {
     }
   }
 
-  isSelected(row: LibraryList) {
+  isSelected(row: LibraryListEntry) {
     return this.selection.isSelected(row.libraryId);
   }
 

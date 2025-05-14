@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_41_ReleaseBranchDataTypeManagementForEndUser;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,7 +12,7 @@ import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.oagi.score.e2e.page.core_component.DTViewEditPage;
-import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.oagi.score.e2e.page.core_component.ViewEditDataTypePage;
 import org.openqa.selenium.TimeoutException;
 
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ public class TC_41_2_CreatingBrandNewDT extends BaseTest {
         LibraryObject library;
         ReleaseObject branch;
         NamespaceObject namespace;
+        DTObject baseDT;
         {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
@@ -50,13 +52,15 @@ public class TC_41_2_CreatingBrandNewDT extends BaseTest {
             library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
             branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
             namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA, library);
+            baseDT = getAPIFactory().getCoreComponentAPI().getBDTByDENAndReleaseNum(
+                    library, "Open_ Number. Type", branch.getReleaseNumber()).get(0);
         }
 
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
         assertFalse(endUserA.isDeveloper());
-        DTObject baseDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Numeric. Type", "10.8.4");
-        DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.createDT(baseDT.getDen(), branch.getReleaseNumber());
+
+        DTViewEditPage dtViewEditPage = viewEditDataTypePage.createDT(baseDT.getDen(), branch.getReleaseNumber());
         assertTrue(dtViewEditPage.getBasedDataTypeFieldValue().equals(baseDT.getDen()));
         assertDisabled(dtViewEditPage.getDataTypeTermField());
         assertTrue(dtViewEditPage.getDataTypeTermFieldValue().equals(baseDT.getDataTypeTerm()));
@@ -64,10 +68,10 @@ public class TC_41_2_CreatingBrandNewDT extends BaseTest {
         assertTrue(dtViewEditPage.getRepresentationTermFieldValue().equals(baseDT.getRepresentationTerm()));
         assertDisabled(dtViewEditPage.getRepresentationTermField());
         String den = "";
-        if (baseDT.getQualifier() != null){
+        if (baseDT.getQualifier() != null) {
             assertTrue(dtViewEditPage.getQualifierFieldValue().equals(baseDT.getQualifier()));
-            den = baseDT.getQualifier() + "" + baseDT.getDataTypeTerm() + ". Type";
-        } else{
+            den = baseDT.getQualifier() + "_ " + baseDT.getDataTypeTerm() + ". Type";
+        } else {
             assertEquals(null, dtViewEditPage.getQualifierFieldValue());
             den = baseDT.getDataTypeTerm() + ". Type";
         }
@@ -77,7 +81,7 @@ public class TC_41_2_CreatingBrandNewDT extends BaseTest {
         assertDisabled(dtViewEditPage.getSixHexadecimalIdentifierField());
         assertEquals(baseDT.getDefinition(), dtViewEditPage.getDefinitionFieldValue());
         assertEquals(null, dtViewEditPage.getDefinitionSourceFieldValue());
-        assertTrue(dtViewEditPage.getContentComponentDefinitionFieldValue().equals(baseDT.getContentComponentDefinition()));
+        assertTrue(StringUtils.equals(dtViewEditPage.getContentComponentDefinitionFieldValue(), baseDT.getContentComponentDefinition()));
         AddCommentDialog addCommentDialog = dtViewEditPage.hitAddCommentButton("/" + baseDT.getDen());
         assertEquals(null, getText(addCommentDialog.getCommentField()));
         assertDoesNotThrow(() -> addCommentDialog.setComment("test comment"));
@@ -85,7 +89,7 @@ public class TC_41_2_CreatingBrandNewDT extends BaseTest {
         dtViewEditPage.showValueDomain();
         assertDoesNotThrow(() -> dtViewEditPage.getValueDomainByTypeNameAndXSDExpression("Primitive", "Float", "float"));
         assertDoesNotThrow(() -> dtViewEditPage.getValueDomainByTypeNameAndXSDExpression("Primitive", "Decimal", "decimal"));
-        assertDoesNotThrow(() -> dtViewEditPage.getValueDomainByTypeNameAndXSDExpression("Primitive", "Double", "double, float"));
+        assertDoesNotThrow(() -> dtViewEditPage.getValueDomainByTypeNameAndXSDExpression("Primitive", "Double", "double"));
 
         assertDisabled(dtViewEditPage.getCheckboxForValueDomainByTypeAndName("Primitive", "Float"));
         assertEquals(branch.getReleaseNumber(), dtViewEditPage.getReleaseFieldValue());
@@ -102,13 +106,15 @@ public class TC_41_2_CreatingBrandNewDT extends BaseTest {
         dtViewEditPage.setContentComponentDefinition("");
         click(dtViewEditPage.getUpdateButton(true));
         dtViewEditPage.hitUpdateAnywayButton();
-        homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
         ReleaseObject workingRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
-        viewEditCoreComponentPage.setBranch(workingRelease.getReleaseNumber());
-        viewEditCoreComponentPage.setDEN(newQualifier + "_" + baseDT.getDen());
-        viewEditCoreComponentPage.hitSearchButton();
-        assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.getTableRecordByValue(newQualifier + "_ " + baseDT.getDen()));
+        viewEditDataTypePage.setBranch(workingRelease.getReleaseNumber());
+        viewEditDataTypePage.setDEN(newQualifier + "_" + baseDT.getDen());
+        viewEditDataTypePage.hitSearchButton();
+        assertThrows(TimeoutException.class, () -> viewEditDataTypePage.getTableRecordByValue(newQualifier + "_ " + baseDT.getDen()));
     }
+
     @Test
     @DisplayName("TC_41_2_TA_2")
     public void test_TA_2() {
@@ -122,9 +128,9 @@ public class TC_41_2_CreatingBrandNewDT extends BaseTest {
         }
 
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-        viewEditCoreComponentPage.setBranch(branch.getReleaseNumber());
-        assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.getCreateDTButton());
+        ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+        viewEditDataTypePage.setBranch(branch.getReleaseNumber());
+        assertThrows(TimeoutException.class, () -> viewEditDataTypePage.getNewDataTypeButton());
     }
 
     @AfterEach

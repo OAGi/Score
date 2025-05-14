@@ -2,10 +2,10 @@ import {Component, OnInit} from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {BusinessTermService} from '../domain/business-term.service';
-import {BusinessTerm} from '../domain/business-term';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
+import {BusinessTermDetails} from '../domain/business-term';
 
 @Component({
   selector: 'score-business-term-create',
@@ -15,7 +15,7 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 export class BusinessTermCreateComponent implements OnInit {
 
   title = 'Create Business Term';
-  businessTerm: BusinessTerm;
+  businessTerm: BusinessTermDetails;
   disabled: boolean;
 
   constructor(private service: BusinessTermService,
@@ -29,10 +29,10 @@ export class BusinessTermCreateComponent implements OnInit {
 
   ngOnInit() {
     this.disabled = false;
-    this.businessTerm = new BusinessTerm();
+    this.businessTerm = new BusinessTermDetails();
   }
 
-  isDisabled(businessTerm: BusinessTerm) {
+  isDisabled(businessTerm: BusinessTermDetails) {
     return (this.disabled) ||
       (businessTerm.businessTerm === undefined || businessTerm.businessTerm === '') ||
       (businessTerm.externalReferenceUri === undefined || businessTerm.externalReferenceUri === '');
@@ -69,8 +69,10 @@ export class BusinessTermCreateComponent implements OnInit {
     });
   }
 
-  checkBusinessTermName(businessTerm: BusinessTerm, callbackFn?) {
-    this.service.checkUniqueness(businessTerm).subscribe(resp => {
+  checkBusinessTermName(businessTerm: BusinessTermDetails, callbackFn?) {
+    this.service.checkNameUniqueness(
+        businessTerm.businessTermId,
+        businessTerm.businessTerm).subscribe(resp => {
       if (!resp) {
         this.openDialogbusinessTermCreate();
         return;
@@ -79,8 +81,11 @@ export class BusinessTermCreateComponent implements OnInit {
     });
   }
 
-  checkUniqueness(businessTerm: BusinessTerm, callbackFn?) {
-    this.service.checkUniqueness(businessTerm).subscribe(resp => {
+  checkUniqueness(businessTerm: BusinessTermDetails, callbackFn?) {
+    this.service.checkUniqueness(
+        businessTerm.businessTermId,
+        businessTerm.businessTerm,
+        businessTerm.externalReferenceUri).subscribe(resp => {
       if (!resp) {
         this.openDialogbusinessTermCreate();
         return;
@@ -88,6 +93,7 @@ export class BusinessTermCreateComponent implements OnInit {
       return callbackFn && callbackFn();
     });
   }
+
   isDirty(): boolean {
     return !!this.businessTerm.businessTermId
       || this.businessTerm.businessTerm && this.businessTerm.businessTerm.length > 0

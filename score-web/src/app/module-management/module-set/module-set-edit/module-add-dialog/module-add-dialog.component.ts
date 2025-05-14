@@ -2,9 +2,9 @@ import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {finalize} from 'rxjs/operators';
-import {SimpleNamespace} from '../../../../namespace-management/domain/namespace';
+import {NamespaceSummary} from '../../../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../../../namespace-management/domain/namespace.service';
-import {Module, ModuleElement, ModuleSet, ModuleSetListRequest, Tile} from '../../../domain/module';
+import {ModuleElement, ModuleSetSummary, Tile} from '../../../domain/module';
 import {ModuleService} from '../../../domain/module.service';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
@@ -23,17 +23,17 @@ export class ModuleAddDialogComponent implements OnInit {
   parentModuleId: number;
 
   /* create new module */
-  namespaceList: SimpleNamespace[];
+  namespaceList: NamespaceSummary[];
   module: ModuleElement;
 
   namespaceListFilterCtrl: FormControl = new FormControl();
-  filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
+  filteredNamespaceList: ReplaySubject<NamespaceSummary[]> = new ReplaySubject<NamespaceSummary[]>(1);
 
   /* create new moduleDir */
   moduleDir: ModuleElement;
 
   /* copy from */
-  moduleSetList: ModuleSet[] = [];
+  moduleSetList: ModuleSetSummary[] = [];
   tiles: Tile[] = [];
   rootElement: ModuleElement;
   selected: ModuleElement;
@@ -59,18 +59,14 @@ export class ModuleAddDialogComponent implements OnInit {
   ngOnInit() {
     this.module = new ModuleElement();
     this.moduleDir = new ModuleElement();
-    this.namespaceService.getSimpleNamespaces(this.libraryId).subscribe(resp => {
+    this.namespaceService.getNamespaceSummaries(this.libraryId).subscribe(resp => {
       this.namespaceList = resp.filter(e => e.standard);
       initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList,
         this.namespaceList, (e) => e.uri);
     });
 
-    const request = new ModuleSetListRequest();
-    request.library.libraryId = this.libraryId;
-    request.page.pageIndex = -1;
-    request.page.pageSize = -1;
-    this.moduleService.getModuleSetList(request).subscribe(resp => {
-      this.moduleSetList = resp.results;
+    this.moduleService.getModuleSetSummaries(this.libraryId).subscribe(resp => {
+      this.moduleSetList = resp;
     });
   }
 
@@ -78,8 +74,8 @@ export class ModuleAddDialogComponent implements OnInit {
     this.moduleService.getModules(moduleSetId).subscribe(resp => {
       this.rootElement = resp as ModuleElement;
       this.tiles = [];
-      this.tiles.push({elements: this.rootElement.child, current: undefined});
-      if (this.rootElement.child && this.rootElement.child.length > 0) {
+      this.tiles.push({elements: this.rootElement.children, current: undefined});
+      if (this.rootElement.children && this.rootElement.children.length > 0) {
         this.onClickElement(this.tiles[0], this.tiles[0].elements[0]);
       }
     });
@@ -100,13 +96,16 @@ export class ModuleAddDialogComponent implements OnInit {
       this.snackBar.open('Created', '', {
         duration: 3000,
       });
-      const element = new ModuleElement();
-      element.moduleId = (resp.module as Module).moduleId;
-      element.name = (resp.module as Module).name;
-      element.namespaceId = (resp.module as Module).namespaceId;
-      element.versionNum = (resp.module as Module).versionNum;
-      element.directory = false;
-      this.dialogRef.close(element);
+
+      this.moduleService.getModule(this.moduleSetId, resp.moduleId).subscribe(module => {
+        const element = new ModuleElement();
+        element.moduleId = module.moduleId;
+        element.name = module.name;
+        element.namespaceId = module.namespaceId;
+        element.versionNum = module.versionNum;
+        element.directory = false;
+        this.dialogRef.close(element);
+      });
     });
   }
 
@@ -121,13 +120,17 @@ export class ModuleAddDialogComponent implements OnInit {
       this.snackBar.open('Created', '', {
         duration: 3000,
       });
-      const element = new ModuleElement();
-      element.moduleId = (resp.module as Module).moduleId;
-      element.name = (resp.module as Module).name;
-      element.path = (resp.module as Module).path;
-      element.directory = true;
-      element.child = [];
-      this.dialogRef.close(element);
+
+      this.moduleService.getModule(this.moduleSetId, resp.moduleId).subscribe(module => {
+        const element = new ModuleElement();
+        element.moduleId = module.moduleId;
+        element.name = module.name;
+        element.namespaceId = module.namespaceId;
+        element.versionNum = module.versionNum;
+        element.directory = true;
+        element.children = [];
+        this.dialogRef.close(element);
+      });
     });
   }
 
@@ -139,7 +142,7 @@ export class ModuleAddDialogComponent implements OnInit {
       this.tiles.splice(tileIndex, this.tiles.length - tileIndex);
     }
     if (element.directory) {
-      this.tiles.push({elements: element.child.sort(this._sort), current: undefined});
+      this.tiles.push({elements: element.children.sort(this._sort), current: undefined});
     }
   }
 

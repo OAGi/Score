@@ -49,7 +49,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.CodeListValueRecor
  * because the USED_INDICATOR of such code list value is FALSE by default and
  * can no longer be changed.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class CodeListValue extends TableImpl<CodeListValueRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -104,7 +104,7 @@ public class CodeListValue extends TableImpl<CodeListValueRecord> {
      * explanation of the code list value, e.g., 'Each' for EA, 'English' for
      * EN.
      */
-    public final TableField<CodeListValueRecord, String> MEANING = createField(DSL.name("meaning"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The description or explanation of the code list value, e.g., 'Each' for EA, 'English' for EN.");
+    public final TableField<CodeListValueRecord, String> MEANING = createField(DSL.name("meaning"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "The description or explanation of the code list value, e.g., 'Each' for EA, 'English' for EN.");
 
     /**
      * The column <code>oagi.code_list_value.definition</code>. Long description

@@ -257,3 +257,9 @@ button:focus, button:active:focus, button.active:focus {
   top: 0;
   right: 0;
 }
+
+.object-class-term-container button {
+  position: absolute;
+  top: 0;
+  right: 0;
+}

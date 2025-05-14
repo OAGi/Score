@@ -1,46 +1,51 @@
-import {PageRequest} from '../../basis/basis';
+import {PageRequest, WhoAndWhen} from '../../basis/basis';
 import {ParamMap} from '@angular/router';
 import {base64Decode, base64Encode} from '../../common/utility';
 import {HttpParams} from '@angular/common/http';
-import {Library} from '../../library-management/domain/library';
+import {LibrarySummary} from '../../library-management/domain/library';
+import {ScoreUser} from '../../authentication/domain/auth';
 
-export class Namespace {
+export class NamespaceDetails {
   namespaceId: number;
   libraryId: number;
   uri: string;
   prefix: string;
   description: string;
-  std: boolean;
+  standard: boolean;
+
+  owner: ScoreUser;
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+
   canEdit: boolean;
 }
 
-export class NamespaceList {
+export class NamespaceListEntry {
   namespaceId: number;
   uri: string;
   prefix: string;
-  owner: string;
   description: string;
-  std: boolean;
-  lastUpdateTimestamp: Date;
-  lastUpdateUser: string;
-  canEdit: boolean;
+  standard: boolean;
+
+  owner: ScoreUser;
+  lastUpdated: WhoAndWhen;
 }
 
-export class SimpleNamespace {
+export class NamespaceSummary {
   namespaceId: number;
   uri: string;
   standard: boolean;
 }
 
 export class NamespaceListRequest {
-  library: Library = new Library();
+  library: LibrarySummary = new LibrarySummary();
   filters: {
     uri: string;
     prefix: string;
     description: string;
   };
-  ownerLoginIds: string[] = [];
-  updaterLoginIds: string[] = [];
+  ownerLoginIdList: string[] = [];
+  updaterLoginIdList: string[] = [];
   updatedDate: {
     start: Date,
     end: Date,
@@ -70,8 +75,8 @@ export class NamespaceListRequest {
       this.page.pageSize = (defaultPageRequest) ? defaultPageRequest.pageSize : 0;
     }
 
-    this.ownerLoginIds = (params.get('ownerLoginIds')) ? Array.from(params.get('ownerLoginIds').split(',')) : [];
-    this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
+    this.ownerLoginIdList = (params.get('ownerLoginIdList')) ? Array.from(params.get('ownerLoginIdList').split(',')) : [];
+    this.updaterLoginIdList = (params.get('updaterLoginIdList')) ? Array.from(params.get('updaterLoginIdList').split(',')) : [];
     this.updatedDate = {
       start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
       end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
@@ -91,11 +96,11 @@ export class NamespaceListRequest {
       .set('pageIndex', '' + this.page.pageIndex)
       .set('pageSize', '' + this.page.pageSize);
 
-    if (this.ownerLoginIds && this.ownerLoginIds.length > 0) {
-      params = params.set('ownerLoginIds', this.ownerLoginIds.join(','));
+    if (this.ownerLoginIdList && this.ownerLoginIdList.length > 0) {
+      params = params.set('ownerLoginIdList', this.ownerLoginIdList.join(','));
     }
-    if (this.updaterLoginIds && this.updaterLoginIds.length > 0) {
-      params = params.set('updaterLoginIds', this.updaterLoginIds.join(','));
+    if (this.updaterLoginIdList && this.updaterLoginIdList.length > 0) {
+      params = params.set('updaterLoginIdList', this.updaterLoginIdList.join(','));
     }
     if (this.standard && this.standard.length > 0) {
       params = params.set('standard', this.standard.join(','));

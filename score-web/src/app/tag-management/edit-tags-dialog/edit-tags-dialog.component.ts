@@ -36,7 +36,7 @@ export class EditTagsDialogComponent implements OnInit {
 
   add(tag: Tag) {
     this.loading = true;
-    this.tagService.add(tag).subscribe(_ => {
+    this.tagService.create(tag).subscribe(_ => {
       this.newTag = new Tag();
       this.snackBar.open('Added', '', {
         duration: 3000,
@@ -45,6 +45,9 @@ export class EditTagsDialogComponent implements OnInit {
         this.tagList = tagList;
         this.loading = false;
       });
+    }, err => {
+      this.loading = false;
+      throw err;
     });
   }
 
@@ -58,6 +61,9 @@ export class EditTagsDialogComponent implements OnInit {
         this.tagList = tagList;
         this.loading = false;
       });
+    }, err => {
+      this.loading = false;
+      throw err;
     });
   }
 
@@ -79,6 +85,9 @@ export class EditTagsDialogComponent implements OnInit {
               this.tagList = tagList;
               this.loading = false;
             });
+          }, err => {
+            this.loading = false;
+            throw err;
           });
         }
       });

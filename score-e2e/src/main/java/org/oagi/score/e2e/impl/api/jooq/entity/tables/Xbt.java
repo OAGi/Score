@@ -36,8 +36,6 @@ import org.oagi.score.e2e.impl.api.jooq.entity.Indexes;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtAwdPriXpsTypeMap.CdtAwdPriXpsTypeMapPath;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtScAwdPriXpsTypeMap.CdtScAwdPriXpsTypeMapPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Xbt.XbtPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.XbtManifest.XbtManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.XbtRecord;
@@ -48,7 +46,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.XbtRecord;
  * built-in types are those types defined in the XMLSchemaBuiltinType and the
  * XMLSchemaBuiltinType Patterns schemas.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Xbt extends TableImpl<XbtRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -293,32 +291,6 @@ public class Xbt extends TableImpl<XbtRecord> {
             _xbt = new XbtPath(this, Keys.XBT_SUBTYPE_OF_XBT_ID_FK, null);
 
         return _xbt;
-    }
-
-    private transient CdtAwdPriXpsTypeMapPath _cdtAwdPriXpsTypeMap;
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.cdt_awd_pri_xps_type_map</code> table
-     */
-    public CdtAwdPriXpsTypeMapPath cdtAwdPriXpsTypeMap() {
-        if (_cdtAwdPriXpsTypeMap == null)
-            _cdtAwdPriXpsTypeMap = new CdtAwdPriXpsTypeMapPath(this, null, Keys.CDT_AWD_PRI_XPS_TYPE_MAP_XBT_ID_FK.getInverseKey());
-
-        return _cdtAwdPriXpsTypeMap;
-    }
-
-    private transient CdtScAwdPriXpsTypeMapPath _cdtScAwdPriXpsTypeMap;
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.cdt_sc_awd_pri_xps_type_map</code> table
-     */
-    public CdtScAwdPriXpsTypeMapPath cdtScAwdPriXpsTypeMap() {
-        if (_cdtScAwdPriXpsTypeMap == null)
-            _cdtScAwdPriXpsTypeMap = new CdtScAwdPriXpsTypeMapPath(this, null, Keys.CDT_SC_AWD_PRI_XPS_TYPE_MAP_XBT_ID_FK.getInverseKey());
-
-        return _cdtScAwdPriXpsTypeMap;
     }
 
     private transient XbtManifestPath _xbtManifest;

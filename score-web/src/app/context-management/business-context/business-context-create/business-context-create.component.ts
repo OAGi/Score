@@ -273,7 +273,7 @@ export class BusinessContextCreateComponent implements OnInit {
   }
 
   create() {
-    this.service.create(this.businessContext).subscribe(_ => {
+    this.service.create(this.businessContext.name, this.businessContext.businessContextValueList).subscribe(_ => {
       this.snackBar.open('Created', '', {
         duration: 3000,
       });

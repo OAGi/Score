@@ -56,7 +56,7 @@ public class TC_10_24_RestoringDeveloperBCCP extends BaseTest {
 
         // Code. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Deleted");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Deleted");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
@@ -88,7 +88,7 @@ public class TC_10_24_RestoringDeveloperBCCP extends BaseTest {
 
         // Code. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, anotherDeveloper, namespace, "Deleted");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(release, dataType, anotherDeveloper, namespace, "Deleted");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
@@ -111,16 +111,19 @@ public class TC_10_24_RestoringDeveloperBCCP extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        String branch = "Working";
-        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
-
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
-        DTObject cdt = coreComponentAPI.getCDTByDENAndReleaseNum(library, "Code. Type", release.getReleaseNumber());
-        DTObject randomBDT = coreComponentAPI.createRandomBDT(cdt, developer, namespace, "Deleted");
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(randomBDT, developer, namespace, "WIP");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+        ReleaseObject branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
+
+        DTObject cdt = coreComponentAPI.getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
+
+        library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+
+        DTObject randomBDT = coreComponentAPI.createRandomBDT(branch, cdt, developer, namespace, "Deleted");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(branch, randomBDT, developer, namespace, "WIP");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =

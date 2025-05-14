@@ -65,8 +65,8 @@ export class ModuleSetEditComponent implements OnInit {
         this.init(moduleSet);
         this.service.getModules(this.moduleSet.moduleSetId).subscribe(resp => {
           this.rootElement = resp as ModuleElement;
-          this.tiles.push({elements: this.rootElement.child, current: undefined});
-          if (this.rootElement.child && this.rootElement.child.length > 0) {
+          this.tiles.push({elements: this.rootElement.children, current: undefined});
+          if (this.rootElement.children && this.rootElement.children.length > 0) {
             this.onClickElement(this.tiles[0], this.tiles[0].elements[0]);
           }
         });
@@ -135,7 +135,7 @@ export class ModuleSetEditComponent implements OnInit {
       this.tiles.splice(tileIndex, this.tiles.length - tileIndex);
     }
     if (element.directory) {
-      this.tiles.push({elements: element.child.sort(this._sort), current: undefined});
+      this.tiles.push({elements: element.children.sort(this._sort), current: undefined});
     }
   }
 
@@ -169,7 +169,7 @@ export class ModuleSetEditComponent implements OnInit {
         this.service.getModules(this.moduleSet.moduleSetId).subscribe(modules => {
           this.rootElement = modules as ModuleElement;
           this.tiles = [];
-          this.tiles.push({elements: this.rootElement.child, current: undefined});
+          this.tiles.push({elements: this.rootElement.children, current: undefined});
         });
       } else {
         tile.elements.push(resp);
@@ -204,17 +204,17 @@ export class ModuleSetEditComponent implements OnInit {
 
           const tileIndex = this.tiles.indexOf(tile);
           if (tileIndex > 0) {
-            const child = this.tiles[tileIndex - 1].current.child;
+            const child = this.tiles[tileIndex - 1].current.children;
             const elementIndex = child.indexOf(element);
             child.splice(elementIndex, 1);
             this.onClickElement(this.tiles[tileIndex - 1], this.tiles[tileIndex - 1].current);
           } else {
-            const child = this.rootElement.child;
+            const child = this.rootElement.children;
             const elementIndex = child.indexOf(element);
             child.splice(elementIndex, 1);
             this.tiles[0].current = undefined;
             if (element.directory) {
-              this.tiles = [{elements: this.rootElement.child, current: undefined}];
+              this.tiles = [{elements: this.rootElement.children, current: undefined}];
             }
           }
 

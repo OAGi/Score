@@ -63,7 +63,7 @@ public class TC_15_19_RestoringEndUserBCCP extends BaseTest {
 
         // Code. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Deleted");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "Deleted");
 
         BCCPViewEditPage bccpViewEditPage =
                 viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
@@ -95,7 +95,7 @@ public class TC_15_19_RestoringEndUserBCCP extends BaseTest {
 
         // Code. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Deleted");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(release, dataType, anotherUser, namespace, "Deleted");
 
         BCCPViewEditPage bccpViewEditPage =
                 viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
@@ -115,21 +115,24 @@ public class TC_15_19_RestoringEndUserBCCP extends BaseTest {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
-        String branch = "10.8.7.1";
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
-        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
-
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
-        DTObject cdt = coreComponentAPI.getCDTByDENAndReleaseNum(library, "Code. Type", release.getReleaseNumber());
-        DTObject randomBDT = coreComponentAPI.createRandomBDT(cdt, endUser, namespace, "Deleted");
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(randomBDT, endUser, namespace, "WIP");
-        viewEditCoreComponentPage.setBranch(branch);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+        ReleaseObject branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
+
+        DTObject cdt = coreComponentAPI.getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
+
+        library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.7.1");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
+
+        DTObject randomBDT = coreComponentAPI.createRandomBDT(branch, cdt, endUser, namespace, "Deleted");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(branch, randomBDT, endUser, namespace, "WIP");
+        viewEditCoreComponentPage.setBranch(branch.getReleaseNumber());
         waitFor(Duration.ofMillis(1500));
         BCCPViewEditPage bccpViewEditPage =
                 viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());

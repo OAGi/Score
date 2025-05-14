@@ -25,6 +25,9 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class HomePageImpl extends BasePageImpl implements HomePage {
 
+    private static final By LIBRARY_SELECT_FIELD_LOCATOR =
+            By.xpath("//score-title-with-library-selector//button");
+
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select");
 
@@ -129,6 +132,23 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
         String logoutUrl = getPageUrl();
         getDriver().get(logoutUrl);
         return new LoginPageImpl(this);
+    }
+
+    @Override
+    public WebElement getLibrarySelectorField() {
+        return elementToBeClickable(getDriver(), LIBRARY_SELECT_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setLibrary(String library) {
+        retry(() -> {
+            click(getDriver(), getLibrarySelectorField());
+            WebElement optionField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//div[contains(@class, \"cdk-overlay-container\")]//mat-radio-button" +
+                            "//span[text() = \"" + library + "\"]//ancestor::mat-radio-button"));
+            click(getDriver(), optionField);
+            escape(getDriver());
+        });
     }
 
     @Override

@@ -1,5 +1,5 @@
 import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
-import {AssignedBtListRequest, AssignedBusinessTerm, BieToAssign} from '../domain/business-term';
+import {AsbieBbieListEntry, AssignedBtListRequest, AssignedBusinessTermListEntry, BieToAssign} from '../domain/business-term';
 import {BusinessTermService} from '../domain/business-term.service';
 import {MatDialog} from '@angular/material/dialog';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
@@ -7,8 +7,8 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
-import {PageRequest, PageResponse} from '../../basis/basis';
-import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {PageRequest} from '../../basis/basis';
+import {MatDatepicker} from '@angular/material/datepicker';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
@@ -18,8 +18,6 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {AuthService} from '../../authentication/auth.service';
-import {AsbieBbieList} from '../../bie-management/bie-list/domain/bie-list';
-import {BieListService} from '../../bie-management/bie-list/domain/bie-list.service';
 import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
@@ -150,8 +148,8 @@ export class AssignedBusinessTermListComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<AssignedBusinessTerm>();
-  selection = new SelectionModel<AssignedBusinessTerm>(true, []);
+  dataSource = new MatTableDataSource<AssignedBusinessTermListEntry>();
+  selection = new SelectionModel<AssignedBusinessTermListEntry>(true, []);
   loading = false;
 
   loginIdList: string[] = [];
@@ -177,8 +175,7 @@ export class AssignedBusinessTermListComponent implements OnInit {
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
-              private snackBar: MatSnackBar,
-              private bieListService: BieListService) {
+              private snackBar: MatSnackBar) {
   }
 
   ngOnInit() {
@@ -226,17 +223,17 @@ export class AssignedBusinessTermListComponent implements OnInit {
         bie.bieType = bieType;
         this.request.filters.bieId = Number(bieId);
         this.request.filters.bieTypes = [bieType];
-        this.bieListService.confirmAsbieBbieListByIdAndType([bie])
-          .subscribe((resp: PageResponse<AsbieBbieList>) => {
-            if (resp === null || resp.list.length !== 1) {
-              this.router.navigateByUrl('/business_term_management/assign_business_term/create');
-            } else {
-              const bieResp = resp.list[0];
-              this.request.filters.bieId = bieResp.bieId;
-              this.request.filters.bieTypes = [bieResp.type];
-              this.request.filters.bieDen = bieResp.den;
-            }
-          });
+        this.service.confirmAsbieBbieListByIdAndType([bie])
+            .subscribe((resp: AsbieBbieListEntry[]) => {
+              if (!resp || resp.length !== 1) {
+                this.router.navigateByUrl('/business_term_management/assign_business_term/create');
+              } else {
+                const bieResp = resp[0];
+                this.request.filters.bieId = bieResp.bieId;
+                this.request.filters.bieTypes = [bieResp.type];
+                this.request.filters.bieDen = bieResp.den;
+              }
+            });
       }
 
       this.loadAssignedBusinessTermList(true);
@@ -276,17 +273,6 @@ export class AssignedBusinessTermListComponent implements OnInit {
     this.loadAssignedBusinessTermList();
   }
 
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
-  }
-
   reset(type: string) {
     switch (type) {
       case 'startDate':
@@ -318,10 +304,7 @@ export class AssignedBusinessTermListComponent implements OnInit {
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
-      this.dataSource.data = resp.list.map((elm: AssignedBusinessTerm) => {
-        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        return elm;
-      });
+      this.dataSource.data = resp.list;
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0],
           this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));
@@ -345,11 +328,11 @@ export class AssignedBusinessTermListComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(row: AssignedBusinessTerm) {
+  select(row: AssignedBusinessTermListEntry) {
     this.selection.select(row);
   }
 
-  toggle(row: AssignedBusinessTerm) {
+  toggle(row: AssignedBusinessTermListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row);
     } else {
@@ -357,7 +340,7 @@ export class AssignedBusinessTermListComponent implements OnInit {
     }
   }
 
-  isSelected(row: AssignedBusinessTerm) {
+  isSelected(row: AssignedBusinessTermListEntry) {
     return this.selection.isSelected(row);
   }
 
@@ -386,7 +369,7 @@ export class AssignedBusinessTermListComponent implements OnInit {
       });
   }
 
-  openMakeAsPrimaryDialog(assignedBusinessTerm: AssignedBusinessTerm, $event) {
+  openMakeAsPrimaryDialog(assignedBusinessTerm: AssignedBusinessTermListEntry, $event) {
     if (assignedBusinessTerm.primaryIndicator) {
       return;
     }

@@ -16,7 +16,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsccBizterm;
  * The ascc_bizterm table stores information about the aggregation between the
  * business term and ASCC. TODO: Placeholder, definition is missing.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class AsccBiztermRecord extends UpdatableRecordImpl<AsccBiztermRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -170,6 +170,6 @@ public class AsccBiztermRecord extends UpdatableRecordImpl<AsccBiztermRecord> {
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

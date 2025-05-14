@@ -5,3 +5,10 @@
 *.ipr
 .vscode/settings.json
 docs/user_guide/_build
+
+###
+docker-compose.yml
+docs
+misc
+ql-test
+*.sql

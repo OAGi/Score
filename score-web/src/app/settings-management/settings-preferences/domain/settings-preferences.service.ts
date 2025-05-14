@@ -9,11 +9,13 @@ import {loadBooleanProperty, loadProperty, saveBooleanProperty, saveProperty} fr
 export class SettingsPreferencesService {
 
   TABLE_COLUMNS_FOR_CORE_COMPONENT_PAGE_KEY = 'TableColumns-CoreComponentPage';
-  TABLE_COLUMNS_FOR_CORE_COMPONENT_WITHOUT_DT_COLUMNS_PAGE_KEY = 'TableColumns-CoreComponentWithoutDtColumnsPage';
-  TABLE_COLUMNS_FOR_CORE_COMPONENT_WITHOUT_TYPE_AND_DT_COLUMNS_PAGE_KEY = 'TableColumns-CoreComponentWithoutTypeAndDtColumnsPage';
+  TABLE_COLUMNS_FOR_DATA_TYPE_PAGE_KEY = 'TableColumns-DataTypePage';
+  TABLE_COLUMNS_FOR_CORE_COMPONENT_WITHOUT_TYPE_COLUMN_PAGE_KEY = 'TableColumns-CoreComponentWithoutTypeColumnPage';
+  TABLE_COLUMNS_FOR_DATA_TYPE_WITHOUT_TYPE_COLUMN_PAGE_KEY = 'TableColumns-DataTypeWithoutTypeColumnPage';
   TABLE_COLUMNS_FOR_CORE_COMPONENT_FOR_VERB_BOD_PAGE_KEY = 'TableColumns-CoreComponentForVerbBodPage';
   TABLE_COLUMNS_FOR_CORE_COMPONENT_FOR_NOUN_BOD_PAGE_KEY = 'TableColumns-CoreComponentForNounBodPage';
   FILTER_TYPES_FOR_CORE_COMPONENT_PAGE_KEY = 'FilterTypes-CoreComponentPage';
+  FILTER_TYPES_FOR_DATA_TYPE_PAGE_KEY = 'FilterTypes-DataTypePage';
   TABLE_COLUMNS_FOR_CORE_COMPONENT_ACC_REFACTOR_PAGE_KEY = 'TableColumns-CoreComponentAccRefactorPage';
   TABLE_COLUMNS_FOR_CODE_LIST_PAGE_KEY = 'TableColumns-CodeListPage';
   TABLE_COLUMNS_FOR_CODE_LIST_VALUE_PAGE_KEY = 'TableColumns-CodeListValuePage';
@@ -60,6 +62,17 @@ export class SettingsPreferencesService {
   constructor(private http: HttpClient) {
   }
 
+  loadColumnsInfo(preferencesInfo: PreferencesInfo, userToken: UserToken,
+                  key: string, propertyName: string) {
+    let properties: TableColumnsProperty[] = preferencesInfo.tableColumnsInfo[propertyName];
+    properties = JSON.parse(loadProperty(userToken, key, JSON.stringify(properties)));
+
+    // If the default column properties hasn't changed
+    if (properties.length === preferencesInfo.tableColumnsInfo[propertyName].length) {
+      preferencesInfo.tableColumnsInfo[propertyName] = properties;
+    }
+  }
+
   load(userToken: UserToken): Observable<PreferencesInfo> {
     return new Observable(subscriber => {
       const preferencesInfo = new PreferencesInfo();
@@ -69,132 +82,90 @@ export class SettingsPreferencesService {
       preferencesInfo.viewSettingsInfo.treeSettings.delimiter = loadProperty(
           userToken, this.TREE_SETTINGS_PATH_DELIMITER_PROPERTY_KEY, '.');
 
-      preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage)));
-      preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutDtColumnsPage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_WITHOUT_DT_COLUMNS_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutDtColumnsPage)));
-      preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutTypeAndDtColumnsPage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_WITHOUT_TYPE_AND_DT_COLUMNS_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutTypeAndDtColumnsPage)));
-      preferencesInfo.tableColumnsInfo.columnsOfCoreComponentForVerbBODPage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_FOR_VERB_BOD_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfCoreComponentForVerbBODPage)));
-      preferencesInfo.tableColumnsInfo.columnsOfCoreComponentForNounBODPage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_FOR_NOUN_BOD_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfCoreComponentForNounBODPage)));
-      // Issue #1650
-      if (preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode) {
-        preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage.forEach((columnInfo: TableColumnsProperty) => {
-          if ('ASCCP' === columnInfo.name) {
-            columnInfo.selected = true;
-          } else {
-            columnInfo.selected = false;
-          }
-        });
-      }
-      preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage =
-          JSON.parse(loadProperty(userToken, this.FILTER_TYPES_FOR_CORE_COMPONENT_PAGE_KEY,
-              JSON.stringify(preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage)));
-      preferencesInfo.tableColumnsInfo.columnsOfCoreComponentAccRefactorPage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_ACC_REFACTOR_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfCoreComponentAccRefactorPage)));
-      preferencesInfo.tableColumnsInfo.columnsOfCodeListPage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CODE_LIST_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfCodeListPage)));
-      preferencesInfo.tableColumnsInfo.columnsOfCodeListValuePage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CODE_LIST_VALUE_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfCodeListValuePage)));
-      preferencesInfo.tableColumnsInfo.columnsOfAgencyIdListPage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_AGENCY_ID_LIST_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfAgencyIdListPage)));
-      preferencesInfo.tableColumnsInfo.columnsOfAgencyIdListValuePage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_AGENCY_ID_LIST_VALUE_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfAgencyIdListValuePage)));
-      preferencesInfo.tableColumnsInfo.columnsOfReleasePage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_RELEASE_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfReleasePage)));
-      preferencesInfo.tableColumnsInfo.columnsOfNamespacePage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_NAMESPACE_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfNamespacePage)));
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_CORE_COMPONENT_PAGE_KEY, 'columnsOfCoreComponentPage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_DATA_TYPE_PAGE_KEY, 'columnsOfDataTypePage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_CORE_COMPONENT_WITHOUT_TYPE_COLUMN_PAGE_KEY, 'columnsOfCoreComponentWithoutTypeColumnPage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_DATA_TYPE_WITHOUT_TYPE_COLUMN_PAGE_KEY, 'columnsOfDataTypeWithoutTypeColumnPage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_CORE_COMPONENT_FOR_VERB_BOD_PAGE_KEY, 'columnsOfCoreComponentForVerbBODPage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_CORE_COMPONENT_FOR_NOUN_BOD_PAGE_KEY, 'columnsOfCoreComponentForNounBODPage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.FILTER_TYPES_FOR_CORE_COMPONENT_PAGE_KEY, 'filterTypesOfCoreComponentPage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.FILTER_TYPES_FOR_DATA_TYPE_PAGE_KEY, 'filterTypesOfDataTypePage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_CORE_COMPONENT_ACC_REFACTOR_PAGE_KEY, 'columnsOfCoreComponentAccRefactorPage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_CODE_LIST_PAGE_KEY, 'columnsOfCodeListPage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_CODE_LIST_VALUE_PAGE_KEY, 'columnsOfCodeListValuePage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_AGENCY_ID_LIST_PAGE_KEY, 'columnsOfAgencyIdListPage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_AGENCY_ID_LIST_VALUE_PAGE_KEY, 'columnsOfAgencyIdListValuePage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_RELEASE_PAGE_KEY, 'columnsOfReleasePage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_NAMESPACE_PAGE_KEY, 'columnsOfNamespacePage');
 
-      preferencesInfo.tableColumnsInfo.columnsOfContextCategoryPage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CONTEXT_CATEGORY_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfContextCategoryPage)));
-      preferencesInfo.tableColumnsInfo.columnsOfContextSchemePage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CONTEXT_SCHEME_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfContextSchemePage)));
-      preferencesInfo.tableColumnsInfo.columnsOfContextSchemeValuePage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CONTEXT_SCHEME_VALUE_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfContextSchemeValuePage)));
-      preferencesInfo.tableColumnsInfo.columnsOfBusinessContextPage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_BUSINESS_CONTEXT_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfBusinessContextPage)));
-      preferencesInfo.tableColumnsInfo.columnsOfBusinessContextWithTenantPage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_BUSINESS_CONTEXT_WITH_TENANT_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfBusinessContextWithTenantPage)));
-      preferencesInfo.tableColumnsInfo.columnsOfBusinessContextValuePage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_BUSINESS_CONTEXT_VALUE_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfBusinessContextValuePage)));
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_CONTEXT_CATEGORY_PAGE_KEY, 'columnsOfContextCategoryPage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_CONTEXT_SCHEME_PAGE_KEY, 'columnsOfContextSchemePage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_CONTEXT_SCHEME_VALUE_PAGE_KEY, 'columnsOfContextSchemeValuePage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_BUSINESS_CONTEXT_PAGE_KEY, 'columnsOfBusinessContextPage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_BUSINESS_CONTEXT_WITH_TENANT_PAGE_KEY, 'columnsOfBusinessContextWithTenantPage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_BUSINESS_CONTEXT_VALUE_PAGE_KEY, 'columnsOfBusinessContextValuePage');
 
-      preferencesInfo.tableColumnsInfo.columnsOfModuleSetPage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_MODULE_SET_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfModuleSetPage)));
-      preferencesInfo.tableColumnsInfo.columnsOfModuleSetReleasePage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_MODULE_SET_RELEASE_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfModuleSetReleasePage)));
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_MODULE_SET_PAGE_KEY, 'columnsOfModuleSetPage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_MODULE_SET_RELEASE_PAGE_KEY, 'columnsOfModuleSetReleasePage');
 
-      preferencesInfo.tableColumnsInfo.columnsOfBiePage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_BIE_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfBiePage)));
-      preferencesInfo.tableColumnsInfo.columnsOfBieReuseReportPage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_BIE_REUSE_REPORT_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfBieReuseReportPage)));
-      preferencesInfo.tableColumnsInfo.columnsOfBieUpliftReportPage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_BIE_UPLIFT_REPORT_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfBieUpliftReportPage)));
-      preferencesInfo.tableColumnsInfo.columnsOfBiePackagePage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_BIE_PACKAGE_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfBiePackagePage)));
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_BIE_PAGE_KEY, 'columnsOfBiePage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_BIE_REUSE_REPORT_PAGE_KEY, 'columnsOfBieReuseReportPage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_BIE_UPLIFT_REPORT_PAGE_KEY, 'columnsOfBieUpliftReportPage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_BIE_PACKAGE_PAGE_KEY, 'columnsOfBiePackagePage');
 
-      preferencesInfo.tableColumnsInfo.columnsOfAccountPage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_ACCOUNT_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfAccountPage)));
-      preferencesInfo.tableColumnsInfo.columnsOfPendingAccountPage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_PENDING_ACCOUNT_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfPendingAccountPage)));
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_ACCOUNT_PAGE_KEY, 'columnsOfAccountPage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_PENDING_ACCOUNT_PAGE_KEY, 'columnsOfPendingAccountPage');
 
-      preferencesInfo.tableColumnsInfo.columnsOfMessagePage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_MESSAGE_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfMessagePage)));
-      preferencesInfo.tableColumnsInfo.columnsOfLogPage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_LOG_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfLogPage)));
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_MESSAGE_PAGE_KEY, 'columnsOfMessagePage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_LOG_PAGE_KEY, 'columnsOfLogPage');
 
-      preferencesInfo.tableColumnsInfo.columnsOfTenantPage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_TENANT_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfTenantPage)));
-      preferencesInfo.tableColumnsInfo.columnsOfTenantManagementForAccountPage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_TENANT_MANAGEMENT_FOR_ACCOUNT_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfTenantManagementForAccountPage)));
-      preferencesInfo.tableColumnsInfo.columnsOfTenantManagementForBusinessContextPage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_TENANT_MANAGEMENT_FOR_BUSINESS_CONTEXT_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfTenantManagementForBusinessContextPage)));
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_TENANT_PAGE_KEY, 'columnsOfTenantPage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_TENANT_MANAGEMENT_FOR_ACCOUNT_PAGE_KEY, 'columnsOfTenantManagementForAccountPage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_TENANT_MANAGEMENT_FOR_BUSINESS_CONTEXT_PAGE_KEY, 'columnsOfTenantManagementForBusinessContextPage');
 
-      preferencesInfo.tableColumnsInfo.columnsOfOpenApiDocumentPage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_OPENAPI_DOCUMENT_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfOpenApiDocumentPage)));
-      preferencesInfo.tableColumnsInfo.columnsOfBieForOasDocPage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_BIE_FOR_OAS_DOC_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfBieForOasDocPage)));
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_OPENAPI_DOCUMENT_PAGE_KEY, 'columnsOfOpenApiDocumentPage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_BIE_FOR_OAS_DOC_PAGE_KEY, 'columnsOfBieForOasDocPage');
 
-      preferencesInfo.tableColumnsInfo.columnsOfBusinessTermPage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_BUSINESS_TERM_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfBusinessTermPage)));
-      preferencesInfo.tableColumnsInfo.columnsOfAssignedBusinessTermPage =
-        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_ASSIGNED_BUSINESS_TERM_PAGE_KEY,
-          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfAssignedBusinessTermPage)));
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_BUSINESS_TERM_PAGE_KEY, 'columnsOfBusinessTermPage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_ASSIGNED_BUSINESS_TERM_PAGE_KEY, 'columnsOfAssignedBusinessTermPage');
 
       subscriber.next(preferencesInfo);
       subscriber.complete();
@@ -215,14 +186,19 @@ export class SettingsPreferencesService {
       preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage);
   }
 
-  updateTableColumnsForCoreComponentWithoutDtColumnsPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
-    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_WITHOUT_DT_COLUMNS_PAGE_KEY,
-      preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutDtColumnsPage);
+  updateTableColumnsForDataTypePage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_DATA_TYPE_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfDataTypePage);
   }
 
-  updateTableColumnsForCoreComponentWithoutTypeAndDtColumnsPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
-    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_WITHOUT_TYPE_AND_DT_COLUMNS_PAGE_KEY,
-      preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutTypeAndDtColumnsPage);
+  updateTableColumnsForCoreComponentWithoutTypeColumnPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_WITHOUT_TYPE_COLUMN_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutTypeColumnPage);
+  }
+
+  updateTableColumnsForDataTypeWithoutTypeColumnPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_DATA_TYPE_WITHOUT_TYPE_COLUMN_PAGE_KEY,
+        preferencesInfo.tableColumnsInfo.columnsOfDataTypeWithoutTypeColumnPage);
   }
 
   updateTableColumnsForCoreComponentForVerbBODPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
@@ -238,6 +214,11 @@ export class SettingsPreferencesService {
   updateFilterTypeForCoreComponentPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
     return this.updateTableColumnsInfo(userToken, this.FILTER_TYPES_FOR_CORE_COMPONENT_PAGE_KEY,
       preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage);
+  }
+
+  updateFilterTypeForDataTypePage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.FILTER_TYPES_FOR_DATA_TYPE_PAGE_KEY,
+        preferencesInfo.tableColumnsInfo.filterTypesOfDataTypePage);
   }
 
   updateTableColumnsForCoreComponentAccRefactorPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {

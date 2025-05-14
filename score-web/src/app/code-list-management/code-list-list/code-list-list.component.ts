@@ -9,29 +9,29 @@ import {SelectionModel} from '@angular/cdk/collections';
 import {faLocationArrow} from '@fortawesome/free-solid-svg-icons';
 import {AccountList} from '../../account-management/domain/accounts';
 import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
-import {CodeListForList, CodeListForListRequest} from '../domain/code-list';
+import {CodeListListEntry, CodeListListEntryRequest} from '../domain/code-list';
 import {CodeListService} from '../domain/code-list.service';
-import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker} from '@angular/material/datepicker';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {initFilter, loadBranch, loadLibrary, saveBranch, saveLibrary} from '../../common/utility';
-import {SimpleRelease, WorkingRelease} from '../../release-management/domain/release';
+import {ReleaseSummary, WorkingRelease} from '../../release-management/domain/release';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {AuthService} from '../../authentication/auth.service';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
-import {SimpleNamespace} from '../../namespace-management/domain/namespace';
+import {NamespaceSummary} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {WebPageInfoService} from '../../basis/basis.service';
 import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
-import {Library} from '../../library-management/domain/library';
+import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryService} from '../../library-management/domain/library.service';
 
 @Component({
@@ -179,32 +179,32 @@ export class CodeListListComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<CodeListForList>();
-  selection = new SelectionModel<CodeListForList>(true, [],
+  dataSource = new MatTableDataSource<CodeListListEntry>();
+  selection = new SelectionModel<CodeListListEntry>(true, [],
     true, (a, b) => a.codeListManifestId === b.codeListManifestId);
-  expandedElement: CodeListForList | null;
+  expandedElement: CodeListListEntry | null;
   canSelect = ['WIP', 'Deleted'];
   loading = false;
 
-  releases: SimpleRelease[] = [];
-  libraries: Library[] = [];
-  mappedLibraries: {library: Library, selected: boolean}[] = [];
+  releases: ReleaseSummary[] = [];
+  libraries: LibrarySummary[] = [];
+  mappedLibraries: {library: LibrarySummary, selected: boolean}[] = [];
   loginIdList: string[] = [];
   releaseListFilterCtrl: FormControl = new FormControl();
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
-  filteredReleaseList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
+  filteredReleaseList: ReplaySubject<ReleaseSummary[]> = new ReplaySubject<ReleaseSummary[]>(1);
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
-  request: CodeListForListRequest;
+  request: CodeListListEntryRequest;
   highlightTextForModule: string;
   highlightTextForDefinition: string;
   preferencesInfo: PreferencesInfo;
-  namespaces: SimpleNamespace[] = [];
+  namespaces: NamespaceSummary[] = [];
   namespaceListFilterCtrl: FormControl = new FormControl();
-  filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
+  filteredNamespaceList: ReplaySubject<NamespaceSummary[]> = new ReplaySubject<NamespaceSummary[]>(1);
 
-  contextMenuItem: CodeListForList;
+  contextMenuItem: CodeListListEntry;
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -229,10 +229,10 @@ export class CodeListListComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.request = new CodeListForListRequest(this.route.snapshot.queryParamMap,
+    this.request = new CodeListListEntryRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
 
-    this.libraryService.getLibraries().subscribe(libraries => {
+    this.libraryService.getLibrarySummaryList().subscribe(libraries => {
       this.initLibraries(libraries);
 
       this.searchBar.showAdvancedSearch =
@@ -259,8 +259,8 @@ export class CodeListListComponent implements OnInit {
 
       this.releases = [];
       forkJoin([
-        this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Draft', 'Published']),
-        this.namespaceService.getSimpleNamespaces(this.request.library.libraryId),
+        this.releaseService.getReleaseSummaryList(this.request.library.libraryId, ['Draft', 'Published']),
+        this.namespaceService.getNamespaceSummaries(this.request.library.libraryId),
         this.accountService.getAccountNames(),
         this.preferencesService.load(this.auth.getUserToken())
       ]).subscribe(([releases, namespaces, loginIds, preferencesInfo]) => {
@@ -280,7 +280,7 @@ export class CodeListListComponent implements OnInit {
     });
   }
 
-  getRelease(releaseNum: string): SimpleRelease | undefined {
+  getRelease(releaseNum: string): ReleaseSummary | undefined {
     for (const release of this.releases) {
       if (release.releaseNum === releaseNum) {
         return release;
@@ -299,17 +299,6 @@ export class CodeListListComponent implements OnInit {
     }
   }
 
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
-  }
-
   reset(type: string) {
     switch (type) {
       case 'startDate':
@@ -323,7 +312,7 @@ export class CodeListListComponent implements OnInit {
     }
   }
 
-  initLibraries(libraries: Library[]) {
+  initLibraries(libraries: LibrarySummary[]) {
     this.libraries = libraries;
     if (this.libraries.length > 0) {
       const savedLibraryId = loadLibrary(this.auth.getUserToken());
@@ -342,7 +331,7 @@ export class CodeListListComponent implements OnInit {
     }
   }
 
-  initReleases(releases: SimpleRelease[]) {
+  initReleases(releases: ReleaseSummary[]) {
     this.releases = [...releases];
     if (this.releases.length > 0) {
       if (this.request.release.releaseId === 0) {
@@ -364,9 +353,9 @@ export class CodeListListComponent implements OnInit {
     initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
   }
 
-  onLibraryChange(library: Library) {
+  onLibraryChange(library: LibrarySummary) {
     this.request.library = library;
-    this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Draft', 'Published']).subscribe(releases => {
+    this.releaseService.getReleaseSummaryList(this.request.library.libraryId, ['Draft', 'Published']).subscribe(releases => {
       saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
       this.initReleases(releases);
       this.onSearch();
@@ -391,10 +380,7 @@ export class CodeListListComponent implements OnInit {
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
-      this.dataSource.data = resp.list.map((elm: CodeListForList) => {
-        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        return elm;
-      });
+      this.dataSource.data = resp.list;
       this.highlightTextForModule = this.request.filters.module;
       this.highlightTextForDefinition = this.request.filters.definition;
 
@@ -411,7 +397,7 @@ export class CodeListListComponent implements OnInit {
   isAllSelected() {
     const numSelected = this.selection.selected.length;
     const numRows = this.dataSource.data.filter(row =>
-      row.owner === this.currentUser && this.canSelect.indexOf(row.state) > -1 && !this.hasRevision(row)).length;
+      row.owner.loginId === this.currentUser && this.canSelect.indexOf(row.state) > -1 && !this.hasRevision(row)).length;
     return numSelected === numRows;
   }
 
@@ -422,13 +408,13 @@ export class CodeListListComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(row: CodeListForList) {
-    if (row.owner === this.currentUser && this.canSelect.indexOf(row.state) > -1 && !this.hasRevision(row)) {
+  select(row: CodeListListEntry) {
+    if (row.owner.loginId === this.currentUser && this.canSelect.indexOf(row.state) > -1 && !this.hasRevision(row)) {
       this.selection.select(row);
     }
   }
 
-  toggle(row: CodeListForList) {
+  toggle(row: CodeListListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row);
     } else {
@@ -436,12 +422,12 @@ export class CodeListListComponent implements OnInit {
     }
   }
 
-  isSelected(row: CodeListForList) {
+  isSelected(row: CodeListListEntry) {
     return this.selection.isSelected(row);
   }
 
   selectionClear() {
-    this.selection = new SelectionModel<CodeListForList>(true, [],
+    this.selection = new SelectionModel<CodeListListEntry>(true, [],
       true, (a, b) => a.codeListManifestId === b.codeListManifestId);
   }
 
@@ -457,7 +443,7 @@ export class CodeListListComponent implements OnInit {
         this.snackBar.open('Created', '', {
           duration: 3000,
         });
-        this.router.navigateByUrl('/code_list/' + resp.manifestId);
+        this.router.navigateByUrl('/code_list/' + resp.codeListManifestId);
       }, _ => {
         this.loading = false;
       });
@@ -560,21 +546,21 @@ export class CodeListListComponent implements OnInit {
       });
   }
 
-  hasRevision(codeList: CodeListForList): boolean {
+  hasRevision(codeList: CodeListListEntry): boolean {
     if (!codeList) {
       return false;
     }
-    return codeList.revision !== '1';
+    return codeList.log.revisionNum > 1;
   }
 
-  isEditable(item: CodeListForList) {
+  isEditable(item: CodeListListEntry) {
     if (!item) {
       return false;
     }
     return item.access === 'CanEdit';
   }
 
-  openTransferDialog(item: CodeListForList, event?: MouseEvent) {
+  openTransferDialog(item: CodeListListEntry, event?: MouseEvent) {
     if (!this.isEditable(item)) {
       return;
     }
@@ -590,13 +576,14 @@ export class CodeListListComponent implements OnInit {
           this.snackBar.open('Transferred', '', {
             duration: 3000,
           });
+          this.selection.clear();
           this.loadCodeList();
         });
       }
     });
   }
 
-  delete(item: CodeListForList) {
+  delete(item: CodeListListEntry) {
     if (!this.isEditable(item)) {
       return;
     }
@@ -627,12 +614,12 @@ export class CodeListListComponent implements OnInit {
       });
   }
 
-  openDetail(item: CodeListForList) {
+  openDetail(item: CodeListListEntry) {
     this.router.navigateByUrl('/code_list/' + item.codeListManifestId);
     return;
   }
 
-  openDialogCcListRestore(item: CodeListForList) {
+  openDialogCcListRestore(item: CodeListListEntry) {
 
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Restore code list';

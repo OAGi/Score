@@ -45,10 +45,10 @@ public class BusinessContextValueDialogImpl implements BusinessContextValueDialo
             By.xpath("//mat-label[contains(text(), \"Context Scheme Value\")]//ancestor::mat-form-field/ancestor::mat-card-content/mat-form-field[2]//textarea");
 
     private static final By ADD_BUTTON_LOCATOR
-            = By.xpath("//mat-dialog-container//mat-icon[contains(text(), \"add\")]//ancestor::button[1]");
+            = By.xpath("//score-business-context-value-dialog//mat-icon[contains(text(), \"add\")]//ancestor::button[1]");
 
     private static final By SAVE_BUTTON_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Save\")]//ancestor::button[1]");
+            By.xpath("//score-business-context-value-dialog//span[contains(text(), \"Save\")]//ancestor::button[1]");
 
     private final BasePageImpl parent;
 
@@ -72,7 +72,7 @@ public class BusinessContextValueDialogImpl implements BusinessContextValueDialo
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//score-business-context-value-dialog//div[contains(@class, \"mat-mdc-dialog-title\")]"));
     }
 
     @Override

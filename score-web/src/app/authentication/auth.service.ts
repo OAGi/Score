@@ -204,7 +204,7 @@ export class AuthService implements OnInit, CanActivate {
   }
 
   getOAuth2AppInfos(): Observable<OAuth2AppInfo[]> {
-    return this.http.get<OAuth2AppInfo[]>('/api/info/oauth2_providers');
+    return this.http.get<OAuth2AppInfo[]>('/api/info/oauth2-providers');
   }
 }
 
@@ -293,6 +293,10 @@ export class ErrorAlertInterceptor implements HttpInterceptor {
                 this.auth.logout(window.location.pathname);
               }
 
+              break;
+
+            case 404:
+              // handle per case
               break;
 
             default:

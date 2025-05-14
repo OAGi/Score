@@ -3,7 +3,7 @@ import {Location} from '@angular/common';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {switchMap} from 'rxjs/operators';
 import {ContextCategoryService} from '../domain/context-category.service';
-import {ContextCategory} from '../domain/context-category';
+import {ContextCategoryDetails} from '../domain/context-category';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {hashCode} from '../../../common/utility';
@@ -18,7 +18,7 @@ import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialo
 export class ContextCategoryDetailComponent implements OnInit {
 
   title = 'Edit Context Category';
-  contextCategory: ContextCategory;
+  contextCategory: ContextCategoryDetails;
   hashCode;
   contextSchemes: ContextScheme[];
 
@@ -32,14 +32,23 @@ export class ContextCategoryDetailComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.contextCategory = new ContextCategory();
+    this.contextCategory = new ContextCategoryDetails();
 
     this.route.paramMap.pipe(
       switchMap((params: ParamMap) =>
-        this.service.getContextCategory(params.get('id')))
-    ).subscribe(resp => {
-      this.hashCode = hashCode(resp);
-      this.contextCategory = resp;
+        this.service.getContextCategoryDetails(params.get('id')))
+    ).subscribe(contextCategory => {
+
+      if (!contextCategory) {
+        this.snackBar.open('Access denied.', '', {
+          duration: 3000
+        });
+        this.router.navigateByUrl('/context_management/context_category');
+        return;
+      }
+
+      this.hashCode = hashCode(contextCategory);
+      this.contextCategory = contextCategory;
     });
   }
 
@@ -47,7 +56,7 @@ export class ContextCategoryDetailComponent implements OnInit {
     return this.hashCode !== hashCode(this.contextCategory);
   }
 
-  isDisabled(contextCategory: ContextCategory) {
+  isDisabled(contextCategory: ContextCategoryDetails) {
     return contextCategory.name === undefined || contextCategory.name === '';
   }
 

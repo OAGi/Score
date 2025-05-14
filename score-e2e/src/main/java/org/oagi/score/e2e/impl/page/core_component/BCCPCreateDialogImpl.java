@@ -70,7 +70,7 @@ public class BCCPCreateDialogImpl extends SearchBarPageImpl implements BCCPCreat
         } catch (TimeoutException e) {
             return false;
         }
-        assert "Select BDT to create BCCP".equals(getText(title.findElement(By.tagName("span"))));
+        assert "Select DT to create BCCP".equals(getText(title.findElement(By.tagName("span"))));
         return true;
     }
 
@@ -115,8 +115,9 @@ public class BCCPCreateDialogImpl extends SearchBarPageImpl implements BCCPCreat
     public void setCommonlyUsed(boolean commonlyUsed) {
         click(getCommonlyUsedSelectField());
         WebElement optionField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-dialog-container//mat-option//span[contains(text(), \"" + (commonlyUsed ? "True" : "False") + "\")]"));
+                By.xpath("//div[contains(@class, \"cdk-overlay-container\")]//mat-option//span[contains(text(), \"" + (commonlyUsed ? "True" : "False") + "\")]"));
         click(optionField);
+        escape(getDriver());
     }
 
     @Override
@@ -253,6 +254,8 @@ public class BCCPCreateDialogImpl extends SearchBarPageImpl implements BCCPCreat
     @Override
     public BCCPViewEditPage create(String den) {
         setDEN(den);
+        showAdvancedSearchPanel();
+        setCommonlyUsed(false);
         hitSearchButton();
 
         retry(() -> {
@@ -286,6 +289,8 @@ public class BCCPCreateDialogImpl extends SearchBarPageImpl implements BCCPCreat
 
     @Override
     public void selectDataTypeByDEN(String dataType) {
+        showAdvancedSearchPanel();
+        setCommonlyUsed(false);
         sendKeys(getDENField(), dataType);
         click(getSearchButton());
         retry(() -> {

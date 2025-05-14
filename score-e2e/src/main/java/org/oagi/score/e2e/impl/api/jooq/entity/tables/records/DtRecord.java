@@ -16,7 +16,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.Dt;
  * The DT table stores both CDT and BDT. The two types of DTs are differentiated
  * by the TYPE column.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class DtRecord extends UpdatableRecordImpl<DtRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -479,6 +479,6 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
         setReplacementDtId(replacementDtId);
         setPrevDtId(prevDtId);
         setNextDtId(nextDtId);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

@@ -11,6 +11,7 @@ import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.DTViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.oagi.score.e2e.page.core_component.ViewEditDataTypePage;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
@@ -49,18 +50,22 @@ public class TC_38_8_EditingValueDomains extends BaseTest {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
 
-            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
+
+            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
             branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
-            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
-            DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, developerA, namespace, "WIP");
+            DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, baseCDT, developerA, namespace, "WIP");
             dtForTesting.add(randomBDT);
 
-            DTObject derivedBDTLevelOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(randomBDT, developerA, namespace, "WIP");
+            DTObject derivedBDTLevelOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, randomBDT, developerA, namespace, "WIP");
             derivedBDTs.add(derivedBDTLevelOne);
 
-            DTObject derivedBDTLevelTwo = getAPIFactory().getCoreComponentAPI().createRandomBDT(derivedBDTLevelOne, developerA, namespace, "WIP");
+            DTObject derivedBDTLevelTwo = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, derivedBDTLevelOne, developerA, namespace, "WIP");
             derivedBDTs.add(derivedBDTLevelTwo);
 
             codeList = getAPIFactory().getCodeListAPI().
@@ -68,13 +73,13 @@ public class TC_38_8_EditingValueDomains extends BaseTest {
         }
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
         for (DTObject dt : dtForTesting) {
-            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+            DTViewEditPage dtViewEditPage = viewEditDataTypePage.openDTViewEditPageByManifestID(dt.getDtManifestId());
             dtViewEditPage.showValueDomain();
             String representationTerm = dtViewEditPage.getRepresentationTermFieldValue();
             List<String> valueDomains = getAPIFactory().getCoreComponentAPI().getValueDomainsByCDTRepresentationTerm(representationTerm);
-            if (valueDomains.contains("Token")){
+            if (valueDomains.contains("Token")) {
                 dtViewEditPage.addCodeListValueDomain(codeList.getName());
             }
             dtViewEditPage.hitUpdateButton();
@@ -89,12 +94,12 @@ public class TC_38_8_EditingValueDomains extends BaseTest {
             List<String> representationTermsForCDTs = getAPIFactory().getCoreComponentAPI().getRepresentationTermsForCDTs(branch.getReleaseNumber());
             representationTerm = SCPanel.getRepresentationSelectFieldValue();
             valueDomains = getAPIFactory().getCoreComponentAPI().getValueDomainsByCDTRepresentationTerm(representationTerm);
-            if (valueDomains.contains("Token")){
+            if (valueDomains.contains("Token")) {
                 dtViewEditPage.addCodeListValueDomain(codeList.getName());
-            } else{
-                for (String representationTermNew: representationTermsForCDTs){
+            } else {
+                for (String representationTermNew : representationTermsForCDTs) {
                     valueDomains = getAPIFactory().getCoreComponentAPI().getValueDomainsByCDTRepresentationTerm(representationTermNew);
-                    if (valueDomains.contains("Token")){
+                    if (valueDomains.contains("Token")) {
                         SCPanel.selectRepresentationTerm(representationTermNew);
                         dtViewEditPage.addCodeListValueDomain(codeList.getName());
                         String propertyTerm = SCPanel.getPropertyTermFieldValue();
@@ -106,9 +111,9 @@ public class TC_38_8_EditingValueDomains extends BaseTest {
             }
             dtViewEditPage.setDefinition("definition");
             dtViewEditPage.hitUpdateButton();
-            for (DTObject derivedDT: derivedBDTs){
-                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-                viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(derivedDT.getDen(), branch.getReleaseNumber());
+            for (DTObject derivedDT : derivedBDTs) {
+                homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+                viewEditDataTypePage.openDTViewEditPageByManifestID(derivedDT.getDtManifestId());
                 dtViewEditPage.showValueDomain();
                 assertDoesNotThrow(() -> dtViewEditPage.getTableRecordByValue(codeList.getName()));
 
@@ -135,18 +140,22 @@ public class TC_38_8_EditingValueDomains extends BaseTest {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
 
-            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
+
+            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
             branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
-            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
-            DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, developerA, namespace, "WIP");
+            DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, baseCDT, developerA, namespace, "WIP");
             dtForTesting.add(randomBDT);
 
-            DTObject derivedBDTLevelOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(randomBDT, developerA, namespace, "WIP");
+            DTObject derivedBDTLevelOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, randomBDT, developerA, namespace, "WIP");
             derivedBDTs.add(derivedBDTLevelOne);
 
-            DTObject derivedBDTLevelTwo = getAPIFactory().getCoreComponentAPI().createRandomBDT(derivedBDTLevelOne, developerA, namespace, "WIP");
+            DTObject derivedBDTLevelTwo = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, derivedBDTLevelOne, developerA, namespace, "WIP");
             derivedBDTs.add(derivedBDTLevelTwo);
 
             codeList = getAPIFactory().getCodeListAPI().
@@ -154,13 +163,13 @@ public class TC_38_8_EditingValueDomains extends BaseTest {
         }
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
         for (DTObject dt : dtForTesting) {
-            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+            DTViewEditPage dtViewEditPage = viewEditDataTypePage.openDTViewEditPageByManifestID(dt.getDtManifestId());
             dtViewEditPage.showValueDomain();
             String representationTerm = dtViewEditPage.getRepresentationTermFieldValue();
             List<String> valueDomains = getAPIFactory().getCoreComponentAPI().getValueDomainsByCDTRepresentationTerm(representationTerm);
-            if (valueDomains.contains("Token")){
+            if (valueDomains.contains("Token")) {
                 dtViewEditPage.addCodeListValueDomain(codeList.getName());
             }
             dtViewEditPage.hitUpdateButton();
@@ -178,12 +187,12 @@ public class TC_38_8_EditingValueDomains extends BaseTest {
             List<String> representationTermsForCDTs = getAPIFactory().getCoreComponentAPI().getRepresentationTermsForCDTs(branch.getReleaseNumber());
             representationTerm = SCPanel.getRepresentationSelectFieldValue();
             valueDomains = getAPIFactory().getCoreComponentAPI().getValueDomainsByCDTRepresentationTerm(representationTerm);
-            if (valueDomains.contains("Token")){
+            if (valueDomains.contains("Token")) {
                 dtViewEditPage.addCodeListValueDomain(codeList.getName());
-            } else{
-                for (String representationTermNew: representationTermsForCDTs){
+            } else {
+                for (String representationTermNew : representationTermsForCDTs) {
                     valueDomains = getAPIFactory().getCoreComponentAPI().getValueDomainsByCDTRepresentationTerm(representationTermNew);
-                    if (valueDomains.contains("Token")){
+                    if (valueDomains.contains("Token")) {
                         SCPanel.selectRepresentationTerm(representationTermNew);
                         dtViewEditPage.addCodeListValueDomain(codeList.getName());
                         String propertyTerm = SCPanel.getPropertyTermFieldValue();
@@ -201,9 +210,9 @@ public class TC_38_8_EditingValueDomains extends BaseTest {
             dtViewEditPage.selectValueDomain(codeList.getName());
             dtViewEditPage.discardValueDomain();
             dtViewEditPage.hitUpdateButton();
-            for (DTObject derivedDT: derivedBDTs){
-                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-                viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(derivedDT.getDen(), branch.getReleaseNumber());
+            for (DTObject derivedDT : derivedBDTs) {
+                homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+                viewEditDataTypePage.openDTViewEditPageByManifestID(derivedDT.getDtManifestId());
                 dtViewEditPage.showValueDomain();
                 assertThrows(TimeoutException.class, () -> dtViewEditPage.getTableRecordByValue(codeList.getName()));
 
@@ -229,12 +238,16 @@ public class TC_38_8_EditingValueDomains extends BaseTest {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
 
-            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
+
+            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
             branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
-            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
-            DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, developerA, namespace, "WIP");
+            DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, baseCDT, developerA, namespace, "WIP");
             dtForTesting.add(randomBDT);
 
             codeList = getAPIFactory().getCodeListAPI().
@@ -242,13 +255,13 @@ public class TC_38_8_EditingValueDomains extends BaseTest {
         }
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
         for (DTObject dt : dtForTesting) {
-            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+            DTViewEditPage dtViewEditPage = viewEditDataTypePage.openDTViewEditPageByManifestID(dt.getDtManifestId());
             dtViewEditPage.showValueDomain();
             String representationTerm = dtViewEditPage.getRepresentationTermFieldValue();
             List<String> valueDomains = getAPIFactory().getCoreComponentAPI().getValueDomainsByCDTRepresentationTerm(representationTerm);
-            if (valueDomains.contains("Token")){
+            if (valueDomains.contains("Token")) {
                 dtViewEditPage.addCodeListValueDomain(codeList.getName());
                 assertThrows(TimeoutException.class, () -> dtViewEditPage.addCodeListValueDomain(codeList.getName()));
                 escape(getDriver());
@@ -264,12 +277,12 @@ public class TC_38_8_EditingValueDomains extends BaseTest {
             List<String> representationTermsForCDTs = getAPIFactory().getCoreComponentAPI().getRepresentationTermsForCDTs(branch.getReleaseNumber());
             representationTerm = SCPanel.getRepresentationSelectFieldValue();
             valueDomains = getAPIFactory().getCoreComponentAPI().getValueDomainsByCDTRepresentationTerm(representationTerm);
-            if (valueDomains.contains("Token")){
+            if (valueDomains.contains("Token")) {
                 dtViewEditPage.addCodeListValueDomain(codeList.getName());
-            } else{
-                for (String representationTermNew: representationTermsForCDTs){
+            } else {
+                for (String representationTermNew : representationTermsForCDTs) {
                     valueDomains = getAPIFactory().getCoreComponentAPI().getValueDomainsByCDTRepresentationTerm(representationTermNew);
-                    if (valueDomains.contains("Token")){
+                    if (valueDomains.contains("Token")) {
                         SCPanel.selectRepresentationTerm(representationTermNew);
                         dtViewEditPage.addCodeListValueDomain(codeList.getName());
                         assertThrows(TimeoutException.class, () -> dtViewEditPage.addCodeListValueDomain(codeList.getName()));
@@ -281,6 +294,7 @@ public class TC_38_8_EditingValueDomains extends BaseTest {
 
         }
     }
+
     @Test
     @DisplayName("TC_38_8_TA_4")
     public void test_TA_4() {
@@ -293,31 +307,35 @@ public class TC_38_8_EditingValueDomains extends BaseTest {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
 
-            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
+
+            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
             branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
-            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
-            DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, developerA, namespace, "WIP");
+            DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, baseCDT, developerA, namespace, "WIP");
             dtForTesting.add(randomBDT);
 
-            DTObject derivedBDTLevelOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(randomBDT, developerA, namespace, "WIP");
+            DTObject derivedBDTLevelOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, randomBDT, developerA, namespace, "WIP");
             derivedBDTs.add(derivedBDTLevelOne);
 
-            DTObject derivedBDTLevelTwo = getAPIFactory().getCoreComponentAPI().createRandomBDT(derivedBDTLevelOne, developerA, namespace, "WIP");
+            DTObject derivedBDTLevelTwo = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, derivedBDTLevelOne, developerA, namespace, "WIP");
             derivedBDTs.add(derivedBDTLevelTwo);
         }
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
         for (DTObject dt : dtForTesting) {
-            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+            DTViewEditPage dtViewEditPage = viewEditDataTypePage.openDTViewEditPageByManifestID(dt.getDtManifestId());
             dtViewEditPage.showValueDomain();
             String representationTerm = dtViewEditPage.getRepresentationTermFieldValue();
             List<String> valueDomains = getAPIFactory().getCoreComponentAPI().getValueDomainsByCDTRepresentationTerm(representationTerm);
             String defaultDomainCC = getAPIFactory().getCoreComponentAPI().getDefaultValueDomainByCDTRepresentationTerm(representationTerm);
-            for (String valueDomain: valueDomains){
-                if (!valueDomain.equals(defaultDomainCC)){
+            for (String valueDomain : valueDomains) {
+                if (!valueDomain.equals(defaultDomainCC)) {
                     dtViewEditPage.setDefaultValueDomain(valueDomain);
                     defaultDomainCC = valueDomain;
                     break;
@@ -335,8 +353,8 @@ public class TC_38_8_EditingValueDomains extends BaseTest {
             representationTerm = SCPanel.getRepresentationSelectFieldValue();
             valueDomains = getAPIFactory().getCoreComponentAPI().getValueDomainsByCDTRepresentationTerm(representationTerm);
             String defaultDomainSC = getAPIFactory().getCoreComponentAPI().getDefaultValueDomainByCDTRepresentationTerm(representationTerm);
-            for (String valueDomain: valueDomains){
-                if (!valueDomain.equals(defaultDomainSC)){
+            for (String valueDomain : valueDomains) {
+                if (!valueDomain.equals(defaultDomainSC)) {
                     dtViewEditPage.setDefaultValueDomain(valueDomain);
                     defaultDomainSC = valueDomain;
                     break;
@@ -345,9 +363,9 @@ public class TC_38_8_EditingValueDomains extends BaseTest {
 
             dtViewEditPage.setDefinition("definition");
             dtViewEditPage.hitUpdateButton();
-            for (DTObject derivedDT: derivedBDTs){
-                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-                viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(derivedDT.getDen(), branch.getReleaseNumber());
+            for (DTObject derivedDT : derivedBDTs) {
+                homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+                viewEditDataTypePage.openDTViewEditPageByManifestID(derivedDT.getDtManifestId());
                 dtViewEditPage.showValueDomain();
                 assertTrue(dtViewEditPage.getDefaultValueDomainFieldValue().contains(defaultDomainCC));
 

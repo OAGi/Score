@@ -20,7 +20,7 @@ public class EditContextCategoryPageImpl extends BasePageImpl implements EditCon
     private static final By DISCARD_BUTTON_LOCATOR = By.xpath("//span[contains(text(), \"Discard\")]//ancestor::button[1]");
 
     private static final By DISCARD_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]");
 
     private final ViewEditContextCategoryPageImpl parent;
 
@@ -89,7 +89,7 @@ public class EditContextCategoryPageImpl extends BasePageImpl implements EditCon
     public void updateContextCategory(ContextCategoryObject contextCategory) {
         setName(contextCategory.getName());
         setDescription(contextCategory.getDescription());
-        click(getUpdateButton());
+        click(getDriver(), getUpdateButton());
         assert getSnackBar(getDriver(), "Updated").isEnabled();
     }
 
@@ -101,8 +101,8 @@ public class EditContextCategoryPageImpl extends BasePageImpl implements EditCon
     @Override
     public ViewEditContextCategoryPage discardContextCategory() {
         return retry(() -> {
-            click(getDiscardButton());
-            click(elementToBeClickable(getDriver(), DISCARD_BUTTON_IN_DIALOG_LOCATOR));
+            click(getDriver(), getDiscardButton());
+            click(getDriver(), elementToBeClickable(getDriver(), DISCARD_BUTTON_IN_DIALOG_LOCATOR));
             assert getSnackBar(getDriver(), "Discarded").isDisplayed();
             return this.parent;
         });

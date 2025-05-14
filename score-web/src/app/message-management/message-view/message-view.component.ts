@@ -3,7 +3,7 @@ import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AuthService} from '../../authentication/auth.service';
 import {MessageService} from '../domain/message.service';
-import {Message} from '../domain/message';
+import {MessageDetails} from '../domain/messageDetails';
 import {finalize} from 'rxjs/operators';
 import {MatSnackBar} from '@angular/material/snack-bar';
 
@@ -16,7 +16,7 @@ export class MessageViewComponent implements OnInit {
 
   loading: boolean;
   messageId: number;
-  message: Message = new Message();
+  message: MessageDetails = new MessageDetails();
 
   constructor(
     private location: Location,

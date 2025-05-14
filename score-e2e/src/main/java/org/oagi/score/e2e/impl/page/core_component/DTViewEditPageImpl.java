@@ -15,6 +15,7 @@ import org.openqa.selenium.interactions.Actions;
 import java.time.Duration;
 
 import static java.time.Duration.ofMillis;
+import static java.time.Duration.ofSeconds;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
@@ -122,7 +123,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     protected String getPageUrl() {
-        return getConfig().getBaseUrl().resolve("/core_component/dt/" + this.dt.getDtManifestId()).toString();
+        return getConfig().getBaseUrl().resolve("/data_type/" + this.dt.getDtManifestId()).toString();
     }
 
     @Override
@@ -130,8 +131,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         String url = getPageUrl();
         getDriver().get(url);
         invisibilityOfLoadingContainerElement(getDriver());
-        String expectedType = (dt.getBasedDtManifestId() == null) ? "CDT" : "BDT";
-        assert expectedType.equals(getCoreComponentTypeFieldValue());
+        waitFor(ofSeconds(2L));
+        assert "DT".equals(getCoreComponentTypeFieldValue());
         assert getText(getTitle()).equals(dt.getDen());
     }
 
@@ -425,11 +426,9 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public WebElement clickOnDropDownMenuByPath(String path) {
-        goToNode(path);
-        String[] nodes = path.split("/");
-        String nodeName = nodes[nodes.length - 1];
-        WebElement node = getNodeByName(nodeName);
-        click(getDriver(), node);
+        WebElement node = goToNode(path);
+
+        click(node);
         new Actions(getDriver()).sendKeys("O").perform();
         waitFor(ofMillis(1000L));
         try {
@@ -439,7 +438,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
             }
         } catch (WebDriverException ignore) {
         }
-        WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
+
+        WebElement contextMenuIcon = getContextMenuIcon(node);
         click(getDriver(), contextMenuIcon);
         waitFor(ofMillis(1000L));
         assert visibilityOfElementLocated(getDriver(),
@@ -449,23 +449,25 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public WebElement goToNode(String path) {
-        WebElement searchInput = getSearchField();
+        WebElement searchInput = getSearchInputTextField();
         click(getDriver(), searchInput);
-        WebElement node = retry(() -> {
-            WebElement e = sendKeys(searchInput, path);
+        retry(() -> {
+            sendKeys(searchInput, path);
             if (!path.equals(getText(searchInput))) {
                 throw new WebDriverException();
             }
-            return e;
         });
-        node.sendKeys(Keys.ENTER);
-        click(getDriver(), node);
+        searchInput.sendKeys(Keys.ENTER);
+        searchInput.sendKeys("");
         clear(searchInput);
-        return node;
+
+        String[] nodes = path.split("/");
+        String nodeName = nodes[nodes.length - 1];
+        return getNodeByName(nodeName);
     }
 
     @Override
-    public WebElement getSearchField() {
+    public WebElement getSearchInputTextField() {
         return visibilityOfElementLocated(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR);
     }
 
@@ -478,6 +480,10 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     @Override
     public WebElement getContextMenuIconByNodeName(String nodeName) {
         WebElement node = getNodeByName(nodeName);
+        return getContextMenuIcon(node);
+    }
+
+    public WebElement getContextMenuIcon(WebElement node) {
         return node.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
     }
 
@@ -604,11 +610,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public WebElement getNodeByPath(String path) {
-        return retry(() -> {
-            goToNode(path);
-            String[] nodes = path.split("/");
-            return getNodeByName(nodes[nodes.length - 1]);
-        });
+        return retry(() -> goToNode(path));
     }
 
     @Override

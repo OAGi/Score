@@ -1,14 +1,14 @@
 import {ChangeListener} from '../../bie-management/domain/bie-flat-tree';
 import {ExpressionEvaluator, FlatNode, getKey, next, PathLikeExpressionEvaluator} from '../../common/flat-tree';
 import {
-  CcAccNodeDetail,
-  CcAsccpNodeDetail,
-  CcBccpNodeDetail,
-  CcBdtScNodeDetail,
-  CcDtNodeDetail,
+  CcAccNodeInfo,
+  CcAsccpNodeInfo,
+  CcBccpNodeInfo,
+  CcDtNodeInfo,
+  CcDtScNodeInfo,
   CcGraph,
   CcGraphNode,
-  CcNodeDetail
+  CcNodeInfo
 } from './core-component-node';
 import {CcNodeService} from './core-component-node.service';
 import {CollectionViewer, DataSource} from '@angular/cdk/collections';
@@ -34,7 +34,7 @@ export interface CcFlatNode extends FlatNode {
 
   isCycle: boolean;
   isChanged: boolean;
-  detail: CcNodeDetail;
+  detail: CcNodeInfo;
   parents: CcFlatNode[];
 
   path: string;
@@ -121,7 +121,7 @@ export abstract class CcFlatNodeImpl implements CcFlatNode {
   revisionNum: number;
   isCycle = false;
 
-  detail: CcNodeDetail;
+  detail: CcNodeInfo;
 
   deprecated: boolean;
 
@@ -233,14 +233,14 @@ export class AccFlatNode extends CcFlatNodeImpl {
 
   get name(): string {
     if (this.detail) {
-      return (this.detail as CcAccNodeDetail).den;
+      return (this.detail as CcAccNodeInfo).den;
     }
     return this.accNode.objectClassTerm + '. Details';
   }
 
   set name(val: string) {
     if (this.detail) {
-      (this.detail as CcAccNodeDetail).objectClassTerm = val;
+      (this.detail as CcAccNodeInfo).objectClassTerm = val;
     }
     this.accNode.objectClassTerm = val;
   }
@@ -254,11 +254,11 @@ export class AccFlatNode extends CcFlatNodeImpl {
   }
 
   get libraryId(): number {
-    return this.detail ? (this.detail as CcAccNodeDetail).libraryId : undefined;
+    return this.detail ? (this.detail as CcAccNodeInfo).library.libraryId : undefined;
   }
 
   get releaseId(): number {
-    return this.detail ? (this.detail as CcAccNodeDetail).releaseId : undefined;
+    return this.detail ? (this.detail as CcAccNodeInfo).release.releaseId : undefined;
   }
 
   get accManifestId(): number {
@@ -331,14 +331,14 @@ export class AsccpFlatNode extends CcFlatNodeImpl {
 
   get name(): string {
     if (this.detail) {
-      return (this.detail as CcAsccpNodeDetail).asccp.propertyTerm;
+      return (this.detail as CcAsccpNodeInfo).asccp.propertyTerm;
     }
     return this.asccpNode.propertyTerm;
   }
 
   set name(val: string) {
     if (this.detail) {
-      (this.detail as CcAsccpNodeDetail).asccp.propertyTerm = val;
+      (this.detail as CcAsccpNodeInfo).asccp.propertyTerm = val;
     }
     this.asccpNode.propertyTerm = val;
   }
@@ -348,11 +348,11 @@ export class AsccpFlatNode extends CcFlatNodeImpl {
   }
 
   get libraryId(): number {
-    return this.detail ? (this.detail as CcAsccpNodeDetail).asccp.libraryId : undefined;
+    return this.detail ? (this.detail as CcAsccpNodeInfo).asccp.library.libraryId : undefined;
   }
 
   get releaseId(): number {
-    return this.detail ? (this.detail as CcAsccpNodeDetail).asccp.releaseId : undefined;
+    return this.detail ? (this.detail as CcAsccpNodeInfo).asccp.release.releaseId : undefined;
   }
 
   get asccManifestId(): number {
@@ -389,8 +389,8 @@ export class AsccpFlatNode extends CcFlatNodeImpl {
   }
 
   get cardinalityMin(): number {
-    if (!!this.detail && !!(this.detail as CcAsccpNodeDetail).ascc && !!(this.detail as CcAsccpNodeDetail).ascc.cardinalityMin) {
-      return (this.detail as CcAsccpNodeDetail).ascc.cardinalityMin;
+    if (!!this.detail && !!(this.detail as CcAsccpNodeInfo).ascc && !!(this.detail as CcAsccpNodeInfo).ascc.cardinalityMin) {
+      return (this.detail as CcAsccpNodeInfo).ascc.cardinalityMin;
     }
     if (this._cardinalityMin === undefined) {
       if (!!this.asccNode) {
@@ -407,8 +407,8 @@ export class AsccpFlatNode extends CcFlatNodeImpl {
   }
 
   get cardinalityMax(): number {
-    if (!!this.detail && !!(this.detail as CcAsccpNodeDetail).ascc && !!(this.detail as CcAsccpNodeDetail).ascc.cardinalityMax) {
-      return (this.detail as CcAsccpNodeDetail).ascc.cardinalityMax;
+    if (!!this.detail && !!(this.detail as CcAsccpNodeInfo).ascc && !!(this.detail as CcAsccpNodeInfo).ascc.cardinalityMax) {
+      return (this.detail as CcAsccpNodeInfo).ascc.cardinalityMax;
     }
     if (this._cardinalityMax === undefined) {
       if (!!this.asccNode) {
@@ -470,14 +470,14 @@ export class BccpFlatNode extends CcFlatNodeImpl {
 
   get name(): string {
     if (this.detail) {
-      return (this.detail as CcBccpNodeDetail).bccp.propertyTerm;
+      return (this.detail as CcBccpNodeInfo).bccp.propertyTerm;
     }
     return this.bccpNode.propertyTerm;
   }
 
   set name(val: string) {
     if (this.detail) {
-      (this.detail as CcBccpNodeDetail).bccp.propertyTerm = val;
+      (this.detail as CcBccpNodeInfo).bccp.propertyTerm = val;
     }
     this.bccpNode.propertyTerm = val;
   }
@@ -491,11 +491,11 @@ export class BccpFlatNode extends CcFlatNodeImpl {
   }
 
   get libraryId(): number {
-    return this.detail ? (this.detail as CcBccpNodeDetail).bccp.libraryId : undefined;
+    return this.detail ? (this.detail as CcBccpNodeInfo).bccp.library.libraryId : undefined;
   }
 
   get releaseId(): number {
-    return this.detail ? (this.detail as CcBccpNodeDetail).bccp.releaseId : undefined;
+    return this.detail ? (this.detail as CcBccpNodeInfo).bccp.release.releaseId : undefined;
   }
 
   get bccManifestId(): number {
@@ -535,8 +535,8 @@ export class BccpFlatNode extends CcFlatNodeImpl {
   }
 
   get cardinalityMin(): number {
-    if (!!this.detail && !!(this.detail as CcBccpNodeDetail).bcc && !!(this.detail as CcBccpNodeDetail).bcc.cardinalityMin) {
-      return (this.detail as CcBccpNodeDetail).bcc.cardinalityMin;
+    if (!!this.detail && !!(this.detail as CcBccpNodeInfo).bcc && !!(this.detail as CcBccpNodeInfo).bcc.cardinalityMin) {
+      return (this.detail as CcBccpNodeInfo).bcc.cardinalityMin;
     }
     if (this._cardinalityMin === undefined) {
       if (!!this.bccNode) {
@@ -553,8 +553,8 @@ export class BccpFlatNode extends CcFlatNodeImpl {
   }
 
   get cardinalityMax(): number {
-    if (!!this.detail && !!(this.detail as CcBccpNodeDetail).bcc && !!(this.detail as CcBccpNodeDetail).bcc.cardinalityMax) {
-      return (this.detail as CcBccpNodeDetail).bcc.cardinalityMax;
+    if (!!this.detail && !!(this.detail as CcBccpNodeInfo).bcc && !!(this.detail as CcBccpNodeInfo).bcc.cardinalityMax) {
+      return (this.detail as CcBccpNodeInfo).bcc.cardinalityMax;
     }
     if (this._cardinalityMax === undefined) {
       if (!!this.bccNode) {
@@ -604,14 +604,14 @@ export class DtFlatNode extends CcFlatNodeImpl {
 
   get name(): string {
     if (this.detail) {
-      return (this.detail as CcDtNodeDetail).den;
+      return (this.detail as CcDtNodeInfo).den;
     }
     return this.dtNode.den;
   }
 
   set name(val: string) {
     if (this.detail) {
-      (this.detail as CcDtNodeDetail).den = val;
+      (this.detail as CcDtNodeInfo).den = val;
     }
     this.dtNode.den = val;
   }
@@ -621,11 +621,11 @@ export class DtFlatNode extends CcFlatNodeImpl {
   }
 
   get libraryId(): number {
-    return this.detail ? (this.detail as CcDtNodeDetail).libraryId : undefined;
+    return this.detail ? (this.detail as CcDtNodeInfo).library.libraryId : undefined;
   }
 
   get releaseId(): number {
-    return this.detail ? (this.detail as CcDtNodeDetail).releaseId : undefined;
+    return this.detail ? (this.detail as CcDtNodeInfo).release.releaseId : undefined;
   }
 
   get den(): string {
@@ -633,7 +633,7 @@ export class DtFlatNode extends CcFlatNodeImpl {
   }
 
   get basedManifestId(): number {
-    return this.detail ? (this.detail as CcDtNodeDetail).basedBdtManifestId : undefined;
+    return this.detail ? (this.detail as CcDtNodeInfo).basedBdtManifestId : undefined;
   }
 
   get path(): string {
@@ -719,11 +719,11 @@ export class DtScFlatNode extends CcFlatNodeImpl {
   }
 
   get libraryId(): number {
-    return this.detail ? (this.detail as CcBdtScNodeDetail).libraryId : undefined;
+    return this.detail ? (this.detail as CcDtScNodeInfo).library.libraryId : undefined;
   }
 
   get releaseId(): number {
-    return this.detail ? (this.detail as CcBdtScNodeDetail).releaseId : undefined;
+    return this.detail ? (this.detail as CcDtScNodeInfo).release.releaseId : undefined;
   }
 
   get manifestId(): number {
@@ -739,7 +739,7 @@ export class DtScFlatNode extends CcFlatNodeImpl {
   }
 
   get removeAble(): boolean {
-    return !(this.dtScNode.basedDtScId > 0);
+    return !(this.dtScNode.basedDtScManifestId > 0);
   }
 
   get path(): string {

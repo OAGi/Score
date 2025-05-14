@@ -214,7 +214,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         // Date Time. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-        BCCPObject bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+        BCCPObject bccp = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
         bccp.setNillable(false);
         coreComponentAPI.updateBCCP(bccp);
 
@@ -435,7 +435,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         // Identifier. Type
         String identifierTypeGuid = "bea4dcd433d54aa698db2176cab33c19";
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, identifierTypeGuid, release.getReleaseNumber());
-        BCCPObject bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+        BCCPObject bccp = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
 
         ReleaseObject nextRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.7.2");
         dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, identifierTypeGuid, nextRelease.getReleaseNumber());
@@ -550,7 +550,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         // Identifier. Type
         String identifierTypeGuid = "bea4dcd433d54aa698db2176cab33c19";
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, identifierTypeGuid, release.getReleaseNumber());
-        BCCPObject bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+        BCCPObject bccp = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
 
         ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
         coreComponentAPI.appendBCC(acc, bccp, "Published");

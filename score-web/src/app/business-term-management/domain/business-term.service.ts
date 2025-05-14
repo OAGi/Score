@@ -3,12 +3,17 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {PageRequest, PageResponse} from '../../basis/basis';
 import {
+  AsbieBbieListEntry,
   AssignedBtListRequest,
-  AssignedBusinessTerm,
+  AssignedBusinessTermDetails,
+  AssignedBusinessTermListEntry,
   BieToAssign,
-  BusinessTerm,
+  BusinessTermDetails,
+  BusinessTermListEntry,
   BusinessTermListRequest
 } from './business-term';
+import {BieListRequest} from '../../bie-management/bie-list/domain/bie-list';
+import {map} from 'rxjs/operators';
 
 @Injectable()
 export class BusinessTermService {
@@ -16,12 +21,19 @@ export class BusinessTermService {
   constructor(private http: HttpClient) {
   }
 
-  getBusinessTermList(request: BusinessTermListRequest, byAssignedBies: BieToAssign[]): Observable<PageResponse<BusinessTerm>> {
-    let params = new HttpParams()
-      .set('sortActive', request.page.sortActive)
-      .set('sortDirection', request.page.sortDirection)
-      .set('pageIndex', '' + request.page.pageIndex)
-      .set('pageSize', '' + request.page.pageSize);
+  getBusinessTermList(request: BusinessTermListRequest, byAssignedBies: BieToAssign[]): Observable<PageResponse<BusinessTermListEntry>> {
+    let params = new HttpParams();
+
+    if (!!request.page.sortActive && !!request.page.sortDirection) {
+      params = params.set('orderBy', ((request.page.sortDirection === 'desc') ? '-' : '+') + request.page.sortActive);
+    }
+    if (request.page.pageIndex >= 0) {
+      params = params.set('pageIndex', request.page.pageIndex);
+    }
+    if (request.page.pageSize > 0) {
+      params = params.set('pageSize', request.page.pageSize);
+    }
+
     if (request.filters.businessTerm) {
       params = params.set('businessTerm', request.filters.businessTerm);
     }
@@ -42,8 +54,8 @@ export class BusinessTermService {
     }
     if (request.filters.searchByCC && byAssignedBies != null) {
       params = params.set('searchByCC', request.filters.searchByCC);
-      params = params.set('byAssignedBieIds', byAssignedBies.map(bie => bie.bieId).join(','));
-      params = params.set('byAssignedBieTypes', byAssignedBies.map(bie => bie.bieType).join(','));
+      params = params.set('byAssignedAsbieIdList', byAssignedBies.filter(e => e.bieType === 'ASBIE').map(e => e.bieId).join(','));
+      params = params.set('byAssignedBbieIdList', byAssignedBies.filter(e => e.bieType === 'BBIE').map(e => e.bieId).join(','));
     }
     if (request.filters.typeCode) {
       params = params.set('typeCode', request.filters.typeCode);
@@ -60,27 +72,165 @@ export class BusinessTermService {
     if (request.updatedDate.end) {
       params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
     }
-    return this.http.get<PageResponse<BusinessTerm>>('/api/business_terms', {params});
+
+    return this.http.get<PageResponse<BusinessTermListEntry>>('/api/business-terms', {params}).pipe(
+        map((res: PageResponse<BusinessTermListEntry>) => ({
+          ...res,
+          list: res.list.map(elm => ({
+            ...elm,
+            created: {
+              ...elm.created,
+              when: new Date(elm.created.when),
+            },
+            lastUpdated: {
+              ...elm.lastUpdated,
+              when: new Date(elm.lastUpdated.when),
+            }
+          }))
+        }))
+    );
   }
 
-  getAssignedBusinessTermList(request: AssignedBtListRequest): Observable<PageResponse<AssignedBusinessTerm>> {
+  getAsbieBbieListWithRequest(request: BieListRequest): Observable<PageResponse<AsbieBbieListEntry>> {
+    let params = new HttpParams()
+        .set('libraryId', '' + request.library.libraryId);
+
+    if (!!request.page.sortActive && !!request.page.sortDirection) {
+      params = params.set('orderBy', ((request.page.sortDirection === 'desc') ? '-' : '+') + request.page.sortActive);
+    }
+    if (request.page.pageIndex >= 0) {
+      params = params.set('pageIndex', request.page.pageIndex);
+    }
+    if (request.page.pageSize > 0) {
+      params = params.set('pageSize', request.page.pageSize);
+    }
+    if (request.ownerLoginIdList.length > 0) {
+      params = params.set('ownerLoginIdList', request.ownerLoginIdList.join(','));
+    }
+    if (request.updaterLoginIdList.length > 0) {
+      params = params.set('updaterLoginIdList', request.updaterLoginIdList.join(','));
+    }
+    if (request.updatedDate.start) {
+      params = params.set('updateStart', '' + request.updatedDate.start.getTime());
+    }
+    if (request.updatedDate.end) {
+      params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
+    }
+    if (request.filters.propertyTerm) {
+      params = params.set('topLevelAsccpPropertyTerm', request.filters.propertyTerm);
+    }
+    if (request.filters.den) {
+      params = params.set('den', request.filters.den);
+    }
+    if (request.types) {
+      params = params.set('types', request.types.join(','));
+    }
+    if (request.filters.businessContext) {
+      params = params.set('businessContext', request.filters.businessContext);
+    }
+    if (request.filters.version) {
+      params = params.set('version', request.filters.version);
+    }
+    if (request.filters.remark) {
+      params = params.set('remark', request.filters.remark);
+    }
+    if (request.states.length > 0) {
+      params = params.set('states', request.states.join(','));
+    }
+    if (request.access) {
+      params = params.set('access', request.access);
+    }
+    if (request.releases) {
+      params = params.set('releaseIds', request.releases.map(e => e.releaseId.toString()).join(','));
+    }
+    if (request.ownedByDeveloper !== undefined) {
+      params = params.set('ownedByDeveloper', request.ownedByDeveloper.toString());
+    }
+    return this.http.get<PageResponse<AsbieBbieListEntry>>('/api/business-terms/asbie-bbie', {params}).pipe(
+        map((res: PageResponse<AsbieBbieListEntry>) => ({
+          ...res,
+          list: res.list.map(elm => ({
+            ...elm,
+            created: {
+              ...elm.created,
+              when: new Date(elm.created.when),
+            },
+            lastUpdated: {
+              ...elm.lastUpdated,
+              when: new Date(elm.lastUpdated.when),
+            }
+          }))
+        }))
+    );
+  }
+
+  confirmAsbieBbieListByIdAndType(biesToAssign: BieToAssign[]): Observable<AsbieBbieListEntry[]> {
+    return this.http.get<AsbieBbieListEntry[]>('/api/business-terms/asbie-bbie/confirm', {
+      params: new HttpParams()
+          .set('asbieIdList', biesToAssign.filter(e => e.bieType === 'ASBIE').map(e => e.bieId.toString()).join(','))
+          .set('bbieIdList', biesToAssign.filter(e => e.bieType === 'BBIE').map(e => e.bieId.toString()).join(','))
+    }).pipe(
+        map((entries: AsbieBbieListEntry[]) =>
+            entries.map(entry => ({
+              ...entry,
+              created: {
+                ...entry.created,
+                when: new Date(entry.created.when),
+              },
+              lastUpdated: {
+                ...entry.lastUpdated,
+                when: new Date(entry.lastUpdated.when),
+              }
+            }))
+        )
+    );
+  }
+
+  getAssignedBusinessTermList(request: AssignedBtListRequest): Observable<PageResponse<AssignedBusinessTermListEntry>> {
     const params = request.toParams();
-    return this.http.get<PageResponse<AssignedBusinessTerm>>('/api/business_terms/assign', {params});
+    return this.http.get<PageResponse<AssignedBusinessTermListEntry>>('/api/business-terms/assign', {params}).pipe(
+        map((res: PageResponse<AssignedBusinessTermListEntry>) => ({
+          ...res,
+          list: res.list.map(elm => ({
+            ...elm,
+            created: {
+              ...elm.created,
+              when: new Date(elm.created.when),
+            },
+            lastUpdated: {
+              ...elm.lastUpdated,
+              when: new Date(elm.lastUpdated.when),
+            }
+          }))
+        }))
+    );
   }
 
-  getAssignedBusinessTerm(type, id): Observable<AssignedBusinessTerm> {
-    return this.http.get<AssignedBusinessTerm>('/api/business_terms/assign/' + type + '/' + id);
+  getAssignedBusinessTerm(type: string, id: number): Observable<AssignedBusinessTermDetails> {
+    return this.http.get<AssignedBusinessTermDetails>('/api/business-terms/assign/' + type.toLowerCase() + '/' + id).pipe(
+        (map((elm: AssignedBusinessTermDetails) => ({
+          ...elm,
+          created: {
+            ...elm.created,
+            when: new Date(elm.created.when),
+          },
+          lastUpdated: {
+            ...elm.lastUpdated,
+            when: new Date(elm.lastUpdated.when),
+          }
+        })))
+    );
   }
 
-  getBusinessTerm(id): Observable<BusinessTerm> {
-    return this.http.get<BusinessTerm>('/api/business_term/' + id);
+  getBusinessTermDetails(id): Observable<BusinessTermDetails> {
+    return this.http.get<BusinessTermDetails>('/api/business-terms/' + id);
   }
 
-  create(businessTerm: BusinessTerm): Observable<any> {
+  create(businessTerm: BusinessTermDetails): Observable<any> {
     if ('' + businessTerm.businessTermId === 'undefined' || !businessTerm.businessTermId) {
       businessTerm.businessTermId = null;
     }
-    return this.http.put('/api/business_term', {
+    return this.http.post('/api/business-terms', {
       businessTermId: businessTerm.businessTermId,
       businessTerm: businessTerm.businessTerm,
       comment: businessTerm.comment,
@@ -90,14 +240,14 @@ export class BusinessTermService {
   }
 
   uploadFromFile(formData: FormData): Observable<any> {
-    return this.http.post('/api/csv/business_terms', formData, {
+    return this.http.post('/api/business-terms/csv', formData, {
       reportProgress: true,
       observe: 'events'
     });
   }
 
-  update(businessTerm: BusinessTerm): Observable<any> {
-    return this.http.post('/api/business_term/' + businessTerm.businessTermId, {
+  update(businessTerm: BusinessTermDetails): Observable<any> {
+    return this.http.put('/api/business-terms/' + businessTerm.businessTermId, {
       businessTermId: businessTerm.businessTermId,
       businessTerm: businessTerm.businessTerm,
       comment: businessTerm.comment,
@@ -108,35 +258,33 @@ export class BusinessTermService {
 
   delete(...businessTermIds): Observable<any> {
     if (businessTermIds.length === 1) {
-      return this.http.delete('/api/business_term/' + businessTermIds[0]);
+      return this.http.delete('/api/business-terms/' + businessTermIds[0]);
     } else {
-      return this.http.post<any>('/api/business_term/delete', {
-        businessTermIdList: businessTermIds
+      return this.http.delete<any>('/api/business-terms', {
+        body: {
+          businessTermIdList: businessTermIds
+        }
       });
     }
   }
 
   assignBusinessTermToBie(businessTermId: number, biesToAssign: BieToAssign[], primaryIndicator: boolean, typeCode: string): Observable<any> {
-    return this.http.put('/api/business_terms/assign', {
+    return this.http.post('/api/business-terms/' + businessTermId + '/assign', {
       biesToAssign,
-      businessTermId,
       primaryIndicator,
       typeCode
     });
   }
 
-  deleteAssignments(assignedBts: AssignedBusinessTerm[]): Observable<any> {
-    const assignedBtList = assignedBts.map(a => {
-      const b = new BieToAssign();
-      b.bieId = a.assignedBizTermId;
-      b.bieType = a.bieType;
-      return b;
-    });
-    if (assignedBtList.length === 1) {
-      return this.http.delete('/api/business_terms/assign/' + assignedBtList[0].bieType + '/' + assignedBtList[0].bieId);
+  deleteAssignments(assignedBts: AssignedBusinessTermDetails[]): Observable<any> {
+    if (assignedBts.length === 1) {
+      return this.http.delete('/api/business-terms/assign/' + assignedBts[0].bieType.toLowerCase() + '/' + assignedBts[0].assignedBizTermId);
     } else {
-      return this.http.post<any>('/api/business_terms/assign/delete', {
-        assignedBtList
+      return this.http.delete<any>('/api/business-terms/assign', {
+        body: {
+          assignedAsbieBizTermIdList: assignedBts.filter(e => e.bieType === 'ASBIE').map(e => e.assignedBizTermId),
+          assignedBbieBizTermIdList: assignedBts.filter(e => e.bieType === 'BBIE').map(e => e.assignedBizTermId)
+        }
       });
     }
   }
@@ -145,32 +293,54 @@ export class BusinessTermService {
     return this.http.put('/api/assigned_business_term/primary', { assignedBizTermId } );
   }
 
-  checkUniqueness(businessTerm: BusinessTerm): Observable<any> {
-    return this.http.post('/api/business_terms/check_uniqueness', {
-      businessTermId: businessTerm.businessTermId,
-      businessTerm: businessTerm.businessTerm,
-      externalReferenceUri: businessTerm.externalReferenceUri
+  checkUniqueness(businessTermId: number, businessTerm: string, externalReferenceUri: string): Observable<boolean> {
+    let params = new HttpParams()
+        .set('businessTerm', businessTerm)
+        .set('externalReferenceUri', externalReferenceUri);
+
+    if (!!businessTermId) {
+      params = params.set('businessTermId', '' + businessTermId);
+    }
+
+    return this.http.get<boolean>('/api/business-terms/check-uniqueness', {
+      params
     });
   }
 
-  checkNameUniqueness(businessTerm: BusinessTerm): Observable<any> {
-    return this.http.post('/api/business_terms/check_name_uniqueness', {
-      businessTermId: businessTerm.businessTermId,
-      businessTerm: businessTerm.businessTerm
+  checkNameUniqueness(businessTermId: number, businessTerm: string): Observable<boolean> {
+    let params = new HttpParams()
+        .set('businessTerm', businessTerm);
+
+    if (!!businessTermId) {
+      params = params.set('businessTermId', '' + businessTermId);
+    }
+
+    return this.http.get<boolean>('/api/business-terms/check-name-uniqueness', {
+      params
     });
   }
 
   checkAssignmentUniqueness(bieId: number, bieType: string, businessTermId: number,
-                            typeCode: string, primaryIndicator: boolean): Observable<any> {
-    return this.http.post('/api/business_terms/assign/check_uniqueness', {
-      biesToAssign: [{ bieId, bieType }],
-      businessTermId,
-      typeCode,
-      primaryIndicator
+                            typeCode: string, primaryIndicator: boolean): Observable<boolean> {
+    let params = new HttpParams()
+        .set('businessTermId', '' + businessTermId)
+        .set('primaryIndicator', (!!primaryIndicator) ? primaryIndicator : false);
+    if (!!typeCode) {
+      params = params.set('typeCode', typeCode);
+    }
+
+    if (bieType === 'ASBIE') {
+      params = params.set('asbieId', '' + bieId);
+    } else if (bieType === 'BBIE') {
+      params = params.set('bbieId', '' + bieId);
+    }
+
+    return this.http.get<boolean>('/api/business-terms/assign/check-uniqueness', {
+      params
     });
   }
 
-  findIfPrimaryExist(bieId: number, bieType: string, primaryIndicator: boolean, typeCode: string): Observable<PageResponse<AssignedBusinessTerm>> {
+  findIfPrimaryExist(bieId: number, bieType: string, primaryIndicator: boolean, typeCode: string): Observable<PageResponse<AssignedBusinessTermListEntry>> {
     if (primaryIndicator) {
       const req = new AssignedBtListRequest();
       req.page = new PageRequest('lastUpdateTimestamp', 'desc', 0, 10);
@@ -183,8 +353,8 @@ export class BusinessTermService {
     }
   }
 
-  updateAssignment(assignedBusinessTerm: AssignedBusinessTerm): Observable<any> {
-    return this.http.post('/api/business_terms/assign/' + assignedBusinessTerm.bieType + '/' + assignedBusinessTerm.assignedBizTermId, {
+  updateAssignment(assignedBusinessTerm: AssignedBusinessTermDetails): Observable<any> {
+    return this.http.put('/api/business-terms/assign/' + assignedBusinessTerm.bieType + '/' + assignedBusinessTerm.assignedBizTermId, {
       bieType: assignedBusinessTerm.bieType,
       bieId: assignedBusinessTerm.bieId,
       typeCode: assignedBusinessTerm.typeCode,
@@ -193,7 +363,7 @@ export class BusinessTermService {
   }
 
   downloadCSV(): Observable<any> {
-    return this.http.get('/api/csv/business_terms/template', {
+    return this.http.get('/api/business-terms/csv/template', {
       responseType: 'text'
     });
   }

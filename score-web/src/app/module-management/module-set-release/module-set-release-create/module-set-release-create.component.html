@@ -60,7 +60,7 @@
         </mat-form-field>
 
         <div class="d-flex flex-column pb-2">
-          <mat-checkbox [(ngModel)]="moduleSetRelease.default">Default</mat-checkbox>
+          <mat-checkbox [(ngModel)]="moduleSetRelease.isDefault">Default</mat-checkbox>
 
           <mat-checkbox [(ngModel)]="copyFromOther">Copy CC assignment from Module Set Release</mat-checkbox>
         </div>
@@ -75,8 +75,8 @@
             </mat-option>
             <mat-option *ngFor="let moduleSetRelease of filteredModuleSetReleaseList | async" [value]="moduleSetRelease">
               <div class="d-flex">
-                <span class="release-num">{{moduleSetRelease.moduleSetReleaseName}}</span>
-                &nbsp;<span class="release-num">{{moduleSetRelease.releaseNum}}</span>
+                <span class="release-num">{{moduleSetRelease.name}}</span>
+                &nbsp;<span class="release-num">{{moduleSetRelease.release.releaseNum}}</span>
               </div>
             </mat-option>
           </mat-select>

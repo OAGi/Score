@@ -18,7 +18,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtSc;
  * of the DT. In other words, when a new revision of a DT is created a new set
  * of supplementary components is created along with it. 
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -447,6 +447,6 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
         setLastUpdateTimestamp(lastUpdateTimestamp);
         setPrevDtScId(prevDtScId);
         setNextDtScId(nextDtScId);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

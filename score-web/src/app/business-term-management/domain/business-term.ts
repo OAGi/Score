@@ -1,8 +1,40 @@
-import {PageRequest} from '../../basis/basis';
+import {PageRequest, WhoAndWhen} from '../../basis/basis';
 import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
 import {base64Decode, base64Encode} from '../../common/utility';
 import {ScoreUser} from '../../authentication/domain/auth';
+import {BusinessContextSummary} from '../../context-management/business-context/domain/business-context';
+import {LibrarySummary} from '../../library-management/domain/library';
+import {ReleaseSummary} from '../../release-management/domain/release';
+
+
+export class AsbieBbieListEntry {
+
+  type: string;
+
+  library: LibrarySummary;
+  release: ReleaseSummary;
+
+  bieId: number;
+  guid: string;
+  topLevelAsbiepId: number;
+
+  den: string;
+  propertyTerm: string;
+  version: string;
+  status: string;
+  bizTerm: string;
+  remark: string;
+  businessContextList: BusinessContextSummary[];
+  state: string;
+  access: string;
+
+  owner: ScoreUser;
+  ownedByDeveloper: boolean;
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+
+}
 
 export class BusinessTermListRequest {
   filters: {
@@ -66,10 +98,10 @@ export class BusinessTermListRequest {
 
   toParams(): HttpParams {
     let params = new HttpParams()
-      .set('sortActive', this.page.sortActive)
-      .set('sortDirection', this.page.sortDirection)
-      .set('pageIndex', '' + this.page.pageIndex)
-      .set('pageSize', '' + this.page.pageSize);
+        .set('sortActive', this.page.sortActive)
+        .set('sortDirection', this.page.sortDirection)
+        .set('pageIndex', '' + this.page.pageIndex)
+        .set('pageSize', '' + this.page.pageSize);
 
     if (this.updaterUsernameList && this.updaterUsernameList.length > 0) {
       params = params.set('updaterUsernameList', this.updaterUsernameList.join(','));
@@ -174,10 +206,10 @@ export class AssignedBtListRequest {
 
   toParams() {
     let params = new HttpParams()
-      .set('sortActive', this.page.sortActive)
-      .set('sortDirection', this.page.sortDirection)
-      .set('pageIndex', '' + this.page.pageIndex)
-      .set('pageSize', '' + this.page.pageSize);
+        .set('sortActive', this.page.sortActive)
+        .set('sortDirection', this.page.sortDirection)
+        .set('pageIndex', '' + this.page.pageIndex)
+        .set('pageSize', '' + this.page.pageSize);
 
     if (this.updaterUsernameList && this.updaterUsernameList.length > 0) {
       params = params.set('updaterUsernameList', this.updaterUsernameList.join(','));
@@ -216,7 +248,7 @@ export class AssignedBtListRequest {
   }
 }
 
-export class BusinessTerm {
+export class BusinessTermListEntry {
   businessTermId: number;
   guid: string;
   businessTerm: string;
@@ -224,13 +256,30 @@ export class BusinessTerm {
   definition: string;
   externalReferenceUri: string;
   externalReferenceId: string;
-  lastUpdateTimestamp: Date;
-  createdBy: ScoreUser;
-  lastUpdatedBy: ScoreUser;
+
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+
   used: boolean;
 }
 
-export class AssignedBusinessTerm {
+export class BusinessTermDetails {
+  businessTermId: number;
+  guid: string;
+  businessTerm: string;
+  comment: string;
+  definition: string;
+  externalReferenceUri: string;
+  externalReferenceId: string;
+
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+
+  used: boolean;
+
+}
+
+export class AssignedBusinessTermListEntry {
   assignedBizTermId: number;
   primaryIndicator: boolean;
   typeCode: string;
@@ -243,9 +292,27 @@ export class AssignedBusinessTerm {
   comment: string;
   externalReferenceUri: string;
   externalReferenceId: string;
-  lastUpdateTimestamp: Date;
-  createdBy: ScoreUser;
-  lastUpdatedBy: ScoreUser;
+
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+}
+
+export class AssignedBusinessTermDetails {
+  assignedBizTermId: number;
+  primaryIndicator: boolean;
+  typeCode: string;
+  bieId: number;
+  den: string;
+  bieType: string;
+  businessTermId: number;
+  guid: string;
+  businessTerm: string;
+  comment: string;
+  externalReferenceUri: string;
+  externalReferenceId: string;
+
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
 }
 
 export class PostAssignBusinessTerm {
@@ -253,15 +320,6 @@ export class PostAssignBusinessTerm {
   typeCode: string;
   biesToAssign: BieToAssign[];
   businessTermId: number;
-}
-
-export interface SimpleBusinessTerm {
-  businessTermId: number;
-  guid: string;
-  businessTerm: string;
-  comment?: string;
-  externalRefUri?: string;
-  externalRefId?: string;
 }
 
 export class BieToAssign {

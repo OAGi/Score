@@ -64,6 +64,7 @@ public class TC_20_1_DeveloperManagementOfNamespaces extends BaseTest {
         String randomDomain = RandomStringUtils.secure().nextAlphabetic(5, 10);
         String testURI = "https://test." + randomDomain + ".com";
         createNamespacePage.setURI(testURI);
+        createNamespacePage.setPrefix(randomDomain);
         createNamespacePage.hitCreateButton();
         viewEditNamespacePage.openPage();
         viewEditNamespacePage.setURI(testURI);
@@ -77,7 +78,7 @@ public class TC_20_1_DeveloperManagementOfNamespaces extends BaseTest {
         createNamespacePage.hitCreateButton();
         String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
         String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
-        assertTrue(snackBarMessage.contains("Namespace '" + testURI + "' exists."));
+        assertTrue(snackBarMessage.contains("Namespace URI '" + testURI + "' already exists."));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//score-multi-actions-snack-bar//span[contains(text(), \"Close\")]//ancestor::button[1]")));
     }
@@ -115,7 +116,7 @@ public class TC_20_1_DeveloperManagementOfNamespaces extends BaseTest {
         editNamespacePage.hitUpdateButton();
         String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
         String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
-        assertTrue(snackBarMessage.contains("Namespace URI '" + existingURI + "' exists."));
+        assertTrue(snackBarMessage.contains("Namespace URI '" + existingURI + "' already exists."));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//score-multi-actions-snack-bar//span[contains(text(), \"Close\")]//ancestor::button[1]")));
         editNamespacePage.hitBackButton();
@@ -201,6 +202,7 @@ public class TC_20_1_DeveloperManagementOfNamespaces extends BaseTest {
         String randomDomain = RandomStringUtils.secure().nextAlphabetic(5, 10);
         String testURI = "https://test." + randomDomain + ".com";
         createNamespacePage.setURI(testURI);
+        createNamespacePage.setPrefix(randomDomain);
         createNamespacePage.hitCreateButton();
         {
             viewEditNamespacePage.setURI(testURI);

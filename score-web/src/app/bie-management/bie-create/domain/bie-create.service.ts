@@ -12,10 +12,10 @@ export class BieCreateService implements OnInit {
   ngOnInit() {
   }
 
-  create(asccpManifestId: number, bizCtxIds: number[]): Observable<any> {
-    return this.http.put('/api/profile_bie/create', {
+  create(asccpManifestId: number, bizCtxIdList: number[]): Observable<any> {
+    return this.http.post('/api/bies', {
       asccpManifestId,
-      bizCtxIds
+      bizCtxIdList
     });
   }
 

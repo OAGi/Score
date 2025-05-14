@@ -88,7 +88,7 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Login ID')" (onResize)="onResizeWidth($event)"> Login ID</th>
               <td mat-cell *matCellDef="let element">
-                <a routerLink="{{ element.appUserId }}">
+                <a routerLink="{{ element.userId }}">
                   <span class="word-break-all">{{ element.loginId }}</span>
                 </a>
               </td>
@@ -107,7 +107,7 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Name')" (onResize)="onResizeWidth($event)"> Name</th>
               <td mat-cell *matCellDef="let element">
-                <span class="word-break-all">{{ element.name }}</span>
+                <span class="word-break-all">{{ element.username }}</span>
               </td>
             </ng-container>
 

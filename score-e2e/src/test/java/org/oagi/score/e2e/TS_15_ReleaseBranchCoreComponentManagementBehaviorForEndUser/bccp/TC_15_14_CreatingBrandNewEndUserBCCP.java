@@ -56,6 +56,7 @@ public class TC_15_14_CreatingBrandNewEndUserBCCP extends BaseTest {
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         BCCPCreateDialog bccpCreateDialog = viewEditCoreComponentPage.openBCCPCreateDialog(branch);
         BCCPViewEditPage bccpViewEditPage = bccpCreateDialog.create("Tax_ Code");
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();

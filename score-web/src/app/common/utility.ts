@@ -1,7 +1,7 @@
 import {Pipe, PipeTransform} from '@angular/core';
 import * as CryptoJS from 'crypto-js';
 import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
+import {Observable, ReplaySubject} from 'rxjs';
 import {UserToken} from '../authentication/domain/auth';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
@@ -79,6 +79,17 @@ export function hashCode(obj): string {
 
       return val;
     }));
+}
+
+export function zip<T, U>(arr1: T[], arr2: U[]): [T, U][] {
+  return arr1.map((value, index) => [value, arr2[index]]);
+}
+
+export function nullObservable(returnValue: any): Observable<any> {
+  return new Observable<any>((subscriber) => {
+    subscriber.next(returnValue);
+    subscriber.complete();
+  });
 }
 
 export type MapperFunction<T, R> = (source: T) => R;
@@ -224,7 +235,7 @@ export function emptyToUndefined(value: string): string {
   if (!value) {
     return undefined;
   }
-  return value.trim().length === 0 ? undefined : value;
+  return trim(value).length === 0 ? undefined : value;
 }
 
 export function trim(value: string): string {
@@ -293,7 +304,7 @@ export class HighlightSearch implements PipeTransform {
 @Pipe({name: 'dateAgo', pure: true})
 export class DateAgoPipe implements PipeTransform {
 
-  transform(value: number[], args?: any): any {
+  transform(value: Date, args?: any): any {
     const intervals = {
       year: 31536000,
       month: 2592000,
@@ -303,15 +314,12 @@ export class DateAgoPipe implements PipeTransform {
       minute: 60,
       second: 1
     };
-    if (value && value.length === 7) {
+    if (value) {
+      if (!(value instanceof Date)) {
+        value = new Date(value);
+      }
       const now = new Date();
-      let seconds = 0;
-      seconds += (now.getFullYear() - value[0]) * intervals.year;
-      seconds += (now.getMonth() + 1 - value[1]) * intervals.month;
-      seconds += (now.getDate() - value[2]) * intervals.day;
-      seconds += (now.getHours() - value[3]) * intervals.hour;
-      seconds += (now.getMinutes() - value[4]) * intervals.minute;
-      seconds += (now.getSeconds() - value[5]) * intervals.second;
+      const seconds = Math.floor((now.getTime() - value.getTime()) / 1000);
       if (seconds < 29) {
         return 'Just now';
       }

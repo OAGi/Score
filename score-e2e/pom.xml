@@ -13,22 +13,22 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <selenium.version>4.27.0</selenium.version>
-        <junit.version>5.11.3</junit.version>
-        <junit.platform.version>1.11.3</junit.platform.version>
-        <slf4j.version>2.0.16</slf4j.version>
-        <log4j.version>2.24.2</log4j.version>
-        <jackson.version>2.18.2</jackson.version>
+        <selenium.version>4.32.0</selenium.version>
+        <junit.version>5.12.2</junit.version>
+        <junit.platform.version>1.12.2</junit.platform.version>
+        <slf4j.version>2.0.17</slf4j.version>
+        <log4j.version>2.24.3</log4j.version>
+        <jackson.version>2.19.0</jackson.version>
         <commons-lang3.version>3.17.0</commons-lang3.version>
         <commons-math3.version>3.6.1</commons-math3.version>
-        <commons-io.version>2.18.0</commons-io.version>
-        <commons-csv.version>1.12.0</commons-csv.version>
-        <lombok.version>1.18.34</lombok.version>
-        <awaitility.version>4.2.2</awaitility.version>
-        <snakeyaml.version>2.3</snakeyaml.version>
-        <mariadb-client.version>3.5.1</mariadb-client.version>
-        <hikariCP.version>5.1.0</hikariCP.version>
-        <jOOQ.version>3.19.15</jOOQ.version>
+        <commons-io.version>2.19.0</commons-io.version>
+        <commons-csv.version>1.14.0</commons-csv.version>
+        <lombok.version>1.18.38</lombok.version>
+        <awaitility.version>4.3.0</awaitility.version>
+        <snakeyaml.version>2.4</snakeyaml.version>
+        <mariadb-client.version>3.5.3</mariadb-client.version>
+        <hikariCP.version>6.3.0</hikariCP.version>
+        <jOOQ.version>3.20.3</jOOQ.version>
         <jOOQ.configuration.skip>true</jOOQ.configuration.skip>
     </properties>
 

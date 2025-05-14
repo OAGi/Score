@@ -16,6 +16,7 @@ import {ReleaseWhatsChangedDialogComponent} from './release-detail/release-whats
 import {SearchBarModule} from '../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../common/column-selector/column-selector.module';
 import {TitleWithLibrarySelector} from '../common/title-with-library-selector/title-with-library-selector';
+import {ReleaseDiagramDialogComponent} from './release-diagram-dialog/release-diagram-dialog.component';
 
 const routes: Routes = [
   {
@@ -64,7 +65,8 @@ const routes: Routes = [
     ReleaseCreateComponent,
     ReleaseDetailComponent,
     ReleaseAssignComponent,
-    ReleaseWhatsChangedDialogComponent
+    ReleaseWhatsChangedDialogComponent,
+    ReleaseDiagramDialogComponent
   ],
   providers: [
     ReleaseService

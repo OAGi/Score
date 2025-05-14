@@ -1,14 +1,6 @@
 import {Injectable} from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
-import {
-  CcAccNodeDetail,
-  CcAsccpNodeDetail,
-  CcBccpNodeDetail,
-  CcBdtScNodeDetail,
-  CcDtNodeDetail,
-  CcNodeDetail,
-  Comment
-} from './core-component-node';
+import {CcAccNodeInfo, CcAsccpNodeInfo, CcBccpNodeInfo, CcDtNodeInfo, CcDtScNodeInfo, CcNodeInfo, Comment} from './core-component-node';
 import {CcNodeService} from './core-component-node.service';
 
 @Injectable()
@@ -26,47 +18,47 @@ export class CommentControl {
   }
 
   /* For type casting of detail property */
-  isAccDetail(detail: CcNodeDetail): boolean {
+  isAccDetail(detail: CcNodeInfo): boolean {
     return (detail !== undefined) && (detail.type.toUpperCase() === 'ACC');
   }
 
-  asAccDetail(detail: CcNodeDetail): CcAccNodeDetail {
-    return detail as CcAccNodeDetail;
+  asAccDetail(detail: CcNodeInfo): CcAccNodeInfo {
+    return detail as CcAccNodeInfo;
   }
 
-  isAsccpDetail(detail: CcNodeDetail): boolean {
+  isAsccpDetail(detail: CcNodeInfo): boolean {
     return (detail !== undefined) && (detail.type.toUpperCase() === 'ASCCP');
   }
 
-  asAsccpDetail(detail: CcNodeDetail): CcAsccpNodeDetail {
-    return detail as CcAsccpNodeDetail;
+  asAsccpDetail(detail: CcNodeInfo): CcAsccpNodeInfo {
+    return detail as CcAsccpNodeInfo;
   }
 
-  isBccpDetail(detail: CcNodeDetail): boolean {
+  isBccpDetail(detail: CcNodeInfo): boolean {
     return (detail !== undefined) && (detail.type.toUpperCase() === 'BCCP');
   }
 
-  asBccpDetail(detail: CcNodeDetail): CcBccpNodeDetail {
-    return detail as CcBccpNodeDetail;
+  asBccpDetail(detail: CcNodeInfo): CcBccpNodeInfo {
+    return detail as CcBccpNodeInfo;
   }
 
-  isBdtDetail(detail: CcNodeDetail): boolean {
+  isDtDetail(detail: CcNodeInfo): boolean {
     return (detail !== undefined) && (detail.type.toUpperCase() === 'DT');
   }
 
-  asBdtDetail(detail: CcNodeDetail): CcDtNodeDetail {
-    return detail as CcDtNodeDetail;
+  asDtDetail(detail: CcNodeInfo): CcDtNodeInfo {
+    return detail as CcDtNodeInfo;
   }
 
-  isBdtScDetail(detail: CcNodeDetail): boolean {
+  isDtScDetail(detail: CcNodeInfo): boolean {
     return (detail !== undefined) && (detail.type.toUpperCase() === 'DT_SC');
   }
 
-  asBdtScDetail(detail: CcNodeDetail): CcBdtScNodeDetail {
-    return detail as CcBdtScNodeDetail;
+  asDtScDetail(detail: CcNodeInfo): CcDtScNodeInfo {
+    return detail as CcDtScNodeInfo;
   }
 
-  toggleCommentSlide(type: string, detail: CcNodeDetail): void {
+  toggleCommentSlide(type: string, detail: CcNodeInfo): void {
     if (!detail) {
       return;
     }
@@ -87,10 +79,10 @@ export class CommentControl {
         this.commentReference = type + '-' + this.asBccpDetail(detail).bccp.manifestId;
         break;
       case 'DT':
-        this.commentReference = type + '-' + this.asBdtDetail(detail).manifestId;
+        this.commentReference = type + '-' + this.asDtDetail(detail).manifestId;
         break;
       case 'DT_SC':
-        this.commentReference = type + '-' + this.asBdtScDetail(detail).manifestId;
+        this.commentReference = type + '-' + this.asDtScDetail(detail).manifestId;
         break;
       default:
         return;

@@ -40,7 +40,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.UserTenantRecord;
 /**
  * This table captures the tenant roles of the user
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class UserTenant extends TableImpl<UserTenantRecord> {
 
     private static final long serialVersionUID = 1L;

@@ -1,14 +1,16 @@
 import {ScoreUser} from '../../authentication/domain/auth';
-import {PageRequest} from '../../basis/basis';
-import {SimpleRelease} from '../../release-management/domain/release';
+import {Definition, PageRequest, WhoAndWhen} from '../../basis/basis';
+import {ReleaseSummary} from '../../release-management/domain/release';
 import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
-import {base64Decode, base64Encode, hashCode4Array, hashCode4String} from '../../common/utility';
-import {Library} from '../../library-management/domain/library';
+import {base64Decode, base64Encode, hashCode4Array} from '../../common/utility';
+import {LibrarySummary} from '../../library-management/domain/library';
+import {LogSummary} from '../../log-management/domain/log';
+import {NamespaceSummary} from '../../namespace-management/domain/namespace';
 
 export class AgencyIdListForListRequest {
-  library: Library = new Library();
-  release: SimpleRelease;
+  library: LibrarySummary = new LibrarySummary();
+  release: ReleaseSummary;
   filters: {
     name: string;
     module: string;
@@ -19,8 +21,8 @@ export class AgencyIdListForListRequest {
   deprecated: boolean[] = [];
   newComponent: boolean[] = [];
   extensible: boolean;
-  ownerLoginIds: string[] = [];
-  updaterLoginIds: string[] = [];
+  ownerLoginIdList: string[] = [];
+  updaterLoginIdList: string[] = [];
   updatedDate: {
     start: Date,
     end: Date,
@@ -33,7 +35,7 @@ export class AgencyIdListForListRequest {
   constructor(paramMap?: ParamMap, defaultPageRequest?: PageRequest) {
     const q = (paramMap) ? paramMap.get('q') : undefined;
     const params = (q) ? new HttpParams({fromString: base64Decode(q)}) : new HttpParams();
-    this.release = new SimpleRelease();
+    this.release = new ReleaseSummary();
     this.release.releaseId = Number(params.get('releaseId') || 0);
     this.page.sortActive = params.get('sortActive');
     if (!this.page.sortActive) {
@@ -61,7 +63,7 @@ export class AgencyIdListForListRequest {
     this.extensible = (params.get('extensible')) ? (('true' === params.get('extensible'))) : undefined;
     this.namespaces = (params.get('namespaces')) ? Array.from(params.get('namespaces').split(',')).map(e => Number(e)) : [];
     this.ownedByDeveloper = (params.get('ownedByDeveloper')) ? (('true' === params.get('ownedByDeveloper'))) : undefined;
-    this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
+    this.updaterLoginIdList = (params.get('updaterLoginIdList')) ? Array.from(params.get('updaterLoginIdList').split(',')) : [];
     this.updatedDate = {
       start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
       end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
@@ -100,8 +102,8 @@ export class AgencyIdListForListRequest {
     if (this.ownedByDeveloper !== undefined) {
       params = params.set('ownedByDeveloper', (this.ownedByDeveloper) ? 'true' : 'false');
     }
-    if (this.updaterLoginIds && this.updaterLoginIds.length > 0) {
-      params = params.set('updaterLoginIds', this.updaterLoginIds.join(','));
+    if (this.updaterLoginIdList && this.updaterLoginIdList.length > 0) {
+      params = params.set('updaterLoginIdList', this.updaterLoginIdList.join(','));
     }
     if (this.updatedDate.start) {
       params = params.set('updatedDateStart', '' + this.updatedDate.start.toUTCString());
@@ -124,6 +126,130 @@ export class AgencyIdListForListRequest {
     const str = base64Encode(params.toString());
     return (str) ? 'q=' + str : undefined;
   }
+}
+
+export class AgencyIdListSummary {
+
+  agencyIdListManifestId: number;
+  agencyIdListId: number;
+  guid: string;
+
+  name: string;
+  listId: string;
+  versionId: string;
+
+  deprecated: boolean;
+  state: string;
+
+  valueList: AgencyIdListValueSummary[];
+
+}
+
+export class AgencyIdListValueSummary {
+
+  agencyIdListValueManifestId: number;
+  agencyIdListValueId: number;
+  agencyIdListManifestId: number;
+  guid: string;
+
+  value: string;
+  name: string;
+
+}
+
+export class AgencyIdListListEntry {
+
+  library: LibrarySummary;
+  release: ReleaseSummary;
+
+  agencyIdListManifestId: number;
+  agencyIdListId: number;
+  guid: string;
+  enumTypeGuid: string;
+
+  name: string;
+  listId: string;
+  versionId: string;
+
+  definition: string;
+  definitionSource: string;
+  remark: string;
+
+  namespaceId: number;
+
+  deprecated: boolean;
+  newComponent: boolean;
+  state: string;
+  access: string;
+
+  log: LogSummary;
+  module: string;
+
+  owner: ScoreUser;
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+
+}
+
+export class AgencyIdListDetails {
+
+  library: LibrarySummary = new LibrarySummary();
+  release: ReleaseSummary = new ReleaseSummary();
+
+  agencyIdListManifestId: number;
+  agencyIdListId: number;
+  guid: string;
+  enumTypeGuid: string;
+
+  based: AgencyIdListSummary = new AgencyIdListSummary();
+
+  name: string;
+  listId: string;
+  versionId: string;
+
+  agencyIdListValue: AgencyIdListValueSummary = new AgencyIdListValueSummary();
+
+  definition: Definition = new Definition();
+  remark: string;
+
+  namespace: NamespaceSummary = new NamespaceSummary();
+
+  deprecated: boolean;
+  newComponent: boolean;
+  state: string;
+  access: string;
+
+  log: LogSummary = new LogSummary();
+  module: string;
+
+  owner: ScoreUser;
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+
+  valueList: AgencyIdListValueDetails[] = [];
+
+}
+
+export class AgencyIdListValueDetails {
+
+  agencyIdListValueManifestId: number;
+  agencyIdListValueId: number;
+  guid: string;
+
+  value: string;
+  name: string;
+
+  definition: Definition = new Definition();
+
+  deprecated: boolean;
+  isDeveloperDefault: boolean;
+  isUserDefault: boolean;
+  used: boolean;
+
+  owner: ScoreUser;
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
+
 }
 
 export class AgencyIdList {
@@ -221,8 +347,7 @@ export class AgencyIdListValue {
   guid: string;
   value: string;
   name: string;
-  definition: string;
-  definitionSource: string;
+  definition: Definition = new Definition();
 
   deprecated: boolean;
   developerDefault: boolean;
@@ -241,7 +366,6 @@ export class AgencyIdListValue {
       this.value = obj.value;
       this.name = obj.name;
       this.definition = obj.definition;
-      this.definitionSource = obj.definitionSource;
 
       this.deprecated = obj.deprecated;
       this.developerDefault = obj.developerDefault;
@@ -252,12 +376,11 @@ export class AgencyIdListValue {
 
   get hashCode(): number {
     return hashCode4Array(this.agencyIdListValueManifestId, this.basedAgencyIdListValueManifestId,
-      this.guid, this.value, this.name, this.definition, this.definitionSource,
-      this.deprecated, this.developerDefault, this.userDefault, this.used);
+        this.guid, this.value, this.name, this.definition,
+        this.deprecated, this.developerDefault, this.userDefault, this.used);
   }
 }
 
-export class SimpleAgencyIdListValue {
-  agencyIdListValueId: number;
-  name: string;
+export class AgencyIdListCreateResponse {
+  agencyIdListManifestId: number;
 }

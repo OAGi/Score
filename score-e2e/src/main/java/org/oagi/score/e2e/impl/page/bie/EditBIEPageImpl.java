@@ -372,7 +372,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
                 node.sendKeys(Keys.ENTER);
                 waitFor(ofMillis(500L));
             }
-            click(getDriver(), node);
+            node.sendKeys("");
             clear(searchInput);
             return node;
         });

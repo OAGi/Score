@@ -1,9 +1,16 @@
 import {Injectable, OnInit} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {BusinessContext, BusinessContextListRequest, BusinessContextRule, BusinessContextValue} from './business-context';
+import {
+  BusinessContext,
+  BusinessContextDetails,
+  BusinessContextListEntry,
+  BusinessContextListRequest,
+  BusinessContextSummary,
+  BusinessContextValue
+} from './business-context';
 import {PageResponse} from '../../../basis/basis';
-import {BieEditAbieNode} from '../../../bie-management/bie-edit/domain/bie-edit-node';
+import {map} from 'rxjs/operators';
 
 @Injectable()
 export class BusinessContextService implements OnInit {
@@ -14,20 +21,25 @@ export class BusinessContextService implements OnInit {
   ngOnInit() {
   }
 
-  getBusinessContextList(request: BusinessContextListRequest): Observable<PageResponse<BusinessContext>> {
+  getBusinessContextSummaries(): Observable<BusinessContextSummary[]> {
+    return this.http.get<BusinessContextSummary[]>('/api/business-contexts/summaries');
+  }
+
+  getBusinessContextList(request: BusinessContextListRequest): Observable<PageResponse<BusinessContextListEntry>> {
     let params = new HttpParams()
-      .set('sortActive', request.page.sortActive)
-      .set('sortDirection', request.page.sortDirection)
-      .set('pageIndex', '' + request.page.pageIndex)
-      .set('pageSize', '' + request.page.pageSize);
-    if (request.updaterUsernameList.length > 0) {
-      params = params.set('updaterUsernameList', request.updaterUsernameList.join(','));
+        .set('pageIndex', '' + request.page.pageIndex)
+        .set('pageSize', '' + request.page.pageSize);
+
+    if (!!request.page.sortActive && !!request.page.sortDirection) {
+      params = params.set('orderBy', ((request.page.sortDirection === 'desc') ? '-' : '+') + request.page.sortActive);
     }
-    if (request.updatedDate.start) {
-      params = params.set('updateStart', '' + request.updatedDate.start.getTime());
+    if (request.updaterLoginIdList.length > 0) {
+      params = params.set('updaterLoginIdList', request.updaterLoginIdList.join(','));
     }
-    if (request.updatedDate.end) {
-      params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
+    if (!!request.updatedDate.start || !!request.updatedDate.end) {
+      params = params.set('lastUpdatedOn',
+          '[' + (!!request.updatedDate.start ? request.updatedDate.start.getTime() : '') + '~' +
+          (!!request.updatedDate.end ? request.updatedDate.end.getTime() : '') + ']');
     }
     if (request.filters.name) {
       params = params.set('name', request.filters.name);
@@ -41,76 +53,77 @@ export class BusinessContextService implements OnInit {
     if (request.filters.isBieEditing) {
       params = params.set('isBieEditing', 'true');
     }
-    return this.http.get<PageResponse<BusinessContext>>('/api/business_contexts', {params});
+    return this.http.get<PageResponse<BusinessContextListEntry>>('/api/business-contexts', {params}).pipe(
+        map((res: PageResponse<BusinessContextListEntry>) => ({
+          ...res,
+          list: res.list.map(elm => ({
+            ...elm,
+            created: {
+              ...elm.created,
+              when: new Date(elm.created.when),
+            },
+            lastUpdated: {
+              ...elm.lastUpdated,
+              when: new Date(elm.lastUpdated.when),
+            }
+          }))
+        }))
+    );
   }
 
-  getBusinessContext(id): Observable<BusinessContext> {
-    return this.http.get<BusinessContext>('/api/business_context/' + id);
+  getBusinessContextDetails(businessContextId): Observable<BusinessContextDetails> {
+    return this.http.get<BusinessContextDetails>('/api/business-contexts/' + businessContextId);
   }
 
-  getBusinessContextsByBizCtxIds(businessContextIdList: number[]): Observable<PageResponse<BusinessContext>> {
-    const params = new HttpParams()
-      .set('businessContextIdList', businessContextIdList.join(','));
-
-    return this.http.get<PageResponse<BusinessContext>>('/api/business_contexts', {params});
+  getBusinessContextValues(businessContextId): Observable<BusinessContextValue[]> {
+    return this.http.get<BusinessContextValue[]>('/api/business-contexts/' + businessContextId + '/values');
   }
 
-  getBusinessContextsByTopLevelAsbiepId(topLevelAsbiepId: number): Observable<PageResponse<BusinessContext>> {
-    const params = new HttpParams()
-      .set('topLevelAsbiepId', '' + topLevelAsbiepId);
-
-    return this.http.get<PageResponse<BusinessContext>>('/api/business_contexts', {params});
-  }
-
-  getBusinessContextValues(): Observable<BusinessContextValue[]> {
-    return this.http.get<BusinessContextValue[]>('/api/business_context_values');
-  }
-
-  create(businessContext: BusinessContext): Observable<any> {
-    return this.http.put('/api/business_context', {
-      name: businessContext.name,
-      businessContextValueList: businessContext.businessContextValueList
+  create(name: string, businessContextValues: BusinessContextValue[]): Observable<any> {
+    return this.http.post('/api/business-contexts', {
+      name,
+      businessContextValueList: businessContextValues
     });
   }
 
-  update(businessContext: BusinessContext): Observable<any> {
-    return this.http.post('/api/business_context/' + businessContext.businessContextId, {
-      name: businessContext.name,
-      businessContextValueList: businessContext.businessContextValueList
+  update(businessContextId: number, name: string, businessContextValues: BusinessContextValue[]): Observable<any> {
+    return this.http.put('/api/business-contexts/' + businessContextId, {
+      name,
+      businessContextValueList: businessContextValues
     });
-  }
-
-  assign(topLevelAsbiepId: number, businessContext: BusinessContext): Observable<any> {
-    const params = new HttpParams()
-      .set('topLevelAsbiepId', '' + topLevelAsbiepId);
-
-    return this.http.put('/api/business_context/' + businessContext.businessContextId, null, {params});
-  }
-
-  dismiss(topLevelAsbiepId: number, businessContext: BusinessContext): Observable<any> {
-    const params = new HttpParams()
-      .set('topLevelAsbiepId', '' + topLevelAsbiepId);
-
-    return this.http.delete('/api/business_context/' + businessContext.businessContextId, {params});
   }
 
   delete(...businessContextIds): Observable<any> {
     if (businessContextIds.length === 1) {
-      return this.http.delete('/api/business_context/' + businessContextIds[0]);
+      return this.http.delete('/api/business-contexts/' + businessContextIds[0]);
     } else {
-      return this.http.post<any>('/api/business_context/delete', {
-        businessContextIdList: businessContextIds
+      return this.http.delete<any>('/api/business-contexts', {
+        body: {
+          businessContextIdList: businessContextIds
+        }
       });
     }
   }
 
-  getAssignBizCtx(id): Observable<BusinessContextRule[]> {
-    return this.http.get<BusinessContextRule[]>('/api/profile_bie/' + id + '/biz_ctx');
+  assign(topLevelAsbiepId: number, businessContext: BusinessContext): Observable<any> {
+    return this.http.post('/api/business-contexts/' + businessContext.businessContextId + '/assignments/' + topLevelAsbiepId, {});
   }
 
-  assignBizCtx(bie: BieEditAbieNode, businessContextList: number[]): Observable<any> {
-    return this.http.post('/api/profile_bie/' + bie.topLevelAsbiepId + '/assign_biz_ctx', {
-      businessContextList
-    });
+  unassign(topLevelAsbiepId: number, businessContext: BusinessContext): Observable<any> {
+    return this.http.delete('/api/business-contexts/' + businessContext.businessContextId + '/assignments/' + topLevelAsbiepId, {});
+  }
+
+  getBusinessContextsByBizCtxIds(businessContextIdList: number[]): Observable<BusinessContextSummary[]> {
+    const params = new HttpParams()
+        .set('businessContextIdList', businessContextIdList.join(','));
+
+    return this.http.get<BusinessContextSummary[]>('/api/business-contexts/summaries', {params});
+  }
+
+  getBusinessContextsByTopLevelAsbiepId(topLevelAsbiepId: number): Observable<BusinessContextSummary[]> {
+    const params = new HttpParams()
+        .set('topLevelAsbiepId', '' + topLevelAsbiepId);
+
+    return this.http.get<BusinessContextSummary[]>('/api/business-contexts/summaries', {params});
   }
 }

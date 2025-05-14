@@ -17,7 +17,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeList;
  * from another code list, the whole set of code values belonging to the based
  * code list will be copied.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -446,6 +446,6 @@ public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> {
         setState(state);
         setPrevCodeListId(prevCodeListId);
         setNextCodeListId(nextCodeListId);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

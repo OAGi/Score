@@ -1,5 +1,5 @@
 import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
-import {BusinessContext, BusinessContextListRequest} from '../domain/business-context';
+import {BusinessContextListEntry, BusinessContextListRequest} from '../domain/business-context';
 import {BusinessContextService} from '../domain/business-context.service';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -7,7 +7,7 @@ import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
-import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker} from '@angular/material/datepicker';
 import {PageRequest} from '../../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
@@ -120,7 +120,7 @@ export class BusinessContextListComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<BusinessContext>();
+  dataSource = new MatTableDataSource<BusinessContextListEntry>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
 
@@ -194,17 +194,6 @@ export class BusinessContextListComponent implements OnInit {
   onChange(property?: string, source?) {
   }
 
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
-  }
-
   reset(type: string) {
     switch (type) {
       case 'startDate':
@@ -236,11 +225,7 @@ export class BusinessContextListComponent implements OnInit {
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
-      this.dataSource.data = resp.list.map((elm: BusinessContext) => {
-        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        elm.businessContextValueList = [];
-        return elm;
-      });
+      this.dataSource.data = resp.list;
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0],
           this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));
@@ -264,13 +249,13 @@ export class BusinessContextListComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(row: BusinessContext) {
+  select(row: BusinessContextListEntry) {
     if (!row.used) {
       this.selection.select(row.businessContextId);
     }
   }
 
-  toggle(row: BusinessContext) {
+  toggle(row: BusinessContextListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row.businessContextId);
     } else {
@@ -278,7 +263,7 @@ export class BusinessContextListComponent implements OnInit {
     }
   }
 
-  isSelected(row: BusinessContext) {
+  isSelected(row: BusinessContextListEntry) {
     return this.selection.isSelected(row.businessContextId);
   }
 

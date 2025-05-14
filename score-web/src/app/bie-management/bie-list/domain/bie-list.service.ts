@@ -2,10 +2,8 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {AsbieBbieList, BieList, BieListRequest, SummaryBieInfo} from './bie-list';
+import {BieListEntry, BieListRequest, SummaryBieInfo} from './bie-list';
 import {PageResponse} from '../../../basis/basis';
-import {BusinessContext} from '../../../context-management/business-context/domain/business-context';
-import {BieToAssign} from '../../../business-term-management/domain/business-term';
 
 @Injectable()
 export class BieListService {
@@ -13,30 +11,58 @@ export class BieListService {
   }
 
   getSummaryBieList(libraryId: number, releaseId: number): Observable<SummaryBieInfo> {
-    return this.http.get<SummaryBieInfo>('/api/info/bie_summary?libraryId=' + libraryId + '&releaseId=' + releaseId).pipe(map(
+    let params = new HttpParams()
+        .set('libraryId', libraryId);
+    if (!!releaseId && releaseId > 0) {
+      params = params.set('releaseId', releaseId);
+    }
+    return this.http.get<SummaryBieInfo>('/api/info/bie-summaries', {
+      params
+    }).pipe(map(
       e => {
         if (e.myRecentBIEs) {
-          e.myRecentBIEs = e.myRecentBIEs.map(elm => {
-            elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-            return elm;
-          });
+          e.myRecentBIEs = e.myRecentBIEs.map(elm => ({
+            ...elm,
+            source: (!!elm.source) ? {
+              ...elm.source,
+              when: new Date(elm.source.when),
+            } : undefined,
+            based: (!!elm.based) ? {
+              ...elm.based,
+              when: new Date(elm.based.when),
+            } : undefined,
+            created: {
+              ...elm.created,
+              when: new Date(elm.created.when),
+            },
+            lastUpdated: {
+              ...elm.lastUpdated,
+              when: new Date(elm.lastUpdated.when),
+            }
+          }));
         }
         return e;
       }));
   }
 
-  getBieListWithRequest(request: BieListRequest): Observable<PageResponse<BieList>> {
+  getBieListWithRequest(request: BieListRequest): Observable<PageResponse<BieListEntry>> {
     let params = new HttpParams()
-      .set('libraryId', '' + request.library.libraryId)
-      .set('sortActives', request.page.sortActives.join(','))
-      .set('sortDirections', request.page.sortDirections.join(','))
-      .set('pageIndex', '' + request.page.pageIndex)
-      .set('pageSize', '' + request.page.pageSize);
-    if (request.ownerLoginIds.length > 0) {
-      params = params.set('ownerLoginIds', request.ownerLoginIds.join(','));
+      .set('libraryId', '' + request.library.libraryId);
+
+    if (!!request.page.sortActive && !!request.page.sortDirection) {
+      params = params.set('orderBy', ((request.page.sortDirection === 'desc') ? '-' : '+') + request.page.sortActive);
     }
-    if (request.updaterLoginIds.length > 0) {
-      params = params.set('updaterLoginIds', request.updaterLoginIds.join(','));
+    if (request.page.pageIndex >= 0) {
+      params = params.set('pageIndex', request.page.pageIndex);
+    }
+    if (request.page.pageSize > 0) {
+      params = params.set('pageSize', request.page.pageSize);
+    }
+    if (request.ownerLoginIdList.length > 0) {
+      params = params.set('ownerLoginIdList', request.ownerLoginIdList.join(','));
+    }
+    if (request.updaterLoginIdList.length > 0) {
+      params = params.set('updaterLoginIdList', request.updaterLoginIdList.join(','));
     }
     if (request.updatedDate.start) {
       params = params.set('updateStart', '' + request.updatedDate.start.getTime());
@@ -89,10 +115,33 @@ export class BieListService {
     if (request.ownedByDeveloper !== undefined) {
       params = params.set('ownedByDeveloper', request.ownedByDeveloper.toString());
     }
-    return this.http.get<PageResponse<BieList>>('/api/bie_list', {params});
+    return this.http.get<PageResponse<BieListEntry>>('/api/bies', {params}).pipe(
+        map((res: PageResponse<BieListEntry>) => ({
+          ...res,
+          list: res.list.map(elm => ({
+            ...elm,
+            source: (!!elm.source) ? {
+              ...elm.source,
+              when: new Date(elm.source.when),
+            } : undefined,
+            based: (!!elm.based) ? {
+              ...elm.based,
+              when: new Date(elm.based.when),
+            } : undefined,
+            created: {
+              ...elm.created,
+              when: new Date(elm.created.when),
+            },
+            lastUpdated: {
+              ...elm.lastUpdated,
+              when: new Date(elm.lastUpdated.when),
+            }
+          }))
+        }))
+    );
   }
 
-  getBieListByTopLevelAsbiepId(topLevelAsbiepId: number): Observable<BieList> {
+  getBieListByTopLevelAsbiepId(topLevelAsbiepId: number): Observable<BieListEntry> {
     const request = new BieListRequest();
     request.page.pageSize = 1;
     request.topLevelAsbiepIds = [topLevelAsbiepId,];
@@ -100,27 +149,11 @@ export class BieListService {
       .pipe(map(resp => (resp.length !== 0) ? resp.list[0] : undefined));
   }
 
-  findBizCtxFromAbieId(id): Observable<BusinessContext> {
-    return this.http.get<BusinessContext>('/api/profile_bie/business_ctx_from_abie/' + id);
-  }
-
-  getBieUsageList(request: BieListRequest, topLevelAsbiepId: number): Observable<PageResponse<BieList>> {
-    const params = new HttpParams()
-      .set('sortActive', request.page.sortActive)
-      .set('sortDirection', request.page.sortDirection)
-      .set('pageIndex', '' + request.page.pageIndex)
-      .set('pageSize', '' + request.page.pageSize);
-
-    return this.http.get<PageResponse<BieList>>('/api/bie_list/' + topLevelAsbiepId + '/usage', {params});
-  }
-
-  getBieListByBizCtxId(id): Observable<BieList[]> {
-    return this.http.get<BieList[]>('/api/profile_bie_list?biz_ctx_id=' + id);
-  }
-
-  delete(topLevelAsbiepIds: number[]): Observable<any> {
-    return this.http.post<any>('/api/profile_bie_list/delete', {
-      topLevelAsbiepIds
+  delete(topLevelAsbiepIdList: number[]): Observable<any> {
+    return this.http.delete<any>('/api/bies', {
+      body: {
+        topLevelAsbiepIdList
+      }
     });
   }
 
@@ -137,7 +170,7 @@ export class BieListService {
     });
   }
 
-  updateStateOnList(actionType: string, toState: string, bieLists: BieList[]): Observable<any> {
+  updateStateOnList(actionType: string, toState: string, bieLists: BieListEntry[]): Observable<any> {
     return this.http.post<any>('/api/bie_list/state/multiple', {
       action: actionType,
       toState,
@@ -145,67 +178,23 @@ export class BieListService {
     });
   }
 
-  transferOwnershipOnList(bieLists: BieList[], targetLoginId: string): Observable<any> {
+  transferOwnershipOnList(bieLists: BieListEntry[], targetLoginId: string): Observable<any> {
     return this.http.post<any>('/api/bie_list/transfer_ownership/multiple', {
       targetLoginId,
       topLevelAsbiepIds: bieLists.map(e => e.topLevelAsbiepId)
     });
   }
 
-  getAsbieBbieListWithRequest(request: BieListRequest): Observable<PageResponse<AsbieBbieList>> {
-    let params = new HttpParams()
-      .set('libraryId', '' + request.library.libraryId)
-      .set('sortActive', request.page.sortActive)
-      .set('sortDirection', request.page.sortDirection)
-      .set('pageIndex', '' + request.page.pageIndex)
-      .set('pageSize', '' + request.page.pageSize);
-    if (request.ownerLoginIds.length > 0) {
-      params = params.set('ownerLoginIds', request.ownerLoginIds.join(','));
+  getPlantUml(topLevelAsbiepId: number, options: {}): Observable<any> {
+    let params = new HttpParams();
+    if (!!options) {
+      for (const key in options) {
+        params = params.append(key, options[key]);
+      }
     }
-    if (request.updaterLoginIds.length > 0) {
-      params = params.set('updaterLoginIds', request.updaterLoginIds.join(','));
-    }
-    if (request.updatedDate.start) {
-      params = params.set('updateStart', '' + request.updatedDate.start.getTime());
-    }
-    if (request.updatedDate.end) {
-      params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
-    }
-    if (request.filters.propertyTerm) {
-      params = params.set('topLevelAsccpPropertyTerm', request.filters.propertyTerm);
-    }
-    if (request.filters.den) {
-      params = params.set('den', request.filters.den);
-    }
-    if (request.types) {
-      params = params.set('types', request.types.join(','));
-    }
-    if (request.filters.businessContext) {
-      params = params.set('businessContext', request.filters.businessContext);
-    }
-    if (request.filters.version) {
-      params = params.set('version', request.filters.version);
-    }
-    if (request.filters.remark) {
-      params = params.set('remark', request.filters.remark);
-    }
-    if (request.states.length > 0) {
-      params = params.set('states', request.states.join(','));
-    }
-    if (request.access) {
-      params = params.set('access', request.access);
-    }
-    if (request.releases) {
-      params = params.set('releaseIds', request.releases.map(e => e.releaseId.toString()).join(','));
-    }
-    if (request.ownedByDeveloper !== undefined) {
-      params = params.set('ownedByDeveloper', request.ownedByDeveloper.toString());
-    }
-    return this.http.get<PageResponse<AsbieBbieList>>('/api/bie_list/asbie_bbie', {params});
-  }
-
-  confirmAsbieBbieListByIdAndType(biesToAssign: BieToAssign[]): Observable<PageResponse<AsbieBbieList>> {
-    return this.http.post<PageResponse<AsbieBbieList>>('/api/bie_list/asbie_bbie/confirm', {biesToAssign});
+    return this.http.get('/api/bies/' + topLevelAsbiepId + '/plantuml', {
+      params
+    });
   }
 
 }

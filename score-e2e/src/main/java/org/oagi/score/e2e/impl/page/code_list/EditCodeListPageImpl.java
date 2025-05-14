@@ -171,6 +171,7 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     @Override
     public EditCodeListValueDialog addCodeListValue() {
         click(getAddCodeListValueButton());
+        waitFor(ofSeconds(1L));
         EditCodeListValueDialog editCodeListValueDialog = new EditCodeListValueDialogImpl(this);
         assert editCodeListValueDialog.isOpened();
         return editCodeListValueDialog;

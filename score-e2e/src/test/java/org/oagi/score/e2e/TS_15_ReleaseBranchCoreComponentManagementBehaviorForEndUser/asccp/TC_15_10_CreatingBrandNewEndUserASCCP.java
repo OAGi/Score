@@ -92,6 +92,7 @@ public class TC_15_10_CreatingBrandNewEndUserASCCP extends BaseTest {
         HomePage homePage = loginPage().signIn(another_user.getLoginId(), another_user.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
 
         for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
             ACCObject acc;
@@ -165,6 +166,7 @@ public class TC_15_10_CreatingBrandNewEndUserASCCP extends BaseTest {
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
 
         LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
@@ -232,13 +234,13 @@ public class TC_15_10_CreatingBrandNewEndUserASCCP extends BaseTest {
 
                     acc = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
                     DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-                    bccp = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
+                    bccp = coreComponentAPI.createRandomBCCP(release, dataType, this.appUser, namespace, state);
                     BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, state);
                     bcc.setCardinalityMax(1);
                     coreComponentAPI.updateBCC(bcc);
 
                     ACCObject acc_association = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
-                    BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
+                    BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, this.appUser, namespace, state);
                     coreComponentAPI.appendBCC(acc_association, bccp_to_append, state);
 
                     asccp = coreComponentAPI.createRandomASCCP(acc_association, this.appUser, namespace, state);

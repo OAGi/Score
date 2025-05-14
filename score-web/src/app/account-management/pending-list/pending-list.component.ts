@@ -9,7 +9,6 @@ import {PageRequest} from '../../basis/basis';
 import {Location} from '@angular/common';
 import {finalize} from 'rxjs/operators';
 import {PendingListService} from '../domain/pending-list.service';
-import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {forkJoin} from 'rxjs';
@@ -179,17 +178,6 @@ export class PendingListComponent implements OnInit {
   }
 
   onChange(property?: string, source?) {
-  }
-
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.createdDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.createdDate.end = new Date(event.value);
-        break;
-    }
   }
 
   reset(type: string) {

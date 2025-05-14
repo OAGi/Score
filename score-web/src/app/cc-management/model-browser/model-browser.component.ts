@@ -1,5 +1,4 @@
 import {Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
-import {ModelBrowserService} from './domain/model-browser.service';
 import {switchMap} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {Location} from '@angular/common';
@@ -17,7 +16,7 @@ import {
   ModelBrowserAccNodeDetail,
   ModelBrowserAsccpNodeDetail,
   ModelBrowserBccpNodeDetail,
-  ModelBrowserBdtScNodeDetail,
+  ModelBrowserDtScNodeDetail,
   ModelBrowserNode,
   ModelBrowserNodeDatabase,
   ModelBrowserNodeDataSource,
@@ -27,6 +26,7 @@ import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import {MatMenuTrigger} from '@angular/material/menu';
 import {loadBooleanProperty, saveBooleanProperty} from '../../common/utility';
 import {ChangeListener} from '../../bie-management/domain/bie-flat-tree';
+import {CcNodeService} from '../domain/core-component-node.service';
 
 
 @Component({
@@ -74,7 +74,7 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
     saveBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, hideCardinality);
   }
 
-  constructor(private service: ModelBrowserService,
+  constructor(private ccNodeService: CcNodeService,
               private snackBar: MatSnackBar,
               private location: Location,
               private router: Router,
@@ -96,7 +96,7 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
         this.manifestId = parseInt(params.get('manifestId'), 10);
 
         return forkJoin([
-          this.service.getGraphNode(this.type, this.manifestId),
+          this.ccNodeService.getGraphNode(this.type, this.manifestId),
           this.preferencesService.load(this.auth.getUserToken())
         ]);
       })).subscribe(([ccGraph, preferencesInfo]) => {
@@ -104,7 +104,7 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
       this.preferencesInfo = preferencesInfo;
 
       const database = new ModelBrowserNodeDatabase<ModelBrowserNode>(ccGraph, this.type, this.manifestId);
-      this.dataSource = new ModelBrowserNodeDataSource<ModelBrowserNode>(database, this.service, [this,]);
+      this.dataSource = new ModelBrowserNodeDataSource<ModelBrowserNode>(database, this.ccNodeService, [this,]);
       this.searcher = new ModelBrowserNodeDataSourceSearcher<ModelBrowserNode>(this.dataSource, database);
       this.dataSource.init();
       this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
@@ -178,10 +178,13 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
       this.dataSource.toggle(this.cursorNode);
     } else if ($event.key === 'o' || $event.key === 'O') {
       this.menuTriggerList.toArray().filter(e => !!e.menuData)
-        .filter(e => e.menuData.menuId === 'contextMenu').forEach(trigger => {
-        this.contextMenuItem = node;
-        trigger.openMenu();
-      });
+          .filter(e => e.menuData.menuId === 'contextMenu' && e.menuData.hashPath === node.hashPath)
+          .forEach(trigger => {
+            this.contextMenuItem = node;
+            if (!trigger.menuOpen) {
+              trigger.openMenu();
+            }
+          });
     } else if ($event.key === 'Enter') {
       this.onClick(this.cursorNode);
     } else {
@@ -326,18 +329,18 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
     return node.detail as ModelBrowserBccpNodeDetail;
   }
 
-  isBdtScDetail(node?: ModelBrowserNode): boolean {
+  isDtScDetail(node?: ModelBrowserNode): boolean {
     if (!node) {
       node = this.selectedNode;
     }
     return (node !== undefined) && (node.ccType.toUpperCase() === 'BDT_SC');
   }
 
-  asBdtScDetail(node?: ModelBrowserNode): ModelBrowserBdtScNodeDetail {
+  asDtScDetail(node?: ModelBrowserNode): ModelBrowserDtScNodeDetail {
     if (!node) {
       node = this.selectedNode;
     }
-    return node.detail as ModelBrowserBdtScNodeDetail;
+    return node.detail as ModelBrowserDtScNodeDetail;
   }
 
 }

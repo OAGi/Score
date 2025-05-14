@@ -7,9 +7,9 @@ import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {ActivatedRoute, Router} from '@angular/router';
-import {ReleaseList, ReleaseListRequest, SimpleRelease, WorkingRelease} from '../domain/release';
+import {ReleaseListEntry, ReleaseListRequest, ReleaseSummary, WorkingRelease} from '../domain/release';
 import {AccountListService} from '../../account-management/domain/account-list.service';
-import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
@@ -17,14 +17,16 @@ import {initFilter, loadLibrary, saveLibrary} from '../../common/utility';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {finalize} from 'rxjs/operators';
 import {Location} from '@angular/common';
-import {SimpleNamespace} from '../../namespace-management/domain/namespace';
+import {NamespaceSummary} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
-import {Library} from '../../library-management/domain/library';
+import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryService} from '../../library-management/domain/library.service';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {ReleaseDiagramDialogComponent} from '../release-diagram-dialog/release-diagram-dialog.component';
 
 @Component({
   selector: 'score-release-list',
@@ -136,12 +138,12 @@ export class ReleaseListComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<ReleaseList>();
+  dataSource = new MatTableDataSource<ReleaseListEntry>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
 
-  libraries: Library[] = [];
-  mappedLibraries: {library: Library, selected: boolean}[] = [];
+  libraries: LibrarySummary[] = [];
+  mappedLibraries: {library: LibrarySummary, selected: boolean}[] = [];
   loginIdList: string[] = [];
   creatorIdListFilterCtrl: FormControl = new FormControl();
   filteredCreatorIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
@@ -150,11 +152,11 @@ export class ReleaseListComponent implements OnInit {
   states: string[] = ['Initialized', 'Draft', 'Published'];
   request: ReleaseListRequest;
   preferencesInfo: PreferencesInfo;
-  namespaces: SimpleNamespace[] = [];
+  namespaces: NamespaceSummary[] = [];
   namespaceListFilterCtrl: FormControl = new FormControl();
-  filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
+  filteredNamespaceList: ReplaySubject<NamespaceSummary[]> = new ReplaySubject<NamespaceSummary[]>(1);
 
-  contextMenuItem: ReleaseList;
+  contextMenuItem: ReleaseListEntry;
   @ViewChild('createdDateStart', {static: true}) createdDateStart: MatDatepicker<any>;
   @ViewChild('createdDateEnd', {static: true}) createdDateEnd: MatDatepicker<any>;
   @ViewChild('updatedDateStart', {static: true}) updatedDateStart: MatDatepicker<any>;
@@ -170,6 +172,7 @@ export class ReleaseListComponent implements OnInit {
               private namespaceService: NamespaceService,
               private snackBar: MatSnackBar,
               private auth: AuthService,
+              private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
               private preferencesService: SettingsPreferencesService,
               private location: Location,
@@ -182,7 +185,7 @@ export class ReleaseListComponent implements OnInit {
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.excludes.push(WorkingRelease.releaseNum);
 
-    this.libraryService.getLibraries().subscribe(libraries => {
+    this.libraryService.getLibrarySummaryList().subscribe(libraries => {
       this.initLibraries(libraries);
 
       this.searchBar.showAdvancedSearch =
@@ -208,7 +211,7 @@ export class ReleaseListComponent implements OnInit {
       });
 
       forkJoin([
-        this.namespaceService.getSimpleNamespaces(this.request.library.libraryId),
+        this.namespaceService.getNamespaceSummaries(this.request.library.libraryId),
         this.accountService.getAccountNames(),
         this.preferencesService.load(this.auth.getUserToken())
       ]).subscribe(([namespaces, loginIds, preferencesInfo]) => {
@@ -237,23 +240,6 @@ export class ReleaseListComponent implements OnInit {
   onChange(property?: string, source?) {
   }
 
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'created.startDate':
-        this.request.createdDate.start = new Date(event.value);
-        break;
-      case 'created.endDate':
-        this.request.createdDate.end = new Date(event.value);
-        break;
-      case 'updated.startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'updated.endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
-  }
-
   reset(type: string) {
     switch (type) {
       case 'created.startDate':
@@ -275,7 +261,7 @@ export class ReleaseListComponent implements OnInit {
     }
   }
 
-  initLibraries(libraries: Library[]) {
+  initLibraries(libraries: LibrarySummary[]) {
     this.libraries = libraries;
     if (this.libraries.length > 0) {
       const savedLibraryId = loadLibrary(this.auth.getUserToken());
@@ -294,7 +280,7 @@ export class ReleaseListComponent implements OnInit {
     }
   }
 
-  onLibraryChange(library: Library) {
+  onLibraryChange(library: LibrarySummary) {
     this.request.library = library;
     saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
     this.onSearch();
@@ -312,17 +298,14 @@ export class ReleaseListComponent implements OnInit {
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
 
-    this.service.getReleases(this.request).pipe(
+    this.service.getReleaseList(this.request).pipe(
       finalize(() => {
         this.loading = false;
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
       this.paginator.pageIndex = resp.page;
-      this.dataSource.data = resp.list.map((elm: ReleaseList) => {
-        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        return elm;
-      });
+      this.dataSource.data = resp.list;
 
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0],
@@ -347,17 +330,17 @@ export class ReleaseListComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(row: ReleaseList) {
+  select(row: ReleaseListEntry) {
     if (this.isSelectable(row)) {
       this.selection.select(row.releaseId);
     }
   }
 
-  isSelectable(row: ReleaseList) {
+  isSelectable(row: ReleaseListEntry) {
     return (row.state === 'Initialized');
   }
 
-  toggle(row: ReleaseList) {
+  toggle(row: ReleaseListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row.releaseId);
     } else {
@@ -365,7 +348,7 @@ export class ReleaseListComponent implements OnInit {
     }
   }
 
-  isSelected(row: ReleaseList) {
+  isSelected(row: ReleaseListEntry) {
     return this.selection.isSelected(row.releaseId);
   }
 
@@ -373,11 +356,11 @@ export class ReleaseListComponent implements OnInit {
     this.router.navigateByUrl('/release/create');
   }
 
-  createDraft(release: SimpleRelease) {
+  createDraft(release: ReleaseSummary) {
     this.router.navigateByUrl('release/' + release.releaseId + '/assign');
   }
 
-  updateState(release: SimpleRelease, state: string) {
+  updateState(release: ReleaseSummary, state: string) {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Update state to \'' + state + '\'?';
     dialogConfig.data.content = ['Are you sure you want to update the state to \'' + state + '\'?'];
@@ -401,7 +384,7 @@ export class ReleaseListComponent implements OnInit {
       });
   }
 
-  discard(release?: SimpleRelease) {
+  discard(release?: ReleaseSummary) {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Discard Release?';
     if (release) {
@@ -427,4 +410,21 @@ export class ReleaseListComponent implements OnInit {
         }
       });
   }
+
+  showUmlDiagram(release: ReleaseListEntry, $event: MouseEvent) {
+    if (!!$event) {
+      $event.preventDefault();
+      $event.stopPropagation();
+    }
+
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.width = window.innerWidth + 'px';
+    dialogConfig.height = '80vh';
+    dialogConfig.data = {releaseId: release.releaseId};
+    const dialogRef = this.dialog.open(ReleaseDiagramDialogComponent, dialogConfig);
+
+    dialogRef.afterClosed().subscribe(_ => {
+    });
+  }
+
 }

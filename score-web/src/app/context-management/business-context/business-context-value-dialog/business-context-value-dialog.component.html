@@ -83,7 +83,8 @@
                                      [noEntriesFoundLabel]="'No matching context scheme value found.'"></ngx-mat-select-search>
             </mat-option>
             <mat-option *ngFor="let contextSchemeValue of filteredContextSchemeValueList | async"
-                        [value]="contextSchemeValue.contextSchemeValueId">
+                        [value]="contextSchemeValue.contextSchemeValueId"
+                        [matTooltip]="contextSchemeValue.meaning">
               {{ contextSchemeValue.value }}
             </mat-option>
           </mat-select>

@@ -73,17 +73,17 @@ public class TC_24_1_ReuseBIE extends BaseTest {
              */
             acc = coreComponentAPI.createRandomACC(usera, prevReleaseObject, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", prevReleaseObject.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
-            bccp_child = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
+            bccp = coreComponentAPI.createRandomBCCP(prevReleaseObject, dataType, usera, namespace, "Production");
+            bccp_child = coreComponentAPI.createRandomBCCP(prevReleaseObject, dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(acc, bccp, "Production");
 
             DTObject dataTypeWithSC = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "3292eaa5630b48ecb7c4249b0ddc760e", prevReleaseObject.getReleaseNumber());
-            bccp_not_reuse = coreComponentAPI.createRandomBCCP(dataTypeWithSC, usera, namespace, "Production");
+            bccp_not_reuse = coreComponentAPI.createRandomBCCP(prevReleaseObject, dataTypeWithSC, usera, namespace, "Production");
 
             ACCObject acc_association = coreComponentAPI.createRandomACC(usera, prevReleaseObject, namespace, "Production");
             ACCObject acc_association2 = coreComponentAPI.createRandomACC(usera, prevReleaseObject, namespace, "Production");
 
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(prevReleaseObject, dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Production");
 
             asccp_child = coreComponentAPI.createRandomASCCP(acc_association, usera, namespace, "Production");
@@ -158,17 +158,17 @@ public class TC_24_1_ReuseBIE extends BaseTest {
              */
             acc = coreComponentAPI.createRandomACC(usera, currentReleaseObject, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", current_release);
-            bccp = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
-            bccp_child = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
+            bccp = coreComponentAPI.createRandomBCCP(currentReleaseObject, dataType, usera, namespace, "Production");
+            bccp_child = coreComponentAPI.createRandomBCCP(currentReleaseObject, dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(acc, bccp, "Production");
 
             DTObject dataTypeWithSC = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "3292eaa5630b48ecb7c4249b0ddc760e", current_release);
-            bccp_not_reuse = coreComponentAPI.createRandomBCCP(dataTypeWithSC, usera, namespace, "Production");
+            bccp_not_reuse = coreComponentAPI.createRandomBCCP(currentReleaseObject, dataTypeWithSC, usera, namespace, "Production");
 
             ACCObject acc_association = coreComponentAPI.createRandomACC(usera, currentReleaseObject, namespace, "Production");
             ACCObject acc_association2 = coreComponentAPI.createRandomACC(usera, currentReleaseObject, namespace, "Production");
 
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(currentReleaseObject, dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Production");
 
             asccp_child = coreComponentAPI.createRandomASCCP(acc_association, usera, namespace, "Production");
@@ -226,17 +226,17 @@ public class TC_24_1_ReuseBIE extends BaseTest {
              */
             acc = coreComponentAPI.createRandomACC(usera, currentReleaseObject, namespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", current_release);
-            bccp = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
-            bccp_child = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
+            bccp = coreComponentAPI.createRandomBCCP(currentReleaseObject, dataType, usera, namespace, "Production");
+            bccp_child = coreComponentAPI.createRandomBCCP(currentReleaseObject, dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(acc, bccp, "Production");
 
             DTObject dataTypeWithSC = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "3292eaa5630b48ecb7c4249b0ddc760e", current_release);
-            bccp_not_reuse = coreComponentAPI.createRandomBCCP(dataTypeWithSC, usera, namespace, "Production");
+            bccp_not_reuse = coreComponentAPI.createRandomBCCP(currentReleaseObject, dataTypeWithSC, usera, namespace, "Production");
 
             ACCObject acc_association = coreComponentAPI.createRandomACC(usera, currentReleaseObject, namespace, "Production");
             ACCObject acc_association2 = coreComponentAPI.createRandomACC(usera, currentReleaseObject, namespace, "Production");
 
-            bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
+            bccp_to_append = coreComponentAPI.createRandomBCCP(currentReleaseObject, dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Production");
 
             asccp_child = coreComponentAPI.createRandomASCCP(acc_association2, usera, namespace, "Production");
@@ -1183,7 +1183,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
              */
             acc = coreComponentAPI.createRandomACC(usera, currentReleaseObject, euNamespace, "Production");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", current_release);
-            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, developerNamespace, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(currentReleaseObject, dataType, developer, developerNamespace, "WIP");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);

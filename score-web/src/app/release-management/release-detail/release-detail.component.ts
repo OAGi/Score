@@ -4,9 +4,9 @@ import {AuthService} from '../../authentication/auth.service';
 import {ReleaseService} from '../domain/release.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
-import {ReleaseDetail} from '../domain/release';
+import {ReleaseDetails} from '../domain/release';
 import {AccountListService} from '../../account-management/domain/account-list.service';
-import {NamespaceList, NamespaceListRequest} from '../../namespace-management/domain/namespace';
+import {NamespaceSummary} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
@@ -26,11 +26,11 @@ export class ReleaseDetailComponent implements OnInit {
   title = 'Releases Detail';
   $hashCode: string;
 
-  releaseDetail = new ReleaseDetail();
-  namespaceList: NamespaceList[];
-  selectedNamespace: NamespaceList;
+  releaseDetail = new ReleaseDetails();
+  namespaceList: NamespaceSummary[];
+  selectedNamespace: NamespaceSummary;
   namespaceListFilterCtrl: FormControl = new FormControl();
-  filteredNamespaceList: ReplaySubject<NamespaceList[]> = new ReplaySubject<NamespaceList[]>(1);
+  filteredNamespaceList: ReplaySubject<NamespaceSummary[]> = new ReplaySubject<NamespaceSummary[]>(1);
   isLoading = false;
 
   assignable: string[];
@@ -56,13 +56,8 @@ export class ReleaseDetailComponent implements OnInit {
       this.releaseDetail = resp;
       this.$hashCode = hashCode(this.releaseDetail);
 
-      const request = new NamespaceListRequest();
-      request.library.libraryId = this.releaseDetail.libraryId;
-      request.page.pageIndex = -1;
-      request.page.pageSize = -1;
-
-      this.namespaceService.getNamespaceList(request).subscribe(resp => {
-        this.namespaceList = resp.list.filter(e => e.std);
+      this.namespaceService.getNamespaceSummaries(this.releaseDetail.libraryId).subscribe(resp => {
+        this.namespaceList = resp.filter(e => e.standard);
         this.filteredNamespaceList.next(this.namespaceList.slice());
 
         if (this.releaseDetail.namespaceId) {

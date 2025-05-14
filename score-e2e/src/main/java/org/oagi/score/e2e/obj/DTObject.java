@@ -53,9 +53,9 @@ public class DTObject {
     private LocalDateTime lastUpdateTimestamp;
     private String contentComponentDefinition;
 
-    public static DTObject createRandomDT(DTObject baseDataType, AppUserObject creator, NamespaceObject namespace, String state) {
+    public static DTObject createRandomDT(ReleaseObject release, DTObject baseDataType, AppUserObject creator, NamespaceObject namespace, String state) {
         DTObject bdt = new DTObject();
-        bdt.setReleaseId(baseDataType.getReleaseId());
+        bdt.setReleaseId(release.getReleaseId());
         bdt.setBasedDtManifestId(baseDataType.getDtManifestId());
         bdt.setBasedDtId(baseDataType.getDtId());
         bdt.setGuid(UUID.randomUUID().toString().replaceAll("-", ""));

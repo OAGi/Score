@@ -17,7 +17,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asbie;
  * An ASBIE represents a relationship/association between two ABIEs through an
  * ASBIEP. It is a contextualization of an ASCC.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class AsbieRecord extends UpdatableRecordImpl<AsbieRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -436,6 +436,6 @@ public class AsbieRecord extends UpdatableRecordImpl<AsbieRecord> {
         setIsUsed(isUsed);
         setIsDeprecated(isDeprecated);
         setOwnerTopLevelAsbiepId(ownerTopLevelAsbiepId);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

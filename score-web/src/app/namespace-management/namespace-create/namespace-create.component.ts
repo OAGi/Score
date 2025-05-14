@@ -4,9 +4,9 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AuthService} from '../../authentication/auth.service';
-import {Namespace} from '../domain/namespace';
+import {NamespaceDetails} from '../domain/namespace';
 import {NamespaceService} from '../domain/namespace.service';
-import {Library} from '../../library-management/domain/library';
+import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryService} from '../../library-management/domain/library.service';
 import {loadLibrary, saveLibrary} from '../../common/utility';
 
@@ -19,10 +19,10 @@ export class NamespaceCreateComponent implements OnInit {
 
   title = 'Create Namespace';
   disabled: boolean;
-  library: Library = new Library();
-  libraries: Library[] = [];
-  mappedLibraries: { library: Library, selected: boolean }[] = [];
-  namespace: Namespace;
+  library: LibrarySummary = new LibrarySummary();
+  libraries: LibrarySummary[] = [];
+  mappedLibraries: { library: LibrarySummary, selected: boolean }[] = [];
+  namespace: NamespaceDetails;
   uriForm: FormControl;
   hashCode;
 
@@ -37,10 +37,10 @@ export class NamespaceCreateComponent implements OnInit {
 
   ngOnInit() {
     this.disabled = false;
-    this.namespace = new Namespace();
+    this.namespace = new NamespaceDetails();
     this.uriForm = new FormControl(this.namespace.uri, Validators.pattern('\\w+:(\\/?\\/?)[^\\s]+'));
 
-    this.libraryService.getLibraries().subscribe(libraries => {
+    this.libraryService.getLibrarySummaryList().subscribe(libraries => {
       this.initLibraries(libraries);
     });
   }
@@ -57,7 +57,7 @@ export class NamespaceCreateComponent implements OnInit {
     this.location.back();
   }
 
-  initLibraries(libraries: Library[]) {
+  initLibraries(libraries: LibrarySummary[]) {
     this.libraries = libraries;
     if (this.libraries.length > 0) {
       const savedLibraryId = loadLibrary(this.auth.getUserToken());
@@ -76,7 +76,7 @@ export class NamespaceCreateComponent implements OnInit {
     }
   }
 
-  onLibraryChange(library: Library) {
+  onLibraryChange(library: LibrarySummary) {
     this.library = library;
     saveLibrary(this.auth.getUserToken(), this.library.libraryId);
   }

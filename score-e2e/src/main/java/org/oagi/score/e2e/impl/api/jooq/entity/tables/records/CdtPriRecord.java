@@ -13,7 +13,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtPri;
 /**
  * This table stores the CDT primitives.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class CdtPriRecord extends UpdatableRecordImpl<CdtPriRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -78,6 +78,6 @@ public class CdtPriRecord extends UpdatableRecordImpl<CdtPriRecord> {
 
         setCdtPriId(cdtPriId);
         setName(name);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

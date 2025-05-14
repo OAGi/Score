@@ -107,7 +107,7 @@ public class TC_15_3_EditingBrandNewEndUserACC extends BaseTest {
 
             asccp = coreComponentAPI.createRandomASCCP(acc, endUser, namespace, "Published");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccpToAppend = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Published");
+            bccpToAppend = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "Published");
 
         }
         TopLevelASBIEPObject topLevelAsbiep = getAPIFactory().getBusinessInformationEntityAPI()

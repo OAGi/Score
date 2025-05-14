@@ -16,7 +16,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asbiep;
  * ASBIEP represents a role in a usage of an ABIE. It is a contextualization of
  * an ASCCP.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class AsbiepRecord extends UpdatableRecordImpl<AsbiepRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -336,6 +336,6 @@ public class AsbiepRecord extends UpdatableRecordImpl<AsbiepRecord> {
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
         setOwnerTopLevelAsbiepId(ownerTopLevelAsbiepId);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

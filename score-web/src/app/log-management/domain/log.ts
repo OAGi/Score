@@ -29,6 +29,12 @@ export class LogListRequest {
   }
 }
 
+export class LogSummary {
+  logId: number;
+  revisionNum: number;
+  revisionTrackingNum: number;
+}
+
 export class Log {
   logId: number;
   hash: string;

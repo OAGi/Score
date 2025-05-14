@@ -127,7 +127,7 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
             assertTrue(viewEditCCPageForWIP.getTableRecordByCCNameAndOwner(ccName, ownerName).isDisplayed());
         }
 
-        click(homePage.getScoreLogo()); // to go to the home page again.
+        homePage.openPage();
         ViewEditCoreComponentPage viewEditCCPageForQA = homePage.openTotalUEsByStatesPanel()
                 .clickStateProgressBar("QA");
         click(viewEditCCPageForQA.getSearchButton());
@@ -150,8 +150,7 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
             assertTrue(viewEditCCPageForQA.getTableRecordByCCNameAndOwner(ccName, ownerName).isDisplayed());
         }
 
-
-        click(homePage.getScoreLogo()); // to go to the home page again.
+        homePage.openPage();
         ViewEditCoreComponentPage viewEditCCPageForProduction = homePage.openTotalUEsByStatesPanel()
                 .clickStateProgressBar("Production");
         click(viewEditCCPageForProduction.getSearchButton());

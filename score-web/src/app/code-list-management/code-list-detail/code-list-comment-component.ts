@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
-import {CodeList} from '../domain/code-list';
+import {CodeListDetails} from '../domain/code-list';
 import {CodeListService} from '../domain/code-list.service';
 import {Comment} from '../../cc-management/domain/core-component-node';
 
@@ -18,7 +18,7 @@ export class CodeListCommentControl {
               private service: CodeListService) {
   }
 
-  toggleCommentSlide(codeList: CodeList): void {
+  toggleCommentSlide(codeList: CodeListDetails): void {
     this.commentReference = 'CODE_LIST-' + codeList.codeListManifestId;
 
     if (this.sidenav.opened) {

@@ -118,7 +118,7 @@
                     <span class="{{ item.state }} cc-state"
                           [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(item.state).background,
                           'color': webPageInfo.getComponentStateColorSet(item.state).font}">{{ item.state | separate }}</span>
-                    &nbsp;Revision <b>{{ item.revision }}</b> owned by <b>{{ item.ownerUserId }}</b>
+                    &nbsp;Revision <b>{{ item.revision }}</b> owned by <b>{{ item.ownerUsername }}</b>
                   </span>
                   <span class="item-timestamp">
                     {{ item.timestamp | dateAgo }}
@@ -185,7 +185,7 @@
                     <span class="{{ item.state }} cc-state"
                           [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(item.state).background,
                           'color': webPageInfo.getComponentStateColorSet(item.state).font}">{{ item.state | separate }}</span>
-                    &nbsp;Revision <b>{{ item.revision }}</b> owned by <b>{{ item.ownerUserId }}</b>
+                    &nbsp;Revision <b>{{ item.revision }}</b> owned by <b>{{ item.ownerUsername }}</b>
                   </span>
                   <span class="item-timestamp">
                     {{ item.timestamp | dateAgo }}

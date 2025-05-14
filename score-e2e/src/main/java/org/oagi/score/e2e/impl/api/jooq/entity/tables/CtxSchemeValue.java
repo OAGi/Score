@@ -41,7 +41,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.CtxSchemeValueReco
  * This table stores the context scheme values for a particular context scheme
  * in the CTX_SCHEME table.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class CtxSchemeValue extends TableImpl<CtxSchemeValueRecord> {
 
     private static final long serialVersionUID = 1L;

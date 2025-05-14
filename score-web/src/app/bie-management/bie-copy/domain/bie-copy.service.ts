@@ -11,10 +11,9 @@ export class BieCopyService implements OnInit {
   ngOnInit() {
   }
 
-  copy(topLevelAsbiepId: number, bizCtxIds: number[]): Observable<any> {
-    return this.http.put('/api/profile_bie/copy', {
-      topLevelAsbiepId,
-      bizCtxIds
+  copy(topLevelAsbiepId: number, bizCtxIdList: number[]): Observable<any> {
+    return this.http.post('/api/bies/' + topLevelAsbiepId + '/copy', {
+      bizCtxIdList
     });
   }
 }

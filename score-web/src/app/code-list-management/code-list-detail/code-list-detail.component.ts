@@ -5,7 +5,7 @@ import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {AuthService} from '../../authentication/auth.service';
 import {Comment} from '../../cc-management/domain/core-component-node';
 import {CodeListService} from '../domain/code-list.service';
-import {CodeList, CodeListValue, SimpleAgencyIdList, SimpleAgencyIdListValue} from '../domain/code-list';
+import {CodeListDetails, CodeListValue, CodeListValueDetails} from '../domain/code-list';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -17,10 +17,9 @@ import {finalize, switchMap} from 'rxjs/operators';
 import {v4 as uuid} from 'uuid';
 import {FormControl} from '@angular/forms';
 import {forkJoin, Observable, ReplaySubject} from 'rxjs';
-import {hashCode, initFilter} from '../../common/utility';
+import {hashCode, initFilter, saveBranch} from '../../common/utility';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
-import {WorkingRelease} from '../../release-management/domain/release';
-import {SimpleNamespace} from '../../namespace-management/domain/namespace';
+import {NamespaceSummary} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {CodeListCommentControl} from './code-list-comment-component';
 import {RxStompService} from '../../common/score-rx-stomp';
@@ -28,6 +27,8 @@ import {Message} from '@stomp/stompjs';
 import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
+import {AgencyIdListService} from '../../agency-id-list-management/domain/agency-id-list.service';
+import {AgencyIdListSummary, AgencyIdListValueSummary} from '../../agency-id-list-management/domain/agency-id-list';
 
 @Component({
   selector: 'score-code-list-detail',
@@ -38,28 +39,28 @@ export class CodeListDetailComponent implements OnInit {
 
   title = 'Edit Code List';
 
-  allAgencyIdListValues: SimpleAgencyIdListValue[];
+  allAgencyIdListValues: AgencyIdListValueSummary[];
 
-  agencyIdLists: SimpleAgencyIdList[];
-  agencyIdListValues: SimpleAgencyIdListValue[];
+  agencyIdLists: AgencyIdListSummary[];
+  agencyIdListValues: AgencyIdListValueSummary[];
 
-  namespaces: SimpleNamespace[] = [];
+  namespaces: NamespaceSummary[] = [];
   isUpdating: boolean;
 
   namespaceListFilterCtrl: FormControl = new FormControl();
-  filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
+  filteredNamespaceList: ReplaySubject<NamespaceSummary[]> = new ReplaySubject<NamespaceSummary[]>(1);
 
   agencyListFilterCtrl: FormControl = new FormControl();
-  filteredAgencyLists: ReplaySubject<SimpleAgencyIdList[]> = new ReplaySubject<SimpleAgencyIdList[]>(1);
+  filteredAgencyLists: ReplaySubject<AgencyIdListSummary[]> = new ReplaySubject<AgencyIdListSummary[]>(1);
 
   agencyListValueFilterCtrl: FormControl = new FormControl();
-  filteredAgencyListValues: ReplaySubject<SimpleAgencyIdListValue[]> = new ReplaySubject<SimpleAgencyIdListValue[]>(1);
+  filteredAgencyListValues: ReplaySubject<AgencyIdListValueSummary[]> = new ReplaySubject<AgencyIdListValueSummary[]>(1);
 
   manifestId: number;
 
-  codeList: CodeList;
-  agencyIdList: SimpleAgencyIdList;
-  revision: CodeList;
+  codeList: CodeListDetails;
+  agencyIdList: AgencyIdListSummary;
+  prevCodeList: CodeListDetails;
   preferencesInfo: PreferencesInfo;
   hashCode;
   valueSearch: string;
@@ -161,8 +162,8 @@ export class CodeListDetailComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<CodeListValue>();
-  selection = new SelectionModel<CodeListValue>(true, []);
+  dataSource = new MatTableDataSource<CodeListValueDetails>();
+  selection = new SelectionModel<CodeListValueDetails>(true, []);
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -172,6 +173,7 @@ export class CodeListDetailComponent implements OnInit {
   commentControl: CodeListCommentControl;
 
   constructor(private service: CodeListService,
+              private agencyIdListService: AgencyIdListService,
               private namespaceService: NamespaceService,
               private location: Location,
               private route: ActivatedRoute,
@@ -197,29 +199,30 @@ export class CodeListDetailComponent implements OnInit {
         this.filterAgencyListValue();
       });
 
-    this.codeList = new CodeList();
+    this.codeList = new CodeListDetails();
 
     // load a code list by given manifest id
     this.route.paramMap.pipe(
-      switchMap((params: ParamMap) => {
-        this.manifestId = Number(params.get('manifestId'));
-        return forkJoin([
-          this.service.getCodeList(this.manifestId),
-          this.service.getCodeListRevision(this.manifestId),
-          this.preferencesService.load(this.auth.getUserToken())
-        ]);
-      })).subscribe(([codeList, revision, preferencesInfo]) => {
+        switchMap((params: ParamMap) => {
+          this.manifestId = Number(params.get('manifestId'));
+          return forkJoin([
+            this.service.getCodeListDetails(this.manifestId),
+            this.preferencesService.load(this.auth.getUserToken())
+          ]);
+        })).subscribe(([codeList, preferencesInfo]) => {
+      /** Save again as Release info may have changed via Uplifting or other routes. */
+      saveBranch(this.auth.getUserToken(), 'CC', codeList.release.releaseId);
 
-      this.namespaceService.getSimpleNamespaces(codeList.libraryId).subscribe(namespaces => {
+      this.namespaceService.getNamespaceSummaries(codeList.library.libraryId).subscribe(namespaces => {
         this.namespaces = namespaces;
         initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList,
-          this.getSelectableNamespaces(), (e) => e.uri);
+            this.getSelectableNamespaces(), (e) => e.uri);
       });
 
-      this.service.getSimpleAgencyIdListValues(codeList.releaseId).subscribe(resp => {
-        this.agencyIdLists = resp.agencyIdLists;
-        this.allAgencyIdListValues = resp.agencyIdListValues;
-        this.revision = revision;
+      this.agencyIdListService.getAgencyIdListSummaries(
+          codeList.release.releaseId).subscribe(resp => {
+        this.agencyIdLists = resp;
+        this.allAgencyIdListValues = resp.flatMap(item => item.valueList);
         this.preferencesInfo = preferencesInfo;
 
         this.filteredAgencyLists.next(this.agencyIdLists.slice());
@@ -228,6 +231,19 @@ export class CodeListDetailComponent implements OnInit {
       }, _ => {
         this.isUpdating = false;
       });
+    }, err => {
+      this.isUpdating = false;
+      let errorMessage;
+      if (err.status === 403) {
+        errorMessage = 'You do not have access permission.';
+      } else {
+        errorMessage = 'Something\'s wrong.';
+      }
+      this.snackBar.open(errorMessage, '', {
+        duration: 3000
+      });
+      this.router.navigateByUrl('/code_list');
+      return;
     });
 
     // Prevent the sorting event from being triggered if any columns are currently resizing.
@@ -241,11 +257,11 @@ export class CodeListDetailComponent implements OnInit {
     };
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
-    this.dataSource.filterPredicate = (data: CodeListValue, filter: string) => {
+    this.dataSource.filterPredicate = (data: CodeListValueDetails, filter: string) => {
       return (data.value && data.value.toLowerCase().indexOf(filter) > -1)
         || (data.meaning && data.meaning.toLowerCase().indexOf(filter) > -1)
-        || (data.definition && data.definition.toLowerCase().indexOf(filter) > -1)
-        || (data.definitionSource && data.definitionSource.toLowerCase().indexOf(filter) > -1);
+        || (data.definition && data.definition.content && data.definition.content.toLowerCase().indexOf(filter) > -1)
+        || (data.definition && data.definition.source && data.definition.source.toLowerCase().indexOf(filter) > -1);
     };
 
     this.subscribeEvent();
@@ -256,7 +272,7 @@ export class CodeListDetailComponent implements OnInit {
     comment.commentId = evt.properties.commentId;
     comment.prevCommentId = evt.properties.prevCommentId;
     comment.text = evt.properties.text;
-    comment.loginId = evt.properties.actor;
+    comment.created.who.loginId = evt.properties.actor;
     comment.timestamp = evt.properties.timestamp;
     comment.isNew = true;
 
@@ -269,7 +285,7 @@ export class CodeListDetailComponent implements OnInit {
     }
   }
 
-  getSelectableNamespaces(namespaceId?: number): SimpleNamespace[] {
+  getSelectableNamespaces(namespaceId?: number): NamespaceSummary[] {
     return this.namespaces.filter(e => {
       if (!!namespaceId && e.namespaceId === namespaceId) {
         return true;
@@ -295,12 +311,30 @@ export class CodeListDetailComponent implements OnInit {
     this.applyFilter(this.valueSearch);
   }
 
-  init(codeList: CodeList) {
+  init(codeList: CodeListDetails) {
+    if (!!codeList && codeList.log.revisionNum > 1) {
+      this.service.getPrevCodeListDetails(codeList.codeListManifestId).subscribe(prev => {
+        this.prevCodeList = prev;
+        this._doInit(codeList);
+      }, err => {
+        if (err.status === 404) {
+          // ignore
+        } else {
+          throw err;
+        }
+        this._doInit(codeList);
+      });
+    } else {
+      this._doInit(codeList);
+    }
+  }
+
+  _doInit(codeList: CodeListDetails) {
     this.hashCode = hashCode(codeList);
-    if (!!codeList.agencyIdListValueManifestId) {
-      let matchedAgencyIdLists = this.allAgencyIdListValues.filter(e => e.agencyIdListValueManifestId === codeList.agencyIdListValueManifestId);
+    if (!!codeList.agencyIdListValue) {
+      let matchedAgencyIdLists = this.allAgencyIdListValues.filter(e => e.agencyIdListValueManifestId === codeList.agencyIdListValue.agencyIdListValueManifestId);
       if (matchedAgencyIdLists.length === 0) {
-        matchedAgencyIdLists = this.allAgencyIdListValues.filter(e => e.name === codeList.agencyIdListValueName);
+        matchedAgencyIdLists = this.allAgencyIdListValues.filter(e => e.name === codeList.agencyIdListValue.name);
       }
 
       if (matchedAgencyIdLists.length > 0) {
@@ -311,12 +345,12 @@ export class CodeListDetailComponent implements OnInit {
     this.onAgencyIdListChange();
     this.codeList = codeList;
 
-    this._updateDataSource(this.codeList.codeListValues);
+    this._updateDataSource(this.codeList.valueList);
 
     this.isUpdating = false;
   }
 
-  get currentAgencyIdListValues(): SimpleAgencyIdListValue[] {
+  get currentAgencyIdListValues(): AgencyIdListValueSummary[] {
     let agencyIdListValues;
     if (!!this.agencyIdList) {
       agencyIdListValues = this.allAgencyIdListValues.filter(
@@ -366,19 +400,19 @@ export class CodeListDetailComponent implements OnInit {
     return this.hashCode !== hashCode(this.codeList);
   }
 
-  isDisabled(codeList: CodeList) {
+  isDisabled(codeList: CodeListDetails) {
     return (this.isUpdating) ||
-      (codeList.codeListName === undefined || codeList.codeListName === '') ||
+      (codeList.name === undefined || codeList.name === '') ||
       (codeList.listId === undefined || codeList.listId === '') ||
-      (codeList.agencyIdListValueManifestId === undefined || codeList.agencyIdListValueManifestId === 0) ||
+      (!codeList.agencyIdListValue || codeList.agencyIdListValue.agencyIdListValueManifestId === undefined || codeList.agencyIdListValue.agencyIdListValueManifestId === 0) ||
       (codeList.versionId === undefined || codeList.versionId === '');
   }
 
-  openDialog(codeListValue?: CodeListValue) {
+  openDialog(codeListValue?: CodeListValueDetails) {
     const dialogConfig = new MatDialogConfig();
 
     dialogConfig.data = {};
-    dialogConfig.data.codeListValue = new CodeListValue();
+    dialogConfig.data.codeListValue = new CodeListValueDetails();
     // Default indicator values
     dialogConfig.data.codeListValue.used = true;
     dialogConfig.data.codeListValue.extension = true;
@@ -387,7 +421,7 @@ export class CodeListDetailComponent implements OnInit {
     if (codeListValue) { // deep copy
       const copiedCLV = JSON.parse(JSON.stringify(codeListValue));
       if (this.hasRevision) {
-        const lastRevisionValue = this.revision.codeListValues.find(
+        const lastRevisionValue = this.prevCodeList.valueList.find(
           e => e.guid === codeListValue.guid);
         dialogConfig.data.lastRevisionValue = lastRevisionValue;
       }
@@ -442,9 +476,9 @@ export class CodeListDetailComponent implements OnInit {
     });
   }
 
-  _updateDataSource(data: CodeListValue[]) {
+  _updateDataSource(data: CodeListValueDetails[]) {
     this.dataSource.data = data;
-    this.codeList.codeListValues = data;
+    this.codeList.valueList = data;
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
@@ -461,13 +495,13 @@ export class CodeListDetailComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(row: CodeListValue) {
+  select(row: CodeListValueDetails) {
     if (this.isAvailable(row)) {
       this.selection.select(row);
     }
   }
 
-  toggle(row: CodeListValue) {
+  toggle(row: CodeListValueDetails) {
     if (this.isSelected(row)) {
       this.selection.deselect(row);
     } else {
@@ -475,11 +509,11 @@ export class CodeListDetailComponent implements OnInit {
     }
   }
 
-  isSelected(row: CodeListValue) {
+  isSelected(row: CodeListValueDetails) {
     return this.selection.isSelected(row);
   }
 
-  isAvailable(codeListValue: CodeListValue) {
+  isAvailable(codeListValue: CodeListValueDetails) {
     return this.codeList.state === 'WIP';
   }
 
@@ -511,18 +545,18 @@ export class CodeListDetailComponent implements OnInit {
 
   derive() {
     this.isUpdating = true;
-    this.service.create(this.codeList.releaseId, this.codeList.codeListManifestId)
+    this.service.create(this.codeList.release.releaseId, this.codeList.codeListManifestId)
       .pipe(finalize(() => {this.isUpdating = false; }))
       .subscribe(resp => {
-        this.router.navigate(['/code_list/' + resp.manifestId]);
+        this.router.navigate(['/code_list/' + resp.codeListManifestId]);
       });
   }
 
-  checkUniqueness(codeList: CodeList): Observable<boolean> {
+  checkUniqueness(codeList: CodeListDetails): Observable<boolean> {
     return this.service.checkUniqueness(codeList);
   }
 
-  checkNameUniqueness(codeList: CodeList): Observable<boolean> {
+  checkNameUniqueness(codeList: CodeListDetails): Observable<boolean> {
     return this.service.checkNameUniqueness(codeList);
   }
 
@@ -567,7 +601,7 @@ export class CodeListDetailComponent implements OnInit {
       return;
     }
 
-    if (!this.codeList.codeListName) {
+    if (!this.codeList.name) {
       this.snackBar.open('Name is required', '', {
         duration: 3000,
       });
@@ -579,7 +613,7 @@ export class CodeListDetailComponent implements OnInit {
       });
       return;
     }
-    if (!this.codeList.agencyIdListValueManifestId) {
+    if (!this.codeList.agencyIdListValue || !this.codeList.agencyIdListValue.agencyIdListValueManifestId) {
       this.snackBar.open('Agency ID List Value is required', '', {
         duration: 3000,
       });
@@ -591,14 +625,14 @@ export class CodeListDetailComponent implements OnInit {
       });
       return;
     }
-    if (!this.codeList.namespaceId) {
+    if (!this.codeList.namespace || !this.codeList.namespace.namespaceId) {
       this.snackBar.open('Namespace is required', '', {
         duration: 3000,
       });
       return;
     }
 
-    if (!this.codeList.definition) {
+    if (!this.codeList.definition || !this.codeList.definition.content) {
       const dialogConfig = this.confirmDialogService.newConfig();
       dialogConfig.data.header = 'Empty Definition';
       dialogConfig.data.content = [
@@ -622,7 +656,7 @@ export class CodeListDetailComponent implements OnInit {
     this.service.update(this.codeList).pipe(finalize(() => {
       this.isUpdating = false;
     })).subscribe(_ => {
-      this.service.getCodeList(this.codeList.codeListManifestId).subscribe(codeList => {
+      this.service.getCodeListDetails(this.codeList.codeListManifestId).subscribe(codeList => {
         this.init(codeList);
         this.snackBar.open('Updated', '', {
           duration: 3000,
@@ -680,11 +714,9 @@ export class CodeListDetailComponent implements OnInit {
             this.isUpdating = false;
           })).subscribe(_ => {
             forkJoin([
-              this.service.getCodeList(this.manifestId),
-              this.service.getCodeListRevision(this.manifestId)
-            ]).subscribe(([codeList, revision]) => {
+              this.service.getCodeListDetails(this.manifestId)
+            ]).subscribe(([codeList]) => {
               this.init(codeList);
-              this.revision = revision;
               this.snackBar.open('Updated', '', {
                 duration: 3000,
               });
@@ -710,11 +742,9 @@ export class CodeListDetailComponent implements OnInit {
             this.isUpdating = false;
           })).subscribe(_ => {
             forkJoin([
-              this.service.getCodeList(this.manifestId),
-              this.service.getCodeListRevision(this.manifestId)
-            ]).subscribe(([codeList, revision]) => {
+              this.service.getCodeListDetails(this.manifestId)
+            ]).subscribe(([codeList]) => {
               this.init(codeList);
-              this.revision = revision;
               this.snackBar.open((isDeveloper) ? 'Revised' : 'Amended', '', {
                 duration: 3000,
               });
@@ -744,7 +774,7 @@ export class CodeListDetailComponent implements OnInit {
         this.service.restore(this.codeList.codeListManifestId).pipe(finalize(() => {
           this.isUpdating = false;
         })).subscribe(_ => {
-          this.service.getCodeList(this.codeList.codeListManifestId).subscribe(resp => {
+          this.service.getCodeListDetails(this.codeList.codeListManifestId).subscribe(resp => {
             this.init(resp);
             this.snackBar.open('Restored', '', {
               duration: 3000,
@@ -778,7 +808,7 @@ export class CodeListDetailComponent implements OnInit {
   }
 
   isWorkingRelease(): boolean {
-    return this.codeList.workingRelease;
+    return !!this.codeList && this.codeList.release.workingRelease;
   }
 
   get state(): string {
@@ -796,20 +826,20 @@ export class CodeListDetailComponent implements OnInit {
   }
 
   get hasRevision(): boolean {
-    return this.revision != null && this.revision.guid !== null;
+    return !!this.codeList && this.codeList.log.revisionNum > 1;
   }
 
   get canDeprecate(): boolean {
-    if (this.revision && this.revision.guid) {
-      return !this.revision.deprecated;
+    if (this.prevCodeList && this.prevCodeList.guid) {
+      return !this.prevCodeList.deprecated;
     } else {
       return false;
     }
   }
 
   isRevisionValue(value: CodeListValue): boolean {
-    if (this.revision && this.revision.codeListValues.length > 0) {
-      return this.revision.codeListValues.find(e => e.guid === value.guid) !== undefined;
+    if (this.prevCodeList && this.prevCodeList.valueList.length > 0) {
+      return this.prevCodeList.valueList.find(e => e.guid === value.guid) !== undefined;
     }
     return false;
   }
@@ -840,11 +870,9 @@ export class CodeListDetailComponent implements OnInit {
           )
           .subscribe(resp => {
             forkJoin([
-              this.service.getCodeList(this.manifestId),
-              this.service.getCodeListRevision(this.manifestId)
-            ]).subscribe(([codeList, revision]) => {
+              this.service.getCodeListDetails(this.manifestId)
+            ]).subscribe(([codeList]) => {
               this.init(codeList);
-              this.revision = revision;
               this.snackBar.open('Canceled', '', {
                 duration: 3000,
               });

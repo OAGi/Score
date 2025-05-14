@@ -3,7 +3,7 @@ import {Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren} fro
 import {MatSidenav} from '@angular/material/sidenav';
 import {finalize, switchMap} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
-import {SimpleNamespace} from '../../namespace-management/domain/namespace';
+import {NamespaceSummary} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {MatDialog} from '@angular/material/dialog';
@@ -11,12 +11,12 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {AsccpFlatNode, CcFlatNode, CcFlatNodeDatabase, CcFlatNodeDataSource, CcFlatNodeDataSourceSearcher} from '../domain/cc-flat-tree';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {
-  CcAccNodeDetail,
-  CcAsccpNodeDetail,
-  CcBccpNodeDetail,
-  CcBdtScNodeDetail,
-  CcNodeDetail,
-  CcRevisionResponse,
+  AsccpDetails,
+  CcAccNodeInfo,
+  CcAsccpNodeInfo,
+  CcBccpNodeInfo,
+  CcDtScNodeInfo,
+  CcNodeInfo,
   Comment,
   EntityType,
   EntityTypes,
@@ -59,6 +59,10 @@ export class AsccpDetailComponent implements OnInit {
   manifestId: number;
   type = 'ASCCP';
   isUpdating: boolean;
+  availableModels: string[] = [];
+  selectedModel: string;
+  isGenerating: boolean = false;
+  originalText: string = undefined;
   componentTypes: OagisComponentType[] = OagisComponentTypes;
   entityTypes: EntityType[] = EntityTypes;
 
@@ -66,17 +70,17 @@ export class AsccpDetailComponent implements OnInit {
   dataSource: CcFlatNodeDataSource<CcFlatNode>;
   searcher: CcFlatNodeDataSourceSearcher<CcFlatNode>;
 
-  lastRevision: CcRevisionResponse;
+  prevAsccpDetails: AsccpDetails;
   selectedNode: CcFlatNode;
   cursorNode: CcFlatNode;
 
   workingRelease = false;
-  namespaces: SimpleNamespace[];
+  namespaces: NamespaceSummary[];
   tags: Tag[] = [];
   commentControl: CommentControl;
 
   namespaceListFilterCtrl: FormControl = new FormControl();
-  filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
+  filteredNamespaceList: ReplaySubject<NamespaceSummary[]> = new ReplaySubject<NamespaceSummary[]>(1);
 
   initialExpandDepth = 10;
 
@@ -132,22 +136,36 @@ export class AsccpDetailComponent implements OnInit {
         this.manifestId = parseInt(params.get('manifestId'), 10);
         return forkJoin([
           this.service.getGraphNode(this.type, this.manifestId),
-          this.service.getLastPublishedRevision(this.type, this.manifestId),
-          this.service.getAsccpNode(this.manifestId),
+          this.service.getAsccpDetails(this.manifestId),
           this.tagService.getTags(),
-          this.preferencesService.load(this.auth.getUserToken())
+          this.preferencesService.load(this.auth.getUserToken()),
+          this.service.availableModels()
         ]);
-      })).subscribe(([ccGraph, revisionResponse, rootNode, tags, preferencesInfo]) => {
+      })).subscribe(([ccGraph, asccpDetails, tags, preferencesInfo, models]) => {
 
-      this.namespaceService.getSimpleNamespaces(rootNode.libraryId).subscribe(namespaces => {
+      this.namespaceService.getNamespaceSummaries(asccpDetails.library.libraryId).subscribe(namespaces => {
         this.namespaces = namespaces;
         initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList,
           this.getSelectableNamespaces(), (e) => e.uri);
       });
 
-      this.lastRevision = revisionResponse;
+      if (asccpDetails.log.revisionNum > 1) {
+        this.service.getPrevAsccpDetails(this.manifestId)
+            .subscribe(prevAsccpDetails => {
+              this.prevAsccpDetails = prevAsccpDetails;
+            }, err => {
+              if (err.status === 404) {
+                // ignore
+              } else {
+                throw err;
+              }
+            });
+      }
       this.tags = tags;
       this.preferencesInfo = preferencesInfo;
+      this.availableModels = models;
+      this.selectedModel = (!!this.availableModels && this.availableModels.length > 0) ? this.availableModels[0] : undefined;
+      this.isGenerating = false;
 
       // subscribe an event
       this.stompService.watch('/topic/asccp/' + this.manifestId).subscribe((message: Message) => {
@@ -179,11 +197,11 @@ export class AsccpDetailComponent implements OnInit {
       this.dataSource.init();
       this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
 
-      this.workingRelease = rootNode.workingRelease;
+      this.workingRelease = asccpDetails.release.workingRelease;
 
       this.rootNode = this.dataSource.data[0] as AsccpFlatNode;
-      this.rootNode.access = rootNode.access;
-      this.rootNode.state = rootNode.state;
+      this.rootNode.access = asccpDetails.access;
+      this.rootNode.state = asccpDetails.state;
       this.rootNode.reset();
 
       // Issue #1254
@@ -231,7 +249,7 @@ export class AsccpDetailComponent implements OnInit {
     comment.commentId = evt.properties.commentId;
     comment.prevCommentId = evt.properties.prevCommentId;
     comment.text = evt.properties.text;
-    comment.loginId = evt.properties.actor;
+    comment.created.who.loginId = evt.properties.actor;
     comment.timestamp = evt.properties.timestamp;
     comment.isNew = true;
 
@@ -244,7 +262,7 @@ export class AsccpDetailComponent implements OnInit {
     }
   }
 
-  getSelectableNamespaces(namespaceId?: number): SimpleNamespace[] {
+  getSelectableNamespaces(namespaceId?: number): NamespaceSummary[] {
     return this.namespaces.filter(e => {
       if (!!namespaceId && e.namespaceId === namespaceId) {
         return true;
@@ -299,19 +317,19 @@ export class AsccpDetailComponent implements OnInit {
 
     this.isUpdating = true;
     forkJoin([
-      this.service.getAsccpNode(this.manifestId),
+      this.service.getAsccpDetails(this.manifestId),
       this.service.getGraphNode(this.rootNode.type, this.manifestId)
-    ]).subscribe(([rootNode, ccGraph]) => {
+    ]).subscribe(([asccpDetails, ccGraph]) => {
       const database = new CcFlatNodeDatabase<CcFlatNode>(ccGraph, 'ASCCP', this.manifestId);
       this.dataSource = new CcFlatNodeDataSource<CcFlatNode>(database, this.service);
       this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
       this.dataSource.init();
 
-      this.workingRelease = rootNode.workingRelease;
+      this.workingRelease = asccpDetails.release.workingRelease;
 
       this.rootNode = this.dataSource.data[0] as AsccpFlatNode;
-      this.rootNode.access = rootNode.access;
-      this.rootNode.state = rootNode.state;
+      this.rootNode.access = asccpDetails.access;
+      this.rootNode.state = asccpDetails.state;
       this.rootNode.reset();
 
       this.onClick(this.dataSource.data[0]);
@@ -334,6 +352,9 @@ export class AsccpDetailComponent implements OnInit {
           }
         }
       }
+
+      // Reset
+      this.originalText = undefined;
 
       if (snackMsg) {
         this.snackBar.open(snackMsg, '', {duration: 3000});
@@ -365,7 +386,7 @@ export class AsccpDetailComponent implements OnInit {
   }
 
   hasRevision() {
-    return this.lastRevision && this.lastRevision.ccId !== null;
+    return !!this.prevAsccpDetails;
   }
 
   isEditable() {
@@ -386,7 +407,7 @@ export class AsccpDetailComponent implements OnInit {
     }
 
     this.commentControl.closeCommentSlide();
-    this.dataSource.loadDetail(node, (detail: CcNodeDetail) => {
+    this.dataSource.loadDetail(node, (detail: CcNodeInfo) => {
       this.selectedNode = node;
       this.cursorNode = node;
     });
@@ -409,11 +430,11 @@ export class AsccpDetailComponent implements OnInit {
     return (node !== undefined) && (node.type.toUpperCase() === 'ACC');
   }
 
-  asAccDetail(node?: CcFlatNode): CcAccNodeDetail {
+  asAccDetail(node?: CcFlatNode): CcAccNodeInfo {
     if (!node) {
       node = this.selectedNode;
     }
-    return node.detail as CcAccNodeDetail;
+    return node.detail as CcAccNodeInfo;
   }
 
   isAsccpDetail(node?: CcFlatNode): boolean {
@@ -423,11 +444,11 @@ export class AsccpDetailComponent implements OnInit {
     return (node !== undefined) && (node.type.toUpperCase() === 'ASCCP');
   }
 
-  asAsccpDetail(node?: CcFlatNode): CcAsccpNodeDetail {
+  asAsccpDetail(node?: CcFlatNode): CcAsccpNodeInfo {
     if (!node) {
       node = this.selectedNode;
     }
-    return node.detail as CcAsccpNodeDetail;
+    return node.detail as CcAsccpNodeInfo;
   }
 
   isBccpDetail(node?: CcFlatNode): boolean {
@@ -437,25 +458,25 @@ export class AsccpDetailComponent implements OnInit {
     return (node !== undefined) && (node.type.toUpperCase() === 'BCCP');
   }
 
-  asBccpDetail(node?: CcFlatNode): CcBccpNodeDetail {
+  asBccpDetail(node?: CcFlatNode): CcBccpNodeInfo {
     if (!node) {
       node = this.selectedNode;
     }
-    return node.detail as CcBccpNodeDetail;
+    return node.detail as CcBccpNodeInfo;
   }
 
-  isBdtScDetail(node?: CcFlatNode): boolean {
+  isDtScDetail(node?: CcFlatNode): boolean {
     if (!node) {
       node = this.selectedNode;
     }
     return (node !== undefined) && (node.type.toUpperCase() === 'DT_SC');
   }
 
-  asBdtScDetail(node?: CcFlatNode): CcBdtScNodeDetail {
+  asDtScDetail(node?: CcFlatNode): CcDtScNodeInfo {
     if (!node) {
       node = this.selectedNode;
     }
-    return node.detail as CcBdtScNodeDetail;
+    return node.detail as CcDtScNodeInfo;
   }
 
   get isChanged() {
@@ -473,9 +494,62 @@ export class AsccpDetailComponent implements OnInit {
     });
   }
 
+  handleMouseDownForGenerate($event: MouseEvent, matMenuTrigger: MatMenuTrigger): void {
+    if ($event.button === 0) { // left-click
+      if (!this.isGenerating && !!this.selectedModel) {
+        this.generateDefinition(this.asAsccpDetail(), this.selectedModel);
+      }
+    } else if ($event.button === 2) { // right-click
+      $event.preventDefault();
+      setTimeout(() => {
+        matMenuTrigger.openMenu();
+      }, 0);
+    }
+  }
+
+  generateDefinition(asccpNodeDetails: CcAsccpNodeInfo, model: string, $event?: MouseEvent) {
+    this.originalText = undefined;
+    this.isGenerating = true;
+    this.selectedModel = model;
+    this.service.generateDefinition('ASCCP', asccpNodeDetails.asccp.manifestId, model,
+        asccpNodeDetails.asccp.definition).subscribe(gen => {
+      let generatedText = gen.generation || ''; // Ensure it's a valid string
+      const originalText = asccpNodeDetails.asccp.definition;
+      asccpNodeDetails.asccp.definition = ''; // Start with an empty string
+      let i = 0;
+
+      if (generatedText.length === 0) {
+        this.isGenerating = false; // No need for animation if nothing to generate
+        return;
+      }
+
+      const interval = setInterval(() => {
+        if (i < generatedText.length) {
+          if (!asccpNodeDetails.asccp.definition) {
+            asccpNodeDetails.asccp.definition = generatedText[i];
+          } else {
+            asccpNodeDetails.asccp.definition += generatedText[i];
+          }
+          i++;
+        } else {
+          clearInterval(interval);
+          this.isGenerating = false;
+          this.originalText = (originalText !== undefined) ? originalText : '';
+        }
+      }, 10); // Very fast typing
+    }, err => {
+      this.isGenerating = false;
+    });
+  }
+
+  revert(asccpNodeDetails: CcAsccpNodeInfo) {
+    asccpNodeDetails.asccp.definition = this.originalText;
+    this.originalText = undefined;
+  }
+
   _updateDetails(details: CcFlatNode[]) {
     this.isUpdating = true;
-    this.service.updateDetails(this.manifestId, details)
+    this.service.updateNodes(details)
       .pipe(finalize(() => {
           this.isUpdating = false;
         }))
@@ -602,7 +676,7 @@ export class AsccpDetailComponent implements OnInit {
       if (!accManifest) {
         return;
       }
-      this.service.updateAsccpManifest(this.rootNode.manifestId, accManifest.manifestId).subscribe(asccp => {
+      this.service.updateRoleOfAcc(this.rootNode.manifestId, accManifest.manifestId).subscribe(asccp => {
         this.reload('Updated');
       });
     });
@@ -619,23 +693,26 @@ export class AsccpDetailComponent implements OnInit {
     dialogConfig.data.action = 'Update';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()
-      .pipe(
-        finalize(() => {
-          this.isUpdating = false;
-        })
-      )
       .subscribe(result => {
         if (!result) {
           return;
         }
-        this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state)
-          .subscribe(resp => {
-            this.afterStateChanged(resp.state, resp.access);
-            this.snackBar.open('Updated', '', {
-              duration: 3000,
+
+        this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state).subscribe({
+          next: () => {
+            this.snackBar.open('Updated', '', {duration: 3000});
+
+            this.service.getAsccpDetails(this.manifestId).subscribe({
+              next: asccpDetails => this.afterStateChanged(asccpDetails.state, asccpDetails.access),
+              error: err => console.error(err),
+              complete: () => (this.isUpdating = false),
             });
-          }, err => {
-          });
+          },
+          error: err => {
+            this.isUpdating = false;
+            throw err;
+          },
+        });
       });
   }
 
@@ -666,7 +743,7 @@ export class AsccpDetailComponent implements OnInit {
     this.rootNode.state = state;
     this.rootNode.access = access;
     const root = this.dataSource.data[0];
-    (root.detail as CcAsccpNodeDetail).asccp.state = state;
+    (root.detail as CcAsccpNodeInfo).asccp.state = state;
   }
 
   makeNewRevision() {
@@ -677,28 +754,30 @@ export class AsccpDetailComponent implements OnInit {
     dialogConfig.data.action = (isDeveloper) ? 'Revise' : 'Amend';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()
-      .subscribe(result => {
-        if (!result) {
-          return;
-        }
+        .subscribe(result => {
+          if (!result) {
+            return;
+          }
 
-        this.isUpdating = true;
-        this.service.makeNewRevision(this.rootNode.type, this.rootNode.manifestId).pipe(
-          finalize(() => {
-            this.isUpdating = false;
-          })
-        ).subscribe(resp => {
-            this.manifestId = resp.manifestId;
-            this.afterStateChanged(resp.state, resp.access);
-            this.service.getLastPublishedRevision(this.type, this.manifestId).subscribe(revision => {
-              this.lastRevision = revision;
+          this.isUpdating = true;
+          this.service.makeNewRevision(this.rootNode.type, this.rootNode.manifestId).subscribe(_ => {
+            forkJoin([
+              this.service.getAsccpDetails(this.manifestId),
+              this.service.getPrevAsccpDetails(this.manifestId),
+            ]).subscribe(([asccpDetails, prevAsccpDetails]) => {
+              this.manifestId = asccpDetails.asccpManifestId;
+              this.afterStateChanged(asccpDetails.state, asccpDetails.access);
+              this.prevAsccpDetails = prevAsccpDetails;
               this.snackBar.open((isDeveloper) ? 'Revised' : 'Amended', '', {
                 duration: 3000,
               });
+              this.reload();
             });
-            this.reload();
+          }, err => {
+            this.isUpdating = false;
+            throw err;
           });
-      });
+        });
   }
 
   get userRoles(): string[] {
@@ -715,7 +794,7 @@ export class AsccpDetailComponent implements OnInit {
     return this.workingRelease;
   }
 
-  deleteNode(): void {
+  markAsDeleteNode(): void {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Delete core component?';
     dialogConfig.data.content = ['Are you sure you want to delete this core component?'];
@@ -727,17 +806,16 @@ export class AsccpDetailComponent implements OnInit {
           return;
         }
         this.isUpdating = true;
-        this.service.deleteNode(this.type, this.manifestId)
-          .pipe(
-            finalize(() => {
-              this.isUpdating = false;
-            })
-          )
-          .subscribe(_ => {
+        this.service.updateState(this.rootNode.type, this.rootNode.manifestId, 'Deleted').subscribe({
+          next: () => {
             this.snackBar.open('Deleted', '', {duration: 3000});
             this.router.navigateByUrl('/core_component');
-          }, error => {
-          });
+          },
+          error: err => {
+            this.isUpdating = false;
+            throw err;
+          },
+        });
       });
   }
 
@@ -753,19 +831,16 @@ export class AsccpDetailComponent implements OnInit {
           return;
         }
         this.isUpdating = true;
-        const state = 'Purge';
-        this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state)
-          .pipe(
-            finalize(() => {
-              this.isUpdating = false;
-            })
-          )
-          .subscribe(resp => {
+        this.service.purge(this.type, this.manifestId).subscribe({
+          next: () => {
             this.snackBar.open('Purged', '', {duration: 3000});
-            this.location.back();
             this.router.navigateByUrl('/core_component');
-          }, err => {
-          });
+          },
+          error: err => {
+            this.isUpdating = false;
+            throw err;
+          },
+        });
       });
   }
 
@@ -781,18 +856,21 @@ export class AsccpDetailComponent implements OnInit {
           return;
         }
         this.isUpdating = true;
-        const state = 'WIP';
-        this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state)
-          .pipe(
-            finalize(() => {
-              this.isUpdating = false;
-            })
-          )
-          .subscribe(resp => {
-            this.afterStateChanged(resp.state, resp.access);
+        this.service.updateState(this.rootNode.type, this.rootNode.manifestId, 'WIP').subscribe({
+          next: () => {
             this.snackBar.open('Restored', '', {duration: 3000});
-          }, err => {
-          });
+
+            this.service.getAsccpDetails(this.manifestId).subscribe({
+              next: asccpDetails => this.afterStateChanged(asccpDetails.state, asccpDetails.access),
+              error: err => console.error(err),
+              complete: () => (this.isUpdating = false),
+            });
+          },
+          error: err => {
+            this.isUpdating = false;
+            throw err;
+          },
+        });
       });
   }
 
@@ -816,7 +894,14 @@ export class AsccpDetailComponent implements OnInit {
       return;
     }
 
-    this.tagService.toggleTag(node.type, node.manifestId, tag.name).subscribe(_ => {
+    let call;
+    if (!this.contains(node, tag)) {
+      call = this.tagService.appendTag(node.type, node.manifestId, tag.tagId);
+    } else {
+      call = this.tagService.removeTag(node.type, node.manifestId, tag.tagId);
+    }
+
+    call.subscribe(_ => {
       if (this.contains(node, tag)) {
         node.tagList.splice(node.tagList.map(e => e.tagId).indexOf(tag.tagId), 1);
       } else {
@@ -886,16 +971,20 @@ export class AsccpDetailComponent implements OnInit {
       this.dataSource.toggle(this.cursorNode);
     } else if ($event.key === 'o' || $event.key === 'O') {
       this.menuTriggerList.toArray().filter(e => !!e.menuData)
-        .filter(e => e.menuData.menuId === 'contextMenu').forEach(trigger => {
-        this.contextMenuItem = node;
-        trigger.openMenu();
-      });
+          .filter(e => e.menuData.menuId === 'contextMenu' && e.menuData.hashPath === node.hashPath)
+          .forEach(trigger => {
+            this.contextMenuItem = node;
+            if (!trigger.menuOpen) {
+              trigger.openMenu();
+            }
+          });
     } else if ($event.key === 'c' || $event.key === 'C') {
       this.menuTriggerList.toArray().filter(e => !!e.menuData)
-        .filter(e => e.menuData.menuId === 'contextMenu').forEach(trigger => {
-        this.contextMenuItem = node;
-        this.openComments(node.type, node);
-      });
+          .filter(e => e.menuData.menuId === 'contextMenu' && e.menuData.hashPath === node.hashPath)
+          .forEach(trigger => {
+            this.contextMenuItem = node;
+            this.openComments(node.type, node);
+          });
     } else if ($event.key === 'Enter') {
       this.onClick(this.cursorNode);
     } else {

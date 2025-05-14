@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {Library} from '../domain/library';
+import {LibraryDetails} from '../domain/library';
 import {FormControl, Validators} from '@angular/forms';
 import {LibraryService} from '../domain/library.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -7,7 +7,6 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AuthService} from '../../authentication/auth.service';
-import {finalize} from 'rxjs/operators';
 
 @Component({
   selector: 'score-library-create',
@@ -18,7 +17,7 @@ export class LibraryCreateComponent {
 
   title = 'Create Library';
   loading = false;
-  library: Library;
+  library: LibraryDetails;
   uriForm = new FormControl('');
 
   constructor(private service: LibraryService,
@@ -31,7 +30,7 @@ export class LibraryCreateComponent {
   }
 
   ngOnInit() {
-    this.library = new Library();
+    this.library = new LibraryDetails();
 
     this.uriForm = new FormControl({value: this.library.link, disabled: !this.isAdmin},
         Validators.pattern('\\w+:(\\/?\\/?)[^\\s]+'));

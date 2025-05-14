@@ -16,7 +16,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bccp;
  * An BCCP specifies a property concept and data type associated with it. A BCCP
  * can be then added as a property of an ACC.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class BccpRecord extends UpdatableRecordImpl<BccpRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -466,6 +466,6 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> {
         setFixedValue(fixedValue);
         setPrevBccpId(prevBccpId);
         setNextBccpId(nextBccpId);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

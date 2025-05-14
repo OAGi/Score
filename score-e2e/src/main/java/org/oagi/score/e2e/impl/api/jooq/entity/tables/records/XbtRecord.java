@@ -17,7 +17,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.Xbt;
  * built-in types are those types defined in the XMLSchemaBuiltinType and the
  * XMLSchemaBuiltinType Patterns schemas.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -315,6 +315,6 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
         setIsDeprecated(isDeprecated);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

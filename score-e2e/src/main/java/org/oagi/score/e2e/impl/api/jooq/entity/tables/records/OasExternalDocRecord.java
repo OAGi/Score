@@ -15,7 +15,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasExternalDoc;
 /**
  * Allows referencing an external resource for extended documentation.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class OasExternalDocRecord extends UpdatableRecordImpl<OasExternalDocRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -167,6 +167,6 @@ public class OasExternalDocRecord extends UpdatableRecordImpl<OasExternalDocReco
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

@@ -5,8 +5,8 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 import {Location} from '@angular/common';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {AuthService} from '../../authentication/auth.service';
-import {finalize, switchMap} from 'rxjs/operators';
-import {Library} from '../domain/library';
+import {switchMap} from 'rxjs/operators';
+import {LibraryDetails} from '../domain/library';
 import {LibraryService} from '../domain/library.service';
 import {hashCode} from 'src/app/common/utility';
 
@@ -19,7 +19,8 @@ export class LibraryDetailComponent {
 
   title = 'Library Detail';
   loading = false;
-  library: Library;
+  library: LibraryDetails;
+
   uriForm = new FormControl('');
   hashCode;
 
@@ -33,7 +34,7 @@ export class LibraryDetailComponent {
   }
 
   ngOnInit() {
-    this.library = new Library();
+    this.library = new LibraryDetails();
 
     // load library
     this.route.paramMap.pipe(

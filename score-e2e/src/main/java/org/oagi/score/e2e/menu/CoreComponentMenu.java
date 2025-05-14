@@ -3,6 +3,7 @@ package org.oagi.score.e2e.menu;
 import org.oagi.score.e2e.page.agency_id_list.ViewEditAgencyIDListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.oagi.score.e2e.page.core_component.ViewEditDataTypePage;
 import org.oagi.score.e2e.page.namespace.ViewEditNamespacePage;
 import org.oagi.score.e2e.page.release.ViewEditReleasePage;
 import org.openqa.selenium.WebElement;
@@ -37,6 +38,20 @@ public interface CoreComponentMenu {
      * @return the 'View/Edit Core Component' page object
      */
     ViewEditCoreComponentPage openViewEditCoreComponentSubMenu();
+
+    /**
+     * Return the UI element of the 'View/Edit Data Type' submenu.
+     *
+     * @return the UI element of the 'View/Edit Data Type' submenu
+     */
+    WebElement getViewEditDataTypeSubMenu();
+
+    /**
+     * Open the 'View/Edit Data Type' submenu to enter the page.
+     *
+     * @return the 'View/Edit Data Type' page object
+     */
+    ViewEditDataTypePage openViewEditDataTypeSubMenu();
 
     /**
      * Return the UI element of the 'View/Edit Code List' submenu.

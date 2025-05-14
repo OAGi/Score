@@ -3,10 +3,10 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
-import {SimpleRelease} from '../../../release-management/domain/release';
-import {BieList, BieListRequest} from '../../bie-list/domain/bie-list';
+import {ReleaseSummary} from '../../../release-management/domain/release';
+import {BieListEntry, BieListRequest} from '../../bie-list/domain/bie-list';
 import {SelectionModel} from '@angular/cdk/collections';
-import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker} from '@angular/material/datepicker';
 import {PageRequest} from '../../../basis/basis';
 import {BieListService} from '../../bie-list/domain/bie-list.service';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
@@ -21,7 +21,7 @@ import {PreferencesInfo, TableColumnsProperty} from '../../../settings-managemen
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {AuthService} from '../../../authentication/auth.service';
 import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
-import {Library} from '../../../library-management/domain/library';
+import {LibrarySummary} from '../../../library-management/domain/library';
 
 @Component({
   selector: 'score-meta-header-dialog',
@@ -130,7 +130,7 @@ export class MetaHeaderDialogComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<BieList>();
+  dataSource = new MatTableDataSource<BieListEntry>();
   selection = new SelectionModel<number>(false, []);
   loading = false;
 
@@ -142,8 +142,8 @@ export class MetaHeaderDialogComponent implements OnInit {
   states: string[] = ['WIP', 'QA', 'Production'];
   request: BieListRequest;
   preferencesInfo: PreferencesInfo;
-  library: Library;
-  release: SimpleRelease;
+  library: LibrarySummary;
+  release: ReleaseSummary;
 
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
@@ -214,17 +214,6 @@ export class MetaHeaderDialogComponent implements OnInit {
   onChange(property?: string, source?) {
   }
 
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
-  }
-
   reset(type: string) {
     switch (type) {
       case 'startDate':
@@ -256,10 +245,7 @@ export class MetaHeaderDialogComponent implements OnInit {
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
-      this.dataSource.data = resp.list.map((elm: BieList) => {
-        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        return elm;
-      });
+      this.dataSource.data = resp.list;
     }, error => {
       this.dataSource.data = [];
     });
@@ -273,11 +259,11 @@ export class MetaHeaderDialogComponent implements OnInit {
     return this.selection.selected.length === 0;
   }
 
-  select(row: BieList) {
+  select(row: BieListEntry) {
     this.selection.select(row.topLevelAsbiepId);
   }
 
-  toggle(row: BieList) {
+  toggle(row: BieListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row.topLevelAsbiepId);
     } else {
@@ -285,7 +271,7 @@ export class MetaHeaderDialogComponent implements OnInit {
     }
   }
 
-  isSelected(row: BieList) {
+  isSelected(row: BieListEntry) {
     return this.selection.isSelected(row.topLevelAsbiepId);
   }
 

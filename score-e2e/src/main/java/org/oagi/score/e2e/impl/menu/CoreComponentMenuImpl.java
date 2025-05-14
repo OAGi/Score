@@ -5,12 +5,14 @@ import org.oagi.score.e2e.impl.page.DelegateBasePageImpl;
 import org.oagi.score.e2e.impl.page.agency_id_list.ViewEditAgencyIDListPageImpl;
 import org.oagi.score.e2e.impl.page.code_list.ViewEditCodeListPageImpl;
 import org.oagi.score.e2e.impl.page.core_component.ViewEditCoreComponentPageImpl;
+import org.oagi.score.e2e.impl.page.core_component.ViewEditDataTypePageImpl;
 import org.oagi.score.e2e.impl.page.namespace.ViewEditNamespacePageImpl;
 import org.oagi.score.e2e.impl.page.release.ViewEditReleasePageImpl;
 import org.oagi.score.e2e.menu.CoreComponentMenu;
 import org.oagi.score.e2e.page.agency_id_list.ViewEditAgencyIDListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.oagi.score.e2e.page.core_component.ViewEditDataTypePage;
 import org.oagi.score.e2e.page.namespace.ViewEditNamespacePage;
 import org.oagi.score.e2e.page.release.ViewEditReleasePage;
 import org.openqa.selenium.By;
@@ -27,6 +29,9 @@ public class CoreComponentMenuImpl extends DelegateBasePageImpl implements CoreC
 
     private final By VIEW_EDIT_CORE_COMPONENT_SUB_MENU_LOCATOR =
             By.xpath("//span[contains(text(), \"View/Edit Core Component\")]");
+
+    private final By VIEW_EDIT_DATA_TYPE_SUB_MENU_LOCATOR =
+            By.xpath("//span[contains(text(), \"View/Edit Data Type\")]");
 
     private final By VIEW_EDIT_CODE_LIST_SUB_MENU_LOCATOR =
             By.xpath("//span[contains(text(), \"View/Edit Code List\")]");
@@ -74,6 +79,23 @@ public class CoreComponentMenuImpl extends DelegateBasePageImpl implements CoreC
         ViewEditCoreComponentPage viewEditCoreComponentPage = new ViewEditCoreComponentPageImpl(this);
         assert viewEditCoreComponentPage.isOpened();
         return viewEditCoreComponentPage;
+    }
+
+    @Override
+    public WebElement getViewEditDataTypeSubMenu() {
+        if (!isExpanded()) {
+            expandCoreComponentMenu();
+        }
+        return elementToBeClickable(getDriver(), VIEW_EDIT_DATA_TYPE_SUB_MENU_LOCATOR);
+    }
+
+    @Override
+    public ViewEditDataTypePage openViewEditDataTypeSubMenu() {
+        retry(() -> click(getViewEditDataTypeSubMenu()));
+        invisibilityOfLoadingContainerElement(getDriver());
+        ViewEditDataTypePage viewEditDataTypePage = new ViewEditDataTypePageImpl(this);
+        assert viewEditDataTypePage.isOpened();
+        return viewEditDataTypePage;
     }
 
     @Override

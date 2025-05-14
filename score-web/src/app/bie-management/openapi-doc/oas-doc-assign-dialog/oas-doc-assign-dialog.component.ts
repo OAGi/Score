@@ -8,12 +8,12 @@ import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker} from '@angular/material/datepicker';
 import {finalize} from 'rxjs/operators';
 import {AssignBieForOasDoc, BieForOasDoc, BieForOasDocListRequest, OasDoc} from '../domain/openapi-doc';
 import {OpenAPIService} from '../domain/openapi.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {SimpleRelease} from '../../../release-management/domain/release';
+import {ReleaseSummary} from '../../../release-management/domain/release';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
 import {ReleaseService} from '../../../release-management/domain/release.service';
 import {AuthService} from '../../../authentication/auth.service';
@@ -24,7 +24,7 @@ import {PreferencesInfo, TableColumnsProperty} from '../../../settings-managemen
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SearchBarComponent} from '../../../common/search-bar/search-bar.component';
-import {Library} from '../../../library-management/domain/library';
+import {LibrarySummary} from '../../../library-management/domain/library';
 import {LibraryService} from '../../../library-management/domain/library.service';
 
 @Component({
@@ -151,13 +151,13 @@ export class OasDocAssignDialogComponent implements OnInit {
   loading = false;
   oasDoc: OasDoc;
   loginIdList: string[] = [];
-  releases: SimpleRelease[] = [];
-  libraries: Library[] = [];
-  mappedLibraries: {library: Library, selected: boolean}[] = [];
+  releases: ReleaseSummary[] = [];
+  libraries: LibrarySummary[] = [];
+  mappedLibraries: {library: LibrarySummary, selected: boolean}[] = [];
   releaseListFilterCtrl: FormControl = new FormControl();
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
-  filteredReleaseList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
+  filteredReleaseList: ReplaySubject<ReleaseSummary[]> = new ReplaySubject<ReleaseSummary[]>(1);
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   states: string[] = ['WIP', 'QA', 'Production'];
@@ -200,7 +200,7 @@ export class OasDocAssignDialogComponent implements OnInit {
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.access = 'CanView';
 
-    this.libraryService.getLibraries().subscribe(libraries => {
+    this.libraryService.getLibrarySummaryList().subscribe(libraries => {
       this.initLibraries(libraries);
 
       this.paginator.pageIndex = this.request.page.pageIndex;
@@ -224,7 +224,7 @@ export class OasDocAssignDialogComponent implements OnInit {
 
       forkJoin([
         this.accountService.getAccountNames(),
-        this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Published']),
+        this.releaseService.getReleaseSummaryList(this.request.library.libraryId, ['Published']),
         this.preferencesService.load(this.auth.getUserToken())
       ]).subscribe(([loginIds, releases, preferencesInfo]) => {
         this.preferencesInfo = preferencesInfo;
@@ -240,7 +240,7 @@ export class OasDocAssignDialogComponent implements OnInit {
     });
   }
 
-  initLibraries(libraries: Library[]) {
+  initLibraries(libraries: LibrarySummary[]) {
     this.libraries = libraries;
     if (this.libraries.length > 0) {
       const savedLibraryId = loadLibrary(this.auth.getUserToken());
@@ -259,7 +259,7 @@ export class OasDocAssignDialogComponent implements OnInit {
     }
   }
 
-  initReleases(releases: SimpleRelease[]) {
+  initReleases(releases: ReleaseSummary[]) {
     this.releases = releases.filter(e => !e.workingRelease);
     initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
     const savedReleaseId = loadBranch(this.auth.getUserToken(), 'BIE');
@@ -274,10 +274,10 @@ export class OasDocAssignDialogComponent implements OnInit {
     }
   }
 
-  onLibraryChange(library: Library) {
+  onLibraryChange(library: LibrarySummary) {
     this.request.library = library;
     this.request.release.releaseId = 0;
-    this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Published']).subscribe(releases => {
+    this.releaseService.getReleaseSummaryList(this.request.library.libraryId, ['Published']).subscribe(releases => {
       saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
       this.initReleases(releases);
       this.onSearch();
@@ -338,17 +338,6 @@ export class OasDocAssignDialogComponent implements OnInit {
         && this.messageBodySelection[source] === 'Request') {
         this.messageBodySelection[source] = 'Response';
       }
-    }
-  }
-
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
     }
   }
 

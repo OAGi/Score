@@ -38,10 +38,10 @@ import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AgencyIdListManifest.AgencyIdListManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bbie.BbiePath;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.BdtScPriRestri.BdtScPriRestriPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeListManifest.CodeListManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtScManifest.DtScManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.TopLevelAsbiep.TopLevelAsbiepPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.XbtManifest.XbtManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BbieScRecord;
 
 
@@ -51,7 +51,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BbieScRecord;
  * associated with the DT are stored in the BBIE table, while this table stores
  * the constraints associated with the DT's SCs. 
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class BbieSc extends TableImpl<BbieScRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -107,20 +107,18 @@ public class BbieSc extends TableImpl<BbieScRecord> {
     public final TableField<BbieScRecord, ULong> BBIE_ID = createField(DSL.name("bbie_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The BBIE this BBIE_SC applies to.");
 
     /**
-     * The column <code>oagi.bbie_sc.dt_sc_pri_restri_id</code>. This must be
-     * one of the allowed primitive/code list as specified in the corresponding
-     * SC of the based BCC of the BBIE (referred to by the BBIE_ID column).
+     * The column <code>oagi.bbie_sc.xbt_manifest_id</code>. This must be one of
+     * the allowed primitive as specified in the corresponding SC of the based
+     * BCC of the BBIE (referred to by the BBIE_ID column).
      * 
-     * It is the foreign key to the BDT_SC_PRI_RESTRI table. It indicates the
-     * primitive assigned to the BBIE (or also can be viewed as assigned to the
-     * BBIEP for this specific association). This is assigned by the user who
-     * authors the BIE. The assignment would override the default from the CC
-     * side.
+     * It is the foreign key to the XBT_MANIFEST table. This is assigned by the
+     * user who authors the BIE. The assignment would override the default from
+     * the CC side.
      * 
      * This column, the CODE_LIST_ID column, and AGENCY_ID_LIST_ID column cannot
      * have a value at the same time.
      */
-    public final TableField<BbieScRecord, ULong> DT_SC_PRI_RESTRI_ID = createField(DSL.name("dt_sc_pri_restri_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This must be one of the allowed primitive/code list as specified in the corresponding SC of the based BCC of the BBIE (referred to by the BBIE_ID column).\n\nIt is the foreign key to the BDT_SC_PRI_RESTRI table. It indicates the primitive assigned to the BBIE (or also can be viewed as assigned to the BBIEP for this specific association). This is assigned by the user who authors the BIE. The assignment would override the default from the CC side.\n\nThis column, the CODE_LIST_ID column, and AGENCY_ID_LIST_ID column cannot have a value at the same time.");
+    public final TableField<BbieScRecord, ULong> XBT_MANIFEST_ID = createField(DSL.name("xbt_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This must be one of the allowed primitive as specified in the corresponding SC of the based BCC of the BBIE (referred to by the BBIE_ID column).\n\nIt is the foreign key to the XBT_MANIFEST table. This is assigned by the user who authors the BIE. The assignment would override the default from the CC side.\n\nThis column, the CODE_LIST_ID column, and AGENCY_ID_LIST_ID column cannot have a value at the same time.");
 
     /**
      * The column <code>oagi.bbie_sc.code_list_manifest_id</code>. This is a
@@ -359,7 +357,7 @@ public class BbieSc extends TableImpl<BbieScRecord> {
 
     @Override
     public List<ForeignKey<BbieScRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.BBIE_SC_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.BBIE_SC_BASED_DT_SC_MANIFEST_ID_FK, Keys.BBIE_SC_BBIE_ID_FK, Keys.BBIE_SC_CODE_LIST_MANIFEST_ID_FK, Keys.BBIE_SC_CREATED_BY_FK, Keys.BBIE_SC_DT_SC_PRI_RESTRI_ID_FK, Keys.BBIE_SC_LAST_UPDATED_BY_FK, Keys.BBIE_SC_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
+        return Arrays.asList(Keys.BBIE_SC_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.BBIE_SC_BASED_DT_SC_MANIFEST_ID_FK, Keys.BBIE_SC_BBIE_ID_FK, Keys.BBIE_SC_CODE_LIST_MANIFEST_ID_FK, Keys.BBIE_SC_CREATED_BY_FK, Keys.BBIE_SC_LAST_UPDATED_BY_FK, Keys.BBIE_SC_OWNER_TOP_LEVEL_ASBIEP_ID_FK, Keys.BBIE_SC_XBT_MANIFEST_ID_FK);
     }
 
     private transient AgencyIdListManifestPath _agencyIdListManifest;
@@ -425,19 +423,6 @@ public class BbieSc extends TableImpl<BbieScRecord> {
         return _bbieScCreatedByFk;
     }
 
-    private transient BdtScPriRestriPath _bdtScPriRestri;
-
-    /**
-     * Get the implicit join path to the <code>oagi.bdt_sc_pri_restri</code>
-     * table.
-     */
-    public BdtScPriRestriPath bdtScPriRestri() {
-        if (_bdtScPriRestri == null)
-            _bdtScPriRestri = new BdtScPriRestriPath(this, Keys.BBIE_SC_DT_SC_PRI_RESTRI_ID_FK, null);
-
-        return _bdtScPriRestri;
-    }
-
     private transient AppUserPath _bbieScLastUpdatedByFk;
 
     /**
@@ -462,6 +447,18 @@ public class BbieSc extends TableImpl<BbieScRecord> {
             _topLevelAsbiep = new TopLevelAsbiepPath(this, Keys.BBIE_SC_OWNER_TOP_LEVEL_ASBIEP_ID_FK, null);
 
         return _topLevelAsbiep;
+    }
+
+    private transient XbtManifestPath _xbtManifest;
+
+    /**
+     * Get the implicit join path to the <code>oagi.xbt_manifest</code> table.
+     */
+    public XbtManifestPath xbtManifest() {
+        if (_xbtManifest == null)
+            _xbtManifest = new XbtManifestPath(this, Keys.BBIE_SC_XBT_MANIFEST_ID_FK, null);
+
+        return _xbtManifest;
     }
 
     @Override

@@ -3,8 +3,6 @@ package org.oagi.score.e2e.page.core_component;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.page.Page;
 import org.oagi.score.e2e.page.SearchBarPage;
-import org.oagi.score.e2e.page.bie.EditBIEPage;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
 import java.math.BigInteger;
@@ -261,23 +259,6 @@ public interface ViewEditCoreComponentPage extends Page, SearchBarPage {
     BCCPViewEditPage openBCCPViewEditPageByManifestID(BigInteger bccpManifestID);
 
     /**
-     * Open the page of the DT filtered by `den` and `branch`.
-     *
-     * @param den    DEN text
-     * @param branch Branch text
-     * @return the DT page object
-     */
-    DTViewEditPage openDTViewEditPageByDenAndBranch(String den, String branch);
-
-    /**
-     * Open the page of the DT by its manifest ID.
-     *
-     * @param dtManifestID manifest ID
-     * @return the DT page object
-     */
-    DTViewEditPage openDTViewEditPageByManifestID(BigInteger dtManifestID);
-
-    /**
      * Open the 'Transfer CC Ownership' dialog.
      *
      * @param tr the table record
@@ -323,27 +304,12 @@ public interface ViewEditCoreComponentPage extends Page, SearchBarPage {
     WebElement getCreateBCCPButton();
 
     /**
-     * Open the 'Select BDT to create BCCP' dialog.
+     * Open the 'Select DT to create BCCP' dialog.
      *
      * @param branch Branch text
-     * @return the 'Select BDT to create BCCP' dialog
+     * @return the 'Select DT to create BCCP' dialog
      */
     BCCPCreateDialog openBCCPCreateDialog(String branch);
-
-    /**
-     * Return the UI element of the 'Create DT' button.
-     *
-     * @return the UI element of the 'Create DT' button
-     */
-    WebElement getCreateDTButton();
-
-    /**
-     * Open the 'Select based DT to create BDT' dialog.
-     *
-     * @param branch Branch text
-     * @return the 'Select based DT to create BDT' dialog
-     */
-    DTCreateDialog openDTCreateDialog(String branch);
 
     /**
      * Return the UI element of the table record at the given index, which starts from 1.
@@ -395,8 +361,6 @@ public interface ViewEditCoreComponentPage extends Page, SearchBarPage {
     void setItemsPerPage(int items);
 
     void selectAllComponentTypes();
-
-    DTViewEditPage createDT(String den, String branch);
 
     BCCPViewEditPage createBCCP(String dataType, String branch, AppUserObject user);
 

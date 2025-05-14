@@ -16,7 +16,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.BbieBizterm;
  * The bbie_bizterm table stores information about the aggregation between the
  * bbie_bizterm and BBIE. TODO: Placeholder, definition is missing.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -204,6 +204,6 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> {
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

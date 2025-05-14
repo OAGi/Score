@@ -21,7 +21,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.Abie;
  * created for an ACC which will not show up in the instance document such as
  * ACCs of OAGIS_COMPONENT_TYPE "SEMANTIC_GROUP", "USER_EXTENSION_GROUP", etc.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class AbieRecord extends UpdatableRecordImpl<AbieRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -345,6 +345,6 @@ public class AbieRecord extends UpdatableRecordImpl<AbieRecord> {
         setRemark(remark);
         setBizTerm(bizTerm);
         setOwnerTopLevelAsbiepId(ownerTopLevelAsbiepId);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

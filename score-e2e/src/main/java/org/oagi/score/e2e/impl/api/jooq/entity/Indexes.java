@@ -35,7 +35,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.Xbt;
 /**
  * A class modelling indexes of tables in oagi.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Indexes {
 
     // -------------------------------------------------------------------------

@@ -28,14 +28,14 @@
           <mat-label>Definition</mat-label>
           <textarea matInput rows="6" cols="30"
                     [disabled]="!isEditable"
-                    [(ngModel)]="agencyIdListValue.definition"></textarea>
+                    [(ngModel)]="agencyIdListValue.definition.content"></textarea>
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Definition Source</mat-label>
           <input matInput maxlength="100"
                  [disabled]="!isEditable"
-                 [(ngModel)]="agencyIdListValue.definitionSource">
+                 [(ngModel)]="agencyIdListValue.definition.source">
         </mat-form-field>
 
         <div class="row">
@@ -71,7 +71,7 @@
             [disabled]="isDisabled()"
             [mat-dialog-close]="agencyIdListValue">
       <mat-icon>{{ (actionName === 'Add') ? 'add' : 'save' }}</mat-icon>
-      {{ (actionName === 'Add') ? 'Add' : 'Save' }}
+      <span class="ml-2">{{ (actionName === 'Add') ? 'Add' : 'Save' }}</span>
     </button>
   </div>
 </div>

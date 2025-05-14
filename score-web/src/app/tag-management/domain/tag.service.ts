@@ -13,14 +13,16 @@ export class TagService {
     return this.http.get<Tag[]>('/api/tags');
   }
 
-  toggleTag(type: string, manifestId: number, name: string): Observable<any> {
-    return this.http.post('/api/tags/' + type + '/' + manifestId, {
-      name
-    });
+  appendTag(type: string, manifestId: number, tagId: number): Observable<any> {
+    return this.http.post('/api/tags/' + tagId + '/' + type.toLowerCase() + '/' + manifestId, {});
   }
 
-  add(tag: Tag): Observable<any> {
-    return this.http.put('/api/tags', {
+  removeTag(type: string, manifestId: number, tagId: number): Observable<any> {
+    return this.http.delete('/api/tags/' + tagId + '/' + type.toLowerCase() + '/' + manifestId, {});
+  }
+
+  create(tag: Tag): Observable<any> {
+    return this.http.post('/api/tags', {
       name: tag.name,
       textColor: tag.textColor,
       backgroundColor: tag.backgroundColor,
@@ -29,7 +31,7 @@ export class TagService {
   }
 
   update(tag: Tag): Observable<any> {
-    return this.http.post('/api/tags/' + tag.tagId, {
+    return this.http.put('/api/tags/' + tag.tagId, {
       name: tag.name,
       textColor: tag.textColor,
       backgroundColor: tag.backgroundColor,

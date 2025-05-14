@@ -158,7 +158,7 @@
                 <th *matHeaderCellDef mat-header-cell mat-sort-header> Updated on</th>
                 <td *matCellDef="let element" mat-cell>
                   <div class="ellipsis">{{ element.timestamp | dateAgo }}</div>
-                  <div class="description"><span class="pr-1">by</span><b>{{ element.ownerUserId }}</b></div>
+                  <div class="description"><span class="pr-1">by</span><b>{{ element.ownerUsername }}</b></div>
                 </td>
               </ng-container>
 
@@ -234,7 +234,7 @@
                 <th *matHeaderCellDef mat-header-cell mat-sort-header> Updated on</th>
                 <td *matCellDef="let element" mat-cell>
                   <div class="ellipsis">{{ element.timestamp | dateAgo }}</div>
-                  <div class="description"><span class="pr-1">by</span><b>{{ element.ownerUserId }}</b></div>
+                  <div class="description"><span class="pr-1">by</span><b>{{ element.ownerUsername }}</b></div>
                 </td>
               </ng-container>
 

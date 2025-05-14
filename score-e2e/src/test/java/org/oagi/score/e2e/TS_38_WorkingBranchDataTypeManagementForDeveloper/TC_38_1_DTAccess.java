@@ -12,6 +12,7 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.oagi.score.e2e.page.core_component.DTViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.oagi.score.e2e.page.core_component.ViewEditDataTypePage;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
@@ -52,29 +53,33 @@ public class TC_38_1_DTAccess extends BaseTest {
             AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
 
-            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
+
+            DTObject baseDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Number. Type", "Working");
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
             branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
-
-            DTObject baseDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Numeric. Type", "Working");
-            DTObject dtWIP = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseDT, developerB, namespace, "WIP");
+            
+            DTObject dtWIP = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, baseDT, developerB, namespace, "WIP");
             dtForTesting.add(dtWIP);
 
-            DTObject dtDraft = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseDT, developerB, namespace, "Draft");
+            DTObject dtDraft = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, baseDT, developerB, namespace, "Draft");
             dtForTesting.add(dtDraft);
 
-            DTObject dtCandidate = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseDT, developerB, namespace, "Candidate");
+            DTObject dtCandidate = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, baseDT, developerB, namespace, "Candidate");
             dtForTesting.add(dtCandidate);
         }
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-        viewEditCoreComponentPage.setBranch(branch.getReleaseNumber());
+        ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+        viewEditDataTypePage.setBranch(branch.getReleaseNumber());
         for (DTObject dt : dtForTesting) {
             assertFalse(dt.getOwnerUserId().equals(developerA.getAppUserId()));
-            viewEditCoreComponentPage.setDEN(dt.getDen());
-            viewEditCoreComponentPage.hitSearchButton();
-            assertDoesNotThrow(() -> viewEditCoreComponentPage.getTableRecordByValue(dt.getDen()));
+            viewEditDataTypePage.setDEN(dt.getDen());
+            viewEditDataTypePage.hitSearchButton();
+            assertDoesNotThrow(() -> viewEditDataTypePage.getTableRecordByValue(dt.getDen()));
         }
 
     }
@@ -89,21 +94,25 @@ public class TC_38_1_DTAccess extends BaseTest {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
 
-            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
+
+            DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
             branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
-            DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
-            DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "WIP");
+            DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerA, namespace, "WIP");
             dtForTesting.add(randomBDT);
         }
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
         for (DTObject dt : dtForTesting) {
             assertTrue(dt.getOwnerUserId().equals(developerA.getAppUserId()));
             assertTrue(dt.getState().equals("WIP"));
-            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+            DTViewEditPage dtViewEditPage = viewEditDataTypePage.openDTViewEditPageByManifestID(dt.getDtManifestId());
             dtViewEditPage.setQualifier("qualifier");
             dtViewEditPage.hitUpdateButton();
         }
@@ -123,21 +132,25 @@ public class TC_38_1_DTAccess extends BaseTest {
             AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
 
-            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
+
+            DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
             branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
-            DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
-            DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerB, namespace, "WIP");
+            DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerB, namespace, "WIP");
             dtForTesting.add(randomBDT);
         }
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
         for (DTObject dt : dtForTesting) {
             assertFalse(dt.getOwnerUserId().equals(developerA.getAppUserId()));
             assertTrue(dt.getState().equals("WIP"));
-            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+            DTViewEditPage dtViewEditPage = viewEditDataTypePage.openDTViewEditPageByManifestID(dt.getDtManifestId());
             assertDisabled(dtViewEditPage.getDefinitionField());
             assertDisabled(dtViewEditPage.getQualifierField());
             AddCommentDialog addCommentDialog = dtViewEditPage.hitAddCommentButton("/" + dt.getDen());
@@ -160,19 +173,22 @@ public class TC_38_1_DTAccess extends BaseTest {
             AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
 
-            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
 
             DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
 
-            DTObject randomBDTDraft = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerB, namespace, "Draft");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+
+            DTObject randomBDTDraft = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerB, namespace, "Draft");
             dtForTesting.add(randomBDTDraft);
 
-            DTObject randomBDTCandidate = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerB, namespace, "Candidate");
+            DTObject randomBDTCandidate = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerB, namespace, "Candidate");
             dtForTesting.add(randomBDTCandidate);
 
-            DTObject randomBDTReleaseDraft = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerB, namespace, "ReleaseDraft");
+            DTObject randomBDTReleaseDraft = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerB, namespace, "ReleaseDraft");
             dtForTesting.add(randomBDTReleaseDraft);
         }
 
@@ -180,8 +196,8 @@ public class TC_38_1_DTAccess extends BaseTest {
         for (DTObject dt : dtForTesting) {
             assertFalse(dt.getOwnerUserId().equals(developerA.getAppUserId()));
             assertTrue(List.of("Draft", "Candidate", "ReleaseDraft").contains(dt.getState()));
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+            ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+            DTViewEditPage dtViewEditPage = viewEditDataTypePage.openDTViewEditPageByManifestID(dt.getDtManifestId());
             assertDisabled(dtViewEditPage.getDefinitionField());
             assertDisabled(dtViewEditPage.getQualifierField());
             AddCommentDialog addCommentDialog = dtViewEditPage.hitAddCommentButton("/" + dt.getDen());
@@ -204,13 +220,16 @@ public class TC_38_1_DTAccess extends BaseTest {
             AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
 
-            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
 
             DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
 
-            DTObject randomBDTPublished = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerB, namespace, "Published");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+
+            DTObject randomBDTPublished = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerB, namespace, "Published");
             dtForTesting.add(randomBDTPublished);
         }
 
@@ -218,8 +237,8 @@ public class TC_38_1_DTAccess extends BaseTest {
         for (DTObject dt : dtForTesting) {
             assertFalse(dt.getOwnerUserId().equals(developerA.getAppUserId()));
             assertTrue(dt.getState().equals("Published"));
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+            ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+            DTViewEditPage dtViewEditPage = viewEditDataTypePage.openDTViewEditPageByManifestID(dt.getDtManifestId());
             assertDisabled(dtViewEditPage.getDefinitionField());
             assertDisabled(dtViewEditPage.getQualifierField());
             AddCommentDialog addCommentDialog = dtViewEditPage.hitAddCommentButton("/" + dt.getDen());
@@ -250,9 +269,9 @@ public class TC_38_1_DTAccess extends BaseTest {
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         assertFalse(endUser.isDeveloper());
-        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-        viewEditCoreComponentPage.setBranch(branch.getReleaseNumber());
-        assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.getCreateDTButton());
+        ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+        viewEditDataTypePage.setBranch(branch.getReleaseNumber());
+        assertThrows(TimeoutException.class, () -> viewEditDataTypePage.getNewDataTypeButton());
     }
 
     @Test
@@ -268,13 +287,16 @@ public class TC_38_1_DTAccess extends BaseTest {
             AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
 
-            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
 
             DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
 
-            DTObject randomBDTDeleted = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerB, namespace, "Deleted");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+
+            DTObject randomBDTDeleted = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerB, namespace, "Deleted");
             dtForTesting.add(randomBDTDeleted);
         }
 
@@ -282,10 +304,11 @@ public class TC_38_1_DTAccess extends BaseTest {
         for (DTObject dt : dtForTesting) {
             assertFalse(dt.getOwnerUserId().equals(developerA.getAppUserId()));
             assertTrue(dt.getState().equals("Deleted"));
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+            ReleaseObject finalBranch = branch;
             assertDoesNotThrow(() -> {
-                DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.
-                        openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+                DTViewEditPage dtViewEditPage = viewEditDataTypePage.
+                        openDTViewEditPageByDenAndBranch(dt.getDen(), finalBranch.getReleaseNumber());
             });
         }
     }
@@ -300,13 +323,16 @@ public class TC_38_1_DTAccess extends BaseTest {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
 
-            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
 
             DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
 
-            DTObject randomBDTDeleted = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "Deleted");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+
+            DTObject randomBDTDeleted = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerA, namespace, "Deleted");
             dtForTesting.add(randomBDTDeleted);
         }
 
@@ -314,8 +340,8 @@ public class TC_38_1_DTAccess extends BaseTest {
         for (DTObject dt : dtForTesting) {
             assertTrue(dt.getOwnerUserId().equals(developerA.getAppUserId()));
             assertTrue(dt.getState().equals("Deleted"));
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+            ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+            DTViewEditPage dtViewEditPage = viewEditDataTypePage.openDTViewEditPageByManifestID(dt.getDtManifestId());
             assertDisabled(dtViewEditPage.getDefinitionField());
             assertDisabled(dtViewEditPage.getQualifierField());
             AddCommentDialog addCommentDialog = dtViewEditPage.hitAddCommentButton("/" + dt.getDen());
@@ -338,13 +364,16 @@ public class TC_38_1_DTAccess extends BaseTest {
             AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
 
-            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
 
             DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
 
-            DTObject randomBDTDeleted = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerB, namespace, "Deleted");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+
+            DTObject randomBDTDeleted = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerB, namespace, "Deleted");
             dtForTesting.add(randomBDTDeleted);
         }
 
@@ -352,8 +381,8 @@ public class TC_38_1_DTAccess extends BaseTest {
         for (DTObject dt : dtForTesting) {
             assertFalse(dt.getOwnerUserId().equals(developerA.getAppUserId()));
             assertTrue(dt.getState().equals("Deleted"));
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+            ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+            DTViewEditPage dtViewEditPage = viewEditDataTypePage.openDTViewEditPageByManifestID(dt.getDtManifestId());
             assertDisabled(dtViewEditPage.getDefinitionField());
             assertDisabled(dtViewEditPage.getQualifierField());
             AddCommentDialog addCommentDialog = dtViewEditPage.hitAddCommentButton("/" + dt.getDen());
@@ -373,13 +402,16 @@ public class TC_38_1_DTAccess extends BaseTest {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
 
-            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
 
             DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
 
-            DTObject randomBDTDeleted = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "Deleted");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+
+            DTObject randomBDTDeleted = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerA, namespace, "Deleted");
             dtForTesting.add(randomBDTDeleted);
         }
 
@@ -387,8 +419,8 @@ public class TC_38_1_DTAccess extends BaseTest {
         for (DTObject dt : dtForTesting) {
             assertTrue(dt.getOwnerUserId().equals(developerA.getAppUserId()));
             assertTrue(dt.getState().equals("Deleted"));
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+            ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+            DTViewEditPage dtViewEditPage = viewEditDataTypePage.openDTViewEditPageByManifestID(dt.getDtManifestId());
             assertDoesNotThrow(() -> dtViewEditPage.hitRestoreButton());
         }
 
@@ -407,13 +439,16 @@ public class TC_38_1_DTAccess extends BaseTest {
             AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
 
-            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
 
             DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
 
-            DTObject randomBDTDeleted = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerB, namespace, "Deleted");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+
+            DTObject randomBDTDeleted = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerB, namespace, "Deleted");
             dtForTesting.add(randomBDTDeleted);
         }
 
@@ -421,8 +456,8 @@ public class TC_38_1_DTAccess extends BaseTest {
         for (DTObject dt : dtForTesting) {
             assertFalse(dt.getOwnerUserId().equals(developerA.getAppUserId()));
             assertTrue(dt.getState().equals("Deleted"));
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+            ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+            DTViewEditPage dtViewEditPage = viewEditDataTypePage.openDTViewEditPageByManifestID(dt.getDtManifestId());
             assertDoesNotThrow(() -> dtViewEditPage.hitRestoreButton());
         }
 
@@ -438,40 +473,39 @@ public class TC_38_1_DTAccess extends BaseTest {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
 
-            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
 
             DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
 
-            DTObject randomBDTWIPOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "WIP");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+
+            DTObject randomBDTWIPOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerA, namespace, "WIP");
             dtForTesting.add(randomBDTWIPOne);
 
-            DTObject randomBDTWIPTwo = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "WIP");
+            DTObject randomBDTWIPTwo = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerA, namespace, "WIP");
             dtForTesting.add(randomBDTWIPTwo);
 
-            DTObject randomBDTWIPThree = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "WIP");
+            DTObject randomBDTWIPThree = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerA, namespace, "WIP");
             dtForTesting.add(randomBDTWIPThree);
         }
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-        viewEditCoreComponentPage.showAdvancedSearchPanel();
-        for (String typeToBeDeselected : Arrays.asList("ACC", "ASCCP", "BCCP", "CDT")) {
-            viewEditCoreComponentPage.setTypeSelect(typeToBeDeselected);
-        }
-        viewEditCoreComponentPage.setBranch(branch.getReleaseNumber());
-        viewEditCoreComponentPage.setState("WIP");
-        viewEditCoreComponentPage.setOwner(developerA.getLoginId());
-        viewEditCoreComponentPage.hitSearchButton();
+        ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+        viewEditDataTypePage.showAdvancedSearchPanel();
+        viewEditDataTypePage.setBranch(branch.getReleaseNumber());
+        viewEditDataTypePage.setState("WIP");
+        viewEditDataTypePage.setOwner(developerA.getLoginId());
+        viewEditDataTypePage.hitSearchButton();
 
         for (DTObject dt : dtForTesting) {
             assertTrue(dt.getOwnerUserId().equals(developerA.getAppUserId()));
             assertTrue(dt.getState().equals("WIP"));
-            click(viewEditCoreComponentPage.getTableRecordByValue(dt.getDen()));
+            click(viewEditDataTypePage.getTableRecordByValue(dt.getDen()));
         }
-        viewEditCoreComponentPage.hitMoveToDraftButton();
-
+        viewEditDataTypePage.hitMoveToDraftButton();
     }
 
     @Test
@@ -484,39 +518,39 @@ public class TC_38_1_DTAccess extends BaseTest {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
 
-            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
 
             DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
 
-            DTObject randomBDTDraftOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "Draft");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+
+            DTObject randomBDTDraftOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerA, namespace, "Draft");
             dtForTesting.add(randomBDTDraftOne);
 
-            DTObject randomBDTDraftTwo = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "Draft");
+            DTObject randomBDTDraftTwo = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerA, namespace, "Draft");
             dtForTesting.add(randomBDTDraftTwo);
 
-            DTObject randomBDTDraftThree = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "Draft");
+            DTObject randomBDTDraftThree = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerA, namespace, "Draft");
             dtForTesting.add(randomBDTDraftThree);
         }
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-        viewEditCoreComponentPage.showAdvancedSearchPanel();
-        for (String typeToBeDeselected : Arrays.asList("ACC", "ASCCP", "BCCP", "CDT")) {
-            viewEditCoreComponentPage.setTypeSelect(typeToBeDeselected);
-        }
-        viewEditCoreComponentPage.setBranch(branch.getReleaseNumber());
-        viewEditCoreComponentPage.setState("Draft");
-        viewEditCoreComponentPage.setOwner(developerA.getLoginId());
-        viewEditCoreComponentPage.hitSearchButton();
+        ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+        viewEditDataTypePage.showAdvancedSearchPanel();
+        viewEditDataTypePage.setBranch(branch.getReleaseNumber());
+        viewEditDataTypePage.setState("Draft");
+        viewEditDataTypePage.setOwner(developerA.getLoginId());
+        viewEditDataTypePage.hitSearchButton();
 
         for (DTObject dt : dtForTesting) {
             assertTrue(dt.getOwnerUserId().equals(developerA.getAppUserId()));
             assertTrue(dt.getState().equals("Draft"));
-            click(viewEditCoreComponentPage.getTableRecordByValue(dt.getDen()));
+            click(viewEditDataTypePage.getTableRecordByValue(dt.getDen()));
         }
-        viewEditCoreComponentPage.hitBackToWIPButton();
+        viewEditDataTypePage.hitBackToWIPButton();
 
     }
 
@@ -530,39 +564,39 @@ public class TC_38_1_DTAccess extends BaseTest {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
 
-            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
 
             DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
 
-            DTObject randomBDTDraftOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "Draft");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+
+            DTObject randomBDTDraftOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerA, namespace, "Draft");
             dtForTesting.add(randomBDTDraftOne);
 
-            DTObject randomBDTDraftTwo = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "Draft");
+            DTObject randomBDTDraftTwo = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerA, namespace, "Draft");
             dtForTesting.add(randomBDTDraftTwo);
 
-            DTObject randomBDTDraftThree = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "Draft");
+            DTObject randomBDTDraftThree = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerA, namespace, "Draft");
             dtForTesting.add(randomBDTDraftThree);
         }
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-        viewEditCoreComponentPage.showAdvancedSearchPanel();
-        for (String typeToBeDeselected : Arrays.asList("ACC", "ASCCP", "BCCP", "CDT")) {
-            viewEditCoreComponentPage.setTypeSelect(typeToBeDeselected);
-        }
-        viewEditCoreComponentPage.setBranch(branch.getReleaseNumber());
-        viewEditCoreComponentPage.setState("Draft");
-        viewEditCoreComponentPage.setOwner(developerA.getLoginId());
-        viewEditCoreComponentPage.hitSearchButton();
+        ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+        viewEditDataTypePage.showAdvancedSearchPanel();
+        viewEditDataTypePage.setBranch(branch.getReleaseNumber());
+        viewEditDataTypePage.setState("Draft");
+        viewEditDataTypePage.setOwner(developerA.getLoginId());
+        viewEditDataTypePage.hitSearchButton();
 
         for (DTObject dt : dtForTesting) {
             assertTrue(dt.getOwnerUserId().equals(developerA.getAppUserId()));
             assertTrue(dt.getState().equals("Draft"));
-            click(viewEditCoreComponentPage.getTableRecordByValue(dt.getDen()));
+            click(viewEditDataTypePage.getTableRecordByValue(dt.getDen()));
         }
-        viewEditCoreComponentPage.hitMoveToCandidateButton();
+        viewEditDataTypePage.hitMoveToCandidateButton();
 
     }
 
@@ -576,38 +610,38 @@ public class TC_38_1_DTAccess extends BaseTest {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
 
-            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
 
             DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
 
-            DTObject randomBDTWIPOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "WIP");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+
+            DTObject randomBDTWIPOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerA, namespace, "WIP");
             dtForTesting.add(randomBDTWIPOne);
 
-            DTObject randomBDTWIPTwo = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "WIP");
+            DTObject randomBDTWIPTwo = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerA, namespace, "WIP");
             dtForTesting.add(randomBDTWIPTwo);
 
-            DTObject randomBDTWIPThree = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "WIP");
+            DTObject randomBDTWIPThree = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerA, namespace, "WIP");
             dtForTesting.add(randomBDTWIPThree);
         }
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-        viewEditCoreComponentPage.showAdvancedSearchPanel();
-        for (String typeToBeDeselected : Arrays.asList("ACC", "ASCCP", "BCCP", "CDT")) {
-            viewEditCoreComponentPage.setTypeSelect(typeToBeDeselected);
-        }
-        viewEditCoreComponentPage.setBranch(branch.getReleaseNumber());
-        viewEditCoreComponentPage.setState("WIP");
-        viewEditCoreComponentPage.setOwner(developerA.getLoginId());
-        viewEditCoreComponentPage.hitSearchButton();
+        ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+        viewEditDataTypePage.showAdvancedSearchPanel();
+        viewEditDataTypePage.setBranch(branch.getReleaseNumber());
+        viewEditDataTypePage.setState("WIP");
+        viewEditDataTypePage.setOwner(developerA.getLoginId());
+        viewEditDataTypePage.hitSearchButton();
 
         for (DTObject dt : dtForTesting) {
             assertTrue(dt.getOwnerUserId().equals(developerA.getAppUserId()));
-            click(viewEditCoreComponentPage.getTableRecordByValue(dt.getDen()));
+            click(viewEditDataTypePage.getTableRecordByValue(dt.getDen()));
         }
-        viewEditCoreComponentPage.hitTransferOwnershipButton();
+        viewEditDataTypePage.hitTransferOwnershipButton();
     }
 
     @Test
@@ -620,38 +654,38 @@ public class TC_38_1_DTAccess extends BaseTest {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
 
-            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
 
             DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
 
-            DTObject randomBDTWIPOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "WIP");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+
+            DTObject randomBDTWIPOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerA, namespace, "WIP");
             dtForTesting.add(randomBDTWIPOne);
 
-            DTObject randomBDTWIPTwo = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "WIP");
+            DTObject randomBDTWIPTwo = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerA, namespace, "WIP");
             dtForTesting.add(randomBDTWIPTwo);
 
-            DTObject randomBDTWIPThree = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "WIP");
+            DTObject randomBDTWIPThree = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerA, namespace, "WIP");
             dtForTesting.add(randomBDTWIPThree);
         }
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-        viewEditCoreComponentPage.showAdvancedSearchPanel();
-        for (String typeToBeDeselected : Arrays.asList("ACC", "ASCCP", "BCCP", "CDT")) {
-            viewEditCoreComponentPage.setTypeSelect(typeToBeDeselected);
-        }
-        viewEditCoreComponentPage.setBranch(branch.getReleaseNumber());
-        viewEditCoreComponentPage.setState("WIP");
-        viewEditCoreComponentPage.setOwner(developerA.getLoginId());
-        viewEditCoreComponentPage.hitSearchButton();
+        ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+        viewEditDataTypePage.showAdvancedSearchPanel();
+        viewEditDataTypePage.setBranch(branch.getReleaseNumber());
+        viewEditDataTypePage.setState("WIP");
+        viewEditDataTypePage.setOwner(developerA.getLoginId());
+        viewEditDataTypePage.hitSearchButton();
 
         for (DTObject dt : dtForTesting) {
             assertTrue(dt.getOwnerUserId().equals(developerA.getAppUserId()));
-            click(viewEditCoreComponentPage.getTableRecordByValue(dt.getDen()));
+            click(viewEditDataTypePage.getTableRecordByValue(dt.getDen()));
         }
-        viewEditCoreComponentPage.hitDeleteButton();
+        viewEditDataTypePage.hitDeleteButton();
     }
 
     @Test
@@ -667,42 +701,42 @@ public class TC_38_1_DTAccess extends BaseTest {
             developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
 
-            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
 
             DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
 
-            DTObject randomBDTWIPOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerB, namespace, "WIP");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+
+            DTObject randomBDTWIPOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerB, namespace, "WIP");
             dtForTesting.add(randomBDTWIPOne);
 
-            DTObject randomBDTWIPTwo = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "WIP");
+            DTObject randomBDTWIPTwo = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerA, namespace, "WIP");
             dtForTesting.add(randomBDTWIPTwo);
 
-            DTObject randomBDTWIPThree = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerB, namespace, "WIP");
+            DTObject randomBDTWIPThree = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, cdt, developerB, namespace, "WIP");
             dtForTesting.add(randomBDTWIPThree);
         }
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-        viewEditCoreComponentPage.showAdvancedSearchPanel();
-        for (String typeToBeDeselected : Arrays.asList("ACC", "ASCCP", "BCCP", "CDT")) {
-            viewEditCoreComponentPage.setTypeSelect(typeToBeDeselected);
-        }
-        viewEditCoreComponentPage.setBranch(branch.getReleaseNumber());
-        viewEditCoreComponentPage.setState("WIP");
-        viewEditCoreComponentPage.setOwner(developerA.getLoginId());
-        viewEditCoreComponentPage.setOwner(developerB.getLoginId());
-        viewEditCoreComponentPage.hitSearchButton();
+        ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+        viewEditDataTypePage.showAdvancedSearchPanel();
+        viewEditDataTypePage.setBranch(branch.getReleaseNumber());
+        viewEditDataTypePage.setState("WIP");
+        viewEditDataTypePage.setOwner(developerA.getLoginId());
+        viewEditDataTypePage.setOwner(developerB.getLoginId());
+        viewEditDataTypePage.hitSearchButton();
 
         for (DTObject dt : dtForTesting) {
-            WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(dt.getDen());
-            WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "select");
+            WebElement tr = viewEditDataTypePage.getTableRecordByValue(dt.getDen());
+            WebElement td = viewEditDataTypePage.getColumnByName(tr, "select");
             click(td);
         }
-        assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.getTransferOwnershipButton());
-        assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.getDeleteButton());
-        assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.getMoveToDraftButton());
+        assertThrows(TimeoutException.class, () -> viewEditDataTypePage.getTransferOwnershipButton());
+        assertThrows(TimeoutException.class, () -> viewEditDataTypePage.getDeleteButton());
+        assertThrows(TimeoutException.class, () -> viewEditDataTypePage.getMoveToDraftButton());
     }
 
     @AfterEach

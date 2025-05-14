@@ -3,7 +3,7 @@ import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {forkJoin, of} from 'rxjs';
 import {AuthService} from '../../authentication/auth.service';
 import {Location} from '@angular/common';
-import {AccountList, AccountListRequest} from '../domain/accounts';
+import {AccountList, AccountListEntry, AccountListRequest} from '../domain/accounts';
 import {AccountListService} from '../domain/account-list.service';
 import {TenantListService} from '../domain/tenant-list.service';
 import {MatSort, SortDirection} from '@angular/material/sort';
@@ -132,7 +132,7 @@ export class TenantUserDetailComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<AccountList>();
+  dataSource = new MatTableDataSource<AccountListEntry>();
 
   addUserToTenant = false;
 

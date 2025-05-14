@@ -1,40 +1,55 @@
-import {ScoreUser} from '../../authentication/domain/auth';
-import {PageRequest} from '../../basis/basis';
+import {PageRequest, WhoAndWhen} from '../../basis/basis';
 import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
 import {base64Decode, base64Encode} from '../../common/utility';
 
-export class Library {
+export class LibrarySummary {
   libraryId: number = 0;
   name: string;
+  state: string;
+  readOnly: boolean;
+}
+
+export class LibraryDetails {
+  libraryId: number = 0;
+  name: string;
+  type: string;
   organization: string;
   link: string;
   domain: string;
   description: string;
   state: string;
-  createdBy: ScoreUser;
-  lastUpdatedBy: ScoreUser;
-  creationTimestamp: Date;
-  lastUpdateTimestamp: Date;
+  readOnly: boolean;
+
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
 }
 
-export class LibraryList {
-  libraryId: number;
+export class LibraryListEntry {
+  libraryId: number = 0;
   name: string;
+  type: string;
   organization: string;
-  lastUpdateUser: string;
-  lastUpdateTimestamp: Date;
+  link: string;
+  domain: string;
+  description: string;
+  state: string;
+  readOnly: boolean;
+
+  created: WhoAndWhen;
+  lastUpdated: WhoAndWhen;
 }
 
 export class LibraryListRequest {
   filters: {
     name: string;
+    type: string;
     organization: string;
     domain: string;
     description: string;
     state: string;
   };
-  updaterLoginIds: string[] = [];
+  updaterLoginIdList: string[] = [];
   updatedDate: {
     start: Date,
     end: Date,
@@ -63,13 +78,14 @@ export class LibraryListRequest {
       this.page.pageSize = (defaultPageRequest) ? defaultPageRequest.pageSize : 0;
     }
 
-    this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
+    this.updaterLoginIdList = (params.get('updaterLoginIdList')) ? Array.from(params.get('updaterLoginIdList').split(',')) : [];
     this.updatedDate = {
       start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
       end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
     };
     this.filters = {
       name: params.get('name') || '',
+      type: params.get('type') || '',
       organization: params.get('organization') || '',
       domain: params.get('domain') || '',
       description: params.get('description') || '',
@@ -79,13 +95,13 @@ export class LibraryListRequest {
 
   toQuery(): string {
     let params = new HttpParams()
-      .set('sortActive', this.page.sortActive)
-      .set('sortDirection', this.page.sortDirection)
-      .set('pageIndex', '' + this.page.pageIndex)
-      .set('pageSize', '' + this.page.pageSize);
+        .set('sortActive', this.page.sortActive)
+        .set('sortDirection', this.page.sortDirection)
+        .set('pageIndex', '' + this.page.pageIndex)
+        .set('pageSize', '' + this.page.pageSize);
 
-    if (this.updaterLoginIds && this.updaterLoginIds.length > 0) {
-      params = params.set('updaterLoginIds', this.updaterLoginIds.join(','));
+    if (this.updaterLoginIdList && this.updaterLoginIdList.length > 0) {
+      params = params.set('updaterLoginIdList', this.updaterLoginIdList.join(','));
     }
     if (this.updatedDate.start) {
       params = params.set('updatedDateStart', '' + this.updatedDate.start.toUTCString());
@@ -95,6 +111,9 @@ export class LibraryListRequest {
     }
     if (this.filters.name && this.filters.name.length > 0) {
       params = params.set('name', '' + this.filters.name);
+    }
+    if (this.filters.type && this.filters.type.length > 0) {
+      params = params.set('type', '' + this.filters.type);
     }
     if (this.filters.organization && this.filters.organization.length > 0) {
       params = params.set('organization', '' + this.filters.organization);

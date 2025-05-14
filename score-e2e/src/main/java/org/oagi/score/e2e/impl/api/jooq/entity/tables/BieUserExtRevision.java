@@ -49,7 +49,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BieUserExtRevision
  * created only when there is a user extension to the the OAGIS extension
  * component/ACC.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
 
     private static final long serialVersionUID = 1L;

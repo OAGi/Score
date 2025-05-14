@@ -7,15 +7,15 @@ import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {faLocationArrow} from '@fortawesome/free-solid-svg-icons';
-import {CodeListForList, CodeListForListRequest} from '../domain/code-list';
+import {CodeListListEntry, CodeListListEntryRequest} from '../domain/code-list';
 import {CodeListService} from '../domain/code-list.service';
-import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker} from '@angular/material/datepicker';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {initFilter, loadBranch, loadLibrary, saveBranch, saveLibrary} from '../../common/utility';
-import {SimpleRelease, WorkingRelease} from '../../release-management/domain/release';
+import {ReleaseSummary} from '../../release-management/domain/release';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {AuthService} from '../../authentication/auth.service';
 import {Location} from '@angular/common';
@@ -27,7 +27,7 @@ import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../set
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
-import {Library} from '../../library-management/domain/library';
+import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryService} from '../../library-management/domain/library.service';
 
 @Component({
@@ -174,23 +174,23 @@ export class CodeListUpliftComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<CodeListForList>();
-  selection = new SelectionModel<CodeListForList>(false, []);
-  expandedElement: CodeListForList | null;
+  dataSource = new MatTableDataSource<CodeListListEntry>();
+  selection = new SelectionModel<CodeListListEntry>(false, []);
+  expandedElement: CodeListListEntry | null;
   loading = false;
 
-  releases: SimpleRelease[] = [];
-  libraries: Library[] = [];
-  mappedLibraries: {library: Library, selected: boolean}[] = [];
-  sourceRelease: SimpleRelease;
-  targetRelease: SimpleRelease;
+  releases: ReleaseSummary[] = [];
+  libraries: LibrarySummary[] = [];
+  mappedLibraries: {library: LibrarySummary, selected: boolean}[] = [];
+  sourceRelease: ReleaseSummary;
+  targetRelease: ReleaseSummary;
   sourceReleaseListFilterCtrl: FormControl = new FormControl();
-  sourceReleaseFilteredList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
+  sourceReleaseFilteredList: ReplaySubject<ReleaseSummary[]> = new ReplaySubject<ReleaseSummary[]>(1);
   targetReleaseListFilterCtrl: FormControl = new FormControl();
-  targetReleaseFilteredList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
+  targetReleaseFilteredList: ReplaySubject<ReleaseSummary[]> = new ReplaySubject<ReleaseSummary[]>(1);
 
-  get targetReleaseList(): SimpleRelease[] {
-    const sourceRelease: SimpleRelease = this.sourceRelease;
+  get targetReleaseList(): ReleaseSummary[] {
+    const sourceRelease: ReleaseSummary = this.sourceRelease;
     if (!!sourceRelease) {
       return this.releases.filter(val => val.releaseId > sourceRelease.releaseId);
     }
@@ -202,12 +202,12 @@ export class CodeListUpliftComponent implements OnInit {
   updaterIdListFilterCtrl: FormControl = new FormControl();
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
-  request: CodeListForListRequest;
+  request: CodeListListEntryRequest;
   highlightTextForModule: string;
   highlightTextForDefinition: string;
   preferencesInfo: PreferencesInfo;
 
-  contextMenuItem: CodeListForList;
+  contextMenuItem: CodeListListEntry;
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -238,12 +238,12 @@ export class CodeListUpliftComponent implements OnInit {
       return this.router.navigateByUrl('/');
     }
 
-    this.request = new CodeListForListRequest(this.route.snapshot.queryParamMap,
+    this.request = new CodeListListEntryRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.access = 'CanView';
     this.request.ownedByDeveloper = false;
 
-    this.libraryService.getLibraries().subscribe(libraries => {
+    this.libraryService.getLibrarySummaryList().subscribe(libraries => {
       this.initLibraries(libraries);
 
       this.searchBar.showAdvancedSearch =
@@ -270,7 +270,7 @@ export class CodeListUpliftComponent implements OnInit {
 
       this.releases = [];
       forkJoin([
-        this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Published']),
+        this.releaseService.getReleaseSummaryList(this.request.library.libraryId, ['Published']),
         this.accountService.getAccountNames(),
         this.preferencesService.load(this.auth.getUserToken())
       ]).subscribe(([releases, loginIds, preferencesInfo]) => {
@@ -287,7 +287,7 @@ export class CodeListUpliftComponent implements OnInit {
     });
   }
 
-  getRelease(releaseNum: string): SimpleRelease | undefined {
+  getRelease(releaseNum: string): ReleaseSummary | undefined {
     for (const release of this.releases) {
       if (release.releaseNum === releaseNum) {
         return release;
@@ -321,17 +321,6 @@ export class CodeListUpliftComponent implements OnInit {
     }
   }
 
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
-  }
-
   reset(type: string) {
     switch (type) {
       case 'startDate':
@@ -345,7 +334,7 @@ export class CodeListUpliftComponent implements OnInit {
     }
   }
 
-  initLibraries(libraries: Library[]) {
+  initLibraries(libraries: LibrarySummary[]) {
     this.libraries = libraries;
     if (this.libraries.length > 0) {
       const savedLibraryId = loadLibrary(this.auth.getUserToken());
@@ -364,7 +353,7 @@ export class CodeListUpliftComponent implements OnInit {
     }
   }
 
-  initReleases(releases: SimpleRelease[]) {
+  initReleases(releases: ReleaseSummary[]) {
     this.releases = releases.filter(e => !e.workingRelease);
     if (this.releases.length > 0) {
       const savedReleaseId = loadBranch(this.auth.getUserToken(), this.request.cookieType);
@@ -388,9 +377,9 @@ export class CodeListUpliftComponent implements OnInit {
     }
   }
 
-  onLibraryChange(library: Library) {
+  onLibraryChange(library: LibrarySummary) {
     this.request.library = library;
-    this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Published']).subscribe(releases => {
+    this.releaseService.getReleaseSummaryList(this.request.library.libraryId, ['Published']).subscribe(releases => {
       saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
       this.initReleases(releases);
       this.onSearch();
@@ -416,10 +405,7 @@ export class CodeListUpliftComponent implements OnInit {
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
-      this.dataSource.data = resp.list.map((elm: CodeListForList) => {
-        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        return elm;
-      });
+      this.dataSource.data = resp.list;
       this.highlightTextForModule = this.request.filters.module;
       this.highlightTextForDefinition = this.request.filters.definition;
 
@@ -432,11 +418,11 @@ export class CodeListUpliftComponent implements OnInit {
     });
   }
 
-  select(row: CodeListForList) {
+  select(row: CodeListListEntry) {
     this.selection.select(row);
   }
 
-  toggle(row: CodeListForList) {
+  toggle(row: CodeListListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row);
     } else {
@@ -444,7 +430,7 @@ export class CodeListUpliftComponent implements OnInit {
     }
   }
 
-  isSelected(row: CodeListForList) {
+  isSelected(row: CodeListListEntry) {
     return this.selection.isSelected(row);
   }
 
@@ -459,7 +445,7 @@ export class CodeListUpliftComponent implements OnInit {
         this.snackBar.open('Created', '', {
           duration: 3000,
         });
-        this.router.navigateByUrl('/code_list/' + resp.manifestId);
+        this.router.navigateByUrl('/code_list/' + resp.codeListManifestId);
       });
   }
 
@@ -535,15 +521,15 @@ export class CodeListUpliftComponent implements OnInit {
       });
   }
 
-  hasRevision(codeList: CodeListForList): boolean {
-    return codeList.revision !== '1';
+  hasRevision(codeList: CodeListListEntry): boolean {
+    return codeList.log.revisionNum > 1;
   }
 
-  isEditable(item: CodeListForList) {
+  isEditable(item: CodeListListEntry) {
     return item.access === 'CanEdit';
   }
 
-  delete(item: CodeListForList, $event) {
+  delete(item: CodeListListEntry, $event) {
     if (!this.isEditable(item)) {
       return;
     }
@@ -574,7 +560,7 @@ export class CodeListUpliftComponent implements OnInit {
       });
   }
 
-  openDetail(item: CodeListForList, $event?) {
+  openDetail(item: CodeListListEntry, $event?) {
     if (!!$event) {
       $event.preventDefault();
       $event.stopPropagation();
@@ -583,7 +569,7 @@ export class CodeListUpliftComponent implements OnInit {
     return;
   }
 
-  openDialogCcListRestore(item: CodeListForList) {
+  openDialogCcListRestore(item: CodeListListEntry) {
 
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Restore code list';
@@ -610,30 +596,34 @@ export class CodeListUpliftComponent implements OnInit {
     const selectedBieList = this.selection.selected[0];
     this.loading = true;
     this.service.uplift(selectedBieList, this.targetRelease.releaseId)
-      .pipe(finalize(() => {
-        this.loading = false;
-      }))
-      .subscribe(result => {
-        if (result.duplicatedValues?.length > 0) {
-          const dialogConfig = this.confirmDialogService.newConfig();
-          dialogConfig.data.header = 'Overwritten Values';
-          dialogConfig.data.content = [
-            'These values are overwritten with the values of the target release.'
-          ];
-
-          result.duplicatedValues.forEach(e => {
-            dialogConfig.data.content.push(' - ' + e);
+        .pipe(finalize(() => {
+          this.loading = false;
+        }))
+        .subscribe(result => {
+          this.snackBar.open('Uplifted', '', {
+            duration: 3000,
           });
 
-          this.confirmDialogService.open(dialogConfig).afterClosed()
-            .subscribe(_ => {
-              this.router.navigateByUrl('/code_list/' + result.codeListManifestId);
+          if (result.duplicatedValues?.length > 0) {
+            const dialogConfig = this.confirmDialogService.newConfig();
+            dialogConfig.data.header = 'Overwritten Values';
+            dialogConfig.data.content = [
+              'These values are overwritten with the values of the target release.'
+            ];
+
+            result.duplicatedValues.forEach(e => {
+              dialogConfig.data.content.push(' - ' + e);
             });
 
-        } else {
-          this.router.navigateByUrl('/code_list/' + result.codeListManifestId);
-        }
-      });
+            this.confirmDialogService.open(dialogConfig).afterClosed()
+                .subscribe(_ => {
+                  this.router.navigateByUrl('/code_list/' + result.codeListManifestId);
+                });
+
+          } else {
+            this.router.navigateByUrl('/code_list/' + result.codeListManifestId);
+          }
+        });
   }
 
 }

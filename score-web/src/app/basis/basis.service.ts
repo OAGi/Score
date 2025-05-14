@@ -35,13 +35,13 @@ export class WebPageInfoService {
   }
 
   load(): Observable<WebPageInfo> {
-    return this.http.get<WebPageInfo>('api/info/webpage').pipe(tap(val => {
+    return this.http.get<WebPageInfo>('api/info/webpages').pipe(tap(val => {
       this.set(val);
     }));
   }
 
   update(webPageInfo: WebPageInfo): Observable<any> {
-    return this.http.post('/api/info/webpage', {
+    return this.http.post('/api/info/webpages', {
       brand: webPageInfo.brand,
       favicon: webPageInfo.favicon,
       signInStatement: webPageInfo.signInStatement,

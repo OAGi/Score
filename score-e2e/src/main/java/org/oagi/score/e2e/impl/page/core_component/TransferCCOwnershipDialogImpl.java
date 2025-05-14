@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.impl.page.core_component;
 
 import org.oagi.score.e2e.impl.page.SearchBarPageImpl;
+import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.core_component.TransferCCOwnershipDialog;
 import org.openqa.selenium.*;
 
@@ -22,9 +23,9 @@ public class TransferCCOwnershipDialogImpl extends SearchBarPageImpl implements 
     private static final By CANCEL_BUTTON_LOCATOR =
             By.xpath("//score-transfer-ownership-dialog//*[contains(text(), \"Cancel\")]//ancestor::button[1]");
 
-    private ViewEditCoreComponentPageImpl parent;
+    private BasePage parent;
 
-    public TransferCCOwnershipDialogImpl(ViewEditCoreComponentPageImpl parent) {
+    public TransferCCOwnershipDialogImpl(BasePage parent) {
         super(parent.getDriver(), "//score-transfer-ownership-dialog");
         this.parent = parent;
     }

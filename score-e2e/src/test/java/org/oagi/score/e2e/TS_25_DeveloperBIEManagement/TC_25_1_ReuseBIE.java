@@ -179,12 +179,12 @@ public class TC_25_1_ReuseBIE extends BaseTest {
              */
             // Indicator. Type
             DTObject dt_indicator = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", current_release);
-            bccp_indicator_type = coreComponentAPI.createRandomBCCP(dt_indicator, developer, developerNamespace, "Published");
+            bccp_indicator_type = coreComponentAPI.createRandomBCCP(currentReleaseObject, dt_indicator, developer, developerNamespace, "Published");
             bccp_indicator_type.setNillable(false);
             coreComponentAPI.updateBCCP(bccp_indicator_type);
 
             DTObject dt_code = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "8954f848e8f448c0a72785acd5a3a805", current_release);
-            bccp_code_type = coreComponentAPI.createRandomBCCP(dt_code, developer, developerNamespace, "Published");
+            bccp_code_type = coreComponentAPI.createRandomBCCP(currentReleaseObject, dt_code, developer, developerNamespace, "Published");
             bccp_code_type.setNillable(false);
             coreComponentAPI.updateBCCP(bccp_code_type);
 
@@ -463,7 +463,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
 
             // Indicator. Type
             DTObject dt_indicator = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", current_release);
-            bccp_indicator_type = coreComponentAPI.createRandomBCCP(dt_indicator, developer, developerNamespace, "Published");
+            bccp_indicator_type = coreComponentAPI.createRandomBCCP(currentReleaseObject, dt_indicator, developer, developerNamespace, "Published");
             bccp_indicator_type.setNillable(false);
             bccp_indicator_type.setDefinition("BCCP definition");
             bccp_indicator_type.setDefinitionSource("BCCP definition source");
@@ -542,7 +542,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
 
             // Indicator. Type
             DTObject dt_indicator = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", current_release);
-            bccp_indicator_type = coreComponentAPI.createRandomBCCP(dt_indicator, developer, developerNamespace, "Published");
+            bccp_indicator_type = coreComponentAPI.createRandomBCCP(currentReleaseObject, dt_indicator, developer, developerNamespace, "Published");
             bccp_indicator_type.setNillable(false);
             coreComponentAPI.updateBCCP(bccp_indicator_type);
 
@@ -641,7 +641,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
 
             // Indicator. Type
             DTObject dt_indicator = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", current_release);
-            bccp_indicator_type = coreComponentAPI.createRandomBCCP(dt_indicator, developer, developerNamespace, "Published");
+            bccp_indicator_type = coreComponentAPI.createRandomBCCP(currentReleaseObject, dt_indicator, developer, developerNamespace, "Published");
             bccp_indicator_type.setNillable(false);
             coreComponentAPI.updateBCCP(bccp_indicator_type);
 
@@ -1357,7 +1357,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
              */
             acc = coreComponentAPI.createRandomACC(devx, currentReleaseObject, developerNamespace, "Published");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", current_release);
-            bccp = coreComponentAPI.createRandomBCCP(dataType, devx, developerNamespace, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(currentReleaseObject, dataType, devx, developerNamespace, "WIP");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);

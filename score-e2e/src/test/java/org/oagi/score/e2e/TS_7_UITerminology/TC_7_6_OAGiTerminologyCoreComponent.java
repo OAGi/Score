@@ -119,6 +119,7 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
 
+        viewEditCoreComponentPage.toggleToDevView();
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
         homePage.getLoginIDMenu().checkOAGISTerminology();
 
@@ -223,18 +224,25 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
     @Test
     @DisplayName("TC_7_6_TA_12_and_TA_13")
     public void test_TA_12_and_TA_13() {
-        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
+        LibraryObject library;
+        ReleaseObject branch;
         BCCPObject bccp;
         {
             AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
-            DTObject dataType = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Identifier. Type", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
+
+            DTObject dataType = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Identifier. Type", branch.getReleaseNumber());
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
+
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+            bccp = coreComponentAPI.createRandomBCCP(branch, dataType, developer, namespace, "Published");
         }
 
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -243,7 +251,8 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
-        BCCPViewEditPage bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(bccp.getDen(), release.getReleaseNumber());
+        viewEditCoreComponentPage.toggleToDevView();
+        BCCPViewEditPage bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(bccp.getDen(), branch.getReleaseNumber());
         homePage.getLoginIDMenu().checkOAGISTerminology();
 
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
@@ -285,6 +294,7 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(accFrom.getDen(), release.getReleaseNumber());
         homePage.getLoginIDMenu().checkOAGISTerminology();
 
@@ -308,8 +318,8 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
     @Test
     @DisplayName("TC_7_6_TA_18_and_TA_19")
     public void test_TA_18_and_TA_19() {
-        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
+        LibraryObject library;
+        ReleaseObject branch;
         ACCObject acc;
         BCCPObject bccp;
         {
@@ -317,10 +327,18 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
             thisAccountWillBeDeletedAfterTests(developer);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
+
+            DTObject dataType = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Identifier. Type", branch.getReleaseNumber());
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
+
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
-            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
-            DTObject dataType = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Identifier. Type", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            acc = coreComponentAPI.createRandomACC(developer, branch, namespace, "Published");
+            bccp = coreComponentAPI.createRandomBCCP(branch, dataType, developer, namespace, "Published");
             coreComponentAPI.appendBCC(acc, bccp, "Published");
         }
 
@@ -330,7 +348,8 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
-        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
+        viewEditCoreComponentPage.toggleToDevView();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), branch.getReleaseNumber());
         homePage.getLoginIDMenu().checkOAGISTerminology();
 
         WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
@@ -354,18 +373,26 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
     @Test
     @DisplayName("TC_7_6_TA_21_to_TA_23")
     public void test_TA_21_to_TA_23() {
-        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
+        LibraryObject library;
+        ReleaseObject branch;
         ACCObject acc;
         BCCPObject bccp;
         {
             AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
+
+            DTObject dataType = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Identifier. Type", branch.getReleaseNumber());
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
+
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
-            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
-            DTObject dataType = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Identifier. Type", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            acc = coreComponentAPI.createRandomACC(developer, branch, namespace, "Published");
+            bccp = coreComponentAPI.createRandomBCCP(branch, dataType, developer, namespace, "Published");
             coreComponentAPI.appendBCC(acc, bccp, "Published");
         }
 
@@ -375,7 +402,8 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
-        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
+        viewEditCoreComponentPage.toggleToDevView();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), branch.getReleaseNumber());
         homePage.getLoginIDMenu().checkOAGISTerminology();
 
         WebElement bdtScNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm() + "/" + "Identifier. Scheme Version. Identifier");

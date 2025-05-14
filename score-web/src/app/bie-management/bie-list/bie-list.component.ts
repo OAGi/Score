@@ -1,5 +1,5 @@
 import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
-import {SimpleRelease} from '../../release-management/domain/release';
+import {ReleaseSummary} from '../../release-management/domain/release';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {BieListDialogComponent} from '../bie-list-dialog/bie-list-dialog.component';
 import {BieListService} from './domain/bie-list.service';
@@ -10,9 +10,9 @@ import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {ActivatedRoute, Router} from '@angular/router';
-import {BieList, BieListRequest} from './domain/bie-list';
+import {BieListEntry, BieListRequest} from './domain/bie-list';
 import {AccountListService} from '../../account-management/domain/account-list.service';
-import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
 import {AuthService} from '../../authentication/auth.service';
 import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
@@ -34,8 +34,9 @@ import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-r
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
 import {BieCreateService} from '../bie-create/domain/bie-create.service';
 import {MultiActionsSnackBarComponent} from '../../common/multi-actions-snack-bar/multi-actions-snack-bar.component';
-import {Library} from '../../library-management/domain/library';
+import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryService} from '../../library-management/domain/library.service';
+import {BieDiagramDialogComponent} from '../bie-diagram-dialog/bie-diagram-dialog.component';
 
 @Component({
   selector: 'score-bie-list',
@@ -171,26 +172,26 @@ export class BieListComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<BieList>();
-  selection = new SelectionModel<BieList>(true, [],
+  dataSource = new MatTableDataSource<BieListEntry>();
+  selection = new SelectionModel<BieListEntry>(true, [],
     true, (a, b) => a.topLevelAsbiepId === b.topLevelAsbiepId);
   loading = false;
 
   loginIdList: string[] = [];
-  releases: SimpleRelease[] = [];
-  libraries: Library[] = [];
-  mappedLibraries: {library: Library, selected: boolean}[] = [];
+  releases: ReleaseSummary[] = [];
+  libraries: LibrarySummary[] = [];
+  mappedLibraries: {library: LibrarySummary, selected: boolean}[] = [];
   releaseListFilterCtrl: FormControl = new FormControl();
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
-  filteredReleaseList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
+  filteredReleaseList: ReplaySubject<ReleaseSummary[]> = new ReplaySubject<ReleaseSummary[]>(1);
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   states: string[] = ['WIP', 'QA', 'Production'];
   request: BieListRequest;
   preferencesInfo: PreferencesInfo;
 
-  contextMenuItem: BieList;
+  contextMenuItem: BieListEntry;
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -220,7 +221,7 @@ export class BieListComponent implements OnInit {
     this.request = new BieListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
 
-    this.libraryService.getLibraries().subscribe(libraries => {
+    this.libraryService.getLibrarySummaryList().subscribe(libraries => {
       this.initLibraries(libraries);
 
       this.searchBar.showAdvancedSearch =
@@ -247,7 +248,7 @@ export class BieListComponent implements OnInit {
 
       forkJoin([
         this.accountService.getAccountNames(),
-        this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Published']),
+        this.releaseService.getReleaseSummaryList(this.request.library.libraryId, ['Published']),
         this.preferencesService.load(this.auth.getUserToken())
       ]).subscribe(([loginIds, releases, preferencesInfo]) => {
         this.preferencesInfo = preferencesInfo;
@@ -297,17 +298,6 @@ export class BieListComponent implements OnInit {
     }
   }
 
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
-  }
-
   reset(type: string) {
     switch (type) {
       case 'startDate':
@@ -329,7 +319,7 @@ export class BieListComponent implements OnInit {
     }
   }
 
-  initLibraries(libraries: Library[]) {
+  initLibraries(libraries: LibrarySummary[]) {
     this.libraries = libraries;
     if (this.libraries.length > 0) {
       const savedLibraryId = loadLibrary(this.auth.getUserToken());
@@ -348,16 +338,16 @@ export class BieListComponent implements OnInit {
     }
   }
 
-  initReleases(releases: SimpleRelease[]) {
+  initReleases(releases: ReleaseSummary[]) {
     this.releases = releases.filter(e => !e.workingRelease);
     initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
     this.request.releases = this.request.releases.map(e => this.releases.find(r => e.releaseId === r.releaseId));
   }
 
-  onLibraryChange(library: Library) {
+  onLibraryChange(library: LibrarySummary) {
     this.request.library = library;
     this.request.releases = [];
-    this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Published']).subscribe(releases => {
+    this.releaseService.getReleaseSummaryList(this.request.library.libraryId, ['Published']).subscribe(releases => {
       saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
       this.initReleases(releases);
       this.onSearch();
@@ -382,10 +372,7 @@ export class BieListComponent implements OnInit {
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
-      this.dataSource.data = resp.list.map((elm: BieList) => {
-        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        return elm;
-      });
+      this.dataSource.data = resp.list;
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0],
           this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));
@@ -398,7 +385,7 @@ export class BieListComponent implements OnInit {
   /** Whether the number of selected elements matches the total number of rows. */
   isAllSelected() {
     const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.filter(row => (this.isAdmin) || row.owner === this.username).length;
+    const numRows = this.dataSource.data.filter(row => (this.isAdmin) || row.owner.loginId === this.username).length;
     return numSelected > 0 && numSelected === numRows;
   }
 
@@ -409,13 +396,13 @@ export class BieListComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(row: BieList) {
-    if ((this.isAdmin) || row.owner === this.username) {
+  select(row: BieListEntry) {
+    if ((this.isAdmin) || row.owner.loginId === this.username) {
       this.selection.select(row);
     }
   }
 
-  toggle(row: BieList) {
+  toggle(row: BieListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row);
     } else {
@@ -423,7 +410,7 @@ export class BieListComponent implements OnInit {
     }
   }
 
-  isSelected(row: BieList): boolean {
+  isSelected(row: BieListEntry): boolean {
     if (!row) {
       return false;
     }
@@ -431,41 +418,41 @@ export class BieListComponent implements OnInit {
   }
 
   selectionClear() {
-    this.selection = new SelectionModel<BieList>(true, [],
+    this.selection = new SelectionModel<BieListEntry>(true, [],
       true, (a, b) => a.topLevelAsbiepId === b.topLevelAsbiepId);
   }
 
-  isEditable(element: BieList): boolean {
+  isEditable(element: BieListEntry): boolean {
     if (!element) {
       return false;
     }
-    return element.owner === this.username && element.state === 'WIP';
+    return element.owner.loginId === this.username && element.state === 'WIP';
   }
 
-  isDeprecatable(element: BieList): boolean {
+  isDeprecatable(element: BieListEntry): boolean {
     if (!element) {
       return false;
     }
-    return element.owner === this.username && element.state === 'Production';
+    return element.owner.loginId === this.username && element.state === 'Production';
   }
 
-  isInheritable(element: BieList): boolean {
+  isInheritable(element: BieListEntry): boolean {
     if (!element) {
       return false;
     }
-    return (this.auth.isDeveloper() && element.ownerIsDeveloper ||
-            this.auth.isEndUser() && !element.ownerIsDeveloper);
+    return (this.auth.isDeveloper() && element.ownedByDeveloper ||
+            this.auth.isEndUser() && !element.ownedByDeveloper);
   }
 
   discardAllSelected() {
     this.openDialogBieDiscard(this.selection.selected);
   }
 
-  discard(bieList: BieList) {
+  discard(bieList: BieListEntry) {
     this.openDialogBieDiscard([bieList,]);
   }
 
-  openDialogBieDiscard(bieLists: BieList[]) {
+  openDialogBieDiscard(bieLists: BieListEntry[]) {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Discard ' + (bieLists.length > 1 ? 'BIEs' : 'BIE') + '?';
     dialogConfig.data.content = [
@@ -491,7 +478,7 @@ export class BieListComponent implements OnInit {
       });
   }
 
-  openTransferDialog(bieList: BieList, $event?: Event) {
+  openTransferDialog(bieList: BieListEntry, $event?: Event) {
     if ($event) {
       $event.stopPropagation();
       $event.preventDefault();
@@ -501,12 +488,12 @@ export class BieListComponent implements OnInit {
       return;
     }
 
-    this.accountService.getAccount(bieList.ownerUserId).subscribe(resp => {
+    this.accountService.getAccount(bieList.owner.userId).subscribe(resp => {
       const dialogConfig = new MatDialogConfig();
       dialogConfig.width = window.innerWidth + 'px';
       dialogConfig.data = {roles: [resp.developer ? 'developer' : 'end-user']};
       if (this.userToken.tenant.enabled) {
-        dialogConfig.data = {businessCtxIds: bieList.businessContexts.map(b => b.businessContextId)};
+        dialogConfig.data = {businessCtxIds: bieList.businessContextList.map(b => b.businessContextId)};
       }
       const dialogRef = this.dialog.open(TransferOwnershipDialogComponent, dialogConfig);
 
@@ -528,9 +515,9 @@ export class BieListComponent implements OnInit {
     });
   }
 
-  requestOwnershipTransfer(bie: BieList) {
+  requestOwnershipTransfer(bie: BieListEntry) {
     this.loading = true;
-    this.mailService.sendMail('bie-ownership-transfer-request', bie.ownerUserId, {
+    this.mailService.sendMail('bie-ownership-transfer-request', bie.owner.userId, {
       parameters: {
         bie_link: window.location.href + '/' + bie.topLevelAsbiepId,
         bie_name: bie.den,
@@ -547,18 +534,18 @@ export class BieListComponent implements OnInit {
     });
   }
 
-  openFindReuseBieListDialog(bie: BieList) {
+  openFindReuseBieListDialog(bie: BieListEntry) {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = window.innerWidth + 'px';
     dialogConfig.data = {
       topLevelAsbiepId: bie.topLevelAsbiepId,
-      releaseNum: bie.releaseNum,
+      releaseNum: bie.release.releaseNum,
       den: bie.den
     };
     const dialogRef = this.dialog.open(BieListDialogComponent, dialogConfig);
   }
 
-  createInheritedBie(bie: BieList) {
+  createInheritedBie(bie: BieListEntry) {
     if (!bie) {
       return;
     }
@@ -593,25 +580,25 @@ export class BieListComponent implements OnInit {
     switch (action) {
       case 'BackWIP':
         return this.selection.selected.filter(e => {
-          if (['QA'].indexOf(e.state) > -1 && e.owner === this.username) {
+          if (['QA'].indexOf(e.state) > -1 && e.owner.loginId === this.username) {
             return e;
           }
         }).length === this.selection.selected.length;
       case 'QA':
         return this.selection.selected.filter(e => {
-          if (e.state === 'WIP' && e.owner === this.username) {
+          if (e.state === 'WIP' && e.owner.loginId === this.username) {
             return e;
           }
         }).length === this.selection.selected.length;
       case 'Production':
         return this.selection.selected.filter(e => {
-          if (e.state === 'QA' && e.owner === this.username) {
+          if (e.state === 'QA' && e.owner.loginId === this.username) {
             return e;
           }
         }).length === this.selection.selected.length;
       case 'Transfer':
         return this.selection.selected.filter(e => {
-          if (e.state === 'WIP' && e.owner === this.username) {
+          if (e.state === 'WIP' && e.owner.loginId === this.username) {
             return e;
           }
         }).length === this.selection.selected.length;
@@ -692,7 +679,7 @@ export class BieListComponent implements OnInit {
     });
   }
 
-  deprecate(bie: BieList) {
+  deprecate(bie: BieListEntry) {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = window.innerWidth + 'px';
     dialogConfig.data = {
@@ -716,6 +703,22 @@ export class BieListComponent implements OnInit {
           this.loading = false;
         });
       }
+    });
+  }
+
+  showUmlDiagram(bieListEntry: BieListEntry, $event?: MouseEvent) {
+    if (!!$event) {
+      $event.preventDefault();
+      $event.stopPropagation();
+    }
+
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.width = window.innerWidth + 'px';
+    dialogConfig.height = '80vh';
+    dialogConfig.data = {topLevelAsbiepId: bieListEntry.topLevelAsbiepId};
+    const dialogRef = this.dialog.open(BieDiagramDialogComponent, dialogConfig);
+
+    dialogRef.afterClosed().subscribe(_ => {
     });
   }
 

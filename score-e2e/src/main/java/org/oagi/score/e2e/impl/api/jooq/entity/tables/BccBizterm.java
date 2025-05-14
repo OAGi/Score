@@ -43,7 +43,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BccBiztermRecord;
  * The bcc_bizterm table stores information about the aggregation between the
  * business term and BCC. TODO: Placeholder, definition is missing.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class BccBizterm extends TableImpl<BccBiztermRecord> {
 
     private static final long serialVersionUID = 1L;

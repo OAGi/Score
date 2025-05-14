@@ -59,7 +59,7 @@ public class TC_10_23_DeletingDeveloperBCCP extends BaseTest {
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "WIP");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
@@ -89,7 +89,7 @@ public class TC_10_23_DeletingDeveloperBCCP extends BaseTest {
 
         // Code. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "WIP");
         coreComponentAPI.appendBCC(randomACC, randomBCCP, "WIP");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -123,7 +123,7 @@ public class TC_10_23_DeletingDeveloperBCCP extends BaseTest {
 
         // Code. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, anotherDeveloper, namespace, "WIP");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(release, dataType, anotherDeveloper, namespace, "WIP");
         coreComponentAPI.appendBCC(randomACC, randomBCCP, "WIP");
 
         HomePage homePage = loginPage().signIn(anotherDeveloper.getLoginId(), anotherDeveloper.getPassword());
@@ -168,7 +168,7 @@ public class TC_10_23_DeletingDeveloperBCCP extends BaseTest {
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
         DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
-        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =

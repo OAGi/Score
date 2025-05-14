@@ -5,11 +5,11 @@ import {MatSidenav} from '@angular/material/sidenav';
 import {MatTableDataSource} from '@angular/material/table';
 import {finalize, switchMap} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
-import {AgencyIdList} from '../../agency-id-list-management/domain/agency-id-list';
+import {AgencyIdListSummary} from '../../agency-id-list-management/domain/agency-id-list';
 import {AgencyIdListService} from '../../agency-id-list-management/domain/agency-id-list.service';
-import {CodeListForList} from '../../code-list-management/domain/code-list';
+import {CodeListSummary} from '../../code-list-management/domain/code-list';
 import {CodeListService} from '../../code-list-management/domain/code-list.service';
-import {SimpleNamespace} from '../../namespace-management/domain/namespace';
+import {NamespaceSummary} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {MatDialog} from '@angular/material/dialog';
@@ -25,24 +25,25 @@ import {
 } from '../domain/cc-flat-tree';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {
-  CcAccNodeDetail,
-  CcAsccpNodeDetail,
-  CcBccpNodeDetail,
+  CcAccNodeInfo,
+  CcAsccpNodeInfo,
+  CcBccpNodeInfo,
   CcBdtPriRestri,
-  CcBdtScNodeDetail,
-  CcDtNodeDetail,
-  CcNodeDetail,
-  CcRevisionResponse,
-  CcXbt,
+  CcDtNodeInfo,
+  CcDtScNodeInfo,
+  CcNodeInfo,
   Comment,
+  DtAwdPriDetails,
+  DtDetails,
   DtPrimitiveAware,
+  DtScAwdPriDetails,
   EntityType,
   EntityTypes,
   OagisComponentType,
-  OagisComponentTypes
+  OagisComponentTypes,
+  XbtSummary
 } from '../domain/core-component-node';
 import {AuthService} from '../../authentication/auth.service';
-import {WorkingRelease} from '../../release-management/domain/release';
 import {CommentControl} from '../domain/comment-component';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {Location} from '@angular/common';
@@ -85,17 +86,17 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   dataSource: CcFlatNodeDataSource<CcFlatNode>;
   searcher: CcFlatNodeDataSourceSearcher<CcFlatNode>;
 
-  lastRevision: CcRevisionResponse;
+  prevDtDetails: DtDetails;
   selectedNode: CcFlatNode;
   cursorNode: CcFlatNode;
 
   workingRelease = false;
-  namespaces: SimpleNamespace[];
+  namespaces: NamespaceSummary[];
   tags: Tag[] = [];
   commentControl: CommentControl;
 
   namespaceListFilterCtrl: FormControl = new FormControl();
-  filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
+  filteredNamespaceList: ReplaySubject<NamespaceSummary[]> = new ReplaySubject<NamespaceSummary[]>(1);
 
   initialExpandDepth = 10;
 
@@ -104,9 +105,9 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
 
   selectedValueDomain: any;
 
-  codeLists: CodeListForList[];
-  agencyIdLists: AgencyIdList[];
-  xbtList: CcXbt[];
+  codeLists: CodeListSummary[];
+  agencyIdLists: AgencyIdListSummary[];
+  xbtList: XbtSummary[];
 
   restrictionListDisplayedColumns: string[] = ['select', 'type', 'name', 'xbt'];
   restrictionDataSource = new MatTableDataSource<any>();
@@ -176,20 +177,31 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
         this.manifestId = parseInt(params.get('manifestId'), 10);
         return forkJoin([
           this.service.getGraphNode(this.type, this.manifestId),
-          this.service.getLastPublishedRevision(this.type, this.manifestId),
-          this.service.getBdtNode(this.manifestId),
+          this.service.getDtDetails(this.manifestId),
           this.tagService.getTags(),
           this.preferencesService.load(this.auth.getUserToken())
         ]);
-      })).subscribe(([ccGraph, revisionResponse, rootNode, tags, preferencesInfo]) => {
+      })).subscribe(([ccGraph, dtDetails, tags, preferencesInfo]) => {
 
-      this.namespaceService.getSimpleNamespaces(rootNode.libraryId).subscribe(namespaces => {
+      this.namespaceService.getNamespaceSummaries(dtDetails.library.libraryId).subscribe(namespaces => {
         this.namespaces = namespaces;
         initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList,
           this.getSelectableNamespaces(), (e) => e.uri);
       });
 
-      this.lastRevision = revisionResponse;
+      if (dtDetails.log.revisionNum > 1) {
+        this.service.getPrevDtDetails(this.manifestId)
+            .subscribe(prevDtDetails => {
+              this.prevDtDetails = prevDtDetails;
+            }, err => {
+              if (err.status === 404) {
+                // ignore
+              } else {
+                throw err;
+              }
+            });
+      }
+
       this.tags = tags;
       this.preferencesInfo = preferencesInfo;
 
@@ -224,21 +236,21 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
       this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
       this.dataSource.hideProhibited = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_PROHIBITED_PROPERTY_KEY, true);
 
-      this.workingRelease = rootNode.workingRelease;
+      this.workingRelease = dtDetails.release.workingRelease;
 
       this.rootNode = this.dataSource.data[0] as DtFlatNode;
-      this.rootNode.access = rootNode.access;
-      this.rootNode.state = rootNode.state;
+      this.rootNode.access = dtDetails.access;
+      this.rootNode.state = dtDetails.state;
       this.rootNode.reset();
 
       forkJoin([
-        this.codeListService.getSimpleCodeLists(rootNode.libraryId, rootNode.releaseId),
-        this.agencyIdListservice.getSimpleAgencyIdLists(rootNode.libraryId, rootNode.releaseId),
-        this.ccListService.getSimpleXbtList(rootNode.libraryId, rootNode.releaseId),
+        this.codeListService.getCodeListSummaries(dtDetails.release.releaseId),
+        this.agencyIdListservice.getAgencyIdListSummaries(dtDetails.release.releaseId),
+        this.ccListService.getXbtListSummaries(dtDetails.release.releaseId),
       ]).subscribe(([codeLists, agencyIdLists, xbtList]) => {
-        this.codeLists = codeLists.list;
-        this.agencyIdLists = agencyIdLists.results;
-        this.xbtList = xbtList.map(e => new CcXbt(e));
+        this.codeLists = codeLists;
+        this.agencyIdLists = agencyIdLists;
+        this.xbtList = xbtList;
 
         // Issue #1254
         // Initial expanding by the query path
@@ -286,7 +298,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     comment.commentId = evt.properties.commentId;
     comment.prevCommentId = evt.properties.prevCommentId;
     comment.text = evt.properties.text;
-    comment.loginId = evt.properties.actor;
+    comment.created.who.loginId = evt.properties.actor;
     comment.timestamp = evt.properties.timestamp;
     comment.isNew = true;
 
@@ -299,7 +311,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     }
   }
 
-  getSelectableNamespaces(namespaceId?: number): SimpleNamespace[] {
+  getSelectableNamespaces(namespaceId?: number): NamespaceSummary[] {
     return this.namespaces.filter(e => {
       if (!!namespaceId && e.namespaceId === namespaceId) {
         return true;
@@ -317,7 +329,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
       return false;
     }
 
-    const detail = node.detail as CcDtNodeDetail;
+    const detail = node.detail as CcDtNodeInfo;
     return detail.basedBdtState === 'Deleted';
   }
 
@@ -368,20 +380,20 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
 
     this.isUpdating = true;
     forkJoin([
-      this.service.getBdtNode(this.manifestId),
+      this.service.getDtDetails(this.manifestId),
       this.service.getGraphNode(this.rootNode.type, this.manifestId)
-    ]).subscribe(([rootNode, ccGraph]) => {
+    ]).subscribe(([dtDetails, ccGraph]) => {
       const database = new CcFlatNodeDatabase<CcFlatNode>(ccGraph, 'DT', this.manifestId);
       this.dataSource = new CcFlatNodeDataSource<CcFlatNode>(database, this.service);
       this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
       this.dataSource.init();
       this.dataSource.hideProhibited = hideProhibited;
 
-      this.workingRelease = rootNode.workingRelease;
+      this.workingRelease = dtDetails.release.workingRelease;
 
       this.rootNode = this.dataSource.data[0] as DtFlatNode;
-      this.rootNode.access = rootNode.access;
-      this.rootNode.state = rootNode.state;
+      this.rootNode.access = dtDetails.access;
+      this.rootNode.state = dtDetails.state;
       this.rootNode.reset();
 
       this.onClick(this.dataSource.data[0]);
@@ -435,7 +447,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   }
 
   hasRevision(): boolean {
-    return this.lastRevision && this.lastRevision.ccId !== null;
+    return !!this.prevDtDetails;
   }
 
   isEditable(): boolean {
@@ -449,16 +461,16 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     }
 
     this.commentControl.closeCommentSlide();
-    this.dataSource.loadDetail(node, (detail: CcNodeDetail) => {
+    this.dataSource.loadDetail(node, (detail: CcNodeInfo) => {
       if (detail instanceof DtFlatNode || detail instanceof DtScFlatNode) {
         detail = detail.detail;
       }
-      if (detail instanceof CcDtNodeDetail) {
-        (node.detail as CcDtNodeDetail).update(this);
-        this.restrictionDataSource.data = (node.detail as CcDtNodeDetail).valueDomains;
+      if (detail instanceof CcDtNodeInfo) {
+        (node.detail as CcDtNodeInfo).update(this);
+        this.restrictionDataSource.data = (node.detail as CcDtNodeInfo).valueDomains;
       } else {
-        (node.detail as CcBdtScNodeDetail).update(this);
-        this.restrictionDataSource.data = (node.detail as CcBdtScNodeDetail).valueDomains;
+        (node.detail as CcDtScNodeInfo).update(this);
+        this.restrictionDataSource.data = (node.detail as CcDtScNodeInfo).valueDomains;
       }
 
       this.selectedNode = node;
@@ -495,11 +507,11 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     });
   }
 
-  select(row: CcBdtPriRestri) {
+  select(row: any) {
     this.selectedValueDomain = row;
   }
 
-  toggleValueDomain(row: CcBdtPriRestri) {
+  toggleValueDomain(row: any) {
     if (this.isSelected(row)) {
       this.selectedValueDomain = undefined;
     } else {
@@ -507,7 +519,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     }
   }
 
-  isSelected(row: CcBdtPriRestri) {
+  isSelected(row: any) {
     return this.selectedValueDomain === row;
   }
 
@@ -519,11 +531,11 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     return (node !== undefined) && (node.type.toUpperCase() === 'ACC');
   }
 
-  asAccDetail(node?: CcFlatNode): CcAccNodeDetail {
+  asAccDetail(node?: CcFlatNode): CcAccNodeInfo {
     if (!node) {
       node = this.selectedNode;
     }
-    return node.detail as CcAccNodeDetail;
+    return node.detail as CcAccNodeInfo;
   }
 
   isAsccpDetail(node?: CcFlatNode): boolean {
@@ -533,11 +545,11 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     return (node !== undefined) && (node.type.toUpperCase() === 'ASCCP');
   }
 
-  asAsccpDetail(node?: CcFlatNode): CcAsccpNodeDetail {
+  asAsccpDetail(node?: CcFlatNode): CcAsccpNodeInfo {
     if (!node) {
       node = this.selectedNode;
     }
-    return node.detail as CcAsccpNodeDetail;
+    return node.detail as CcAsccpNodeInfo;
   }
 
   isBccpDetail(node?: CcFlatNode): boolean {
@@ -547,11 +559,11 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     return (node !== undefined) && (node.type.toUpperCase() === 'BCCP');
   }
 
-  asBccpDetail(node?: CcFlatNode): CcBccpNodeDetail {
+  asBccpDetail(node?: CcFlatNode): CcBccpNodeInfo {
     if (!node) {
       node = this.selectedNode;
     }
-    return node.detail as CcBccpNodeDetail;
+    return node.detail as CcBccpNodeInfo;
   }
 
   isBdtDetail(node?: CcFlatNode): boolean {
@@ -561,25 +573,25 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     return (node !== undefined) && (node.type.toUpperCase() === 'DT');
   }
 
-  asBdtDetail(node?: CcFlatNode): CcDtNodeDetail {
+  asBdtDetail(node?: CcFlatNode): CcDtNodeInfo {
     if (!node) {
       node = this.selectedNode;
     }
-    return node.detail as CcDtNodeDetail;
+    return node.detail as CcDtNodeInfo;
   }
 
-  isBdtScDetail(node?: CcFlatNode): boolean {
+  isDtScDetail(node?: CcFlatNode): boolean {
     if (!node) {
       node = this.selectedNode;
     }
     return (node !== undefined) && (node.type.toUpperCase() === 'DT_SC');
   }
 
-  asBdtScDetail(node?: CcFlatNode): CcBdtScNodeDetail {
+  asDtScDetail(node?: CcFlatNode): CcDtScNodeInfo {
     if (!node) {
       node = this.selectedNode;
     }
-    return node.detail as CcBdtScNodeDetail;
+    return node.detail as CcDtScNodeInfo;
   }
 
   get isChanged() {
@@ -599,7 +611,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
 
   _updateDetails(details: CcFlatNode[]) {
     this.isUpdating = true;
-    this.service.updateDetails(this.manifestId, details)
+    this.service.updateNodes(details)
       .pipe(finalize(() => {
         this.isUpdating = false;
       }))
@@ -655,10 +667,10 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
         }
       }
       if (detail.type.toUpperCase() === 'DT_SC') {
-        if (!this.asBdtScDetail(detail).definition || this.asBdtScDetail(detail).definition.length === 0) {
+        if (!this.asDtScDetail(detail).definition || this.asDtScDetail(detail).definition.length === 0) {
           emptyDefinition = true;
         }
-        if (!this.asBdtScDetail(detail).propertyTerm || this.asBdtScDetail(detail).propertyTerm.length === 0) {
+        if (!this.asDtScDetail(detail).propertyTerm || this.asDtScDetail(detail).propertyTerm.length === 0) {
           emptyPropertyTerm = true;
         }
       }
@@ -754,24 +766,31 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     dialogConfig.data.action = 'Update';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()
-      .pipe(
-        finalize(() => {
-          this.isUpdating = false;
-        })
-      )
-      .subscribe(result => {
-        if (!result) {
-          return;
-        }
-        this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state)
-          .subscribe(resp => {
-            this.afterStateChanged(resp.state, resp.access);
-            this.snackBar.open('Updated', '', {
-              duration: 3000,
-            });
-          }, err => {
+        .pipe(
+            finalize(() => {
+              this.isUpdating = false;
+            })
+        )
+        .subscribe(result => {
+          if (!result) {
+            return;
+          }
+          this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state).subscribe({
+            next: () => {
+              this.snackBar.open('Updated', '', {duration: 3000});
+
+              this.service.getDtDetails(this.manifestId).subscribe({
+                next: dtDetails => this.afterStateChanged(dtDetails.state, dtDetails.access),
+                error: err => console.error(err),
+                complete: () => (this.isUpdating = false),
+              });
+            },
+            error: err => {
+              this.isUpdating = false;
+              throw err;
+            },
           });
-      });
+        });
   }
 
   updateState(state: string) {
@@ -801,7 +820,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     this.rootNode.state = state;
     this.rootNode.access = access;
     const root = this.dataSource.data[0];
-    (root.detail as CcDtNodeDetail).state = state;
+    (root.detail as CcDtNodeInfo).state = state;
   }
 
   makeNewRevision() {
@@ -812,28 +831,30 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     dialogConfig.data.action = (isDeveloper) ? 'Revise' : 'Amend';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()
-      .subscribe(result => {
-        if (!result) {
-          return;
-        }
+        .subscribe(result => {
+          if (!result) {
+            return;
+          }
 
-        this.isUpdating = true;
-        this.service.makeNewRevision(this.rootNode.type, this.rootNode.manifestId).pipe(
-          finalize(() => {
-            this.isUpdating = false;
-          })
-        ).subscribe(resp => {
-          this.manifestId = resp.manifestId;
-          this.afterStateChanged(resp.state, resp.access);
-          this.service.getLastPublishedRevision(this.type, this.manifestId).subscribe(revision => {
-            this.lastRevision = revision;
-            this.snackBar.open((isDeveloper) ? 'Revised' : 'Amended', '', {
-              duration: 3000,
+          this.isUpdating = true;
+          this.service.makeNewRevision(this.rootNode.type, this.rootNode.manifestId).subscribe(_ => {
+            forkJoin([
+              this.service.getDtDetails(this.manifestId),
+              this.service.getPrevDtDetails(this.manifestId),
+            ]).subscribe(([dtDetails, prevDtDetails]) => {
+              this.manifestId = dtDetails.dtManifestId;
+              this.afterStateChanged(dtDetails.state, dtDetails.access);
+              this.prevDtDetails = prevDtDetails;
+              this.snackBar.open((isDeveloper) ? 'Revised' : 'Amended', '', {
+                duration: 3000,
+              });
+              this.reload();
             });
+          }, err => {
+            this.isUpdating = false;
+            throw err;
           });
-          this.reload();
         });
-      });
   }
 
   get userRoles(): string[] {
@@ -850,7 +871,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     return this.workingRelease;
   }
 
-  deleteNode(): void {
+  markAsDeleteNode(): void {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Delete core component?';
     dialogConfig.data.content = ['Are you sure you want to delete this core component?'];
@@ -862,17 +883,16 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
           return;
         }
         this.isUpdating = true;
-        this.service.deleteNode(this.type, this.manifestId)
-          .pipe(
-            finalize(() => {
-              this.isUpdating = false;
-            })
-          )
-          .subscribe(_ => {
+        this.service.updateState(this.type, this.manifestId, 'Deleted').subscribe({
+          next: () => {
             this.snackBar.open('Deleted', '', {duration: 3000});
-            this.router.navigateByUrl('/core_component');
-          }, error => {
-          });
+            this.router.navigateByUrl('/data_type');
+          },
+          error: err => {
+            this.isUpdating = false;
+            throw err;
+          },
+        });
       });
   }
 
@@ -888,19 +908,16 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
           return;
         }
         this.isUpdating = true;
-        const state = 'Purge';
-        this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state)
-          .pipe(
-            finalize(() => {
-              this.isUpdating = false;
-            })
-          )
-          .subscribe(resp => {
+        this.service.purge(this.type, this.manifestId).subscribe({
+          next: () => {
             this.snackBar.open('Purged', '', {duration: 3000});
-            this.location.back();
-            this.router.navigateByUrl('/core_component');
-          }, err => {
-          });
+            this.router.navigateByUrl('/data_type');
+          },
+          error: err => {
+            this.isUpdating = false;
+            throw err;
+          },
+        });
       });
   }
 
@@ -916,18 +933,21 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
           return;
         }
         this.isUpdating = true;
-        const state = 'WIP';
-        this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state)
-          .pipe(
-            finalize(() => {
-              this.isUpdating = false;
-            })
-          )
-          .subscribe(resp => {
-            this.afterStateChanged(resp.state, resp.access);
-            this.reload('Restored');
-          }, err => {
-          });
+        this.service.updateState(this.rootNode.type, this.rootNode.manifestId, 'WIP').subscribe({
+          next: () => {
+            this.snackBar.open('Restored', '', {duration: 3000});
+
+            this.service.getDtDetails(this.manifestId).subscribe({
+              next: dtDetails => this.afterStateChanged(dtDetails.state, dtDetails.access),
+              error: err => console.error(err),
+              complete: () => (this.isUpdating = false),
+            });
+          },
+          error: err => {
+            this.isUpdating = false;
+            throw err;
+          },
+        });
       });
   }
 
@@ -951,7 +971,14 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
       return;
     }
 
-    this.tagService.toggleTag(node.type, node.manifestId, tag.name).subscribe(_ => {
+    let call;
+    if (!this.contains(node, tag)) {
+      call = this.tagService.appendTag(node.type, node.manifestId, tag.tagId);
+    } else {
+      call = this.tagService.removeTag(node.type, node.manifestId, tag.tagId);
+    }
+
+    call.subscribe(_ => {
       if (this.contains(node, tag)) {
         node.tagList.splice(node.tagList.map(e => e.tagId).indexOf(tag.tagId), 1);
       } else {
@@ -1021,16 +1048,20 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
       this.dataSource.toggle(this.cursorNode);
     } else if ($event.key === 'o' || $event.key === 'O') {
       this.menuTriggerList.toArray().filter(e => !!e.menuData)
-        .filter(e => e.menuData.menuId === 'contextMenu').forEach(trigger => {
-        this.contextMenuItem = node;
-        trigger.openMenu();
-      });
+          .filter(e => e.menuData.menuId === 'contextMenu' && e.menuData.hashPath === node.hashPath)
+          .forEach(trigger => {
+            this.contextMenuItem = node;
+            if (!trigger.menuOpen) {
+              trigger.openMenu();
+            }
+          });
     } else if ($event.key === 'c' || $event.key === 'C') {
       this.menuTriggerList.toArray().filter(e => !!e.menuData)
-        .filter(e => e.menuData.menuId === 'contextMenu').forEach(trigger => {
-        this.contextMenuItem = node;
-        this.openComments(node.type, node);
-      });
+          .filter(e => e.menuData.menuId === 'contextMenu' && e.menuData.hashPath === node.hashPath)
+          .forEach(trigger => {
+            this.contextMenuItem = node;
+            this.openComments(node.type, node);
+          });
     } else if ($event.key === 'Enter') {
       this.onClick(this.cursorNode);
     } else {
@@ -1119,164 +1150,188 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     this.dataSource.toggle(node);
   }
 
-  hasTokenPrimitive(detail: CcDtNodeDetail | CcBdtScNodeDetail) {
-    if (detail instanceof CcDtNodeDetail) {
-      return (detail as CcDtNodeDetail).bdtPriRestriList.filter(e => e.xbtName === 'token').length > 0;
+  hasTokenPrimitive(detail: CcDtNodeInfo | CcDtScNodeInfo) {
+    if (detail instanceof CcDtNodeInfo) {
+      return (detail as CcDtNodeInfo).dtAwdPriList.filter(e => !!e.xbt && e.xbt.name === 'token').length > 0;
     } else {
-      return (detail as CcBdtScNodeDetail).bdtScPriRestriList.filter(e => e.xbtName === 'token').length > 0;
+      return (detail as CcDtScNodeInfo).dtScAwdPriList.filter(e => !!e.xbt && e.xbt.name === 'token').length > 0;
     }
   }
 
-  addValueDomain(detail: CcNodeDetail) {
-    if (detail instanceof CcDtNodeDetail) {
-      const ccBdtPriRestri = new CcBdtPriRestri((detail as CcDtNodeDetail), {
-        type: 'CodeList',
-        default: false
-      } as CcBdtPriRestri, this);
-      (detail as CcDtNodeDetail).bdtPriRestriList.push(ccBdtPriRestri);
+  addValueDomain(detail: CcNodeInfo) {
+    if (detail instanceof CcDtNodeInfo) {
+      const dtAwdPriDetails = new DtAwdPriDetails();
+      dtAwdPriDetails.codeList = new CodeListSummary();
+      dtAwdPriDetails.isDefault = false;
+      (detail as CcDtNodeInfo).dtAwdPriList.push(dtAwdPriDetails);
       this.onChangeValueDomain(detail);
-      this.restrictionDataSource.data = (detail as CcDtNodeDetail).valueDomains;
+      this.restrictionDataSource.data = (detail as CcDtNodeInfo).valueDomains;
     } else {
-      const ccBdtPriRestri = new CcBdtPriRestri((detail as CcBdtScNodeDetail), {
-        type: 'CodeList',
-        default: false
-      } as CcBdtPriRestri, this);
-      (detail as CcBdtScNodeDetail).bdtScPriRestriList.push(ccBdtPriRestri);
+      const dtScAwdPriDetails = new DtScAwdPriDetails();
+      dtScAwdPriDetails.codeList = new CodeListSummary();
+      dtScAwdPriDetails.isDefault = false;
+      (detail as CcDtScNodeInfo).dtScAwdPriList.push(dtScAwdPriDetails);
       this.onChangeValueDomain(detail);
-      this.restrictionDataSource.data = (detail as CcBdtScNodeDetail).valueDomains;
+      this.restrictionDataSource.data = (detail as CcDtScNodeInfo).valueDomains;
     }
   }
 
-  deleteValueDomain(detail: CcNodeDetail) {
+  deleteValueDomain(detail: CcNodeInfo) {
     if (!this.selectedValueDomain) {
       return;
     }
 
-    if (detail instanceof CcDtNodeDetail) {
-      if (this.selectedValueDomain.name === (detail as CcDtNodeDetail).defaultValueDomain.name) {
+    if (detail instanceof CcDtNodeInfo) {
+      const selectedDtAwdPri = this.selectedValueDomain.dtAwdPri;
+      const selectedValueDomainName = (!!selectedDtAwdPri.xbt) ? selectedDtAwdPri.xbt.name :
+          ((!!selectedDtAwdPri.codeList) ? selectedDtAwdPri.codeList.name :
+              selectedDtAwdPri.agencyIdList.name);
+
+      if (selectedValueDomainName === (detail as CcDtNodeInfo).defaultValueDomain.name) {
         this.snackBar.open('\'Default Value Domain\' cannot be discarded.', '', {duration: 3000});
         return;
       }
 
-      const newBdtPriRestriList = [];
-      for (const bdtPriRestri of (detail as CcDtNodeDetail).bdtPriRestriList) {
-        switch (this.selectedValueDomain.type) {
-          case 'Primitive':
-            if (this.selectedValueDomain.bdtPriRestri.xbtId !== bdtPriRestri.xbtId) {
-              newBdtPriRestriList.push(bdtPriRestri);
-            }
-            break;
-          case 'CodeList':
-            if (this.selectedValueDomain.bdtPriRestri.codeListManifestId !== bdtPriRestri.codeListManifestId) {
-              newBdtPriRestriList.push(bdtPriRestri);
-            }
-            break;
-          case 'AgencyIdList':
-            if (this.selectedValueDomain.bdtPriRestri.agencyIdListManifestId !== bdtPriRestri.agencyIdListManifestId) {
-              newBdtPriRestriList.push(bdtPriRestri);
-            }
-            break;
+      const newDtAwdPriList = [];
+      for (const dtAwdPri of (detail as CcDtNodeInfo).dtAwdPriList) {
+        const selected = this.selectedValueDomain.dtAwdPri;
+
+        if (selected.xbt) {
+          if (!dtAwdPri.xbt || dtAwdPri.xbt.xbtManifestId !== selected.xbt.xbtManifestId) {
+            newDtAwdPriList.push(dtAwdPri);
+          }
+        } else if (selected.codeList) {
+          if (!dtAwdPri.codeList || dtAwdPri.codeList.codeListManifestId !== selected.codeList.codeListManifestId) {
+            newDtAwdPriList.push(dtAwdPri);
+          }
+        } else if (selected.agencyIdList) {
+          if (!dtAwdPri.agencyIdList || dtAwdPri.agencyIdList.agencyIdListManifestId !== selected.agencyIdList.agencyIdListManifestId) {
+            newDtAwdPriList.push(dtAwdPri);
+          }
+        } else {
+          // If none of the value domains are selected, include all
+          newDtAwdPriList.push(dtAwdPri);
         }
       }
 
-      if ((detail as CcDtNodeDetail).defaultValueDomain.name === this.selectedValueDomain.name) {
-        (detail as CcDtNodeDetail).defaultValueDomain = 'token';
+      if ((detail as CcDtNodeInfo).defaultValueDomain.name === selectedValueDomainName) {
+        (detail as CcDtNodeInfo).defaultValueDomain = 'token';
       }
 
-      (detail as CcDtNodeDetail).bdtPriRestriList = newBdtPriRestriList;
+      (detail as CcDtNodeInfo).dtAwdPriList = newDtAwdPriList;
       this.onChangeValueDomain(detail);
-      this.restrictionDataSource.data = (detail as CcDtNodeDetail).valueDomains;
+      this.restrictionDataSource.data = (detail as CcDtNodeInfo).valueDomains;
     } else {
-      if (this.selectedValueDomain.name === (detail as CcBdtScNodeDetail).defaultValueDomain.name) {
+      const selectedDtScAwdPri = this.selectedValueDomain.dtScAwdPri;
+      const selectedValueDomainName = (!!selectedDtScAwdPri.xbt) ? selectedDtScAwdPri.xbt.name :
+          ((!!selectedDtScAwdPri.codeList) ? selectedDtScAwdPri.codeList.name :
+              selectedDtScAwdPri.agencyIdList.name);
+
+      if (selectedValueDomainName === (detail as CcDtScNodeInfo).defaultValueDomain.name) {
         this.snackBar.open('\'Default Value Domain\' cannot be discarded.', '', {duration: 3000});
         return;
       }
 
-      const newBdtScPriRestriList = [];
-      for (const bdtScPriRestri of (detail as CcBdtScNodeDetail).bdtScPriRestriList) {
-        switch (this.selectedValueDomain.type) {
-          case 'Primitive':
-            if (this.selectedValueDomain.bdtScPriRestri.xbtId !== bdtScPriRestri.xbtId) {
-              newBdtScPriRestriList.push(bdtScPriRestri);
-            }
-            break;
-          case 'CodeList':
-            if (this.selectedValueDomain.bdtScPriRestri.codeListManifestId !== bdtScPriRestri.codeListManifestId) {
-              newBdtScPriRestriList.push(bdtScPriRestri);
-            }
-            break;
-          case 'AgencyIdList':
-            if (this.selectedValueDomain.bdtScPriRestri.agencyIdListManifestId !== bdtScPriRestri.agencyIdListManifestId) {
-              newBdtScPriRestriList.push(bdtScPriRestri);
-            }
-            break;
+      const newDtScAwdPriList = [];
+      for (const dtScAwdPri of (detail as CcDtScNodeInfo).dtScAwdPriList) {
+        const selected = this.selectedValueDomain.dtScAwdPri;
+
+        if (selected.xbt) {
+          if (!dtScAwdPri.xbt || dtScAwdPri.xbt.xbtManifestId !== selected.xbt.xbtManifestId) {
+            newDtScAwdPriList.push(dtScAwdPri);
+          }
+        } else if (selected.codeList) {
+          if (!dtScAwdPri.codeList || dtScAwdPri.codeList.codeListManifestId !== selected.codeList.codeListManifestId) {
+            newDtScAwdPriList.push(dtScAwdPri);
+          }
+        } else if (selected.agencyIdList) {
+          if (!dtScAwdPri.agencyIdList || dtScAwdPri.agencyIdList.agencyIdListManifestId !== selected.agencyIdList.agencyIdListManifestId) {
+            newDtScAwdPriList.push(dtScAwdPri);
+          }
+        } else {
+          // If none of the value domains are selected, include all
+          newDtScAwdPriList.push(dtScAwdPri);
         }
       }
 
-      if ((detail as CcBdtScNodeDetail).defaultValueDomain.name === this.selectedValueDomain.name) {
-        (detail as CcBdtScNodeDetail).defaultValueDomain = 'token';
+      if ((detail as CcDtScNodeInfo).defaultValueDomain.name === selectedValueDomainName) {
+        (detail as CcDtScNodeInfo).defaultValueDomain = 'token';
       }
 
-      (detail as CcBdtScNodeDetail).bdtScPriRestriList = newBdtScPriRestriList;
+      (detail as CcDtScNodeInfo).dtScAwdPriList = newDtScAwdPriList;
       this.onChangeValueDomain(detail);
-      this.restrictionDataSource.data = (detail as CcBdtScNodeDetail).valueDomains;
+      this.restrictionDataSource.data = (detail as CcDtScNodeInfo).valueDomains;
     }
 
     this.selectedValueDomain = null;
     this.onChangeValueDomain(detail);
   }
 
-  filteredCodeLists(element: any): CodeListForList[] {
+  filteredCodeLists(element: any): CodeListSummary[] {
     let selfCodeListManifestId;
-    if (!!element.bdtPriRestri) {
-      selfCodeListManifestId = element.bdtPriRestri.codeListManifestId;
-    } else if (!!element.bdtScPriRestri) {
-      selfCodeListManifestId = element.bdtScPriRestri.codeListManifestId;
+    if (!!element.dtAwdPri) {
+      selfCodeListManifestId = element.dtAwdPri.codeList.codeListManifestId;
+    } else if (!!element.dtScAwdPri) {
+      selfCodeListManifestId = element.dtScAwdPri.codeList.codeListManifestId;
     }
 
-    const selectedCodeLists = this.restrictionDataSource.data.filter(e => e.type === 'CodeList').map(e => {
-      if (!!e.bdtPriRestri) {
-        return e.bdtPriRestri.codeListManifestId;
-      } else if (!!e.bdtScPriRestri) {
-        return e.bdtScPriRestri.codeListManifestId;
-      }
-      return undefined;
-    }).filter(e => !!e);
+    const selectedCodeLists = this.restrictionDataSource.data
+        .map(e => {
+          if (!!e.dtAwdPri) {
+            return e.dtAwdPri.codeList;
+          }
+          if (!!e.dtScAwdPri) {
+            return e.dtScAwdPri.codeList;
+          }
+          return undefined;
+        })
+        .filter(e => !!e).map(e => e.codeListManifestId);
 
     return this.codeLists.filter(e => !selectedCodeLists.includes(e.codeListManifestId) || e.codeListManifestId === selfCodeListManifestId);
   }
 
-  filteredAgencyIdLists(element: any): AgencyIdList[] {
+  filteredAgencyIdLists(element: any): AgencyIdListSummary[] {
     let selfAgencyIdListManifestId;
-    if (!!element.bdtPriRestri) {
-      selfAgencyIdListManifestId = element.bdtPriRestri.agencyIdListManifestId;
-    } else if (!!element.bdtScPriRestri) {
-      selfAgencyIdListManifestId = element.bdtScPriRestri.agencyIdListManifestId;
+    if (!!element.dtAwdPri && !!element.dtAwdPri.agencyIdList) {
+      selfAgencyIdListManifestId = element.dtAwdPri.agencyIdList.agencyIdListManifestId;
+    } else if (!!element.dtScAwdPri && !!element.dtScAwdPri.agencyIdList) {
+      selfAgencyIdListManifestId = element.dtScAwdPri.agencyIdList.agencyIdListManifestId;
     }
 
-    const selectedAgencyIdLists = this.restrictionDataSource.data.filter(e => e.type === 'AgencyIdList').map(e => {
-      if (!!e.bdtPriRestri) {
-        return e.bdtPriRestri.agencyIdListManifestId;
-      } else if (!!e.bdtScPriRestri) {
-        return e.bdtScPriRestri.agencyIdListManifestId;
-      }
-      return undefined;
-    }).filter(e => !!e);
+    const selectedAgencyIdLists = this.restrictionDataSource.data
+        .map(e => {
+          if (!!e.dtAwdPri) {
+            return e.dtAwdPri.agencyIdList;
+          }
+          if (!!e.dtScAwdPri) {
+            return e.dtScAwdPri.agencyIdList;
+          }
+          return undefined;
+        })
+        .filter(e => !!e).map(e => e.agencyIdListManifestId);
 
     return this.agencyIdLists.filter(e => !selectedAgencyIdLists.includes(e.agencyIdListManifestId) || e.agencyIdListManifestId === selfAgencyIdListManifestId);
   }
 
-  onChangeValueDomain(detail: CcNodeDetail) {
-    if (detail instanceof CcDtNodeDetail) {
-      (detail as CcDtNodeDetail).updateValueDomainGroup();
-      detail._node.fireChangeEvent('ValueDomain', (detail as CcDtNodeDetail).bdtPriRestriList);
+  compareCodeList(a: CodeListSummary, b: CodeListSummary): boolean {
+    return !!a && !!b && a.codeListManifestId === b.codeListManifestId;
+  }
+
+  compareAgencyIdList(a: AgencyIdListSummary, b: AgencyIdListSummary): boolean {
+    return !!a && !!b && a.agencyIdListManifestId === b.agencyIdListManifestId;
+  }
+
+  onChangeValueDomain(detail: CcNodeInfo) {
+    if (detail instanceof CcDtNodeInfo) {
+      (detail as CcDtNodeInfo).updateValueDomainGroup();
+      detail._node.fireChangeEvent('ValueDomain', (detail as CcDtNodeInfo).dtAwdPriList);
     } else {
-      (detail as CcBdtScNodeDetail).updateValueDomainGroup();
-      detail._node.fireChangeEvent('ValueDomain', (detail as CcBdtScNodeDetail).bdtScPriRestriList);
+      (detail as CcDtScNodeInfo).updateValueDomainGroup();
+      detail._node.fireChangeEvent('ValueDomain', (detail as CcDtScNodeInfo).dtScAwdPriList);
     }
   }
 
-  loadDefaultPrimitiveValues(detail: CcBdtScNodeDetail) {
+  loadDefaultPrimitiveValues(detail: CcDtScNodeInfo) {
     if (!detail.representationTerm) {
       this.restrictionDataSource.data = detail.valueDomains;
       return;
@@ -1290,11 +1345,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
 
     this.service.getPrimitiveListByRepresentationTerm(detail.representationTerm, detail.manifestId)
       .subscribe(resp => {
-        detail.bdtScPriRestriList = [];
-        resp.forEach(restri => {
-          const ccBdtPriRestri = new CcBdtPriRestri(detail, restri, this);
-          detail.bdtScPriRestriList.push(ccBdtPriRestri);
-        });
+        detail.dtScAwdPriList = resp;
         this.onChangeValueDomain(detail);
         this.restrictionDataSource.data = detail.valueDomains;
       });

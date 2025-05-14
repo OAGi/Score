@@ -56,7 +56,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AccRecord;
  * 
  * In OAGIS, all XSD extensions will be treated as a qualification of an ACC.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Acc extends TableImpl<AccRecord> {
 
     private static final long serialVersionUID = 1L;

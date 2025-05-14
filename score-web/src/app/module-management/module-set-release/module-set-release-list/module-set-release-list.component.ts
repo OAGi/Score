@@ -2,7 +2,7 @@ import {SelectionModel} from '@angular/cdk/collections';
 import {Location} from '@angular/common';
 import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {FormControl} from '@angular/forms';
-import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker} from '@angular/material/datepicker';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort, SortDirection} from '@angular/material/sort';
@@ -15,7 +15,7 @@ import {AuthService} from '../../../authentication/auth.service';
 import {PageRequest} from '../../../basis/basis';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 import {initFilter, loadLibrary, saveLibrary} from '../../../common/utility';
-import {ModuleSetRelease, ModuleSetReleaseListRequest} from '../../domain/module';
+import {ModuleSetReleaseListEntry, ModuleSetReleaseListRequest} from '../../domain/module';
 import {ModuleService} from '../../domain/module.service';
 import {UserToken} from '../../../authentication/domain/auth';
 import {
@@ -26,7 +26,7 @@ import {
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SearchBarComponent} from '../../../common/search-bar/search-bar.component';
-import {Library} from '../../../library-management/domain/library';
+import {LibrarySummary} from '../../../library-management/domain/library';
 import {LibraryService} from '../../../library-management/domain/library.service';
 
 @Component({
@@ -136,12 +136,12 @@ export class ModuleSetReleaseListComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<ModuleSetRelease>();
+  dataSource = new MatTableDataSource<ModuleSetReleaseListEntry>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
 
-  libraries: Library[] = [];
-  mappedLibraries: { library: Library, selected: boolean }[] = [];
+  libraries: LibrarySummary[] = [];
+  mappedLibraries: { library: LibrarySummary, selected: boolean }[] = [];
   loginIdList: string[] = [];
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
@@ -150,7 +150,7 @@ export class ModuleSetReleaseListComponent implements OnInit {
   request: ModuleSetReleaseListRequest;
   preferencesInfo: PreferencesInfo;
 
-  contextMenuItem: ModuleSetRelease;
+  contextMenuItem: ModuleSetReleaseListEntry;
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -174,7 +174,7 @@ export class ModuleSetReleaseListComponent implements OnInit {
     this.request = new ModuleSetReleaseListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
 
-    this.libraryService.getLibraries().subscribe(libraries => {
+    this.libraryService.getLibrarySummaryList().subscribe(libraries => {
       this.initLibraries(libraries);
 
       this.searchBar.showAdvancedSearch =
@@ -223,17 +223,6 @@ export class ModuleSetReleaseListComponent implements OnInit {
     return (userToken) ? userToken.roles : [];
   }
 
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
-  }
-
   reset(type: string) {
     switch (type) {
       case 'startDate':
@@ -254,7 +243,7 @@ export class ModuleSetReleaseListComponent implements OnInit {
     this.loadModuleSetReleaseList();
   }
 
-  initLibraries(libraries: Library[]) {
+  initLibraries(libraries: LibrarySummary[]) {
     this.libraries = libraries;
     if (this.libraries.length > 0) {
       const savedLibraryId = loadLibrary(this.auth.getUserToken());
@@ -273,7 +262,7 @@ export class ModuleSetReleaseListComponent implements OnInit {
     }
   }
 
-  onLibraryChange(library: Library) {
+  onLibraryChange(library: LibrarySummary) {
     this.request.library = library;
     saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
     this.onSearch();
@@ -296,7 +285,7 @@ export class ModuleSetReleaseListComponent implements OnInit {
         this.loading = false;
       })
     ).subscribe(resp => {
-      this.dataSource.data = resp.results;
+      this.dataSource.data = resp.list;
       this.paginator.length = resp.length;
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0],
@@ -308,14 +297,14 @@ export class ModuleSetReleaseListComponent implements OnInit {
   }
 
 
-  isEditable(item: ModuleSetRelease) {
+  isEditable(item: ModuleSetReleaseListEntry) {
     if (!item) {
       return false;
     }
     return true;
   }
 
-  discard(item: ModuleSetRelease) {
+  discard(item: ModuleSetReleaseListEntry) {
     if (!this.isEditable(item)) {
       return;
     }

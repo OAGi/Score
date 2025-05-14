@@ -1,9 +1,10 @@
 import {Injectable, OnInit} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {ContextCategory, ContextCategoryListRequest} from './context-category';
+import {ContextCategoryDetails, ContextCategoryListEntry, ContextCategoryListRequest, ContextCategorySummary} from './context-category';
 import {ContextScheme} from '../../context-scheme/domain/context-scheme';
 import {PageResponse} from '../../../basis/basis';
+import {map} from 'rxjs/operators';
 
 @Injectable()
 export class ContextCategoryService implements OnInit {
@@ -14,20 +15,25 @@ export class ContextCategoryService implements OnInit {
   ngOnInit() {
   }
 
-  getContextCategoryList(request: ContextCategoryListRequest): Observable<PageResponse<ContextCategory>> {
+  getContextCategorySummaries(): Observable<ContextCategorySummary[]> {
+    return this.http.get<ContextCategorySummary[]>('/api/context-categories/summaries');
+  }
+
+  getContextCategoryList(request: ContextCategoryListRequest): Observable<PageResponse<ContextCategoryListEntry>> {
     let params = new HttpParams()
-      .set('sortActive', request.page.sortActive)
-      .set('sortDirection', request.page.sortDirection)
-      .set('pageIndex', '' + request.page.pageIndex)
-      .set('pageSize', '' + request.page.pageSize);
-    if (request.updaterUsernameList.length > 0) {
-      params = params.set('updaterUsernameList', request.updaterUsernameList.join(','));
+        .set('pageIndex', '' + request.page.pageIndex)
+        .set('pageSize', '' + request.page.pageSize);
+
+    if (!!request.page.sortActive && !!request.page.sortDirection) {
+      params = params.set('orderBy', ((request.page.sortDirection === 'desc') ? '-' : '+') + request.page.sortActive);
     }
-    if (request.updatedDate.start) {
-      params = params.set('updateStart', '' + request.updatedDate.start.getTime());
+    if (request.updaterLoginIdList.length > 0) {
+      params = params.set('updaterLoginIdList', request.updaterLoginIdList.join(','));
     }
-    if (request.updatedDate.end) {
-      params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
+    if (!!request.updatedDate.start || !!request.updatedDate.end) {
+      params = params.set('lastUpdatedOn',
+          '[' + (!!request.updatedDate.start ? request.updatedDate.start.getTime() : '') + '~' +
+          (!!request.updatedDate.end ? request.updatedDate.end.getTime() : '') + ']');
     }
     if (request.filters.name) {
       params = params.set('name', request.filters.name);
@@ -36,26 +42,41 @@ export class ContextCategoryService implements OnInit {
       params = params.set('description', request.filters.description);
     }
 
-    return this.http.get<PageResponse<ContextCategory>>('/api/context_categories', {params});
+    return this.http.get<PageResponse<ContextCategoryListEntry>>('/api/context-categories', {params}).pipe(
+        map((res: PageResponse<ContextCategoryListEntry>) => ({
+          ...res,
+          list: res.list.map(elm => ({
+            ...elm,
+            created: {
+              ...elm.created,
+              when: new Date(elm.created.when),
+            },
+            lastUpdated: {
+              ...elm.lastUpdated,
+              when: new Date(elm.lastUpdated.when),
+            }
+          }))
+        }))
+    );
   }
 
   getContextSchemeFromCategoryId(id): Observable<ContextScheme[]> {
-    return this.http.get<ContextScheme[]>('/api/context_schemes_from_ctg/' + id);
+    return this.http.get<ContextScheme[]>('/api/context-categories/' + id + '/context-schemes/summaries');
   }
 
-  getContextCategory(id): Observable<ContextCategory> {
-    return this.http.get<ContextCategory>('/api/context_category/' + id);
+  getContextCategoryDetails(id): Observable<ContextCategoryDetails> {
+    return this.http.get<ContextCategoryDetails>('/api/context-categories/' + id);
   }
 
-  create(contextCategory: ContextCategory): Observable<any> {
-    return this.http.put('/api/context_category', {
-      name: contextCategory.name,
-      description: contextCategory.description
+  create(name: string, description: string): Observable<any> {
+    return this.http.post('/api/context-categories', {
+      name,
+      description
     });
   }
 
-  update(contextCategory: ContextCategory): Observable<any> {
-    return this.http.post('/api/context_category/' + contextCategory.contextCategoryId, {
+  update(contextCategory: ContextCategoryDetails): Observable<any> {
+    return this.http.put('/api/context-categories/' + contextCategory.contextCategoryId, {
       name: contextCategory.name,
       description: contextCategory.description
     });
@@ -63,10 +84,12 @@ export class ContextCategoryService implements OnInit {
 
   delete(...contextCategoryIds): Observable<any> {
     if (contextCategoryIds.length === 1) {
-      return this.http.delete('/api/context_category/' + contextCategoryIds[0]);
+      return this.http.delete('/api/context-categories/' + contextCategoryIds[0]);
     } else {
-      return this.http.post<any>('/api/context_category/delete', {
-        contextCategoryIdList: contextCategoryIds
+      return this.http.delete('/api/context-categories', {
+        body: {
+          contextCategoryIdList: contextCategoryIds
+        }
       });
     }
   }

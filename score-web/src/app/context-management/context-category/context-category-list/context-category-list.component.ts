@@ -1,13 +1,13 @@
 import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {ContextCategoryService} from '../domain/context-category.service';
-import {ContextCategory, ContextCategoryListRequest} from '../domain/context-category';
+import {ContextCategoryListEntry, ContextCategoryListRequest} from '../domain/context-category';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {PageRequest} from '../../../basis/basis';
-import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker} from '@angular/material/datepicker';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {initFilter} from '../../../common/utility';
@@ -125,7 +125,7 @@ export class ContextCategoryListComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<ContextCategory>();
+  dataSource = new MatTableDataSource<ContextCategoryListEntry>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
 
@@ -200,17 +200,6 @@ export class ContextCategoryListComponent implements OnInit {
   onChange(property?: string, source?) {
   }
 
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
-  }
-
   reset(type: string) {
     switch (type) {
       case 'startDate':
@@ -268,13 +257,13 @@ export class ContextCategoryListComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(row: ContextCategory) {
+  select(row: ContextCategoryListEntry) {
     if (!row.used) {
       this.selection.select(row.contextCategoryId);
     }
   }
 
-  toggle(row: ContextCategory) {
+  toggle(row: ContextCategoryListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row.contextCategoryId);
     } else {
@@ -282,7 +271,7 @@ export class ContextCategoryListComponent implements OnInit {
     }
   }
 
-  isSelected(row: ContextCategory) {
+  isSelected(row: ContextCategoryListEntry) {
     return this.selection.isSelected(row.contextCategoryId);
   }
 

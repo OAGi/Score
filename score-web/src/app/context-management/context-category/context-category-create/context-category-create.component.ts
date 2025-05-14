@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ContextCategoryService} from '../domain/context-category.service';
-import {ContextCategory} from '../domain/context-category';
+import {ContextCategoryDetails} from '../domain/context-category';
 import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
@@ -13,7 +13,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 export class ContextCategoryCreateComponent implements OnInit {
 
   title = 'Create Context Category';
-  contextCategory: ContextCategory;
+  contextCategory: ContextCategoryDetails;
 
   constructor(private service: ContextCategoryService,
               private location: Location,
@@ -23,10 +23,10 @@ export class ContextCategoryCreateComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.contextCategory = new ContextCategory();
+    this.contextCategory = new ContextCategoryDetails();
   }
 
-  isDisabled(contextCategory: ContextCategory) {
+  isDisabled(contextCategory: ContextCategoryDetails) {
     return contextCategory.name === undefined || contextCategory.name === '';
   }
 
@@ -35,7 +35,7 @@ export class ContextCategoryCreateComponent implements OnInit {
   }
 
   create() {
-    this.service.create(this.contextCategory).subscribe(_ => {
+    this.service.create(this.contextCategory.name, this.contextCategory.description).subscribe(_ => {
       this.snackBar.open('Created', '', {
         duration: 3000,
       });

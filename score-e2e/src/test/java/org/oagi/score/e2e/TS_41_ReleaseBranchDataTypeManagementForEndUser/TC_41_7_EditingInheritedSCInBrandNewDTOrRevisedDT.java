@@ -9,7 +9,7 @@ import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.DTViewEditPage;
-import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.oagi.score.e2e.page.core_component.ViewEditDataTypePage;
 import org.openqa.selenium.WebElement;
 
 import java.time.Duration;
@@ -49,18 +49,22 @@ public class TC_41_7_EditingInheritedSCInBrandNewDTOrRevisedDT extends BaseTest 
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
 
-            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("CCTS Data Type Catalogue v3");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "3.1");
+
+            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
             branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.8");
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA, library);
 
-            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
-            DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, endUserA, namespace, "WIP");
+            DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, baseCDT, endUserA, namespace, "WIP");
             dtForTesting.add(randomBDT);
 
-            DTObject derivedBDTLevelOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(randomBDT, endUserA, namespace, "WIP");
+            DTObject derivedBDTLevelOne = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, randomBDT, endUserA, namespace, "WIP");
             derivedBDTs.put(randomBDT, derivedBDTLevelOne);
 
-            DTObject derivedBDTLevelTwo = getAPIFactory().getCoreComponentAPI().createRandomBDT(derivedBDTLevelOne, endUserA, namespace, "WIP");
+            DTObject derivedBDTLevelTwo = getAPIFactory().getCoreComponentAPI().createRandomBDT(branch, derivedBDTLevelOne, endUserA, namespace, "WIP");
             derivedBDTs.put(derivedBDTLevelOne, derivedBDTLevelTwo);
 
             codeList = getAPIFactory().getCodeListAPI().
@@ -68,9 +72,9 @@ public class TC_41_7_EditingInheritedSCInBrandNewDTOrRevisedDT extends BaseTest 
         }
 
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
-        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ViewEditDataTypePage viewEditDataTypePage = homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
         for (DTObject dt : dtForTesting) {
-            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+            DTViewEditPage dtViewEditPage = viewEditDataTypePage.openDTViewEditPageByManifestID(dt.getDtManifestId());
             dtViewEditPage.addSupplementaryComponent("/" + dt.getDen());
             waitFor(Duration.ofMillis(3000L));
             DTSCObject dtSC = getAPIFactory().getCoreComponentAPI().getNewlyCreatedSCForDT(dt.getDtId(), branch.getReleaseNumber());
@@ -80,7 +84,7 @@ public class TC_41_7_EditingInheritedSCInBrandNewDTOrRevisedDT extends BaseTest 
             assertTrue(supplementaryComponentNode.isDisplayed());
             DTViewEditPage.SupplementaryComponentPanel SCPanel = dtViewEditPage.getSCPanel(supplementaryComponentNode);
             dtViewEditPage.showValueDomain();
-            List<String> representationTermsForCDTs = getAPIFactory().getCoreComponentAPI().getRepresentationTermsForCDTs(branch.getReleaseNumber());
+            List<String> representationTermsForCDTs = getAPIFactory().getCoreComponentAPI().getRepresentationTermsForCDTs("3.1");
             String representationTerm = SCPanel.getRepresentationSelectFieldValue();
             List<String> valueDomains = getAPIFactory().getCoreComponentAPI().getValueDomainsByCDTRepresentationTerm(representationTerm);
             String defaultValueDomain = getAPIFactory().getCoreComponentAPI().getDefaultValueDomainByCDTRepresentationTerm(representationTerm);
@@ -108,7 +112,7 @@ public class TC_41_7_EditingInheritedSCInBrandNewDTOrRevisedDT extends BaseTest 
 
             DTObject derivedDTLevelOne = derivedBDTs.get(dt);
             homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-            viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(derivedDTLevelOne.getDen(), branch.getReleaseNumber());
+            viewEditDataTypePage.openDTViewEditPageByManifestID(derivedDTLevelOne.getDtManifestId());
             supplementaryComponentNode = dtViewEditPage.getNodeByPath("/" + derivedDTLevelOne.getDen() + "/" + dtSCName);
             assertTrue(supplementaryComponentNode.isDisplayed());
             SCPanel = dtViewEditPage.getSCPanel(supplementaryComponentNode);
@@ -169,8 +173,8 @@ public class TC_41_7_EditingInheritedSCInBrandNewDTOrRevisedDT extends BaseTest 
              */
 
             DTObject derivedDTLevelTwo = derivedBDTs.get(derivedDTLevelOne);
-            homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-            viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(derivedDTLevelTwo.getDen(), branch.getReleaseNumber());
+            homePage.getCoreComponentMenu().openViewEditDataTypeSubMenu();
+            viewEditDataTypePage.openDTViewEditPageByManifestID(derivedDTLevelTwo.getDtManifestId());
             supplementaryComponentNode = dtViewEditPage.getNodeByPath("/" + derivedDTLevelTwo.getDen() + "/" + dtSCName);
             assertTrue(supplementaryComponentNode.isDisplayed());
             SCPanel = dtViewEditPage.getSCPanel(supplementaryComponentNode);

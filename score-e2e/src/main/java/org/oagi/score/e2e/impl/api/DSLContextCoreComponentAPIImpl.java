@@ -556,9 +556,9 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
     }
 
     @Override
-    public BCCPObject createRandomBCCP(DTObject dataType, AppUserObject creator, NamespaceObject namespace, String state) {
+    public BCCPObject createRandomBCCP(ReleaseObject branch, DTObject dataType, AppUserObject creator, NamespaceObject namespace, String state) {
         BCCPObject bccp = BCCPObject.createRandonBCCP(dataType, creator, namespace, state);
-        bccp.setReleaseId(dataType.getReleaseId());
+        bccp.setReleaseId(branch.getReleaseId());
         BccpRecord bccpRecord = new BccpRecord();
         bccpRecord.setGuid(bccp.getGuid());
         bccpRecord.setPropertyTerm(bccp.getPropertyTerm());
@@ -601,7 +601,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
 
         BccpManifestRecord bccpManifestRecord = new BccpManifestRecord();
 
-        bccpManifestRecord.setReleaseId(ULong.valueOf(dataType.getReleaseId()));
+        bccpManifestRecord.setReleaseId(ULong.valueOf(branch.getReleaseId()));
         bccpManifestRecord.setBccpId(bccpId);
         bccpManifestRecord.setDen(bccp.getDen());
         bccpManifestRecord.setLogId(logId);
@@ -651,15 +651,9 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
     }
 
     @Override
-    public DTObject createRandomBDT(DTObject baseDataType, AppUserObject creator, NamespaceObject namespace, String state) {
-        return createRandomBDT(baseDataType, creator, namespace, state, ReferenceSpec.CCTS_DT_v3_1);
-    }
-
-    @Override
-    public DTObject createRandomBDT(DTObject baseDataType, AppUserObject creator, NamespaceObject namespace, String state,
-                                    ReferenceSpec referenceSpec) {
-        DTObject bdt = DTObject.createRandomDT(baseDataType, creator, namespace, state);
-        bdt.setReleaseId(baseDataType.getReleaseId());
+    public DTObject createRandomBDT(ReleaseObject release, DTObject baseDataType, AppUserObject creator, NamespaceObject namespace, String state) {
+        DTObject bdt = DTObject.createRandomDT(release, baseDataType, creator, namespace, state);
+        bdt.setReleaseId(release.getReleaseId());
         DtRecord dtRecord = new DtRecord();
         dtRecord.setGuid(bdt.getGuid());
         dtRecord.setDataTypeTerm(bdt.getDataTypeTerm());
@@ -699,7 +693,6 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .fetchOne().getLogId();
 
         DtManifestRecord bdtManifestRecord = new DtManifestRecord();
-
         bdtManifestRecord.setReleaseId(ULong.valueOf(bdt.getReleaseId()));
         bdtManifestRecord.setDtId(bdtId);
         bdtManifestRecord.setDen(bdt.getDen());
@@ -712,35 +705,70 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .fetchOne().getDtManifestId();
         bdt.setDtManifestId(dtManifestId.toBigInteger());
 
-        boolean isCdt = baseDataType.getBasedDtManifestId() == null;
-        if (isCdt) {
-            List<CdtAwdPriRecord> cdtAwdPriList = dslContext.selectFrom(CDT_AWD_PRI)
-                    .where(CDT_AWD_PRI.CDT_ID.eq(ULong.valueOf(baseDataType.getDtId())))
-                    .fetch();
-            for (CdtAwdPriRecord cdtAwdPri : cdtAwdPriList) {
-                List<CdtAwdPriXpsTypeMapRecord> cdtAwdPriXpsTypeMapList = dslContext.selectFrom(CDT_AWD_PRI_XPS_TYPE_MAP)
-                        .where(CDT_AWD_PRI_XPS_TYPE_MAP.CDT_AWD_PRI_ID.eq(cdtAwdPri.getCdtAwdPriId()))
-                        .fetch();
+        ReleaseObject baseDataTypeRelease = apiFactory.getReleaseAPI().getReleaseById(baseDataType.getReleaseId());
+        LibraryObject baseDataTypeLibrary = apiFactory.getLibraryAPI().getLibraryById(baseDataTypeRelease.getLibraryId());
 
-                for (CdtAwdPriXpsTypeMapRecord cdtAwdPriXpsTypeMap : cdtAwdPriXpsTypeMapList) {
-                    BdtPriRestriRecord bdtPriRestri = new BdtPriRestriRecord();
-                    bdtPriRestri.setBdtManifestId(dtManifestId);
-                    bdtPriRestri.setCdtAwdPriXpsTypeMapId(cdtAwdPriXpsTypeMap.getCdtAwdPriXpsTypeMapId());
-                    bdtPriRestri.setIsDefault(cdtAwdPriXpsTypeMap.getIsDefault());
-                    dslContext.insertInto(BDT_PRI_RESTRI)
-                            .set(bdtPriRestri).execute();
-                }
+        List<DtAwdPriRecord> dtAwdPriList = dslContext.selectFrom(DT_AWD_PRI)
+                .where(and(
+                        DT_AWD_PRI.RELEASE_ID.eq(ULong.valueOf(baseDataTypeRelease.getReleaseId())),
+                        DT_AWD_PRI.DT_ID.eq(ULong.valueOf(baseDataType.getDtId()))
+                ))
+                .fetch();
+        for (DtAwdPriRecord dtAwdPri : dtAwdPriList) {
+            DtAwdPriRecord copiedDtAwdPri = dtAwdPri.copy();
+            copiedDtAwdPri.setDtAwdPriId(null);
+            copiedDtAwdPri.setReleaseId(bdtManifestRecord.getReleaseId());
+            copiedDtAwdPri.setDtId(bdtManifestRecord.getDtId());
+            if (copiedDtAwdPri.getXbtManifestId() != null) {
+                copiedDtAwdPri.setXbtManifestId(
+                        dslContext.select(XBT_MANIFEST.XBT_MANIFEST_ID)
+                                .from(XBT_MANIFEST)
+                                .where(and(
+                                        XBT_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId())),
+                                        XBT_MANIFEST.XBT_ID.eq(
+                                                dslContext.select(XBT_MANIFEST.XBT_ID)
+                                                        .from(XBT_MANIFEST)
+                                                        .where(XBT_MANIFEST.XBT_MANIFEST_ID.eq(copiedDtAwdPri.getXbtManifestId()))
+                                        )
+                                ))
+                                .fetchOneInto(ULong.class));
             }
-        } else {
-            List<BdtPriRestriRecord> bdtPriRestriList = dslContext.selectFrom(BDT_PRI_RESTRI)
-                    .where(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(ULong.valueOf(baseDataType.getDtManifestId())))
-                    .fetch();
-            bdtPriRestriList.stream().forEach(bdtPriRestri -> {
-                bdtPriRestri.setBdtPriRestriId(null);
-                bdtPriRestri.setBdtManifestId(dtManifestId);
-                dslContext.insertInto(BDT_PRI_RESTRI)
-                        .set(bdtPriRestri).execute();
-            });
+            if (copiedDtAwdPri.getCodeListManifestId() != null) {
+                copiedDtAwdPri.setCodeListManifestId(
+                        dslContext.select(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID)
+                                .from(CODE_LIST_MANIFEST)
+                                .where(and(
+                                        CODE_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId())),
+                                        CODE_LIST_MANIFEST.CODE_LIST_ID.eq(
+                                                dslContext.select(CODE_LIST_MANIFEST.CODE_LIST_ID)
+                                                        .from(CODE_LIST_MANIFEST)
+                                                        .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(copiedDtAwdPri.getCodeListManifestId()))
+                                        )
+                                ))
+                                .fetchOneInto(ULong.class));
+            }
+            if (copiedDtAwdPri.getAgencyIdListManifestId() != null) {
+                copiedDtAwdPri.setAgencyIdListManifestId(
+                        dslContext.select(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID)
+                                .from(AGENCY_ID_LIST_MANIFEST)
+                                .where(and(
+                                        AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId())),
+                                        AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(
+                                                dslContext.select(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID)
+                                                        .from(AGENCY_ID_LIST_MANIFEST)
+                                                        .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(copiedDtAwdPri.getAgencyIdListManifestId()))
+                                        )
+                                ))
+                                .fetchOneInto(ULong.class));
+            }
+            if (copiedDtAwdPri.getXbtManifestId() == null &&
+                copiedDtAwdPri.getCodeListManifestId() == null &&
+                copiedDtAwdPri.getAgencyIdListManifestId() == null) {
+                continue;
+            }
+            dslContext.insertInto(DT_AWD_PRI)
+                    .set(copiedDtAwdPri)
+                    .execute();
         }
 
         dslContext.selectFrom(DT_SC_MANIFEST)
@@ -754,33 +782,6 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                     dtSc.setDtScId(null);
                     dtSc.setBasedDtScId(oldDtScId);
                     dtSc.setOwnerDtId(bdtId);
-                    if (isCdt) {
-                        RefSpecRecord refSpec = null;
-                        switch (referenceSpec) {
-                            case CCTS_DT_v3_1:
-                                refSpec = dslContext.selectFrom(REF_SPEC)
-                                        .where(REF_SPEC.SPEC.eq("CCTS DT v3.1"))
-                                        .fetchOne();
-                                break;
-                            case ISO_15000_5:
-                                refSpec = dslContext.selectFrom(REF_SPEC)
-                                        .where(REF_SPEC.SPEC.eq("ISO 15000:5 (2014) CCT"))
-                                        .fetchOne();
-                                break;
-                        }
-                        if (refSpec != null) {
-                            CdtScRefSpecRecord cdtScRefSpec = dslContext.selectFrom(CDT_SC_REF_SPEC)
-                                    .where(and(
-                                            CDT_SC_REF_SPEC.REF_SPEC_ID.eq(refSpec.getRefSpecId()),
-                                            CDT_SC_REF_SPEC.CDT_SC_ID.eq(oldDtScId)
-                                    ))
-                                    .fetchOptional().orElse(null);
-                            if (cdtScRefSpec == null) {
-                                dtSc.setCardinalityMax(0);
-                            }
-                        }
-                    }
-
                     dtSc.setCreatedBy(ULong.valueOf(bdt.getCreatedBy()));
                     dtSc.setOwnerUserId(ULong.valueOf(bdt.getOwnerUserId()));
                     dtSc.setLastUpdatedBy(ULong.valueOf(bdt.getLastUpdatedBy()));
@@ -795,6 +796,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                     ULong oldDtScManifestId = dtScManifest.getDtScManifestId();
 
                     dtScManifest.setDtScManifestId(null);
+                    dtScManifest.setReleaseId(ULong.valueOf(bdt.getReleaseId()));
                     dtScManifest.setBasedDtScManifestId(oldDtScManifestId);
                     dtScManifest.setDtScId(dtSc.getDtScId());
                     dtScManifest.setOwnerDtManifestId(dtManifestId);
@@ -804,35 +806,67 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                                     .returning(DT_SC_MANIFEST.DT_SC_MANIFEST_ID).fetchOne().getDtScManifestId()
                     );
 
-                    if (isCdt) {
-                        List<CdtScAwdPriRecord> cdtScAwdPriList = dslContext.selectFrom(CDT_SC_AWD_PRI)
-                                .where(CDT_SC_AWD_PRI.CDT_SC_ID.eq(oldDtScId))
-                                .fetch();
-                        for (CdtScAwdPriRecord cdtScAwdPri : cdtScAwdPriList) {
-                            List<CdtScAwdPriXpsTypeMapRecord> cdtScAwdPriXpsTypeMapList = dslContext.selectFrom(CDT_SC_AWD_PRI_XPS_TYPE_MAP)
-                                    .where(CDT_SC_AWD_PRI_XPS_TYPE_MAP.CDT_SC_AWD_PRI_ID.eq(cdtScAwdPri.getCdtScAwdPriId()))
-                                    .fetch();
-                            for (CdtScAwdPriXpsTypeMapRecord cdtScAwdPriXpsTypeMap : cdtScAwdPriXpsTypeMapList) {
-                                BdtScPriRestriRecord bdtScPriRestri = new BdtScPriRestriRecord();
-                                bdtScPriRestri.setBdtScManifestId(dtScManifest.getDtScManifestId());
-                                bdtScPriRestri.setCdtScAwdPriXpsTypeMapId(cdtScAwdPriXpsTypeMap.getCdtScAwdPriXpsTypeMapId());
-                                bdtScPriRestri.setIsDefault(cdtScAwdPriXpsTypeMap.getIsDefault());
-                                dslContext.insertInto(BDT_SC_PRI_RESTRI)
-                                        .set(bdtScPriRestri)
-                                        .execute();
-                            }
+                    List<DtScAwdPriRecord> dtScAwdPriList = dslContext.selectFrom(DT_SC_AWD_PRI)
+                            .where(and(
+                                    DT_SC_AWD_PRI.RELEASE_ID.eq(ULong.valueOf(baseDataTypeRelease.getReleaseId())),
+                                    DT_SC_AWD_PRI.DT_SC_ID.eq(oldDtScId)
+                            ))
+                            .fetch();
+                    for (DtScAwdPriRecord dtScAwdPri : dtScAwdPriList) {
+                        DtScAwdPriRecord copiedDtScAwdPri = dtScAwdPri.copy();
+                        copiedDtScAwdPri.setDtScAwdPriId(null);
+                        copiedDtScAwdPri.setReleaseId(dtScManifest.getReleaseId());
+                        copiedDtScAwdPri.setDtScId(dtScManifest.getDtScId());
+                        if (copiedDtScAwdPri.getXbtManifestId() != null) {
+                            copiedDtScAwdPri.setXbtManifestId(
+                                    dslContext.select(XBT_MANIFEST.XBT_MANIFEST_ID)
+                                            .from(XBT_MANIFEST)
+                                            .where(and(
+                                                    XBT_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId())),
+                                                    XBT_MANIFEST.XBT_ID.eq(
+                                                            dslContext.select(XBT_MANIFEST.XBT_ID)
+                                                                    .from(XBT_MANIFEST)
+                                                                    .where(XBT_MANIFEST.XBT_MANIFEST_ID.eq(copiedDtScAwdPri.getXbtManifestId()))
+                                                    )
+                                            ))
+                                            .fetchOneInto(ULong.class));
                         }
-                    } else {
-                        List<BdtScPriRestriRecord> bdtScPriRestriList = dslContext.selectFrom(BDT_SC_PRI_RESTRI)
-                                .where(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(oldDtScManifestId))
-                                .fetch();
-                        bdtScPriRestriList.stream().forEach(bdtScPriRestri -> {
-                            bdtScPriRestri.setBdtScPriRestriId(null);
-                            bdtScPriRestri.setBdtScManifestId(dtScManifest.getDtScManifestId());
-                            dslContext.insertInto(BDT_SC_PRI_RESTRI)
-                                    .set(bdtScPriRestri)
-                                    .execute();
-                        });
+                        if (copiedDtScAwdPri.getCodeListManifestId() != null) {
+                            copiedDtScAwdPri.setCodeListManifestId(
+                                    dslContext.select(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID)
+                                            .from(CODE_LIST_MANIFEST)
+                                            .where(and(
+                                                    CODE_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId())),
+                                                    CODE_LIST_MANIFEST.CODE_LIST_ID.eq(
+                                                            dslContext.select(CODE_LIST_MANIFEST.CODE_LIST_ID)
+                                                                    .from(CODE_LIST_MANIFEST)
+                                                                    .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(copiedDtScAwdPri.getCodeListManifestId()))
+                                                    )
+                                            ))
+                                            .fetchOneInto(ULong.class));
+                        }
+                        if (copiedDtScAwdPri.getAgencyIdListManifestId() != null) {
+                            copiedDtScAwdPri.setAgencyIdListManifestId(
+                                    dslContext.select(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID)
+                                            .from(AGENCY_ID_LIST_MANIFEST)
+                                            .where(and(
+                                                    AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId())),
+                                                    AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(
+                                                            dslContext.select(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID)
+                                                                    .from(AGENCY_ID_LIST_MANIFEST)
+                                                                    .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(copiedDtScAwdPri.getAgencyIdListManifestId()))
+                                                    )
+                                            ))
+                                            .fetchOneInto(ULong.class));
+                        }
+                        if (copiedDtScAwdPri.getXbtManifestId() == null &&
+                            copiedDtScAwdPri.getCodeListManifestId() == null &&
+                            copiedDtScAwdPri.getAgencyIdListManifestId() == null) {
+                            continue;
+                        }
+                        dslContext.insertInto(DT_SC_AWD_PRI)
+                                .set(copiedDtScAwdPri)
+                                .execute();
                     }
                 });
 
@@ -1580,9 +1614,10 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .join(DT_MANIFEST).on(DT_MANIFEST.DT_MANIFEST_ID.eq(DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID))
                 .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                 .join(DT).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
-                .join(CDT_SC_REF_SPEC).on(DT_SC.DT_SC_ID.eq(CDT_SC_REF_SPEC.CDT_SC_ID))
-                .join(REF_SPEC).on(CDT_SC_REF_SPEC.REF_SPEC_ID.eq(REF_SPEC.REF_SPEC_ID))
-                .where(DT.DT_ID.eq(ULong.valueOf(dtID)).and(RELEASE.RELEASE_NUM.eq(release)).and(REF_SPEC.SPEC.eq("CCTS DT v3.1")))
+                .where(and(
+                        DT.DT_ID.eq(ULong.valueOf(dtID)),
+                        RELEASE.RELEASE_NUM.eq(release)
+                ))
                 .fetchMany();
         for (Result<Record> r : result) {
             for (int i = 0; i < r.size(); i++) {
@@ -1602,9 +1637,13 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .join(DT).on(DT.DT_ID.eq(DT_SC.OWNER_DT_ID))
                 .join(DT_MANIFEST).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
                 .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(and(DT.DT_ID.eq(ULong.valueOf(dataType.getDtId())),
-                        RELEASE.RELEASE_NUM.eq(release), DT_SC.OBJECT_CLASS_TERM.eq(objectClassTerm), DT_SC.REPRESENTATION_TERM.eq(representationTerm),
-                        DT_SC.PROPERTY_TERM.eq(propertyTerm)))
+                .where(and(
+                        DT.DT_ID.eq(ULong.valueOf(dataType.getDtId())),
+                        RELEASE.RELEASE_NUM.eq(release),
+                        DT_SC.OBJECT_CLASS_TERM.eq(objectClassTerm),
+                        DT_SC.REPRESENTATION_TERM.eq(representationTerm),
+                        DT_SC.PROPERTY_TERM.eq(propertyTerm)
+                ))
                 .fetchMany();
         if (result.size() > 1) {
             return false;
@@ -1615,37 +1654,59 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
     public List<String> getRepresentationTermsForCDTs(String release) {
         List<String> representationTerms = new ArrayList<>();
 
-        representationTerms = dslContext.select(DT.REPRESENTATION_TERM)
+        representationTerms = dslContext.selectDistinct(DT.REPRESENTATION_TERM)
                 .from(DT)
                 .join(DT_MANIFEST).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
                 .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .join(CDT_REF_SPEC).on(DT.DT_ID.eq(CDT_REF_SPEC.CDT_ID))
-                .join(REF_SPEC).on(CDT_REF_SPEC.REF_SPEC_ID.eq(REF_SPEC.REF_SPEC_ID))
-                .where(and(RELEASE.RELEASE_NUM.eq(release), REF_SPEC.SPEC.eq("CCTS DT v3.1")))
+                .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
+                .where(and(
+                        RELEASE.RELEASE_NUM.eq(release),
+                        LIBRARY.NAME.eq("CCTS Data Type Catalogue v3")
+                ))
                 .fetch(DT.REPRESENTATION_TERM);
         return representationTerms;
     }
 
     @Override
     public List<String> getValueDomainsByCDTRepresentationTerm(String representationTerm) {
-        List<String> valueDomains = new ArrayList<>();
-
-        valueDomains = dslContext.select()
-                .from(DT)
-                .join(CDT_AWD_PRI).on(DT.DT_ID.eq(CDT_AWD_PRI.CDT_ID))
-                .join(CDT_PRI).on(CDT_AWD_PRI.CDT_PRI_ID.eq(CDT_PRI.CDT_PRI_ID))
-                .where(DT.REPRESENTATION_TERM.eq(representationTerm))
-                .fetch(CDT_PRI.NAME);
-        return valueDomains;
+        return dslContext.selectDistinct(CDT_PRI.NAME)
+                .from(LIBRARY)
+                .join(RELEASE).on(LIBRARY.LIBRARY_ID.eq(RELEASE.LIBRARY_ID))
+                .join(DT_MANIFEST).on(RELEASE.RELEASE_ID.eq(DT_MANIFEST.RELEASE_ID))
+                .join(DT).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
+                .join(DT_AWD_PRI).on(and(
+                        DT_AWD_PRI.RELEASE_ID.eq(RELEASE.RELEASE_ID),
+                        DT_AWD_PRI.DT_ID.eq(DT.DT_ID)
+                ))
+                .join(CDT_PRI).on(DT_AWD_PRI.CDT_PRI_ID.eq(CDT_PRI.CDT_PRI_ID))
+                .join(XBT_MANIFEST).on(DT_AWD_PRI.XBT_MANIFEST_ID.eq(XBT_MANIFEST.XBT_MANIFEST_ID))
+                .where(and(
+                        LIBRARY.NAME.eq("CCTS Data Type Catalogue v3"),
+                        RELEASE.RELEASE_NUM.eq("3.1"),
+                        DT.REPRESENTATION_TERM.eq(representationTerm)
+                ))
+                .fetchInto(String.class);
     }
 
     @Override
     public String getDefaultValueDomainByCDTRepresentationTerm(String representationTerm) {
         return dslContext.select(CDT_PRI.NAME)
-                .from(DT)
-                .join(CDT_AWD_PRI).on(DT.DT_ID.eq(CDT_AWD_PRI.CDT_ID))
-                .join(CDT_PRI).on(CDT_AWD_PRI.CDT_PRI_ID.eq(CDT_PRI.CDT_PRI_ID))
-                .where(DT.REPRESENTATION_TERM.eq(representationTerm).and(CDT_AWD_PRI.IS_DEFAULT.eq((byte) 1)))
+                .from(LIBRARY)
+                .join(RELEASE).on(LIBRARY.LIBRARY_ID.eq(RELEASE.LIBRARY_ID))
+                .join(DT_MANIFEST).on(RELEASE.RELEASE_ID.eq(DT_MANIFEST.RELEASE_ID))
+                .join(DT).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
+                .join(DT_AWD_PRI).on(and(
+                        DT_AWD_PRI.RELEASE_ID.eq(RELEASE.RELEASE_ID),
+                        DT_AWD_PRI.DT_ID.eq(DT.DT_ID)
+                ))
+                .join(CDT_PRI).on(DT_AWD_PRI.CDT_PRI_ID.eq(CDT_PRI.CDT_PRI_ID))
+                .join(XBT_MANIFEST).on(DT_AWD_PRI.XBT_MANIFEST_ID.eq(XBT_MANIFEST.XBT_MANIFEST_ID))
+                .where(and(
+                        LIBRARY.NAME.eq("CCTS Data Type Catalogue v3"),
+                        RELEASE.RELEASE_NUM.eq("3.1"),
+                        DT.REPRESENTATION_TERM.eq(representationTerm),
+                        DT_AWD_PRI.IS_DEFAULT.eq((byte) 1)
+                ))
                 .fetchOneInto(String.class);
     }
 

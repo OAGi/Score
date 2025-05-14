@@ -133,7 +133,7 @@
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
                   <mat-label>Owner</mat-label>
-                  <mat-select [(ngModel)]="request.ownerLoginIds" multiple>
+                  <mat-select [(ngModel)]="request.ownerLoginIdList" multiple>
                     <mat-option>
                       <ngx-mat-select-search [formControl]="loginIdListFilterCtrl"
                                              [placeholderLabel]="'Search...'"
@@ -148,7 +148,7 @@
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
                   <mat-label>Updater</mat-label>
-                  <mat-select [(ngModel)]="request.updaterLoginIds" multiple>
+                  <mat-select [(ngModel)]="request.updaterLoginIdList" multiple>
                     <mat-option>
                       <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
                                              [placeholderLabel]="'Search...'"
@@ -164,8 +164,7 @@
                 <mat-form-field>
                   <mat-label>Updated start date</mat-label>
                   <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
-                         [max]="request.updatedDate.end"
-                         (dateInput)="onDateEvent('startDate', $event)">
+                         [(ngModel)]="request.updatedDate.start" [max]="request.updatedDate.end">
                   <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
                   <mat-datepicker #dateStart></mat-datepicker>
                 </mat-form-field>
@@ -181,8 +180,7 @@
                 <mat-form-field>
                   <mat-label>Updated end date</mat-label>
                   <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
-                         [min]="request.updatedDate.start"
-                         (dateInput)="onDateEvent('endDate', $event)">
+                         [(ngModel)]="request.updatedDate.end" [min]="request.updatedDate.start">
                   <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
                   <mat-datepicker #dateEnd></mat-datepicker>
                 </mat-form-field>
@@ -227,7 +225,7 @@
                 </mat-checkbox>
               </th>
               <td mat-cell *matCellDef="let row">
-                <mat-checkbox (click)="$event.stopPropagation()" [disabled]="!isAdmin && row.owner !== username"
+                <mat-checkbox (click)="$event.stopPropagation()" [disabled]="!isAdmin && row.owner.loginId !== username"
                               (change)="$event ? toggle(row) : null"
                               [checked]="isSelected(row)">
                 </mat-checkbox>
@@ -251,7 +249,7 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Branch')" (onResize)="onResizeWidth($event)"> Branch</th>
               <td mat-cell *matCellDef="let element">
-                <span [matTooltip]="element.releaseNum">{{ element.releaseNum }}</span>
+                <span [matTooltip]="element.release.releaseNum">{{ element.release.releaseNum }}</span>
               </td>
             </ng-container>
 
@@ -259,7 +257,7 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('DEN')" (onResize)="onResizeWidth($event)"> DEN</th>
               <td mat-cell *matCellDef="let element">
-                <div class="den word-break-all">
+                <div class="den word-break-all" (contextmenu)="showUmlDiagram(element, $event)">
                   <div class="d-inline-flex align-items-center"
                        *ngIf='!isAdmin && element.access === "Prohibited"'
                        matTooltip="Only the owner can access BIE in this state.">
@@ -284,27 +282,27 @@
                 <div class="bie-guid">
                   <span>{{ element.guid }}</span>
                 </div>
-                <div class="bie-source" *ngIf="!!element.sourceTopLevelAsbiepId && !!element.sourceReleaseId">
+                <div class="bie-source" *ngIf="!!element.source">
                   <span>Source:</span>
                   <a target="_blank" rel="noopener noreferrer"
                      href="/profile_bie?{{ request.toQuery({
-                      den: element.sourceDen,
-                      releaseIds: element.sourceReleaseId,
-                      topLevelAsbiepIds: element.sourceTopLevelAsbiepId }) }}">
-                    <span class="d-inline" matTooltip="{{ element.sourceAction | pastTense }} at {{ element.sourceTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}">
-                      {{ element.sourceDen + ((element.sourceDisplayName) ? (' (' + element.sourceDisplayName + ')') : '') }} in {{ element.sourceReleaseNum }}
+                      den: element.source.den,
+                      releaseIds: element.source.release.releaseId,
+                      topLevelAsbiepIds: element.source.topLevelAsbiepId }) }}">
+                    <span class="d-inline" matTooltip="{{ element.source.sourceAction | pastTense }} at {{ element.source.when | date: 'yyyy-MM-dd HH:mm:ss' }}">
+                      {{ element.source.den + ((element.source.displayName) ? (' (' + element.source.displayName + ')') : '') }} in {{ element.source.release.releaseNum }}
                     </span>
                   </a>
                 </div>
-                <div class="bie-based" *ngIf="!!element.basedTopLevelAsbiepId && !!element.basedTopLevelAsbiepReleaseId">
+                <div class="bie-based" *ngIf="!!element.based">
                   <span>Based on:</span>
                   <a target="_blank" rel="noopener noreferrer"
                      href="/profile_bie?{{ request.toQuery({
-                      den: element.basedTopLevelAsbiepDen,
-                      releaseIds: element.basedTopLevelAsbiepReleaseId,
-                      topLevelAsbiepIds: element.basedTopLevelAsbiepId }) }}">
+                      den: element.based.den,
+                      releaseIds: element.based.release.releaseId,
+                      topLevelAsbiepIds: element.based.topLevelAsbiepId }) }}">
                     <span class="d-inline">
-                      {{ element.basedTopLevelAsbiepDen + ((element.basedTopLevelAsbiepDisplayName) ? (' (' + element.basedTopLevelAsbiepDisplayName + ')') : '') }} in {{ element.basedTopLevelAsbiepReleaseNum }}
+                      {{ element.based.den + ((element.based.displayName) ? (' (' + element.based.displayName + ')') : '') }} in {{ element.based.release.releaseNum }}
                     </span>
                   </a>
                 </div>
@@ -316,7 +314,7 @@
                   score-table-column-resize [defaultWidth]="width('Owner')" (onResize)="onResizeWidth($event)"> Owner</th>
               <td mat-cell *matCellDef="let element">
                 <div class="d-flex align-items-center align-content-center justify-content-between">
-                  <span class="word-break-all" [matTooltip]="element.owner" [innerHTML]="element.owner"></span>
+                  <span class="word-break-all" [matTooltip]="element.owner.username" [innerHTML]="element.owner.loginId"></span>
                   <mat-icon class="pointer align-self-center" style="padding-right: 24px;"
                             *ngIf="isEditable(element) || isAdmin"
                             (click)="openTransferDialog(element, $event)">swap_horiz</mat-icon>
@@ -325,10 +323,10 @@
             </ng-container>
 
             <ng-container matColumnDef="businessContexts">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header
+              <th mat-header-cell *matHeaderCellDef
                   score-table-column-resize [defaultWidth]="width('Business Contexts')" (onResize)="onResizeWidth($event)"> Business Contexts</th>
               <td mat-cell *matCellDef="let element">
-                <ng-container *ngFor="let businessContext of element.businessContexts">
+                <ng-container *ngFor="let businessContext of element.businessContextList">
                 <span class="businessContext word-break-all">
                   <a target="_blank" rel="noopener noreferrer"
                      routerLink="/context_management/business_context/{{ businessContext.businessContextId }}">
@@ -375,8 +373,8 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
               <td mat-cell *matCellDef="let element">
-                <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-                <div class="description"><span class="pr-1">by</span><b class="word-break-all">{{ element.lastUpdateUser }}</b></div>
+                <div class="ellipsis">{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                <div class="description"><span class="pr-1">by</span><b class="word-break-all">{{ element.lastUpdated.who.loginId }}</b></div>
               </td>
             </ng-container>
 

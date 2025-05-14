@@ -10,7 +10,7 @@ import {AuthService} from '../../authentication/auth.service';
 import {PageRequest} from '../../basis/basis';
 import {finalize} from 'rxjs/operators';
 import {AccountListService} from '../domain/account-list.service';
-import {AccountList, AccountListRequest} from '../domain/accounts';
+import {AccountListEntry, AccountListRequest} from '../domain/accounts';
 import {PendingAccount} from '../domain/pending-list';
 import {PreferencesInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
@@ -94,12 +94,12 @@ export class AccountListDialogComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<AccountList>();
+  dataSource = new MatTableDataSource<AccountListEntry>();
   loading = false;
 
   request: AccountListRequest;
   preferencesInfo: PreferencesInfo;
-  selection = new SelectionModel<AccountList>(false, []);
+  selection = new SelectionModel<AccountListEntry>(false, []);
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -181,7 +181,7 @@ export class AccountListDialogComponent implements OnInit {
 
   link() {
     if (this.selection.selected.length > 0) {
-      this.service.link(this.pending, this.selection.selected[0]).subscribe(resp => {
+      this.service.link(this.pending, this.selection.selected[0].userId).subscribe(resp => {
         this.dialogRef.close('Linked');
       }, error => {
       });
@@ -191,18 +191,18 @@ export class AccountListDialogComponent implements OnInit {
     this.dialogRef.close('');
   }
 
-  select(row: AccountList) {
+  select(row: AccountListEntry) {
     this.selection.select(row);
   }
 
-  toggle(row: AccountList) {
+  toggle(row: AccountListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row);
     } else {
       this.select(row);
     }
   }
-  isSelected(row: AccountList) {
+  isSelected(row: AccountListEntry) {
     return this.selection.isSelected(row);
   }
 }

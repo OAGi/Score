@@ -2,7 +2,7 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {BusinessTermService} from '../domain/business-term.service';
-import {BusinessTerm, SimpleBusinessTerm} from '../domain/business-term';
+import {BusinessTermDetails} from '../domain/business-term';
 import {MatDialog} from '@angular/material/dialog';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -19,8 +19,7 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 export class BusinessTermDetailComponent implements OnInit {
 
   title = 'Edit Business Term';
-  businessTerms: SimpleBusinessTerm[];
-  businessTerm: BusinessTerm;
+  businessTerm: BusinessTermDetails;
   hashCode;
   disabled: boolean;
 
@@ -38,15 +37,14 @@ export class BusinessTermDetailComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.businessTerm = new BusinessTerm();
-    this.businessTerm.used = true;
+    this.businessTerm = new BusinessTermDetails();
     const businessTermId = this.route.snapshot.params.id;
 
     forkJoin(
-      this.service.getBusinessTerm(businessTermId)
+      this.service.getBusinessTermDetails(businessTermId)
     )
-      .subscribe(([simpleBusinessTerm]) => {
-        this.businessTerm = simpleBusinessTerm;
+      .subscribe(([businessTerm]) => {
+        this.businessTerm = businessTerm;
         this.hashCode = hashCode(this.businessTerm);
       });
 
@@ -56,7 +54,7 @@ export class BusinessTermDetailComponent implements OnInit {
     return this.hashCode !== hashCode(this.businessTerm);
   }
 
-  isDisabled(businessTerm1: BusinessTerm) {
+  isDisabled(businessTerm1: BusinessTermDetails) {
     return (this.disabled) ||
       (businessTerm1.businessTermId === undefined || !businessTerm1.businessTermId) ||
       (businessTerm1.businessTerm === undefined || businessTerm1.businessTerm === '') ||
@@ -73,8 +71,11 @@ export class BusinessTermDetailComponent implements OnInit {
     });
   }
 
-  checkUniqueness(_businessTerm: BusinessTerm, callbackFn?) {
-    this.service.checkUniqueness(_businessTerm).subscribe(resp => {
+  checkUniqueness(businessTerm: BusinessTermDetails, callbackFn?) {
+    this.service.checkUniqueness(
+        businessTerm.businessTermId,
+        businessTerm.businessTerm,
+        businessTerm.externalReferenceUri).subscribe(resp => {
       if (!resp) {
         this.openDialogBusinessTermUpdate();
         return;
@@ -83,8 +84,10 @@ export class BusinessTermDetailComponent implements OnInit {
     });
   }
 
-  checkBusinessTermName(_businessTerm: BusinessTerm, callbackFn?) {
-    this.service.checkNameUniqueness(_businessTerm).subscribe(resp => {
+  checkBusinessTermName(businessTerm: BusinessTermDetails, callbackFn?) {
+    this.service.checkNameUniqueness(
+        businessTerm.businessTermId,
+        businessTerm.businessTerm).subscribe(resp => {
       if (!resp) {
         this.openDialogBusinessTermUpdateIgnore();
         return;

@@ -42,7 +42,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.UsageRuleRecord;
  * USAGE_RULE_EXPRESSION table. To capture a description of a usage rule, create
  * a usage rule expression with the unstructured constraint type.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class UsageRule extends TableImpl<UsageRuleRecord> {
 
     private static final long serialVersionUID = 1L;

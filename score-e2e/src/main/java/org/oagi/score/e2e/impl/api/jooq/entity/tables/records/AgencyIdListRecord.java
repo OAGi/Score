@@ -16,7 +16,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.AgencyIdList;
  * The AGENCY_ID_LIST table stores information about agency identification
  * lists. The list's values are however kept in the AGENCY_ID_LIST_VALUE.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class AgencyIdListRecord extends UpdatableRecordImpl<AgencyIdListRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -465,6 +465,6 @@ public class AgencyIdListRecord extends UpdatableRecordImpl<AgencyIdListRecord> 
         setOwnerUserId(ownerUserId);
         setPrevAgencyIdListId(prevAgencyIdListId);
         setNextAgencyIdListId(nextAgencyIdListId);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

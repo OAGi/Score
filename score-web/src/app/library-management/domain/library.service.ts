@@ -1,7 +1,7 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {Library, LibraryList, LibraryListRequest} from './library';
+import {LibraryDetails, LibraryListEntry, LibraryListRequest, LibrarySummary} from './library';
 import {PageResponse} from '../../basis/basis';
 import {map} from 'rxjs/operators';
 
@@ -11,17 +11,18 @@ export class LibraryService {
   constructor(private http: HttpClient) {
   }
 
-  getLibraries(): Observable<Library[]> {
-    return this.http.get<Library[]>('/api/libraries', {});
+  getLibrarySummaryList(): Observable<LibrarySummary[]> {
+    return this.http.get<LibrarySummary[]>('/api/libraries/summaries', {});
   }
 
-  getLibraryById(libraryId: number): Observable<Library> {
-    return this.http.get<Library>('/api/library/' + libraryId, {});
+  getLibraryById(libraryId: number): Observable<LibraryDetails> {
+    return this.http.get<LibraryDetails>('/api/libraries/' + libraryId, {});
   }
 
-  create(library: Library): Observable<any> {
-    return this.http.put<any>('/api/library', {
+  create(library: LibraryDetails): Observable<any> {
+    return this.http.post<any>('/api/libraries', {
       name: library.name,
+      type: library.type,
       organization: library.organization,
       link: library.link,
       domain: library.domain,
@@ -29,9 +30,10 @@ export class LibraryService {
     });
   }
 
-  update(library: Library): Observable<any> {
-    return this.http.post<any>('/api/library/' + library.libraryId, {
+  update(library: LibraryDetails): Observable<any> {
+    return this.http.put<any>('/api/libraries/' + library.libraryId, {
       name: library.name,
+      type: library.type,
       organization: library.organization,
       link: library.link,
       domain: library.domain,
@@ -41,26 +43,30 @@ export class LibraryService {
   }
 
   discard(libraryId: number): Observable<any> {
-    return this.http.delete<any>('/api/library/' + libraryId);
+    return this.http.delete<any>('/api/libraries/' + libraryId);
   }
 
-  getLibraryList(request: LibraryListRequest): Observable<PageResponse<LibraryList>> {
+  getLibraryList(request: LibraryListRequest): Observable<PageResponse<LibraryListEntry>> {
     let params = new HttpParams()
-        .set('sortActive', request.page.sortActive)
-        .set('sortDirection', request.page.sortDirection)
         .set('pageIndex', '' + request.page.pageIndex)
         .set('pageSize', '' + request.page.pageSize);
-    if (request.updaterLoginIds.length > 0) {
-      params = params.set('updaterLoginIds', request.updaterLoginIds.join(','));
+
+    if (!!request.page.sortActive && !!request.page.sortDirection) {
+      params = params.set('orderBy', ((request.page.sortDirection === 'desc') ? '-' : '+') + request.page.sortActive);
     }
-    if (request.updatedDate.start) {
-      params = params.set('updateStart', '' + request.updatedDate.start.getTime());
+    if (request.updaterLoginIdList.length > 0) {
+      params = params.set('updaterLoginIdList', request.updaterLoginIdList.join(','));
     }
-    if (request.updatedDate.end) {
-      params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
+    if (!!request.updatedDate.start || !!request.updatedDate.end) {
+      params = params.set('lastUpdatedOn',
+          '[' + (!!request.updatedDate.start ? request.updatedDate.start.getTime() : '') + '~' +
+          (!!request.updatedDate.end ? request.updatedDate.end.getTime() : '') + ']');
     }
     if (request.filters.name) {
       params = params.set('name', request.filters.name);
+    }
+    if (request.filters.type) {
+      params = params.set('type', request.filters.type);
     }
     if (request.filters.organization) {
       params = params.set('organization', request.filters.organization);
@@ -74,13 +80,22 @@ export class LibraryService {
     if (request.filters.state) {
       params = params.set('state', request.filters.state);
     }
-    return this.http.get<PageResponse<LibraryList>>('/api/library_list', {params})
-        .pipe(map((resp: PageResponse<LibraryList>) => {
-          resp.list.forEach(e => {
-            e.lastUpdateTimestamp = new Date(e.lastUpdateTimestamp);
-          });
-          return resp;
-        }));
+    return this.http.get<PageResponse<LibraryListEntry>>('/api/libraries', {params}).pipe(
+        map((res: PageResponse<LibraryListEntry>) => ({
+          ...res,
+          list: res.list.map(elm => ({
+            ...elm,
+            created: {
+              ...elm.created,
+              when: new Date(elm.created.when),
+            },
+            lastUpdated: {
+              ...elm.lastUpdated,
+              when: new Date(elm.lastUpdated.when),
+            }
+          }))
+        }))
+    );
   }
 
 }

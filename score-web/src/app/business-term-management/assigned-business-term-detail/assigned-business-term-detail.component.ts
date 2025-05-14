@@ -2,13 +2,13 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {BusinessTermService} from '../domain/business-term.service';
-import {AssignedBusinessTerm} from '../domain/business-term';
 import {MatDialog} from '@angular/material/dialog';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort} from '@angular/material/sort';
 import {hashCode} from '../../common/utility';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
+import {AssignedBusinessTermDetails} from '../domain/business-term';
 
 @Component({
   selector: 'score-business-term-detail',
@@ -18,7 +18,7 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 export class AssignedBusinessTermDetailComponent implements OnInit {
 
   title = 'Edit Business Term Assignment';
-  assignedBusinessTerm: AssignedBusinessTerm;
+  assignedBusinessTerm: AssignedBusinessTermDetails;
   hashCode;
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -34,7 +34,7 @@ export class AssignedBusinessTermDetailComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.assignedBusinessTerm = new AssignedBusinessTerm();
+    this.assignedBusinessTerm = new AssignedBusinessTermDetails();
     const assignedBusinessTermId = this.route.snapshot.queryParams.id;
     const bieType = this.route.snapshot.queryParams.type;
     this.service.getAssignedBusinessTerm(bieType, assignedBusinessTermId).subscribe(assignedBusinessTerm => {
@@ -64,7 +64,7 @@ export class AssignedBusinessTermDetailComponent implements OnInit {
     });
   }
 
-  checkUniqueness(_assignedBusinessTerm: AssignedBusinessTerm, callbackFn?) {
+  checkUniqueness(_assignedBusinessTerm: AssignedBusinessTermDetails, callbackFn?) {
     this.service.checkAssignmentUniqueness(
       _assignedBusinessTerm.bieId, _assignedBusinessTerm.bieType,
       _assignedBusinessTerm.businessTermId, _assignedBusinessTerm.typeCode,
@@ -78,7 +78,7 @@ export class AssignedBusinessTermDetailComponent implements OnInit {
     });
   }
 
-  checkIfPrimaryWillBeOverwrittenAndDoUpdate(_assignedBusinessTerm: AssignedBusinessTerm) {
+  checkIfPrimaryWillBeOverwrittenAndDoUpdate(_assignedBusinessTerm: AssignedBusinessTermDetails) {
     if (_assignedBusinessTerm.primaryIndicator) {
       return this.service.findIfPrimaryExist(_assignedBusinessTerm.bieId,
         _assignedBusinessTerm.bieType, _assignedBusinessTerm.primaryIndicator, _assignedBusinessTerm.typeCode)
@@ -107,7 +107,7 @@ export class AssignedBusinessTermDetailComponent implements OnInit {
     }
   }
 
-  doUpdate(assignedBusinessTerm: AssignedBusinessTerm) {
+  doUpdate(assignedBusinessTerm: AssignedBusinessTermDetails) {
     this.service.updateAssignment(assignedBusinessTerm).subscribe(_ => {
       this.hashCode = hashCode(assignedBusinessTerm);
       this.snackBar.open('Updated', '', {

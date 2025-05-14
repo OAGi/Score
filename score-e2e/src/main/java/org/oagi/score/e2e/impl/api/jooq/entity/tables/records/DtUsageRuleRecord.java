@@ -17,7 +17,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtUsageRule;
  * record, either a TARGET_DT_ID or TARGET_DT_SC_ID must be present but not
  * both.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class DtUsageRuleRecord extends UpdatableRecordImpl<DtUsageRuleRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -120,6 +120,6 @@ public class DtUsageRuleRecord extends UpdatableRecordImpl<DtUsageRuleRecord> {
         setAssignedUsageRuleId(assignedUsageRuleId);
         setTargetDtId(targetDtId);
         setTargetDtScId(targetDtScId);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

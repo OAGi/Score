@@ -75,6 +75,7 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
         HomePage homePage = loginPage().signIn(second_user.getLoginId(), second_user.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
 
         for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
             ACCObject acc;
@@ -123,13 +124,13 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
 
             acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "WIP");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "WIP");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
 
             ACCObject acc_association = coreComponentAPI.createRandomACC(endUser, release, namespace, "WIP");
-            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "WIP");
+            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "WIP");
             coreComponentAPI.appendBCC(acc_association, bccp_to_append, "WIP");
 
             asccp = coreComponentAPI.createRandomASCCP(acc_association, endUser, namespace, "WIP");
@@ -141,6 +142,7 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
         WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
         ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
@@ -420,13 +422,13 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
 
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Published");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
 
             ACCObject acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
-            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
             coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Published");
 
             asccp = coreComponentAPI.createRandomASCCP(acc_association, developer, namespace, "Published");
@@ -438,6 +440,7 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
 
         assertEquals("Published", getText(accViewEditPage.getStateField()));
@@ -498,13 +501,13 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
 
             acc = coreComponentAPI.createRandomACC(endUser, release, namespace_endUser, "WIP");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace_endUser, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace_endUser, "WIP");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
 
             ACCObject acc_association = coreComponentAPI.createRandomACC(endUser, release, namespace_endUser, "WIP");
-            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace_endUser, "WIP");
+            BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace_endUser, "WIP");
             coreComponentAPI.appendBCC(acc_association, bccp_to_append, "WIP");
 
             asccp = coreComponentAPI.createRandomASCCP(acc_association, endUser, namespace_endUser, "WIP");
@@ -516,6 +519,7 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         viewEditCoreComponentPage.showAdvancedSearchPanel();
         viewEditCoreComponentPage.setBranch(branch);
         viewEditCoreComponentPage.setOwner(endUser.getLoginId());
@@ -643,13 +647,13 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
 
                     acc = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
                     DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-                    bccp = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
+                    bccp = coreComponentAPI.createRandomBCCP(release, dataType, this.appUser, namespace, state);
                     BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, state);
                     bcc.setCardinalityMax(1);
                     coreComponentAPI.updateBCC(bcc);
 
                     ACCObject acc_association = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
-                    BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
+                    BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, this.appUser, namespace, state);
                     coreComponentAPI.appendBCC(acc_association, bccp_to_append, state);
 
                     asccp = coreComponentAPI.createRandomASCCP(acc_association, this.appUser, namespace, state);

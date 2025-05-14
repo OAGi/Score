@@ -125,7 +125,7 @@
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
                   <mat-label>Owner</mat-label>
-                  <mat-select [(ngModel)]="request.ownerLoginIds" multiple>
+                  <mat-select [(ngModel)]="request.ownerLoginIdList" multiple>
                     <mat-option>
                       <ngx-mat-select-search [formControl]="loginIdListFilterCtrl"
                                              [placeholderLabel]="'Search...'"
@@ -141,7 +141,7 @@
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
                   <mat-label>Updater</mat-label>
-                  <mat-select [(ngModel)]="request.updaterLoginIds" multiple>
+                  <mat-select [(ngModel)]="request.updaterLoginIdList" multiple>
                     <mat-option>
                       <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
                                              [placeholderLabel]="'Search...'"
@@ -158,8 +158,7 @@
                 <mat-form-field>
                   <mat-label>Updated start date</mat-label>
                   <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
-                         [max]="request.updatedDate.end"
-                         (dateInput)="onDateEvent('startDate', $event)">
+                         [(ngModel)]="request.updatedDate.start" [max]="request.updatedDate.end">
                   <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
                   <mat-datepicker #dateStart></mat-datepicker>
                 </mat-form-field>
@@ -176,8 +175,7 @@
                 <mat-form-field>
                   <mat-label>Updated end date</mat-label>
                   <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
-                         [min]="request.updatedDate.start"
-                         (dateInput)="onDateEvent('endDate', $event)">
+                         [(ngModel)]="request.updatedDate.end" [min]="request.updatedDate.start">
                   <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
                   <mat-datepicker #dateEnd></mat-datepicker>
                 </mat-form-field>
@@ -239,7 +237,7 @@
               </th>
               <td mat-cell *matCellDef="let row">
                 <mat-checkbox (click)="$event.stopPropagation()"
-                              [disabled]="row.owner !== currentUser || canSelect.indexOf(row.state) == -1 || hasRevision(row)"
+                              [disabled]="row.owner.loginId !== currentUser || canSelect.indexOf(row.state) == -1 || hasRevision(row)"
                               (change)="$event ? toggle(row) : null"
                               [checked]="isSelected(row)">
                 </mat-checkbox>
@@ -266,7 +264,7 @@
                 <div class="den word-break-all">
                   <span class="new-component mr-2" *ngIf="element.newComponent">New</span>
                   <a rel="noopener noreferrer" href="/code_list/{{ element.codeListManifestId }}">
-                    <span>{{ element.codeListName }}</span>
+                    <span>{{ element.name }}</span>
                   </a>
                 </div>
                 <div class="description">{{ element.guid }}</div>
@@ -276,18 +274,24 @@
             <ng-container matColumnDef="basedCodeListName">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Based Code List')" (onResize)="onResizeWidth($event)"> Based Code List</th>
-              <td mat-cell *matCellDef="let element" matTooltip="{{ element.basedCodeListName }}">
-                <a rel="noopener noreferrer"
-                   routerLink="/code_list/{{ element.basedCodeListManifestId }}" *ngIf="element.basedCodeListManifestId > 0">
-                  <fa-icon [icon]="faLocationArrow"></fa-icon>
-                </a>
+              <td mat-cell *matCellDef="let element">
+                <div matTooltip="{{ element.based.name }}" *ngIf="!!element.based">
+                  <a rel="noopener noreferrer"
+                     routerLink="/code_list/{{ element.based.codeListManifestId }}">
+                    <fa-icon [icon]="faLocationArrow"></fa-icon>
+                  </a>
+                </div>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="agencyId">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Agency ID')" (onResize)="onResizeWidth($event)"> Agency ID</th>
-              <td mat-cell *matCellDef="let element" matTooltip="{{ element.agencyIdListValueName }}"> {{ element.agencyIdListValueValue }}</td>
+              <td mat-cell *matCellDef="let element">
+                <div matTooltip="{{ element.agencyIdListValue.name }}" *ngIf="!!element.agencyIdListValue">
+                  {{ element.agencyIdListValue.value }}
+                </div>
+              </td>
             </ng-container>
 
             <ng-container matColumnDef="versionId">
@@ -309,7 +313,7 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Revision')" (onResize)="onResizeWidth($event)"> Revision</th>
               <td mat-cell *matCellDef="let element">
-                <span>{{ element.revision }}</span>
+                <span>{{ element.log.revisionNum }}</span>
               </td>
             </ng-container>
 
@@ -318,7 +322,7 @@
                   score-table-column-resize [defaultWidth]="width('Owner')" (onResize)="onResizeWidth($event)"> Owner</th>
               <td mat-cell *matCellDef="let element">
                 <div class="d-flex align-items-center align-content-center justify-content-between">
-                  <span class="word-break-all" [matTooltip]="element.owner" [innerHTML]="element.owner"></span>
+                  <span class="word-break-all" [matTooltip]="element.owner.username" [innerHTML]="element.owner.loginId"></span>
                   <mat-icon class="pointer align-self-center" style="padding-right: 24px;"
                             *ngIf="isEditable(element)"
                             (click)="openTransferDialog(element, $event)">swap_horiz</mat-icon>
@@ -331,7 +335,7 @@
                   score-table-column-resize [defaultWidth]="width('Module')" (onResize)="onResizeWidth($event)"> Module</th>
               <td mat-cell *matCellDef="let element">
                 <div class="word-break-all"
-                     [innerHTML]="element.modulePath | highlight : highlightTextForModule : ['bg-warning']"></div>
+                     [innerHTML]="element.module | highlight : highlightTextForModule : ['bg-warning']"></div>
               </td>
             </ng-container>
 
@@ -339,8 +343,8 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
               <td mat-cell *matCellDef="let element">
-                <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-                <div class="description"><span class="pr-1">by</span><b class="word-break-all">{{ element.lastUpdateUser }}</b></div>
+                <div class="ellipsis">{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                <div class="description"><span class="pr-1">by</span><b class="word-break-all">{{ element.lastUpdated.who.loginId }}</b></div>
               </td>
             </ng-container>
 
@@ -404,7 +408,7 @@
         <span class="context-menu-item">Delete</span>
       </button>
       <button mat-menu-item (click)="openDialogCcListRestore(contextMenuItem)"
-              *ngIf="!!contextMenuItem && contextMenuItem.owner === this.currentUser && contextMenuItem.state === 'Deleted'">
+              *ngIf="!!contextMenuItem && contextMenuItem.owner.username === this.currentUser && contextMenuItem.state === 'Deleted'">
         <span class="context-menu-item">Restore</span>
       </button>
     </mat-menu>

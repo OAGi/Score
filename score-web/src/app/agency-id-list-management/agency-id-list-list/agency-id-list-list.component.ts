@@ -8,29 +8,29 @@ import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {AccountList} from '../../account-management/domain/accounts';
 import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
-import {AgencyIdList, AgencyIdListForListRequest} from '../domain/agency-id-list';
+import {AgencyIdListForListRequest, AgencyIdListListEntry} from '../domain/agency-id-list';
 import {AgencyIdListService} from '../domain/agency-id-list.service';
-import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker} from '@angular/material/datepicker';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {initFilter, loadBranch, loadLibrary, saveBranch, saveLibrary} from '../../common/utility';
-import {SimpleRelease, WorkingRelease} from '../../release-management/domain/release';
+import {ReleaseSummary, WorkingRelease} from '../../release-management/domain/release';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {AuthService} from '../../authentication/auth.service';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
-import {SimpleNamespace} from '../../namespace-management/domain/namespace';
+import {NamespaceSummary} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {WebPageInfoService} from '../../basis/basis.service';
 import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
-import {Library} from '../../library-management/domain/library';
+import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryService} from '../../library-management/domain/library.service';
 
 @Component({
@@ -162,38 +162,40 @@ export class AgencyIdListListComponent implements OnInit {
     return displayedColumns;
   }
 
-  dataSource = new MatTableDataSource<AgencyIdList>();
-  selection = new SelectionModel<AgencyIdList>(true, [],
+  dataSource = new MatTableDataSource<AgencyIdListListEntry>();
+  selection = new SelectionModel<AgencyIdListListEntry>(true, [],
     true, (a, b) => a.agencyIdListManifestId === b.agencyIdListManifestId);
-  expandedElement: AgencyIdList | null;
+  expandedElement: AgencyIdListListEntry | null;
   canSelect = ['WIP', 'Deleted'];
   loading = false;
 
-  releases: SimpleRelease[] = [];
-  libraries: Library[] = [];
-  mappedLibraries: {library: Library, selected: boolean}[] = [];
+  releases: ReleaseSummary[] = [];
+  libraries: LibrarySummary[] = [];
+  mappedLibraries: {library: LibrarySummary, selected: boolean}[] = [];
   loginIdList: string[] = [];
   releaseListFilterCtrl: FormControl = new FormControl();
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
-  filteredReleaseList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
+  filteredReleaseList: ReplaySubject<ReleaseSummary[]> = new ReplaySubject<ReleaseSummary[]>(1);
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: AgencyIdListForListRequest;
   highlightTextForModule: string;
   highlightTextForDefinition: string;
   preferencesInfo: PreferencesInfo;
-  namespaces: SimpleNamespace[] = [];
+  namespaces: NamespaceSummary[] = [];
   namespaceListFilterCtrl: FormControl = new FormControl();
-  filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
+  filteredNamespaceList: ReplaySubject<NamespaceSummary[]> = new ReplaySubject<NamespaceSummary[]>(1);
 
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
+  dateStartFormControl;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
+  dateEndtFormControl;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
-  contextMenuItem: AgencyIdList;
+  contextMenuItem: AgencyIdListListEntry;
 
   constructor(private service: AgencyIdListService,
               private releaseService: ReleaseService,
@@ -215,7 +217,7 @@ export class AgencyIdListListComponent implements OnInit {
     this.request = new AgencyIdListForListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
 
-    this.libraryService.getLibraries().subscribe(libraries => {
+    this.libraryService.getLibrarySummaryList().subscribe(libraries => {
       this.initLibraries(libraries);
 
       this.searchBar.showAdvancedSearch =
@@ -242,8 +244,8 @@ export class AgencyIdListListComponent implements OnInit {
 
       this.releases = [];
       forkJoin([
-        this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Draft', 'Published']),
-        this.namespaceService.getSimpleNamespaces(this.request.library.libraryId),
+        this.releaseService.getReleaseSummaryList(this.request.library.libraryId, ['Draft', 'Published']),
+        this.namespaceService.getNamespaceSummaries(this.request.library.libraryId),
         this.accountService.getAccountNames(),
         this.preferencesService.load(this.auth.getUserToken())
       ]).subscribe(([releases, namespaces, loginIds, preferencesInfo]) => {
@@ -263,7 +265,7 @@ export class AgencyIdListListComponent implements OnInit {
     });
   }
 
-  getRelease(releaseNum: string): SimpleRelease | undefined {
+  getRelease(releaseNum: string): ReleaseSummary | undefined {
     for (const release of this.releases) {
       if (release.releaseNum === releaseNum) {
         return release;
@@ -282,17 +284,6 @@ export class AgencyIdListListComponent implements OnInit {
     }
   }
 
-  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = new Date(event.value);
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = new Date(event.value);
-        break;
-    }
-  }
-
   reset(type: string) {
     switch (type) {
       case 'startDate':
@@ -306,7 +297,7 @@ export class AgencyIdListListComponent implements OnInit {
     }
   }
 
-  initLibraries(libraries: Library[]) {
+  initLibraries(libraries: LibrarySummary[]) {
     this.libraries = libraries;
     if (this.libraries.length > 0) {
       const savedLibraryId = loadLibrary(this.auth.getUserToken());
@@ -325,7 +316,7 @@ export class AgencyIdListListComponent implements OnInit {
     }
   }
 
-  initReleases(releases: SimpleRelease[]) {
+  initReleases(releases: ReleaseSummary[]) {
     this.releases = [...releases];
     if (this.releases.length > 0) {
       if (this.request.release.releaseId === 0) {
@@ -347,9 +338,9 @@ export class AgencyIdListListComponent implements OnInit {
     initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
   }
 
-  onLibraryChange(library: Library) {
+  onLibraryChange(library: LibrarySummary) {
     this.request.library = library;
-    this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Draft', 'Published']).subscribe(releases => {
+    this.releaseService.getReleaseSummaryList(this.request.library.libraryId, ['Draft', 'Published']).subscribe(releases => {
       saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
       this.initReleases(releases);
       this.onSearch();
@@ -374,10 +365,7 @@ export class AgencyIdListListComponent implements OnInit {
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
-      this.dataSource.data = resp.results.map((elm: AgencyIdList) => {
-        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        return elm;
-      });
+      this.dataSource.data = resp.list;
       this.highlightTextForModule = this.request.filters.module;
       this.highlightTextForDefinition = this.request.filters.definition;
 
@@ -394,7 +382,7 @@ export class AgencyIdListListComponent implements OnInit {
   isAllSelected() {
     const numSelected = this.selection.selected.length;
     const numRows = this.dataSource.data.filter(row => this.canSelect.indexOf(row.state) > -1 &&
-      !this.hasRevision(row) && row.owner.username === this.currentUser).length;
+      !this.hasRevision(row) && row.owner.loginId === this.currentUser).length;
     return numSelected === numRows;
   }
 
@@ -405,13 +393,13 @@ export class AgencyIdListListComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(row: AgencyIdList) {
-    if (this.canSelect.indexOf(row.state) > -1 && !this.hasRevision(row) && row.owner.username === this.currentUser) {
+  select(row: AgencyIdListListEntry) {
+    if (this.canSelect.indexOf(row.state) > -1 && !this.hasRevision(row) && row.owner.loginId === this.currentUser) {
       this.selection.select(row);
     }
   }
 
-  toggle(row: AgencyIdList) {
+  toggle(row: AgencyIdListListEntry) {
     if (this.isSelected(row)) {
       this.selection.deselect(row);
     } else {
@@ -419,12 +407,12 @@ export class AgencyIdListListComponent implements OnInit {
     }
   }
 
-  isSelected(row: AgencyIdList) {
+  isSelected(row: AgencyIdListListEntry) {
     return this.selection.isSelected(row);
   }
 
   selectionClear() {
-    this.selection = new SelectionModel<AgencyIdList>(true, [],
+    this.selection = new SelectionModel<AgencyIdListListEntry>(true, [],
       true, (a, b) => a.agencyIdListManifestId === b.agencyIdListManifestId);
   }
 
@@ -439,7 +427,7 @@ export class AgencyIdListListComponent implements OnInit {
         this.snackBar.open('Created', '', {
           duration: 3000,
         });
-        this.router.navigateByUrl('/agency_id_list/' + resp.manifestId);
+        this.router.navigateByUrl('/agency_id_list/' + resp.agencyIdListManifestId);
       });
   }
 
@@ -460,7 +448,7 @@ export class AgencyIdListListComponent implements OnInit {
     return true;
   }
 
-  get showDiscardBtn(): boolean {
+  get showDeleteBtn(): boolean {
     return this.selection.selected.length > 0 ?
       this.selection.selected.filter(e => e.state === 'Deleted').length === 0 :
       false;
@@ -541,28 +529,28 @@ export class AgencyIdListListComponent implements OnInit {
       });
   }
 
-  hasRevision(item: AgencyIdList): boolean {
+  hasRevision(item: AgencyIdListListEntry): boolean {
     if (!item) {
       return false;
     }
-    return !!item.prevAgencyIdListManifestId;
+    return item.log.revisionNum > 1;
   }
 
-  isEditable(item: AgencyIdList) {
+  isEditable(item: AgencyIdListListEntry) {
     if (!item) {
       return false;
     }
     return item.owner.username === this.currentUser && item.state === 'WIP';
   }
 
-  canRestore(item: AgencyIdList) {
+  canRestore(item: AgencyIdListListEntry) {
     if (!item) {
       return false;
     }
     return item.owner.username === this.currentUser && item.state === 'Deleted';
   }
 
-  openTransferDialog(item: AgencyIdList, event?: MouseEvent) {
+  openTransferDialog(item: AgencyIdListListEntry, event?: MouseEvent) {
     if (!this.isEditable(item)) {
       return;
     }
@@ -578,6 +566,7 @@ export class AgencyIdListListComponent implements OnInit {
           this.snackBar.open('Transferred', '', {
             duration: 3000,
           });
+          this.selection.clear();
           this.loadAgencyIdList();
         });
       }
@@ -624,7 +613,7 @@ export class AgencyIdListListComponent implements OnInit {
     return;
   }
 
-  openDialogCcListRestore(item: AgencyIdList) {
+  openDialogCcListRestore(item: AgencyIdListListEntry) {
 
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Restore agency ID list';

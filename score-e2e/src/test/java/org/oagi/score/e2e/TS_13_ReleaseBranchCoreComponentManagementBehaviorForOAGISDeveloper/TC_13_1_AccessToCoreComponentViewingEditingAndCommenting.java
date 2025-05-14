@@ -76,7 +76,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             accForTesting.add(acc);
             coreComponentAPI.appendExtension(acc, developerB, namespace, "Published");
             DTObject dt = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            BCCPObject bccp = coreComponentAPI.createRandomBCCP(dt, developerB, namespace, "Published");
+            BCCPObject bccp = coreComponentAPI.createRandomBCCP(release, dt, developerB, namespace, "Published");
             bccpForTesting.add(bccp);
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Published");
             bccForTesting.add(bcc);
@@ -92,7 +92,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             acc = coreComponentAPI.createRandomACC(developerA, release, namespace, "Published");
             accForTesting.add(acc);
             coreComponentAPI.appendExtension(acc, developerA, namespace, "Published");
-            bccp = coreComponentAPI.createRandomBCCP(dt, developerA, namespace, "Published");
+            bccp = coreComponentAPI.createRandomBCCP(release, dt, developerA, namespace, "Published");
             bccpForTesting.add(bccp);
             bcc = coreComponentAPI.appendBCC(acc, bccp, "Published");
             bccForTesting.add(bcc);
@@ -106,7 +106,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             accForTesting.add(acc);
             coreComponentAPI.appendExtension(acc, developerB, namespace, "WIP");
             DTObject dtWorkingRelease = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", workingBranch.getReleaseNumber());
-            bccp = coreComponentAPI.createRandomBCCP(dtWorkingRelease, developerB, namespace, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(workingBranch, dtWorkingRelease, developerB, namespace, "WIP");
             bccpForTesting.add(bccp);
             bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bccForTesting.add(bcc);
@@ -116,7 +116,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             acc = coreComponentAPI.createRandomACC(developerA, workingBranch, namespace, "WIP");
             accForTesting.add(acc);
             coreComponentAPI.appendExtension(acc, developerA, namespace, "WIP");
-            bccp = coreComponentAPI.createRandomBCCP(dtWorkingRelease, developerA, namespace, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(workingBranch, dtWorkingRelease, developerA, namespace, "WIP");
             bccpForTesting.add(bccp);
             bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bccForTesting.add(bcc);
@@ -129,7 +129,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             acc = coreComponentAPI.createRandomACC(endUser, release, namespaceEU, "WIP");
             accForTesting.add(acc);
             coreComponentAPI.appendExtension(acc, endUser, namespaceEU, "WIP");
-            bccp = coreComponentAPI.createRandomBCCP(dt, endUser, namespaceEU, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(release, dt, endUser, namespaceEU, "WIP");
             bccpForTesting.add(bccp);
             bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bccForTesting.add(bcc);
@@ -142,7 +142,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             acc = coreComponentAPI.createRandomACC(endUser, release, namespaceEU, "QA");
             accForTesting.add(acc);
             coreComponentAPI.appendExtension(acc, endUser, namespaceEU, "QA");
-            bccp = coreComponentAPI.createRandomBCCP(dt, endUser, namespaceEU, "QA");
+            bccp = coreComponentAPI.createRandomBCCP(release, dt, endUser, namespaceEU, "QA");
             bccpForTesting.add(bccp);
             bcc = coreComponentAPI.appendBCC(acc, bccp, "QA");
             bccForTesting.add(bcc);
@@ -155,7 +155,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             acc = coreComponentAPI.createRandomACC(endUser, release, namespaceEU, "Production");
             accForTesting.add(acc);
             coreComponentAPI.appendExtension(acc, endUser, namespaceEU, "Production");
-            bccp = coreComponentAPI.createRandomBCCP(dt, endUser, namespaceEU, "Production");
+            bccp = coreComponentAPI.createRandomBCCP(release, dt, endUser, namespaceEU, "Production");
             bccpForTesting.add(bccp);
             bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
             bccForTesting.add(bcc);
@@ -168,7 +168,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             acc = coreComponentAPI.createRandomACC(endUser, release, namespaceEU, "Deleted");
             accForTesting.add(acc);
             coreComponentAPI.appendExtension(acc, endUser, namespaceEU, "Deleted");
-            bccp = coreComponentAPI.createRandomBCCP(dt, endUser, namespaceEU, "Deleted");
+            bccp = coreComponentAPI.createRandomBCCP(release, dt, endUser, namespaceEU, "Deleted");
             bccpForTesting.add(bccp);
             bcc = coreComponentAPI.appendBCC(acc, bccp, "Deleted");
             bccForTesting.add(bcc);
@@ -200,8 +200,8 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         viewEditCoreComponentPage.setBranch(release.getReleaseNumber());
-        viewEditCoreComponentPage.selectAllComponentTypes();
         for (ACCObject acc : accForTesting) {
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(acc.getOwnerUserId());
             viewEditCoreComponentPage.setDEN(acc.getDen());
@@ -240,6 +240,8 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             }
         }
 
+        // Since 3.4, 'Core Component' list page doesn't display ASCC/BCC records.
+        /*
         for (BCCObject bcc : bccForTesting) {
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(bcc.getOwnerUserId());
             viewEditCoreComponentPage.setDEN(bcc.getDen());
@@ -254,6 +256,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
                 });
             }
         }
+        */
         for (ASCCPObject asccp : asccpForTesting) {
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(asccp.getOwnerUserId());
             viewEditCoreComponentPage.setDEN(asccp.getDen());
@@ -268,6 +271,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
                 });
             }
         }
+        /*
         for (ASCCObject ascc : asccForTesting) {
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(ascc.getOwnerUserId());
             viewEditCoreComponentPage.setDEN(ascc.getDen());
@@ -282,6 +286,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
                 });
             }
         }
+        */
     }
 
     @Test
@@ -318,7 +323,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             ACCObject acc = coreComponentAPI.createRandomACC(developerB, release, namespace, "Published");
             coreComponentAPI.appendExtension(acc, developerB, namespace, "Published");
             DTObject dt = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            BCCPObject bccp = coreComponentAPI.createRandomBCCP(dt, developerB, namespace, "Published");
+            BCCPObject bccp = coreComponentAPI.createRandomBCCP(release, dt, developerB, namespace, "Published");
             coreComponentAPI.appendBCC(acc, bccp, "Published");
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, developerB, namespace, "Published");
 
@@ -334,7 +339,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             acc = coreComponentAPI.createRandomACC(endUser, release, namespaceEU, "WIP");
             accForTesting.add(acc);
             coreComponentAPI.appendExtension(acc, endUser, namespaceEU, "WIP");
-            bccp = coreComponentAPI.createRandomBCCP(dt, endUser, namespaceEU, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(release, dt, endUser, namespaceEU, "WIP");
             bccpForTesting.add(bccp);
             coreComponentAPI.appendBCC(acc, bccp, "WIP");
             asccp = coreComponentAPI.createRandomASCCP(acc, endUser, namespaceEU, "WIP");
@@ -462,7 +467,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             ACCObject acc = coreComponentAPI.createRandomACC(developerB, release, namespace, "Published");
             coreComponentAPI.appendExtension(acc, developerB, namespace, "Published");
             DTObject dt = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            BCCPObject bccp = coreComponentAPI.createRandomBCCP(dt, developerB, namespace, "Published");
+            BCCPObject bccp = coreComponentAPI.createRandomBCCP(release, dt, developerB, namespace, "Published");
             coreComponentAPI.appendBCC(acc, bccp, "Published");
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, developerB, namespace, "Published");
 
@@ -478,7 +483,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             acc = coreComponentAPI.createRandomACC(endUser, release, namespaceEU, "QA");
             accForTesting.add(acc);
             coreComponentAPI.appendExtension(acc, endUser, namespaceEU, "QA");
-            bccp = coreComponentAPI.createRandomBCCP(dt, endUser, namespaceEU, "QA");
+            bccp = coreComponentAPI.createRandomBCCP(release, dt, endUser, namespaceEU, "QA");
             bccpForTesting.add(bccp);
             coreComponentAPI.appendBCC(acc, bccp, "QA");
             asccp = coreComponentAPI.createRandomASCCP(acc, endUser, namespaceEU, "QA");
@@ -490,7 +495,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             acc = coreComponentAPI.createRandomACC(endUser, release, namespaceEU, "Deleted");
             accForTesting.add(acc);
             coreComponentAPI.appendExtension(acc, endUser, namespaceEU, "Deleted");
-            bccp = coreComponentAPI.createRandomBCCP(dt, endUser, namespaceEU, "Deleted");
+            bccp = coreComponentAPI.createRandomBCCP(release, dt, endUser, namespaceEU, "Deleted");
             bccpForTesting.add(bccp);
             coreComponentAPI.appendBCC(acc, bccp, "Deleted");
             asccp = coreComponentAPI.createRandomASCCP(acc, endUser, namespaceEU, "Deleted");
@@ -656,7 +661,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             ACCObject acc = coreComponentAPI.createRandomACC(developerB, release, namespace, "Published");
             coreComponentAPI.appendExtension(acc, developerB, namespace, "Published");
             DTObject dt = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            BCCPObject bccp = coreComponentAPI.createRandomBCCP(dt, developerB, namespace, "Published");
+            BCCPObject bccp = coreComponentAPI.createRandomBCCP(release, dt, developerB, namespace, "Published");
             coreComponentAPI.appendBCC(acc, bccp, "Published");
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, developerB, namespace, "Published");
 
@@ -671,7 +676,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             acc = coreComponentAPI.createRandomACC(endUser, release, namespaceEU, "Production");
             accForTesting.add(acc);
             coreComponentAPI.appendExtension(acc, endUser, namespaceEU, "Production");
-            bccp = coreComponentAPI.createRandomBCCP(dt, endUser, namespaceEU, "Production");
+            bccp = coreComponentAPI.createRandomBCCP(release, dt, endUser, namespaceEU, "Production");
             bccpForTesting.add(bccp);
             coreComponentAPI.appendBCC(acc, bccp, "Production");
             asccp = coreComponentAPI.createRandomASCCP(acc, endUser, namespaceEU, "Production");
@@ -811,7 +816,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             accForTesting.add(acc);
             coreComponentAPI.appendExtension(acc, developerB, namespace, "Published");
             DTObject dt = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            BCCPObject bccp = coreComponentAPI.createRandomBCCP(dt, developerB, namespace, "Published");
+            BCCPObject bccp = coreComponentAPI.createRandomBCCP(release, dt, developerB, namespace, "Published");
             bccpForTesting.add(bccp);
             coreComponentAPI.appendBCC(acc, bccp, "Published");
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, developerB, namespace, "Published");
@@ -823,7 +828,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             acc = coreComponentAPI.createRandomACC(endUser, release, namespaceEU, "Published");
             accForTesting.add(acc);
             coreComponentAPI.appendExtension(acc, endUser, namespaceEU, "Published");
-            bccp = coreComponentAPI.createRandomBCCP(dt, endUser, namespaceEU, "Published");
+            bccp = coreComponentAPI.createRandomBCCP(release, dt, endUser, namespaceEU, "Published");
             bccpForTesting.add(bccp);
             coreComponentAPI.appendBCC(acc, bccp, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, endUser, namespaceEU, "Published");
@@ -908,9 +913,6 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
         });
         assertThrows(TimeoutException.class, () -> {
             viewEditCoreComponentPage.getCreateBCCPButton();
-        });
-        assertThrows(TimeoutException.class, () -> {
-            viewEditCoreComponentPage.getCreateDTButton();
         });
     }
 

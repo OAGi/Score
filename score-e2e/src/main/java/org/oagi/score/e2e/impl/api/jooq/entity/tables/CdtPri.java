@@ -32,15 +32,15 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtAwdPri.CdtAwdPriPath;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtScAwdPri.CdtScAwdPriPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtAwdPri.DtAwdPriPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtScAwdPri.DtScAwdPriPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.CdtPriRecord;
 
 
 /**
  * This table stores the CDT primitives.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class CdtPri extends TableImpl<CdtPriRecord> {
 
     private static final long serialVersionUID = 1L;
@@ -152,30 +152,30 @@ public class CdtPri extends TableImpl<CdtPriRecord> {
         return Arrays.asList(Keys.KEY_CDT_PRI_CDT_PRI_UK1);
     }
 
-    private transient CdtAwdPriPath _cdtAwdPri;
+    private transient DtAwdPriPath _dtAwdPri;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.cdt_awd_pri</code>
+     * Get the implicit to-many join path to the <code>oagi.dt_awd_pri</code>
      * table
      */
-    public CdtAwdPriPath cdtAwdPri() {
-        if (_cdtAwdPri == null)
-            _cdtAwdPri = new CdtAwdPriPath(this, null, Keys.CDT_AWD_PRI_CDT_PRI_ID_FK.getInverseKey());
+    public DtAwdPriPath dtAwdPri() {
+        if (_dtAwdPri == null)
+            _dtAwdPri = new DtAwdPriPath(this, null, Keys.DT_AWD_PRI_CDT_PRI_ID_FK.getInverseKey());
 
-        return _cdtAwdPri;
+        return _dtAwdPri;
     }
 
-    private transient CdtScAwdPriPath _cdtScAwdPri;
+    private transient DtScAwdPriPath _dtScAwdPri;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.cdt_sc_awd_pri</code> table
+     * Get the implicit to-many join path to the <code>oagi.dt_sc_awd_pri</code>
+     * table
      */
-    public CdtScAwdPriPath cdtScAwdPri() {
-        if (_cdtScAwdPri == null)
-            _cdtScAwdPri = new CdtScAwdPriPath(this, null, Keys.CDT_SC_AWD_PRI_CDT_PRI_ID_FK.getInverseKey());
+    public DtScAwdPriPath dtScAwdPri() {
+        if (_dtScAwdPri == null)
+            _dtScAwdPri = new DtScAwdPriPath(this, null, Keys.DT_SC_AWD_PRI_CDT_PRI_ID_FK.getInverseKey());
 
-        return _cdtScAwdPri;
+        return _dtScAwdPri;
     }
 
     @Override

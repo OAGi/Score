@@ -14,21 +14,21 @@
       <mat-card-content class="mat-card-container">
         <mat-form-field>
           <mat-label>Name</mat-label>
-          <input matInput [(ngModel)]="moduleSetRelease.moduleSetReleaseName" maxlength="100"
+          <input matInput [(ngModel)]="moduleSetRelease.name" maxlength="100"
                 [disabled]="!roles.includes('developer')">
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Description</mat-label>
-          <textarea [(ngModel)]="moduleSetRelease.moduleSetReleaseDescription"
+          <textarea [(ngModel)]="moduleSetRelease.description"
                     [disabled]="!roles.includes('developer')"
                     cols="30" data-id="moduleSetRelease.description" matInput
                     rows="6"></textarea>
         </mat-form-field>
 
-        <mat-form-field>
+        <mat-form-field *ngIf="moduleSetRelease.moduleSet">
           <mat-label>Module Set</mat-label>
-          <mat-select [(ngModel)]="moduleSetRelease.moduleSetId" [disabled]="true">
+          <mat-select [(ngModel)]="moduleSetRelease.moduleSet.moduleSetId" [disabled]="true">
             <mat-option>
               <ngx-mat-select-search [formControl]="moduleSetListFilterCtrl"
                                      [noEntriesFoundLabel]="'No matching release found.'"
@@ -40,9 +40,9 @@
           </mat-select>
         </mat-form-field>
 
-        <mat-form-field>
+        <mat-form-field *ngIf="moduleSetRelease.release">
           <mat-label>Release</mat-label>
-          <mat-select [(ngModel)]="moduleSetRelease.releaseId" [disabled]="true">
+          <mat-select [(ngModel)]="moduleSetRelease.release.releaseId" [disabled]="true">
             <mat-option>
               <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
                                      [noEntriesFoundLabel]="'No matching release found.'"
@@ -60,7 +60,7 @@
           </mat-select>
         </mat-form-field>
 
-        <mat-checkbox [(ngModel)]="moduleSetRelease.default" [disabled]="!roles.includes('developer')">Default</mat-checkbox>
+        <mat-checkbox [(ngModel)]="moduleSetRelease.isDefault" [disabled]="!roles.includes('developer')">Default</mat-checkbox>
       </mat-card-content>
     </mat-card>
   </div>
