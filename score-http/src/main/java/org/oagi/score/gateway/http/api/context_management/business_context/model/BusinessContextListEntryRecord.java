@@ -4,7 +4,7 @@ import org.oagi.score.gateway.http.common.model.Guid;
 import org.oagi.score.gateway.http.common.model.WhoAndWhen;
 
 /**
- * Represents a list entry for a business context, including the business context ID, GUID, meaning,
+ * Represents a list entry for a business context, including the business context ID, GUID, name,
  * connected tenant names, status (whether it's in use), and the creation and last update information.
  */
 public record BusinessContextListEntryRecord(BusinessContextId businessContextId,

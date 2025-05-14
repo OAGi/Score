@@ -1213,7 +1213,6 @@ public class BieEditService implements InitializingBean {
                 .fetchOptional().orElse(null);
         if (asbieRecord == null) {
             var abieCommand = repositoryFactory.abieCommandRepository(requester);
-            LocalDateTime timestamp = LocalDateTime.now();
             AbieNode.Abie abie = new AbieNode.Abie();
             abie.setPath(request.getFromAbiePath());
             abie.setHashPath(request.getFromAbieHashPath());
@@ -1232,44 +1231,50 @@ public class BieEditService implements InitializingBean {
             asbie.setToAsbiepId(reuseTopLevelAsbiep.asbiepId());
             asbie.setOwnerTopLevelAsbiepId(topLevelAsbiepId);
             asbieCommand.upsertAsbie(new UpsertAsbieRequest(topLevelAsbiepId, asbie));
-        } else {
-            ULong prevToAsbiepId = asbieRecord.getToAsbiepId();
 
-            ULong ownerTopLevelAsbiepOfToAsbiep =
-                    dslContext.select(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID)
-                            .from(ASBIEP)
-                            .where(ASBIEP.ASBIEP_ID.eq(asbieRecord.getToAsbiepId()))
-                            .fetchOneInto(ULong.class);
+            asbieRecord = dslContext.selectFrom(ASBIE)
+                    .where(and(
+                            ASBIE.HASH_PATH.eq(request.getAsbieHashPath()),
+                            ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId.value()))
+                    ))
+                    .fetchOne();
+        }
 
+        ULong prevToAsbiepId = asbieRecord.getToAsbiepId();
 
-            if (!nestedCall || !isInInheritance(reuseAsbiepId, prevToAsbiepId)) {
-                asbieRecord.setToAsbiepId(reuseAsbiepId);
-            }
+        ULong ownerTopLevelAsbiepOfToAsbiep =
+                dslContext.select(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID)
+                        .from(ASBIEP)
+                        .where(ASBIEP.ASBIEP_ID.eq(asbieRecord.getToAsbiepId()))
+                        .fetchOneInto(ULong.class);
 
-            asbieRecord.setIsUsed((byte) 1);
-            asbieRecord.setIsDeprecated((byte) (reuseTopLevelAsbiep.deprecated() ? 1 : 0));
-            asbieRecord.setLastUpdatedBy(ULong.valueOf(requester.userId().value()));
-            asbieRecord.setLastUpdateTimestamp(LocalDateTime.now());
-            asbieRecord.update(
-                    ASBIE.TO_ASBIEP_ID,
-                    ASBIE.IS_DEPRECATED,
-                    ASBIE.LAST_UPDATED_BY,
-                    ASBIE.LAST_UPDATE_TIMESTAMP);
+        if (!nestedCall || !isInInheritance(reuseAsbiepId, prevToAsbiepId)) {
+            asbieRecord.setToAsbiepId(reuseAsbiepId);
+        }
 
-            boolean isReused = !asbieRecord.getOwnerTopLevelAsbiepId().equals(ownerTopLevelAsbiepOfToAsbiep);
-            if (!isReused) {
-                // Delete orphan ASBIEP record.
-                dslContext.deleteFrom(ASBIEP)
-                        .where(ASBIEP.ASBIEP_ID.eq(prevToAsbiepId))
-                        .execute();
+        asbieRecord.setIsUsed((byte) 1);
+        asbieRecord.setIsDeprecated((byte) (reuseTopLevelAsbiep.deprecated() ? 1 : 0));
+        asbieRecord.setLastUpdatedBy(ULong.valueOf(requester.userId().value()));
+        asbieRecord.setLastUpdateTimestamp(LocalDateTime.now());
+        asbieRecord.update(
+                ASBIE.TO_ASBIEP_ID,
+                ASBIE.IS_DEPRECATED,
+                ASBIE.LAST_UPDATED_BY,
+                ASBIE.LAST_UPDATE_TIMESTAMP);
 
-                PurgeBieEvent event = new PurgeBieEvent(
-                        new TopLevelAsbiepId(asbieRecord.getOwnerTopLevelAsbiepId().toBigInteger()));
-                /*
-                 * Message Publishing
-                 */
-                redisTemplate.convertAndSend(PURGE_BIE_EVENT_NAME, event);
-            }
+        boolean isReused = !asbieRecord.getOwnerTopLevelAsbiepId().equals(ownerTopLevelAsbiepOfToAsbiep);
+        if (!isReused) {
+            // Delete orphan ASBIEP record.
+            dslContext.deleteFrom(ASBIEP)
+                    .where(ASBIEP.ASBIEP_ID.eq(prevToAsbiepId))
+                    .execute();
+
+            PurgeBieEvent event = new PurgeBieEvent(
+                    new TopLevelAsbiepId(asbieRecord.getOwnerTopLevelAsbiepId().toBigInteger()));
+            /*
+             * Message Publishing
+             */
+            redisTemplate.convertAndSend(PURGE_BIE_EVENT_NAME, event);
         }
 
         // Issue #1635
@@ -1445,15 +1450,30 @@ public class BieEditService implements InitializingBean {
                 .where(ABIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(reuseTopLevelAsbiepId))
                 .fetchStream().forEach(abie -> {
                     ULong oldAbieId = abie.getAbieId();
-                    abie.setAbieId(null);
-                    abie.setPath(asbieRecord.getPath() + ">" + abie.getPath());
-                    abie.setHashPath(sha256(abie.getPath()));
-                    abie.setLastUpdatedBy(ULong.valueOf(requester.userId().value()));
-                    abie.setLastUpdateTimestamp(LocalDateTime.now());
-                    abie.setOwnerTopLevelAsbiepId(ULong.valueOf(topLevelAsbiep.topLevelAsbiepId().value()));
-                    ULong newAbieId = dslContext.insertInto(ABIE).set(abie)
-                            .returning(ABIE.ABIE_ID).fetchOne().getAbieId();
-                    abieIdChangeMap.put(oldAbieId, newAbieId);
+                    String path = asbieRecord.getPath() + ">" + abie.getPath();
+                    String hashPath = sha256(abie.getPath());
+
+                    // If there are any remaining ABIEs during the Reuse BIE creation process, reuse them to avoid duplication.
+                    ULong abieId = dslContext.select(ABIE.ABIE_ID)
+                            .from(ABIE)
+                            .where(and(
+                                    ABIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiep.topLevelAsbiepId().value())),
+                                    ABIE.HASH_PATH.eq(hashPath)
+                            ))
+                            .fetchOptionalInto(ULong.class).orElse(null);
+                    if (abieId != null) {
+                        abieIdChangeMap.put(oldAbieId, abieId);
+                    } else {
+                        abie.setAbieId(null);
+                        abie.setPath(path);
+                        abie.setHashPath(hashPath);
+                        abie.setLastUpdatedBy(ULong.valueOf(requester.userId().value()));
+                        abie.setLastUpdateTimestamp(LocalDateTime.now());
+                        abie.setOwnerTopLevelAsbiepId(ULong.valueOf(topLevelAsbiep.topLevelAsbiepId().value()));
+                        ULong newAbieId = dslContext.insertInto(ABIE).set(abie)
+                                .returning(ABIE.ABIE_ID).fetchOne().getAbieId();
+                        abieIdChangeMap.put(oldAbieId, newAbieId);
+                    }
                 });
         Map<ULong, ULong> asbiepIdChangeMap = new HashMap<>();
         AtomicReference<ULong> newToAsbiepIdRef = new AtomicReference<>();

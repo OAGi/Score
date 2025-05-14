@@ -143,7 +143,7 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                             .fetchOne().getDtScId().toBigInteger()
             );
 
-            dtScManifestRecord.setReleaseId(valueOf(basedDt.release().releaseId()));
+            dtScManifestRecord.setReleaseId(valueOf(releaseId));
             dtScManifestRecord.setDtScId(valueOf(dtScId));
             dtScManifestRecord.setBasedDtScManifestId(valueOf(basedDtSc.dtScManifestId()));
             dtScManifestRecord.setOwnerDtManifestId(valueOf(dtManifestId));
@@ -164,6 +164,7 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
         dslContext().insertInto(DT_AWD_PRI,
                         DT_AWD_PRI.RELEASE_ID,
                         DT_AWD_PRI.DT_ID,
+                        DT_AWD_PRI.CDT_PRI_ID,
                         DT_AWD_PRI.XBT_MANIFEST_ID,
                         DT_AWD_PRI.CODE_LIST_MANIFEST_ID,
                         DT_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID,
@@ -171,6 +172,7 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                 .select(dslContext().select(
                                 inline(valueOf(releaseId)),
                                 inline(valueOf(dtId)),
+                                DT_AWD_PRI.CDT_PRI_ID,
                                 DT_AWD_PRI.XBT_MANIFEST_ID,
                                 DT_AWD_PRI.CODE_LIST_MANIFEST_ID,
                                 DT_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID,
@@ -189,6 +191,7 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
         dslContext().insertInto(DT_SC_AWD_PRI,
                         DT_SC_AWD_PRI.RELEASE_ID,
                         DT_SC_AWD_PRI.DT_SC_ID,
+                        DT_SC_AWD_PRI.CDT_PRI_ID,
                         DT_SC_AWD_PRI.XBT_MANIFEST_ID,
                         DT_SC_AWD_PRI.CODE_LIST_MANIFEST_ID,
                         DT_SC_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID,
@@ -196,6 +199,7 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                 .select(dslContext().select(
                                 inline(valueOf(releaseId)),
                                 inline(valueOf(dtScId)),
+                                DT_SC_AWD_PRI.CDT_PRI_ID,
                                 DT_SC_AWD_PRI.XBT_MANIFEST_ID,
                                 DT_SC_AWD_PRI.CODE_LIST_MANIFEST_ID,
                                 DT_SC_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID,
@@ -311,9 +315,15 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                 dtAwdPriList.stream()
                         .filter(e -> e.xbt() != null)
                         .map(dtAwdPri -> {
+                            String cdtPriName = dtAwdPri.cdtPriName();
+
                             DtScAwdPriRecord dtScAwdPriRecord = new DtScAwdPriRecord();
                             dtScAwdPriRecord.setReleaseId(valueOf(dtSc.release().releaseId()));
                             dtScAwdPriRecord.setDtScId(valueOf(dtSc.dtScId()));
+                            dtScAwdPriRecord.setCdtPriId(dslContext().select(CDT_PRI.CDT_PRI_ID)
+                                    .from(CDT_PRI)
+                                    .where(CDT_PRI.NAME.eq(cdtPriName))
+                                    .fetchOneInto(ULong.class));
                             dtScAwdPriRecord.setXbtManifestId(valueOf(dtAwdPri.xbt().xbtManifestId()));
                             dtScAwdPriRecord.setIsDefault((byte) (dtAwdPri.isDefault() ? 1 : 0));
 
@@ -736,11 +746,11 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
         List<DtScDetailsRecord> dtScList = query.getDtScDetailsList(dtManifestId);
         if (!dtScList.isEmpty()) {
             // discard DT_SC_AWD_PRIs
+            Collection<DtScAwdPriId> dtScAwdPriIds =
+                    dtScList.stream().map(e -> e.dtScAwdPriList()).flatMap(Collection::stream)
+                            .map(e -> e.dtScAwdPriId()).collect(Collectors.toSet());
             dslContext().deleteFrom(DT_SC_AWD_PRI)
-                    .where(DT_SC_AWD_PRI.DT_SC_AWD_PRI_ID.in(valueOf(
-                            dtScList.stream().map(e -> e.dtScAwdPriList()).flatMap(Collection::stream)
-                                    .map(e -> e.dtScAwdPriId()).collect(Collectors.toSet()))
-                    ))
+                    .where(DT_SC_AWD_PRI.DT_SC_AWD_PRI_ID.in(valueOf(dtScAwdPriIds)))
                     .execute();
 
             dslContext().deleteFrom(DT_SC_MANIFEST)
@@ -1006,6 +1016,7 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
 
     @Override
     public DtAwdPriId createDtAwdPri(ReleaseId releaseId, DtId dtId,
+                                     String cdtPriName,
                                      XbtManifestId xbtManifestId,
                                      CodeListManifestId codeListManifestId,
                                      AgencyIdListManifestId agencyIdListManifestId,
@@ -1014,6 +1025,10 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
         DtAwdPriRecord dtAwdPriRecord = new DtAwdPriRecord();
         dtAwdPriRecord.setReleaseId(valueOf(releaseId));
         dtAwdPriRecord.setDtId(valueOf(dtId));
+        dtAwdPriRecord.setCdtPriId(dslContext().select(CDT_PRI.CDT_PRI_ID)
+                .from(CDT_PRI)
+                .where(CDT_PRI.NAME.eq(cdtPriName))
+                .fetchOneInto(ULong.class));
         if (codeListManifestId != null) {
             dtAwdPriRecord.setCodeListManifestId(valueOf(codeListManifestId));
         } else if (agencyIdListManifestId != null) {
@@ -1034,6 +1049,7 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
 
     @Override
     public boolean updateDtAwdPri(DtAwdPriId dtAwdPriId,
+                                  String cdtPriName,
                                   XbtManifestId xbtManifestId,
                                   CodeListManifestId codeListManifestId,
                                   AgencyIdListManifestId agencyIdListManifestId,
@@ -1041,6 +1057,13 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
 
         UpdateSetMoreStep moreStep = dslContext().update(DT_AWD_PRI)
                 .set(DT_AWD_PRI.IS_DEFAULT, (byte) (isDefault ? 1 : 0));
+        if (hasLength(cdtPriName)) {
+            moreStep = moreStep
+                    .set(DT_AWD_PRI.CDT_PRI_ID, dslContext().select(CDT_PRI.CDT_PRI_ID)
+                            .from(CDT_PRI)
+                            .where(CDT_PRI.NAME.eq(cdtPriName))
+                            .fetchOneInto(ULong.class));
+        }
         if (codeListManifestId != null) {
             moreStep = moreStep
                     .setNull(DT_AWD_PRI.XBT_MANIFEST_ID)
@@ -1079,6 +1102,7 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
 
     @Override
     public DtScAwdPriId createDtScAwdPri(ReleaseId releaseId, DtScId dtScId,
+                                         String cdtPriName,
                                          XbtManifestId xbtManifestId,
                                          CodeListManifestId codeListManifestId,
                                          AgencyIdListManifestId agencyIdListManifestId,
@@ -1087,6 +1111,10 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
         DtScAwdPriRecord dtScAwdPriRecord = new DtScAwdPriRecord();
         dtScAwdPriRecord.setReleaseId(valueOf(releaseId));
         dtScAwdPriRecord.setDtScId(valueOf(dtScId));
+        dtScAwdPriRecord.setCdtPriId(dslContext().select(CDT_PRI.CDT_PRI_ID)
+                .from(CDT_PRI)
+                .where(CDT_PRI.NAME.eq(cdtPriName))
+                .fetchOneInto(ULong.class));
         if (codeListManifestId != null) {
             dtScAwdPriRecord.setCodeListManifestId(valueOf(codeListManifestId));
         } else if (agencyIdListManifestId != null) {
@@ -1107,6 +1135,7 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
 
     @Override
     public boolean updateDtScAwdPri(DtScAwdPriId dtScAwdPriId,
+                                    String cdtPriName,
                                     XbtManifestId xbtManifestId,
                                     CodeListManifestId codeListManifestId,
                                     AgencyIdListManifestId agencyIdListManifestId,
@@ -1114,6 +1143,13 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
 
         UpdateSetMoreStep moreStep = dslContext().update(DT_SC_AWD_PRI)
                 .set(DT_SC_AWD_PRI.IS_DEFAULT, (byte) (isDefault ? 1 : 0));
+        if (hasLength(cdtPriName)) {
+            moreStep = moreStep
+                    .set(DT_SC_AWD_PRI.CDT_PRI_ID, dslContext().select(CDT_PRI.CDT_PRI_ID)
+                            .from(CDT_PRI)
+                            .where(CDT_PRI.NAME.eq(cdtPriName))
+                            .fetchOneInto(ULong.class));
+        }
         if (codeListManifestId != null) {
             moreStep = moreStep
                     .setNull(DT_SC_AWD_PRI.XBT_MANIFEST_ID)

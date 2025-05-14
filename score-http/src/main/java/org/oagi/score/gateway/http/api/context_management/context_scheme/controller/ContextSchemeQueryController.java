@@ -85,7 +85,7 @@ public class ContextSchemeQueryController {
             @AuthenticationPrincipal AuthenticatedPrincipal user,
 
             @RequestParam(name = "name", required = false)
-            @Parameter(description = "The meaning of the context scheme to filter results.")
+            @Parameter(description = "The name of the context scheme to filter results.")
             String name,
 
             @RequestParam(name = "description", required = false)

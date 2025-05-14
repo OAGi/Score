@@ -85,7 +85,8 @@ export class CcListRequest {
     this.tags = (params.get('tags')) ? Array.from(params.get('tags').split(',')) : [];
     this.namespaces = (params.get('namespaces')) ? Array.from(params.get('namespaces').split(',')).map(e => Number(e)) : [];
     this.componentTypes = (params.get('componentTypes')) ? Array.from(params.get('componentTypes').split(','))
-      .map(elm => OagisComponentTypes[elm]) : [];
+        .filter(e => !!e)
+        .map(elm => OagisComponentTypes[elm]) : [];
     this.updatedDate = {
       start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
       end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
@@ -149,14 +150,17 @@ export class CcListRequest {
       params = params.set('module', '' + this.filters.module);
     }
     if (this.tags && this.tags.length > 0) {
-      params = params.set('tags', this.tags.join(','));
+      params = params.set('tags', this.tags
+          .filter(e => !!e).join(','));
     }
     if (this.namespaces && this.namespaces.length > 0) {
-      params = params.set('namespaces', this.namespaces.map(e => '' + e).join(','));
+      params = params.set('namespaces', this.namespaces
+          .filter(e => !!e).map(e => '' + e).join(','));
     }
     if (this.componentTypes && this.componentTypes.length > 0) {
       params = params.set('componentTypes', this.componentTypes
-        .map((elm: OagisComponentType) => elm.value).join(','));
+          .filter(e => !!e)
+          .map((elm: OagisComponentType) => elm.value).join(','));
     }
     if (this.findUsages.type && this.findUsages.manifestId > 0) {
       params = params.set('findUsagesType', this.findUsages.type)

@@ -2070,6 +2070,7 @@ export class CcDtNodeInfo extends CcNodeInfo {
       dtAwdPriList: this.dtAwdPriList.map(e => {
         return {
           dtAwdPriId: e.dtAwdPriId,
+          cdtPriName: (!!e.codeList || !!e.agencyIdList) ? 'Token' : e.cdtPriName,
           xbtManifestId: (!!e.xbt) ? e.xbt.xbtManifestId : undefined,
           codeListManifestId: (!!e.codeList) ? e.codeList.codeListManifestId : undefined,
           agencyIdListManifestId: (!!e.agencyIdList) ? e.agencyIdList.agencyIdListManifestId : undefined,
@@ -2580,6 +2581,7 @@ export class CcDtScNodeInfo extends CcNodeInfo {
       dtScAwdPriList: this.dtScAwdPriList.map(e => {
         return {
           dtScAwdPriId: e.dtScAwdPriId,
+          cdtPriName: (!!e.codeList || !!e.agencyIdList) ? 'Token' : e.cdtPriName,
           xbtManifestId: (!!e.xbt) ? e.xbt.xbtManifestId : undefined,
           codeListManifestId: (!!e.codeList) ? e.codeList.codeListManifestId : undefined,
           agencyIdListManifestId: (!!e.agencyIdList) ? e.agencyIdList.agencyIdListManifestId : undefined,

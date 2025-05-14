@@ -929,14 +929,14 @@ public class CcCommandService {
         for (var value : request.dtAwdPriList()) {
             DtAwdPriId valueId = value.dtAwdPriId();
             if (existingValues.containsKey(valueId)) {
-                boolean updatedAwdPri = command.updateDtAwdPri(valueId,
+                boolean updatedAwdPri = command.updateDtAwdPri(valueId, value.cdtPriName(),
                         value.xbtManifestId(), value.codeListManifestId(), value.agencyIdListManifestId(), value.isDefault());
                 if (updatedAwdPri) {
                     updated = true;
                 }
                 existingValues.remove(valueId);
             } else {
-                DtAwdPriId createdId = command.createDtAwdPri(dt.release().releaseId(), dt.dtId(),
+                DtAwdPriId createdId = command.createDtAwdPri(dt.release().releaseId(), dt.dtId(), value.cdtPriName(),
                         value.xbtManifestId(), value.codeListManifestId(), value.agencyIdListManifestId(), value.isDefault());
                 if (createdId != null) {
                     updated = true;
@@ -1075,14 +1075,14 @@ public class CcCommandService {
         for (var value : request.dtScAwdPriList()) {
             DtScAwdPriId valueId = value.dtScAwdPriId();
             if (existingValues.containsKey(valueId)) {
-                boolean updatedScAwdPri = command.updateDtScAwdPri(valueId,
+                boolean updatedScAwdPri = command.updateDtScAwdPri(valueId, value.cdtPriName(),
                         value.xbtManifestId(), value.codeListManifestId(), value.agencyIdListManifestId(), value.isDefault());
                 if (updatedScAwdPri) {
                     updated = true;
                 }
                 existingValues.remove(valueId);
             } else {
-                DtScAwdPriId createdId = command.createDtScAwdPri(dt.release().releaseId(), dtSc.dtScId(),
+                DtScAwdPriId createdId = command.createDtScAwdPri(dt.release().releaseId(), dtSc.dtScId(), value.cdtPriName(),
                         value.xbtManifestId(), value.codeListManifestId(), value.agencyIdListManifestId(), value.isDefault());
                 if (createdId != null) {
                     updated = true;

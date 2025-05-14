@@ -61,29 +61,11 @@ public class XbtManifestRecord extends UpdatableRecordImpl<XbtManifestRecord> {
     }
 
     /**
-     * Setter for <code>oagi.xbt_manifest.cdt_pri_id</code>. Foreign key
-     * referencing the CDT_PRI table. Specifies how the current record maps to
-     * allowed primitives in CDT.
-     */
-    public void setCdtPriId(ULong value) {
-        set(3, value);
-    }
-
-    /**
-     * Getter for <code>oagi.xbt_manifest.cdt_pri_id</code>. Foreign key
-     * referencing the CDT_PRI table. Specifies how the current record maps to
-     * allowed primitives in CDT.
-     */
-    public ULong getCdtPriId() {
-        return (ULong) get(3);
-    }
-
-    /**
      * Setter for <code>oagi.xbt_manifest.conflict</code>. This indicates that
      * there is a conflict between self and relationship.
      */
     public void setConflict(Byte value) {
-        set(4, value);
+        set(3, value);
     }
 
     /**
@@ -91,7 +73,7 @@ public class XbtManifestRecord extends UpdatableRecordImpl<XbtManifestRecord> {
      * there is a conflict between self and relationship.
      */
     public Byte getConflict() {
-        return (Byte) get(4);
+        return (Byte) get(3);
     }
 
     /**
@@ -99,7 +81,7 @@ public class XbtManifestRecord extends UpdatableRecordImpl<XbtManifestRecord> {
      * to a log for the current record.
      */
     public void setLogId(ULong value) {
-        set(5, value);
+        set(4, value);
     }
 
     /**
@@ -107,35 +89,35 @@ public class XbtManifestRecord extends UpdatableRecordImpl<XbtManifestRecord> {
      * to a log for the current record.
      */
     public ULong getLogId() {
-        return (ULong) get(5);
+        return (ULong) get(4);
     }
 
     /**
      * Setter for <code>oagi.xbt_manifest.prev_xbt_manifest_id</code>.
      */
     public void setPrevXbtManifestId(ULong value) {
-        set(6, value);
+        set(5, value);
     }
 
     /**
      * Getter for <code>oagi.xbt_manifest.prev_xbt_manifest_id</code>.
      */
     public ULong getPrevXbtManifestId() {
-        return (ULong) get(6);
+        return (ULong) get(5);
     }
 
     /**
      * Setter for <code>oagi.xbt_manifest.next_xbt_manifest_id</code>.
      */
     public void setNextXbtManifestId(ULong value) {
-        set(7, value);
+        set(6, value);
     }
 
     /**
      * Getter for <code>oagi.xbt_manifest.next_xbt_manifest_id</code>.
      */
     public ULong getNextXbtManifestId() {
-        return (ULong) get(7);
+        return (ULong) get(6);
     }
 
     // -------------------------------------------------------------------------
@@ -161,13 +143,12 @@ public class XbtManifestRecord extends UpdatableRecordImpl<XbtManifestRecord> {
     /**
      * Create a detached, initialised XbtManifestRecord
      */
-    public XbtManifestRecord(ULong xbtManifestId, ULong releaseId, ULong xbtId, ULong cdtPriId, Byte conflict, ULong logId, ULong prevXbtManifestId, ULong nextXbtManifestId) {
+    public XbtManifestRecord(ULong xbtManifestId, ULong releaseId, ULong xbtId, Byte conflict, ULong logId, ULong prevXbtManifestId, ULong nextXbtManifestId) {
         super(XbtManifest.XBT_MANIFEST);
 
         setXbtManifestId(xbtManifestId);
         setReleaseId(releaseId);
         setXbtId(xbtId);
-        setCdtPriId(cdtPriId);
         setConflict(conflict);
         setLogId(logId);
         setPrevXbtManifestId(prevXbtManifestId);

@@ -234,6 +234,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
         thisAccountWillBeDeletedAfterTests(endUser);
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         for (Map.Entry<String, ACCObject> entry : developerCoreComponentWithStateContainer.stateACCs.entrySet()) {
             String state = entry.getKey();
             ACCObject acc = developerCoreComponentWithStateContainer.stateACCs.get(state);

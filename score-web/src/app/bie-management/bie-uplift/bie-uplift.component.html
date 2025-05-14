@@ -13,15 +13,15 @@
       </div>
       <div class="row" [hidden]="loading">
         <div class="col-md-12 pt-2 pb-2 d-flex">
-          <button mat-icon-button class="nav-button mr-2" (click)="lookUpUnmatched(-1)"
+          <button mat-icon-button mat-tiny-icon-button class="nav-button mr-2" (click)="lookUpUnmatched(-1)"
                   [hidden]="unmatchedSource.length === 0">
             <mat-icon>arrow_back_ios</mat-icon>
           </button>
-          <button mat-icon-button class="nav-button mr-2" (click)="lookUpUnmatched(1)"
+          <button mat-icon-button mat-tiny-icon-button class="nav-button mr-2" (click)="lookUpUnmatched(1)"
                   [hidden]="unmatchedSource.length === 0">
             <mat-icon>arrow_forward_ios</mat-icon>
           </button>
-          <div>
+          <div class="ml-2">
             <span *ngIf="unmatchedSource.length === 0">All contents are mapped.</span>
             <span *ngIf="unmatchedSource.length > 0" class="nav-number">
               {{unmatchedSource.indexOf(this.currentUnmatchedSource) + 1}}/{{unmatchedSource.length}}

@@ -13,7 +13,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <selenium.version>4.31.0</selenium.version>
+        <selenium.version>4.32.0</selenium.version>
         <junit.version>5.12.2</junit.version>
         <junit.platform.version>1.12.2</junit.platform.version>
         <slf4j.version>2.0.17</slf4j.version>
@@ -28,7 +28,7 @@
         <snakeyaml.version>2.4</snakeyaml.version>
         <mariadb-client.version>3.5.3</mariadb-client.version>
         <hikariCP.version>6.3.0</hikariCP.version>
-        <jOOQ.version>3.20.2</jOOQ.version>
+        <jOOQ.version>3.20.3</jOOQ.version>
         <jOOQ.configuration.skip>true</jOOQ.configuration.skip>
     </properties>
 

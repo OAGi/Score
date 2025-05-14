@@ -3290,14 +3290,11 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
                     (node.basedTopLevelAsbiepId ? node.basedTopLevelAsbiepId : node.topLevelAsbiepId),
                 asbiepNode.asccNode.manifestId, asbiepNode.asbiePath)
           ]).subscribe(([asbieDetails, asbiepDetails, abieDetails, basedAsbieDetails]) => {
-            if ((asbieDetails as unknown as BieEditAsbiepNodeDetail).asbie.toAsbiepId ===
-                (basedAsbieDetails as unknown as BieEditAsbiepNodeDetail).asbie.toAsbiepId) {
-
+            if (asbieDetails.toAsbiepId === basedAsbieDetails.toAsbiepId) {
               return doAfterAsbiep(asbieDetails, asbiepDetails, abieDetails, basedAsbieDetails, asbiepDetails, abieDetails);
             } else {
-              this.service.getAsbiepDetails((basedAsbieDetails as unknown as BieEditAsbiepNodeDetail).asbie.toAsbiepId).subscribe(
-                  basedAsbiepDetail => this.service.getAbieDetails(
-                      (basedAsbiepDetail as unknown as BieEditAsbiepNodeDetail).asbiep.roleOfAbieId).subscribe(
+              this.service.getAsbiepDetails(basedAsbieDetails.toAsbiepId).subscribe(
+                  basedAsbiepDetail => this.service.getAbieDetails(basedAsbiepDetail.roleOfAbieId).subscribe(
                       basedAbieDetails => {
                         return doAfterAsbiep(asbieDetails, asbiepDetails, abieDetails,
                             basedAsbieDetails, basedAsbiepDetail, basedAbieDetails);

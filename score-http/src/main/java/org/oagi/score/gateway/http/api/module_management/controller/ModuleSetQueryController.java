@@ -55,7 +55,7 @@ public class ModuleSetQueryController {
             LibraryId libraryId,
 
             @RequestParam(name = "name", required = false)
-            @Parameter(description = "The meaning of the module set to filter results.")
+            @Parameter(description = "The name of the module set to filter results.")
             String name,
 
             @RequestParam(name = "description", required = false)

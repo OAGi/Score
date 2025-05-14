@@ -92,6 +92,7 @@ public class TC_15_10_CreatingBrandNewEndUserASCCP extends BaseTest {
         HomePage homePage = loginPage().signIn(another_user.getLoginId(), another_user.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
 
         for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
             ACCObject acc;
@@ -165,6 +166,7 @@ public class TC_15_10_CreatingBrandNewEndUserASCCP extends BaseTest {
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
 
         LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);

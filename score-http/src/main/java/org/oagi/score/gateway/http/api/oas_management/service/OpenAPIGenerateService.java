@@ -110,15 +110,15 @@ public class OpenAPIGenerateService {
     private void defineSchemaName(BieGenerateOpenApiExpression generateExpression,
                                   OpenAPIGenerateExpressionOption option, GenerationContext generationContext) {
         // Issue #1603
-        // Pre-define the schema object meaning for each operation
+        // Pre-define the schema object name for each operation
         //
         // <SchemaObject Name> ::= <UniqueTopLevelBIEName>[List][<MessageBodyType>][<ActionVerb>][Entry]
         //
         // <UniqueTopLevelBIEName> ::= <BIEName> when a DEN only has one distinct BIEId in the list of usages
-        // [List] ::= **conditional** meaning; only used when the outer schema object represents an array or if the BIE has few properties selected in an inner array typically on a GET operation
+        // [List] ::= **conditional** name; only used when the outer schema object represents an array or if the BIE has few properties selected in an inner array typically on a GET operation
         // [<MessageBodyType>] ::= **optional** meaning, only used to distinguish distinct BIEs, across different message bodies
-        // [<ActionVerb>] :: = 'Update' | 'Delete' | 'Create' | 'Replace' | 'Read'; **optional** meaning used to further assist in unique DEN when multiple BIE ids exist for the same DEN.
-        // [Entry] ::= **optional** meaning; used for the inner schema object of an array -- seldom used.
+        // [<ActionVerb>] :: = 'Update' | 'Delete' | 'Create' | 'Replace' | 'Read'; **optional** name used to further assist in unique DEN when multiple BIE ids exist for the same DEN.
+        // [Entry] ::= **optional** name; used for the inner schema object of an array -- seldom used.
         Map<String, List<OpenAPITemplateForVerbOption>> bieNameTemplateMap = new HashMap<>();
         for (OpenAPITemplateForVerbOption template : option.getTemplates()) {
             String bieName = getBieName(template.getTopLevelAsbiep(), generationContext);

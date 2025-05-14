@@ -92,26 +92,26 @@ public interface ContextSchemeQueryRepository {
                                          String schemeId, String schemeAgencyId, String schemeVersionId);
 
     /**
-     * Checks if a context scheme with the given meaning, scheme ID, agency ID, and version ID already exists.
+     * Checks if a context scheme with the given name, scheme ID, agency ID, and version ID already exists.
      *
-     * @param schemeName      The scheme meaning to check.
+     * @param schemeName      The scheme name to check.
      * @param schemeId        The scheme ID to check.
      * @param schemeAgencyId  The agency ID of the scheme.
      * @param schemeVersionId The version ID of the scheme.
-     * @return true if a context scheme with the same meaning exists, false otherwise.
+     * @return true if a context scheme with the same name exists, false otherwise.
      */
     boolean hasDuplicateName(String schemeName, String schemeId, String schemeAgencyId, String schemeVersionId);
 
     /**
-     * Checks if a context scheme with the given meaning, scheme ID, agency ID, and version ID already exists,
+     * Checks if a context scheme with the given name, scheme ID, agency ID, and version ID already exists,
      * excluding the current context scheme.
      *
      * @param contextSchemeId The ID of the current context scheme to exclude from the check.
-     * @param schemeName      The scheme meaning to check.
+     * @param schemeName      The scheme name to check.
      * @param schemeId        The scheme ID to check.
      * @param schemeAgencyId  The agency ID of the scheme.
      * @param schemeVersionId The version ID of the scheme.
-     * @return true if a context scheme with the same meaning exists (excluding the current one), false otherwise.
+     * @return true if a context scheme with the same name exists (excluding the current one), false otherwise.
      */
     boolean hasDuplicateNameExcludingCurrent(ContextSchemeId contextSchemeId,
                                              String schemeName, String schemeId, String schemeAgencyId, String schemeVersionId);

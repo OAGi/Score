@@ -43,12 +43,12 @@ public class ContextCategoryCommandService {
      * @param requester The user making the request.
      * @param request   The request containing the context category details.
      * @return The ID of the created context category.
-     * @throws IllegalArgumentException if the context category meaning is empty.
+     * @throws IllegalArgumentException if the context category name is empty.
      */
     public ContextCategoryId create(ScoreUser requester, CreateContextCategoryRequest request) {
 
         if (!hasLength(request.name())) {
-            throw new IllegalArgumentException("Context category meaning cannot be empty.");
+            throw new IllegalArgumentException("Context category name cannot be empty.");
         }
 
         return command(requester).create(
@@ -62,7 +62,7 @@ public class ContextCategoryCommandService {
      * @param requester The user making the request.
      * @param request   The request containing the updated context category details.
      * @return true if the update was successful, false otherwise.
-     * @throws IllegalArgumentException if the context category ID is null or the meaning is empty.
+     * @throws IllegalArgumentException if the context category ID is null or the name is empty.
      */
     public boolean update(ScoreUser requester, UpdateContextCategoryRequest request) {
 
@@ -70,7 +70,7 @@ public class ContextCategoryCommandService {
             throw new IllegalArgumentException("Context category ID must not be null.");
         }
         if (!hasLength(request.name())) {
-            throw new IllegalArgumentException("Context category meaning cannot be empty.");
+            throw new IllegalArgumentException("Context category name cannot be empty.");
         }
 
         return command(requester).update(

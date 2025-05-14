@@ -5,7 +5,7 @@ import org.oagi.score.gateway.http.common.model.WhoAndWhen;
 
 /**
  * Represents the detailed information of a context category.
- * This record contains the context category ID, GUID, meaning, description, usage status,
+ * This record contains the context category ID, GUID, name, description, usage status,
  * and information about when it was created and last updated.
  */
 public record ContextCategoryDetailsRecord(ContextCategoryId contextCategoryId,

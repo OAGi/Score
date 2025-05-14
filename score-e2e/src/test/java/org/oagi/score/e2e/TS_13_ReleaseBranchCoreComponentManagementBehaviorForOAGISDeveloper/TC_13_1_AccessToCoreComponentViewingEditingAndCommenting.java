@@ -200,8 +200,8 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         viewEditCoreComponentPage.setBranch(release.getReleaseNumber());
-        viewEditCoreComponentPage.selectAllComponentTypes();
         for (ACCObject acc : accForTesting) {
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(acc.getOwnerUserId());
             viewEditCoreComponentPage.setDEN(acc.getDen());
@@ -240,6 +240,8 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             }
         }
 
+        // Since 3.4, 'Core Component' list page doesn't display ASCC/BCC records.
+        /*
         for (BCCObject bcc : bccForTesting) {
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(bcc.getOwnerUserId());
             viewEditCoreComponentPage.setDEN(bcc.getDen());
@@ -254,6 +256,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
                 });
             }
         }
+        */
         for (ASCCPObject asccp : asccpForTesting) {
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(asccp.getOwnerUserId());
             viewEditCoreComponentPage.setDEN(asccp.getDen());
@@ -268,6 +271,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
                 });
             }
         }
+        /*
         for (ASCCObject ascc : asccForTesting) {
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(ascc.getOwnerUserId());
             viewEditCoreComponentPage.setDEN(ascc.getDen());
@@ -282,6 +286,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
                 });
             }
         }
+        */
     }
 
     @Test

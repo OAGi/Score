@@ -46,7 +46,7 @@ public class ModuleSetModuleCommandService {
         var query = query(requester);
 
         if (query.hasDuplicateName(request.parentModuleId(), request.name())) {
-            throw new IllegalArgumentException("Duplicate module meaning exist.");
+            throw new IllegalArgumentException("Duplicate module name exist.");
         }
 
         ModuleSummaryRecord parentModule = null;
@@ -81,7 +81,7 @@ public class ModuleSetModuleCommandService {
         List<String> tokens = Collections.emptyList();
         if (hasLength(request.name()) && !Objects.equals(request.name(), module.name())) {
             if (query.hasDuplicateName(module.parentModuleId(), request.name())) {
-                throw new IllegalArgumentException("Duplicate module meaning exist.");
+                throw new IllegalArgumentException("Duplicate module name exist.");
             }
 
             tokens = Arrays.asList(module.path().split(MODULE_PATH_SEPARATOR + MODULE_PATH_SEPARATOR));

@@ -18,18 +18,18 @@ import java.util.List;
 public interface BusinessContextCommandRepository {
 
     /**
-     * Creates a new business context with the provided meaning.
+     * Creates a new business context with the provided name.
      *
-     * @param name The meaning of the new business context.
+     * @param name The name of the new business context.
      * @return The ID of the created business context.
      */
     BusinessContextId create(String name);
 
     /**
-     * Updates an existing business context with the provided meaning.
+     * Updates an existing business context with the provided name.
      *
      * @param businessContextId The ID of the business context to update.
-     * @param name              The new meaning for the business context.
+     * @param name              The new name for the business context.
      * @return true if the update was successful, false otherwise.
      */
     boolean update(BusinessContextId businessContextId, String name);

@@ -659,8 +659,6 @@ export class DtListComponent implements OnInit {
           });
           this.selection.clear();
           this.loadCcList();
-
-          this.loading = false;
         }, err => {
           this.loading = false;
           throw err;

@@ -113,20 +113,25 @@ export class CcListService {
       params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
     }
     if (request.tags && request.tags.length > 0) {
-      params = params.set('tags', request.tags.join(','));
+      params = params.set('tags', request.tags
+          .filter(e => !!e).join(','));
     }
     if (request.namespaces && request.namespaces.length > 0) {
-      params = params.set('namespaces', request.namespaces.map(e => '' + e).join(','));
+      params = params.set('namespaces', request.namespaces
+          .filter(e => !!e).map(e => '' + e).join(','));
     }
     if (request.componentTypes && request.componentTypes.length > 0) {
       params = params.set('componentTypes', request.componentTypes
-        .map((elm: OagisComponentType) => elm.value).join(','));
+          .filter(e => !!e)
+          .map((elm: OagisComponentType) => elm.value).join(','));
     }
     if (request.dtTypes && request.dtTypes.length > 0) {
-      params = params.set('dtTypes', request.dtTypes.join(','));
+      params = params.set('dtTypes', request.dtTypes
+          .filter(e => !!e).join(','));
     }
     if (request.asccpTypes && request.asccpTypes.length > 0) {
-      params = params.set('asccpTypes', request.asccpTypes.join(','));
+      params = params.set('asccpTypes', request.asccpTypes
+          .filter(e => !!e).join(','));
     }
     if (request.findUsages.type && request.findUsages.manifestId > 0) {
       params = params.set('findUsagesType', request.findUsages.type)

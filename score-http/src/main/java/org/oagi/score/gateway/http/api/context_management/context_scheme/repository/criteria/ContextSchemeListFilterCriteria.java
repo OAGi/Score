@@ -6,7 +6,7 @@ import java.util.Collection;
 
 /**
  * Criteria for filtering context schemes in a list.
- * This record includes fields for filtering by meaning, description,
+ * This record includes fields for filtering by name, description,
  * updater login IDs, and last updated timestamp range.
  */
 public record ContextSchemeListFilterCriteria(String name, String description,

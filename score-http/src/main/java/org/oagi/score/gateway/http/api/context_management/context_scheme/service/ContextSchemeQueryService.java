@@ -123,14 +123,14 @@ public class ContextSchemeQueryService {
     }
 
     /**
-     * Checks if the context scheme meaning is unique based on the scheme's ID, agency ID, and version ID.
+     * Checks if the context scheme name is unique based on the scheme's ID, agency ID, and version ID.
      *
      * @param requester       The user making the request.
-     * @param schemeName      The meaning of the scheme to check.
+     * @param schemeName      The name of the scheme to check.
      * @param schemeId        The ID of the scheme to check.
      * @param schemeAgencyId  The agency ID of the scheme to check.
      * @param schemeVersionId The version ID of the scheme to check.
-     * @return true if the context scheme meaning is unique, false otherwise.
+     * @return true if the context scheme name is unique, false otherwise.
      */
     public boolean isContextSchemeNameUnique(
             ScoreUser requester,
@@ -141,15 +141,15 @@ public class ContextSchemeQueryService {
     }
 
     /**
-     * Checks if the context scheme meaning is unique, excluding the current context scheme (by its ID).
+     * Checks if the context scheme name is unique, excluding the current context scheme (by its ID).
      *
      * @param requester       The user making the request.
      * @param contextSchemeId The ID of the current context scheme to exclude from the check.
-     * @param schemeName      The meaning of the scheme to check.
+     * @param schemeName      The name of the scheme to check.
      * @param schemeId        The ID of the scheme to check.
      * @param schemeAgencyId  The agency ID of the scheme to check.
      * @param schemeVersionId The version ID of the scheme to check.
-     * @return true if the context scheme meaning is unique, excluding the current context scheme, false otherwise.
+     * @return true if the context scheme name is unique, excluding the current context scheme, false otherwise.
      */
     public boolean isContextSchemeNameUniqueExcludingCurrent(
             ScoreUser requester, ContextSchemeId contextSchemeId,

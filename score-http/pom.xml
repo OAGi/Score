@@ -63,10 +63,10 @@
         <db.password>oagi</db.password>
 
         <cglib.version>3.3.0</cglib.version>
-        <aspectj.version>1.9.22.1</aspectj.version>
+        <aspectj.version>1.9.24</aspectj.version>
         <lettuce.version>6.6.0.RELEASE</lettuce.version>
         <redisson.version>3.46.0</redisson.version>
-        <netty.version>4.2.0.Final</netty.version>
+        <netty.version>4.2.1.Final</netty.version>
         <lombok.version>1.18.38</lombok.version>
         <mariadb-client.version>3.5.3</mariadb-client.version>
         <log4j.version>2.24.3</log4j.version>
@@ -313,12 +313,6 @@
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>xsom</artifactId>
             <version>${xsom.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.checkerframework</groupId>
-            <artifactId>checker-qual</artifactId>
-            <version>3.43.0</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 

@@ -69,11 +69,11 @@ public class BusinessContextQueryService {
     }
 
     /**
-     * Retrieves the list of business context summaries filtered by top-level ASBIEP ID and business context meaning.
+     * Retrieves the list of business context summaries filtered by top-level ASBIEP ID and business context name.
      *
      * @param requester           The user requesting the data.
      * @param topLevelAsbiepId    The top-level ASBIEP ID to filter the results.
-     * @param businessContextName The business context meaning to filter the results.
+     * @param businessContextName The business context name to filter the results.
      * @return A list of filtered business context summary records.
      */
     public List<BusinessContextSummaryRecord> getBusinessContextSummaryList(

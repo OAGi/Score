@@ -16,7 +16,7 @@ import {
   ValueDomainType
 } from '../bie-edit/domain/bie-edit-node';
 import {
-  AbieFlatNode,
+  AbieFlatNode, AsbieDetail, AsbiepDetail, AsbiepDetails,
   AsbiepFlatNode,
   BbieDetail,
   BbiepFlatNode,
@@ -159,7 +159,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   /* reused BIE */
   reusedBusinessContexts: BusinessContextSummary[] = [];
   reusedNode: BieEditNode;
-  reusedNodeDetail: BieEditAsbiepNodeDetail;
+  reusedNodeDetail: AsbiepDetails;
 
   /* business contexts in base BIE */
   basedBusinessContexts?: BusinessContextSummary[] = [];
@@ -168,7 +168,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   /* reused base BIE */
   reusedBaseBusinessContexts: BusinessContextSummary[] = [];
   reusedBaseNode: BieEditNode;
-  reusedBaseNodeDetail: BieEditAsbiepNodeDetail;
+  reusedBaseNodeDetail: AsbiepDetails;
 
   /* cardinality management */
   bieCardinalityMin: FormControl;
@@ -431,12 +431,12 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       if (node.bieType.toUpperCase() === 'ASBIEP' && node.reused) {
         forkJoin([
           this.service.getRootNode(node.topLevelAsbiepId),
-          this.service.getDetail(node.topLevelAsbiepId, 'ASBIEP',
-            (node as AsbiepFlatNode).asccpNode.manifestId, (node as AsbiepFlatNode).asbiepPath),
+          this.service.getAsbiepDetailsByPath(node.topLevelAsbiepId,
+              (node as AsbiepFlatNode).asccpNode.manifestId, (node as AsbiepFlatNode).asbiepPath),
           this.bizCtxService.getBusinessContextsByTopLevelAsbiepId(node.topLevelAsbiepId)
         ]).subscribe(([resp, detail, bizCtxResp]) => {
           this.reusedNode = resp as BieEditAbieNode;
-          this.reusedNodeDetail = detail as BieEditAsbiepNodeDetail;
+          this.reusedNodeDetail = detail;
           this.reusedBusinessContexts = bizCtxResp;
 
           if (node.inherited) {
@@ -444,12 +444,12 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
               const inheritedReuseTopLevelAsbiepId = this.asAsbiepDetail(node).base.asbiep.ownerTopLevelAsbiepId;
               forkJoin([
                 this.service.getRootNode(inheritedReuseTopLevelAsbiepId),
-                this.service.getDetail(inheritedReuseTopLevelAsbiepId, 'ASBIEP',
-                  (node as AsbiepFlatNode).asccpNode.manifestId, (node as AsbiepFlatNode).asbiepPath),
+                this.service.getAsbiepDetailsByPath(inheritedReuseTopLevelAsbiepId,
+                    (node as AsbiepFlatNode).asccpNode.manifestId, (node as AsbiepFlatNode).asbiepPath),
                 this.bizCtxService.getBusinessContextsByTopLevelAsbiepId(inheritedReuseTopLevelAsbiepId)
               ]).subscribe(([baseResp, baseDetail, baseBizCtxResp]) => {
                 this.reusedBaseNode = baseResp as BieEditAbieNode;
-                this.reusedBaseNodeDetail = baseDetail as BieEditAsbiepNodeDetail;
+                this.reusedBaseNodeDetail = baseDetail;
                 this.reusedBaseBusinessContexts = baseBizCtxResp;
               });
             } else {
@@ -516,11 +516,13 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       this.toggleTreeUsed(this.cursorNode);
     } else if ($event.key === 'o' || $event.key === 'O') {
       this.menuTriggerList.toArray().filter(e => !!e.menuData)
-        .filter(e => e.menuData.menuId === 'contextMenu')
-        .forEach(trigger => {
-          this.contextMenuItem = node;
-          trigger.openMenu();
-        });
+          .filter(e => e.menuData.menuId === 'contextMenu' && e.menuData.hashPath === node.hashPath)
+          .forEach(trigger => {
+            this.contextMenuItem = node;
+            if (!trigger.menuOpen) {
+              trigger.openMenu();
+            }
+          });
     } else if ($event.key === 'Enter') {
       this.onClick(this.cursorNode);
     } else {
@@ -976,10 +978,10 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   removeOverrideReusedBIE(node: BieFlatNode) {
     const asbiepNode = (node as AsbiepFlatNode);
     // Base.ASBIE -> ASBIEP.OwnerTopLevelAsbiepId = Base Reuse BIE
-    this.service.getDetail((node.parent as AsbiepFlatNode).basedTopLevelAsbiepId, 'ASBIE',
-      (node as AsbiepFlatNode).asccNode.manifestId, (node as AsbiepFlatNode).asbiePath).subscribe(baseAsbie => {
-      this.service.getDetailById((baseAsbie as BieEditAsbiepNodeDetail).asbie.toAsbiepId, 'ASBIEP').subscribe(baseAsbiep => {
-        const baseReusedTopLevelAsbiepId = (baseAsbiep as BieEditAsbiepNodeDetail).asbiep.ownerTopLevelAsbiepId;
+    this.service.getAsbieDetailsByPath((node.parent as AsbiepFlatNode).basedTopLevelAsbiepId,
+        (node as AsbiepFlatNode).asccNode.manifestId, (node as AsbiepFlatNode).asbiePath).subscribe(baseAsbie => {
+      this.service.getAsbiepDetails(baseAsbie.toAsbiepId).subscribe(baseAsbiep => {
+        const baseReusedTopLevelAsbiepId = baseAsbiep.ownerTopLevelAsbiep.topLevelAsbiepId;
 
         if (!asbiepNode.used) {
           this.toggleTreeUsed(asbiepNode);
@@ -1007,10 +1009,10 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
     const asbiepNode = (node as AsbiepFlatNode);
     // Base.ASBIE -> ASBIEP.OwnerTopLevelAsbiepId = Base Reuse BIE
-    this.service.getDetail(asbiepNode.parent.basedTopLevelAsbiepId, 'ASBIE',
-      (node as AsbiepFlatNode).asccNode.manifestId, (node as AsbiepFlatNode).asbiePath).subscribe(asbie => {
-      this.service.getDetailById((asbie as BieEditAsbiepNodeDetail).asbie.toAsbiepId, 'ASBIEP').subscribe(asbiep => {
-        const baseReusedTopLevelAsbiepId = (asbiep as BieEditAsbiepNodeDetail).asbiep.ownerTopLevelAsbiepId;
+    this.service.getAsbieDetailsByPath(asbiepNode.parent.basedTopLevelAsbiepId,
+        (node as AsbiepFlatNode).asccNode.manifestId, (node as AsbiepFlatNode).asbiePath).subscribe(asbie => {
+      this.service.getAsbiepDetails(asbie.toAsbiepId).subscribe(asbiep => {
+        const baseReusedTopLevelAsbiepId = asbiep.ownerTopLevelAsbiep.topLevelAsbiepId;
 
         const dialogRef = this.dialog.open(ReuseBieDialogComponent, {
           data: {

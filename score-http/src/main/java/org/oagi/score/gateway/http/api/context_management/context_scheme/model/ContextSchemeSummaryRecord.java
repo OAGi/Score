@@ -5,7 +5,7 @@ import org.oagi.score.gateway.http.common.model.Guid;
 
 /**
  * Represents a summary of a context scheme, including its ID, GUID, associated context category, scheme ID,
- * meaning, agency ID, version ID, and description.
+ * name, agency ID, version ID, and description.
  */
 public record ContextSchemeSummaryRecord(ContextSchemeId contextSchemeId,
                                          Guid guid,

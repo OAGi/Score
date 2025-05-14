@@ -5,7 +5,7 @@ import org.oagi.score.gateway.http.common.model.WhoAndWhen;
 
 /**
  * Represents the details of a business context.
- * This record contains the business context ID, GUID, meaning, status (whether it's in use),
+ * This record contains the business context ID, GUID, name, status (whether it's in use),
  * and information about when it was created and last updated.
  */
 public record BusinessContextDetailsRecord(BusinessContextId businessContextId,

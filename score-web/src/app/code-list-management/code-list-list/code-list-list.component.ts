@@ -397,7 +397,7 @@ export class CodeListListComponent implements OnInit {
   isAllSelected() {
     const numSelected = this.selection.selected.length;
     const numRows = this.dataSource.data.filter(row =>
-      row.owner.username === this.currentUser && this.canSelect.indexOf(row.state) > -1 && !this.hasRevision(row)).length;
+      row.owner.loginId === this.currentUser && this.canSelect.indexOf(row.state) > -1 && !this.hasRevision(row)).length;
     return numSelected === numRows;
   }
 
@@ -409,7 +409,7 @@ export class CodeListListComponent implements OnInit {
   }
 
   select(row: CodeListListEntry) {
-    if (row.owner.username === this.currentUser && this.canSelect.indexOf(row.state) > -1 && !this.hasRevision(row)) {
+    if (row.owner.loginId === this.currentUser && this.canSelect.indexOf(row.state) > -1 && !this.hasRevision(row)) {
       this.selection.select(row);
     }
   }

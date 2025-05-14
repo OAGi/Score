@@ -6,7 +6,7 @@ import java.util.Collection;
 
 /**
  * Criteria for filtering context categories in a list.
- * This record includes fields for filtering by meaning, description,
+ * This record includes fields for filtering by name, description,
  * updater login IDs, and last updated timestamp range.
  */
 public record ContextCategoryListFilterCriteria(String name, String description,

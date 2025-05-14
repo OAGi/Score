@@ -1639,7 +1639,7 @@ public class BieUpliftingService {
         if (targetCodeList == null) {
             // Issue #1356
             // End-user code list assigned to a source BIE node can be carried into the uplifted BIE only
-            // if the end-user code list with the same meaning, list ID, and agency ID exists (or has been uplifted)
+            // if the end-user code list with the same name, list ID, and agency ID exists (or has been uplifted)
             // in the target release and it is allowed by the target BIE node.
             targetCodeList = targetCodeListList.stream()
                     .filter(e -> StringUtils.equals(sourceCodeList.name(), e.name()) &&

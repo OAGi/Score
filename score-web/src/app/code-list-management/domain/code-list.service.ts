@@ -132,7 +132,7 @@ export class CodeListService {
       body = {
         releaseId: codeList.release.releaseId,
         basedCodeListManifestId: (!!codeList.based) ? codeList.based.codeListManifestId : undefined,
-        codeListName: codeList.name,
+        name: codeList.name,
         listId: codeList.listId,
         agencyIdListValueManifestId: (!!codeList.agencyIdListValue) ? codeList.agencyIdListValue.agencyIdListValueManifestId : undefined,
         versionId: codeList.versionId,

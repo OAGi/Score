@@ -124,7 +124,7 @@ public class BusinessContextQueryController {
             @AuthenticationPrincipal AuthenticatedPrincipal user,
 
             @RequestParam(name = "name", required = false)
-            @Parameter(description = "The meaning of the business context to filter results.")
+            @Parameter(description = "The name of the business context to filter results.")
             String name,
 
             @RequestParam(name = "tenantId", required = false)

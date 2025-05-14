@@ -199,7 +199,7 @@
                             </mat-icon>
                             <mat-icon class="context-menu-icon"
                                       [matMenuTriggerFor]="contextMenu"
-                                      [matMenuTriggerData]="{'menuId': 'contextMenu'}"
+                                      [matMenuTriggerData]="{'menuId': 'contextMenu', 'hashPath': node.hashPath}"
                                       (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
                             </mat-icon>
                           </div>
@@ -871,7 +871,7 @@
                             <mat-form-field>
                               <mat-label>Legacy Business Term</mat-label>
                               <input matInput placeholder="Legacy Business Term" maxlength="225"
-                                     [value]="reusedNodeDetail.asbiep.bizTerm"
+                                     [value]="reusedNodeDetail.bizTerm"
                                      [disabled]="true">
                             </mat-form-field>
                           </div>
@@ -879,7 +879,7 @@
                             <mat-form-field>
                               <mat-label>Remark</mat-label>
                               <input matInput placeholder="Remark" maxlength="225"
-                                     [value]="reusedNodeDetail.asbiep.remark"
+                                     [value]="reusedNodeDetail.remark"
                                      [disabled]="true">
                             </mat-form-field>
                           </div>
@@ -908,10 +908,10 @@
                           <div class="textarea-container">
                             <textarea matInput rows="6"
                                       placeholder="Context Definition"
-                                      [value]="reusedNodeDetail.asbiep.definition"
+                                      [value]="reusedNodeDetail.definition"
                                       [readonly]="true"></textarea>
                             <button mat-icon-button mat-small-icon-button *ngIf="used(selectedNode)"
-                                    (click)="copyToDefinition(reusedNodeDetail.asbiep.definition, asAsbiepDetail().asbie)"
+                                    (click)="copyToDefinition(reusedNodeDetail.definition, asAsbiepDetail().asbie)"
                                     matTooltip="Copy to Context Definition">
                               <mat-icon>content_paste</mat-icon>
                             </button>
@@ -1148,7 +1148,7 @@
                             <mat-form-field>
                               <mat-label>Legacy Business Term</mat-label>
                               <input matInput placeholder="Legacy Business Term" maxlength="225"
-                                     [value]="reusedBaseNodeDetail.asbiep.bizTerm"
+                                     [value]="reusedBaseNodeDetail.bizTerm"
                                      [disabled]="true">
                             </mat-form-field>
                           </div>
@@ -1156,7 +1156,7 @@
                             <mat-form-field>
                               <mat-label>Remark</mat-label>
                               <input matInput placeholder="Remark" maxlength="225"
-                                     [value]="reusedBaseNodeDetail.asbiep.remark"
+                                     [value]="reusedBaseNodeDetail.remark"
                                      [disabled]="true">
                             </mat-form-field>
                           </div>
@@ -1185,7 +1185,7 @@
                           <div class="textarea-container">
                             <textarea matInput rows="6"
                                       placeholder="Context Definition"
-                                      [value]="reusedBaseNodeDetail.asbiep.definition"
+                                      [value]="reusedBaseNodeDetail.definition"
                                       [readonly]="true"></textarea>
                           </div>
                         </mat-form-field>

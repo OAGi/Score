@@ -62,7 +62,7 @@ public class BusinessContextCommandService {
 
     /**
      * Updates an existing business context with the new details provided in the request.
-     * This includes updating the business context meaning and managing the context scheme values.
+     * This includes updating the business context name and managing the context scheme values.
      *
      * @param requester The user making the request.
      * @param request   The request containing the updated business context details.

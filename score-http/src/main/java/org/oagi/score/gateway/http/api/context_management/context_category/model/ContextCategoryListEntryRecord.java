@@ -4,7 +4,7 @@ import org.oagi.score.gateway.http.common.model.Guid;
 import org.oagi.score.gateway.http.common.model.WhoAndWhen;
 
 /**
- * Represents a list entry for a context category, including the category ID, GUID, meaning, description,
+ * Represents a list entry for a context category, including the category ID, GUID, name, description,
  * status (whether it's in use), and the creation and last update information.
  */
 public record ContextCategoryListEntryRecord(ContextCategoryId contextCategoryId,

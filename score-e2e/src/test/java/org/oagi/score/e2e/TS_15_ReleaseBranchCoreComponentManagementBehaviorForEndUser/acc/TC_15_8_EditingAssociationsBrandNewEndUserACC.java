@@ -1604,11 +1604,13 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
             ascc.setCardinalityMax(1);
             coreComponentAPI.updateASCC(ascc);
         }
+
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         ACCViewEditPage accViewEditPage;
         viewEditCoreComponentPage.openPage();
+        viewEditCoreComponentPage.toggleToDevView();
         {
             invisibilityOfLoadingContainerElement(getDriver());
             viewEditCoreComponentPage.setBranch(branch);
@@ -1645,6 +1647,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         homePage = loginPage().signIn(anotherUser.getLoginId(), anotherUser.getPassword());
         viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         {
             viewEditCoreComponentPage.setBranch(branch);
             waitFor(Duration.ofMillis(1500));

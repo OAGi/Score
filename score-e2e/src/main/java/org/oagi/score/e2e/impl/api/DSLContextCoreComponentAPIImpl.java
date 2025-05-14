@@ -1678,8 +1678,8 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                         DT_AWD_PRI.RELEASE_ID.eq(RELEASE.RELEASE_ID),
                         DT_AWD_PRI.DT_ID.eq(DT.DT_ID)
                 ))
+                .join(CDT_PRI).on(DT_AWD_PRI.CDT_PRI_ID.eq(CDT_PRI.CDT_PRI_ID))
                 .join(XBT_MANIFEST).on(DT_AWD_PRI.XBT_MANIFEST_ID.eq(XBT_MANIFEST.XBT_MANIFEST_ID))
-                .join(CDT_PRI).on(XBT_MANIFEST.CDT_PRI_ID.eq(CDT_PRI.CDT_PRI_ID))
                 .where(and(
                         LIBRARY.NAME.eq("CCTS Data Type Catalogue v3"),
                         RELEASE.RELEASE_NUM.eq("3.1"),
@@ -1699,8 +1699,8 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                         DT_AWD_PRI.RELEASE_ID.eq(RELEASE.RELEASE_ID),
                         DT_AWD_PRI.DT_ID.eq(DT.DT_ID)
                 ))
+                .join(CDT_PRI).on(DT_AWD_PRI.CDT_PRI_ID.eq(CDT_PRI.CDT_PRI_ID))
                 .join(XBT_MANIFEST).on(DT_AWD_PRI.XBT_MANIFEST_ID.eq(XBT_MANIFEST.XBT_MANIFEST_ID))
-                .join(CDT_PRI).on(XBT_MANIFEST.CDT_PRI_ID.eq(CDT_PRI.CDT_PRI_ID))
                 .where(and(
                         LIBRARY.NAME.eq("CCTS Data Type Catalogue v3"),
                         RELEASE.RELEASE_NUM.eq("3.1"),

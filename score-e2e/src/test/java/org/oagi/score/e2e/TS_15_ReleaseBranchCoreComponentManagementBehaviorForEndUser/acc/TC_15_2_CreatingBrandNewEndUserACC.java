@@ -68,6 +68,7 @@ public class TC_15_2_CreatingBrandNewEndUserACC extends BaseTest {
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.createACC(branch);
         String url = getDriver().getCurrentUrl();
         int idx = url.lastIndexOf("/");

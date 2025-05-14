@@ -7,7 +7,7 @@ import java.util.Collection;
 
 /**
  * Criteria for filtering business context summaries.
- * This record includes filters for business context meaning, tenant status,
+ * This record includes filters for business context name, tenant status,
  * associated top-level ASBIEP, and a list of business context IDs.
  */
 public record BusinessContextSummaryListFilterCriteria(String name,

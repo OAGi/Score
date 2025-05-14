@@ -3,7 +3,7 @@ package org.oagi.score.gateway.http.api.context_management.business_context.mode
 import org.oagi.score.gateway.http.common.model.Guid;
 
 /**
- * Represents a summary of a business context, including the business context ID, GUID, and meaning.
+ * Represents a summary of a business context, including the business context ID, GUID, and name.
  */
 public record BusinessContextSummaryRecord(BusinessContextId businessContextId,
                                            Guid guid,

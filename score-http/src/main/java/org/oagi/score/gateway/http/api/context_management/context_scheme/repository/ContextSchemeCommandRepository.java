@@ -19,7 +19,7 @@ public interface ContextSchemeCommandRepository {
      * @param contextCategoryId The ID of the context category the scheme belongs to.
      * @param codeListId        The ID of the code list associated with the scheme.
      * @param schemeId          The ID of the context scheme.
-     * @param schemeName        The meaning of the context scheme.
+     * @param schemeName        The name of the context scheme.
      * @param schemeAgencyId    The agency ID of the context scheme.
      * @param schemeVersionId   The version ID of the context scheme.
      * @param description       A description of the context scheme.
@@ -40,7 +40,7 @@ public interface ContextSchemeCommandRepository {
      * @param contextCategoryId The ID of the context category to assign to the scheme.
      * @param codeListId        The ID of the code list to associate with the scheme.
      * @param schemeId          The scheme ID.
-     * @param schemeName        The meaning of the context scheme.
+     * @param schemeName        The name of the context scheme.
      * @param schemeAgencyId    The agency ID of the scheme.
      * @param schemeVersionId   The version ID of the scheme.
      * @param description       The description of the context scheme.

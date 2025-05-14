@@ -6,7 +6,7 @@ import org.oagi.score.gateway.http.common.model.WhoAndWhen;
 
 /**
  * Represents a list entry for a context scheme, including the context scheme ID, GUID, associated context category,
- * associated code list, scheme ID, meaning, agency ID, version ID, description, usage status,
+ * associated code list, scheme ID, name, agency ID, version ID, description, usage status,
  * and information about when the context scheme was created and last updated.
  */
 public record ContextSchemeListEntryRecord(ContextSchemeId contextSchemeId,

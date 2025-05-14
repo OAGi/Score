@@ -878,21 +878,23 @@ export class ExtensionDetailComponent implements OnInit {
         }
 
         this.isUpdating = true;
-        this.service.makeNewRevision(this.rootNode.type, this.rootNode.manifestId).pipe(
-          finalize(() => {
-            this.isUpdating = false;
-          })
-        ).subscribe(resp => {
-            this.manifestId = resp.manifestId;
-            this.afterStateChanged(resp.state, resp.access);
-            this.service.getPrevAccDetails(this.manifestId).subscribe(revision => {
-              this.prevAccDetails = revision;
-              this.snackBar.open((isDeveloper) ? 'Revised' : 'Amended', '', {
-                duration: 3000,
-              });
+        this.service.makeNewRevision(this.rootNode.type, this.rootNode.manifestId).subscribe(_ => {
+          forkJoin([
+            this.service.getAccDetails(this.manifestId),
+            this.service.getPrevAccDetails(this.manifestId),
+          ]).subscribe(([accDetails, prevAccDetails]) => {
+            this.manifestId = accDetails.accManifestId;
+            this.afterStateChanged(accDetails.state, accDetails.access);
+            this.prevAccDetails = prevAccDetails;
+            this.snackBar.open((isDeveloper) ? 'Revised' : 'Amended', '', {
+              duration: 3000,
             });
             this.reload();
           });
+        }, err => {
+          this.isUpdating = false;
+          throw err;
+        });
       });
   }
 

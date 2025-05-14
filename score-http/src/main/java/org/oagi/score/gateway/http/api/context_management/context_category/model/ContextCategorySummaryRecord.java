@@ -3,7 +3,7 @@ package org.oagi.score.gateway.http.api.context_management.context_category.mode
 import org.oagi.score.gateway.http.common.model.Guid;
 
 /**
- * Represents a summary of a context category, including the category ID, GUID, meaning, and description.
+ * Represents a summary of a context category, including the category ID, GUID, name, and description.
  */
 public record ContextCategorySummaryRecord(ContextCategoryId contextCategoryId,
                                            Guid guid,

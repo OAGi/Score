@@ -515,7 +515,7 @@ export class CcNodeService {
         comment.prevCommentId = elm.prevCommentId;
         comment.text = elm.text;
         comment.hidden = elm.hidden;
-        comment.created.who.loginId = elm.created.who.username;
+        comment.created = elm.created;
         comment.timestamp = new Date(elm.lastUpdated.when);
         return comment;
       });

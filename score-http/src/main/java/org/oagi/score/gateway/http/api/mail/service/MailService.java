@@ -129,7 +129,7 @@ public class MailService {
                 .fetchOptional().orElse(null);
 
         if (textTemplateRecord == null) {
-            throw new ScoreDataAccessException("No template meaning: " + templateName);
+            throw new ScoreDataAccessException("No template name: " + templateName);
         }
 
         message.setSubject(textTemplateRecord.getSubject());

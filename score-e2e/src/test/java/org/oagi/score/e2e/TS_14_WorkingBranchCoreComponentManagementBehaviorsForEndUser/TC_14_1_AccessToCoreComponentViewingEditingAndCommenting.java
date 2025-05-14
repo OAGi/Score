@@ -181,8 +181,8 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         viewEditCoreComponentPage.setBranch(workingBranch.getReleaseNumber());
-        viewEditCoreComponentPage.selectAllComponentTypes();
         for (ACCObject acc : accForTesting) {
             viewEditCoreComponentPage.setDEN(acc.getDen());
             viewEditCoreComponentPage.hitSearchButton();
@@ -199,6 +199,8 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             });
         }
 
+        // Since 3.4, 'Core Component' list page doesn't display ASCC/BCC records.
+        /*
         for (BCCObject bcc : bccForTesting) {
             viewEditCoreComponentPage.setDEN(bcc.getDen());
             viewEditCoreComponentPage.hitSearchButton();
@@ -206,6 +208,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
                 viewEditCoreComponentPage.getTableRecordByValue(bcc.getDen());
             });
         }
+        */
         for (ASCCPObject asccp : asccpForTesting) {
             viewEditCoreComponentPage.setDEN(asccp.getDen());
             viewEditCoreComponentPage.hitSearchButton();
@@ -213,6 +216,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
                 viewEditCoreComponentPage.getTableRecordByValue(asccp.getDen());
             });
         }
+        /*
         for (ASCCObject ascc : asccForTesting) {
             viewEditCoreComponentPage.setDEN(ascc.getDen());
             viewEditCoreComponentPage.hitSearchButton();
@@ -220,6 +224,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
                 viewEditCoreComponentPage.getTableRecordByValue(ascc.getDen());
             });
         }
+        */
     }
 
     @Test
@@ -257,7 +262,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             ACCObject acc = coreComponentAPI.createRandomACC(developerB, release, namespace, "Published");
             coreComponentAPI.appendExtension(acc, developerB, namespace, "Published");
             DTObject dt = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-            BCCPObject bccp = coreComponentAPI.createRandomBCCP(workingBranch, dt, developerB, namespace, "Published");
+            BCCPObject bccp = coreComponentAPI.createRandomBCCP(release, dt, developerB, namespace, "Published");
             coreComponentAPI.appendBCC(acc, bccp, "Published");
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, developerB, namespace, "Published");
 
@@ -273,7 +278,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             acc = coreComponentAPI.createRandomACC(endUserB, release, namespaceEU, "WIP");
             accForTesting.add(acc);
             coreComponentAPI.appendExtension(acc, endUserB, namespaceEU, "WIP");
-            bccp = coreComponentAPI.createRandomBCCP(workingBranch, dt, endUserB, namespaceEU, "WIP");
+            bccp = coreComponentAPI.createRandomBCCP(release, dt, endUserB, namespaceEU, "WIP");
             bccpForTesting.add(bccp);
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bccForTesting.add(bcc);
@@ -286,7 +291,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             acc = coreComponentAPI.createRandomACC(endUserB, release, namespaceEU, "QA");
             accForTesting.add(acc);
             coreComponentAPI.appendExtension(acc, endUserB, namespaceEU, "QA");
-            bccp = coreComponentAPI.createRandomBCCP(workingBranch, dt, endUserB, namespaceEU, "QA");
+            bccp = coreComponentAPI.createRandomBCCP(release, dt, endUserB, namespaceEU, "QA");
             bccpForTesting.add(bccp);
             bcc = coreComponentAPI.appendBCC(acc, bccp, "QA");
             bccForTesting.add(bcc);
@@ -299,7 +304,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             acc = coreComponentAPI.createRandomACC(endUserB, release, namespaceEU, "Production");
             accForTesting.add(acc);
             coreComponentAPI.appendExtension(acc, endUserB, namespaceEU, "Production");
-            bccp = coreComponentAPI.createRandomBCCP(workingBranch, dt, endUserB, namespaceEU, "Production");
+            bccp = coreComponentAPI.createRandomBCCP(release, dt, endUserB, namespaceEU, "Production");
             bccpForTesting.add(bccp);
             bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
             bccForTesting.add(bcc);
@@ -312,7 +317,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             acc = coreComponentAPI.createRandomACC(endUserB, release, namespaceEU, "Deleted");
             accForTesting.add(acc);
             coreComponentAPI.appendExtension(acc, endUserB, namespaceEU, "Deleted");
-            bccp = coreComponentAPI.createRandomBCCP(workingBranch, dt, endUserB, namespaceEU, "Deleted");
+            bccp = coreComponentAPI.createRandomBCCP(release, dt, endUserB, namespaceEU, "Deleted");
             bccpForTesting.add(bccp);
             bcc = coreComponentAPI.appendBCC(acc, bccp, "Deleted");
             bccForTesting.add(bcc);
@@ -343,8 +348,8 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
         }
         homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         viewEditCoreComponentPage.setBranch(workingBranch.getReleaseNumber());
-        viewEditCoreComponentPage.selectAllComponentTypes();
         for (ACCObject acc : accForTesting) {
             viewEditCoreComponentPage.setDEN(acc.getDen());
             viewEditCoreComponentPage.hitSearchButton();
@@ -366,6 +371,8 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
                 viewEditCoreComponentPage.getTableRecordByValue(bccp.getDen());
             });
         }
+        // Since 3.4, 'Core Component' list page doesn't display ASCC/BCC records.
+        /*
         for (BCCObject bcc : bccForTesting) {
             viewEditCoreComponentPage.setDEN(bcc.getDen());
             viewEditCoreComponentPage.hitSearchButton();
@@ -373,6 +380,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
                 viewEditCoreComponentPage.getTableRecordByValue(bcc.getDen());
             });
         }
+        */
         for (ASCCPObject asccp : asccpForTesting) {
             viewEditCoreComponentPage.setDEN(asccp.getDen());
             viewEditCoreComponentPage.hitSearchButton();
@@ -380,6 +388,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
                 viewEditCoreComponentPage.getTableRecordByValue(asccp.getDen());
             });
         }
+        /*
         for (ASCCObject ascc : asccForTesting) {
             viewEditCoreComponentPage.setDEN(ascc.getDen());
             viewEditCoreComponentPage.hitSearchButton();
@@ -387,6 +396,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
                 viewEditCoreComponentPage.getTableRecordByValue(ascc.getDen());
             });
         }
+        */
     }
 
     @Test

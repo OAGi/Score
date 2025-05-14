@@ -7,7 +7,7 @@ import java.util.Collection;
 
 /**
  * Criteria for filtering business contexts in a list.
- * This record includes various fields to filter business contexts by meaning, tenant status,
+ * This record includes various fields to filter business contexts by name, tenant status,
  * connection status, business context editing status, and last updated timestamps.
  */
 public record BusinessContextListFilterCriteria(String name,

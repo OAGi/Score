@@ -204,11 +204,12 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
 
         String BieUEG = asccp.getPropertyTerm() + " User Extension Group";
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         viewEditCoreComponentPage.showAdvancedSearchPanel();
         waitFor(Duration.ofMillis(3000L));
         click(viewEditCoreComponentPage.getTypeSelectField());
         List<WebElement> options = getDriver().findElements(By.xpath("//div[@class=\"cdk-overlay-container\"]//div[contains(@class, \"column\")]"));
-        for (String ccState : Arrays.asList("ACC", "CDT", "BDT")) {
+        for (String ccState : Arrays.asList("ACC")) {
             List<WebElement> result = options.stream().filter(e -> ccState.equals(getText(e))).collect(Collectors.toList());
             result.get(0).click();
         }
@@ -224,7 +225,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         viewEditCoreComponentPage.showAdvancedSearchPanel();
         click(viewEditCoreComponentPage.getTypeSelectField());
         options = getDriver().findElements(By.xpath("//div[@class=\"cdk-overlay-container\"]//div[contains(@class, \"column\")]"));
-        for (String ccState : Arrays.asList("BCCP", "ACC", "ASCCP")) {
+        for (String ccState : Arrays.asList("ACC")) {
             List<WebElement> result = options.stream().filter(e -> ccState.equals(getText(e))).collect(Collectors.toList());
             result.get(0).click();
         }

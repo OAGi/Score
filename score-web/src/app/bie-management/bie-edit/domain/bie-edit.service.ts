@@ -13,8 +13,7 @@ import {
   AsbiepFlatNode,
   BbieDetails,
   BbiepDetails,
-  BbieScDetails,
-  BieEditNodeDetail
+  BbieScDetails
 } from '../../domain/bie-flat-tree';
 import {CodeListSummary} from '../../../code-list-management/domain/code-list';
 import {AgencyIdListSummary} from '../../../agency-id-list-management/domain/agency-id-list';
@@ -122,8 +121,8 @@ export class BieEditService {
     );
   }
 
-  getAsbieDetailsByPath(topLevelAsbiepId: number, asccpManifestId: number, path: string): Observable<AsbieDetails> {
-    const url = '/api/profile_bie/' + topLevelAsbiepId + '/asbie/' + asccpManifestId;
+  getAsbieDetailsByPath(topLevelAsbiepId: number, asccManifestId: number, path: string): Observable<AsbieDetails> {
+    const url = '/api/profile_bie/' + topLevelAsbiepId + '/asbie/' + asccManifestId;
     let params;
     if (path.length > 0) {
       params = new HttpParams().set('hashPath', sha256(path));
@@ -293,20 +292,6 @@ export class BieEditService {
           }
         }))
     );
-  }
-
-  getDetail(topLevelAsbiepId: number, bieType: string, ccManifestId: number, path: string): Observable<BieEditNodeDetail> {
-    const url = '/api/profile_bie/' + topLevelAsbiepId + '/' + bieType.toLowerCase() + '/' + ccManifestId;
-    let params;
-    if (path.length > 0) {
-      params = new HttpParams().set('hashPath', sha256(path));
-    }
-    return this.http.get<BieEditNodeDetail>(url, {params});
-  }
-
-  getDetailById(bieId: number, bieType: string): Observable<BieEditNodeDetail> {
-    const url = '/api/profile_bie/' + bieType.toLowerCase() + '/' + bieId;
-    return this.http.get<BieEditNodeDetail>(url, {});
   }
 
   updateDetails(topLevelAsbiepId: number, request: BieDetailUpdateRequest): Observable<BieDetailUpdateResponse> {

@@ -58,12 +58,14 @@ public interface DtCommandRepository {
     void cancel(DtManifestId dtManifestId);
 
     DtAwdPriId createDtAwdPri(ReleaseId releaseId, DtId dtId,
+                              String cdtPriName,
                               XbtManifestId xbtManifestId,
                               CodeListManifestId codeListManifestId,
                               AgencyIdListManifestId agencyIdListManifestId,
                               boolean isDefault);
 
     boolean updateDtAwdPri(DtAwdPriId dtAwdPriId,
+                           String cdtPriName,
                            XbtManifestId xbtManifestId,
                            CodeListManifestId codeListManifestId,
                            AgencyIdListManifestId agencyIdListManifestId,
@@ -72,12 +74,14 @@ public interface DtCommandRepository {
     boolean deleteDtAwdPri(DtAwdPriId dtAwdPriId);
 
     DtScAwdPriId createDtScAwdPri(ReleaseId releaseId, DtScId dtScId,
+                                  String cdtPriName,
                                   XbtManifestId xbtManifestId,
                                   CodeListManifestId codeListManifestId,
                                   AgencyIdListManifestId agencyIdListManifestId,
                                   boolean isDefault);
 
     boolean updateDtScAwdPri(DtScAwdPriId dtScAwdPriId,
+                             String cdtPriName,
                              XbtManifestId xbtManifestId,
                              CodeListManifestId codeListManifestId,
                              AgencyIdListManifestId agencyIdListManifestId,

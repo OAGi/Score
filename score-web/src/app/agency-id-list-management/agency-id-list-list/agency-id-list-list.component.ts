@@ -382,7 +382,7 @@ export class AgencyIdListListComponent implements OnInit {
   isAllSelected() {
     const numSelected = this.selection.selected.length;
     const numRows = this.dataSource.data.filter(row => this.canSelect.indexOf(row.state) > -1 &&
-      !this.hasRevision(row) && row.owner.username === this.currentUser).length;
+      !this.hasRevision(row) && row.owner.loginId === this.currentUser).length;
     return numSelected === numRows;
   }
 
@@ -394,7 +394,7 @@ export class AgencyIdListListComponent implements OnInit {
   }
 
   select(row: AgencyIdListListEntry) {
-    if (this.canSelect.indexOf(row.state) > -1 && !this.hasRevision(row) && row.owner.username === this.currentUser) {
+    if (this.canSelect.indexOf(row.state) > -1 && !this.hasRevision(row) && row.owner.loginId === this.currentUser) {
       this.selection.select(row);
     }
   }

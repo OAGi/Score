@@ -67,20 +67,6 @@ tr.element-row:not(.expanded-row):active {
   font-size: 20px;
 }
 
-.nav-button.mat-icon-button {
-  width: 16px;
-  height: 16px;
-  line-height: 16px;
-  outline: none;
-}
-
-.nav-button .mat-icon {
-  width: 16px;
-  height: 16px;
-  line-height: 16px;
-  font-size: 16px;
-}
-
 .mat-tree-node .mat-icon-button {
   width: 24px;
   height: 24px;

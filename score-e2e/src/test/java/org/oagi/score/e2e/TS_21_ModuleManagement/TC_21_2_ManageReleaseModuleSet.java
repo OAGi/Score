@@ -341,7 +341,7 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
         viewEditReleasePage.openPage();
         viewEditReleasePage.hitDiscardButton(newRelease.getReleaseNumber());
         String errorMessage = getText(getMultiActionSnackBar(getDriver()).getMessageElement());
-        assertTrue(errorMessage.contains("It cannot be discarded because there are dependent module set releases."));
+        assertTrue(errorMessage.contains("The release '" + newRelease.getReleaseNumber() + "' cannot be discarded due to dependent module set releases."));
     }
 
     @Test

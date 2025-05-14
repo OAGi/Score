@@ -238,7 +238,7 @@
               </th>
               <td mat-cell *matCellDef="let row">
                 <mat-checkbox (click)="$event.stopPropagation()"
-                              [disabled]="row.owner.username !== currentUser || canSelect.indexOf(row.state) == -1 || hasRevision(row)"
+                              [disabled]="row.owner.loginId !== currentUser || canSelect.indexOf(row.state) == -1 || hasRevision(row)"
                               (change)="$event ? toggle(row) : null"
                               [checked]="isSelected(row)">
                 </mat-checkbox>

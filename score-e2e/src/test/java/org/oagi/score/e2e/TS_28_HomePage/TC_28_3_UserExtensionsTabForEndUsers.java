@@ -92,6 +92,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         homePage.setBranch(release.getReleaseNumber());
         click(homePage.getUserExtensionsTab());
         ViewEditCoreComponentPage viewEditCCPageForWIP = homePage.openTotalUEsByStatesPanel().clickStateProgressBar("WIP");
+        viewEditCCPageForWIP.toggleToDevView();
         viewEditCCPageForWIP.hitSearchButton();
         viewEditCCPageForWIP.setItemsPerPage(50);
 
@@ -109,7 +110,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
             assertTrue(getText(td).startsWith(ownerName));
         }
 
-        click(homePage.getScoreLogo()); // to go to the home page again.
+        homePage.openPage();
         click(homePage.getUserExtensionsTab());
         ViewEditCoreComponentPage viewEditCCPageForQA = homePage.openTotalUEsByStatesPanel().clickStateProgressBar("QA");
         viewEditCCPageForQA.hitSearchButton();
@@ -129,7 +130,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
             assertTrue(getText(td).startsWith(ownerName));
         }
 
-        click(homePage.getScoreLogo()); // to go to the home page again.
+        homePage.openPage();
         click(homePage.getUserExtensionsTab());
         ViewEditCoreComponentPage viewEditCCPageForProduction = homePage.openTotalUEsByStatesPanel().clickStateProgressBar("Production");
         viewEditCCPageForProduction.hitSearchButton();
@@ -198,6 +199,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         click(homePage.getUserExtensionsTab());
         ViewEditCoreComponentPage viewEditCCPageForWIP = homePage.openMyUEsByStatesPanel()
                 .clickStateProgressBar("WIP");
+        viewEditCCPageForWIP.toggleToDevView();
         click(viewEditCCPageForWIP.getSearchButton());
 
         assertTrue(container1.numberOfWIPUEGs <= viewEditCCPageForWIP.getNumberOfOnlyCCsPerStateAreListed("WIP"));
@@ -388,6 +390,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
 
         ViewEditCoreComponentPage viewEditCCPageForWIP = uesByUsersAndStatesPanel.openViewEditCCPageByUsernameAndColumnName(
                 endUser1.getLoginId(), "WIP");
+        viewEditCCPageForWIP.toggleToDevView();
         assertEquals(container1.numberOfWIPUEGs, viewEditCCPageForWIP.getNumberOfOnlyCCsPerStateAreListed("WIP"));
         assertEquals(0, viewEditCCPageForWIP.getNumberOfOnlyCCsPerStateAreListed("QA"));
         assertEquals(0, viewEditCCPageForWIP.getNumberOfOnlyCCsPerStateAreListed("Production"));
@@ -497,7 +500,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
             loop--;
 
         }
-        click(homePage.getScoreLogo());
+        homePage.openPage();
         homePage.setBranch(release.getReleaseNumber());
         HomePage.MyUnusedUEsInBIEsPanel myUnusedUEsInBIEsPanel = homePage.openMyUnusedUEsInBIEsPanel();
         String ueName = asccp.getPropertyTerm() + " User Extension Group";
@@ -576,7 +579,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
             loop--;
 
         }
-        click(homePage.getScoreLogo());
+        homePage.openPage();
         homePage.setBranch(release.getReleaseNumber());
         HomePage.MyUnusedUEsInBIEsPanel myUnusedUEsInBIEsPanel = homePage.openMyUnusedUEsInBIEsPanel();
         String ueName = asccp.getPropertyTerm() + " User Extension Group";

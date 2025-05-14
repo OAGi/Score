@@ -89,7 +89,7 @@ public class TC_38_2_CreatingBrandNewDT extends BaseTest {
         dtViewEditPage.showValueDomain();
         assertDoesNotThrow(() -> dtViewEditPage.getValueDomainByTypeNameAndXSDExpression("Primitive", "Float", "float"));
         assertDoesNotThrow(() -> dtViewEditPage.getValueDomainByTypeNameAndXSDExpression("Primitive", "Decimal", "decimal"));
-        assertDoesNotThrow(() -> dtViewEditPage.getValueDomainByTypeNameAndXSDExpression("Primitive", "Double", "double"));
+        assertDoesNotThrow(() -> dtViewEditPage.getValueDomainByTypeNameAndXSDExpression("Primitive", "Double", "float, double"));
 
         assertDisabled(dtViewEditPage.getCheckboxForValueDomainByTypeAndName("Primitive", "Float"));
         assertEquals("Working", dtViewEditPage.getReleaseFieldValue());

@@ -30,7 +30,7 @@ public class JooqModuleSetCommandRepository extends JooqBaseRepository implement
     @Override
     public ModuleSetId create(LibraryId libraryId, String name, String description) {
         if (!StringUtils.hasLength(name)) {
-            throw new IllegalArgumentException("Module set meaning cannot be empty.");
+            throw new IllegalArgumentException("Module set name cannot be empty.");
         }
 
         LocalDateTime timestamp = LocalDateTime.now();
@@ -53,7 +53,7 @@ public class JooqModuleSetCommandRepository extends JooqBaseRepository implement
     public boolean update(ModuleSetId moduleSetId, String name, String description) {
 
         if (!StringUtils.hasLength(name)) {
-            throw new IllegalArgumentException("Module set meaning cannot be empty.");
+            throw new IllegalArgumentException("Module set name cannot be empty.");
         }
 
         LocalDateTime timestamp = LocalDateTime.now();

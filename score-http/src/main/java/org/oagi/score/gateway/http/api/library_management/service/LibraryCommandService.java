@@ -54,7 +54,7 @@ public class LibraryCommandService {
         }
 
         if (query(requester).hasDuplicateName(request.name())) {
-            throw new IllegalArgumentException("The library meaning '" + request.name() + "' already exists.");
+            throw new IllegalArgumentException("The library name '" + request.name() + "' already exists.");
         }
 
         LibraryId libraryId = command(requester).create(
@@ -77,7 +77,7 @@ public class LibraryCommandService {
             throw new IllegalArgumentException("'" + request.libraryId() + "' does not exist.");
         }
         if (query.hasDuplicateNameExcludingCurrent(request.libraryId(), request.name())) {
-            throw new IllegalArgumentException("The library meaning '" + request.name() + "' already exists.");
+            throw new IllegalArgumentException("The library name '" + request.name() + "' already exists.");
         }
 
         return command(requester).update(

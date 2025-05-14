@@ -11,9 +11,9 @@ import java.util.Collection;
 public interface ContextCategoryCommandRepository {
 
     /**
-     * Creates a new context category with the provided meaning and description.
+     * Creates a new context category with the provided name and description.
      *
-     * @param name        The meaning of the new context category.
+     * @param name        The name of the new context category.
      * @param description A description of the new context category.
      * @return The ID of the created context category.
      */
@@ -24,7 +24,7 @@ public interface ContextCategoryCommandRepository {
      * Updates an existing context category with the provided details.
      *
      * @param contextCategoryId The ID of the context category to update.
-     * @param name              The new meaning for the context category.
+     * @param name              The new name for the context category.
      * @param description       The new description for the context category.
      * @return true if the update was successful, false otherwise.
      */

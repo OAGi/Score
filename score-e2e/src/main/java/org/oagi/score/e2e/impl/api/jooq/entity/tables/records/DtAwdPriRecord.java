@@ -73,11 +73,27 @@ public class DtAwdPriRecord extends UpdatableRecordImpl<DtAwdPriRecord> {
     }
 
     /**
+     * Setter for <code>oagi.dt_awd_pri.cdt_pri_id</code>. Foreign key to the
+     * CDT_PRI table.
+     */
+    public void setCdtPriId(ULong value) {
+        set(3, value);
+    }
+
+    /**
+     * Getter for <code>oagi.dt_awd_pri.cdt_pri_id</code>. Foreign key to the
+     * CDT_PRI table.
+     */
+    public ULong getCdtPriId() {
+        return (ULong) get(3);
+    }
+
+    /**
      * Setter for <code>oagi.dt_awd_pri.xbt_manifest_id</code>. This is a
      * foreign key to the XBT_MANIFEST table.
      */
     public void setXbtManifestId(ULong value) {
-        set(3, value);
+        set(4, value);
     }
 
     /**
@@ -85,7 +101,7 @@ public class DtAwdPriRecord extends UpdatableRecordImpl<DtAwdPriRecord> {
      * foreign key to the XBT_MANIFEST table.
      */
     public ULong getXbtManifestId() {
-        return (ULong) get(3);
+        return (ULong) get(4);
     }
 
     /**
@@ -93,7 +109,7 @@ public class DtAwdPriRecord extends UpdatableRecordImpl<DtAwdPriRecord> {
      * key to the CODE_LIST_MANIFEST table.
      */
     public void setCodeListManifestId(ULong value) {
-        set(4, value);
+        set(5, value);
     }
 
     /**
@@ -101,7 +117,7 @@ public class DtAwdPriRecord extends UpdatableRecordImpl<DtAwdPriRecord> {
      * key to the CODE_LIST_MANIFEST table.
      */
     public ULong getCodeListManifestId() {
-        return (ULong) get(4);
+        return (ULong) get(5);
     }
 
     /**
@@ -109,7 +125,7 @@ public class DtAwdPriRecord extends UpdatableRecordImpl<DtAwdPriRecord> {
      * is a foreign key to the AGENCY_ID_LIST_MANIFEST table.
      */
     public void setAgencyIdListManifestId(ULong value) {
-        set(5, value);
+        set(6, value);
     }
 
     /**
@@ -117,7 +133,7 @@ public class DtAwdPriRecord extends UpdatableRecordImpl<DtAwdPriRecord> {
      * is a foreign key to the AGENCY_ID_LIST_MANIFEST table.
      */
     public ULong getAgencyIdListManifestId() {
-        return (ULong) get(5);
+        return (ULong) get(6);
     }
 
     /**
@@ -125,7 +141,7 @@ public class DtAwdPriRecord extends UpdatableRecordImpl<DtAwdPriRecord> {
      * generic primitive for the data type.
      */
     public void setIsDefault(Byte value) {
-        set(6, value);
+        set(7, value);
     }
 
     /**
@@ -133,7 +149,7 @@ public class DtAwdPriRecord extends UpdatableRecordImpl<DtAwdPriRecord> {
      * generic primitive for the data type.
      */
     public Byte getIsDefault() {
-        return (Byte) get(6);
+        return (Byte) get(7);
     }
 
     // -------------------------------------------------------------------------
@@ -159,12 +175,13 @@ public class DtAwdPriRecord extends UpdatableRecordImpl<DtAwdPriRecord> {
     /**
      * Create a detached, initialised DtAwdPriRecord
      */
-    public DtAwdPriRecord(ULong dtAwdPriId, ULong releaseId, ULong dtId, ULong xbtManifestId, ULong codeListManifestId, ULong agencyIdListManifestId, Byte isDefault) {
+    public DtAwdPriRecord(ULong dtAwdPriId, ULong releaseId, ULong dtId, ULong cdtPriId, ULong xbtManifestId, ULong codeListManifestId, ULong agencyIdListManifestId, Byte isDefault) {
         super(DtAwdPri.DT_AWD_PRI);
 
         setDtAwdPriId(dtAwdPriId);
         setReleaseId(releaseId);
         setDtId(dtId);
+        setCdtPriId(cdtPriId);
         setXbtManifestId(xbtManifestId);
         setCodeListManifestId(codeListManifestId);
         setAgencyIdListManifestId(agencyIdListManifestId);
