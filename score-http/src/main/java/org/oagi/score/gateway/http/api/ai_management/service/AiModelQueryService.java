@@ -58,26 +58,24 @@ public class AiModelQueryService {
 
         CcDocument ccDocument = new CcDocumentImpl(requester, repositoryFactory, acc.release().releaseId());
 
-        String prompt = "The object class term of the given object is '" + acc.objectClassTerm() + "'.\n" +
-                prompt(accManifestId, ccDocument, 0);
+        String systemPrompt = "Generate a concise, business-focused definition of the given object in approximately 2–4 sentences, depending on the complexity of the object. Describe its purpose and structural role within business processes or data exchange. Summarize the nature of the information it captures by abstractly referring to relevant business domains or categories (e.g., product attributes, compliance details, operational parameters), without listing specific elements. Focus on conveying the business intent and utility of the object based on its structure. Output only the refined definition, with no extra commentary.";
+        String userPrompt = "The object class term of the given object is '" + acc.objectClassTerm() + "'.\n";
         if (hasLength(originalText)) {
-            prompt += "\nThe original definition is '" + originalText + "'.";
+            userPrompt += "The original definition is '" + originalText + "'.\n";
         }
-        System.out.println(prompt);
+        userPrompt += prompt(accManifestId, ccDocument, 0);
+
         var request = OllamaApi.ChatRequest.builder(model)
                 .stream(false) // not streaming
                 .messages(List.of(
                         OllamaApi.Message.builder(OllamaApi.Message.Role.SYSTEM)
-                                .content("Generate a concise definition of the given object in 2-4 sentences based on its description. " +
-                                        "If an existing definition is provided, refine it for clarity and correctness, ensuring the best possible version. " +
-                                        "Also, your generated definition must not lose the original content or manipulate its meaning. " +
-                                        "The final response should contain only the improved definition, without any explanatory notes or structural details.")
+                                .content(systemPrompt)
                                 .build(),
                         OllamaApi.Message.builder(OllamaApi.Message.Role.USER)
-                                .content(prompt)
+                                .content(userPrompt)
                                 .build()))
                 .options(OllamaOptions.builder()
-                        .temperature(1.0)
+                        .temperature(0.7)
                         .numCtx(64 * 1024)
                         .build())
                 .build();
@@ -116,19 +114,19 @@ public class AiModelQueryService {
                 .filter(e -> !e.den().contains("Extension. ")).collect(Collectors.toList());
         var bccList = ccDocument.getBccListByFromAccManifestId(accManifestId);
         if (asccList.size() + bccList.size() > 0) {
-            sb.append("Additionally, it has child elements, including ");
+            sb.append("'" + acc.objectClassTerm() + "' has child elements, including ");
             List<String> childrenNames = new ArrayList<>();
             for (var ascc : asccList) {
                 var asccp = ccDocument.getAsccp(ascc.toAsccpManifestId());
                 childrenNames.add("'" + asccp.propertyTerm() + "' " +
                         "(Cardinality: " + ascc.cardinality().min() + ".." +
-                        (ascc.cardinality().max() == -1 ? "unbounded" : ascc.cardinality().max()) + ")");
+                        (ascc.cardinality().max() == -1 ? "*" : ascc.cardinality().max()) + ")");
             }
             for (var bcc : bccList) {
                 var bccp = ccDocument.getBccp(bcc.toBccpManifestId());
                 childrenNames.add("'" + bccp.propertyTerm() + "' " +
                         "(Cardinality: " + bcc.cardinality().min() + ".." +
-                        (bcc.cardinality().max() == -1 ? "unbounded" : bcc.cardinality().max()) + ")");
+                        (bcc.cardinality().max() == -1 ? "*" : bcc.cardinality().max()) + ")");
             }
             sb.append(childrenNames.stream().collect(Collectors.joining(", ")));
             sb.append(".").append("\n");
@@ -156,24 +154,23 @@ public class AiModelQueryService {
 
         CcDocument ccDocument = new CcDocumentImpl(requester, repositoryFactory, acc.release().releaseId());
 
-        String prompt = "The original object class term of the given object is '" + originalName + "'.\n" +
-                prompt(accManifestId, ccDocument, 0);
-        System.out.println(prompt);
+        String systemPrompt = "Generate a concise, descriptive name for the given object based on its definition. Preserve the original name if it clearly reflects the object's purpose. If the original name includes the word \"Base,\" retain it in the final name. Use the fewest number of words necessary, avoiding articles and special characters. Capitalize the first letter of each word and separate words with a single space. Return only the final name, with no additional text or explanation.";
+        String userPrompt = "The original object class term of the given object is '" + originalName + "'.\n";
+        if (acc.definition() != null && hasLength(acc.definition().content())) {
+            userPrompt += "The definition is '" + acc.definition().content() + "'.\n";
+        }
+        userPrompt += prompt(accManifestId, ccDocument, 0);
         var request = OllamaApi.ChatRequest.builder(model)
                 .stream(false) // not streaming
                 .messages(List.of(
                         OllamaApi.Message.builder(OllamaApi.Message.Role.SYSTEM)
-                                .content("Generate a name that describe the given object in word(s) based on its description. " +
-                                        "If the original name is perfectly describing the object, do not change it. " +
-                                        "Each word must start with the capital letter and must be space separated with only alpha-numeric characters. " +
-                                        "Use a smallest number of words if possible without any articles. " +
-                                        "The final response should contain only the word(s) without any explanatory notes or structural details.")
+                                .content(systemPrompt)
                                 .build(),
                         OllamaApi.Message.builder(OllamaApi.Message.Role.USER)
-                                .content(prompt)
+                                .content(userPrompt)
                                 .build()))
                 .options(OllamaOptions.builder()
-                        .temperature(1.0)
+                        .temperature(0.7)
                         .numCtx(64 * 1024)
                         .build())
                 .build();

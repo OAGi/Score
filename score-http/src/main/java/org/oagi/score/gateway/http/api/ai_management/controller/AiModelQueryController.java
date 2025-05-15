@@ -45,7 +45,6 @@ public class AiModelQueryController {
         String content = queryService.generateDefinition(
                 sessionService.asScoreUser(user), asccpManifestId, model, originalText);
         return Map.of("generation", content);
-
     }
 
     @GetMapping("/generate/acc/{accManifestId:[\\d]+}/definition")
