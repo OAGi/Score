@@ -1216,7 +1216,7 @@ public class CcCommandService {
                 throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
             }
 
-            if (acc.namespaceId() == null) {
+            if (nextState != CcState.Deleted && acc.namespaceId() == null) {
                 throw new IllegalArgumentException("'" + acc.den() + "' namespace required.");
             }
         }
@@ -1301,7 +1301,7 @@ public class CcCommandService {
                 throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
             }
 
-            if (asccp.namespaceId() == null) {
+            if (nextState != CcState.Deleted && asccp.namespaceId() == null) {
                 throw new IllegalArgumentException("'" + asccp.den() + "' namespace required.");
             }
         }
@@ -1384,7 +1384,7 @@ public class CcCommandService {
                 throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
             }
 
-            if (bccp.namespaceId() == null) {
+            if (nextState != CcState.Deleted && bccp.namespaceId() == null) {
                 throw new IllegalArgumentException("'" + bccp.den() + "' namespace required.");
             }
         }
@@ -1429,7 +1429,7 @@ public class CcCommandService {
                 throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
             }
 
-            if (dt.namespaceId() == null) {
+            if (nextState != CcState.Deleted && dt.namespaceId() == null) {
                 throw new IllegalArgumentException("'" + dt.den() + "' namespace required.");
             }
         }
