@@ -36,9 +36,9 @@ cp -rf ../docs/user_guide/_build/html docker/docs
 
 echo "Building docker image..."
 cd docker
-docker build --no-cache -f Dockerfile -t oagi1docker/srt-web:3.4.0-$current_date .
+docker build --no-cache -f Dockerfile -t oagi1docker/srt-web:3.4.0 .
 
 echo "Scanning vulnerabilities..."
-docker scout cves oagi1docker/srt-web:3.4.0-$current_date
+docker scout cves oagi1docker/srt-web:3.4.0
 
 echo "Done."
