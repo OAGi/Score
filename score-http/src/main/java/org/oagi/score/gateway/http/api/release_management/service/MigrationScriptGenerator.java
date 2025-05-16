@@ -398,7 +398,7 @@ public class MigrationScriptGenerator {
 
     private File generateInfoFile(File scriptFile, ScoreUser user, ReleaseSummaryRecord release) throws IOException {
         MigrationInfo migrationInfo = new MigrationInfo();
-        migrationInfo.setVersion("1.0");
+        migrationInfo.setVersion("1.1");
         migrationInfo.setMaintainer(user.username());
         migrationInfo.setDescription("Add " + release.releaseNum() + " release");
         MigrationInfo.Migration migration = migrationInfo.getMigration();

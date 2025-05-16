@@ -48,6 +48,8 @@ export class ContextSchemeCreateComponent implements OnInit {
 
   contextSchemeCreateRequest: ContextSchemeCreateRequest;
   preferencesInfo: PreferencesInfo;
+  valueSearch: string;
+  highlightText: string;
 
   get columns(): TableColumnsProperty[] {
     if (!this.preferencesInfo) {
@@ -173,6 +175,10 @@ export class ContextSchemeCreateComponent implements OnInit {
 
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
+    this.dataSource.filterPredicate = (data: ContextSchemeValue, filter: string) => {
+      return (data.value && data.value.toLowerCase().indexOf(filter) > -1)
+          || (data.meaning && data.meaning.toLowerCase().indexOf(filter) > -1);
+    };
   }
 
   filterCtxCategories() {
@@ -195,6 +201,18 @@ export class ContextSchemeCreateComponent implements OnInit {
       (this.contextSchemeCreateRequest.schemeId === undefined || this.contextSchemeCreateRequest.schemeId === '') ||
       (this.contextSchemeCreateRequest.schemeAgencyId === undefined || this.contextSchemeCreateRequest.schemeAgencyId === '') ||
       (this.contextSchemeCreateRequest.schemeVersionId === undefined || this.contextSchemeCreateRequest.schemeVersionId === '');
+  }
+
+  applyFilter(filterValue: string) {
+    filterValue = filterValue.trim(); // Remove whitespace
+    filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
+    this.dataSource.filter = filterValue;
+    this.highlightText = filterValue;
+  }
+
+  clearFilter() {
+    this.valueSearch = '';
+    this.applyFilter(this.valueSearch);
   }
 
   openDialog(contextSchemeValue?: ContextSchemeValue) {

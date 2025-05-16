@@ -449,7 +449,7 @@
                                             [value]="asBccpDetail().dt.defaultDtAwdPri?.dtAwdPriId">
                                   <mat-option *ngFor="let dtAwdPri of asBccpDetail().dt.dtAwdPriList"
                                               [value]="dtAwdPri.dtAwdPriId" [disabled]="true">
-                                    {{ dtAwdPri.xbt.name }}
+                                    {{ dtAwdPri.xbt?.name }}
                                   </mat-option>
                                 </mat-select>
                               </mat-form-field>
@@ -579,7 +579,7 @@
                                             [value]="asDtScDetail().dtSc.defaultDtScAwdPri?.dtScAwdPriId">
                                   <mat-option *ngFor="let dtScAwdPri of asDtScDetail().dtSc.dtScAwdPriList"
                                               [value]="dtScAwdPri.dtScAwdPriId" [disabled]="true">
-                                    {{ dtScAwdPri.xbt.name }}
+                                    {{ dtScAwdPri.xbt?.name }}
                                   </mat-option>
                                 </mat-select>
                               </mat-form-field>

@@ -883,6 +883,7 @@ export class AccDetailComponent implements OnInit {
         return;
       }
 
+      this.isUpdating = true;
       this.service.verifyAppendAssociation(
         this.rootNode.manifestId,
         association.manifestId, association.type).subscribe(verifyRes => {
