@@ -66,10 +66,23 @@
         <div class="table-container">
           <div class="score-column-container align-items-center justify-content-between">
             <score-column-selector
-              [columns]="columns"
-              (columnsChange)="onColumnsChange($event)"
-              (onReset)="onColumnsReset()">
+                [columns]="columns"
+                (columnsChange)="onColumnsChange($event)"
+                (onReset)="onColumnsReset()">
             </score-column-selector>
+
+            <div class="ml-3">
+              <mat-form-field>
+                <mat-label>Search</mat-label>
+                <input matInput [(ngModel)]="valueSearch" (keyup.enter)="applyFilter(valueSearch)" maxlength="100"/>
+                <button mat-icon-button matSuffix (click)="applyFilter(valueSearch)">
+                  <mat-icon>search</mat-icon>
+                </button>
+                <button mat-icon-button matSuffix *ngIf="valueSearch && valueSearch.length > 0" (click)="clearFilter()">
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </mat-form-field>
+            </div>
           </div>
           <div class="mat-elevation-z1 table-wrapper mt-3">
             <table mat-table matSort [dataSource]="dataSource">
