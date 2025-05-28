@@ -236,7 +236,7 @@
                   <a target="_blank" rel="noopener noreferrer"
                      href="/profile_bie?{{ request.toQuery({
                       den: element.source.den,
-                      releaseIds: element.source.relase.releaseId,
+                      releaseIds: element.source.release.releaseId,
                       topLevelAsbiepIds: element.source.topLevelAsbiepId }) }}">
                     <span class="d-inline" matTooltip="{{ element.source.sourceAction | pastTense }} at {{ element.source.when | date: 'yyyy-MM-dd HH:mm:ss' }}">
                       {{ element.source.den + ((element.source.displayName) ? (' (' + element.source.displayName + ')') : '') }} in {{ element.source.release.releaseNum }}
