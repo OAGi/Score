@@ -533,9 +533,13 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
         }
 
         var queryBuilder = new GetCodeListDetailsQueryBuilder();
+        // For the record in the 'Release Draft' state,
+        // since there are records with duplicate next manifest IDs from the existing previous release,
+        // retrieve the first record after sorting by ID in descending order.
         CodeListDetailsRecord prevCodeListDetails = queryBuilder.select()
                 .where(CODE_LIST_MANIFEST.NEXT_CODE_LIST_MANIFEST_ID.eq(valueOf(codeListManifestId)))
-                .fetchOne(queryBuilder.mapper());
+                .orderBy(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.desc())
+                .fetchAny(queryBuilder.mapper());
         if (prevCodeListDetails == null) {
             // In the case of an end-user, the new revision is created within the same Manifest and does not have a previous Manifest.
             // Therefore, the previous record must be retrieved based on the log.

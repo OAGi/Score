@@ -473,9 +473,13 @@ public class JooqAccQueryRepository extends JooqBaseRepository implements AccQue
             return null;
         }
         var queryBuilder = new GetAccDetailsQueryBuilder();
+        // For the record in the 'Release Draft' state,
+        // since there are records with duplicate next manifest IDs from the existing previous release,
+        // retrieve the first record after sorting by ID in descending order.
         AccDetailsRecord prevAccDetails = queryBuilder.select()
                 .where(ACC_MANIFEST.NEXT_ACC_MANIFEST_ID.eq(valueOf(accManifestId)))
-                .fetchOne(queryBuilder.mapper());
+                .orderBy(ACC_MANIFEST.ACC_MANIFEST_ID.desc())
+                .fetchAny(queryBuilder.mapper());
         if (prevAccDetails == null) {
             // In the case of an end-user, the new revision is created within the same Manifest and does not have a previous Manifest.
             // Therefore, the previous record must be retrieved based on the log.

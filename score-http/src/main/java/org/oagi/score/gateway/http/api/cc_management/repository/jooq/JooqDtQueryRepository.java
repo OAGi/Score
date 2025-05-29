@@ -358,9 +358,13 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
             return null;
         }
         var queryBuilder = new GetDtDetailsQueryBuilder();
+        // For the record in the 'Release Draft' state,
+        // since there are records with duplicate next manifest IDs from the existing previous release,
+        // retrieve the first record after sorting by ID in descending order.
         DtDetailsRecord prevDtDetails = queryBuilder.select()
                 .where(DT_MANIFEST.NEXT_DT_MANIFEST_ID.eq(valueOf(dtManifestId)))
-                .fetchOne(queryBuilder.mapper());
+                .orderBy(DT_MANIFEST.DT_MANIFEST_ID.desc())
+                .fetchAny(queryBuilder.mapper());
         if (prevDtDetails == null) {
             // In the case of an end-user, the new revision is created within the same Manifest and does not have a previous Manifest.
             // Therefore, the previous record must be retrieved based on the log.

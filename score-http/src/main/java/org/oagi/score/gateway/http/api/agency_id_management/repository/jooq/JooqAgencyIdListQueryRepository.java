@@ -619,9 +619,13 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
         }
 
         var queryBuilder = new GetAgencyIdListDetailsQueryBuilder();
+        // For the record in the 'Release Draft' state,
+        // since there are records with duplicate next manifest IDs from the existing previous release,
+        // retrieve the first record after sorting by ID in descending order.
         AgencyIdListDetailsRecord prevAgencyIdListDetails = queryBuilder.select()
                 .where(AGENCY_ID_LIST_MANIFEST.NEXT_AGENCY_ID_LIST_MANIFEST_ID.eq(valueOf(agencyIdListManifestId)))
-                .fetchOne(queryBuilder.mapper());
+                .orderBy(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.desc())
+                .fetchAny(queryBuilder.mapper());
         if (prevAgencyIdListDetails == null) {
             // In the case of an end-user, the new revision is created within the same Manifest and does not have a previous Manifest.
             // Therefore, the previous record must be retrieved based on the log.

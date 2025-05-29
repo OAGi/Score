@@ -259,9 +259,13 @@ public class JooqBccpQueryRepository extends JooqBaseRepository implements BccpQ
             return null;
         }
         var queryBuilder = new GetBccpDetailsQueryBuilder();
+        // For the record in the 'Release Draft' state,
+        // since there are records with duplicate next manifest IDs from the existing previous release,
+        // retrieve the first record after sorting by ID in descending order.
         BccpDetailsRecord prevBccpDetails = queryBuilder.select()
                 .where(BCCP_MANIFEST.NEXT_BCCP_MANIFEST_ID.eq(valueOf(bccpManifestId)))
-                .fetchOne(queryBuilder.mapper());
+                .orderBy(BCCP_MANIFEST.BCCP_MANIFEST_ID.desc())
+                .fetchAny(queryBuilder.mapper());
         if (prevBccpDetails == null) {
             // In the case of an end-user, the new revision is created within the same Manifest and does not have a previous Manifest.
             // Therefore, the previous record must be retrieved based on the log.
