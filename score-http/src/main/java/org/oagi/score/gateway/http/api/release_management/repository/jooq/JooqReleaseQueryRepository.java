@@ -494,7 +494,7 @@ public class JooqReleaseQueryRepository extends JooqBaseRepository implements Re
             node.setManifestId(accManifestId);
             node.setDen(e.get(0).value2());
             node.setTimestamp(toDate(e.get(0).value4()));
-            node.setOwnerUserId(e.get(0).value5());
+            node.setOwnerUsername(e.get(0).value5());
             node.setState(CcState.valueOf(e.get(0).value6()));
             node.setRevision(e.get(0).value7().toBigInteger());
             node.setType(CcType.ACC);
@@ -535,7 +535,7 @@ public class JooqReleaseQueryRepository extends JooqBaseRepository implements Re
             node.setManifestId(asccpManifestId);
             node.setDen(e.get(0).value2());
             node.setTimestamp(toDate(e.get(0).value4()));
-            node.setOwnerUserId(e.get(0).value5());
+            node.setOwnerUsername(e.get(0).value5());
             node.setState(CcState.valueOf(e.get(0).value6()));
             node.setRevision(e.get(0).value7().toBigInteger());
             node.setType(CcType.ASCCP);
@@ -576,7 +576,7 @@ public class JooqReleaseQueryRepository extends JooqBaseRepository implements Re
             node.setManifestId(bccpManifestId);
             node.setDen(e.get(0).value2());
             node.setTimestamp(toDate(e.get(0).value4()));
-            node.setOwnerUserId(e.get(0).value5());
+            node.setOwnerUsername(e.get(0).value5());
             node.setState(CcState.valueOf(e.get(0).value6()));
             node.setRevision(e.get(0).value7().toBigInteger());
             node.setType(CcType.BCCP);
@@ -617,7 +617,7 @@ public class JooqReleaseQueryRepository extends JooqBaseRepository implements Re
             node.setManifestId(codeListManifestId);
             node.setDen(e.get(0).value2());
             node.setTimestamp(toDate(e.get(0).value4()));
-            node.setOwnerUserId(e.get(0).value5());
+            node.setOwnerUsername(e.get(0).value5());
             node.setState(CcState.valueOf(e.get(0).value6()));
             node.setRevision(e.get(0).value7().toBigInteger());
             node.setType(CcType.CODE_LIST);
@@ -658,7 +658,7 @@ public class JooqReleaseQueryRepository extends JooqBaseRepository implements Re
             node.setManifestId(agencyIdListManifestId);
             node.setDen(e.get(0).value2());
             node.setTimestamp(toDate(e.get(0).value4()));
-            node.setOwnerUserId(e.get(0).value5());
+            node.setOwnerUsername(e.get(0).value5());
             node.setState(CcState.valueOf(e.get(0).value6()));
             node.setRevision(e.get(0).value7().toBigInteger());
             node.setType(CcType.AGENCY_ID_LIST);
@@ -699,7 +699,7 @@ public class JooqReleaseQueryRepository extends JooqBaseRepository implements Re
             node.setManifestId(dtManifestId);
             node.setDen(e.get(0).value2());
             node.setTimestamp(toDate(e.get(0).value4()));
-            node.setOwnerUserId(e.get(0).value5());
+            node.setOwnerUsername(e.get(0).value5());
             node.setState(CcState.valueOf(e.get(0).value6()));
             node.setRevision(e.get(0).value7().toBigInteger());
             node.setType(CcType.DT);

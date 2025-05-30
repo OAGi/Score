@@ -7,33 +7,6 @@ import java.util.function.Predicate;
 
 public class DSLInterpreter {
 
-    public static void main(String[] args) {
-        String dsl1 = "contains(\"Given Name\" or \"Family Name\")";
-        String dsl2 = "not contains(\"Given Name\" and \"Family Name\")";
-        String dsl3 = "count(children) = 0";
-        String dsl4 = "count(children) > 2";
-        String dsl5 = "count(children) != 3";
-        String dsl6 = "count(children) > 2 and contains(\"Given Name\" and \"Family Name\")";
-        String dsl7 = "count(children) > 2 or not contains(\"Nothing\")";
-        String dsl8 = "child-of(\"Mary\")";
-
-        DSLRecord record1 = new StringDSLRecord("Mary", "My given name is Alice.", 0);
-        DSLRecord record2 = new StringDSLRecord("John", "My family name is Smith.", 3);
-        DSLRecord record3 = new StringDSLRecord("Sara", "My given name is Alice and my family name is Smith.", 5);
-        DSLRecord record4 = new StringDSLRecord("Tim", "Nothing here.", 3);
-
-//        System.out.println(parseExpression(dsl1).test(record1)); // true
-//        System.out.println(parseExpression(dsl2).test(record1)); // false
-//        System.out.println(parseExpression(dsl3).test(record1)); // true
-//        System.out.println(parseExpression(dsl4).test(record2)); // true
-//        System.out.println(parseExpression(dsl5).test(record3)); // true
-//        System.out.println(parseExpression(dsl5).test(record4)); // false
-//        System.out.println(parseExpression(dsl6).test(record3)); // true
-//        System.out.println(parseExpression(dsl7).test(record4)); // true
-        System.out.println(parseExpression(dsl8).test(record1)); // true
-        System.out.println(parseExpression(dsl8).test(record2)); // false
-    }
-
     public static Predicate<DSLRecord> parseExpression(String dsl) {
         dsl = dsl.trim();
         List<String> tokens = tokenize(dsl);

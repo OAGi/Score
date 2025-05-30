@@ -1,21 +1,15 @@
 package org.oagi.score.gateway.http.api.log_management.model;
 
-import lombok.Data;
+import java.util.Date;
 
-import java.math.BigInteger;
-import java.time.LocalDateTime;
-
-@Data
-public class Log {
-
-    private BigInteger logId;
-    private String hash;
-    private int revisionNum;
-    private int revisionTrackingNum;
-    private LogAction logAction;
-    private String loginId;
-    private LocalDateTime timestamp;
-    private BigInteger prevLogId;
-    private boolean isDeveloper;
-
+public record Log(
+        LogId logId,
+        String hash,
+        int revisionNum,
+        int revisionTrackingNum,
+        LogAction logAction,
+        String loginId,
+        Date timestamp,
+        LogId prevLogId,
+        boolean isDeveloper) {
 }

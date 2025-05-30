@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
+import org.jooq.RecordMapper;
 import org.jooq.impl.DSL;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
@@ -14,6 +15,7 @@ import org.oagi.score.gateway.http.api.cc_management.model.CcType;
 import org.oagi.score.gateway.http.api.log_management.controller.payload.LogListRequest;
 import org.oagi.score.gateway.http.api.log_management.model.Log;
 import org.oagi.score.gateway.http.api.log_management.model.LogAction;
+import org.oagi.score.gateway.http.api.log_management.model.LogId;
 import org.oagi.score.gateway.http.api.log_management.service.LogSerializer;
 import org.oagi.score.gateway.http.common.model.*;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
@@ -23,7 +25,9 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -78,7 +82,7 @@ public class LogRepository {
                 .where(conditions)
                 .orderBy(LOG.LOG_ID.desc())
                 .limit(pageRequest.pageOffset(), pageRequest.pageSize())
-                .fetchInto(Log.class);
+                .fetch(mapper());
 
         response.setList(list);
         response.setPage(pageRequest.pageIndex());
@@ -86,6 +90,22 @@ public class LogRepository {
         response.setLength(length);
 
         return response;
+    }
+
+    private RecordMapper<org.jooq.Record, Log> mapper() {
+        return record -> {
+            return new Log(
+                    new LogId(record.get(LOG.LOG_ID).toBigInteger()),
+                    record.get(LOG.HASH),
+                    record.get(LOG.REVISION_NUM).intValue(),
+                    record.get(LOG.REVISION_TRACKING_NUM).intValue(),
+                    LogAction.valueOf(record.get(LOG.LOG_ACTION)),
+                    record.get(APP_USER.LOGIN_ID.as("loginId")),
+                    Date.from(record.get(LOG.CREATION_TIMESTAMP.as("timestamp")).atZone(ZoneId.systemDefault()).toInstant()),
+                    (record.get(LOG.PREV_LOG_ID) != null) ?
+                            new LogId(record.get(LOG.PREV_LOG_ID).toBigInteger()) : null,
+                    record.get(APP_USER.IS_DEVELOPER) == (byte) 1);
+        };
     }
 
     public String getSnapshotById(ScoreUser requester, BigInteger logId) {

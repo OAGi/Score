@@ -14,7 +14,7 @@ public class AssignableNode {
     private CcType type;
     private CcState state;
     private String den;
-    private String ownerUserId;
+    private String ownerUsername;
     private Date timestamp;
     private BigInteger revision;
 }

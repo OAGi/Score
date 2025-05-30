@@ -556,11 +556,13 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
         dslContext().insertInto(DT_AWD_PRI,
                         DT_AWD_PRI.RELEASE_ID,
                         DT_AWD_PRI.DT_ID,
+                        DT_AWD_PRI.CDT_PRI_ID,
                         DT_AWD_PRI.XBT_MANIFEST_ID,
                         DT_AWD_PRI.IS_DEFAULT)
                 .select(dslContext().select(
                                 DT_MANIFEST.as("target").RELEASE_ID,
                                 DT_MANIFEST.as("target").DT_ID,
+                                DT_AWD_PRI.CDT_PRI_ID,
                                 XBT_MANIFEST.as("target_xbt").XBT_MANIFEST_ID,
                                 DT_AWD_PRI.IS_DEFAULT)
                         .from(DT_MANIFEST.as("working"))
@@ -583,11 +585,13 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
         dslContext().insertInto(DT_AWD_PRI,
                         DT_AWD_PRI.RELEASE_ID,
                         DT_AWD_PRI.DT_ID,
+                        DT_AWD_PRI.CDT_PRI_ID,
                         DT_AWD_PRI.CODE_LIST_MANIFEST_ID,
                         DT_AWD_PRI.IS_DEFAULT)
                 .select(dslContext().select(
                                 DT_MANIFEST.as("target").RELEASE_ID,
                                 DT_MANIFEST.as("target").DT_ID,
+                                DT_AWD_PRI.CDT_PRI_ID,
                                 CODE_LIST_MANIFEST.as("target_code_list").CODE_LIST_MANIFEST_ID,
                                 DT_AWD_PRI.IS_DEFAULT)
                         .from(DT_MANIFEST.as("working"))
@@ -610,11 +614,13 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
         dslContext().insertInto(DT_AWD_PRI,
                         DT_AWD_PRI.RELEASE_ID,
                         DT_AWD_PRI.DT_ID,
+                        DT_AWD_PRI.CDT_PRI_ID,
                         DT_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID,
                         DT_AWD_PRI.IS_DEFAULT)
                 .select(dslContext().select(
                                 DT_MANIFEST.as("target").RELEASE_ID,
                                 DT_MANIFEST.as("target").DT_ID,
+                                DT_AWD_PRI.CDT_PRI_ID,
                                 AGENCY_ID_LIST_MANIFEST.as("target_agency_id_list").AGENCY_ID_LIST_MANIFEST_ID,
                                 DT_AWD_PRI.IS_DEFAULT)
                         .from(DT_MANIFEST.as("working"))
@@ -640,11 +646,13 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
         dslContext().insertInto(DT_SC_AWD_PRI,
                         DT_SC_AWD_PRI.RELEASE_ID,
                         DT_SC_AWD_PRI.DT_SC_ID,
+                        DT_SC_AWD_PRI.CDT_PRI_ID,
                         DT_SC_AWD_PRI.XBT_MANIFEST_ID,
                         DT_SC_AWD_PRI.IS_DEFAULT)
                 .select(dslContext().select(
                                 DT_SC_MANIFEST.as("target").RELEASE_ID,
                                 DT_SC_MANIFEST.as("target").DT_SC_ID,
+                                DT_SC_AWD_PRI.CDT_PRI_ID,
                                 XBT_MANIFEST.as("target_xbt").XBT_MANIFEST_ID,
                                 DT_SC_AWD_PRI.IS_DEFAULT)
                         .from(DT_SC_MANIFEST.as("working"))
@@ -667,11 +675,13 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
         dslContext().insertInto(DT_SC_AWD_PRI,
                         DT_SC_AWD_PRI.RELEASE_ID,
                         DT_SC_AWD_PRI.DT_SC_ID,
+                        DT_SC_AWD_PRI.CDT_PRI_ID,
                         DT_SC_AWD_PRI.CODE_LIST_MANIFEST_ID,
                         DT_SC_AWD_PRI.IS_DEFAULT)
                 .select(dslContext().select(
                                 DT_SC_MANIFEST.as("target").RELEASE_ID,
                                 DT_SC_MANIFEST.as("target").DT_SC_ID,
+                                DT_SC_AWD_PRI.CDT_PRI_ID,
                                 CODE_LIST_MANIFEST.as("target_code_list").CODE_LIST_MANIFEST_ID,
                                 DT_SC_AWD_PRI.IS_DEFAULT)
                         .from(DT_SC_MANIFEST.as("working"))
@@ -694,11 +704,13 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
         dslContext().insertInto(DT_SC_AWD_PRI,
                         DT_SC_AWD_PRI.RELEASE_ID,
                         DT_SC_AWD_PRI.DT_SC_ID,
+                        DT_SC_AWD_PRI.CDT_PRI_ID,
                         DT_SC_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID,
                         DT_SC_AWD_PRI.IS_DEFAULT)
                 .select(dslContext().select(
                                 DT_SC_MANIFEST.as("target").RELEASE_ID,
                                 DT_SC_MANIFEST.as("target").DT_SC_ID,
+                                DT_SC_AWD_PRI.CDT_PRI_ID,
                                 AGENCY_ID_LIST_MANIFEST.as("target_agency_id_list").AGENCY_ID_LIST_MANIFEST_ID,
                                 DT_SC_AWD_PRI.IS_DEFAULT)
                         .from(DT_SC_MANIFEST.as("working"))

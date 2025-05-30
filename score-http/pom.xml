@@ -5,7 +5,7 @@
 
     <groupId>org.oagi</groupId>
     <artifactId>score-http</artifactId>
-    <version>3.4.0</version>
+    <version>3.4.0.1</version>
     <packaging>war</packaging>
 
     <name>score-http</name>

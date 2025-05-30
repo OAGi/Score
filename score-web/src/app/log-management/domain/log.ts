@@ -44,7 +44,7 @@ export class Log {
   snapshot: string;
   prevLogId: number;
   loginId: string;
-  timestamp: number[];
+  timestamp: Date;
   developer: boolean;
 }
 

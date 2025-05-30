@@ -247,9 +247,13 @@ public class JooqAsccpQueryRepository extends JooqBaseRepository implements Ascc
             return null;
         }
         var queryBuilder = new GetAsccpDetailsQueryBuilder();
+        // For the record in the 'Release Draft' state,
+        // since there are records with duplicate next manifest IDs from the existing previous release,
+        // retrieve the first record after sorting by ID in descending order.
         AsccpDetailsRecord prevAsccpDetails = queryBuilder.select()
                 .where(ASCCP_MANIFEST.NEXT_ASCCP_MANIFEST_ID.eq(valueOf(asccpManifestId)))
-                .fetchOne(queryBuilder.mapper());
+                .orderBy(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.desc())
+                .fetchAny(queryBuilder.mapper());
         if (prevAsccpDetails == null) {
             // In the case of an end-user, the new revision is created within the same Manifest and does not have a previous Manifest.
             // Therefore, the previous record must be retrieved based on the log.
