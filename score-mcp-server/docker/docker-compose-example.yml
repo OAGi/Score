@@ -1,0 +1,100 @@
+version: '3.8'
+
+services:
+  database:
+    image: oagi1docker/srt-repo:3.4.1
+    container_name: srt-repo-db
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DATABASE_ROOT_PASSWORD:-oagi}
+      - MYSQL_DATABASE=${DATABASE_NAME:-oagi}
+      - MYSQL_USER=${DATABASE_USERNAME:-oagi}
+      - MYSQL_PASSWORD=${DATABASE_PASSWORD:-oagi}
+    volumes:
+      - database-data:/var/lib/mysql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p${MYSQL_ROOT_PASSWORD} || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  score-mcp-server:
+    image: oagi1docker/score-mcp-server:0.1.0
+    container_name: score-mcp-server
+    ports:
+      - "${PORT:-8000}:${PORT:-8000}"
+    environment:
+      - HOST=${HOST:-0.0.0.0}
+      - PORT=${PORT:-8000}
+      - WORKERS=${WORKERS:-4}
+      # Logging configuration
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      # Database configuration - use service name as hostname
+      - DATABASE_CONNECTOR=${DATABASE_CONNECTOR:-mariadb+mariadbconnector}
+      - DATABASE_USERNAME=${DATABASE_USERNAME:-oagi}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD:-oagi}
+      - DATABASE_HOSTNAME=database
+      - DATABASE_PORT=${DATABASE_PORT:-3306}
+      - DATABASE_NAME=${DATABASE_NAME:-oagi}
+      # Or use DATABASE_URL with service name:
+      # - DATABASE_URL=${DATABASE_URL:-mariadb+mariadbconnector://oagi:oagi@database:3306/oagi}
+      # Authentication configuration
+      - AUTH_PROVIDER=${AUTH_PROVIDER:-fastmcp.server.auth.oidc_proxy.OIDCProxy}
+      - AUTH_PROVIDER_PARAMS_CONFIG_URL=${AUTH_PROVIDER_PARAMS_CONFIG_URL}
+      - AUTH_PROVIDER_PARAMS_CLIENT_ID=${AUTH_PROVIDER_PARAMS_CLIENT_ID}
+      - AUTH_PROVIDER_PARAMS_CLIENT_SECRET=${AUTH_PROVIDER_PARAMS_CLIENT_SECRET}
+      - AUTH_PROVIDER_PARAMS_AUDIENCE=${AUTH_PROVIDER_PARAMS_AUDIENCE}
+      - AUTH_PROVIDER_PARAMS_BASE_URL=${AUTH_PROVIDER_PARAMS_BASE_URL}
+      # FastMCP Configuration
+      - CORS_ENABLED=${CORS_ENABLED:-false}
+      - STATELESS_HTTP=${STATELESS_HTTP:-true}
+      # CORS configuration (only used if CORS_ENABLED=true)
+      # These can be set in your .env file or passed as environment variables
+      # List values (ORIGINS, METHODS, HEADERS, EXPOSE_HEADERS) can be comma-separated strings
+      # Example: CORS_ALLOW_ORIGINS=https://example.com,https://app.example.com
+      # The application will automatically split comma-separated strings into lists
+      - CORS_ALLOW_ORIGINS=${CORS_ALLOW_ORIGINS:-*}
+      - CORS_ALLOW_METHODS=${CORS_ALLOW_METHODS:-*}
+      - CORS_ALLOW_HEADERS=${CORS_ALLOW_HEADERS:-*}
+      - CORS_EXPOSE_HEADERS=${CORS_EXPOSE_HEADERS:-*}
+      - CORS_ALLOW_CREDENTIALS=${CORS_ALLOW_CREDENTIALS:-false}
+      - CORS_MAX_AGE=${CORS_MAX_AGE:-600}
+      # Cache Configuration
+      # Cache type: 'memory' (or 'inmemory') for in-memory cache, 'redis' for Redis cache
+      # In-memory cache is faster but limited to a single process/container
+      # Redis cache allows sharing cache across multiple processes/containers
+      - CACHE_TYPE=${CACHE_TYPE:-memory}
+      # Cache settings for InMemoryCache (only used when CACHE_TYPE=memory)
+      - CACHE_MAX_SIZE=${CACHE_MAX_SIZE:-1000}
+      - CACHE_DEFAULT_TTL=${CACHE_DEFAULT_TTL:-60}
+      # Redis Configuration (only used when CACHE_TYPE=redis)
+      # Redis Cache connection URL - supported schemes:
+      #   - Single instance: redis://[password@]host:port[/database_number]
+      #   - Sentinel: redis+sentinel://[password@]host:port[/database_number]?master=master_name
+      #   - Cluster: redis-cluster://[password@]host:port
+      - REDIS_CACHE_URL=${REDIS_CACHE_URL:-redis://localhost:6379/0}
+      # Redis deployment type: 'single', 'sentinel', or 'cluster'
+      # If not set, will be auto-detected from REDIS_CACHE_URL scheme
+      # - REDIS_CACHE_TYPE=${REDIS_CACHE_TYPE}
+      # Redis Sentinel Configuration (only used when CACHE_TYPE=redis and REDIS_CACHE_TYPE=sentinel)
+      # - REDIS_CACHE_SENTINEL_MASTER=${REDIS_CACHE_SENTINEL_MASTER:-mymaster}
+      # - REDIS_CACHE_SENTINEL_NODES=${REDIS_CACHE_SENTINEL_NODES}
+      # Redis Cluster Configuration (only used when CACHE_TYPE=redis and REDIS_CACHE_TYPE=cluster)
+      # - REDIS_CACHE_CLUSTER_NODES=${REDIS_CACHE_CLUSTER_NODES}
+    volumes:
+      # Mount .env file if it exists (optional)
+      # The application will automatically load .env from the working directory
+      # Since WORKDIR is /app in the Dockerfile, mount to /app/.env
+      # Note: The application uses Path.cwd() to find .env, so it works with any working directory
+      - ./.env:/app/.env:ro
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  database-data:
+

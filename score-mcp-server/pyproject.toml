@@ -1,0 +1,21 @@
+[project]
+name = "score-mcp-server"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastmcp>=2.13.0",
+    "aiohttp>=3.8.0",
+    "sqlmodel>=0.0.27",
+    "mariadb>=1.1.14",
+    "bcrypt>=4.0.0",
+    "pydantic-settings>=2.0.0",
+    "fastapi>=0.119.1",
+    "python-dotenv>=1.0.0",
+    "redis>=5.0.0",
+    "pytest>=8.4.2",
+    "pytest-asyncio>=0.24.0",
+    "pytest-xdist>=3.8.0",
+    "uvicorn[standard]>=0.38.0",
+]
