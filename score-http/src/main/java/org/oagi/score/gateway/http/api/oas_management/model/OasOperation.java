@@ -7,8 +7,8 @@ import java.math.BigInteger;
 import java.util.Date;
 
 public class OasOperation extends Auditable {
-    private BigInteger oasOperationId;
-    private BigInteger oasResourceId;
+    private OasOperationId oasOperationId;
+    private OasResourceId oasResourceId;
     private String verb;
     private String operationId;
     private String summary;
@@ -19,24 +19,26 @@ public class OasOperation extends Auditable {
     private UserSummaryRecord createdBy;
     private UserSummaryRecord lastUpdatedBy;
 
-    public OasOperation(){
+    public OasOperation() {
 
     }
-    public BigInteger getOasOperationId() {
+
+    public OasOperationId getOasOperationId() {
         return oasOperationId;
     }
 
-    public void setOasOperationId(BigInteger oasOperationId) {
+    public void setOasOperationId(OasOperationId oasOperationId) {
         this.oasOperationId = oasOperationId;
     }
 
-    public BigInteger getOasResourceId() {
+    public OasResourceId getOasResourceId() {
         return oasResourceId;
     }
 
-    public void setOasResourceId(BigInteger oasResourceId) {
+    public void setOasResourceId(OasResourceId oasResourceId) {
         this.oasResourceId = oasResourceId;
     }
+
     public String getVerb() {
         return verb;
     }

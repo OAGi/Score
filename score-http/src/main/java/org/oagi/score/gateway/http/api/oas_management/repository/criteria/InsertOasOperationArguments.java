@@ -2,9 +2,10 @@ package org.oagi.score.gateway.http.api.oas_management.repository.criteria;
 
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
+import org.oagi.score.gateway.http.api.oas_management.model.OasOperationId;
+import org.oagi.score.gateway.http.api.oas_management.model.OasResourceId;
 import org.oagi.score.gateway.http.api.oas_management.repository.OasDocCommandRepository;
 
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -13,7 +14,7 @@ public class InsertOasOperationArguments {
 
     private final OasDocCommandRepository repository;
 
-    private ULong userId;
+    private UserId userId;
     private ULong oasResourceId;
     private String verb;
     private String operationId;
@@ -27,10 +28,6 @@ public class InsertOasOperationArguments {
     }
 
     public InsertOasOperationArguments setUserId(UserId userId) {
-        return setUserId(ULong.valueOf(userId.value()));
-    }
-
-    public InsertOasOperationArguments setUserId(ULong userId) {
         this.userId = userId;
         return this;
     }
@@ -39,8 +36,8 @@ public class InsertOasOperationArguments {
         return oasResourceId;
     }
 
-    public InsertOasOperationArguments setOasResourceId(BigInteger oasResourceId) {
-        return setOasResourceId(ULong.valueOf(oasResourceId));
+    public InsertOasOperationArguments setOasResourceId(OasResourceId oasResourceId) {
+        return setOasResourceId(ULong.valueOf(oasResourceId.value()));
     }
 
     public InsertOasOperationArguments setOasResourceId(ULong oasResourceId) {
@@ -106,7 +103,7 @@ public class InsertOasOperationArguments {
         return this;
     }
 
-    public ULong getUserId() {
+    public UserId getUserId() {
         return userId;
     }
 
@@ -114,7 +111,7 @@ public class InsertOasOperationArguments {
         return timestamp;
     }
 
-    public ULong execute() {
+    public OasOperationId execute() {
         return repository.insertOasOperation(this);
     }
 }

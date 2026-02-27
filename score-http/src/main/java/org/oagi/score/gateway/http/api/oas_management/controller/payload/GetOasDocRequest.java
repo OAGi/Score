@@ -1,26 +1,25 @@
 package org.oagi.score.gateway.http.api.oas_management.controller.payload;
 
+import org.oagi.score.gateway.http.api.oas_management.model.OasDocId;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.model.base.Request;
 
-import java.math.BigInteger;
-
 public class GetOasDocRequest extends Request {
-    private BigInteger oasDocId;
+    private OasDocId oasDocId;
 
     public GetOasDocRequest(ScoreUser requester) {
         super(requester);
     }
 
-    public BigInteger getOasDocId() {
+    public OasDocId getOasDocId() {
         return oasDocId;
     }
 
-    public void setOasDocId(BigInteger oasDocId) {
+    public void setOasDocId(OasDocId oasDocId) {
         this.oasDocId = oasDocId;
     }
 
-    public GetOasDocRequest withOasDocId(BigInteger oasDocId) {
+    public GetOasDocRequest withOasDocId(OasDocId oasDocId) {
         this.setOasDocId(oasDocId);
         return this;
     }

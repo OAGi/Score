@@ -1,10 +1,11 @@
 package org.oagi.score.gateway.http.api.oas_management.controller.payload;
 
+import org.oagi.score.gateway.http.api.oas_management.model.OasDocId;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.model.base.Request;
 
 public class UpdateOasDocRequest extends Request {
-    private String oasDocId;
+    private OasDocId oasDocId;
     private String openAPIVersion;
     private String title;
     private String description;
@@ -21,16 +22,16 @@ public class UpdateOasDocRequest extends Request {
         super(requester);
     }
 
-    public UpdateOasDocRequest withOasDocId(String oasDocId) {
+    public UpdateOasDocRequest withOasDocId(OasDocId oasDocId) {
         this.setOasDocId(oasDocId);
         return this;
     }
 
-    public String getOasDocId() {
+    public OasDocId getOasDocId() {
         return oasDocId;
     }
 
-    public void setOasDocId(String oasDocId) {
+    public void setOasDocId(OasDocId oasDocId) {
         this.oasDocId = oasDocId;
     }
 

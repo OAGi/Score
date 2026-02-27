@@ -6,14 +6,13 @@ import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.context_management.business_context.model.BusinessContextSummaryRecord;
 import org.oagi.score.gateway.http.common.model.base.Auditable;
 
-import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
 public class AssignBieForOasDoc extends Auditable {
     private boolean oasRequest;
     private TopLevelAsbiepId topLevelAsbiepId;
-    private BigInteger oasDocId;
+    private OasDocId oasDocId;
     private String propertyTerm;
     private List<BusinessContextSummaryRecord> businessContexts;
     private String access;
@@ -44,11 +43,11 @@ public class AssignBieForOasDoc extends Auditable {
         this.topLevelAsbiepId = topLevelAsbiepId;
     }
 
-    public BigInteger getOasDocId() {
+    public OasDocId getOasDocId() {
         return oasDocId;
     }
 
-    public void setOasDocId(BigInteger oasDocId) {
+    public void setOasDocId(OasDocId oasDocId) {
         this.oasDocId = oasDocId;
     }
 

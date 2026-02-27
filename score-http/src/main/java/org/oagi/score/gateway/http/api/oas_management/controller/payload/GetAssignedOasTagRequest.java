@@ -1,19 +1,19 @@
 package org.oagi.score.gateway.http.api.oas_management.controller.payload;
 
+import org.oagi.score.gateway.http.api.oas_management.model.OasOperationId;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.model.base.Request;
 
-import java.math.BigInteger;
-
 public class GetAssignedOasTagRequest extends Request {
-    private BigInteger oasOperationId;
+
+    private OasOperationId oasOperationId;
     private String messageBodyType;
 
     public GetAssignedOasTagRequest(ScoreUser requester) {
         super(requester);
     }
 
-    public GetAssignedOasTagRequest withOasOperationId(BigInteger oasOperationId) {
+    public GetAssignedOasTagRequest withOasOperationId(OasOperationId oasOperationId) {
         this.setOasOperationId(oasOperationId);
         return this;
     }
@@ -23,11 +23,11 @@ public class GetAssignedOasTagRequest extends Request {
         return this;
     }
 
-    public BigInteger getOasOperationId() {
+    public OasOperationId getOasOperationId() {
         return oasOperationId;
     }
 
-    public void setOasOperationId(BigInteger oasOperationId) {
+    public void setOasOperationId(OasOperationId oasOperationId) {
         this.oasOperationId = oasOperationId;
     }
 

@@ -1,15 +1,15 @@
 package org.oagi.score.gateway.http.api.oas_management.controller.payload;
 
 import org.oagi.score.gateway.http.api.oas_management.model.BieForOasDoc;
+import org.oagi.score.gateway.http.api.oas_management.model.OasDocId;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.model.base.Request;
 
-import java.math.BigInteger;
 import java.util.List;
 
 public class UpdateBieForOasDocRequest extends Request {
     private List<BieForOasDoc> bieForOasDocList;
-    private BigInteger oasDocId;
+    private OasDocId oasDocId;
 
     public UpdateBieForOasDocRequest(ScoreUser requester) {
         super(requester);
@@ -28,15 +28,15 @@ public class UpdateBieForOasDocRequest extends Request {
         return this;
     }
 
-    public BigInteger getOasDocId() {
+    public OasDocId getOasDocId() {
         return oasDocId;
     }
 
-    public void setOasDocId(BigInteger oasDocId) {
+    public void setOasDocId(OasDocId oasDocId) {
         this.oasDocId = oasDocId;
     }
 
-    public UpdateBieForOasDocRequest withOasDocId(BigInteger oasDocId) {
+    public UpdateBieForOasDocRequest withOasDocId(OasDocId oasDocId) {
         setOasDocId(oasDocId);
         return this;
     }

@@ -150,7 +150,7 @@ public class OpenAPIDocController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<BieForOasDoc> selectBieForOasDoc(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @PathVariable("id") BigInteger oasDocId,
+            @PathVariable("id") OasDocId oasDocId,
             @RequestParam(name = "den", required = false) String den,
             @RequestParam(name = "propertyTerm", required = false) String propertyTerm,
             @RequestParam(name = "businessContext", required = false) String businessContext,
@@ -242,9 +242,10 @@ public class OpenAPIDocController {
         return oasDocService.selectBieForOasDoc(sessionService.asScoreUser(user), request);
     }
 
-    @RequestMapping(value = "/oas_doc/{oasDocId:[\\d]+}/bie_list/delete", method = RequestMethod.POST)
+    @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list/delete", method = RequestMethod.POST)
     public ResponseEntity deletes(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("id") OasDocId oasDocId,
             @RequestBody DeleteBieForOasDocRequestData requestData) {
 
         DeleteBieForOasDocRequest request = new DeleteBieForOasDocRequest(sessionService.asScoreUser(user))
@@ -260,14 +261,14 @@ public class OpenAPIDocController {
     }
 
     public static class DeleteBieForOasDocRequestData {
-        private BigInteger oasDocId;
+        private OasDocId oasDocId;
         private List<BieForOasDoc> bieForOasDocList = Collections.emptyList();
 
-        public BigInteger getOasDocId() {
+        public OasDocId getOasDocId() {
             return oasDocId;
         }
 
-        public void setOasDocId(BigInteger oasDocId) {
+        public void setOasDocId(OasDocId oasDocId) {
             this.oasDocId = oasDocId;
         }
 
@@ -284,7 +285,7 @@ public class OpenAPIDocController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<BieForOasDoc> getBieListForOasDoc(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @PathVariable("id") BigInteger oasDocId,
+            @PathVariable("id") OasDocId oasDocId,
             @RequestParam(name = "den", required = false) String den,
             @RequestParam(name = "propertyTerm", required = false) String propertyTerm,
             @RequestParam(name = "businessContext", required = false) String businessContext,
@@ -340,7 +341,7 @@ public class OpenAPIDocController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public BieForOasDoc getBieForOasDoc(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @PathVariable("oasDocId") BigInteger oasDocId,
+            @PathVariable("id") OasDocId oasDocId,
             @PathVariable("topLevelAsbiepId") TopLevelAsbiepId selectedTopLevelAsbiepId) {
 
         BieForOasDoc bieForOasDoc = new BieForOasDoc();
@@ -360,6 +361,7 @@ public class OpenAPIDocController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity addBieForOasDoc(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("id") OasDocId oasDocId,
             @RequestBody AssignBieForOasDoc assignBieForOasDoc) {
         ScoreUser requester = sessionService.asScoreUser(user);
         AddBieForOasDocRequest request = new AddBieForOasDocRequest(requester);
@@ -423,7 +425,7 @@ public class OpenAPIDocController {
     public ReusedBIEViolationCheckResponse checkBIEReusedAcrossOperations(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @RequestBody BieForOasDoc selectedBieForOasDoc,
-            @PathVariable("id") BigInteger oasDocId) {
+            @PathVariable("id") OasDocId oasDocId) {
         // Retrieve all current assigned bie list for this given oasDocId
         ReusedBIEViolationCheck reusedBIEViolationCheck = new ReusedBIEViolationCheck(oasDocId);
         ReusedBIEViolationCheckResponse response = new ReusedBIEViolationCheckResponse();
@@ -464,7 +466,7 @@ public class OpenAPIDocController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ReusedBIEViolationCheckResponse checkBIEReusedAcrossOperationsAfterUpdate(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @PathVariable("id") BigInteger oasDocId) {
+            @PathVariable("id") OasDocId oasDocId) {
         // Retrieve all current assigned bie list for this given oasDocId
         ReusedBIEViolationCheck reusedBIEViolationCheck = new ReusedBIEViolationCheck(oasDocId);
         ReusedBIEViolationCheckResponse response = new ReusedBIEViolationCheckResponse();
@@ -490,10 +492,10 @@ public class OpenAPIDocController {
 
     private class ReusedBIEViolationCheck {
 
-        private BigInteger oasDocId;
+        private OasDocId oasDocId;
         private Map<TopLevelAsbiepId, ReusedBIERecord> reusedBIEMap = new HashMap<>();
 
-        public ReusedBIEViolationCheck(BigInteger oasDocId) {
+        public ReusedBIEViolationCheck(OasDocId oasDocId) {
             this.oasDocId = oasDocId;
         }
 
@@ -513,11 +515,11 @@ public class OpenAPIDocController {
             return reusedBIEMap.get(topLevelAsbiepId);
         }
 
-        public BigInteger getOasDocId() {
+        public OasDocId getOasDocId() {
             return oasDocId;
         }
 
-        public void setOasDocId(BigInteger oasDocId) {
+        public void setOasDocId(OasDocId oasDocId) {
             this.oasDocId = oasDocId;
         }
     }
@@ -599,6 +601,7 @@ public class OpenAPIDocController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity updateBieForOasDoc(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("id") OasDocId oasDocId,
             @RequestBody BieForOasDocUpdateRequest request) {
 
         UpdateBieForOasDocRequest updateBieForOasDocRequest = new UpdateBieForOasDocRequest(sessionService.asScoreUser(user));
@@ -707,7 +710,7 @@ public class OpenAPIDocController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public OasDoc getOasDoc(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @PathVariable("id") BigInteger oasDocId) {
+            @PathVariable("id") OasDocId oasDocId) {
 
         GetOasDocRequest request = new GetOasDocRequest(
                 sessionService.asScoreUser(user));
@@ -719,7 +722,7 @@ public class OpenAPIDocController {
 
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}", method = RequestMethod.POST)
     public ResponseEntity update(
-            @PathVariable("id") String oasDocId,
+            @PathVariable("id") OasDocId oasDocId,
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @RequestBody OasDoc oasDoc) {
 
@@ -749,7 +752,7 @@ public class OpenAPIDocController {
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}", method = RequestMethod.DELETE)
     public ResponseEntity delete(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @PathVariable("id") BigInteger oasDocId) throws ScoreDataAccessException {
+            @PathVariable("id") OasDocId oasDocId) throws ScoreDataAccessException {
 
         ScoreUser requester = sessionService.asScoreUser(user);
 
@@ -780,13 +783,13 @@ public class OpenAPIDocController {
     }
 
     public static class DeleteOasDocRequestData {
-        private List<BigInteger> oasDocIdList = Collections.emptyList();
+        private List<OasDocId> oasDocIdList = Collections.emptyList();
 
-        public List<BigInteger> getOasDocIdList() {
+        public List<OasDocId> getOasDocIdList() {
             return oasDocIdList;
         }
 
-        public void setOasDocIdList(List<BigInteger> oasDocIdList) {
+        public void setOasDocIdList(List<OasDocId> oasDocIdList) {
             this.oasDocIdList = oasDocIdList;
         }
     }

@@ -4,8 +4,7 @@ import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.context_management.business_context.service.BusinessContextQueryService;
 import org.oagi.score.gateway.http.api.oas_management.controller.payload.*;
-import org.oagi.score.gateway.http.api.oas_management.model.BieForOasDoc;
-import org.oagi.score.gateway.http.api.oas_management.model.OasDoc;
+import org.oagi.score.gateway.http.api.oas_management.model.*;
 import org.oagi.score.gateway.http.api.oas_management.repository.BieForOasDocCommandRepository;
 import org.oagi.score.gateway.http.api.oas_management.repository.BieForOasDocQueryRepository;
 import org.oagi.score.gateway.http.api.oas_management.repository.OasDocCommandRepository;
@@ -145,13 +144,13 @@ public class OpenAPIDocService {
 
         var command = repositoryFactory.oasDocCommandRepository(requester);
 
-        ULong oasMessageBodyId = new InsertOasMessageBodyArguments(command)
+        OasMessageBodyId oasMessageBodyId = new InsertOasMessageBodyArguments(command)
                 .setUserId(userId)
                 .setTopLevelAsbiepId(request.getTopLevelAsbiepId())
                 .setTimestamp(millis)
                 .execute();
 
-        ULong oasResourceId = new InsertOasResourceArguments(command)
+        OasResourceId oasResourceId = new InsertOasResourceArguments(command)
                 .setUserId(userId)
                 .setOasDocId(request.getOasDocId())
                 .setPath(request.getPath())
@@ -159,7 +158,7 @@ public class OpenAPIDocService {
                 .setTimestamp(millis)
                 .execute();
 
-        ULong oasOperationId = new InsertOasOperationArguments(command)
+        OasOperationId oasOperationId = new InsertOasOperationArguments(command)
                 .setUserId(userId)
                 .setOperationId(request.getOperationId())
                 .setOasResourceId(oasResourceId)
@@ -171,7 +170,7 @@ public class OpenAPIDocService {
                 .execute();
 
         if (request.getTagName() != null) {
-            ULong oasTagId = new InsertOasTagArguments(command)
+            OasTagId oasTagId = new InsertOasTagArguments(command)
                     .setUserId(userId)
                     .setGuid(randomGuid())
                     .setName(request.getTagName())
@@ -182,8 +181,8 @@ public class OpenAPIDocService {
                     .setOasTagId(oasTagId)
                     .execute();
         }
-        ULong oasRequestId = null;
-        ULong oasResponseId = null;
+        OasRequestId oasRequestId = null;
+        OasResponseId oasResponseId = null;
         if (request.isOasRequest()) {
             oasRequestId = new InsertOasRequestArguments(command)
                     .setUserId(userId)
@@ -210,8 +209,8 @@ public class OpenAPIDocService {
                     .setTimestamp(millis)
                     .execute();
         }
-        return new AddBieForOasDocResponse(oasRequestId != null ? oasRequestId.toBigInteger() : null,
-                oasResponseId != null ? oasResponseId.toBigInteger() : null);
+        return new AddBieForOasDocResponse(oasRequestId != null ? oasRequestId : null,
+                oasResponseId != null ? oasResponseId : null);
     }
 
     @Transactional

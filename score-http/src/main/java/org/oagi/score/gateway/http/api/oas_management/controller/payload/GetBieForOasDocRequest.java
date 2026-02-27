@@ -2,13 +2,14 @@ package org.oagi.score.gateway.http.api.oas_management.controller.payload;
 
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.oas_management.model.BieForOasDoc;
+import org.oagi.score.gateway.http.api.oas_management.model.OasDocId;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.model.base.PaginationRequest;
 
 import java.math.BigInteger;
 
 public class GetBieForOasDocRequest extends PaginationRequest<BieForOasDoc> {
-    private BigInteger oasDocId;
+    private OasDocId oasDocId;
     private String businessContext;
     private TopLevelAsbiepId topLevelAsbiepId;
 
@@ -17,11 +18,11 @@ public class GetBieForOasDocRequest extends PaginationRequest<BieForOasDoc> {
         this.oasDocId = oasDocId;
     }
 
-    public BigInteger getOasDocId() {
+    public OasDocId getOasDocId() {
         return oasDocId;
     }
 
-    public void setOasDocId(BigInteger oasDocId) {
+    public void setOasDocId(OasDocId oasDocId) {
         this.oasDocId = oasDocId;
     }
 
@@ -33,7 +34,7 @@ public class GetBieForOasDocRequest extends PaginationRequest<BieForOasDoc> {
         this.businessContext = businessContext;
     }
 
-    public GetBieForOasDocRequest withOasDocId(BigInteger oasDocId) {
+    public GetBieForOasDocRequest withOasDocId(OasDocId oasDocId) {
         this.setOasDocId(oasDocId);
         return this;
     }

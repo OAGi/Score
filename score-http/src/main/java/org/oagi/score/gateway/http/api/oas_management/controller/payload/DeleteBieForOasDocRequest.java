@@ -1,6 +1,7 @@
 package org.oagi.score.gateway.http.api.oas_management.controller.payload;
 
 import org.oagi.score.gateway.http.api.oas_management.model.BieForOasDoc;
+import org.oagi.score.gateway.http.api.oas_management.model.OasDocId;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.model.base.Request;
 
@@ -10,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class DeleteBieForOasDocRequest extends Request {
-    private BigInteger oasDocId;
+    private OasDocId oasDocId;
     private List<BieForOasDoc> bieForOasDocList = Collections.emptyList();
 
     public DeleteBieForOasDocRequest(ScoreUser requester) {
@@ -28,11 +29,11 @@ public class DeleteBieForOasDocRequest extends Request {
         return this;
     }
 
-    public BigInteger getOasDocId() {
+    public OasDocId getOasDocId() {
         return oasDocId;
     }
 
-    public void setOasDocId(BigInteger oasDocId) {
+    public void setOasDocId(OasDocId oasDocId) {
         this.oasDocId = oasDocId;
     }
 
