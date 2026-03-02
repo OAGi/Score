@@ -49,6 +49,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -62,6 +64,7 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, InitializingBean {
 
     private static final String OPEN_API_VERSION = "3.0.3";
+    private static final Pattern PATH_PARAMETER_PATTERN = Pattern.compile("\\{([^{}]+)}");
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -152,7 +155,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
         return replacer.apply(basedAsccp.propertyTerm());
     }
 
-    private List<Map<String, Object>> buildParameters(Operation verb, boolean isArray, boolean hasId) {
+    private List<Map<String, Object>> buildParameters(Operation verb, boolean isArray, List<String> pathParameterNames) {
         List<Map<String, Object>> parameters = new ArrayList<>();
 
         if (verb == GET && isArray) {
@@ -168,9 +171,10 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     .build());
         }
 
-        if (hasId) {
+        // Issue #1710: Generate one required path parameter for every token found in the resource path.
+        for (String pathParameterName : pathParameterNames) {
             parameters.add(ImmutableMap.<String, Object>builder()
-                    .put("name", "id")
+                    .put("name", pathParameterName)
                     .put("in", "path")
                     .put("description", "")
                     .put("required", true)
@@ -181,6 +185,48 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
         }
 
         return parameters;
+    }
+
+    private List<String> extractPathParameterNames(String resourceName) {
+        if (!StringUtils.hasLength(resourceName)) {
+            return Collections.emptyList();
+        }
+
+        // Issue #1710: Parse only valid `{...}` placeholders and ignore malformed fragments.
+        Set<String> pathParameterNames = new LinkedHashSet<>();
+        Matcher matcher = PATH_PARAMETER_PATTERN.matcher(resourceName);
+        while (matcher.find()) {
+            String candidate = matcher.group(1).trim();
+            if (StringUtils.hasLength(candidate)) {
+                pathParameterNames.add(candidate);
+            }
+        }
+
+        return new ArrayList<>(pathParameterNames);
+    }
+
+    /**
+     * Issue #1710:
+     * Ensures OpenAPI parameters are aligned with the current resource name by generating all path parameters
+     * declared as `{...}` placeholders, while omitting the `parameters` field when none are applicable.
+     */
+    private void ensurePathParameters(Map<String, Object> path,
+                                      Operation operation,
+                                      boolean isArray,
+                                      OpenAPITemplateForVerbOption template) {
+        List<String> pathParameterNames = extractPathParameterNames(template.getResourceName());
+        List<Map<String, Object>> parameters = buildParameters(operation, isArray, pathParameterNames);
+        if (parameters.isEmpty()) {
+            // Issue #1710: Omit `parameters` when nothing is generated.
+            path.remove("parameters");
+            return;
+        }
+
+        Object existingParameters = path.get("parameters");
+        if (existingParameters instanceof List && !((List<?>) existingParameters).isEmpty()) {
+            return;
+        }
+        path.put("parameters", parameters);
     }
 
     private void fillPropertiesForTemplate(String schemaName,
@@ -242,14 +288,12 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                             Map<String, Object> path,
                             AsbiepSummaryRecord asbiep) {
             if (path != null && path.size() > 0) {
-
+                ensurePathParameters(path, GET, template.isArrayForJsonExpression(), template);
             } else {
                 boolean isArray = template.isArrayForJsonExpression();
                 String schemaName = template.getSchemaName();
                 boolean isSuppressRoot = template.isSuppressRootProperty();
                 String bieName = getBieName(topLevelAsbiep);
-                String pathName = template.getResourceName();
-                boolean hasId = pathName.contains("{id}");
 
                 path.put("summary", "");
                 path.put("description", "");
@@ -260,7 +304,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
                 path.put("operationId", template.getOperationId());
-                path.put("parameters", buildParameters(GET, isArray, hasId));
+                ensurePathParameters(path, GET, isArray, template);
                 if (template.getMessageBodyType().equals("Response")) {
                     path.put("responses", ImmutableMap.<String, Object>builder()
                             .put("200", ImmutableMap.<String, Object>builder()
@@ -301,6 +345,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 boolean isArray = template.isArrayForJsonExpression();
                 String schemaName = template.getSchemaName();
                 boolean isSuppressRoot = template.isSuppressRootProperty();
+                ensurePathParameters(path, getOperation(), isArray, template);
                 if (template.getTagName() != null && !path.containsKey("tags")) {
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
@@ -337,7 +382,6 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 String schemaName = template.getSchemaName();
                 boolean isSuppressRoot = template.isSuppressRootProperty();
                 String bieName = getBieName(topLevelAsbiep);
-                String pathName = template.getResourceName();
 
                 path.put("summary", "");
                 path.put("description", "");
@@ -348,6 +392,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
                 path.put("operationId", template.getOperationId());
+                ensurePathParameters(path, getOperation(), isArray, template);
                 if (template.getMessageBodyType().equals("Request")) {
                     path.put("requestBody", ImmutableMap.<String, Object>builder()
                             .put("description", "")
@@ -410,6 +455,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 boolean isArray = template.isArrayForJsonExpression();
                 String schemaName = template.getSchemaName();
                 boolean isSuppressRoot = template.isSuppressRootProperty();
+                ensurePathParameters(path, getOperation(), isArray, template);
                 if (template.getTagName() != null && !path.containsKey("tags")) {
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
@@ -446,8 +492,6 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 String schemaName = template.getSchemaName();
                 boolean isSuppressRoot = template.isSuppressRootProperty();
                 String bieName = getBieName(topLevelAsbiep);
-                String pathName = template.getResourceName();
-                boolean hasId = pathName.contains("{id}");
 
                 path.put("summary", "");
                 path.put("description", "");
@@ -458,7 +502,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
                 path.put("operationId", template.getOperationId());
-                path.put("parameters", buildParameters(getOperation(), isArray, hasId));
+                ensurePathParameters(path, getOperation(), isArray, template);
                 if (template.getMessageBodyType().equals("Request")) {
                     path.put("requestBody", ImmutableMap.<String, Object>builder()
                             .put("description", "")
@@ -520,6 +564,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 boolean isArray = template.isArrayForJsonExpression();
                 String schemaName = template.getSchemaName();
                 boolean isSuppressRoot = template.isSuppressRootProperty();
+                ensurePathParameters(path, getOperation(), isArray, template);
                 if (template.getTagName() != null && !path.containsKey("tags")) {
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
@@ -556,7 +601,6 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 String schemaName = template.getSchemaName();
                 boolean isSuppressRoot = template.isSuppressRootProperty();
                 String bieName = getBieName(topLevelAsbiep);
-                String pathName = template.getResourceName();
 
                 path.put("summary", "");
                 path.put("description", "");
@@ -567,6 +611,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
                 path.put("operationId", template.getOperationId());
+                ensurePathParameters(path, getOperation(), isArray, template);
                 if (template.getMessageBodyType().equals("Request")) {
                     path.put("requestBody", ImmutableMap.<String, Object>builder()
                             .put("description", "")
@@ -625,13 +670,12 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                             Map<String, Object> path,
                             AsbiepSummaryRecord asbiep) {
             if (path != null && path.size() > 0) {
-
+                ensurePathParameters(path, getOperation(), template.isArrayForJsonExpression(), template);
             } else {
                 boolean isArray = template.isArrayForJsonExpression();
                 String schemaName = template.getSchemaName();
                 boolean isSuppressRoot = template.isSuppressRootProperty();
                 String bieName = getBieName(topLevelAsbiep);
-                String pathName = template.getResourceName();
 
                 path.put("summary", "");
                 path.put("description", "");
@@ -642,6 +686,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
                 path.put("operationId", template.getOperationId());
+                ensurePathParameters(path, getOperation(), isArray, template);
                 if (template.getMessageBodyType().equals("Response")) {
                     path.put("responses", ImmutableMap.<String, Object>builder()
                             .put("200", ImmutableMap.<String, Object>builder()
