@@ -19,6 +19,8 @@ import java.util.Collections;
  */
 public record CcListFilterCriteria(
         ReleaseId releaseId,
+        // Issue #1700: Browse Standards mode uses this field to search by component "Name".
+        @Nullable String name,
         @Nullable String den,
         @Nullable String definition,
         @Nullable String module,
@@ -48,6 +50,7 @@ public record CcListFilterCriteria(
 
     public static class Builder {
         private final ReleaseId releaseId;
+        private String name;
         private String den;
         private String definition;
         private String module;
@@ -70,6 +73,11 @@ public record CcListFilterCriteria(
 
         public Builder(ReleaseId releaseId) {
             this.releaseId = releaseId;
+        }
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
         }
 
         public Builder den(String den) {
@@ -170,6 +178,7 @@ public record CcListFilterCriteria(
         public CcListFilterCriteria build() {
             return new CcListFilterCriteria(
                     releaseId,
+                    name,
                     den, definition,
                     module, types, states, tags,
                     namespaceIds,

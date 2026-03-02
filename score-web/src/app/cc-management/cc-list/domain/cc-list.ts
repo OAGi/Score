@@ -37,6 +37,10 @@ export class CcListRequest {
     end: Date,
   };
   filters: {
+    // Issue #1700:
+    // Browse Standards binds to `name`, while existing CC pages bind to `den`.
+    // They are set mutually exclusive by the component before requests are sent.
+    name: string;
     den: string;
     definition: string;
     module: string;
@@ -92,6 +96,7 @@ export class CcListRequest {
       end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
     };
     this.filters = {
+      name: params.get('name') || '',
       den: params.get('den') || '',
       definition: params.get('definition') || '',
       module: params.get('module') || '',
@@ -139,6 +144,9 @@ export class CcListRequest {
     }
     if (this.updatedDate.end) {
       params = params.set('updatedDateEnd', '' + this.updatedDate.end.toUTCString());
+    }
+    if (this.filters.name && this.filters.name.length > 0) {
+      params = params.set('name', '' + this.filters.name);
     }
     if (this.filters.den && this.filters.den.length > 0) {
       params = params.set('den', '' + this.filters.den);

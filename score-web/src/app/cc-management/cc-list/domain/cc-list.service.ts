@@ -73,6 +73,9 @@ export class CcListService {
     if (request.filters.den) {
       params = params.set('den', request.filters.den);
     }
+    if (request.filters.name) {
+      params = params.set('name', request.filters.name);
+    }
     if (request.filters.definition) {
       params = params.set('definition', request.filters.definition);
     }

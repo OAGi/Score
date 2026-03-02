@@ -66,7 +66,20 @@ export class CcListComponent implements OnInit {
   releaseStateList = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
   componentTypeList: OagisComponentType[] = OagisComponentTypes;
   workingRelease = WorkingRelease;
+  // Issue #1700: Browser mode limits type filters to the browseable property components.
   private readonly browserModeTypes = ['ASCCP', 'BCCP'];
+  // Issue #1700: `!Extension` means "all ASCCP types except Extension".
+  private readonly browseStandardsAsccpTypes = ['!Extension'];
+
+  get isTenantEnabled(): boolean {
+    const userToken = this.auth.getUserToken();
+    return userToken?.tenant?.enabled === true;
+  }
+
+  get isBrowseStandardsMode(): boolean {
+    // Issue #1700: tenant end-user accounts use the simplified Browse Standards flow.
+    return this.isTenantEnabled && this.auth.isEndUser() && !this.auth.isDeveloper() && !this.auth.isAdmin();
+  }
 
   get filterTypes() {
     if (!this.preferencesInfo) {
@@ -120,6 +133,11 @@ export class CcListComponent implements OnInit {
     if (!this.preferencesInfo) {
       return [];
     }
+
+    if (this.isBrowseStandardsMode) {
+      return this.preferencesInfo.tableColumnsInfo.columnsOfBrowseStandardsPage;
+    }
+
     return this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage;
   }
 
@@ -128,18 +146,26 @@ export class CcListComponent implements OnInit {
       return;
     }
 
-    this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage = columns;
-    this.updateTableColumnsForCoreComponentPage();
+    if (this.isBrowseStandardsMode) {
+      this.preferencesInfo.tableColumnsInfo.columnsOfBrowseStandardsPage = columns;
+    } else {
+      this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage = columns;
+    }
+    this.updateTableColumnsForCurrentPage();
   }
 
-  updateTableColumnsForCoreComponentPage() {
-    this.preferencesService.updateTableColumnsForCoreComponentPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
+  updateTableColumnsForCurrentPage() {
+    const updateCall = this.isBrowseStandardsMode ?
+      this.preferencesService.updateTableColumnsForBrowseStandardsPage(this.auth.getUserToken(), this.preferencesInfo) :
+      this.preferencesService.updateTableColumnsForCoreComponentPage(this.auth.getUserToken(), this.preferencesInfo);
+    updateCall.subscribe(_ => {});
   }
 
   onColumnsReset() {
     const defaultTableColumnInfo = new TableColumnsInfo();
-    this.columns = defaultTableColumnInfo.columnsOfCoreComponentPage;
+    this.columns = this.isBrowseStandardsMode ?
+      defaultTableColumnInfo.columnsOfBrowseStandardsPage :
+      defaultTableColumnInfo.columnsOfCoreComponentPage;
   }
 
   onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
@@ -168,7 +194,7 @@ export class CcListComponent implements OnInit {
     const matched = this.columns.find(c => c.name === name);
     if (matched) {
       matched.width = width;
-      this.updateTableColumnsForCoreComponentPage();
+      this.updateTableColumnsForCurrentPage();
     }
   }
 
@@ -180,7 +206,7 @@ export class CcListComponent implements OnInit {
   }
 
   get displayedColumns(): string[] {
-    let displayedColumns = ['select'];
+    let displayedColumns = this.isBrowseStandardsMode ? [] : ['select'];
     if (!this.preferencesInfo) {
       return displayedColumns;
     }
@@ -197,8 +223,14 @@ export class CcListComponent implements OnInit {
           }
           break;
         case 'DEN':
-          if (column.selected) {
+          if (column.selected && !this.isBrowseStandardsMode) {
             displayedColumns.push('den');
+          }
+          break;
+        case 'Name':
+          // Issue #1700: "Name" column is enabled only in Browse Standards mode.
+          if (column.selected && this.isBrowseStandardsMode) {
+            displayedColumns.push('name');
           }
           break;
         case 'Revision':
@@ -241,6 +273,9 @@ export class CcListComponent implements OnInit {
   }
 
   onBrowserModeChange($event: MatSlideToggleChange) {
+    if (this.isBrowseStandardsMode) {
+      return;
+    }
     this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode = $event.checked;
     this.preferencesService.updateViewSettingsInfo(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
     });
@@ -314,12 +349,16 @@ export class CcListComponent implements OnInit {
     // Init CcList table
     this.request = new CcListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
+    this.title = this.isBrowseStandardsMode ? 'Standards' : 'Core Component';
 
     this.libraryService.getLibrarySummaryList().subscribe(libraries => {
       this.initLibraries(libraries);
 
       this.searchBar.showAdvancedSearch =
         (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
+      if (this.isBrowseStandardsMode) {
+        this.searchBar.showAdvancedSearch = false;
+      }
 
       this.paginator.pageIndex = this.request.page.pageIndex;
       this.paginator.pageSize = this.request.page.pageSize;
@@ -359,6 +398,7 @@ export class CcListComponent implements OnInit {
         this.initReleases(releases);
         this.tags = tags;
         this.preferencesInfo = preferencesInfo;
+        this.configureBrowseStandardsMode();
 
         this.namespaces.push(...namespaces);
         initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList, this.namespaces, (e) => e.uri);
@@ -443,12 +483,17 @@ export class CcListComponent implements OnInit {
         this.sort.active, this.sort.direction,
         this.paginator.pageIndex, this.paginator.pageSize);
 
-    if (this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode) {
+    if (this.isBrowseStandardsMode) {
+      this.request.types = ['ASCCP'];
+      this.request.asccpTypes = [...this.browseStandardsAsccpTypes];
+    } else if (this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode) {
       const selectedBrowserTypes = this.visibleFilterTypes.filter(e => e.selected).map(e => e.name);
       this.request.types = (selectedBrowserTypes.length > 0) ? selectedBrowserTypes : [...this.browserModeTypes];
+      this.request.asccpTypes = [];
     } else {
       this.request.types = this.preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage
           .filter(e => e.selected).map(e => e.name);
+      this.request.asccpTypes = [];
     }
 
     this.service.getCcList(this.request).subscribe(resp => {
@@ -474,6 +519,48 @@ export class CcListComponent implements OnInit {
     });
   }
 
+  private configureBrowseStandardsMode(): void {
+    if (!this.preferencesInfo) {
+      return;
+    }
+
+    if (!this.isBrowseStandardsMode) {
+      // Issue #1700: den/name filters are mutually exclusive in the request model.
+      this.request.filters.name = '';
+      return;
+    }
+
+    // Issue #1700: Browse Standards is browser-only with reduced filter surface.
+    this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode = true;
+    this.request.states = [];
+    this.request.reusable = [];
+    this.request.newComponent = [];
+    this.request.ownerLoginIdList = [];
+    this.request.updaterLoginIdList = [];
+    this.request.tags = [];
+    this.request.namespaces = [];
+    this.request.componentTypes = [];
+    this.request.filters.den = '';
+    this.request.filters.definition = '';
+    this.request.filters.module = '';
+    this.request.updatedDate.start = null;
+    this.request.updatedDate.end = null;
+  }
+
+  onSearchFilterChange(value: string): void {
+    if (this.isBrowseStandardsMode) {
+      // Issue #1700: Browse Standards binds search to "name" only.
+      this.request.filters.name = value;
+      this.request.filters.den = undefined;
+      this.onChange('filters.name', value);
+    } else {
+      // Issue #1700: Non-browse screens keep DEN search.
+      this.request.filters.den = value;
+      this.request.filters.name = undefined;
+      this.onChange('filters.den', value);
+    }
+  }
+
   onPageChange(event: PageEvent) {
     this.loadCcList();
   }
@@ -482,7 +569,7 @@ export class CcListComponent implements OnInit {
     if (property === 'branch') {
       saveBranch(this.auth.getUserToken(), this.request.cookieType, source.releaseId);
     }
-    if (property === 'filters.den' && !!source) {
+    if ((property === 'filters.den' || property === 'filters.name') && !!source) {
       this.request.page.sortActive = '';
       this.request.page.sortDirection = '';
       this.sort.active = '';

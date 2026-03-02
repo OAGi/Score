@@ -75,6 +75,13 @@ export class TableColumnsInfo {
     {name: 'Updated On', selected: true, width: 160}
   ];
 
+  columnsOfBrowseStandardsPage: TableColumnsProperty[] = [
+    // Issue #1700: simplified Browse Standards view for tenant end-user accounts.
+    {name: 'State', selected: true, width: 104},
+    {name: 'Name', selected: true, width: 0},
+    {name: 'Updated On', selected: true, width: 160}
+  ];
+
   columnsOfCoreComponentForVerbBODPage: TableColumnsProperty[] = [
     {name: 'State', selected: true, width: 104},
     {name: 'DEN', selected: true, width: 0},

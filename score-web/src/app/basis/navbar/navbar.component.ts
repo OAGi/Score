@@ -66,6 +66,10 @@ export class NavbarComponent implements OnInit {
     return userToken.businessTerm.enabled;
   }
 
+  get isBrowseStandardsMenuEnabled(): boolean {
+    return this.isTenantEnabled && this.auth.isEndUser() && !this.auth.isDeveloper() && !this.auth.isAdmin();
+  }
+
   get userRole(): string {
     const userToken = this.auth.getUserToken();
     if (userToken.roles.includes(this.auth.ROLE_ADMIN)) {

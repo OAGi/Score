@@ -213,7 +213,7 @@ public class ExternalComponentsController {
                                                 .collect(Collectors.toSet()))
                                 .componentTypes(separate(componentTypes).map(e -> OagisComponentType.valueOf(e))
                                                 .collect(toSet()))
-                                .asccpTypes(separate(asccpTypes).map(e -> AsccpType.valueOf(e)).collect(toSet()))
+                                .asccpTypes(parseAsccpTypes(asccpTypes))
                                 .asccpManifestIds(
                                                 (hasLength(den) && den.startsWith("AI:"))
                                                                 ? interpreter.interpret(requester, releaseId,
@@ -402,6 +402,35 @@ public class ExternalComponentsController {
                 }
 
                 return response;
+        }
+
+        private Set<AsccpType> parseAsccpTypes(String asccpTypes) {
+                List<String> filters = separate(asccpTypes)
+                                .map(String::trim)
+                                .filter(StringUtils::hasLength)
+                                .collect(Collectors.toList());
+                if (filters.isEmpty()) {
+                        return Collections.emptySet();
+                }
+
+                EnumSet<AsccpType> include = EnumSet.noneOf(AsccpType.class);
+                EnumSet<AsccpType> exclude = EnumSet.noneOf(AsccpType.class);
+                for (String filter : filters) {
+                        boolean excluded = filter.startsWith("!");
+                        String normalized = excluded ? filter.substring(1) : filter;
+                        AsccpType type = AsccpType.valueOf(normalized);
+                        if (excluded) {
+                                exclude.add(type);
+                        } else {
+                                include.add(type);
+                        }
+                }
+
+                EnumSet<AsccpType> resolved = include.isEmpty()
+                                ? EnumSet.allOf(AsccpType.class)
+                                : EnumSet.copyOf(include);
+                resolved.removeAll(exclude);
+                return resolved;
         }
 
 }
