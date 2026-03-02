@@ -79,6 +79,7 @@ public class JooqXbtQueryRepository extends JooqBaseRepository implements XbtQue
                             XBT.NAME,
                             XBT.BUILTIN_TYPE,
                             XBT.JBT_DRAFT05_MAP,
+                            XBT.JBT_202012_MAP,
                             XBT.OPENAPI30_MAP,
                             XBT.AVRO_MAP,
                             XBT.SCHEMA_DEFINITION)
@@ -112,6 +113,7 @@ public class JooqXbtQueryRepository extends JooqBaseRepository implements XbtQue
                         record.get(XBT.BUILTIN_TYPE),
 
                         record.get(XBT.JBT_DRAFT05_MAP),
+                        record.get(XBT.JBT_202012_MAP),
                         record.get(XBT.OPENAPI30_MAP),
                         record.get(XBT.AVRO_MAP),
 
@@ -142,6 +144,7 @@ public class JooqXbtQueryRepository extends JooqBaseRepository implements XbtQue
                             XBT.NAME,
                             XBT.BUILTIN_TYPE,
                             XBT.JBT_DRAFT05_MAP,
+                            XBT.JBT_202012_MAP,
                             XBT.OPENAPI30_MAP,
                             XBT.AVRO_MAP,
                             XBT.SCHEMA_DEFINITION,
@@ -199,6 +202,7 @@ public class JooqXbtQueryRepository extends JooqBaseRepository implements XbtQue
                         record.get(XBT.BUILTIN_TYPE),
 
                         record.get(XBT.JBT_DRAFT05_MAP),
+                        record.get(XBT.JBT_202012_MAP),
                         record.get(XBT.OPENAPI30_MAP),
                         record.get(XBT.AVRO_MAP),
 

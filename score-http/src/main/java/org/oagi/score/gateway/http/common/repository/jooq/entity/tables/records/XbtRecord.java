@@ -89,45 +89,67 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
     }
 
     /**
-     * Setter for <code>oagi.xbt.jbt_draft05_map</code>.
+     * Setter for <code>oagi.xbt.jbt_draft05_map</code>. Mapping from XML
+     * built-in datatype to JSON Schema Draft-05 type definition (JSON text).
      */
     public void setJbtDraft05Map(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.xbt.jbt_draft05_map</code>.
+     * Getter for <code>oagi.xbt.jbt_draft05_map</code>. Mapping from XML
+     * built-in datatype to JSON Schema Draft-05 type definition (JSON text).
      */
     public String getJbtDraft05Map() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>oagi.xbt.openapi30_map</code>.
+     * Setter for <code>oagi.xbt.jbt_202012_map</code>. Mapping from XML
+     * built-in datatype to JSON Schema 2020-12 type definition (JSON text).
      */
-    public void setOpenapi30Map(String value) {
+    public void setJbt_202012Map(String value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.xbt.openapi30_map</code>.
+     * Getter for <code>oagi.xbt.jbt_202012_map</code>. Mapping from XML
+     * built-in datatype to JSON Schema 2020-12 type definition (JSON text).
      */
-    public String getOpenapi30Map() {
+    public String getJbt_202012Map() {
         return (String) get(5);
     }
 
     /**
-     * Setter for <code>oagi.xbt.avro_map</code>.
+     * Setter for <code>oagi.xbt.openapi30_map</code>. Mapping from XML built-in
+     * datatype to OpenAPI 3.0.3 schema type definition (JSON text).
      */
-    public void setAvroMap(String value) {
+    public void setOpenapi30Map(String value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.xbt.avro_map</code>.
+     * Getter for <code>oagi.xbt.openapi30_map</code>. Mapping from XML built-in
+     * datatype to OpenAPI 3.0.3 schema type definition (JSON text).
+     */
+    public String getOpenapi30Map() {
+        return (String) get(6);
+    }
+
+    /**
+     * Setter for <code>oagi.xbt.avro_map</code>. Mapping from XML built-in
+     * datatype to Apache Avro schema type definition (JSON text).
+     */
+    public void setAvroMap(String value) {
+        set(7, value);
+    }
+
+    /**
+     * Getter for <code>oagi.xbt.avro_map</code>. Mapping from XML built-in
+     * datatype to Apache Avro schema type definition (JSON text).
      */
     public String getAvroMap() {
-        return (String) get(6);
+        return (String) get(7);
     }
 
     /**
@@ -135,7 +157,7 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
      * XBT table itself. It indicates a super type of this XSD built-in type.
      */
     public void setSubtypeOfXbtId(ULong value) {
-        set(7, value);
+        set(8, value);
     }
 
     /**
@@ -143,133 +165,149 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
      * XBT table itself. It indicates a super type of this XSD built-in type.
      */
     public ULong getSubtypeOfXbtId() {
-        return (ULong) get(7);
+        return (ULong) get(8);
     }
 
     /**
-     * Setter for <code>oagi.xbt.schema_definition</code>.
+     * Setter for <code>oagi.xbt.schema_definition</code>. Schema definition
+     * text for the built-in type when applicable.
      */
     public void setSchemaDefinition(String value) {
-        set(8, value);
-    }
-
-    /**
-     * Getter for <code>oagi.xbt.schema_definition</code>.
-     */
-    public String getSchemaDefinition() {
-        return (String) get(8);
-    }
-
-    /**
-     * Setter for <code>oagi.xbt.revision_doc</code>.
-     */
-    public void setRevisionDoc(String value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>oagi.xbt.revision_doc</code>.
+     * Getter for <code>oagi.xbt.schema_definition</code>. Schema definition
+     * text for the built-in type when applicable.
      */
-    public String getRevisionDoc() {
+    public String getSchemaDefinition() {
         return (String) get(9);
     }
 
     /**
-     * Setter for <code>oagi.xbt.state</code>.
+     * Setter for <code>oagi.xbt.revision_doc</code>. Revision notes or
+     * documentation for this built-in type mapping.
      */
-    public void setState(Integer value) {
+    public void setRevisionDoc(String value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>oagi.xbt.state</code>.
+     * Getter for <code>oagi.xbt.revision_doc</code>. Revision notes or
+     * documentation for this built-in type mapping.
      */
-    public Integer getState() {
-        return (Integer) get(10);
+    public String getRevisionDoc() {
+        return (String) get(10);
     }
 
     /**
-     * Setter for <code>oagi.xbt.created_by</code>.
+     * Setter for <code>oagi.xbt.state</code>. Record lifecycle state code.
      */
-    public void setCreatedBy(ULong value) {
+    public void setState(Integer value) {
         set(11, value);
     }
 
     /**
-     * Getter for <code>oagi.xbt.created_by</code>.
+     * Getter for <code>oagi.xbt.state</code>. Record lifecycle state code.
      */
-    public ULong getCreatedBy() {
-        return (ULong) get(11);
+    public Integer getState() {
+        return (Integer) get(11);
     }
 
     /**
-     * Setter for <code>oagi.xbt.owner_user_id</code>.
+     * Setter for <code>oagi.xbt.created_by</code>. User ID that created this
+     * record (FK to app_user.app_user_id).
      */
-    public void setOwnerUserId(ULong value) {
+    public void setCreatedBy(ULong value) {
         set(12, value);
     }
 
     /**
-     * Getter for <code>oagi.xbt.owner_user_id</code>.
+     * Getter for <code>oagi.xbt.created_by</code>. User ID that created this
+     * record (FK to app_user.app_user_id).
      */
-    public ULong getOwnerUserId() {
+    public ULong getCreatedBy() {
         return (ULong) get(12);
     }
 
     /**
-     * Setter for <code>oagi.xbt.last_updated_by</code>.
+     * Setter for <code>oagi.xbt.owner_user_id</code>. Owner user ID for this
+     * record (FK to app_user.app_user_id).
      */
-    public void setLastUpdatedBy(ULong value) {
+    public void setOwnerUserId(ULong value) {
         set(13, value);
     }
 
     /**
-     * Getter for <code>oagi.xbt.last_updated_by</code>.
+     * Getter for <code>oagi.xbt.owner_user_id</code>. Owner user ID for this
+     * record (FK to app_user.app_user_id).
      */
-    public ULong getLastUpdatedBy() {
+    public ULong getOwnerUserId() {
         return (ULong) get(13);
     }
 
     /**
-     * Setter for <code>oagi.xbt.creation_timestamp</code>.
+     * Setter for <code>oagi.xbt.last_updated_by</code>. User ID that last
+     * updated this record (FK to app_user.app_user_id).
      */
-    public void setCreationTimestamp(LocalDateTime value) {
+    public void setLastUpdatedBy(ULong value) {
         set(14, value);
     }
 
     /**
-     * Getter for <code>oagi.xbt.creation_timestamp</code>.
+     * Getter for <code>oagi.xbt.last_updated_by</code>. User ID that last
+     * updated this record (FK to app_user.app_user_id).
      */
-    public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(14);
+    public ULong getLastUpdatedBy() {
+        return (ULong) get(14);
     }
 
     /**
-     * Setter for <code>oagi.xbt.last_update_timestamp</code>.
+     * Setter for <code>oagi.xbt.creation_timestamp</code>. Timestamp when this
+     * record was created.
      */
-    public void setLastUpdateTimestamp(LocalDateTime value) {
+    public void setCreationTimestamp(LocalDateTime value) {
         set(15, value);
     }
 
     /**
-     * Getter for <code>oagi.xbt.last_update_timestamp</code>.
+     * Getter for <code>oagi.xbt.creation_timestamp</code>. Timestamp when this
+     * record was created.
      */
-    public LocalDateTime getLastUpdateTimestamp() {
+    public LocalDateTime getCreationTimestamp() {
         return (LocalDateTime) get(15);
     }
 
     /**
-     * Setter for <code>oagi.xbt.is_deprecated</code>.
+     * Setter for <code>oagi.xbt.last_update_timestamp</code>. Timestamp when
+     * this record was last updated.
      */
-    public void setIsDeprecated(Byte value) {
+    public void setLastUpdateTimestamp(LocalDateTime value) {
         set(16, value);
     }
 
     /**
-     * Getter for <code>oagi.xbt.is_deprecated</code>.
+     * Getter for <code>oagi.xbt.last_update_timestamp</code>. Timestamp when
+     * this record was last updated.
+     */
+    public LocalDateTime getLastUpdateTimestamp() {
+        return (LocalDateTime) get(16);
+    }
+
+    /**
+     * Setter for <code>oagi.xbt.is_deprecated</code>. Deprecation flag (1
+     * deprecated, 0 active).
+     */
+    public void setIsDeprecated(Byte value) {
+        set(17, value);
+    }
+
+    /**
+     * Getter for <code>oagi.xbt.is_deprecated</code>. Deprecation flag (1
+     * deprecated, 0 active).
      */
     public Byte getIsDeprecated() {
-        return (Byte) get(16);
+        return (Byte) get(17);
     }
 
     // -------------------------------------------------------------------------
@@ -295,7 +333,7 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
     /**
      * Create a detached, initialised XbtRecord
      */
-    public XbtRecord(ULong xbtId, String guid, String name, String builtinType, String jbtDraft05Map, String openapi30Map, String avroMap, ULong subtypeOfXbtId, String schemaDefinition, String revisionDoc, Integer state, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, Byte isDeprecated) {
+    public XbtRecord(ULong xbtId, String guid, String name, String builtinType, String jbtDraft05Map, String jbt_202012Map, String openapi30Map, String avroMap, ULong subtypeOfXbtId, String schemaDefinition, String revisionDoc, Integer state, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, Byte isDeprecated) {
         super(Xbt.XBT);
 
         setXbtId(xbtId);
@@ -303,6 +341,7 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
         setName(name);
         setBuiltinType(builtinType);
         setJbtDraft05Map(jbtDraft05Map);
+        setJbt_202012Map(jbt_202012Map);
         setOpenapi30Map(openapi30Map);
         setAvroMap(avroMap);
         setSubtypeOfXbtId(subtypeOfXbtId);

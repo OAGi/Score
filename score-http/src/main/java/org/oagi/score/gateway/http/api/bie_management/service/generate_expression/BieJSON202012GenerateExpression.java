@@ -44,6 +44,8 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -54,7 +56,7 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 
 @Component
 @Scope(SCOPE_PROTOTYPE)
-public class BieJSONGenerateExpression implements BieGenerateExpression, InitializingBean {
+public class BieJSON202012GenerateExpression implements BieGenerateExpression, InitializingBean {
 
     private static final String ID_KEYWORD = "$id";
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -139,7 +141,9 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
             Map<String, Object> definitions;
             if (root == null) {
                 root = new LinkedHashMap();
-                root.put("$schema", "http://json-schema.org/draft-04/schema#");
+                root.put("$schema", getJsonSchemaUri());
+                root.put(ID_KEYWORD, "");
+                root.put("type", "object");
 
                 root.put("required", new ArrayList());
                 root.put("additionalProperties", false);
@@ -147,11 +151,11 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
                 Map<String, Object> properties = new LinkedHashMap();
                 root.put("properties", properties);
                 definitions = new LinkedHashMap();
-                root.put("definitions", definitions);
+                root.put("$defs", definitions);
 
                 reusedTopLevelAsbiepNameMap = new LinkedHashMap<>();
             } else {
-                definitions = (Map<String, Object>) root.get("definitions");
+                definitions = (Map<String, Object>) root.get("$defs");
             }
 
             /*
@@ -308,7 +312,7 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
         }
 
         Map<String, Object> refProperties = new HashMap<>();
-        refProperties.put("$ref", "#/definitions/" + nameForList);
+        refProperties.put("$ref", "#/$defs/" + nameForList);
         return refProperties;
     }
 
@@ -431,8 +435,16 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
         return true;
     }
 
-    private Map<String, Object> toProperties(XbtSummaryRecord xbt) {
-        String jbtDraft05Map = xbt.jbtDraft05Map();
+    protected String getJsonSchemaUri() {
+        return "https://json-schema.org/draft/2020-12/schema";
+    }
+
+    protected String getXbtJsonSchemaMap(XbtSummaryRecord xbt) {
+        return xbt.jbt202012Map();
+    }
+
+    protected Map<String, Object> toProperties(XbtSummaryRecord xbt) {
+        String jbtDraft05Map = getXbtJsonSchemaMap(xbt);
         try {
             return mapper.readValue(jbtDraft05Map, LinkedHashMap.class);
         } catch (IOException e) {
@@ -474,7 +486,7 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
             definitions.put(componentName, content);
         }
 
-        return "#/definitions/" + componentName;
+        return "#/$defs/" + componentName;
     }
 
     private String fillDefinitions(Map<String, Object> definitions,
@@ -488,7 +500,7 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
             definitions.put(builtInType, content);
         }
 
-        return "#/definitions/" + builtInType;
+        return "#/$defs/" + builtInType;
     }
 
     private String fillDefinitions(Map<String, Object> definitions,
@@ -547,7 +559,7 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
             definitions.put(codeListName, properties);
         }
 
-        return "#/definitions/" + codeListName;
+        return "#/$defs/" + codeListName;
     }
 
     private String fillDefinitions(Map<String, Object> definitions,
@@ -574,7 +586,7 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
             definitions.put(agencyListTypeName, properties);
         }
 
-        return "#/definitions/" + agencyListTypeName;
+        return "#/$defs/" + agencyListTypeName;
     }
 
     private void fillProperties(Map<String, Object> parent,
@@ -643,6 +655,82 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
         return null;
     }
 
+    private void normalizeExamplesByRef(Map<String, Object> properties,
+                                        String ref,
+                                        Map<String, Object> definitions) {
+        if (properties == null || ref == null || !ref.startsWith("#/$defs/")) {
+            return;
+        }
+
+        Object examplesObject = properties.get("examples");
+        if (!(examplesObject instanceof List<?>)) {
+            return;
+        }
+
+        String definitionName = ref.substring("#/$defs/".length());
+        Object definitionObject = definitions.get(definitionName);
+        if (!(definitionObject instanceof Map<?, ?>)) {
+            return;
+        }
+
+        Object typeObject = ((Map<?, ?>) definitionObject).get("type");
+        if (!(typeObject instanceof String)) {
+            return;
+        }
+        String type = (String) typeObject;
+        if (!"boolean".equals(type) && !"number".equals(type) && !"integer".equals(type)) {
+            return;
+        }
+
+        List<Object> normalizedExamples = new ArrayList<>();
+        boolean changed = false;
+        for (Object example : (List<?>) examplesObject) {
+            Object normalized = normalizeExampleByType(example, type);
+            normalizedExamples.add(normalized);
+            if (!Objects.equals(example, normalized)) {
+                changed = true;
+            }
+        }
+
+        if (changed) {
+            properties.put("examples", normalizedExamples);
+        }
+    }
+
+    private Object normalizeExampleByType(Object example, String type) {
+        if (!(example instanceof String)) {
+            return example;
+        }
+
+        String trimmed = ((String) example).trim();
+        if (!StringUtils.hasLength(trimmed)) {
+            return example;
+        }
+
+        if ("boolean".equals(type)) {
+            if ("true".equalsIgnoreCase(trimmed)) {
+                return true;
+            }
+            if ("false".equalsIgnoreCase(trimmed)) {
+                return false;
+            }
+            return example;
+        }
+
+        try {
+            if ("integer".equals(type)) {
+                return new BigInteger(trimmed);
+            }
+            if ("number".equals(type)) {
+                return new BigDecimal(trimmed);
+            }
+        } catch (NumberFormatException ignored) {
+            return example;
+        }
+
+        return example;
+    }
+
     private void fillProperties(Map<String, Object> parent,
                                 Map<String, Object> definitions,
                                 BbieSummaryRecord bbie,
@@ -699,6 +787,7 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
 
         // Issue #564
         String ref = getReference(definitions, bbie, bdt, generationContext);
+        normalizeExamplesByRef(properties, ref, definitions);
         List<BbieScSummaryRecord> bbieScList = generationContext.queryBBIESCs(bbie)
                 .stream().filter(e -> e.cardinality().max() != 0).collect(Collectors.toList());
         if (bbieScList.isEmpty()) {
@@ -782,15 +871,23 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
                                 AsbiepSummaryRecord asbiep,
                                 GenerationContext generationContext) {
         String refNameOfTopLevelAsbiep = resolveReusedSchemaName(definitions, asbiep);
-        if (!definitions.containsKey(refNameOfTopLevelAsbiep)) {
-            TopLevelAsbiepSummaryRecord refTopLevelAsbiep = generationContext.findTopLevelAsbiep(asbiep.ownerTopLevelAsbiepId());
-            Map<String, Object> properties = new LinkedHashMap<>();
-            properties.put("required", new ArrayList());
-            fillProperties(properties, definitions, refTopLevelAsbiep, false, generationContext);
-            suppressRootProperty(properties, false);
-            definitions.put(refNameOfTopLevelAsbiep, properties);
+        TopLevelAsbiepSummaryRecord refTopLevelAsbiep = generationContext.findTopLevelAsbiep(asbiep.ownerTopLevelAsbiepId());
+        if (!option.isSeparateFileReferencesForReusedSchemas()) {
+            if (!definitions.containsKey(refNameOfTopLevelAsbiep)) {
+                Map<String, Object> properties = new LinkedHashMap<>();
+                properties.put("required", new ArrayList());
+                fillProperties(properties, definitions, refTopLevelAsbiep, false, generationContext);
+                suppressRootProperty(properties, false);
+                definitions.put(refNameOfTopLevelAsbiep, properties);
+            }
+            return "#/$defs/" + refNameOfTopLevelAsbiep;
         }
-        return "#/definitions/" + refNameOfTopLevelAsbiep;
+
+        String refFileName = option.getFilenames().get(refTopLevelAsbiep.topLevelAsbiepId());
+        if (!StringUtils.hasLength(refFileName)) {
+            refFileName = Character.toUpperCase(refNameOfTopLevelAsbiep.charAt(0)) + refNameOfTopLevelAsbiep.substring(1);
+        }
+        return refFileName + ".json#/$defs/" + refNameOfTopLevelAsbiep;
     }
 
     private String resolveReusedSchemaName(Map<String, Object> definitions,
@@ -915,6 +1012,7 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
             }
         }
 
+        normalizeExamplesByRef(properties, ref, definitions);
         properties.put("$ref", ref);
         properties = allOf(properties);
 
@@ -943,6 +1041,7 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
     @Override
     public File asFile(String filename) throws IOException {
         ensureRoot();
+        root.put(ID_KEYWORD, filename + ".json");
 
         File tempFile = File.createTempFile(ScoreGuidUtils.randomGuid(), null);
         tempFile = new File(tempFile.getParentFile(), filename + ".json");

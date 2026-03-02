@@ -90,19 +90,28 @@ public class Xbt extends TableImpl<XbtRecord> {
     public final TableField<XbtRecord, String> BUILTIN_TYPE = createField(DSL.name("builtIn_type"), SQLDataType.VARCHAR(45).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Built-in type as it should appear in the XML schema including the namespace prefix. Namespace prefix for the XML schema namespace is assumed to be 'xsd' and a default prefix for the OAGIS built-int type.");
 
     /**
-     * The column <code>oagi.xbt.jbt_draft05_map</code>.
+     * The column <code>oagi.xbt.jbt_draft05_map</code>. Mapping from XML
+     * built-in datatype to JSON Schema Draft-05 type definition (JSON text).
      */
-    public final TableField<XbtRecord, String> JBT_DRAFT05_MAP = createField(DSL.name("jbt_draft05_map"), SQLDataType.VARCHAR(500).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+    public final TableField<XbtRecord, String> JBT_DRAFT05_MAP = createField(DSL.name("jbt_draft05_map"), SQLDataType.VARCHAR(500).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Mapping from XML built-in datatype to JSON Schema Draft-05 type definition (JSON text).");
 
     /**
-     * The column <code>oagi.xbt.openapi30_map</code>.
+     * The column <code>oagi.xbt.jbt_202012_map</code>. Mapping from XML
+     * built-in datatype to JSON Schema 2020-12 type definition (JSON text).
      */
-    public final TableField<XbtRecord, String> OPENAPI30_MAP = createField(DSL.name("openapi30_map"), SQLDataType.VARCHAR(500).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+    public final TableField<XbtRecord, String> JBT_202012_MAP = createField(DSL.name("jbt_202012_map"), SQLDataType.VARCHAR(500).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Mapping from XML built-in datatype to JSON Schema 2020-12 type definition (JSON text).");
 
     /**
-     * The column <code>oagi.xbt.avro_map</code>.
+     * The column <code>oagi.xbt.openapi30_map</code>. Mapping from XML built-in
+     * datatype to OpenAPI 3.0.3 schema type definition (JSON text).
      */
-    public final TableField<XbtRecord, String> AVRO_MAP = createField(DSL.name("avro_map"), SQLDataType.VARCHAR(500).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+    public final TableField<XbtRecord, String> OPENAPI30_MAP = createField(DSL.name("openapi30_map"), SQLDataType.VARCHAR(500).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Mapping from XML built-in datatype to OpenAPI 3.0.3 schema type definition (JSON text).");
+
+    /**
+     * The column <code>oagi.xbt.avro_map</code>. Mapping from XML built-in
+     * datatype to Apache Avro schema type definition (JSON text).
+     */
+    public final TableField<XbtRecord, String> AVRO_MAP = createField(DSL.name("avro_map"), SQLDataType.VARCHAR(500).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Mapping from XML built-in datatype to Apache Avro schema type definition (JSON text).");
 
     /**
      * The column <code>oagi.xbt.subtype_of_xbt_id</code>. Foreign key to the
@@ -111,49 +120,57 @@ public class Xbt extends TableImpl<XbtRecord> {
     public final TableField<XbtRecord, ULong> SUBTYPE_OF_XBT_ID = createField(DSL.name("subtype_of_xbt_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the XBT table itself. It indicates a super type of this XSD built-in type.");
 
     /**
-     * The column <code>oagi.xbt.schema_definition</code>.
+     * The column <code>oagi.xbt.schema_definition</code>. Schema definition
+     * text for the built-in type when applicable.
      */
-    public final TableField<XbtRecord, String> SCHEMA_DEFINITION = createField(DSL.name("schema_definition"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
+    public final TableField<XbtRecord, String> SCHEMA_DEFINITION = createField(DSL.name("schema_definition"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Schema definition text for the built-in type when applicable.");
 
     /**
-     * The column <code>oagi.xbt.revision_doc</code>.
+     * The column <code>oagi.xbt.revision_doc</code>. Revision notes or
+     * documentation for this built-in type mapping.
      */
-    public final TableField<XbtRecord, String> REVISION_DOC = createField(DSL.name("revision_doc"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
+    public final TableField<XbtRecord, String> REVISION_DOC = createField(DSL.name("revision_doc"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Revision notes or documentation for this built-in type mapping.");
 
     /**
-     * The column <code>oagi.xbt.state</code>.
+     * The column <code>oagi.xbt.state</code>. Record lifecycle state code.
      */
-    public final TableField<XbtRecord, Integer> STATE = createField(DSL.name("state"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "");
+    public final TableField<XbtRecord, Integer> STATE = createField(DSL.name("state"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "Record lifecycle state code.");
 
     /**
-     * The column <code>oagi.xbt.created_by</code>.
+     * The column <code>oagi.xbt.created_by</code>. User ID that created this
+     * record (FK to app_user.app_user_id).
      */
-    public final TableField<XbtRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "");
+    public final TableField<XbtRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "User ID that created this record (FK to app_user.app_user_id).");
 
     /**
-     * The column <code>oagi.xbt.owner_user_id</code>.
+     * The column <code>oagi.xbt.owner_user_id</code>. Owner user ID for this
+     * record (FK to app_user.app_user_id).
      */
-    public final TableField<XbtRecord, ULong> OWNER_USER_ID = createField(DSL.name("owner_user_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "");
+    public final TableField<XbtRecord, ULong> OWNER_USER_ID = createField(DSL.name("owner_user_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Owner user ID for this record (FK to app_user.app_user_id).");
 
     /**
-     * The column <code>oagi.xbt.last_updated_by</code>.
+     * The column <code>oagi.xbt.last_updated_by</code>. User ID that last
+     * updated this record (FK to app_user.app_user_id).
      */
-    public final TableField<XbtRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "");
+    public final TableField<XbtRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "User ID that last updated this record (FK to app_user.app_user_id).");
 
     /**
-     * The column <code>oagi.xbt.creation_timestamp</code>.
+     * The column <code>oagi.xbt.creation_timestamp</code>. Timestamp when this
+     * record was created.
      */
-    public final TableField<XbtRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
+    public final TableField<XbtRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when this record was created.");
 
     /**
-     * The column <code>oagi.xbt.last_update_timestamp</code>.
+     * The column <code>oagi.xbt.last_update_timestamp</code>. Timestamp when
+     * this record was last updated.
      */
-    public final TableField<XbtRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
+    public final TableField<XbtRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when this record was last updated.");
 
     /**
-     * The column <code>oagi.xbt.is_deprecated</code>.
+     * The column <code>oagi.xbt.is_deprecated</code>. Deprecation flag (1
+     * deprecated, 0 active).
      */
-    public final TableField<XbtRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "");
+    public final TableField<XbtRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Deprecation flag (1 deprecated, 0 active).");
 
     private Xbt(Name alias, Table<XbtRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);

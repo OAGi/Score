@@ -186,6 +186,7 @@ export class BieExpressComponent implements OnInit {
   preferencesInfo: PreferencesInfo;
 
   option: BieExpressOption;
+  jsonSchemaVersions: string[] = ['2020-12', 'Draft-04'];
   openApiFormats: string[] = ['YAML', 'JSON'];
   odfFormats: string[] = ['ODS', 'FODS', 'XLSX'];
 
@@ -217,6 +218,9 @@ export class BieExpressComponent implements OnInit {
     this.option = new BieExpressOption();
     this.option.bieDefinition = true;
     this.option.expressionOption = 'XML';
+    // Default JSON Schema expression version is '2020-12'.
+    this.option.expressionVersion = '2020-12';
+    this.option.separateFileReferencesForReusedSchemas = false;
     this.option.packageOption = 'ALL';
     // Default OpenAPI expression format is 'YAML'.
     this.option.openAPIExpressionFormat = 'YAML';
@@ -542,6 +546,10 @@ export class BieExpressComponent implements OnInit {
     }
 
     if (this.option.expressionOption === 'JSON') {
+      if (!this.option.expressionVersion) {
+        this.option.expressionVersion = '2020-12';
+      }
+      this.onJsonSchemaVersionChange();
       if (this.option.includeMetaHeaderForJson || this.option.includePaginationResponseForJson) {
         this.option.packageOption = 'EACH';
       }
@@ -566,5 +574,16 @@ export class BieExpressComponent implements OnInit {
     if (!this.option.bieOagiScoreMetaData) {
       this.option.includeWhoColumns = false;
     }
+  }
+
+  onJsonSchemaVersionChange() {
+    if (this.isSeparateFileReferencesForReusedSchemasDisabled()) {
+      this.option.separateFileReferencesForReusedSchemas = false;
+    }
+  }
+
+  isSeparateFileReferencesForReusedSchemasDisabled(): boolean {
+    return this.option.expressionOption !== 'JSON'
+      || this.option.expressionVersion === 'Draft-04';
   }
 }

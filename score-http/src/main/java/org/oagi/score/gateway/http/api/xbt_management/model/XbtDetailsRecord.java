@@ -19,6 +19,7 @@ public record XbtDetailsRecord(LibrarySummaryRecord library,
                                String builtInType,
 
                                String jbtDraft05Map,
+                               String jbt202012Map,
                                String openApi30Map,
                                String avroMap,
 

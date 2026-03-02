@@ -25,6 +25,7 @@ import {
 import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {forkJoin, of} from 'rxjs';
+import {BieExpressOption} from '../../bie-express/domain/generate-expression';
 
 @Component({
   selector: 'score-bie-package-detail',
@@ -35,9 +36,9 @@ export class BiePackageDetailComponent implements OnInit {
 
   title = 'Edit BIE Package';
   biePackage: BiePackageDetails = new BiePackageDetails();
-  schemaExpression = 'XML';
   hashCode;
   disabled: boolean;
+  option: BieExpressOption;
 
   get columns(): TableColumnsProperty[] {
     if (!this.preferencesInfo) {
@@ -193,6 +194,7 @@ export class BiePackageDetailComponent implements OnInit {
 
   table: TableData<BieListEntry>;
   selection = new SelectionModel<BieListEntry>(true, []);
+  businessContextSelection = {};
   request: BieListInBiePackageRequest;
   preferencesInfo: PreferencesInfo;
   loading = false;
@@ -214,6 +216,14 @@ export class BiePackageDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.option = new BieExpressOption();
+    this.option.bieDefinition = true;
+    this.option.expressionOption = 'XML';
+    this.option.expressionVersion = '2020-12';
+    this.option.arrayForJsonExpression = false;
+    this.option.packageOption = 'EACH';
+    this.option.separateFileReferencesForReusedSchemas = true;
+
     this.table = new TableData<BieListEntry>(this.defaultDisplayedColumns, {});
     this.table.dataSource = new MatMultiSortTableDataSource<BieListEntry>(this.sort, false);
 
@@ -305,12 +315,16 @@ export class BiePackageDetailComponent implements OnInit {
     ).subscribe(resp => {
       this.paginator.length = resp.length;
       this.table.dataSource.data = resp.list;
+      this.table.dataSource.data.forEach((elm: BieListEntry) => {
+        this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContextList[0];
+      });
 
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
       }
     }, error => {
       this.table.dataSource.data = [];
+      this.businessContextSelection = {};
     });
   }
 
@@ -497,11 +511,14 @@ export class BiePackageDetailComponent implements OnInit {
       topLevelAsbiepIdList = selectedBieLists.map(e => e.topLevelAsbiepId);
     }
 
+    this.option.expressionVersion = '2020-12';
+    this.option.packageOption = 'EACH';
+    this.option.arrayForJsonExpression = false;
+    this.option.separateFileReferencesForReusedSchemas = true;
+
     this.loading = true;
     this.biePackageService.generateBiePackage(
-      this.biePackage.biePackageId, {
-        schemaExpression: this.schemaExpression
-      }, ...topLevelAsbiepIdList).subscribe(resp => {
+      this.biePackage.biePackageId, this.option, ...topLevelAsbiepIdList).subscribe(resp => {
       const blob = new Blob([resp.body], {type: resp.headers.get('Content-Type')});
       saveAs(blob, this._getFilenameFromContentDisposition(resp));
 
@@ -605,6 +622,38 @@ export class BiePackageDetailComponent implements OnInit {
           });
         }
       });
+  }
+
+  expressionOptionChange() {
+    this.option.packageOption = 'EACH';
+    this.option.separateFileReferencesForReusedSchemas = true;
+    this.option.expressionVersion = '2020-12';
+    this.option.arrayForJsonExpression = false;
+
+    if (this.option.expressionOption === 'JSON') {
+      this.option.expressionVersion = '2020-12';
+      this.option.arrayForJsonExpression = false;
+    }
+
+    if (this.option.expressionOption !== 'XML') {
+      this.option.bieCctsMetaData = false;
+      this.option.includeCctsDefinitionTag = false;
+      this.option.bieGuid = false;
+      this.option.businessContext = false;
+      this.option.bieOagiScoreMetaData = false;
+      this.option.includeWhoColumns = false;
+      this.option.basedCcMetaData = false;
+    }
+  }
+
+  bieAnnotationChange() {
+    if (!this.option.bieCctsMetaData) {
+      this.option.includeCctsDefinitionTag = false;
+    }
+
+    if (!this.option.bieOagiScoreMetaData) {
+      this.option.includeWhoColumns = false;
+    }
   }
 
   makeNewRevision() {

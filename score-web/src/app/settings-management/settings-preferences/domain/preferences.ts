@@ -235,7 +235,7 @@ export class TableColumnsInfo {
     {name: 'Branch', selected: true, width: 100},
     {name: 'DEN', selected: true, width: 0},
     {name: 'Owner', selected: true, width: 140},
-    {name: 'Business Contexts', selected: true, width: 140},
+    {name: 'Business Contexts', selected: true, width: 180},
     {name: 'Version', selected: true, width: 100},
     {name: 'Status', selected: true, width: 100},
     {name: 'Business Term', selected: true, width: 120},

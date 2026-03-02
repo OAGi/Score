@@ -78,7 +78,21 @@ tr.element-row:not(.expanded-row):active {
   font-size: 13px;
 }
 
-/* @TODO: <mat-select>'s width should be synchronized with the <th>'s width. */
-.mat-column-businessContexts mat-select {
-  width: 140px;
+/* Keep mat-table columns width-driven by header resize instead of content-driven auto layout. */
+:host ::ng-deep .table-wrapper table[mat-table] {
+  table-layout: fixed;
+  width: 100%;
+}
+
+/* Let Business Contexts mat-select follow column width and shrink when resized narrower. */
+:host ::ng-deep .mat-column-businessContexts .mat-mdc-select {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Truncate long selected context names so they do not force the column to expand. */
+:host ::ng-deep .mat-column-businessContexts .mat-mdc-select-min-line {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

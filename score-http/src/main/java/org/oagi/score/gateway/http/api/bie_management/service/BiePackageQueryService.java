@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.oagi.score.gateway.http.common.util.StringUtils.hasLength;
+
 @Service
 @Transactional(readOnly = true)
 public class BiePackageQueryService {
@@ -63,7 +65,7 @@ public class BiePackageQueryService {
 
     public BieGenerateExpressionResult generate(
             ScoreUser requester, BiePackageId biePackageId,
-            Collection<TopLevelAsbiepId> topLevelAsbiepIdList, String schemaExpression,
+            Collection<TopLevelAsbiepId> topLevelAsbiepIdList, GenerateExpressionOption option,
             String pathDelimiter) throws IOException {
 
         var query = query(requester);
@@ -85,11 +87,27 @@ public class BiePackageQueryService {
                 topLevelAsbiepIdList.stream().map(e -> topLevelAsbiepQuery.getTopLevelAsbiepSummary(e))
                         .collect(Collectors.toList());
 
-        GenerateExpressionOption option = new GenerateExpressionOption();
-        option.setExpressionOption(schemaExpression);
+        if (option == null) {
+            option = new GenerateExpressionOption();
+        }
+        if (!hasLength(option.getExpressionOption())) {
+            option.setExpressionOption("XML");
+        }
+        if (!hasLength(option.getPackageOption())) {
+            option.setPackageOption("EACH");
+        }
         option.setBiePackage(biePackage);
 
-        Map<TopLevelAsbiepId, File> result = bieGenerateService.generateSchemaForEach(requester, topLevelAsbiepList, option);
+        Map<TopLevelAsbiepId, File> result;
+        boolean useEachPackaging = "EACH".equalsIgnoreCase(option.getPackageOption())
+                || isSeparateFileReferencesForReusedSchemasEnabled(option);
+        if (useEachPackaging) {
+            result = bieGenerateService.generateSchemaForEach(requester, topLevelAsbiepList, option);
+        } else {
+            File generated = bieGenerateService.generateSchemaForAll(requester, topLevelAsbiepList, option);
+            result = new LinkedHashMap<>();
+            result.put(topLevelAsbiepList.get(0).topLevelAsbiepId(), generated);
+        }
         BiePackageManifestResponse biePackageManifestResponse =
                 biePackageManifestService.getBiePackageManifest(requester, biePackageId, pathDelimiter);
 
@@ -135,6 +153,22 @@ public class BiePackageQueryService {
 
         String contentType = "application/zip";
         return new BieGenerateExpressionResult(file.getName(), contentType, file);
+    }
+
+    private boolean isSeparateFileReferencesForReusedSchemasEnabled(GenerateExpressionOption option) {
+        if (!"JSON".equalsIgnoreCase(option.getExpressionOption())) {
+            return false;
+        }
+        if (!option.isSeparateFileReferencesForReusedSchemas()) {
+            return false;
+        }
+        String expressionVersion = option.getExpressionVersion();
+        if (!hasLength(expressionVersion)) {
+            return true;
+        }
+        String normalizedExpressionVersion = expressionVersion.trim().toUpperCase();
+        return !"DRAFT-04".equals(normalizedExpressionVersion)
+                && !"DRAFT04".equals(normalizedExpressionVersion);
     }
 
     public ResultAndCount<BieListEntryRecord> getBieListInBiePackage(
