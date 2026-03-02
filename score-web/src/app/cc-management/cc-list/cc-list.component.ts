@@ -66,6 +66,7 @@ export class CcListComponent implements OnInit {
   releaseStateList = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
   componentTypeList: OagisComponentType[] = OagisComponentTypes;
   workingRelease = WorkingRelease;
+  private readonly browserModeTypes = ['ASCCP', 'BCCP'];
 
   get filterTypes() {
     if (!this.preferencesInfo) {
@@ -74,16 +75,44 @@ export class CcListComponent implements OnInit {
     return this.preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage;
   }
 
+  get visibleFilterTypes() {
+    if (!this.browserMode) {
+      return this.filterTypes;
+    }
+
+    return this.filterTypes.filter(e => this.browserModeTypes.includes(e.name.toUpperCase()));
+  }
+
   onFilterTypesChange(updatedColumns: { name: string; selected: boolean }[]) {
-    this.preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage = updatedColumns;
+    if (this.browserMode) {
+      const selectedMap = new Map(
+        updatedColumns.map(e => [e.name.toUpperCase(), e.selected] as [string, boolean])
+      );
+      this.preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage.forEach(column => {
+        const upperName = column.name.toUpperCase();
+        if (this.browserModeTypes.includes(upperName) && selectedMap.has(upperName)) {
+          column.selected = selectedMap.get(upperName);
+        }
+      });
+    } else {
+      this.preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage = updatedColumns;
+    }
     this.preferencesService.updateFilterTypeForCoreComponentPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
 
-    this.request.types = updatedColumns.filter(e => e.selected).map(e => e.name);
+    this.request.types = this.visibleFilterTypes.filter(e => e.selected).map(e => e.name);
     this.onSearch();
   }
 
   onFilterTypesReset() {
     const defaultTableColumnInfo = new TableColumnsInfo();
+    if (this.browserMode) {
+      this.onFilterTypesChange(
+        defaultTableColumnInfo.filterTypesOfCoreComponentPage
+          .filter(e => this.browserModeTypes.includes(e.name.toUpperCase()))
+      );
+      return;
+    }
+
     this.onFilterTypesChange(defaultTableColumnInfo.filterTypesOfCoreComponentPage);
   }
 
@@ -414,9 +443,9 @@ export class CcListComponent implements OnInit {
         this.sort.active, this.sort.direction,
         this.paginator.pageIndex, this.paginator.pageSize);
 
-    // Issue #1650
     if (this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode) {
-      this.request.types = ['ASCCP'];
+      const selectedBrowserTypes = this.visibleFilterTypes.filter(e => e.selected).map(e => e.name);
+      this.request.types = (selectedBrowserTypes.length > 0) ? selectedBrowserTypes : [...this.browserModeTypes];
     } else {
       this.request.types = this.preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage
           .filter(e => e.selected).map(e => e.name);
@@ -505,7 +534,11 @@ export class CcListComponent implements OnInit {
         }
 
       case 'BCCP':
-        return '/core_component/bccp/' + ccList.manifestId;
+        if (this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode) {
+          return '/core_component/browser/bccp/' + ccList.manifestId;
+        } else {
+          return '/core_component/bccp/' + ccList.manifestId;
+        }
 
       case 'DT':
         return '/data_type/' + ccList.manifestId;

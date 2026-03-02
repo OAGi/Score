@@ -517,7 +517,11 @@ export class DtListComponent implements OnInit {
         }
 
       case 'BCCP':
-        return '/core_component/bccp/' + ccList.manifestId;
+        if (this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode) {
+          return '/core_component/browser/bccp/' + ccList.manifestId;
+        } else {
+          return '/core_component/bccp/' + ccList.manifestId;
+        }
 
       case 'DT':
         return '/data_type/' + ccList.manifestId;

@@ -464,7 +464,7 @@ export class ModelBrowserBccpNode extends ModelBrowserNodeImpl {
   }
 
   get bccManifestId(): number {
-    return this.bccNode.manifestId;
+    return (!!this.bccNode) ? this.bccNode.manifestId : undefined;
   }
 
   get bccpManifestId(): number {
@@ -483,11 +483,16 @@ export class ModelBrowserBccpNode extends ModelBrowserNodeImpl {
   }
 
   get entityType(): string {
-    return this.bccNode.entityType;
+    return (!!this.bccNode) ? this.bccNode.entityType : undefined;
   }
 
   get bccPath(): string {
     if (!this._bccPath) {
+      if (!this.bccNode) {
+        this._bccPath = this.bccpPath;
+        return this._bccPath;
+      }
+
       let arr;
       if (this.intermediateAccNodes && this.intermediateAccNodes.length > 0) {
         arr = [(this.parent as ModelBrowserAsccpNode).asccpPath, this.intermediateAccNodes.map(e => getKey(e)).join('>')];
@@ -509,7 +514,11 @@ export class ModelBrowserBccpNode extends ModelBrowserNodeImpl {
 
   get bccpPath(): string {
     if (!this._bccpPath) {
-      this._bccpPath = [this.bccPath, 'BCCP-' + this.bccpNode.manifestId].join('>');
+      if (!!this.bccNode) {
+        this._bccpPath = [this.bccPath, 'BCCP-' + this.bccpNode.manifestId].join('>');
+      } else {
+        this._bccpPath = 'BCCP-' + this.bccpNode.manifestId;
+      }
     }
     return this._bccpPath;
   }
@@ -548,6 +557,9 @@ export class ModelBrowserBccpNode extends ModelBrowserNodeImpl {
       return (this._detail as ModelBrowserBccpNodeDetail).bcc.cardinalityMin;
     }
     if (this._cardinalityMin === undefined) {
+      if (!this.bccNode) {
+        return this.required ? 1 : 0;
+      }
       return this.bccNode.cardinalityMin;
     }
     return this._cardinalityMin;
@@ -562,6 +574,9 @@ export class ModelBrowserBccpNode extends ModelBrowserNodeImpl {
       return (this._detail as ModelBrowserBccpNodeDetail).bcc.cardinalityMax;
     }
     if (this._cardinalityMax === undefined) {
+      if (!this.bccNode) {
+        return 1;
+      }
       return this.bccNode.cardinalityMax;
     }
     return this._cardinalityMax;
@@ -572,7 +587,7 @@ export class ModelBrowserBccpNode extends ModelBrowserNodeImpl {
   }
 
   get ccDeprecated(): boolean {
-    return this.bccpNode.deprecated || this.bdtNode.deprecated || this.bccNode.deprecated;
+    return this.bccpNode.deprecated || this.bdtNode.deprecated || (!!this.bccNode && this.bccNode.deprecated);
   }
 }
 
@@ -808,7 +823,7 @@ export class BccDetail {
   }
 
   get manifestId(): number {
-    return this._node.bccNode.manifestId;
+    return (!!this._node.bccNode) ? this._node.bccNode.manifestId : undefined;
   }
 
   get path(): string {
@@ -820,11 +835,13 @@ export class BccDetail {
   }
 
   get fromAccPath(): string {
-    return (this._node.parent as ModelBrowserAsccpNode).accPath;
+    const parent = this._node.parent as ModelBrowserAsccpNode;
+    return (!!parent) ? parent.accPath : '';
   }
 
   get fromAccHashPath(): string {
-    return (this._node.parent as ModelBrowserAsccpNode).accHashPath;
+    const parent = this._node.parent as ModelBrowserAsccpNode;
+    return (!!parent) ? parent.accHashPath : '';
   }
 
   get toBccpPath(): string {
@@ -1517,7 +1534,9 @@ export class ModelBrowserNodeDataSource<T extends ModelBrowserNode> implements D
           const detail = (node.detail as ModelBrowserBccpNodeDetail);
           detail.updateBdt(ccDt);
           detail.updateBccp(ccBccp);
-          detail.updateBcc(ccBcc);
+          if (!!ccBcc) {
+            detail.updateBcc(ccBcc);
+          }
           detail.reset();
           detail.isLoaded = true;
           return callbackFn && callbackFn(node);
@@ -1703,8 +1722,12 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
   }
 
   get rootNode(): T {
-    const node = this.toAccNode('ASCCP-' + this._manifestId);
-    return node as unknown as T;
+    const type = (this._type || '').toUpperCase();
+    if (type === 'BCCP') {
+      return this.toRootBccpNode('BCCP-' + this._manifestId) as unknown as T;
+    }
+
+    return this.toAccNode('ASCCP-' + this._manifestId) as unknown as T;
   }
 
   toAccNode(key: string): ModelBrowserAccNode {
@@ -1715,6 +1738,20 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
     node.level = 0;
     node.required = true;
     node.deprecated = node.asccpNode.deprecated || node.accNode.deprecated;
+    node.dataSource = this.dataSource;
+    return node;
+  }
+
+  toRootBccpNode(key: string): ModelBrowserBccpNode {
+    const node = new ModelBrowserBccpNode();
+    node.bccpNode = this._ccGraph.graph.nodes[key];
+    node.bdtNode = this.getChildren(node.bccpNode)[0];
+    node.name = node.bccpNode.propertyTerm;
+    node.level = 0;
+    node.required = true;
+    node.cardinalityMin = 1;
+    node.cardinalityMax = 1;
+    node.deprecated = node.ccDeprecated;
     node.dataSource = this.dataSource;
     return node;
   }

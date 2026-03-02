@@ -318,9 +318,9 @@
             (onReset)="onColumnsReset()">
           </score-column-selector>
 
-          <score-column-selector class="pr-2" *ngIf="!browserMode"
+          <score-column-selector class="pr-2"
                                  [title]="'Types'"
-                                 [columns]="filterTypes"
+                                 [columns]="visibleFilterTypes"
                                  [draggable]="false"
                                  (columnsChange)="onFilterTypesChange($event)"
                                  (onReset)="onFilterTypesReset()">
