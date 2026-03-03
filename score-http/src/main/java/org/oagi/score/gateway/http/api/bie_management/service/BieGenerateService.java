@@ -30,6 +30,8 @@ import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.*;
+import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.camelCase;
+import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.convertIdentifierToId;
 
 @Service
 @Transactional(readOnly = true)
@@ -117,6 +119,8 @@ public class BieGenerateService {
     public File generateSchemaForAll(ScoreUser requester,
                                      List<TopLevelAsbiepSummaryRecord> topLevelAsbiepList,
                                      GenerateExpressionOption option) throws BieGenerateFailureException {
+        ensureNoDuplicateRootPropertyNamesForSingleSchema(topLevelAsbiepList);
+
         BieGenerateExpression generateExpression = createBieGenerateExpression(option);
         GenerationContext generationContext = generateExpression.generateContext(requester, topLevelAsbiepList, option);
         ensureExpressionFilenames(collectTopLevelAsbieps(topLevelAsbiepList, generationContext), option);
@@ -160,6 +164,48 @@ public class BieGenerateService {
         } catch (IOException e) {
             throw new BieGenerateFailureException("Compression failure.", e);
         }
+    }
+
+    private void ensureNoDuplicateRootPropertyNamesForSingleSchema(
+            List<TopLevelAsbiepSummaryRecord> topLevelAsbieps) {
+        if (topLevelAsbieps == null || topLevelAsbieps.size() < 2) {
+            return;
+        }
+
+        Map<String, List<TopLevelAsbiepSummaryRecord>> topLevelAsbiepsByRootPropertyName = new LinkedHashMap<>();
+        for (TopLevelAsbiepSummaryRecord topLevelAsbiep : topLevelAsbieps) {
+            String rootPropertyName = getRootPropertyName(topLevelAsbiep.propertyTerm());
+            topLevelAsbiepsByRootPropertyName
+                    .computeIfAbsent(rootPropertyName, key -> new ArrayList<>())
+                    .add(topLevelAsbiep);
+        }
+
+        List<Map.Entry<String, List<TopLevelAsbiepSummaryRecord>>> duplicates = topLevelAsbiepsByRootPropertyName.entrySet()
+                .stream()
+                .filter(e -> e.getValue().size() > 1)
+                .collect(Collectors.toList());
+
+        if (duplicates.isEmpty()) {
+            return;
+        }
+
+        String duplicateMessages = duplicates.stream()
+                .map(entry -> "'" + entry.getKey() + "': " + entry.getValue().stream()
+                        .map(topLevelAsbiep -> topLevelAsbiep.den() + " (TopLevelAsbiepId="
+                                + topLevelAsbiep.topLevelAsbiepId().value() + ")")
+                        .collect(Collectors.joining(", ")))
+                .collect(Collectors.joining("; "));
+        throw new IllegalArgumentException("Cannot generate all schemas in a single file due to duplicate ASCCP property terms. "
+                + "Conflicts: " + duplicateMessages
+                + ". Use 'Put each schema in an individual file' instead.");
+    }
+
+    private String getRootPropertyName(String propertyTerm) {
+        String normalizedPropertyTerm = StringUtils.trim(propertyTerm);
+        if (!StringUtils.hasLength(normalizedPropertyTerm)) {
+            return "";
+        }
+        return convertIdentifierToId(camelCase(normalizedPropertyTerm));
     }
 
     public Map<TopLevelAsbiepId, File> generateSchemaForEach(
@@ -462,8 +508,16 @@ public class BieGenerateService {
                         throw new IllegalArgumentException("Unknown JSON expression version: " + expressionVersion);
                 }
                 break;
+            case "OPENAPI3":
+                String openApiVersion = option.getExpressionVersion();
+                if (!StringUtils.hasLength(openApiVersion) || isOpenApi31Version(openApiVersion)) {
+                    generateExpression = applicationContext.getBean(BieOpenAPI31GenerateExpression.class);
+                } else {
+                    generateExpression = applicationContext.getBean(BieOpenAPI30GenerateExpression.class);
+                }
+                break;
             case "OPENAPI30":
-                generateExpression = applicationContext.getBean(BieOpenAPIGenerateExpression.class);
+                generateExpression = applicationContext.getBean(BieOpenAPI30GenerateExpression.class);
                 break;
             case "ODF":
                 generateExpression = applicationContext.getBean(BieODFSpreadsheetGenerationExpression.class);
@@ -476,5 +530,16 @@ public class BieGenerateService {
         }
 
         return generateExpression;
+    }
+
+    private boolean isOpenApi31Version(String expressionVersion) {
+        if (!StringUtils.hasLength(expressionVersion)) {
+            return false;
+        }
+
+        String normalizedExpressionVersion = expressionVersion.trim().toUpperCase();
+        return normalizedExpressionVersion.startsWith("3.1")
+                || "OPENAPI31".equals(normalizedExpressionVersion)
+                || "OPENAPI-3.1".equals(normalizedExpressionVersion);
     }
 }

@@ -108,6 +108,12 @@ public class Xbt extends TableImpl<XbtRecord> {
     public final TableField<XbtRecord, String> OPENAPI30_MAP = createField(DSL.name("openapi30_map"), SQLDataType.VARCHAR(500).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Mapping from XML built-in datatype to OpenAPI 3.0.3 schema type definition (JSON text).");
 
     /**
+     * The column <code>oagi.xbt.openapi31_map</code>. Mapping from XML built-in
+     * datatype to OpenAPI 3.1.1 schema type definition (JSON text).
+     */
+    public final TableField<XbtRecord, String> OPENAPI31_MAP = createField(DSL.name("openapi31_map"), SQLDataType.VARCHAR(500).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Mapping from XML built-in datatype to OpenAPI 3.1.1 schema type definition (JSON text).");
+
+    /**
      * The column <code>oagi.xbt.avro_map</code>. Mapping from XML built-in
      * datatype to Apache Avro schema type definition (JSON text).
      */

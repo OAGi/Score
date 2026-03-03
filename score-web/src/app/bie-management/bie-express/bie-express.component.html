@@ -397,16 +397,20 @@
                   JSON Schema
                 </mat-radio-button>
                 <div class="generate-option dependent-option" *ngIf="option.expressionOption === 'JSON'">
-                  <mat-form-field>
-                    <mat-label>Version</mat-label>
-                    <mat-select [(ngModel)]="option.expressionVersion"
-                                (ngModelChange)="onJsonSchemaVersionChange()"
-                                required="true">
-                      <mat-option *ngFor="let jsonSchemaVersion of jsonSchemaVersions" [value]="jsonSchemaVersion">
-                        {{ jsonSchemaVersion }}
-                      </mat-option>
-                    </mat-select>
-                  </mat-form-field>
+                  <div class="row g-2">
+                    <div class="col-6">
+                      <mat-form-field class="w-100">
+                        <mat-label>Version</mat-label>
+                        <mat-select [(ngModel)]="option.expressionVersion"
+                                    (ngModelChange)="onJsonSchemaVersionChange()"
+                                    required="true">
+                          <mat-option *ngFor="let jsonSchemaVersion of jsonSchemaVersions" [value]="jsonSchemaVersion">
+                            {{ jsonSchemaVersion }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                  </div>
                   <mat-checkbox [(ngModel)]="option.arrayForJsonExpression">
                   <span
                     class="{{ (option.expressionOption !== 'JSON') ? 'toggle-disabled' : '' }}">Make as an array</span>
@@ -430,22 +434,37 @@
                     <span class="{{ (option.expressionOption !== 'JSON') ? 'toggle-disabled' : '' }}">Include Pagination Response</span>
                   </mat-checkbox>
                 </div>
-                <mat-radio-button class="option-radio-button" value="OpenAPI30" id="expr-OpenAPI30">
-                  OpenAPI 3.0 (Template)
+                <mat-radio-button class="option-radio-button" value="OPENAPI3" id="expr-OPENAPI3">
+                  OpenAPI 3 (Template)
                 </mat-radio-button>
-                <div class="generate-option dependent-option" *ngIf="option.expressionOption === 'OpenAPI30'">
-                  <mat-form-field>
-                    <mat-label>Format</mat-label>
-                    <mat-select [(ngModel)]="option.openAPIExpressionFormat"
-                                required="true">
-                      <mat-option *ngFor="let openApiFormat of openApiFormats" [value]="openApiFormat">
-                        {{ openApiFormat }}
-                      </mat-option>
-                    </mat-select>
-                  </mat-form-field>
+                <div class="generate-option dependent-option" *ngIf="option.expressionOption === 'OPENAPI3'">
+                  <div class="row g-2">
+                    <div class="col-6">
+                      <mat-form-field class="w-100">
+                        <mat-label>Version</mat-label>
+                        <mat-select [(ngModel)]="option.expressionVersion"
+                                    required="true">
+                          <mat-option *ngFor="let openApiVersion of openApiVersions" [value]="openApiVersion">
+                            {{ openApiVersion }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-6">
+                      <mat-form-field class="w-100">
+                        <mat-label>Format</mat-label>
+                        <mat-select [(ngModel)]="option.openAPIExpressionFormat"
+                                    required="true">
+                          <mat-option *ngFor="let openApiFormat of openApiFormats" [value]="openApiFormat">
+                            {{ openApiFormat }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                  </div>
 
                   <mat-checkbox [(ngModel)]="option.openAPI30GetTemplate">
-                    <span class="{{ (option.expressionOption !== 'OpenAPI30') ? 'toggle-disabled' : '' }}">GET Operation Template</span>
+                    <span class="{{ (option.expressionOption !== 'OPENAPI3') ? 'toggle-disabled' : '' }}">GET Operation Template</span>
                   </mat-checkbox>
 
                   <mat-checkbox [(ngModel)]="option.arrayForJsonExpressionForOpenAPI30GetTemplate"
@@ -479,8 +498,8 @@
                   </mat-checkbox>
 
                   <mat-checkbox [(ngModel)]="option.openAPI30PostTemplate"
-                                [disabled]="option.expressionOption !== 'OpenAPI30'">
-                    <span class="{{ (option.expressionOption !== 'OpenAPI30') ? 'toggle-disabled' : '' }}">POST Operation Template</span>
+                                [disabled]="option.expressionOption !== 'OPENAPI3'">
+                    <span class="{{ (option.expressionOption !== 'OPENAPI3') ? 'toggle-disabled' : '' }}">POST Operation Template</span>
                   </mat-checkbox>
 
                   <mat-checkbox [(ngModel)]="option.arrayForJsonExpressionForOpenAPI30PostTemplate"
@@ -539,7 +558,7 @@
                 </mat-radio-button>
               </mat-radio-group>
 
-              <div class="filename-option">
+              <div class="mt-2 filename-option">
                 <div class="generate-option">
                   <mat-checkbox [(ngModel)]="option.includeBusinessContextInFilename">Include a business context in the filename</mat-checkbox>
                 </div>

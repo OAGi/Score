@@ -12,6 +12,7 @@ public record XbtSummaryRecord(XbtManifestId xbtManifestId,
                                String jbtDraft05Map,
                                String jbt202012Map,
                                String openApi30Map,
+                               String openApi31Map,
                                String avroMap,
 
                                String schemaDefinition) {

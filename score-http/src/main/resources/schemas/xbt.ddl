@@ -6,6 +6,7 @@ CREATE TABLE `xbt`
     `builtIn_type`          varchar(45)  DEFAULT NULL COMMENT 'Built-in type as it should appear in the XML schema including the namespace prefix. Namespace prefix for the XML schema namespace is assumed to be ''xsd'' and a default prefix for the OAGIS built-int type.',
     `jbt_draft05_map`       varchar(500) DEFAULT NULL,
     `openapi30_map`         varchar(500) DEFAULT NULL,
+    `openapi31_map`         varchar(500) DEFAULT NULL COMMENT 'Mapping from XML built-in datatype to OpenAPI 3.1.1 schema type definition (JSON text).',
     `avro_map`              varchar(500) DEFAULT NULL,
     `subtype_of_xbt_id`     bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the XBT table itself. It indicates a super type of this XSD built-in type.',
     `schema_definition`     text         DEFAULT NULL,

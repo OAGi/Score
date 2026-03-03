@@ -82,7 +82,7 @@
     <div class="loading-container" *ngIf="loading">
       <mat-spinner [diameter]="40"></mat-spinner>
     </div>
-    <mat-card-header class="align-items-baseline">
+    <mat-card-header class="align-items-baseline pt-0">
       <mat-toolbar class="bg-white p-0" style="box-shadow: none;">
         <span class="title">BIE List</span>
         <div style="padding: 8px 12px 8px 24px;">
@@ -362,14 +362,16 @@
           <span class="option-header">Schema File Option</span>
           <div class="option-body">
             <div class="filename-option">
-              <mat-checkbox [(ngModel)]="option.includeBusinessContextInFilename">
-                Include a business context in the filename
-              </mat-checkbox>
-            </div>
-            <div class="filename-option">
-              <mat-checkbox [(ngModel)]="option.includeVersionInFilename">
-                Include a version in the filename
-              </mat-checkbox>
+              <div class="generate-option">
+                <mat-checkbox [(ngModel)]="option.includeBusinessContextInFilename">
+                  Include a business context in the filename
+                </mat-checkbox>
+              </div>
+              <div class="generate-option">
+                <mat-checkbox [(ngModel)]="option.includeVersionInFilename">
+                  Include a version in the filename
+                </mat-checkbox>
+              </div>
             </div>
 
             <div class="actions mt-4">

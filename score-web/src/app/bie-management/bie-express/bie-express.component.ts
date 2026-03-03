@@ -187,6 +187,7 @@ export class BieExpressComponent implements OnInit {
 
   option: BieExpressOption;
   jsonSchemaVersions: string[] = ['2020-12', 'Draft-04'];
+  openApiVersions: string[] = ['3.1', '3.0'];
   openApiFormats: string[] = ['YAML', 'JSON'];
   odfFormats: string[] = ['ODS', 'FODS', 'XLSX'];
 
@@ -541,12 +542,18 @@ export class BieExpressComponent implements OnInit {
   }
 
   expressionOptionChange() {
+    if (this.option.expressionOption === 'OPENAPI3') {
+      if (!this.openApiVersions.includes(this.option.expressionVersion)) {
+        this.option.expressionVersion = '3.1';
+      }
+    }
+
     if (this.option.expressionOption === 'ODF' || this.option.expressionOption === 'AVRO') {
       this.option.packageOption = 'EACH';
     }
 
     if (this.option.expressionOption === 'JSON') {
-      if (!this.option.expressionVersion) {
+      if (!this.jsonSchemaVersions.includes(this.option.expressionVersion)) {
         this.option.expressionVersion = '2020-12';
       }
       this.onJsonSchemaVersionChange();

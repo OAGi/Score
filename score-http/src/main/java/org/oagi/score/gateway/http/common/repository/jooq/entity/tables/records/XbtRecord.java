@@ -137,11 +137,27 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
     }
 
     /**
+     * Setter for <code>oagi.xbt.openapi31_map</code>. Mapping from XML built-in
+     * datatype to OpenAPI 3.1.1 schema type definition (JSON text).
+     */
+    public void setOpenapi31Map(String value) {
+        set(7, value);
+    }
+
+    /**
+     * Getter for <code>oagi.xbt.openapi31_map</code>. Mapping from XML built-in
+     * datatype to OpenAPI 3.1.1 schema type definition (JSON text).
+     */
+    public String getOpenapi31Map() {
+        return (String) get(7);
+    }
+
+    /**
      * Setter for <code>oagi.xbt.avro_map</code>. Mapping from XML built-in
      * datatype to Apache Avro schema type definition (JSON text).
      */
     public void setAvroMap(String value) {
-        set(7, value);
+        set(8, value);
     }
 
     /**
@@ -149,7 +165,7 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
      * datatype to Apache Avro schema type definition (JSON text).
      */
     public String getAvroMap() {
-        return (String) get(7);
+        return (String) get(8);
     }
 
     /**
@@ -157,7 +173,7 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
      * XBT table itself. It indicates a super type of this XSD built-in type.
      */
     public void setSubtypeOfXbtId(ULong value) {
-        set(8, value);
+        set(9, value);
     }
 
     /**
@@ -165,7 +181,7 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
      * XBT table itself. It indicates a super type of this XSD built-in type.
      */
     public ULong getSubtypeOfXbtId() {
-        return (ULong) get(8);
+        return (ULong) get(9);
     }
 
     /**
@@ -173,7 +189,7 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
      * text for the built-in type when applicable.
      */
     public void setSchemaDefinition(String value) {
-        set(9, value);
+        set(10, value);
     }
 
     /**
@@ -181,7 +197,7 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
      * text for the built-in type when applicable.
      */
     public String getSchemaDefinition() {
-        return (String) get(9);
+        return (String) get(10);
     }
 
     /**
@@ -189,7 +205,7 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
      * documentation for this built-in type mapping.
      */
     public void setRevisionDoc(String value) {
-        set(10, value);
+        set(11, value);
     }
 
     /**
@@ -197,21 +213,21 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
      * documentation for this built-in type mapping.
      */
     public String getRevisionDoc() {
-        return (String) get(10);
+        return (String) get(11);
     }
 
     /**
      * Setter for <code>oagi.xbt.state</code>. Record lifecycle state code.
      */
     public void setState(Integer value) {
-        set(11, value);
+        set(12, value);
     }
 
     /**
      * Getter for <code>oagi.xbt.state</code>. Record lifecycle state code.
      */
     public Integer getState() {
-        return (Integer) get(11);
+        return (Integer) get(12);
     }
 
     /**
@@ -219,7 +235,7 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
      * record (FK to app_user.app_user_id).
      */
     public void setCreatedBy(ULong value) {
-        set(12, value);
+        set(13, value);
     }
 
     /**
@@ -227,7 +243,7 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
      * record (FK to app_user.app_user_id).
      */
     public ULong getCreatedBy() {
-        return (ULong) get(12);
+        return (ULong) get(13);
     }
 
     /**
@@ -235,7 +251,7 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
      * record (FK to app_user.app_user_id).
      */
     public void setOwnerUserId(ULong value) {
-        set(13, value);
+        set(14, value);
     }
 
     /**
@@ -243,7 +259,7 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
      * record (FK to app_user.app_user_id).
      */
     public ULong getOwnerUserId() {
-        return (ULong) get(13);
+        return (ULong) get(14);
     }
 
     /**
@@ -251,7 +267,7 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
      * updated this record (FK to app_user.app_user_id).
      */
     public void setLastUpdatedBy(ULong value) {
-        set(14, value);
+        set(15, value);
     }
 
     /**
@@ -259,7 +275,7 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
      * updated this record (FK to app_user.app_user_id).
      */
     public ULong getLastUpdatedBy() {
-        return (ULong) get(14);
+        return (ULong) get(15);
     }
 
     /**
@@ -267,7 +283,7 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
      * record was created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
-        set(15, value);
+        set(16, value);
     }
 
     /**
@@ -275,7 +291,7 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
      * record was created.
      */
     public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(15);
+        return (LocalDateTime) get(16);
     }
 
     /**
@@ -283,7 +299,7 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
      * this record was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(16, value);
+        set(17, value);
     }
 
     /**
@@ -291,7 +307,7 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
      * this record was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
-        return (LocalDateTime) get(16);
+        return (LocalDateTime) get(17);
     }
 
     /**
@@ -299,7 +315,7 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
      * deprecated, 0 active).
      */
     public void setIsDeprecated(Byte value) {
-        set(17, value);
+        set(18, value);
     }
 
     /**
@@ -307,7 +323,7 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
      * deprecated, 0 active).
      */
     public Byte getIsDeprecated() {
-        return (Byte) get(17);
+        return (Byte) get(18);
     }
 
     // -------------------------------------------------------------------------
@@ -333,7 +349,7 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
     /**
      * Create a detached, initialised XbtRecord
      */
-    public XbtRecord(ULong xbtId, String guid, String name, String builtinType, String jbtDraft05Map, String jbt_202012Map, String openapi30Map, String avroMap, ULong subtypeOfXbtId, String schemaDefinition, String revisionDoc, Integer state, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, Byte isDeprecated) {
+    public XbtRecord(ULong xbtId, String guid, String name, String builtinType, String jbtDraft05Map, String jbt_202012Map, String openapi30Map, String openapi31Map, String avroMap, ULong subtypeOfXbtId, String schemaDefinition, String revisionDoc, Integer state, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, Byte isDeprecated) {
         super(Xbt.XBT);
 
         setXbtId(xbtId);
@@ -343,6 +359,7 @@ public class XbtRecord extends UpdatableRecordImpl<XbtRecord> {
         setJbtDraft05Map(jbtDraft05Map);
         setJbt_202012Map(jbt_202012Map);
         setOpenapi30Map(openapi30Map);
+        setOpenapi31Map(openapi31Map);
         setAvroMap(avroMap);
         setSubtypeOfXbtId(subtypeOfXbtId);
         setSchemaDefinition(schemaDefinition);
