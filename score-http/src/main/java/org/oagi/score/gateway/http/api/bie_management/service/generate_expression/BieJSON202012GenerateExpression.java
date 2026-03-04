@@ -885,12 +885,102 @@ public class BieJSON202012GenerateExpression implements BieGenerateExpression, I
             }
             return "#/$defs/" + refNameOfTopLevelAsbiep;
         } else {
-            String refFileName = option.getFilenames().get(refTopLevelAsbiep.topLevelAsbiepId());
+            String refFileName = resolveExternalRefFileName(
+                    refTopLevelAsbiep, refNameOfTopLevelAsbiep, refRootPropertyName);
             if (!StringUtils.hasLength(refFileName)) {
                 refFileName = Character.toUpperCase(refNameOfTopLevelAsbiep.charAt(0)) + refNameOfTopLevelAsbiep.substring(1);
             }
             return refFileName + ".json#/properties/" + escapeJsonPointerToken(refRootPropertyName);
         }
+    }
+
+    private String resolveExternalRefFileName(TopLevelAsbiepSummaryRecord refTopLevelAsbiep,
+                                              String refNameOfTopLevelAsbiep,
+                                              String refRootPropertyName) {
+        Map<TopLevelAsbiepId, String> filenames = option.getFilenames();
+        if (filenames == null || filenames.isEmpty()) {
+            return null;
+        }
+
+        String filename = filenames.get(refTopLevelAsbiep.topLevelAsbiepId());
+        if (!StringUtils.hasLength(filename)) {
+            return null;
+        }
+
+        int expectedIndex = resolveReusedSchemaIndex(refNameOfTopLevelAsbiep, refRootPropertyName);
+        if (expectedIndex < 0) {
+            return filename;
+        }
+
+        // Keep name-suffix and filename-suffix ordering aligned.
+        // Example: securityClassification -> first file, securityClassification1 -> second file (-1).
+        // This prevents swapped refs when duplicate reused schemas share the same root property term.
+        List<String> sameRootFilenames = filenames.entrySet().stream()
+                .filter(e -> hasSameRootPropertyName(e.getKey(), refRootPropertyName))
+                .map(Map.Entry::getValue)
+                .filter(StringUtils::hasLength)
+                .distinct()
+                .sorted(this::compareFilenameBySuffix)
+                .collect(Collectors.toList());
+        if (expectedIndex >= sameRootFilenames.size()) {
+            return filename;
+        }
+
+        return sameRootFilenames.get(expectedIndex);
+    }
+
+    private boolean hasSameRootPropertyName(TopLevelAsbiepId topLevelAsbiepId,
+                                            String refRootPropertyName) {
+        TopLevelAsbiepSummaryRecord candidateTopLevelAsbiep = generationContext.findTopLevelAsbiep(topLevelAsbiepId);
+        if (candidateTopLevelAsbiep == null) {
+            return false;
+        }
+        AsbiepSummaryRecord candidateAsbiep =
+                generationContext.findASBIEP(candidateTopLevelAsbiep.asbiepId(), candidateTopLevelAsbiep);
+        return refRootPropertyName.equals(resolveRootPropertyName(candidateAsbiep));
+    }
+
+    private int resolveReusedSchemaIndex(String refNameOfTopLevelAsbiep,
+                                         String refRootPropertyName) {
+        if (!StringUtils.hasLength(refNameOfTopLevelAsbiep) || !refNameOfTopLevelAsbiep.startsWith(refRootPropertyName)) {
+            return -1;
+        }
+
+        String suffix = refNameOfTopLevelAsbiep.substring(refRootPropertyName.length());
+        if (!StringUtils.hasLength(suffix)) {
+            return 0;
+        }
+
+        if (suffix.chars().allMatch(Character::isDigit)) {
+            return Integer.parseInt(suffix);
+        }
+        return -1;
+    }
+
+    private int compareFilenameBySuffix(String left, String right) {
+        int leftSuffix = trailingNumericSuffix(left);
+        int rightSuffix = trailingNumericSuffix(right);
+        if (leftSuffix != rightSuffix) {
+            return Integer.compare(leftSuffix, rightSuffix);
+        }
+        return left.compareTo(right);
+    }
+
+    private int trailingNumericSuffix(String filename) {
+        if (!StringUtils.hasLength(filename)) {
+            return Integer.MAX_VALUE;
+        }
+
+        int lastHyphen = filename.lastIndexOf('-');
+        if (lastHyphen < 0 || lastHyphen == filename.length() - 1) {
+            return 0;
+        }
+
+        String suffix = filename.substring(lastHyphen + 1);
+        if (suffix.chars().allMatch(Character::isDigit)) {
+            return Integer.parseInt(suffix);
+        }
+        return 0;
     }
 
     private String resolveReusedSchemaName(Map<String, Object> definitions,
@@ -905,7 +995,7 @@ public class BieJSON202012GenerateExpression implements BieGenerateExpression, I
 
         String candidate = baseName;
         int suffix = 1;
-        while (definitions.containsKey(candidate)) {
+        while (definitions.containsKey(candidate) || reusedTopLevelAsbiepNameMap.containsValue(candidate)) {
             candidate = baseName + suffix++;
         }
 

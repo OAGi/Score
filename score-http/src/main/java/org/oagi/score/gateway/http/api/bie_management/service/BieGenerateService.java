@@ -119,27 +119,49 @@ public class BieGenerateService {
     public File generateSchemaForAll(ScoreUser requester,
                                      List<TopLevelAsbiepSummaryRecord> topLevelAsbiepList,
                                      GenerateExpressionOption option) throws BieGenerateFailureException {
-        ensureNoDuplicateRootPropertyNamesForSingleSchema(topLevelAsbiepList);
-
         BieGenerateExpression generateExpression = createBieGenerateExpression(option);
         GenerationContext generationContext = generateExpression.generateContext(requester, topLevelAsbiepList, option);
+        Set<TopLevelAsbiepId> selectedTopLevelAsbiepIdSet = toTopLevelAsbiepIdSet(topLevelAsbiepList);
+        Set<TopLevelAsbiepId> selectedReferencedTopLevelAsbiepIdSet = Collections.emptySet();
+        List<TopLevelAsbiepSummaryRecord> primaryTopLevelAsbieps = topLevelAsbiepList;
+        if (isSeparateFileReferencesForReusedSchemasEnabled(option) &&
+                !generationContext.getRefTopLevelAsbiepSet().isEmpty()) {
+            // Example:
+            // - Selected top-level ASBIEPs: [BOM(1), SecurityClassification(2)]
+            // - BOM(1) reuses 2 and also 3.
+            // - "Referenced-schema flow" means generateReferencedSchemasRecursively(...):
+            //   reused top-level ASBIEPs are emitted as standalone external $ref target files.
+            // In ALL mode, 2 should be treated by referenced-schema flow (same as 3),
+            // not as another primary root in the main document.
+            selectedReferencedTopLevelAsbiepIdSet =
+                    findSelectedReferencedTopLevelAsbiepIds(selectedTopLevelAsbiepIdSet, generationContext);
+            clearFilenameOverridesForSelectedReferencedSchemas(option, selectedReferencedTopLevelAsbiepIdSet);
+            primaryTopLevelAsbieps = excludeTopLevelAsbiepsById(topLevelAsbiepList, selectedReferencedTopLevelAsbiepIdSet);
+            if (primaryTopLevelAsbieps.isEmpty()) {
+                primaryTopLevelAsbieps = topLevelAsbiepList;
+            }
+        }
+
+        ensureNoDuplicateRootPropertyNamesForSingleSchema(primaryTopLevelAsbieps);
         ensureExpressionFilenames(collectTopLevelAsbieps(topLevelAsbiepList, generationContext), option);
 
         Map<TopLevelAsbiepId, File> referencedSchemaFiles = new LinkedHashMap<>();
         if (isSeparateFileReferencesForReusedSchemasEnabled(option) &&
                 !generationContext.getRefTopLevelAsbiepSet().isEmpty()) {
-            // #1711: Generate reused schemas as standalone files first.
+            // #1713: Generate reused schemas as standalone files first.
+            Set<TopLevelAsbiepId> excludedFromReferencedFlow = new HashSet<>(selectedTopLevelAsbiepIdSet);
+            excludedFromReferencedFlow.removeAll(selectedReferencedTopLevelAsbiepIdSet);
             referencedSchemaFiles.putAll(generateReferencedSchemasRecursively(
-                    requester, generationContext.getRefTopLevelAsbiepSet(), option, null));
+                    requester, generationContext.getRefTopLevelAsbiepSet(), option, excludedFromReferencedFlow));
         }
 
-        for (TopLevelAsbiepSummaryRecord topLevelAsbiep : topLevelAsbiepList) {
+        for (TopLevelAsbiepSummaryRecord topLevelAsbiep : primaryTopLevelAsbieps) {
             generateExpression.generate(requester, topLevelAsbiep, generationContext, option);
         }
 
         String filename;
-        if (topLevelAsbiepList.size() == 1) {
-            filename = getFilenameByTopLevelAsbiep(topLevelAsbiepList.get(0), option);
+        if (primaryTopLevelAsbieps.size() == 1) {
+            filename = getFilenameByTopLevelAsbiep(primaryTopLevelAsbieps.get(0), option);
         } else {
             filename = ScoreGuidUtils.randomGuid();
         }
@@ -214,22 +236,43 @@ public class BieGenerateService {
         Map<TopLevelAsbiepId, File> targetFiles = new HashMap();
         BieGenerateExpression generateExpression = createBieGenerateExpression(option);
         GenerationContext generationContext = generateExpression.generateContext(requester, topLevelAsbieps, option);
+        Set<TopLevelAsbiepId> selectedTopLevelAsbiepIdSet = toTopLevelAsbiepIdSet(topLevelAsbieps);
+        boolean separateFileReferencesEnabled = isSeparateFileReferencesForReusedSchemasEnabled(option);
+        // Example:
+        // - Selected top-level ASBIEPs: [BOM(1), SecurityClassification(2), SecurityClassification(3)]
+        // - BOM(1) reuses 2 and 3.
+        // IDs 2 and 3 are selected + reused, so they must not be treated as primary targets.
+        // Otherwise target-only options (Make as an array / Include Meta Header / Include Pagination Response)
+        // would be incorrectly applied to reused schema files.
+        Set<TopLevelAsbiepId> selectedReferencedTopLevelAsbiepIdSet = Collections.emptySet();
+        if (separateFileReferencesEnabled && !generationContext.getRefTopLevelAsbiepSet().isEmpty()) {
+            selectedReferencedTopLevelAsbiepIdSet =
+                    findSelectedReferencedTopLevelAsbiepIds(selectedTopLevelAsbiepIdSet, generationContext);
+            clearFilenameOverridesForSelectedReferencedSchemas(option, selectedReferencedTopLevelAsbiepIdSet);
+        }
         ensureExpressionFilenames(collectTopLevelAsbieps(topLevelAsbieps, generationContext), option);
 
-        Set<TopLevelAsbiepId> selectedTopLevelAsbiepIdSet = new HashSet<>();
-        for (TopLevelAsbiepSummaryRecord topLevelAsbiep : topLevelAsbieps) {
-            selectedTopLevelAsbiepIdSet.add(topLevelAsbiep.topLevelAsbiepId());
-        }
-
-        if (isSeparateFileReferencesForReusedSchemasEnabled(option) &&
+        if (separateFileReferencesEnabled &&
                 !generationContext.getRefTopLevelAsbiepSet().isEmpty()) {
-            // #1711: Include recursively discovered reused schemas in EACH packaging.
+            // #1713: Include recursively discovered reused schemas in EACH packaging.
+            // Continue the example above:
+            // - Referenced-schema flow (generateReferencedSchemasRecursively(...)) should still generate
+            //   2 and 3 as standalone files because A/BOM references them.
+            // - Exclude only true primary targets (for the example, only 1) from referenced-schema flow.
+            Set<TopLevelAsbiepId> excludedFromReferencedFlow = new HashSet<>(selectedTopLevelAsbiepIdSet);
+            excludedFromReferencedFlow.removeAll(selectedReferencedTopLevelAsbiepIdSet);
             Map<TopLevelAsbiepId, File> referencedFiles = generateReferencedSchemasRecursively(
-                    requester, generationContext.getRefTopLevelAsbiepSet(), option, selectedTopLevelAsbiepIdSet);
+                    requester, generationContext.getRefTopLevelAsbiepSet(), option, excludedFromReferencedFlow);
             targetFiles.putAll(referencedFiles);
         }
 
         for (TopLevelAsbiepSummaryRecord topLevelAsbiep : topLevelAsbieps) {
+            if (selectedReferencedTopLevelAsbiepIdSet.contains(topLevelAsbiep.topLevelAsbiepId())) {
+                // In the example, skip direct generation for 2 and 3 here.
+                // They are already generated in referenced-schema flow
+                // (generateReferencedSchemasRecursively(...)) with referenced-schema options.
+                continue;
+            }
             try {
                 generateExpression.reset();
             } catch (Exception e) {
@@ -251,11 +294,56 @@ public class BieGenerateService {
         return targetFiles;
     }
 
+    private Set<TopLevelAsbiepId> toTopLevelAsbiepIdSet(List<TopLevelAsbiepSummaryRecord> topLevelAsbieps) {
+        return topLevelAsbieps.stream()
+                .map(TopLevelAsbiepSummaryRecord::topLevelAsbiepId)
+                .collect(Collectors.toSet());
+    }
+
+    private Set<TopLevelAsbiepId> findSelectedReferencedTopLevelAsbiepIds(
+            Set<TopLevelAsbiepId> selectedTopLevelAsbiepIdSet,
+            GenerationContext generationContext) {
+        return generationContext.getRefTopLevelAsbiepSet().stream()
+                .map(TopLevelAsbiepSummaryRecord::topLevelAsbiepId)
+                .filter(selectedTopLevelAsbiepIdSet::contains)
+                .collect(Collectors.toSet());
+    }
+
+    private void clearFilenameOverridesForSelectedReferencedSchemas(
+            GenerateExpressionOption option,
+            Set<TopLevelAsbiepId> selectedReferencedTopLevelAsbiepIdSet) {
+        if (selectedReferencedTopLevelAsbiepIdSet == null || selectedReferencedTopLevelAsbiepIdSet.isEmpty()) {
+            return;
+        }
+
+        Map<TopLevelAsbiepId, String> existingFilenames = option.getFilenames();
+        if (existingFilenames == null || existingFilenames.isEmpty()) {
+            return;
+        }
+
+        Map<TopLevelAsbiepId, String> filtered = new LinkedHashMap<>(existingFilenames);
+        for (TopLevelAsbiepId selectedReferencedTopLevelAsbiepId : selectedReferencedTopLevelAsbiepIdSet) {
+            filtered.remove(selectedReferencedTopLevelAsbiepId);
+        }
+        option.setFilenames(filtered);
+    }
+
+    private List<TopLevelAsbiepSummaryRecord> excludeTopLevelAsbiepsById(
+            List<TopLevelAsbiepSummaryRecord> topLevelAsbieps,
+            Set<TopLevelAsbiepId> excludedTopLevelAsbiepIdSet) {
+        if (excludedTopLevelAsbiepIdSet == null || excludedTopLevelAsbiepIdSet.isEmpty()) {
+            return topLevelAsbieps;
+        }
+        return topLevelAsbieps.stream()
+                .filter(topLevelAsbiep -> !excludedTopLevelAsbiepIdSet.contains(topLevelAsbiep.topLevelAsbiepId()))
+                .collect(Collectors.toList());
+    }
+
     /**
      * Recursively generates standalone schema files for reused top-level ASBIEPs.
      *
      * This method is used for JSON generation when "Separate file references for reused schemas"
-     * is enabled (#1711). The goal is to produce external reference targets that are independently
+     * is enabled (#1713). The goal is to produce external reference targets that are independently
      * valid schema documents (with their own root and local {@code #/$defs} closure), instead of
      * partially extracted fragments.
      *
@@ -314,7 +402,7 @@ public class BieGenerateService {
             BieGenerateExpression referencedGenerateExpression = createBieGenerateExpression(referencedOption);
             GenerationContext referencedGenerationContext = referencedGenerateExpression.generateContext(
                     requester, List.of(refTopLevelAsbiep), referencedOption);
-            // #1711: Keep filename resolution consistent between referenced and target schemas.
+            // #1713: Keep filename resolution consistent between referenced and target schemas.
             ensureExpressionFilenames(collectTopLevelAsbieps(List.of(refTopLevelAsbiep), referencedGenerationContext), option);
             ensureExpressionFilenames(collectTopLevelAsbieps(List.of(refTopLevelAsbiep), referencedGenerationContext), referencedOption);
             try {
@@ -357,7 +445,7 @@ public class BieGenerateService {
         Map<TopLevelAsbiepId, String> resolved = new LinkedHashMap<>();
         Map<String, Integer> filenameCount = new HashMap<>();
         if (existing != null && !existing.isEmpty()) {
-            // #1711: Normalize pre-resolved names as well to avoid duplicate filenames.
+            // #1713: Normalize pre-resolved names as well to avoid duplicate filenames.
             List<Map.Entry<TopLevelAsbiepId, String>> existingEntries = new ArrayList<>(existing.entrySet());
             existingEntries.sort(Comparator.comparing(e -> e.getKey().value()));
             for (Map.Entry<TopLevelAsbiepId, String> entry : existingEntries) {
@@ -414,6 +502,14 @@ public class BieGenerateService {
         GenerateExpressionOption copied = new GenerateExpressionOption();
         BeanUtils.copyProperties(option, copied);
         copied.setSeparateFileReferencesForReusedSchemas(false);
+        // Apply array wrapper only to direct target schemas, not reused referenced schemas.
+        copied.setArrayForJsonExpression(false);
+        // Apply meta-header only to direct target schemas, not reused referenced schemas.
+        copied.setIncludeMetaHeaderForJson(false);
+        copied.setMetaHeaderTopLevelAsbiepId(null);
+        // Apply pagination response only to direct target schemas, not reused referenced schemas.
+        copied.setIncludePaginationResponseForJson(false);
+        copied.setPaginationResponseTopLevelAsbiepId(null);
         copied.setFilenames(new LinkedHashMap<>(option.getFilenames()));
         return copied;
     }
@@ -459,7 +555,7 @@ public class BieGenerateService {
                     .fetchOne();
 
             if (bizCtxRecord != null) {
-                sb.append('-').append(bizCtxRecord.getName().replaceAll(" ", "-"));
+                sb.append('-').append(bizCtxRecord.getName().replaceAll("\\s+", ""));
             }
         }
 

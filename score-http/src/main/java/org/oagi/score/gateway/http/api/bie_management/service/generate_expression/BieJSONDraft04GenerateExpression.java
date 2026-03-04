@@ -814,7 +814,7 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
 
         String candidate = baseName;
         int suffix = 1;
-        while (definitions.containsKey(candidate)) {
+        while (definitions.containsKey(candidate) || reusedTopLevelAsbiepNameMap.containsValue(candidate)) {
             candidate = baseName + suffix++;
         }
 

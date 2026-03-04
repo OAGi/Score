@@ -436,7 +436,7 @@ export class BieExpressComponent implements OnInit {
 
   getFilename(topLevelAsbiepId: number): string {
     const topLevelAsbiep = this.dataSource.data.filter(e => e.topLevelAsbiepId === topLevelAsbiepId)[0];
-    const separator = '';
+    const separator = '-';
 
     let filename = topLevelAsbiep.propertyTerm.trim().split(' ').join(separator);
     if (this.option.includeBusinessContextInFilename) {

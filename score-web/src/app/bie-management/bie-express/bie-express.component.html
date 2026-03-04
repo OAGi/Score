@@ -411,21 +411,18 @@
                       </mat-form-field>
                     </div>
                   </div>
-                  <mat-checkbox [(ngModel)]="option.arrayForJsonExpression">
-                  <span
-                    class="{{ (option.expressionOption !== 'JSON') ? 'toggle-disabled' : '' }}">Make as an array</span>
-                  </mat-checkbox>
                   <mat-checkbox [(ngModel)]="option.separateFileReferencesForReusedSchemas"
                                 [disabled]="isSeparateFileReferencesForReusedSchemasDisabled()">
-                  <span
-                    class="{{ isSeparateFileReferencesForReusedSchemasDisabled() ? 'toggle-disabled' : '' }}">Separate file references for reused schemas</span>
+                    <span class="{{ isSeparateFileReferencesForReusedSchemasDisabled() ? 'toggle-disabled' : '' }}">Separate file references for reused schemas</span>
+                  </mat-checkbox>
+                  <mat-checkbox [(ngModel)]="option.arrayForJsonExpression">
+                    <span class="{{ (option.expressionOption !== 'JSON') ? 'toggle-disabled' : '' }}">Make as an array</span>
                   </mat-checkbox>
                   <mat-checkbox [(ngModel)]="option.includeMetaHeaderForJson"
                                 (click)="toggleMetaHeaderOption($event, option.expressionOption !== 'JSON',
                                              'includeMetaHeaderForJson',
                                              'metaHeaderTopLevelAsbiepId')">
-                  <span
-                    class="{{ (option.expressionOption !== 'JSON') ? 'toggle-disabled' : '' }}">Include Meta Header</span>
+                    <span class="{{ (option.expressionOption !== 'JSON') ? 'toggle-disabled' : '' }}">Include Meta Header</span>
                   </mat-checkbox>
                   <mat-checkbox [(ngModel)]="option.includePaginationResponseForJson"
                                 (click)="togglePaginationResponseOption($event, option.expressionOption !== 'JSON',
