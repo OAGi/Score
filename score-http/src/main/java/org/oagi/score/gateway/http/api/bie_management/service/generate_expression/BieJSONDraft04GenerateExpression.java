@@ -16,6 +16,7 @@ import org.oagi.score.gateway.http.api.bie_management.model.bbie.BbieSummaryReco
 import org.oagi.score.gateway.http.api.bie_management.model.bbie_sc.BbieScSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BiePackageSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.expression.GenerateExpressionOption;
+import org.oagi.score.gateway.http.api.bie_management.repository.TopLevelAsbiepQueryRepository;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.OagisComponentType;
 import org.oagi.score.gateway.http.api.cc_management.model.ascc.AsccSummaryRecord;
@@ -52,6 +53,9 @@ import static org.oagi.score.gateway.http.api.bie_management.service.generate_ex
 import static org.oagi.score.gateway.http.common.util.StringUtils.hasLength;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
+/**
+ * Generates JSON Schema Draft-04 expressions for selected top-level BIEs.
+ */
 @Component
 @Scope(SCOPE_PROTOTYPE)
 public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, InitializingBean {
@@ -87,36 +91,36 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
         this.afterPropertiesSet();
     }
 
+    /**
+     * Builds a generation context for the requested top-level BIEs and optional JSON wrappers
+     * (meta header / pagination response). Optional wrappers must belong to the same release.
+     */
     @Override
     public GenerationContext generateContext(
             ScoreUser requester,
             List<TopLevelAsbiepSummaryRecord> topLevelAsbieps, GenerateExpressionOption option) {
-        List<TopLevelAsbiepSummaryRecord> mergedTopLevelAsbieps = new ArrayList(topLevelAsbieps);
+        List<TopLevelAsbiepSummaryRecord> mergedTopLevelAsbieps = new ArrayList<>(topLevelAsbieps);
 
-        if (mergedTopLevelAsbieps.size() == 0) {
+        if (mergedTopLevelAsbieps.isEmpty()) {
             throw new IllegalArgumentException("Cannot found BIEs.");
         }
         ReleaseId releaseId = mergedTopLevelAsbieps.get(0).release().releaseId();
 
-        var topLevelAsbiepQuery = repositoryFactory.topLevelAsbiepQueryRepository(requester);
-
-        /* Issue 587 */
-        if (option.isIncludeMetaHeaderForJson()) {
-            TopLevelAsbiepSummaryRecord metaHeaderTopLevelAsbiep =
-                    topLevelAsbiepQuery.getTopLevelAsbiepSummary(option.getMetaHeaderTopLevelAsbiepId());
-            if (!releaseId.equals(metaHeaderTopLevelAsbiep.release().releaseId())) {
-                throw new IllegalArgumentException("Meta Header release does not match.");
-            }
-            mergedTopLevelAsbieps.add(metaHeaderTopLevelAsbiep);
-        }
-        if (option.isIncludePaginationResponseForJson()) {
-            TopLevelAsbiepSummaryRecord paginationResponseTopLevelAsbiep =
-                    topLevelAsbiepQuery.getTopLevelAsbiepSummary(option.getPaginationResponseTopLevelAsbiepId());
-            if (!releaseId.equals(paginationResponseTopLevelAsbiep.release().releaseId())) {
-                throw new IllegalArgumentException("Pagination Response release does not match.");
-            }
-            mergedTopLevelAsbieps.add(paginationResponseTopLevelAsbiep);
-        }
+        TopLevelAsbiepQueryRepository topLevelAsbiepQuery = repositoryFactory.topLevelAsbiepQueryRepository(requester);
+        appendOptionalTopLevelAsbiep(
+                mergedTopLevelAsbieps,
+                topLevelAsbiepQuery,
+                option.isIncludeMetaHeaderForJson(),
+                option.getMetaHeaderTopLevelAsbiepId(),
+                releaseId,
+                "Meta Header");
+        appendOptionalTopLevelAsbiep(
+                mergedTopLevelAsbieps,
+                topLevelAsbiepQuery,
+                option.isIncludePaginationResponseForJson(),
+                option.getPaginationResponseTopLevelAsbiepId(),
+                releaseId,
+                "Pagination Response");
 
         return applicationContext.getBean(GenerationContext.class, requester, mergedTopLevelAsbieps);
     }
@@ -187,22 +191,27 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
         fillProperties(parent, definitions, topLevelAsbiep, asbiep, typeAbie, isArray, null, generationContext);
     }
 
+    /**
+     * Promotes the first child under {@code properties} to the current root object.
+     * Used when a wrapped top-level property should be suppressed.
+     */
     private void suppressRootProperty(Map<String, Object> parent, boolean isArray) {
         Map<String, Object> properties = (Map<String, Object>) parent.get("properties");
-        // Get the first element from 'properties' property and move all children of the element to the parent.
-        Set<String> keys = properties.keySet();
-        if (keys.isEmpty()) {
+        if (properties == null || properties.isEmpty()) {
             return;
         }
-        Map<String, Object> rootProperties = (Map<String, Object>) properties.get(keys.iterator().next());
+        Map<String, Object> rootProperties =
+                (Map<String, Object>) properties.get(properties.keySet().iterator().next());
+        if (rootProperties == null) {
+            return;
+        }
         if (!isArray) {
             parent.put("type", "object");
         }
-        Arrays.asList("required", "additionalProperties", "properties").stream().forEach(e -> parent.remove(e));
-
-        for (Map.Entry<String, Object> entry : rootProperties.entrySet()) {
-            parent.put(entry.getKey(), entry.getValue());
-        }
+        parent.remove("required");
+        parent.remove("additionalProperties");
+        parent.remove("properties");
+        parent.putAll(rootProperties);
     }
 
     private void fillProperties(Map<String, Object> parent,
@@ -787,6 +796,9 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
         return properties;
     }
 
+    /**
+     * Resolves a local definition reference for a reused ABIE schema.
+     */
     private String getReference(Map<String, Object> definitions,
                                 AsbiepSummaryRecord asbiep,
                                 GenerationContext generationContext) {
@@ -802,10 +814,27 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
         return "#/definitions/" + refNameOfTopLevelAsbiep;
     }
 
+    private void appendOptionalTopLevelAsbiep(
+            List<TopLevelAsbiepSummaryRecord> mergedTopLevelAsbieps,
+            TopLevelAsbiepQueryRepository topLevelAsbiepQuery,
+            boolean enabled,
+            TopLevelAsbiepId optionalTopLevelAsbiepId,
+            ReleaseId expectedReleaseId,
+            String label) {
+        if (!enabled || optionalTopLevelAsbiepId == null) {
+            return;
+        }
+        TopLevelAsbiepSummaryRecord optionalTopLevelAsbiep =
+                topLevelAsbiepQuery.getTopLevelAsbiepSummary(optionalTopLevelAsbiepId);
+        if (!expectedReleaseId.equals(optionalTopLevelAsbiep.release().releaseId())) {
+            throw new IllegalArgumentException(label + " release does not match.");
+        }
+        mergedTopLevelAsbieps.add(optionalTopLevelAsbiep);
+    }
+
     private String resolveReusedSchemaName(Map<String, Object> definitions,
                                            AsbiepSummaryRecord asbiep) {
-        AsccpSummaryRecord asccp = generationContext.queryBasedASCCP(asbiep);
-        String baseName = convertIdentifierToId(camelCase(asccp.propertyTerm()));
+        String baseName = resolveReusedSchemaBaseName(asbiep);
         TopLevelAsbiepId ownerTopLevelAsbiepId = asbiep.ownerTopLevelAsbiepId();
         String existing = reusedTopLevelAsbiepNameMap.get(ownerTopLevelAsbiepId);
         if (StringUtils.hasLength(existing)) {
@@ -820,6 +849,11 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
 
         reusedTopLevelAsbiepNameMap.put(ownerTopLevelAsbiepId, candidate);
         return candidate;
+    }
+
+    private String resolveReusedSchemaBaseName(AsbiepSummaryRecord asbiep) {
+        AsccpSummaryRecord asccp = generationContext.queryBasedASCCP(asbiep);
+        return convertIdentifierToId(camelCase(asccp.propertyTerm()));
     }
 
     private String getReference(Map<String, Object> definitions, BbieSummaryRecord bbie, DtSummaryRecord bdt,

@@ -359,25 +359,13 @@
         </div>
 
         <div class="col-md-4 col-sm-12">
-          <span class="option-header">Schema File Option</span>
+          <!--
+          <span class="option-header">Generate</span>
+          -->
           <div class="option-body">
-            <div class="filename-option">
-              <div class="generate-option">
-                <mat-checkbox [(ngModel)]="option.includeBusinessContextInFilename">
-                  Include a business context in the filename
-                </mat-checkbox>
-              </div>
-              <div class="generate-option">
-                <mat-checkbox [(ngModel)]="option.includeVersionInFilename">
-                  Include a version in the filename
-                </mat-checkbox>
-              </div>
-            </div>
-
-            <div class="actions mt-4">
+            <div class="actions">
               <button mat-raised-button class="mr-2" color="primary" (click)="generate()"
-                      [hidden]="table.dataSource.data.length == 0">
-                Generate
+                      [hidden]="table.dataSource.data.length == 0">Generate
               </button>
             </div>
           </div>

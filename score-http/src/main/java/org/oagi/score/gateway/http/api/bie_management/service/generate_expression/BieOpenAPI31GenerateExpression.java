@@ -17,6 +17,7 @@ import org.oagi.score.gateway.http.api.bie_management.model.bbie.BbieSummaryReco
 import org.oagi.score.gateway.http.api.bie_management.model.bbie_sc.BbieScSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.expression.GenerateExpressionOption;
 import org.oagi.score.gateway.http.api.bie_management.repository.BieQueryRepository;
+import org.oagi.score.gateway.http.api.bie_management.repository.TopLevelAsbiepQueryRepository;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.OagisComponentType;
 import org.oagi.score.gateway.http.api.cc_management.model.ascc.AsccSummaryRecord;
@@ -58,6 +59,9 @@ import java.util.stream.Stream;
 import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.*;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
+/**
+ * Generates OpenAPI 3.1 expressions for selected top-level BIEs.
+ */
 @Component
 @Scope(SCOPE_PROTOTYPE)
 public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, InitializingBean {
@@ -99,45 +103,42 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
         this.afterPropertiesSet();
     }
 
+    /**
+     * Builds a generation context for top-level BIEs and optional OpenAPI template wrappers
+     * (meta header / pagination response). Optional wrappers must belong to the same release.
+     */
     @Override
     public GenerationContext generateContext(
             ScoreUser requester, List<TopLevelAsbiepSummaryRecord> topLevelAsbieps, GenerateExpressionOption option) {
-        List<TopLevelAsbiepSummaryRecord> mergedTopLevelAsbieps = new ArrayList(topLevelAsbieps);
+        List<TopLevelAsbiepSummaryRecord> mergedTopLevelAsbieps = new ArrayList<>(topLevelAsbieps);
 
-        if (mergedTopLevelAsbieps.size() == 0) {
+        if (mergedTopLevelAsbieps.isEmpty()) {
             throw new IllegalArgumentException("Cannot found BIEs.");
         }
         ReleaseId releaseId = mergedTopLevelAsbieps.get(0).release().releaseId();
 
-        var topLevelAsbiepQuery = repositoryFactory.topLevelAsbiepQueryRepository(requester);
-
-        /*
-         * Issue #587
-         */
-        if (option.isIncludeMetaHeaderForJsonForOpenAPI30GetTemplate()) {
-            TopLevelAsbiepSummaryRecord getMetaHeaderTopLevelAsbiep =
-                    topLevelAsbiepQuery.getTopLevelAsbiepSummary(option.getMetaHeaderTopLevelAsbiepIdForOpenAPI30GetTemplate());
-            if (!releaseId.equals(getMetaHeaderTopLevelAsbiep.release().releaseId())) {
-                throw new IllegalArgumentException("Meta Header release does not match.");
-            }
-            mergedTopLevelAsbieps.add(getMetaHeaderTopLevelAsbiep);
-        }
-        if (option.isIncludeMetaHeaderForJsonForOpenAPI30PostTemplate()) {
-            TopLevelAsbiepSummaryRecord postMetaHeaderTopLevelAsbiep =
-                    topLevelAsbiepQuery.getTopLevelAsbiepSummary(option.getMetaHeaderTopLevelAsbiepIdForOpenAPI30PostTemplate());
-            if (!releaseId.equals(postMetaHeaderTopLevelAsbiep.release().releaseId())) {
-                throw new IllegalArgumentException("Meta Header release does not match.");
-            }
-            mergedTopLevelAsbieps.add(postMetaHeaderTopLevelAsbiep);
-        }
-        if (option.isIncludePaginationResponseForJsonForOpenAPI30GetTemplate()) {
-            TopLevelAsbiepSummaryRecord paginationResponseTopLevelAsbiep =
-                    topLevelAsbiepQuery.getTopLevelAsbiepSummary(option.getPaginationResponseTopLevelAsbiepIdForOpenAPI30GetTemplate());
-            if (!releaseId.equals(paginationResponseTopLevelAsbiep.release().releaseId())) {
-                throw new IllegalArgumentException("Pagination Response release does not match.");
-            }
-            mergedTopLevelAsbieps.add(paginationResponseTopLevelAsbiep);
-        }
+        TopLevelAsbiepQueryRepository topLevelAsbiepQuery = repositoryFactory.topLevelAsbiepQueryRepository(requester);
+        appendOptionalTopLevelAsbiep(
+                mergedTopLevelAsbieps,
+                topLevelAsbiepQuery,
+                option.isIncludeMetaHeaderForJsonForOpenAPI30GetTemplate(),
+                option.getMetaHeaderTopLevelAsbiepIdForOpenAPI30GetTemplate(),
+                releaseId,
+                "Meta Header");
+        appendOptionalTopLevelAsbiep(
+                mergedTopLevelAsbieps,
+                topLevelAsbiepQuery,
+                option.isIncludeMetaHeaderForJsonForOpenAPI30PostTemplate(),
+                option.getMetaHeaderTopLevelAsbiepIdForOpenAPI30PostTemplate(),
+                releaseId,
+                "Meta Header");
+        appendOptionalTopLevelAsbiep(
+                mergedTopLevelAsbieps,
+                topLevelAsbiepQuery,
+                option.isIncludePaginationResponseForJsonForOpenAPI30GetTemplate(),
+                option.getPaginationResponseTopLevelAsbiepIdForOpenAPI30GetTemplate(),
+                releaseId,
+                "Pagination Response");
 
         return applicationContext.getBean(GenerationContext.class, requester, mergedTopLevelAsbieps);
     }
@@ -513,20 +514,25 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
         }
     }
 
+    /**
+     * Promotes the first child under {@code properties} to the current root object.
+     * Used by template options that suppress the wrapper root property.
+     */
     private void suppressRootProperty(Map<String, Object> parent) {
         Map<String, Object> properties = (Map<String, Object>) parent.get("properties");
-        // Get the first element from 'properties' property and move all children of the element to the parent.
-        Set<String> keys = properties.keySet();
-        if (keys.isEmpty()) {
+        if (properties == null || properties.isEmpty()) {
             return;
         }
-        Map<String, Object> rootProperties = (Map<String, Object>) properties.get(keys.iterator().next());
-        parent.put("type", "object");
-        Arrays.asList("required", "additionalProperties", "properties").stream().forEach(e -> parent.remove(e));
-
-        for (Map.Entry<String, Object> entry : rootProperties.entrySet()) {
-            parent.put(entry.getKey(), entry.getValue());
+        Map<String, Object> rootProperties =
+                (Map<String, Object>) properties.get(properties.keySet().iterator().next());
+        if (rootProperties == null) {
+            return;
         }
+        parent.put("type", "object");
+        parent.remove("required");
+        parent.remove("additionalProperties");
+        parent.remove("properties");
+        parent.putAll(rootProperties);
     }
 
     private void fillProperties(Map<String, Object> parent, Map<String, Object> schemas,
@@ -1105,6 +1111,9 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
         }
     }
 
+    /**
+     * Resolves a reference to a reused ABIE schema under {@code #/components/schemas}.
+     */
     private String getReference(Map<String, Object> schemas, AsbiepSummaryRecord asbiep,
                                 GenerationContext generationContext) {
         String refNameOfTopLevelAsbiep = resolveReusedSchemaName(schemas, asbiep);
@@ -1120,9 +1129,26 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
         return "#/components/schemas/" + refNameOfTopLevelAsbiep;
     }
 
+    private void appendOptionalTopLevelAsbiep(
+            List<TopLevelAsbiepSummaryRecord> mergedTopLevelAsbieps,
+            TopLevelAsbiepQueryRepository topLevelAsbiepQuery,
+            boolean enabled,
+            TopLevelAsbiepId optionalTopLevelAsbiepId,
+            ReleaseId expectedReleaseId,
+            String label) {
+        if (!enabled || optionalTopLevelAsbiepId == null) {
+            return;
+        }
+        TopLevelAsbiepSummaryRecord optionalTopLevelAsbiep =
+                topLevelAsbiepQuery.getTopLevelAsbiepSummary(optionalTopLevelAsbiepId);
+        if (!expectedReleaseId.equals(optionalTopLevelAsbiep.release().releaseId())) {
+            throw new IllegalArgumentException(label + " release does not match.");
+        }
+        mergedTopLevelAsbieps.add(optionalTopLevelAsbiep);
+    }
+
     private String resolveReusedSchemaName(Map<String, Object> schemas, AsbiepSummaryRecord asbiep) {
-        AsccpSummaryRecord asccp = generationContext.queryBasedASCCP(asbiep);
-        String baseName = convertIdentifierToId(camelCase(asccp.propertyTerm()));
+        String baseName = resolveReusedSchemaBaseName(asbiep);
         TopLevelAsbiepId ownerTopLevelAsbiepId = asbiep.ownerTopLevelAsbiepId();
         String existing = reusedTopLevelAsbiepNameMap.get(ownerTopLevelAsbiepId);
         if (StringUtils.hasLength(existing)) {
@@ -1137,6 +1163,11 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
 
         reusedTopLevelAsbiepNameMap.put(ownerTopLevelAsbiepId, candidate);
         return candidate;
+    }
+
+    private String resolveReusedSchemaBaseName(AsbiepSummaryRecord asbiep) {
+        AsccpSummaryRecord asccp = generationContext.queryBasedASCCP(asbiep);
+        return convertIdentifierToId(camelCase(asccp.propertyTerm()));
     }
 
     private String getReference(Map<String, Object> schemas, BbieSummaryRecord bbie, DtSummaryRecord bdt,

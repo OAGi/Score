@@ -96,6 +96,10 @@ public class BiePackageQueryService {
         if (!hasLength(option.getPackageOption())) {
             option.setPackageOption("EACH");
         }
+        // #1711: Package export filenames always use package pattern metadata.
+        option.setIncludeBusinessContextInFilename(true);
+        option.setIncludeVersionInFilename(true);
+        option.setFilenames(Collections.emptyMap());
         option.setBiePackage(biePackage);
 
         Map<TopLevelAsbiepId, File> result;

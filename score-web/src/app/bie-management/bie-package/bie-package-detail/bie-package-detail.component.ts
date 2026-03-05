@@ -223,6 +223,8 @@ export class BiePackageDetailComponent implements OnInit {
     this.option.arrayForJsonExpression = false;
     this.option.packageOption = 'EACH';
     this.option.separateFileReferencesForReusedSchemas = true;
+    this.option.includeBusinessContextInFilename = true;
+    this.option.includeVersionInFilename = true;
 
     this.table = new TableData<BieListEntry>(this.defaultDisplayedColumns, {});
     this.table.dataSource = new MatMultiSortTableDataSource<BieListEntry>(this.sort, false);
@@ -515,6 +517,20 @@ export class BiePackageDetailComponent implements OnInit {
     this.option.packageOption = 'EACH';
     this.option.arrayForJsonExpression = false;
     this.option.separateFileReferencesForReusedSchemas = true;
+    this.option.includeBusinessContextInFilename = true;
+    this.option.includeVersionInFilename = true;
+    this.option.filenames = {};
+    this.option.bizCtxIds = {};
+
+    const targetBieLists = (selectedBieLists && selectedBieLists.length > 0)
+      ? selectedBieLists
+      : this.table.dataSource.data;
+    for (const bieList of targetBieLists) {
+      const selectedBusinessContext = this.businessContextSelection[bieList.topLevelAsbiepId];
+      if (!!selectedBusinessContext) {
+        this.option.bizCtxIds[bieList.topLevelAsbiepId] = selectedBusinessContext.businessContextId;
+      }
+    }
 
     this.loading = true;
     this.biePackageService.generateBiePackage(
@@ -629,6 +645,8 @@ export class BiePackageDetailComponent implements OnInit {
     this.option.separateFileReferencesForReusedSchemas = true;
     this.option.expressionVersion = '2020-12';
     this.option.arrayForJsonExpression = false;
+    this.option.includeBusinessContextInFilename = true;
+    this.option.includeVersionInFilename = true;
 
     if (this.option.expressionOption === 'JSON') {
       this.option.expressionVersion = '2020-12';

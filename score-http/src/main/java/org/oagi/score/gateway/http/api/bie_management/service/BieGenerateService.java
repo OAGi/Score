@@ -1,19 +1,17 @@
 package org.oagi.score.gateway.http.api.bie_management.service;
 
-import org.jooq.DSLContext;
-import org.jooq.Record2;
-import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummaryRecord;
-import org.oagi.score.gateway.http.api.bie_management.model.asbiep.AsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.expression.BieGenerateExpressionResult;
 import org.oagi.score.gateway.http.api.bie_management.model.expression.GenerateExpressionOption;
 import org.oagi.score.gateway.http.api.bie_management.repository.BieQueryRepository;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.BieSchemaFilenameStrategy;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.BiePackageExpressionFilenameStrategy;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.DefaultBieSchemaFilenameStrategy;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.DuplicateHandler;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.*;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.BizCtxAssignmentRecord;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.BizCtxRecord;
 import org.oagi.score.gateway.http.common.util.ScoreGuidUtils;
 import org.oagi.score.gateway.http.common.util.StringUtils;
 import org.oagi.score.gateway.http.common.util.Zip;
@@ -28,8 +26,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.jooq.impl.DSL.and;
-import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.*;
 import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.camelCase;
 import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.convertIdentifierToId;
 
@@ -48,7 +44,10 @@ public class BieGenerateService {
     private ApplicationContext applicationContext;
 
     @Autowired
-    private DSLContext dslContext;
+    private DefaultBieSchemaFilenameStrategy defaultBieSchemaFilenameStrategy;
+
+    @Autowired
+    private BiePackageExpressionFilenameStrategy biePackageExpressionFilenameStrategy;
 
     public BieGenerateExpressionResult generate(
             ScoreUser requester, List<TopLevelAsbiepId> topLevelAsbiepIds,
@@ -143,7 +142,7 @@ public class BieGenerateService {
         }
 
         ensureNoDuplicateRootPropertyNamesForSingleSchema(primaryTopLevelAsbieps);
-        ensureExpressionFilenames(collectTopLevelAsbieps(topLevelAsbiepList, generationContext), option);
+        ensureExpressionFilenames(collectTopLevelAsbieps(topLevelAsbiepList, generationContext), option, requester);
 
         Map<TopLevelAsbiepId, File> referencedSchemaFiles = new LinkedHashMap<>();
         if (isSeparateFileReferencesForReusedSchemasEnabled(option) &&
@@ -161,7 +160,7 @@ public class BieGenerateService {
 
         String filename;
         if (primaryTopLevelAsbieps.size() == 1) {
-            filename = getFilenameByTopLevelAsbiep(primaryTopLevelAsbieps.get(0), option);
+            filename = getFilenameByTopLevelAsbiep(primaryTopLevelAsbieps.get(0), option, requester);
         } else {
             filename = ScoreGuidUtils.randomGuid();
         }
@@ -250,7 +249,7 @@ public class BieGenerateService {
                     findSelectedReferencedTopLevelAsbiepIds(selectedTopLevelAsbiepIdSet, generationContext);
             clearFilenameOverridesForSelectedReferencedSchemas(option, selectedReferencedTopLevelAsbiepIdSet);
         }
-        ensureExpressionFilenames(collectTopLevelAsbieps(topLevelAsbieps, generationContext), option);
+        ensureExpressionFilenames(collectTopLevelAsbieps(topLevelAsbieps, generationContext), option, requester);
 
         if (separateFileReferencesEnabled &&
                 !generationContext.getRefTopLevelAsbiepSet().isEmpty()) {
@@ -280,7 +279,7 @@ public class BieGenerateService {
             }
 
             generateExpression.generate(requester, topLevelAsbiep, generationContext, option);
-            String filename = getFilenameByTopLevelAsbiep(topLevelAsbiep, option);
+            String filename = getFilenameByTopLevelAsbiep(topLevelAsbiep, option, requester);
 
             File schemaExpressionFile;
             try {
@@ -403,8 +402,8 @@ public class BieGenerateService {
             GenerationContext referencedGenerationContext = referencedGenerateExpression.generateContext(
                     requester, List.of(refTopLevelAsbiep), referencedOption);
             // #1713: Keep filename resolution consistent between referenced and target schemas.
-            ensureExpressionFilenames(collectTopLevelAsbieps(List.of(refTopLevelAsbiep), referencedGenerationContext), option);
-            ensureExpressionFilenames(collectTopLevelAsbieps(List.of(refTopLevelAsbiep), referencedGenerationContext), referencedOption);
+            ensureExpressionFilenames(collectTopLevelAsbieps(List.of(refTopLevelAsbiep), referencedGenerationContext), option, requester);
+            ensureExpressionFilenames(collectTopLevelAsbieps(List.of(refTopLevelAsbiep), referencedGenerationContext), referencedOption, requester);
             try {
                 referencedGenerateExpression.reset();
             } catch (Exception e) {
@@ -413,7 +412,7 @@ public class BieGenerateService {
 
             referencedGenerateExpression.generate(
                     requester, refTopLevelAsbiep, referencedGenerationContext, referencedOption);
-            String filename = getFilenameByTopLevelAsbiep(refTopLevelAsbiep, option);
+            String filename = getFilenameByTopLevelAsbiep(refTopLevelAsbiep, option, requester);
             try {
                 files.put(topLevelAsbiepId, referencedGenerateExpression.asFile(filename));
             } catch (IOException e) {
@@ -440,12 +439,16 @@ public class BieGenerateService {
     }
 
     private void ensureExpressionFilenames(List<TopLevelAsbiepSummaryRecord> topLevelAsbieps,
-                                           GenerateExpressionOption option) {
+                                           GenerateExpressionOption option,
+                                           ScoreUser requester) {
+        BieSchemaFilenameStrategy filenamePattern = getFilenamePattern(option);
+        DuplicateHandler duplicateHandler = filenamePattern.duplicateHandler();
+
         Map<TopLevelAsbiepId, String> existing = option.getFilenames();
-        Map<TopLevelAsbiepId, String> resolved = new LinkedHashMap<>();
-        Map<String, Integer> filenameCount = new HashMap<>();
+        List<FilenameCandidate> candidates = new ArrayList<>();
+        Set<TopLevelAsbiepId> included = new HashSet<>();
         if (existing != null && !existing.isEmpty()) {
-            // #1713: Normalize pre-resolved names as well to avoid duplicate filenames.
+            // Normalize pre-resolved names as well to avoid duplicate filenames.
             List<Map.Entry<TopLevelAsbiepId, String>> existingEntries = new ArrayList<>(existing.entrySet());
             existingEntries.sort(Comparator.comparing(e -> e.getKey().value()));
             for (Map.Entry<TopLevelAsbiepId, String> entry : existingEntries) {
@@ -453,31 +456,43 @@ public class BieGenerateService {
                 if (!StringUtils.hasLength(baseFilename)) {
                     continue;
                 }
-
-                int count = filenameCount.getOrDefault(baseFilename, 0);
-                String resolvedFilename = withDuplicateSuffix(baseFilename, count);
-                filenameCount.put(baseFilename, count + 1);
-                resolved.put(entry.getKey(), resolvedFilename);
+                candidates.add(new FilenameCandidate(entry.getKey(), baseFilename));
+                included.add(entry.getKey());
             }
         }
 
         for (TopLevelAsbiepSummaryRecord topLevelAsbiep : topLevelAsbieps) {
-            if (resolved.containsKey(topLevelAsbiep.topLevelAsbiepId())) {
+            if (included.contains(topLevelAsbiep.topLevelAsbiepId())) {
                 continue;
             }
+            String baseFilename = filenamePattern.buildBaseFilename(requester, topLevelAsbiep, option);
+            if (!StringUtils.hasLength(baseFilename)) {
+                continue;
+            }
+            candidates.add(new FilenameCandidate(topLevelAsbiep.topLevelAsbiepId(), baseFilename));
+            included.add(topLevelAsbiep.topLevelAsbiepId());
+        }
 
-            String baseFilename = getFilenameByTopLevelAsbiep(topLevelAsbiep, option);
-            int count = filenameCount.getOrDefault(baseFilename, 0);
-            String filename = withDuplicateSuffix(baseFilename, count);
-            filenameCount.put(baseFilename, count + 1);
-            resolved.put(topLevelAsbiep.topLevelAsbiepId(), filename);
+        Map<String, Integer> totalByBaseFilename = new HashMap<>();
+        for (FilenameCandidate candidate : candidates) {
+            totalByBaseFilename.merge(candidate.baseFilename(), 1, Integer::sum);
+        }
+
+        Map<String, Integer> occurrenceByBaseFilename = new HashMap<>();
+        Map<TopLevelAsbiepId, String> resolved = new LinkedHashMap<>();
+        for (FilenameCandidate candidate : candidates) {
+            int occurrence = occurrenceByBaseFilename.getOrDefault(candidate.baseFilename(), 0);
+            int totalOccurrences = totalByBaseFilename.getOrDefault(candidate.baseFilename(), 1);
+            String resolvedFilename = duplicateHandler.resolve(
+                    candidate.baseFilename(), candidate.topLevelAsbiepId(), occurrence, totalOccurrences);
+            occurrenceByBaseFilename.put(candidate.baseFilename(), occurrence + 1);
+            resolved.put(candidate.topLevelAsbiepId(), resolvedFilename);
         }
 
         option.setFilenames(resolved);
     }
 
-    private String withDuplicateSuffix(String baseFilename, int count) {
-        return (count == 0) ? baseFilename : (baseFilename + "-" + count);
+    private record FilenameCandidate(TopLevelAsbiepId topLevelAsbiepId, String baseFilename) {
     }
 
     private boolean isSeparateFileReferencesForReusedSchemasEnabled(GenerateExpressionOption option) {
@@ -514,59 +529,21 @@ public class BieGenerateService {
         return copied;
     }
 
-    private String getFilenameByTopLevelAsbiep(TopLevelAsbiepSummaryRecord topLevelAsbiep, GenerateExpressionOption option) {
+    private String getFilenameByTopLevelAsbiep(TopLevelAsbiepSummaryRecord topLevelAsbiep,
+                                               GenerateExpressionOption option,
+                                               ScoreUser requester) {
         Map<TopLevelAsbiepId, String> filenames = option.getFilenames();
         if (filenames != null && filenames.containsKey(topLevelAsbiep.topLevelAsbiepId())) {
             return filenames.get(topLevelAsbiep.topLevelAsbiepId());
         }
+        return getFilenamePattern(option).buildBaseFilename(requester, topLevelAsbiep, option);
+    }
 
-        /*
-         * Issue 566
-         */
-        AsbiepId rootAsbiepId = topLevelAsbiep.asbiepId();
-        Record2<String, ULong> result = dslContext.select(ASBIEP.GUID, ASBIEP.BASED_ASCCP_MANIFEST_ID)
-                .from(ASBIEP)
-                .join(ASCCP_MANIFEST).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
-                .where(and(ASBIEP.ASBIEP_ID
-                                .eq(ULong.valueOf(rootAsbiepId.value())),
-                        ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID
-                                .eq(ULong.valueOf(topLevelAsbiep.topLevelAsbiepId().value()))))
-                .fetchOne();
-
-        String propertyTerm = dslContext.select(ASCCP.PROPERTY_TERM)
-                .from(ASCCP_MANIFEST)
-                .join(ASCCP)
-                .on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
-                .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(result.get(ASBIEP.BASED_ASCCP_MANIFEST_ID)))
-                .fetchOneInto(String.class);
-
-        /*
-         * Issue 1267
-         */
-        StringBuilder sb = new StringBuilder();
-        sb.append(propertyTerm.replaceAll(" ", "-"));
-
-        if (option.isIncludeBusinessContextInFilename()) {
-            BizCtxAssignmentRecord bizCtxAssignmentRecord = dslContext.selectFrom(BIZ_CTX_ASSIGNMENT)
-                    .where(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiep.topLevelAsbiepId().value())))
-                    .fetchAny();
-            BizCtxRecord bizCtxRecord = dslContext.selectFrom(BIZ_CTX)
-                    .where(BIZ_CTX.BIZ_CTX_ID.eq(bizCtxAssignmentRecord.getBizCtxId()))
-                    .fetchOne();
-
-            if (bizCtxRecord != null) {
-                sb.append('-').append(bizCtxRecord.getName().replaceAll("\\s+", ""));
-            }
+    private BieSchemaFilenameStrategy getFilenamePattern(GenerateExpressionOption option) {
+        if (option.getBiePackage() != null) {
+            return biePackageExpressionFilenameStrategy;
         }
-
-        if (option.isIncludeVersionInFilename()) {
-            String version = StringUtils.trim(topLevelAsbiep.version());
-            if (StringUtils.hasLength(version)) {
-                sb.append('-').append(version.replaceAll("\\.", "_"));
-            }
-        }
-
-        return sb.toString();
+        return defaultBieSchemaFilenameStrategy;
     }
 
     private BieGenerateExpression createBieGenerateExpression(GenerateExpressionOption option) {
