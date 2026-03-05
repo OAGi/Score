@@ -23,7 +23,7 @@ import {CreateAsccpDialogComponent} from './create-asccp-dialog/create-asccp-dia
 import {CreateBccpDialogComponent} from './create-bccp-dialog/create-bccp-dialog.component';
 import {MatTableDataSource} from '@angular/material/table';
 import {FormControl} from '@angular/forms';
-import {initFilter, loadBranch, loadLibrary, saveBranch, saveLibrary} from '../../common/utility';
+import {initFilter, loadBranch, loadLibrary, saveAsBlobResponse, saveBranch, saveLibrary} from '../../common/utility';
 import {ReleaseSummary, WorkingRelease} from '../../release-management/domain/release';
 import {OagisComponentType, OagisComponentTypes} from '../domain/core-component-node';
 import {finalize} from 'rxjs/operators';
@@ -33,7 +33,6 @@ import {CreateVerbDialogComponent} from './create-verb-dialog/create-verb-dialog
 import {AboutService} from '../../basis/about/domain/about.service';
 import {TagService} from '../../tag-management/domain/tag.service';
 import {Tag} from '../../tag-management/domain/tag';
-import {saveAs} from 'file-saver';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {NamespaceSummary} from '../../namespace-management/domain/namespace';
 import {WebPageInfoService} from '../../basis/basis.service';
@@ -79,6 +78,10 @@ export class CcListComponent implements OnInit {
   get isBrowseStandardsMode(): boolean {
     // Issue #1700: tenant end-user accounts use the simplified Browse Standards flow.
     return this.isTenantEnabled && this.auth.isEndUser() && !this.auth.isDeveloper() && !this.auth.isAdmin();
+  }
+
+  get canSelectTypesInBrowserMode(): boolean {
+    return this.auth.isDeveloper() || this.auth.isAdmin();
   }
 
   get filterTypes() {
@@ -457,11 +460,16 @@ export class CcListComponent implements OnInit {
   onLibraryChange(library: LibrarySummary) {
     this.loading = true;
     this.request.library = library;
-    this.releaseService.getReleaseSummaryList(this.request.library.libraryId, ['Draft', 'Published']).subscribe(releases => {
-      saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
-      this.initReleases(releases);
-      this.onSearch();
-    });
+    this.releaseService.getReleaseSummaryList(this.request.library.libraryId, ['Draft', 'Published']).subscribe(
+      releases => {
+        saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
+        this.initReleases(releases);
+        this.onSearch();
+      },
+      () => {
+        this.loading = false;
+      }
+    );
   }
 
   onSearch() {
@@ -487,8 +495,12 @@ export class CcListComponent implements OnInit {
       this.request.types = ['ASCCP'];
       this.request.asccpTypes = [...this.browseStandardsAsccpTypes];
     } else if (this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode) {
-      const selectedBrowserTypes = this.visibleFilterTypes.filter(e => e.selected).map(e => e.name);
-      this.request.types = (selectedBrowserTypes.length > 0) ? selectedBrowserTypes : [...this.browserModeTypes];
+      if (!this.canSelectTypesInBrowserMode) {
+        this.request.types = ['ASCCP'];
+      } else {
+        const selectedBrowserTypes = this.visibleFilterTypes.filter(e => e.selected).map(e => e.name);
+        this.request.types = (selectedBrowserTypes.length > 0) ? selectedBrowserTypes : [...this.browserModeTypes];
+      }
       this.request.asccpTypes = [];
     } else {
       this.request.types = this.preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage
@@ -787,18 +799,11 @@ export class CcListComponent implements OnInit {
 
     this.loading = true;
     this.service.exportStandaloneSchemas(this.selection.selected).subscribe(resp => {
-      const blob = new Blob([resp.body], {type: resp.headers.get('Content-Type')});
-      saveAs(blob, this._getFilenameFromContentDisposition(resp));
+      saveAsBlobResponse(resp);
       this.loading = false;
     }, err => {
       this.loading = false;
     });
-  }
-
-  _getFilenameFromContentDisposition(resp) {
-    const contentDisposition = resp.headers.get('Content-Disposition') || '';
-    const matches = /filename=([^;]+)/ig.exec(contentDisposition);
-    return (matches[1] || 'untitled').replace(/\"/gi, '').trim();
   }
 
   hasCreatePermission(): boolean {
@@ -1021,16 +1026,6 @@ export class CcListComponent implements OnInit {
     return this.selection.isSelected(row);
   }
 
-  openDetail(ccList: CcListEntry, $event?) {
-    if (!!$event) {
-      $event.preventDefault();
-      $event.stopPropagation();
-    }
-
-    this.router.navigateByUrl('/core_component/' + this.getRouterLink(ccList));
-    return;
-  }
-
   isInitialRevision(ccList: CcListEntry): boolean {
     return !!ccList && ccList.log.revisionNum === 1;
   }
@@ -1040,7 +1035,7 @@ export class CcListComponent implements OnInit {
       return false;
     }
     switch (action) {
-      case 'BackWIP':
+      case 'WIP':
         return this.selection.selected.filter(e => {
           if (['Draft', 'QA', 'Candidate'].indexOf(e.state) > -1 && e.owner.loginId === this.currentUser) {
             return e;

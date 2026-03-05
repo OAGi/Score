@@ -3,10 +3,9 @@ import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {hashCode} from 'src/app/common/utility';
+import {hashCode, saveAsBlobResponse} from 'src/app/common/utility';
 import {SelectionModel} from '@angular/cdk/collections';
 import {catchError, finalize, map} from 'rxjs/operators';
-import {saveAs} from 'file-saver';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatMultiSort, MatMultiSortTableDataSource, TableData} from 'ngx-mat-multi-sort';
 import {AuthService} from '../../../authentication/auth.service';
@@ -502,20 +501,13 @@ export class BiePackageDetailComponent implements OnInit {
       this.biePackage.biePackageId, {
         schemaExpression: this.schemaExpression
       }, ...topLevelAsbiepIdList).subscribe(resp => {
-      const blob = new Blob([resp.body], {type: resp.headers.get('Content-Type')});
-      saveAs(blob, this._getFilenameFromContentDisposition(resp));
+      saveAsBlobResponse(resp);
 
       this.loading = false;
     }, err => {
       this.loading = false;
       throw err;
     });
-  }
-
-  _getFilenameFromContentDisposition(resp) {
-    const contentDisposition = resp.headers.get('Content-Disposition') || '';
-    const matches = /filename=([^;]+)/ig.exec(contentDisposition);
-    return (matches[1] || 'untitled').replace(/\"/gi, '').trim();
   }
 
   getManifest(): any {

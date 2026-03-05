@@ -7,7 +7,6 @@ import {BieListEntry, BieListRequest} from '../bie-list/domain/bie-list';
 import {BieExpressService} from './domain/bie-express.service';
 import {BieListService} from '../bie-list/domain/bie-list.service';
 import {BieExpressOption} from './domain/generate-expression';
-import {saveAs} from 'file-saver';
 import {MetaHeaderDialogComponent} from './meta-header-dialog/meta-header-dialog.component';
 import {PaginationResponseDialogComponent} from './pagination-response-dialog/pagination-response-dialog.component';
 import {AccountListService} from '../../account-management/domain/account-list.service';
@@ -15,7 +14,7 @@ import {MatDatepicker} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
-import {initFilter, loadBranch, loadLibrary, saveBranch, saveLibrary} from '../../common/utility';
+import {initFilter, loadBranch, loadLibrary, saveAsBlobResponse, saveBranch, saveLibrary} from '../../common/utility';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
@@ -419,9 +418,7 @@ export class BieExpressComponent implements OnInit {
 
     this.loading = true;
     this.service.generate(selectedTopLevelAsbiepIds, this.option).subscribe(resp => {
-
-      const blob = new Blob([resp.body], {type: resp.headers.get('Content-Type')});
-      saveAs(blob, this._getFilenameFromContentDisposition(resp));
+      saveAsBlobResponse(resp);
 
       this.loading = false;
     }, err => {
@@ -448,12 +445,6 @@ export class BieExpressComponent implements OnInit {
       }
     }
     return filename;
-  }
-
-  _getFilenameFromContentDisposition(resp) {
-    const contentDisposition = resp.headers.get('Content-Disposition') || '';
-    const matches = /filename=([^;]+)/ig.exec(contentDisposition);
-    return (matches[1] || 'untitled').replace(/\"/gi, '').trim();
   }
 
   toggleMetaHeaderOption(event, disabled: boolean,

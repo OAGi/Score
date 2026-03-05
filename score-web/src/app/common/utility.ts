@@ -4,6 +4,7 @@ import {FormControl} from '@angular/forms';
 import {Observable, ReplaySubject} from 'rxjs';
 import {UserToken} from '../authentication/domain/auth';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
+import {saveAs} from 'file-saver';
 
 export function base64Encode(str): string {
   return CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(str));
@@ -243,6 +244,26 @@ export function trim(value: string): string {
     return value;
   }
   return value.trim();
+}
+
+export function getFilenameFromContentDisposition(resp): string | undefined {
+  const contentDisposition = resp?.headers?.get('Content-Disposition') || '';
+  const matches = /filename=([^;]+)/ig.exec(contentDisposition);
+  if (!matches || !matches[1]) {
+    return undefined;
+  }
+  const filename = matches[1].replace(/\"/gi, '').trim();
+  return filename || undefined;
+}
+
+export function saveAsBlobResponse(resp): void {
+  const blob = new Blob([resp.body], {type: resp.headers.get('Content-Type')});
+  const filename = getFilenameFromContentDisposition(resp);
+  if (filename) {
+    saveAs(blob, filename);
+  } else {
+    saveAs(blob);
+  }
 }
 
 @Pipe({name: 'unbounded'})

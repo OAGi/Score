@@ -4,12 +4,11 @@ import {FormControl} from '@angular/forms';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
-import {saveAs} from 'file-saver';
 import {ReplaySubject} from 'rxjs';
 import {finalize, switchMap} from 'rxjs/operators';
 import {AuthService} from '../../../authentication/auth.service';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
-import {hashCode} from '../../../common/utility';
+import {hashCode, saveAsBlobResponse} from '../../../common/utility';
 import {ReleaseService} from '../../../release-management/domain/release.service';
 import {ModuleSetReleaseDetails, ModuleSetReleaseListRequest, ModuleSetSummary} from '../../domain/module';
 import {ModuleService} from '../../domain/module.service';
@@ -144,18 +143,11 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
   exportSchemas() {
     this.isUpdating = true;
     this.moduleService.export(this.moduleSetRelease.moduleSetReleaseId).subscribe(resp => {
-      const blob = new Blob([resp.body], {type: resp.headers.get('Content-Type')});
-      saveAs(blob, this._getFilenameFromContentDisposition(resp));
+      saveAsBlobResponse(resp);
       this.isUpdating = false;
     }, err => {
       this.isUpdating = false;
     });
-  }
-
-  _getFilenameFromContentDisposition(resp) {
-    const contentDisposition = resp.headers.get('Content-Disposition') || '';
-    const matches = /filename=([^;]+)/ig.exec(contentDisposition);
-    return (matches[1] || 'untitled').replace(/\"/gi, '').trim();
   }
 
   @HostListener('document:keydown', ['$event'])

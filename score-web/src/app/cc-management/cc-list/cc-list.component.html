@@ -43,7 +43,7 @@
       </button>
       <button mat-icon-button class="ml-2" matTooltip="Back to WIP"
               *ngIf="!browserMode"
-              [hidden]="!canToolbarAction('BackWIP')"
+              [hidden]="!canToolbarAction('WIP')"
               (click)="multipleUpdate('WIP')">
         <mat-icon>arrow_back</mat-icon>
       </button>
@@ -323,6 +323,7 @@
           </score-column-selector>
 
           <score-column-selector class="pr-2"
+                                 *ngIf="!browserMode || canSelectTypesInBrowserMode"
                                  [title]="'Types'"
                                  [columns]="visibleFilterTypes"
                                  [draggable]="false"
