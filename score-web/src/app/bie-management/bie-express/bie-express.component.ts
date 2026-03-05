@@ -562,6 +562,7 @@ export class BieExpressComponent implements OnInit {
       this.option.includeWhoColumns = false;
       this.option.basedCcMetaData = false;
     }
+
   }
 
   bieAnnotationChange() {
@@ -581,6 +582,9 @@ export class BieExpressComponent implements OnInit {
   }
 
   isSeparateFileReferencesForReusedSchemasDisabled(): boolean {
+    if (this.option.expressionOption === 'XML') {
+      return false;
+    }
     return this.option.expressionOption !== 'JSON'
       || this.option.expressionVersion === 'Draft-04';
   }

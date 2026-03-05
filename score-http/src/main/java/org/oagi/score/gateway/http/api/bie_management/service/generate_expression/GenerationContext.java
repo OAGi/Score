@@ -84,6 +84,12 @@ public class GenerationContext implements InitializingBean, CcDocument {
     private final List<TopLevelAsbiepSummaryRecord> topLevelAsbieps;
     private Map<TopLevelAsbiepId, TopLevelAsbiepSummaryRecord> topLevelAsbiepMap;
     private Set<TopLevelAsbiepSummaryRecord> refTopLevelAsbiepSet;
+    /**
+     * Runtime-only per-top-level reference metadata populated by generation services.
+     * Expression implementations should read this map via {@link #getSchemaReferenceInfo(TopLevelAsbiepId)}
+     * instead of keeping their own mutable cross-file flags.
+     */
+    private final Map<TopLevelAsbiepId, SchemaReferenceInfo> schemaReferenceInfoMap = new LinkedHashMap<>();
 
     @Autowired
     private RepositoryFactory repositoryFactory;
@@ -290,6 +296,7 @@ public class GenerationContext implements InitializingBean, CcDocument {
         if (topLevelAsbieps == null) {
             throw new IllegalStateException("'topLevelAsbieps' parameter must not be null.");
         }
+        schemaReferenceInfoMap.clear();
 
         Set<ReleaseId> releaseIdSet = topLevelAsbieps.stream().map(e -> e.release().releaseId()).collect(Collectors.toSet());
 
@@ -320,6 +327,31 @@ public class GenerationContext implements InitializingBean, CcDocument {
 
     public Set<TopLevelAsbiepSummaryRecord> getRefTopLevelAsbiepSet() {
         return (refTopLevelAsbiepSet != null) ? refTopLevelAsbiepSet : Collections.emptySet();
+    }
+
+    /**
+     * Registers runtime reference metadata for a generated top-level ASBIEP schema.
+     *
+     * @param schemaReferenceInfo reference metadata to cache; ignored when null or missing key ID
+     */
+    public void setSchemaReferenceInfo(SchemaReferenceInfo schemaReferenceInfo) {
+        if (schemaReferenceInfo == null || schemaReferenceInfo.getCurrentTopLevelAsbiepId() == null) {
+            return;
+        }
+        schemaReferenceInfoMap.put(schemaReferenceInfo.getCurrentTopLevelAsbiepId(), schemaReferenceInfo);
+    }
+
+    /**
+     * Retrieves reference metadata for a generated top-level ASBIEP schema.
+     *
+     * @param topLevelAsbiepId top-level ASBIEP ID
+     * @return cached metadata, or {@link SchemaReferenceInfo#empty()} when absent
+     */
+    public SchemaReferenceInfo getSchemaReferenceInfo(TopLevelAsbiepId topLevelAsbiepId) {
+        if (topLevelAsbiepId == null) {
+            return SchemaReferenceInfo.empty();
+        }
+        return schemaReferenceInfoMap.getOrDefault(topLevelAsbiepId, SchemaReferenceInfo.empty());
     }
 
     private void init(Collection<TopLevelAsbiepId> topLevelAsbiepIds, Collection<ReleaseId> releaseIds) {

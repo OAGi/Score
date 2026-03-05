@@ -38,7 +38,7 @@ public class BieGenerateService {
 
     private BieQueryRepository query(ScoreUser requester) {
         return repositoryFactory.bieQueryRepository(requester);
-    };
+    }
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -155,6 +155,11 @@ public class BieGenerateService {
         }
 
         for (TopLevelAsbiepSummaryRecord topLevelAsbiep : primaryTopLevelAsbieps) {
+            generationContext.setSchemaReferenceInfo(new SchemaReferenceInfo(
+                    topLevelAsbiep.topLevelAsbiepId(),
+                    false,
+                    Collections.emptySet(),
+                    toTopLevelAsbiepIdSet(generationContext.getRefTopLevelAsbiepSet())));
             generateExpression.generate(requester, topLevelAsbiep, generationContext, option);
         }
 
@@ -278,6 +283,11 @@ public class BieGenerateService {
                 throw new BieGenerateFailureException("Unexpected error occurs during initialization of the expression processor.");
             }
 
+            generationContext.setSchemaReferenceInfo(new SchemaReferenceInfo(
+                    topLevelAsbiep.topLevelAsbiepId(),
+                    false,
+                    Collections.emptySet(),
+                    toTopLevelAsbiepIdSet(generationContext.getRefTopLevelAsbiepSet())));
             generateExpression.generate(requester, topLevelAsbiep, generationContext, option);
             String filename = getFilenameByTopLevelAsbiep(topLevelAsbiep, option, requester);
 
@@ -341,17 +351,16 @@ public class BieGenerateService {
     /**
      * Recursively generates standalone schema files for reused top-level ASBIEPs.
      *
-     * This method is used for JSON generation when "Separate file references for reused schemas"
-     * is enabled (#1713). The goal is to produce external reference targets that are independently
-     * valid schema documents (with their own root and local {@code #/$defs} closure), instead of
-     * partially extracted fragments.
+     * When split-reference mode is enabled, this method creates external reference targets for
+     * reused top-level ASBIEPs. JSON referenced schemas are generated as self-contained files,
+     * while XML referenced schemas keep split-reference mode so namespace-based
+     * {@code xsd:import}/{@code xsd:include} can be emitted consistently.
      *
      * Generation flow:
      * 1) Seed a pending queue with initial referenced top-level ASBIEPs.
      * 2) Pop one pending item at a time and skip if it was already processed.
      * 3) Optionally skip items that are in {@code excludedTopLevelAsbiepIds}.
-     * 4) Create a copied option with split-reference mode disabled so each referenced file is
-     *    generated as a self-contained schema.
+     * 4) Create a copied option adjusted for referenced-file generation.
      * 5) Build a dedicated {@link GenerationContext} for that referenced top-level ASBIEP and
      *    generate its file using the same filename mapping strategy as the target schema.
      * 6) Discover nested reused top-level ASBIEPs from that dedicated context and enqueue them.
@@ -378,8 +387,10 @@ public class BieGenerateService {
             Set<TopLevelAsbiepId> excludedTopLevelAsbiepIds) throws BieGenerateFailureException {
 
         Map<TopLevelAsbiepId, TopLevelAsbiepSummaryRecord> pending = new LinkedHashMap<>();
+        Map<TopLevelAsbiepId, Set<TopLevelAsbiepId>> referredByTopLevelAsbiepIds = new LinkedHashMap<>();
         for (TopLevelAsbiepSummaryRecord refTopLevelAsbiep : initialReferences) {
             pending.put(refTopLevelAsbiep.topLevelAsbiepId(), refTopLevelAsbiep);
+            referredByTopLevelAsbiepIds.putIfAbsent(refTopLevelAsbiep.topLevelAsbiepId(), new LinkedHashSet<>());
         }
 
         Set<TopLevelAsbiepId> processed = new HashSet<>();
@@ -409,6 +420,11 @@ public class BieGenerateService {
             } catch (Exception e) {
                 throw new BieGenerateFailureException("Unexpected error occurs during initialization of the expression processor.");
             }
+            referencedGenerationContext.setSchemaReferenceInfo(new SchemaReferenceInfo(
+                    topLevelAsbiepId,
+                    true,
+                    referredByTopLevelAsbiepIds.getOrDefault(topLevelAsbiepId, Collections.emptySet()),
+                    toTopLevelAsbiepIdSet(referencedGenerationContext.getRefTopLevelAsbiepSet())));
 
             referencedGenerateExpression.generate(
                     requester, refTopLevelAsbiep, referencedGenerationContext, referencedOption);
@@ -421,8 +437,12 @@ public class BieGenerateService {
 
             processed.add(topLevelAsbiepId);
             for (TopLevelAsbiepSummaryRecord nestedRefTopLevelAsbiep : referencedGenerationContext.getRefTopLevelAsbiepSet()) {
-                if (!processed.contains(nestedRefTopLevelAsbiep.topLevelAsbiepId())) {
-                    pending.put(nestedRefTopLevelAsbiep.topLevelAsbiepId(), nestedRefTopLevelAsbiep);
+                TopLevelAsbiepId nestedTopLevelAsbiepId = nestedRefTopLevelAsbiep.topLevelAsbiepId();
+                referredByTopLevelAsbiepIds
+                        .computeIfAbsent(nestedTopLevelAsbiepId, key -> new LinkedHashSet<>())
+                        .add(topLevelAsbiepId);
+                if (!processed.contains(nestedTopLevelAsbiepId)) {
+                    pending.put(nestedTopLevelAsbiepId, nestedRefTopLevelAsbiep);
                 }
             }
         }
@@ -436,6 +456,15 @@ public class BieGenerateService {
         List<TopLevelAsbiepSummaryRecord> all = new java.util.ArrayList<>(topLevelAsbieps);
         all.addAll(generationContext.getRefTopLevelAsbiepSet());
         return all;
+    }
+
+    private Set<TopLevelAsbiepId> toTopLevelAsbiepIdSet(Set<TopLevelAsbiepSummaryRecord> topLevelAsbieps) {
+        if (topLevelAsbieps == null || topLevelAsbieps.isEmpty()) {
+            return Collections.emptySet();
+        }
+        return topLevelAsbieps.stream()
+                .map(TopLevelAsbiepSummaryRecord::topLevelAsbiepId)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     private void ensureExpressionFilenames(List<TopLevelAsbiepSummaryRecord> topLevelAsbieps,
@@ -495,12 +524,27 @@ public class BieGenerateService {
     private record FilenameCandidate(TopLevelAsbiepId topLevelAsbiepId, String baseFilename) {
     }
 
+    /**
+     * Returns whether split reused-schema references are effectively enabled for the current
+     * expression option.
+     * <p>
+     * Effective behavior:
+     * <ul>
+     *   <li>XML: enabled when option flag is true</li>
+     *   <li>JSON: enabled when option flag is true and version is not Draft-04</li>
+     * </ul>
+     */
     private boolean isSeparateFileReferencesForReusedSchemasEnabled(GenerateExpressionOption option) {
         String expressionOption = option.getExpressionOption();
 
+        if (!option.isSeparateFileReferencesForReusedSchemas()) {
+            return false;
+        }
+        if ("XML".equalsIgnoreCase(expressionOption)) {
+            return true;
+        }
         return "JSON".equalsIgnoreCase(expressionOption)
-                && !isJsonDraft04Version(option.getExpressionVersion())
-                && option.isSeparateFileReferencesForReusedSchemas();
+                && !isJsonDraft04Version(option.getExpressionVersion());
     }
 
     private boolean isJsonDraft04Version(String expressionVersion) {
@@ -513,10 +557,20 @@ public class BieGenerateService {
                 || "DRAFT04".equals(normalizedExpressionVersion);
     }
 
+    /**
+     * Clones user option for referenced-schema generation.
+     * <p>
+     * Referenced files are generated as dependency targets, so target-only output wrappers
+     * (array/meta-header/pagination response) must be disabled. XML keeps split-reference mode
+     * enabled to continue emitting include/import directives consistently.
+     */
     private GenerateExpressionOption cloneOptionForReferencedSchema(GenerateExpressionOption option) {
         GenerateExpressionOption copied = new GenerateExpressionOption();
         BeanUtils.copyProperties(option, copied);
-        copied.setSeparateFileReferencesForReusedSchemas(false);
+        // Keep XML split-reference behavior for referenced files so namespace-based imports remain consistent.
+        if (!"XML".equalsIgnoreCase(option.getExpressionOption())) {
+            copied.setSeparateFileReferencesForReusedSchemas(false);
+        }
         // Apply array wrapper only to direct target schemas, not reused referenced schemas.
         copied.setArrayForJsonExpression(false);
         // Apply meta-header only to direct target schemas, not reused referenced schemas.

@@ -218,7 +218,7 @@ export class BiePackageDetailComponent implements OnInit {
     this.option = new BieExpressOption();
     this.option.bieDefinition = true;
     this.option.expressionOption = 'XML';
-    this.option.expressionVersion = '2020-12';
+    this.option.expressionVersion = '';
     this.option.arrayForJsonExpression = false;
     this.option.packageOption = 'EACH';
     this.option.separateFileReferencesForReusedSchemas = true;
@@ -512,7 +512,13 @@ export class BiePackageDetailComponent implements OnInit {
       topLevelAsbiepIdList = selectedBieLists.map(e => e.topLevelAsbiepId);
     }
 
-    this.option.expressionVersion = '2020-12';
+    // Package export uses JSON Schema 2020-12 only when JSON is selected.
+    if (this.option.expressionOption === 'JSON') {
+      this.option.expressionVersion = '2020-12';
+    } else {
+      this.option.expressionVersion = '';
+    }
+    // Package export is intentionally fixed to per-file mode with split reused-schema refs.
     this.option.packageOption = 'EACH';
     this.option.arrayForJsonExpression = false;
     this.option.separateFileReferencesForReusedSchemas = true;
@@ -633,17 +639,13 @@ export class BiePackageDetailComponent implements OnInit {
   }
 
   expressionOptionChange() {
+    // Keep package export behavior deterministic regardless of expression switch.
     this.option.packageOption = 'EACH';
     this.option.separateFileReferencesForReusedSchemas = true;
-    this.option.expressionVersion = '2020-12';
+    this.option.expressionVersion = (this.option.expressionOption === 'JSON') ? '2020-12' : '';
     this.option.arrayForJsonExpression = false;
     this.option.includeBusinessContextInFilename = true;
     this.option.includeVersionInFilename = true;
-
-    if (this.option.expressionOption === 'JSON') {
-      this.option.expressionVersion = '2020-12';
-      this.option.arrayForJsonExpression = false;
-    }
 
     if (this.option.expressionOption !== 'XML') {
       this.option.bieCctsMetaData = false;

@@ -393,6 +393,12 @@
                 <mat-radio-button class="option-radio-button" value="XML" id="expr-XML">
                   XML Schema
                 </mat-radio-button>
+                <div class="generate-option dependent-option" *ngIf="option.expressionOption === 'XML'">
+                  <mat-checkbox [(ngModel)]="option.separateFileReferencesForReusedSchemas"
+                                [disabled]="isSeparateFileReferencesForReusedSchemasDisabled()">
+                    <span class="{{ isSeparateFileReferencesForReusedSchemasDisabled() ? 'toggle-disabled' : '' }}">Separate file references for reused schemas</span>
+                  </mat-checkbox>
+                </div>
                 <mat-radio-button class="option-radio-button" value="JSON" id="expr-JSON">
                   JSON Schema
                 </mat-radio-button>

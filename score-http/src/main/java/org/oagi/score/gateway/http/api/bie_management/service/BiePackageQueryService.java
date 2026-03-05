@@ -93,25 +93,17 @@ public class BiePackageQueryService {
         if (!hasLength(option.getExpressionOption())) {
             option.setExpressionOption("XML");
         }
-        if (!hasLength(option.getPackageOption())) {
-            option.setPackageOption("EACH");
-        }
+        // BIE package export always generates each schema file with split reused-schema references.
+        option.setPackageOption("EACH");
+        option.setSeparateFileReferencesForReusedSchemas(true);
         // #1711: Package export filenames always use package pattern metadata.
         option.setIncludeBusinessContextInFilename(true);
         option.setIncludeVersionInFilename(true);
         option.setFilenames(Collections.emptyMap());
         option.setBiePackage(biePackage);
 
-        Map<TopLevelAsbiepId, File> result;
-        boolean useEachPackaging = "EACH".equalsIgnoreCase(option.getPackageOption())
-                || isSeparateFileReferencesForReusedSchemasEnabled(option);
-        if (useEachPackaging) {
-            result = bieGenerateService.generateSchemaForEach(requester, topLevelAsbiepList, option);
-        } else {
-            File generated = bieGenerateService.generateSchemaForAll(requester, topLevelAsbiepList, option);
-            result = new LinkedHashMap<>();
-            result.put(topLevelAsbiepList.get(0).topLevelAsbiepId(), generated);
-        }
+        Map<TopLevelAsbiepId, File> result =
+                bieGenerateService.generateSchemaForEach(requester, topLevelAsbiepList, option);
         BiePackageManifestResponse biePackageManifestResponse =
                 biePackageManifestService.getBiePackageManifest(requester, biePackageId, pathDelimiter);
 
@@ -157,22 +149,6 @@ public class BiePackageQueryService {
 
         String contentType = "application/zip";
         return new BieGenerateExpressionResult(file.getName(), contentType, file);
-    }
-
-    private boolean isSeparateFileReferencesForReusedSchemasEnabled(GenerateExpressionOption option) {
-        if (!"JSON".equalsIgnoreCase(option.getExpressionOption())) {
-            return false;
-        }
-        if (!option.isSeparateFileReferencesForReusedSchemas()) {
-            return false;
-        }
-        String expressionVersion = option.getExpressionVersion();
-        if (!hasLength(expressionVersion)) {
-            return true;
-        }
-        String normalizedExpressionVersion = expressionVersion.trim().toUpperCase();
-        return !"DRAFT-04".equals(normalizedExpressionVersion)
-                && !"DRAFT04".equals(normalizedExpressionVersion);
     }
 
     public ResultAndCount<BieListEntryRecord> getBieListInBiePackage(
