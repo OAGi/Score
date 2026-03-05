@@ -363,7 +363,6 @@
                   <th mat-header-cell *matHeaderCellDef> Business Contexts</th>
                   <td mat-cell *matCellDef="let element">
                     <ng-container *ngFor="let businessContext of element.businessContextList; let i = index">
-                      <span *ngIf="i > 0">, </span>
                       <span class="businessContext word-break-all">
                         <a target="_blank" rel="noopener noreferrer"
                            routerLink="/context_management/business_context/{{ businessContext.businessContextId }}">
