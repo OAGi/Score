@@ -854,14 +854,8 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
     }
 
     private String resolveTopLevelElementName(AsccpSummaryRecord asccp, TopLevelAsbiepId topLevelAsbiepId) {
-        String baseName = resolveTopLevelElementName(asccp);
-        if (!isSeparateFileReferencesForReusedSchemasEnabled()
-                || !isReferencedSchemaFile(topLevelAsbiepId)
-                || topLevelAsbiepId == null) {
-            return baseName;
-        }
-        // Referenced schemas must remain distinguishable when same namespace has same element name.
-        return baseName + "_" + topLevelAsbiepId.value();
+        // Keep top-level element (ASCCP property-term-derived) name stable even for reused/referenced files.
+        return resolveTopLevelElementName(asccp);
     }
 
     /**

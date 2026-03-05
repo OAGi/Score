@@ -8,7 +8,6 @@ import org.oagi.score.gateway.http.api.bie_management.repository.BieQueryReposit
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.BieSchemaFilenameStrategy;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.BiePackageExpressionFilenameStrategy;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.DefaultBieSchemaFilenameStrategy;
-import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.DuplicateHandler;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.*;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
@@ -471,7 +470,6 @@ public class BieGenerateService {
                                            GenerateExpressionOption option,
                                            ScoreUser requester) {
         BieSchemaFilenameStrategy filenamePattern = getFilenamePattern(option);
-        DuplicateHandler duplicateHandler = filenamePattern.duplicateHandler();
 
         Map<TopLevelAsbiepId, String> existing = option.getFilenames();
         List<FilenameCandidate> candidates = new ArrayList<>();
@@ -512,7 +510,7 @@ public class BieGenerateService {
         for (FilenameCandidate candidate : candidates) {
             int occurrence = occurrenceByBaseFilename.getOrDefault(candidate.baseFilename(), 0);
             int totalOccurrences = totalByBaseFilename.getOrDefault(candidate.baseFilename(), 1);
-            String resolvedFilename = duplicateHandler.resolve(
+            String resolvedFilename = filenamePattern.resolveDuplicateFilename(
                     candidate.baseFilename(), candidate.topLevelAsbiepId(), occurrence, totalOccurrences);
             occurrenceByBaseFilename.put(candidate.baseFilename(), occurrence + 1);
             resolved.put(candidate.topLevelAsbiepId(), resolvedFilename);
