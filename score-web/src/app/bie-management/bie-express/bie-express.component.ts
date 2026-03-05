@@ -185,6 +185,8 @@ export class BieExpressComponent implements OnInit {
   preferencesInfo: PreferencesInfo;
 
   option: BieExpressOption;
+  jsonSchemaVersions: string[] = ['2020-12', 'Draft-04'];
+  openApiVersions: string[] = ['3.1', '3.0'];
   openApiFormats: string[] = ['YAML', 'JSON'];
   odfFormats: string[] = ['ODS', 'FODS', 'XLSX'];
 
@@ -216,6 +218,9 @@ export class BieExpressComponent implements OnInit {
     this.option = new BieExpressOption();
     this.option.bieDefinition = true;
     this.option.expressionOption = 'XML';
+    // Default JSON Schema expression version is '2020-12'.
+    this.option.expressionVersion = '2020-12';
+    this.option.separateFileReferencesForReusedSchemas = false;
     this.option.packageOption = 'ALL';
     // Default OpenAPI expression format is 'YAML'.
     this.option.openAPIExpressionFormat = 'YAML';
@@ -428,7 +433,7 @@ export class BieExpressComponent implements OnInit {
 
   getFilename(topLevelAsbiepId: number): string {
     const topLevelAsbiep = this.dataSource.data.filter(e => e.topLevelAsbiepId === topLevelAsbiepId)[0];
-    const separator = '';
+    const separator = '-';
 
     let filename = topLevelAsbiep.propertyTerm.trim().split(' ').join(separator);
     if (this.option.includeBusinessContextInFilename) {
@@ -528,11 +533,21 @@ export class BieExpressComponent implements OnInit {
   }
 
   expressionOptionChange() {
+    if (this.option.expressionOption === 'OPENAPI3') {
+      if (!this.openApiVersions.includes(this.option.expressionVersion)) {
+        this.option.expressionVersion = '3.1';
+      }
+    }
+
     if (this.option.expressionOption === 'ODF' || this.option.expressionOption === 'AVRO') {
       this.option.packageOption = 'EACH';
     }
 
     if (this.option.expressionOption === 'JSON') {
+      if (!this.jsonSchemaVersions.includes(this.option.expressionVersion)) {
+        this.option.expressionVersion = '2020-12';
+      }
+      this.onJsonSchemaVersionChange();
       if (this.option.includeMetaHeaderForJson || this.option.includePaginationResponseForJson) {
         this.option.packageOption = 'EACH';
       }
@@ -557,5 +572,16 @@ export class BieExpressComponent implements OnInit {
     if (!this.option.bieOagiScoreMetaData) {
       this.option.includeWhoColumns = false;
     }
+  }
+
+  onJsonSchemaVersionChange() {
+    if (this.isSeparateFileReferencesForReusedSchemasDisabled()) {
+      this.option.separateFileReferencesForReusedSchemas = false;
+    }
+  }
+
+  isSeparateFileReferencesForReusedSchemasDisabled(): boolean {
+    return this.option.expressionOption !== 'JSON'
+      || this.option.expressionVersion === 'Draft-04';
   }
 }

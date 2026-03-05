@@ -15,12 +15,14 @@ export class BieExpressOption {
   basedCcMetaData: boolean;
 
   expressionOption: string;
+  expressionVersion: string;
   packageOption: string;
 
   includeBusinessContextInFilename: boolean;
   includeVersionInFilename: boolean;
 
   arrayForJsonExpression: boolean;
+  separateFileReferencesForReusedSchemas: boolean;
   includeMetaHeaderForJson: boolean;
   metaHeaderTopLevelAsbiepId: number;
   includePaginationResponseForJson: boolean;

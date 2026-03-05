@@ -23,6 +23,7 @@ public class GenerateExpressionOption {
     private boolean basedCcMetaData;
 
     private String expressionOption;
+    private String expressionVersion;
     private String packageOption;
     // Issue #1615
     private BiePackageSummaryRecord biePackage;
@@ -31,6 +32,7 @@ public class GenerateExpressionOption {
     private boolean includeVersionInFilename;
 
     private boolean arrayForJsonExpression;
+    private boolean separateFileReferencesForReusedSchemas;
     private boolean includeMetaHeaderForJson;
     private TopLevelAsbiepId metaHeaderTopLevelAsbiepId;
     private boolean includePaginationResponseForJson;

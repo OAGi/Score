@@ -82,7 +82,7 @@
     <div class="loading-container" *ngIf="loading">
       <mat-spinner [diameter]="40"></mat-spinner>
     </div>
-    <mat-card-header class="align-items-baseline">
+    <mat-card-header class="align-items-baseline pt-0">
       <mat-toolbar class="bg-white p-0" style="box-shadow: none;">
         <span class="title">BIE List</span>
         <div style="padding: 8px 12px 8px 24px;">
@@ -104,14 +104,10 @@
             <mat-icon>delete</mat-icon>
             Remove
           </button>
-          <button mat-raised-button class="mr-2" color="primary" (click)="generate()"
-                  [hidden]="table.dataSource.data.length == 0">
-            Generate
-          </button>
         </div>
       </mat-toolbar>
     </mat-card-header>
-    <mat-card-content class="mat-card-container">
+    <mat-card-content class="mat-card-container mb-4">
       <div class="table-container">
         <div class="d-flex">
           <mat-multi-sort-table-settings [tableData]="table" [closeDialogOnChoice]="false">
@@ -227,14 +223,12 @@
               <th mat-header-cell *matHeaderCellDef
                   score-table-column-resize [defaultWidth]="width('Business Contexts')" (onResize)="onResizeWidth($event)"> Business Contexts</th>
               <td mat-cell *matCellDef="let element">
-                <ng-container *ngFor="let businessContext of element.businessContextList">
-                <span class="businessContext word-break-all">
-                  <a target="_blank" rel="noopener noreferrer"
-                     routerLink="/context_management/business_context/{{ businessContext.businessContextId }}">
+                <mat-select [(ngModel)]="businessContextSelection[element.topLevelAsbiepId]"
+                            (click)="$event.stopPropagation()">
+                  <mat-option *ngFor="let businessContext of element.businessContextList" [value]="businessContext">
                     <span class="word-break-all">{{ businessContext.name }}</span>
-                  </a>
-                </span>
-                </ng-container>
+                  </mat-option>
+                </mat-select>
               </td>
             </ng-container>
 
@@ -287,6 +281,94 @@
             [pageSizeOptions]="[10, 25, 50]"
             (page)="onPageChange($event)"
             showFirstLastButtons></mat-paginator>
+        </div>
+      </div>
+    </mat-card-content>
+    <mat-card-content class="mat-card-container mt-4">
+      <div class="row">
+        <div class="col-md-4 col-sm-12">
+          <span class="option-header">Select annotation to generate for BIEs</span>
+          <div class="option-body">
+            <div class="generate-option">
+              <mat-checkbox [(ngModel)]="option.bieDefinition">
+                BIE Definition
+              </mat-checkbox>
+            </div>
+            <div class="generate-option">
+              <mat-checkbox [(ngModel)]="option.bieCctsMetaData"
+                            [disabled]="option.expressionOption !== 'XML'"
+                            (change)="bieAnnotationChange()">
+                <span class="{{ (option.expressionOption !== 'XML') ? 'toggle-disabled' : '' }}">BIE CCTS Meta Data</span>
+              </mat-checkbox>
+            </div>
+            <div class="generate-option dependent-option">
+              <mat-checkbox [(ngModel)]="option.includeCctsDefinitionTag"
+                            [disabled]="option.expressionOption !== 'XML' || option.bieCctsMetaData !== true">
+                <span
+                  class="{{ (option.expressionOption !== 'XML' || option.bieCctsMetaData !== true) ? 'toggle-disabled' : '' }}">Include CCTS_Definition Tag</span>
+              </mat-checkbox>
+            </div>
+            <div class="generate-option">
+              <mat-checkbox [(ngModel)]="option.bieGuid"
+                            [disabled]="option.expressionOption !== 'XML'">
+                <span class="{{ (option.expressionOption !== 'XML') ? 'toggle-disabled' : '' }}">BIE GUID</span>
+              </mat-checkbox>
+            </div>
+            <div class="generate-option">
+              <mat-checkbox [(ngModel)]="option.businessContext"
+                            [disabled]="option.expressionOption !== 'XML'">
+                <span class="{{ (option.expressionOption !== 'XML') ? 'toggle-disabled' : '' }}">Business Context</span>
+              </mat-checkbox>
+            </div>
+            <div class="generate-option">
+              <mat-checkbox [(ngModel)]="option.bieOagiScoreMetaData"
+                            [disabled]="option.expressionOption !== 'XML'"
+                            (change)="bieAnnotationChange()">
+                <span class="{{ (option.expressionOption !== 'XML') ? 'toggle-disabled' : '' }}">BIE OAGi/connectCenter Meta Data</span>
+              </mat-checkbox>
+            </div>
+            <div class="generate-option dependent-option">
+              <mat-checkbox [(ngModel)]="option.includeWhoColumns"
+                            [disabled]="option.expressionOption !== 'XML' || option.bieOagiScoreMetaData !== true">
+                <span
+                  class="{{ (option.expressionOption !== 'XML' || option.bieOagiScoreMetaData !== true) ? 'toggle-disabled' : '' }}">Include WHO Columns</span>
+              </mat-checkbox>
+            </div>
+            <div class="generate-option">
+              <mat-checkbox [(ngModel)]="option.basedCcMetaData"
+                            [disabled]="option.expressionOption !== 'XML'">
+                <span class="{{ (option.expressionOption !== 'XML') ? 'toggle-disabled' : '' }}">Based CC Meta Data</span>
+              </mat-checkbox>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 col-sm-12">
+          <span class="option-header">Select an expression</span>
+          <div class="option-body">
+            <mat-radio-group class="option-radio-group" [(ngModel)]="option.expressionOption"
+                             (change)="expressionOptionChange()">
+              <mat-radio-button class="option-radio-button" value="XML">
+                XML Schema
+              </mat-radio-button>
+              <mat-radio-button class="option-radio-button" value="JSON">
+                JSON Schema
+              </mat-radio-button>
+            </mat-radio-group>
+          </div>
+        </div>
+
+        <div class="col-md-4 col-sm-12">
+          <!--
+          <span class="option-header">Generate</span>
+          -->
+          <div class="option-body">
+            <div class="actions">
+              <button mat-raised-button class="mr-2" color="primary" (click)="generate()"
+                      [hidden]="table.dataSource.data.length == 0">Generate
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </mat-card-content>

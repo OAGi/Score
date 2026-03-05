@@ -1,4 +1,38 @@
 
+.option-header {
+  border-bottom: 1px solid #e5e5e5;
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+  display: inline-block;
+}
+
+.option-body {
+  padding-top: 0;
+}
+
+.toggle-disabled {
+  text-shadow: 3px 3px 2px rgba(150, 150, 150, 0.5);
+  color: rgba(102, 102, 102, 0.5);
+}
+
+.generate-option {
+  padding: 0;
+}
+
+.dependent-option {
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.option-radio-group {
+  display: inline-flex;
+  flex-direction: column;
+}
+
+.option-radio-button {
+  margin: 0;
+}
 
 .mat-column-state {
   width: 100px;
@@ -33,4 +67,23 @@
 .bie-source, .bie-based {
   font-size: 11px !important;
   color: #767676 !important;
+}
+
+/* Keep mat-table columns width-driven by header resize instead of content-driven auto layout. */
+:host ::ng-deep .table-wrapper table[mat-table] {
+  table-layout: fixed;
+  width: 100%;
+}
+
+/* Let Business Contexts mat-select follow column width and shrink when resized narrower. */
+:host ::ng-deep .mat-column-businessContexts .mat-mdc-select {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Truncate long selected context names so they do not force the column to expand. */
+:host ::ng-deep .mat-column-businessContexts .mat-mdc-select-min-line {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
