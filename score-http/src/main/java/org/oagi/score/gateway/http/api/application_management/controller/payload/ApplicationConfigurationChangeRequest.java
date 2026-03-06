@@ -17,6 +17,8 @@ public class ApplicationConfigurationChangeRequest {
 
     private Boolean functionsRequiringEmailTransmissionEnabled;
 
+    private Boolean browseStandardModeEnabled;
+
     // General
     private Map<String, String> keyValueMap = new HashMap<>();
 

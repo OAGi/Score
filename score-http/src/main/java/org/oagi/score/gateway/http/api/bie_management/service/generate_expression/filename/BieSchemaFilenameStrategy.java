@@ -2,7 +2,6 @@ package org.oagi.score.gateway.http.api.bie_management.service.generate_expressi
 
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummaryRecord;
-import org.oagi.score.gateway.http.api.bie_management.model.expression.GenerateExpressionOption;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 
 /**
@@ -15,12 +14,10 @@ public interface BieSchemaFilenameStrategy {
      *
      * @param requester      current user context used by repository lookups
      * @param topLevelAsbiep target top-level ASBIEP
-     * @param option         generation options that affect filename composition
      * @return base filename without file extension
      */
     String buildBaseFilename(ScoreUser requester,
-                             TopLevelAsbiepSummaryRecord topLevelAsbiep,
-                             GenerateExpressionOption option);
+                             TopLevelAsbiepSummaryRecord topLevelAsbiep);
 
     String resolveDuplicateFilename(String baseFilename,
                                     TopLevelAsbiepId topLevelAsbiepId,

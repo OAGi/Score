@@ -4,10 +4,10 @@ import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.expression.BieGenerateExpressionResult;
 import org.oagi.score.gateway.http.api.bie_management.model.expression.GenerateExpressionOption;
+import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
 import org.oagi.score.gateway.http.api.bie_management.repository.BieQueryRepository;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.BieSchemaFilenameStrategy;
-import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.BiePackageExpressionFilenameStrategy;
-import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.DefaultBieSchemaFilenameStrategy;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.ExpressionBasedFilenameStrategy;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.*;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
@@ -27,7 +27,18 @@ import java.util.stream.Collectors;
 
 import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.camelCase;
 import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.convertIdentifierToId;
+import static org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService.BIE_PACKAGE_SCHEMA_FILENAME_EXPRESSION_CONFIG_PARAM_NAME;
+import static org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService.BIE_SCHEMA_FILENAME_EXPRESSION_CONFIG_PARAM_NAME;
 
+/**
+ * Coordinates BIE schema generation for selected top-level ASBIEPs.
+ * <p>
+ * This service orchestrates:
+ * - expression engine selection (XML/JSON/OpenAPI/ODF/AVRO),
+ * - package mode routing ({@code ALL} vs {@code EACH}),
+ * - referenced-schema split generation,
+ * - deterministic filename resolution (including duplicate handling).
+ */
 @Service
 @Transactional(readOnly = true)
 public class BieGenerateService {
@@ -43,11 +54,19 @@ public class BieGenerateService {
     private ApplicationContext applicationContext;
 
     @Autowired
-    private DefaultBieSchemaFilenameStrategy defaultBieSchemaFilenameStrategy;
+    private ApplicationConfigurationService applicationConfigurationService;
 
-    @Autowired
-    private BiePackageExpressionFilenameStrategy biePackageExpressionFilenameStrategy;
-
+    /**
+     * Generates schema output for the provided top-level ASBIEP IDs.
+     * <p>
+     * IDs are resolved to summaries first, then delegated to {@link #generateSchema(ScoreUser, List, GenerateExpressionOption)}.
+     *
+     * @param requester caller context
+     * @param topLevelAsbiepIds selected top-level ASBIEP IDs
+     * @param option generation options
+     * @return generated file result with content type metadata
+     * @throws BieGenerateFailureException when generation fails
+     */
     public BieGenerateExpressionResult generate(
             ScoreUser requester, List<TopLevelAsbiepId> topLevelAsbiepIds,
             GenerateExpressionOption option) throws BieGenerateFailureException {
@@ -60,6 +79,12 @@ public class BieGenerateService {
         return toResult(file);
     }
 
+    /**
+     * Converts a generated file to API response metadata.
+     *
+     * @param file generated file
+     * @return response object with filename/contentType/file payload
+     */
     public BieGenerateExpressionResult toResult(File file) {
         String filename = file.getName();
         String contentType;
@@ -78,6 +103,20 @@ public class BieGenerateService {
         return new BieGenerateExpressionResult(filename, contentType, file);
     }
 
+    /**
+     * Entry point for schema generation.
+     * <p>
+     * This method validates input, applies configured filename expressions to the option,
+     * and routes to packaging strategy:
+     * - {@code ALL}: single expression output (plus referenced schema files if split-reference is enabled)
+     * - {@code EACH}: one file per target top-level ASBIEP (plus referenced schema files if enabled)
+     *
+     * @param requester caller context
+     * @param topLevelAsbieps target top-level ASBIEPs
+     * @param option generation options
+     * @return generated file (single file or zip)
+     * @throws BieGenerateFailureException when generation/compression fails
+     */
     public File generateSchema(
             ScoreUser requester,
             List<TopLevelAsbiepSummaryRecord> topLevelAsbieps, GenerateExpressionOption option) throws BieGenerateFailureException {
@@ -87,6 +126,7 @@ public class BieGenerateService {
         if (option == null) {
             throw new IllegalArgumentException();
         }
+        applyConfiguredFilenameExpressions(requester, option);
 
         String packageOption = option.getPackageOption();
         if (packageOption != null) {
@@ -114,6 +154,18 @@ public class BieGenerateService {
         }
     }
 
+    /**
+     * Generates schemas in {@code ALL} mode.
+     * <p>
+     * In this mode a single root expression document is produced for primary targets.
+     * When split-reference mode is enabled, reused schemas are emitted as separate files and zipped together.
+     *
+     * @param requester caller context
+     * @param topLevelAsbiepList selected top-level ASBIEPs
+     * @param option generation options
+     * @return single schema file or zip containing the root + referenced files
+     * @throws BieGenerateFailureException when expression/file/compression fails
+     */
     public File generateSchemaForAll(ScoreUser requester,
                                      List<TopLevelAsbiepSummaryRecord> topLevelAsbiepList,
                                      GenerateExpressionOption option) throws BieGenerateFailureException {
@@ -191,6 +243,12 @@ public class BieGenerateService {
         }
     }
 
+    /**
+     * Guards single-file generation from JSON root-property collisions.
+     * <p>
+     * Root property names are derived from top-level ASCCP property terms.
+     * If duplicates are found, generation is rejected and caller should use EACH mode.
+     */
     private void ensureNoDuplicateRootPropertyNamesForSingleSchema(
             List<TopLevelAsbiepSummaryRecord> topLevelAsbieps) {
         if (topLevelAsbieps == null || topLevelAsbieps.size() < 2) {
@@ -233,6 +291,18 @@ public class BieGenerateService {
         return convertIdentifierToId(camelCase(normalizedPropertyTerm));
     }
 
+    /**
+     * Generates schemas in {@code EACH} mode.
+     * <p>
+     * One file is generated per primary target. If split-reference mode is enabled,
+     * reused schemas are generated recursively as referenced files and included together.
+     *
+     * @param requester caller context
+     * @param topLevelAsbieps selected top-level ASBIEPs
+     * @param option generation options
+     * @return map from top-level ASBIEP ID to generated file
+     * @throws BieGenerateFailureException when expression/file generation fails
+     */
     public Map<TopLevelAsbiepId, File> generateSchemaForEach(
             ScoreUser requester,
             List<TopLevelAsbiepSummaryRecord> topLevelAsbieps, GenerateExpressionOption option) throws BieGenerateFailureException {
@@ -308,6 +378,11 @@ public class BieGenerateService {
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * Finds targets that are both explicitly selected and reused by other selected targets.
+     * <p>
+     * Such IDs are treated through referenced-schema flow to preserve referenced-schema options.
+     */
     private Set<TopLevelAsbiepId> findSelectedReferencedTopLevelAsbiepIds(
             Set<TopLevelAsbiepId> selectedTopLevelAsbiepIdSet,
             GenerationContext generationContext) {
@@ -317,6 +392,12 @@ public class BieGenerateService {
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * Removes user-provided filename overrides for selected schemas that will be generated
+     * as referenced schemas.
+     * <p>
+     * This prevents mismatches between referenced-file naming and target-file naming policies.
+     */
     private void clearFilenameOverridesForSelectedReferencedSchemas(
             GenerateExpressionOption option,
             Set<TopLevelAsbiepId> selectedReferencedTopLevelAsbiepIdSet) {
@@ -336,6 +417,9 @@ public class BieGenerateService {
         option.setFilenames(filtered);
     }
 
+    /**
+     * Returns a filtered list excluding entries by top-level ASBIEP IDs.
+     */
     private List<TopLevelAsbiepSummaryRecord> excludeTopLevelAsbiepsById(
             List<TopLevelAsbiepSummaryRecord> topLevelAsbieps,
             Set<TopLevelAsbiepId> excludedTopLevelAsbiepIdSet) {
@@ -412,8 +496,11 @@ public class BieGenerateService {
             GenerationContext referencedGenerationContext = referencedGenerateExpression.generateContext(
                     requester, List.of(refTopLevelAsbiep), referencedOption);
             // #1713: Keep filename resolution consistent between referenced and target schemas.
-            ensureExpressionFilenames(collectTopLevelAsbieps(List.of(refTopLevelAsbiep), referencedGenerationContext), option, requester);
-            ensureExpressionFilenames(collectTopLevelAsbieps(List.of(refTopLevelAsbiep), referencedGenerationContext), referencedOption, requester);
+            // Resolve once on the canonical option, then copy the result for referenced generation.
+            List<TopLevelAsbiepSummaryRecord> filenameCandidates =
+                    collectTopLevelAsbieps(List.of(refTopLevelAsbiep), referencedGenerationContext);
+            ensureExpressionFilenames(filenameCandidates, option, requester);
+            referencedOption.setFilenames(new LinkedHashMap<>(option.getFilenames()));
             try {
                 referencedGenerateExpression.reset();
             } catch (Exception e) {
@@ -449,6 +536,10 @@ public class BieGenerateService {
         return files;
     }
 
+    /**
+     * Merges primary and discovered referenced top-level ASBIEPs into a single list for
+     * filename normalization.
+     */
     private List<TopLevelAsbiepSummaryRecord> collectTopLevelAsbieps(
             List<TopLevelAsbiepSummaryRecord> topLevelAsbieps,
             GenerationContext generationContext) {
@@ -457,6 +548,9 @@ public class BieGenerateService {
         return all;
     }
 
+    /**
+     * Converts top-level ASBIEP summaries to an ordered ID set.
+     */
     private Set<TopLevelAsbiepId> toTopLevelAsbiepIdSet(Set<TopLevelAsbiepSummaryRecord> topLevelAsbieps) {
         if (topLevelAsbieps == null || topLevelAsbieps.isEmpty()) {
             return Collections.emptySet();
@@ -466,10 +560,19 @@ public class BieGenerateService {
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
+    /**
+     * Ensures deterministic, collision-free filenames for all candidate top-level ASBIEPs.
+     * <p>
+     * Workflow:
+     * 1) take existing filename overrides,
+     * 2) generate missing base filenames from expression strategy,
+     * 3) resolve duplicates by occurrence order using duplicate-handler expression,
+     * 4) write finalized names back to {@code option.filenames}.
+     */
     private void ensureExpressionFilenames(List<TopLevelAsbiepSummaryRecord> topLevelAsbieps,
                                            GenerateExpressionOption option,
                                            ScoreUser requester) {
-        BieSchemaFilenameStrategy filenamePattern = getFilenamePattern(option);
+        BieSchemaFilenameStrategy filenamePattern = getFilenameStrategy(option);
 
         Map<TopLevelAsbiepId, String> existing = option.getFilenames();
         List<FilenameCandidate> candidates = new ArrayList<>();
@@ -492,7 +595,7 @@ public class BieGenerateService {
             if (included.contains(topLevelAsbiep.topLevelAsbiepId())) {
                 continue;
             }
-            String baseFilename = filenamePattern.buildBaseFilename(requester, topLevelAsbiep, option);
+            String baseFilename = filenamePattern.buildBaseFilename(requester, topLevelAsbiep);
             if (!StringUtils.hasLength(baseFilename)) {
                 continue;
             }
@@ -588,16 +691,54 @@ public class BieGenerateService {
         if (filenames != null && filenames.containsKey(topLevelAsbiep.topLevelAsbiepId())) {
             return filenames.get(topLevelAsbiep.topLevelAsbiepId());
         }
-        return getFilenamePattern(option).buildBaseFilename(requester, topLevelAsbiep, option);
+        return getFilenameStrategy(option).buildBaseFilename(requester, topLevelAsbiep);
     }
 
-    private BieSchemaFilenameStrategy getFilenamePattern(GenerateExpressionOption option) {
-        if (option.getBiePackage() != null) {
-            return biePackageExpressionFilenameStrategy;
+    /**
+     * Resolves filename-expression related options from application configuration
+     * when caller does not provide explicit values.
+     * <p>
+     * This keeps runtime behavior stable for existing API consumers while allowing admin overrides.
+     */
+    private void applyConfiguredFilenameExpressions(ScoreUser requester, GenerateExpressionOption option) {
+        if (!StringUtils.hasLength(option.getBieSchemaFilenameExpression())) {
+            option.setBieSchemaFilenameExpression(
+                    applicationConfigurationService.getConfigurationValueByName(
+                            requester, BIE_SCHEMA_FILENAME_EXPRESSION_CONFIG_PARAM_NAME));
         }
-        return defaultBieSchemaFilenameStrategy;
+        if (!StringUtils.hasLength(option.getBieSchemaFilenameDuplicateHandlerExpression())) {
+            option.setBieSchemaFilenameDuplicateHandlerExpression(
+                    applicationConfigurationService.getConfigurationValueByName(
+                            requester, ApplicationConfigurationService.BIE_SCHEMA_FILENAME_DUPLICATE_HANDLER_EXPRESSION_CONFIG_PARAM_NAME));
+        }
+        if (!StringUtils.hasLength(option.getBiePackageSchemaFilenameExpression())) {
+            option.setBiePackageSchemaFilenameExpression(
+                    applicationConfigurationService.getConfigurationValueByName(
+                            requester, BIE_PACKAGE_SCHEMA_FILENAME_EXPRESSION_CONFIG_PARAM_NAME));
+        }
+        if (!StringUtils.hasLength(option.getBiePackageSchemaFilenameDuplicateHandlerExpression())) {
+            option.setBiePackageSchemaFilenameDuplicateHandlerExpression(
+                    applicationConfigurationService.getConfigurationValueByName(
+                            requester, ApplicationConfigurationService.BIE_PACKAGE_SCHEMA_FILENAME_DUPLICATE_HANDLER_EXPRESSION_CONFIG_PARAM_NAME));
+        }
     }
 
+    /**
+     * Creates an option-bound filename strategy.
+     * <p>
+     * The strategy captures resolved expression/duplicate-handler values and no longer requires
+     * passing {@link GenerateExpressionOption} per filename method call.
+     */
+    private BieSchemaFilenameStrategy getFilenameStrategy(GenerateExpressionOption option) {
+        return ExpressionBasedFilenameStrategy.from(repositoryFactory, option);
+    }
+
+    /**
+     * Selects the schema expression generator bean by expression option/version.
+     *
+     * @param option generation options
+     * @return concrete generation expression implementation
+     */
     private BieGenerateExpression createBieGenerateExpression(GenerateExpressionOption option) {
         String expressionOption = option.getExpressionOption();
         if (expressionOption != null) {

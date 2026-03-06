@@ -6,5 +6,9 @@ import lombok.Data;
 public class ApplicationSettingsInfo {
 
     private SMTPSettingsInfo smtpSettingsInfo;
+    private String bieSchemaFilenameExpression;
+    private String biePackageSchemaFilenameExpression;
+    private String bieSchemaFilenameDuplicateHandlerExpression;
+    private String biePackageSchemaFilenameDuplicateHandlerExpression;
 
 }

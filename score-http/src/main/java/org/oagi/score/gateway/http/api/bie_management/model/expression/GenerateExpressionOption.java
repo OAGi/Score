@@ -30,6 +30,10 @@ public class GenerateExpressionOption {
 
     private boolean includeBusinessContextInFilename;
     private boolean includeVersionInFilename;
+    private String bieSchemaFilenameExpression;
+    private String biePackageSchemaFilenameExpression;
+    private String bieSchemaFilenameDuplicateHandlerExpression;
+    private String biePackageSchemaFilenameDuplicateHandlerExpression;
 
     private boolean arrayForJsonExpression;
     private boolean separateFileReferencesForReusedSchemas;

@@ -52,8 +52,7 @@ export class NavbarComponent implements OnInit {
   }
 
   get isTenantEnabled(): boolean {
-    const userToken = this.auth.getUserToken();
-    return userToken.tenant.enabled;
+    return this.auth.isTenantEnabled();
   }
 
   get hasTenantRole(): boolean {
@@ -67,7 +66,7 @@ export class NavbarComponent implements OnInit {
   }
 
   get isBrowseStandardsMenuEnabled(): boolean {
-    return this.isTenantEnabled && this.auth.isEndUser() && !this.auth.isDeveloper() && !this.auth.isAdmin();
+    return this.auth.isBrowseStandardsMenuEnabled();
   }
 
   get userRole(): string {

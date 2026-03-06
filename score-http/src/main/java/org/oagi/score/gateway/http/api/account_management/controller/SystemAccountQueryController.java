@@ -140,6 +140,10 @@ public class SystemAccountQueryController implements InitializingBean {
                 .put("enabled", configService.isFunctionsRequiringEmailTransmissionEnabled(requester))
                 .build());
 
+        resp.put("browseStandardMode", ImmutableMap.builder()
+                .put("enabled", configService.isBrowseStandardModeEnabled(requester))
+                .build());
+
         return resp;
     }
 

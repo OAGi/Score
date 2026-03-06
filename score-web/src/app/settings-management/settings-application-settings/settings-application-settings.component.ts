@@ -22,6 +22,10 @@ export class SettingsApplicationSettingsComponent implements OnInit {
 
   title = 'Application settings';
   loading = false;
+  bieSchemaSampleFilename = '';
+  bieSchemaSampleDuplicateFilename = '';
+  biePackageSchemaSampleFilename = '';
+  biePackageSchemaSampleDuplicateFilename = '';
 
   constructor(private auth: AuthService,
               private sanitizer: DomSanitizer,
@@ -73,6 +77,11 @@ export class SettingsApplicationSettingsComponent implements OnInit {
   get isFunctionsRequiringEmailTransmissionEnabled(): boolean {
     const userToken = this.auth.getUserToken();
     return userToken.functionsRequiringEmailTransmission.enabled;
+  }
+
+  get isBrowseStandardModeEnabled(): boolean {
+    const userToken = this.auth.getUserToken();
+    return userToken.browseStandardMode.enabled;
   }
 
   updateTenantConfiguration(value: boolean) {
@@ -168,13 +177,13 @@ export class SettingsApplicationSettingsComponent implements OnInit {
   updateFunctionsRequiringEmailTransmissionConfiguration(value: boolean) {
     const dialogConfig = this.confirmDialogService.newConfig();
     if (value) {
-      dialogConfig.data.header = 'Enable functions requiring email transmission?';
-      dialogConfig.data.content = ['Are you sure you want to enable functions requiring email transmission?',
+      dialogConfig.data.header = 'Enable email-based workflows?';
+      dialogConfig.data.content = ['Are you sure you want to enable email-based workflows?',
         'If SMTP settings are incorrect, these functions may not operate properly.'];
       dialogConfig.data.action = 'Enable';
     } else {
-      dialogConfig.data.header = 'Disable functions requiring email transmission?';
-      dialogConfig.data.content = ['Are you sure you want to disable functions requiring email transmission?'];
+      dialogConfig.data.header = 'Disable email-based workflows?';
+      dialogConfig.data.content = ['Are you sure you want to disable email-based workflows?'];
       dialogConfig.data.action = 'Disable';
     }
 
@@ -184,6 +193,36 @@ export class SettingsApplicationSettingsComponent implements OnInit {
           this.settingsService.updateFunctionsRequiringEmailTransmissionConfiguration(value).subscribe(_ => {
             this.auth.reloadUserToken().subscribe(userToken => {
               if (userToken.functionsRequiringEmailTransmission.enabled === value) {
+                this.snackBar.open('Updated', '', {
+                  duration: 3000,
+                });
+              }
+            });
+          });
+        }
+      });
+  }
+
+  updateBrowseStandardModeConfiguration(value: boolean) {
+    const dialogConfig = this.confirmDialogService.newConfig();
+    if (value) {
+      dialogConfig.data.header = 'Enable Browse Standard mode?';
+      dialogConfig.data.content = ['Are you sure you want to enable Browse Standard mode for end-users?',
+        'When enabled, end-users will use Browse Standard view.'];
+      dialogConfig.data.action = 'Enable';
+    } else {
+      dialogConfig.data.header = 'Disable Browse Standard mode?';
+      dialogConfig.data.content = ['Are you sure you want to disable Browse Standard mode?',
+        'When disabled, end-users will use the regular Core Component menu.'];
+      dialogConfig.data.action = 'Disable';
+    }
+
+    this.confirmDialogService.open(dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (result) {
+          this.settingsService.updateBrowseStandardModeConfiguration(value).subscribe(_ => {
+            this.auth.reloadUserToken().subscribe(userToken => {
+              if (userToken.browseStandardMode.enabled === value) {
                 this.snackBar.open('Updated', '', {
                   duration: 3000,
                 });
@@ -219,9 +258,77 @@ export class SettingsApplicationSettingsComponent implements OnInit {
   }
 
   updateApplicationSettingsInfo() {
-    this.settingsService.update(this.applicationSettingsInfo).subscribe(_ => {
+    this.settingsService.update({
+      smtpSettingsInfo: this.applicationSettingsInfo.smtpSettingsInfo
+    } as ApplicationSettingsInfo).subscribe(_ => {
       this.snackBar.open('Updated', '', {
         duration: 3000,
+      });
+    });
+  }
+
+  validateBieSchemaFilenameExpression() {
+    const bieSchemaFilenameExpression = this.applicationSettingsInfo?.bieSchemaFilenameExpression || '';
+    const bieSchemaFilenameDuplicateHandlerExpression =
+      this.applicationSettingsInfo?.bieSchemaFilenameDuplicateHandlerExpression || '';
+    this.settingsService.previewFilenameExpression(
+      'bie-schema',
+      bieSchemaFilenameExpression,
+      bieSchemaFilenameDuplicateHandlerExpression)
+      .subscribe(_ => {
+        this.bieSchemaSampleFilename = _.sampleFilename;
+        this.bieSchemaSampleDuplicateFilename = _.sampleDuplicateFilename;
+        this.snackBar.open('Valid BIE Schema Expressions', '', {
+          duration: 3000,
+        });
+      });
+  }
+
+  validateBiePackageSchemaFilenameExpression() {
+    const biePackageSchemaFilenameExpression = this.applicationSettingsInfo?.biePackageSchemaFilenameExpression || '';
+    const biePackageSchemaFilenameDuplicateHandlerExpression =
+      this.applicationSettingsInfo?.biePackageSchemaFilenameDuplicateHandlerExpression || '';
+    this.settingsService.previewFilenameExpression(
+      'bie-package-schema',
+      biePackageSchemaFilenameExpression,
+      biePackageSchemaFilenameDuplicateHandlerExpression)
+      .subscribe(_ => {
+        this.biePackageSchemaSampleFilename = _.sampleFilename;
+        this.biePackageSchemaSampleDuplicateFilename = _.sampleDuplicateFilename;
+        this.snackBar.open('Valid BIE Package Schema Expressions', '', {
+          duration: 3000,
+        });
+      });
+  }
+
+  updateBieFilenameExpressions() {
+    const bieSchemaFilenameExpression = this.applicationSettingsInfo?.bieSchemaFilenameExpression || '';
+    const biePackageSchemaFilenameExpression = this.applicationSettingsInfo?.biePackageSchemaFilenameExpression || '';
+    const bieSchemaFilenameDuplicateHandlerExpression =
+      this.applicationSettingsInfo?.bieSchemaFilenameDuplicateHandlerExpression || '';
+    const biePackageSchemaFilenameDuplicateHandlerExpression =
+      this.applicationSettingsInfo?.biePackageSchemaFilenameDuplicateHandlerExpression || '';
+    forkJoin([
+      this.settingsService.validateFilenameExpression(
+        'bie-schema',
+        bieSchemaFilenameExpression,
+        bieSchemaFilenameDuplicateHandlerExpression
+      ),
+      this.settingsService.validateFilenameExpression(
+        'bie-package-schema',
+        biePackageSchemaFilenameExpression,
+        biePackageSchemaFilenameDuplicateHandlerExpression
+      )
+    ]).subscribe(_ => {
+      this.settingsService.updateBieFilenameExpressions(
+        bieSchemaFilenameExpression,
+        biePackageSchemaFilenameExpression,
+        bieSchemaFilenameDuplicateHandlerExpression,
+        biePackageSchemaFilenameDuplicateHandlerExpression
+      ).subscribe(__ => {
+        this.snackBar.open('Updated', '', {
+          duration: 3000,
+        });
       });
     });
   }

@@ -1,8 +1,11 @@
 package org.oagi.score.gateway.http.api.application_management.service;
 
 import org.oagi.score.gateway.http.api.application_management.controller.payload.ApplicationConfigurationChangeRequest;
+import org.oagi.score.gateway.http.api.application_management.controller.payload.FilenameExpressionPreviewResponse;
 import org.oagi.score.gateway.http.api.application_management.model.ApplicationSettingsInfo;
 import org.oagi.score.gateway.http.api.application_management.model.SMTPSettingsInfo;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.ExpressionBasedFilenameStrategy;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.FilenameExpressionValidationService;
 import org.oagi.score.gateway.http.common.model.AccessControlException;
 import org.oagi.score.gateway.http.common.model.ScoreRole;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
@@ -21,6 +24,9 @@ public class ApplicationConfigurationService {
     @Autowired
     private RepositoryFactory repositoryFactory;
 
+    @Autowired
+    private FilenameExpressionValidationService filenameExpressionValidationService;
+
     private static final String TENANT_CONFIG_PARAM_NAME = "score.tenant.enabled";
 
     private static final String BUSINESS_TERM_CONFIG_PARAM_NAME = "score.business-term.enabled";
@@ -29,6 +35,21 @@ public class ApplicationConfigurationService {
 
     private static final String FUNCTIONS_REQUIRING_EMAIL_TRANSMISSION_CONFIG_PARAM_NAME =
             "score.functions-requiring-email-transmission.enabled";
+
+    private static final String BROWSE_STANDARD_MODE_CONFIG_PARAM_NAME =
+            "score.browse-standard-mode.enabled";
+
+    public static final String BIE_SCHEMA_FILENAME_EXPRESSION_CONFIG_PARAM_NAME =
+            "score.bie.schema-filename-expression";
+
+    public static final String BIE_PACKAGE_SCHEMA_FILENAME_EXPRESSION_CONFIG_PARAM_NAME =
+            "score.bie.package-schema-filename-expression";
+
+    public static final String BIE_SCHEMA_FILENAME_DUPLICATE_HANDLER_EXPRESSION_CONFIG_PARAM_NAME =
+            "score.bie.schema-filename-duplicate-handler-expression";
+
+    public static final String BIE_PACKAGE_SCHEMA_FILENAME_DUPLICATE_HANDLER_EXPRESSION_CONFIG_PARAM_NAME =
+            "score.bie.package-schema-filename-duplicate-handler-expression";
 
     public static final String NAVBAR_BRAND_CONFIG_PARAM_NAME = "score.pages.navbar.brand";
 
@@ -79,6 +100,10 @@ public class ApplicationConfigurationService {
 
     public boolean isFunctionsRequiringEmailTransmissionEnabled(ScoreUser requester) {
         return getBooleanProperty(requester, FUNCTIONS_REQUIRING_EMAIL_TRANSMISSION_CONFIG_PARAM_NAME);
+    }
+
+    public boolean isBrowseStandardModeEnabled(ScoreUser requester) {
+        return getBooleanProperty(requester, BROWSE_STANDARD_MODE_CONFIG_PARAM_NAME);
     }
 
     public boolean getBooleanProperty(ScoreUser requester, String key) {
@@ -133,6 +158,11 @@ public class ApplicationConfigurationService {
                             functionsRequiringEmailTransmissionEnabled);
         }
 
+        Boolean browseStandardModeEnabled = request.getBrowseStandardModeEnabled();
+        if (browseStandardModeEnabled != null) {
+            command.upsertBooleanConfiguration(BROWSE_STANDARD_MODE_CONFIG_PARAM_NAME, browseStandardModeEnabled);
+        }
+
         Map<String, String> keyValueMap = request.getKeyValueMap();
         if (keyValueMap != null && keyValueMap.size() > 0) {
             for (String key : keyValueMap.keySet()) {
@@ -156,6 +186,22 @@ public class ApplicationConfigurationService {
         smtpSettingsInfo.setAuthUsername(getProperty(requester, "score.mail.smtp.auth.username"));
         smtpSettingsInfo.setAuthPassword(getProperty(requester, "score.mail.smtp.auth.password"));
         applicationSettingsInfo.setSmtpSettingsInfo(smtpSettingsInfo);
+        applicationSettingsInfo.setBieSchemaFilenameExpression(getPropertyOrDefault(
+                requester,
+                BIE_SCHEMA_FILENAME_EXPRESSION_CONFIG_PARAM_NAME,
+                ExpressionBasedFilenameStrategy.DEFAULT_BIE_SCHEMA_FILENAME_EXPRESSION));
+        applicationSettingsInfo.setBiePackageSchemaFilenameExpression(getPropertyOrDefault(
+                requester,
+                BIE_PACKAGE_SCHEMA_FILENAME_EXPRESSION_CONFIG_PARAM_NAME,
+                ExpressionBasedFilenameStrategy.DEFAULT_BIE_PACKAGE_SCHEMA_FILENAME_EXPRESSION));
+        applicationSettingsInfo.setBieSchemaFilenameDuplicateHandlerExpression(getPropertyOrDefault(
+                requester,
+                BIE_SCHEMA_FILENAME_DUPLICATE_HANDLER_EXPRESSION_CONFIG_PARAM_NAME,
+                ExpressionBasedFilenameStrategy.DEFAULT_BIE_SCHEMA_DUPLICATE_HANDLER_EXPRESSION));
+        applicationSettingsInfo.setBiePackageSchemaFilenameDuplicateHandlerExpression(getPropertyOrDefault(
+                requester,
+                BIE_PACKAGE_SCHEMA_FILENAME_DUPLICATE_HANDLER_EXPRESSION_CONFIG_PARAM_NAME,
+                ExpressionBasedFilenameStrategy.DEFAULT_BIE_PACKAGE_SCHEMA_DUPLICATE_HANDLER_EXPRESSION));
 
         return applicationSettingsInfo;
     }
@@ -165,9 +211,9 @@ public class ApplicationConfigurationService {
             throw new AccessControlException(requester);
         }
 
+        var command = repositoryFactory.configurationCommandRepository(requester);
         SMTPSettingsInfo smtpSettingsInfo = applicationSettingsInfo.getSmtpSettingsInfo();
         if (smtpSettingsInfo != null) {
-            var command = repositoryFactory.configurationCommandRepository(requester);
             command.upsertConfiguration(
                     "score.mail.smtp.host", smtpSettingsInfo.getHost());
             command.upsertConfiguration(
@@ -185,5 +231,97 @@ public class ApplicationConfigurationService {
             command.upsertConfiguration(
                     "score.mail.smtp.auth.password", smtpSettingsInfo.getAuthPassword());
         }
+
+        if (applicationSettingsInfo.getBieSchemaFilenameExpression() != null) {
+            String bieSchemaFilenameExpression = StringUtils.trim(applicationSettingsInfo.getBieSchemaFilenameExpression());
+            String bieSchemaFilenameDuplicateHandlerExpression = StringUtils.trim(
+                    applicationSettingsInfo.getBieSchemaFilenameDuplicateHandlerExpression());
+            filenameExpressionValidationService.validateBieSchemaExpression(
+                    bieSchemaFilenameExpression,
+                    bieSchemaFilenameDuplicateHandlerExpression);
+            command.upsertConfiguration(
+                    BIE_SCHEMA_FILENAME_EXPRESSION_CONFIG_PARAM_NAME,
+                    bieSchemaFilenameExpression);
+            command.upsertConfiguration(
+                    BIE_SCHEMA_FILENAME_DUPLICATE_HANDLER_EXPRESSION_CONFIG_PARAM_NAME,
+                    bieSchemaFilenameDuplicateHandlerExpression);
+        }
+
+        if (applicationSettingsInfo.getBiePackageSchemaFilenameExpression() != null) {
+            String biePackageSchemaFilenameExpression = StringUtils.trim(applicationSettingsInfo.getBiePackageSchemaFilenameExpression());
+            String biePackageSchemaFilenameDuplicateHandlerExpression = StringUtils.trim(
+                    applicationSettingsInfo.getBiePackageSchemaFilenameDuplicateHandlerExpression());
+            filenameExpressionValidationService.validateBiePackageSchemaExpression(
+                    biePackageSchemaFilenameExpression,
+                    biePackageSchemaFilenameDuplicateHandlerExpression);
+            command.upsertConfiguration(
+                    BIE_PACKAGE_SCHEMA_FILENAME_EXPRESSION_CONFIG_PARAM_NAME,
+                    biePackageSchemaFilenameExpression);
+            command.upsertConfiguration(
+                    BIE_PACKAGE_SCHEMA_FILENAME_DUPLICATE_HANDLER_EXPRESSION_CONFIG_PARAM_NAME,
+                    biePackageSchemaFilenameDuplicateHandlerExpression);
+        }
+    }
+
+    public void validateFilenameExpression(ScoreUser requester,
+                                           String type,
+                                           String expression,
+                                           String duplicateHandlerExpression) {
+        if (!requester.hasRole(ScoreRole.ADMINISTRATOR)) {
+            throw new AccessControlException(requester);
+        }
+
+        String normalizedType = StringUtils.trim(type).toLowerCase();
+        String normalizedExpression = StringUtils.trim(expression);
+        String normalizedDuplicateHandlerExpression = StringUtils.trim(duplicateHandlerExpression);
+        switch (normalizedType) {
+            case "bie-schema":
+                filenameExpressionValidationService.validateBieSchemaExpression(
+                        normalizedExpression, normalizedDuplicateHandlerExpression);
+                break;
+            case "bie-package-schema":
+                filenameExpressionValidationService.validateBiePackageSchemaExpression(
+                        normalizedExpression, normalizedDuplicateHandlerExpression);
+                break;
+            default:
+                throw new IllegalArgumentException("Unregistered type: " + type);
+        }
+    }
+
+    public FilenameExpressionPreviewResponse previewFilenameExpression(ScoreUser requester,
+                                                                      String type,
+                                                                      String expression,
+                                                                      String duplicateHandlerExpression) {
+        if (!requester.hasRole(ScoreRole.ADMINISTRATOR)) {
+            throw new AccessControlException(requester);
+        }
+
+        String normalizedType = StringUtils.trim(type).toLowerCase();
+        String normalizedExpression = StringUtils.trim(expression);
+        String normalizedDuplicateHandlerExpression = StringUtils.trim(duplicateHandlerExpression);
+        FilenameExpressionValidationService.PreviewResult previewResult;
+        switch (normalizedType) {
+            case "bie-schema":
+                previewResult = filenameExpressionValidationService.previewBieSchemaExpression(
+                        normalizedExpression, normalizedDuplicateHandlerExpression);
+                break;
+            case "bie-package-schema":
+                previewResult = filenameExpressionValidationService.previewBiePackageSchemaExpression(
+                        normalizedExpression, normalizedDuplicateHandlerExpression);
+                break;
+            default:
+                throw new IllegalArgumentException("Unregistered type: " + type);
+        }
+        return new FilenameExpressionPreviewResponse(
+                previewResult.sampleFilename(),
+                previewResult.sampleDuplicateFilename());
+    }
+
+    private String getPropertyOrDefault(ScoreUser requester, String key, String defaultValue) {
+        String value = StringUtils.trim(getProperty(requester, key));
+        if (!StringUtils.hasLength(value)) {
+            return defaultValue;
+        }
+        return value;
     }
 }

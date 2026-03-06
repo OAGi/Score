@@ -17,6 +17,7 @@ export class ScoreTableColumnResizeDirective implements OnInit, OnChanges {
   private siblingTitle: string;
 
   @Input() defaultWidth: number | string;
+  @Input() resizable = true;
   @Output() onResize: EventEmitter<{ name: string; width: number | string }> = new EventEmitter();
 
   constructor(private el: ElementRef, private renderer: Renderer2) {
@@ -25,11 +26,15 @@ export class ScoreTableColumnResizeDirective implements OnInit, OnChanges {
   ngOnInit() {
     this.setInitialWidth();
     this.createResizeHandle();
+    this.applyResizableState();
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.defaultWidth && changes.defaultWidth.currentValue !== undefined) {
       this.setInitialWidth();
+    }
+    if (changes.resizable) {
+      this.applyResizableState();
     }
   }
 
@@ -121,8 +126,26 @@ export class ScoreTableColumnResizeDirective implements OnInit, OnChanges {
     });
   }
 
+  applyResizableState() {
+    if (!this.resizeHandle) {
+      return;
+    }
+
+    if (this.resizable) {
+      this.renderer.removeStyle(this.resizeHandle, 'display');
+      this.renderer.setStyle(this.resizeHandle, 'pointer-events', 'auto');
+    } else {
+      this.renderer.setStyle(this.resizeHandle, 'display', 'none');
+      this.renderer.setStyle(this.resizeHandle, 'pointer-events', 'none');
+    }
+  }
+
   @HostListener('mousedown', ['$event'])
   onResizeStart(event: MouseEvent) {
+    if (!this.resizable) {
+      return;
+    }
+
     if (event.target === this.resizeHandle || event.target === this.innerLine) {
       this._resizing = true;  // Set resizing flag
       this.startX = event.pageX;

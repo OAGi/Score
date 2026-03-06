@@ -16,6 +16,7 @@ import {Observable, of, throwError} from 'rxjs';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {
   BIEProperties,
+  BrowseStandardModeProperties,
   BusinessTermProperties,
   FunctionsRequiringEmailTransmissionProperties,
   OAuth2AppInfo,
@@ -121,6 +122,11 @@ export class AuthService implements OnInit, CanActivate {
         value.functionsRequiringEmailTransmission.enabled = false;
         this.storeUserInfo(value);
       }
+      if (!value.browseStandardMode) {
+        value.browseStandardMode = new BrowseStandardModeProperties();
+        value.browseStandardMode.enabled = false;
+        this.storeUserInfo(value);
+      }
     } catch (ignore) {
       value = new UserToken();
       this.storeUserInfo(value);
@@ -158,6 +164,24 @@ export class AuthService implements OnInit, CanActivate {
       return false;
     }
     return userToken.roles.includes(this.ROLE_END_USER);
+  }
+
+  isTenantEnabled() {
+    const userToken = this.getUserToken();
+    return userToken?.tenant?.enabled === true;
+  }
+
+  isBrowseStandardModeEnabled() {
+    const userToken = this.getUserToken();
+    return userToken?.browseStandardMode?.enabled === true;
+  }
+
+  isBrowseStandardsMenuEnabled() {
+    // Browse Standards mode is controlled by application configuration for end-user accounts.
+    return this.isBrowseStandardModeEnabled() &&
+      this.isEndUser() &&
+      !this.isDeveloper() &&
+      !this.isAdmin();
   }
 
   logout(url?) {

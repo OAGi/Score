@@ -54,7 +54,7 @@
       </ng-template>
     </mat-menu>
 
-    <button *ngIf="isBrowseStandardsMenuEnabled" mat-button routerLink="core_component" title="Browse Standards">Browse Standards</button>
+    <button *ngIf="isBrowseStandardsMenuEnabled" mat-button routerLink="core_component" title="Browse Standard">Browse Standard</button>
     <button *ngIf="!isBrowseStandardsMenuEnabled" mat-button [matMenuTriggerFor]="ccMenu" title="{{'CC_NAV.TITLE' | translate}}">Core Component</button>
     <mat-menu #ccMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>

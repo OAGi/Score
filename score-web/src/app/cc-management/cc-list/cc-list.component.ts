@@ -67,17 +67,11 @@ export class CcListComponent implements OnInit {
   workingRelease = WorkingRelease;
   // Issue #1700: Browser mode limits type filters to the browseable property components.
   private readonly browserModeTypes = ['ASCCP', 'BCCP'];
-  // Issue #1700: `!Extension` means "all ASCCP types except Extension".
-  private readonly browseStandardsAsccpTypes = ['!Extension'];
+  // Issue #1700: exclude Extension and DataArea ASCCPs in Browse Standards mode.
+  private readonly browseStandardsAsccpTypes = ['!Extension', '!DataArea'];
 
-  get isTenantEnabled(): boolean {
-    const userToken = this.auth.getUserToken();
-    return userToken?.tenant?.enabled === true;
-  }
-
-  get isBrowseStandardsMode(): boolean {
-    // Issue #1700: tenant end-user accounts use the simplified Browse Standards flow.
-    return this.isTenantEnabled && this.auth.isEndUser() && !this.auth.isDeveloper() && !this.auth.isAdmin();
+  get isBrowseStandardMode(): boolean {
+    return this.auth.isBrowseStandardsMenuEnabled();
   }
 
   get canSelectTypesInBrowserMode(): boolean {
@@ -137,7 +131,7 @@ export class CcListComponent implements OnInit {
       return [];
     }
 
-    if (this.isBrowseStandardsMode) {
+    if (this.isBrowseStandardMode) {
       return this.preferencesInfo.tableColumnsInfo.columnsOfBrowseStandardsPage;
     }
 
@@ -149,7 +143,7 @@ export class CcListComponent implements OnInit {
       return;
     }
 
-    if (this.isBrowseStandardsMode) {
+    if (this.isBrowseStandardMode) {
       this.preferencesInfo.tableColumnsInfo.columnsOfBrowseStandardsPage = columns;
     } else {
       this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage = columns;
@@ -158,7 +152,7 @@ export class CcListComponent implements OnInit {
   }
 
   updateTableColumnsForCurrentPage() {
-    const updateCall = this.isBrowseStandardsMode ?
+    const updateCall = this.isBrowseStandardMode ?
       this.preferencesService.updateTableColumnsForBrowseStandardsPage(this.auth.getUserToken(), this.preferencesInfo) :
       this.preferencesService.updateTableColumnsForCoreComponentPage(this.auth.getUserToken(), this.preferencesInfo);
     updateCall.subscribe(_ => {});
@@ -166,7 +160,7 @@ export class CcListComponent implements OnInit {
 
   onColumnsReset() {
     const defaultTableColumnInfo = new TableColumnsInfo();
-    this.columns = this.isBrowseStandardsMode ?
+    this.columns = this.isBrowseStandardMode ?
       defaultTableColumnInfo.columnsOfBrowseStandardsPage :
       defaultTableColumnInfo.columnsOfCoreComponentPage;
   }
@@ -182,6 +176,10 @@ export class CcListComponent implements OnInit {
   }
 
   onResizeWidth($event) {
+    if (this.isBrowseStandardMode) {
+      return;
+    }
+
     switch ($event.name) {
       case 'Updated on':
         this.setWidth('Updated On', $event.width);
@@ -209,7 +207,7 @@ export class CcListComponent implements OnInit {
   }
 
   get displayedColumns(): string[] {
-    let displayedColumns = this.isBrowseStandardsMode ? [] : ['select'];
+    let displayedColumns = this.isBrowseStandardMode ? [] : ['select'];
     if (!this.preferencesInfo) {
       return displayedColumns;
     }
@@ -226,13 +224,13 @@ export class CcListComponent implements OnInit {
           }
           break;
         case 'DEN':
-          if (column.selected && !this.isBrowseStandardsMode) {
+          if (column.selected && !this.isBrowseStandardMode) {
             displayedColumns.push('den');
           }
           break;
         case 'Name':
           // Issue #1700: "Name" column is enabled only in Browse Standards mode.
-          if (column.selected && this.isBrowseStandardsMode) {
+          if (column.selected && this.isBrowseStandardMode) {
             displayedColumns.push('name');
           }
           break;
@@ -276,7 +274,7 @@ export class CcListComponent implements OnInit {
   }
 
   onBrowserModeChange($event: MatSlideToggleChange) {
-    if (this.isBrowseStandardsMode) {
+    if (this.isBrowseStandardMode) {
       return;
     }
     this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode = $event.checked;
@@ -352,14 +350,14 @@ export class CcListComponent implements OnInit {
     // Init CcList table
     this.request = new CcListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
-    this.title = this.isBrowseStandardsMode ? 'Standards' : 'Core Component';
+    this.title = this.isBrowseStandardMode ? 'Standard' : 'Core Component';
 
     this.libraryService.getLibrarySummaryList().subscribe(libraries => {
       this.initLibraries(libraries);
 
       this.searchBar.showAdvancedSearch =
         (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
-      if (this.isBrowseStandardsMode) {
+      if (this.isBrowseStandardMode) {
         this.searchBar.showAdvancedSearch = false;
       }
 
@@ -401,7 +399,7 @@ export class CcListComponent implements OnInit {
         this.initReleases(releases);
         this.tags = tags;
         this.preferencesInfo = preferencesInfo;
-        this.configureBrowseStandardsMode();
+        this.configureBrowseStandardMode();
 
         this.namespaces.push(...namespaces);
         initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList, this.namespaces, (e) => e.uri);
@@ -491,7 +489,7 @@ export class CcListComponent implements OnInit {
         this.sort.active, this.sort.direction,
         this.paginator.pageIndex, this.paginator.pageSize);
 
-    if (this.isBrowseStandardsMode) {
+    if (this.isBrowseStandardMode) {
       this.request.types = ['ASCCP'];
       this.request.asccpTypes = [...this.browseStandardsAsccpTypes];
     } else if (this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode) {
@@ -531,12 +529,12 @@ export class CcListComponent implements OnInit {
     });
   }
 
-  private configureBrowseStandardsMode(): void {
+  private configureBrowseStandardMode(): void {
     if (!this.preferencesInfo) {
       return;
     }
 
-    if (!this.isBrowseStandardsMode) {
+    if (!this.isBrowseStandardMode) {
       // Issue #1700: den/name filters are mutually exclusive in the request model.
       this.request.filters.name = '';
       return;
@@ -560,7 +558,7 @@ export class CcListComponent implements OnInit {
   }
 
   onSearchFilterChange(value: string): void {
-    if (this.isBrowseStandardsMode) {
+    if (this.isBrowseStandardMode) {
       // Issue #1700: Browse Standards binds search to "name" only.
       this.request.filters.name = value;
       this.request.filters.den = undefined;

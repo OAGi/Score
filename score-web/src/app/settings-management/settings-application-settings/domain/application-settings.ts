@@ -1,5 +1,9 @@
 export class ApplicationSettingsInfo {
   smtpSettingsInfo: SMTPSettingsInfo;
+  bieSchemaFilenameExpression: string;
+  biePackageSchemaFilenameExpression: string;
+  bieSchemaFilenameDuplicateHandlerExpression: string;
+  biePackageSchemaFilenameDuplicateHandlerExpression: string;
 }
 
 export class SMTPSettingsInfo {

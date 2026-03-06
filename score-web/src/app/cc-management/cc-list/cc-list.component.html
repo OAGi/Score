@@ -73,7 +73,7 @@
         <mat-icon>swap_horiz</mat-icon>
       </button>
       <button mat-icon-button class="ml-2" matTooltip="Export"
-              *ngIf="!isBrowseStandardsMode"
+              *ngIf="!isBrowseStandardMode"
               [hidden]="!canToolbarAction('Export')"
               (click)="exportStandaloneSchemas()">
         <mat-icon svgIcon="export_notes"></mat-icon>
@@ -104,9 +104,9 @@
 
   <mat-card class="pt-3">
     <!-- Issue #1700: Browse Standards uses Name-only search and disables advanced search. -->
-    <score-search-bar [placeholder]="isBrowseStandardsMode ? 'Search by Name' : 'Search by DEN'"
-                      [model]="isBrowseStandardsMode ? request.filters.name : request.filters.den"
-                      [advancedSearch]="!isBrowseStandardsMode"
+    <score-search-bar [placeholder]="isBrowseStandardMode ? 'Search by Name' : 'Search by DEN'"
+                      [model]="isBrowseStandardMode ? request.filters.name : request.filters.den"
+                      [advancedSearch]="!isBrowseStandardMode"
                       (modelChange)="onSearchFilterChange($event)"
                       (search)="onSearch();">
       <div branchSelector class="branch-selector d-flex" style="width: 11rem; padding: 0 0.5rem 0 1rem;">
@@ -315,7 +315,7 @@
       </div>
 
       <div class="table-container">
-        <div class="score-column-container align-items-center" *ngIf="!isBrowseStandardsMode">
+        <div class="score-column-container align-items-center" *ngIf="!isBrowseStandardMode">
           <score-column-selector
             [columns]="columns"
             (columnsChange)="onColumnsChange($event)"
@@ -365,7 +365,8 @@
 
             <ng-container matColumnDef="type">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Type')" (onResize)="onResizeWidth($event)"> Type</th>
+                  score-table-column-resize [defaultWidth]="width('Type')" [resizable]="!isBrowseStandardMode"
+                  (onResize)="onResizeWidth($event)"> Type</th>
               <td mat-cell *matCellDef="let element">
                 <mat-chip-list [ngSwitch]="element.type">
                   <mat-chip *ngSwitchDefault>{{ displayType(element) }}</mat-chip>
@@ -375,7 +376,8 @@
 
             <ng-container matColumnDef="state">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('State')" (onResize)="onResizeWidth($event)"> State</th>
+                  score-table-column-resize [defaultWidth]="width('State')" [resizable]="!isBrowseStandardMode"
+                  (onResize)="onResizeWidth($event)"> State</th>
               <td mat-cell *matCellDef="let element">
               <span class="cc-state {{ element.state }}"
                     [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
@@ -388,7 +390,8 @@
 
             <ng-container matColumnDef="den">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('DEN')" (onResize)="onResizeWidth($event)"> DEN</th>
+                  score-table-column-resize [defaultWidth]="width('DEN')" [resizable]="!isBrowseStandardMode"
+                  (onResize)="onResizeWidth($event)"> DEN</th>
               <td mat-cell *matCellDef="let element">
                 <div class="den word-break-all">
                   <span class="new-component mr-2" *ngIf="element.newComponent && !loading && element.libraryId === request.library.libraryId">New</span>
@@ -407,7 +410,8 @@
 
             <ng-container matColumnDef="name">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Name')" (onResize)="onResizeWidth($event)"> Name</th>
+                  score-table-column-resize [defaultWidth]="width('Name')" [resizable]="!isBrowseStandardMode"
+                  (onResize)="onResizeWidth($event)"> Name</th>
               <td mat-cell *matCellDef="let element">
                 <div class="den word-break-all">
                   <a routerLink="{{ getRouterLink(element) }}" matTooltip="{{ element.name }}">
@@ -420,7 +424,8 @@
 
             <ng-container matColumnDef="valueDomain">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Value Domain')" (onResize)="onResizeWidth($event)"> Value Domain</th>
+                  score-table-column-resize [defaultWidth]="width('Value Domain')" [resizable]="!isBrowseStandardMode"
+                  (onResize)="onResizeWidth($event)"> Value Domain</th>
               <td mat-cell *matCellDef="let element">
                 <span class="word-break-all">{{ element.defaultValueDomain }}</span>
               </td>
@@ -428,7 +433,8 @@
 
             <ng-container matColumnDef="sixDigitId">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Six Hexadecimal ID')" (onResize)="onResizeWidth($event)"> Six Hexadecimal ID</th>
+                  score-table-column-resize [defaultWidth]="width('Six Hexadecimal ID')" [resizable]="!isBrowseStandardMode"
+                  (onResize)="onResizeWidth($event)"> Six Hexadecimal ID</th>
               <td mat-cell *matCellDef="let element">
                 <span class="word-break-all">{{ element.sixDigitId }}</span>
               </td>
@@ -436,7 +442,8 @@
 
             <ng-container matColumnDef="revision">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Revision')" (onResize)="onResizeWidth($event)"> Revision</th>
+                  score-table-column-resize [defaultWidth]="width('Revision')" [resizable]="!isBrowseStandardMode"
+                  (onResize)="onResizeWidth($event)"> Revision</th>
               <td mat-cell *matCellDef="let element">
                 <span>{{ element.log.revisionNum }}</span>
               </td>
@@ -444,7 +451,8 @@
 
             <ng-container matColumnDef="owner">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Owner')" (onResize)="onResizeWidth($event)"> Owner</th>
+                  score-table-column-resize [defaultWidth]="width('Owner')" [resizable]="!isBrowseStandardMode"
+                  (onResize)="onResizeWidth($event)"> Owner</th>
               <td mat-cell *matCellDef="let element" class="ellipsis">
                 <div class="d-flex align-items-center align-content-center justify-content-between">
                   <span class="word-break-all" [matTooltip]="element.owner.username" [innerHTML]="element.owner.loginId"></span>
@@ -457,7 +465,8 @@
 
             <ng-container matColumnDef="module">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Module')" (onResize)="onResizeWidth($event)"> Module</th>
+                  score-table-column-resize [defaultWidth]="width('Module')" [resizable]="!isBrowseStandardMode"
+                  (onResize)="onResizeWidth($event)"> Module</th>
               <td mat-cell *matCellDef="let element">
                 <div class="word-break-all"
                      [innerHTML]="element.module | highlight : highlightTextForModule : ['bg-warning']"></div>
@@ -466,7 +475,8 @@
 
             <ng-container matColumnDef="lastUpdateTimestamp">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
+                  score-table-column-resize [defaultWidth]="width('Updated On')" [resizable]="!isBrowseStandardMode"
+                  (onResize)="onResizeWidth($event)"> Updated on</th>
               <td mat-cell *matCellDef="let element">
                 <div class="ellipsis">{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
                 <div class="description"><span class="pr-1">by</span><b class="word-break-all">{{ element.lastUpdated.who.loginId }}</b></div>
@@ -495,9 +505,9 @@
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let element; columns: displayedColumns;" class="element-row"
                 [class.expanded-row]="expandedElement === element"
-                (click)="expandedElement = expandedElement === element ? null : element; !isBrowseStandardsMode && toggle(element);"></tr>
+                (click)="expandedElement = expandedElement === element ? null : element; !isBrowseStandardMode && toggle(element);"></tr>
             <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"
-                (click)="!isBrowseStandardsMode && toggle(row);"></tr>
+                (click)="!isBrowseStandardMode && toggle(row);"></tr>
           </table>
 
           <mat-paginator

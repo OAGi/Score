@@ -54,6 +54,7 @@ public class JooqConfigurationCommandRepository extends JooqBaseRepository imple
                     .set(CONFIGURATION.VALUE, value)
                     .set(CONFIGURATION.TYPE, type)
                     .execute();
+            return;
         }
 
         String prevValue = configurationRecord.getValue();

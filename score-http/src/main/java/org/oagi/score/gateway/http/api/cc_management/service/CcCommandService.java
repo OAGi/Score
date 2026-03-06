@@ -323,7 +323,7 @@ public class CcCommandService {
 
                 AsccpCreateRequest dataAreaAsccpRequest = AsccpCreateRequest.builder(releaseId, dataAreaAccManifestId)
                         .initialPropertyTerm("Data Area")
-                        .asccpType(AsccpType.Extension)
+                        .asccpType(AsccpType.DataArea)
                         .reusable(false)
                         .namespaceId(verbNamespaceId)
                         .definition(new Definition(dataAreaDefinition, dataAreaDefinitionSource))

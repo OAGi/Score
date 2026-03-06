@@ -11,24 +11,34 @@ import org.oagi.score.gateway.http.api.context_management.business_context.model
 import org.oagi.score.gateway.http.api.context_management.business_context.repository.BusinessContextQueryRepository;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.FilenameTokenUtils.sanitizeFileName;
 import static org.oagi.score.gateway.http.common.util.StringUtils.hasLength;
+import static org.oagi.score.gateway.http.common.util.StringUtils.trim;
 
 /**
- * Base filename strategy that renders a filename from a placeholder expression.
+ * Filename strategy that renders a filename from a placeholder expression.
  */
-public abstract class ExpressionBasedFilenameStrategy implements BieSchemaFilenameStrategy {
+public class ExpressionBasedFilenameStrategy implements BieSchemaFilenameStrategy {
+
+    public static final String DEFAULT_BIE_SCHEMA_FILENAME_EXPRESSION =
+            "{BIE Property Term:separator('-')}(-{Business Context Name[0]?includeBusinessContext})(-{BIE Version?includeVersion:replace('\\\\.', '_')})";
+    public static final String DEFAULT_BIE_SCHEMA_DUPLICATE_HANDLER_EXPRESSION = "-{Incremental}";
+    public static final String DEFAULT_BIE_PACKAGE_SCHEMA_FILENAME_EXPRESSION =
+            "{BIE Package Name}-{BIE Package Version ID}_{Business Context Names:replace('\\\\s+', ''):separator('+')}_{BIE Property Term}([{BIE Display Name}])(-{BIE Version})";
+    public static final String DEFAULT_BIE_PACKAGE_SCHEMA_DUPLICATE_HANDLER_EXPRESSION = "~{BIE ID}";
 
     protected static final String PLACEHOLDER_BIE_PACKAGE_NAME = "BIE Package Name";
     protected static final String PLACEHOLDER_BIE_PACKAGE_VERSION_ID = "BIE Package Version ID";
@@ -50,34 +60,136 @@ public abstract class ExpressionBasedFilenameStrategy implements BieSchemaFilena
     private static final Pattern BUSINESS_CONTEXT_NAME_INDEXED_NAME_PATTERN =
             compileIndexedBusinessContextNamePattern();
 
+    private final RepositoryFactory repositoryFactory;
+    private final BiePackageSummaryRecord biePackage;
+    private final Map<TopLevelAsbiepId, BusinessContextId> businessContextByTopLevelAsbiepId;
+    private final boolean includeBusinessContextInFilename;
+    private final boolean includeVersionInFilename;
+
     private final String filenameExpression;
     private final String duplicateHandlerExpression;
-    private final FilenameExpressionParser.ParsedExpression parsedFilenameExpression;
-    private final FilenameExpressionParser.ParsedExpression parsedDuplicateHandlerExpression;
+    private final String defaultFilenameExpression;
+    private final String defaultDuplicateHandlerExpression;
+    private final FilenameExpressionParser.ParsedExpression parsedDefaultFilenameExpression;
+    private final FilenameExpressionParser.ParsedExpression parsedDefaultDuplicateHandlerExpression;
+    private final ConcurrentMap<String, FilenameExpressionParser.ParsedExpression> parsedFilenameExpressionCache =
+            new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, FilenameExpressionParser.ParsedExpression> parsedDuplicateHandlerExpressionCache =
+            new ConcurrentHashMap<>();
 
-    @Autowired
-    private RepositoryFactory repositoryFactory;
+    public static ExpressionBasedFilenameStrategy from(RepositoryFactory repositoryFactory,
+                                                       GenerateExpressionOption option) {
+        boolean packageExpression = option.getBiePackage() != null;
 
-    protected ExpressionBasedFilenameStrategy(String filenameExpression,
-                                              String duplicateHandlerExpression) {
-        this.filenameExpression = filenameExpression;
-        this.duplicateHandlerExpression = duplicateHandlerExpression;
-        this.parsedFilenameExpression = FilenameExpressionParser.parse(filenameExpression);
-        this.parsedDuplicateHandlerExpression = FilenameExpressionParser.parse(duplicateHandlerExpression);
+        String defaultFilenameExpression = packageExpression
+                ? DEFAULT_BIE_PACKAGE_SCHEMA_FILENAME_EXPRESSION
+                : DEFAULT_BIE_SCHEMA_FILENAME_EXPRESSION;
+        String defaultDuplicateHandlerExpression = packageExpression
+                ? DEFAULT_BIE_PACKAGE_SCHEMA_DUPLICATE_HANDLER_EXPRESSION
+                : DEFAULT_BIE_SCHEMA_DUPLICATE_HANDLER_EXPRESSION;
+
+        String filenameExpression = packageExpression
+                ? option.getBiePackageSchemaFilenameExpression()
+                : option.getBieSchemaFilenameExpression();
+        String duplicateHandlerExpression = packageExpression
+                ? option.getBiePackageSchemaFilenameDuplicateHandlerExpression()
+                : option.getBieSchemaFilenameDuplicateHandlerExpression();
+
+        return new ExpressionBasedFilenameStrategy(
+                repositoryFactory,
+                filenameExpression,
+                duplicateHandlerExpression,
+                defaultFilenameExpression,
+                defaultDuplicateHandlerExpression,
+                option.getBiePackage(),
+                option.getBizCtxIds(),
+                option.isIncludeBusinessContextInFilename(),
+                option.isIncludeVersionInFilename());
+    }
+
+    private ExpressionBasedFilenameStrategy(RepositoryFactory repositoryFactory,
+                                            String filenameExpression,
+                                            String duplicateHandlerExpression,
+                                            String defaultFilenameExpression,
+                                            String defaultDuplicateHandlerExpression,
+                                            BiePackageSummaryRecord biePackage,
+                                            Map<TopLevelAsbiepId, BusinessContextId> businessContextByTopLevelAsbiepId,
+                                            boolean includeBusinessContextInFilename,
+                                            boolean includeVersionInFilename) {
+        this.repositoryFactory = repositoryFactory;
+        this.biePackage = biePackage;
+        this.businessContextByTopLevelAsbiepId =
+                (businessContextByTopLevelAsbiepId != null) ? businessContextByTopLevelAsbiepId : Collections.emptyMap();
+        this.includeBusinessContextInFilename = includeBusinessContextInFilename;
+        this.includeVersionInFilename = includeVersionInFilename;
+
+        this.defaultFilenameExpression = defaultFilenameExpression;
+        this.defaultDuplicateHandlerExpression = defaultDuplicateHandlerExpression;
+        this.filenameExpression = hasLength(trim(filenameExpression)) ? trim(filenameExpression) : defaultFilenameExpression;
+        this.duplicateHandlerExpression = hasLength(trim(duplicateHandlerExpression))
+                ? trim(duplicateHandlerExpression)
+                : defaultDuplicateHandlerExpression;
+
+        this.parsedDefaultFilenameExpression = FilenameExpressionParser.parse(defaultFilenameExpression);
+        this.parsedDefaultDuplicateHandlerExpression =
+                FilenameExpressionParser.parse(defaultDuplicateHandlerExpression);
+        this.parsedFilenameExpressionCache.put(defaultFilenameExpression, this.parsedDefaultFilenameExpression);
+        this.parsedDuplicateHandlerExpressionCache.put(
+                defaultDuplicateHandlerExpression, this.parsedDefaultDuplicateHandlerExpression);
     }
 
     @Override
-    public final String buildBaseFilename(ScoreUser requester,
-                                          TopLevelAsbiepSummaryRecord topLevelAsbiep,
-                                          GenerateExpressionOption option) {
+    public String buildBaseFilename(ScoreUser requester,
+                                    TopLevelAsbiepSummaryRecord topLevelAsbiep) {
+        FilenameExpressionParser.ParsedExpression parsedExpression =
+                parseFilenameExpressionOrDefault(filenameExpression);
+        try {
+            return evaluateFilenameExpression(requester, topLevelAsbiep,
+                    filenameExpression, parsedExpression);
+        } catch (RuntimeException e) {
+            if (!defaultFilenameExpression.equals(filenameExpression)) {
+                return evaluateFilenameExpression(requester, topLevelAsbiep,
+                        defaultFilenameExpression, parsedDefaultFilenameExpression);
+            }
+            throw e;
+        }
+    }
+
+    private FilenameExpressionParser.ParsedExpression parseFilenameExpressionOrDefault(String expression) {
+        if (!hasLength(expression) || defaultFilenameExpression.equals(expression)) {
+            return parsedDefaultFilenameExpression;
+        }
+        try {
+            return parsedFilenameExpressionCache.computeIfAbsent(expression, FilenameExpressionParser::parse);
+        } catch (RuntimeException ignore) {
+            return parsedDefaultFilenameExpression;
+        }
+    }
+
+    private FilenameExpressionParser.ParsedExpression parseDuplicateHandlerExpressionOrDefault(String expression) {
+        if (!hasLength(expression) || defaultDuplicateHandlerExpression.equals(expression)) {
+            return parsedDefaultDuplicateHandlerExpression;
+        }
+        try {
+            return parsedDuplicateHandlerExpressionCache.computeIfAbsent(expression, FilenameExpressionParser::parse);
+        } catch (RuntimeException ignore) {
+            return parsedDefaultDuplicateHandlerExpression;
+        }
+    }
+
+    private String evaluateFilenameExpression(ScoreUser requester,
+                                              TopLevelAsbiepSummaryRecord topLevelAsbiep,
+                                              String filenameExpression,
+                                              FilenameExpressionParser.ParsedExpression parsedExpression) {
         List<String> businessContextNames =
-                resolveBusinessContextNames(requester, topLevelAsbiep.topLevelAsbiepId(), option);
+                resolveBusinessContextNames(requester, topLevelAsbiep.topLevelAsbiepId());
+        ensurePackageMetadataAvailableIfUsed(biePackage, filenameExpression);
         Map<String, FilenameExpressionEvaluator.PlaceholderValues> placeholders =
-                placeholders(requester, topLevelAsbiep, option, businessContextNames);
-        Map<String, Boolean> flags = flags(option);
+                placeholders(requester, topLevelAsbiep, businessContextNames, filenameExpression);
+        Map<String, Boolean> flags = flags();
 
         return sanitizeFileName(FilenameExpressionEvaluator.evaluate(
-                parsedFilenameExpression,
+                parsedExpression,
                 (placeholderName, flagName) -> {
                     FilenameExpressionEvaluator.PlaceholderValues placeholderValue =
                             resolvePlaceholderValue(placeholderName, placeholders, businessContextNames);
@@ -91,11 +203,8 @@ public abstract class ExpressionBasedFilenameStrategy implements BieSchemaFilena
     protected Map<String, FilenameExpressionEvaluator.PlaceholderValues> placeholders(
             ScoreUser requester,
             TopLevelAsbiepSummaryRecord topLevelAsbiep,
-            GenerateExpressionOption option,
-            List<String> businessContextNames) {
-        BiePackageSummaryRecord biePackage = option.getBiePackage();
-        ensurePackageMetadataAvailableIfUsed(biePackage);
-
+            List<String> businessContextNames,
+            String resolvedFilenameExpression) {
         Map<String, FilenameExpressionEvaluator.PlaceholderValues> placeholders = new LinkedHashMap<>();
         if (biePackage != null) {
             placeholders.put(PLACEHOLDER_BIE_PACKAGE_NAME,
@@ -120,19 +229,16 @@ public abstract class ExpressionBasedFilenameStrategy implements BieSchemaFilena
         placeholders.put(PLACEHOLDER_BIE_STATUS,
                 FilenameExpressionEvaluator.PlaceholderValues.single(topLevelAsbiep.status()));
         placeholders.put(PLACEHOLDER_BIE_REMARK,
-                FilenameExpressionEvaluator.PlaceholderValues.single(resolveBieRemark(requester, topLevelAsbiep)));
+                FilenameExpressionEvaluator.PlaceholderValues.single(
+                        resolveBieRemark(requester, topLevelAsbiep, resolvedFilenameExpression)));
         return placeholders;
     }
 
-    protected Map<String, Boolean> flags(GenerateExpressionOption option) {
+    protected Map<String, Boolean> flags() {
         Map<String, Boolean> flags = new LinkedHashMap<>();
-        flags.put(FLAG_INCLUDE_BUSINESS_CONTEXT, option.isIncludeBusinessContextInFilename());
-        flags.put(FLAG_INCLUDE_VERSION, option.isIncludeVersionInFilename());
+        flags.put(FLAG_INCLUDE_BUSINESS_CONTEXT, includeBusinessContextInFilename);
+        flags.put(FLAG_INCLUDE_VERSION, includeVersionInFilename);
         return flags;
-    }
-
-    protected BusinessContextResolutionOrder businessContextResolutionOrder() {
-        return BusinessContextResolutionOrder.ASSIGNED_THEN_SELECTED;
     }
 
     private FilenameExpressionEvaluator.PlaceholderValues resolvePlaceholderValue(
@@ -172,19 +278,23 @@ public abstract class ExpressionBasedFilenameStrategy implements BieSchemaFilena
         return Boolean.TRUE.equals(flags.get(flagName));
     }
 
-    private void ensurePackageMetadataAvailableIfUsed(BiePackageSummaryRecord biePackage) {
+    private void ensurePackageMetadataAvailableIfUsed(BiePackageSummaryRecord biePackage, String expression) {
         if (biePackage != null) {
             return;
         }
-        if (usesPlaceholder(PLACEHOLDER_BIE_PACKAGE_NAME)
-                || usesPlaceholder(PLACEHOLDER_BIE_PACKAGE_VERSION_ID)
-                || usesPlaceholder(PLACEHOLDER_BIE_PACKAGE_VERSION_NAME)) {
+        if (usesPlaceholder(expression, PLACEHOLDER_BIE_PACKAGE_NAME)
+                || usesPlaceholder(expression, PLACEHOLDER_BIE_PACKAGE_VERSION_ID)
+                || usesPlaceholder(expression, PLACEHOLDER_BIE_PACKAGE_VERSION_NAME)) {
             throw new IllegalArgumentException("BIE package metadata is required for package placeholders.");
         }
     }
 
-    private String resolveBieRemark(ScoreUser requester, TopLevelAsbiepSummaryRecord topLevelAsbiep) {
-        if (!usesPlaceholder(PLACEHOLDER_BIE_REMARK) || topLevelAsbiep == null || topLevelAsbiep.asbiepId() == null) {
+    private String resolveBieRemark(ScoreUser requester,
+                                    TopLevelAsbiepSummaryRecord topLevelAsbiep,
+                                    String expression) {
+        if (!usesPlaceholder(expression, PLACEHOLDER_BIE_REMARK)
+                || topLevelAsbiep == null
+                || topLevelAsbiep.asbiepId() == null) {
             return "";
         }
         AsbiepSummaryRecord asbiep = repositoryFactory.asbiepQueryRepository(requester)
@@ -193,10 +303,6 @@ public abstract class ExpressionBasedFilenameStrategy implements BieSchemaFilena
             return "";
         }
         return asbiep.remark();
-    }
-
-    private boolean usesPlaceholder(String placeholderName) {
-        return usesPlaceholder(filenameExpression, placeholderName);
     }
 
     private boolean usesPlaceholder(String expression, String placeholderName) {
@@ -209,22 +315,14 @@ public abstract class ExpressionBasedFilenameStrategy implements BieSchemaFilena
     }
 
     private List<String> resolveBusinessContextNames(ScoreUser requester,
-                                                     TopLevelAsbiepId topLevelAsbiepId,
-                                                     GenerateExpressionOption option) {
+                                                     TopLevelAsbiepId topLevelAsbiepId) {
         BusinessContextQueryRepository businessContextQuery =
                 repositoryFactory.businessContextQueryRepository(requester);
         Set<String> businessContextNames = new LinkedHashSet<>();
 
-        if (businessContextResolutionOrder() == BusinessContextResolutionOrder.SELECTED_THEN_ASSIGNED) {
-            addSelectedBusinessContextName(topLevelAsbiepId, option, businessContextQuery, businessContextNames);
-            if (businessContextNames.isEmpty()) {
-                addAssignedBusinessContextNames(topLevelAsbiepId, businessContextQuery, businessContextNames);
-            }
-        } else {
+        addSelectedBusinessContextName(topLevelAsbiepId, businessContextQuery, businessContextNames);
+        if (businessContextNames.isEmpty()) {
             addAssignedBusinessContextNames(topLevelAsbiepId, businessContextQuery, businessContextNames);
-            if (businessContextNames.isEmpty()) {
-                addSelectedBusinessContextName(topLevelAsbiepId, option, businessContextQuery, businessContextNames);
-            }
         }
 
         return new ArrayList<>(businessContextNames);
@@ -250,13 +348,8 @@ public abstract class ExpressionBasedFilenameStrategy implements BieSchemaFilena
 
     private void addSelectedBusinessContextName(
             TopLevelAsbiepId topLevelAsbiepId,
-            GenerateExpressionOption option,
             BusinessContextQueryRepository businessContextQuery,
             Set<String> businessContextNames) {
-        Map<TopLevelAsbiepId, BusinessContextId> businessContextByTopLevelAsbiepId = option.getBizCtxIds();
-        if (businessContextByTopLevelAsbiepId == null) {
-            return;
-        }
         BusinessContextId selectedBusinessContextId = businessContextByTopLevelAsbiepId.get(topLevelAsbiepId);
         if (selectedBusinessContextId == null) {
             return;
@@ -268,16 +361,31 @@ public abstract class ExpressionBasedFilenameStrategy implements BieSchemaFilena
         }
     }
 
-    protected enum BusinessContextResolutionOrder {
-        ASSIGNED_THEN_SELECTED,
-        SELECTED_THEN_ASSIGNED
+    @Override
+    public String resolveDuplicateFilename(String baseFilename,
+                                           TopLevelAsbiepId topLevelAsbiepId,
+                                           int occurrence,
+                                           int totalOccurrences) {
+        FilenameExpressionParser.ParsedExpression parsedExpression =
+                parseDuplicateHandlerExpressionOrDefault(duplicateHandlerExpression);
+        try {
+            return resolveDuplicateFilename(baseFilename, topLevelAsbiepId, occurrence, totalOccurrences,
+                    duplicateHandlerExpression, parsedExpression);
+        } catch (RuntimeException e) {
+            if (!defaultDuplicateHandlerExpression.equals(duplicateHandlerExpression)) {
+                return resolveDuplicateFilename(baseFilename, topLevelAsbiepId, occurrence, totalOccurrences,
+                        defaultDuplicateHandlerExpression, parsedDefaultDuplicateHandlerExpression);
+            }
+            throw e;
+        }
     }
 
-    @Override
-    public final String resolveDuplicateFilename(String baseFilename,
-                                                 TopLevelAsbiepId topLevelAsbiepId,
-                                                 int occurrence,
-                                                 int totalOccurrences) {
+    private String resolveDuplicateFilename(String baseFilename,
+                                            TopLevelAsbiepId topLevelAsbiepId,
+                                            int occurrence,
+                                            int totalOccurrences,
+                                            String duplicateHandlerExpression,
+                                            FilenameExpressionParser.ParsedExpression parsedExpression) {
         if (totalOccurrences <= 1 || !hasLength(duplicateHandlerExpression)) {
             return baseFilename;
         }
@@ -295,7 +403,7 @@ public abstract class ExpressionBasedFilenameStrategy implements BieSchemaFilena
                 FilenameExpressionEvaluator.PlaceholderValues.single(String.valueOf(occurrence)));
 
         String suffix = FilenameExpressionEvaluator.evaluate(
-                parsedDuplicateHandlerExpression,
+                parsedExpression,
                 (placeholderName, flagName) -> {
                     if (hasLength(flagName)) {
                         throw new IllegalArgumentException(

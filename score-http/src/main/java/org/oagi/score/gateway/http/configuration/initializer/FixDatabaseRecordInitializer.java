@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.time.LocalDateTime;
 
 import static org.jooq.impl.DSL.*;
 import static org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService.NAVBAR_BRAND_CONFIG_PARAM_NAME;

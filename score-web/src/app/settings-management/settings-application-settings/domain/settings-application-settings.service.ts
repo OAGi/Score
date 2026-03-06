@@ -16,7 +16,11 @@ export class SettingsApplicationSettingsService {
 
   update(applicationSettingsInfo: ApplicationSettingsInfo): Observable<any> {
     return this.http.post('/api/application/settings', {
-      smtpSettingsInfo: applicationSettingsInfo.smtpSettingsInfo
+      smtpSettingsInfo: applicationSettingsInfo.smtpSettingsInfo,
+      bieSchemaFilenameExpression: applicationSettingsInfo.bieSchemaFilenameExpression,
+      biePackageSchemaFilenameExpression: applicationSettingsInfo.biePackageSchemaFilenameExpression,
+      bieSchemaFilenameDuplicateHandlerExpression: applicationSettingsInfo.bieSchemaFilenameDuplicateHandlerExpression,
+      biePackageSchemaFilenameDuplicateHandlerExpression: applicationSettingsInfo.biePackageSchemaFilenameDuplicateHandlerExpression
     });
   }
 
@@ -42,8 +46,42 @@ export class SettingsApplicationSettingsService {
     return this.updateBooleanConfiguration('functions-requiring-email-transmission', value);
   }
 
+  updateBrowseStandardModeConfiguration(value: boolean): Observable<any> {
+    return this.updateBooleanConfiguration('browse-standard-mode', value);
+  }
+
   updateBooleanConfiguration(type: string, value: boolean): Observable<any> {
     return this.http.post('/api/application/' + type + '/' + (value ? 'enable' : 'disable'), {});
+  }
+
+  updateBieFilenameExpressions(bieSchemaFilenameExpression: string,
+                               biePackageSchemaFilenameExpression: string,
+                               bieSchemaFilenameDuplicateHandlerExpression: string,
+                               biePackageSchemaFilenameDuplicateHandlerExpression: string): Observable<any> {
+    return this.http.post('/api/application/settings', {
+      bieSchemaFilenameExpression,
+      biePackageSchemaFilenameExpression,
+      bieSchemaFilenameDuplicateHandlerExpression,
+      biePackageSchemaFilenameDuplicateHandlerExpression
+    });
+  }
+
+  validateFilenameExpression(type: 'bie-schema' | 'bie-package-schema',
+                             expression: string,
+                             duplicateHandlerExpression: string): Observable<any> {
+    return this.http.post('/api/application/filename-expression/' + type + '/validate', {
+      expression,
+      duplicateHandlerExpression
+    });
+  }
+
+  previewFilenameExpression(type: 'bie-schema' | 'bie-package-schema',
+                            expression: string,
+                            duplicateHandlerExpression: string): Observable<any> {
+    return this.http.post('/api/application/filename-expression/' + type + '/preview', {
+      expression,
+      duplicateHandlerExpression
+    });
   }
 
   getConfiguration(key: string): Observable<any> {

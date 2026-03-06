@@ -394,7 +394,19 @@ public class BieJSON202012GenerateExpression implements BieGenerateExpression, I
             properties.put("items", items);
         }
 
-        ((Map<String, Object>) parent.get("properties")).put(name, properties);
+        Map<String, Object> parentProperties = (Map<String, Object>) parent.get("properties");
+        if (isReferencedSchemaFile(topLevelAsbiep)) {
+            // Mirror XML "global named type" style for referenced schema files.
+            // The root property points to a named $defs type, and external refs can target it.
+            String topLevelTypeName = resolveTopLevelExternalTypeName(topLevelAsbiep, asccp, definitions);
+            definitions.putIfAbsent(topLevelTypeName, properties);
+            Map<String, Object> refProperty = new LinkedHashMap<>();
+            refProperty.put("$ref", "#/$defs/" + topLevelTypeName);
+            parentProperties.put(name, refProperty);
+            return;
+        }
+
+        parentProperties.put(name, properties);
     }
 
     private void attachBiePackageAttributes(Map<String, Object> properties, Map<String, Object> definitions,
@@ -892,7 +904,6 @@ public class BieJSON202012GenerateExpression implements BieGenerateExpression, I
                                 AsbiepSummaryRecord asbiep,
                                 GenerationContext generationContext) {
         String refNameOfTopLevelAsbiep = resolveReusedSchemaName(definitions, asbiep);
-        String refRootPropertyName = resolveRootPropertyName(asbiep);
         TopLevelAsbiepSummaryRecord refTopLevelAsbiep = generationContext.findTopLevelAsbiep(asbiep.ownerTopLevelAsbiepId());
         if (!option.isSeparateFileReferencesForReusedSchemas()) {
             if (!definitions.containsKey(refNameOfTopLevelAsbiep)) {
@@ -904,18 +915,19 @@ public class BieJSON202012GenerateExpression implements BieGenerateExpression, I
             }
             return "#/$defs/" + refNameOfTopLevelAsbiep;
         } else {
-            String refFileName = resolveExternalRefFileName(
-                    refTopLevelAsbiep, refNameOfTopLevelAsbiep, refRootPropertyName);
+            String refFileName = resolveExternalRefFileName(refTopLevelAsbiep);
             if (!StringUtils.hasLength(refFileName)) {
                 refFileName = defaultExternalRefFileName(refNameOfTopLevelAsbiep);
             }
-            return refFileName + ".json#/properties/" + escapeJsonPointerToken(refRootPropertyName);
+            String refTypeName = resolveTopLevelExternalTypeName(
+                    refTopLevelAsbiep,
+                    generationContext.queryBasedASCCP(asbiep),
+                    null);
+            return refFileName + ".json#/$defs/" + escapeJsonPointerToken(refTypeName);
         }
     }
 
-    private String resolveExternalRefFileName(TopLevelAsbiepSummaryRecord refTopLevelAsbiep,
-                                              String refNameOfTopLevelAsbiep,
-                                              String refRootPropertyName) {
+    private String resolveExternalRefFileName(TopLevelAsbiepSummaryRecord refTopLevelAsbiep) {
         Map<TopLevelAsbiepId, String> filenames = option.getFilenames();
         if (filenames == null || filenames.isEmpty()) {
             return null;
@@ -954,9 +966,34 @@ public class BieJSON202012GenerateExpression implements BieGenerateExpression, I
         return convertIdentifierToId(camelCase(asccp.propertyTerm()));
     }
 
-    private String resolveRootPropertyName(AsbiepSummaryRecord asbiep) {
-        AsccpSummaryRecord asccp = generationContext.queryBasedASCCP(asbiep);
-        return convertIdentifierToId(camelCase(asccp.propertyTerm()));
+    private String resolveTopLevelExternalTypeName(TopLevelAsbiepSummaryRecord topLevelAsbiep,
+                                                   AsccpSummaryRecord asccp,
+                                                   Map<String, Object> definitions) {
+        String baseName = convertIdentifierToId(camelCase(asccp.propertyTerm()));
+        String topLevelAsbiepIdValue = (topLevelAsbiep != null && topLevelAsbiep.topLevelAsbiepId() != null)
+                ? topLevelAsbiep.topLevelAsbiepId().value().toString()
+                : "0";
+        String candidate = baseName + "_" + topLevelAsbiepIdValue + "Type";
+        if (definitions == null) {
+            return candidate;
+        }
+        if (!definitions.containsKey(candidate)) {
+            return candidate;
+        }
+        int suffix = 1;
+        String uniqueCandidate = candidate + "_" + suffix;
+        while (definitions.containsKey(uniqueCandidate)) {
+            suffix++;
+            uniqueCandidate = candidate + "_" + suffix;
+        }
+        return uniqueCandidate;
+    }
+
+    private boolean isReferencedSchemaFile(TopLevelAsbiepSummaryRecord topLevelAsbiep) {
+        if (topLevelAsbiep == null || topLevelAsbiep.topLevelAsbiepId() == null || generationContext == null) {
+            return false;
+        }
+        return generationContext.getSchemaReferenceInfo(topLevelAsbiep.topLevelAsbiepId()).isReferencedSchemaFile();
     }
 
     private String escapeJsonPointerToken(String token) {

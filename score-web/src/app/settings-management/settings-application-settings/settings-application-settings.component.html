@@ -65,9 +65,9 @@
                     </div>
                   </div>
                 </div>
-                <div class="row">
+                <div class="row pt-2">
                   <div class="col-md-4 col-sm-12">
-                    <mat-label>Functions requiring email transmission (e.g., ownership transfer requests)</mat-label>
+                    <mat-label>Email-Based Workflows</mat-label>
                     <div class="actions">
                       <button mat-raised-button color="primary"
                               (click)="updateFunctionsRequiringEmailTransmissionConfiguration(true)"
@@ -77,6 +77,21 @@
                       <button mat-raised-button color="warn"
                               (click)="updateFunctionsRequiringEmailTransmissionConfiguration(false)"
                               [disabled]="!isFunctionsRequiringEmailTransmissionEnabled">
+                        Disable
+                      </button>
+                    </div>
+                  </div>
+                  <div class="col-md-4 col-sm-12">
+                    <mat-label>Browse Standard mode</mat-label>
+                    <div class="actions">
+                      <button mat-raised-button color="primary"
+                              (click)="updateBrowseStandardModeConfiguration(true)"
+                              [disabled]="isBrowseStandardModeEnabled">
+                        Enable
+                      </button>
+                      <button mat-raised-button color="warn"
+                              (click)="updateBrowseStandardModeConfiguration(false)"
+                              [disabled]="!isBrowseStandardModeEnabled">
                         Disable
                       </button>
                     </div>
@@ -147,6 +162,87 @@
                         Test
                       </button>
                     </div>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4" *ngIf="!!applicationSettingsInfo">
+                <div class="subhead">
+                  <h4 class="subhead-heading">Filename Expressions</h4>
+                </div>
+                <div class="webpage-setting">
+                  <div class="row">
+                    <div class="col-12">
+                      <details>
+                        <summary><b>Guide</b></summary>
+                        <div class="pt-2">
+                          <div><b>Filename Syntax</b>: <code>&#123;Placeholder&#125;</code> <code>(optional-group)</code> <code>&#123;Placeholder?flag&#125;</code> <code>&#123;Placeholder:separator('-')&#125;</code> <code>&#123;Placeholder:replace('regex', 'replacement')&#125;</code></div>
+                          <div class="pt-2"><b>Duplicate Handler Syntax</b>: <code>-&#123;Incremental&#125;</code>, <code>~&#123;BIE ID&#125;</code></div>
+                          <div class="pt-2"><b>Flags</b>: `includeBusinessContext`, `includeVersion`</div>
+                          <div class="pt-2"><b>Common placeholders</b>: `BIE Property Term`, `BIE Display Name`, `BIE Version`, `BIE DEN`, `BIE Status`, `BIE Remark`, `BIE ID`, `Business Context Names`, `Business Context Name[0]`</div>
+                          <div class="pt-2"><b>BIE Package only</b>: `BIE Package Name`, `BIE Package Version ID`, `BIE Package Version Name`</div>
+                          <div class="pt-2"><b>Duplicate handler placeholders</b>: `Incremental`, `BIE ID`</div>
+                          <div class="pt-2"><b>Example (BIE Schema)</b>: <code>&#123;BIE Property Term:separator('-')&#125;(-&#123;Business Context Name[0]?includeBusinessContext&#125;)(-&#123;BIE Version?includeVersion:replace('\\.', '_')&#125;)</code></div>
+                          <div class="pt-2"><b>Example (BIE Package Schema)</b>: <code>&#123;BIE Package Name&#125;-&#123;BIE Package Version ID&#125;_&#123;Business Context Names:replace('\\s+', ''):separator('+')&#125;_&#123;BIE Property Term&#125;([&#123;BIE Display Name&#125;])(-&#123;BIE Version&#125;)</code></div>
+                        </div>
+                      </details>
+                    </div>
+                  </div>
+                  <div class="row pt-2">
+                    <div class="col-6">
+                      <div class="subsubhead">
+                        <h5 class="subsubhead-heading">BIE Schema Expression</h5>
+                      </div>
+                      <textarea class="width-max"
+                                cdkTextareaAutosize
+                                [cdkAutosizeMinRows]="3"
+                                [cdkAutosizeMaxRows]="8"
+                                [(ngModel)]="applicationSettingsInfo.bieSchemaFilenameExpression"></textarea>
+                      <div class="subsubhead pt-2">
+                        <h5 class="subsubhead-heading">Duplicate Handler Expression</h5>
+                      </div>
+                      <textarea class="width-max"
+                                cdkTextareaAutosize
+                                [cdkAutosizeMinRows]="2"
+                                [cdkAutosizeMaxRows]="4"
+                                [(ngModel)]="applicationSettingsInfo.bieSchemaFilenameDuplicateHandlerExpression"></textarea>
+                      <div class="actions pt-2">
+                        <button mat-raised-button color="primary" (click)="validateBieSchemaFilenameExpression()">
+                          Evaluate
+                        </button>
+                      </div>
+                      <div class="pt-2"><b>Sample Filename:</b> <code>{{ bieSchemaSampleFilename || '-' }}</code></div>
+                      <div class="pt-1"><b>Sample Duplicate Filename:</b> <code>{{ bieSchemaSampleDuplicateFilename || '-' }}</code></div>
+                    </div>
+                    <div class="col-6">
+                      <div class="subsubhead">
+                        <h5 class="subsubhead-heading">BIE Package Schema Expression</h5>
+                      </div>
+                      <textarea class="width-max"
+                                cdkTextareaAutosize
+                                [cdkAutosizeMinRows]="3"
+                                [cdkAutosizeMaxRows]="8"
+                                [(ngModel)]="applicationSettingsInfo.biePackageSchemaFilenameExpression"></textarea>
+                      <div class="subsubhead pt-2">
+                        <h5 class="subsubhead-heading">Duplicate Handler Expression</h5>
+                      </div>
+                      <textarea class="width-max"
+                                cdkTextareaAutosize
+                                [cdkAutosizeMinRows]="2"
+                                [cdkAutosizeMaxRows]="4"
+                                [(ngModel)]="applicationSettingsInfo.biePackageSchemaFilenameDuplicateHandlerExpression"></textarea>
+                      <div class="actions pt-2">
+                        <button mat-raised-button color="primary" (click)="validateBiePackageSchemaFilenameExpression()">
+                          Evaluate
+                        </button>
+                      </div>
+                      <div class="pt-2"><b>Sample Filename:</b> <code>{{ biePackageSchemaSampleFilename || '-' }}</code></div>
+                      <div class="pt-1"><b>Sample Duplicate Filename:</b> <code>{{ biePackageSchemaSampleDuplicateFilename || '-' }}</code></div>
+                    </div>
+                  </div>
+                  <div class="actions pt-4">
+                    <button mat-raised-button color="primary" (click)="updateBieFilenameExpressions()">
+                      Update
+                    </button>
                   </div>
                 </div>
               </div>
