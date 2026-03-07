@@ -104,8 +104,11 @@ public class BiePackageQueryService {
 
         Map<TopLevelAsbiepId, File> result =
                 bieGenerateService.generateSchemaForEach(requester, topLevelAsbiepList, option);
+        Map<TopLevelAsbiepId, String> generatedFilesByTopLevelAsbiepId = result.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getName()));
         BiePackageManifestResponse biePackageManifestResponse =
-                biePackageManifestService.getBiePackageManifest(requester, biePackageId, pathDelimiter);
+                biePackageManifestService.getBiePackageManifest(
+                        requester, biePackageId, pathDelimiter, generatedFilesByTopLevelAsbiepId);
 
         return makeGenerateBiePackageResponse(biePackage, result, biePackageManifestResponse);
     }

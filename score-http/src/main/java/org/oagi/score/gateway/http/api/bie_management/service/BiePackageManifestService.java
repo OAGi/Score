@@ -4,16 +4,24 @@ import jakarta.annotation.Nullable;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.BieAssociation;
+import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.abie.Abie;
 import org.oagi.score.gateway.http.api.bie_management.model.asbie.Asbie;
 import org.oagi.score.gateway.http.api.bie_management.model.asbiep.Asbiep;
+import org.oagi.score.gateway.http.api.bie_management.model.asbiep.AsbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.bbie.Bbie;
 import org.oagi.score.gateway.http.api.bie_management.model.bbie_sc.BbieSc;
 import org.oagi.score.gateway.http.api.bie_management.model.bbiep.Bbiep;
 import org.oagi.score.gateway.http.api.bie_management.model.bie_package.*;
 import org.oagi.score.gateway.http.api.bie_management.repository.BiePackageQueryRepository;
 import org.oagi.score.gateway.http.api.bie_management.repository.TopLevelAsbiepQueryRepository;
+import org.oagi.score.gateway.http.api.context_management.business_context.model.BusinessContextSummaryRecord;
+import org.oagi.score.gateway.http.api.context_management.business_context.model.BusinessContextValueRecord;
+import org.oagi.score.gateway.http.api.context_management.business_context.repository.BusinessContextQueryRepository;
+import org.oagi.score.gateway.http.api.context_management.context_scheme.model.ContextSchemeDetailsRecord;
+import org.oagi.score.gateway.http.api.context_management.context_scheme.model.ContextSchemeId;
+import org.oagi.score.gateway.http.api.context_management.context_scheme.repository.ContextSchemeQueryRepository;
 import org.oagi.score.gateway.http.api.cc_management.model.ascc.AsccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.bcc.BccSummaryRecord;
@@ -54,7 +62,7 @@ import static org.oagi.score.gateway.http.common.util.StringUtils.hasLength;
 @Transactional(readOnly = true)
 public class BiePackageManifestService {
 
-    private static final String BIE_PACKAGE_MANIFEST_VERSION = "0.1";
+    private static final String BIE_PACKAGE_MANIFEST_VERSION = "0.2";
 
     @Autowired
     private RepositoryFactory repositoryFactory;
@@ -64,11 +72,23 @@ public class BiePackageManifestService {
 
     public BiePackageManifestResponse getBiePackageManifest(ScoreUser requester,
                                                             BiePackageId biePackageId, String pathDelimiter) {
+        return getBiePackageManifest(requester, biePackageId, pathDelimiter, Collections.emptyMap());
+    }
+
+    public BiePackageManifestResponse getBiePackageManifest(ScoreUser requester,
+                                                            BiePackageId biePackageId,
+                                                            String pathDelimiter,
+                                                            Map<TopLevelAsbiepId, String> generatedFilesByTopLevelAsbiepId) {
 
         BiePackageQueryRepository biePackageQueryRepository = repositoryFactory.biePackageQueryRepository(requester);
         BiePackageSummaryRecord currentPackage = biePackageQueryRepository.getBiePackageSummary(biePackageId);
 
         TopLevelAsbiepQueryRepository topLevelAsbiepQueryRepository = repositoryFactory.topLevelAsbiepQueryRepository(requester);
+        var asbiepQueryRepository = repositoryFactory.asbiepQueryRepository(requester);
+        BusinessContextQueryRepository businessContextQueryRepository =
+                repositoryFactory.businessContextQueryRepository(requester);
+        ContextSchemeQueryRepository contextSchemeQueryRepository =
+                repositoryFactory.contextSchemeQueryRepository(requester);
 
         Collection<BieManifestSummary> newBiesFromPriorPackageVersion = new ArrayList<>();
         Collection<BieManifestSummary> removedBiesFromPriorPackageVersion = new ArrayList<>();
@@ -103,7 +123,13 @@ public class BiePackageManifestService {
                 BieTrackContext context = diff(requester, currentTopLevelAsbiep, prevTopLevelAsbiep, pathDelimiter);
                 if (context != null) {
                     biePackageManifestEntry = new BiePackageManifestEntry(
-                            newBieManifestDetail(currentTopLevelAsbiep),
+                            newBieManifestDetail(currentTopLevelAsbiep,
+                                    resolveRemark(asbiepQueryRepository, currentTopLevelAsbiep),
+                                    resolveBusinessContexts(
+                                            businessContextQueryRepository,
+                                            contextSchemeQueryRepository,
+                                            currentTopLevelAsbiep),
+                                    generatedFilesByTopLevelAsbiepId.get(currentTopLevelAsbiep.topLevelAsbiepId())),
                             prevTopLevelAsbiep.guid(),
                             prevTopLevelAsbiep.version(),
                             null,
@@ -131,7 +157,13 @@ public class BiePackageManifestService {
                 }
             } else {
                 biePackageManifestEntry = new BiePackageManifestEntry(
-                        newBieManifestDetail(currentTopLevelAsbiep),
+                        newBieManifestDetail(currentTopLevelAsbiep,
+                                resolveRemark(asbiepQueryRepository, currentTopLevelAsbiep),
+                                resolveBusinessContexts(
+                                        businessContextQueryRepository,
+                                        contextSchemeQueryRepository,
+                                        currentTopLevelAsbiep),
+                                generatedFilesByTopLevelAsbiepId.get(currentTopLevelAsbiep.topLevelAsbiepId())),
                         null,
                         null,
                         null,
@@ -199,6 +231,52 @@ public class BiePackageManifestService {
                 new BiePackageManifestResponse(BIE_PACKAGE_MANIFEST_VERSION, biePackageMetadata);
 
         return biePackageManifest;
+    }
+
+    private String resolveRemark(org.oagi.score.gateway.http.api.bie_management.repository.AsbiepQueryRepository asbiepQueryRepository,
+                                 TopLevelAsbiepSummaryRecord topLevelAsbiep) {
+        AsbiepSummaryRecord asbiep = asbiepQueryRepository.getAsbiepSummary(topLevelAsbiep.asbiepId());
+        return (asbiep != null) ? asbiep.remark() : null;
+    }
+
+    private Collection<BusinessContextManifest> resolveBusinessContexts(
+            BusinessContextQueryRepository businessContextQueryRepository,
+            ContextSchemeQueryRepository contextSchemeQueryRepository,
+            TopLevelAsbiepSummaryRecord topLevelAsbiep) {
+        List<BusinessContextSummaryRecord> businessContextSummaries =
+                businessContextQueryRepository.getBusinessContextSummaryList(topLevelAsbiep.topLevelAsbiepId());
+        if (businessContextSummaries == null || businessContextSummaries.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Map<ContextSchemeId, ContextSchemeDetailsRecord> contextSchemeDetailsById = new HashMap<>();
+        List<BusinessContextManifest> businessContexts = new ArrayList<>();
+        for (BusinessContextSummaryRecord businessContextSummary : businessContextSummaries) {
+            List<BusinessContextValueRecord> businessContextValueRecords =
+                    businessContextQueryRepository.getBusinessContextValueList(businessContextSummary.businessContextId());
+            List<BusinessContextValueManifest> businessContextValues = new ArrayList<>();
+            if (businessContextValueRecords != null) {
+                for (BusinessContextValueRecord businessContextValueRecord : businessContextValueRecords) {
+                    ContextSchemeDetailsRecord contextSchemeDetails = contextSchemeDetailsById.computeIfAbsent(
+                            businessContextValueRecord.contextSchemeId(),
+                            contextSchemeQueryRepository::getContextSchemeDetails);
+                    businessContextValues.add(new BusinessContextValueManifest(
+                            businessContextValueRecord.contextCategoryName(),
+                            new ContextSchemeManifest(
+                                    (contextSchemeDetails != null) ? contextSchemeDetails.schemeId() : null,
+                                    (contextSchemeDetails != null) ? contextSchemeDetails.schemeName() : businessContextValueRecord.contextSchemeName(),
+                                    (contextSchemeDetails != null) ? contextSchemeDetails.schemeAgencyId() : null,
+                                    (contextSchemeDetails != null) ? contextSchemeDetails.schemeVersionId() : null),
+                            businessContextValueRecord.contextSchemeValue()));
+                }
+            }
+
+            businessContexts.add(new BusinessContextManifest(
+                    businessContextSummary.name(),
+                    businessContextValues));
+        }
+
+        return businessContexts;
     }
 
     private ReleaseSummaryRecord findLatestReleasesIn(ScoreUser requester,
