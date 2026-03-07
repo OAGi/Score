@@ -799,14 +799,8 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         return !Objects.equals(asbie.ownerTopLevelAsbiepId(), asbiep.ownerTopLevelAsbiepId());
     }
 
-    /**
-     * XML-specific gate for split reused-schema generation.
-     */
     private boolean isSeparateFileReferencesForReusedSchemasEnabled() {
-        if (option == null || !option.isSeparateFileReferencesForReusedSchemas()) {
-            return false;
-        }
-        return "XML".equalsIgnoreCase(option.getExpressionOption());
+        return (option != null) && (option.isSeparateFileReferencesForReusedSchemas());
     }
 
     /**

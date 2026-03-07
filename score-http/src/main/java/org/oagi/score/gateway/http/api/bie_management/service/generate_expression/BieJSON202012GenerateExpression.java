@@ -1154,12 +1154,16 @@ public class BieJSON202012GenerateExpression implements BieGenerateExpression, I
         }
 
         // The "required" property for the root element of schema should has only one child.
-        if (((List<String>) root.get("required")).size() > 1) {
+        List<String> required = (List<String>) root.get("required");
+        if (required != null && required.size() > 1) {
             root.remove("required");
         }
 
-        //
         Map<String, Object> properties = (Map<String, Object>) root.get("properties");
+        if (properties == null || properties.isEmpty()) {
+            return;
+        }
+
         for (String key : properties.keySet()) {
             Map<String, Object> copied = new LinkedHashMap();
             copied.putAll(((Map<String, Object>) properties.get(key)));

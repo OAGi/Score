@@ -662,16 +662,12 @@ public class BieGenerateService {
      * Clones user option for referenced-schema generation.
      * <p>
      * Referenced files are generated as dependency targets, so target-only output wrappers
-     * (array/meta-header/pagination response) must be disabled. XML keeps split-reference mode
-     * enabled to continue emitting include/import directives consistently.
+     * (array/meta-header/pagination response) must be disabled. Reused-schema split references
+     * stay enabled so nested referenced schemas continue to externalize consistently.
      */
     private GenerateExpressionOption cloneOptionForReferencedSchema(GenerateExpressionOption option) {
         GenerateExpressionOption copied = new GenerateExpressionOption();
         BeanUtils.copyProperties(option, copied);
-        // Keep XML split-reference behavior for referenced files so namespace-based imports remain consistent.
-        if (!"XML".equalsIgnoreCase(option.getExpressionOption())) {
-            copied.setSeparateFileReferencesForReusedSchemas(false);
-        }
         // Apply array wrapper only to direct target schemas, not reused referenced schemas.
         copied.setArrayForJsonExpression(false);
         // Apply meta-header only to direct target schemas, not reused referenced schemas.
