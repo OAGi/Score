@@ -1,7 +1,6 @@
 package org.oagi.score.gateway.http.api.oas_management.controller;
 
 import io.swagger.v3.oas.annotations.Parameter;
-import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
 import org.oagi.score.gateway.http.api.bie_management.model.BieState;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpManifestId;
@@ -43,9 +42,6 @@ public class OpenAPIDocController {
 
     @Autowired
     private BusinessContextQueryService businessContextQueryService;
-
-    @Autowired
-    private ApplicationConfigurationService applicationConfigurationService;
 
     @Autowired
     private SessionService sessionService;
@@ -811,5 +807,4 @@ public class OpenAPIDocController {
         }
     }
 }
-
 

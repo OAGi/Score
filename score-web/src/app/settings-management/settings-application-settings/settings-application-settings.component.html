@@ -19,7 +19,7 @@
                   <h4 class="subhead-heading">Application Features</h4>
                 </div>
                 <div class="row">
-                  <div class="col-md-4 col-sm-12" *ngIf="!isTenantEnabled">
+                  <div class="col-md-4 col-sm-12">
                     <mat-label>Multi-tenant mode</mat-label>
                     <div class="actions">
                       <button mat-raised-button color="primary"
@@ -34,17 +34,21 @@
                       </button>
                     </div>
                   </div>
-                  <div class="col-md-4 col-sm-12" *ngIf="!isTenantEnabled">
-                    <mat-label>Business term function</mat-label>
+                  <div class="col-md-4 col-sm-12">
+                    <mat-label [matTooltip]="'Unavailable in multi-tenant mode'"
+                               [matTooltipDisabled]="!isTenantEnabled"
+                               [class.feature-disabled-label]="isTenantEnabled">
+                      Business term function
+                    </mat-label>
                     <div class="actions">
                       <button mat-raised-button color="primary"
                               (click)="updateBusinessTermConfiguration(true)"
-                              [disabled]="isBusinessTermEnabled">
+                              [disabled]="isTenantEnabled || isBusinessTermEnabled">
                         Enable
                       </button>
                       <button mat-raised-button color="warn"
                               (click)="updateBusinessTermConfiguration(false)"
-                              [disabled]="!isBusinessTermEnabled">
+                              [disabled]="isTenantEnabled || !isBusinessTermEnabled">
                         Disable
                       </button>
                     </div>
@@ -193,22 +197,26 @@
                         <h5 class="subsubhead-heading">BIE Schema Expression</h5>
                       </div>
                       <textarea class="width-max"
+                                [class.filename-expression-input-error]="!!bieSchemaFilenameExpressionError"
                                 cdkTextareaAutosize
                                 [cdkAutosizeMinRows]="3"
                                 [cdkAutosizeMaxRows]="8"
-                                [(ngModel)]="applicationSettingsInfo.bieSchemaFilenameExpression"></textarea>
+                                [(ngModel)]="applicationSettingsInfo.bieSchemaFilenameExpression"
+                                (ngModelChange)="queueBieSchemaFilenamePreview()"></textarea>
                       <div class="subsubhead pt-2">
                         <h5 class="subsubhead-heading">Duplicate Handler Expression</h5>
                       </div>
                       <textarea class="width-max"
+                                [class.filename-expression-input-error]="!!bieSchemaFilenameExpressionError"
                                 cdkTextareaAutosize
                                 [cdkAutosizeMinRows]="2"
                                 [cdkAutosizeMaxRows]="4"
-                                [(ngModel)]="applicationSettingsInfo.bieSchemaFilenameDuplicateHandlerExpression"></textarea>
-                      <div class="actions pt-2">
-                        <button mat-raised-button color="primary" (click)="validateBieSchemaFilenameExpression()">
-                          Evaluate
-                        </button>
+                                [(ngModel)]="applicationSettingsInfo.bieSchemaFilenameDuplicateHandlerExpression"
+                                (ngModelChange)="queueBieSchemaFilenamePreview()"></textarea>
+                      <div *ngIf="bieSchemaFilenameExpressionError"
+                           class="filename-expression-error"
+                           role="alert">
+                        {{ bieSchemaFilenameExpressionError }}
                       </div>
                       <div class="pt-2"><b>Sample Filename:</b> <code>{{ bieSchemaSampleFilename || '-' }}</code></div>
                       <div class="pt-1"><b>Sample Duplicate Filename:</b> <code>{{ bieSchemaSampleDuplicateFilename || '-' }}</code></div>
@@ -218,22 +226,26 @@
                         <h5 class="subsubhead-heading">BIE Package Schema Expression</h5>
                       </div>
                       <textarea class="width-max"
+                                [class.filename-expression-input-error]="!!biePackageSchemaFilenameExpressionError"
                                 cdkTextareaAutosize
                                 [cdkAutosizeMinRows]="3"
                                 [cdkAutosizeMaxRows]="8"
-                                [(ngModel)]="applicationSettingsInfo.biePackageSchemaFilenameExpression"></textarea>
+                                [(ngModel)]="applicationSettingsInfo.biePackageSchemaFilenameExpression"
+                                (ngModelChange)="queueBiePackageSchemaFilenamePreview()"></textarea>
                       <div class="subsubhead pt-2">
                         <h5 class="subsubhead-heading">Duplicate Handler Expression</h5>
                       </div>
                       <textarea class="width-max"
+                                [class.filename-expression-input-error]="!!biePackageSchemaFilenameExpressionError"
                                 cdkTextareaAutosize
                                 [cdkAutosizeMinRows]="2"
                                 [cdkAutosizeMaxRows]="4"
-                                [(ngModel)]="applicationSettingsInfo.biePackageSchemaFilenameDuplicateHandlerExpression"></textarea>
-                      <div class="actions pt-2">
-                        <button mat-raised-button color="primary" (click)="validateBiePackageSchemaFilenameExpression()">
-                          Evaluate
-                        </button>
+                                [(ngModel)]="applicationSettingsInfo.biePackageSchemaFilenameDuplicateHandlerExpression"
+                                (ngModelChange)="queueBiePackageSchemaFilenamePreview()"></textarea>
+                      <div *ngIf="biePackageSchemaFilenameExpressionError"
+                           class="filename-expression-error"
+                           role="alert">
+                        {{ biePackageSchemaFilenameExpressionError }}
                       </div>
                       <div class="pt-2"><b>Sample Filename:</b> <code>{{ biePackageSchemaSampleFilename || '-' }}</code></div>
                       <div class="pt-1"><b>Sample Duplicate Filename:</b> <code>{{ biePackageSchemaSampleDuplicateFilename || '-' }}</code></div>

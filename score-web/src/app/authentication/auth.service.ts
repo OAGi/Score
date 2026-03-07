@@ -1,6 +1,7 @@
 import {Injectable, OnInit} from '@angular/core';
 import {
   HttpClient,
+  HttpContextToken,
   HttpErrorResponse,
   HttpEvent,
   HttpHandler,
@@ -243,6 +244,8 @@ export class XhrInterceptor implements HttpInterceptor {
   }
 }
 
+export const SUPPRESS_ERROR_ALERT = new HttpContextToken<boolean>(() => false);
+
 @Injectable()
 export class ErrorAlertInterceptor implements HttpInterceptor {
   constructor(private auth: AuthService,
@@ -254,6 +257,10 @@ export class ErrorAlertInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(req).pipe(
       catchError((error, caught) => {
+        if (req.context.get(SUPPRESS_ERROR_ALERT)) {
+          return throwError(error);
+        }
+
         if (error instanceof HttpErrorResponse || error.name === 'HttpErrorResponse') {
           switch (error.status) {
             case 0:

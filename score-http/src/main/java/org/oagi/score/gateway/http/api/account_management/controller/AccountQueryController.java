@@ -6,7 +6,7 @@ import org.oagi.score.gateway.http.api.account_management.model.AccountDetailsRe
 import org.oagi.score.gateway.http.api.account_management.model.AccountListEntryRecord;
 import org.oagi.score.gateway.http.api.account_management.repository.criteria.AccountListFilterCriteria;
 import org.oagi.score.gateway.http.api.account_management.service.AccountQueryService;
-import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
+import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationQueryService;
 import org.oagi.score.gateway.http.api.context_management.business_context.model.BusinessContextId;
 import org.oagi.score.gateway.http.api.tenant_management.model.TenantId;
 import org.oagi.score.gateway.http.common.model.PageRequest;
@@ -35,7 +35,7 @@ public class AccountQueryController {
     private AccountQueryService accountQueryService;
 
     @Autowired
-    private ApplicationConfigurationService configService;
+    private ApplicationConfigurationQueryService configService;
 
     @Autowired
     private SessionService sessionService;

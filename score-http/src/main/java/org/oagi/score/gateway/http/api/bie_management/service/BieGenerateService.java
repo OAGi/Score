@@ -4,7 +4,7 @@ import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.expression.BieGenerateExpressionResult;
 import org.oagi.score.gateway.http.api.bie_management.model.expression.GenerateExpressionOption;
-import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
+import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationQueryService;
 import org.oagi.score.gateway.http.api.bie_management.repository.BieQueryRepository;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.BieSchemaFilenameStrategy;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.ExpressionBasedFilenameStrategy;
@@ -27,8 +27,10 @@ import java.util.stream.Collectors;
 
 import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.camelCase;
 import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.convertIdentifierToId;
-import static org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService.BIE_PACKAGE_SCHEMA_FILENAME_EXPRESSION_CONFIG_PARAM_NAME;
-import static org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService.BIE_SCHEMA_FILENAME_EXPRESSION_CONFIG_PARAM_NAME;
+import static org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationProperties.BIE_PACKAGE_SCHEMA_FILENAME_DUPLICATE_HANDLER_EXPRESSION_CONFIG_PARAM_NAME;
+import static org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationProperties.BIE_PACKAGE_SCHEMA_FILENAME_EXPRESSION_CONFIG_PARAM_NAME;
+import static org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationProperties.BIE_SCHEMA_FILENAME_DUPLICATE_HANDLER_EXPRESSION_CONFIG_PARAM_NAME;
+import static org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationProperties.BIE_SCHEMA_FILENAME_EXPRESSION_CONFIG_PARAM_NAME;
 
 /**
  * Coordinates BIE schema generation for selected top-level ASBIEPs.
@@ -54,7 +56,7 @@ public class BieGenerateService {
     private ApplicationContext applicationContext;
 
     @Autowired
-    private ApplicationConfigurationService applicationConfigurationService;
+    private ApplicationConfigurationQueryService applicationConfigurationService;
 
     /**
      * Generates schema output for the provided top-level ASBIEP IDs.
@@ -705,7 +707,7 @@ public class BieGenerateService {
         if (!StringUtils.hasLength(option.getBieSchemaFilenameDuplicateHandlerExpression())) {
             option.setBieSchemaFilenameDuplicateHandlerExpression(
                     applicationConfigurationService.getConfigurationValueByName(
-                            requester, ApplicationConfigurationService.BIE_SCHEMA_FILENAME_DUPLICATE_HANDLER_EXPRESSION_CONFIG_PARAM_NAME));
+                            requester, BIE_SCHEMA_FILENAME_DUPLICATE_HANDLER_EXPRESSION_CONFIG_PARAM_NAME));
         }
         if (!StringUtils.hasLength(option.getBiePackageSchemaFilenameExpression())) {
             option.setBiePackageSchemaFilenameExpression(
@@ -715,7 +717,7 @@ public class BieGenerateService {
         if (!StringUtils.hasLength(option.getBiePackageSchemaFilenameDuplicateHandlerExpression())) {
             option.setBiePackageSchemaFilenameDuplicateHandlerExpression(
                     applicationConfigurationService.getConfigurationValueByName(
-                            requester, ApplicationConfigurationService.BIE_PACKAGE_SCHEMA_FILENAME_DUPLICATE_HANDLER_EXPRESSION_CONFIG_PARAM_NAME));
+                            requester, BIE_PACKAGE_SCHEMA_FILENAME_DUPLICATE_HANDLER_EXPRESSION_CONFIG_PARAM_NAME));
         }
     }
 

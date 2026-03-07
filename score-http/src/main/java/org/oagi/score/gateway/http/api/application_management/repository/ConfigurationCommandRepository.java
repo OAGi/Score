@@ -6,6 +6,10 @@ public interface ConfigurationCommandRepository {
 
     void upsertBooleanConfiguration(String configurationName, boolean value);
 
+    void insertIntConfigurationIfNotExists(String configurationName, int value);
+
+    void upsertIntConfiguration(String configurationName, int value);
+
     void insertConfigurationIfNotExists(String configurationName, String value);
 
     void upsertConfiguration(String configurationName, String value);

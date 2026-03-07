@@ -29,3 +29,21 @@
 .actions .info mat-icon {
   transform: scale(0.8);
 }
+
+.filename-expression-input-error {
+  border-color: #f44336;
+}
+
+.filename-expression-input-error:focus {
+  outline-color: #f44336;
+}
+
+.filename-expression-error {
+  color: #f44336;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.feature-disabled-label {
+  text-decoration: line-through;
+}

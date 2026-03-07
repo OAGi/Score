@@ -1,6 +1,5 @@
 package org.oagi.score.gateway.http.api.bie_management.service;
 
-import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
 import org.oagi.score.gateway.http.api.bie_management.repository.BiePackageCommandRepository;
 import org.oagi.score.gateway.http.api.bie_management.repository.BiePackageQueryRepository;
 import org.oagi.score.gateway.http.api.context_management.business_context.service.BusinessContextQueryService;
@@ -39,9 +38,6 @@ public class BiePackageService implements ApplicationContextAware, InitializingB
 
     @Autowired
     private BiePackageQueryService biePackageQueryService;
-
-    @Autowired
-    private ApplicationConfigurationService applicationConfigurationService;
 
     @Autowired
     private BusinessContextQueryService businessContextQueryService;

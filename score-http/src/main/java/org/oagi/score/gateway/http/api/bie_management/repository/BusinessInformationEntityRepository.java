@@ -3,7 +3,7 @@ package org.oagi.score.gateway.http.api.bie_management.repository;
 import org.jooq.*;
 import org.jooq.Record;
 import org.jooq.types.ULong;
-import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
+import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationQueryService;
 import org.oagi.score.gateway.http.api.bie_management.model.BieState;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpManifestId;
@@ -40,7 +40,7 @@ public class BusinessInformationEntityRepository {
     private DSLContext dslContext;
 
     @Autowired
-    private ApplicationConfigurationService configService;
+    private ApplicationConfigurationQueryService configService;
 
     public class SelectBieListArguments {
 

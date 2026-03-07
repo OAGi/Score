@@ -2,7 +2,7 @@ package org.oagi.score.gateway.http.api.bie_management.controller;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
+import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationQueryService;
 import org.oagi.score.gateway.http.api.bie_management.model.BieListEntryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.BieState;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
@@ -41,7 +41,7 @@ public class BieQueryController {
     private SessionService sessionService;
 
     @Autowired
-    private ApplicationConfigurationService configService;
+    private ApplicationConfigurationQueryService configService;
 
     @Autowired
     private TenantQueryService tenantService;

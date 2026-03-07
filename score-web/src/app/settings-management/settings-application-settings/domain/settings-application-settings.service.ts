@@ -1,7 +1,8 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpContext} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ApplicationSettingsInfo} from './application-settings';
+import {SUPPRESS_ERROR_ALERT} from '../../../authentication/auth.service';
 
 @Injectable()
 export class SettingsApplicationSettingsService {
@@ -72,6 +73,8 @@ export class SettingsApplicationSettingsService {
     return this.http.post('/api/application/filename-expression/' + type + '/validate', {
       expression,
       duplicateHandlerExpression
+    }, {
+      context: this.suppressErrorAlert()
     });
   }
 
@@ -81,11 +84,17 @@ export class SettingsApplicationSettingsService {
     return this.http.post('/api/application/filename-expression/' + type + '/preview', {
       expression,
       duplicateHandlerExpression
+    }, {
+      context: this.suppressErrorAlert()
     });
   }
 
   getConfiguration(key: string): Observable<any> {
     return this.http.get<any>('/api/application/' + key);
+  }
+
+  private suppressErrorAlert(): HttpContext {
+    return new HttpContext().set(SUPPRESS_ERROR_ALERT, true);
   }
 
 }

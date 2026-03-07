@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
+import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationQueryService;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.context_management.business_context.model.*;
 import org.oagi.score.gateway.http.api.context_management.business_context.repository.criteria.BusinessContextListFilterCriteria;
@@ -46,7 +46,7 @@ public class BusinessContextQueryController {
     private SessionService sessionService;
 
     @Autowired
-    private ApplicationConfigurationService configService;
+    private ApplicationConfigurationQueryService configService;
 
     @Operation(summary = "Retrieve business context summaries", description = "Fetches summaries of business contexts.")
     @ApiResponses(value = {

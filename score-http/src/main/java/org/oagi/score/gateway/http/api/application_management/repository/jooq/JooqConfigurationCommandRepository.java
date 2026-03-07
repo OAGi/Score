@@ -31,6 +31,16 @@ public class JooqConfigurationCommandRepository extends JooqBaseRepository imple
     }
 
     @Override
+    public void insertIntConfigurationIfNotExists(String configurationName, int value) {
+        insertConfiguration(configurationName, "Integer", Integer.toString(value), false);
+    }
+
+    @Override
+    public void upsertIntConfiguration(String configurationName, int value) {
+        insertConfiguration(configurationName, "Integer", Integer.toString(value), true);
+    }
+
+    @Override
     public void insertConfigurationIfNotExists(String configurationName, String value) {
         insertConfiguration(configurationName, "String", value, false);
     }

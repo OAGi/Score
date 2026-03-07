@@ -13,7 +13,7 @@ import org.oagi.score.gateway.http.api.account_management.model.AccountDetailsRe
 import org.oagi.score.gateway.http.api.account_management.model.EmailValidationInfo;
 import org.oagi.score.gateway.http.api.account_management.model.OAuth2UserRecord;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
-import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
+import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationQueryService;
 import org.oagi.score.gateway.http.api.mail.controller.payload.SendMailRequest;
 import org.oagi.score.gateway.http.api.mail.service.MailService;
 import org.oagi.score.gateway.http.common.model.AccessControlException;
@@ -58,7 +58,7 @@ public class AccountCommandService {
     private SessionService sessionService;
 
     @Autowired
-    private ApplicationConfigurationService configService;
+    private ApplicationConfigurationQueryService configService;
 
     @Autowired
     private MailService mailService;

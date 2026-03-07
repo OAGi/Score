@@ -2,7 +2,7 @@ package org.oagi.score.gateway.http.api.tenant_management.controller;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
+import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationQueryService;
 import org.oagi.score.gateway.http.api.tenant_management.controller.payload.TenantListRequest;
 import org.oagi.score.gateway.http.api.tenant_management.model.Tenant;
 import org.oagi.score.gateway.http.api.tenant_management.model.TenantId;
@@ -33,7 +33,7 @@ public class TenantQueryController {
     private SessionService sessionService;
 
     @Autowired
-    private ApplicationConfigurationService configService;
+    private ApplicationConfigurationQueryService configService;
 
     @GetMapping()
     public PageResponse<Tenant> getAllTenantRoles(
