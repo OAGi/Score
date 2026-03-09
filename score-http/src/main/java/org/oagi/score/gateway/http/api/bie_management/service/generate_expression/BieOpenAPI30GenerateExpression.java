@@ -304,7 +304,7 @@ public class BieOpenAPI30GenerateExpression implements BieGenerateExpression, In
                 String schemaName;
                 String prefix = "";
                 // Issue #1302
-                if (isDifferent) {
+                if (shouldPrefixGetSchemaName(isDifferent)) {
                     prefix = "get-";
                 }
                 if (isFriendly()) {
@@ -377,7 +377,7 @@ public class BieOpenAPI30GenerateExpression implements BieGenerateExpression, In
                 String schemaName;
                 String prefix = "";
                 // Issue #1302
-                if (isDifferent) {
+                if (shouldPrefixPostSchemaName(isDifferent)) {
                     prefix = "post-";
                 }
                 if (isFriendly()) {
@@ -461,6 +461,16 @@ public class BieOpenAPI30GenerateExpression implements BieGenerateExpression, In
         String controllerName = getBieName(topLevelAsbiep);
         String action = operation + Character.toUpperCase(controllerName.charAt(0)) + controllerName.substring(1);
         return controllerName + "_" + action;
+    }
+
+    private boolean shouldPrefixGetSchemaName(boolean isDifferent) {
+        return isDifferent
+                || option.isIncludeMetaHeaderForJsonForOpenAPI30GetTemplate()
+                || option.isIncludePaginationResponseForJsonForOpenAPI30GetTemplate();
+    }
+
+    private boolean shouldPrefixPostSchemaName(boolean isDifferent) {
+        return isDifferent || option.isIncludeMetaHeaderForJsonForOpenAPI30PostTemplate();
     }
 
     private void fillPropertiesForGetTemplate(Map<String, Object> parent,
