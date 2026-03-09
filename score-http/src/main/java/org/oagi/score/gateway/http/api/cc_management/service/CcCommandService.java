@@ -31,6 +31,7 @@ import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScAwdPriId;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScAwdPriSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScSummaryRecord;
+import org.oagi.score.gateway.http.api.cc_management.repository.DtQueryRepository;
 import org.oagi.score.gateway.http.api.graph.model.CoreComponentGraphContext;
 import org.oagi.score.gateway.http.api.graph.model.Node;
 import org.oagi.score.gateway.http.api.graph.repository.GraphContextRepository;
@@ -2306,13 +2307,16 @@ public class CcCommandService {
         }
 
         if (CcState.WIP != dt.state()) {
-            throw new IllegalArgumentException("The DT '" + dt.den() + "' cannot be transferred " +
-                    "because it is in the '" + dt.state() + "' state. "
-                    + "Only DTs in the 'WIP' state can be transferred.");
+            throw new IllegalArgumentException(buildDtScStateErrorMessage(dt));
         }
 
         if (!requester.isAdministrator() && !dt.owner().userId().equals(requester.userId())) {
             throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
+        }
+
+        List<DtSummaryRecord> blockingDerivedDts = findNonWipInheritedDts(query, ownerDtManifestId);
+        if (!blockingDerivedDts.isEmpty()) {
+            throw new IllegalArgumentException(buildDtScDerivedStateErrorMessage(dt, blockingDerivedDts));
         }
 
         var command = repositoryFactory.dtCommandRepository(requester);
@@ -2344,9 +2348,12 @@ public class CcCommandService {
         }
 
         if (CcState.WIP != dt.state()) {
-            throw new IllegalArgumentException("The DT '" + dt.den() + "' cannot be transferred " +
-                    "because it is in the '" + dt.state() + "' state. "
-                    + "Only DTs in the 'WIP' state can be transferred.");
+            throw new IllegalArgumentException(buildDtScStateErrorMessage(dt));
+        }
+
+        List<DtSummaryRecord> blockingDerivedDts = findNonWipInheritedDts(query, ownerDtManifestId);
+        if (!blockingDerivedDts.isEmpty()) {
+            throw new IllegalArgumentException(buildDtScDerivedStateErrorMessage(dt, blockingDerivedDts));
         }
 
         var command = repositoryFactory.dtCommandRepository(requester);
@@ -2358,6 +2365,42 @@ public class CcCommandService {
         }
 
         return dtScManifestId;
+    }
+
+    private List<DtSummaryRecord> findNonWipInheritedDts(DtQueryRepository query, DtManifestId dtManifestId) {
+        List<DtSummaryRecord> nonWipInheritedDts = new ArrayList<>();
+        collectNonWipInheritedDts(query, dtManifestId, nonWipInheritedDts, new HashSet<>());
+        return nonWipInheritedDts;
+    }
+
+    private void collectNonWipInheritedDts(DtQueryRepository query, DtManifestId dtManifestId,
+                                           List<DtSummaryRecord> nonWipInheritedDts,
+                                           Set<DtManifestId> visitedDtManifestIds) {
+        if (dtManifestId == null || !visitedDtManifestIds.add(dtManifestId)) {
+            return;
+        }
+
+        for (DtSummaryRecord inheritedDt : query.getInheritedDtSummaryList(dtManifestId)) {
+            if (CcState.WIP != inheritedDt.state()) {
+                nonWipInheritedDts.add(inheritedDt);
+            }
+            collectNonWipInheritedDts(query, inheritedDt.dtManifestId(), nonWipInheritedDts, visitedDtManifestIds);
+        }
+    }
+
+    private String buildDtScStateErrorMessage(DtSummaryRecord dt) {
+        return "The supplementary component cannot be added to DT '" + dt.den() + "' because it is in the '"
+                + dt.state() + "' state. Supplementary components can only be added to DTs in the 'WIP' state.";
+    }
+
+    private String buildDtScDerivedStateErrorMessage(DtSummaryRecord dt, List<DtSummaryRecord> blockingDerivedDts) {
+        String blockedDerivedDts = blockingDerivedDts.stream()
+                .map(blockingDt -> "'" + blockingDt.den() + "' (" + blockingDt.state() + ")")
+                .collect(Collectors.joining(", "));
+        String subject = (blockingDerivedDts.size() == 1) ? "the following derived DT is" : "the following derived DTs are";
+        return "The supplementary component cannot be added to DT '" + dt.den() + "' because " + subject
+                + " not in the 'WIP' state: " + blockedDerivedDts + ". "
+                + "Supplementary components can only be added when the target DT and all derived DTs are in the 'WIP' state.";
     }
 
     public void discardCoreComponents(ScoreUser requester, Collection<ReleaseId> releaseIdSet) {
