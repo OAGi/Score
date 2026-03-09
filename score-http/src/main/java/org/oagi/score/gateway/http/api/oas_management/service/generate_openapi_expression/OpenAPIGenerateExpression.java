@@ -64,6 +64,7 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, InitializingBean {
 
     private static final String OPEN_API_VERSION = "3.0.3";
+    static final String VERSION_PATH_PARAMETER = "{version}";
     private static final Pattern PATH_PARAMETER_PATTERN = Pattern.compile("\\{([^{}]+)}");
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -205,6 +206,21 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
         return new ArrayList<>(pathParameterNames);
     }
 
+    static String resolveResourceName(String resourceName, String documentVersion) {
+        if (!StringUtils.hasLength(resourceName) || !StringUtils.hasLength(documentVersion)) {
+            return resourceName;
+        }
+        return resourceName.replace(VERSION_PATH_PARAMETER, documentVersion);
+    }
+
+    private String getResolvedResourceName(OpenAPITemplateForVerbOption template) {
+        if (template == null) {
+            return null;
+        }
+        String documentVersion = option != null && option.getOasDoc() != null ? option.getOasDoc().getVersion() : null;
+        return resolveResourceName(template.getResourceName(), documentVersion);
+    }
+
     /**
      * Issue #1710:
      * Ensures OpenAPI parameters are aligned with the current resource name by generating all path parameters
@@ -214,7 +230,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                       Operation operation,
                                       boolean isArray,
                                       OpenAPITemplateForVerbOption template) {
-        List<String> pathParameterNames = extractPathParameterNames(template.getResourceName());
+        List<String> pathParameterNames = extractPathParameterNames(getResolvedResourceName(template));
         List<Map<String, Object>> parameters = buildParameters(operation, isArray, pathParameterNames);
         if (parameters.isEmpty()) {
             // Issue #1710: Omit `parameters` when nothing is generated.
@@ -802,7 +818,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
             Map<String, Object> pathMap = new LinkedHashMap<>();
             Map<String, Object> path = new LinkedHashMap();
-            String pathName = template.getResourceName();
+            String pathName = getResolvedResourceName(template);
             String verbKey = template.getVerbOption().name().toLowerCase();
             if (paths.isEmpty() || !paths.containsKey(pathName)) {
                 paths.put(pathName, pathMap);
