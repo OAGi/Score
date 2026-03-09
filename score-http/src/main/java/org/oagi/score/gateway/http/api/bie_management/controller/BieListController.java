@@ -1,11 +1,14 @@
 package org.oagi.score.gateway.http.api.bie_management.controller;
 
 import org.oagi.score.gateway.http.api.bie_management.controller.payload.BieTransferOwnershipListRequest;
+import org.oagi.score.gateway.http.api.bie_management.controller.payload.BieStateDependenciesRequest;
 import org.oagi.score.gateway.http.api.bie_management.controller.payload.BieUpdateStateListRequest;
 import org.oagi.score.gateway.http.api.bie_management.model.BieEvent;
+import org.oagi.score.gateway.http.api.bie_management.service.state_transition.BieStateDependencyTarget;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.abie.AbieId;
 import org.oagi.score.gateway.http.api.bie_management.service.BieService;
+import org.oagi.score.gateway.http.api.bie_management.service.state_transition.BieStateTransitionService;
 import org.oagi.score.gateway.http.api.context_management.business_context.model.BusinessContextSummaryRecord;
 import org.oagi.score.gateway.http.api.mail.controller.payload.SendMailRequest;
 import org.oagi.score.gateway.http.api.mail.service.MailService;
@@ -18,6 +21,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -25,6 +29,9 @@ public class BieListController {
 
     @Autowired
     private BieService bieService;
+
+    @Autowired
+    private BieStateTransitionService bieStateTransitionService;
 
     @Autowired
     private SessionService sessionService;
@@ -74,8 +81,30 @@ public class BieListController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity updateCcState(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                         @RequestBody BieUpdateStateListRequest request) {
-        bieService.updateStateBieList(sessionService.asScoreUser(user), request);
+        bieStateTransitionService.updateStateBieList(sessionService.asScoreUser(user), request);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping(value = "/bie_list/state/dependencies",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    /**
+     * Builds a merged dependency preview graph for the currently selected BIE list rows.
+     */
+    public List<BieStateDependencyTarget> getStateDependencies(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                                            @RequestBody BieStateDependenciesRequest request) {
+        return bieStateTransitionService.getStateDependencies(sessionService.asScoreUser(user),
+                request.getTopLevelAsbiepIds(), request.getState());
+    }
+
+    @PostMapping(value = "/bie_list/state/dependencies/validate",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    /**
+     * Revalidates bulk dependency selection after the list dialog changes checkbox state.
+     */
+    public List<BieStateDependencyTarget> validateStateDependencies(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                                                 @RequestBody BieStateDependenciesRequest request) {
+        return bieStateTransitionService.validateStateDependencies(sessionService.asScoreUser(user),
+                request.getTopLevelAsbiepIds(), request.getState(), request.getSelectedTopLevelAsbiepIds());
     }
 
     @RequestMapping(value = "/bie_list/transfer_ownership/multiple",

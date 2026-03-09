@@ -1,4 +1,5 @@
 import {ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, QueryList, Renderer2, ViewChild, ViewChildren} from '@angular/core';
+import {HttpErrorResponse} from '@angular/common/http';
 import {faRecycle, faSitemap} from '@fortawesome/free-solid-svg-icons';
 import {BieEditService} from '../bie-edit/domain/bie-edit.service';
 import {finalize, map, startWith, switchMap} from 'rxjs/operators';
@@ -62,6 +63,7 @@ import {WebPageInfoService} from '../../basis/basis.service';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
 import {CcNodeService} from '../../cc-management/domain/core-component-node.service';
+import {BieStateTransitionFlowService} from '../domain/bie-state-transition-flow.service';
 
 
 @Component({
@@ -248,7 +250,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
               private renderer: Renderer2,
               private el: ElementRef,
               private cdr: ChangeDetectorRef,
-              public webPageInfo: WebPageInfoService) {
+              public webPageInfo: WebPageInfoService,
+              private stateTransitionFlowService: BieStateTransitionFlowService) {
   }
 
   ngOnInit(): void {
@@ -1196,7 +1199,22 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       this.isUpdating = false;
     }, err => {
       this.isUpdating = false;
+      this.openStateUpdateErrorDialog(err);
     });
+  }
+
+  private openStateUpdateErrorDialog(error: HttpErrorResponse): void {
+    const errorMessage = error?.headers?.get('x-error-message') || error?.message || 'Failed to update BIE state';
+    const lines = errorMessage.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = lines[0] || 'Failed to update BIE state';
+    dialogConfig.data.content = lines.slice(1).filter(line => !line.startsWith('- '));
+    dialogConfig.data.list = lines
+      .slice(1)
+      .filter(line => line.startsWith('- '))
+      .map(line => line.substring(2));
+    dialogConfig.data.action = undefined;
+    this.confirmDialogService.open(dialogConfig);
   }
 
   createGlobalAbieExtension(node: BieFlatNode) {
@@ -2388,38 +2406,47 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   updateState(state: string) {
-    const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = 'Update state to \'' + state + '\'?';
-    dialogConfig.data.content = ['Are you sure you want to update the state to \'' + state + '\'?'];
-    dialogConfig.data.action = 'Update';
-
-    this.confirmDialogService.open(dialogConfig).afterClosed()
-      .pipe(
-        finalize(() => {
+    this.isUpdating = true;
+    this.stateTransitionFlowService.requestDependencySelection({
+      state,
+      rootTopLevelAsbiepIds: [this.rootNode.topLevelAsbiepId],
+      loadDependencies: () => this.service.getStateDependencies(this.rootNode.topLevelAsbiepId, state),
+      validateSelection: (selectedTopLevelAsbiepIds: number[]) =>
+        this.service.validateStateDependencies(this.rootNode.topLevelAsbiepId, state, selectedTopLevelAsbiepIds)
+    }).pipe(
+      finalize(() => {
+        this.isUpdating = false;
+      })
+    ).subscribe((dependencyTopLevelAsbiepIds?: number[]) => {
+      if (dependencyTopLevelAsbiepIds === undefined) {
+        return;
+      }
+      this.isUpdating = true;
+      this.service.setState(
+        this.rootNode.topLevelAsbiepId,
+        state,
+        dependencyTopLevelAsbiepIds.length > 0 ? dependencyTopLevelAsbiepIds : undefined
+      ).subscribe(_ => {
+        this.service.getRootNode(this.topLevelAsbiepId).subscribe(root => {
+          (this.rootNode as BieEditAbieNode).topLevelAsbiepState = root.topLevelAsbiepState;
+          (this.rootNode as BieEditAbieNode).access = root.access;
           this.isUpdating = false;
-        })
-      )
-      .subscribe(result => {
-        if (!result) {
-          return;
-        }
-        this.service.setState(this.rootNode.topLevelAsbiepId, state).subscribe(_ => {
-          this.service.getRootNode(this.topLevelAsbiepId).subscribe(root => {
-            (this.rootNode as BieEditAbieNode).topLevelAsbiepState = root.topLevelAsbiepState;
-            (this.rootNode as BieEditAbieNode).access = root.access;
-            this.isUpdating = false;
 
-            this.resetCardinalities();
-            this.resetFacets();
+          this.resetCardinalities();
+          this.resetFacets();
 
-            this.snackBar.open('State updated', '', {
-              duration: 3000,
-            });
+          this.snackBar.open('State updated', '', {
+            duration: 3000,
           });
-        }, err => {
-          this.isUpdating = false;
         });
+      }, err => {
+        this.isUpdating = false;
+        this.openStateUpdateErrorDialog(err);
       });
+    }, err => {
+      this.isUpdating = false;
+      this.openStateUpdateErrorDialog(err);
+    });
   }
 
   /* For type casting of detail property */

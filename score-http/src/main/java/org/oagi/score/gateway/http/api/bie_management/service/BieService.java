@@ -3,7 +3,6 @@ package org.oagi.score.gateway.http.api.bie_management.service;
 import org.jooq.*;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.bie_management.controller.payload.BieTransferOwnershipListRequest;
-import org.oagi.score.gateway.http.api.bie_management.controller.payload.BieUpdateStateListRequest;
 import org.oagi.score.gateway.http.api.bie_management.model.BieEvent;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.abie.AbieId;
@@ -32,9 +31,6 @@ public class BieService {
 
     @Autowired
     private RepositoryFactory repositoryFactory;
-
-    @Autowired
-    private BieEditService bieEditService;
 
     @Autowired
     private DSLContext dslContext;
@@ -326,13 +322,6 @@ public class BieService {
         } catch (Exception ignore) {
             logger.error("Couldn't send BIE event: " + event, ignore);
         }
-    }
-
-    @Transactional
-    public void updateStateBieList(ScoreUser user, BieUpdateStateListRequest request) {
-        request.getTopLevelAsbiepIds().forEach(topLevelAsbiepId -> {
-            bieEditService.updateState(user, topLevelAsbiepId, request.getToState());
-        });
     }
 
     @Transactional

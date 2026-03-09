@@ -1086,32 +1086,119 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
     }
 
     @Override
-    public void updateState(ScoreUser requester, BieState state) {
+    /**
+     * Walks the dependency graph from the current root and applies the requested
+     * state only to rows that were approved by the validated dependency selection.
+     */
+    public void updateState(ScoreUser requester, BieState state, Collection<TopLevelAsbiepId> dependencyTopLevelAsbiepIds) {
         Queue<TopLevelAsbiepSummaryRecord> topLevelAsbiepQueue = new LinkedList<>();
+        Set<TopLevelAsbiepId> visitedTopLevelAsbiepIds = new HashSet<>();
+        Set<TopLevelAsbiepId> allowedDependencyTopLevelAsbiepIds =
+                (dependencyTopLevelAsbiepIds != null) ? new HashSet<>(dependencyTopLevelAsbiepIds) : null;
         topLevelAsbiepQueue.offer(topLevelAsbiep);
 
         var topLevelAsbiepQuery = repositoryFactory.topLevelAsbiepQueryRepository(requester);
 
         while (!topLevelAsbiepQueue.isEmpty()) {
             TopLevelAsbiepSummaryRecord topLevelAsbiep = topLevelAsbiepQueue.poll();
-            repository.updateState(topLevelAsbiep.topLevelAsbiepId(), state);
+            if (!visitedTopLevelAsbiepIds.add(topLevelAsbiep.topLevelAsbiepId())) {
+                continue;
+            }
+            if (shouldApplyDependencyStateChange(topLevelAsbiep.state(), state)) {
+                repository.updateState(topLevelAsbiep.topLevelAsbiepId(), state);
+            }
+
+            if (isBackwardStateTransition(state)) {
+                topLevelAsbiepQueue.addAll(
+                        topLevelAsbiepQuery.getReusedTopLevelAsbiepSummaryList(topLevelAsbiep.topLevelAsbiepId())
+                                .stream()
+                                .filter(e -> topLevelAsbiep.owner().userId().equals(e.owner().userId()))
+                                .filter(e -> isDependencyTraversalAllowed(allowedDependencyTopLevelAsbiepIds, e, state))
+                                .collect(Collectors.toList())
+                );
+
+                topLevelAsbiepQueue.addAll(
+                        topLevelAsbiepQuery.getReusingTopLevelAsbiepSummaryList(topLevelAsbiep.topLevelAsbiepId())
+                                .stream()
+                                .filter(e -> topLevelAsbiep.owner().userId().equals(e.owner().userId()))
+                                .filter(e -> isDependencyTraversalAllowed(allowedDependencyTopLevelAsbiepIds, e, state))
+                                .collect(Collectors.toList())
+                );
+
+                TopLevelAsbiepSummaryRecord basedTopLevelAsbiep =
+                        topLevelAsbiepQuery.getTopLevelAsbiepSummary(topLevelAsbiep.basedTopLevelAsbiepId());
+                if (basedTopLevelAsbiep != null &&
+                        topLevelAsbiep.owner().userId().equals(basedTopLevelAsbiep.owner().userId()) &&
+                        isDependencyTraversalAllowed(allowedDependencyTopLevelAsbiepIds, basedTopLevelAsbiep, state)) {
+                    topLevelAsbiepQueue.offer(basedTopLevelAsbiep);
+                }
+
+                topLevelAsbiepQueue.addAll(
+                        topLevelAsbiepQuery.getDerivedTopLevelAsbiepSummaryList(topLevelAsbiep.topLevelAsbiepId())
+                                .stream()
+                                .filter(e -> topLevelAsbiep.owner().userId().equals(e.owner().userId()))
+                                .filter(e -> isDependencyTraversalAllowed(allowedDependencyTopLevelAsbiepIds, e, state))
+                                .collect(Collectors.toList())
+                );
+                continue;
+            }
 
             // Issue #1604
-            // Apply cascade state update to reused BIEs.
+            // Apply dependency-driven state update to reused BIEs.
             topLevelAsbiepQueue.addAll(
-                    topLevelAsbiepQuery.getReusedTopLevelAsbiepSummaryList(topLevelAsbiep.topLevelAsbiepId())
-                            .stream().filter(e -> topLevelAsbiep.owner().userId().equals(e.owner().userId()))
+                    topLevelAsbiepQuery.getReusingTopLevelAsbiepSummaryList(topLevelAsbiep.topLevelAsbiepId())
+                            .stream()
+                            .filter(e -> topLevelAsbiep.owner().userId().equals(e.owner().userId()))
+                            .filter(e -> isDependencyTraversalAllowed(allowedDependencyTopLevelAsbiepIds, e, state))
                             .collect(Collectors.toList())
             );
 
-            // Issue #1635
-            // Apply cascade state update to inherited BIEs.
+            TopLevelAsbiepSummaryRecord basedTopLevelAsbiep =
+                    topLevelAsbiepQuery.getTopLevelAsbiepSummary(topLevelAsbiep.basedTopLevelAsbiepId());
+            if (basedTopLevelAsbiep != null &&
+                    topLevelAsbiep.owner().userId().equals(basedTopLevelAsbiep.owner().userId()) &&
+                    isDependencyTraversalAllowed(allowedDependencyTopLevelAsbiepIds, basedTopLevelAsbiep, state)) {
+                topLevelAsbiepQueue.offer(basedTopLevelAsbiep);
+            }
+
             topLevelAsbiepQueue.addAll(
                     topLevelAsbiepQuery.getDerivedTopLevelAsbiepSummaryList(topLevelAsbiep.topLevelAsbiepId())
-                            .stream().filter(e -> topLevelAsbiep.owner().userId().equals(e.owner().userId()))
+                            .stream()
+                            .filter(e -> topLevelAsbiep.owner().userId().equals(e.owner().userId()))
+                            .filter(e -> isDependencyTraversalAllowed(allowedDependencyTopLevelAsbiepIds, e, state))
                             .collect(Collectors.toList())
             );
         }
+    }
+
+    /**
+     * Allows traversal when the row does not need a state change or when it was
+     * explicitly approved in the validated dependency selection.
+     */
+    private boolean isDependencyTraversalAllowed(Set<TopLevelAsbiepId> dependencyTopLevelAsbiepIds,
+                                                 TopLevelAsbiepSummaryRecord target,
+                                                 BieState nextState) {
+        if (dependencyTopLevelAsbiepIds == null) {
+            return true;
+        }
+        if (!shouldApplyDependencyStateChange(target.state(), nextState)) {
+            return true;
+        }
+        return dependencyTopLevelAsbiepIds.contains(target.topLevelAsbiepId());
+    }
+
+    private boolean shouldApplyDependencyStateChange(BieState currentState, BieState nextState) {
+        if (currentState == null || nextState == null) {
+            return false;
+        }
+        if (currentState == nextState) {
+            return false;
+        }
+        return currentState != BieState.Production;
+    }
+
+    private boolean isBackwardStateTransition(BieState nextState) {
+        return nextState == BieState.WIP;
     }
 
     @Override

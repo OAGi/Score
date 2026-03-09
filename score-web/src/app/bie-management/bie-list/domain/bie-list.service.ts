@@ -1,9 +1,11 @@
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpContext, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {BieListEntry, BieListRequest, SummaryBieInfo} from './bie-list';
 import {PageResponse} from '../../../basis/basis';
+import {SUPPRESS_ERROR_ALERT} from '../../../authentication/auth.service';
+import {StateDependencyTarget} from '../../domain/state-dependency-target';
 
 @Injectable()
 export class BieListService {
@@ -170,11 +172,44 @@ export class BieListService {
     });
   }
 
-  updateStateOnList(actionType: string, toState: string, bieLists: BieListEntry[]): Observable<any> {
+  /**
+   * Submits the final bulk state transition together with any approved dependency rows.
+   */
+  updateStateOnList(actionType: string, toState: string, bieLists: BieListEntry[],
+                    dependencyTopLevelAsbiepIds?: number[]): Observable<any> {
     return this.http.post<any>('/api/bie_list/state/multiple', {
       action: actionType,
       toState,
-      topLevelAsbiepIds: bieLists.map(e => e.topLevelAsbiepId)
+      topLevelAsbiepIds: bieLists.map(e => e.topLevelAsbiepId),
+      dependencyTopLevelAsbiepIds
+    }, {
+      context: this.suppressErrorAlert()
+    });
+  }
+
+  /**
+   * Loads the merged dependency preview graph for the selected list rows.
+   */
+  getStateDependencies(topLevelAsbiepIds: number[], state: string): Observable<StateDependencyTarget[]> {
+    return this.http.post<StateDependencyTarget[]>('/api/bie_list/state/dependencies', {
+      topLevelAsbiepIds,
+      state
+    }, {
+      context: this.suppressErrorAlert()
+    });
+  }
+
+  /**
+   * Revalidates the current bulk dependency selection on the server.
+   */
+  validateStateDependencies(topLevelAsbiepIds: number[], state: string,
+                            selectedTopLevelAsbiepIds: number[]): Observable<StateDependencyTarget[]> {
+    return this.http.post<StateDependencyTarget[]>('/api/bie_list/state/dependencies/validate', {
+      topLevelAsbiepIds,
+      state,
+      selectedTopLevelAsbiepIds
+    }, {
+      context: this.suppressErrorAlert()
     });
   }
 
@@ -195,6 +230,10 @@ export class BieListService {
     return this.http.get('/api/bies/' + topLevelAsbiepId + '/plantuml', {
       params
     });
+  }
+
+  private suppressErrorAlert(): HttpContext {
+    return new HttpContext().set(SUPPRESS_ERROR_ALERT, true);
   }
 
 }

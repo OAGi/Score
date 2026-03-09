@@ -1,0 +1,147 @@
+<div class="d-block">
+  <div class="header d-flex align-items-center" mat-dialog-title>
+    <span>Update state to '{{ data.state }}'?</span>
+    <div class="close pr-2">
+      <button mat-icon-button mat-small-icon-button (click)="onCancel()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="content" mat-dialog-content>
+    <p>Are you sure you want to update the state to '{{ data.state }}'?</p>
+    <p class="selection-hint">
+      {{ selectionHint() }}
+    </p>
+
+    <ng-container *ngIf="hasTargets()">
+      <p *ngIf="hasInvalidTargets()" class="validation-summary">
+        {{ validationSummary() }}
+      </p>
+
+      <div class="table-container">
+        <div class="mat-elevation-z1 table-wrapper mt-3">
+          <table mat-table [dataSource]="data.targets" [trackBy]="trackByTopLevelAsbiepId">
+            <ng-container matColumnDef="select">
+              <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox
+                  [checked]="allSelected()"
+                  [indeterminate]="someSelected()"
+                  [disabled]="isValidating"
+                  (change)="toggleAll($event.checked)">
+                </mat-checkbox>
+              </th>
+              <td mat-cell *matCellDef="let target">
+                <mat-checkbox [checked]="target.checked"
+                              [disabled]="!isSelectable(target) || isValidating"
+                              (change)="onTargetCheckedChange(target, $event.checked)"></mat-checkbox>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="displayName">
+              <th mat-header-cell *matHeaderCellDef>Display Name</th>
+              <td mat-cell *matCellDef="let target">
+                <div class="den word-break-all">
+                  <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ target.topLevelAsbiepId }}">
+                    {{ value(target.displayName || target.propertyTerm) }}
+                  </a>
+                </div>
+                <div *ngIf="target.displayName && target.propertyTerm" class="property-term word-break-all">
+                  {{ target.propertyTerm }}
+                </div>
+                <div class="bie-guid">{{ value(target.guid) }}</div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="dependencies">
+              <th mat-header-cell *matHeaderCellDef>Dependencies</th>
+              <td mat-cell *matCellDef="let target">
+                <ng-container *ngIf="dependenciesRelations(target).length > 0; else noDependencies">
+                  <div class="word-break-all relation-summary"
+                       [matTooltip]="relationTooltip(dependenciesRelations(target))"
+                       [matTooltipDisabled]="!hasMoreRelations(dependenciesRelations(target))"
+                       matTooltipClass="dependency-relation-tooltip">
+                    <a target="_blank" rel="noopener noreferrer"
+                       href="/profile_bie/{{ primaryRelation(dependenciesRelations(target))?.topLevelAsbiepId }}">
+                      {{ relationSummaryText(primaryRelation(dependenciesRelations(target))) }}
+                    </a>
+                    <span *ngIf="hasMoreRelations(dependenciesRelations(target))" class="relation-more">
+                      +{{ moreRelationsCount(dependenciesRelations(target)) }} more
+                    </span>
+                  </div>
+                </ng-container>
+                <ng-template #noDependencies></ng-template>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="businessContexts">
+              <th mat-header-cell *matHeaderCellDef>Business Contexts</th>
+              <td mat-cell *matCellDef="let target">
+                <ng-container *ngIf="target.businessContexts?.length; else noBusinessContexts">
+                  <span *ngFor="let businessContext of target.businessContexts" class="businessContext">
+                    {{ businessContext }}
+                  </span>
+                </ng-container>
+                <ng-template #noBusinessContexts></ng-template>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="version">
+              <th mat-header-cell *matHeaderCellDef>Version</th>
+              <td mat-cell *matCellDef="let target">
+                <div class="word-break-all">{{ value(target.version) }}</div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let target">
+                <div class="word-break-all">{{ value(target.status) }}</div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="remark">
+              <th mat-header-cell *matHeaderCellDef>Remark</th>
+              <td mat-cell *matCellDef="let target">
+                <div class="word-break-all">{{ value(target.remark) }}</div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="state">
+              <th mat-header-cell *matHeaderCellDef>State</th>
+              <td mat-cell *matCellDef="let target">
+                <span class="bie-state {{ target.state }}"
+                      [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(target.state).background,
+                      'color': webPageInfo.getComponentStateColorSet(target.state).font}">{{ target.state }}</span>
+                <div *ngIf="!target.dependencyUpdateAllowed" class="dependency-message">
+                  {{ target.dependencyUpdateMessage }}
+                </div>
+                <div *ngIf="!target.stateTransitionAllowed" class="validation-message">
+                  {{ target.stateTransitionMessage }}
+                </div>
+                <div *ngIf="target.selectionConflict && target.dependencyUpdateAllowed && target.stateTransitionAllowed"
+                     class="validation-message">
+                  {{ target.selectionConflictMessage }}
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                [class.invalid-row]="!row.stateTransitionAllowed || row.selectionConflict"></tr>
+          </table>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+
+  <div class="actions ml-auto" mat-dialog-actions>
+    <button mat-raised-button color="warn" (click)="onCancel()">
+      <mat-icon>close</mat-icon>
+      Cancel
+    </button>
+    <button mat-raised-button color="primary" [disabled]="hasInvalidTargets() || isValidating" (click)="onConfirm()">
+      Update
+    </button>
+  </div>
+</div>

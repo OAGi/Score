@@ -1,4 +1,5 @@
 import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {HttpErrorResponse} from '@angular/common/http';
 import {ReleaseSummary} from '../../release-management/domain/release';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {BieListDialogComponent} from '../bie-list-dialog/bie-list-dialog.component';
@@ -37,6 +38,7 @@ import {MultiActionsSnackBarComponent} from '../../common/multi-actions-snack-ba
 import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryService} from '../../library-management/domain/library.service';
 import {BieDiagramDialogComponent} from '../bie-diagram-dialog/bie-diagram-dialog.component';
+import {BieStateTransitionFlowService} from '../domain/bie-state-transition-flow.service';
 
 @Component({
   selector: 'score-bie-list',
@@ -214,7 +216,8 @@ export class BieListComponent implements OnInit {
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
-              public webPageInfo: WebPageInfoService) {
+              public webPageInfo: WebPageInfoService,
+              private stateTransitionFlowService: BieStateTransitionFlowService) {
   }
 
   ngOnInit() {
@@ -612,44 +615,86 @@ export class BieListComponent implements OnInit {
       return;
     }
 
-    const dialogConfig = this.confirmDialogService.newConfig();
     const notiMsg = 'Updated';
     const toState = action;
     const actionType = 'Update';
-
     switch (action) {
       case 'WIP':
       case 'QA':
       case 'Production':
-        dialogConfig.data.header = 'Update state to \'' + action + '\'?';
-        dialogConfig.data.content = ['Are you sure you want to update the state to \'' + action + '\'?'];
-        dialogConfig.data.action = 'Update';
         break;
       default:
         return false;
     }
 
-    this.confirmDialogService.open(dialogConfig).afterClosed()
-      .subscribe(result => {
-        if (!result) {
-          return;
-        }
-        this.loading = true;
-        this.service.updateStateOnList(actionType, toState, this.selection.selected)
-          .pipe(
-            finalize(() => {
-              this.loading = false;
-            })
-          )
-          .subscribe(_ => {
-            this.loadBieList();
-            this.snackBar.open(notiMsg, '', {
-              duration: 3000
-            });
-            this.selectionClear();
-          }, error => {
-          });
+    this.loading = true;
+    this.stateTransitionFlowService.requestDependencySelection({
+      state: action,
+      rootTopLevelAsbiepIds: this.selection.selected.map(e => e.topLevelAsbiepId),
+      loadDependencies: () => this.service.getStateDependencies(this.selection.selected.map(e => e.topLevelAsbiepId), action),
+      validateSelection: (selectedTopLevelAsbiepIds: number[]) =>
+        this.service.validateStateDependencies(
+          this.selection.selected.map(e => e.topLevelAsbiepId),
+          action,
+          selectedTopLevelAsbiepIds),
+      normalizeTargets: (dependencyTargets) => {
+        const selectedTopLevelAsbiepIdSet = new Set(this.selection.selected.map(e => e.topLevelAsbiepId));
+        const visibleTopLevelAsbiepIdSet = new Set(this.dataSource.data.map(e => e.topLevelAsbiepId));
+        return dependencyTargets.map(target => ({
+          ...target,
+          // Respect explicit omissions on the current list page. If a BIE is
+          // visible in the grid but was left unchecked, keep it unchecked when
+          // it appears as an optional dependency row in the dialog.
+          checked: visibleTopLevelAsbiepIdSet.has(target.topLevelAsbiepId) ?
+            selectedTopLevelAsbiepIdSet.has(target.topLevelAsbiepId) :
+            target.checked
+        }));
+      }
+    }).pipe(
+      finalize(() => {
+        this.loading = false;
+      })
+    ).subscribe((dependencyTopLevelAsbiepIds?: number[]) => {
+      if (dependencyTopLevelAsbiepIds === undefined) {
+        return;
+      }
+      this.loading = true;
+      this.service.updateStateOnList(
+        actionType,
+        toState,
+        this.selection.selected,
+        dependencyTopLevelAsbiepIds.length > 0 ? dependencyTopLevelAsbiepIds : undefined
+      ).pipe(
+        finalize(() => {
+          this.loading = false;
+        })
+      ).subscribe(_ => {
+        this.loadBieList();
+        this.snackBar.open(notiMsg, '', {
+          duration: 3000
+        });
+        this.selectionClear();
+      }, error => {
+        this.openStateUpdateErrorDialog(error);
       });
+    }, error => {
+      this.openStateUpdateErrorDialog(error);
+      this.loading = false;
+    });
+  }
+
+  private openStateUpdateErrorDialog(error: HttpErrorResponse): void {
+    const errorMessage = error?.headers?.get('x-error-message') || error?.message || 'Failed to update BIE state';
+    const lines = errorMessage.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = lines[0] || 'Failed to update BIE state';
+    dialogConfig.data.content = lines.slice(1).filter(line => !line.startsWith('- '));
+    dialogConfig.data.list = lines
+      .slice(1)
+      .filter(line => line.startsWith('- '))
+      .map(line => line.substring(2));
+    dialogConfig.data.action = undefined;
+    this.confirmDialogService.open(dialogConfig);
   }
 
   openTransferDialogMultiple() {
