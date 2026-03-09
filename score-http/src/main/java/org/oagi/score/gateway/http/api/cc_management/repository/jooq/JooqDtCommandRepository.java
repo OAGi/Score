@@ -957,29 +957,42 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
         List<DtScManifestRecord> dtScManifestRecords = dslContext().selectFrom(DT_SC_MANIFEST)
                 .where(DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID.eq(valueOf(dtManifestId))).fetch();
 
-        // remove revised DT_SCs
-        for (DtScSummaryRecord dtSc : query.getDtScSummaryList(dtManifestId)) {
-
+        // remove revised DT_SCs and any supplementary components added only in this revision
+        for (DtScManifestRecord dtScManifestRecord : dtScManifestRecords) {
             DtScRecord currentDtSc = dslContext().selectFrom(DT_SC)
-                    .where(DT_SC.DT_SC_ID.eq(valueOf(dtSc.dtScId())))
+                    .where(DT_SC.DT_SC_ID.eq(dtScManifestRecord.getDtScId()))
                     .fetchOne();
 
-            DtScRecord prevDtSc = dslContext().selectFrom(DT_SC)
-                    .where(DT_SC.DT_SC_ID.eq(currentDtSc.getPrevDtScId())).fetchOne();
+            if (currentDtSc == null) {
+                throw new IllegalStateException("DT_SC record not found for manifest ID " + dtScManifestRecord.getDtScManifestId());
+            }
 
-            prevDtSc.setNextDtScId(null);
-            prevDtSc.update(DT_SC.NEXT_DT_SC_ID);
+            if (currentDtSc.getPrevDtScId() == null) {
+                // This DT_SC was added only in the current revision, so cancel removes its manifest and row outright.
+                dtScManifestRecord.delete();
+            } else {
+                DtScRecord prevDtSc = dslContext().selectFrom(DT_SC)
+                        .where(DT_SC.DT_SC_ID.eq(currentDtSc.getPrevDtScId()))
+                        .fetchOne();
 
-            dslContext().update(DT_SC_MANIFEST)
-                    .set(DT_SC_MANIFEST.DT_SC_ID, prevDtSc.getDtScId())
-                    .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(valueOf(dtSc.dtScManifestId())))
-                    .execute();
+                if (prevDtSc == null) {
+                    throw new IllegalStateException("Previous DT_SC record not found for DT_SC manifest ID "
+                            + dtScManifestRecord.getDtScManifestId());
+                }
+
+                // This DT_SC came from a previous revision, so cancel rebinds the manifest back to the previous row.
+                prevDtSc.setNextDtScId(null);
+                prevDtSc.update(DT_SC.NEXT_DT_SC_ID);
+
+                dtScManifestRecord.setDtScId(prevDtSc.getDtScId());
+                dtScManifestRecord.update(DT_SC_MANIFEST.DT_SC_ID);
+            }
 
             // delete DT_SC_AWD_PRI
             dslContext().deleteFrom(DT_SC_AWD_PRI)
                     .where(and(
                             DT_SC_AWD_PRI.RELEASE_ID.eq(valueOf(dt.release().releaseId())),
-                            DT_SC_AWD_PRI.DT_SC_ID.eq(valueOf(dtSc.dtScId()))
+                            DT_SC_AWD_PRI.DT_SC_ID.eq(currentDtSc.getDtScId())
                     ))
                     .execute();
 
