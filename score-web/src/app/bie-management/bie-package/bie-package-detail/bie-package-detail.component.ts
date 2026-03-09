@@ -654,6 +654,8 @@ export class BiePackageDetailComponent implements OnInit {
       this.option.businessContext = false;
       this.option.bieOagiScoreMetaData = false;
       this.option.includeWhoColumns = false;
+    }
+    if (this.option.expressionOption !== 'XML' && this.option.expressionOption !== 'JSON') {
       this.option.basedCcMetaData = false;
     }
   }
@@ -666,6 +668,10 @@ export class BiePackageDetailComponent implements OnInit {
     if (!this.option.bieOagiScoreMetaData) {
       this.option.includeWhoColumns = false;
     }
+  }
+
+  isBasedCcMetaDataDisabled(): boolean {
+    return this.option.expressionOption !== 'XML' && this.option.expressionOption !== 'JSON';
   }
 
   makeNewRevision() {

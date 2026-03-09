@@ -7,6 +7,8 @@ import org.oagi.score.gateway.http.api.bie_management.model.abie.AbieSummaryReco
 import org.oagi.score.gateway.http.api.bie_management.model.asbie.AsbieSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.asbiep.AsbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.bbie.BbieSummaryRecord;
+import org.oagi.score.gateway.http.api.bie_management.model.expression.GenerateExpressionOption;
+import org.oagi.score.gateway.http.api.cc_management.model.Definition;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.OagisComponentType;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpManifestId;
@@ -138,6 +140,37 @@ public class Helper {
         return facet.minLength() != null ||
                 facet.maxLength() != null ||
                 StringUtils.hasLength(facet.pattern());
+    }
+
+    public static String resolveDescription(GenerateExpressionOption option,
+                                            String[] bieDefinitions,
+                                            Object... basedCcDefinitions) {
+        if (option.isBieDefinition()) {
+            for (String bieDefinition : bieDefinitions) {
+                if (StringUtils.hasLength(bieDefinition)) {
+                    return bieDefinition;
+                }
+            }
+        }
+        if (option.isBasedCcMetaData()) {
+            for (Object basedCcDefinition : basedCcDefinitions) {
+                String definitionText;
+                if (basedCcDefinition == null) {
+                    definitionText = null;
+                } else if (basedCcDefinition instanceof String) {
+                    definitionText = (String) basedCcDefinition;
+                } else if (basedCcDefinition instanceof Definition) {
+                    definitionText = ((Definition) basedCcDefinition).content();
+                } else {
+                    throw new IllegalArgumentException(
+                            "Unsupported definition type: " + basedCcDefinition.getClass().getName());
+                }
+                if (StringUtils.hasLength(definitionText)) {
+                    return definitionText;
+                }
+            }
+        }
+        return null;
     }
 
     public static String toName(String propertyTerm, String representationTerm,

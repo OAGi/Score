@@ -560,6 +560,8 @@ export class BieExpressComponent implements OnInit {
       this.option.businessContext = false;
       this.option.bieOagiScoreMetaData = false;
       this.option.includeWhoColumns = false;
+    }
+    if (this.option.expressionOption !== 'XML' && this.option.expressionOption !== 'JSON') {
       this.option.basedCcMetaData = false;
     }
 
@@ -587,5 +589,9 @@ export class BieExpressComponent implements OnInit {
     }
     return this.option.expressionOption !== 'JSON'
       || this.option.expressionVersion === 'Draft-04';
+  }
+
+  isBasedCcMetaDataDisabled(): boolean {
+    return this.option.expressionOption !== 'XML' && this.option.expressionOption !== 'JSON';
   }
 }

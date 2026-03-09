@@ -257,11 +257,11 @@ public class BieJSON202012GenerateExpression implements BieGenerateExpression, I
                 parentRequired.add(name);
             }
 
-            if (option.isBieDefinition()) {
-                String definition = asbie.definition();
-                if (StringUtils.hasLength(definition)) {
-                    properties.put("description", definition);
-                }
+            String resolvedDescription = resolveDescription(option,
+                    new String[]{asbie.definition()},
+                    ascc.definition());
+            if (StringUtils.hasLength(resolvedDescription)) {
+                properties.put("description", resolvedDescription);
             }
 
             properties.put("type", "object");
@@ -337,6 +337,7 @@ public class BieJSON202012GenerateExpression implements BieGenerateExpression, I
                                 GenerationContext generationContext) {
 
         AsccpSummaryRecord asccp = generationContext.queryBasedASCCP(asbiep);
+        AccSummaryRecord acc = generationContext.queryBasedACC(abie);
         String name = convertIdentifierToId(camelCase(asccp.propertyTerm()));
 
         List<String> parentRequired = (List<String>) parent.get("required");
@@ -347,14 +348,11 @@ public class BieJSON202012GenerateExpression implements BieGenerateExpression, I
             parent.put("properties", new LinkedHashMap<String, Object>());
         }
 
-        if (option.isBieDefinition()) {
-            String definition = asbiep.definition();
-            if (!StringUtils.hasLength(definition)) {
-                definition = abie.definition();
-            }
-            if (StringUtils.hasLength(definition)) {
-                properties.put("description", definition);
-            }
+        String resolvedDescription = resolveDescription(option,
+                new String[]{asbiep.definition(), abie.definition()},
+                asccp.definition(), acc.definition());
+        if (StringUtils.hasLength(resolvedDescription)) {
+            properties.put("description", resolvedDescription);
         }
 
         /*
@@ -780,11 +778,11 @@ public class BieJSON202012GenerateExpression implements BieGenerateExpression, I
             parent.put("properties", new LinkedHashMap<String, Object>());
         }
 
-        if (option.isBieDefinition()) {
-            String definition = bbie.definition();
-            if (StringUtils.hasLength(definition)) {
-                properties.put("description", definition);
-            }
+        String resolvedDescription = resolveDescription(option,
+                new String[]{bbie.definition()},
+                bcc.definition());
+        if (StringUtils.hasLength(resolvedDescription)) {
+            properties.put("description", resolvedDescription);
         }
 
         if (minVal > 0) {
@@ -1078,11 +1076,11 @@ public class BieJSON202012GenerateExpression implements BieGenerateExpression, I
         }, true));
         Map<String, Object> properties = new LinkedHashMap();
 
-        if (option.isBieDefinition()) {
-            String definition = bbieSc.definition();
-            if (StringUtils.hasLength(definition)) {
-                properties.put("description", definition);
-            }
+        String resolvedDescription = resolveDescription(option,
+                new String[]{bbieSc.definition()},
+                dtSc.definition());
+        if (StringUtils.hasLength(resolvedDescription)) {
+            properties.put("description", resolvedDescription);
         }
 
         if (minVal > 0) {

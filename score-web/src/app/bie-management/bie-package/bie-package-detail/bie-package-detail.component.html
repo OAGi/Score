@@ -336,8 +336,8 @@
             </div>
             <div class="generate-option">
               <mat-checkbox [(ngModel)]="option.basedCcMetaData"
-                            [disabled]="option.expressionOption !== 'XML'">
-                <span class="{{ (option.expressionOption !== 'XML') ? 'toggle-disabled' : '' }}">Based CC Meta Data</span>
+                            [disabled]="isBasedCcMetaDataDisabled()">
+                <span class="{{ isBasedCcMetaDataDisabled() ? 'toggle-disabled' : '' }}">Based CC Meta Data</span>
               </mat-checkbox>
             </div>
           </div>
