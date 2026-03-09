@@ -34,6 +34,8 @@ export interface BieStateTransitionFlowRequest {
 })
 export class BieStateTransitionFlowService {
 
+  private static readonly NO_UPDATE_MESSAGE = 'This BIE will not be updated.';
+
   constructor(private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService) {
   }
@@ -49,6 +51,7 @@ export class BieStateTransitionFlowService {
   requestDependencySelection(request: BieStateTransitionFlowRequest): Observable<number[] | undefined> {
     return request.loadDependencies().pipe(
       map(targets => request.normalizeTargets ? request.normalizeTargets(targets || []) : (targets || [])),
+      map(targets => this.filterActionableTargets(targets || [])),
       switchMap(targets => {
         if (targets.length === 0) {
           return this.openSimpleConfirmation(request.state);
@@ -82,6 +85,19 @@ export class BieStateTransitionFlowService {
 
     return this.confirmDialogService.open(dialogConfig).afterClosed().pipe(
       map(result => result ? [] : undefined)
+    );
+  }
+
+  /**
+   * Hides dependency rows that would not be updated and do not currently
+   * contribute any conflict. When only those rows are returned, the shared
+   * flow should fall back to the simple confirmation dialog.
+   */
+  private filterActionableTargets(targets: StateDependencyTarget[]): StateDependencyTarget[] {
+    return targets.filter(target =>
+      target.selectionConflict === true ||
+      target.stateTransitionAllowed === false ||
+      target.dependencyUpdateMessage !== BieStateTransitionFlowService.NO_UPDATE_MESSAGE
     );
   }
 }

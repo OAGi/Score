@@ -2425,7 +2425,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       this.service.setState(
         this.rootNode.topLevelAsbiepId,
         state,
-        dependencyTopLevelAsbiepIds.length > 0 ? dependencyTopLevelAsbiepIds : undefined
+        dependencyTopLevelAsbiepIds
       ).subscribe(_ => {
         this.service.getRootNode(this.topLevelAsbiepId).subscribe(root => {
           (this.rootNode as BieEditAbieNode).topLevelAsbiepState = root.topLevelAsbiepState;

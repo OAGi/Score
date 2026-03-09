@@ -260,16 +260,17 @@ export class BieStateDependencyDialogComponent {
   }
 
   private normalizeTarget(target: StateDependencyTarget): StateDependencyTarget {
+    const dependencyUpdateAllowed = target.dependencyUpdateAllowed !== false;
     return {
       ...target,
       dependencyTopLevelAsbiepIds: target.dependencyTopLevelAsbiepIds || [],
       requiredDependencyTopLevelAsbiepIds: target.requiredDependencyTopLevelAsbiepIds || [],
       dependencies: target.dependencies || [],
-      dependencyUpdateAllowed: target.dependencyUpdateAllowed !== false,
+      dependencyUpdateAllowed,
       dependencyUpdateMessage: target.dependencyUpdateMessage,
       stateTransitionAllowed: target.stateTransitionAllowed !== false,
       stateTransitionMessage: target.stateTransitionMessage,
-      checked: this.isRootTarget(target) || target.checked !== false,
+      checked: this.isRootTarget(target) || (dependencyUpdateAllowed && target.checked !== false),
       selectionConflict: target.selectionConflict === true,
       selectionConflictMessage: target.selectionConflictMessage
     };

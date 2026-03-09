@@ -642,12 +642,13 @@ export class BieListComponent implements OnInit {
         const visibleTopLevelAsbiepIdSet = new Set(this.dataSource.data.map(e => e.topLevelAsbiepId));
         return dependencyTargets.map(target => ({
           ...target,
+          dependencyUpdateAllowed: target.dependencyUpdateAllowed !== false,
           // Respect explicit omissions on the current list page. If a BIE is
           // visible in the grid but was left unchecked, keep it unchecked when
           // it appears as an optional dependency row in the dialog.
-          checked: visibleTopLevelAsbiepIdSet.has(target.topLevelAsbiepId) ?
+          checked: target.dependencyUpdateAllowed === false ? false : (visibleTopLevelAsbiepIdSet.has(target.topLevelAsbiepId) ?
             selectedTopLevelAsbiepIdSet.has(target.topLevelAsbiepId) :
-            target.checked
+            target.checked)
         }));
       }
     }).pipe(
@@ -663,7 +664,7 @@ export class BieListComponent implements OnInit {
         actionType,
         toState,
         this.selection.selected,
-        dependencyTopLevelAsbiepIds.length > 0 ? dependencyTopLevelAsbiepIds : undefined
+        dependencyTopLevelAsbiepIds
       ).pipe(
         finalize(() => {
           this.loading = false;
