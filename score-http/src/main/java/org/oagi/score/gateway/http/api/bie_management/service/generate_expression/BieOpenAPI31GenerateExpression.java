@@ -60,13 +60,12 @@ import static org.oagi.score.gateway.http.api.bie_management.service.generate_ex
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
 /**
- * Generates OpenAPI 3.1 expressions for selected top-level BIEs.
+ * Generates OpenAPI 3.x expressions for selected top-level BIEs.
+ * Subclasses may override version-specific hooks for newer OpenAPI variants.
  */
 @Component
 @Scope(SCOPE_PROTOTYPE)
 public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, InitializingBean {
-
-    private static final String OPEN_API_VERSION = "3.1.1";
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private ObjectMapper mapper;
@@ -169,11 +168,23 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
         generateTopLevelAsbiep(topLevelAsbiep);
     }
 
+    protected GenerateExpressionOption getOption() {
+        return option;
+    }
+
+    protected ScoreUser getRequester() {
+        return requester;
+    }
+
+    protected GenerationContext getGenerationContext() {
+        return generationContext;
+    }
+
     private boolean isFriendly() {
         return this.option.isOpenAPICodeGenerationFriendly();
     }
 
-    private String getPathName(TopLevelAsbiepSummaryRecord topLevelAsbiep) {
+    protected String getPathName(TopLevelAsbiepSummaryRecord topLevelAsbiep) {
         // Issue #1308
         StringBuilder pathName = new StringBuilder();
         pathName.append("/");
@@ -211,7 +222,7 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
         return pathName.toString().toLowerCase();
     }
 
-    private Map<String, Object> getAuthorizationCodeScopes(TopLevelAsbiepSummaryRecord topLevelAsbiep) {
+    protected Map<String, Object> getAuthorizationCodeScopes(TopLevelAsbiepSummaryRecord topLevelAsbiep) {
         AsbiepSummaryRecord asbiep = generationContext.findASBIEP(topLevelAsbiep.asbiepId(), topLevelAsbiep);
         AsccpSummaryRecord basedAsccp = generationContext.getAsccp(asbiep.basedAsccpManifestId());
         String bieName = getBieName(topLevelAsbiep);
@@ -221,11 +232,11 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
         return scopes;
     }
 
-    private String getBieName(TopLevelAsbiepSummaryRecord topLevelAsbiep) {
+    protected String getBieName(TopLevelAsbiepSummaryRecord topLevelAsbiep) {
         return getBieName(topLevelAsbiep, s -> convertIdentifierToId(camelCase(s)));
     }
 
-    private String getBieName(TopLevelAsbiepSummaryRecord topLevelAsbiep, Function<String, String> replacer) {
+    protected String getBieName(TopLevelAsbiepSummaryRecord topLevelAsbiep, Function<String, String> replacer) {
         AsbiepSummaryRecord asbiep = generationContext.findASBIEP(topLevelAsbiep.asbiepId(), topLevelAsbiep);
         AsccpSummaryRecord basedAsccp = generationContext.getAsccp(asbiep.basedAsccpManifestId());
         return replacer.apply(basedAsccp.propertyTerm());
@@ -243,32 +254,11 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
             Map<String, Object> securitySchemes = null;
             if (root == null) {
                 root = new LinkedHashMap<>();
-                root.put("openapi", OPEN_API_VERSION);
-                root.put("info", ImmutableMap.<String, Object>builder()
-                        .put("title", "")
-                        .put("description", "")
-                        .put("contact", ImmutableMap.<String, Object>builder()
-                                .put("name", "")
-                                .put("url", "")
-                                .put("email", "example@example.org")
-                                .build())
-                        .put("version", "")
-                        .put("x-oagis-license", StringUtils.hasLength(release.releaseLicense()) ? release.releaseLicense() : "")
-                        .build());
+                root.put("openapi", getOpenApiVersion());
+                root.put("info", buildInfo(release));
 
                 paths = new LinkedHashMap();
-                securitySchemes = ImmutableMap.<String, Object>builder()
-                        .put("OAuth2", ImmutableMap.<String, Object>builder()
-                                .put("type", "oauth2")
-                                .put("flows", ImmutableMap.<String, Object>builder()
-                                        .put("authorizationCode", ImmutableMap.<String, Object>builder()
-                                                .put("authorizationUrl", "https://example.com/oauth/authorize")
-                                                .put("tokenUrl", "https://example.com/oauth/token")
-                                                .put("scopes", getAuthorizationCodeScopes(topLevelAsbiep))
-                                                .build())
-                                        .build())
-                                .build())
-                        .build();
+                securitySchemes = buildSecuritySchemes(topLevelAsbiep);
 
                 root.put("paths", paths);
                 root.put("components", ImmutableMap.<String, Object>builder()
@@ -276,6 +266,7 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
                         .put("schemas", schemas)
                         .build()
                 );
+                customizeRootDocument(root, topLevelAsbiep, release);
                 reusedTopLevelAsbiepNameMap = new LinkedHashMap<>();
             } else {
                 paths = (Map<String, Object>) root.get("paths");
@@ -289,14 +280,11 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
                 scopes.putAll(getAuthorizationCodeScopes(topLevelAsbiep));
             }
 
-            Map<String, Object> path = new LinkedHashMap();
             AsccpSummaryRecord basedAsccp = generationContext.getAsccp(asbiep.basedAsccpManifestId());
+            Map<String, Object> path = createPathItem(topLevelAsbiep, basedAsccp);
             String bieName = getBieName(topLevelAsbiep);
             String pathName = getPathName(topLevelAsbiep);
             paths.put(pathName, path);
-
-            path.put("summary", "");
-            path.put("description", "");
 
             boolean isDifferent = option.isGetTemplateAndPostTemplateOptionDifferent();
 
@@ -316,43 +304,10 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
                     option.setSuppressRootPropertyForOpenAPI30GetTemplate(true);
                 }
                 boolean isArray = option.isArrayForJsonExpressionForOpenAPI30GetTemplate();
-                path.put("get", ImmutableMap.<String, Object>builder()
-                        .put("summary", "")
-                        .put("description", "")
-                        .put("security", Arrays.asList(ImmutableMap.builder()
-                                .put("OAuth2", Arrays.asList(bieName + "Read"))
-                                .build()))
-                        .put("tags", Arrays.asList(basedAsccp.propertyTerm()))
-                        .put("operationId", getOperationId("get", topLevelAsbiep))
-                        .put("parameters", Arrays.asList(
-                                ImmutableMap.<String, Object>builder()
-                                        .put("name", "id")
-                                        .put("in", "query")
-                                        .put("description", "")
-                                        .put("required", false)
-                                        .put("schema", (isFriendly()) ? ImmutableMap.<String, Object>builder()
-                                                .put("type", "integer")
-                                                .build() : ImmutableMap.<String, Object>builder()
-                                                .put("$ref", "#/components/schemas/integer")
-                                                .build())
-                                        .build()
-                        ))
-                        .put("responses", ImmutableMap.<String, Object>builder()
-                                .put("200", ImmutableMap.<String, Object>builder()
-                                        .put("description", "")
-                                        .put("content", ImmutableMap.<String, Object>builder()
-                                                .put("application/json", ImmutableMap.<String, Object>builder()
-                                                        .put("schema", ImmutableMap.<String, Object>builder()
-                                                                .put("$ref", "#/components/schemas/" + ((isArray) ? schemaName + "List" : schemaName))
-                                                                .build())
-                                                        .build())
-                                                .build())
-                                        .build())
-                                .build())
-                        .build());
+                path.put("get", buildGetOperation(bieName, basedAsccp, topLevelAsbiep, schemaName, isArray));
 
                 if (!isFriendly() && !schemas.containsKey("integer")) {
-                    schemas.put("integer", ImmutableMap.<String, Object>builder()
+                    putSchema(schemas, "integer", ImmutableMap.<String, Object>builder()
                             .put("type", "integer")
                             .build());
                 }
@@ -360,11 +315,11 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
                 if (!schemas.containsKey(schemaName)) {
                     Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
                     fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                    schemas.put(schemaName, properties);
+                    putSchema(schemas, schemaName, properties);
                 }
                 // Issue #1483
                 if (isArray && !schemas.containsKey(schemaName + "List")) {
-                    schemas.put(schemaName + "List", ImmutableMap.<String, Object>builder()
+                    putSchema(schemas, schemaName + "List", ImmutableMap.<String, Object>builder()
                             .put("type", "array")
                             .put("items", ImmutableMap.<String, Object>builder()
                                     .put("$ref", "#/components/schemas/" + schemaName)
@@ -389,44 +344,17 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
                     option.setSuppressRootPropertyForOpenAPI30PostTemplate(true);
                 }
                 boolean isArray = option.isArrayForJsonExpressionForOpenAPI30PostTemplate();
-                path.put("post", ImmutableMap.<String, Object>builder()
-                        .put("summary", "")
-                        .put("description", "")
-                        .put("security", Arrays.asList(ImmutableMap.builder()
-                                .put("OAuth2", Arrays.asList(bieName + "Write"))
-                                .build()))
-                        .put("tags", Arrays.asList(basedAsccp.propertyTerm()))
-                        .put("operationId", getOperationId("create", topLevelAsbiep))
-                        .put("requestBody", ImmutableMap.<String, Object>builder()
-                                .put("description", "")
-                                .put("content", ImmutableMap.<String, Object>builder()
-                                        .put("application/json", ImmutableMap.<String, Object>builder()
-                                                .put("schema", ImmutableMap.<String, Object>builder()
-                                                        .put("$ref", "#/components/schemas/" + ((isArray) ? schemaName + "List" : schemaName))
-                                                        .build())
-                                                .build())
-                                        .build())
-                                .build())
-                        .put("responses", ImmutableMap.<String, Object>builder()
-                                .put("200", ImmutableMap.<String, Object>builder()
-                                        .put("description", "")
-                                        .put("content", ImmutableMap.<String, Object>builder()
-                                                .put("application/json", ImmutableMap.<String, Object>builder()
-                                                        .build())
-                                                .build())
-                                        .build())
-                                .build())
-                        .build());
+                path.put("post", buildPostOperation(bieName, basedAsccp, topLevelAsbiep, schemaName, isArray));
 
                 if (!schemas.containsKey(schemaName)) {
                     Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
                     fillPropertiesForPostTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                    schemas.put(schemaName, properties);
+                    putSchema(schemas, schemaName, properties);
                 }
 
                 // Issue #1483
                 if (isArray && !schemas.containsKey(schemaName + "List")) {
-                    schemas.put(schemaName + "List", ImmutableMap.<String, Object>builder()
+                    putSchema(schemas, schemaName + "List", ImmutableMap.<String, Object>builder()
                             .put("type", "array")
                             .put("items", ImmutableMap.<String, Object>builder()
                                     .put("$ref", "#/components/schemas/" + schemaName)
@@ -666,7 +594,7 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
 
         String nameForList = name + "List";
         if (!schemas.containsKey(nameForList)) {
-            schemas.put(nameForList, properties);
+            putSchema(schemas, nameForList, properties);
         }
 
         Map<String, Object> refProperties = new HashMap<>();
@@ -713,13 +641,162 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
         ((Map<String, Object>) parent.get("properties")).put(name, properties);
     }
 
-    private Map<String, Object> toProperties(XbtSummaryRecord xbt) {
-        String openapi31Map = xbt.openApi31Map();
+    protected String getOpenApiVersion() {
+        return "3.1.2";
+    }
+
+    protected Map<String, Object> buildInfo(ReleaseDetailsRecord release) {
+        return ImmutableMap.<String, Object>builder()
+                .put("title", "")
+                .put("description", "")
+                .put("contact", ImmutableMap.<String, Object>builder()
+                        .put("name", "")
+                        .put("url", "")
+                        .put("email", "example@example.org")
+                        .build())
+                .put("version", "")
+                .put("x-oagis-license", StringUtils.hasLength(release.releaseLicense()) ? release.releaseLicense() : "")
+                .build();
+    }
+
+    protected Map<String, Object> buildSecuritySchemes(TopLevelAsbiepSummaryRecord topLevelAsbiep) {
+        return ImmutableMap.<String, Object>builder()
+                .put("OAuth2", ImmutableMap.<String, Object>builder()
+                        .put("type", "oauth2")
+                        .put("flows", ImmutableMap.<String, Object>builder()
+                                .put("authorizationCode", ImmutableMap.<String, Object>builder()
+                                        .put("authorizationUrl", "https://example.com/oauth/authorize")
+                                        .put("tokenUrl", "https://example.com/oauth/token")
+                                        .put("scopes", getAuthorizationCodeScopes(topLevelAsbiep))
+                                        .build())
+                                .build())
+                        .build())
+                .build();
+    }
+
+    protected void customizeRootDocument(Map<String, Object> root,
+                                         TopLevelAsbiepSummaryRecord topLevelAsbiep,
+                                         ReleaseDetailsRecord release) {
+    }
+
+    protected Map<String, Object> createPathItem(TopLevelAsbiepSummaryRecord topLevelAsbiep,
+                                                 AsccpSummaryRecord basedAsccp) {
+        Map<String, Object> pathItem = new LinkedHashMap();
+        pathItem.put("summary", "");
+        pathItem.put("description", "");
+        customizePathItem(pathItem, topLevelAsbiep, basedAsccp);
+        return pathItem;
+    }
+
+    protected void customizePathItem(Map<String, Object> pathItem,
+                                     TopLevelAsbiepSummaryRecord topLevelAsbiep,
+                                     AsccpSummaryRecord basedAsccp) {
+    }
+
+    protected Map<String, Object> buildGetOperation(String bieName,
+                                                    AsccpSummaryRecord basedAsccp,
+                                                    TopLevelAsbiepSummaryRecord topLevelAsbiep,
+                                                    String schemaName,
+                                                    boolean isArray) {
+        Map<String, Object> operation = ImmutableMap.<String, Object>builder()
+                .put("summary", "")
+                .put("description", "")
+                .put("security", Arrays.asList(ImmutableMap.builder()
+                        .put("OAuth2", Arrays.asList(bieName + "Read"))
+                        .build()))
+                .put("tags", Arrays.asList(basedAsccp.propertyTerm()))
+                .put("operationId", getOperationId("get", topLevelAsbiep))
+                .put("parameters", Arrays.asList(
+                        ImmutableMap.<String, Object>builder()
+                                .put("name", "id")
+                                .put("in", "query")
+                                .put("description", "")
+                                .put("required", false)
+                                .put("schema", (isFriendly()) ? ImmutableMap.<String, Object>builder()
+                                        .put("type", "integer")
+                                        .build() : ImmutableMap.<String, Object>builder()
+                                        .put("$ref", "#/components/schemas/integer")
+                                        .build())
+                                .build()
+                ))
+                .put("responses", ImmutableMap.<String, Object>builder()
+                        .put("200", ImmutableMap.<String, Object>builder()
+                                .put("description", "")
+                                .put("content", ImmutableMap.<String, Object>builder()
+                                        .put("application/json", ImmutableMap.<String, Object>builder()
+                                                .put("schema", ImmutableMap.<String, Object>builder()
+                                                        .put("$ref", "#/components/schemas/" + ((isArray) ? schemaName + "List" : schemaName))
+                                                        .build())
+                                                .build())
+                                        .build())
+                                .build())
+                        .build())
+                .build();
+        return customizeOperation(new LinkedHashMap<>(operation), "get", topLevelAsbiep, basedAsccp);
+    }
+
+    protected Map<String, Object> buildPostOperation(String bieName,
+                                                     AsccpSummaryRecord basedAsccp,
+                                                     TopLevelAsbiepSummaryRecord topLevelAsbiep,
+                                                     String schemaName,
+                                                     boolean isArray) {
+        Map<String, Object> operation = ImmutableMap.<String, Object>builder()
+                .put("summary", "")
+                .put("description", "")
+                .put("security", Arrays.asList(ImmutableMap.builder()
+                        .put("OAuth2", Arrays.asList(bieName + "Write"))
+                        .build()))
+                .put("tags", Arrays.asList(basedAsccp.propertyTerm()))
+                .put("operationId", getOperationId("create", topLevelAsbiep))
+                .put("requestBody", ImmutableMap.<String, Object>builder()
+                        .put("description", "")
+                        .put("content", ImmutableMap.<String, Object>builder()
+                                .put("application/json", ImmutableMap.<String, Object>builder()
+                                        .put("schema", ImmutableMap.<String, Object>builder()
+                                                .put("$ref", "#/components/schemas/" + ((isArray) ? schemaName + "List" : schemaName))
+                                                .build())
+                                        .build())
+                                .build())
+                        .build())
+                .put("responses", ImmutableMap.<String, Object>builder()
+                        .put("200", ImmutableMap.<String, Object>builder()
+                                .put("description", "")
+                                .put("content", ImmutableMap.<String, Object>builder()
+                                        .put("application/json", ImmutableMap.<String, Object>builder()
+                                                .build())
+                                        .build())
+                                .build())
+                        .build())
+                .build();
+        return customizeOperation(new LinkedHashMap<>(operation), "post", topLevelAsbiep, basedAsccp);
+    }
+
+    protected Map<String, Object> customizeOperation(Map<String, Object> operation,
+                                                     String httpMethod,
+                                                     TopLevelAsbiepSummaryRecord topLevelAsbiep,
+                                                     AsccpSummaryRecord basedAsccp) {
+        return operation;
+    }
+
+    protected String getBuiltInTypeMap(XbtSummaryRecord xbt) {
+        return xbt.openApi31Map();
+    }
+
+    protected Map<String, Object> toProperties(XbtSummaryRecord xbt) {
+        String openApiMap = getBuiltInTypeMap(xbt);
         try {
-            return mapper.readValue(openapi31Map, LinkedHashMap.class);
+            return mapper.readValue(openApiMap, LinkedHashMap.class);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    protected Map<String, Object> customizeSchema(Map<String, Object> schema, String schemaName) {
+        return schema;
+    }
+
+    private void putSchema(Map<String, Object> schemas, String schemaName, Map<String, Object> schema) {
+        schemas.put(schemaName, customizeSchema(new LinkedHashMap<>(schema), schemaName));
     }
 
     private String fillSchemas(Map<String, Object> schemas,
@@ -753,7 +830,7 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
                 }
             }
 
-            schemas.put(componentName, content);
+            putSchema(schemas, componentName, content);
         }
 
         return "#/components/schemas/" + componentName;
@@ -767,7 +844,7 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
         }
         if (!schemas.containsKey(builtInType)) {
             Map<String, Object> content = toProperties(xbt);
-            schemas.put(builtInType, content);
+            putSchema(schemas, builtInType, content);
         }
 
         return "#/components/schemas/" + builtInType;
@@ -826,7 +903,7 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
                 properties.put("enum", enumerations);
             }
 
-            schemas.put(codeListName, properties);
+            putSchema(schemas, codeListName, properties);
         }
 
         return "#/components/schemas/" + codeListName;
@@ -853,7 +930,7 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
                 properties.put("enum", enumerations);
             }
 
-            schemas.put(agencyListTypeName, properties);
+            putSchema(schemas, agencyListTypeName, properties);
         }
 
         return "#/components/schemas/" + agencyListTypeName;
@@ -884,13 +961,21 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
                 oneOf.add(item);
             }
 
-            parent.clear();
-            parent.put("oneOf", oneOf);
+            populateChoiceSchema(parent, oneOf, acc, abie, generationContext);
         } else {
             for (BIE bie : children) {
                 fillProperties(parent, schemas, bie, generationContext);
             }
         }
+    }
+
+    protected void populateChoiceSchema(Map<String, Object> parent,
+                                        List<Object> oneOf,
+                                        AccSummaryRecord acc,
+                                        AbieSummaryRecord abie,
+                                        GenerationContext generationContext) {
+        parent.clear();
+        parent.put("oneOf", oneOf);
     }
 
     private void fillProperties(Map<String, Object> parent,
@@ -972,11 +1057,7 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
         // Issue #692
         XbtSummaryRecord xbt = getXbt(bbie, bdt);
         String exampleText = bbie.example();
-        if (StringUtils.hasLength(exampleText)) {
-            properties.put("examples", Arrays.asList(exampleText));
-        } else { // Issue #1405
-            properties.put("examples", Arrays.asList(emptyExample(xbt)));
-        }
+        properties.put("examples", buildExamples(xbt, exampleText));
 
         // Issue #564
         String ref = getReference(schemas, bbie, bdt, generationContext);
@@ -1052,7 +1133,14 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
         ((Map<String, Object>) parent.get("properties")).put(name, properties);
     }
 
-    private Object emptyExample(XbtSummaryRecord xbt) {
+    protected List<Object> buildExamples(XbtSummaryRecord xbt, String exampleText) {
+        if (StringUtils.hasLength(exampleText)) {
+            return Arrays.asList(exampleText);
+        }
+        return Arrays.asList(emptyExample(xbt));
+    }
+
+    protected Object emptyExample(XbtSummaryRecord xbt) {
         Map<String, Object> properties = toProperties(xbt);
         Object type = properties.getOrDefault("type", "string");
         if ("boolean".equals(type)) {
@@ -1133,7 +1221,7 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
             Map<String, Object> properties = makeProperties(typeAbie, refTopLevelAsbiep);
             fillProperties(properties, schemas, asbiep, typeAbie, generationContext);
             suppressRootProperty(properties);
-            schemas.put(refNameOfTopLevelAsbiep, properties);
+            putSchema(schemas, refNameOfTopLevelAsbiep, properties);
         }
 
         return "#/components/schemas/" + refNameOfTopLevelAsbiep;
@@ -1273,11 +1361,7 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
         // Issue #692
         XbtSummaryRecord xbt = getXbt(bbieSc, dtSc);
         String exampleText = bbieSc.example();
-        if (StringUtils.hasLength(exampleText)) {
-            properties.put("examples", Arrays.asList(exampleText));
-        } else { // Issue #1405
-            properties.put("examples", Arrays.asList(emptyExample(xbt)));
-        }
+        properties.put("examples", buildExamples(xbt, exampleText));
 
         CodeListSummaryRecord codeList = generationContext.getCodeList(bbieSc);
         String ref;
@@ -1326,7 +1410,7 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
         tempFile = new File(tempFile.getParentFile(), filename + "." + extension);
 
         expressionMapper.writeValue(tempFile, root);
-        logger.info("Open API " + OPEN_API_VERSION + " Schema is generated: " + tempFile);
+        logger.info("Open API " + getOpenApiVersion() + " Schema is generated: " + tempFile);
 
         return tempFile;
     }
