@@ -50,7 +50,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.oagi.score.gateway.http.api.cc_management.model.acc.OagisComponentType.Extension;
-import static org.oagi.score.gateway.http.api.export.model.ConnectSpecNameResolvers.*;
 import static org.oagi.score.gateway.http.common.util.StringUtils.hasLength;
 import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROTOTYPE;
 
@@ -70,10 +69,16 @@ public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
     private final org.jdom2.Namespace OAGI_NS = org.jdom2.Namespace.getNamespace("", ScoreConstants.OAGI_NS);
     private final org.jdom2.Namespace XSD_NS = org.jdom2.Namespace.getNamespace("xsd", "http://www.w3.org/2001/XMLSchema");
 
-    private CcDocument ccDocument;
+    private final CcDocument ccDocument;
+    private final SchemaNamingStrategy namingStrategy;
 
     public XMLExportSchemaModuleVisitor(CcDocument ccDocument) {
+        this(ccDocument, new XmlSchemaNamingStrategy());
+    }
+
+    public XMLExportSchemaModuleVisitor(CcDocument ccDocument, SchemaNamingStrategy namingStrategy) {
         this.ccDocument = ccDocument;
+        this.namingStrategy = namingStrategy;
     }
 
     public void setBaseDirectory(File baseDirectory) throws IOException {
@@ -510,7 +515,7 @@ public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
         }
         CodeListSummaryRecord codeList = ccDocument.getCodeList(
                 dtAwdPriList.get(0).codeListManifestId());
-        String codeListName = codeListNameResolver.apply(codeList);
+        String codeListName = namingStrategy.codeListName(codeList);
         return attachNamespacePrefixIfExists(codeListName, codeList.namespaceId());
     }
 
@@ -525,7 +530,7 @@ public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
 
         AgencyIdListSummaryRecord agencyIdList = ccDocument.getAgencyIdList(
                 dtAwdPriList.get(0).agencyIdListManifestId());
-        String agencyIdListName = agencyIdListNameResolver.apply(agencyIdList);
+        String agencyIdListName = namingStrategy.agencyIdListName(agencyIdList);
         return attachNamespacePrefixIfExists(agencyIdListName, agencyIdList.namespaceId());
     }
 
@@ -1052,7 +1057,7 @@ public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
                     BccpSummaryRecord bccp = ccDocument.getBccp(bcc.toBccpManifestId());
                     Element element = new Element("element", XSD_NS);
 
-                    String ref = Utility.toCamelCase(bccp.propertyTerm());
+                    String ref = namingStrategy.bccpName(bccp);
                     element.setAttribute("ref", attachNamespacePrefixIfExists(ref, bccp.namespaceId()));
                     element.setAttribute("id", ID_ATTIBUTE_PREFIX + bcc.guid());
                     setCardinalities(element, bcc.cardinality().min(), bcc.cardinality().max());
@@ -1094,9 +1099,9 @@ public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
 
                     Element attributeElement = new Element("attribute", XSD_NS);
 
-                    attributeElement.setAttribute("name", Utility.toLowerCamelCase(bccp.propertyTerm()));
+                    attributeElement.setAttribute("name", toLowerCamelCase(namingStrategy.bccpName(bccp)));
                     attributeElement.setAttribute("type", attachNamespacePrefixIfExists(
-                            dtNameResolver.apply(dt), dt.namespaceId()));
+                            namingStrategy.dtName(dt), dt.namespaceId()));
 
                     int useInt = bcc.cardinality().min() * 2 + bcc.cardinality().max();
                     String useVal = getUseAttributeValue(useInt);
@@ -1157,6 +1162,13 @@ public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
                 throw new IllegalStateException();
         }
         return null;
+    }
+
+    private String toLowerCamelCase(String value) {
+        if (!StringUtils.hasLength(value)) {
+            return value;
+        }
+        return Character.toLowerCase(value.charAt(0)) + value.substring(1);
     }
 
     public void visitACCGroup(ACCGroup accGroup) throws Exception {

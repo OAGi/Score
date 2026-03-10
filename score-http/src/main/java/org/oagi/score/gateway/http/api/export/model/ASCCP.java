@@ -6,19 +6,24 @@ import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpSummaryRecord;
 import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
-import org.oagi.score.gateway.http.common.util.Utility;
 
 public abstract class ASCCP implements Component {
 
-    private AsccpSummaryRecord asccp;
-    private AccSummaryRecord roleOfAcc;
+    private final AsccpSummaryRecord asccp;
+    private final AccSummaryRecord roleOfAcc;
+    private final SchemaNamingStrategy namingStrategy;
 
-    ASCCP(AsccpSummaryRecord asccp, AccSummaryRecord roleOfAcc) {
+    ASCCP(AsccpSummaryRecord asccp, AccSummaryRecord roleOfAcc, SchemaNamingStrategy namingStrategy) {
         this.asccp = asccp;
         this.roleOfAcc = roleOfAcc;
+        this.namingStrategy = namingStrategy;
     }
 
     public static ASCCP newInstance(AsccpSummaryRecord asccp, CcDocument ccDocument) {
+        return newInstance(asccp, ccDocument, new XmlSchemaNamingStrategy());
+    }
+
+    public static ASCCP newInstance(AsccpSummaryRecord asccp, CcDocument ccDocument, SchemaNamingStrategy namingStrategy) {
         AccSummaryRecord roleOfAcc = ccDocument.getAcc(asccp.roleOfAccManifestId());
         if (roleOfAcc == null) {
             throw new IllegalStateException();
@@ -31,16 +36,16 @@ public abstract class ASCCP implements Component {
             case 5:
             case 6:
             case 7:
-                return new ASCCPComplexType(asccp, roleOfAcc);
+                return new ASCCPComplexType(asccp, roleOfAcc, namingStrategy);
             case 4:
-                return new ASCCPGroup(asccp, roleOfAcc);
+                return new ASCCPGroup(asccp, roleOfAcc, namingStrategy);
             default:
                 throw new IllegalStateException();
         }
     }
 
     public String getName() {
-        return Utility.toCamelCase(asccp.propertyTerm());
+        return namingStrategy.asccpName(asccp);
     }
 
     public String getPropertyTerm() {
@@ -48,10 +53,7 @@ public abstract class ASCCP implements Component {
     }
 
     public String getTypeName() {
-        String den = asccp.den();
-        String propertyTerm = asccp.propertyTerm();
-
-        return Utility.toCamelCase(den.substring((propertyTerm + ". ").length())) + "Type";
+        return namingStrategy.asccpTypeName(asccp, roleOfAcc);
     }
 
     public String getGuid() {

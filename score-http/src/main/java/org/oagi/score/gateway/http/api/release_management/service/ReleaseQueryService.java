@@ -11,7 +11,10 @@ import org.oagi.score.gateway.http.api.export.impl.ExportSchemaModuleVisitor;
 import org.oagi.score.gateway.http.api.export.impl.JSONExportSchemaModuleVisitor;
 import org.oagi.score.gateway.http.api.export.impl.StandaloneExportContextBuilder;
 import org.oagi.score.gateway.http.api.export.impl.XMLExportSchemaModuleVisitor;
+import org.oagi.score.gateway.http.api.export.model.JsonSchemaNamingStrategy;
+import org.oagi.score.gateway.http.api.export.model.SchemaNamingStrategy;
 import org.oagi.score.gateway.http.api.export.model.SchemaModule;
+import org.oagi.score.gateway.http.api.export.model.XmlSchemaNamingStrategy;
 import org.oagi.score.gateway.http.api.library_management.model.LibraryDetailsRecord;
 import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
 import org.oagi.score.gateway.http.api.library_management.repository.LibraryQueryRepository;
@@ -158,11 +161,12 @@ public class ReleaseQueryService {
             List<Exception> exceptions = Collections.synchronizedList(new ArrayList<>());
             asccpManifestIdList.parallelStream().forEach(asccpManifestId -> {
                 try {
+                    SchemaNamingStrategy namingStrategy = newSchemaNamingStrategy(normalizedExpressionOption);
                     ExportSchemaModuleVisitor visitor = newSchemaModuleVisitor(ccDocument, normalizedExpressionOption);
                     visitor.setBaseDirectory(baseDir);
 
                     StandaloneExportContextBuilder builder =
-                            new StandaloneExportContextBuilder(ccDocument, pathCounter);
+                            new StandaloneExportContextBuilder(ccDocument, pathCounter, namingStrategy);
                     ExportContext exportContext = builder.build(asccpManifestId);
 
                     for (SchemaModule schemaModule : exportContext.getSchemaModules()) {
@@ -217,9 +221,16 @@ public class ReleaseQueryService {
 
     private ExportSchemaModuleVisitor newSchemaModuleVisitor(CcDocument ccDocument, String expressionOption) {
         if ("JSON".equals(expressionOption)) {
-            return new JSONExportSchemaModuleVisitor(ccDocument);
+            return new JSONExportSchemaModuleVisitor(ccDocument, new JsonSchemaNamingStrategy());
         }
-        return new XMLExportSchemaModuleVisitor(ccDocument);
+        return new XMLExportSchemaModuleVisitor(ccDocument, new XmlSchemaNamingStrategy());
+    }
+
+    private SchemaNamingStrategy newSchemaNamingStrategy(String expressionOption) {
+        if ("JSON".equals(expressionOption)) {
+            return new JsonSchemaNamingStrategy();
+        }
+        return new XmlSchemaNamingStrategy();
     }
 
     private void validateExpressionVersion(String expressionOption, String expressionVersion) {

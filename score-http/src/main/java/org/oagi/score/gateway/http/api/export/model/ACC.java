@@ -6,25 +6,29 @@ import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.OagisComponentType;
 import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
-import org.oagi.score.gateway.http.common.util.Utility;
 
 public abstract class ACC implements Component {
 
-    private AccSummaryRecord acc;
-    private ACC basedAcc;
+    private final AccSummaryRecord acc;
+    private final ACC basedAcc;
+    private final SchemaNamingStrategy namingStrategy;
 
-    private CcDocument ccDocument;
-    private Integer oagisComponentType;
+    private final Integer oagisComponentType;
 
     ACC(AccSummaryRecord acc, ACC basedAcc,
-        CcDocument ccDocument) {
+        CcDocument ccDocument,
+        SchemaNamingStrategy namingStrategy) {
         this.acc = acc;
         this.basedAcc = basedAcc;
-        this.ccDocument = ccDocument;
+        this.namingStrategy = namingStrategy;
         this.oagisComponentType = acc.componentType().getValue();
     }
 
     public static ACC newInstance(AccSummaryRecord acc, CcDocument ccDocument) {
+        return newInstance(acc, ccDocument, new XmlSchemaNamingStrategy());
+    }
+
+    public static ACC newInstance(AccSummaryRecord acc, CcDocument ccDocument, SchemaNamingStrategy namingStrategy) {
         switch (acc.componentType().getValue()) {
             case 0: //Base
             case 1: //Semantics
@@ -39,11 +43,11 @@ public abstract class ACC implements Component {
                     if (basedAcc == null) {
                         throw new IllegalStateException();
                     }
-                    basedACC = newInstance(basedAcc, ccDocument);
+                    basedACC = newInstance(basedAcc, ccDocument, namingStrategy);
                 }
-                return new ACCComplexType(acc, basedACC, ccDocument);
+                return new ACCComplexType(acc, basedACC, ccDocument, namingStrategy);
             case 4: // UEG
-                return new ACCGroup(acc, null, ccDocument);
+                return new ACCGroup(acc, null, ccDocument, namingStrategy);
             default:
                 throw new IllegalStateException();
         }
@@ -54,7 +58,7 @@ public abstract class ACC implements Component {
     }
 
     public String getName() {
-        return Utility.toCamelCase(acc.objectClassTerm());
+        return namingStrategy.accName(acc);
     }
 
     public boolean isAbstract() {

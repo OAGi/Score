@@ -19,7 +19,10 @@ import org.oagi.score.gateway.http.api.export.impl.DefaultExportContextBuilder;
 import org.oagi.score.gateway.http.api.export.impl.ExportSchemaModuleVisitor;
 import org.oagi.score.gateway.http.api.export.impl.JSONExportSchemaModuleVisitor;
 import org.oagi.score.gateway.http.api.export.impl.XMLExportSchemaModuleVisitor;
+import org.oagi.score.gateway.http.api.export.model.JsonSchemaNamingStrategy;
+import org.oagi.score.gateway.http.api.export.model.SchemaNamingStrategy;
 import org.oagi.score.gateway.http.api.export.model.SchemaModule;
+import org.oagi.score.gateway.http.api.export.model.XmlSchemaNamingStrategy;
 import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
 import org.oagi.score.gateway.http.api.module_management.controller.payload.ExportModuleSetReleaseResponse;
 import org.oagi.score.gateway.http.api.module_management.controller.payload.ModuleAssignableComponentsRecord;
@@ -175,8 +178,9 @@ public class ModuleSetReleaseQueryService implements InitializingBean {
         validateExpressionVersion(normalizedExpressionOption, expressionVersion);
 
         ModuleCcDocument moduleCcDocument = new ModuleCcDocumentImpl(requester, repositoryFactory, moduleSetReleaseId);
+        SchemaNamingStrategy namingStrategy = newSchemaNamingStrategy(normalizedExpressionOption);
         DefaultExportContextBuilder builder = new DefaultExportContextBuilder(
-                moduleQuery(requester), moduleCcDocument, moduleSetReleaseId);
+                moduleQuery(requester), moduleCcDocument, moduleSetReleaseId, namingStrategy);
         ExportSchemaModuleVisitor visitor = newSchemaModuleVisitor(moduleCcDocument, normalizedExpressionOption);
         ExportContext exportContext = builder.build(moduleSetReleaseId);
 
@@ -459,15 +463,6 @@ public class ModuleSetReleaseQueryService implements InitializingBean {
         try {
             List<File> files = exportModuleSetReleaseWithoutCompression(
                     requester, moduleSetReleaseId, rootDirectory, normalizedExpressionOption, expressionVersion);
-            if (files.size() == 1) {
-                File srcFile = files.get(0);
-                File destFile = File.createTempFile("oagis-", null);
-                if (!srcFile.renameTo(destFile)) {
-                    FileUtils.copyFile(srcFile, destFile);
-                }
-                return new ExportModuleSetReleaseResponse(srcFile.getName(), destFile);
-            }
-
             File zipFile = Zip.compressionHierarchy(baseDirectory, files);
             return new ExportModuleSetReleaseResponse(fileName + ".zip", zipFile);
         } finally {
@@ -477,9 +472,16 @@ public class ModuleSetReleaseQueryService implements InitializingBean {
 
     private ExportSchemaModuleVisitor newSchemaModuleVisitor(ModuleCcDocument moduleCcDocument, String expressionOption) {
         if ("JSON".equals(expressionOption)) {
-            return new JSONExportSchemaModuleVisitor(moduleCcDocument);
+            return new JSONExportSchemaModuleVisitor(moduleCcDocument, new JsonSchemaNamingStrategy());
         }
-        return new XMLExportSchemaModuleVisitor(moduleCcDocument);
+        return new XMLExportSchemaModuleVisitor(moduleCcDocument, new XmlSchemaNamingStrategy());
+    }
+
+    private SchemaNamingStrategy newSchemaNamingStrategy(String expressionOption) {
+        if ("JSON".equals(expressionOption)) {
+            return new JsonSchemaNamingStrategy();
+        }
+        return new XmlSchemaNamingStrategy();
     }
 
     private String normalizeExpressionOption(String expressionOption) {

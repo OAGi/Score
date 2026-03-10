@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.oagi.score.gateway.http.api.export.model.ConnectSpecNameResolvers.*;
 import static org.oagi.score.gateway.http.api.export.model.Namespace.newNamespace;
 import static org.oagi.score.gateway.http.common.ScoreConstants.ANY_ASCCP_DEN;
 
@@ -41,13 +40,21 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
     private final CcDocument ccDocument;
 
     private final Map<String, Integer> pathCounter;
+    private final SchemaNamingStrategy namingStrategy;
 
     private Map<String, SchemaModule> schemaModuleMap = new HashMap<>();
 
     public StandaloneExportContextBuilder(CcDocument ccDocument,
                                           Map<String, Integer> pathCounter) {
+        this(ccDocument, pathCounter, new XmlSchemaNamingStrategy());
+    }
+
+    public StandaloneExportContextBuilder(CcDocument ccDocument,
+                                          Map<String, Integer> pathCounter,
+                                          SchemaNamingStrategy namingStrategy) {
         this.ccDocument = ccDocument;
         this.pathCounter = pathCounter;
+        this.namingStrategy = namingStrategy;
     }
 
     private SchemaModule getModuleByNamespace(NamespaceSummaryRecord namespace) {
@@ -112,7 +119,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
                 parentSchemaModule.addNamespace(schemaModule.getNamespace());
             }
 
-            if (!schemaModule.addASCCP(ASCCP.newInstance(asccp, ccDocument))) {
+            if (!schemaModule.addASCCP(ASCCP.newInstance(asccp, ccDocument, namingStrategy))) {
                 return;
             }
         }
@@ -133,7 +140,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
             }
 
             DtSummaryRecord dt = ccDocument.getDt(bccp.dtManifestId());
-            if (!bccpSchemaModule.addBCCP(new BCCP(bccp, dt))) {
+            if (!bccpSchemaModule.addBCCP(new BCCP(bccp, dt, namingStrategy))) {
                 return;
             }
         }
@@ -157,7 +164,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
                 parentSchemaModule.addNamespace(schemaModule.getNamespace());
             }
 
-            if (!schemaModule.addACC(ACC.newInstance(acc, ccDocument))) {
+            if (!schemaModule.addACC(ACC.newInstance(acc, ccDocument, namingStrategy))) {
                 return;
             }
 
@@ -218,15 +225,15 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
                         .collect(Collectors.toList());
                 bdtSimple = new BDTSimpleType(
                         dt, baseDataType, isDefaultBDT,
-                        dtAwdPriList, xbtList, ccDocument, dtNameResolver);
+                        dtAwdPriList, xbtList, ccDocument, namingStrategy.dtNameResolver());
             } else {
                 bdtSimple = new BDTSimpleType(
-                        dt, baseDataType, isDefaultBDT, ccDocument, dtNameResolver);
+                        dt, baseDataType, isDefaultBDT, ccDocument, namingStrategy.dtNameResolver());
             }
         } else {
             Map<DtScManifestId, DtScSummaryRecord> dtScMap = dtScList.stream()
                     .collect(Collectors.toMap(DtScSummaryRecord::dtScManifestId, Function.identity()));
-            bdtSimple = new BDTSimpleContent(dt, baseDataType, isDefaultBDT, dtScMap, ccDocument, dtNameResolver);
+            bdtSimple = new BDTSimpleContent(dt, baseDataType, isDefaultBDT, dtScMap, ccDocument, namingStrategy.dtNameResolver(), namingStrategy);
             dtScList.forEach(dtSc -> {
                 List<DtScAwdPriSummaryRecord> dtScAwdPriList = ccDocument.getDtScAwdPriList(dtSc.dtScManifestId());
 
@@ -262,7 +269,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
                                 schemaModule.addNamespace(agencyIdListSchemaModule.getNamespace());
                             }
 
-                            agencyIdListSchemaModule.addAgencyId(new AgencyId(agencyIdList, agencyIdListNameResolver));
+                            agencyIdListSchemaModule.addAgencyId(new AgencyId(agencyIdList, namingStrategy.agencyIdListNameResolver()));
                         });
             });
         }
@@ -302,7 +309,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
                         schemaModule.addNamespace(agencyIdListSchemaModule.getNamespace());
                     }
 
-                    agencyIdListSchemaModule.addAgencyId(new AgencyId(agencyIdList, agencyIdListNameResolver));
+                    agencyIdListSchemaModule.addAgencyId(new AgencyId(agencyIdList, namingStrategy.agencyIdListNameResolver()));
                 });
     }
 
@@ -323,7 +330,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
             addCodeList(parentSchemaModule, baseCodeList);
         }
 
-        SchemaCodeList schemaCodeList = new SchemaCodeList(codeList, codeList.codeListManifestId(), codeList.namespaceId(), codeListNameResolver);
+        SchemaCodeList schemaCodeList = new SchemaCodeList(codeList, codeList.codeListManifestId(), codeList.namespaceId(), namingStrategy.codeListNameResolver());
         schemaCodeList.setGuid(codeList.guid().value());
         schemaCodeList.setName(codeList.name());
         schemaCodeList.setEnumTypeGuid(codeList.enumTypeGuid());

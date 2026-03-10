@@ -37,10 +37,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-
-import static org.oagi.score.gateway.http.api.export.model.ConnectSpecNameResolvers.agencyIdListNameResolver;
-import static org.oagi.score.gateway.http.api.export.model.ConnectSpecNameResolvers.codeListNameResolver;
-import static org.oagi.score.gateway.http.api.export.model.ConnectSpecNameResolvers.dtNameResolver;
 import static org.oagi.score.gateway.http.common.ScoreConstants.ANY_ASCCP_DEN;
 
 public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
@@ -50,6 +46,7 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
     private final CcDocument ccDocument;
     private final ModuleCcDocument moduleCcDocument;
     private final ObjectMapper mapper;
+    private final SchemaNamingStrategy namingStrategy;
 
     private File baseDir;
     private SchemaModule schemaModule;
@@ -62,9 +59,14 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
     private final Map<String, String> externalModuleRefMap = new LinkedHashMap<>();
 
     public JSONExportSchemaModuleVisitor(CcDocument ccDocument) {
+        this(ccDocument, new JsonSchemaNamingStrategy());
+    }
+
+    public JSONExportSchemaModuleVisitor(CcDocument ccDocument, SchemaNamingStrategy namingStrategy) {
         this.ccDocument = ccDocument;
         this.moduleCcDocument = (ccDocument instanceof ModuleCcDocument moduleCcDocument) ? moduleCcDocument : null;
         this.mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+        this.namingStrategy = namingStrategy;
     }
 
     @Override
@@ -345,12 +347,13 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
         String definitionName;
         String targetModulePath;
         NamespaceId targetNamespaceId;
+        String accTypeName = namingStrategy.accTypeName(ccDocument.getAcc(asccp.roleOfAccManifestId()));
         if (asccp.reusable()) {
-            definitionName = Utility.toCamelCase(asccp.den().substring((asccp.propertyTerm() + ". ").length())) + "Type";
+            definitionName = accTypeName;
             targetModulePath = referencedModulePathForAcc(asccp.roleOfAccManifestId());
             targetNamespaceId = ccDocument.getAcc(asccp.roleOfAccManifestId()).namespaceId();
         } else {
-            definitionName = Utility.toCamelCase(asccp.den().substring((asccp.propertyTerm() + ". ").length())) + "Type";
+            definitionName = accTypeName;
             targetModulePath = referencedModulePathForAcc(asccp.roleOfAccManifestId());
             targetNamespaceId = ccDocument.getAcc(asccp.roleOfAccManifestId()).namespaceId();
         }
@@ -366,7 +369,7 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
     private Map<String, Object> buildBccPropertySchema(BccSummaryRecord bcc, BccpSummaryRecord bccp) {
         DtSummaryRecord dt = ccDocument.getDt(bccp.dtManifestId());
         LinkedHashMap<String, Object> schema = withRefFirst(
-                definitionRef(dtNameResolver.apply(dt), referencedModulePathForDt(dt.dtManifestId()), dt.namespaceId()),
+                definitionRef(namingStrategy.dtName(dt), referencedModulePathForDt(dt.dtManifestId()), dt.namespaceId()),
                 buildMetadata(firstNonBlank(definitionOf(bcc), definitionOf(bccp)), bcc.den()));
         applyValueConstraint(schema, (bcc.valueConstraint() != null) ? bcc.valueConstraint() : bccp.valueConstraint());
         return applyArrayCardinality(
@@ -380,7 +383,7 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
         if (defaultDtAwdPri == null) {
             if (dt.basedDtManifestId() != null) {
                 DtSummaryRecord basedDt = ccDocument.getDt(dt.basedDtManifestId());
-                return withRefFirst(definitionRef(dtNameResolver.apply(basedDt), referencedModulePathForDt(basedDt.dtManifestId()), basedDt.namespaceId()), new LinkedHashMap<>());
+                return withRefFirst(definitionRef(namingStrategy.dtName(basedDt), referencedModulePathForDt(basedDt.dtManifestId()), basedDt.namespaceId()), new LinkedHashMap<>());
             }
             return stringTypeSchema();
         }
@@ -388,13 +391,13 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
         if (defaultDtAwdPri.codeListManifestId() != null) {
             CodeListSummaryRecord codeList = ccDocument.getCodeList(defaultDtAwdPri.codeListManifestId());
             return withRefFirst(definitionRef(
-                    codeListNameResolver.apply(codeList) + "ContentType",
+                    namingStrategy.codeListTypeName(codeList),
                     referencedModulePathForCodeList(codeList.codeListManifestId()),
                     codeList.namespaceId()), new LinkedHashMap<>());
         }
         if (defaultDtAwdPri.agencyIdListManifestId() != null) {
             var agencyIdList = ccDocument.getAgencyIdList(defaultDtAwdPri.agencyIdListManifestId());
-            String typeName = agencyIdListNameResolver.apply(agencyIdList) + "ContentType";
+            String typeName = namingStrategy.agencyIdListTypeName(agencyIdList);
             return withRefFirst(definitionRef(
                     typeName,
                     referencedModulePathForAgencyIdList(agencyIdList.agencyIdListManifestId()),
@@ -406,7 +409,7 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
         }
         if (dt.basedDtManifestId() != null) {
             DtSummaryRecord basedDt = ccDocument.getDt(dt.basedDtManifestId());
-            return withRefFirst(definitionRef(dtNameResolver.apply(basedDt), referencedModulePathForDt(basedDt.dtManifestId()), basedDt.namespaceId()), new LinkedHashMap<>());
+            return withRefFirst(definitionRef(namingStrategy.dtName(basedDt), referencedModulePathForDt(basedDt.dtManifestId()), basedDt.namespaceId()), new LinkedHashMap<>());
         }
         return stringTypeSchema();
     }
@@ -419,12 +422,12 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
         if (dtSc.getCodeList() != null) {
             schema = withRefFirst(
                     definitionRef(
-                            codeListNameResolver.apply(dtSc.getCodeList()) + "ContentType",
+                            namingStrategy.codeListTypeName(dtSc.getCodeList()),
                             referencedModulePathForCodeList(dtSc.getCodeList().codeListManifestId()),
                             dtSc.getCodeList().namespaceId()),
                     schema);
         } else if (dtSc.getAgencyIdList() != null) {
-            String typeName = agencyIdListNameResolver.apply(dtSc.getAgencyIdList()) + "ContentType";
+            String typeName = namingStrategy.agencyIdListTypeName(dtSc.getAgencyIdList());
             schema = withRefFirst(definitionRef(
                     typeName,
                     referencedModulePathForAgencyIdList(dtSc.getAgencyIdList().agencyIdListManifestId()),

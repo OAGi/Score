@@ -38,7 +38,6 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.oagi.score.gateway.http.api.export.model.ConnectSpecNameResolvers.*;
 import static org.oagi.score.gateway.http.common.ScoreConstants.ANY_ASCCP_DEN;
 
 public class DefaultExportContextBuilder implements SchemaModuleTraversal {
@@ -48,13 +47,22 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
     private ModuleCcDocument moduleCcDocument;
 
     private ModuleSetReleaseId moduleSetReleaseId;
+    private final SchemaNamingStrategy namingStrategy;
 
     public DefaultExportContextBuilder(ModuleQueryRepository moduleQueryRepository,
                                        ModuleCcDocument moduleCcDocument,
                                        ModuleSetReleaseId moduleSetReleaseId) {
+        this(moduleQueryRepository, moduleCcDocument, moduleSetReleaseId, new XmlSchemaNamingStrategy());
+    }
+
+    public DefaultExportContextBuilder(ModuleQueryRepository moduleQueryRepository,
+                                       ModuleCcDocument moduleCcDocument,
+                                       ModuleSetReleaseId moduleSetReleaseId,
+                                       SchemaNamingStrategy namingStrategy) {
         this.moduleQueryRepository = moduleQueryRepository;
         this.moduleCcDocument = moduleCcDocument;
         this.moduleSetReleaseId = moduleSetReleaseId;
+        this.namingStrategy = namingStrategy;
     }
 
     @Transactional
@@ -109,7 +117,7 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
         for (ModuleCCID<AgencyIdListManifestId> moduleCCID : moduleCcDocument.getModuleAgencyIdList()) {
             SchemaModule schemaModule = moduleMap.get(moduleCCID.moduleId());
             AgencyIdListSummaryRecord agencyIdList = moduleCcDocument.getAgencyIdList(moduleCCID.manifestId());
-            schemaModule.addAgencyId(new AgencyId(agencyIdList, agencyIdListNameResolver));
+            schemaModule.addAgencyId(new AgencyId(agencyIdList, namingStrategy.agencyIdListNameResolver()));
         }
     }
 
@@ -119,7 +127,7 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
             SchemaModule schemaModule = moduleMap.get(moduleCCID.moduleId());
             CodeListSummaryRecord codeList = moduleCcDocument.getCodeList(moduleCCID.manifestId());
             SchemaCodeList schemaCodeList =
-                    new SchemaCodeList(codeList, codeList.codeListManifestId(), codeList.namespaceId(), codeListNameResolver);
+                    new SchemaCodeList(codeList, codeList.codeListManifestId(), codeList.namespaceId(), namingStrategy.codeListNameResolver());
             schemaCodeList.setGuid(codeList.guid().value());
             schemaCodeList.setName(codeList.name());
             schemaCodeList.setEnumTypeGuid(codeList.enumTypeGuid());
@@ -188,7 +196,7 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
                             .filter(e -> e.xbtManifestId() != null)
                             .map(e -> moduleCcDocument.getXbt(e.xbtManifestId()))
                             .collect(Collectors.toList());
-                    bdtSimple = new BDTSimpleType(dt, basedDt, isDefaultBDT, dtAwdPriList, xbtList, moduleCcDocument, dtNameResolver);
+                    bdtSimple = new BDTSimpleType(dt, basedDt, isDefaultBDT, dtAwdPriList, xbtList, moduleCcDocument, namingStrategy.dtNameResolver());
                     xbtList.forEach(xbt -> {
                         ModuleCCID<XbtManifestId> xbtModuleCCID = moduleCcDocument.getModuleXbt(xbt.xbtManifestId());
                         if (xbtModuleCCID != null) {
@@ -198,7 +206,7 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
                     });
                 } else {
                     bdtSimple = new BDTSimpleType(
-                            dt, basedDt, isDefaultBDT, moduleCcDocument, dtNameResolver);
+                            dt, basedDt, isDefaultBDT, moduleCcDocument, namingStrategy.dtNameResolver());
                 }
             } else {
                 Map<DtScManifestId, DtScSummaryRecord> dtScMap = new HashMap();
@@ -206,7 +214,7 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
                     dtScMap.put(dtSc.dtScManifestId(), dtSc);
                 }
                 bdtSimple = new BDTSimpleContent(
-                        dt, basedDt, isDefaultBDT, dtScMap, moduleCcDocument, dtNameResolver);
+                        dt, basedDt, isDefaultBDT, dtScMap, moduleCcDocument, namingStrategy.dtNameResolver(), namingStrategy);
                 dtScList.forEach(dtSc -> {
                     List<DtScAwdPriSummaryRecord> dtScAwdPriList =
                             moduleCcDocument.getDtScAwdPriList(dtSc.dtScManifestId());
@@ -273,7 +281,7 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
                 DtSummaryRecord dt = moduleCcDocument.getDt(bccp.dtManifestId());
 
                 SchemaModule schemaModule = moduleMap.get(moduleCCID.moduleId());
-                schemaModule.addBCCP(new BCCP(bccp, dt));
+                schemaModule.addBCCP(new BCCP(bccp, dt, namingStrategy));
 
                 ModuleCCID dtModuleCCID = moduleCcDocument.getModuleDt(dt.dtManifestId());
                 if (dtModuleCCID == null) {
@@ -307,7 +315,7 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
             if (schemaModule == null) {
                 throw new IllegalStateException();
             }
-            schemaModule.addACC(ACC.newInstance(acc, moduleCcDocument));
+            schemaModule.addACC(ACC.newInstance(acc, moduleCcDocument, namingStrategy));
 
             if (acc.basedAccManifestId() != null) {
                 AccSummaryRecord basedAcc = moduleCcDocument.getAcc(acc.basedAccManifestId());
@@ -353,7 +361,7 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
             }
 
             SchemaModule schemaModule = moduleMap.get(moduleCCID.moduleId());
-            schemaModule.addASCCP(ASCCP.newInstance(asccp, moduleCcDocument));
+            schemaModule.addASCCP(ASCCP.newInstance(asccp, moduleCcDocument, namingStrategy));
 
             ModuleCCID roleOfAccModuleCCID = moduleCcDocument.getModuleAcc(asccp.roleOfAccManifestId());
             if (roleOfAccModuleCCID == null) {

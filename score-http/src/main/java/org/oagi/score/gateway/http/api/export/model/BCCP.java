@@ -6,16 +6,20 @@ import org.oagi.score.gateway.http.api.cc_management.model.dt.DtManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.DtSummaryRecord;
 import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
 
-import static org.oagi.score.gateway.http.api.export.model.ConnectSpecNameResolvers.dtNameResolver;
-
 public class BCCP implements Component {
 
-    private BccpSummaryRecord bccp;
-    private DtSummaryRecord dt;
+    private final BccpSummaryRecord bccp;
+    private final DtSummaryRecord dt;
+    private final SchemaNamingStrategy namingStrategy;
 
     public BCCP(BccpSummaryRecord bccp, DtSummaryRecord dt) {
+        this(bccp, dt, new XmlSchemaNamingStrategy());
+    }
+
+    public BCCP(BccpSummaryRecord bccp, DtSummaryRecord dt, SchemaNamingStrategy namingStrategy) {
         this.bccp = bccp;
         this.dt = dt;
+        this.namingStrategy = namingStrategy;
     }
 
     public String getGuid() {
@@ -23,8 +27,7 @@ public class BCCP implements Component {
     }
 
     public String getName() {
-        String propertyTerm = bccp.propertyTerm();
-        return propertyTerm.replaceAll(" ", "").replace("Identifier", "ID");
+        return namingStrategy.bccpName(bccp);
     }
 
     public String getPropertyTerm() {
@@ -32,7 +35,7 @@ public class BCCP implements Component {
     }
 
     public String getTypeName() {
-        return dtNameResolver.apply(dt);
+        return namingStrategy.dtName(dt);
     }
 
     public BccpManifestId bccpManifestId() {
