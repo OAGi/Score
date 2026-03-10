@@ -55,7 +55,7 @@ import static org.oagi.score.gateway.http.common.util.StringUtils.hasLength;
 import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROTOTYPE;
 
 @Scope(SCOPE_PROTOTYPE)
-public class XMLExportSchemaModuleVisitor {
+public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
 
     private static final String ID_ATTIBUTE_PREFIX = "_";
     private final Logger logger = LoggerFactory.getLogger(getClass());

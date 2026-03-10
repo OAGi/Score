@@ -2,6 +2,8 @@ package org.oagi.score.gateway.http.api.export.model;
 
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocument;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
+import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
+import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpSummaryRecord;
 import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
 import org.oagi.score.gateway.http.common.util.Utility;
@@ -41,6 +43,10 @@ public abstract class ASCCP implements Component {
         return Utility.toCamelCase(asccp.propertyTerm());
     }
 
+    public String getPropertyTerm() {
+        return asccp.propertyTerm();
+    }
+
     public String getTypeName() {
         String den = asccp.den();
         String propertyTerm = asccp.propertyTerm();
@@ -58,6 +64,14 @@ public abstract class ASCCP implements Component {
 
     public boolean isReusableIndicator() {
         return asccp.reusable();
+    }
+
+    public AsccpManifestId asccpManifestId() {
+        return asccp.asccpManifestId();
+    }
+
+    public AccManifestId roleOfAccManifestId() {
+        return asccp.roleOfAccManifestId();
     }
 
     public boolean isNillable() {

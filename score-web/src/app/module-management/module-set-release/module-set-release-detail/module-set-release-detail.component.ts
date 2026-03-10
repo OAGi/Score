@@ -127,22 +127,25 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
     this.filteredReleaseList.next(this.releaseList.slice());
   }
 
-  validateSchemas() {
+  validateSchemas(expressionOption: 'XML' | 'JSON' = 'XML') {
     const dialogConfig = new MatDialogConfig();
 
     dialogConfig.width = '80vw';
     dialogConfig.height = '60%';
     dialogConfig.data = {
-      moduleSetReleaseId: this.moduleSetRelease.moduleSetReleaseId
+      moduleSetReleaseId: this.moduleSetRelease.moduleSetReleaseId,
+      expressionOption,
+      expressionVersion: expressionOption === 'JSON' ? '2020-12' : undefined
     };
     const dialogRef = this.dialog.open(ModuleSetReleaseValidationDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
     });
   }
 
-  exportSchemas() {
+  exportSchemas(expressionOption: 'XML' | 'JSON' = 'XML') {
     this.isUpdating = true;
-    this.moduleService.export(this.moduleSetRelease.moduleSetReleaseId).subscribe(resp => {
+    const expressionVersion = expressionOption === 'JSON' ? '2020-12' : undefined;
+    this.moduleService.export(this.moduleSetRelease.moduleSetReleaseId, expressionOption, expressionVersion).subscribe(resp => {
       saveAsBlobResponse(resp);
       this.isUpdating = false;
     }, err => {

@@ -445,16 +445,21 @@ public class CcQueryController {
     @GetMapping(value = "/export/standalone")
     public ResponseEntity<DeleteOnCloseFileSystemResource> exportStandaloneSchema(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @RequestParam(name = "asccpManifestIdList") String asccpManifestIdList) throws Exception {
+            @RequestParam(name = "asccpManifestIdList") String asccpManifestIdList,
+            @RequestParam(name = "expressionOption", required = false) String expressionOption,
+            @RequestParam(name = "expressionVersion", required = false) String expressionVersion) throws Exception {
 
         ExportStandaloneSchemaResponse response =
                 releaseQueryService.exportStandaloneSchema(sessionService.asScoreUser(user),
-                        separate(asccpManifestIdList).map(e -> AsccpManifestId.from(e)).collect(toSet()));
+                        separate(asccpManifestIdList).map(e -> AsccpManifestId.from(e)).collect(toSet()),
+                        expressionOption, expressionVersion);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + response.filename() + "\"")
                 .contentType(MediaType.parseMediaType(
-                        (response.filename().endsWith(".zip") ? "application/zip" : "application/xml")
+                        response.filename().endsWith(".zip") ? "application/zip" :
+                                response.filename().endsWith(".json") ? "application/schema+json" :
+                                        "application/xml"
                 ))
                 .contentLength(response.file().length())
                 .body(new DeleteOnCloseFileSystemResource(response.file()));

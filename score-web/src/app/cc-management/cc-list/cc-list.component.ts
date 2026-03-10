@@ -790,13 +790,14 @@ export class CcListComponent implements OnInit {
         });
   }
 
-  exportStandaloneSchemas() {
+  exportStandaloneSchemas(expressionOption: 'XML' | 'JSON' = 'XML') {
     if (this.selection.selected.length === 0) {
       return;
     }
 
     this.loading = true;
-    this.service.exportStandaloneSchemas(this.selection.selected).subscribe(resp => {
+    const expressionVersion = (expressionOption === 'JSON') ? '2020-12' : undefined;
+    this.service.exportStandaloneSchemas(this.selection.selected, expressionOption, expressionVersion).subscribe(resp => {
       saveAsBlobResponse(resp);
       this.loading = false;
     }, err => {

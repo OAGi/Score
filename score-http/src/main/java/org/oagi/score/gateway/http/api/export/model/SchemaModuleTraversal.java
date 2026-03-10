@@ -1,10 +1,10 @@
 package org.oagi.score.gateway.http.api.export.model;
 
-import org.oagi.score.gateway.http.api.export.impl.XMLExportSchemaModuleVisitor;
+import org.oagi.score.gateway.http.api.export.impl.ExportSchemaModuleVisitor;
 
 public interface SchemaModuleTraversal {
 
     void traverse(SchemaModule schemaModule,
-                  XMLExportSchemaModuleVisitor schemaModuleVisitor) throws Exception;
+                  ExportSchemaModuleVisitor schemaModuleVisitor) throws Exception;
 
 }

@@ -1,5 +1,12 @@
 package org.oagi.score.gateway.http.api.module_management.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.networknt.schema.Error;
+import com.networknt.schema.InputFormat;
+import com.networknt.schema.Schema;
+import com.networknt.schema.SchemaLocation;
+import com.networknt.schema.SchemaRegistry;
+import com.networknt.schema.dialect.Dialects;
 import org.apache.commons.io.FileUtils;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
@@ -9,6 +16,8 @@ import org.oagi.score.gateway.http.api.cc_management.model.dt.DtManifestId;
 import org.oagi.score.gateway.http.api.code_list_management.model.CodeListManifestId;
 import org.oagi.score.gateway.http.api.export.ExportContext;
 import org.oagi.score.gateway.http.api.export.impl.DefaultExportContextBuilder;
+import org.oagi.score.gateway.http.api.export.impl.ExportSchemaModuleVisitor;
+import org.oagi.score.gateway.http.api.export.impl.JSONExportSchemaModuleVisitor;
 import org.oagi.score.gateway.http.api.export.impl.XMLExportSchemaModuleVisitor;
 import org.oagi.score.gateway.http.api.export.model.SchemaModule;
 import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
@@ -46,10 +55,13 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.xml.validation.SchemaFactory;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -59,6 +71,7 @@ import java.util.stream.Collectors;
 public class ModuleSetReleaseQueryService implements InitializingBean {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     private RepositoryFactory repositoryFactory;
@@ -116,13 +129,19 @@ public class ModuleSetReleaseQueryService implements InitializingBean {
 
     public ValidateModuleSetReleaseResponse validateModuleSetRelease(
             ScoreUser requester, ModuleSetReleaseId moduleSetReleaseId) throws Exception {
+        return validateModuleSetRelease(requester, moduleSetReleaseId, "XML", null);
+    }
+
+    public ValidateModuleSetReleaseResponse validateModuleSetRelease(
+            ScoreUser requester, ModuleSetReleaseId moduleSetReleaseId,
+            String expressionOption, String expressionVersion) throws Exception {
 
         String requestId = UUID.randomUUID().toString();
         File baseDirectory = new File(FileUtils.getTempDirectory(), requestId);
         FileUtils.forceMkdir(baseDirectory);
 
         List<File> schemaFiles = exportModuleSetReleaseWithoutCompression(
-                requester, moduleSetReleaseId, baseDirectory);
+                requester, moduleSetReleaseId, baseDirectory, expressionOption, expressionVersion);
 
         ModuleSetReleaseValidationRequestEvent event = new ModuleSetReleaseValidationRequestEvent(
                 requester.userId(),
@@ -145,19 +164,28 @@ public class ModuleSetReleaseQueryService implements InitializingBean {
 
     private List<File> exportModuleSetReleaseWithoutCompression(
             ScoreUser requester, ModuleSetReleaseId moduleSetReleaseId, File baseDirectory) throws Exception {
+        return exportModuleSetReleaseWithoutCompression(requester, moduleSetReleaseId, baseDirectory, "XML", null);
+    }
+
+    private List<File> exportModuleSetReleaseWithoutCompression(
+            ScoreUser requester, ModuleSetReleaseId moduleSetReleaseId, File baseDirectory,
+            String expressionOption, String expressionVersion) throws Exception {
+
+        String normalizedExpressionOption = normalizeExpressionOption(expressionOption);
+        validateExpressionVersion(normalizedExpressionOption, expressionVersion);
 
         ModuleCcDocument moduleCcDocument = new ModuleCcDocumentImpl(requester, repositoryFactory, moduleSetReleaseId);
         DefaultExportContextBuilder builder = new DefaultExportContextBuilder(
                 moduleQuery(requester), moduleCcDocument, moduleSetReleaseId);
-        XMLExportSchemaModuleVisitor visitor = new XMLExportSchemaModuleVisitor(moduleCcDocument);
+        ExportSchemaModuleVisitor visitor = newSchemaModuleVisitor(moduleCcDocument, normalizedExpressionOption);
         ExportContext exportContext = builder.build(moduleSetReleaseId);
 
         List<File> files = new ArrayList<>();
 
+        visitor.setBaseDirectory(baseDirectory);
         for (SchemaModule schemaModule : exportContext.getSchemaModules()) {
-            visitor.setBaseDirectory(baseDirectory);
             schemaModule.visit(visitor);
-            File file = visitor.endSchemaModule(schemaModule);
+            File file = schemaModule.getModuleFile();
             if (file != null) {
                 files.add(file);
             }
@@ -190,6 +218,7 @@ public class ModuleSetReleaseQueryService implements InitializingBean {
 
         File baseDirectory = event.getBaseDirectory();
         List<File> schemaFiles = event.getSchemaFiles();
+        Map<String, String> jsonSchemaSources = buildJsonSchemaSources(baseDirectory, schemaFiles);
         RAtomicLong length = redissonClient.getAtomicLong("ModuleSetReleaseValidationRequestEvent:" + event.getRequestId() + ":Length");
         length.set(schemaFiles.size());
         RAtomicLong done = redissonClient.getAtomicLong("ModuleSetReleaseValidationRequestEvent:" + event.getRequestId() + ":Done");
@@ -202,8 +231,8 @@ public class ModuleSetReleaseQueryService implements InitializingBean {
                     moduleName = moduleName.substring(baseDirectory.getCanonicalPath().length() + 1);
                     moduleName = moduleName.replaceAll("\\\\", "/");
 
-                    SchemaFactory schemaFactory = SchemaFactory.newDefaultInstance();
-                    schemaFactory.newSchema(schemaFile);
+                    SchemaModuleValidator validator = newSchemaModuleValidator(baseDirectory, schemaFile, jsonSchemaSources);
+                    validator.validate(schemaFile);
                     resultMap.put(moduleName, "Valid");
                 } catch (Exception e) {
                     logger.error("Unexpected error occurs during the module set release validation", e);
@@ -239,8 +268,182 @@ public class ModuleSetReleaseQueryService implements InitializingBean {
         }
     }
 
+    private SchemaModuleValidator newSchemaModuleValidator(File baseDirectory,
+                                                           File schemaFile,
+                                                           Map<String, String> jsonSchemaSources) {
+        if (schemaFile.getName().endsWith(".json")) {
+            return new JSONSchemaValidator(baseDirectory, jsonSchemaSources);
+        }
+        if (schemaFile.getName().endsWith(".xsd")) {
+            return new XMLSchemaValidator();
+        }
+        throw new IllegalArgumentException("Unsupported schema file type: " + schemaFile.getName());
+    }
+
+    private Map<String, String> buildJsonSchemaSources(File baseDirectory, List<File> schemaFiles) {
+        Map<String, String> schemaSources = new LinkedHashMap<>();
+        for (File schemaFile : schemaFiles) {
+            if (!schemaFile.getName().endsWith(".json")) {
+                continue;
+            }
+
+            try {
+                String content = FileUtils.readFileToString(schemaFile, StandardCharsets.UTF_8);
+                String relativePath = baseDirectory.toPath().relativize(schemaFile.toPath()).toString().replace("\\", "/");
+                String fileUri = schemaFile.toURI().toString();
+
+                schemaSources.put(relativePath, content);
+                schemaSources.put("/" + relativePath, content);
+                schemaSources.put(fileUri, content);
+
+                var schemaNode = objectMapper.readTree(content);
+                var idNode = schemaNode.get("$id");
+                if (idNode != null && idNode.isTextual() && !idNode.asText().isBlank()) {
+                    String schemaId = idNode.asText();
+                    schemaSources.put(schemaId, content);
+                    schemaSources.put("/" + schemaId, content);
+                }
+            } catch (IOException e) {
+                throw new IllegalStateException("Failed to read JSON schema source: " + schemaFile, e);
+            }
+        }
+        return schemaSources;
+    }
+
+    private String resolveJsonSchemaSource(File baseDirectory,
+                                           Map<String, String> jsonSchemaSources,
+                                           String schemaLocation) {
+        for (String normalizedLocation : candidateJsonSchemaLocations(baseDirectory, schemaLocation)) {
+            String schemaSource = jsonSchemaSources.get(normalizedLocation);
+            if (schemaSource != null) {
+                return schemaSource;
+            }
+
+            if (!normalizedLocation.startsWith("/") && jsonSchemaSources.containsKey("/" + normalizedLocation)) {
+                return jsonSchemaSources.get("/" + normalizedLocation);
+            }
+
+            if (normalizedLocation.startsWith("file:")) {
+                try {
+                    File schemaFile = new File(java.net.URI.create(normalizedLocation));
+                    if (schemaFile.isFile()) {
+                        return FileUtils.readFileToString(schemaFile, StandardCharsets.UTF_8);
+                    }
+                } catch (Exception ignore) {
+                    logger.debug("Unable to resolve JSON schema location from file URI: {}", normalizedLocation, ignore);
+                }
+            }
+
+            File schemaFile = new File(baseDirectory, normalizedLocation);
+            if (schemaFile.isFile()) {
+                try {
+                    return FileUtils.readFileToString(schemaFile, StandardCharsets.UTF_8);
+                } catch (IOException e) {
+                    throw new IllegalStateException("Failed to read JSON schema source: " + normalizedLocation, e);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private List<String> candidateJsonSchemaLocations(File baseDirectory, String schemaLocation) {
+        String normalizedLocation = stripJsonSchemaFragment(schemaLocation);
+        List<String> candidates = new ArrayList<>();
+        candidates.add(normalizedLocation);
+
+        if (normalizedLocation.startsWith("file:")) {
+            try {
+                File schemaFile = new File(java.net.URI.create(normalizedLocation));
+                String absolutePath = schemaFile.getCanonicalPath().replace("\\", "/");
+                candidates.add(absolutePath);
+
+                String basePath = baseDirectory.getCanonicalPath().replace("\\", "/");
+                if (absolutePath.startsWith(basePath + "/")) {
+                    candidates.add(absolutePath.substring(basePath.length() + 1));
+                }
+                addModelPathCandidates(candidates, absolutePath);
+            } catch (Exception ignore) {
+                logger.debug("Unable to normalize JSON schema location: {}", normalizedLocation, ignore);
+            }
+        } else {
+            addModelPathCandidates(candidates, normalizedLocation);
+        }
+
+        return candidates.stream().distinct().toList();
+    }
+
+    private void addModelPathCandidates(List<String> candidates, String location) {
+        String normalized = location.replace("\\", "/");
+        int modelIndex = normalized.indexOf("/Model/");
+        if (modelIndex >= 0) {
+            candidates.add(normalized.substring(modelIndex + 1));
+        }
+
+        int lastModelIndex = normalized.lastIndexOf("/Model/");
+        if (lastModelIndex >= 0) {
+            candidates.add(normalized.substring(lastModelIndex + 1));
+        }
+
+        if (normalized.startsWith("Model/")) {
+            candidates.add(normalized);
+        }
+    }
+
+    private String stripJsonSchemaFragment(String schemaLocation) {
+        int fragmentIndex = schemaLocation.indexOf('#');
+        return (fragmentIndex >= 0) ? schemaLocation.substring(0, fragmentIndex) : schemaLocation;
+    }
+
+    private interface SchemaModuleValidator {
+        void validate(File schemaFile) throws Exception;
+    }
+
+    private static final class XMLSchemaValidator implements SchemaModuleValidator {
+        @Override
+        public void validate(File schemaFile) throws Exception {
+            SchemaFactory schemaFactory = SchemaFactory.newDefaultInstance();
+            schemaFactory.newSchema(schemaFile);
+        }
+    }
+
+    private final class JSONSchemaValidator implements SchemaModuleValidator {
+        private final File baseDirectory;
+        private final Map<String, String> jsonSchemaSources;
+
+        private JSONSchemaValidator(File baseDirectory, Map<String, String> jsonSchemaSources) {
+            this.baseDirectory = baseDirectory;
+            this.jsonSchemaSources = jsonSchemaSources;
+        }
+
+        @Override
+        public void validate(File schemaFile) throws Exception {
+            String schemaSource = FileUtils.readFileToString(schemaFile, StandardCharsets.UTF_8);
+            SchemaRegistry schemaRegistry = SchemaRegistry.withDialect(Dialects.getDraft202012(), builder ->
+                    builder.schemas(uri -> resolveJsonSchemaSource(baseDirectory, jsonSchemaSources, uri)));
+
+            Schema schema = schemaRegistry.getSchema(SchemaLocation.of(schemaFile.toURI().toString()), schemaSource, InputFormat.JSON);
+            schema.initializeValidators();
+
+            Schema metaSchema = schemaRegistry.getSchema(SchemaLocation.of(Dialects.getDraft202012().getId()));
+            List<Error> errors = metaSchema.validate(schemaSource, InputFormat.JSON);
+            if (!errors.isEmpty()) {
+                throw new IllegalStateException(errors.get(0).getMessage());
+            }
+        }
+    }
+
     public ExportModuleSetReleaseResponse exportModuleSetRelease(
             ScoreUser requester, ModuleSetReleaseId moduleSetReleaseId) throws Exception {
+        return exportModuleSetRelease(requester, moduleSetReleaseId, "XML", null);
+    }
+
+    public ExportModuleSetReleaseResponse exportModuleSetRelease(
+            ScoreUser requester, ModuleSetReleaseId moduleSetReleaseId,
+            String expressionOption, String expressionVersion) throws Exception {
+
+        String normalizedExpressionOption = normalizeExpressionOption(expressionOption);
+        validateExpressionVersion(normalizedExpressionOption, expressionVersion);
 
         ModuleSetReleaseDetailsRecord moduleSetRelease =
                 moduleSetReleaseQuery(requester).getModuleSetReleaseDetails(moduleSetReleaseId);
@@ -253,10 +456,54 @@ public class ModuleSetReleaseQueryService implements InitializingBean {
         File rootDirectory = new File(baseDirectory, fileName);
         FileUtils.forceMkdir(rootDirectory);
 
-        List<File> files = exportModuleSetReleaseWithoutCompression(requester, moduleSetReleaseId, rootDirectory);
-        File zipFile = Zip.compressionHierarchy(baseDirectory, files);
-        FileUtils.deleteDirectory(baseDirectory);
-        return new ExportModuleSetReleaseResponse(fileName + ".zip", zipFile);
+        try {
+            List<File> files = exportModuleSetReleaseWithoutCompression(
+                    requester, moduleSetReleaseId, rootDirectory, normalizedExpressionOption, expressionVersion);
+            if (files.size() == 1) {
+                File srcFile = files.get(0);
+                File destFile = File.createTempFile("oagis-", null);
+                if (!srcFile.renameTo(destFile)) {
+                    FileUtils.copyFile(srcFile, destFile);
+                }
+                return new ExportModuleSetReleaseResponse(srcFile.getName(), destFile);
+            }
+
+            File zipFile = Zip.compressionHierarchy(baseDirectory, files);
+            return new ExportModuleSetReleaseResponse(fileName + ".zip", zipFile);
+        } finally {
+            FileUtils.deleteDirectory(baseDirectory);
+        }
+    }
+
+    private ExportSchemaModuleVisitor newSchemaModuleVisitor(ModuleCcDocument moduleCcDocument, String expressionOption) {
+        if ("JSON".equals(expressionOption)) {
+            return new JSONExportSchemaModuleVisitor(moduleCcDocument);
+        }
+        return new XMLExportSchemaModuleVisitor(moduleCcDocument);
+    }
+
+    private String normalizeExpressionOption(String expressionOption) {
+        if (!org.springframework.util.StringUtils.hasLength(expressionOption)) {
+            return "XML";
+        }
+        String normalized = expressionOption.trim().toUpperCase();
+        if ("XML".equals(normalized) || "JSON".equals(normalized)) {
+            return normalized;
+        }
+        throw new IllegalArgumentException("Unsupported expression option: " + expressionOption);
+    }
+
+    private void validateExpressionVersion(String expressionOption, String expressionVersion) {
+        if (!"JSON".equals(expressionOption)) {
+            return;
+        }
+        if (!org.springframework.util.StringUtils.hasLength(expressionVersion)) {
+            return;
+        }
+        String normalizedVersion = expressionVersion.trim().toUpperCase();
+        if (!"2020-12".equals(normalizedVersion) && !"202012".equals(normalizedVersion)) {
+            throw new IllegalArgumentException("Unsupported JSON expression version: " + expressionVersion);
+        }
     }
 
     public ModuleAssignableComponentsRecord getAssignableCCs(

@@ -1,6 +1,8 @@
 package org.oagi.score.gateway.http.api.export.model;
 
 import org.oagi.score.gateway.http.api.cc_management.model.bccp.BccpSummaryRecord;
+import org.oagi.score.gateway.http.api.cc_management.model.bccp.BccpManifestId;
+import org.oagi.score.gateway.http.api.cc_management.model.dt.DtManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.DtSummaryRecord;
 import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
 
@@ -25,8 +27,20 @@ public class BCCP implements Component {
         return propertyTerm.replaceAll(" ", "").replace("Identifier", "ID");
     }
 
+    public String getPropertyTerm() {
+        return bccp.propertyTerm();
+    }
+
     public String getTypeName() {
         return dtNameResolver.apply(dt);
+    }
+
+    public BccpManifestId bccpManifestId() {
+        return bccp.bccpManifestId();
+    }
+
+    public DtManifestId dtManifestId() {
+        return dt.dtManifestId();
     }
 
     public boolean isNillable() {

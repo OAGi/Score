@@ -1,7 +1,7 @@
 package org.oagi.score.gateway.http.api.export.model;
 
 import org.apache.commons.io.FilenameUtils;
-import org.oagi.score.gateway.http.api.export.impl.XMLExportSchemaModuleVisitor;
+import org.oagi.score.gateway.http.api.export.impl.ExportSchemaModuleVisitor;
 import org.oagi.score.gateway.http.api.module_management.model.ModuleId;
 import org.oagi.score.gateway.http.api.module_management.model.ModuleSetReleaseId;
 import org.springframework.data.util.Pair;
@@ -260,7 +260,7 @@ public class SchemaModule {
         this.content = content;
     }
 
-    public void visit(XMLExportSchemaModuleVisitor schemaModuleVisitor) throws Exception {
+    public void visit(ExportSchemaModuleVisitor schemaModuleVisitor) throws Exception {
         schemaModuleVisitor.startSchemaModule(this);
 
         if (content == null) {

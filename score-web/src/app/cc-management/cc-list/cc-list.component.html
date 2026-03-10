@@ -75,9 +75,13 @@
       <button mat-icon-button class="ml-2" matTooltip="Export"
               *ngIf="!isBrowseStandardMode"
               [hidden]="!canToolbarAction('Export')"
-              (click)="exportStandaloneSchemas()">
+              [matMenuTriggerFor]="exportMenu">
         <mat-icon svgIcon="export_notes"></mat-icon>
       </button>
+      <mat-menu #exportMenu="matMenu">
+        <button mat-menu-item (click)="exportStandaloneSchemas('XML')">XML Schema</button>
+        <button mat-menu-item (click)="exportStandaloneSchemas('JSON')">JSON Schema</button>
+      </mat-menu>
     </mat-toolbar>
   </div>
 

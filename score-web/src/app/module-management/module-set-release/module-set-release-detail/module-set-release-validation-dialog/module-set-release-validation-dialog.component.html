@@ -1,6 +1,6 @@
 <div class="d-block">
   <div class="header d-flex align-items-center" mat-dialog-title>
-    <span>Module Set Release - XML Schema Validation</span>
+    <span>Module Set Release - {{ schemaTypeLabel }} Validation</span>
     <div class="close pr-2">
       <button mat-icon-button mat-small-icon-button (click)="onNoClick()" *ngIf="resp.done">
         <mat-icon>close</mat-icon>
@@ -12,7 +12,7 @@
     <mat-progress-bar mode="indeterminate" *ngIf="!determinate"></mat-progress-bar>
     <mat-progress-bar mode="determinate" *ngIf="determinate"
                       color="{{ invalidKeys.length > 0 ? 'warn' : 'primary' }}" value="{{ progress }}"></mat-progress-bar>
-    <p *ngIf="!determinate">Generating schemas...</p>
+    <p *ngIf="!determinate">Generating {{ schemaTypeLabel.toLowerCase() }}s...</p>
     <p *ngIf="resp.progress > 0">{{ resp.progress }} / {{ resp.length }} ({{ progress }}% - {{ validKeys.length }} valid, {{ invalidKeys.length }} invalid)</p>
 
     <mat-card class="pt-2">

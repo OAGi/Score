@@ -361,9 +361,17 @@ export class CcListService {
     });
   }
 
-  exportStandaloneSchemas(asccpManifestIdList: CcListEntry[]): Observable<HttpResponse<Blob>> {
-    const params = new HttpParams().set('asccpManifestIdList',
-      asccpManifestIdList.map(e => e.manifestId.toString().toLowerCase()).join(','));
+  exportStandaloneSchemas(
+    asccpManifestIdList: CcListEntry[],
+    expressionOption: 'XML' | 'JSON' = 'XML',
+    expressionVersion?: string
+  ): Observable<HttpResponse<Blob>> {
+    let params = new HttpParams()
+      .set('asccpManifestIdList', asccpManifestIdList.map(e => e.manifestId.toString().toLowerCase()).join(','))
+      .set('expressionOption', expressionOption);
+    if (expressionVersion) {
+      params = params.set('expressionVersion', expressionVersion);
+    }
     return this.http.get('/api/core-components/export/standalone', {
       params,
       observe: 'response',

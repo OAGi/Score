@@ -372,7 +372,7 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
     }
 
     @Override
-    public void traverse(SchemaModule schemaModule, XMLExportSchemaModuleVisitor schemaModuleVisitor) throws Exception {
+    public void traverse(SchemaModule schemaModule, ExportSchemaModuleVisitor schemaModuleVisitor) throws Exception {
         for (SchemaModule include : schemaModule.getIncludeModules()) {
             schemaModuleVisitor.visitIncludeModule(include);
         }
