@@ -68,27 +68,52 @@ tr.element-row:not(.expanded-row):active {
 .bie-source, .bie-based {
   font-size: 11px !important;
   color: #767676 !important;
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.bie-source > a,
+.bie-based > a {
+  min-width: 0;
 }
 
 .mat-column-owner {
   font-size: 13px;
 }
 
-/* Keep mat-table columns width-driven by header resize instead of content-driven auto layout. */
-:host ::ng-deep .table-wrapper table[mat-table] {
-  table-layout: fixed;
-  width: 100%;
-}
-
-/* Let Business Contexts mat-select follow column width and shrink when resized narrower. */
-:host ::ng-deep .mat-column-businessContexts .mat-mdc-select {
-  width: 100%;
+.business-contexts-menu-wrapper {
+  display: block;
+  max-width: 100%;
   min-width: 0;
+  overflow: hidden;
 }
 
-/* Truncate long selected context names so they do not force the column to expand. */
-:host ::ng-deep .mat-column-businessContexts .mat-mdc-select-min-line {
+.business-contexts-menu-trigger {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  max-width: 100%;
+  min-width: 0;
+  padding: 0;
+  text-align: left;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+}
+
+.business-contexts-menu-trigger.is-clickable {
+  cursor: pointer;
+}
+
+.business-contexts-menu-label {
+  max-width: 100%;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.business-contexts-menu-icon {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.54);
 }

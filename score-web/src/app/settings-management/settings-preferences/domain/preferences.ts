@@ -233,7 +233,7 @@ export class TableColumnsInfo {
     {name: 'Type', selected: true, width: 140},
     {name: 'Organization', selected: true, width: 400},
     {name: 'Domain', selected: true, width: 200},
-    {name: 'Description', selected: true, width: '30%'},
+    {name: 'Description', selected: true, width: 400},
     {name: 'Updated On', selected: true, width: 160}
   ];
 
@@ -282,7 +282,7 @@ export class TableColumnsInfo {
     {name: 'Version ID', selected: true, width: 160},
     {name: 'Version Name', selected: true, width: 160},
     {name: 'Owner', selected: true, width: 140},
-    {name: 'Description', selected: true, width: '40%'},
+    {name: 'Description', selected: true, width: 400},
     {name: 'Updated On', selected: true, width: 160}
   ];
 

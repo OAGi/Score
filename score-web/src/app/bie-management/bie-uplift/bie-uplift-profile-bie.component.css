@@ -18,10 +18,22 @@ tr.element-row:not(.expanded-row):active {
 .bie-source, .bie-based {
   font-size: 11px !important;
   color: #767676 !important;
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
 }
 
-.mat-column-businessContexts .businessContext:not(:last-child)::after {
-  content: ', ';
+.bie-source > a,
+.bie-based > a {
+  min-width: 0;
+}
+
+.mat-column-businessContexts .businessContext {
+  display: block;
+}
+
+.mat-column-businessContexts .businessContext:not(:last-child) {
+  margin-bottom: 2px;
 }
 
 .mat-column-owner {

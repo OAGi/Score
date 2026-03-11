@@ -35,14 +35,14 @@ A random non-existent username cannot log in and receives the message `Invalid u
 
 1. A user opens the Score login page.
 2. The user logs in with the built-in OAGIS developer account credentials.
-3. Verify successful login. (Assertion [#1](#test-assertion-111))
-4. Verify that the signed-in account is shown as a developer account. (Assertion [#2](#test-assertion-112))
+3. Verify that the built-in OAGIS developer account can log in successfully. (Assertion [#1](#test-assertion-111))
+4. Verify that the signed-in account is identified as a developer account. (Assertion [#2](#test-assertion-112))
 5. The user logs out.
-6. Verify that the browser is redirected back to the home page. (Assertion [#3](#test-assertion-113))
+6. Verify that the built-in OAGIS developer account can log out and that the browser is redirected back to the home page. (Assertion [#3](#test-assertion-113))
 7. The user tries to log in again with username `oagis` and a random invalid password.
-8. Verify that the user receives `Invalid username or password`. (Assertion [#4](#test-assertion-114))
+8. Verify that the built-in OAGIS developer account cannot log in with an invalid password and receives `Invalid username or password`. (Assertion [#4](#test-assertion-114))
 9. The user tries to log in with a random username and a random password.
-10. Verify that the user receives `Invalid username or password`. (Assertion [#5](#test-assertion-115))
+10. Verify that a random non-existent username cannot log in and receives `Invalid username or password`. (Assertion [#5](#test-assertion-115))
 
 ## Test Case 1.2
 
@@ -118,17 +118,17 @@ The `CCTS Terminology` option is enabled and mutually exclusive with `connectSpe
 
 1. Open the Score login page.
 2. Log in with a developer account.
-3. Verify the `BIE` menu items listed in Assertion [#1](#test-assertion-121), including that `Uplift Code List` is present but disabled.
-4. Verify the `Context` menu items listed in Assertion [#2](#test-assertion-122).
-5. Verify the `Core Component` menu items described in Assertion [#3](#test-assertion-123).
-6. Verify the `Module` menu items in Assertion [#4](#test-assertion-124).
-7. Verify the `Library` menu item in Assertion [#5](#test-assertion-125).
-8. Verify that the `Admin` menu is hidden. (Assertion [#6](#test-assertion-126))
-9. Verify the `Help` menu items in Assertion [#7](#test-assertion-127). If the test host is `localhost`, the `User Guide` check may be skipped.
-10. Verify the notification icon behavior in Assertion [#8](#test-assertion-128), including navigation to the `Message` page.
-11. Verify the login ID label in Assertion [#9](#test-assertion-129).
-12. Verify the terminology toggle behavior in Assertions [#10](#test-assertion-1210) and [#11](#test-assertion-1211).
-13. Verify the `Settings` and `Logout` items in Assertion [#12](#test-assertion-1212).
+3. Verify that `BIE > View/Edit BIE`, `Create BIE`, `Copy BIE`, `Uplift BIE`, `Express BIE`, `BIE Package`, `Reuse Report`, and `View/Edit Code List` are accessible and that `BIE > Uplift Code List` is present but disabled. (Assertion [#1](#test-assertion-121))
+4. Verify that `Context > View/Edit Context Category`, `View/Edit Context Scheme`, and `View/Edit Business Context` are accessible. (Assertion [#2](#test-assertion-122))
+5. Verify that `Core Component > View/Edit Core Component`, `View/Edit Data Type`, `View/Edit Code List`, `View/Edit Agency ID List`, `View/Edit Release`, and `View/Edit Namespace` are accessible. (Assertion [#3](#test-assertion-123))
+6. Verify that `Module > View/Edit Module Set` and `View/Edit Module Set Release` are accessible. (Assertion [#4](#test-assertion-124))
+7. Verify that `Library > View Library` is accessible for a developer account. (Assertion [#5](#test-assertion-125))
+8. Verify that the `Admin` menu is hidden from a developer account. (Assertion [#6](#test-assertion-126))
+9. Verify that `Help > About` is accessible and that `Help > User Guide` is accessible when the test host is not `localhost`. If the test host is `localhost`, the `User Guide` check may be skipped. (Assertion [#7](#test-assertion-127))
+10. Verify that the notification icon is accessible and that it navigates to the `Message` page. (Assertion [#8](#test-assertion-128))
+11. Verify that the login ID menu shows `Signed in as <loginId>`. (Assertion [#9](#test-assertion-129))
+12. Verify that the `connectSpec Terminology` option is enabled and mutually exclusive with `CCTS Terminology`, and that the `CCTS Terminology` option is enabled and mutually exclusive with `connectSpec Terminology`. (Assertions [#10](#test-assertion-1210), [#11](#test-assertion-1211))
+13. Verify that `Login ID > Settings` is accessible and that `Login ID > Logout` is accessible and returns the user to the login page. (Assertion [#12](#test-assertion-1212))
 
 ## Test Case 1.3
 
@@ -164,5 +164,5 @@ Pre-condition:
 1. Enable tenant mode through the application settings API.
 2. Open the Score login page.
 3. Log in with a developer account without tenant roles.
-4. Verify the disabled `BIE` menu items in Assertion [#1](#test-assertion-131).
-5. Verify the hidden menus in Assertion [#2](#test-assertion-132).
+4. Verify that for a developer account without tenant roles, `BIE > Create BIE`, `BIE > View/Edit Code List`, and `BIE > Uplift Code List` are present but disabled. (Assertion [#1](#test-assertion-131))
+5. Verify that for a developer account without tenant roles, the `Context`, `Module`, and `Library` menus are hidden. (Assertion [#2](#test-assertion-132))

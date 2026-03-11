@@ -144,12 +144,12 @@
               <ng-container matColumnDef="den">
                 <th *matHeaderCellDef mat-header-cell mat-sort-header> Den</th>
                 <td *matCellDef="let element" mat-cell>
-                  <a *ngIf="['ACC', 'ASCCP', 'BCCP'].indexOf(element.type) !== -1" class="den"
+                  <a *ngIf="['ACC', 'ASCCP', 'BCCP'].indexOf(element.type) !== -1" class="den score-line-clamp-2 score-break-word"
                      routerLink="/core_component/{{element.type.toLowerCase()}}/{{ element.manifestId }}"
                      target="_blank">{{element.den}}</a>
-                  <a *ngIf="element.type === 'CODE_LIST'" class="den" routerLink="/code_list/{{ element.manifestId }}"
+                  <a *ngIf="element.type === 'CODE_LIST'" class="den score-line-clamp-2 score-break-word" routerLink="/code_list/{{ element.manifestId }}"
                      target="_blank">{{element.den}}</a>
-                  <span
+                  <span class="score-line-clamp-2 score-break-word"
                     *ngIf="['ACC', 'ASCCP', 'BCCP', 'CODE_LIST'].indexOf(element.type) === -1">{{element.den}}</span>
                 </td>
               </ng-container>
@@ -220,12 +220,12 @@
               <ng-container matColumnDef="den">
                 <th *matHeaderCellDef mat-header-cell mat-sort-header> Den</th>
                 <td *matCellDef="let element" mat-cell>
-                  <a *ngIf="['ACC', 'ASCCP', 'BCCP', 'DT'].indexOf(element.type) !== -1" class="den"
+                  <a *ngIf="['ACC', 'ASCCP', 'BCCP', 'DT'].indexOf(element.type) !== -1" class="den score-line-clamp-2 score-break-word"
                      routerLink="/core_component/{{element.type.toLowerCase()}}/{{ element.manifestId }}"
                      target="_blank">{{element.den}}</a>
-                  <a *ngIf="element.type === 'CODE_LIST'" class="den" routerLink="/code_list/{{ element.manifestId }}"
+                  <a *ngIf="element.type === 'CODE_LIST'" class="den score-line-clamp-2 score-break-word" routerLink="/code_list/{{ element.manifestId }}"
                      target="_blank">{{element.den}}</a>
-                  <span
+                  <span class="score-line-clamp-2 score-break-word"
                     *ngIf="['ACC', 'ASCCP', 'BCCP', 'CODE_LIST', 'DT'].indexOf(element.type) === -1">{{element.den}}</span>
                 </td>
               </ng-container>

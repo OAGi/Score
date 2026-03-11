@@ -78,17 +78,17 @@ The `CCTS Terminology` option is enabled and mutually exclusive with `connectSpe
 
 1. Open the Score login page.
 2. Log in with an end user account.
-3. Verify the `BIE` menu items listed in Assertion [#1](#test-assertion-311).
-4. Verify the `Context` menu items listed in Assertion [#2](#test-assertion-312).
-5. Verify the `Core Component` menu items in Assertion [#3](#test-assertion-313) when the `Core Component` menu is shown.
-6. Verify the `Module` menu items in Assertion [#4](#test-assertion-314).
-7. Verify the `Library` menu item in Assertion [#5](#test-assertion-315).
-8. Verify that the `Admin` menu is hidden. (Assertion [#6](#test-assertion-316))
-9. Verify the `Help` menu items in Assertion [#7](#test-assertion-317). If the test host is `localhost`, the `User Guide` check may be skipped.
-10. Verify the notification icon behavior in Assertion [#8](#test-assertion-318), including navigation to the `Message` page.
-11. Verify the login ID label in Assertion [#9](#test-assertion-319).
-12. Verify the terminology toggle behavior in Assertions [#10](#test-assertion-3110) and [#11](#test-assertion-3111).
-13. Verify the `Settings` and `Logout` items in Assertion [#12](#test-assertion-3112).
+3. Verify that `BIE > View/Edit BIE`, `Create BIE`, `Copy BIE`, `Uplift BIE`, `Express BIE`, `BIE Package`, `OpenAPI Document`, `Reuse Report`, `View/Edit Code List`, and `Uplift Code List` are accessible. (Assertion [#1](#test-assertion-311))
+4. Verify that `Context > View/Edit Context Category`, `View/Edit Context Scheme`, and `View/Edit Business Context` are accessible. (Assertion [#2](#test-assertion-312))
+5. When the `Core Component` menu is shown, verify that `Core Component > View/Edit Core Component`, `View/Edit Data Type`, `View/Edit Code List`, `View/Edit Agency ID List`, `View/Edit Release`, and `View/Edit Namespace` are accessible. (Assertion [#3](#test-assertion-313))
+6. Verify that `Module > View Module Set` and `View Module Set Release` are accessible. (Assertion [#4](#test-assertion-314))
+7. Verify that `Library > View Library` is accessible for an end user account. (Assertion [#5](#test-assertion-315))
+8. Verify that the `Admin` menu is hidden from an end user account. (Assertion [#6](#test-assertion-316))
+9. Verify that `Help > About` is accessible and that `Help > User Guide` is accessible when the test host is not `localhost`. If the test host is `localhost`, the `User Guide` check may be skipped. (Assertion [#7](#test-assertion-317))
+10. Verify that the notification icon is accessible and that it navigates to the `Message` page. (Assertion [#8](#test-assertion-318))
+11. Verify that the login ID menu shows `Signed in as <loginId>`. (Assertion [#9](#test-assertion-319))
+12. Verify that the `connectSpec Terminology` option is enabled and mutually exclusive with `CCTS Terminology`, and that the `CCTS Terminology` option is enabled and mutually exclusive with `connectSpec Terminology`. (Assertions [#10](#test-assertion-3110), [#11](#test-assertion-3111))
+13. Verify that `Login ID > Settings` is accessible and that `Login ID > Logout` is accessible and returns the user to the login page. (Assertion [#12](#test-assertion-3112))
 
 
 ## Test Case 3.2
@@ -120,7 +120,7 @@ Pre-condition:
 1. Enable standard browsing mode through the application settings API.
 2. Open the Score login page.
 3. Log in with an end user account.
-4. Verify the `Browse Standard` menu is shown and the `Core Component` menu is hidden. (Assertion [#1](#test-assertion-321))
+4. Verify that the `Browse Standard` menu is shown and the `Core Component` menu is hidden from the end user account. (Assertion [#1](#test-assertion-321))
 5. Open the `Browse Standard` menu and verify navigation to the core component browsing page. (Assertion [#1](#test-assertion-321))
 
 
@@ -158,5 +158,5 @@ Pre-condition:
 1. Enable tenant mode through the application settings API.
 2. Open the Score login page.
 3. Log in with an end user account without tenant roles.
-4. Verify the disabled `BIE` menu items in Assertion [#1](#test-assertion-331).
-5. Verify the hidden menus in Assertion [#2](#test-assertion-332).
+4. Verify that for an end user account without tenant roles, `BIE > Create BIE`, `BIE > View/Edit Code List`, and `BIE > Uplift Code List` are present but disabled. (Assertion [#1](#test-assertion-331))
+5. Verify that for an end user account without tenant roles, the `Context`, `Module`, and `Library` menus are hidden. (Assertion [#2](#test-assertion-332))

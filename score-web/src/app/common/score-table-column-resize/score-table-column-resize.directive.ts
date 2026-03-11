@@ -53,13 +53,9 @@ export class ScoreTableColumnResizeDirective implements OnInit, OnChanges {
   setInitialWidth() {
     if (this.defaultWidth) {
       this._width = this.defaultWidth;
-      if (typeof (this._width) === 'string') {
-        this.renderer.setStyle(this.el.nativeElement, 'width', `${this._width}`);
-      } else {
-        this.renderer.setStyle(this.el.nativeElement, 'width', `${this._width}px`);
-      }
+      this.applyWidthToColumn(this.el.nativeElement, this._width);
     } else {
-      this.renderer.removeStyle(this.el.nativeElement, 'width');
+      this.clearWidthFromColumn(this.el.nativeElement);
     }
   }
 
@@ -174,15 +170,11 @@ export class ScoreTableColumnResizeDirective implements OnInit, OnChanges {
     if (this.sibling) {
       const newSiblingWidth = this.startSiblingWidth - deltaX;
       if (newSiblingWidth >= 0) {
-        this.renderer.setStyle(this.sibling, 'width', `${newSiblingWidth}px`);
+        this.applyWidthToColumn(this.sibling, newSiblingWidth);
       }
     }
 
-    if (typeof (this._width) === 'string') {
-      this.renderer.setStyle(this.el.nativeElement, 'width', `${this._width}`);
-    } else {
-      this.renderer.setStyle(this.el.nativeElement, 'width', `${this._width}px`);
-    }
+    this.applyWidthToColumn(this.el.nativeElement, this._width);
   };
 
   onMouseUp = (event: MouseEvent) => {
@@ -207,4 +199,49 @@ export class ScoreTableColumnResizeDirective implements OnInit, OnChanges {
       this._resizing = false;  // Reset resizing flag
     }, 0);
   };
+
+  private applyWidthToColumn(element: HTMLElement, width: number | string) {
+    const targets = this.getColumnElements(element);
+    if (targets.length === 0) {
+      this.applyWidth(element, width);
+      return;
+    }
+
+    targets.forEach(target => this.applyWidth(target, width));
+  }
+
+  private clearWidthFromColumn(element: HTMLElement) {
+    const targets = this.getColumnElements(element);
+    if (targets.length === 0) {
+      this.renderer.removeStyle(element, 'width');
+      return;
+    }
+
+    targets.forEach(target => this.renderer.removeStyle(target, 'width'));
+  }
+
+  private applyWidth(element: HTMLElement, width: number | string) {
+    if (typeof width === 'string') {
+      this.renderer.setStyle(element, 'width', `${width}`);
+    } else {
+      this.renderer.setStyle(element, 'width', `${width}px`);
+    }
+  }
+
+  private getColumnElements(element: HTMLElement): HTMLElement[] {
+    const table = element.closest('table');
+    if (!table) {
+      return [];
+    }
+
+    const selectors = Array.from(element.classList)
+      .filter(className => className.startsWith('mat-column-') || className.startsWith('cdk-column-'))
+      .map(className => `.${className}`);
+
+    if (selectors.length === 0) {
+      return [];
+    }
+
+    return Array.from(table.querySelectorAll(selectors.join(','))) as HTMLElement[];
+  }
 }

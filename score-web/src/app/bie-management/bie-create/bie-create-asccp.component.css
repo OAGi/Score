@@ -64,6 +64,18 @@ tr.element-row:not(.expanded-row):active {
   font-size: 13px;
 }
 
+.den-with-tags {
+  display: inline-flex;
+  align-items: flex-start;
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+
+.den-with-tags > a {
+  min-width: 0;
+  flex: 0 1 auto;
+}
+
 .mat-column-module {
   font-size: 13px;
 }
@@ -107,7 +119,9 @@ tr.element-row:not(.expanded-row):active {
 }
 
 .tag-list {
-  display: inline-block;
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
 }
 
 .tag {

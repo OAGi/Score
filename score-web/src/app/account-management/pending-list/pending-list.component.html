@@ -93,7 +93,7 @@
                   score-table-column-resize [defaultWidth]="width('Preferred Username')" (onResize)="onResizeWidth($event)"> Preferred Username</th>
               <td mat-cell *matCellDef="let element">
                 <a routerLink="/account/pending/{{ element.appOauth2UserId }}">
-                  <span class="word-break-all">{{ element.preferredUsername }}</span>
+                  <span class="score-line-clamp-2 score-break-word">{{ element.preferredUsername }}</span>
                 </a>
               </td>
             </ng-container>
@@ -103,7 +103,7 @@
                   score-table-column-resize [defaultWidth]="width('Email')" (onResize)="onResizeWidth($event)"> Email</th>
               <td mat-cell *matCellDef="let element">
                 <a routerLink="/account/pending/{{ element.appOauth2UserId }}">
-                  <span class="word-break-all">{{ element.email }}</span>
+                  <span class="score-line-clamp-2 score-break-word">{{ element.email }}</span>
                 </a>
               </td>
             </ng-container>
@@ -112,7 +112,7 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Provider')" (onResize)="onResizeWidth($event)"> Provider</th>
               <td mat-cell *matCellDef="let element">
-                <span class="word-break-all">{{ element.providerName }}</span>
+                <span class="score-line-clamp-2 score-break-word">{{ element.providerName }}</span>
               </td>
             </ng-container>
 
@@ -120,7 +120,7 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Created On')" (onResize)="onResizeWidth($event)"> Created</th>
               <td mat-cell *matCellDef="let element">
-                {{ element.creationTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}
+                <span class="score-line-clamp-2 score-break-word">{{ element.creationTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</span>
               </td>
             </ng-container>
 

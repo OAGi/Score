@@ -2,10 +2,6 @@
   font-size: 13px;
 }
 
-.mat-column-tagName .tagName:not(:last-child)::after {
-  content: ', ';
-}
-
 .bie-guid {
   font-size: 11px !important;
   color: #767676 !important;

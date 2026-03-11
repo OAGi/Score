@@ -63,20 +63,20 @@ The SSO approval or rejection scenario for another developer account is not auto
 
 1. Log in with the built-in `oagis` account.
 2. Open `Admin > Account`.
-3. Create a new developer account with valid information and verify that the new account can log in. (Assertion [#1](#test-assertion-211))
+3. Create a new developer account with valid information and verify that the account is created successfully and can log in. (Assertion [#1](#test-assertion-211))
 4. Attempt to create a developer account with a duplicate login ID and verify that creation is rejected. (Assertion [#2](#test-assertion-212))
-5. Attempt to create a developer account with a short password and verify that creation is rejected with the password-length validation message. (Assertion [#3](#test-assertion-213))
-6. Open another developer account and verify that the login ID field is enabled. (Assertion [#4](#test-assertion-214))
-7. Update another developer account password with a valid password and verify that the account can log in with the new password. (Assertion [#5](#test-assertion-215))
-8. Attempt to update another developer account password with a short password and verify that the update is rejected and the previous password still works. (Assertion [#6](#test-assertion-216))
-9. Log in with an administrator account and open its own account-edit page. Verify that the login ID field is enabled. (Assertion [#7](#test-assertion-217))
-10. Log in with a developer account, open `Settings`, and update the password with a valid new password. Verify that the new password works. (Assertion [#8](#test-assertion-218))
-11. Attempt to update the developer password with an invalid old password and verify that the `Invalid old password` error is returned. (Assertion [#9](#test-assertion-219))
-12. Attempt to update the developer password with a short password and verify that the password-length validation message is returned. (Assertion [#10](#test-assertion-2110))
-13. Attempt to update the developer password with mismatched `New password` and `Confirm new password` values and verify that the update is rejected. (Assertion [#11](#test-assertion-2111))
-14. Disable another developer account and verify that the disabled account cannot log in. (Assertion [#12](#test-assertion-2112))
-15. Enable a disabled developer account and verify that the account can log in again. (Assertion [#13](#test-assertion-2113))
-16. Note that the SSO approval or rejection scenario is present in the suite as a disabled placeholder test. (Assertion [#14](#test-assertion-2114))
+5. Attempt to create a developer account with a password shorter than the minimum length and verify that creation is rejected with the password-length validation message. (Assertion [#3](#test-assertion-213))
+6. Open another developer account on the edit account page and verify that the login ID field is enabled. (Assertion [#4](#test-assertion-214))
+7. Update another developer account password with a new valid password and verify that the account can log in with the new password. (Assertion [#5](#test-assertion-215))
+8. Attempt to update another developer account password with a password shorter than the minimum length and verify that the update is rejected and the previous password still works. (Assertion [#6](#test-assertion-216))
+9. Open the current administrator account on the edit account page and verify that the login ID field is enabled. (Assertion [#7](#test-assertion-217))
+10. Log in with a developer account, open `Settings`, update the password with a new valid password, and verify that the new password works. (Assertion [#8](#test-assertion-218))
+11. Attempt to update the developer password from `Settings` with an invalid old password and verify that the `Invalid old password` error is returned. (Assertion [#9](#test-assertion-219))
+12. Attempt to update the developer password from `Settings` with a password shorter than the minimum length and verify that the password-length validation message is returned. (Assertion [#10](#test-assertion-2110))
+13. Attempt to update the developer password from `Settings` with mismatched `New password` and `Confirm new password` values and verify that the update is rejected. (Assertion [#11](#test-assertion-2111))
+14. Disable another developer account and verify that the disabled account cannot be used to log in to the application. (Assertion [#12](#test-assertion-2112))
+15. Enable a disabled developer account and verify that the enabled account can be used to log in to the application again. (Assertion [#13](#test-assertion-2113))
+16. Note that the SSO approval or rejection scenario for another developer account is present in the suite as a disabled placeholder test. (Assertion [#14](#test-assertion-2114))
 
 ## Test Case 2.2
 
@@ -123,12 +123,12 @@ The SSO approval or rejection scenario for an end user account is not automated 
 
 1. Log in with the built-in `oagis` account.
 2. Open `Admin > Account`.
-3. Create a new end user account with valid information and verify that the new account can log in. (Assertion [#1](#test-assertion-221))
+3. Create a new end user account with valid information and verify that the account is created successfully and can log in. (Assertion [#1](#test-assertion-221))
 4. Attempt to create an end user account with a duplicate login ID and verify that creation is rejected. (Assertion [#2](#test-assertion-222))
-5. Attempt to create an end user account with a short password and verify that creation is rejected with the password-length validation message. (Assertion [#3](#test-assertion-223))
-6. Open another end user account and verify that the login ID field is enabled. (Assertion [#4](#test-assertion-224))
-7. Update another end user account password with a valid password and verify that the account can log in with the new password. (Assertion [#5](#test-assertion-225))
-8. Attempt to update another end user account password with a short password and verify that the update is rejected and the previous password still works. (Assertion [#6](#test-assertion-226))
-9. Disable another end user account and verify that the disabled account cannot log in. (Assertion [#7](#test-assertion-227))
-10. Enable a disabled end user account and verify that the account can log in again. (Assertion [#8](#test-assertion-228))
-11. Note that the SSO approval or rejection scenario is present in the suite as a disabled placeholder test. (Assertion [#9](#test-assertion-229))
+5. Attempt to create an end user account with a password shorter than the minimum length and verify that creation is rejected with the password-length validation message. (Assertion [#3](#test-assertion-223))
+6. Open another end user account on the edit account page and verify that the login ID field is enabled. (Assertion [#4](#test-assertion-224))
+7. Update another end user account password with a new valid password and verify that the account can log in with the new password. (Assertion [#5](#test-assertion-225))
+8. Attempt to update another end user account password with a password shorter than the minimum length and verify that the update is rejected and the previous password still works. (Assertion [#6](#test-assertion-226))
+9. Disable another end user account and verify that the disabled account cannot be used to log in to the application. (Assertion [#7](#test-assertion-227))
+10. Enable a disabled end user account and verify that the enabled account can be used to log in to the application again. (Assertion [#8](#test-assertion-228))
+11. Note that the SSO approval or rejection scenario for an end user account is present in the suite as a disabled placeholder test. (Assertion [#9](#test-assertion-229))

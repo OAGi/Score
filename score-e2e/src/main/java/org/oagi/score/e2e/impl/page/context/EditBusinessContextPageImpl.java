@@ -106,17 +106,16 @@ public class EditBusinessContextPageImpl extends BasePageImpl implements EditBus
         ContextCategoryObject contextCategory =
                 getAPIFactory().getContextCategoryAPI().getContextCategoryById(contextScheme.getContextCategoryId());
 
-        WebElement td = visibilityOfElementLocated(getDriver(), By.xpath(
-                "//tbody//td//span[contains(text(), \"" + contextSchemeValue.getValue() + "\")]" +
-                        "//ancestor::tr/td//span[contains(text(), \"" + contextScheme.getSchemeName() + "\")]" +
-                        "//ancestor::tr/td//span[contains(text(), \"" + contextCategory.getName() + "\")]" +
-                        "//ancestor::td"));
-        click(td);
-        waitFor(ofMillis(2000L));
+        return retry(() -> {
+            WebElement tr = visibilityOfElementLocated(getDriver(), By.xpath(
+                    "//tbody//tr[.//td//span[contains(text(), \"" + contextSchemeValue.getValue() + "\")]" +
+                            " and .//td//span[contains(text(), \"" + contextScheme.getSchemeName() + "\")]" +
+                            " and .//td//span[contains(text(), \"" + contextCategory.getName() + "\")]]"));
+            click(getDriver(), tr);
+            waitFor(ofMillis(500L));
 
-        BusinessContextValueDialog businessContextValueDialog = new BusinessContextValueDialogImpl(this);
-        assert businessContextValueDialog.isOpened();
-        retry(() -> {
+            BusinessContextValueDialog businessContextValueDialog = new BusinessContextValueDialogImpl(this);
+            assert businessContextValueDialog.isOpened();
             if (isEmpty(getText(businessContextValueDialog.getContextCategorySelectField()))) {
                 throw new WebDriverException("Cannot locate a context category.");
             }
@@ -126,8 +125,8 @@ public class EditBusinessContextPageImpl extends BasePageImpl implements EditBus
             if (isEmpty(getText(businessContextValueDialog.getContextSchemeValueSelectField()))) {
                 throw new WebDriverException("Cannot locate a context scheme value.");
             }
+            return businessContextValueDialog;
         });
-        return businessContextValueDialog;
     }
 
     @Override

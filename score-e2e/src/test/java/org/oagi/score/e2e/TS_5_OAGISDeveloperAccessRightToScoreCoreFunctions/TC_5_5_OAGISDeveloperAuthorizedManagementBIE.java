@@ -1556,9 +1556,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         bbiePanel.toggleUsed();
 
-        bbiePanel.setCardinalityMin(2);
+        int currentCardinalityMax = Integer.parseInt(getText(bbiePanel.getCardinalityMaxField()));
+        bbiePanel.setCardinalityMin(currentCardinalityMax + 1);
         assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
-                "//mat-error[contains(text(), \"Cardinality Min must be less than or equals to 1\")]")).isDisplayed());
+                "//mat-error[contains(text(), \"Cardinality Min must be less than or equals to " + currentCardinalityMax + "\")]")).isDisplayed());
         assertFalse(editBIEPage.getUpdateButton(false).isEnabled());
 
         bbiePanel.setCardinalityMin(1);
@@ -1685,8 +1686,9 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         assertEquals("unbounded", getText(bbiePanel.getCardinalityMaxField()));
 
         bbiePanel.setCardinalityMin(0);
+        int currentCardinalityMin = Integer.parseInt(getText(bbiePanel.getCardinalityMinField()));
         assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
-                "//mat-error[contains(text(), \"Cardinality Min must be greater than or equals to 1\")]")).isDisplayed());
+                "//mat-error[contains(text(), \"Cardinality Min must be greater than or equals to " + currentCardinalityMin + "\")]")).isDisplayed());
 
         bbiePanel.setCardinalityMax(0);
         assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
@@ -1718,10 +1720,11 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         bbiePanel.toggleUsed();
 
-        int randCardinalityMin = RandomUtils.secure().randomInt(2, 100);
+        int currentCardinalityMax = Integer.parseInt(getText(bbiePanel.getCardinalityMaxField()));
+        int randCardinalityMin = RandomUtils.secure().randomInt(currentCardinalityMax + 1, currentCardinalityMax + 100);
         bbiePanel.setCardinalityMin(randCardinalityMin);
         assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
-                "//mat-error[contains(text(), \"Cardinality Min must be less than or equals to 1\")]")).isDisplayed());
+                "//mat-error[contains(text(), \"Cardinality Min must be less than or equals to " + currentCardinalityMax + "\")]")).isDisplayed());
     }
 
     @Test

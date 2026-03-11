@@ -68,8 +68,12 @@ tr.element-row:not(.expanded-row):active {
   width: 10%;
 }
 
-.mat-column-businessContexts .businessContext:not(:last-child)::after {
-  content: ', ';
+.mat-column-businessContexts .businessContext {
+  display: block;
+}
+
+.mat-column-businessContexts .businessContext:not(:last-child) {
+  margin-bottom: 2px;
 }
 
 .mat-column-version, .mat-column-status {

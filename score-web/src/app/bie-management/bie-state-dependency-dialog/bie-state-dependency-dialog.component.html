@@ -41,12 +41,12 @@
             <ng-container matColumnDef="displayName">
               <th mat-header-cell *matHeaderCellDef>Display Name</th>
               <td mat-cell *matCellDef="let target">
-                <div class="den word-break-all">
+                <div class="den score-line-clamp-2 score-break-word">
                   <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ target.topLevelAsbiepId }}">
                     {{ value(target.displayName || target.propertyTerm) }}
                   </a>
                 </div>
-                <div *ngIf="target.displayName && target.propertyTerm" class="property-term word-break-all">
+                <div *ngIf="target.displayName && target.propertyTerm" class="property-term score-line-clamp-2 score-break-word">
                   {{ target.propertyTerm }}
                 </div>
                 <div class="bie-guid">{{ value(target.guid) }}</div>
@@ -57,7 +57,7 @@
               <th mat-header-cell *matHeaderCellDef>Dependencies</th>
               <td mat-cell *matCellDef="let target">
                 <ng-container *ngIf="dependenciesRelations(target).length > 0; else noDependencies">
-                  <div class="word-break-all relation-summary"
+                  <div class="score-line-clamp-2 score-break-word relation-summary"
                        [matTooltip]="relationTooltip(dependenciesRelations(target))"
                        [matTooltipDisabled]="!hasMoreRelations(dependenciesRelations(target))"
                        matTooltipClass="dependency-relation-tooltip">
@@ -77,11 +77,12 @@
             <ng-container matColumnDef="businessContexts">
               <th mat-header-cell *matHeaderCellDef>Business Contexts</th>
               <td mat-cell *matCellDef="let target">
-                <ng-container *ngIf="target.businessContexts?.length; else noBusinessContexts">
+                <div *ngIf="target.businessContexts?.length; else noBusinessContexts"
+                     class="business-context-list score-line-clamp-2 score-break-word">
                   <span *ngFor="let businessContext of target.businessContexts" class="businessContext">
                     {{ businessContext }}
                   </span>
-                </ng-container>
+                </div>
                 <ng-template #noBusinessContexts></ng-template>
               </td>
             </ng-container>
@@ -89,21 +90,21 @@
             <ng-container matColumnDef="version">
               <th mat-header-cell *matHeaderCellDef>Version</th>
               <td mat-cell *matCellDef="let target">
-                <div class="word-break-all">{{ value(target.version) }}</div>
+                <div class="score-line-clamp-2 score-break-word">{{ value(target.version) }}</div>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="status">
               <th mat-header-cell *matHeaderCellDef>Status</th>
               <td mat-cell *matCellDef="let target">
-                <div class="word-break-all">{{ value(target.status) }}</div>
+                <div class="score-line-clamp-2 score-break-word">{{ value(target.status) }}</div>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="remark">
               <th mat-header-cell *matHeaderCellDef>Remark</th>
               <td mat-cell *matCellDef="let target">
-                <div class="word-break-all">{{ value(target.remark) }}</div>
+                <div class="score-line-clamp-2 score-break-word">{{ value(target.remark) }}</div>
               </td>
             </ng-container>
 

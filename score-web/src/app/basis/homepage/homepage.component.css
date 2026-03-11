@@ -166,8 +166,12 @@ a {
   width: 15%;
 }
 
-.mat-column-businessContexts .businessContext:not(:last-child)::after {
-  content: ', ';
+.mat-column-businessContexts .businessContext {
+  display: block;
+}
+
+.mat-column-businessContexts .businessContext:not(:last-child) {
+  margin-bottom: 2px;
 }
 
 .mat-column-lastUpdateTimestamp {

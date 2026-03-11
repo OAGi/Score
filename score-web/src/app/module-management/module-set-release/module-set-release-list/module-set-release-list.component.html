@@ -96,7 +96,7 @@
               <th *matHeaderCellDef mat-header-cell mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Name')" (onResize)="onResizeWidth($event)"> Name</th>
               <td *matCellDef="let element" mat-cell>
-                <div class="den word-break-all">
+                <div class="den score-line-clamp-2 score-break-word">
                   <a routerLink="{{ element.moduleSetReleaseId }}">{{ element.name }}</a>
                 </div>
               </td>
@@ -106,7 +106,7 @@
               <th *matHeaderCellDef mat-header-cell mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Release Num')" (onResize)="onResizeWidth($event)"> Release Num</th>
               <td *matCellDef="let element" mat-cell>
-                <div class="den word-break-all">
+                <div class="den score-line-clamp-2 score-break-word">
                   <a routerLink="/release/{{ element.releaseId }}">{{ element.releaseNum }}</a>
                 </div>
               </td>
@@ -124,8 +124,10 @@
               <th *matHeaderCellDef mat-header-cell mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
               <td *matCellDef="let element" mat-cell>
-                <div class="ellipsis">{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-                <div class="description"><span class="pr-1">by</span><b class="word-break-all">{{ element.lastUpdated.who.loginId }}</b></div>
+                <div class="score-line-clamp-2 score-break-word">
+                  <div>{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                  <div class="description"><span class="pr-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
+                </div>
               </td>
             </ng-container>
 
