@@ -107,7 +107,7 @@ public interface EditAccountPage extends Page {
      * @return the parent 'Accounts' page object
      * @throws AccountUpdateException if the update request failed
      */
-    AccountsPage updatePassword(String newPassword) throws AccountUpdateException;
+    AccountPage updatePassword(String newPassword) throws AccountUpdateException;
 
     /**
      * Return an error message on the password field if exists.

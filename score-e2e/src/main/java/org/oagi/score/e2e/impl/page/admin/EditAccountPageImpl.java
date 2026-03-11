@@ -3,7 +3,7 @@ package org.oagi.score.e2e.impl.page.admin;
 import org.oagi.score.e2e.AccountUpdateException;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.AppUserObject;
-import org.oagi.score.e2e.page.admin.AccountsPage;
+import org.oagi.score.e2e.page.admin.AccountPage;
 import org.oagi.score.e2e.page.admin.EditAccountPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
@@ -45,11 +45,11 @@ public class EditAccountPageImpl extends BasePageImpl implements EditAccountPage
 
     private static final By DELETE_BUTTON_LOCATOR = By.xpath("//span[contains(text(), \"Delete\")]//ancestor::button[1]");
 
-    private final AccountsPageImpl parent;
+    private final AccountPageImpl parent;
 
     private final AppUserObject appUser;
 
-    public EditAccountPageImpl(AccountsPageImpl parent, AppUserObject appUser) {
+    public EditAccountPageImpl(AccountPageImpl parent, AppUserObject appUser) {
         super(parent);
 
         this.parent = parent;
@@ -141,7 +141,7 @@ public class EditAccountPageImpl extends BasePageImpl implements EditAccountPage
     }
 
     @Override
-    public AccountsPage updatePassword(String newPassword) throws AccountUpdateException {
+    public AccountPage updatePassword(String newPassword) throws AccountUpdateException {
         setPassword(newPassword);
         setConfirmPassword(newPassword);
         click(getUpdateButton());

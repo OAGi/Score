@@ -13,15 +13,15 @@ cd ..
 ./mvnw clean package -DskipTests=true
 
 echo "Preparing files..."
-cp target/score-http-3.4.3-rc.1.war docker
+cp target/score-http-3.5.0.war docker
 cp ~/.m2/repository/org/mariadb/jdbc/mariadb-java-client/3.5.7/mariadb-java-client-3.5.7.jar docker
 
 echo "Building docker image..."
 cd docker
-docker build --no-cache -f Dockerfile -t oagi1docker/srt-http-gateway:3.4.3-rc.1 .
+docker build --no-cache -f Dockerfile -t oagi1docker/srt-http-gateway:3.5.0 .
 
 echo "Scanning vulnerabilities..."
-docker scout cves oagi1docker/srt-http-gateway:3.4.3-rc.1
+docker scout cves oagi1docker/srt-http-gateway:3.5.0
 
 echo "Cleaning up..."
 rm -f *.jar *.war

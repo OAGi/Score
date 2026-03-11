@@ -46,6 +46,14 @@ public interface BIEMenu {
     WebElement getCreateBIESubMenu();
 
     /**
+     * Return the UI element of the 'Create BIE' submenu.
+     *
+     * @param clickable {@code true} if the menu is enabled, otherwise {@code false}.
+     * @return the UI element of the 'Create BIE' submenu
+     */
+    WebElement getCreateBIESubMenu(boolean clickable);
+
+    /**
      * Open the 'Create BIE' submenu to enter the page.
      *
      * @return the 'Create BIE' page object
@@ -95,6 +103,20 @@ public interface BIEMenu {
     ExpressBIEPage openExpressBIESubMenu();
 
     /**
+     * Return the UI element of the 'BIE Package' submenu.
+     *
+     * @return the UI element of the 'BIE Package' submenu
+     */
+    WebElement getBIEPackageSubMenu();
+
+    /**
+     * Open the 'BIE Package' submenu to enter the page.
+     *
+     * @return the 'BIE Package' page object
+     */
+    ViewBIEPackagePage openBIEPackageSubMenu();
+
+    /**
      * Return the UI element of the 'OpenAPI Document' submenu.
      *
      * @return the UI element of the 'OpenAPI Document' submenu
@@ -142,6 +164,14 @@ public interface BIEMenu {
      * @return the UI element of the 'View/Edit Code List' submenu
      */
     WebElement getViewEditCodeListSubMenu();
+
+    /**
+     * Return the UI element of the 'View/Edit Code List' submenu.
+     *
+     * @param clickable {@code true} if the menu is enabled, otherwise {@code false}.
+     * @return the UI element of the 'View/Edit Code List' submenu
+     */
+    WebElement getViewEditCodeListSubMenu(boolean clickable);
 
     /**
      * Open the 'View/Edit Code List' submenu to enter the page.

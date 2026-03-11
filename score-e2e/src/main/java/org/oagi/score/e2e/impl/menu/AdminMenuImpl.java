@@ -2,10 +2,10 @@ package org.oagi.score.e2e.impl.menu;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.impl.page.DelegateBasePageImpl;
-import org.oagi.score.e2e.impl.page.admin.AccountsPageImpl;
+import org.oagi.score.e2e.impl.page.admin.AccountPageImpl;
 import org.oagi.score.e2e.impl.page.admin.PendingSSOPageImpl;
 import org.oagi.score.e2e.menu.AdminMenu;
-import org.oagi.score.e2e.page.admin.AccountsPage;
+import org.oagi.score.e2e.page.admin.AccountPage;
 import org.oagi.score.e2e.page.admin.PendingSSOPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriverException;
@@ -22,18 +22,18 @@ public class AdminMenuImpl extends DelegateBasePageImpl implements AdminMenu {
     private final By ADMIN_MENU_LOCATOR =
             By.xpath("//mat-toolbar-row/button/span[contains(text(), \"Admin\")]//ancestor::button[1]");
 
-    private final By ACCOUNTS_SUB_MENU_LOCATOR =
-            By.xpath("//button[contains(text(), \"Accounts\")]");
+    private final By ACCOUNT_SUB_MENU_LOCATOR =
+            By.xpath("//span[contains(text(), \"Account\")]//ancestor::button[1]");
 
     private final By PENDING_SSO_SUB_MENU_LOCATOR =
-            By.xpath("//button[contains(text(), \"Pending SSO\")]");
+            By.xpath("//span[contains(text(), \"Pending SSO\")]//ancestor::button[1]");
 
     public AdminMenuImpl(BasePageImpl delegate) {
         super(delegate);
     }
 
     private boolean isExpanded() {
-        return retry(() -> elementToBeClickable(shortWait(getDriver()), ACCOUNTS_SUB_MENU_LOCATOR).isEnabled(), false);
+        return retry(() -> elementToBeClickable(shortWait(getDriver()), ACCOUNT_SUB_MENU_LOCATOR).isEnabled(), false);
     }
 
     @Override
@@ -44,28 +44,28 @@ public class AdminMenuImpl extends DelegateBasePageImpl implements AdminMenu {
     @Override
     public void expandAdminMenu() {
         click(getAdminMenu());
-        assert getAccountsSubMenu().isEnabled();
+        assert getAccountSubMenu().isEnabled();
     }
 
     @Override
-    public WebElement getAccountsSubMenu() {
+    public WebElement getAccountSubMenu() {
         if (!isExpanded()) {
             expandAdminMenu();
         }
-        return elementToBeClickable(getDriver(), ACCOUNTS_SUB_MENU_LOCATOR);
+        return elementToBeClickable(getDriver(), ACCOUNT_SUB_MENU_LOCATOR);
     }
 
     @Override
-    public AccountsPage openAccountsSubMenu() {
-        AccountsPage accountsPage = new AccountsPageImpl(this);
+    public AccountPage openAccountSubMenu() {
+        AccountPage accountPage = new AccountPageImpl(this);
         try {
-            click(getAccountsSubMenu());
+            retry(() -> click(getDriver(), getAccountSubMenu()));
         } catch (WebDriverException e) {
-            logger.warn("Failed to click the 'Accounts' menu.", e);
-            accountsPage.openPage();
+            logger.warn("Failed to click the 'Account' menu.", e);
+            accountPage.openPage();
         }
-        assert accountsPage.isOpened();
-        return accountsPage;
+        assert accountPage.isOpened();
+        return accountPage;
     }
 
     @Override
@@ -80,7 +80,7 @@ public class AdminMenuImpl extends DelegateBasePageImpl implements AdminMenu {
     public PendingSSOPage openPendingSSOSubMenu() {
         PendingSSOPage pendingSSOPage = new PendingSSOPageImpl(this);
         try {
-            click(getPendingSSOSubMenu());
+            retry(() -> click(getDriver(), getPendingSSOSubMenu()));
         } catch (WebDriverException e) {
             logger.warn("Failed to click the 'Pending SSO' menu.", e);
             pendingSSOPage.openPage();

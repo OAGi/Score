@@ -4,6 +4,7 @@ import org.oagi.score.e2e.impl.menu.*;
 import org.oagi.score.e2e.impl.page.bie.EditBIEPageImpl;
 import org.oagi.score.e2e.impl.page.bie.ViewEditBIEPageImpl;
 import org.oagi.score.e2e.impl.page.core_component.ViewEditCoreComponentPageImpl;
+import org.oagi.score.e2e.impl.page.message.MessageListPageImpl;
 import org.oagi.score.e2e.menu.*;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
@@ -13,6 +14,7 @@ import org.oagi.score.e2e.page.LoginPage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.oagi.score.e2e.page.message.MessageListPage;
 import org.openqa.selenium.*;
 
 import java.math.BigInteger;
@@ -36,6 +38,24 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
 
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
+
+    private static final By BROWSE_STANDARD_MENU_LOCATOR =
+            By.xpath("//mat-toolbar-row/button/span[contains(text(), \"Browse Standard\")]//ancestor::button[1]");
+
+    private static final By CONTEXT_MENU_LOCATOR =
+            By.xpath("//mat-toolbar-row/button/span[contains(text(), \"Context\")]//ancestor::button[1]");
+
+    private static final By CORE_COMPONENT_MENU_LOCATOR =
+            By.xpath("//mat-toolbar-row/button/span[contains(text(), \"Core Component\")]//ancestor::button[1]");
+
+    private static final By MODULE_MENU_LOCATOR =
+            By.xpath("//mat-toolbar-row/button/span[contains(text(), \"Module\")]//ancestor::button[1]");
+
+    private static final By LIBRARY_MENU_LOCATOR =
+            By.xpath("//mat-toolbar-row/button/span[contains(text(), \"Library\")]//ancestor::button[1]");
+
+    private static final By NOTIFICATION_ICON_LOCATOR =
+            By.xpath("//mat-toolbar-row//mat-icon[contains(@class, \"notIcon\")]");
 
     private final AppUserObject user;
 
@@ -97,6 +117,11 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
     }
 
     @Override
+    public LibraryMenu getLibraryMenu() {
+        return new LibraryMenuImpl(this);
+    }
+
+    @Override
     public AdminMenu getAdminMenu() {
         return new AdminMenuImpl(this);
     }
@@ -124,6 +149,59 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
     @Override
     public WebElement getUserExtensionsTab() {
         return visibilityOfElementLocated(defaultWait(getDriver()), By.xpath("//div[contains(@class, \"mat-mdc-tab\")]//span[contains(text(), \"User Extensions\")]"));
+    }
+
+    @Override
+    public WebElement getBrowseStandardMenu() {
+        return elementToBeClickable(getDriver(), BROWSE_STANDARD_MENU_LOCATOR);
+    }
+
+    @Override
+    public boolean hasBrowseStandardMenu() {
+        return !getDriver().findElements(BROWSE_STANDARD_MENU_LOCATOR).isEmpty();
+    }
+
+    @Override
+    public boolean hasContextMenu() {
+        return !getDriver().findElements(CONTEXT_MENU_LOCATOR).isEmpty();
+    }
+
+    @Override
+    public boolean hasCoreComponentMenu() {
+        return !getDriver().findElements(CORE_COMPONENT_MENU_LOCATOR).isEmpty();
+    }
+
+    @Override
+    public boolean hasModuleMenu() {
+        return !getDriver().findElements(MODULE_MENU_LOCATOR).isEmpty();
+    }
+
+    @Override
+    public boolean hasLibraryMenu() {
+        return !getDriver().findElements(LIBRARY_MENU_LOCATOR).isEmpty();
+    }
+
+    @Override
+    public ViewEditCoreComponentPage openBrowseStandardMenu() {
+        retry(() -> click(getBrowseStandardMenu()));
+        invisibilityOfLoadingContainerElement(getDriver());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = new ViewEditCoreComponentPageImpl(this);
+        assert viewEditCoreComponentPage.isOpened();
+        return viewEditCoreComponentPage;
+    }
+
+    @Override
+    public WebElement getNotificationIcon() {
+        return elementToBeClickable(getDriver(), NOTIFICATION_ICON_LOCATOR);
+    }
+
+    @Override
+    public MessageListPage openMessageListPage() {
+        retry(() -> click(getDriver(), getNotificationIcon()));
+        invisibilityOfLoadingContainerElement(getDriver());
+        MessageListPage messageListPage = new MessageListPageImpl(this);
+        assert messageListPage.isOpened();
+        return messageListPage;
     }
 
 

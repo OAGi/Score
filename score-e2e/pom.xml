@@ -6,7 +6,7 @@
 
     <groupId>org.oagi.score.e2e</groupId>
     <artifactId>score-e2e</artifactId>
-    <version>3.4.2</version>
+    <version>3.5.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -19,7 +19,7 @@
         <db.user>oagi</db.user>
         <db.password>oagi</db.password>
 
-        <selenium.version>4.40.0</selenium.version>
+        <selenium.version>4.41.0</selenium.version>
         <junit.version>5.14.2</junit.version>
         <junit.platform.version>1.14.2</junit.platform.version>
         <slf4j.version>2.0.17</slf4j.version>

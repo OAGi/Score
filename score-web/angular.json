@@ -33,7 +33,6 @@
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
-              "node_modules/bootstrap/dist/css/bootstrap-grid.css",
               "src/assets/css/material-icons.css",
               "src/score-web-theme.scss",
               "src/styles.css"
@@ -45,9 +44,7 @@
             },
             "scripts": [
               "node_modules/jquery/dist/jquery.js",
-              "node_modules/bootstrap/dist/js/bootstrap.js",
-              "node_modules/crypto-js/crypto-js.js",
-              "node_modules/marked/lib/marked.umd.js"
+              "node_modules/bootstrap/dist/js/bootstrap.js"
             ],
             "optimization": false,
             "outputHashing": "none",

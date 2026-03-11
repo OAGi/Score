@@ -22,7 +22,7 @@ import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
 })
 export class AccountListComponent implements OnInit {
 
-  title = 'Accounts';
+  title = 'Account';
 
   get columns(): TableColumnsProperty[] {
     if (!this.preferencesInfo) {

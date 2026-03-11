@@ -38,6 +38,9 @@ public class BIEMenuImpl extends DelegateBasePageImpl implements BIEMenu {
     private final By EXPRESS_BIE_SUB_MENU_LOCATOR =
             By.xpath("//span[contains(text(), \"Express BIE\")]//ancestor::button[1]");
 
+    private final By BIE_PACKAGE_SUB_MENU_LOCATOR =
+            By.xpath("//span[contains(text(), \"BIE Package\")]//ancestor::button[1]");
+
     private final By OPENAPI_DOCUMENT_SUB_MENU_LOCATOR =
             By.xpath("//span[contains(text(), \"OpenAPI Document\")]//ancestor::button[1]");
 
@@ -90,10 +93,16 @@ public class BIEMenuImpl extends DelegateBasePageImpl implements BIEMenu {
 
     @Override
     public WebElement getCreateBIESubMenu() {
+        return getCreateBIESubMenu(true);
+    }
+
+    @Override
+    public WebElement getCreateBIESubMenu(boolean clickable) {
         if (!isExpanded()) {
             expandBIEMenu();
         }
-        return elementToBeClickable(getDriver(), CREATE_BIE_SUB_MENU_LOCATOR);
+        By locator = CREATE_BIE_SUB_MENU_LOCATOR;
+        return clickable ? elementToBeClickable(getDriver(), locator) : visibilityOfElementLocated(getDriver(), locator);
     }
 
     @Override
@@ -153,6 +162,22 @@ public class BIEMenuImpl extends DelegateBasePageImpl implements BIEMenu {
     }
 
     @Override
+    public WebElement getBIEPackageSubMenu() {
+        if (!isExpanded()) {
+            expandBIEMenu();
+        }
+        return elementToBeClickable(getDriver(), BIE_PACKAGE_SUB_MENU_LOCATOR);
+    }
+
+    @Override
+    public ViewBIEPackagePage openBIEPackageSubMenu() {
+        retry(() -> click(getBIEPackageSubMenu()));
+        ViewBIEPackagePage viewBIEPackagePage = new ViewBIEPackagePageImpl(this);
+        assert viewBIEPackagePage.isOpened();
+        return viewBIEPackagePage;
+    }
+
+    @Override
     public WebElement getOpenAPIDocumentSubMenu() {
         if (!isExpanded()) {
             expandBIEMenu();
@@ -202,10 +227,16 @@ public class BIEMenuImpl extends DelegateBasePageImpl implements BIEMenu {
 
     @Override
     public WebElement getViewEditCodeListSubMenu() {
+        return getViewEditCodeListSubMenu(true);
+    }
+
+    @Override
+    public WebElement getViewEditCodeListSubMenu(boolean clickable) {
         if (!isExpanded()) {
             expandBIEMenu();
         }
-        return elementToBeClickable(getDriver(), VIEW_EDIT_CODE_LIST_SUB_MENU_LOCATOR);
+        By locator = VIEW_EDIT_CODE_LIST_SUB_MENU_LOCATOR;
+        return clickable ? elementToBeClickable(getDriver(), locator) : visibilityOfElementLocated(getDriver(), locator);
     }
 
     @Override
@@ -258,5 +289,3 @@ public class BIEMenuImpl extends DelegateBasePageImpl implements BIEMenu {
         return getExpressBIESubMenu().getAttribute("Title");
     }
 }
-
-

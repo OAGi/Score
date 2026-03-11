@@ -7,6 +7,11 @@ import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.CONFIGURATION;
 
 public class DSLContextApplicationSettingsAPIImpl implements ApplicationSettingsAPI {
 
+    private static final String BOOLEAN_TYPE = "Boolean";
+    private static final String TENANT_ENABLED_CONFIG_NAME = "score.tenant.enabled";
+    private static final String BUSINESS_TERM_ENABLED_CONFIG_NAME = "score.business-term.enabled";
+    private static final String BROWSE_STANDARD_MODE_ENABLED_CONFIG_NAME = "score.browse-standard-mode.enabled";
+
     private final DSLContext dslContext;
 
     public DSLContextApplicationSettingsAPIImpl(DSLContext dslContext) {
@@ -15,33 +20,52 @@ public class DSLContextApplicationSettingsAPIImpl implements ApplicationSettings
 
     @Override
     public boolean isTenantEnabled() {
-        return Boolean.valueOf(dslContext.select(CONFIGURATION.VALUE)
-                .from(CONFIGURATION)
-                .where(CONFIGURATION.NAME.eq("score.tenant.enabled"))
-                .fetchOptionalInto(String.class).orElse("false"));
+        return getBooleanConfiguration(TENANT_ENABLED_CONFIG_NAME);
     }
 
     @Override
     public void setTenantEnable(boolean tenantEnable) {
-        dslContext.update(CONFIGURATION)
-                .set(CONFIGURATION.VALUE, (tenantEnable) ? "true" : "false")
-                .where(CONFIGURATION.NAME.eq("score.tenant.enabled"))
-                .execute();
+        upsertBooleanConfiguration(TENANT_ENABLED_CONFIG_NAME, tenantEnable);
     }
 
     @Override
     public boolean isBusinessTermEnabled() {
-        return Boolean.valueOf(dslContext.select(CONFIGURATION.VALUE)
-                .from(CONFIGURATION)
-                .where(CONFIGURATION.NAME.eq("score.business-term.enabled"))
-                .fetchOptionalInto(String.class).orElse("false"));
+        return getBooleanConfiguration(BUSINESS_TERM_ENABLED_CONFIG_NAME);
     }
 
     @Override
     public void setBusinessTermEnable(boolean businessTermEnable) {
-        dslContext.update(CONFIGURATION)
-                .set(CONFIGURATION.VALUE, (businessTermEnable) ? "true" : "false")
-                .where(CONFIGURATION.NAME.eq("score.business-term.enabled"))
+        upsertBooleanConfiguration(BUSINESS_TERM_ENABLED_CONFIG_NAME, businessTermEnable);
+    }
+
+    @Override
+    public boolean isBrowseStandardModeEnabled() {
+        return getBooleanConfiguration(BROWSE_STANDARD_MODE_ENABLED_CONFIG_NAME);
+    }
+
+    @Override
+    public void setBrowseStandardModeEnable(boolean browseStandardModeEnable) {
+        upsertBooleanConfiguration(BROWSE_STANDARD_MODE_ENABLED_CONFIG_NAME, browseStandardModeEnable);
+    }
+
+    private boolean getBooleanConfiguration(String configurationName) {
+        return Boolean.valueOf(dslContext.select(CONFIGURATION.VALUE)
+                .from(CONFIGURATION)
+                .where(CONFIGURATION.NAME.eq(configurationName))
+                .fetchOptionalInto(String.class).orElse("false"));
+    }
+
+    private void upsertBooleanConfiguration(String configurationName, boolean enabled) {
+        int updated = dslContext.update(CONFIGURATION)
+                .set(CONFIGURATION.VALUE, enabled ? "true" : "false")
+                .where(CONFIGURATION.NAME.eq(configurationName))
                 .execute();
+        if (updated == 0) {
+            dslContext.insertInto(CONFIGURATION)
+                    .set(CONFIGURATION.NAME, configurationName)
+                    .set(CONFIGURATION.TYPE, BOOLEAN_TYPE)
+                    .set(CONFIGURATION.VALUE, enabled ? "true" : "false")
+                    .execute();
+        }
     }
 }

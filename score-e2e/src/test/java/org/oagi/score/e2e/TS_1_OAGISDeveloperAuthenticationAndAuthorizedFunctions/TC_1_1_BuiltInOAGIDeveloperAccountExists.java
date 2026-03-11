@@ -26,13 +26,13 @@ public class TC_1_1_BuiltInOAGIDeveloperAccountExists extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_1_TA_1")
+    @DisplayName("TC_1_1_TA_1")
     public void test_login_oagis() {
         loginPage().signIn("oagis", "oagis");
     }
 
     @Test
-    @DisplayName("TC_1_TA_2")
+    @DisplayName("TC_1_1_TA_2")
     public void verify_oagis_role() {
         HomePage homePage = loginPage().signIn("oagis", "oagis");
         String role = "developer";
@@ -44,7 +44,7 @@ public class TC_1_1_BuiltInOAGIDeveloperAccountExists extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_1_TA_3")
+    @DisplayName("TC_1_1_TA_3")
     public void test_logout() throws URISyntaxException {
         HomePage homePage = loginPage().signIn("oagis", "oagis");
         homePage.getLoginIDMenu().logout();
@@ -56,7 +56,7 @@ public class TC_1_1_BuiltInOAGIDeveloperAccountExists extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_1_TA_4")
+    @DisplayName("TC_1_1_TA_4")
     public void test_login_oagis_with_wrong_password() {
         SignInException exception = assertThrows(SignInException.class, () -> {
             loginPage().signIn("oagis", RandomStringUtils.secure().nextAlphanumeric(5, 10));
@@ -66,6 +66,7 @@ public class TC_1_1_BuiltInOAGIDeveloperAccountExists extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_1_1_TA_5")
     public void test_login_random_username() {
         SignInException exception = assertThrows(SignInException.class, () -> {
             loginPage().signIn(RandomStringUtils.secure().nextAlphanumeric(5, 10), RandomStringUtils.secure().nextAlphanumeric(5, 10));

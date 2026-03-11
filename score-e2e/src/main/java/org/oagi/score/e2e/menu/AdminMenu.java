@@ -1,6 +1,6 @@
 package org.oagi.score.e2e.menu;
 
-import org.oagi.score.e2e.page.admin.AccountsPage;
+import org.oagi.score.e2e.page.admin.AccountPage;
 import org.oagi.score.e2e.page.admin.PendingSSOPage;
 import org.openqa.selenium.WebElement;
 
@@ -26,14 +26,14 @@ public interface AdminMenu {
      *
      * @return the UI element of the 'Accounts' submenu
      */
-    WebElement getAccountsSubMenu();
+    WebElement getAccountSubMenu();
 
     /**
      * Open the 'Accounts' submenu to enter the page.
      *
      * @return the 'Accounts' page object.
      */
-    AccountsPage openAccountsSubMenu();
+    AccountPage openAccountSubMenu();
 
     /**
      * Return the UI element of the 'Pending SSO' submenu.

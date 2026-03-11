@@ -11,7 +11,7 @@ import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.menu.AdminMenu;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.admin.AccountsPage;
+import org.oagi.score.e2e.page.admin.AccountPage;
 import org.oagi.score.e2e.page.admin.EditAccountPage;
 import org.oagi.score.e2e.page.admin.NewAccountPage;
 
@@ -40,8 +40,8 @@ public class TC_9_1_NoUserAccountCanBeDeleted extends BaseTest {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
 
         AdminMenu adminMenu = homePage.getAdminMenu();
-        AccountsPage accountsPage = adminMenu.openAccountsSubMenu();
-        NewAccountPage newAccountPage = accountsPage.openNewAccountPage();
+        AccountPage accountPage = adminMenu.openAccountSubMenu();
+        NewAccountPage newAccountPage = accountPage.openNewAccountPage();
 
         AppUserObject newUser = new AppUserObject();
         newUser.setLoginId("eu_" + RandomStringUtils.secure().nextAlphanumeric(5, 10));
@@ -54,7 +54,7 @@ public class TC_9_1_NoUserAccountCanBeDeleted extends BaseTest {
         thisAccountWillBeDeletedAfterTests(newUser);
         newAccountPage.createNewAccount(newUser);
 
-        EditAccountPage editAccountPage = accountsPage.openEditAccountPageByLoginID(newUser.getLoginId());
+        EditAccountPage editAccountPage = accountPage.openEditAccountPageByLoginID(newUser.getLoginId());
         assertEquals(false, editAccountPage.deleteAccountButtonIsPresent());
     }
 
@@ -64,8 +64,8 @@ public class TC_9_1_NoUserAccountCanBeDeleted extends BaseTest {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
 
         AdminMenu adminMenu = homePage.getAdminMenu();
-        AccountsPage accountsPage = adminMenu.openAccountsSubMenu();
-        NewAccountPage newAccountPage = accountsPage.openNewAccountPage();
+        AccountPage accountPage = adminMenu.openAccountSubMenu();
+        NewAccountPage newAccountPage = accountPage.openNewAccountPage();
 
         AppUserObject newUser = new AppUserObject();
         newUser.setLoginId("dev_" + RandomStringUtils.secure().nextAlphanumeric(5, 10));
@@ -78,7 +78,7 @@ public class TC_9_1_NoUserAccountCanBeDeleted extends BaseTest {
         thisAccountWillBeDeletedAfterTests(newUser);
         newAccountPage.createNewAccount(newUser);
 
-        EditAccountPage editAccountPage = accountsPage.openEditAccountPageByLoginID(newUser.getLoginId());
+        EditAccountPage editAccountPage = accountPage.openEditAccountPageByLoginID(newUser.getLoginId());
         assertEquals(false, editAccountPage.deleteAccountButtonIsPresent());
     }
 

@@ -33,4 +33,18 @@ public interface ApplicationSettingsAPI {
      */
     void setBusinessTermEnable(boolean businessTermEnable);
 
+    /**
+     * Return {@code true} if the browse standard mode property is set to enable, otherwise {@code false}.
+     *
+     * @return {@code true} if the browse standard mode property is set to enable, otherwise {@code false}
+     */
+    boolean isBrowseStandardModeEnabled();
+
+    /**
+     * Set the browse standard mode property to either enable or disable.
+     *
+     * @param browseStandardModeEnable {@code true/false} for enable/disable
+     */
+    void setBrowseStandardModeEnable(boolean browseStandardModeEnable);
+
 }

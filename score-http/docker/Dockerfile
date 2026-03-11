@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 tomcat:10.1.43-jdk21-temurin
+FROM --platform=linux/amd64 tomcat:10.1.52-jdk21-temurin
 
 LABEL maintainer="Hakju Oh <hakju.oh@nist.gov>"
 
@@ -21,6 +21,6 @@ RUN rm -rf /usr/local/tomcat/webapps/* && \
 
 USER 1001
 COPY web.xml /usr/local/tomcat/conf/web.xml
-COPY score-http-3.4.3-rc.1.war /usr/local/tomcat/webapps/ROOT.war
+COPY score-http-3.5.0.war /usr/local/tomcat/webapps/ROOT.war
 
 CMD ["catalina.sh", "run"]
