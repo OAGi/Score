@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {Observable, of} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
+import {catchError, map, switchMap} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {
   BieStateDependencyDialogComponent,
@@ -57,18 +57,30 @@ export class BieStateTransitionFlowService {
           return this.openSimpleConfirmation(request.state);
         }
 
-        const dialogData: BieStateDependencyDialogData = {
-          state: request.state,
-          rootTopLevelAsbiepIds: request.rootTopLevelAsbiepIds,
+        const initialSelectedTopLevelAsbiepIds = this.getInitiallySelectedDependencyIds(
           targets,
-          validateSelection: request.validateSelection
-        };
+          request.rootTopLevelAsbiepIds
+        );
 
-        return this.dialog.open(BieStateDependencyDialogComponent, {
-          width: '1200px',
-          maxWidth: '95vw',
-          data: dialogData
-        }).afterClosed();
+        return request.validateSelection(initialSelectedTopLevelAsbiepIds).pipe(
+          map(validatedTargets => request.normalizeTargets ? request.normalizeTargets(validatedTargets || []) : (validatedTargets || [])),
+          map(validatedTargets => this.filterActionableTargets(validatedTargets || [])),
+          catchError(() => of(targets)),
+          switchMap(validatedTargets => {
+            const dialogData: BieStateDependencyDialogData = {
+              state: request.state,
+              rootTopLevelAsbiepIds: request.rootTopLevelAsbiepIds,
+              targets: validatedTargets,
+              validateSelection: request.validateSelection
+            };
+
+            return this.dialog.open(BieStateDependencyDialogComponent, {
+              width: '1200px',
+              maxWidth: '95vw',
+              data: dialogData
+            }).afterClosed();
+          })
+        );
       })
     );
   }
@@ -99,5 +111,16 @@ export class BieStateTransitionFlowService {
       target.stateTransitionAllowed === false ||
       target.dependencyUpdateMessage !== BieStateTransitionFlowService.NO_UPDATE_MESSAGE
     );
+  }
+
+  private getInitiallySelectedDependencyIds(
+    targets: StateDependencyTarget[],
+    rootTopLevelAsbiepIds: number[]
+  ): number[] {
+    const rootIdSet = new Set(rootTopLevelAsbiepIds || []);
+    return (targets || [])
+      .filter(target => !rootIdSet.has(target.topLevelAsbiepId))
+      .filter(target => target.dependencyUpdateAllowed !== false && target.checked !== false)
+      .map(target => target.topLevelAsbiepId);
   }
 }

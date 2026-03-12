@@ -1,5 +1,6 @@
-import {Component, Inject} from '@angular/core';
+import {Component, Inject, ViewChild} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {MatTable} from '@angular/material/table';
 import {Observable} from 'rxjs';
 import {WebPageInfoService} from '../../basis/basis.service';
 import {StateDependencyRelation, StateDependencyTarget} from '../domain/state-dependency-target';
@@ -24,15 +25,13 @@ export class BieStateDependencyDialogComponent {
   displayedColumns: string[] = ['select', 'displayName', 'dependencies', 'businessContexts', 'version', 'status', 'remark', 'state'];
   isValidating = false;
   private validationRequestId = 0;
+  @ViewChild(MatTable) table?: MatTable<StateDependencyTarget>;
 
   constructor(
     public dialogRef: MatDialogRef<BieStateDependencyDialogComponent>,
     public webPageInfo: WebPageInfoService,
     @Inject(MAT_DIALOG_DATA) public data: BieStateDependencyDialogData) {
     this.applyTargets(this.data.targets || []);
-    if (this.hasTargets() && this.data.validateSelection) {
-      this.validateSelection(this.getSelectedDependencyIds());
-    }
   }
 
   onCancel(): void {
@@ -229,7 +228,7 @@ export class BieStateDependencyDialogComponent {
 
   private applyCheckedState(selectedTopLevelAsbiepIds: number[]): void {
     const selectedIdSet = new Set(selectedTopLevelAsbiepIds);
-    this.data.targets = this.data.targets
+    const nextTargets = this.data.targets
       .map(target => ({
         ...target,
         checked: this.isRootTarget(target) || (this.isToggleable(target) && selectedIdSet.has(target.topLevelAsbiepId)),
@@ -239,6 +238,9 @@ export class BieStateDependencyDialogComponent {
           : undefined
       }))
       .sort((left, right) => this.compareTargets(left, right));
+
+    this.data.targets.splice(0, this.data.targets.length, ...nextTargets);
+    this.table?.renderRows();
   }
 
   private applyTargets(targets: StateDependencyTarget[]): void {
@@ -247,9 +249,7 @@ export class BieStateDependencyDialogComponent {
       .sort((left, right) => this.compareTargets(left, right));
     const currentTargetMap = new Map(this.data.targets.map(target => [target.topLevelAsbiepId, target]));
 
-    // Preserve row object identity when possible so Angular Material does not
-    // tear down and recreate the table on each validation response.
-    this.data.targets = normalizedTargets.map(target => {
+    const nextTargets = normalizedTargets.map(target => {
       const currentTarget = currentTargetMap.get(target.topLevelAsbiepId);
       if (!currentTarget) {
         return target;
@@ -257,6 +257,11 @@ export class BieStateDependencyDialogComponent {
       Object.assign(currentTarget, target);
       return currentTarget;
     });
+
+    // Keep the same array instance so mat-table updates rows in place instead
+    // of tearing down the whole table between validation responses.
+    this.data.targets.splice(0, this.data.targets.length, ...nextTargets);
+    this.table?.renderRows();
   }
 
   private normalizeTarget(target: StateDependencyTarget): StateDependencyTarget {
