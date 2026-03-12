@@ -44,6 +44,27 @@
   margin-top: 4px;
 }
 
+.filename-expression-guide-syntax {
+  margin-top: 4px;
+}
+
+.filename-expression-ebnf {
+  margin: 8px 0 0;
+  padding: 12px 14px;
+  overflow-x: auto;
+  border: 1px solid #d8dee7;
+  border-radius: 6px;
+  background: #f7f9fc;
+  color: #243447;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.filename-expression-ebnf code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  white-space: pre;
+}
+
 .feature-disabled-label {
   text-decoration: line-through;
 }

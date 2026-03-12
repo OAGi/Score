@@ -179,7 +179,16 @@
                       <details>
                         <summary><b>Guide</b></summary>
                         <div class="pt-2">
-                          <div><b>Filename Syntax</b>: <code>&#123;Placeholder&#125;</code> <code>(optional-group)</code> <code>&#123;Placeholder?flag&#125;</code> <code>&#123;Placeholder:separator('-')&#125;</code> <code>&#123;Placeholder:replace('regex', 'replacement')&#125;</code></div>
+                          <div class="filename-expression-guide-syntax">
+                            <b>Filename Syntax</b>:
+                            <pre class="filename-expression-ebnf"><code ngNonBindable>expression       = &#123; literal | optional-group | placeholder &#125; ;
+optional-group   = "(" , expression , ")" ;
+placeholder      = "&#123;" , placeholder-name , [ "?" , flag-name ] , [ ":" , modifier-chain ] , "&#125;" ;
+modifier-chain   = modifier-token , &#123; ":" , modifier-token &#125; ;
+modifier-token   = "separator" , "(" , quoted-arg , ")"
+                                 | "replace" , "(" , quoted-arg , "," , quoted-arg , ")"
+                                 | raw-separator ;</code></pre>
+                          </div>
                           <div class="pt-2"><b>Duplicate Handler Syntax</b>: <code>-&#123;Incremental&#125;</code>, <code>~&#123;BIE ID&#125;</code></div>
                           <div class="pt-2"><b>Flags</b>: `includeBusinessContext`, `includeVersion`</div>
                           <div class="pt-2"><b>Common placeholders</b>: `BIE Property Term`, `BIE Display Name`, `BIE Version`, `BIE DEN`, `BIE Status`, `BIE Remark`, `BIE ID`, `Business Context Names`, `Business Context Name[0]`</div>

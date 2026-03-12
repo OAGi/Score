@@ -2,6 +2,7 @@ package org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsFo
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -45,7 +46,8 @@ public class TC_10_10_RestoringDeveloperACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_10_1() {
+    @DisplayName("TC_10_10_TA_1")
+    public void restoring_deleted_acc_restores_its_ascc_and_bcc_associations() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);

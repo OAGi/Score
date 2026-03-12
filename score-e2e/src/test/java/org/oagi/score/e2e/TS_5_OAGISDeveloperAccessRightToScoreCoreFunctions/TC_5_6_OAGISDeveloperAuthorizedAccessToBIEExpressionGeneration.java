@@ -37,7 +37,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_1")
-    public void test_TA_1() {
+    public void developer_can_generate_xml_expression_for_owned_non_latest_bie_in_any_state() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -70,7 +70,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_2")
-    public void test_TA_2() {
+    public void developer_can_generate_xml_expression_for_owned_latest_bie_in_any_state() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -104,7 +104,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_2 (Verify BIE per Branch)")
-    public void test_TA_2_verify_BIE_per_branch() {
+    public void developer_can_filter_express_bie_search_results_by_selected_branch() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -146,7 +146,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_3 (Another Developer)")
-    public void test_TA_3_another_developer() {
+    public void developer_cannot_generate_expression_for_another_developers_wip_bie() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -173,7 +173,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_3 (Another End-User)")
-    public void test_TA_3_another_enduser() {
+    public void developer_cannot_generate_expression_for_another_end_users_wip_bie() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -200,7 +200,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_4 (Another Developer)")
-    public void test_TA_4_another_developer() {
+    public void developer_can_generate_expression_for_another_developers_qa_bie() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -231,7 +231,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_4 (Another End-User)")
-    public void test_TA_4_another_enduser() {
+    public void developer_can_generate_expression_for_another_end_users_qa_bie() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -262,7 +262,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_5 (Another Developer)")
-    public void test_TA_5_another_developer() {
+    public void developer_can_generate_expression_for_another_developers_production_bie() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -293,7 +293,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_5 (Another End-User)")
-    public void test_TA_5_another_enduser() {
+    public void developer_can_generate_expression_for_another_end_users_production_bie() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -324,7 +324,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_6")
-    public void test_TA_6() {
+    public void developer_can_generate_multiple_xml_schemas_in_same_package_without_annotations() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -365,7 +365,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_7")
-    public void test_TA_7() {
+    public void developer_can_generate_single_xml_schema_in_same_package_with_all_annotations() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -406,7 +406,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_8")
-    public void test_TA_8() {
+    public void developer_can_generate_single_xml_schema_with_ccts_metadata_without_definition_tag() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -440,7 +440,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_9")
-    public void test_TA_9() {
+    public void developer_can_generate_single_xml_schema_with_score_metadata_without_who_columns() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -474,7 +474,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_10")
-    public void test_TA_10() {
+    public void developer_cannot_select_include_ccts_definition_tag_without_ccts_metadata() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -505,7 +505,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_11")
-    public void test_TA_11() {
+    public void developer_cannot_select_include_who_columns_without_score_metadata() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -536,7 +536,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_12")
-    public void test_TA_12() {
+    public void developer_can_generate_single_json_schema_in_same_package_without_annotations() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -566,7 +566,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_13")
-    public void test_TA_13() {
+    public void developer_can_generate_single_json_schema_with_bie_definition_annotation() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -597,7 +597,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_14")
-    public void test_TA_14() {
+    public void developer_can_only_use_based_cc_metadata_option_for_json_schema() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -619,12 +619,13 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
         assertDisabled(expressBIEPage.getBusinessContextCheckbox());
         assertDisabled(expressBIEPage.getBIEOAGIConnectCenterMetaDataCheckbox());
         assertDisabled(expressBIEPage.getIncludeWHOColumnsCheckbox());
-        assertDisabled(expressBIEPage.getBasedCCMetaDataCheckbox());
+        assertEnabled(expressBIEPage.getBasedCCMetaDataCheckbox());
+        assertNotChecked(expressBIEPage.getBasedCCMetaDataCheckbox());
     }
 
     @Test
     @DisplayName("TC_5_6_TA_15")
-    public void test_TA_15() {
+    public void developer_can_generate_multiple_xml_schemas_in_same_package_with_selected_annotations() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -676,7 +677,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_16")
-    public void test_TA_16() {
+    public void developer_can_generate_multiple_xml_schemas_in_different_packages_with_selected_annotations() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -728,7 +729,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_17")
-    public void test_TA_17() {
+    public void developer_can_generate_multiple_json_schemas_in_same_package_with_bie_definition() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -772,7 +773,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_18")
-    public void test_TA_18() {
+    public void developer_can_generate_multiple_json_schemas_in_different_packages_with_bie_definition() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -815,7 +816,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_19")
-    public void test_TA_19() {
+    public void developer_can_generate_single_json_schema_with_selected_meta_header() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -852,7 +853,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_20")
-    public void test_TA_20() {
+    public void developer_can_generate_multiple_json_schemas_with_selected_meta_header() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -901,13 +902,13 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
     @Disabled
     @Test
     @DisplayName("TC_5_6_TA_21")
-    public void test_TA_21() {
-        // Duplicate with test_TA_2_verify_BIE_per_branch
+    public void developer_can_search_bies_in_express_bie_page() {
+        // Duplicate with developer_can_filter_express_bie_search_results_by_selected_branch
     }
 
     @Test
     @DisplayName("TC_5_6_TA_22")
-    public void test_TA_22() {
+    public void developer_can_see_matching_bie_count_in_grid_and_index_summary() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -945,7 +946,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_23")
-    public void test_TA_23() {
+    public void developer_can_generate_xml_expression_for_bie_with_multiple_business_contexts() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -978,7 +979,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_24")
-    public void test_TA_24() {
+    public void developer_can_generate_single_openapi_json_expression_with_get_and_post_templates() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1026,7 +1027,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_25")
-    public void test_TA_25() {
+    public void developer_can_generate_single_openapi_yaml_expression_with_get_and_post_templates() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1074,7 +1075,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_26")
-    public void test_TA_26() {
+    public void developer_can_generate_single_openapi_yaml_expression_with_code_generation_friendly_option() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1106,7 +1107,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
     @Disabled
     @Test
     @DisplayName("TC_5_6_TA_27")
-    public void test_TA_27() {
+    public void developer_can_generate_multiple_openapi_yaml_expressions_with_code_generation_friendly_option() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1149,7 +1150,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_28")
-    public void test_TA_28() {
+    public void developer_can_generate_single_openapi_json_expression_with_code_generation_friendly_option() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1180,7 +1181,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_29")
-    public void test_TA_29() {
+    public void developer_can_generate_multiple_openapi_json_expressions_with_code_generation_friendly_option() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1223,7 +1224,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_30")
-    public void test_TA_30() {
+    public void developer_can_generate_single_openapi_yaml_expression_with_get_template_make_array_option() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1255,7 +1256,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_31")
-    public void test_TA_31() {
+    public void developer_can_generate_multiple_openapi_yaml_expressions_with_get_template_make_array_option() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1299,7 +1300,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_32")
-    public void test_TA_32() {
+    public void developer_can_generate_single_openapi_yaml_expression_with_get_template_meta_header() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1337,7 +1338,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_33")
-    public void test_TA_33() {
+    public void developer_can_generate_multiple_openapi_yaml_expressions_with_get_template_meta_header() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1386,7 +1387,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_34")
-    public void test_TA_34() {
+    public void developer_can_generate_single_openapi_yaml_expression_with_get_template_meta_header_and_pagination_response() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1427,7 +1428,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_35")
-    public void test_TA_35() {
+    public void developer_can_generate_multiple_openapi_yaml_expressions_with_get_template_meta_header_and_pagination_response() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1480,7 +1481,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_36")
-    public void test_TA_36() {
+    public void developer_can_generate_single_openapi_yaml_expression_with_post_template_make_array_option() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1512,7 +1513,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_37")
-    public void test_TA_37() {
+    public void developer_can_generate_multiple_openapi_yaml_expressions_with_post_template_make_array_option() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1556,7 +1557,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_38")
-    public void test_TA_38() {
+    public void developer_can_generate_single_openapi_yaml_expression_with_post_template_meta_header() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1593,7 +1594,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_39")
-    public void test_TA_39() {
+    public void developer_can_generate_multiple_openapi_yaml_expressions_with_post_template_meta_header() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1642,7 +1643,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_40")
-    public void test_TA_40() {
+    public void developer_can_generate_single_openapi_yaml_expression_with_get_template_meta_header_pagination_response_and_make_array() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1684,7 +1685,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_41")
-    public void test_TA_41() {
+    public void developer_can_generate_multiple_openapi_yaml_expressions_with_get_template_meta_header_pagination_response_and_make_array() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1739,13 +1740,13 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
     @Disabled
     @Test
     @DisplayName("TC_5_6_TA_42")
-    public void test_TA_42() {
+    public void developer_can_generate_single_openapi_yaml_expression_with_get_and_post_templates_meta_header_pagination_response_and_make_array() {
         // Duplicate with TC_5_6_TA_25
     }
 
     @Test
     @DisplayName("TC_5_6_TA_43")
-    public void test_TA_43() {
+    public void developer_can_generate_multiple_openapi_yaml_expressions_with_get_and_post_templates_meta_header_pagination_response_and_make_array() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1806,13 +1807,13 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
     @Disabled
     @Test
     @DisplayName("TC_5_6_TA_44")
-    public void test_TA_44() {
+    public void developer_can_generate_single_openapi_json_expression_with_get_and_post_templates_meta_header_pagination_response_and_make_array() {
         // Duplicate with TC_5_6_TA_24
     }
 
     @Test
     @DisplayName("TC_5_6_TA_45")
-    public void test_TA_45() {
+    public void developer_can_generate_multiple_openapi_json_expressions_with_get_and_post_templates_meta_header_pagination_response_and_make_array() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1872,7 +1873,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
 
     @Test
     @DisplayName("TC_5_6_TA_46")
-    public void test_TA_46() {
+    public void developer_can_include_bie_version_in_generated_xml_filename() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1907,8 +1908,8 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
     }
 
     @Test
-    @DisplayName("TC_5_6_TA_Test_Refreshing_page")
-    public void test_TA_Test_Refreshing_page() {
+    @DisplayName("TC_5_6_TA_47")
+    public void developer_can_refresh_express_bie_page_and_still_select_meta_header_for_post_operation_template() {
         // we had an issue that the Meta-header does not listed in the dialog after refreashing the page
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);

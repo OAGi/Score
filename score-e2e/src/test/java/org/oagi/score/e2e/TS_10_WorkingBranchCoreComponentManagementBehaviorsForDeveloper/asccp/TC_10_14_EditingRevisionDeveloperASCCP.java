@@ -3,6 +3,7 @@ package org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsFo
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -50,6 +51,7 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_14_TA_1.a")
     public void test_TA_10_14_1_a() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -98,6 +100,7 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_14_TA_1.b")
     public void test_TA_10_14_1_b() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -155,6 +158,7 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_14_TA_1.c")
     public void test_TA_10_14_1_c() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -229,6 +233,7 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_14_TA_1.d")
     public void test_TA_10_14_1_d_deprecated_in_previous_version() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -278,6 +283,7 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_14_TA_1.d (previous revision not deprecated)")
     public void test_TA_10_14_1_d_not_deprecated_in_previous_version() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -326,6 +332,7 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_14_TA_1.e")
     public void test_TA_10_14_1_e_nillable_in_previous_revision() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -375,6 +382,7 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_14_TA_1.e (previous revision not nillable)")
     public void test_TA_10_14_1_e_not_nillable_in_previous_revision() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -424,6 +432,7 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_14_TA_1.f")
     public void test_TA_10_14_1_f() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -477,6 +486,7 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_14_TA_1.g")
     public void test_TA_10_14_1_g() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -559,6 +569,7 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_14_TA_2")
     public void test_TA_10_14_2() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -614,6 +625,7 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_14_TA_3")
     public void test_TA_10_14_3() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);

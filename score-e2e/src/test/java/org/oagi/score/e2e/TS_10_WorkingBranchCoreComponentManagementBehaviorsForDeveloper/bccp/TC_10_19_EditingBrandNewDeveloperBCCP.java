@@ -3,6 +3,7 @@ package org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsFo
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -50,6 +51,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_19_TA_1.a")
     public void test_TA_10_19_1_a() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -68,6 +70,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_19_TA_1.b")
     public void test_TA_10_19_1_b() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -100,6 +103,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_19_TA_1.c")
     public void test_TA_10_19_1_c() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -121,6 +125,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_19_TA_1.d")
     public void test_TA_10_19_1_d() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -149,6 +154,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_19_TA_1.e")
     public void test_TA_10_19_1_e() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -176,6 +182,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_19_TA_1.f")
     public void test_TA_10_19_1_f() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -201,6 +208,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_19_TA_1.g")
     public void test_TA_10_19_1_g() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -234,6 +242,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_19_TA_1.h")
     public void test_TA_10_19_1_h() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -256,6 +265,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_19_TA_2")
     public void test_TA_10_19_2() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -277,6 +287,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_19_TA_3")
     public void test_TA_10_19_3() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -336,6 +347,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_19_TA_4")
     public void test_TA_10_19_4() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);

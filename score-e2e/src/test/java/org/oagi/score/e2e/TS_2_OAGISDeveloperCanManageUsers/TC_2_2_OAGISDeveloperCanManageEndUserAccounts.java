@@ -221,7 +221,7 @@ public class TC_2_2_OAGISDeveloperCanManageEndUserAccounts extends BaseTest {
     @Test
     @DisplayName("TC_2_2_TA_9")
     @Disabled
-    public void test_TA_9() {
+    public void single_sign_on_for_end_user_accounts_cannot_be_tested_yet() {
         // SSO cannot be tested yet
     }
 

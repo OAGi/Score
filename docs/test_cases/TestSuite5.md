@@ -159,6 +159,9 @@ The developer cannot use the `Load from Code List` function if a value of the co
 #### Test Assertion #5.2.24
 The developer can select a context scheme from the Context Scheme List page, navigate through different paginator pages, and keep that context scheme selected.
 
+#### Test Assertion #5.2.25
+The developer can search the Context Scheme List by an exact `Name` value and reliably retrieve the matching context scheme.
+
 ### Test Step Pre-condition:
 
 1. The test creates developer, developer admin, end user, and end user admin accounts and their context schemes as needed.
@@ -188,6 +191,7 @@ The developer can select a context scheme from the Context Scheme List page, nav
 20. After loading values from a code list, the developer changes imported values, adds manual values, and deletes imported values, then verifies that the saved context scheme reflects those changes. (Assertions [#20](#test-assertion-5220), [#21](#test-assertion-5221), [#22](#test-assertion-5222))
 21. The developer attempts to use `Load from Code List` for a context scheme whose value is already used by a business context and verifies that the action is blocked. (Assertion [#23](#test-assertion-5223))
 22. The developer selects a context scheme in the list, navigates to another paginator page and back, and verifies that the selection is retained. (Assertion [#24](#test-assertion-5224))
+23. The developer searches the Context Scheme List using the exact `Name` of a saved context scheme and verifies that the correct matching row is returned reliably. (Assertion [#25](#test-assertion-5225))
 
 ## Test Case 5.3
 
@@ -843,6 +847,9 @@ The developer can hide and display the cardinalities of the nodes in the BIE tre
 ##### Test Assertion #5.5.56.b
 Changed cardinalities of the nodes must be correctly shown in the BIE tree and remain visible after reopening the page.
 
+#### Test Assertion #5.5.57
+When a BIE is created from adjacent releases where a related BCCP was renamed between releases, the BBIE node must preserve the correct default-value and value-constraint behavior for each release.
+
 ### Test Step Pre-condition:
 
 1. The test provisions the developer, business contexts, top-level concepts, releases, BIEs, and related core components that it needs for each assertion.
@@ -930,6 +937,7 @@ Changed cardinalities of the nodes must be correctly shown in the BIE tree and r
 77. The developer opens a BIE tree and verifies that node cardinality labels such as `1..1`, `0..1`, and `0..∞` are displayed in the tree. This covers Assertion [#5.5.56](#test-assertion-5556).
 78. The developer toggles `Hide cardinality` and verifies that the cardinality labels are hidden and shown again. This covers Assertion [#5.5.56.a](#test-assertion-5556a).
 79. The developer changes node cardinalities, updates the BIE, reopens the page, and verifies that the cardinality labels in the tree reflect the saved values. This covers Assertion [#5.5.56.b](#test-assertion-5556b).
+80. The developer creates BIEs from adjacent releases where a related BCCP has been renamed between releases and verifies that the earlier-release BBIE node keeps the revised default value while the later-release node keeps the correct `Value Constraint` state. This covers Assertion [#5.5.57](#test-assertion-5557).
 
 ## Test Case 5.6
 
@@ -980,7 +988,7 @@ The developer can generate an expression of a single BIE, in JSON Schema, in the
 The developer can generate an expression of a single BIE, in JSON Schema, in the same package, with the BIE Definition annotation selected.
 
 #### Test Assertion #5.6.14
-The developer cannot generate an expression of a single BIE, in JSON Schema, in the same package, with any of the BIE CCTS Meta Data, Include CCTS_Definition Tag, BIE GUID, Business Context, BIE OAGi/Score Meta Data, Include WHO Columns, Based CC Meta Data annotations selected.
+The developer cannot generate an expression of a single BIE, in JSON Schema, in the same package, with any of the BIE CCTS Meta Data, Include CCTS_Definition Tag, BIE GUID, Business Context, BIE OAGi/Score Meta Data, or Include WHO Columns annotations selected. `Based CC Meta Data` remains available for JSON Schema and is unchecked by default.
 
 #### Test Assertion #5.6.15
 The developer can generate an expression of multiple BIEs, in multiple XML Schemas, saved in the same package, with some annotations selected.
@@ -1078,9 +1086,16 @@ The developer can generate an expression of a single BIE, in Open API 3.0 in JSO
 #### Test Assertion #5.6.45
 The developer can generate an expression of multiple BIEs, in Open API 3.0 in JSON with Code Generation Friendly, GET Operation Template that includes Meta Header, Pagination Response, and Make Array option as well as POST Operation Template that includes Meta Header, Pagination Response, and Make Array option, in different packages.
 
+#### Test Assertion #5.6.46
+The developer can generate an XML Schema expression of a single BIE while including the BIE version in the generated filename.
+
+#### Test Assertion #5.6.47
+The developer can refresh the Express BIE page during OpenAPI generation setup and still select a Meta Header BIE for the POST Operation Template before generating the expression.
+
 ### Test Step Pre-condition:
 
 1. There are some BIEs created by users, namely BIEa, BIEb, BIEc, which are in Editing, Candidate and Published correspondingly. Additionally, there are some BIEs created by a developer, namely BIE0, BIE1, BIE2, which are in Editing, Candidate and Published correspondingly. The name of the BIE1 is “Receive Item”. Finally, there is a BIE, BIE3, created by a developer with multiple business contexts assigned.
+2. A developer-owned BIE with a version value is available or is created during the test for generated-filename verification.
 
 ### Test Step:
 
@@ -1103,8 +1118,8 @@ The developer can generate an expression of multiple BIEs, in Open API 3.0 in JS
 17. Verify that the Schema is successfully generated. (Assertion [#11](#test-assertion-5611))
 18. The developer generates an expression from BIE1, in JSON Schema, selecting the BIE Definition annotation and that the schema will be saved in the same package.
 19. Verify that the Schema is successfully generated and saved in the same package. (Assertion [#12](#test-assertion-5612))
-20. The developer generates an expression from BIE2, in JSON Schema, selecting the BIE CCTS Meta Data, Include CCTS_Definition Tag, BIE GUID, Business Context, BIE OAGi/Score Meta Data, Include WHO Columns, Based CC Meta Data annotations.
-21. Verify that the aforementioned annotations cannot be selected. (Assertion [#13](#test-assertion-5613))
+20. The developer generates an expression from BIE2, in JSON Schema, attempting to select BIE CCTS Meta Data, Include CCTS_Definition Tag, BIE GUID, Business Context, BIE OAGi/Score Meta Data, and Include WHO Columns. He also verifies that `Based CC Meta Data` remains available but unchecked by default.
+21. Verify that the former annotations cannot be selected and that `Based CC Meta Data` remains enabled but unchecked. (Assertion [#13](#test-assertion-5613))
 22. The developer generates an expression from BIEb and BIE1, in XML Schemas, selecting some annotations and that the XML Schemas will be saved in the same package.
 23. Verify that the Schemas are successfully generated and saved in the same package. (Assertion [#14](#test-assertion-5614))
 24. The developer generates an expression from BIEb and BIE1, in XML Schemas, selecting some annotations and that the XML Schemas will be saved in different packages.
@@ -1134,3 +1149,51 @@ The developer can generate an expression of multiple BIEs, in Open API 3.0 in JS
 48. The developer opens the “Express BIE” page.
 49. The developer generates an expression from BIE3, in XML Schema, selecting the Business Context annotation.
 50. Verify that the Schema is successfully generated. (Assertion [#22](#test-assertion-5622))
+51. The developer generates Open API 3.0 in JSON for a single BIE using GET Operation Template with Meta Header and Pagination Response and POST Operation Template with Meta Header, selecting developer-owned Meta Header and Pagination Response BIEs in any state.
+52. Verify that the expression is successfully generated. (Assertion [#23](#test-assertion-5624))
+53. The developer generates Open API 3.0 in YAML for a single BIE using GET Operation Template with Meta Header, Pagination Response, and Make Array and POST Operation Template with Meta Header and Make Array, selecting other users' Meta Header and Pagination Response BIEs only in QA or Production state.
+54. Verify that the expression is successfully generated. (Assertion [#24](#test-assertion-5625))
+55. The developer generates Open API 3.0 in YAML with Code Generation Friendly for a single BIE in a single file.
+56. Verify that the expression is successfully generated. (Assertion [#25](#test-assertion-5626))
+57. The developer generates Open API 3.0 in YAML with Code Generation Friendly for multiple BIEs saved in different packages.
+58. Verify that the expressions are successfully generated. (Assertion [#26](#test-assertion-5627))
+59. The developer generates Open API 3.0 in JSON with Code Generation Friendly for a single BIE in a single file.
+60. Verify that the expression is successfully generated. (Assertion [#27](#test-assertion-5628))
+61. The developer generates Open API 3.0 in JSON with Code Generation Friendly for multiple BIEs saved in different packages.
+62. Verify that the expressions are successfully generated. (Assertion [#28](#test-assertion-5629))
+63. The developer generates Open API 3.0 in YAML with Code Generation Friendly for a single BIE using GET Operation Template with Make Array in a single file.
+64. Verify that the expression is successfully generated. (Assertion [#29](#test-assertion-5630))
+65. The developer generates Open API 3.0 in YAML with Code Generation Friendly for multiple BIEs using GET Operation Template with Make Array in different packages.
+66. Verify that the expressions are successfully generated. (Assertion [#30](#test-assertion-5631))
+67. The developer generates Open API 3.0 in YAML with Code Generation Friendly for a single BIE using GET Operation Template with Meta Header in a single file.
+68. Verify that the expression is successfully generated. (Assertion [#31](#test-assertion-5632))
+69. The developer generates Open API 3.0 in YAML with Code Generation Friendly for multiple BIEs using GET Operation Template with Meta Header in different packages.
+70. Verify that the expressions are successfully generated. (Assertion [#32](#test-assertion-5633))
+71. The developer generates Open API 3.0 in YAML with Code Generation Friendly for a single BIE using GET Operation Template with Meta Header and Pagination Response in a single file.
+72. Verify that the expression is successfully generated. (Assertion [#33](#test-assertion-5634))
+73. The developer generates Open API 3.0 in YAML with Code Generation Friendly for multiple BIEs using GET Operation Template with Meta Header and Pagination Response in different packages.
+74. Verify that the expressions are successfully generated. (Assertion [#34](#test-assertion-5635))
+75. The developer generates Open API 3.0 in YAML with Code Generation Friendly for a single BIE using POST Operation Template with Make Array in a single file.
+76. Verify that the expression is successfully generated. (Assertion [#35](#test-assertion-5636))
+77. The developer generates Open API 3.0 in YAML with Code Generation Friendly for multiple BIEs using POST Operation Template with Make Array in different packages.
+78. Verify that the expressions are successfully generated. (Assertion [#36](#test-assertion-5637))
+79. The developer generates Open API 3.0 in YAML with Code Generation Friendly for a single BIE using POST Operation Template with Meta Header in a single file.
+80. Verify that the expression is successfully generated. (Assertion [#37](#test-assertion-5638))
+81. The developer generates Open API 3.0 in YAML with Code Generation Friendly for multiple BIEs using POST Operation Template with Meta Header in different packages.
+82. Verify that the expressions are successfully generated. (Assertion [#38](#test-assertion-5639))
+83. The developer generates Open API 3.0 in YAML with Code Generation Friendly for a single BIE using GET Operation Template with Meta Header, Pagination Response, and Make Array in a single file.
+84. Verify that the expression is successfully generated. (Assertion [#39](#test-assertion-5640))
+85. The developer generates Open API 3.0 in YAML with Code Generation Friendly for multiple BIEs using GET Operation Template with Meta Header, Pagination Response, and Make Array in different packages.
+86. Verify that the expressions are successfully generated. (Assertion [#40](#test-assertion-5641))
+87. The developer generates Open API 3.0 in YAML with Code Generation Friendly for a single BIE using both GET and POST Operation Templates with Meta Header, Pagination Response, and Make Array in a single file.
+88. Verify that the expression is successfully generated. (Assertion [#41](#test-assertion-5642))
+89. The developer generates Open API 3.0 in YAML with Code Generation Friendly for multiple BIEs using both GET and POST Operation Templates with Meta Header, Pagination Response, and Make Array in different packages.
+90. Verify that the expressions are successfully generated. (Assertion [#42](#test-assertion-5643))
+91. The developer generates Open API 3.0 in JSON with Code Generation Friendly for a single BIE using both GET and POST Operation Templates with Meta Header, Pagination Response, and Make Array in a single file.
+92. Verify that the expression is successfully generated. (Assertion [#43](#test-assertion-5644))
+93. The developer generates Open API 3.0 in JSON with Code Generation Friendly for multiple BIEs using both GET and POST Operation Templates with Meta Header, Pagination Response, and Make Array in different packages.
+94. Verify that the expressions are successfully generated. (Assertion [#44](#test-assertion-5645))
+95. The developer generates an XML Schema expression for a single BIE while enabling the option to include the BIE version in the filename.
+96. Verify that the expression is successfully generated and that the filename includes the BIE version. (Assertion [#46](#test-assertion-5646))
+97. The developer begins OpenAPI generation for a BIE, selects a Meta Header for the POST Operation Template, refreshes the Express BIE page, reselects the same BIE and OpenAPI options, and verifies that the Meta Header can still be selected.
+98. Verify that the expression is successfully generated after refreshing the page. (Assertion [#47](#test-assertion-5647))

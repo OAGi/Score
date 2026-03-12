@@ -36,7 +36,7 @@ public class TC_9_1_NoUserAccountCanBeDeleted extends BaseTest {
 
     @Test
     @DisplayName("TC_9_1_TA_1")
-    public void test_eu_account_cannot_be_deleted() {
+    public void end_user_account_cannot_be_deleted() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
 
         AdminMenu adminMenu = homePage.getAdminMenu();
@@ -60,7 +60,7 @@ public class TC_9_1_NoUserAccountCanBeDeleted extends BaseTest {
 
     @Test
     @DisplayName("TC_9_1_TA_2")
-    public void test_dev_account_cannot_be_deleted() {
+    public void oagi_developer_account_cannot_be_deleted() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
 
         AdminMenu adminMenu = homePage.getAdminMenu();

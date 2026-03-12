@@ -280,6 +280,23 @@ public abstract class PageHelper {
         }
     }
 
+    public static String xpathLiteral(String value) {
+        if (!value.contains("\"")) {
+            return "\"" + value + "\"";
+        }
+
+        String[] parts = value.split("\"", -1);
+        StringBuilder builder = new StringBuilder("concat(");
+        for (int i = 0; i < parts.length; i++) {
+            if (i > 0) {
+                builder.append(", '\"', ");
+            }
+            builder.append("\"").append(parts[i]).append("\"");
+        }
+        builder.append(")");
+        return builder.toString();
+    }
+
     public static void waitFor(Duration duration) {
         try {
             Thread.sleep(duration.toMillis());

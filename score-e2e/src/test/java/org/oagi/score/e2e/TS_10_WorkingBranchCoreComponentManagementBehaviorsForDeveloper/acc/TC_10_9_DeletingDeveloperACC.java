@@ -2,6 +2,7 @@ package org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsFo
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -48,7 +49,8 @@ public class TC_10_9_DeletingDeveloperACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_9_1() {
+    @DisplayName("TC_10_9_TA_1")
+    public void revision_one_wip_acc_can_be_deleted() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -72,7 +74,8 @@ public class TC_10_9_DeletingDeveloperACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_9_2() {
+    @DisplayName("TC_10_9_TA_2")
+    public void deleted_base_of_descendant_acc_is_flagged_until_restored_or_replaced() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -123,7 +126,8 @@ public class TC_10_9_DeletingDeveloperACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_9_3() {
+    @DisplayName("TC_10_9_TA_3")
+    public void deleted_direct_base_acc_is_flagged_until_restored_or_replaced() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -181,7 +185,8 @@ public class TC_10_9_DeletingDeveloperACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_9_4() {
+    @DisplayName("TC_10_9_TA_4")
+    public void deleted_acc_used_by_ascc_association_is_flagged_until_restored() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -226,7 +231,8 @@ public class TC_10_9_DeletingDeveloperACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_9_5() {
+    @DisplayName("TC_10_9_TA_5")
+    public void deleted_descendant_acc_is_flagged_until_restored() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -261,7 +267,8 @@ public class TC_10_9_DeletingDeveloperACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_9_6() {
+    @DisplayName("TC_10_9_TA_6")
+    public void deleted_acc_used_by_asccp_is_flagged_until_restored() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -305,7 +312,8 @@ public class TC_10_9_DeletingDeveloperACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_9_7() {
+    @DisplayName("TC_10_9_TA_7")
+    public void acc_revision_greater_than_one_cannot_be_deleted_in_any_state() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 

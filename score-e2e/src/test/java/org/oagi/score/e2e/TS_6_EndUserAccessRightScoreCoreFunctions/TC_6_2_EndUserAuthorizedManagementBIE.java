@@ -44,7 +44,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_6_2_TA_1")
-    public void test_TA_1() {
+    public void end_user_can_invoke_local_extension_only_for_wip_bie_and_revision_increments() {
         ASCCPObject asccp;
         ACCObject acc;
         AppUserObject usera;
@@ -117,7 +117,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_6_2_TA_2")
-    public void test_TA_2() {
+    public void end_user_sees_attention_dialog_and_read_only_qa_local_extension_when_another_user_owns_it() {
         ASCCPObject asccp;
         ACCObject acc;
         AppUserObject usera;
@@ -217,7 +217,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_6_2_TA_3")
-    public void test_TA_3() {
+    public void end_user_can_reopen_owned_local_extension_in_wip_and_qa_states() {
         ASCCPObject asccp;
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
@@ -288,7 +288,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_6_2_TA_4")
-    public void test_TA_4() {
+    public void end_user_cannot_edit_non_production_local_extension_nodes_in_bie_tree() {
         ASCCPObject asccp;
         AppUserObject usera;
         TopLevelASBIEPObject useraBIEWIP;
@@ -424,7 +424,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_6_2_TA_5_1_and_TC_6_2_TA_5_3")
-    public void test_TA_5_1_and_TA_5_3() {
+    public void end_user_cannot_edit_local_extension_nodes_for_non_production_child_asccp_or_bccp() {
         ASCCPObject asccp;
         ACCObject acc;
         AppUserObject usera;
@@ -609,7 +609,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_6_2_TA_5_2")
-    public void test_TA_5_2() {
+    public void end_user_cannot_edit_local_extension_nodes_when_child_asccp_owner_acc_is_not_in_production() {
         ASCCPObject asccp;
         ACCObject acc;
         AppUserObject usera;
@@ -744,7 +744,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_6_2_TA_5_4")
-    public void test_TA_5_4() {
+    public void end_user_cannot_edit_amended_local_extension_descendants_when_nested_asccp_is_not_in_production() {
         ASCCPObject asccp;
         ACCObject acc;
         AppUserObject usera;
@@ -922,7 +922,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_6_2_TA_5_5")
-    public void test_TA_5_5() {
+    public void end_user_cannot_edit_group_local_extension_children_when_group_acc_is_not_in_production() {
         ASCCPObject asccp;
         ACCObject acc;
         AppUserObject usera;
@@ -1075,7 +1075,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_6_2_TA_6_1")
-    public void test_TA_6_1() {
+    public void end_user_can_invoke_local_extension_in_another_release_and_revision_increments() {
         Map<TopLevelASBIEPObject, ASCCPObject> bieASCCPMap = new HashMap<>();
         AppUserObject usera;
         NamespaceObject useraNamespace;
@@ -1222,7 +1222,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_6_2_TA_6_2")
-    public void test_TA_6_2() {
+    public void end_user_sees_attention_dialog_and_read_only_qa_local_extension_in_another_release_when_another_user_owns_it() {
         AppUserObject usera;
         AppUserObject userb;
         TopLevelASBIEPObject useraBIEReleaseOne;
@@ -1466,7 +1466,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_6_2_TA_6_3")
-    public void test_TA_6_3() {
+    public void end_user_can_reopen_owned_local_extension_in_another_release() {
         Map<TopLevelASBIEPObject, ASCCPObject> bieASCCPMap = new HashMap<>();
         Map<ASCCPObject, BCCPObject> asccpBCCPMap = new HashMap<>();
         Map<BCCPObject, BCCObject> bccpBCCMap = new HashMap<>();
@@ -1601,7 +1601,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_6_2_TA_6_4")
-    public void test_TA_6_4() {
+    public void end_user_cannot_edit_non_production_local_extension_nodes_in_another_release() {
         Map<TopLevelASBIEPObject, ASCCPObject> bieASCCPMap = new HashMap<>();
         Map<ASCCPObject, BCCPObject> asccpBCCPMap = new HashMap<>();
         Map<BCCPObject, BCCObject> bccpBCCMap = new HashMap<>();
@@ -1813,7 +1813,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_6_2_TA_6_5_1_and_TA_6_2_TA_6_5_3")
-    public void test_TA_6_5_1_and_TA_6_5_3() {
+    public void end_user_cannot_edit_local_extension_nodes_for_non_production_child_asccp_or_bccp_in_another_release() {
         AppUserObject usera;
         List<ASCCPObject> asccpsForTesting = new ArrayList<>();
         List<BCCPObject> bccpsForTesting = new ArrayList<>();
@@ -2114,7 +2114,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_6_2_TA_6_5_2")
-    public void test_TA_6_5_2() {
+    public void end_user_cannot_edit_local_extension_nodes_when_child_asccp_owner_acc_is_not_in_production_in_another_release() {
         AppUserObject usera;
         List<ASCCPObject> asccpsForTesting = new ArrayList<>();
         NamespaceObject namespaceEU;
@@ -2329,7 +2329,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_6_2_TA_6_5_4")
-    public void test_TA_6_5_4() {
+    public void end_user_cannot_edit_amended_local_extension_descendants_when_nested_asccp_is_not_in_production_in_another_release() {
         AppUserObject usera;
         List<ASCCPObject> asccpsForTesting = new ArrayList<>();
         NamespaceObject namespaceEU;
@@ -2611,7 +2611,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_6_2_TA_6_5_5")
-    public void test_TA_6_5_5() {
+    public void end_user_cannot_edit_group_local_extension_children_when_group_acc_is_not_in_production_in_another_release() {
         AppUserObject usera;
         List<ASCCPObject> asccpsForTesting = new ArrayList<>();
         NamespaceObject namespaceEU;
@@ -2855,7 +2855,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_6_2_TA_8_1_and_TA_8_3")
-    public void test_TA_8_1_and_TA_8_3() {
+    public void end_user_can_select_production_compatible_code_lists_and_same_release_fallback_code_lists() {
         List<CodeListObject> codeListsForTesting = new ArrayList<>();
         Map<CodeListObject, ReleaseObject> codeListReleaseMap = new HashMap<>();
         ASCCPObject asccp;
@@ -2977,7 +2977,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_6_2_TA_8_2_and_TA_8_3")
-    public void test_TA_8_2_and_TA_8_3() {
+    public void end_user_can_see_unstable_and_deleted_state_indicators_for_compatible_end_user_code_lists() {
         List<CodeListObject> codeListsForTesting = new ArrayList<>();
         Map<CodeListObject, ReleaseObject> codeListReleaseMap = new HashMap<>();
         ASCCPObject asccp;
@@ -3144,7 +3144,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_6_2_TA_9")
-    public void test_TA_9() {
+    public void end_user_cannot_create_bie_from_group_type_asccp() {
         ASCCPObject asccp;
         AppUserObject usera;
         BusinessContextObject context;
@@ -3176,7 +3176,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_6_2_TA_10")
-    public void test_TA_10() {
+    public void end_user_can_reset_bie_node_details_to_initial_values() {
         ASCCPObject asccp;
         BCCPObject bccp;
         AppUserObject usera;
@@ -3261,7 +3261,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_6_2_TA_12")
-    public void test_TA_12() {
+    public void end_user_can_create_bie_from_production_end_user_asccps_regardless_of_owner() {
         ASCCPObject asccp_owner_usera;
         ASCCPObject asccp_owner_userb;
         AppUserObject usera;
@@ -3318,7 +3318,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_6_2_TA_13")
-    public void test_TA_13() {
+    public void end_user_cannot_create_bie_from_production_group_type_asccp() {
         ASCCPObject asccp_owner_usera;
         AppUserObject usera;
         AppUserObject userb;
@@ -3361,7 +3361,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_6_2_TA_14_and_TA_14_1")
-    public void test_TA_14_and_TA_14_1() {
+    public void end_user_can_edit_bie_from_production_end_user_asccp_but_locks_after_amendment() {
         ASCCPObject asccpTopLevel;
         BCCPObject bccp_ACCTopLevel;
         ASCCPObject asccp;
@@ -3516,7 +3516,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_6_2_TA_14_2")
-    public void test_TA_14_2() {
+    public void end_user_can_edit_bie_from_production_end_user_asccp_but_locks_after_qa_transition() {
         ASCCPObject asccpTopLevel;
         BCCPObject bccp_ACCTopLevel;
         ASCCPObject asccp;
@@ -3669,7 +3669,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_6_2_TA_14_3")
-    public void test_TA_14_3() {
+    public void end_user_can_see_deprecated_flag_after_end_user_asccp_is_deprecated() {
         ASCCPObject asccpTopLevel;
         BCCPObject bccp_ACCTopLevel;
         ASCCPObject asccp;
@@ -3795,7 +3795,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_6_2_TA_14_4")
-    public void test_TA_14_4() {
+    public void end_user_cannot_edit_bie_nodes_when_base_acc_or_nested_base_acc_is_not_in_production() {
         ASCCPObject asccpTopLevel;
         BCCPObject bccp_ACCTopLevel;
         ASCCPObject asccp;
@@ -4112,7 +4112,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
     @Test
     @DisplayName("TC_6_2_TA_14_5")
     @Disabled
-    public void test_TA_14_5() {
+    public void end_user_cannot_edit_bie_nodes_when_corresponding_cc_is_deleted() {
         /**
          * The user cannot delete CC on which some BIE was previously created.
          */
@@ -4121,7 +4121,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
     @Test
     @DisplayName("TC_6_2_TA_14_6")
     @Disabled
-    public void test_TA_14_6() {
+    public void end_user_cannot_edit_group_descendant_nodes_when_group_component_is_not_in_production() {
         ASCCPObject asccpTopLevel;
         BCCPObject bccp_ACCTopLevel;
         ASCCPObject asccp;

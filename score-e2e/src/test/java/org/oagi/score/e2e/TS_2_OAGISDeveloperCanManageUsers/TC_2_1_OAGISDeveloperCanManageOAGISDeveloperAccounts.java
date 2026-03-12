@@ -319,7 +319,7 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
     @Test
     @DisplayName("TC_2_1_TA_14")
     @Disabled
-    public void test_TA_14() {
+    public void single_sign_on_for_developer_accounts_cannot_be_tested_yet() {
         // SSO cannot be tested yet
     }
 

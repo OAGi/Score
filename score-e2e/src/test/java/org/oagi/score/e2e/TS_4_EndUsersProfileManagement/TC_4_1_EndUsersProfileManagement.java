@@ -132,7 +132,7 @@ public class TC_4_1_EndUsersProfileManagement extends BaseTest {
     @Test
     @DisplayName("TC_4_1_TA_9")
     @Disabled
-    public void test_TA_9() {
+    public void end_user_single_sign_on_cannot_be_tested_yet() {
         // SSO cannot be checked yet
     }
 

@@ -787,6 +787,13 @@ public interface BCCPViewEditPage extends Page {
         WebElement getDENField();
 
         /**
+         * Return the label of the 'DEN' field.
+         *
+         * @return the label of the 'DEN' field
+         */
+        String getDENFieldLabel();
+
+        /**
          * Return the UI element of the 'Property Term' field.
          *
          * @return the UI element of the 'Property Term' field

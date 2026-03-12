@@ -2,6 +2,7 @@ package org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsFo
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -51,6 +52,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_1.a")
     public void test_TA_10_4_1_a() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -94,6 +96,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_1.b")
     public void test_TA_10_4_1_b() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -139,6 +142,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_1.c")
     public void test_TA_10_4_1_c() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -175,6 +179,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_1.d")
     public void test_TA_10_4_1_d() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -200,6 +205,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_1.e")
     public void test_TA_10_4_1_e() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -279,6 +285,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_1.f")
     public void test_TA_10_4_1_f() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -307,6 +314,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_2")
     public void test_TA_10_4_2() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -349,6 +357,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_3.a")
     public void test_TA_10_4_3_a() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -396,6 +405,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_3.b")
     public void test_TA_10_4_3_b() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -457,6 +467,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_3.c")
     public void test_TA_10_4_3_c() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -503,6 +514,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_3.d")
     public void test_TA_10_4_3_d() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -552,6 +564,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_3.e")
     public void test_TA_10_4_3_e() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -601,6 +614,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_3.f")
     public void test_TA_10_4_3_f() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -646,6 +660,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_4.a")
     public void test_TA_10_4_4_a() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -690,6 +705,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_4.b")
     public void test_TA_10_4_4_b() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -745,6 +761,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_4.c")
     public void test_TA_10_4_4_c() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -794,6 +811,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_4.d")
     public void test_TA_10_4_4_d() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -830,6 +848,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_5")
     public void test_TA_10_4_5() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -893,6 +912,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_6.a")
     public void test_TA_10_4_6_a() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -939,6 +959,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_6.b")
     public void test_TA_10_4_6_b() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -988,6 +1009,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_6.c")
     public void test_TA_10_4_6_c() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -1028,6 +1050,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_6.d")
     public void test_TA_10_4_6_d() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -1077,6 +1100,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_6.e")
     public void test_TA_10_4_6_e() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -1113,6 +1137,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_6.f")
     public void test_TA_10_4_6_f() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -1174,6 +1199,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_6.g_and_h")
     public void test_TA_10_4_6_g_h() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -1243,6 +1269,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_7")
     public void test_TA_10_4_7() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -1286,6 +1313,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_8")
     public void test_TA_10_4_8() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -1349,6 +1377,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_9")
     public void test_TA_10_4_9() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -1389,6 +1418,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_10.a")
     public void test_TA_10_4_10_a() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -1438,6 +1468,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_10.b")
     public void test_TA_10_4_10_b() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -1497,6 +1528,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_10.c")
     public void test_TA_10_4_10_c() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -1545,6 +1577,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_10.d")
     public void test_TA_10_4_10_d() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -1591,6 +1624,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_10.e")
     public void test_TA_10_4_10_e() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -1631,6 +1665,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_10.f")
     public void test_TA_10_4_10_f() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -1701,6 +1736,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_11")
     public void test_TA_10_4_11() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -1735,6 +1771,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_12")
     public void test_TA_10_4_12() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -1827,6 +1864,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_13")
     public void test_TA_10_4_13() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -1911,6 +1949,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_14.a_to_d")
     public void test_TA_10_4_14_abcd() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -1986,6 +2025,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_14.e")
     public void test_TA_10_4_14_e() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -2064,6 +2104,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_15.a")
     public void test_TA_10_4_15_a() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -2168,6 +2209,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_15.b_and_c")
     public void test_TA_10_4_15_bc() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -2250,6 +2292,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_16")
     public void test_TA_10_4_16() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -2330,6 +2373,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_17")
     public void test_TA_10_4_17() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -2438,6 +2482,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_18")
     public void test_TA_10_4_18() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -2548,6 +2593,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_19")
     public void test_TA_10_4_19() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -2623,6 +2669,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_20")
     public void test_TA_10_4_20() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -2697,6 +2744,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_21.a_to_d")
     public void test_TA_10_4_21_abcd() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -2764,6 +2812,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_21.e")
     public void test_TA_10_4_21_e() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -2832,6 +2881,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_22")
     public void test_TA_10_4_22() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -2893,6 +2943,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_23")
     public void test_TA_10_4_23() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -2928,6 +2979,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_24.a_to_d")
     public void test_TA_10_4_24_and_26() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -3012,6 +3064,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_4_TA_25")
     public void test_TA_10_4_25() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);

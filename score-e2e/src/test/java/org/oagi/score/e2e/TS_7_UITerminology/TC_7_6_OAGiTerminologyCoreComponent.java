@@ -21,6 +21,7 @@ import java.util.List;
 import static java.time.Duration.ofMillis;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.oagi.score.e2e.impl.PageHelper.click;
+import static org.oagi.score.e2e.impl.PageHelper.getText;
 import static org.oagi.score.e2e.impl.PageHelper.waitFor;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -41,14 +42,21 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
 
     @Test
     @DisplayName("TC_7_6_TA_1")
-    @Disabled
-    public void test_TA_1() {
-        //The name of the Core Component page should be “Core Components (Model Library)”.
+    public void core_component_page_uses_core_component_title() {
+        AppUserObject appUser = getAPIFactory().getAppUserAPI().getAppUserByLoginID("oagis");
+        appUser.setPassword("oagis");
+
+        HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
+        homePage.getLoginIDMenu().checkConnectSpecTerminology();
+
+        CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
+        ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        assertEquals("Core Component", getText(viewEditCoreComponentPage.getTitle()));
     }
 
     @Test
     @DisplayName("TC_7_6_TA_2_and_TA_3")
-    public void test_TA_2_and_TA_3() {
+    public void core_component_search_panel_uses_search_by_den_and_module_labels() {
         LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
         ASCCPObject asccp;
@@ -77,6 +85,9 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
         viewEditCoreComponentPage.showAdvancedSearchPanel();
 
+        String denFieldLabel = viewEditCoreComponentPage.getDENFieldLabel();
+        assertEquals("Search by DEN", denFieldLabel);
+
         String moduleFieldLabel = viewEditCoreComponentPage.getModuleFieldLabel();
         assertEquals("Module (Part of schema file path, no extension)", moduleFieldLabel);
     }
@@ -84,14 +95,14 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
     @Test
     @DisplayName("TC_7_6_TA_4")
     @Disabled
-    public void test_TA_4() {
+    public void acc_tree_panel_uses_component_type_or_group_definition_title() {
         //The title of the left pane where the tree of an ACC is displayed should be “ACC (Component Type or Group Definition)”.
 
     }
 
     @Test
     @DisplayName("TC_7_6_TA_5_and_TA_6")
-    public void test_TA_5_and_TA_6() {
+    public void acc_pages_use_oagi_terminology_for_object_class_term_and_den_labels() {
         LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
         ASCCPObject asccp;
@@ -163,21 +174,21 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
     @Test
     @DisplayName("TC_7_6_TA_7")
     @Disabled
-    public void testTA_7() {
+    public void asccp_tree_panel_uses_component_or_group_definition_title() {
         //The title of the left pane where the tree of an ASCCP is displayed should be “ASCCP (Component or Group Definition)”.
     }
 
     @Test
     @DisplayName("TC_7_6_TA_8")
     @Disabled
-    public void testTA_8() {
-        //The title of the left pane where the tree of an ASCCP is displayed should be “ASCCP (Component or Group Definition)”.
+    public void asccp_detail_panel_uses_associated_component_title() {
+        //The title of the right pane where the details of an ASCCP are displayed should be “ASCCP (Associated Component) Detail”.
 
     }
 
     @Test
     @DisplayName("TC_7_6_TA_9_and_TA_10")
-    public void test_TA_9_and_TA_10() {
+    public void asccp_detail_panel_uses_component_name_and_dictionary_entry_name_labels() {
         LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
         ASCCPObject asccp;
@@ -217,13 +228,13 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
     @Test
     @DisplayName("TC_7_6_TA_11")
     @Disabled
-    public void test_TA_11() {
+    public void bccp_detail_panel_uses_associated_field_title() {
         //The title of the right pane where the details of a BCCP are displayed should be “BCCP (Associated Field) Detail”.
     }
 
     @Test
     @DisplayName("TC_7_6_TA_12_and_TA_13")
-    public void test_TA_12_and_TA_13() {
+    public void bccp_detail_panel_uses_field_name_and_dictionary_entry_name_labels() {
         LibraryObject library;
         ReleaseObject branch;
         BCCPObject bccp;
@@ -258,19 +269,22 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
         String propertyTermFieldLabel = bccpPanel.getPropertyTermFieldLabel();
         assertEquals("Property Term (Field Name)", propertyTermFieldLabel);
+
+        String denFieldLabel = bccpPanel.getDENFieldLabel();
+        assertEquals("DEN (Dictionary Entry Name)", denFieldLabel);
     }
 
     @Test
     @DisplayName("TC_7_6_TA_14")
     @Disabled
-    public void test_TA_14() {
+    public void ascc_detail_panel_uses_component_association_title() {
         //The title of the right pane where the details of an ASCC are displayed should be “ASCC (Component Association) Detail”. (It cannot be checked yet).
 
     }
 
     @Test
     @DisplayName("TC_7_6_TA_15_and_TA_16")
-    public void test_TA_15_and_TA_16() {
+    public void ascc_detail_panel_uses_cardinality_max_and_dictionary_entry_name_labels() {
         LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
         ASCCPObject asccp;
@@ -310,14 +324,14 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
     @Test
     @DisplayName("TC_7_6_TA_17")
     @Disabled
-    public void test_TA_17() {
+    public void bcc_detail_panel_uses_field_association_title() {
         //The title of the right pane where the details of a BCC are displayed should be “BCC (Field Association) Detail”.
 
     }
 
     @Test
     @DisplayName("TC_7_6_TA_18_and_TA_19")
-    public void test_TA_18_and_TA_19() {
+    public void bcc_detail_panel_uses_cardinality_max_and_dictionary_entry_name_labels() {
         LibraryObject library;
         ReleaseObject branch;
         ACCObject acc;
@@ -364,7 +378,7 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
     @Test
     @DisplayName("TC_7_6_TA_20")
     @Disabled
-    public void test_TA_20() {
+    public void supplementary_component_panel_uses_field_metadata_title() {
         //The title of the right pane where the details of a supplementary component are displayed should be
         // “Supplementary Component (Field Metadata)”. (It cannot be checked yet).
 
@@ -372,7 +386,7 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
 
     @Test
     @DisplayName("TC_7_6_TA_21_to_TA_23")
-    public void test_TA_21_to_TA_23() {
+    public void supplementary_and_data_type_components_use_cardinality_and_dictionary_entry_name_labels() {
         LibraryObject library;
         ReleaseObject branch;
         ACCObject acc;

@@ -287,7 +287,13 @@ public class ViewEditDataTypePageImpl extends BaseSearchBarPageImpl implements V
     @Override
     public WebElement getTableRecordByCCNameAndOwner(String name, String owner) {
         waitFor(ofMillis(1000L));
-        return visibilityOfElementLocated(getDriver(), By.xpath("//*[contains(text(), \"" + name + "\")]//ancestor::tr//td[8]//*[contains(text(), \"" + owner + "\")]"));
+        String xpathExpr = "//tbody/tr[" +
+                ".//td[contains(@class, 'mat-column-den')][contains(normalize-space(.), " + xpathLiteral(name) + ")]" +
+                " and " +
+                ".//td[contains(@class, 'mat-column-owner')][contains(normalize-space(.), " + xpathLiteral(owner) + ")]" +
+                "]";
+        return visibilityOfElementLocated(org.oagi.score.e2e.impl.PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
+                By.xpath(xpathExpr));
     }
 
     @Override

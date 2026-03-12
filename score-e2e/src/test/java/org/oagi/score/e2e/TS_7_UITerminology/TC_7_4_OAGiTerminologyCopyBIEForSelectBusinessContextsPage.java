@@ -37,7 +37,7 @@ public class TC_7_4_OAGiTerminologyCopyBIEForSelectBusinessContextsPage extends 
 
     @Test
     @DisplayName("TC_7_4_TA_1")
-    public void test_copy_bie_page_title_first_page() {
+    public void copy_bie_business_context_page_uses_oagi_terminology_in_title() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         homePage.getLoginIDMenu().checkConnectSpecTerminology();
         BIEMenu bieMenu = homePage.getBIEMenu();
@@ -48,10 +48,7 @@ public class TC_7_4_OAGiTerminologyCopyBIEForSelectBusinessContextsPage extends 
 
     @Test
     @DisplayName("TC_7_4_TA_2")
-    public void test_copy_bie_page_title_second_page() {
-
-        //test assertion in the documentation should be changed because the subtitle of the second page is not “Select BIE (Profiled Component, Noun, BOD)”
-
+    public void copy_bie_selection_page_includes_selected_business_context_in_title() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         homePage.getLoginIDMenu().checkConnectSpecTerminology();
 

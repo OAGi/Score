@@ -3,6 +3,7 @@ package org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsFo
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -50,6 +51,7 @@ public class TC_10_6_EditingRevisionDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_6_TA_1.a")
     public void test_TA_10_6_1_a() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -73,6 +75,7 @@ public class TC_10_6_EditingRevisionDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_6_TA_1.b")
     public void test_TA_10_6_1_b() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -140,6 +143,7 @@ public class TC_10_6_EditingRevisionDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_6_TA_1.c")
     public void test_TA_10_6_1_c() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -172,6 +176,7 @@ public class TC_10_6_EditingRevisionDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_6_TA_1.d")
     public void test_TA_10_6_1_d_deprecated_previous_version() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -199,6 +204,7 @@ public class TC_10_6_EditingRevisionDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_6_TA_1.d (previous version not deprecated)")
     public void test_TA_10_6_1_d_not_deprecated_previous_version() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -225,6 +231,7 @@ public class TC_10_6_EditingRevisionDeveloperACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_6_TA_1.e")
     public void test_TA_10_6_1_e() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);

@@ -29,7 +29,7 @@ public class TC_7_1_OAGiNavigationMenu extends BaseTest {
 
     @Test
     @DisplayName("TC_7_1_TA_1_to_TA_6")
-    public void test_TA_1_to_TA_6() {
+    public void navigation_menu_uses_oagi_terminology_for_bie_and_core_component_entries() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         homePage.getLoginIDMenu().getConnectSpecTerminologyButton().click();
         BIEMenu bieMenu = homePage.getBIEMenu();

@@ -40,7 +40,7 @@ public class TC_7_5_OAGiTerminologyAppendAssociationDialog extends BaseTest {
 
     @Test
     @DisplayName("TC_7_5_TA_1_and_TA_2")
-    public void test_TA_1_and_TA_2() {
+    public void append_asccp_dialog_uses_search_by_den_and_module_labels() {
         LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
         ASCCPObject asccp;
@@ -77,13 +77,16 @@ public class TC_7_5_OAGiTerminologyAppendAssociationDialog extends BaseTest {
         SelectAssociationDialog selectCCPropertyPage = ACCExtensionViewEditPage.appendPropertyAtLast("/" + asccp.getPropertyTerm() + " User Extension Group. Details");
         selectCCPropertyPage.showAdvancedSearchPanel();
 
+        String denFieldLabel = selectCCPropertyPage.getDENFieldLabel();
+        assertEquals("Search by DEN", denFieldLabel);
+
         String moduleFieldLabel = selectCCPropertyPage.getModuleFieldLabel();
         assertEquals("Module (Part of schema file path, no extension)", moduleFieldLabel);
     }
 
     @Test
     @DisplayName("TC_7_5_TA_3_and_TA_4")
-    public void test_TA_3_and_TA_4() {
+    public void append_bccp_dialog_uses_search_by_den_and_module_labels() {
         LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
         ASCCPObject asccp;
@@ -115,9 +118,12 @@ public class TC_7_5_OAGiTerminologyAppendAssociationDialog extends BaseTest {
         // TODO:
         // Can't open the context menu in a small size of the screen.
         getDriver().manage().window().maximize();
-        ACCExtensionViewEditPage ACCExtensionViewEditPage = editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
-        SelectAssociationDialog selectCCPropertyPage = ACCExtensionViewEditPage.appendPropertyAtLast("/All User Extension Group. Details");
+        ACCExtensionViewEditPage ACCExtensionViewEditPage = editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+        SelectAssociationDialog selectCCPropertyPage = ACCExtensionViewEditPage.appendPropertyAtLast("/" + asccp.getPropertyTerm() + " User Extension Group. Details");
         selectCCPropertyPage.showAdvancedSearchPanel();
+
+        String denFieldLabel = selectCCPropertyPage.getDENFieldLabel();
+        assertEquals("Search by DEN", denFieldLabel);
 
         String moduleFieldLabel = selectCCPropertyPage.getModuleFieldLabel();
         assertEquals("Module (Part of schema file path, no extension)", moduleFieldLabel);

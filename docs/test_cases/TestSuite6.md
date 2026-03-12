@@ -106,7 +106,7 @@ Compatible end user code lists in the same release as the BIE shall be included.
 If there is no default code list, all developer code lists in the published state in the same release and end user code lists in the same release shall be included. End user code lists shall be displayed in the same way as described in 8.2.
 
 #### Test Assertion #6.2.9
-End user cannot create a new BIE from an ASCCP whose ACC has a group component type.
+The end user cannot create a new BIE from a selectable ASCCP when its underlying ACC has a group component type.
 
 #### Test Assertion #6.2.10
 The end user can click the Detail Reset button of a specific BIE node to reset the values of the BIE node to the initial values based on the corresponding CC. A confirmation dialog is shown before resetting.
@@ -115,7 +115,7 @@ The end user can click the Detail Reset button of a specific BIE node to reset t
 The end user can create a BIE from an end user ASCCP providing that it is in Production state. Check that the end user can create BIEs from both ASCCP that he owns or not.
 
 #### Test Assertion #6.2.13
-The end user cannot create a new BIE from an ASCCP whose ACC has a group component type.
+The end user cannot create a new BIE from an end-user-owned ASCCP in `Production` when that ASCCP's ACC has a group component type.
 
 #### Test Assertion #6.2.14
 The end user can edit the BIE if the end user ASCCP is in Production State
@@ -152,7 +152,7 @@ Current automation status: not automated yet.
 5. The test repeats the extension-locking scenarios in another release and verifies the expected behavior again with revised CC content. (Assertion [#6](#test-assertion-626))
 6. The test exercises the global-extension path in a separate class, including the restriction that ASCCP cannot be appended to the global extension. (Assertion [#7](#test-assertion-627))
 7. The test verifies code-list selection for BBIE value domains in `Code` mode, covering compatible production developer and end-user code lists in the same release, warnings for unstable end-user code lists, deleted end-user code lists, and the no-default-code-list fallback behavior. (Assertions [#8](#test-assertion-628), [#8.a](#test-assertion-628a), [#8.b](#test-assertion-628b), [#8.c](#test-assertion-628c))
-8. The test verifies that an end user cannot create a BIE from an ASCCP whose ACC has a group component type, can reset a BIE node to its initial values after confirmation, and can create BIEs from production end-user ASCCPs regardless of ownership. (Assertions [#9](#test-assertion-629), [#10](#test-assertion-6210), [#12](#test-assertion-6212), [#13](#test-assertion-6213))
+8. The test verifies that an end user cannot create a BIE from a selectable ASCCP whose ACC has a group component type, can reset a BIE node to its initial values after confirmation, can create BIEs from production end-user ASCCPs regardless of ownership, and still cannot create a BIE when such a production end-user ASCCP is backed by a group-type ACC. (Assertions [#9](#test-assertion-629), [#10](#test-assertion-6210), [#12](#test-assertion-6212), [#13](#test-assertion-6213))
 9. The test verifies BIE editability when the end-user ASCCP is in `Production`, and then checks the locking/flagging behavior after amendment, `QA`, `Deprecated`, and non-production base-ACC scenarios. Assertions `6.2.14.e` and `6.2.14.f` are documented but not automated yet. (Assertions [#14](#test-assertion-6214), [#14.a](#test-assertion-6214a), [#14.b](#test-assertion-6214b), [#14.c](#test-assertion-6214c), [#14.d](#test-assertion-6214d), [#14.e](#test-assertion-6214e), [#14.f](#test-assertion-6214f))
 
 ## Test Case 6.3
@@ -206,7 +206,7 @@ The end user can generate an expression of a single BIE, in JSON Schema, in the 
 The end user can generate an expression of a single BIE, in JSON Schema, in the same package, with the BIE Definition annotation selected.
 
 #### Test Assertion #6.3.13
-The end user cannot generate an expression of a single BIE, in JSON Schema, in the same package, with any of the BIE CCTS Meta Data, Include CCTS_Definition Tag, BIE GUID, Business Context, BIE OAGi/Score Meta Data, Include WHO Columns, Based CC Meta Data annotations selected.
+The end user cannot generate an expression of a single BIE, in JSON Schema, in the same package, with any of the BIE CCTS Meta Data, Include CCTS_Definition Tag, BIE GUID, Business Context, BIE OAGi/Score Meta Data, or Include WHO Columns annotations selected. `Based CC Meta Data` remains available for JSON Schema and is unchecked by default.
 
 #### Test Assertion #6.3.14
 The end user can generate an expression of multiple BIEs, in multiple XML Schemas, saved in the same package, with some annotations selected.
@@ -331,7 +331,7 @@ The end user can generate an expression of multiple BIEs, in Open API 3.0 in JSO
 1. An end user logs into the `Express BIE` page.
 2. The test verifies which BIEs are selectable for expression generation based on ownership, state, and release, including end-user-owned BIEs in all states, other users' `QA` and `Production` BIEs, and the exclusion of other users' `WIP` BIEs. (Assertions [#1](#test-assertion-631), [#2](#test-assertion-632), [#3](#test-assertion-633), [#4](#test-assertion-634))
 3. The test generates single-BIE XML expressions with the relevant annotation combinations and verifies the expected file is produced, including the dependency rules for `Include CCTS_Definition Tag` and `Include WHO Columns`. (Assertions [#5](#test-assertion-635), [#6](#test-assertion-636), [#7](#test-assertion-637), [#8](#test-assertion-638), [#9](#test-assertion-639), [#10](#test-assertion-6310))
-4. The test generates single-BIE JSON expressions with the supported annotation combinations and verifies that unsupported JSON-only annotation combinations cannot be selected. (Assertions [#11](#test-assertion-6311), [#12](#test-assertion-6312), [#13](#test-assertion-6313))
+4. The test generates single-BIE JSON expressions with the supported annotation combinations and verifies that unsupported JSON-only annotation combinations cannot be selected while `Based CC Meta Data` remains enabled but unchecked. (Assertions [#11](#test-assertion-6311), [#12](#test-assertion-6312), [#13](#test-assertion-6313))
 5. The test generates multiple-BIE XML and JSON expressions in same-package and separate-package modes and verifies that the expected single-file or multi-file output is produced. (Assertions [#14](#test-assertion-6314), [#15](#test-assertion-6315), [#16](#test-assertion-6316), [#17](#test-assertion-6317))
 6. The test generates JSON expressions with Meta Header and Pagination Response options, including `Make as an array`, and verifies that the generated `metaHeader` and `paginationResponse` properties remain JSON objects rather than arrays. (Assertions [#18](#test-assertion-6318), [#18.a](#test-assertion-6318a), [#18.b](#test-assertion-6318b), [#18.c](#test-assertion-6318c), [#19](#test-assertion-6319), [#25](#test-assertion-6325), [#25.a](#test-assertion-6325a), [#26](#test-assertion-6326))
 7. The test verifies the search filters and index count on the `Express BIE` page and confirms that expressions can be generated for a BIE with multiple business contexts. (Assertions [#20](#test-assertion-6320), [#21](#test-assertion-6321), [#22](#test-assertion-6322))

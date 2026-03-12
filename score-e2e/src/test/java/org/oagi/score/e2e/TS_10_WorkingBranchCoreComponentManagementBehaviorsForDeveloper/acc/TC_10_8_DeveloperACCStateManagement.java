@@ -2,6 +2,7 @@ package org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsFo
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -44,7 +45,8 @@ public class TC_10_8_DeveloperACCStateManagement extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_8_1() {
+    @DisplayName("TC_10_8_TA_1")
+    public void wip_acc_and_child_associations_move_to_draft() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -102,7 +104,8 @@ public class TC_10_8_DeveloperACCStateManagement extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_8_2() {
+    @DisplayName("TC_10_8_TA_2")
+    public void draft_acc_and_child_associations_move_to_candidate() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -161,7 +164,8 @@ public class TC_10_8_DeveloperACCStateManagement extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_8_3() {
+    @DisplayName("TC_10_8_TA_3")
+    public void candidate_acc_and_child_associations_return_to_wip() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -219,7 +223,8 @@ public class TC_10_8_DeveloperACCStateManagement extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_8_4() {
+    @DisplayName("TC_10_8_TA_4")
+    public void draft_acc_and_child_associations_return_to_wip() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 

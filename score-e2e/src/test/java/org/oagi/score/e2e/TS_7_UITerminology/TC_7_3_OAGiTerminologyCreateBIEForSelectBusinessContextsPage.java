@@ -37,7 +37,7 @@ public class TC_7_3_OAGiTerminologyCreateBIEForSelectBusinessContextsPage extend
 
     @Test
     @DisplayName("TC_7_3_TA_1")
-    public void test_create_bie_page_title_first_page() {
+    public void create_bie_business_context_page_uses_oagi_terminology_in_title() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         homePage.getLoginIDMenu().checkConnectSpecTerminology();
         BIEMenu bieMenu = homePage.getBIEMenu();
@@ -48,7 +48,7 @@ public class TC_7_3_OAGiTerminologyCreateBIEForSelectBusinessContextsPage extend
 
     @Test
     @DisplayName("TC_7_3_TA_2")
-    public void test_create_bie_page_title_second_page() {
+    public void create_bie_top_level_concept_page_includes_selected_business_context_in_title() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         homePage.getLoginIDMenu().checkConnectSpecTerminology();
 

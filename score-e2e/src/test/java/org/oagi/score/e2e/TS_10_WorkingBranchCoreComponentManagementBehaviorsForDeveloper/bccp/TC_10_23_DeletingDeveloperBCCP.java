@@ -2,6 +2,7 @@ package org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsFo
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -47,7 +48,8 @@ public class TC_10_23_DeletingDeveloperBCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_23_1() {
+    @DisplayName("TC_10_23_TA_1")
+    public void revision_one_wip_bccp_can_be_deleted() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -75,7 +77,8 @@ public class TC_10_23_DeletingDeveloperBCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_23_2() {
+    @DisplayName("TC_10_23_TA_2")
+    public void deleted_bccp_is_flagged_from_acc_tree() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -107,7 +110,8 @@ public class TC_10_23_DeletingDeveloperBCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_23_3() {
+    @DisplayName("TC_10_23_TA_3")
+    public void another_developer_can_restore_deleted_bccp_from_acc_tree() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -156,7 +160,8 @@ public class TC_10_23_DeletingDeveloperBCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_23_4() {
+    @DisplayName("TC_10_23_TA_4")
+    public void bccp_revision_greater_than_one_cannot_be_deleted() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
