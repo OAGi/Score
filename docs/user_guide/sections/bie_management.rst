@@ -18,3 +18,22 @@ BIE Management
 .. include:: sections/bie_management/07_manage_business_terms.rst
 
 .. include:: sections/bie_management/08_common_functions.rst
+
+.. |image3| image:: media/image12.png
+   :width: 0.24997in
+   :height: 0.19789in
+.. |image4| image:: media/image13.png
+   :width: 0.31669in
+   :height: 0.29169in
+.. |image5| image:: media/image13.png
+   :width: 0.31669in
+   :height: 0.29169in
+.. |image6| image:: media/image13.png
+   :width: 0.31669in
+   :height: 0.29169in
+.. |image7| image:: media/image14.png
+   :width: 0.19168in
+   :height: 0.20835in
+.. |bie_expression_format| image:: media/expression_format_options.png
+   :width: 363px
+   :height: 202px

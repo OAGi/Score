@@ -135,29 +135,3 @@ Features with restricted behavior
 
 * Manage context: Restricted to users with the Admin right in multi-tenant mode.
 * Transfer BIE ownership: Users to whom BIE ownership may be transferred are limited to users associated with tenants associated with business contexts associated with the BIE.
-
-
-.. |image1| image:: media/image6.png
-   :width: 2.74814in
-   :height: 1.95383in
-.. |image2| image:: media/image7.png
-   :width: 2.33321in
-   :height: 1.93231in
-.. |image3| image:: media/image12.png
-   :width: 0.24997in
-   :height: 0.19789in
-.. |image4| image:: media/image13.png
-   :width: 0.31669in
-   :height: 0.29169in
-.. |image5| image:: media/image13.png
-   :width: 0.31669in
-   :height: 0.29169in
-.. |image6| image:: media/image13.png
-   :width: 0.31669in
-   :height: 0.29169in
-.. |image7| image:: media/image14.png
-   :width: 0.19168in
-   :height: 0.20835in
-.. |bie_expression_format| image:: media/expression_format_options.png
-   :width: 363px
-   :height: 202px

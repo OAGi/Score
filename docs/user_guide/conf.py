@@ -47,18 +47,17 @@ extensions = [
 templates_path = ['_templates']
 
 html_static_path = ['_static']
-
-html_context = {
-    'css_files': [
-        '_static/theme_overrides.css',  # override wide tables in RTD theme
-    ],
-}
+html_css_files = [
+    'theme_overrides.css',  # override wide tables in RTD theme
+]
      
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
 # source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+source_suffix = {
+    '.rst': 'restructuredtext',
+}
 
 # The master toctree document.
 master_doc = 'index'
@@ -73,7 +72,14 @@ language = 'en'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = [u'_build', 'Thumbs.db', '.DS_Store', 'sections', 'venv']
+exclude_patterns = [
+    u'_build',
+    'Thumbs.db',
+    '.DS_Store',
+    'sections',
+    'venv',
+    '.venv',
+]
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = None
@@ -85,7 +91,6 @@ pygments_style = None
 # a list of builtin themes.
 #
 html_theme = 'sphinx_rtd_theme'
-html_theme_path = ["_themes", ]
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -95,7 +100,6 @@ html_theme_options = {
     'canonical_url': '',
     'analytics_id': '',
     'logo_only': False,
-    'display_version': True,
     'prev_next_buttons_location': 'bottom',
     'style_external_links': False,
     # Toc options

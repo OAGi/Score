@@ -34,3 +34,10 @@ Core Component Management
 .. include:: sections/core_component_management/15_end_user_acc_management.rst
 
 .. include:: sections/core_component_management/16_end_user_dt_and_common_functions.rst
+
+.. |image1| image:: media/image6.png
+   :width: 2.74814in
+   :height: 1.95383in
+.. |image2| image:: media/image7.png
+   :width: 2.33321in
+   :height: 1.93231in
