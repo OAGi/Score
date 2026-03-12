@@ -24,9 +24,9 @@ copyright = u'2025, NIST'
 author = u'NIST'
 
 # The short X.Y version
-version = u'3.4.1'
+version = u'3.5.0'
 # The full version, including alpha/beta/rc tags
-release = u'3.4.1'
+release = u'3.5.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -73,7 +73,7 @@ language = 'en'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = [u'_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = [u'_build', 'Thumbs.db', '.DS_Store', 'sections', 'venv']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = None
