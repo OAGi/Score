@@ -374,7 +374,9 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
          * Issue #575
          */
         if (isArray) {
-            Map<String, Object> items = new LinkedHashMap(properties);
+            Map<String, Object> items = new LinkedHashMap();
+            items.put("type", "object");
+            items.putAll(properties);
             properties = new LinkedHashMap();
 
             String description = (String) items.remove("description");
