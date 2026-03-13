@@ -97,6 +97,8 @@ UPDATE `xbt` SET `jbt_202012_map` = '{"type":"integer","minimum":0,"maximum":429
 UPDATE `xbt` SET `jbt_202012_map` = '{"type":"integer","minimum":0,"maximum":65535}' WHERE `builtIn_type` = 'xsd:unsignedShort';
 UPDATE `xbt` SET `jbt_202012_map` = '{"type":"integer","minimum":0,"maximum":255}' WHERE `builtIn_type` = 'xsd:unsignedByte';
 
+UPDATE `xbt` SET `jbt_202012_map` = '{"type":"string","format":"duration"}' WHERE `builtIn_type` = 'xsd:duration';
+UPDATE `xbt` SET `jbt_202012_map` = '{"type":"string","format":"date-time"}' WHERE `builtIn_type` = 'xsd:dateTime';
 UPDATE `xbt` SET `jbt_202012_map` = '{"type":"string","format":"date"}' WHERE `builtIn_type` = 'xsd:date';
 UPDATE `xbt` SET `jbt_202012_map` = '{"type":"string","format":"time"}' WHERE `builtIn_type` = 'xsd:time';
 UPDATE `xbt` SET `jbt_202012_map` = '{"type":"string","contentEncoding":"base64"}' WHERE `builtIn_type` = 'xsd:base64Binary';
@@ -133,9 +135,11 @@ UPDATE `xbt` SET `openapi31_map` = '{"type":"integer","maximum":-1}' WHERE `buil
 UPDATE `xbt` SET `openapi31_map` = '{"type":"integer","minimum":-9223372036854775808,"maximum":9223372036854775807}' WHERE `builtIn_type` = 'xsd:long';
 UPDATE `xbt` SET `openapi31_map` = '{"type":"integer","minimum":0,"maximum":18446744073709551615}' WHERE `builtIn_type` = 'xsd:unsignedLong';
 
+UPDATE `xbt` SET `openapi31_map` = '{"type":"string","format":"duration"}' WHERE `builtIn_type` = 'xsd:duration';
+UPDATE `xbt` SET `openapi31_map` = '{"type":"string","format":"date-time"}' WHERE `builtIn_type` = 'xsd:dateTime';
+UPDATE `xbt` SET `openapi31_map` = '{"type":"string","format":"date"}' WHERE `builtIn_type` = 'xsd:date';
+UPDATE `xbt` SET `openapi31_map` = '{"type":"string","format":"time"}' WHERE `builtIn_type` = 'xsd:time';
 UPDATE `xbt` SET `openapi31_map` = '{"type":"string","contentEncoding":"base64"}' WHERE `builtIn_type` = 'xsd:base64Binary';
 UPDATE `xbt` SET `openapi31_map` = '{"type":"string","pattern":"^[0-9A-Fa-f]*$"}' WHERE `builtIn_type` = 'xsd:hexBinary';
-
-UPDATE `xbt` SET `openapi31_map` = '{"type":"string","pattern":"^(?:[01]\\\\d|2[0-3]):(?:[0-5]\\\\d):(?:[0-5]\\\\d)(?:\\\\.\\\\d+)?(?:Z|[+\\\\-](?:0\\\\d|1[0-4]):[0-5]\\\\d)?$"}' WHERE `builtIn_type` = 'xsd:time';
 
 SET FOREIGN_KEY_CHECKS = @OLD_FOREIGN_KEY_CHECKS;
