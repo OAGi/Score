@@ -62,7 +62,15 @@ public class Helper {
         return xbt;
     }
 
-    public static String getCodeListTypeName(CodeListSummaryRecord codeList, AgencyIdListValueSummaryRecord agencyIdListValue) {
+    public static String getCodeListTypeName(CodeListSummaryRecord codeList,
+                                             AgencyIdListValueSummaryRecord agencyIdListValue) {
+        return getCodeListTypeName(codeList, agencyIdListValue,
+                (name) -> name.contains(" ") ? Utility.toLowerCamelCase(name) : name);
+    }
+
+    public static String getCodeListTypeName(CodeListSummaryRecord codeList,
+                                             AgencyIdListValueSummaryRecord agencyIdListValue,
+                                             Function<String, String> nameConverter) {
         StringBuilder sb = new StringBuilder();
 
         sb.append(CODE_LIST_NAME_PREFIX);
@@ -74,14 +82,22 @@ public class Helper {
         sb.append(codeList.versionId()).append('_');
         String name = codeList.name();
         if (StringUtils.hasLength(name)) {
-            sb.append(Utility.toCamelCase(name)).append("ContentType").append('_');
+            sb.append(nameConverter.apply(name)).append("ContentType").append('_');
         }
         sb.append(codeList.listId());
 
         return sb.toString().replaceAll(" ", "_");
     }
 
-    public static String getAgencyListTypeName(AgencyIdListSummaryRecord agencyIdList, AgencyIdListValueSummaryRecord agencyIdListValue) {
+    public static String getAgencyListTypeName(AgencyIdListSummaryRecord agencyIdList,
+                                               AgencyIdListValueSummaryRecord agencyIdListValue) {
+        return getAgencyListTypeName(agencyIdList, agencyIdListValue,
+                (name) -> name.contains(" ") ? Utility.toLowerCamelCase(name) : name);
+    }
+
+    public static String getAgencyListTypeName(AgencyIdListSummaryRecord agencyIdList,
+                                               AgencyIdListValueSummaryRecord agencyIdListValue,
+                                               Function<String, String> nameConverter) {
         StringBuilder sb = new StringBuilder();
 
         sb.append(AGENCY_ID_LIST_NAME_PREFIX);
@@ -92,7 +108,7 @@ public class Helper {
         sb.append(agencyIdList.versionId()).append('_');
         String name = agencyIdList.name();
         if (StringUtils.hasLength(name)) {
-            sb.append(Utility.toCamelCase(name)).append("ContentType").append('_');
+            sb.append(nameConverter.apply(name)).append("ContentType").append('_');
         }
         sb.append(agencyIdList.listId());
 

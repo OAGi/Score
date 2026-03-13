@@ -92,24 +92,32 @@ public class BDTSC implements Component {
         List<DtScAwdPriSummaryRecord> dtScAwdPriList =
                 ccDocument.getDtScAwdPriList(dtSc.dtScManifestId());
 
-        List<DtScAwdPriSummaryRecord> codeListBdtScPriRestri =
+        List<DtScAwdPriSummaryRecord> agencyIdBdtScPriRestri =
                 dtScAwdPriList.stream()
-                        .filter(e -> e.codeListManifestId() != null && e.isDefault())
+                        .filter(e -> e.agencyIdListManifestId() != null)
                         .collect(Collectors.toList());
-        if (codeListBdtScPriRestri.size() > 1) {
+        if (agencyIdBdtScPriRestri.size() > 1) {
             throw new IllegalStateException();
         }
 
-        if (codeListBdtScPriRestri.isEmpty()) {
-            List<DtScAwdPriSummaryRecord> agencyIdBdtScPriRestri =
+        if (!agencyIdBdtScPriRestri.isEmpty()) {
+            agencyIdList = ccDocument.getAgencyIdList(agencyIdBdtScPriRestri.get(0).agencyIdListManifestId());
+            typeName = namingStrategy.agencyIdListTypeName(agencyIdList);
+            namespaceId = agencyIdList.namespaceId();
+        } else {
+            List<DtScAwdPriSummaryRecord> codeListBdtScPriRestri =
                     dtScAwdPriList.stream()
-                            .filter(e -> e.agencyIdListManifestId() != null && e.isDefault())
+                            .filter(e -> e.codeListManifestId() != null)
                             .collect(Collectors.toList());
-            if (agencyIdBdtScPriRestri.size() > 1) {
+            if (codeListBdtScPriRestri.size() > 1) {
                 throw new IllegalStateException();
             }
 
-            if (agencyIdBdtScPriRestri.isEmpty()) {
+            if (!codeListBdtScPriRestri.isEmpty()) {
+                codeList = ccDocument.getCodeList(codeListBdtScPriRestri.get(0).codeListManifestId());
+                typeName = namingStrategy.codeListTypeName(codeList);
+                namespaceId = codeList.namespaceId();
+            } else {
                 List<DtScAwdPriSummaryRecord> defaultBdtScPriRestri =
                         dtScAwdPriList.stream()
                                 .filter(e -> e.isDefault())
@@ -122,15 +130,7 @@ public class BDTSC implements Component {
                 xbt = ccDocument.getXbt(dtScAwdPri.xbtManifestId());
                 typeName = xbt.builtInType();
                 namespaceId = this.ownerDt.namespaceId();
-            } else {
-                agencyIdList = ccDocument.getAgencyIdList(agencyIdBdtScPriRestri.get(0).agencyIdListManifestId());
-                typeName = namingStrategy.agencyIdListTypeName(agencyIdList);
-                namespaceId = agencyIdList.namespaceId();
             }
-        } else {
-            codeList = ccDocument.getCodeList(codeListBdtScPriRestri.get(0).codeListManifestId());
-            typeName = namingStrategy.codeListTypeName(codeList);
-            namespaceId = codeList.namespaceId();
         }
     }
 

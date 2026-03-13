@@ -61,8 +61,13 @@ public class XmlSchemaNamingStrategy implements SchemaNamingStrategy {
 
     @Override
     public String dtName(DtSummaryRecord dt) {
-        return pascalCase(dt.den(), "(\\. |_ |\\s)") +
-                ((dt.sixDigitId() != null) ? "_" + dt.sixDigitId() : "");
+        String dtName = pascalCase(dt.den(), "(\\. |_ |\\s)");
+        if (dtName.endsWith("ContentCodeType")) {
+            dtName = dtName.substring(0, dtName.length() - "CodeType".length()) + "Type";
+        } else if (dtName.endsWith("ContentIDType")) {
+            dtName = dtName.substring(0, dtName.length() - "IDType".length()) + "Type";
+        }
+        return dtName + ((dt.sixDigitId() != null) ? "_" + dt.sixDigitId() : "");
     }
 
     @Override

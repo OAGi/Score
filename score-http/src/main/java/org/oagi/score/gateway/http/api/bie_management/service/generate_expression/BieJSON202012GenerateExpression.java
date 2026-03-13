@@ -568,12 +568,6 @@ public class BieJSON202012GenerateExpression implements BieGenerateExpression, I
 
         AgencyIdListValueSummaryRecord agencyIdListValue = generationContext.findAgencyIdListValue(codeList.agencyIdListValueManifestId());
         String codeListName = Helper.getCodeListTypeName(codeList, agencyIdListValue);
-        /*
-         * Issue #589
-         */
-        codeListName = Stream.of(codeListName.split("_"))
-                .map(e -> convertIdentifierToId(camelCase(e))).collect(Collectors.joining("_"));
-
         if (!definitions.containsKey(codeListName)) {
             List<CodeListValueSummaryRecord> codeListValues = generationContext.getCodeListValues(codeList);
             List<String> enumerations = codeListValues.stream().map(e -> e.value()).collect(Collectors.toList());
@@ -592,11 +586,6 @@ public class BieJSON202012GenerateExpression implements BieGenerateExpression, I
         AgencyIdListValueSummaryRecord agencyIdListValue =
                 generationContext.findAgencyIdListValue(agencyIdList.agencyIdListValueManifestId());
         String agencyListTypeName = Helper.getAgencyListTypeName(agencyIdList, agencyIdListValue);
-        /*
-         * Issue #589
-         */
-        agencyListTypeName = Stream.of(agencyListTypeName.split("_"))
-                .map(e -> convertIdentifierToId(camelCase(e))).collect(Collectors.joining("_"));
         if (!definitions.containsKey(agencyListTypeName)) {
             Map<String, Object> properties = new LinkedHashMap();
             properties.put("type", "string");

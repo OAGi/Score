@@ -398,16 +398,11 @@ public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
             simpleTypeElement.addContent(restrictionElement);
             String name = bdtSimpleType.getName();
 
-            if ((name.endsWith("CodeContentType") && !name.equals("CodeContentType")) ||
-                    (name.endsWith("IDContentType") && !name.equals("IDContentType"))) {
-                String baseName;
-                if (name.endsWith("CodeContentType")) {
-                    baseName = getCodeListName(bdtSimpleType);
-                } else {
-                    baseName = getAgencyIdName(bdtSimpleType);
-                }
-
-                restrictionElement.setAttribute("base", baseName + "ContentType");
+            DtAwdPriSummaryRecord selectedDtAwdPri = getSelectedDtAwdPri(bdtSimpleType);
+            if (selectedDtAwdPri.codeListManifestId() != null) {
+                restrictionElement.setAttribute("base", getCodeListName(bdtSimpleType) + "ContentType");
+            } else if (selectedDtAwdPri.agencyIdListManifestId() != null) {
+                restrictionElement.setAttribute("base", getAgencyIdName(bdtSimpleType) + "ContentType");
             } else {
                 if (bdtSimpleType.isDefaultBDT()) {
                     String xbtName = bdtSimpleType.getXbtName();
@@ -426,7 +421,10 @@ public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
 
             targetElement = restrictionElement;
 
-            setDocumentationForRestrictionOrUnionOrExtension(targetElement, bdtSimpleType, false);
+            if (selectedDtAwdPri.codeListManifestId() == null &&
+                    selectedDtAwdPri.agencyIdListManifestId() == null) {
+                setDocumentationForRestrictionOrUnionOrExtension(targetElement, bdtSimpleType, false);
+            }
         }
     }
 
@@ -456,8 +454,8 @@ public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
             ccts_Definition.setText(contentComponentDefinition);
         }
 
-        DtAwdPriSummaryRecord defaultDtAwdPri = bdtSimple.getDefaultDtAwdPri();
-        if (defaultDtAwdPri != null) {
+        DtAwdPriSummaryRecord selectedDtAwdPri = getSelectedDtAwdPri(bdtSimple);
+        if (selectedDtAwdPri != null) {
             boolean defaultIndicator;
             DtSummaryRecord cdt = getCDT(bdtSimple.getBdtManifestId());
             if (cdt != null) {
@@ -465,7 +463,7 @@ public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
                         this.ccDocument.getDtAwdPriList(cdt.dtManifestId()).stream()
                                 .filter(e -> e.isDefault())
                                 .findAny().orElse(null);
-                defaultIndicator = cdtAwdPri.cdtPriName().equals(defaultDtAwdPri.cdtPriName());
+                defaultIndicator = cdtAwdPri != null && isSamePrimitive(selectedDtAwdPri, cdtAwdPri);
             } else {
                 defaultIndicator = false;
             }
@@ -476,9 +474,42 @@ public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
 
             Element ccts_PrimitiveTypeName = new Element("ccts_PrimitiveTypeName", OAGI_NS);
             ccts_ContentComponentValueDomain.addContent(ccts_PrimitiveTypeName);
-            String primitiveTypeName = bdtSimple.getCdtPriName();
+            String primitiveTypeName = selectedDtAwdPri.cdtPriName();
             ccts_PrimitiveTypeName.setText(primitiveTypeName);
         }
+    }
+
+    private DtAwdPriSummaryRecord getSelectedDtAwdPri(BDTSimple bdtSimple) {
+        DtSummaryRecord dt = ccDocument.getDt(bdtSimple.getBdtManifestId());
+        List<DtAwdPriSummaryRecord> dtAwdPriList = ccDocument.getDtAwdPriList(dt.dtManifestId());
+
+        List<DtAwdPriSummaryRecord> agencyIdDtAwdPriList = dtAwdPriList.stream()
+                .filter(e -> e.agencyIdListManifestId() != null)
+                .collect(Collectors.toList());
+        if (agencyIdDtAwdPriList.size() > 1) {
+            throw new IllegalStateException();
+        }
+        if (!agencyIdDtAwdPriList.isEmpty()) {
+            return agencyIdDtAwdPriList.get(0);
+        }
+
+        List<DtAwdPriSummaryRecord> codeListDtAwdPriList = dtAwdPriList.stream()
+                .filter(e -> e.codeListManifestId() != null)
+                .collect(Collectors.toList());
+        if (codeListDtAwdPriList.size() > 1) {
+            throw new IllegalStateException();
+        }
+        if (!codeListDtAwdPriList.isEmpty()) {
+            return codeListDtAwdPriList.get(0);
+        }
+
+        List<DtAwdPriSummaryRecord> defaultDtAwdPriList = dtAwdPriList.stream()
+                .filter(DtAwdPriSummaryRecord::isDefault)
+                .collect(Collectors.toList());
+        if (defaultDtAwdPriList.size() != 1) {
+            throw new IllegalStateException();
+        }
+        return defaultDtAwdPriList.get(0);
     }
 
     private boolean isSamePrimitive(DtAwdPriSummaryRecord dtAwdPri, DtAwdPriSummaryRecord cdtAwdPri) {
@@ -506,30 +537,24 @@ public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
     }
 
     private String getCodeListName(BDTSimpleType bdtSimpleType) {
-        DtSummaryRecord dt = ccDocument.getDt(bdtSimpleType.getBdtManifestId());
-        List<DtAwdPriSummaryRecord> dtAwdPriList =
-                ccDocument.getDtAwdPriList(dt.dtManifestId()).stream()
-                        .filter(e -> e.codeListManifestId() != null && e.isDefault()).collect(Collectors.toList());
-        if (dtAwdPriList.isEmpty() || dtAwdPriList.size() > 1) {
+        DtAwdPriSummaryRecord selectedDtAwdPri = getSelectedDtAwdPri(bdtSimpleType);
+        if (selectedDtAwdPri.codeListManifestId() == null) {
             throw new IllegalStateException();
         }
         CodeListSummaryRecord codeList = ccDocument.getCodeList(
-                dtAwdPriList.get(0).codeListManifestId());
+                selectedDtAwdPri.codeListManifestId());
         String codeListName = namingStrategy.codeListName(codeList);
         return attachNamespacePrefixIfExists(codeListName, codeList.namespaceId());
     }
 
     public String getAgencyIdName(BDTSimpleType bdtSimpleType) {
-        DtSummaryRecord dt = ccDocument.getDt(bdtSimpleType.getBdtManifestId());
-        List<DtAwdPriSummaryRecord> dtAwdPriList =
-                ccDocument.getDtAwdPriList(dt.dtManifestId()).stream()
-                        .filter(e -> e.agencyIdListManifestId() != null && e.isDefault()).collect(Collectors.toList());
-        if (dtAwdPriList.isEmpty() || dtAwdPriList.size() > 1) {
+        DtAwdPriSummaryRecord selectedDtAwdPri = getSelectedDtAwdPri(bdtSimpleType);
+        if (selectedDtAwdPri.agencyIdListManifestId() == null) {
             throw new IllegalStateException();
         }
 
         AgencyIdListSummaryRecord agencyIdList = ccDocument.getAgencyIdList(
-                dtAwdPriList.get(0).agencyIdListManifestId());
+                selectedDtAwdPri.agencyIdListManifestId());
         String agencyIdListName = namingStrategy.agencyIdListName(agencyIdList);
         return attachNamespacePrefixIfExists(agencyIdListName, agencyIdList.namespaceId());
     }

@@ -379,8 +379,8 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
     }
 
     private Map<String, Object> buildDtContentSchema(DtSummaryRecord dt) {
-        DtAwdPriSummaryRecord defaultDtAwdPri = getDefaultDtAwdPri(dt);
-        if (defaultDtAwdPri == null) {
+        DtAwdPriSummaryRecord selectedDtAwdPri = getSelectedDtAwdPri(dt);
+        if (selectedDtAwdPri == null) {
             if (dt.basedDtManifestId() != null) {
                 DtSummaryRecord basedDt = ccDocument.getDt(dt.basedDtManifestId());
                 return withRefFirst(definitionRef(namingStrategy.dtName(basedDt), referencedModulePathForDt(basedDt.dtManifestId()), basedDt.namespaceId()), new LinkedHashMap<>());
@@ -388,23 +388,23 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
             return stringTypeSchema();
         }
 
-        if (defaultDtAwdPri.codeListManifestId() != null) {
-            CodeListSummaryRecord codeList = ccDocument.getCodeList(defaultDtAwdPri.codeListManifestId());
-            return withRefFirst(definitionRef(
-                    namingStrategy.codeListTypeName(codeList),
-                    referencedModulePathForCodeList(codeList.codeListManifestId()),
-                    codeList.namespaceId()), new LinkedHashMap<>());
-        }
-        if (defaultDtAwdPri.agencyIdListManifestId() != null) {
-            var agencyIdList = ccDocument.getAgencyIdList(defaultDtAwdPri.agencyIdListManifestId());
+        if (selectedDtAwdPri.agencyIdListManifestId() != null) {
+            var agencyIdList = ccDocument.getAgencyIdList(selectedDtAwdPri.agencyIdListManifestId());
             String typeName = namingStrategy.agencyIdListTypeName(agencyIdList);
             return withRefFirst(definitionRef(
                     typeName,
                     referencedModulePathForAgencyIdList(agencyIdList.agencyIdListManifestId()),
                     agencyIdList.namespaceId()), new LinkedHashMap<>());
         }
-        if (defaultDtAwdPri.xbtManifestId() != null) {
-            XbtSummaryRecord xbt = ccDocument.getXbt(defaultDtAwdPri.xbtManifestId());
+        if (selectedDtAwdPri.codeListManifestId() != null) {
+            CodeListSummaryRecord codeList = ccDocument.getCodeList(selectedDtAwdPri.codeListManifestId());
+            return withRefFirst(definitionRef(
+                    namingStrategy.codeListTypeName(codeList),
+                    referencedModulePathForCodeList(codeList.codeListManifestId()),
+                    codeList.namespaceId()), new LinkedHashMap<>());
+        }
+        if (selectedDtAwdPri.xbtManifestId() != null) {
+            XbtSummaryRecord xbt = ccDocument.getXbt(selectedDtAwdPri.xbtManifestId());
             return xbtSchema(xbt);
         }
         if (dt.basedDtManifestId() != null) {
@@ -451,8 +451,30 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
                 new LinkedHashMap<>());
     }
 
-    private DtAwdPriSummaryRecord getDefaultDtAwdPri(DtSummaryRecord dt) {
-        return ccDocument.getDtAwdPriList(dt.dtManifestId()).stream()
+    private DtAwdPriSummaryRecord getSelectedDtAwdPri(DtSummaryRecord dt) {
+        List<DtAwdPriSummaryRecord> dtAwdPriList = ccDocument.getDtAwdPriList(dt.dtManifestId());
+
+        List<DtAwdPriSummaryRecord> agencyIdDtAwdPriList = dtAwdPriList.stream()
+                .filter(e -> e.agencyIdListManifestId() != null)
+                .toList();
+        if (agencyIdDtAwdPriList.size() > 1) {
+            throw new IllegalStateException();
+        }
+        if (!agencyIdDtAwdPriList.isEmpty()) {
+            return agencyIdDtAwdPriList.get(0);
+        }
+
+        List<DtAwdPriSummaryRecord> codeListDtAwdPriList = dtAwdPriList.stream()
+                .filter(e -> e.codeListManifestId() != null)
+                .toList();
+        if (codeListDtAwdPriList.size() > 1) {
+            throw new IllegalStateException();
+        }
+        if (!codeListDtAwdPriList.isEmpty()) {
+            return codeListDtAwdPriList.get(0);
+        }
+
+        return dtAwdPriList.stream()
                 .filter(DtAwdPriSummaryRecord::isDefault)
                 .findFirst()
                 .orElse(null);

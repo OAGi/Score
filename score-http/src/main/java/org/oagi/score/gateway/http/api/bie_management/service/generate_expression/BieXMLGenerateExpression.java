@@ -56,6 +56,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.*;
 import java.util.*;
+import java.util.function.Function;
 
 import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.hasAnyValuesInFacets;
 import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.toName;
@@ -1031,7 +1032,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         simpleContent.addContent(extNode);
 
         AgencyIdListValueSummaryRecord agencyIdListValue = generationContext.findAgencyIdListValue(codeList.agencyIdListValueManifestId());
-        String codeListTypeName = Helper.getCodeListTypeName(codeList, agencyIdListValue);
+        String codeListTypeName = getCodeListTypeName(codeList, agencyIdListValue);
         extNode.setAttribute("base", codeListTypeName);
         eNode.addContent(complexType);
         return eNode;
@@ -1343,7 +1344,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
 
                     AgencyIdListValueSummaryRecord agencyIdListValue =
                             generationContext.findAgencyIdListValue(agencyIdList.agencyIdListValueManifestId());
-                    String agencyListTypeName = Helper.getAgencyListTypeName(agencyIdList, agencyIdListValue);
+                    String agencyListTypeName = getAgencyListTypeName(agencyIdList, agencyIdListValue);
 
                     generateAgencyList(agencyIdList, agencyListTypeName);
                     if (StringUtils.hasLength(agencyListTypeName)) {
@@ -1374,7 +1375,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
 
                 if (bbieScList.isEmpty()) {
                     AgencyIdListValueSummaryRecord agencyIdListValue = generationContext.findAgencyIdListValue(codeList.agencyIdListValueManifestId());
-                    eNode.setAttribute("type", Helper.getCodeListTypeName(codeList, agencyIdListValue));
+                    eNode.setAttribute("type", getCodeListTypeName(codeList, agencyIdListValue));
                 } else {
                     eNode = generateBDT(bbie, eNode, codeList);
                     eNode = generateSCs(bbie, eNode, bbieScList);
@@ -1394,7 +1395,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
 
                     AgencyIdListValueSummaryRecord agencyIdListValue =
                             generationContext.findAgencyIdListValue(agencyIdList.agencyIdListValueManifestId());
-                    String agencyListTypeName = Helper.getAgencyListTypeName(agencyIdList, agencyIdListValue);
+                    String agencyListTypeName = getAgencyListTypeName(agencyIdList, agencyIdListValue);
 
                     generateAgencyList(agencyIdList, agencyListTypeName);
                     if (StringUtils.hasLength(agencyListTypeName)) {
@@ -1427,7 +1428,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
 
                 if (bbieScList.isEmpty()) {
                     AgencyIdListValueSummaryRecord agencyIdListValue = generationContext.findAgencyIdListValue(codeList.agencyIdListValueManifestId());
-                    String codeListTypeName = Helper.getCodeListTypeName(codeList, agencyIdListValue);
+                    String codeListTypeName = getCodeListTypeName(codeList, agencyIdListValue);
                     if (StringUtils.hasLength(codeListTypeName)) {
                         eNode.setAttribute("type", codeListTypeName);
                     }
@@ -1437,7 +1438,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                         eNode = setBBIE_Attr_Type(bdt, eNode);
                     } else {
                         AgencyIdListValueSummaryRecord agencyIdListValue = generationContext.findAgencyIdListValue(codeList.agencyIdListValueManifestId());
-                        String codeListTypeName = Helper.getCodeListTypeName(codeList, agencyIdListValue);
+                        String codeListTypeName = getCodeListTypeName(codeList, agencyIdListValue);
                         if (StringUtils.hasLength(codeListTypeName)) {
                             eNode.setAttribute("type", codeListTypeName);
                         }
@@ -1502,7 +1503,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         Element stNode = newElement("simpleType");
 
         AgencyIdListValueSummaryRecord agencyIdListValue = generationContext.findAgencyIdListValue(codeList.agencyIdListValueManifestId());
-        stNode.setAttribute("name", Helper.getCodeListTypeName(codeList, agencyIdListValue));
+        stNode.setAttribute("name", getCodeListTypeName(codeList, agencyIdListValue));
         if (option.isBieGuid()) {
             stNode.setAttribute("id", ID_ATTRIBUTE_PREFIX + codeList.guid());
         }
@@ -1650,7 +1651,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
 
                     AgencyIdListValueSummaryRecord agencyIdListValue =
                             generationContext.findAgencyIdListValue(agencyIdList.agencyIdListValueManifestId());
-                    String agencyListTypeName = Helper.getAgencyListTypeName(agencyIdList, agencyIdListValue);
+                    String agencyListTypeName = getAgencyListTypeName(agencyIdList, agencyIdListValue);
 
                     generateAgencyList(agencyIdList, agencyListTypeName);
                     if (StringUtils.hasLength(agencyListTypeName)) {
@@ -1665,7 +1666,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                 generateCodeList(codeList, bbieSc);
 
                 AgencyIdListValueSummaryRecord agencyIdListValue = generationContext.findAgencyIdListValue(codeList.agencyIdListValueManifestId());
-                String codeListTypeName = Helper.getCodeListTypeName(codeList, agencyIdListValue);
+                String codeListTypeName = getCodeListTypeName(codeList, agencyIdListValue);
                 if (StringUtils.hasLength(codeListTypeName)) {
                     aNode.setAttribute("type", codeListTypeName);
                 }
@@ -2464,5 +2465,17 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         public Collection<Definition> getCoreComponentDefinitions() {
             return (dt.definition() != null) ? Arrays.asList(dt.definition()) : Collections.emptyList();
         }
+    }
+
+    public String getCodeListTypeName(CodeListSummaryRecord codeList,
+                                             AgencyIdListValueSummaryRecord agencyIdListValue) {
+        return Helper.getCodeListTypeName(codeList, agencyIdListValue,
+                (name) -> name.contains(" ") ? Utility.toCamelCase(name) : name);
+    }
+
+    public String getAgencyListTypeName(AgencyIdListSummaryRecord agencyIdList,
+                                               AgencyIdListValueSummaryRecord agencyIdListValue) {
+        return Helper.getAgencyListTypeName(agencyIdList, agencyIdListValue,
+                (name) -> name.contains(" ") ? Utility.toCamelCase(name) : name);
     }
 }
