@@ -1048,7 +1048,7 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
         // Issue #700
         if (bbie.valueConstraint() != null) {
             if (StringUtils.hasLength(bbie.valueConstraint().fixedValue())) {
-                properties.put("enum", Arrays.asList(bbie.valueConstraint().fixedValue()));
+                properties.put("const", bbie.valueConstraint().fixedValue());
             } else if (StringUtils.hasLength(bbie.valueConstraint().defaultValue())) {
                 properties.put("default", bbie.valueConstraint().defaultValue());
             }
@@ -1084,7 +1084,7 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
             } else {
                 contentProperties.put("$ref", ref);
             }
-            for (String key : Arrays.asList("description", "enum", "default", "examples")) {
+            for (String key : Arrays.asList("description", "const", "default", "examples")) {
                 if (properties.containsKey(key)) {
                     contentProperties.put(key, properties.remove(key));
                 }
@@ -1352,7 +1352,7 @@ public class BieOpenAPI31GenerateExpression implements BieGenerateExpression, In
         // Issue #596
         if (bbieSc.valueConstraint() != null) {
             if (StringUtils.hasLength(bbieSc.valueConstraint().fixedValue())) {
-                properties.put("enum", Arrays.asList(bbieSc.valueConstraint().fixedValue()));
+                properties.put("const", bbieSc.valueConstraint().fixedValue());
             } else if (StringUtils.hasLength(bbieSc.valueConstraint().defaultValue())) {
                 properties.put("default", bbieSc.valueConstraint().defaultValue());
             }

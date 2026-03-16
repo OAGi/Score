@@ -453,7 +453,7 @@ public class BieJSON202012GenerateExpression implements BieGenerateExpression, I
 
         Map<String, Object> attrProps = new LinkedHashMap<>();
         attrProps.put("$ref", ref);
-        attrProps.put("enum", Arrays.asList(hasLength(value) ? value : ""));
+        attrProps.put("const", hasLength(value) ? value : "");
 
         properties.put(name, attrProps);
 
@@ -787,7 +787,7 @@ public class BieJSON202012GenerateExpression implements BieGenerateExpression, I
         // Issue #596
         if (bbie.valueConstraint() != null) {
             if (StringUtils.hasLength(bbie.valueConstraint().fixedValue())) {
-                properties.put("enum", Arrays.asList(bbie.valueConstraint().fixedValue()));
+                properties.put("const", bbie.valueConstraint().fixedValue());
             } else if (StringUtils.hasLength(bbie.valueConstraint().defaultValue())) {
                 properties.put("default", bbie.valueConstraint().defaultValue());
             }
@@ -815,7 +815,7 @@ public class BieJSON202012GenerateExpression implements BieGenerateExpression, I
 
             Map<String, Object> contentProperties = new LinkedHashMap();
             contentProperties.put("$ref", ref);
-            for (String key : Arrays.asList("enum", "default", "examples")) {
+            for (String key : Arrays.asList("const", "default", "examples")) {
                 if (properties.containsKey(key)) {
                     contentProperties.put(key, properties.remove(key));
                 }
@@ -1081,7 +1081,7 @@ public class BieJSON202012GenerateExpression implements BieGenerateExpression, I
         // Issue #596
         if (bbieSc.valueConstraint() != null) {
             if (StringUtils.hasLength(bbieSc.valueConstraint().fixedValue())) {
-                properties.put("enum", Arrays.asList(bbieSc.valueConstraint().fixedValue()));
+                properties.put("const", bbieSc.valueConstraint().fixedValue());
             } else if (StringUtils.hasLength(bbieSc.valueConstraint().defaultValue())) {
                 properties.put("default", bbieSc.valueConstraint().defaultValue());
             }
