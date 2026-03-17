@@ -235,20 +235,20 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
         boolean isNillable = (asbie.nillable() != null) ? asbie.nillable() : false;
 
         boolean reused = !asbie.ownerTopLevelAsbiepId().equals(asbiep.ownerTopLevelAsbiepId());
+        if (minVal > 0) {
+            List<String> parentRequired = (List<String>) parent.get("required");
+            if (parentRequired == null) {
+                throw new IllegalStateException();
+            }
+            parentRequired.add(name);
+        }
+
         if (reused) {
             String ref = getReference(definitions, asbiep, generationContext);
             properties.put("$ref", ref);
         } else {
             AbieSummaryRecord typeAbie = generationContext.queryTargetABIE(asbiep);
             AsccSummaryRecord ascc = generationContext.queryBasedASCC(asbie);
-
-            if (minVal > 0) {
-                List<String> parentRequired = (List<String>) parent.get("required");
-                if (parentRequired == null) {
-                    throw new IllegalStateException();
-                }
-                parentRequired.add(name);
-            }
 
             String resolvedDescription = resolveDescription(option,
                     new String[]{asbie.definition()},
@@ -274,6 +274,9 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
         if (isArray) {
             Map<String, Object> items = new LinkedHashMap();
             items.putAll(properties);
+            if (reused) {
+                items = oneOf(allOf(items), isNillable);
+            }
 
             properties = new LinkedHashMap();
 

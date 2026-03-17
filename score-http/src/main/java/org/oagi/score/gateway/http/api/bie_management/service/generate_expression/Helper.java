@@ -65,7 +65,7 @@ public class Helper {
     public static String getCodeListTypeName(CodeListSummaryRecord codeList,
                                              AgencyIdListValueSummaryRecord agencyIdListValue) {
         return getCodeListTypeName(codeList, agencyIdListValue,
-                (name) -> name.contains(" ") ? Utility.toLowerCamelCase(name) : name);
+                Helper::normalizeReusableDefinitionName);
     }
 
     public static String getCodeListTypeName(CodeListSummaryRecord codeList,
@@ -92,7 +92,7 @@ public class Helper {
     public static String getAgencyListTypeName(AgencyIdListSummaryRecord agencyIdList,
                                                AgencyIdListValueSummaryRecord agencyIdListValue) {
         return getAgencyListTypeName(agencyIdList, agencyIdListValue,
-                (name) -> name.contains(" ") ? Utility.toLowerCamelCase(name) : name);
+                Helper::normalizeReusableDefinitionName);
     }
 
     public static String getAgencyListTypeName(AgencyIdListSummaryRecord agencyIdList,
@@ -121,6 +121,35 @@ public class Helper {
         }
         return str.replaceAll("Identifier", "Id")
                 .replaceAll("identifier", "id");
+    }
+
+    private static String normalizeReusableDefinitionName(String name) {
+        StringBuilder sb = new StringBuilder(name.length());
+        StringBuilder segment = new StringBuilder();
+        for (int i = 0; i < name.length(); i++) {
+            char ch = name.charAt(i);
+            if (Character.isLetterOrDigit(ch) || Character.isWhitespace(ch)) {
+                segment.append(ch);
+            } else {
+                if (segment.length() > 0) {
+                    String normalized = Utility.toLowerCamelCase(
+                            Utility.spaceSeparator(segment.toString().trim()));
+                    if (StringUtils.hasLength(normalized)) {
+                        sb.append(normalized);
+                    }
+                }
+                segment.setLength(0);
+                sb.append(ch);
+            }
+        }
+        if (segment.length() > 0) {
+            String normalized = Utility.toLowerCamelCase(
+                    Utility.spaceSeparator(segment.toString().trim()));
+            if (StringUtils.hasLength(normalized)) {
+                sb.append(normalized);
+            }
+        }
+        return sb.toString();
     }
 
     public static String camelCase(String... terms) {

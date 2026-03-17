@@ -908,20 +908,20 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
         boolean isNillable = (asbie.nillable() != null) ? asbie.nillable() : false;
 
         boolean reused = !asbie.ownerTopLevelAsbiepId().equals(asbiep.ownerTopLevelAsbiepId());
+        if (minVal > 0) {
+            List<String> parentRequired = (List<String>) parent.get("required");
+            if (parentRequired == null) {
+                throw new IllegalStateException();
+            }
+            parentRequired.add(name);
+        }
+
         if (reused) {
             SchemaReference ref = getReference(asbiep);
             properties.put("$ref", ref.getPath());
         } else {
             AbieSummaryRecord typeAbie = generationContext.queryTargetABIE(asbiep);
             AsccSummaryRecord ascc = generationContext.queryBasedASCC(asbie);
-
-            if (minVal > 0) {
-                List<String> parentRequired = (List<String>) parent.get("required");
-                if (parentRequired == null) {
-                    throw new IllegalStateException();
-                }
-                parentRequired.add(name);
-            }
 
             if (option.isBieDefinition()) {
                 String definition = asbie.definition();
