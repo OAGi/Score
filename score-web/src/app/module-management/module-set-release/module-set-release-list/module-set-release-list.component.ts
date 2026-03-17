@@ -30,6 +30,7 @@ import {LibrarySummary} from '../../../library-management/domain/library';
 import {LibraryService} from '../../../library-management/domain/library.service';
 
 @Component({
+  standalone: false,
   selector: 'score-module-set-release-list',
   templateUrl: './module-set-release-list.component.html',
   styleUrls: ['./module-set-release-list.component.css']

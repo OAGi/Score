@@ -8,6 +8,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {HttpErrorResponse} from '@angular/common/http';
 
 @Component({
+  standalone: false,
   selector: 'score-module-set-release-validation-dialog',
   templateUrl: './module-set-release-validation-dialog.component.html',
   styleUrls: ['./module-set-release-validation-dialog.component.css']

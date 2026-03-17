@@ -67,6 +67,7 @@ import {BieStateTransitionFlowService} from '../domain/bie-state-transition-flow
 
 
 @Component({
+  standalone: false,
   selector: 'score-bie-edit',
   templateUrl: './bie-edit.component.html',
   styleUrls: ['./bie-edit.component.css']

@@ -20,6 +20,7 @@ import {
 import {ReleaseSummary} from '../../../release-management/domain/release';
 
 @Component({
+  standalone: false,
   selector: 'score-module-set-detail',
   templateUrl: './module-set-release-detail.component.html',
   styleUrls: ['./module-set-release-detail.component.css']

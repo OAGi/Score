@@ -31,6 +31,7 @@ import {LibrarySummary} from '../../../library-management/domain/library';
 import {LibraryService} from '../../../library-management/domain/library.service';
 
 @Component({
+  standalone: false,
   selector: 'score-bie-package-bie-dialog',
   templateUrl: './bie-package-bie-dialog.component.html',
   styleUrls: ['./bie-package-bie-dialog.component.css']

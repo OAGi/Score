@@ -14,7 +14,7 @@
   <mat-card class="pt-3">
     <score-search-bar placeholder="Search by Release" [(model)]="request.filters.releaseNum"
                       (modelChange)="onChange('filters.releaseNum', request.filters.releaseNum);"
-                      (search)="onSearch();">
+                      (searchTriggered)="onSearch();">
       <div advancedSearchContent style="padding-left: 3rem;">
         <mat-card-content class="mat-card-container">
           <div class="container-fluid" style="padding: 0;">

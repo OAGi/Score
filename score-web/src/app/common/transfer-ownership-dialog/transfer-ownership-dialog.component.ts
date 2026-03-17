@@ -14,6 +14,7 @@ import {forkJoin} from 'rxjs';
 import {ScoreTableColumnResizeDirective} from '../score-table-column-resize/score-table-column-resize.directive';
 
 @Component({
+  standalone: false,
   selector: 'score-transfer-ownership-dialog',
   templateUrl: './transfer-ownership-dialog.component.html',
   styleUrls: ['./transfer-ownership-dialog.component.css']

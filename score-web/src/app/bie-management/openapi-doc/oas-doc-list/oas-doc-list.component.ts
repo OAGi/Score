@@ -27,6 +27,7 @@ import {ScoreTableColumnResizeDirective} from '../../../common/score-table-colum
 import {SearchBarComponent} from '../../../common/search-bar/search-bar.component';
 
 @Component({
+  standalone: false,
   selector: 'score-oas-doc-list',
   templateUrl: './oas-doc-list.component.html',
   styleUrls: ['./oas-doc-list.component.css']

@@ -9,7 +9,7 @@
   <mat-card class="pt-3">
     <score-search-bar placeholder="Search by Preferred Username" [(model)]="request.filters.preferredUsername"
                       (modelChange)="onChange('filters.preferredUsername', request.filters.preferredUsername);"
-                      (search)="onSearch();">
+                      (searchTriggered)="onSearch();">
       <div advancedSearchContent style="padding-left: 3rem;">
         <mat-card-content class="mat-card-container">
           <div class="container-fluid" style="padding: 0;">

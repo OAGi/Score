@@ -6,6 +6,7 @@ import {PlantUmlService} from '../../common/plantuml-diagram/plantuml.service';
 import {ReleaseService} from '../domain/release.service';
 
 @Component({
+  standalone: false,
   selector: 'score-release-diagram-dialog',
   templateUrl: './release-diagram-dialog.component.html',
   styleUrls: ['./release-diagram-dialog.component.css']

@@ -34,6 +34,7 @@ export interface UserStatesItem {
 }
 
 @Component({
+  standalone: false,
   selector: 'score-homepage',
   templateUrl: './homepage.component.html',
   styleUrls: ['./homepage.component.css']

@@ -15,7 +15,7 @@
   <mat-card class="pt-3">
     <score-search-bar placeholder="Search by Name" [(model)]="request.filters.name"
                       (modelChange)="onChange('filters.name', request.filters.name);"
-                      (search)="onSearch();">
+                      (searchTriggered)="onSearch();">
       <div advancedSearchContent style="padding-left: 3rem;">
         <mat-card-content class="mat-card-container">
           <div class="container-fluid" style="padding: 0;">

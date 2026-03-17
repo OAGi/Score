@@ -12,6 +12,7 @@ import {SettingsPreferencesService} from '../../settings-management/settings-pre
 import {forkJoin} from 'rxjs';
 
 @Component({
+  standalone: false,
   selector: 'score-bie-list-dialog',
   templateUrl: './bie-list-dialog.component.html',
   styleUrls: ['./bie-list-dialog.component.css']

@@ -45,6 +45,7 @@ import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryService} from '../../library-management/domain/library.service';
 
 @Component({
+  standalone: false,
   selector: 'score-cc-list',
   templateUrl: './cc-list.component.html',
   styleUrls: ['./cc-list.component.css'],

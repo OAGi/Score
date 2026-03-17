@@ -19,6 +19,7 @@ import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-r
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
 
 @Component({
+  standalone: false,
   selector: 'score-transfer-ownership-list',
   templateUrl: './transfer-ownership-list.component.html',
   styleUrls: ['./transfer-ownership-list.component.css']

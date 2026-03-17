@@ -29,6 +29,7 @@ import {LibraryService} from '../../library-management/domain/library.service';
 import {AsbieBbieListEntry} from '../domain/business-term';
 
 @Component({
+  standalone: false,
   selector: 'score-bie-create-bie',
   templateUrl: './assign-business-term-bie.component.html',
   styleUrls: ['./assign-business-term-bie.component.css'],

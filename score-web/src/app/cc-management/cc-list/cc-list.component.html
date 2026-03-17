@@ -112,7 +112,7 @@
                       [model]="isBrowseStandardMode ? request.filters.name : request.filters.den"
                       [advancedSearch]="!isBrowseStandardMode"
                       (modelChange)="onSearchFilterChange($event)"
-                      (search)="onSearch();">
+                      (searchTriggered)="onSearch();">
       <div branchSelector class="branch-selector d-flex" style="width: 11rem; padding: 0 0.5rem 0 1rem;">
         <mat-form-field appearance="outline">
           <mat-label>Branch</mat-label>

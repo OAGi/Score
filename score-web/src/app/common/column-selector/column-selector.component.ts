@@ -2,6 +2,7 @@ import {Component, EventEmitter, Input, Output, ViewEncapsulation} from '@angula
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 
 @Component({
+  standalone: false,
   selector: 'score-column-selector',
   templateUrl: './column-selector.component.html',
   styleUrls: ['./column-selector.component.css'],

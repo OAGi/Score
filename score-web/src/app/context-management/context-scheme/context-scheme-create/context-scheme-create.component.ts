@@ -28,6 +28,7 @@ import {ContextCategorySummary} from '../../context-category/domain/context-cate
 import {CodeListService} from '../../../code-list-management/domain/code-list.service';
 
 @Component({
+  standalone: false,
   selector: 'score-context-scheme-create',
   templateUrl: './context-scheme-create.component.html',
   styleUrls: ['./context-scheme-create.component.css']

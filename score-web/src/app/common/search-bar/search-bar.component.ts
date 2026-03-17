@@ -1,6 +1,7 @@
 import {Component, EventEmitter, Input, Output, ViewEncapsulation} from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'score-search-bar',
   templateUrl: './search-bar.component.html',
   styleUrls: ['./search-bar.component.css'],
@@ -26,10 +27,10 @@ export class SearchBarComponent {
   }
 
   @Output() modelChange = new EventEmitter<string>();
-  @Output() search = new EventEmitter<string>();
+  @Output() searchTriggered = new EventEmitter<void>();
 
   onSearch(): void {
-    this.search.emit();
+    this.searchTriggered.emit();
   }
 
   onModelChange(value: string): void {

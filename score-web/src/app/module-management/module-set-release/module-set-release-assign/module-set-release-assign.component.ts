@@ -19,6 +19,7 @@ import {UserToken} from '../../../authentication/domain/auth';
 import {WebPageInfoService} from '../../../basis/basis.service';
 
 @Component({
+  standalone: false,
   selector: 'score-module-set-assign',
   templateUrl: './module-set-release-assign.component.html',
   styleUrls: ['./module-set-release-assign.component.css']

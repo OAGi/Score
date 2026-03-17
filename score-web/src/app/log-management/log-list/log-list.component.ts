@@ -18,6 +18,7 @@ import {forkJoin} from 'rxjs';
 import {AuthService} from '../../authentication/auth.service';
 
 @Component({
+  standalone: false,
   selector: 'score-log-list',
   templateUrl: './log-list.component.html',
   styleUrls: ['./log-list.component.css'],

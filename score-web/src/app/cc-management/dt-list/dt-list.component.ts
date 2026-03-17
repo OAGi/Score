@@ -42,6 +42,7 @@ import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryService} from '../../library-management/domain/library.service';
 
 @Component({
+  standalone: false,
   selector: 'score-dt-list',
   templateUrl: './dt-list.component.html',
   styleUrls: ['./dt-list.component.css'],

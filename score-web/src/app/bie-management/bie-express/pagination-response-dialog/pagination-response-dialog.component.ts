@@ -24,6 +24,7 @@ import {ScoreTableColumnResizeDirective} from '../../../common/score-table-colum
 import {LibrarySummary} from '../../../library-management/domain/library';
 
 @Component({
+  standalone: false,
   selector: 'score-pagination-response-dialog',
   templateUrl: './pagination-response-dialog.component.html',
   styleUrls: ['./pagination-response-dialog.component.css']

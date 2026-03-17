@@ -11,6 +11,7 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 import {AssignedBusinessTermDetails} from '../domain/business-term';
 
 @Component({
+  standalone: false,
   selector: 'score-business-term-detail',
   templateUrl: './assigned-business-term-detail.component.html',
   styleUrls: ['./assigned-business-term-detail.component.css']

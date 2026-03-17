@@ -88,6 +88,7 @@ class FindUsagesCcFlatNodeDatabase<T extends CcFlatNode> extends CcFlatNodeDatab
 }
 
 @Component({
+  standalone: false,
   selector: 'score-find-usages-dialog',
   templateUrl: './find-usages-dialog.component.html',
   styleUrls: ['./find-usages-dialog.component.css']

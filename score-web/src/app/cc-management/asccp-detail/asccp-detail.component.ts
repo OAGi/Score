@@ -46,6 +46,7 @@ import {SettingsPreferencesService} from '../../settings-management/settings-pre
 import {ModelBrowserNode} from '../model-browser/domain/model-browser-node';
 
 @Component({
+  standalone: false,
   selector: 'score-asccp-detail',
   templateUrl: './asccp-detail.component.html',
   styleUrls: ['./asccp-detail.component.css']

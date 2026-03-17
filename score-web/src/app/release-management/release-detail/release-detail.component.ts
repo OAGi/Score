@@ -16,6 +16,7 @@ import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {ReleaseWhatsChangedDialogComponent} from './release-whats-changed-dialog/release-whats-changed-dialog.component';
 
 @Component({
+  standalone: false,
   selector: 'score-release-list',
   templateUrl: './release-detail.component.html',
   styleUrls: ['./release-detail.component.css']

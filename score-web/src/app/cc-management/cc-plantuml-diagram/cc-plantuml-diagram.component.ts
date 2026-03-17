@@ -10,6 +10,7 @@ import {SettingsPreferencesService} from '../../settings-management/settings-pre
 import {forkJoin} from 'rxjs';
 
 @Component({
+  standalone: false,
   selector: 'score-cc-plantuml-diagram',
   templateUrl: './cc-plantuml-diagram.component.html',
   styleUrls: ['./cc-plantuml-diagram.component.css']

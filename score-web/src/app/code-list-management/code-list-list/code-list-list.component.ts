@@ -35,6 +35,7 @@ import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryService} from '../../library-management/domain/library.service';
 
 @Component({
+  standalone: false,
   selector: 'score-code-list-list',
   templateUrl: './code-list-list.component.html',
   styleUrls: ['./code-list-list.component.css'],

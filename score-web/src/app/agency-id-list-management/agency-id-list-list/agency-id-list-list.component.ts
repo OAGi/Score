@@ -34,6 +34,7 @@ import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryService} from '../../library-management/domain/library.service';
 
 @Component({
+  standalone: false,
   selector: 'score-agency-id-list-list',
   templateUrl: './agency-id-list-list.component.html',
   styleUrls: ['./agency-id-list-list.component.css'],

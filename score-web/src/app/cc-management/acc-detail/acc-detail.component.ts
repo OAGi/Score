@@ -72,6 +72,7 @@ import {PreferencesInfo} from '../../settings-management/settings-preferences/do
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 
 @Component({
+  standalone: false,
   selector: 'score-acc-detail',
   templateUrl: './acc-detail.component.html',
   styleUrls: ['./acc-detail.component.css']

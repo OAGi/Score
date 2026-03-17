@@ -16,6 +16,7 @@ import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-r
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
 
 @Component({
+  standalone: false,
   selector: 'score-account-list',
   templateUrl: './account-list.component.html',
   styleUrls: ['./account-list.component.css']

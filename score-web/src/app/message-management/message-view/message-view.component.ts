@@ -8,6 +8,7 @@ import {finalize} from 'rxjs/operators';
 import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
+  standalone: false,
   selector: 'score-message-view',
   templateUrl: './message-view.component.html',
   styleUrls: ['./message-view.component.css']

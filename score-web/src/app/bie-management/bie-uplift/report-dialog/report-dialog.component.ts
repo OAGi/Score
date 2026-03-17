@@ -14,6 +14,7 @@ import {AuthService} from '../../../authentication/auth.service';
 import {forkJoin} from 'rxjs';
 
 @Component({
+  standalone: false,
   selector: 'score-report-dialog',
   templateUrl: './report-dialog.component.html',
   styleUrls: ['./report-dialog.component.css']

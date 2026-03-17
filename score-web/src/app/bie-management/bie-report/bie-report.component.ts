@@ -12,6 +12,7 @@ import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../set
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 
 @Component({
+  standalone: false,
   selector: 'score-bie-report',
   templateUrl: './bie-report.component.html',
   styleUrls: ['./bie-report.component.css']

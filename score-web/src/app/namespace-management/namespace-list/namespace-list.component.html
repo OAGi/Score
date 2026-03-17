@@ -14,7 +14,7 @@
   <mat-card class="pt-3">
     <score-search-bar placeholder="Search by URI" [(model)]="request.filters.uri"
                       (modelChange)="onChange('filters.uri', request.filters.uri);"
-                      (search)="onSearch();">
+                      (searchTriggered)="onSearch();">
       <div advancedSearchContent style="padding-left: 3rem;">
         <mat-card-content class="mat-card-container">
           <div class="container-fluid" style="padding: 0;">

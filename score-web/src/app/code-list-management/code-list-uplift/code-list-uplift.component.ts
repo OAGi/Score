@@ -31,6 +31,7 @@ import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryService} from '../../library-management/domain/library.service';
 
 @Component({
+  standalone: false,
   selector: 'score-code-list-uplift',
   templateUrl: './code-list-uplift.component.html',
   styleUrls: ['./code-list-uplift.component.css'],

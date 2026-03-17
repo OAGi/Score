@@ -1,6 +1,7 @@
 import {Directive, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, Renderer2, SimpleChanges} from '@angular/core';
 
 @Directive({
+  standalone: false,
   selector: '[score-table-column-resize]'
 })
 export class ScoreTableColumnResizeDirective implements OnInit, OnChanges {

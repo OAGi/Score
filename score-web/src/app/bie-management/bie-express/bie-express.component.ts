@@ -31,6 +31,7 @@ import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryService} from '../../library-management/domain/library.service';
 
 @Component({
+  standalone: false,
   selector: 'score-bie-express',
   templateUrl: './bie-express.component.html',
   styleUrls: ['./bie-express.component.css']

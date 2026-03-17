@@ -24,6 +24,7 @@ import {ScoreTableColumnResizeDirective} from '../../../common/score-table-colum
 import {LibrarySummary} from '../../../library-management/domain/library';
 
 @Component({
+  standalone: false,
   selector: 'score-meta-header-dialog',
   templateUrl: './meta-header-dialog.component.html',
   styleUrls: ['./meta-header-dialog.component.css']

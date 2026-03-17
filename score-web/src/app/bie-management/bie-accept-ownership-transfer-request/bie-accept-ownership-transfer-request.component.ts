@@ -4,6 +4,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
+  standalone: false,
   selector: 'score-bie-accept-ownership-transfer-request',
   templateUrl: 'bie-accept-ownership-transfer-request.component.html',
   styleUrls: ['bie-accept-ownership-transfer-request.component.css']

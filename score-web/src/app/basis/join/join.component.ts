@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'score-join',
   templateUrl: './join.component.html',
   styleUrls: ['./join.component.css']

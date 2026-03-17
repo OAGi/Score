@@ -31,6 +31,7 @@ import {AgencyIdListService} from '../../agency-id-list-management/domain/agency
 import {AgencyIdListSummary, AgencyIdListValueSummary} from '../../agency-id-list-management/domain/agency-id-list';
 
 @Component({
+  standalone: false,
   selector: 'score-code-list-detail',
   templateUrl: './code-list-detail.component.html',
   styleUrls: ['./code-list-detail.component.css']

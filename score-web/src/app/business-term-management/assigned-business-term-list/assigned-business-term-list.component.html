@@ -30,7 +30,7 @@
     </mat-card>
     <score-search-bar placeholder="Search by DEN" [(model)]="request.filters.bieDen"
                       (modelChange)="onChange('filters.bieDen', request.filters.bieDen);"
-                      (search)="onSearch();">
+                      (searchTriggered)="onSearch();">
       <div advancedSearchContent style="padding-left: 3rem;">
         <mat-card-content class="mat-card-container">
           <div class="container-fluid" style="padding: 0;">

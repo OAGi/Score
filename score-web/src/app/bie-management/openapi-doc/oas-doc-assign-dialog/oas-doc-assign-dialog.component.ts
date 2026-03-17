@@ -28,6 +28,7 @@ import {LibrarySummary} from '../../../library-management/domain/library';
 import {LibraryService} from '../../../library-management/domain/library.service';
 
 @Component({
+  standalone: false,
   selector: 'score-oas-doc-assign-dialog',
   templateUrl: './oas-doc-assign-dialog.component.html',
   styleUrls: ['./oas-doc-assign-dialog.component.css']

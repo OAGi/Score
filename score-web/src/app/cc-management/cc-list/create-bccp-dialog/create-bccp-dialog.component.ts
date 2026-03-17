@@ -30,6 +30,7 @@ import {ScoreTableColumnResizeDirective} from '../../../common/score-table-colum
 import {SearchBarComponent} from '../../../common/search-bar/search-bar.component';
 
 @Component({
+  standalone: false,
   selector: 'score-create-bccp-dialog',
   templateUrl: './create-bccp-dialog.component.html',
   styleUrls: ['./create-bccp-dialog.component.css'],

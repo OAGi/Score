@@ -12,6 +12,7 @@ import {FormControl} from '@angular/forms';
 import {finalize} from 'rxjs/operators';
 
 @Component({
+  standalone: false,
   selector: 'score-business-context-value-dialog',
   templateUrl: './business-context-value-dialog.component.html',
   styleUrls: ['./business-context-value-dialog.component.css']

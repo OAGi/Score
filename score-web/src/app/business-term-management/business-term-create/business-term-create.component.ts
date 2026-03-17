@@ -8,6 +8,7 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 import {BusinessTermDetails} from '../domain/business-term';
 
 @Component({
+  standalone: false,
   selector: 'score-business-term-create',
   templateUrl: './business-term-create.component.html',
   styleUrls: ['./business-term-create.component.css']

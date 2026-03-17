@@ -41,6 +41,7 @@ import {BieDiagramDialogComponent} from '../bie-diagram-dialog/bie-diagram-dialo
 import {BieStateTransitionFlowService} from '../domain/bie-state-transition-flow.service';
 
 @Component({
+  standalone: false,
   selector: 'score-bie-list',
   templateUrl: './bie-list.component.html',
   styleUrls: ['./bie-list.component.css']

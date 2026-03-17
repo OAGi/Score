@@ -13,6 +13,7 @@ import {MailService} from '../../common/score-mail.service';
 import {HttpErrorResponse} from '@angular/common/http';
 
 @Component({
+  standalone: false,
   selector: 'score-settings-application-settings',
   templateUrl: './settings-application-settings.component.html',
   styleUrls: ['./settings-application-settings.component.css']

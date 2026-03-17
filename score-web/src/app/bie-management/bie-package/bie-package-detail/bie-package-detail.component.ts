@@ -27,6 +27,7 @@ import {forkJoin, of} from 'rxjs';
 import {BieExpressOption} from '../../bie-express/domain/generate-expression';
 
 @Component({
+  standalone: false,
   selector: 'score-bie-package-detail',
   templateUrl: './bie-package-detail.component.html',
   styleUrls: ['./bie-package-detail.component.css']

@@ -11,6 +11,7 @@ import {ReplaySubject} from 'rxjs';
 import {initFilter} from '../../../../common/utility';
 
 @Component({
+  standalone: false,
   selector: 'score-module-add-dialog',
   templateUrl: './module-add-dialog.component.html',
   styleUrls: ['./module-add-dialog.component.css']

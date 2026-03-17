@@ -32,6 +32,7 @@ import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryService} from '../../library-management/domain/library.service';
 
 @Component({
+  standalone: false,
   selector: 'score-bie-create-asccp',
   templateUrl: './bie-copy-profile-bie.component.html',
   styleUrls: ['./bie-copy-profile-bie.component.css']

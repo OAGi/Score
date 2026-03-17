@@ -36,6 +36,7 @@ import {ScoreTableColumnResizeDirective} from '../../../common/score-table-colum
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 
 @Component({
+  standalone: false,
   selector: 'score-oas-doc-detail',
   templateUrl: './oas-doc-detail.component.html',
   styleUrls: ['./oas-doc-detail.component.css']

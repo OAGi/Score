@@ -7,6 +7,7 @@ import {CcChange} from '../../../cc-management/cc-list/domain/cc-list';
 import {compare} from '../../../common/utility';
 
 @Component({
+  standalone: false,
   selector: 'score-release-whats-changed-dialog',
   templateUrl: './release-whats-changed-dialog.component.html',
   styleUrls: ['./release-whats-changed-dialog.component.css']

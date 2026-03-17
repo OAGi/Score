@@ -28,6 +28,7 @@ import {ScoreTableColumnResizeDirective} from '../../../common/score-table-colum
 import {LibrarySummary} from '../../../library-management/domain/library';
 
 @Component({
+  standalone: false,
   selector: 'score-reuse-bie-dialog',
   templateUrl: './reuse-bie-dialog.component.html',
   styleUrls: ['./reuse-bie-dialog.component.css']

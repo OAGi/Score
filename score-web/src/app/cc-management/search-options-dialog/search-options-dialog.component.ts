@@ -4,6 +4,7 @@ import {SearchOptions} from './domain/search-options';
 import {SearchOptionsService} from './domain/search-options-service';
 
 @Component({
+  standalone: false,
   selector: 'score-search-options-dialog',
   templateUrl: './search-options-dialog.component.html',
   styleUrls: ['./search-options-dialog.component.css']

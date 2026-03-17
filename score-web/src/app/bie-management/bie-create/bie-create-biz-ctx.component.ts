@@ -21,6 +21,7 @@ import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-r
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
 
 @Component({
+  standalone: false,
   selector: 'score-bie-create',
   templateUrl: './bie-create-biz-ctx.component.html',
   styleUrls: ['./bie-create-biz-ctx.component.css']

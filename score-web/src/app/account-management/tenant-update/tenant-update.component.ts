@@ -10,6 +10,7 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 
 
 @Component({
+  standalone: false,
   selector: 'score-tenant-update-component',
   templateUrl: './tenant-update.component.html'
 })

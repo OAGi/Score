@@ -30,6 +30,7 @@ import {LibrarySummary} from '../../../library-management/domain/library';
 import {LibraryService} from '../../../library-management/domain/library.service';
 
 @Component({
+  standalone: false,
   selector: 'score-module-set-list',
   templateUrl: './module-set-list.component.html',
   styleUrls: ['./module-set-list.component.css']

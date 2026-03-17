@@ -9,6 +9,7 @@ import {finalize} from 'rxjs/operators';
 import {saveAs} from 'file-saver';
 
 @Component({
+  standalone: false,
   selector: 'score-business-term-create',
   templateUrl: './business-term-upload-file.component.html',
   styleUrls: ['./business-term-upload-file.component.css']

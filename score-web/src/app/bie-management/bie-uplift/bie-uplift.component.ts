@@ -56,6 +56,7 @@ export class BieUpliftTargetFlatNodeDatabase<T extends BieFlatNode> extends BieF
 }
 
 @Component({
+  standalone: false,
   selector: 'score-bie-uplift',
   templateUrl: './bie-uplift.component.html',
   styleUrls: ['./bie-uplift.component.css']

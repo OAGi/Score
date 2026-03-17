@@ -17,6 +17,7 @@ import {AboutService} from '../about/domain/about.service';
 import {WebPageInfoService} from '../basis.service';
 
 @Component({
+  standalone: false,
   selector: 'score-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']

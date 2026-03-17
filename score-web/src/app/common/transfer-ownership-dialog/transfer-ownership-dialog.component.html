@@ -11,7 +11,7 @@
     <mat-card style="box-shadow: none;">
       <score-search-bar placeholder="Search by Login ID" [(model)]="request.filters.loginId"
                         (modelChange)="onChange('filters.loginId', request.filters.loginId);"
-                        (search)="onSearch();">
+                        (searchTriggered)="onSearch();">
         <div advancedSearchContent style="padding-left: 3rem;">
           <mat-card-content class="mat-card-container">
             <div class="container-fluid" style="padding: 0;">

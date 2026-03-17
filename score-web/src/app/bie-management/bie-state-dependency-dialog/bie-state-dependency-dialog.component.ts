@@ -16,6 +16,7 @@ export interface BieStateDependencyDialogData {
 }
 
 @Component({
+  standalone: false,
   selector: 'score-bie-state-dependency-dialog',
   templateUrl: './bie-state-dependency-dialog.component.html',
   styleUrls: ['./bie-state-dependency-dialog.component.css']

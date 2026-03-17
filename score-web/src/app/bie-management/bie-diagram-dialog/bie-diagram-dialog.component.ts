@@ -6,6 +6,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {PlantUmlService} from '../../common/plantuml-diagram/plantuml.service';
 
 @Component({
+  standalone: false,
   selector: 'score-bie-diagram-dialog',
   templateUrl: './bie-diagram-dialog.component.html',
   styleUrls: ['./bie-diagram-dialog.component.css']

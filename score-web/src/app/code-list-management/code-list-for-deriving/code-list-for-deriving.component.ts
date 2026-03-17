@@ -26,6 +26,7 @@ import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryService} from '../../library-management/domain/library.service';
 
 @Component({
+  standalone: false,
   selector: 'score-code-list-for-deriving',
   templateUrl: './code-list-for-deriving.component.html',
   styleUrls: ['./code-list-for-deriving.component.css']

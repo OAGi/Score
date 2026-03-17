@@ -4,6 +4,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {SettingsApplicationSettingsService} from '../settings-application-settings/domain/settings-application-settings.service';
 
 @Component({
+  standalone: false,
   selector: 'score-email-validation',
   templateUrl: 'email-validation.component.html',
   styleUrls: ['email-validation.component.css']

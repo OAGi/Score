@@ -11,6 +11,7 @@ import {AuthService} from '../../../authentication/auth.service';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 
 @Component({
+  standalone: false,
   selector: 'score-oas-doc-create',
   templateUrl: './oas-doc-create.component.html',
   styleUrls: ['./oas-doc-create.component.css']

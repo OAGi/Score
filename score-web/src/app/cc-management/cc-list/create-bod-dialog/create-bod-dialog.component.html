@@ -12,7 +12,7 @@
         <mat-card style="box-shadow: none;">
           <score-search-bar placeholder="Search by DEN" [(model)]="verbRequest.filters.den"
                             (modelChange)="onChange('verb', 'filters.den', verbRequest.filters.den)"
-                            (search)="onSearch('verb');">
+                            (searchTriggered)="onSearch('verb');">
             <div advancedSearchContent style="padding-left: 3rem;">
               <mat-card-content class="mat-card-container">
                 <div class="container-fluid" style="padding: 0;">
@@ -235,7 +235,7 @@
         <mat-card style="box-shadow: none;">
           <score-search-bar placeholder="Search by DEN" [(model)]="nounRequest.filters.den"
                             (modelChange)="onChange('noun', 'filters.den', nounRequest.filters.den)"
-                            (search)="onSearch('noun');">
+                            (searchTriggered)="onSearch('noun');">
             <div advancedSearchContent style="padding-left: 3rem;">
               <mat-card-content class="mat-card-container">
                 <div class="container-fluid" style="padding: 0;">

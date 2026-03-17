@@ -30,6 +30,7 @@ import {AuthService} from '../../../authentication/auth.service';
 import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
 
 @Component({
+  standalone: false,
   selector: 'score-create-asccp-dialog',
   templateUrl: './create-asccp-dialog.component.html',
   styleUrls: ['./create-asccp-dialog.component.css'],

@@ -28,6 +28,7 @@ import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryService} from '../../library-management/domain/library.service';
 
 @Component({
+  standalone: false,
   selector: 'score-bie-uplift-profile-bie',
   templateUrl: './bie-uplift-profile-bie.component.html',
   styleUrls: ['./bie-uplift-profile-bie.component.css']

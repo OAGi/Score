@@ -5,6 +5,7 @@ import {TenantListService} from '../domain/tenant-list.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
+  standalone: false,
   selector: 'score-tenant-create-component',
   templateUrl: './tenant-create.component.html'
 })

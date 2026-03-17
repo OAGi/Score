@@ -31,6 +31,7 @@ import {LibrarySummary} from '../../../library-management/domain/library';
 import {LibraryService} from '../../../library-management/domain/library.service';
 
 @Component({
+  standalone: false,
   selector: 'score-context-scheme-value-dialog',
   templateUrl: './codelist-list-dialog.component.html',
   styleUrls: ['./codelist-list-dialog.component.css']

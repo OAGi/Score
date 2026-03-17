@@ -6,6 +6,7 @@ import {ContextCategoryDetails} from '../domain/context-category';
 import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
+  standalone: false,
   selector: 'score-context-category-create',
   templateUrl: './context-category-create.component.html',
   styleUrls: ['./context-category-create.component.css']

@@ -18,6 +18,7 @@ import {forkJoin} from 'rxjs';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 
 @Component({
+  standalone: false,
   selector: 'score-account-list-dialog',
   templateUrl: './account-list-dialog.component.html',
   styleUrls: ['./account-list-dialog.component.css']

@@ -76,8 +76,6 @@ class ShouldReuseRouteFalseRouteReuseStrategy extends BaseRouteReuseStrategy {
           gfm: true,
           breaks: false,
           pedantic: false,
-          smartLists: true,
-          smartypants: false,
         }
       }
     }),
