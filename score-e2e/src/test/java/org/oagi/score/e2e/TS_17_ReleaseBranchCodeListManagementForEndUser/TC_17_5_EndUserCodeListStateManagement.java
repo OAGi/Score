@@ -36,7 +36,7 @@ public class TC_17_5_EndUserCodeListStateManagement extends BaseTest {
 
     @Test
     @DisplayName("TC_17_5_TA_1")
-    public void test_TA_1() {
+    public void no_unsaved_changes_to_the_code_list_the_end_user_cannot_change_the_state() {
         AppUserObject endUser;
         ReleaseObject branch;
         CodeListObject codeList;
@@ -67,7 +67,7 @@ public class TC_17_5_EndUserCodeListStateManagement extends BaseTest {
 
     @Test
     @DisplayName("TC_17_5_TA_2")
-    public void test_TA_2() {
+    public void changes_to_code_list_details_or_code_list_value_have_been_saved() {
         AppUserObject endUser;
         ReleaseObject branch;
         CodeListObject codeList;

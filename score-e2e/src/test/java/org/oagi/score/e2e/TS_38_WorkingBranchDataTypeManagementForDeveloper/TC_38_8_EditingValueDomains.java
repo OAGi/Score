@@ -39,7 +39,7 @@ public class TC_38_8_EditingValueDomains extends BaseTest {
 
     @Test
     @DisplayName("TC_38_8_TA_1")
-    public void test_TA_1() {
+    public void user_can_add_a_value_domain_that_whose_value_domain_type_is_a_code_list_or_agency_id_list_only_if_al() {
         AppUserObject developerA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -129,7 +129,7 @@ public class TC_38_8_EditingValueDomains extends BaseTest {
 
     @Test
     @DisplayName("TC_38_8_TA_2")
-    public void test_TA_2() {
+    public void user_can_discard_a_value_domain_that_is_not_inherited_from_based_data_type_and_that_is_currently_not() {
         AppUserObject developerA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -228,7 +228,7 @@ public class TC_38_8_EditingValueDomains extends BaseTest {
 
     @Test
     @DisplayName("TC_38_8_TA_3")
-    public void test_TA_3() {
+    public void user_cannot_add_a_duplicate_value_domain() {
         AppUserObject developerA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -297,7 +297,7 @@ public class TC_38_8_EditingValueDomains extends BaseTest {
 
     @Test
     @DisplayName("TC_38_8_TA_4")
-    public void test_TA_4() {
+    public void user_can_change_default_value_domain() {
         AppUserObject developerA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();

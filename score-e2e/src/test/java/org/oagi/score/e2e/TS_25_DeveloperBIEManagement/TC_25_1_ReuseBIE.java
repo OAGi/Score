@@ -2,6 +2,7 @@ package org.oagi.score.e2e.TS_25_DeveloperBIEManagement;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -53,7 +54,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
-    public void test_TA_25_1_1() {
+    public void developer_can_reuse_a_bie_the_reused_bie_can_be_in_any_state_and_owned_by() {
         ASCCPObject devx_asccp, devx_asccp_for_devy;
         ACCObject acc, devx_acc, devx_acc_association;
         AppUserObject usera, devx, devy;
@@ -102,7 +103,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
-    public void test_TA_25_1_2_a_and_b() {
+    public void only_the_asbie_details_remain_on_the_detail_pane_of_the_node() {
         ASCCPObject developer_asccp, developer_asccp_for_usera;
         ACCObject acc, developer_acc, developer_acc_association;
         AppUserObject anotherDeveloper, developer;
@@ -154,7 +155,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
-    public void test_TA_25_1_3() {
+    public void reuse_target_node_can_only_be_asbie_asbiep_abie_node_but_not_any_bbie_bbiep_nor() {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         BCCPObject bccp_indicator_type, bccp_code_type;
         ACCObject developer_acc, developer_acc_lv2;
@@ -230,7 +231,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
-    public void test_TA_25_1_4() {
+    public void developer_can_click_on_the_bie_reuse_node_to_view_the_details_of_the_reused_bie() {
         ASCCPObject developer_asccp, developer_asccp_for_usera;
         ACCObject developer_acc, developer_acc_association;
         AppUserObject anotherDeveloper, developer;
@@ -305,7 +306,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
-    public void test_TA_25_1_5() {
+    public void on_the_detail_pane_of_a_reused_bie_node_business_term_context_definition_remark_version_owner() {
         ASCCPObject developer_asccp, developer_asccp_for_usera;
         ACCObject developer_acc, developer_acc_association;
         AppUserObject anotherDeveloper, developer;
@@ -361,7 +362,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
-    public void test_TA_25_1_6() {
+    public void developer_can_view_the_details_of_the_nodes_of_a_bie_reuse_node_but_it_cannot() {
         ASCCPObject developer_asccp, developer_asccp_for_usera;
         ACCObject developer_acc, developer_acc_association;
         AppUserObject anotherDeveloper, developer;
@@ -441,7 +442,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
-    public void test_TA_25_1_7() {
+    public void developer_can_copy_a_reusing_bie_that_has_a_bie_reuse_node_in_this_case_the() {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         BCCPObject bccp_indicator_type, bccp_code_type;
         ACCObject developer_acc, developer_acc_lv2;
@@ -520,7 +521,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
-    public void test_TA_25_1_8() {
+    public void developer_can_view_all_the_reuses_of_all_bie_in_the_reuse_bie_report_page_when() {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         BCCPObject bccp_indicator_type;
         ACCObject developer_acc, developer_acc_lv2;
@@ -619,7 +620,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
-    public void test_TA_25_1_9() {
+    public void developer_cannot_discard_a_reused_bie_that_he_owned_if_it_is_used_in_another_top() {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         BCCPObject bccp_indicator_type;
         ACCObject developer_acc, developer_acc_lv2;
@@ -708,7 +709,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
-    public void test_TA_25_1_10() {
+    public void developer_can_move_a_reusing_bie_from_wip_state_to_qa_state_even_if_the_reused() {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         BCCPObject bccp_indicator_type;
         ACCObject developer_acc, developer_acc_lv2;
@@ -780,7 +781,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
-    public void test_TA_25_1_11() {
+    public void developer_can_move_a_reusing_bie_from_qa_state_to_production_state_even_if_the_reused() {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         ACCObject developer_acc, developer_acc_lv2;
         AppUserObject anotherDeveloper, developer;
@@ -859,7 +860,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
-    public void test_TA_25_1_12() {
+    public void developer_can_move_a_reusing_bie_from_wip_state_to_qa_state_if_the_reused_bie() {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         ACCObject developer_acc, developer_acc_lv2;
         AppUserObject anotherDeveloper, developer;
@@ -929,7 +930,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
-    public void test_TA_25_1_13() {
+    public void developer_can_move_a_reusing_bie_from_qa_state_to_production_state_if_the_reused_bie() {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         ACCObject developer_acc, developer_acc_lv2;
         AppUserObject anotherDeveloper, developer;
@@ -1003,7 +1004,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
-    public void test_TA_25_1_14() {
+    public void developer_can_move_a_reused_bie_from_qa_state_to_wip_state_even_if_the_reusing() {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         ACCObject developer_acc, developer_acc_lv2;
         AppUserObject anotherDeveloper, developer;
@@ -1081,7 +1082,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
-    public void test_TA_25_1_15() {
+    public void developer_can_move_a_reused_bie_from_qa_state_to_wip_state_if_the_reusing_bie() {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         ACCObject developer_acc, developer_acc_lv2;
         AppUserObject anotherDeveloper, developer;
@@ -1153,7 +1154,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
-    public void test_TA_25_1_16() {
+    public void developer_can_see_the_details_of_a_reused_bie_node_that_he_does_not_own_and() {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         ACCObject developer_acc, developer_acc_lv2;
         AppUserObject anotherDeveloper, developer;
@@ -1242,8 +1243,9 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         assertEquals("association of the Reused BIE", getText(asbiePanel.getContextDefinitionField()));
     }
 
+    @Disabled("Blob-based Express BIE download is not reliably observable in the current browser automation path.")
     @Test
-    public void test_TA_25_1_17() {
+    public void developer_can_express_a_reusing_bie_that_reuses_a_bie_in_wip_state_and_owned_by() {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         ACCObject developer_acc, developer_acc_lv2;
         AppUserObject anotherDeveloper, developer;
@@ -1327,7 +1329,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
-    public void test_TA_25_1_18() {
+    public void developer_can_remove_reused_bie_references_at_any_level_even_if_theres_another_same_reused_bie() {
         ASCCPObject asccp, asccp_for_devx, asccp_lv2;
         BCCPObject bccp;
         ACCObject acc, acc_association, acc_lv2;
@@ -1402,13 +1404,13 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
-    public void test_TA_25_1_19() {
+    public void enable_the_global_schema_for_reused_bie_references_no_matter_it_has_nested_reused_bie_or() {
 
 
     }
 
     @Test
-    public void test_TA_25_1_20() {
+    public void retain_all_enabled_properties_under_the_reused_bie_hierarchy_when_the_user_clicks_the_retain() {
         ASCCPObject asccp, asccp_for_devx;
         ACCObject acc, acc_association;
         AppUserObject devx, devy;

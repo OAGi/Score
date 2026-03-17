@@ -34,7 +34,7 @@ public class TC_33_1_DeveloperCodeListUplifting extends BaseTest {
 
     @Test
     @DisplayName("TC_33_1_TA_1")
-    public void test_TA_1() {
+    public void developer_cannot_use_this_functionality() {
         AppUserObject developer;
 
         {

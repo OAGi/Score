@@ -33,7 +33,7 @@ A random non-existent username cannot log in and receives the message `Invalid u
 
 ### Test Step:
 
-1. A user opens the Score login page.
+1. A user opens the connectCenter login page.
 2. The user logs in with the built-in OAGIS developer account credentials.
 3. Verify that the built-in OAGIS developer account can log in successfully. (Assertion [#1](#test-assertion-111))
 4. Verify that the signed-in account is identified as a developer account. (Assertion [#2](#test-assertion-112))
@@ -116,7 +116,7 @@ The `CCTS Terminology` option is enabled and mutually exclusive with `connectSpe
 
 ### Test Step:
 
-1. Open the Score login page.
+1. Open the connectCenter login page.
 2. Log in with a developer account.
 3. Verify that `BIE > View/Edit BIE`, `Create BIE`, `Copy BIE`, `Uplift BIE`, `Express BIE`, `BIE Package`, `Reuse Report`, and `View/Edit Code List` are accessible and that `BIE > Uplift Code List` is present but disabled. (Assertion [#1](#test-assertion-121))
 4. Verify that `Context > View/Edit Context Category`, `View/Edit Context Scheme`, and `View/Edit Business Context` are accessible. (Assertion [#2](#test-assertion-122))
@@ -162,7 +162,7 @@ Pre-condition:
 ### Test Step:
 
 1. Enable tenant mode through the application settings API.
-2. Open the Score login page.
+2. Open the connectCenter login page.
 3. Log in with a developer account without tenant roles.
 4. Verify that for a developer account without tenant roles, `BIE > Create BIE`, `BIE > View/Edit Code List`, and `BIE > Uplift Code List` are present but disabled. (Assertion [#1](#test-assertion-131))
 5. Verify that for a developer account without tenant roles, the `Context`, `Module`, and `Library` menus are hidden. (Assertion [#2](#test-assertion-132))

@@ -90,7 +90,7 @@ public class AssignBusinessTermBIEPageImpl extends BaseSearchBarPageImpl impleme
 
     @Override
     public void setState(String state) {
-        click(getUpdaterSelectField());
+        click(getStateSelectField());
         sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), state);
         WebElement searchedSelectField = visibilityOfElementLocated(getDriver(), By.xpath("//mat-option//span[contains(text(), \"" + state + "\")]"));
         click(searchedSelectField);
@@ -104,7 +104,7 @@ public class AssignBusinessTermBIEPageImpl extends BaseSearchBarPageImpl impleme
 
     @Override
     public void setOwner(String owner) {
-        click(getUpdaterSelectField());
+        click(getOwnerSelectField());
         sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), owner);
         WebElement searchedSelectField = visibilityOfElementLocated(getDriver(), By.xpath("//mat-option//span[contains(text(), \"" + owner + "\")]"));
         click(searchedSelectField);
@@ -143,7 +143,7 @@ public class AssignBusinessTermBIEPageImpl extends BaseSearchBarPageImpl impleme
 
     @Override
     public void setType(String bieType) {
-        click(getUpdaterSelectField());
+        click(getTypeField());
         sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), bieType);
         WebElement searchedSelectField = visibilityOfElementLocated(getDriver(), By.xpath("//mat-option//span[contains(text(), \"" + bieType + "\")]"));
         click(searchedSelectField);

@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.impl.menu;
 
+import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.impl.page.DelegateBasePageImpl;
 import org.oagi.score.e2e.impl.page.agency_id_list.ViewEditAgencyIDListPageImpl;
@@ -55,7 +56,8 @@ public class CoreComponentMenuImpl extends DelegateBasePageImpl implements CoreC
 
     @Override
     public WebElement getCoreComponentMenu() {
-        return elementToBeClickable(getDriver(), CORE_COMPONENT_MENU_LOCATOR);
+        return elementToBeClickable(PageHelper.wait(getDriver(), Duration.ofSeconds(10L), Duration.ofMillis(200L)),
+                CORE_COMPONENT_MENU_LOCATOR);
     }
 
     @Override

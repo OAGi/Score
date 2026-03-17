@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
+import org.oagi.score.e2e.condition.DisabledIfBusinessTermProperty;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
@@ -29,6 +30,7 @@ import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
+@DisabledIfBusinessTermProperty(value = false)
 public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
 
     private final List<AppUserObject> randomAccounts = new ArrayList<>();
@@ -44,7 +46,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
 
     @Test
     @DisplayName("TC_42_1_1")
-    public void enduser_should_open_page_titled_business_term_under_bie_menu() {
+    public void end_user_opens_business_term_page_from_bie_menu() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -56,7 +58,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
 
     @Test
     @DisplayName("TC_42_1_2")
-    public void enduser_can_create_business_term_with_only_required_fields() {
+    public void end_user_can_create_business_term_with_only_required_fields() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -76,7 +78,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
 
     @Test
     @DisplayName("TC_42_1_3")
-    public void enduser_cannot_create_business_term_if_any_required_field_missing() {
+    public void end_user_cannot_create_business_term_if_any_required_field_is_missing() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -96,7 +98,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
 
     @Test
     @DisplayName("TC_42_1_4")
-    public void enduser_can_search_for_business_term_based_only_on_its_term() {
+    public void end_user_can_search_business_term_by_term_only() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
@@ -111,7 +113,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
 
     @Test
     @DisplayName("TC_42_1_5")
-    public void enduser_can_search_for_business_term_based_on_external_reference_uri() {
+    public void end_user_can_search_business_term_by_external_reference_uri() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
@@ -135,7 +137,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
 
     @Test
     @DisplayName("TC_42_1_6")
-    public void enduser_can_click_business_term_to_update_its_details_in_edit_business_term_page() {
+    public void end_user_can_update_business_term_from_edit_page() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
@@ -174,7 +176,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
 
     @Test
     @DisplayName("TC_42_1_7")
-    public void enduser_cannot_change_definition_field_in_edit_business_term_page() {
+    public void end_user_cannot_change_definition_field_in_edit_business_term_page() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
@@ -190,7 +192,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
 
     @Test
     @DisplayName("TC_42_1_8")
-    public void enduser_cannot_save_business_term_if_an_already_existing_term_and_uri_in_edit_business_term_page() {
+    public void end_user_cannot_create_duplicate_business_term_with_same_term_and_uri() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
@@ -208,7 +210,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
 
     @Test
     @DisplayName("TC_42_1_9")
-    public void enduser_cannot_discard_business_term_in_edit_business_term_page_if_it_is_used_in_assignments() {
+    public void end_user_cannot_discard_business_term_when_it_is_used_in_assignments() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -259,7 +261,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
 
     @Test
     @DisplayName("TC_42_1_10")
-    public void enduser_can_discard_business_term_in_edit_business_term_page_if_not_used_in_any_assignments() {
+    public void end_user_can_discard_business_term_after_removing_its_assignments() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);

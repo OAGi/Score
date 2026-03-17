@@ -79,11 +79,14 @@ Enable the global schema for reused BIE references no matter it has nested reuse
 Retain all enabled properties under the reused BIE hierarchy when the user clicks the 'Retain Reused BIE' context menu.
 
 ### Test Step Pre-condition:
-
-
+1. The latest release branch, developer-owned CCs, reusable top-level BIEs, and business-context data needed for developer BIE reuse are available in connectCenter.
+2. Assertions [#25.1.17](#test-assertion-25117) and [#25.1.19](#test-assertion-25119) are not currently automated in `TS_25`. The express-BIE assertion is present but disabled in the test class, and the global-schema assertion has a placeholder test method with no executable steps.
 
 ### Test Step:
-
+1. A developer signs in to connectCenter, opens developer-owned top-level BIEs for editing, and navigates to reusable descendant ASBIE nodes.
+2. Invoke `Reuse BIE` on valid descendant nodes, verify selection candidates and reused-node UI behavior, and confirm remove/copy/report flows where covered by the suite. (Assertions [#25.1.1](#test-assertion-2511), [#25.1.2](#test-assertion-2512), [#25.1.3](#test-assertion-2513), [#25.1.4](#test-assertion-2514), [#25.1.5](#test-assertion-2515), [#25.1.6](#test-assertion-2516), [#25.1.7](#test-assertion-2517), [#25.1.8](#test-assertion-2518), [#25.1.16](#test-assertion-25116), [#25.1.18](#test-assertion-25118), [#25.1.20](#test-assertion-25120))
+3. Verify discard and state-transition behavior between reusing and reused developer BIEs across WIP, QA, and Production scenarios. (Assertions [#25.1.9](#test-assertion-2519), [#25.1.10](#test-assertion-25110), [#25.1.11](#test-assertion-25111), [#25.1.12](#test-assertion-25112), [#25.1.13](#test-assertion-25113), [#25.1.14](#test-assertion-25114), [#25.1.15](#test-assertion-25115))
+4. Verify reused-node retain behavior on the reusing BIE so that reused references are removed while retained association details remain editable in the resulting node. (Assertion [#25.1.20](#test-assertion-25120))
 ## Test Case 25.2
 
 **Create a Top-level BIE from a BIE node**
@@ -106,7 +109,11 @@ The newly created top-level BIE shall be in WIP state (after finish copying) and
 The new top-level BIE is owned by the developer invoking the creation.
 
 ### Test Step Pre-condition:
-
+1. Developer-owned top-level BIEs with descendant non-reuse ASBIE or ABIE nodes exist in the target release branch.
+2. The originating BIE and descendant node can be opened by the developer in the BIE editor.
 
 
 ### Test Step:
+1. A developer signs in, opens a top-level BIE in the BIE editor, and selects a descendant non-reuse ASBIE or ABIE node.
+2. Invoke `Create top-level BIE` from that descendant node.
+3. Open the newly created top-level BIE and verify that it exists in the same release branch, is created in `WIP`, and is owned by the invoking developer. (Assertion [#25.2.1](#test-assertion-2521))

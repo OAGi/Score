@@ -45,8 +45,8 @@ The SSO approval scenario for an end user is not automated yet.
 
 ### Test Step:
 
-1. A user opens the Score homepage.
-2. The user logs into the Score using the euser1 account.
+1. A user opens the connectCenter homepage.
+2. The user logs into connectCenter using the euser1 account.
 3. Verify that an end user cannot manage another user's profile because the `Admin` menu is not available. (Assertion [#1](#test-assertion-411))
 4. Verify that an end user cannot create a new user account because the `Admin` menu is not available. (Assertion [#2](#test-assertion-412))
 5. The user clicks the drop-down menu labelled with his account’s username.

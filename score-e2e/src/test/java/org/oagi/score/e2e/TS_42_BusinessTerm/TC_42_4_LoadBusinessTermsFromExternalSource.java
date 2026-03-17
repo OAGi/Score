@@ -11,12 +11,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
+import org.oagi.score.e2e.condition.DisabledIfBusinessTermProperty;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.BusinessTermObject;
 import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.business_term.EditBusinessTermPage;
 import org.oagi.score.e2e.page.business_term.UploadBusinessTermsPage;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
+import org.openqa.selenium.By;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -33,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
+@DisabledIfBusinessTermProperty(value = false)
 public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
     private final List<AppUserObject> randomAccounts = new ArrayList<>();
@@ -48,7 +52,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
     @Test
     @DisplayName("TC_42_4_1")
-    public void end_user_can_download_a_template_for_external_csv_file_to_be_uploaded_in_business_term_page() {
+    public void end_user_can_download_business_term_upload_template() {
         File targetFolder = new File(System.getProperty("user.home"), "Downloads");
         File csvFile = new File(targetFolder, "businessTermTemplateWithExample.csv");
         if (csvFile.exists()) {
@@ -71,7 +75,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
     @Test
     @DisplayName("TC_42_4_2")
-    public void end_user_can_upload_and_attach_the_csv_file_with_correct_format_in_business_term_page() throws IOException {
+    public void end_user_can_upload_business_terms_using_valid_csv_format() throws IOException {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -126,7 +130,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
     @Test
     @DisplayName("TC_42_4_3")
-    public void no_business_term_will_be_created_if_invalid_format_in_uploaded_csv_file() throws IOException {
+    public void invalid_business_term_csv_does_not_create_any_records() throws IOException {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -195,7 +199,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
     @Test
     @DisplayName("TC_42_4_4")
-    public void new_business_term_will_be_created_if_the_business_term_is_uploaded_with_new_external_reference_uri() throws IOException {
+    public void upload_creates_new_business_terms_when_external_reference_uri_is_new() throws IOException {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -252,7 +256,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
     @Test
     @DisplayName("TC_42_4_5")
-    public void previous_business_term_will_be_updated_with_new_information_if_the_business_term_is_uploaded_with_an_existent_external_reference_uri() throws IOException {
+    public void upload_updates_existing_business_term_when_external_reference_uri_already_exists() throws IOException {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -297,16 +301,29 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
             waitFor(ofMillis(1000L));
             assertTrue(getSnackBarMessage(getDriver()).contains("Uploaded"));
 
-            int totalNumberOfItems = 0;
-            // Either the first BT or the last BT should be existed.
-            for (BusinessTermObject businessTerm : businessTerms) {
-                viewEditBusinessTermPage.openPage();
-                viewEditBusinessTermPage.setTerm(businessTerm.getBusinessTerm());
-                viewEditBusinessTermPage.hitSearchButton();
-                totalNumberOfItems += viewEditBusinessTermPage.getTotalNumberOfItems();
-            }
+            BusinessTermObject originalBusinessTerm = businessTerms.get(0);
+            BusinessTermObject updatedBusinessTerm = businessTerms.get(businessTerms.size() - 1);
 
-            assertEquals(businessTerms.size() - 1, totalNumberOfItems);
+            viewEditBusinessTermPage.openPage();
+            viewEditBusinessTermPage.showAdvancedSearchPanel();
+            viewEditBusinessTermPage.setExternalReferenceURI(originalBusinessTerm.getExternalReferenceUri());
+            viewEditBusinessTermPage.hitSearchButton();
+            assertEquals(1, viewEditBusinessTermPage.getTotalNumberOfItems());
+            assertEquals(updatedBusinessTerm.getBusinessTerm(),
+                    viewEditBusinessTermPage.getColumnByName(viewEditBusinessTermPage.getTableRecordAtIndex(1), "businessTerm")
+                            .findElement(By.cssSelector("a > span")).getText());
+
+            EditBusinessTermPage editBusinessTermPage =
+                    viewEditBusinessTermPage.openEditBusinessTermPageByTerm(updatedBusinessTerm.getBusinessTerm());
+            assertEquals(updatedBusinessTerm.getExternalReferenceUri(), editBusinessTermPage.getExternalReferenceURIFieldText());
+            assertEquals(updatedBusinessTerm.getExternalReferenceId(), editBusinessTermPage.getExternalReferenceIDFieldText());
+            assertEquals(updatedBusinessTerm.getDefinition(), editBusinessTermPage.getDefinitionFieldText());
+            assertEquals(updatedBusinessTerm.getComment(), editBusinessTermPage.getCommentFieldText());
+
+            viewEditBusinessTermPage.openPage();
+            viewEditBusinessTermPage.setTerm(originalBusinessTerm.getBusinessTerm());
+            viewEditBusinessTermPage.hitSearchButton();
+            assertEquals(0, viewEditBusinessTermPage.getTotalNumberOfItems());
         } finally {
             csvFileForUpload.delete();
         }

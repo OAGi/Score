@@ -35,7 +35,7 @@ public class TC_38_9_CreatingNewRevisionOfDeveloperDT extends BaseTest {
 
     @Test
     @DisplayName("TC_38_9_TA_1")
-    public void test_TA_1() {
+    public void core_component_detail_page_of_the_working_branch_the_developer_can_create_a_new_revision_of_data_typ() {
         AppUserObject developerA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -97,7 +97,7 @@ public class TC_38_9_CreatingNewRevisionOfDeveloperDT extends BaseTest {
     }
     @Test
     @DisplayName("TC_38_9_TA_2")
-    public void test_TA_2() {
+    public void new_revision_cannot_be_made_on_data_type_in_non_published_state() {
         AppUserObject developerA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();

@@ -42,7 +42,7 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_11_5_TA_1")
-    public void test_TA_1() {
+    public void code_list_revision_locks_existing_deprecation_while_allowing_metadata_updates() {
         AppUserObject developerA;
         LibraryObject library;
         ReleaseObject workingBranch;
@@ -79,8 +79,8 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
             assertTrue(Integer.valueOf(getText(editCodeListPage.getRevisionField())) > 1);
             assertEquals("WIP", getText(editCodeListPage.getStateField()));
             boolean previousDeprecatedStatus = codeList.isDeprecated();
-            if (previousDeprecatedStatus == true) {
-                assertEnabled(editCodeListPage.getDeprecatedSelectField());
+            if (previousDeprecatedStatus) {
+                assertDisabled(editCodeListPage.getDeprecatedSelectField());
             } else {
                 assertEnabled(editCodeListPage.getDeprecatedSelectField());
             }
@@ -103,7 +103,7 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_11_5_TA_2")
-    public void test_TA_2() {
+    public void existing_revision_values_lock_prior_deprecation_and_allow_only_supported_edits() {
         AppUserObject developerA;
         LibraryObject library;
         ReleaseObject workingBranch;
@@ -148,8 +148,8 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
                 editCodeListValueDialog.setDefinition("new definition for value");
                 editCodeListValueDialog.setDefinitionSource("new definition source for value");
                 boolean previousDeprecatedStatusForValue = value.isDeprecated();
-                if (previousDeprecatedStatusForValue == true) {
-                    assertEnabled(editCodeListValueDialog.getDeprecatedSelectField());
+                if (previousDeprecatedStatusForValue) {
+                    assertDisabled(editCodeListValueDialog.getDeprecatedSelectField());
                 } else {
                     assertEnabled(editCodeListValueDialog.getDeprecatedSelectField());
                 }
@@ -160,7 +160,7 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_11_5_TA_3")
-    public void test_TA_3() {
+    public void developer_can_add_and_edit_new_code_list_value_in_revision() {
         AppUserObject developerA;
         LibraryObject library;
         ReleaseObject workingBranch;
@@ -204,7 +204,7 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_11_5_TA_4")
-    public void test_TA_4() {
+    public void duplicate_code_value_is_rejected_when_adding_new_revision_value() {
         AppUserObject developerA;
         LibraryObject library;
         ReleaseObject workingBranch;
@@ -246,7 +246,7 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_11_5_TA_5")
-    public void test_TA_5() {
+    public void developer_can_remove_brand_new_code_list_value_added_in_revision() {
         AppUserObject developerA;
         LibraryObject library;
         ReleaseObject workingBranch;
@@ -287,7 +287,7 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_11_5_TA_6")
-    public void test_TA_6() {
+    public void canceling_revision_restores_previous_revision_state() {
         AppUserObject developerA;
         LibraryObject library;
         ReleaseObject workingBranch;

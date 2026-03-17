@@ -42,7 +42,7 @@ public class TC_17_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_17_1_TA_1")
-    public void test_TA_1() {
+    public void end_user_can_see_in_the_view_or_edit_code_list_page_all_code_lists_owned_by_any_end_user_in_any_stat() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject endUserA;
         ReleaseObject branch;
@@ -133,7 +133,7 @@ public class TC_17_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_17_1_TA_2")
-    public void test_TA_2() {
+    public void end_user_can_view_and_edit_the_details_and_code_values_of_end_user_code_list_that_is_in_wip_state_an() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<CodeListObject, CodeListValueObject> codeListValuesMap = new HashMap<>();
         AppUserObject endUserA;
@@ -182,7 +182,7 @@ public class TC_17_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_17_1_TA_3")
-    public void test_TA_3() {
+    public void end_user_can_view_but_cannot_edit_the_details_of_a_code_list_that_is_in_wip_state_and_owned_by_anoth() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<CodeListObject, CodeListValueObject> codeListValuesMap = new HashMap<>();
         AppUserObject endUserB;
@@ -232,7 +232,7 @@ public class TC_17_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_17_1_TA_4")
-    public void test_TA_4() {
+    public void end_user_can_view_the_details_of_a_code_list_that_is_in_qa_or_production_state_and_owned_by_another() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<CodeListObject, CodeListValueObject> codeListValuesMap = new HashMap<>();
         AppUserObject endUserB;
@@ -288,7 +288,7 @@ public class TC_17_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_17_1_TA_5")
-    public void test_TA_5() {
+    public void end_user_can_view_details_of_any_developer_code_list_in_the_selected_release_branch_the_code_list_al() {
         Map<CodeListObject, CodeListValueObject> codeListValuesMap = new HashMap<>();
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject endUserA;

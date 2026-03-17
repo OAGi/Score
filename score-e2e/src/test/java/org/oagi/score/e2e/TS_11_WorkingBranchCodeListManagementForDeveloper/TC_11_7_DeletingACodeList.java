@@ -42,7 +42,7 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_11_7_TA_1")
-    public void test_TA_1() {
+    public void developer_can_delete_wip_revision_one_code_list() {
         AppUserObject developerA;
         LibraryObject library;
         ReleaseObject workingBranch;
@@ -80,7 +80,7 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_11_7_TA_2")
-    public void test_TA_2() {
+    public void deleted_code_list_is_flagged_in_bdt_and_cleared_after_restore() {
         AppUserObject developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developerA);
 
@@ -129,13 +129,12 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_11_7_TA_3")
-    public void test_TA_3() {
+    public void deleted_code_list_is_flagged_when_traced_through_acc_descendants() {
         AppUserObject developerA;
         LibraryObject library;
         ReleaseObject workingBranch;
         ACCObject acc;
         List<CodeListObject> codeListForTesting = new ArrayList<>();
-        Map<BigInteger, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
         {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
@@ -146,8 +145,7 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
             acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developerA, workingBranch, namespace, "WIP");
 
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "WIP");
-            CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerA);
-            codeListCodeListValueMap.put(codeList.getCodeListManifestId(), codeListValue);
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerA);
             codeListForTesting.add(codeList);
         }
 
@@ -201,19 +199,40 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
             EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
             editCodeListPage.hitDeleteButton();
-            /*TODO:
-            As the developer expands the tree down to the BCCP using the BDT that the deleted CL, the CL shall be flagged as deleted.
-             */
+
             viewEditCoreComponentPage.openPage();
             accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), workingBranch.getReleaseNumber());
-            WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + createdBCCP.getPropertyTerm());
+            String bccPath = "/" + acc.getDen() + "/" + createdBCCP.getPropertyTerm();
+            WebElement bccNode = accViewEditPage.clickOnDropDownMenuByPath(bccPath);
             ACCViewEditPage.BCCPanelContainer bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
+            assertEquals(createdBCCP.getDen(), getText(bccPanelContainer.getBCCPPanel().getDENField()));
+            BCCPViewEditPage descendantBccpViewEditPage = accViewEditPage.openBCCPInNewTab(bccNode);
+            assertEquals(qualifier + "_ Code. Type",
+                    getText(descendantBccpViewEditPage.getBCCPPanelContainer().getDTPanel().getDENField()));
+
+            viewEditDataTypePage.openPage();
+            DTViewEditPage dtViewEditPageNew = viewEditDataTypePage.openDTViewEditPageByDenAndBranch(
+                    qualifier + "_ Code. Type", workingBranch.getReleaseNumber());
+            dtViewEditPageNew.showValueDomain();
+            DTViewEditPage deletedFlagDtViewEditPage = dtViewEditPageNew;
+            assertDoesNotThrow(() -> deletedFlagDtViewEditPage.codeListIdMarkedAsDeleted(codeList));
+
+            viewEditCodeListPage.openPage();
+            editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
+            editCodeListPage.hitRestoreButton();
+
+            viewEditDataTypePage.openPage();
+            dtViewEditPageNew = viewEditDataTypePage.openDTViewEditPageByDenAndBranch(
+                    qualifier + "_ Code. Type", workingBranch.getReleaseNumber());
+            dtViewEditPageNew.showValueDomain();
+            DTViewEditPage restoredDtViewEditPage = dtViewEditPageNew;
+            assertThrows(TimeoutException.class, () -> restoredDtViewEditPage.codeListIdMarkedAsDeleted(codeList));
         }
     }
 
     @Test
     @DisplayName("TC_11_7_TA_4")
-    public void test_TA_4() {
+    public void code_list_with_revision_greater_than_one_cannot_be_deleted() {
         AppUserObject developerA;
         LibraryObject library;
         ReleaseObject workingBranch;

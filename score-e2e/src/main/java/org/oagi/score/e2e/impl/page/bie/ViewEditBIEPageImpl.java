@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.impl.page.bie;
 
 import org.oagi.score.e2e.impl.page.BaseSearchBarPageImpl;
+import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
@@ -13,6 +14,7 @@ import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.openqa.selenium.*;
 
 import java.math.BigInteger;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -73,12 +75,15 @@ public class ViewEditBIEPageImpl extends BaseSearchBarPageImpl implements ViewEd
     public void openPage() {
         String url = getPageUrl();
         getDriver().get(url);
+        invisibilityOfLoadingContainerElement(getDriver());
         assert "BIE".equals(getText(getTitle()));
     }
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("title"));
+        invisibilityOfLoadingContainerElement(getDriver());
+        return visibilityOfElementLocated(PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
+                By.cssSelector("score-title-with-library-selector .title, .title"));
     }
 
     @Override
@@ -287,6 +292,14 @@ public class ViewEditBIEPageImpl extends BaseSearchBarPageImpl implements ViewEd
 
     @Override
     public EditBIEPage openEditBIEPage(TopLevelASBIEPObject topLevelASBIEP) {
+        EditBIEPage editBIEPage = new EditBIEPageImpl(this, topLevelASBIEP);
+        try {
+            editBIEPage.openPage();
+            return editBIEPage;
+        } catch (AssertionError | WebDriverException e) {
+            openPage();
+        }
+
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseById(topLevelASBIEP.getReleaseId());
         showAdvancedSearchPanel();
         setBranch(release.getReleaseNumber());
@@ -317,7 +330,6 @@ public class ViewEditBIEPageImpl extends BaseSearchBarPageImpl implements ViewEd
             waitFor(ofMillis(500L));
             invisibilityOfLoadingContainerElement(getDriver());
 
-            EditBIEPage editBIEPage = new EditBIEPageImpl(this, topLevelASBIEP);
             try {
                 assert editBIEPage.isOpened();
             } catch (AssertionError e) {

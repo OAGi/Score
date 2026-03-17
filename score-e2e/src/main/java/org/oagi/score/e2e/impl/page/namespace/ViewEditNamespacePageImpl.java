@@ -72,14 +72,28 @@ public class ViewEditNamespacePageImpl extends BaseSearchBarPageImpl implements 
         return visibilityOfElementLocated(getDriver(), OWNER_SELECT_FIELD_LOCATOR);
     }
 
+    private void selectFromDropdown(By selectFieldLocator, String value) {
+        retry(() -> {
+            click(getDriver(), visibilityOfElementLocated(getDriver(), selectFieldLocator));
+            waitFor(ofMillis(500L));
+
+            for (WebElement searchField : getDriver().findElements(DROPDOWN_SEARCH_FIELD_LOCATOR)) {
+                if (searchField.isDisplayed()) {
+                    sendKeys(searchField, value);
+                    break;
+                }
+            }
+
+            WebElement optionField = elementToBeClickable(getDriver(),
+                    By.xpath("//mat-option//span[contains(text(), \"" + value + "\")]"));
+            click(getDriver(), optionField);
+            escape(getDriver());
+        });
+    }
+
     @Override
     public void setOwner(String owner) {
-        click(getOwerSelectField());
-        sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), owner);
-        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[contains(text(), \"" + owner + "\")]"));
-        click(searchedSelectField);
-        escape(getDriver());
+        selectFromDropdown(OWNER_SELECT_FIELD_LOCATOR, owner);
     }
 
     @Override
@@ -123,12 +137,7 @@ public class ViewEditNamespacePageImpl extends BaseSearchBarPageImpl implements 
 
     @Override
     public void setUpdater(String updater) {
-        click(getUpdaterSelectField());
-        sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), updater);
-        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[contains(text(), \"" + updater + "\")]"));
-        click(searchedSelectField);
-        escape(getDriver());
+        selectFromDropdown(UPDATER_SELECT_FIELD_LOCATOR, updater);
     }
 
     @Override

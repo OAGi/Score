@@ -312,8 +312,7 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
             return retry(() -> {
                 WebElement stateProgressBar = getStateProgressBarByState(state);
                 click(stateProgressBar);
-
-                waitFor(ofMillis(500L));
+                invisibilityOfLoadingContainerElement(getDriver());
                 ViewEditBIEPage viewEditBIEPage = new ViewEditBIEPageImpl(this.parent);
                 assert viewEditBIEPage.isOpened();
                 return viewEditBIEPage;
@@ -336,14 +335,15 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
 
         @Override
         public ViewEditBIEPage clickStateProgressBar(String state) {
-            WebElement stateProgressBar = getStateProgressBarByState(state);
-            click(stateProgressBar);
-            waitFor(ofMillis(500L));
+            return retry(() -> {
+                WebElement stateProgressBar = getStateProgressBarByState(state);
+                click(stateProgressBar);
+                invisibilityOfLoadingContainerElement(getDriver());
 
-            ViewEditBIEPage viewEditBIEPage = new ViewEditBIEPageImpl(this.parent);
-            assert viewEditBIEPage.isOpened();
-            return viewEditBIEPage;
-
+                ViewEditBIEPage viewEditBIEPage = new ViewEditBIEPageImpl(this.parent);
+                assert viewEditBIEPage.isOpened();
+                return viewEditBIEPage;
+            });
         }
     }
 
@@ -391,7 +391,7 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
             } catch (ElementClickInterceptedException e) {
                 getDriver().get(href);
             }
-            waitFor(ofMillis(500L));
+            invisibilityOfLoadingContainerElement(getDriver());
 
             EditBIEPage editBIEPage = new EditBIEPageImpl(this.parent, topLevelASBIEP);
             assert editBIEPage.isOpened();
@@ -465,14 +465,16 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
 
         @Override
         public ViewEditBIEPage openViewEditBIEPageByUsernameAndColumnName(String user, String columnName) {
-            WebElement tr = getTableRecordByValue(user);
-            WebElement td = getColumnByName(tr, columnName);
-            click(getDriver(), td.findElement(By.tagName("a")));
-            waitFor(ofMillis(500L));
+            return retry(() -> {
+                WebElement tr = getTableRecordByValue(user);
+                WebElement td = getColumnByName(tr, columnName);
+                click(getDriver(), td.findElement(By.tagName("a")));
+                invisibilityOfLoadingContainerElement(getDriver());
 
-            ViewEditBIEPage viewEditBIEPage = new ViewEditBIEPageImpl(this.parent);
-            assert viewEditBIEPage.isOpened();
-            return viewEditBIEPage;
+                ViewEditBIEPage viewEditBIEPage = new ViewEditBIEPageImpl(this.parent);
+                assert viewEditBIEPage.isOpened();
+                return viewEditBIEPage;
+            });
         }
     }
 
@@ -494,8 +496,7 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
             return retry(() -> {
                 WebElement stateProgressBar = getStateProgressBarByState(state);
                 click(stateProgressBar);
-
-                waitFor(ofMillis(500L));
+                invisibilityOfLoadingContainerElement(getDriver());
                 ViewEditCoreComponentPage viewEditCoreComponentPage = new ViewEditCoreComponentPageImpl(this.parent);
                 assert viewEditCoreComponentPage.isOpened();
                 return viewEditCoreComponentPage;
@@ -521,8 +522,7 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
             return retry(() -> {
                 WebElement stateProgressBar = getStateProgressBarByState(state);
                 click(stateProgressBar);
-
-                waitFor(ofMillis(500L));
+                invisibilityOfLoadingContainerElement(getDriver());
                 ViewEditCoreComponentPage viewEditCoreComponentPage = new ViewEditCoreComponentPageImpl(this.parent);
                 assert viewEditCoreComponentPage.isOpened();
                 return viewEditCoreComponentPage;
@@ -596,14 +596,16 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
 
         @Override
         public ViewEditCoreComponentPage openViewEditCCPageByUsernameAndColumnName(String user, String columnName) {
-            WebElement tr = getTableRecordByValue(user);
-            WebElement td = getColumnByName(tr, columnName);
-            click(td.findElement(By.tagName("a")));
-            waitFor(ofMillis(500L));
+            return retry(() -> {
+                WebElement tr = getTableRecordByValue(user);
+                WebElement td = getColumnByName(tr, columnName);
+                click(td.findElement(By.tagName("a")));
+                invisibilityOfLoadingContainerElement(getDriver());
 
-            ViewEditCoreComponentPage viewEditCoreComponentPage = new ViewEditCoreComponentPageImpl(this.parent);
-            assert viewEditCoreComponentPage.isOpened();
-            return viewEditCoreComponentPage;
+                ViewEditCoreComponentPage viewEditCoreComponentPage = new ViewEditCoreComponentPageImpl(this.parent);
+                assert viewEditCoreComponentPage.isOpened();
+                return viewEditCoreComponentPage;
+            });
         }
     }
 
@@ -617,18 +619,24 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
 
         @Override
         public WebElement getTableRecordByUEAndDEN(String ueName, String assocDEN) {
-            return visibilityOfElementLocated(getDriver(), By.xpath("//div[@class='ellipsis']//ancestor::tr//td[2]//span[contains(text(),\"" + ueName + "\")]"));
+            return visibilityOfElementLocated(getDriver(), By.xpath(
+                    "//p[normalize-space() = 'My unused extensions in BIEs']" +
+                            "//ancestor::div[contains(@class, 'box')][1]" +
+                            "//tr[td[2]//span[contains(normalize-space(), \"" + ueName + "\")]" +
+                            " and td[6]//div[contains(normalize-space(), \"" + assocDEN + "\")]]"));
         }
 
         @Override
         public ViewEditCoreComponentPage openViewEditCCPageByUEAndDEN(String ueName, String assocDEN) {
-            WebElement td = getTableRecordByUEAndDEN(ueName, assocDEN);
-            click(td.findElement(By.tagName("a")));
-            waitFor(ofMillis(500L));
+            return retry(() -> {
+                WebElement td = getTableRecordByUEAndDEN(ueName, assocDEN);
+                click(td.findElement(By.tagName("a")));
+                invisibilityOfLoadingContainerElement(getDriver());
 
-            ViewEditCoreComponentPage viewEditCoreComponentPage = new ViewEditCoreComponentPageImpl(this.parent);
-            assert viewEditCoreComponentPage.isOpened();
-            return viewEditCoreComponentPage;
+                ViewEditCoreComponentPage viewEditCoreComponentPage = new ViewEditCoreComponentPageImpl(this.parent);
+                assert viewEditCoreComponentPage.isOpened();
+                return viewEditCoreComponentPage;
+            });
         }
     }
 

@@ -45,7 +45,7 @@ The developer can see in the list, Core Components that he owns, does not owns a
 The developer can view details of a Core Component that he owns regardless of its state.
 
 #### Test Assertion #8.1.12
-If a working branch is selected, no UEGCC shall be listed.
+If the Working branch is selected, no UEGCC shall be listed.
 
 #### Test Assertion #8.1.13
 If a specific branch is selected, UEGACC shall be listed but UEGASCCP and UGASCC shall not be listed.
@@ -143,7 +143,7 @@ The developer can view a production UEGACC created by another user.
 68. He expands the ACCa’s tree and clicks to view the details of different nodes.
 69. Verify that he can view the details of the ACCa and those of the nodes selected. (Assertion [#11](#test-assertion-8111))
 70. He visits the CC view page.
-71. He selects the working branch.
+71. He selects the Working branch.
 72. Verify that the UEG CC mentioned in the preconditions are not listed. (Assertion [#12](#test-assertion-8112))
 73. He selects the 10.6 branch.
 74. Verify that the UEGACC mentioned in the preconditions are listed but no UEGASCCP and UGASCC are returned/listed. (Assertion [#13](#test-assertion-8113))

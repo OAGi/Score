@@ -34,7 +34,7 @@ public class TC_41_14_RestoringEndUserDT extends BaseTest {
 
     @Test
     @DisplayName("TC_41_14_TA_1")
-    public void test_TA_1() {
+    public void end_user_can_open_a_deleted_data_type_and_restore_it() {
         AppUserObject endUserA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();

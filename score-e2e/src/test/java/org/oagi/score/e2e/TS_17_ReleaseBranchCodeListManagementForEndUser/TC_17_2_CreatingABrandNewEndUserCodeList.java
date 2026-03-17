@@ -41,7 +41,7 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_2_TA_1")
-    public void test_TA_1() {
+    public void code_list_view_or_edit_page_a_release_branch_is_selected_the_end_user_can_create_a_brand_new_code_li() {
         AppUserObject endUserA;
         LibraryObject library;
         ReleaseObject branch;
@@ -81,7 +81,7 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_2_TA_2")
-    public void test_TA_2() {
+    public void end_user_can_create_a_code_list_without_base_with_all_information_specified_and_multiple_code_values() {
         AppUserObject endUserA;
         ReleaseObject branch;
         NamespaceObject namespaceEU;
@@ -123,7 +123,7 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_2_TA_3")
-    public void test_TA_3() {
+    public void end_user_can_remove_a_code_value_during_the_code_list_without_base_creation() {
         AppUserObject endUserA;
         ReleaseObject branch;
         NamespaceObject namespaceEU;
@@ -160,7 +160,7 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_2_TA_4")
-    public void test_TA_4() {
+    public void end_user_cannot_create_a_code_list_without_base_when_it_does_not_meet_a_uniqueness_constraint_see_cr() {
         AppUserObject endUserA;
         ReleaseObject branch;
         NamespaceObject namespaceEU;
@@ -187,7 +187,7 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_2_TA_5")
-    public void test_TA_5() {
+    public void end_user_can_create_a_brand_new_code_list_based_on_another_published_developer_code_list_in_the_same() {
         AppUserObject endUserA;
         ReleaseObject branch;
         CodeListObject codeListPublished;
@@ -221,7 +221,7 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_2_TA_6")
-    public void test_TA_6() {
+    public void end_user_cannot_create_a_brand_new_code_list_based_on_another_end_user_code_list() {
         AppUserObject endUserA;
         ReleaseObject branch;
         List<CodeListObject> codeListForTesting = new ArrayList<>();
@@ -267,7 +267,7 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_2_TA_7")
-    public void test_TA_7() {
+    public void developer_code_list_that_has_different_revisions_in_two_releases_one_of_which_is_the_release_current() {
         AppUserObject endUserA;
         AppUserObject developerA;
         ReleaseObject branchTwo;

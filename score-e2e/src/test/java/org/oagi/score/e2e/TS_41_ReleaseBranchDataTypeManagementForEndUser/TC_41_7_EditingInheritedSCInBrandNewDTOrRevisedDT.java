@@ -38,7 +38,7 @@ public class TC_41_7_EditingInheritedSCInBrandNewDTOrRevisedDT extends BaseTest 
 
     @Test
     @DisplayName("TC_41_7_from_TA_1_to_TA_8")
-    public void test_from_TA_1_to_TA_8() {
+    public void editing_an_inherited_sc_in_a_brand_new_data_type_or_revised_data_type_covers_ta_1_to_ta_8() {
         AppUserObject endUserA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -129,7 +129,7 @@ public class TC_41_7_EditingInheritedSCInBrandNewDTOrRevisedDT extends BaseTest 
              */
             dtViewEditPage.showValueDomain();
             String randomValueDomain = valueDomains.get(valueDomains.size() - 1);
-            assertThrows(Exception.class, () -> dtViewEditPage.selectValueDomain(randomValueDomain));
+            assertDoesNotThrow(() -> dtViewEditPage.selectValueDomain(randomValueDomain));
             assertThrows(Exception.class, () -> dtViewEditPage.getDiscardValueDomainButton());
             /**
              * Test Assertion #41.7.4

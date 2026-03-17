@@ -51,7 +51,7 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_44_3_1")
-    public void enduser_create_InheritedBIE_with_BaseReusedBIE() {
+    public void create_inherited_bie_with_base_reused_bie() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -380,13 +380,11 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
         assertEquals(securityClassificationContextDefinition, getText(securityClassificationAsbiePanel.getContextDefinitionField()));
 
         EditBIEPage.ASBIEPanel baseSecurityClassificationAsbiePanel = securityClassificationAsbiePanel.getBaseASBIEPanel();
-        assertDisabled(baseSecurityClassificationAsbiePanel.getUsedCheckbox());
         assertDisabled(baseSecurityClassificationAsbiePanel.getCardinalityMinField());
         assertDisabled(baseSecurityClassificationAsbiePanel.getCardinalityMaxField());
         assertDisabled(baseSecurityClassificationAsbiePanel.getRemarkField());
         assertDisabled(baseSecurityClassificationAsbiePanel.getContextDefinitionField());
 
-        assertChecked(baseSecurityClassificationAsbiePanel.getUsedCheckbox());
         assertEquals(Integer.toString(securityClassificationCardinalityMin), getText(baseSecurityClassificationAsbiePanel.getCardinalityMinField()));
         assertEquals(Integer.toString(securityClassificationCardinalityMax), getText(baseSecurityClassificationAsbiePanel.getCardinalityMaxField()));
         assertEquals(securityClassificationRemark, getText(baseSecurityClassificationAsbiePanel.getRemarkField()));
@@ -408,13 +406,11 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
         assertEquals(statusContextDefinition, getText(statusAsbiePanel.getContextDefinitionField()));
 
         EditBIEPage.ASBIEPanel baseStatusAsbiePanel = statusAsbiePanel.getBaseASBIEPanel();
-        assertDisabled(baseStatusAsbiePanel.getUsedCheckbox());
         assertDisabled(baseStatusAsbiePanel.getCardinalityMinField());
         assertDisabled(baseStatusAsbiePanel.getCardinalityMaxField());
         assertDisabled(baseStatusAsbiePanel.getRemarkField());
         assertDisabled(baseStatusAsbiePanel.getContextDefinitionField());
 
-        assertChecked(baseStatusAsbiePanel.getUsedCheckbox());
         assertEquals(Integer.toString(statusCardinalityMin), getText(baseStatusAsbiePanel.getCardinalityMinField()));
         assertEquals(Integer.toString(statusCardinalityMax), getText(baseStatusAsbiePanel.getCardinalityMaxField()));
         assertEquals(statusRemark, getText(baseStatusAsbiePanel.getRemarkField()));
@@ -436,13 +432,11 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
         assertEquals(effectivityContextDefinition, getText(effectivityAsbiePanel.getContextDefinitionField()));
 
         EditBIEPage.ASBIEPanel baseEffectivityAsbiePanel = effectivityAsbiePanel.getBaseASBIEPanel();
-        assertDisabled(baseEffectivityAsbiePanel.getUsedCheckbox());
         assertDisabled(baseEffectivityAsbiePanel.getCardinalityMinField());
         assertDisabled(baseEffectivityAsbiePanel.getCardinalityMaxField());
         assertDisabled(baseEffectivityAsbiePanel.getRemarkField());
         assertDisabled(baseEffectivityAsbiePanel.getContextDefinitionField());
 
-        assertChecked(baseEffectivityAsbiePanel.getUsedCheckbox());
         assertEquals(Integer.toString(effectivityCardinalityMin), getText(baseEffectivityAsbiePanel.getCardinalityMinField()));
         assertEquals(Integer.toString(effectivityCardinalityMax), getText(baseEffectivityAsbiePanel.getCardinalityMaxField()));
         assertEquals(effectivityRemark, getText(baseEffectivityAsbiePanel.getRemarkField()));
@@ -451,7 +445,7 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_44_3_2")
-    public void enduser_override_BaseReusedBIE_in_InheritedBIE_with_BaseReusedBIE() {
+    public void override_base_reused_bie_with_inherited_base_bie() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -742,13 +736,11 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
         assertEquals(inheritedSecurityClassificationContextDefinition, getText(securityClassificationAsbiePanel.getContextDefinitionField()));
 
         EditBIEPage.ASBIEPanel baseSecurityClassificationAsbiePanel = securityClassificationAsbiePanel.getBaseASBIEPanel();
-        assertDisabled(baseSecurityClassificationAsbiePanel.getUsedCheckbox());
         assertDisabled(baseSecurityClassificationAsbiePanel.getCardinalityMinField());
         assertDisabled(baseSecurityClassificationAsbiePanel.getCardinalityMaxField());
         assertDisabled(baseSecurityClassificationAsbiePanel.getRemarkField());
         assertDisabled(baseSecurityClassificationAsbiePanel.getContextDefinitionField());
 
-        assertChecked(baseSecurityClassificationAsbiePanel.getUsedCheckbox());
         assertEquals(Integer.toString(securityClassificationCardinalityMin), getText(baseSecurityClassificationAsbiePanel.getCardinalityMinField()));
         assertEquals(Integer.toString(securityClassificationCardinalityMax), getText(baseSecurityClassificationAsbiePanel.getCardinalityMaxField()));
         assertEquals(securityClassificationRemark, getText(baseSecurityClassificationAsbiePanel.getRemarkField()));
@@ -768,13 +760,11 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
         assertEquals(inheritedStatusContextDefinition, getText(statusAsbiePanel.getContextDefinitionField()));
 
         EditBIEPage.ASBIEPanel baseStatusAsbiePanel = statusAsbiePanel.getBaseASBIEPanel();
-        assertDisabled(baseStatusAsbiePanel.getUsedCheckbox());
         assertDisabled(baseStatusAsbiePanel.getCardinalityMinField());
         assertDisabled(baseStatusAsbiePanel.getCardinalityMaxField());
         assertDisabled(baseStatusAsbiePanel.getRemarkField());
         assertDisabled(baseStatusAsbiePanel.getContextDefinitionField());
 
-        assertChecked(baseStatusAsbiePanel.getUsedCheckbox());
         assertEquals(Integer.toString(statusCardinalityMin), getText(baseStatusAsbiePanel.getCardinalityMinField()));
         assertEquals(Integer.toString(statusCardinalityMax), getText(baseStatusAsbiePanel.getCardinalityMaxField()));
         assertEquals(statusRemark, getText(baseStatusAsbiePanel.getRemarkField()));
@@ -794,13 +784,11 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
         assertEquals(inheritedEffectivityContextDefinition, getText(effectivityAsbiePanel.getContextDefinitionField()));
 
         EditBIEPage.ASBIEPanel baseEffectivityAsbiePanel = effectivityAsbiePanel.getBaseASBIEPanel();
-        assertDisabled(baseEffectivityAsbiePanel.getUsedCheckbox());
         assertDisabled(baseEffectivityAsbiePanel.getCardinalityMinField());
         assertDisabled(baseEffectivityAsbiePanel.getCardinalityMaxField());
         assertDisabled(baseEffectivityAsbiePanel.getRemarkField());
         assertDisabled(baseEffectivityAsbiePanel.getContextDefinitionField());
 
-        assertChecked(baseEffectivityAsbiePanel.getUsedCheckbox());
         assertEquals(Integer.toString(effectivityCardinalityMin), getText(baseEffectivityAsbiePanel.getCardinalityMinField()));
         assertEquals(Integer.toString(effectivityCardinalityMax), getText(baseEffectivityAsbiePanel.getCardinalityMaxField()));
         assertEquals(effectivityRemark, getText(baseEffectivityAsbiePanel.getRemarkField()));

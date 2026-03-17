@@ -37,7 +37,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
 
     @Test
     @DisplayName("TC_33_2_TA_1")
-    public void test_TA_1() {
+    public void end_user_can_visit_the_uplift_code_list_page_he_can_choose_a_code_list_to_uplift_from_a_source_relea() {
         AppUserObject endUser;
         LibraryObject library;
         CodeListObject codeList;
@@ -79,9 +79,10 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
 
     @Test
     @DisplayName("TC_33_2_TA_2")
-    public void test_TA_2() {
+    public void end_user_can_view_in_the_uplift_code_list_page_any_end_user_code_list_in_any_state() {
         AppUserObject endUser;
         LibraryObject library;
+        CodeListObject codeListProduction;
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         ReleaseObject release;
         {
@@ -97,7 +98,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
             CodeListObject codeListQA = getAPIFactory().getCodeListAPI().createRandomCodeList(endUser, namespace, release, "QA");
             codeListForTesting.add(codeListQA);
 
-            CodeListObject codeListProduction = getAPIFactory().getCodeListAPI().createRandomCodeList(endUser, namespace, release, "WIP");
+            codeListProduction = getAPIFactory().getCodeListAPI().createRandomCodeList(endUser, namespace, release, "Production");
             codeListForTesting.add(codeListProduction);
 
             CodeListObject codeListDeprecated = getAPIFactory().getCodeListAPI().createRandomCodeList(endUser, namespace, release, "WIP");
@@ -114,6 +115,12 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
         }
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        EditCodeListPage editCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu().openCodeListViewEditPage(codeListProduction);
+        editCodeListPage.hitAmendButton();
+        waitFor(ofMillis(500L));
+        CodeListObject amendedCodeList = getAPIFactory().getCodeListAPI().getNewlyCreatedCodeList(endUser, release.getReleaseNumber());
+        codeListForTesting.add(amendedCodeList);
+
         UpliftCodeListPage upliftCodeListPage = homePage.getBIEMenu().openUpliftCodeListSubMenu();
         upliftCodeListPage.setSourceRelease(release.getReleaseNumber());
         ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
@@ -125,7 +132,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
 
     @Test
     @DisplayName("TC_33_2_TA_3")
-    public void test_TA_3() {
+    public void end_user_can_uplift_end_user_code_list_in_wip_state_from_a_source_release_to_a_target_release_all_de() {
         AppUserObject endUser;
         LibraryObject library;
         CodeListObject codeList;
@@ -159,7 +166,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
 
     @Test
     @DisplayName("TC_33_2_TA_4")
-    public void test_TA_4() {
+    public void end_user_can_uplift_end_user_code_list_in_qa_state_from_a_source_release_to_a_target_release_all_det() {
         AppUserObject endUser;
         LibraryObject library;
         CodeListObject codeList;
@@ -193,7 +200,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
 
     @Test
     @DisplayName("TC_33_2_TA_5")
-    public void test_TA_5() {
+    public void end_user_can_uplift_end_user_code_list_in_production_state_from_a_source_release_to_a_target_release() {
         AppUserObject endUser;
         LibraryObject library;
         CodeListObject codeList;
@@ -228,7 +235,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
 
     @Test
     @DisplayName("TC_33_2_TA_6")
-    public void test_TA_6() {
+    public void end_user_can_uplift_end_user_code_list_in_deleted_state_from_a_source_release_to_a_target_release_al() {
         AppUserObject endUser;
         LibraryObject library;
         CodeListObject codeList;
@@ -262,7 +269,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
 
     @Test
     @DisplayName("TC_33_2_TA_7")
-    public void test_TA_7() {
+    public void end_user_can_uplift_end_user_deprecated_code_list_from_a_source_release_to_a_target_release_all_deta() {
         AppUserObject endUser;
         LibraryObject library;
         CodeListObject codeList;
@@ -299,7 +306,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
 
     @Test
     @DisplayName("TC_33_2_TA_8")
-    public void test_TA_8() {
+    public void end_user_can_uplift_end_user_amended_code_list_from_a_source_release_to_a_target_release_all_details() {
         AppUserObject endUser;
         LibraryObject library;
         CodeListObject codeList;
@@ -324,22 +331,22 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
 
         UpliftCodeListPage upliftCodeListPage = homePage.getBIEMenu().openUpliftCodeListSubMenu();
         ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
-        upliftCodeListPage.hitUpliftButton(amendedCL, release, targetRelease);
-        assertEquals(amendedCL.getName(), getText(editCodeListPage.getCodeListNameField()));
-        assertEquals(amendedCL.getListId(), getText(editCodeListPage.getListIDField()));
-        assertEquals(amendedCL.getVersionId(), getText(editCodeListPage.getVersionField()));
-        assertEquals(amendedCL.getRemark(), getText(editCodeListPage.getRemarkField()));
-        assertEquals(amendedCL.getDefinition(), getText(editCodeListPage.getDefinitionField()));
-        assertEquals(amendedCL.getDefinitionSource(), getText(editCodeListPage.getDefinitionSourceField()));
-        assertEquals("1", getText(editCodeListPage.getRevisionField()));
-        assertEquals("WIP", getText(editCodeListPage.getStateField()));
-        assertEquals(targetRelease.getReleaseNumber(), getText(editCodeListPage.getReleaseField()));
-        assertDoesNotThrow(() -> editCodeListPage.selectCodeListValue(value.getValue()));
+        EditCodeListPage upliftedEditCodeListPage = upliftCodeListPage.hitUpliftButton(amendedCL, release, targetRelease);
+        assertEquals(amendedCL.getName(), getText(upliftedEditCodeListPage.getCodeListNameField()));
+        assertEquals(amendedCL.getListId(), getText(upliftedEditCodeListPage.getListIDField()));
+        assertEquals(amendedCL.getVersionId(), getText(upliftedEditCodeListPage.getVersionField()));
+        assertEquals(amendedCL.getRemark(), getText(upliftedEditCodeListPage.getRemarkField()));
+        assertEquals(amendedCL.getDefinition(), getText(upliftedEditCodeListPage.getDefinitionField()));
+        assertEquals(amendedCL.getDefinitionSource(), getText(upliftedEditCodeListPage.getDefinitionSourceField()));
+        assertEquals("1", getText(upliftedEditCodeListPage.getRevisionField()));
+        assertEquals("WIP", getText(upliftedEditCodeListPage.getStateField()));
+        assertEquals(targetRelease.getReleaseNumber(), getText(upliftedEditCodeListPage.getReleaseField()));
+        assertDoesNotThrow(() -> upliftedEditCodeListPage.selectCodeListValue(value.getValue()));
     }
 
     @Test
     @DisplayName("TC_33_2_TA_9")
-    public void test_TA_9() {
+    public void end_user_can_uplift_end_user_derived_code_list_from_a_source_release_to_a_target_release_all_details() {
         AppUserObject endUser;
         LibraryObject library;
         CodeListObject codeList;
@@ -379,7 +386,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
 
     @Test
     @DisplayName("TC_33_2_TA_10")
-    public void test_TA_10() {
+    public void end_user_can_uplift_end_user_derived_code_list_from_a_source_release_to_a_target_release_if_the_deve() {
         AppUserObject endUser;
         LibraryObject library;
         CodeListObject codeListEU;

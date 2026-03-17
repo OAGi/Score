@@ -48,7 +48,7 @@ public class TC_15_6_DeletingEndUserACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_15_6_1() {
+    public void if_an_acc_revision_number_is_1_the_end_user_owner_can_delete_it_when_it() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -73,7 +73,7 @@ public class TC_15_6_DeletingEndUserACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_15_6_2() {
+    public void upon_opening_an_acc_that_has_a_descendant_acc_that_has_a_deleted_acc_as_a() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         String branch = "10.8.7.1";
@@ -125,7 +125,7 @@ public class TC_15_6_DeletingEndUserACC extends BaseTest {
 
 
     @Test
-    public void test_TA_15_6_3() {
+    public void upon_opening_an_acc_that_uses_a_deleted_acc_as_a_base_the_system_should_flag() {
 
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -186,7 +186,7 @@ public class TC_15_6_DeletingEndUserACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_15_6_4() {
+    public void upon_opening_an_acc_that_has_an_association_to_an_asccp_that_uses_a_deleted_acc() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -231,7 +231,7 @@ public class TC_15_6_DeletingEndUserACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_15_6_5() {
+    public void upon_opening_an_acc_that_has_a_descendant_acc_that_was_deleted_earlier_used_in_in() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -268,7 +268,7 @@ public class TC_15_6_DeletingEndUserACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_15_6_6() {
+    public void upon_opening_an_asccp_that_uses_the_deleted_acc_the_asccp_shall_be_highlighted_or_flagged() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -313,7 +313,7 @@ public class TC_15_6_DeletingEndUserACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_15_6_7() {
+    public void acc_whose_revision_number_is_more_than_1_and_is_in_any_state_cannot_be_deleted() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 

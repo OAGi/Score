@@ -1,6 +1,6 @@
 # Test Suite 6
 
-**End user access right to Score core functions**
+**End user access right to connectCenter core functions**
 
 > Test cases in here should be similar to those in Test Suite 5. However, I'm thinking we don't have to test as comprehensive as Test Suite 5 when the behaviors are expected to be the same regardless of the user role. This test suite should make sure that the end user can see and do and cannot see and do as appropriate to the user role.
 
@@ -191,13 +191,13 @@ The end user can generate an expression of a single BIE, in XML Schema, in the s
 The end user can generate an expression of a single BIE, in XML Schema, in the same package, with the BIE CCTS Meta Data annotation selected but not the Include CCTS_Definition Tag annotation.
 
 #### Test Assertion #6.3.8
-The end user can generate an expression of a single BIE, in XML Schema, in the same package, with the BIE OAGi/Score Meta Data annotation selected but not the Include WHO Columns annotation.
+The end user can generate an expression of a single BIE, in XML Schema, in the same package, with the BIE OAGi/connectCenter Meta Data annotation selected but not the Include WHO Columns annotation.
 
 #### Test Assertion #6.3.9
 The end user cannot generate an expression of a single BIE, in XML Schema, with the Include CCTS_Definition Tag annotation selected but not the BIE CCTS Meta Data annotation.
 
 #### Test Assertion #6.3.10
-The end user cannot generate an expression of a single BIE, in XML Schema, with the Include WHO Columns annotation selected but not the BIE OAGi/Score Meta Data annotation.
+The end user cannot generate an expression of a single BIE, in XML Schema, with the Include WHO Columns annotation selected but not the BIE OAGi/connectCenter Meta Data annotation.
 
 #### Test Assertion #6.3.11
 The end user can generate an expression of a single BIE, in JSON Schema, in the same package, with no annotation selected.
@@ -206,7 +206,7 @@ The end user can generate an expression of a single BIE, in JSON Schema, in the 
 The end user can generate an expression of a single BIE, in JSON Schema, in the same package, with the BIE Definition annotation selected.
 
 #### Test Assertion #6.3.13
-The end user cannot generate an expression of a single BIE, in JSON Schema, in the same package, with any of the BIE CCTS Meta Data, Include CCTS_Definition Tag, BIE GUID, Business Context, BIE OAGi/Score Meta Data, or Include WHO Columns annotations selected. `Based CC Meta Data` remains available for JSON Schema and is unchecked by default.
+The end user cannot generate an expression of a single BIE, in JSON Schema, in the same package, with any of the BIE CCTS Meta Data, Include CCTS_Definition Tag, BIE GUID, Business Context, BIE OAGi/connectCenter Meta Data, or Include WHO Columns annotations selected. `Based CC Meta Data` remains available for JSON Schema and is unchecked by default.
 
 #### Test Assertion #6.3.14
 The end user can generate an expression of multiple BIEs, in multiple XML Schemas, saved in the same package, with some annotations selected.

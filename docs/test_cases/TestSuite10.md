@@ -12,7 +12,7 @@
 
 > (As it is now) individual ASCC page is not provided.
 
-Pre-condition: A working branch is selected.
+Pre-condition: The Working branch is selected.
 
 
 ### Test Assertion:
@@ -105,7 +105,7 @@ If an ACC is selected to view wherein it is used, then the ACCs which are based 
 
 ### Test Step:
 
-1. The oagis developer logs into Score.
+1. The oagis developer logs into connectCenter.
 2. He visits the CC page.
 3. Verify that he can view in the returned list all the CCs mentioned in the precondition section. (Assertion [#1](#test-assertion-1011))
 4. The developer clicks on the ACC0w.
@@ -162,14 +162,15 @@ Pre-condition: N/A
 ### Test Assertion:
 
 #### Test Assertion #10.2.1
-On the CC list page where a working branch is selected, the developer can create a brand-new ACC with the following default values – Object Class Term = “Object Class Term”; DEN = [Object Class Term] + “. Details” and disabled; Component Type = “Semantics”; Abstract = false; Definition = blank; Definition Source= blank; Deprecated = false (and locked); Namespace = null, Comments = empty. The brand-new ACC must not have any release assigned yet, i.e., it must not appear in any release branch except the working branch. It has a revision number 1. All fields are required and cannot be blank except Definition, Definition Source, and Comments. Only the following Component Type can be selected Base, Semantics, Semantic_Group.
+On the CC list page where the Working branch is selected, the developer can create a brand-new ACC with the following default values – Object Class Term = “Object Class Term”; DEN = [Object Class Term] + “. Details” and disabled; Component Type = “Semantics”; Abstract = false; Definition = blank; Definition Source= blank; Deprecated = false (and locked); Namespace = null, Comments = empty. The brand-new ACC must not have any release assigned yet, i.e., it must not appear in any release branch except the Working branch. It has a revision number 1. All fields are required and cannot be blank except Definition, Definition Source, and Comments. Only the following Component Type can be selected Base, Semantics, Semantic_Group.
 
 #### Test Assertion #10.2.2
 The developer cannot create a brand-new developer ACC when a release branch is selected.
 
 ### Test Step Pre-condition:
-
-
+1. A developer account can access the Core Component page with branch `Working` selected.
+2. At least one release branch exists for the negative create-in-release check.
+3. The suite can create and clean up a temporary ACC.
 
 ### Test Step:
 
@@ -231,7 +232,7 @@ If the “Exclude SCs” checkbox is disabled (i.e., unchecked) the SCs are incl
 
 1. There is an ACC, say ACC103a, which is a brand new ACC and it is in WIP state
 2. There is an ACC, say ASCCP103a, which is a brand new ASCCP, uses ACC103a and it is in WIP state
-3. The working branch is selected
+3. The Working branch is selected
 
 ### Test Step:
 
@@ -345,7 +346,7 @@ The developer can change (move up or down) the sequence of an association to a B
 The developer can remove an association (ASCC or BCC), there must be a confirmation dialog box though. (In that case, the association information is stored in the history record).
 
 #### Test Assertion #10.4.10
-The developer can assign another developer ACC belonging to the working branch as a base of this ACC.
+The developer can assign another developer ACC belonging to the Working branch as a base of this ACC.
 
 ##### Test Assertion #10.4.10.a
 The base ACC can be in any state.
@@ -384,7 +385,7 @@ The base ACC in Deleted
 The base ACC is owned by another developer regardless of the state
 
 #### Test Assertion #10.4.15
-The developer cannot refactor an ASCCP to base ACC if the latter already contains this ASCCP either directly on indirectly in its hierarchy. When the developer selects the base ACC, he should be able to validate the choice. This means that Score should display all ACCs that the developer should take some action. After the developer takes that actions, Score deletes the associations to the ASCCPs that are same as the refactoring ASCCP (duplicate ASCCPs) and moves the refactoring ASCCP to the selected base ACC. Check for:
+The developer cannot refactor an ASCCP to base ACC if the latter already contains this ASCCP either directly on indirectly in its hierarchy. When the developer selects the base ACC, he should be able to validate the choice. This means that connectCenter should display all ACCs that the developer should take some action. After the developer takes that actions, connectCenter deletes the associations to the ASCCPs that are same as the refactoring ASCCP (duplicate ASCCPs) and moves the refactoring ASCCP to the selected base ACC. Check for:
 
 ##### Test Assertion #10.4.15.a
 Moving an ACC to WIP state
@@ -397,13 +398,13 @@ which are not in WIP state and those not in WIP state that also contain the refa
 The developer cannot refactor an ASCCP to a selected base ACC if the ASCCP already exists as a property in a group ACC used in an association of under an ACC that exists in a hierarchy of the selected base ACC. In this case the developer should ungroup the group ACC so that he can refactor the ASCCP to the base ACC.
 
 #### Test Assertion #10.4.17
-The developer can cancel the revision of the Editing ACC. Doing so, Score restores the association to the refactored ASCPP.
+The developer can cancel the revision of the Editing ACC. Doing so, connectCenter restores the association to the refactored ASCPP.
 
 #### Test Assertion #10.4.18
-The developer can cancel the revision of the base ACC where an ASCCP was moved. Doing so, Score deletes the association to the ASCCP.
+The developer can cancel the revision of the base ACC where an ASCCP was moved. Doing so, connectCenter deletes the association to the ASCCP.
 
 #### Test Assertion #10.4.19
-The developer can cancel the revision of an ACC that had the base ACC as its based and also it had an association to the ASCCP that the developer refactored (this association was deleted because of the refactoring). Doing so, Score restores the association to the refactored ASCPP.
+The developer can cancel the revision of an ACC that had the base ACC as its based and also it had an association to the ASCCP that the developer refactored (this association was deleted because of the refactoring). Doing so, connectCenter restores the association to the refactored ASCPP.
 
 #### Test Assertion #10.4.20
 The developer can refactor an BCCP to base ACC providing that the base ACC is in WIP state, owned by the developer and there is no association to the refactoring BCCP within base ACC hierarchy neither there is an association to the refactoring BCCP within the ACCs that have the base ACC within their hierarchy.
@@ -423,19 +424,19 @@ The base ACC in Deleted
 The base ACC is owned by another developer regardless of the state
 
 #### Test Assertion #10.4.22
-The developer cannot refactor an BCCP to base ACC if the latter already contains this BCCP either directly on indirectly in its hierarchy. When the developer selects the base ACC, he should be able to validate the choice. This means that Score should display all ACCs with some issues, namely the ACCs that contain the refactoring BCCP already of the base ACC that contain the BCCP. If the developer  refactors the BCCP to the selected base ACC, the BCCPs that exists in the hierarchy are deleted and the new BCCP is moved to the base ACC.
+The developer cannot refactor an BCCP to base ACC if the latter already contains this BCCP either directly on indirectly in its hierarchy. When the developer selects the base ACC, he should be able to validate the choice. This means that connectCenter should display all ACCs with some issues, namely the ACCs that contain the refactoring BCCP already of the base ACC that contain the BCCP. If the developer  refactors the BCCP to the selected base ACC, the BCCPs that exists in the hierarchy are deleted and the new BCCP is moved to the base ACC.
 
 #### Test Assertion #10.4.23
 The developer can refactor a BCCP to the base ACC if the BCCP already exists as a property in a group ACC, which exists under the base ACC, after receiving a warning message to proceed.
 
 #### Test Assertion #10.4.24
-The developer can cancel the revision of the Editing ACC. Doing so, Score restores the association to the refactored BCCP.
+The developer can cancel the revision of the Editing ACC. Doing so, connectCenter restores the association to the refactored BCCP.
 
 #### Test Assertion #10.4.25
-The developer can cancel the revision of the base ACC where an BCCP was moved. Doing so, Score deletes the association to the BCCP.
+The developer can cancel the revision of the base ACC where an BCCP was moved. Doing so, connectCenter deletes the association to the BCCP.
 
 #### Test Assertion #10.4.26
-The developer can cancel the revision of an ACC that had the base ACC as its based and also it had an association to the BCCP that the developer refactored (this association was deleted because of the refactoring). Doing so, Score restores the association to the refactored BCCP.
+The developer can cancel the revision of an ACC that had the base ACC as its based and also it had an association to the BCCP that the developer refactored (this association was deleted because of the refactoring). Doing so, connectCenter restores the association to the refactored BCCP.
 
 ### Test Step Pre-condition:
 
@@ -464,7 +465,7 @@ The developer can cancel the revision of an ACC that had the base ACC as its bas
 8. He edits a newly added BCC and verifies the Min/Max, “unbounded”, required-field, empty-definition-warning, Entity Type, and Default/Fixed Value rules. (Assertions [#6.a](#test-assertion-1046a)-[#6.h](#test-assertion-1046h))
 9. He changes the sequence of ASCC and BCC associations and verifies the updated order. (Assertions [#7](#test-assertion-1047), [#8](#test-assertion-1048))
 10. He removes an ASCC or BCC association and verifies that a confirmation dialog appears. (Assertion [#9](#test-assertion-1049))
-11. He assigns another developer ACC in the working branch as a base ACC, verifies the allowed and blocked selection rules, removes the base ACC again, and verifies ownership transfer behavior. (Assertions [#10.a](#test-assertion-10410a)-[#10.f](#test-assertion-10410f), [#11](#test-assertion-10411), [#12](#test-assertion-10412))
+11. He assigns another developer ACC in the Working branch as a base ACC, verifies the allowed and blocked selection rules, removes the base ACC again, and verifies ownership transfer behavior. (Assertions [#10.a](#test-assertion-10410a)-[#10.f](#test-assertion-10410f), [#11](#test-assertion-10411), [#12](#test-assertion-10412))
 12. He refactors an ASCCP to a valid base ACC and verifies the successful case. (Assertion [#13](#test-assertion-10413))
 13. He tries to refactor an ASCCP to invalid base ACCs and verifies that Draft, Candidate, Published, Deleted, and other-owner cases are rejected. (Assertions [#14.a](#test-assertion-10414a)-[#14.e](#test-assertion-10414e))
 14. He verifies the duplicate-property-term and group-hierarchy restrictions for ASCCP refactoring, then cancels related revisions and verifies the restoration behavior. (Assertions [#15.a](#test-assertion-10415a)-[#15.c](#test-assertion-10415c), [#16](#test-assertion-10416), [#17](#test-assertion-10417)-[#19](#test-assertion-10419))
@@ -482,7 +483,7 @@ Pre-condition: N/A
 ### Test Assertion:
 
 #### Test Assertion #10.5.1
-On the CC Detail page of the working branch, the developer can create a new revision of an ACC that is in Published state regardless of the current owner. The result is that the working branch has that ACC and its associations with an incremental revision number that is in the WIP state.  Its detail attributes are initially the same as those of the previous revision.
+On the CC Detail page of the Working branch, the developer can create a new revision of an ACC that is in Published state regardless of the current owner. The result is that the Working branch has that ACC and its associations with an incremental revision number that is in the WIP state.  Its detail attributes are initially the same as those of the previous revision.
 
 #### Test Assertion #10.5.2
 A new revision CANNOT be made on an ACC in non-Published state.
@@ -680,7 +681,7 @@ The developer can change (move up or down) the sequence of the brand-new and exi
 The developer can remove an existing new association (ASCC or BCC) added in this revision (new association added during this revision should still have revision #1), there must be a confirmation dialog box though. However, an association cannot be removed if it is used as a replacement of a deprecated association. Information about the removed association is kept in the history record. The developer can also remove an association added to a previous revision. There should also be a confirmation dialog. If the developer cancel the revision, the removed associations should be restored.
 
 #### Test Assertion #10.7.12
-The developer can assign another developer ACC belonging to the working branch as a base of this ACC, both in the case where a based ACC does and does not already exist in the previous revision.
+The developer can assign another developer ACC belonging to the Working branch as a base of this ACC, both in the case where a based ACC does and does not already exist in the previous revision.
 
 ##### Test Assertion #10.7.12.a
 The base ACC can be in any state.
@@ -708,11 +709,14 @@ The developer can cancel the revision. In this case, the system rollbacks all ch
 The developer can move an existing association (i.e., ASCCP, BCCP) of the revised ACC to its base ACC (including the base ACC of its base ACC as so fourth - For example if the revised ACC is based on ACC1 that is based on ACC2 that is based on ACC3, the developer the move the association to any of these ACCs). The base ACC has to be in WIP state while there must not be any BIE using the revised ACC or the base ACC.
 
 ### Test Step Pre-condition:
-
-
+1. The stated test-case pre-condition is satisfied for revision-association editing of a developer ACC (revision > 1 in `WIP`).
+2. The suite can prepare related ACC, ASCCP, and BCCP records in the states required by the assertions in this test case.
+3. The acting developer owns the revised ACC under test.
 
 ### Test Step:
-
+1. The developer signs in to connectCenter and opens the revised ACC from the Working-branch Core Component list.
+2. The developer performs the revision-association operations described by this test case, including append/insert/edit/remove actions, base-ACC assignment and removal, ownership transfer, cancellation, and association-move checks where applicable.
+3. For each action, verify the expected behavior and constraints defined by Assertions `#10.7.1` through `#10.7.16`.
 ## Test Case 10.8
 
 **Developer ACC state management**
@@ -785,7 +789,7 @@ The developer can change the ACC state from Draft back to WIP. The system shall 
 
 **Deleting developer ACC**
 
-> Delete a CC means that it is marked as “Deleted” and it is still displayed in the CC list when the working branch is selected. If a CC is “Deleted” any other developer can restore it. Delete also means the deleted information is kept in the ACC table. Generally, when an entity is opened that has a relationship (whether in association or in base relationship) to a deleted entity, the opened entity shall be flagged as in an invalid state. And once the user has expanded the tree down to the deleted entity, the deleted entity should be flagged as deleted. This is applied to all test cases related to deletions.
+> Delete a CC means that it is marked as “Deleted” and it is still displayed in the CC list when the Working branch is selected. If a CC is “Deleted” any other developer can restore it. Delete also means the deleted information is kept in the ACC table. Generally, when an entity is opened that has a relationship (whether in association or in base relationship) to a deleted entity, the opened entity shall be flagged as in an invalid state. And once the user has expanded the tree down to the deleted entity, the deleted entity should be flagged as deleted. This is applied to all test cases related to deletions.
 
 Pre-condition: N/A
 
@@ -793,7 +797,7 @@ Pre-condition: N/A
 ### Test Assertion:
 
 #### Test Assertion #10.9.1
-If an ACC revision number is 1, the developer owner can delete it when it is in WIP state. A confirmation dialog box should appear to ask for a confirmation.  After successful deletion, the system takes the user back to the CC list page. The deleted ACC shall appear in the working branch CC list (even without the Deleted state filter).
+If an ACC revision number is 1, the developer owner can delete it when it is in WIP state. A confirmation dialog box should appear to ask for a confirmation.  After successful deletion, the system takes the user back to the CC list page. The deleted ACC shall appear in the Working branch CC list (even without the Deleted state filter).
 
 #### Test Assertion #10.9.2
 Upon opening an ACC that has a descendant ACC that has a deleted ACC as a base, the system shall be able to flag that the opening ACC is in an invalid state and flag that the descendant-based ACC is in the deleted state. After the based ACC is replaced or restored, the developer should be able to see that reflected in the ACC tree (e.g., after clicking refresh).
@@ -828,7 +832,7 @@ ACC whose revision number is more than 1 and is in any state cannot be deleted.
 
 ### Test Step:
 
-1. The oagi developer logs into score.
+1. The oagi developer logs into connectCenter.
 2. He visits the CC list page and opens the ACC11019ow.
 3. He deletes the ACC11019ow.
 4. Verify that that the CC list page is returned and that the is deleted. (Assertion [#1](#test-assertion-1091))
@@ -915,7 +919,7 @@ The developer user can open an ACC and restore it. All of its associations shall
 
 ### Test Step:
 
-1. The oagi developer logs into score.
+1. The oagi developer logs into connectCenter.
 2. He visits the CC list page, and filters CCs based on state “Deleted”.
 3. He opens the ACC11010ow and restores it.
 4. Verify that the ACC11010ow has been restored and is in WIP state. (Assertion [#1](#test-assertion-10101))
@@ -932,7 +936,7 @@ Pre-condition: N/A
 ### Test Assertion:
 
 #### Test Assertion #10.11.1
-On the CC list page where a working branch is selected, the developer can create a brand-new ASCCP by selecting ONLY a developer ACC which is in any state and owned by any user. The ASCCP should have the following default values – Property Term = [ACC Object Class Term]; DEN = [Property Term] + “. Object Class Term” and disabled; Reusable = true; Definition = blank; Definition Source=blank; Deprecated = false and disabled; Nillable = false; Namespace = null, Comments = empty. The brand-new ASCCP must not have any release assigned yet, i.e., it must not appear in any release branch except the working branch. It has a revision number of 1. The ASCCP should have the associated ACC along with its properties but they cannot be changed. Only ACC whose Component Type is Semantics, and Semantic Group can be selected.
+On the CC list page where the Working branch is selected, the developer can create a brand-new ASCCP by selecting ONLY a developer ACC which is in any state and owned by any user. The ASCCP should have the following default values – Property Term = [ACC Object Class Term]; DEN = [Property Term] + “. Object Class Term” and disabled; Reusable = true; Definition = blank; Definition Source=blank; Deprecated = false and disabled; Nillable = false; Namespace = null, Comments = empty. The brand-new ASCCP must not have any release assigned yet, i.e., it must not appear in any release branch except the Working branch. It has a revision number of 1. The ASCCP should have the associated ACC along with its properties but they cannot be changed. Only ACC whose Component Type is Semantics, and Semantic Group can be selected.
 
 #### Test Assertion #10.11.2
 If the underlying ACC has changed after the ASCCP was first created, the system should automatically pick up the change, e.g., when the ASCCP is opened or refreshed on the ASCCP details page.
@@ -970,7 +974,7 @@ The developer can create an ASCCP from an ACC in WIP state using the function �
 6. The developer visits the CC list page, opens the ACC1011ow and changes its Object Class Term.
 7. He then opens the brand new ASCCP created in the second test step.
 8. Verify that the DEN of the ASCCP has been changed according to the ACC1011ow change. (Assertion [#2](#test-assertion-10112))
-9. The developer visits CC List page and selects the working branch.
+9. The developer visits CC List page and selects the Working branch.
 10. Verify that the ASCCP has a revision number 1 and it is listed. (Assertion [#1](#test-assertion-10111))
 11. The developer visits CC List page and selects a non-working branch.
 12. Verify that the ASCCP is not listed. (Assertion [#1](#test-assertion-10111))
@@ -1058,7 +1062,7 @@ If the “Exclude SCs” checkbox is disabled (i.e., unchecked) the SCs are incl
 22. Verify that no end user is displayed and so it cannot transfer the ownership of the to an end user. (Assertion [#2](#test-assertion-10122))
 23. He transfers the ownership to the developer devx.
 24. The oagi developer logs out.
-25. The developer devx logs into the score.
+25. The developer devx logs into connectCenter.
 26. The visits the CC list page.
 27. Verify that he owns the ASCCP1012ow. (Assertion [#2](#test-assertion-10122))
 28. He opens the ACC1012ow and changes its Object Class Term ACC1012ow from to ACC1012owchanged.
@@ -1079,7 +1083,7 @@ Pre-condition: N/A
 ### Test Assertion:
 
 #### Test Assertion #10.13.1
-On the CC Detail page of a published working branch of an ASCCP (whose revision number is the same as that of the latest release), the developer can create a new revision of the ASCCP. The result is that the working branch has that ASCCP with an incremental revision number that is in the WIP state.  Its attributes are initially the same as those of the previous revision.
+On the CC Detail page of a published ASCCP in the Working branch (whose revision number is the same as that of the latest release), the developer can create a new revision of the ASCCP. The result is that the Working branch has that ASCCP with an incremental revision number that is in the WIP state.  Its attributes are initially the same as those of the previous revision.
 
 ### Test Step Pre-condition:
 
@@ -1223,7 +1227,7 @@ The developer can retract an ASCCP which is in Candidate state back to the WIP s
 
 **Deleting a developer ASCCP**
 
-> Delete a CC means that it is marked as “Deleted” and it is still displayed in the CC list when the working branch is selected. If a CC is “Deleted” any other developer can restore it.
+> Delete a CC means that it is marked as “Deleted” and it is still displayed in the CC list when the Working branch is selected. If a CC is “Deleted” any other developer can restore it.
 
 Pre-condition: N/A
 
@@ -1283,7 +1287,7 @@ ASCCP whose revision number is more than 1 and is in any state cannot be deleted
 
 **Restoring a developer ASCCP**
 
-Pre-condition: The developer is on the CC View page with the working branch open and filters the list by the Deleted state before opening the ASCCP under test.
+Pre-condition: The developer is on the CC View page with the Working branch open and filters the list by the Deleted state before opening the ASCCP under test.
 
 
 ### Test Assertion:
@@ -1303,7 +1307,7 @@ The developer user can restore a deleted ASCCP whose ACC is deleted. The UI shal
 
 ### Test Step:
 
-1. The oagi developer logs into score.
+1. The oagi developer logs into connectCenter.
 2. He visits the CC list page, and filters CCs based on state “Deleted”.
 3. He opens the ASCCP11017odel and restores it.
 4. Verify that the ASCCP11017odel has been restored and is in WIP state. (Assertion [#1](#test-assertion-10171))
@@ -1325,14 +1329,16 @@ Pre-condition: N/A
 ### Test Assertion:
 
 #### Test Assertion #10.18.1
-On the CC list page where a working branch is selected, the developer can create a brand-new BCCP by selecting a BDT which can be in any state and belongs to any developer. The BDT choice shall be, by default, is empty. Filtering field is used to filter the commonly-used BDT (BDTs may also be classified as Default, Qualified, and Unqualified - see section 4.1.1.12.1 in the SRT Design Document version 2.4 to understand what is unqualified BDT ), but the user has a choice to be able to select any BDT (type > 1). The BCCP should have the following default values – Property Term = “Property Term”; DEN = “Property Term. “ + BDT_Data_Type_Term and disable; Nillable = false; Deprecated = false and disabled; Value Constraint= None (Default and Fixed value should be empty); Definition = blank; Definition Source = blank; Namespace = null, Comments = empty. The brand-new BCCP must not have any specific release assigned yet, i.e., it must not appear in any release branch except the working branch. It has a revision number 1. The BCCP should have the associated BDT details but cannot be changed. BDT supplementary components are displayed in the tree but their details cannot be changed.
+On the CC list page where the Working branch is selected, the developer can create a brand-new BCCP by selecting a BDT which can be in any state and belongs to any developer. The BDT choice shall be, by default, is empty. Filtering field is used to filter the commonly-used BDT (BDTs may also be classified as Default, Qualified, and Unqualified - see section 4.1.1.12.1 in the SRT Design Document version 2.4 to understand what is unqualified BDT ), but the user has a choice to be able to select any BDT (type > 1). The BCCP should have the following default values – Property Term = “Property Term”; DEN = “Property Term. “ + BDT_Data_Type_Term and disable; Nillable = false; Deprecated = false and disabled; Value Constraint= None (Default and Fixed value should be empty); Definition = blank; Definition Source = blank; Namespace = null, Comments = empty. The brand-new BCCP must not have any specific release assigned yet, i.e., it must not appear in any release branch except the Working branch. It has a revision number 1. The BCCP should have the associated BDT details but cannot be changed. BDT supplementary components are displayed in the tree but their details cannot be changed.
 
 #### Test Assertion #10.18.2
 The developer cannot create a brand-new BCCP when a release branch is selected.
 
 ### Test Step Pre-condition:
-
-
+1. A developer account can access the Core Component page with branch `Working` selected.
+2. At least one BDT is available to create a brand-new BCCP in the Working branch.
+3. At least one release branch exists for the negative create-in-release check.
+4. The suite can create and clean up a temporary BCCP.
 
 ### Test Step:
 
@@ -1418,7 +1424,7 @@ Pre-condition: N/A
 ### Test Assertion:
 
 #### Test Assertion #10.20.1
-On the CC Detail page of a published BCCP in working branch, the developer can create a new revision of the BCCP. The result is that the Working branch has that BCCP with an incremental revision number that is in the WIP state.  Its attributes are initially the same as those of the previous revision.
+On the CC Detail page of a published BCCP in the Working branch, the developer can create a new revision of the BCCP. The result is that the Working branch has that BCCP with an incremental revision number that is in the WIP state.  Its attributes are initially the same as those of the previous revision.
 
 ### Test Step Pre-condition:
 
@@ -1512,7 +1518,7 @@ The developer can change the BCCP state from Candidate back to WIP.
 ### Test Step Pre-condition:
 
 1. There is a BCCP, say BCCP4, which is in WIP state with revision number 1.
-2. The working branch is selected
+2. The Working branch is selected
 
 ### Test Step:
 
@@ -1530,7 +1536,7 @@ The developer can change the BCCP state from Candidate back to WIP.
 
 **Deleting developer BCCP**
 
-> Delete a CC means that it is marked as “Deleted” and it is still displayed in the CC list when the working branch is selected. Its detail can also be viewed. If a CC is “Deleted” any other developer can restore it as described in the following Test Case 10.24.
+> Delete a CC means that it is marked as “Deleted” and it is still displayed in the CC list when the Working branch is selected. Its detail can also be viewed. If a CC is “Deleted” any other developer can restore it as described in the following Test Case 10.24.
 
 Pre-condition: N/A
 
@@ -1605,7 +1611,7 @@ The developer user can restore a deleted BCCP whose BDT is deleted. The UI displ
 
 ### Test Step:
 
-1. The oagi developer logs into score.
+1. The oagi developer logs into connectCenter.
 2. He visits the CC list page, and filters CCs based on state “Deleted”.
 3. He opens the BCCP11024odel and restores it.
 4. Verify that the BCCP11024odel has been restored and is in WIP state. (Assertion [#1](#test-assertion-10241))

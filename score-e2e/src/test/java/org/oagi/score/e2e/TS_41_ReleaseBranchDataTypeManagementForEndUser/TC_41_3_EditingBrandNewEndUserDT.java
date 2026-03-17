@@ -40,7 +40,7 @@ public class TC_41_3_EditingBrandNewEndUserDT extends BaseTest {
 
     @Test
     @DisplayName("TC_41_3_TA_1")
-    public void test_TA_1() {
+    public void end_user_can_change_the_properties_of_the_data_type_and_save_changes() {
         AppUserObject endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUserA);
 
@@ -110,7 +110,7 @@ public class TC_41_3_EditingBrandNewEndUserDT extends BaseTest {
 
     @Test
     @DisplayName("TC_41_3_TA_2_and_TA_3")
-    public void test_TA_2_and_TA_3() {
+    public void new_sc_can_be_added_to_the_data_type_and_edited() {
         AppUserObject endUserA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -148,7 +148,7 @@ public class TC_41_3_EditingBrandNewEndUserDT extends BaseTest {
 
     @Test
     @DisplayName("TC_41_3_TA_4")
-    public void test_TA_4() {
+    public void the_update_button_is_clicked_the_changes_except_definition_and_definition_source_and_content_compone() {
         AppUserObject endUserA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();

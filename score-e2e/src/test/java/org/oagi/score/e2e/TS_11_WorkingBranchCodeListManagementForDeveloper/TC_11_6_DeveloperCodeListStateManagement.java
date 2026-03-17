@@ -37,7 +37,7 @@ public class TC_11_6_DeveloperCodeListStateManagement extends BaseTest {
 
     @Test
     @DisplayName("TC_11_6_from_TA_1_to_TA_4")
-    public void test_from_TA_1_to_TA_4() {
+    public void developer_can_transition_code_list_across_draft_and_candidate_states() {
         AppUserObject developerA;
         LibraryObject library;
         ReleaseObject workingBranch;

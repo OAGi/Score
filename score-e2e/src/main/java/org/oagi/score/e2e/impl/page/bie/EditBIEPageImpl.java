@@ -23,7 +23,9 @@ import org.openqa.selenium.interactions.Actions;
 import java.math.BigInteger;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 import static java.time.Duration.ofMillis;
@@ -693,6 +695,27 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
                 baseXPath + "//mat-icon[contains(text(), \"" + iconName + "\")]//ancestor::button"));
     }
 
+    private WebElement getButtonInActiveDetailTab(String activeDetailTabXPath, String buttonName, boolean enabled) {
+        By locator = By.xpath(activeDetailTabXPath +
+                "//button[.//*[normalize-space(.) = \"" + buttonName + "\"] or normalize-space(.) = \"" + buttonName + "\"]");
+        if (enabled) {
+            return elementToBeClickable(getDriver(), locator);
+        }
+        return visibilityOfElementLocated(getDriver(), locator);
+    }
+
+    private void switchToNewWindow(Set<String> windowHandlesBeforeClick) {
+        PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L))
+                .until(driver -> driver.getWindowHandles().size() > windowHandlesBeforeClick.size());
+        for (String winHandle : getDriver().getWindowHandles()) {
+            if (!windowHandlesBeforeClick.contains(winHandle)) {
+                getDriver().switchTo().window(winHandle);
+                return;
+            }
+        }
+        throw new TimeoutException("Failed to switch to a newly opened window.");
+    }
+
     private class TopLevelASBIEPPanelImpl implements TopLevelASBIEPPanel {
         @Override
         public WebElement getReleaseField() {
@@ -901,14 +924,17 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     private class ASBIEPanelImpl implements ASBIEPanel {
 
+        private static final String ACTIVE_ASBIE_DETAIL_TAB_XPATH =
+                "(//div[contains(@class, \"bie-edit-detail-panel\")]//mat-tab-body[" +
+                        "(contains(@class, \"mat-mdc-tab-body-active\") or contains(@class, \"mat-tab-body-active\"))" +
+                        " and .//textarea[@placeholder = \"Association Definition\"]" +
+                        " and .//button[.//*[normalize-space(.) = \"Assign Business Term\"] or normalize-space(.) = \"Assign Business Term\"]])[1]";
+
         @Override
         public BusinessTermAssignmentPage clickShowBusinessTermsButton() {
-            //Store the current window handle
-            String winHandleBefore = getDriver().getWindowHandle();
+            Set<String> windowHandlesBeforeClick = new HashSet<>(getDriver().getWindowHandles());
             click(getShowBusinessTermsButton());
-            for (String winHandle : getDriver().getWindowHandles()) {
-                getDriver().switchTo().window(winHandle);
-            }
+            switchToNewWindow(windowHandlesBeforeClick);
             String url = getDriver().getCurrentUrl();
             String bieTypes = StringUtils.substringAfter(url, "bieType=");
             Integer bieId = Integer.parseInt(StringUtils.substringBetween(url, "bieId=", "&"));
@@ -920,12 +946,9 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
         @Override
         public AssignBusinessTermBTPage clickAssignBusinessTermButton() {
-            //Store the current window handle
-            String winHandleBefore = getDriver().getWindowHandle();
+            Set<String> windowHandlesBeforeClick = new HashSet<>(getDriver().getWindowHandles());
             click(getAssignBusinessTermButton(true));
-            for (String winHandle : getDriver().getWindowHandles()) {
-                getDriver().switchTo().window(winHandle);
-            }
+            switchToNewWindow(windowHandlesBeforeClick);
             String url = getDriver().getCurrentUrl();
             String bieTypes = StringUtils.substringAfter(url, "bieTypes=");
             Integer bieId = Integer.parseInt(StringUtils.substringBetween(url, "bieIds=", "&"));
@@ -1015,16 +1038,12 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         }
 
         public WebElement getShowBusinessTermsButton() {
-            return elementToBeClickable(getDriver(), By.xpath("//span[contains(text(), \"Show Business Terms\")]//ancestor::button[1]"));
+            return getButtonInActiveDetailTab(ACTIVE_ASBIE_DETAIL_TAB_XPATH, "Show Business Terms", true);
         }
 
         @Override
         public WebElement getAssignBusinessTermButton(boolean enabled) {
-            if (enabled) {
-                return elementToBeClickable(getDriver(), ASSIGN_BUSINESS_TERM_LOCATOR);
-            } else {
-                return visibilityOfElementLocated(getDriver(), ASSIGN_BUSINESS_TERM_LOCATOR);
-            }
+            return getButtonInActiveDetailTab(ACTIVE_ASBIE_DETAIL_TAB_XPATH, "Assign Business Term", enabled);
         }
 
         @Override
@@ -1049,6 +1068,13 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     }
 
     private class BBIEPanelImpl implements BBIEPanel {
+
+        private static final String ACTIVE_BBIE_DETAIL_TAB_XPATH =
+                "(//div[contains(@class, \"bie-edit-detail-panel\")]//mat-tab-body[" +
+                        "(contains(@class, \"mat-mdc-tab-body-active\") or contains(@class, \"mat-tab-body-active\"))" +
+                        " and .//input[@placeholder = \"Example\"]" +
+                        " and .//button[.//*[normalize-space(.) = \"Assign Business Term\"] or normalize-space(.) = \"Assign Business Term\"]])[1]";
+
         @Override
         public WebElement getBusinessTermField() {
             return getInputFieldByName("Business Term");
@@ -1056,26 +1082,19 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
         @Override
         public WebElement getShowBusinessTermsButton() {
-            return elementToBeClickable(getDriver(), By.xpath("//span[contains(text(), \"Show Business Terms\")]//ancestor::button[1]"));
+            return getButtonInActiveDetailTab(ACTIVE_BBIE_DETAIL_TAB_XPATH, "Show Business Terms", true);
         }
 
         @Override
         public WebElement getAssignBusinessTermButton(boolean enabled) {
-            if (enabled) {
-                return elementToBeClickable(getDriver(), ASSIGN_BUSINESS_TERM_LOCATOR);
-            } else {
-                return visibilityOfElementLocated(getDriver(), ASSIGN_BUSINESS_TERM_LOCATOR);
-            }
+            return getButtonInActiveDetailTab(ACTIVE_BBIE_DETAIL_TAB_XPATH, "Assign Business Term", enabled);
         }
 
         @Override
         public BusinessTermAssignmentPage clickShowBusinessTermsButton() {
-            //Store the current window handle
-            String winHandleBefore = getDriver().getWindowHandle();
+            Set<String> windowHandlesBeforeClick = new HashSet<>(getDriver().getWindowHandles());
             click(getShowBusinessTermsButton());
-            for (String winHandle : getDriver().getWindowHandles()) {
-                getDriver().switchTo().window(winHandle);
-            }
+            switchToNewWindow(windowHandlesBeforeClick);
             String url = getDriver().getCurrentUrl();
             String bieTypes = StringUtils.substringAfter(url, "bieType=");
             Integer bieId = Integer.parseInt(StringUtils.substringBetween(url, "bieId=", "&"));
@@ -1087,12 +1106,9 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
         @Override
         public AssignBusinessTermBTPage clickAssignBusinessTermButton() {
-            //Store the current window handle
-            String winHandleBefore = getDriver().getWindowHandle();
+            Set<String> windowHandlesBeforeClick = new HashSet<>(getDriver().getWindowHandles());
             click(getAssignBusinessTermButton(true));
-            for (String winHandle : getDriver().getWindowHandles()) {
-                getDriver().switchTo().window(winHandle);
-            }
+            switchToNewWindow(windowHandlesBeforeClick);
             String url = getDriver().getCurrentUrl();
             String bieTypes = StringUtils.substringAfter(url, "bieTypes=");
             Integer bieId = Integer.parseInt(StringUtils.substringBetween(url, "bieIds=", "&"));
@@ -1228,11 +1244,18 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
         @Override
         public void setValueDomain(String valueDomain) {
-            click(getDriver(), getValueDomainField());
-            waitFor(ofMillis(1000L));
-            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), valueDomain);
-            click(getDriver(), elementToBeClickable(getDriver(), By.xpath(
-                    "//span[contains(text(), \"" + valueDomain + "\")]//ancestor::mat-option[1]")));
+            retry(() -> {
+                click(getDriver(), getValueDomainField());
+                waitFor(ofMillis(1000L));
+                WebElement dropdownSearchField = visibilityOfElementLocated(
+                        PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
+                        DROPDOWN_SEARCH_FIELD_LOCATOR);
+                sendKeys(dropdownSearchField, valueDomain);
+                click(getDriver(), elementToBeClickable(
+                        PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
+                        By.xpath("//div[@class=\"cdk-overlay-container\"]//span[contains(text(), \"" + valueDomain + "\")]//ancestor::mat-option[1]")));
+                escape(getDriver());
+            });
         }
 
         @Override
@@ -1444,10 +1467,17 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
         @Override
         public void setValueDomain(String valueDomain) {
-            click(getValueDomainField());
-            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), valueDomain);
-            click(elementToBeClickable(getDriver(), By.xpath(
-                    "//span[contains(text(), \"" + valueDomain + "\")]//ancestor::mat-option[1]")));
+            retry(() -> {
+                click(getDriver(), getValueDomainField());
+                WebElement dropdownSearchField = visibilityOfElementLocated(
+                        PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
+                        DROPDOWN_SEARCH_FIELD_LOCATOR);
+                sendKeys(dropdownSearchField, valueDomain);
+                click(getDriver(), elementToBeClickable(
+                        PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
+                        By.xpath("//div[@class=\"cdk-overlay-container\"]//span[contains(text(), \"" + valueDomain + "\")]//ancestor::mat-option[1]")));
+                escape(getDriver());
+            });
         }
 
         @Override

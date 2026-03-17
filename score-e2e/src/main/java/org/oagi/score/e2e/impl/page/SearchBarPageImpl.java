@@ -7,6 +7,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import static org.oagi.score.e2e.impl.PageHelper.click;
+import static org.oagi.score.e2e.impl.PageHelper.invisibilityOfLoadingContainerElement;
 import static org.oagi.score.e2e.impl.PageHelper.visibilityOfElementLocated;
 
 public class SearchBarPageImpl implements SearchBarPage {
@@ -53,7 +54,8 @@ public class SearchBarPageImpl implements SearchBarPage {
     @Override
     public void showAdvancedSearchPanel() {
         try {
-            click(getShowAdvancedSearchButton());
+            invisibilityOfLoadingContainerElement(getDriver());
+            click(getDriver(), getShowAdvancedSearchButton());
         } catch (TimeoutException e) {
             if (getHideAdvancedSearchButton() != null) { // the panel has been opened already
                 return;
@@ -71,7 +73,8 @@ public class SearchBarPageImpl implements SearchBarPage {
     @Override
     public void hideAdvancedSearchPanel() {
         try {
-            click(getHideAdvancedSearchButton());
+            invisibilityOfLoadingContainerElement(getDriver());
+            click(getDriver(), getHideAdvancedSearchButton());
         } catch (TimeoutException e) {
             if (getShowAdvancedSearchButton() != null) { // the panel has been closed already
                 return;

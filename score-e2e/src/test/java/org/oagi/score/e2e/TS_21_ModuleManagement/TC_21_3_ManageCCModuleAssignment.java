@@ -55,7 +55,7 @@ public class TC_21_3_ManageCCModuleAssignment extends BaseTest {
 
     @Test
     @DisplayName("TC_21_2_TA_6a_and_6c")
-    public void test_TA_6a_and_6c() {
+    public void manage_release_module_set_covers_ta_6a_and_6c() {
         /*
          * This test case has been separated from TC_21_2 because Score allows only one active release.
          * Thus, it should be executed in this class to use the SAME_THREAD concurrent condition.
@@ -222,7 +222,7 @@ public class TC_21_3_ManageCCModuleAssignment extends BaseTest {
 
     @Test
     @DisplayName("TC_21_3_TA_3")
-    public void test_TA_3() {
+    public void after_both_the_release_and_module_set_have_been_selected_core_components_and_modules_are_listed_in_t() {
         AppUserObject developer;
         LibraryObject library;
         NamespaceObject namespace;
@@ -344,7 +344,7 @@ public class TC_21_3_ManageCCModuleAssignment extends BaseTest {
 
     @Test
     @DisplayName("TC_21_3_TA_4")
-    public void test_TA_4() {
+    public void end_user_can_view_core_component_module_assignment_but_cannot_make_any_change() {
         AppUserObject developer;
         AppUserObject endUser;
         LibraryObject library;

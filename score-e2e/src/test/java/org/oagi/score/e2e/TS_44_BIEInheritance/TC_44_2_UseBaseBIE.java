@@ -51,7 +51,7 @@ public class TC_44_2_UseBaseBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_44_2_1")
-    public void enduser_use_BaseBIE() {
+    public void assign_base_bie_to_existing_bie() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         AppUserObject anotherEndUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);

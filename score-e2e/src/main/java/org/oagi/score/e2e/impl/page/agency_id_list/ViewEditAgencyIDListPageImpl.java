@@ -149,9 +149,9 @@ public class ViewEditAgencyIDListPageImpl extends BaseSearchBarPageImpl implemen
         retry(() -> {
             click(getDriver(), getBranchSelectField());
             waitFor(ofSeconds(2L));
-            WebElement optionField = visibilityOfElementLocated(getDriver(),
+            WebElement optionField = visibilityOfElementLocated(longWait(getDriver()),
                     By.xpath("//div[@class = \"cdk-overlay-container\"]//mat-option//span[text() = \"" + branch + "\"]"));
-            click(optionField);
+            click(getDriver(), optionField);
         });
     }
 
@@ -162,24 +162,24 @@ public class ViewEditAgencyIDListPageImpl extends BaseSearchBarPageImpl implemen
 
     @Override
     public void setState(String state) {
-        click(getStateSelectField());
-        WebElement optionField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[contains(text(), \"" + state + "\")]"));
-        click(optionField);
+        click(getDriver(), getStateSelectField());
+        WebElement optionField = visibilityOfElementLocated(longWait(getDriver()),
+                By.xpath("//div[contains(@class, \"cdk-overlay-container\")]//mat-option//span[contains(text(), \"" + state + "\")]"));
+        click(getDriver(), optionField);
         escape(getDriver());
     }
 
     @Override
     public WebElement getDeprecatedSelectField() {
-        return visibilityOfElementLocated(getDriver(), DEPRECATED_SELECT_FIELD_LOCATOR);
+        return visibilityOfElementLocated(longWait(getDriver()), DEPRECATED_SELECT_FIELD_LOCATOR);
     }
 
     @Override
     public void setDeprecated(boolean deprecated) {
-        click(getDeprecatedSelectField());
-        WebElement optionField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[contains(text(), \"" + (deprecated ? "True" : "False") + "\")]"));
-        click(optionField);
+        click(getDriver(), getDeprecatedSelectField());
+        WebElement optionField = visibilityOfElementLocated(longWait(getDriver()),
+                By.xpath("//div[contains(@class, \"cdk-overlay-container\")]//mat-option//span[contains(text(), \"" + (deprecated ? "True" : "False") + "\")]"));
+        click(getDriver(), optionField);
         escape(getDriver());
     }
 
@@ -190,11 +190,11 @@ public class ViewEditAgencyIDListPageImpl extends BaseSearchBarPageImpl implemen
 
     @Override
     public void setOwner(String owner) {
-        click(getOwnerSelectField());
-        sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), owner);
-        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[contains(text(), \"" + owner + "\")]"));
-        click(searchedSelectField);
+        click(getDriver(), getOwnerSelectField());
+        sendKeys(visibilityOfElementLocated(longWait(getDriver()), DROPDOWN_SEARCH_FIELD_LOCATOR), owner);
+        WebElement searchedSelectField = visibilityOfElementLocated(longWait(getDriver()),
+                By.xpath("//div[contains(@class, \"cdk-overlay-container\")]//mat-option//span[contains(text(), \"" + owner + "\")]"));
+        click(getDriver(), searchedSelectField);
         escape(getDriver());
     }
 
@@ -205,11 +205,11 @@ public class ViewEditAgencyIDListPageImpl extends BaseSearchBarPageImpl implemen
 
     @Override
     public void setUpdater(String updater) {
-        click(getUpdaterSelectField());
-        sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), updater);
-        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[contains(text(), \"" + updater + "\")]"));
-        click(searchedSelectField);
+        click(getDriver(), getUpdaterSelectField());
+        sendKeys(visibilityOfElementLocated(longWait(getDriver()), DROPDOWN_SEARCH_FIELD_LOCATOR), updater);
+        WebElement searchedSelectField = visibilityOfElementLocated(longWait(getDriver()),
+                By.xpath("//div[contains(@class, \"cdk-overlay-container\")]//mat-option//span[contains(text(), \"" + updater + "\")]"));
+        click(getDriver(), searchedSelectField);
         escape(getDriver());
     }
 

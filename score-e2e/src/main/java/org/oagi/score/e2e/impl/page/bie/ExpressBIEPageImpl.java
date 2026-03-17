@@ -233,9 +233,10 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
 
     @Override
     public File hitGenerateButton(ExpressionFormat format, Function<String, Boolean> expectedFilenameMatcher, boolean compressed) {
+        long startedAt = System.currentTimeMillis();
         click(getGenerateButton());
         try {
-            return waitForDownloadFile(ofMillis(60000L), expectedFilenameMatcher, getValidator(format, compressed));
+            return waitForDownloadFile(ofMillis(60000L), startedAt, expectedFilenameMatcher, getValidator(format, compressed));
         } catch (IOException | InterruptedException e) {
             throw new IllegalStateException(e);
         }
@@ -347,13 +348,18 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
     }
 
     private File waitForDownloadFile(Duration duration,
+                                     long startedAt,
                                      Function<String, Boolean> expectedFilenameMatcher,
                                      Function<File, Boolean> validator) throws IOException, InterruptedException {
         String userHome = System.getProperty("user.home");
         Path path = Paths.get(new File(userHome, "Downloads").toURI());
-        if (expectedFilenameMatcher != null) {
-            Optional<Path> matchedFile = Files.list(path)
-                    .filter(child -> expectedFilenameMatcher.apply(child.toFile().getName())).findFirst();
+        try (var files = Files.list(path)) {
+            Optional<Path> matchedFile = files
+                    .filter(child -> child.toFile().lastModified() >= startedAt)
+                    .filter(child -> expectedFilenameMatcher == null || expectedFilenameMatcher.apply(child.toFile().getName()))
+                    .filter(child -> child.toFile().exists() && child.toFile().length() > 0L)
+                    .filter(child -> validator.apply(child.toFile()))
+                    .max((left, right) -> Long.compare(left.toFile().lastModified(), right.toFile().lastModified()));
             if (matchedFile.isPresent()) {
                 return matchedFile.get().toFile();
             }
@@ -363,24 +369,28 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
         path.register(watchService, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
 
         long timeout = duration.toMillis();
-        File downloadedFile = null;
         WatchKey key;
         do {
             key = watchService.poll(1000L, TimeUnit.MILLISECONDS);
             if (key != null && key.isValid()) {
+                File downloadedFile = null;
                 for (WatchEvent<?> event : key.pollEvents()) {
-                    downloadedFile = new File(path.toFile(), event.context().toString());
-                    if (expectedFilenameMatcher != null && !expectedFilenameMatcher.apply(downloadedFile.getName())) {
-                        break;
+                    File candidate = new File(path.toFile(), event.context().toString());
+                    if (expectedFilenameMatcher != null && !expectedFilenameMatcher.apply(candidate.getName())) {
+                        continue;
                     }
-                    if (validator.apply(downloadedFile)) {
-                        return downloadedFile;
+                    if (!candidate.exists() || candidate.length() == 0L) {
+                        continue;
                     }
+                    if (candidate.lastModified() < startedAt) {
+                        continue;
+                    }
+                    downloadedFile = candidate;
                 }
                 key.reset();
-            }
-            if (downloadedFile != null && validator.apply(downloadedFile)) {
-                return downloadedFile;
+                if (downloadedFile != null && validator.apply(downloadedFile)) {
+                    return downloadedFile;
+                }
             }
             timeout -= 1000L;
         } while (timeout > 0L);

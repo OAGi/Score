@@ -43,7 +43,7 @@ public class TC_15_17_EndUserBCCPStateManagement extends BaseTest {
     }
 
     @Test
-    public void test_TA_15_17_1() {
+    public void end_user_can_change_the_bccp_state_from_wip_to_qa_if_he_is_the_owner() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -74,7 +74,7 @@ public class TC_15_17_EndUserBCCPStateManagement extends BaseTest {
     }
 
     @Test
-    public void test_TA_15_17_2() {
+    public void end_user_can_change_the_bccp_state_from_qa_back_to_wip_only_if_he_is() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -107,7 +107,7 @@ public class TC_15_17_EndUserBCCPStateManagement extends BaseTest {
 
 
     @Test
-    public void test_TA_15_17_3() {
+    public void end_user_can_change_the_bccp_state_from_qa_to_production_only_if_he_is_the() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 

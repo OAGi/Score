@@ -19,6 +19,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -47,7 +48,7 @@ public class TC_44_4_StateChangeRules extends BaseTest {
 
     @Test
     @DisplayName("TC_44_4_1")
-    public void validate_compliance_with_state_change_rules_in_case_of_InheritedBIE_Move_to_QA() {
+    public void inherited_bie_cannot_move_to_qa_before_base_bie() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         AppUserObject anotherEndUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -88,15 +89,12 @@ public class TC_44_4_StateChangeRules extends BaseTest {
         WebElement inheritedBieTr = viewEditBIEPage.getTableRecordAtIndex(1);
         assertNotNull(inheritedBieTr);
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(inheritedBieTr);
-        editBIEPage.moveToQA();
-
-        String errorMessage = getText(getMultiActionSnackBar(getDriver()).getMessageElement());
-        assertNotNull(errorMessage);
+        assertDisabled(editBIEPage.getMoveToQAButton(false));
     }
 
     @Test
     @DisplayName("TC_44_4_2")
-    public void validate_compliance_with_state_change_rules_in_case_of_BaseBIE_Back_to_WIP() {
+    public void base_bie_cannot_move_back_to_wip_before_inherited_bie() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         AppUserObject anotherEndUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -179,15 +177,12 @@ public class TC_44_4_StateChangeRules extends BaseTest {
         baseBieTr = viewEditBIEPage.getTableRecordAtIndex(1);
         assertNotNull(baseBieTr);
         editBIEPage = viewEditBIEPage.openEditBIEPage(baseBieTr);
-        editBIEPage.backToWIP();
-
-        String errorMessage = getText(getMultiActionSnackBar(getDriver()).getMessageElement());
-        assertNotNull(errorMessage);
+        assertDisabled(editBIEPage.getBackToWIPButton(false));
     }
 
     @Test
     @DisplayName("TC_44_4_3")
-    public void validate_compliance_with_state_change_rules_in_case_of_InheritedBIE_and_BaseBIE_Back_to_WIP() {
+    public void inherited_bie_can_move_back_to_wip_before_base_bie() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         AppUserObject anotherEndUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -280,7 +275,7 @@ public class TC_44_4_StateChangeRules extends BaseTest {
 
     @Test
     @DisplayName("TC_44_4_4")
-    public void validate_compliance_with_state_change_rules_in_case_of_InheritedBIE_Move_to_Production() {
+    public void inherited_bie_cannot_move_to_production_while_base_stays_in_qa() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         AppUserObject anotherEndUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -348,10 +343,7 @@ public class TC_44_4_StateChangeRules extends BaseTest {
         assertEquals("State updated", getSnackBarMessage(getDriver()));
 
         // Inherited BIE 'Move to Production'
-        editBIEPage.moveToProduction();
-
-        String errorMessage = getText(getMultiActionSnackBar(getDriver()).getMessageElement());
-        assertNotNull(errorMessage);
+        assertDisabled(editBIEPage.getMoveToProductionButton(false));
     }
 
 

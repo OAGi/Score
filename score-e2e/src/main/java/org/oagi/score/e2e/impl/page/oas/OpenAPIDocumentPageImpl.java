@@ -39,7 +39,7 @@ public class OpenAPIDocumentPageImpl extends BaseSearchBarPageImpl implements Op
             By.xpath("//span[contains(text(), \"New OpenAPI Document\")]//ancestor::button[1]");
 
     private static final By DISCARD_BUTTON_LOCATOR =
-            By.xpath("//mat-icon[contains(text(), \"delete\")]//ancestor::button[1]");
+            By.xpath("//span[normalize-space(.) = \"Discard\"]//ancestor::button[1]");
 
     public OpenAPIDocumentPageImpl(BasePage parent) {
         super(parent);

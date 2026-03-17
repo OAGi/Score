@@ -94,6 +94,8 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
             By.xpath("//span[contains(text(), \"Remove\")]//ancestor::button[1]");
     private static final By SEARCH_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
+    private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
+            By.xpath("//input[@aria-label=\"dropdown search\"]");
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//mat-icon[text() = \"search\"]");
     private static final By COMMENT_BUTTON_LOCATOR =
@@ -126,7 +128,7 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     @Override
     public WebElement getTitle() {
         invisibilityOfLoadingContainerElement(getDriver());
-        return visibilityOfElementLocated(getDriver(), By.className("title"));
+        return visibilityOfElementLocated(longWait(getDriver()), By.className("title"));
     }
 
     @Override
@@ -176,7 +178,7 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
 
     @Override
     public WebElement getBasedAgencyIDListField() {
-        return visibilityOfElementLocated(getDriver(), BASED_AGENCY_ID_LIST_FIELD_LOCATOR);
+        return visibilityOfElementLocated(longWait(getDriver()), BASED_AGENCY_ID_LIST_FIELD_LOCATOR);
     }
 
     @Override
@@ -192,11 +194,11 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     @Override
     public void setAgencyIDListValue(AgencyIDListValueObject agencyIDListValue) {
         retry(() -> {
-            click(getAgencyIDListValueSelectField());
+            click(getDriver(), getAgencyIDListValueSelectField());
             waitFor(ofSeconds(2L));
-            WebElement optionField = visibilityOfElementLocated(getDriver(),
+            WebElement optionField = visibilityOfElementLocated(longWait(getDriver()),
                     By.xpath("//span[contains(text(), \"" + agencyIDListValue.getName() + "\")]//ancestor::mat-option[1]"));
-            click(optionField);
+            click(getDriver(), optionField);
         });
     }
 
@@ -208,17 +210,19 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     @Override
     public void setNamespace(NamespaceObject namespace) {
         retry(() -> {
-            click(getNamespaceSelectField());
-            waitFor(ofSeconds(2L));
-            WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//span[contains(text(), \"" + namespace.getUri() + "\")]//ancestor::mat-option[1]"));
-            click(optionField);
+            click(getDriver(), getNamespaceSelectField());
+            waitFor(ofMillis(1000L));
+            sendKeys(visibilityOfElementLocated(longWait(getDriver()), DROPDOWN_SEARCH_FIELD_LOCATOR), namespace.getUri());
+            WebElement optionField = elementToBeClickable(longWait(getDriver()),
+                    By.xpath("//div[contains(@class, \"cdk-overlay-container\")]//span[contains(text(), \"" +
+                            namespace.getUri() + "\")]//ancestor::mat-option[1]"));
+            click(getDriver(), optionField);
         });
     }
 
     @Override
     public WebElement getDeprecatedCheckbox() {
-        return visibilityOfElementLocated(getDriver(), DEPRECATED_CHECKBOX_LOCATOR);
+        return presenceOfElementLocated(longWait(getDriver()), DEPRECATED_CHECKBOX_LOCATOR);
     }
 
     @Override
@@ -439,10 +443,22 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     @Override
     public void hitDeriveAgencyIDListButton() {
         retry(() -> {
-            click(getDeriveAgencyIDListButton());
+            click(getDriver(), getDeriveAgencyIDListButton());
             waitFor(ofMillis(1000L));
         });
         invisibilityOfLoadingContainerElement(getDriver());
+        if (agencyIDList.getName() != null) {
+            String expectedBasedAgencyIDList = agencyIDList.getName().trim();
+            retry(() -> {
+                String basedAgencyIDList = getText(getBasedAgencyIDListField());
+                basedAgencyIDList = basedAgencyIDList == null ? "" : basedAgencyIDList.trim();
+                if (basedAgencyIDList.isEmpty() || !basedAgencyIDList.contains(expectedBasedAgencyIDList)) {
+                    waitFor(ofMillis(500L));
+                    throw new WebDriverException("The derived agency ID list is not ready yet.");
+                }
+                return basedAgencyIDList;
+            }, 20);
+        }
         waitFor(ofMillis(500L));
     }
 
@@ -463,7 +479,7 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
 
     @Override
     public EditAgencyIDListValueDialog addAgencyIDListValue() {
-        click(getAddAgencyIDListValueButton());
+        click(getDriver(), getAddAgencyIDListValueButton());
         EditAgencyIDListValueDialog editAgencyIDListValueDialog = new EditAgencyIDListValueDialogImpl(this);
         assert editAgencyIDListValueDialog.isOpened();
         return editAgencyIDListValueDialog;

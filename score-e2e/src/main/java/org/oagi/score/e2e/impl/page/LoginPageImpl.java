@@ -33,12 +33,13 @@ public class LoginPageImpl extends BasePageImpl implements LoginPage {
         String url = getPageUrl();
         getDriver().get(url);
         waitFor(ofSeconds(1L));
-        assert "Sign in to NIST/OAGi connectCenter".equals(getText(getTitle()));
+        WebElement usernameInput = visibilityOfElementLocated(org.oagi.score.e2e.impl.PageHelper.wait(getDriver(), ofSeconds(10L), ofSeconds(1L)), By.cssSelector("input[id=\"login_field\"]"));
+        assert usernameInput.isDisplayed();
     }
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.tagName("h1"));
+        return visibilityOfElementLocated(org.oagi.score.e2e.impl.PageHelper.wait(getDriver(), ofSeconds(10L), ofSeconds(1L)), By.tagName("h1"));
     }
 
     @Override

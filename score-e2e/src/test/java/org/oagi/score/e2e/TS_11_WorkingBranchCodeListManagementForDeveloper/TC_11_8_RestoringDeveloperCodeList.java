@@ -36,7 +36,7 @@ public class TC_11_8_RestoringDeveloperCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_11_8_TA_1")
-    public void test_TA_1() {
+    public void current_owner_can_restore_deleted_code_list() {
         AppUserObject developerA;
         LibraryObject library;
         ReleaseObject workingBranch;
@@ -77,7 +77,7 @@ public class TC_11_8_RestoringDeveloperCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_11_8_TA_2")
-    public void test_TA_2() {
+    public void non_owner_can_restore_deleted_code_list_and_become_owner() {
         AppUserObject developerA;
         AppUserObject developerB;
         LibraryObject library;

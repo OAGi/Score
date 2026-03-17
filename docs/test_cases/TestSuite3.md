@@ -7,7 +7,7 @@
 
 **End user's authorized functionalities**
 
-> A Score end user can access the functionalities listed in the test assertions.
+> A connectCenter end user can access the functionalities listed in the test assertions.
 
 Pre-condition: N/A
 
@@ -76,7 +76,7 @@ The `CCTS Terminology` option is enabled and mutually exclusive with `connectSpe
 
 ### Test Step:
 
-1. Open the Score login page.
+1. Open the connectCenter login page.
 2. Log in with an end user account.
 3. Verify that `BIE > View/Edit BIE`, `Create BIE`, `Copy BIE`, `Uplift BIE`, `Express BIE`, `BIE Package`, `OpenAPI Document`, `Reuse Report`, `View/Edit Code List`, and `Uplift Code List` are accessible. (Assertion [#1](#test-assertion-311))
 4. Verify that `Context > View/Edit Context Category`, `View/Edit Context Scheme`, and `View/Edit Business Context` are accessible. (Assertion [#2](#test-assertion-312))
@@ -95,7 +95,7 @@ The `CCTS Terminology` option is enabled and mutually exclusive with `connectSpe
 
 **End user's authorized functionalities in standard browsing mode**
 
-> A Score end user in standard browsing mode sees the `Browse Standard` menu instead of the `Core Component` menu.
+> A connectCenter end user in standard browsing mode sees the `Browse Standard` menu instead of the `Core Component` menu.
 
 Pre-condition:
 
@@ -118,7 +118,7 @@ Pre-condition:
 ### Test Step:
 
 1. Enable standard browsing mode through the application settings API.
-2. Open the Score login page.
+2. Open the connectCenter login page.
 3. Log in with an end user account.
 4. Verify that the `Browse Standard` menu is shown and the `Core Component` menu is hidden from the end user account. (Assertion [#1](#test-assertion-321))
 5. Open the `Browse Standard` menu and verify navigation to the core component browsing page. (Assertion [#1](#test-assertion-321))
@@ -156,7 +156,7 @@ Pre-condition:
 ### Test Step:
 
 1. Enable tenant mode through the application settings API.
-2. Open the Score login page.
+2. Open the connectCenter login page.
 3. Log in with an end user account without tenant roles.
 4. Verify that for an end user account without tenant roles, `BIE > Create BIE`, `BIE > View/Edit Code List`, and `BIE > Uplift Code List` are present but disabled. (Assertion [#1](#test-assertion-331))
 5. Verify that for an end user account without tenant roles, the `Context`, `Module`, and `Library` menus are hidden. (Assertion [#2](#test-assertion-332))

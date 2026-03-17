@@ -39,7 +39,7 @@ public class TC_41_2_CreatingBrandNewDT extends BaseTest {
 
     @Test
     @DisplayName("TC_41_2_TA_1")
-    public void test_TA_1() {
+    public void core_component_list_page_a_release_branch_is_selected_the_end_user_can_create_a_brand_new_data_type() {
         AppUserObject endUserA;
         LibraryObject library;
         ReleaseObject branch;
@@ -117,7 +117,7 @@ public class TC_41_2_CreatingBrandNewDT extends BaseTest {
 
     @Test
     @DisplayName("TC_41_2_TA_2")
-    public void test_TA_2() {
+    public void end_user_cannot_create_a_brand_new_end_user_data_type_when_the_working_branch_is_selected() {
         AppUserObject endUserA;
         ReleaseObject branch;
         {

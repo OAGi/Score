@@ -42,7 +42,7 @@ public class TC_16_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_16_1_TA_1")
-    public void test_TA_1() {
+    public void developer_can_see_in_the_list_both_developer_code_lists_and_end_user_code_lists_created_in_the_relea() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerA;
         ReleaseObject branch;
@@ -128,7 +128,7 @@ public class TC_16_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_16_1_TA_2")
-    public void test_TA_2() {
+    public void developer_can_view_the_detail_of_a_developer_code_list_not_owned_by_himself() {
         AppUserObject developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developerA);
         AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -155,7 +155,7 @@ public class TC_16_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_16_1_TA_3")
-    public void test_TA_3() {
+    public void developer_can_view_the_detail_of_end_user_code_list_in_any_state_he_cannot_make_any_change_but_he_ca() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<BigInteger, CodeListValueObject> codeListValuesMap = new HashMap<>();
         AppUserObject developerA;

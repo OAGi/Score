@@ -38,7 +38,7 @@ public class TC_41_6_EditingBrandNewSC extends BaseTest {
 
     @Test
     @DisplayName("TC_41_6_TA_1")
-    public void test_TA_1() {
+    public void following_fields_can_be_edited_with_business_rule_checked_either_when_field_is_updated_or_the_update() {
         AppUserObject endUserA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -161,7 +161,7 @@ public class TC_41_6_EditingBrandNewSC extends BaseTest {
 
     @Test
     @DisplayName("TC_41_6_TA_2")
-    public void test_TA_2() {
+    public void the_update_button_is_clicked_the_changes_except_definition_and_definition_source_also_be_made_to_the() {
         AppUserObject endUserA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();

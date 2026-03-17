@@ -42,7 +42,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_11_1_TA_1_and_TA_14")
-    public void test_TA_1_and_TA_14() {
+    public void developer_can_search_working_branch_code_lists_by_name() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
         LibraryObject library;
@@ -57,7 +57,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
             library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA, library);
             /**
-             * Create Code List for Working branch. States - WIP, Draft and Candidate
+             * Create Code List for Working branch. States - WIP, Draft, Candidate, Release Draft, Published and Deleted
              */
             workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             CodeListObject codeListWIP = getAPIFactory().getCodeListAPI().
@@ -74,6 +74,21 @@ public class TC_11_1_CodeListAccess extends BaseTest {
                     createRandomCodeList(developerA, namespace, workingBranch, "Candidate");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListCandidate, developerA);
             codeListForTesting.add(codeListCandidate);
+
+            CodeListObject codeListReleaseDraft = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(developerA, namespace, workingBranch, "ReleaseDraft");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListReleaseDraft, developerA);
+            codeListForTesting.add(codeListReleaseDraft);
+
+            CodeListObject codeListPublished = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(developerA, namespace, workingBranch, "Published");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListPublished, developerA);
+            codeListForTesting.add(codeListPublished);
+
+            CodeListObject codeListDeleted = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(developerA, namespace, workingBranch, "Deleted");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListDeleted, developerA);
+            codeListForTesting.add(codeListDeleted);
         }
 
         HomePage homePage = loginPage().signIn(developerB.getLoginId(), developerB.getPassword());
@@ -86,7 +101,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_11_1_TA_2")
-    public void test_TA_2() {
+    public void owner_can_edit_owned_wip_code_lists() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerA;
         LibraryObject library;
@@ -143,7 +158,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_11_1_TA_3")
-    public void test_TA_3() {
+    public void non_owner_cannot_edit_wip_code_list() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
         LibraryObject library;
@@ -183,7 +198,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_11_1_TA_4")
-    public void test_TA_4() {
+    public void draft_candidate_deleted_and_release_draft_code_lists_are_read_only_except_comments() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
         LibraryObject library;
@@ -197,7 +212,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
             library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA, library);
             /**
-             * Create Code List for Working branch. States - Draft, Candidate, Deleted
+             * Create Code List for Working branch. States - Draft, Candidate, Deleted, Release Draft
              */
             workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             CodeListObject codeListDraft = getAPIFactory().getCodeListAPI().
@@ -210,6 +225,11 @@ public class TC_11_1_CodeListAccess extends BaseTest {
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListCandidate, developerA);
             codeListForTesting.add(codeListCandidate);
 
+            CodeListObject codeListReleaseDraft = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(developerA, namespace, workingBranch, "ReleaseDraft");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListReleaseDraft, developerA);
+            codeListForTesting.add(codeListReleaseDraft);
+
             CodeListObject codeListDeleted = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(developerA, namespace, workingBranch, "Deleted");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListDeleted, developerA);
@@ -219,11 +239,12 @@ public class TC_11_1_CodeListAccess extends BaseTest {
         HomePage homePage = loginPage().signIn(developerB.getLoginId(), developerB.getPassword());
         for (CodeListObject cl : codeListForTesting) {
             /**
-             * The developer can view the details of a CL that is in Draft, Candidate or Deleted state and owned by any developer
+             * The developer can view the details of a CL that is in Draft, Candidate, Deleted, or Release Draft state and
+             * owned by any developer
              * but he cannot make any change except adding comments.
              */
             assertNotEquals(developerB.getAppUserId(), cl.getOwnerUserId());
-            ArrayList<String> acceptedStates = new ArrayList<>(List.of("Draft", "Candidate", "Deleted"));
+            ArrayList<String> acceptedStates = new ArrayList<>(List.of("Draft", "Candidate", "Deleted", "ReleaseDraft"));
             assertTrue(acceptedStates.contains(cl.getState()));
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
             EditCodeListPage editCodeListPage = viewEditCodeListPage.
@@ -238,7 +259,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_11_1_TA_5")
-    public void test_TA_5() {
+    public void published_code_list_allows_comments_and_revision_only() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
         LibraryObject library;
@@ -283,7 +304,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_11_1_TA_6")
-    public void test_TA_6() {
+    public void end_user_code_lists_are_not_listed_in_working_branch() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
         LibraryObject library;
@@ -336,7 +357,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_11_1_TA_7")
-    public void test_TA_7() {
+    public void deleted_code_list_owned_by_another_developer_is_viewable() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
         AppUserObject developerA;
@@ -383,7 +404,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_11_1_TA_8")
-    public void test_TA_8() {
+    public void developer_can_comment_on_developer_code_lists_in_any_state() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
         AppUserObject developerA;
@@ -398,9 +419,14 @@ public class TC_11_1_CodeListAccess extends BaseTest {
             library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA, library);
             /**
-             * Create Code List for Working branch. States - Draft, Candidate, Deleted
+             * Create Code List for Working branch. States - WIP, Draft, Candidate, Release Draft, Published, Deleted
              */
             workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            CodeListObject codeListWIP = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(developerA, namespace, workingBranch, "WIP");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListWIP, developerA);
+            codeListForTesting.add(codeListWIP);
+
             CodeListObject codeListDraft = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(developerA, namespace, workingBranch, "Draft");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListDraft, developerA);
@@ -410,6 +436,16 @@ public class TC_11_1_CodeListAccess extends BaseTest {
                     createRandomCodeList(developerA, namespace, workingBranch, "Candidate");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListCandidate, developerA);
             codeListForTesting.add(codeListCandidate);
+
+            CodeListObject codeListReleaseDraft = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(developerA, namespace, workingBranch, "ReleaseDraft");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListReleaseDraft, developerA);
+            codeListForTesting.add(codeListReleaseDraft);
+
+            CodeListObject codeListPublished = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(developerA, namespace, workingBranch, "Published");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListPublished, developerA);
+            codeListForTesting.add(codeListPublished);
 
             CodeListObject codeListDeleted = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(developerA, namespace, workingBranch, "Deleted");
@@ -425,6 +461,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
             assertNotEquals(developerB.getAppUserId(), cl.getOwnerUserId());
             assertEquals(developerA.getAppUserId(), cl.getOwnerUserId());
             assertTrue(developerA.isDeveloper());
+            assertTrue(List.of("WIP", "Draft", "Candidate", "ReleaseDraft", "Published", "Deleted").contains(cl.getState()));
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
             EditCodeListPage editCodeListPage = viewEditCodeListPage.
                     openCodeListViewEditPage(cl);
@@ -438,7 +475,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_11_1_TA_9")
-    public void test_TA_9() {
+    public void end_user_can_comment_on_developer_code_lists_in_any_state() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject endUser;
         AppUserObject developerA;
@@ -453,9 +490,14 @@ public class TC_11_1_CodeListAccess extends BaseTest {
             library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA, library);
             /**
-             * Create Code List for Working branch. States - Draft, Candidate, Deleted
+             * Create Code List for Working branch. States - WIP, Draft, Candidate, Release Draft, Published, Deleted
              */
             workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            CodeListObject codeListWIP = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(developerA, namespace, workingBranch, "WIP");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListWIP, developerA);
+            codeListForTesting.add(codeListWIP);
+
             CodeListObject codeListDraft = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(developerA, namespace, workingBranch, "Draft");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListDraft, developerA);
@@ -465,6 +507,16 @@ public class TC_11_1_CodeListAccess extends BaseTest {
                     createRandomCodeList(developerA, namespace, workingBranch, "Candidate");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListCandidate, developerA);
             codeListForTesting.add(codeListCandidate);
+
+            CodeListObject codeListReleaseDraft = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(developerA, namespace, workingBranch, "ReleaseDraft");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListReleaseDraft, developerA);
+            codeListForTesting.add(codeListReleaseDraft);
+
+            CodeListObject codeListPublished = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(developerA, namespace, workingBranch, "Published");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListPublished, developerA);
+            codeListForTesting.add(codeListPublished);
 
             CodeListObject codeListDeleted = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(developerA, namespace, workingBranch, "Deleted");
@@ -481,6 +533,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
             assertEquals(developerA.getAppUserId(), cl.getOwnerUserId());
             assertFalse(endUser.isDeveloper());
             assertTrue(developerA.isDeveloper());
+            assertTrue(List.of("WIP", "Draft", "Candidate", "ReleaseDraft", "Published", "Deleted").contains(cl.getState()));
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
             EditCodeListPage editCodeListPage = viewEditCodeListPage.
                     openCodeListViewEditPage(cl);
@@ -494,7 +547,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_11_1_TA_10")
-    public void test_TA_10() {
+    public void developer_can_filter_code_lists_by_branch() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
         LibraryObject library;
@@ -564,7 +617,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_11_1_TA_11")
-    public void test_TA_11() {
+    public void developer_can_filter_code_lists_by_deprecation_status() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerA;
         LibraryObject library;
@@ -625,7 +678,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_11_1_TA_12")
-    public void test_TA_12() {
+    public void developer_can_filter_code_lists_by_state() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerA;
         LibraryObject library;
@@ -678,7 +731,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_11_1_TA_13")
-    public void test_TA_13() {
+    public void developer_can_filter_code_lists_by_updated_date() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerA, developerB;
         LibraryObject library;
@@ -724,7 +777,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_11_1_TA_15")
-    public void test_TA_15() {
+    public void developer_can_search_code_lists_by_definition() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
         LibraryObject library;
@@ -767,7 +820,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_11_1_TA_16")
-    public void test_TA_16() {
+    public void developer_can_search_code_lists_by_module() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
         LibraryObject library;

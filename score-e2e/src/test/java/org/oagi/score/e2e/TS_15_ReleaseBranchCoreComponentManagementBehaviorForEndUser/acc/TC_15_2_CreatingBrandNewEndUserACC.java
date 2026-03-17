@@ -47,7 +47,7 @@ public class TC_15_2_CreatingBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_15_2_1() {
+    public void end_user_cannot_create_a_brand_new_end_user_acc_on_the_working_branch() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -60,7 +60,7 @@ public class TC_15_2_CreatingBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_15_2_2() {
+    public void on_the_cc_list_page_with_a_particular_release_branch_selected_the_end_user_can_create() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 

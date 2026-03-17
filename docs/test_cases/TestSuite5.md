@@ -1,6 +1,6 @@
 # Test Suite 5
 
-**OAGIS developer access right to Score core functions**
+**OAGIS developer access right to connectCenter core functions**
 
 
 ## Test Case 5.1
@@ -13,7 +13,7 @@ Pre-condition: N/A
 ### Test Assertion:
 
 #### Test Assertion #5.1.1
-The developer can create a context category with only required information. See Create a Context Category in Score User Guide for Mandatory/Optional fields.
+The developer can create a context category with only required information. See Create a Context Category in the connectCenter User Guide for Mandatory/Optional fields.
 
 #### Test Assertion #5.1.2
 The developer can create a context category with all information specified.
@@ -203,7 +203,7 @@ Pre-condition: N/A
 ### Test Assertion:
 
 #### Test Assertion #5.3.1
-The OAGi developer can create a business context with only required information. See Create a Business Context in Score User Guide for Mandatory/Optional fields.
+The OAGi developer can create a business context with only required information. See Create a Business Context in the connectCenter User Guide for Mandatory/Optional fields.
 
 #### Test Assertion #5.3.2
 The developer can remove a context value during the business context creation.
@@ -288,7 +288,7 @@ Pre-condition: N/A
 ### Test Assertion:
 
 #### Test Assertion #5.4.1
-The developer can create a code list without base with only required information. See Create a Brand New Code List in Score User Guide for Mandatory/Optional fields. In addition, Code list value cannot be duplicated.
+The developer can create a code list without base with only required information. See Create a Brand New Code List in the connectCenter User Guide for Mandatory/Optional fields. In addition, Code list value cannot be duplicated.
 
 #### Test Assertion #5.4.2
 The developer can create a code list without base with all information specified and multiple code values.
@@ -300,7 +300,7 @@ The developer can remove a code value during the code list without base creation
 The developer cannot create a code list without base with missing required information including missing required information in the code value table.
 
 #### Test Assertion #5.4.5
-The developer cannot create a code list without base, when it does not meet a uniqueness constraint. See Create a Brand New Code List in Score User Guide for the uniqueness constraint.
+The developer cannot create a code list without base, when it does not meet a uniqueness constraint. See Create a Brand New Code List in the connectCenter User Guide for the uniqueness constraint.
 
 #### Test Assertion #5.4.6
 The developer can see, in the code list page, all code lists created by any user.
@@ -339,7 +339,7 @@ Only published code lists without base can be used in BIE (and CC – we will no
 The developer cannot discard a code list once it has been published.
 
 #### Test Assertion #5.4.18
-The developer can create a code list with base that has only required information. See Create a Brand New Code List in Score User Guide for Mandatory/Optional fields.
+The developer can create a code list with base that has only required information. See Create a Brand New Code List in the connectCenter User Guide for Mandatory/Optional fields.
 
 #### Test Assertion #5.4.19
 The developer can create a code list with base with all information specified and with some code value restrictions and extensions added. The developer cannot change any field of the inherited code value.
@@ -351,7 +351,7 @@ The developer can remove a code value during the code list with base creation.
 The developer cannot create a code list with base with missing required information including missing required information in the code value table.
 
 #### Test Assertion #5.4.22
-The developer cannot create a code list with base, when it does not meet a uniqueness constraint. See Create a Brand New Code List in Score User Guide for the uniqueness constraint.
+The developer cannot create a code list with base, when it does not meet a uniqueness constraint. See Create a Brand New Code List in the connectCenter User Guide for the uniqueness constraint.
 
 #### Test Assertion #5.4.23
 The developer can update a code list with base that has only required information including adding, removing and restricting, unrestricting code values. The developer cannot change any field of the inherited code value.
@@ -639,7 +639,7 @@ One of its ASCCPs is deprecated.
 One of its BCCPs has its default value revised from no default value to a default value.
 
 #### Test Assertion #5.5.3
-The developer cannot create a BIE based on a working branch ASCCP.
+The developer cannot create a BIE based on an ASCCP in the Working branch.
 
 #### Test Assertion #5.5.4
 The developer can see, in the BIE list page, all BIEs owned by any user.
@@ -973,13 +973,13 @@ The developer can generate an expression of a single BIE, in XML Schema, in the 
 The developer can generate an expression of a single BIE, in XML Schema, in the same package, with the BIE CCTS Meta Data annotation selected but not the Include CCTS_Definition Tag annotation.
 
 #### Test Assertion #5.6.9
-The developer can generate an expression of a single BIE, in XML Schema, in the same package, with the BIE OAGi/Score Meta Data annotation selected but not the Include WHO Columns annotation.
+The developer can generate an expression of a single BIE, in XML Schema, in the same package, with the BIE OAGi/connectCenter Meta Data annotation selected but not the Include WHO Columns annotation.
 
 #### Test Assertion #5.6.10
 The developer cannot generate an expression of a single BIE, in XML Schema, with the Include CCTS_Definition Tag annotation selected but not the BIE CCTS Meta Data annotation.
 
 #### Test Assertion #5.6.11
-The developer cannot generate an expression of a single BIE, in XML Schema, with the Include WHO Columns annotation selected but not the BIE OAGi/Score Meta Data annotation.
+The developer cannot generate an expression of a single BIE, in XML Schema, with the Include WHO Columns annotation selected but not the BIE OAGi/connectCenter Meta Data annotation.
 
 #### Test Assertion #5.6.12
 The developer can generate an expression of a single BIE, in JSON Schema, in the same package, with no annotation selected.
@@ -988,7 +988,7 @@ The developer can generate an expression of a single BIE, in JSON Schema, in the
 The developer can generate an expression of a single BIE, in JSON Schema, in the same package, with the BIE Definition annotation selected.
 
 #### Test Assertion #5.6.14
-The developer cannot generate an expression of a single BIE, in JSON Schema, in the same package, with any of the BIE CCTS Meta Data, Include CCTS_Definition Tag, BIE GUID, Business Context, BIE OAGi/Score Meta Data, or Include WHO Columns annotations selected. `Based CC Meta Data` remains available for JSON Schema and is unchecked by default.
+The developer cannot generate an expression of a single BIE, in JSON Schema, in the same package, with any of the BIE CCTS Meta Data, Include CCTS_Definition Tag, BIE GUID, Business Context, BIE OAGi/connectCenter Meta Data, or Include WHO Columns annotations selected. `Based CC Meta Data` remains available for JSON Schema and is unchecked by default.
 
 #### Test Assertion #5.6.15
 The developer can generate an expression of multiple BIEs, in multiple XML Schemas, saved in the same package, with some annotations selected.
@@ -1108,17 +1108,17 @@ The developer can refresh the Express BIE page during OpenAPI generation setup a
 7. Verify that the Schema is successfully generated and saved in the same package. (Assertion [#6](#test-assertion-566))
 8. The developer generates an expression from BIE1, in XML Schema, selecting the BIE CCTS Meta Data annotation but not the Include CCTS_Definition Tag annotation and that the scheme will be saved in the same package.
 9. Verify that the Schema is successfully generated and saved in the same package. (Assertion [#7](#test-assertion-567))
-10. The developer generates an expression from BIE2, in XML Schema, selecting the BIE OAGi/Score Meta Data annotation but not the Include WHO Columns annotation and that the schema will be saved in the same package.
+10. The developer generates an expression from BIE2, in XML Schema, selecting the BIE OAGi/connectCenter Meta Data annotation but not the Include WHO Columns annotation and that the schema will be saved in the same package.
 11. Verify that the Schema is successfully generated and saved in the same package. (Assertion [#8](#test-assertion-568))
 12. The developer generates an expression from BIE2, in XML Schema, selecting the Include CCTS_Definition Tag annotation but not the BIE CCTS Meta Data annotation.
 13. Verify that the Include CCTS_Definition Tag annotation cannot be selected without selecting the BIE CCTS Meta Data annotation first. (Assertion [#9](#test-assertion-569))
-14. The developer generates an expression from BIE2, in XML Schema, selecting the Include WHO Columns annotation but not the BIE OAGi/Score Meta Data annotation.
-15. Verify that the Include WHO Columns annotation cannot be selected without selecting the BIE OAGi/Score Meta Data annotation first. (Assertion [#10](#test-assertion-5610))
+14. The developer generates an expression from BIE2, in XML Schema, selecting the Include WHO Columns annotation but not the BIE OAGi/connectCenter Meta Data annotation.
+15. Verify that the Include WHO Columns annotation cannot be selected without selecting the BIE OAGi/connectCenter Meta Data annotation first. (Assertion [#10](#test-assertion-5610))
 16. The developer generates an expression from BIEb, in JSON Schema, selecting that the schema will be saved in the same package and without selecting any annotation.
 17. Verify that the Schema is successfully generated. (Assertion [#11](#test-assertion-5611))
 18. The developer generates an expression from BIE1, in JSON Schema, selecting the BIE Definition annotation and that the schema will be saved in the same package.
 19. Verify that the Schema is successfully generated and saved in the same package. (Assertion [#12](#test-assertion-5612))
-20. The developer generates an expression from BIE2, in JSON Schema, attempting to select BIE CCTS Meta Data, Include CCTS_Definition Tag, BIE GUID, Business Context, BIE OAGi/Score Meta Data, and Include WHO Columns. He also verifies that `Based CC Meta Data` remains available but unchecked by default.
+20. The developer generates an expression from BIE2, in JSON Schema, attempting to select BIE CCTS Meta Data, Include CCTS_Definition Tag, BIE GUID, Business Context, BIE OAGi/connectCenter Meta Data, and Include WHO Columns. He also verifies that `Based CC Meta Data` remains available but unchecked by default.
 21. Verify that the former annotations cannot be selected and that `Based CC Meta Data` remains enabled but unchecked. (Assertion [#13](#test-assertion-5613))
 22. The developer generates an expression from BIEb and BIE1, in XML Schemas, selecting some annotations and that the XML Schemas will be saved in the same package.
 23. Verify that the Schemas are successfully generated and saved in the same package. (Assertion [#14](#test-assertion-5614))

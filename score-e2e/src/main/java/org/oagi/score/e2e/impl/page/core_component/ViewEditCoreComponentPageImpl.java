@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.impl.page.core_component;
 
 import org.oagi.score.e2e.impl.page.BaseSearchBarPageImpl;
+import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.core_component.*;
@@ -55,13 +56,15 @@ public class ViewEditCoreComponentPageImpl extends BaseSearchBarPageImpl impleme
     public void openPage() {
         String url = getPageUrl();
         getDriver().get(url);
-        waitFor(ofSeconds(2L));
+        invisibilityOfLoadingContainerElement(getDriver());
         assert "Core Component".equals(getText(getTitle()));
     }
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("title"));
+        invisibilityOfLoadingContainerElement(getDriver());
+        return visibilityOfElementLocated(PageHelper.wait(getDriver(), ofSeconds(10L), ofMillis(100L)),
+                By.cssSelector("score-title-with-library-selector .title, .title"));
     }
 
     @Override

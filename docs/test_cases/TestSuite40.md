@@ -31,13 +31,17 @@ The end user can view the details of an DT that is in Deleted, but he cannot mak
 The end user can view details of any Published DT but cannot make any change except adding comments.
 
 #### Test Assertion #40.1.7
-The developer cannot make a new revision on any DT.
+The end user cannot make a new revision on any DT.
 
 #### Test Assertion #40.1.8
-The developer shall not be able to create any new DT.
+The end user shall not be able to create any new DT.
 
 ### Test Step Pre-condition:
-
+1. The stated test-case pre-condition is satisfied: A working release is selected.
+2. The users, branches, releases, and records needed to exercise "Access to DT viewing, editing, and commenting" are available in connectCenter.
 
 
 ### Test Step:
+1. The end user signs in to connectCenter, opens `Core Component > View/Edit Core Component`, and selects the Working branch.
+2. Verify DT visibility for the Working branch and confirm state-specific permissions across `WIP`, `Draft`, `Candidate`, `Deleted`, and `Published` records by ownership. (Assertions [#40.1.1](#test-assertion-4011), [#40.1.2](#test-assertion-4012), [#40.1.3](#test-assertion-4013), [#40.1.4](#test-assertion-4014), [#40.1.5](#test-assertion-4015), [#40.1.6](#test-assertion-4016))
+3. Verify that creating a new revision and creating a new DT are unavailable in this working-branch access scenario. (Assertions [#40.1.7](#test-assertion-4017), [#40.1.8](#test-assertion-4018))

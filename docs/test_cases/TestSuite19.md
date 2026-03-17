@@ -10,6 +10,8 @@
 
 Pre-condition: N/A
 
+> Current E2E coverage in this suite focuses on release creation and discard, draft creation from candidate content, selected reference and extension validations, draft visibility in branch selectors, publishing, published-release immutability, and end-user read-only access. Assertions about replaced-by reference validation, non-reusable ASCCP validation, candidate locking during draft creation, and migration-script generation are not automated here.
+
 
 ### Test Assertion:
 
@@ -23,7 +25,7 @@ The developer can discard a release that is in the Initialized state if there is
 From the Initialized Release, a Release Draft can be created by a developer – Create a Release Draft function. There can be only one Release Draft at a particular point in time. I.e., when a Release Draft is being created, another developer MUST NOT be able to invoke the Create a Release Draft function; and when there is a Release Draft, another Release Draft cannot be created. The process of creating a release draft has the following steps.
 
 ##### Test Assertion #19.1.3.a
-The developer can add CCs in the working branch that are in the Candidate state (no CCs in other states are allowed) to the release draft (this can include new and revised CCs).
+The developer can add CCs in the Working branch that are in the Candidate state (no CCs in other states are allowed) to the release draft (this can include new and revised CCs).
 ##### Test Assertion #19.1.3.b
 The developer can invoke Validate to:
 ##### Test Assertion #19.1.3.c
@@ -49,7 +51,7 @@ If the reference validation is successful, the user can hit the Finish button. T
 Initialized Releases shall not show up in the Branch drop down box in the Core Component page or when selecting an ASCCP while creating a BIE.
 
 #### Test Assertion #19.1.5
-While a release draft is being created, all working branch CCs in the Candidate State that are included in the release draft shall be locked. This is needed so that no one can go in and change states of CCs included in the release draft. So, if anyone has a candidate developer CC already open, they cannot make a commit/change the state, for example, back to WIP.
+While a release draft is being created, all Working-branch CCs in the Candidate State that are included in the release draft shall be locked. This is needed so that no one can go in and change states of CCs included in the release draft. So, if anyone has a candidate developer CC already open, they cannot make a commit/change the state, for example, back to WIP.
 
 #### Test Assertion #19.1.6
 The created Release Draft shall show up in the Branch drop down box in the Core Component page, so that any users can view the CCs. All CCs shall display the Release Draft state. No actions can be performed in this branch except viewing details of those release draft CCs. The Working branch can still show. Among others, it would include CCs in Release Draft state where no actions can be performed except viewing.
@@ -80,7 +82,15 @@ A developer can generate a migration script only for the most recent published r
 in the external data loader to update other instances to the recent published release. 
 
 ### Test Step Pre-condition:
-
+1. Developer and end-user accounts needed for release-management scenarios are available in connectCenter.
+2. The suite prepares initialized releases, candidate Working-branch CCs, and selected dependency scenarios needed for draft creation and validation checks.
+3. Where publish is verified, the acting developer has the permissions required by the current application configuration.
 
 
 ### Test Step:
+1. A developer signs in to connectCenter and opens the View/Edit Release page.
+2. Create an initialized release with the required release number and namespace, verify that it can be discarded when unused, and verify that initialized releases do not appear in the Core Component or BIE branch selectors. (Assertions [#19.1.1](#test-assertion-1911), [#19.1.2](#test-assertion-1912), [#19.1.4](#test-assertion-1914))
+3. Create a draft release from an initialized release, assign all candidate content, and validate the implemented dependency scenarios: ACC to ASCCP, ACC to BCCP, ASCCP to ACC, ACC to based ACC, and extension-related missing-reference cases. (Assertion [#19.1.3](#test-assertion-1913))
+4. Verify the successful and cancelled draft-release flows: when validation succeeds, create the draft release, verify that Release Draft content appears read-only in the branch selector for Core Components but is excluded from BIE branch selection, and verify that moving the draft back to Initialized restores the CC state. (Assertions [#19.1.3](#test-assertion-1913), [#19.1.6](#test-assertion-1916), [#19.1.7](#test-assertion-1917), [#19.1.8](#test-assertion-1918))
+5. Publish a draft release, verify that draft release details can still be updated before publishing, verify that assigned CCs move to Published, and verify that the published release becomes read-only. (Assertions [#19.1.9](#test-assertion-1919), [#19.1.10](#test-assertion-19110), [#19.1.11](#test-assertion-19111))
+6. Sign in as an end user and verify that release-management actions are unavailable while release details remain viewable. (Assertions [#19.1.12](#test-assertion-19112), [#19.1.13](#test-assertion-19113))

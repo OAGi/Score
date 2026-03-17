@@ -53,7 +53,7 @@ public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
     }
 
     @Test
-    public void test_TA_20_2_1_a_b_c_d() {
+    public void end_user_management_of_namespaces_uri_is_required_and_unique_this_is_a_text() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -87,7 +87,7 @@ public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
     }
 
     @Test
-    public void test_TA_20_2_2() {
+    public void end_user_who_is_an_owner_of_the_namespace_can_change_details_of_an_existing_namespace() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -127,7 +127,7 @@ public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
         assertEquals(1, getDriver().findElements(By.xpath(namespaceXpath)).size());
     }
     @Test
-    public void test_TA_20_2_3() {
+    public void developer_and_end_user_who_does_not_own_the_namespace_cannot_update_it() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -161,7 +161,7 @@ public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
     }
 
     @Test
-    public void test_TA_20_2_4() {
+    public void end_user_who_is_the_owner_of_the_namespace_can_discard_it_if_the_namespace_has() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -179,7 +179,7 @@ public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
     }
 
     @Test
-    public void test_TA_20_2_6() {
+    public void owner_end_user_of_the_namespace_can_transfer_ownership_only_to_another_end_user() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);

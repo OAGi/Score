@@ -189,4 +189,16 @@ public interface EditOpenAPIDocumentPage extends Page {
      */
     AddBIEForOpenAPIDocumentDialog openAddBIEForOpenAPIDocumentDialog();
 
+    WebElement getTableRecordAtIndex(int idx);
+
+    WebElement getTableRecordByValue(String value);
+
+    WebElement getColumnByName(WebElement tableRecord, String columnName);
+
+    void toggleSelect(WebElement tableRecord);
+
+    WebElement getRemoveButton(boolean enabled);
+
+    void removeSelectedBIEs();
+
 }

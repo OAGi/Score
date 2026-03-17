@@ -48,7 +48,7 @@ public class TC_15_14_CreatingBrandNewEndUserBCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_15_14_1() {
+    public void on_the_cc_view_edit_page_where_a_particular_release_branch_is_selected_the_end_user() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -84,7 +84,7 @@ public class TC_15_14_CreatingBrandNewEndUserBCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_15_14_2() {
+    public void end_user_cannot_create_a_brand_new_bccp_when_the_working_branch_is_selected() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 

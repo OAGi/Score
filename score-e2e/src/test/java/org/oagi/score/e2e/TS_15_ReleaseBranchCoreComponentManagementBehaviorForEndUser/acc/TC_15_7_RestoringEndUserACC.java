@@ -45,7 +45,7 @@ public class TC_15_7_RestoringEndUserACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_15_7_1() {
+    public void end_user_can_open_an_acc_and_restore_it_all_of_its_associations_shall_be_restored() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 

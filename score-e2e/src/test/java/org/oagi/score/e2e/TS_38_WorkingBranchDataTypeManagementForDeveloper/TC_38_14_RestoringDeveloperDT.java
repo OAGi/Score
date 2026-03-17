@@ -35,7 +35,7 @@ public class TC_38_14_RestoringDeveloperDT extends BaseTest {
 
     @Test
     @DisplayName("TC_38_14_TA_1")
-    public void test_TA_1() {
+    public void developer_user_can_open_data_type_and_restore_it() {
         AppUserObject developerA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();

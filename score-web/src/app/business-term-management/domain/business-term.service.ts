@@ -187,7 +187,15 @@ export class BusinessTermService {
   }
 
   getAssignedBusinessTermList(request: AssignedBtListRequest): Observable<PageResponse<AssignedBusinessTermListEntry>> {
-    const params = request.toParams();
+    let params = request.toParams();
+    if (request.updaterUsernameList && request.updaterUsernameList.length > 0) {
+      params = params.delete('updaterUsernameList')
+        .set('updaterLoginIdList', request.updaterUsernameList.join(','));
+    }
+    if (request.filters.bieTypes && request.filters.bieTypes.length > 0) {
+      params = params.delete('bieTypes')
+        .set('bieTypeList', request.filters.bieTypes.join(','));
+    }
     return this.http.get<PageResponse<AssignedBusinessTermListEntry>>('/api/business-terms/assign', {params}).pipe(
         map((res: PageResponse<AssignedBusinessTermListEntry>) => ({
           ...res,

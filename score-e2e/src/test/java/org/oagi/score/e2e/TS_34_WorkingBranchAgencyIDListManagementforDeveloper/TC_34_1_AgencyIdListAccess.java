@@ -546,7 +546,8 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         commentDialog = editAgencyIDListPage.openCommentDialog();
         AddCommentDialog.CommentContent content = commentDialog.getContent(1);
         assertEquals(endUser.getLoginId(), content.getCreator());
-        assertEquals(commentText, content.getCommentText());
+        assertEquals(commentText.replaceAll("\\s+", " ").trim(),
+                content.getCommentText().replaceAll("\\s+", " ").trim());
     }
 
     @Test

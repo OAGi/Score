@@ -23,7 +23,12 @@ The developer can view the detail of a developer Agency ID list. He cannot make 
 The developer can view the detail of an end user Agency ID list in any state, he cannot make any change, but he can add comment.
 
 ### Test Step Pre-condition:
-
+1. The stated test-case pre-condition is satisfied: The developer is on the View/Edit Agency ID List page with a particular release branch selected.
+2. The users, branches, releases, and records needed to exercise "Agency ID access" are available in connectCenter.
 
 
 ### Test Step:
+1. Sign in as a developer and open **Core Component > View/Edit Agency ID List** with the target release branch selected.
+2. Verify the list contains published developer Agency ID Lists and end user Agency ID Lists created in the selected release. (Assertion [#36.1.1](#test-assertion-3611))
+3. Open a developer Agency ID List and verify that details are view-only while comments remain available. (Assertion [#36.1.2](#test-assertion-3612))
+4. Open end user Agency ID Lists in the covered states and verify that details are view-only while comments remain available. (Assertion [#36.1.3](#test-assertion-3613))

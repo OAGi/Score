@@ -53,7 +53,7 @@ public class TC_15_3_EditingBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_15_3_1() {
+    public void component_type_can_only_be_either_base_semantics_or_semantic_group() {
 
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -84,7 +84,7 @@ public class TC_15_3_EditingBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_15_3_2() {
+    public void if_acc_s_component_type_is_user_extension_group_the_end_user_cannot_change() {
 
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -133,7 +133,7 @@ public class TC_15_3_EditingBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_15_3_3_a() {
+    public void if_the_component_type_is_base_abstract_shall_be_true() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -156,7 +156,7 @@ public class TC_15_3_EditingBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_15_3_3_b() {
+    public void abstract_can_only_be_true_when_the_component_type_is_base_or_semantics() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -182,7 +182,7 @@ public class TC_15_3_EditingBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_15_3_3_c() {
+    public void object_class_term_component_type_namespace_and_abstract_are_required_namespace_must_be_a() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -227,7 +227,7 @@ public class TC_15_3_EditingBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_15_3_3_d() {
+    public void deprecated_must_be_false_and_locked_b_c_revision_is_1() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -250,7 +250,7 @@ public class TC_15_3_EditingBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_15_3_3_e() {
+    public void warning_should_be_given_when_the_definition_is_empty() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -278,7 +278,7 @@ public class TC_15_3_EditingBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_15_3_3_f() {
+    public void if_object_class_term_of_the_acc_change_and_there_is_one_or_more() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 

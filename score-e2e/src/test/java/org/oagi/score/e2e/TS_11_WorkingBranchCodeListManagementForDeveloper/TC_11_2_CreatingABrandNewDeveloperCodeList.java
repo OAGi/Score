@@ -41,7 +41,7 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_11_2_TA_1")
-    public void test_TA_1() {
+    public void developer_can_create_brand_new_code_list_with_default_values() {
         AppUserObject developer;
         LibraryObject library;
         ReleaseObject workingBranch;
@@ -78,7 +78,7 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_11_2_TA_2")
-    public void test_TA_2() {
+    public void developer_can_create_code_list_with_unique_values_and_reject_duplicates() {
         AppUserObject developer;
         LibraryObject library;
         ReleaseObject workingBranch;
@@ -117,7 +117,7 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_11_2_TA_3")
-    public void test_TA_3() {
+    public void developer_can_remove_code_list_value_during_creation() {
         AppUserObject developer;
         LibraryObject library;
         ReleaseObject workingBranch;
@@ -151,7 +151,7 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_11_2_TA_4")
-    public void test_TA_4() {
+    public void code_list_uniqueness_is_enforced_during_creation() {
         AppUserObject developer;
         LibraryObject library;
         ReleaseObject workingBranch;
@@ -175,7 +175,7 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_11_2_TA_5")
-    public void test_TA_5() {
+    public void developer_cannot_create_code_list_based_on_existing_code_list() {
         AppUserObject developerA;
         LibraryObject library;
         ReleaseObject release;
@@ -200,7 +200,7 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_11_2_TA_6")
-    public void test_TA_6() {
+    public void developer_cannot_create_brand_new_code_list_in_release_branch() {
         AppUserObject developer;
         LibraryObject library;
         ReleaseObject release;
@@ -220,7 +220,7 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_11_2_TA_7")
-    public void test_TA_7() {
+    public void brand_new_code_list_value_deprecated_flag_is_disabled() {
         AppUserObject developer;
         LibraryObject library;
         ReleaseObject workingBranch;

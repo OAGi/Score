@@ -39,7 +39,7 @@ public class TC_38_10_EditingRevisionOfDeveloperDT extends BaseTest {
 
     @Test
     @DisplayName("TC_38_10_TA_1")
-    public void test_TA_1() {
+    public void only_the_following_can_change() {
         AppUserObject developerA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -140,7 +140,7 @@ public class TC_38_10_EditingRevisionOfDeveloperDT extends BaseTest {
 
     @Test
     @DisplayName("TC_38_10_TA_2")
-    public void test_TA_2() {
+    public void the_update_button_is_clicked_all_changes_except_definition_source_and_content_component_definition_s() {
         AppUserObject developerA;
         LibraryObject library;
         ReleaseObject branch;

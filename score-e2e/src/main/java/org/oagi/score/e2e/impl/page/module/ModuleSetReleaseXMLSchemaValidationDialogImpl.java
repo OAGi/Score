@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.impl.page.module;
 
+import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.page.module.ModuleSetReleaseXMLSchemaValidationDialog;
 import org.openqa.selenium.By;
@@ -7,6 +8,9 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.time.Duration;
+
+import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ModuleSetReleaseXMLSchemaValidationDialogImpl implements ModuleSetReleaseXMLSchemaValidationDialog {
@@ -34,7 +38,8 @@ public class ModuleSetReleaseXMLSchemaValidationDialogImpl implements ModuleSetR
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//div/span"));
+        return visibilityOfElementLocated(PageHelper.wait(getDriver(), Duration.ofSeconds(30L), ofMillis(200L)),
+                By.xpath("//div[contains(@class, \"mat-mdc-dialog-title\")]/span"));
     }
 
     @Override

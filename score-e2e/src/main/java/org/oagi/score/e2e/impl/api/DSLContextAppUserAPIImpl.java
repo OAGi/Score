@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.impl.api;
 
 import org.jooq.DSLContext;
+import org.jooq.exception.DataAccessException;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.api.AppUserAPI;
 import org.oagi.score.e2e.impl.api.helper.BCryptPasswordEncoder;
@@ -21,6 +22,7 @@ import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.*;
 
 public class DSLContextAppUserAPIImpl implements AppUserAPI {
 
+    private static final int DEADLOCK_RETRY_COUNT = 3;
     private final DSLContext dslContext;
 
     public DSLContextAppUserAPIImpl(DSLContext dslContext) {
@@ -149,30 +151,63 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
             revertWorkingRelease(appUserId, publishedRelease);
         }
 
-        dslContext.transaction(conf -> {
-            DSLContext txContext = conf.dsl();
-            txContext.execute("SET FOREIGN_KEY_CHECKS = 0");
+        int attempts = 0;
+        while (true) {
+            try {
+                dslContext.transaction(conf -> {
+                    DSLContext txContext = conf.dsl();
+                    txContext.execute("SET FOREIGN_KEY_CHECKS = 0");
 
-            deleteOpenAPIDocumentByAppUserId(txContext, appUserId);
-            deleteBusinessTermByAppUserId(txContext, appUserId);
-            deleteBusinessInformationEntityByAppUserId(txContext, appUserId);
-            deleteCoreComponentByAppUserId(txContext, appUserId);
-            deleteCodeListByAppUserId(txContext, appUserId);
-            deleteAgencyIDListListByAppUserId(txContext, appUserId);
-            deleteBusinessContextByAppUserId(txContext, appUserId);
-            deleteContextSchemeByAppUserId(txContext, appUserId);
-            deleteContextCategoryByAppUserId(txContext, appUserId);
-            deleteModuleSetReleaseByAppUserId(txContext, appUserId);
-            deleteModuleSetByAppUserId(txContext, appUserId);
-            deleteNamespaceByAppUserId(txContext, appUserId);
-            deleteReleaseByAppUserId(txContext, appUserId);
+                    deleteOpenAPIDocumentByAppUserId(txContext, appUserId);
+                    deleteBusinessTermByAppUserId(txContext, appUserId);
+                    deleteBusinessInformationEntityByAppUserId(txContext, appUserId);
+                    deleteCoreComponentByAppUserId(txContext, appUserId);
+                    deleteCodeListByAppUserId(txContext, appUserId);
+                    deleteAgencyIDListListByAppUserId(txContext, appUserId);
+                    deleteBusinessContextByAppUserId(txContext, appUserId);
+                    deleteContextSchemeByAppUserId(txContext, appUserId);
+                    deleteContextCategoryByAppUserId(txContext, appUserId);
+                    deleteModuleSetReleaseByAppUserId(txContext, appUserId);
+                    deleteModuleSetByAppUserId(txContext, appUserId);
+                    deleteNamespaceByAppUserId(txContext, appUserId);
+                    deleteReleaseByAppUserId(txContext, appUserId);
 
-            txContext.deleteFrom(APP_USER)
-                    .where(APP_USER.APP_USER_ID.eq(appUserId))
-                    .execute();
+                    txContext.deleteFrom(APP_USER)
+                            .where(APP_USER.APP_USER_ID.eq(appUserId))
+                            .execute();
 
-            txContext.execute("SET FOREIGN_KEY_CHECKS = 1");
-        });
+                    txContext.execute("SET FOREIGN_KEY_CHECKS = 1");
+                });
+                return;
+            } catch (DataAccessException e) {
+                if (!isDeadlock(e) || attempts >= DEADLOCK_RETRY_COUNT) {
+                    throw e;
+                }
+                attempts++;
+                waitForRetry(attempts);
+            }
+        }
+    }
+
+    private boolean isDeadlock(DataAccessException e) {
+        Throwable cause = e;
+        while (cause != null) {
+            String message = cause.getMessage();
+            if (message != null && message.contains("Deadlock found when trying to get lock")) {
+                return true;
+            }
+            cause = cause.getCause();
+        }
+        return false;
+    }
+
+    private void waitForRetry(int attempts) {
+        try {
+            Thread.sleep(500L * attempts);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        }
     }
 
     private void deleteOpenAPIDocumentByAppUserId(DSLContext dslContext, ULong appUserId) {
@@ -257,6 +292,20 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
         dslContext.deleteFrom(OAS_DOC_TAG)
                 .where(OAS_DOC_TAG.OAS_DOC_ID.in(oasDocIdList))
                 .execute();
+
+        List<ULong> oasServerIdList = dslContext.select(OAS_SERVER.OAS_SERVER_ID)
+                .from(OAS_SERVER)
+                .where(OAS_SERVER.OAS_DOC_ID.in(oasDocIdList))
+                .fetchInto(ULong.class);
+        if (!oasServerIdList.isEmpty()) {
+            dslContext.deleteFrom(OAS_SERVER_VARIABLE)
+                    .where(OAS_SERVER_VARIABLE.OAS_SERVER_ID.in(oasServerIdList))
+                    .execute();
+
+            dslContext.deleteFrom(OAS_SERVER)
+                    .where(OAS_SERVER.OAS_SERVER_ID.in(oasServerIdList))
+                    .execute();
+        }
 
         dslContext.deleteFrom(OAS_DOC)
                 .where(OAS_DOC.OAS_DOC_ID.in(oasDocIdList))
