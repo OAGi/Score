@@ -7,7 +7,6 @@ import {BieListEntry, BieListRequest} from '../bie-list/domain/bie-list';
 import {BieExpressService} from './domain/bie-express.service';
 import {BieListService} from '../bie-list/domain/bie-list.service';
 import {BieExpressOption} from './domain/generate-expression';
-import {saveAs} from 'file-saver';
 import {MetaHeaderDialogComponent} from './meta-header-dialog/meta-header-dialog.component';
 import {PaginationResponseDialogComponent} from './pagination-response-dialog/pagination-response-dialog.component';
 import {AccountListService} from '../../account-management/domain/account-list.service';
@@ -15,7 +14,7 @@ import {MatDatepicker} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
-import {initFilter, loadBranch, loadLibrary, saveBranch, saveLibrary} from '../../common/utility';
+import {initFilter, loadBranch, loadLibrary, saveAsBlobResponse, saveBranch, saveLibrary} from '../../common/utility';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
@@ -32,6 +31,7 @@ import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryService} from '../../library-management/domain/library.service';
 
 @Component({
+  standalone: false,
   selector: 'score-bie-express',
   templateUrl: './bie-express.component.html',
   styleUrls: ['./bie-express.component.css']
@@ -186,6 +186,8 @@ export class BieExpressComponent implements OnInit {
   preferencesInfo: PreferencesInfo;
 
   option: BieExpressOption;
+  jsonSchemaVersions: string[] = ['2020-12', 'Draft-04'];
+  openApiVersions: string[] = ['3.1', '3.0'];
   openApiFormats: string[] = ['YAML', 'JSON'];
   odfFormats: string[] = ['ODS', 'FODS', 'XLSX'];
 
@@ -217,6 +219,9 @@ export class BieExpressComponent implements OnInit {
     this.option = new BieExpressOption();
     this.option.bieDefinition = true;
     this.option.expressionOption = 'XML';
+    // Default JSON Schema expression version is '2020-12'.
+    this.option.expressionVersion = '2020-12';
+    this.option.separateFileReferencesForReusedSchemas = false;
     this.option.packageOption = 'ALL';
     // Default OpenAPI expression format is 'YAML'.
     this.option.openAPIExpressionFormat = 'YAML';
@@ -419,9 +424,7 @@ export class BieExpressComponent implements OnInit {
 
     this.loading = true;
     this.service.generate(selectedTopLevelAsbiepIds, this.option).subscribe(resp => {
-
-      const blob = new Blob([resp.body], {type: resp.headers.get('Content-Type')});
-      saveAs(blob, this._getFilenameFromContentDisposition(resp));
+      saveAsBlobResponse(resp);
 
       this.loading = false;
     }, err => {
@@ -431,7 +434,7 @@ export class BieExpressComponent implements OnInit {
 
   getFilename(topLevelAsbiepId: number): string {
     const topLevelAsbiep = this.dataSource.data.filter(e => e.topLevelAsbiepId === topLevelAsbiepId)[0];
-    const separator = '';
+    const separator = '-';
 
     let filename = topLevelAsbiep.propertyTerm.trim().split(' ').join(separator);
     if (this.option.includeBusinessContextInFilename) {
@@ -448,12 +451,6 @@ export class BieExpressComponent implements OnInit {
       }
     }
     return filename;
-  }
-
-  _getFilenameFromContentDisposition(resp) {
-    const contentDisposition = resp.headers.get('Content-Disposition') || '';
-    const matches = /filename=([^;]+)/ig.exec(contentDisposition);
-    return (matches[1] || 'untitled').replace(/\"/gi, '').trim();
   }
 
   toggleMetaHeaderOption(event, disabled: boolean,
@@ -537,11 +534,21 @@ export class BieExpressComponent implements OnInit {
   }
 
   expressionOptionChange() {
+    if (this.option.expressionOption === 'OPENAPI3') {
+      if (!this.openApiVersions.includes(this.option.expressionVersion)) {
+        this.option.expressionVersion = '3.1';
+      }
+    }
+
     if (this.option.expressionOption === 'ODF' || this.option.expressionOption === 'AVRO') {
       this.option.packageOption = 'EACH';
     }
 
     if (this.option.expressionOption === 'JSON') {
+      if (!this.jsonSchemaVersions.includes(this.option.expressionVersion)) {
+        this.option.expressionVersion = '2020-12';
+      }
+      this.onJsonSchemaVersionChange();
       if (this.option.includeMetaHeaderForJson || this.option.includePaginationResponseForJson) {
         this.option.packageOption = 'EACH';
       }
@@ -554,8 +561,11 @@ export class BieExpressComponent implements OnInit {
       this.option.businessContext = false;
       this.option.bieOagiScoreMetaData = false;
       this.option.includeWhoColumns = false;
+    }
+    if (this.option.expressionOption !== 'XML' && this.option.expressionOption !== 'JSON') {
       this.option.basedCcMetaData = false;
     }
+
   }
 
   bieAnnotationChange() {
@@ -566,5 +576,23 @@ export class BieExpressComponent implements OnInit {
     if (!this.option.bieOagiScoreMetaData) {
       this.option.includeWhoColumns = false;
     }
+  }
+
+  onJsonSchemaVersionChange() {
+    if (this.isSeparateFileReferencesForReusedSchemasDisabled()) {
+      this.option.separateFileReferencesForReusedSchemas = false;
+    }
+  }
+
+  isSeparateFileReferencesForReusedSchemasDisabled(): boolean {
+    if (this.option.expressionOption === 'XML') {
+      return false;
+    }
+    return this.option.expressionOption !== 'JSON'
+      || this.option.expressionVersion === 'Draft-04';
+  }
+
+  isBasedCcMetaDataDisabled(): boolean {
+    return this.option.expressionOption !== 'XML' && this.option.expressionOption !== 'JSON';
   }
 }

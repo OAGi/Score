@@ -38,7 +38,7 @@ public class TC_38_5_RemoveBrandNewSC extends BaseTest {
 
     @Test
     @DisplayName("TC_38_5_TA_1")
-    public void test_TA_1() {
+    public void developer_can_remove_a_brand_new_sc() {
         AppUserObject developerA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -85,7 +85,7 @@ public class TC_38_5_RemoveBrandNewSC extends BaseTest {
 
     @Test
     @DisplayName("TC_38_5_TA_2")
-    public void test_TA_2() {
+    public void developer_can_remove_a_brand_new_sc_of_data_type_that_is_a_base_of_another_data_type_in_this_case_th() {
         AppUserObject developerA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();

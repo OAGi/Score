@@ -1,10 +1,8 @@
 package org.oagi.score.gateway.http.api.bie_management.service;
 
 import org.jooq.DSLContext;
-import org.jooq.Record;
 import org.jooq.Record2;
 import org.jooq.types.ULong;
-import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.api.bie_management.controller.payload.*;
 import org.oagi.score.gateway.http.api.bie_management.model.BieState;
 import org.oagi.score.gateway.http.api.bie_management.model.PrimitiveRestriction;
@@ -48,8 +46,6 @@ import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScDetailsReco
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.service.CcCommandService;
-import org.oagi.score.gateway.http.api.message_management.model.MessageId;
-import org.oagi.score.gateway.http.api.message_management.service.MessageCommandService;
 import org.oagi.score.gateway.http.api.oas_management.controller.payload.UpdateBieForOasDocRequest;
 import org.oagi.score.gateway.http.api.oas_management.model.BieForOasDoc;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
@@ -118,9 +114,6 @@ public class BieEditService implements InitializingBean {
     @Autowired
     private OpenAPIDocService openAPIDocService;
 
-    @Autowired
-    private MessageCommandService messageCommandService;
-
     private final String PURGE_BIE_EVENT_NAME = "purgeBieEvent";
 
     @Override
@@ -176,161 +169,6 @@ public class BieEditService implements InitializingBean {
     public BieEditNodeDetail getDetail(ScoreUser requester, BieEditNode node) {
         BieEditTreeController treeController = getTreeController(requester, node);
         return treeController.getDetail(node);
-    }
-
-    private void ensureBieRelationshipsForChangingState(ScoreUser requester, TopLevelAsbiepId topLevelAsbiepId, BieState state) {
-        // Issue #1010
-        StringBuilder failureMessageBody = new StringBuilder();
-
-        var topLevelAsbiepQuery = repositoryFactory.topLevelAsbiepQueryRepository(requester);
-
-        if (state == BieState.WIP) { // 'Move to WIP' Case.
-            List<TopLevelAsbiepSummaryRecord> reusedTopLevelAsbiepList =
-                    topLevelAsbiepQuery.getReusedTopLevelAsbiepSummaryList(topLevelAsbiepId);
-
-            reusedTopLevelAsbiepList = reusedTopLevelAsbiepList.stream()
-                    .filter(e -> !e.owner().userId().equals(requester.userId()))
-                    .filter(e -> e.state().getLevel() > state.getLevel()).collect(Collectors.toList());
-            if (!reusedTopLevelAsbiepList.isEmpty()) {
-                Record source = bieService.selectAsccpPropertyTermAndAsbiepGuidByTopLevelAsbiepId(topLevelAsbiepId);
-                failureMessageBody = failureMessageBody.append("\n---\n[**")
-                        .append(source.get(ASCCP.PROPERTY_TERM))
-                        .append("**](")
-                        .append("/profile_bie/").append(topLevelAsbiepId)
-                        .append(") (")
-                        .append(source.get(ASBIEP.GUID))
-                        .append(") cannot move to ")
-                        .append(state)
-                        .append(" because the following reusing BIEs:")
-                        .append("\n\n");
-                for (TopLevelAsbiepSummaryRecord target : reusedTopLevelAsbiepList) {
-                    failureMessageBody = failureMessageBody.append("- [")
-                            .append(target.propertyTerm())
-                            .append("](")
-                            .append("/profile_bie/").append(target.topLevelAsbiepId())
-                            .append(") (")
-                            .append(target.guid())
-                            .append(") - ")
-                            .append(target.state()).append(" state")
-                            .append("\n");
-                }
-            }
-        } else {
-            List<TopLevelAsbiepSummaryRecord> reusingTopLevelAsbiepList =
-                    topLevelAsbiepQuery.getReusingTopLevelAsbiepSummaryList(topLevelAsbiepId);
-
-            reusingTopLevelAsbiepList = reusingTopLevelAsbiepList.stream()
-                    .filter(e -> !e.owner().userId().equals(requester.userId()))
-                    .filter(e -> e.state().getLevel() < state.getLevel()).collect(Collectors.toList());
-
-            if (!reusingTopLevelAsbiepList.isEmpty()) {
-                Record source = bieService.selectAsccpPropertyTermAndAsbiepGuidByTopLevelAsbiepId(topLevelAsbiepId);
-                failureMessageBody = failureMessageBody.append("\n---\n[**")
-                        .append(source.get(ASCCP.PROPERTY_TERM))
-                        .append("**](")
-                        .append("/profile_bie/").append(topLevelAsbiepId)
-                        .append(") (")
-                        .append(source.get(ASBIEP.GUID))
-                        .append(") cannot move to ")
-                        .append(state)
-                        .append(" because the following reused BIEs:")
-                        .append("\n\n");
-                for (TopLevelAsbiepSummaryRecord target : reusingTopLevelAsbiepList) {
-                    failureMessageBody = failureMessageBody.append("- [")
-                            .append(target.propertyTerm())
-                            .append("](")
-                            .append("/profile_bie/").append(target.topLevelAsbiepId())
-                            .append(") (")
-                            .append(target.guid())
-                            .append(") - ")
-                            .append(target.state()).append(" state")
-                            .append("\n");
-                }
-            }
-        }
-
-        // Issue #1635
-        if (state == BieState.WIP) { // 'Move to WIP' Case.
-            List<TopLevelAsbiepSummaryRecord> derivedTopLevelAsbiepList =
-                    topLevelAsbiepQuery.getDerivedTopLevelAsbiepSummaryList(topLevelAsbiepId);
-
-            derivedTopLevelAsbiepList = derivedTopLevelAsbiepList.stream()
-                    .filter(e -> !e.owner().userId().equals(requester.userId()))
-                    .filter(e -> e.state().getLevel() > state.getLevel()).collect(Collectors.toList());
-            if (!derivedTopLevelAsbiepList.isEmpty()) {
-                Record source = bieService.selectAsccpPropertyTermAndAsbiepGuidByTopLevelAsbiepId(topLevelAsbiepId);
-                failureMessageBody = failureMessageBody.append("\n---\n[**")
-                        .append(source.get(ASCCP.PROPERTY_TERM))
-                        .append("**](")
-                        .append("/profile_bie/").append(topLevelAsbiepId)
-                        .append(") (")
-                        .append(source.get(ASBIEP.GUID))
-                        .append(") cannot move to ")
-                        .append(state)
-                        .append(" because the following inherited BIEs:")
-                        .append("\n\n");
-                for (TopLevelAsbiepSummaryRecord target : derivedTopLevelAsbiepList) {
-                    failureMessageBody = failureMessageBody.append("- [")
-                            .append(target.propertyTerm())
-                            .append("](")
-                            .append("/profile_bie/").append(target.topLevelAsbiepId())
-                            .append(") (")
-                            .append(target.guid())
-                            .append(") - ")
-                            .append(target.state()).append(" state")
-                            .append("\n");
-                }
-            }
-        } else {
-            TopLevelAsbiepSummaryRecord topLevelAsbiep = topLevelAsbiepQuery.getTopLevelAsbiepSummary(topLevelAsbiepId);
-            TopLevelAsbiepSummaryRecord basedTopLevelAsbiep =
-                    topLevelAsbiepQuery.getTopLevelAsbiepSummary(topLevelAsbiep.basedTopLevelAsbiepId());
-
-            if (basedTopLevelAsbiep != null &&
-                    !requester.userId().equals(basedTopLevelAsbiep.owner().userId().value()) &&
-                    basedTopLevelAsbiep.state().getLevel() < state.getLevel()) {
-                Record source = bieService.selectAsccpPropertyTermAndAsbiepGuidByTopLevelAsbiepId(topLevelAsbiepId);
-                failureMessageBody = failureMessageBody.append("\n---\n[**")
-                        .append(source.get(ASCCP.PROPERTY_TERM))
-                        .append("**](")
-                        .append("/profile_bie/").append(topLevelAsbiepId)
-                        .append(") (")
-                        .append(source.get(ASBIEP.GUID))
-                        .append(") cannot move to ")
-                        .append(state)
-                        .append(" because the following base BIE:")
-                        .append("\n\n");
-                failureMessageBody = failureMessageBody.append("- [")
-                        .append(basedTopLevelAsbiep.propertyTerm())
-                        .append("](")
-                        .append("/profile_bie/").append(basedTopLevelAsbiep.topLevelAsbiepId())
-                        .append(") (")
-                        .append(basedTopLevelAsbiep.guid())
-                        .append(") - ")
-                        .append(basedTopLevelAsbiep.state()).append(" state")
-                        .append("\n");
-            }
-        }
-
-        if (failureMessageBody.length() > 0) {
-            String subject = "Failed to update BIE state";
-            MessageId errorMessageId = messageCommandService.asyncSendMessage(
-                    sessionService.getScoreSystemUser(),
-                    Arrays.asList(requester.userId()),
-                    subject,
-                    failureMessageBody.toString(),
-                    "text/markdown").join().values().iterator().next();
-
-            throw new DataAccessForbiddenException(subject, errorMessageId.value());
-        }
-    }
-
-    @Transactional
-    public void updateState(ScoreUser requester, TopLevelAsbiepId topLevelAsbiepId, BieState state) {
-        ensureBieRelationshipsForChangingState(requester, topLevelAsbiepId, state);
-
-        BieEditTreeController treeController = getTreeController(requester, topLevelAsbiepId);
-        treeController.updateState(requester, state);
     }
 
     @Transactional

@@ -75,6 +75,13 @@ export class TableColumnsInfo {
     {name: 'Updated On', selected: true, width: 160}
   ];
 
+  columnsOfBrowseStandardsPage: TableColumnsProperty[] = [
+    // Issue #1700: simplified Browse Standards view for tenant end-user accounts.
+    {name: 'State', selected: true, width: 104},
+    {name: 'Name', selected: true, width: 0},
+    {name: 'Updated On', selected: true, width: 160}
+  ];
+
   columnsOfCoreComponentForVerbBODPage: TableColumnsProperty[] = [
     {name: 'State', selected: true, width: 104},
     {name: 'DEN', selected: true, width: 0},
@@ -226,7 +233,7 @@ export class TableColumnsInfo {
     {name: 'Type', selected: true, width: 140},
     {name: 'Organization', selected: true, width: 400},
     {name: 'Domain', selected: true, width: 200},
-    {name: 'Description', selected: true, width: '30%'},
+    {name: 'Description', selected: true, width: 400},
     {name: 'Updated On', selected: true, width: 160}
   ];
 
@@ -235,7 +242,7 @@ export class TableColumnsInfo {
     {name: 'Branch', selected: true, width: 100},
     {name: 'DEN', selected: true, width: 0},
     {name: 'Owner', selected: true, width: 140},
-    {name: 'Business Contexts', selected: true, width: 140},
+    {name: 'Business Contexts', selected: true, width: 180},
     {name: 'Version', selected: true, width: 100},
     {name: 'Status', selected: true, width: 100},
     {name: 'Business Term', selected: true, width: 120},
@@ -275,7 +282,7 @@ export class TableColumnsInfo {
     {name: 'Version ID', selected: true, width: 160},
     {name: 'Version Name', selected: true, width: 160},
     {name: 'Owner', selected: true, width: 140},
-    {name: 'Description', selected: true, width: '40%'},
+    {name: 'Description', selected: true, width: 400},
     {name: 'Updated On', selected: true, width: 160}
   ];
 

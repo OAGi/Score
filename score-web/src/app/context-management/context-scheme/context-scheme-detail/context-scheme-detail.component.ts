@@ -33,6 +33,7 @@ import {CodeListService} from '../../../code-list-management/domain/code-list.se
 import {finalize} from 'rxjs/operators';
 
 @Component({
+  standalone: false,
   selector: 'score-context-scheme-detail',
   templateUrl: './context-scheme-detail.component.html',
   styleUrls: ['./context-scheme-detail.component.css']

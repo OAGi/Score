@@ -2,133 +2,150 @@
 
 **BIE Inheritance**
 
-This test suite verifies the functionality and rules of BIE inheritance, ensuring that the creation, modification, and management of Base BIEs and Inherited BIEs adhere to the specified constraints and propagation rules. Each test case focuses on a specific feature or rule related to the inheritance mechanism.
-
 ## Test Case 44.1
 
 **Create Inherited BIE**
 
-This test case validates that a new Inherited BIE can be created from an existing Base BIE and ensures it complies with the inheritance rules.
+Pre-condition: N/A
 
-### Test Assertions:
+### Test Assertion:
 
 #### Test Assertion #44.1.1
-Users can create a new Inherited BIE from a Base BIE in any state.
+The end user can create a new Inherited BIE from an existing Base BIE.
 
 #### Test Assertion #44.1.2
-Attributes inherited from the Base BIE retain their values and are marked as non-editable in the Inherited BIE.
+The editable fields on the Inherited BIE are initialized with the same values as the Base BIE, and the Base-value panels are displayed as non-editable.
 
 #### Test Assertion #44.1.3
-The Inherited BIE displays all inherited attributes along with their definitions from the Base BIE.
+The Inherited BIE displays inherited attribute details and definitions from the Base BIE.
 
-### Test Steps:
+### Test Step Pre-condition:
+1. The stated test-case pre-condition is satisfied: an end user can create and edit BIEs in the Working branch.
+2. A business context exists or can be created for the test BIEs.
+3. A Base BIE exists or can be created from a valid `BOM Header. BOM Header` ASCCP.
 
-1. Log in as an end user.
-2. Create a random business context (e.g., Manufacturing).
-3. Create a new Base BIE named "BOM Header" using the business context from step 2.
-4. Define random attribute values for the "Status," "Effectivity," and "Security Classification" ASBIEs in the "BOM Header" BIE and enable these attributes.
-5. Navigate to the "BIE List" page.
-6. Open the context menu for the "BOM Header" record and select **Create Inherited BIE** (Assertion [#1.1](#test-assertion-4411)).
-7. Open the newly created Inherited "BOM Header" BIE.
-8. Verify the following:
-    - **Attributes Check**: The "Status," "Effectivity," and "Security Classification" ASBIEs are checked (Assertion [#1.2](#test-assertion-4412)).
-    - **Attribute Consistency**: The values of these attributes match the ones defined in the Base BIE (Assertion [#1.2](#test-assertion-4412)).
-    - **Non-editable Attributes**: The "Status," "Effectivity," and "Security Classification" ASBIEs are marked as non-editable (e.g., checkboxes are disabled or locked) (Assertion [#2](#test-assertion-4412)).
-    - **Inherited Details**: Attribute details display both the inherited values and their definitions from the Base BIE (Assertion [#1.3](#test-assertion-4413)).
+### Test Step:
+1. Sign in to connectCenter as an end user.
+2. Create a business context for the test.
+3. Create a Base BIE from `BOM Header. BOM Header`.
+4. Update top-level values such as Business Term, Remark, Version, Status, and Context Definition on the Base BIE.
+5. Enable and update the `Security Classification`, `Status`, and `Effectivity` ASBIEs with explicit cardinality, remark, and context-definition values.
+6. Save the Base BIE.
+7. Open the BIE list and create an inherited BIE from the Base BIE. (Assertion [#1](#test-assertion-4411))
+8. Open the newly created Inherited BIE.
+9. Verify that the editable top-level and ASBIE fields on the Inherited BIE are initialized with the same values as the Base BIE. (Assertion [#2](#test-assertion-4412))
+10. Verify that the corresponding Base-value panels are displayed and are non-editable. (Assertion [#2](#test-assertion-4412))
+11. Verify that the inherited attribute details and definitions are displayed from the Base BIE for the inherited top-level and ASBIE panels. (Assertion [#3](#test-assertion-4413))
 
 ## Test Case 44.2
 
 **Use Base BIE**
 
-This test case validates the functionality of assigning an existing Base BIE to a BIE that initially does not have a Base BIE.
+Pre-condition: N/A
 
-### Test Assertions:
+### Test Assertion:
 
 #### Test Assertion #44.2.1
 A Base BIE can be successfully assigned to an existing BIE.
 
-### Test Steps:
+#### Test Assertion #44.2.2
+After assigning a Base BIE, existing editable top-level values on the target BIE remain on the target BIE and are not overwritten by the Base BIE.
 
-1. Log in as an end user.
-2. Create a random business context (e.g., Manufacturing).
-3. Create a new Base BIE named "BOM Header" using the business context from step 2.
-4. Define random attribute values for the "Status," "Effectivity," and "Security Classification" ASBIEs in the "BOM Header" BIE and enable these attributes.
-5. Log out and log in as another end user.
-6. Navigate to the BIE List page.
-7. Create another BIE named "BOM Header" using the business context from step 2.
-8. Open the newly created "BOM Header" BIE.
-9. Open the context menu for the root node and select Use Base BIE (Assertion [#2.1](#test-assertion-4421)).
-10. Assign the previously created "BOM Header" Base BIE.
-11. Verify the following:
-    - **Attributes Check**: The "Status," "Effectivity," and "Security Classification" ASBIEs are checked (Assertion [#1.2](#test-assertion-4412)).
-    - **Attribute Consistency**: The values of these attributes match the ones defined in the Base BIE (Assertion [#1.2](#test-assertion-4412)).
-    - **Non-editable Attributes**: The "Status," "Effectivity," and "Security Classification" ASBIEs are marked as non-editable (e.g., checkboxes are disabled or locked) (Assertion [#2](#test-assertion-4412)).
-    - **Inherited Details**: Attribute details display both the inherited values and their definitions from the Base BIE (Assertion [#1.3](#test-assertion-4413)).
+#### Test Assertion #44.2.3
+Inherited child ASBIE values from the assigned Base BIE are applied, while the Base-value panels are displayed as non-editable.
+
+### Test Step Pre-condition:
+1. The stated test-case pre-condition is satisfied: two end users can create and edit BIEs.
+2. A business context exists or can be created for both BIEs.
+3. A Base BIE exists or can be created by one end user, and another end user can create a separate target BIE from the same ASCCP.
+
+### Test Step:
+1. Sign in to connectCenter as the first end user.
+2. Create a business context for the test.
+3. Create a Base BIE from `BOM Header. BOM Header`.
+4. Update top-level values on the Base BIE and enable and update the `Security Classification`, `Status`, and `Effectivity` ASBIEs.
+5. Save the Base BIE.
+6. Sign out.
+7. Sign in as another end user.
+8. Create a separate target BIE from the same `BOM Header. BOM Header` ASCCP.
+9. Open the target BIE and use the `Use Base BIE` action to assign the previously created Base BIE. (Assertion [#1](#test-assertion-4421))
+10. Verify that the target BIE remains editable at the top level and that its own existing top-level values are retained instead of being overwritten by the Base BIE. (Assertion [#2](#test-assertion-4422))
+11. Verify that the inherited child ASBIE values from the Base BIE are applied to the target BIE. (Assertion [#3](#test-assertion-4423))
+12. Verify that the Base-value panels for the assigned Base BIE are displayed and are non-editable. (Assertion [#3](#test-assertion-4423))
 
 ## Test Case 44.3
 
 **Create Inherited BIE with Base Reused BIE**
 
-This test case validates that a new Inherited BIE can be created from an existing Base BIE and that it complies with inheritance rules, including scenarios where the Base BIE itself reuses another BIE. The test also includes validation for additional ASBIEs and BBIEs.
+Pre-condition: N/A
 
-### Test Assertions:
+### Test Assertion:
 
 #### Test Assertion #44.3.1
-An inherited BIE also inherits BIEs reused by the base BIE.
+An inherited BIE also inherits reused BIEs and inherited descendant values from the Base BIE.
 
 #### Test Assertion #44.3.2
-The inherited BIE's reused Base BIE can be overridden with another Base BIE.
+The inherited BIE's reused Base BIE can be overridden with an inherited version of that reused Base BIE.
 
-### Test Steps:
+### Test Step Pre-condition:
+1. The stated test-case pre-condition is satisfied: an end user can create, edit, inherit, and reuse BIEs.
+2. A business context exists or can be created for the test BIEs.
+3. A Base `BOM Header` BIE and a Base `BOM` BIE can be created from valid ASCCPs in the same release.
 
-1. Log in as an end user with the required permissions.
-2. Create a random business context (e.g., Manufacturing).
-3. Create a new Base BIE named "BOM Header" using the business context from step 2.
-4. Define random attribute values for the "Status," "Effectivity," and "Security Classification" ASBIEs in the "BOM Header" BIE and enable these attributes.
-5. Create another BIE named "BOM" using the same business context.
-6. Define random attribute values for the "BOM Option" ASBIE and "Action Code" BBIE in the "BOM" BIE and enable these attributes.
-7. Reuse the "BOM Header" created in step 3 as part of the "BOM" configuration.
-8. Navigate to the BIE List page.
-9. Use the **Create Inherited BIE** to create an inherited version of the "BOM Header" (Assertion [#1.1](#test-assertion-4411)). 
-10. Use the **Create Inherited BIE** to create an inherited version of the "BOM" (Assertion [#1.1](#test-assertion-4411)).
-11. Verify the following for the inherited "BOM":
-    - Initially, the inherited "BOM" reuses the original "BOM Header" (Assertion [#3.1](#test-assertion-4431)).
-    - **Attributes Check**: Attributes inherited from the original "BOM" and "BOM Header" match the base BIE (Assertion [#1.2](#test-assertion-4412)).
-    - **ASBIE and BBIE Consistency**: The "BOM Option" ASBIE and "Action Code" BBIE retain their attribute values and relationships (Assertion [#1.3](#test-assertion-4413)).
-12. Use the **Override Base Reused BIE** function to replace the reused "BOM Header" in the inherited BOM with the inherited "BOM Header".
-13. Verify the following after overriding the base reused BIE:
-    - The inherited "BOM" now references the inherited "BOM Header" (Assertion [#3.2](#test-assertion-4432)).
-    - Attributes inherited from the new base match those of the inherited "BOM Header" (Assertion [#1.2](#test-assertion-4412)).
-    - Previously locked attributes remain consistent and reflect the updated base BIE (e.g., "Status," "Effectivity," "Security Classification") (Assertion [#1.2](#test-assertion-4412)).
-    - **ASBIE and BBIE Consistency**: The "BOM Option" ASBIE and "Action Code" BBIE are unaffected by the override and maintain their attribute values (Assertion [#1.3](#test-assertion-4413)).
+### Test Step:
+1. Sign in to connectCenter as an end user.
+2. Create a business context for the test.
+3. Create a Base `BOM Header` BIE and update its top-level values and the inherited `Security Classification`, `Status`, and `Effectivity` ASBIE values.
+4. Create a Base `BOM` BIE and update its top-level values and the `BOM Option` ASBIE and `Action Code` BBIE values.
+5. Reuse the Base `BOM Header` BIE on the Base `BOM` BIE and save the Base `BOM` BIE.
+6. Create an inherited `BOM Header` BIE from the Base `BOM Header` BIE.
+7. Create an inherited `BOM` BIE from the Base `BOM` BIE.
+8. Open the inherited `BOM` BIE and verify that it still reuses `BOM Header` and that the inherited reused hierarchy displays the expected inherited and read-only base values. (Assertion [#1](#test-assertion-4431))
+9. Verify that unrelated inherited values on `BOM Option` and `Action Code` are preserved on the inherited `BOM`. (Assertion [#1](#test-assertion-4431))
+10. Update the inherited `BOM Header` BIE with distinguishable inherited remarks and context definitions and save it.
+11. Reopen the inherited `BOM` BIE and use `Override Base Reused BIE` on the reused `BOM Header` node to point it to the inherited `BOM Header` BIE. (Assertion [#2](#test-assertion-4432))
+12. Verify that the reused `BOM Header` subtree now reflects the inherited `BOM Header` values where the override applies, while the Base-value panels remain read-only. (Assertion [#2](#test-assertion-4432))
+13. Verify that the unrelated `BOM Option` ASBIE and `Action Code` BBIE remain unaffected by the override. (Assertion [#2](#test-assertion-4432))
 
 ## Test Case 44.4
 
 **State Change Rules Between Base BIE and Inherited BIE**
 
-This test case validates compliance with state change rules between the Base BIE and its Inherited BIE.
+Pre-condition: N/A
 
-### Test Assertions:
+### Test Assertion:
 
 #### Test Assertion #44.4.1
-The state of the Base BIE must be equal to or ahead of the state of the Inherited BIE.
+The `Back to WIP` action for the Base BIE remains unavailable while its Inherited BIE remains ahead in `QA`.
 
 #### Test Assertion #44.4.2
-The state of the Inherited BIE is dependent on the state of the Base BIE and cannot precede it.
+The `Move to QA` action for the Inherited BIE remains unavailable before the Base BIE moves to `QA`.
 
-### Test Steps:
+#### Test Assertion #44.4.3
+If both the Base BIE and the Inherited BIE are in `QA`, the Inherited BIE can move back to `WIP` first and then the Base BIE can move back to `WIP`.
 
-1. Log in as an end user.
-2. Create a random business context (e.g., Manufacturing).
-3. Create a new Base BIE named "BOM Header" using the business context created in step 2.
-4. Navigate to the "BIE List" page.
-5. Create a new Inherited "BOM Header" BIE from the Base BIE created in step 3.
-6. Attempt to move the Inherited BIE to the QA state. It must display an error message (Assertion [#4.2](#test-assertion-4442)).
-7. Move the Base BIE to the QA state. It must succeed (Assertion [#4.1](#test-assertion-4441)).
-8. Move the Inherited BIE to the QA state. It must succeed (Assertion [#4.2](#test-assertion-4442)).
-9. Attempt to move the Base BIE back to the WIP state. It must display an error message (Assertion [#4.1](#test-assertion-4441)).
-10. Move the Inherited BIE back to the WIP state. It must succeed (Assertion [#4.2](#test-assertion-4442)).
-11. Move the Base BIE back to the WIP state. It must succeed (Assertion [#4.1](#test-assertion-4441)).
-12. Move the Base BIE to the QA state.
-13. Move the Inherited BIE to the QA state.
-14. Attempt to move the Inherited BIE to the Production state. It must display an error message (Assertion [#4.2](#test-assertion-4442)).
+#### Test Assertion #44.4.4
+If both the Base BIE and the Inherited BIE are in `QA`, the `Move to Production` action for the Inherited BIE remains unavailable while the Base BIE remains in `QA`.
+
+### Test Step Pre-condition:
+1. The stated test-case pre-condition is satisfied: two end users can create and edit BIEs.
+2. A business context exists or can be created for the test BIEs.
+3. A Base BIE and an Inherited BIE derived from it can be created for the same `BOM Header. BOM Header` ASCCP.
+
+### Test Step:
+1. Sign in as one end user and create a Base BIE from `BOM Header. BOM Header`.
+2. Sign in as another end user and create an Inherited BIE from that Base BIE.
+3. Open the Inherited BIE before the Base BIE is in `QA`.
+4. Verify that the `Move to QA` action is unavailable. (Assertion [#2](#test-assertion-4442))
+5. Move the Base BIE to `QA`.
+6. Move the Inherited BIE to `QA`.
+7. Open the Base BIE while the Inherited BIE is still in `QA`.
+8. Verify that the `Back to WIP` action is unavailable. (Assertion [#1](#test-assertion-4441))
+9. Move the Inherited BIE back to `WIP`.
+10. Verify that this rollback succeeds. (Assertion [#3](#test-assertion-4443))
+11. Move the Base BIE back to `WIP`.
+12. Verify that this rollback now succeeds. (Assertion [#3](#test-assertion-4443))
+13. Move the Base BIE to `QA` again.
+14. Move the Inherited BIE to `QA` again.
+15. Open the Inherited BIE while the Base BIE remains in `QA`.
+16. Verify that the `Move to Production` action is unavailable. (Assertion [#4](#test-assertion-4444))

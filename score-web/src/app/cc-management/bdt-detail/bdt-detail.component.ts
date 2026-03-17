@@ -65,6 +65,7 @@ import {SettingsPreferencesService} from '../../settings-management/settings-pre
 
 
 @Component({
+  standalone: false,
   selector: 'score-bccp-detail',
   templateUrl: './bdt-detail.component.html',
   styleUrls: ['./bdt-detail.component.css']

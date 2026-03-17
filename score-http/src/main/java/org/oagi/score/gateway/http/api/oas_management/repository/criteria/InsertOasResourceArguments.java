@@ -2,9 +2,10 @@ package org.oagi.score.gateway.http.api.oas_management.repository.criteria;
 
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
+import org.oagi.score.gateway.http.api.oas_management.model.OasDocId;
+import org.oagi.score.gateway.http.api.oas_management.model.OasResourceId;
 import org.oagi.score.gateway.http.api.oas_management.repository.OasDocCommandRepository;
 
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -13,8 +14,8 @@ public class InsertOasResourceArguments {
 
     private final OasDocCommandRepository repository;
 
-    private ULong userId;
-    private ULong oasDocId;
+    private UserId userId;
+    private OasDocId oasDocId;
     private String path;
     private String ref;
     private LocalDateTime timestamp = new Timestamp(System.currentTimeMillis()).toLocalDateTime();
@@ -24,29 +25,21 @@ public class InsertOasResourceArguments {
     }
 
     public InsertOasResourceArguments setUserId(UserId userId) {
-        return setUserId(ULong.valueOf(userId.value()));
-    }
-
-    public InsertOasResourceArguments setUserId(ULong userId) {
         this.userId = userId;
         return this;
     }
 
-    public ULong getOasDocId() {
+    public OasDocId getOasDocId() {
         return oasDocId;
     }
 
-    public InsertOasResourceArguments setOasDocId(ULong oasDocId) {
+    public InsertOasResourceArguments setOasDocId(OasDocId oasDocId) {
         this.oasDocId = oasDocId;
         return this;
     }
 
     public String getPath() {
         return path;
-    }
-
-    public InsertOasResourceArguments setOasDocId(BigInteger oasDocId) {
-        return setOasDocId(ULong.valueOf(oasDocId));
     }
 
     public InsertOasResourceArguments setPath(String path) {
@@ -76,7 +69,7 @@ public class InsertOasResourceArguments {
         return this;
     }
 
-    public ULong getUserId() {
+    public UserId getUserId() {
         return userId;
     }
 
@@ -84,7 +77,7 @@ public class InsertOasResourceArguments {
         return timestamp;
     }
 
-    public ULong execute() {
+    public OasResourceId execute() {
         return repository.insertOasResource(this);
     }
 

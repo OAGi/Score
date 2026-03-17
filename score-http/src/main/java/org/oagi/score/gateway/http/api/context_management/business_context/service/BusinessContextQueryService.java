@@ -1,6 +1,6 @@
 package org.oagi.score.gateway.http.api.context_management.business_context.service;
 
-import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
+import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationQueryService;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.context_management.business_context.model.*;
 import org.oagi.score.gateway.http.api.context_management.business_context.repository.BusinessContextQueryRepository;
@@ -41,7 +41,7 @@ public class BusinessContextQueryService {
     private TenantQueryService tenantService;
 
     @Autowired
-    private ApplicationConfigurationService applicationConfigurationService;
+    private ApplicationConfigurationQueryService applicationConfigurationService;
 
     /**
      * Retrieves the list of business context summaries.

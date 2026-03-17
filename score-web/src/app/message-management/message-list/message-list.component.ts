@@ -22,6 +22,7 @@ import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-r
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
 
 @Component({
+  standalone: false,
   selector: 'score-message-list',
   templateUrl: './message-list.component.html',
   styleUrls: ['./message-list.component.css']

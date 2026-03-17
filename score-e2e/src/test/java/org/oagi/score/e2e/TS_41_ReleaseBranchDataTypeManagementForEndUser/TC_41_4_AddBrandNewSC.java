@@ -38,7 +38,7 @@ public class TC_41_4_AddBrandNewSC extends BaseTest {
 
     @Test
     @DisplayName("TC_41_4_TA_1")
-    public void test_TA_1() {
+    public void end_user_can_add_an_sc_to_the_data_type() {
         AppUserObject endUserA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -71,7 +71,7 @@ public class TC_41_4_AddBrandNewSC extends BaseTest {
 
     @Test
     @DisplayName("TC_41_4_TA_2")
-    public void test_TA_2() {
+    public void default_values_of_the_new_sc_shall_be_as_follows() {
         AppUserObject endUserA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -184,7 +184,7 @@ public class TC_41_4_AddBrandNewSC extends BaseTest {
 
     @Test
     @DisplayName("TC_41_4_TA_3")
-    public void test_TA_3() {
+    public void added_sc_is_propagated_to_all_data_types_derived_from_the_data_type_in_which_the_sc_is_added() {
         AppUserObject endUserA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();

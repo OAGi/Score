@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.impl.page.core_component;
 
 import org.oagi.score.e2e.impl.page.BaseSearchBarPageImpl;
+import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.core_component.*;
@@ -55,13 +56,15 @@ public class ViewEditCoreComponentPageImpl extends BaseSearchBarPageImpl impleme
     public void openPage() {
         String url = getPageUrl();
         getDriver().get(url);
-        waitFor(ofSeconds(2L));
+        invisibilityOfLoadingContainerElement(getDriver());
         assert "Core Component".equals(getText(getTitle()));
     }
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("title"));
+        invisibilityOfLoadingContainerElement(getDriver());
+        return visibilityOfElementLocated(PageHelper.wait(getDriver(), ofSeconds(10L), ofMillis(100L)),
+                By.cssSelector("score-title-with-library-selector .title, .title"));
     }
 
     @Override
@@ -208,6 +211,9 @@ public class ViewEditCoreComponentPageImpl extends BaseSearchBarPageImpl impleme
         LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         ACCObject acc = getAPIFactory().getCoreComponentAPI().getACCByDENAndReleaseNum(library, den, branch);
         ACCViewEditPage accViewEditPage = new ACCViewEditPageImpl(this, acc);
+        if (!accViewEditPage.isOpened()) {
+            accViewEditPage.openPage();
+        }
         assert accViewEditPage.isOpened();
         return accViewEditPage;
     }
@@ -255,6 +261,9 @@ public class ViewEditCoreComponentPageImpl extends BaseSearchBarPageImpl impleme
         LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(library, den, branch);
         ASCCPViewEditPage asccpViewEditPage = new ASCCPViewEditPageImpl(this, asccp);
+        if (!asccpViewEditPage.isOpened()) {
+            asccpViewEditPage.openPage();
+        }
         assert asccpViewEditPage.isOpened();
         return asccpViewEditPage;
     }
@@ -303,6 +312,9 @@ public class ViewEditCoreComponentPageImpl extends BaseSearchBarPageImpl impleme
         LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         BCCPObject bccp = getAPIFactory().getCoreComponentAPI().getBCCPByDENAndReleaseNum(library, den, branch);
         BCCPViewEditPage bccpViewEditPage = new BCCPViewEditPageImpl(this, bccp);
+        if (!bccpViewEditPage.isOpened()) {
+            bccpViewEditPage.openPage();
+        }
         assert bccpViewEditPage.isOpened();
         return bccpViewEditPage;
     }
@@ -475,7 +487,13 @@ public class ViewEditCoreComponentPageImpl extends BaseSearchBarPageImpl impleme
     @Override
     public WebElement getTableRecordByCCNameAndOwner(String name, String owner) {
         waitFor(ofMillis(1000L));
-        return visibilityOfElementLocated(getDriver(), By.xpath("//*[contains(text(), \"" + name + "\")]//ancestor::tr//td[8]//*[contains(text(), \"" + owner + "\")]"));
+        String xpathExpr = "//tbody/tr[" +
+                ".//td[contains(@class, 'mat-column-den')][contains(normalize-space(.), " + xpathLiteral(name) + ")]" +
+                " and " +
+                ".//td[contains(@class, 'mat-column-owner')][contains(normalize-space(.), " + xpathLiteral(owner) + ")]" +
+                "]";
+        return visibilityOfElementLocated(org.oagi.score.e2e.impl.PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
+                By.xpath(xpathExpr));
     }
 
     @Override

@@ -9,6 +9,7 @@ import {AuthService} from '../../authentication/auth.service';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 
 @Component({
+  standalone: false,
   selector: 'score-account-detail',
   templateUrl: './account-detail.component.html',
   styleUrls: ['./account-detail.component.css']

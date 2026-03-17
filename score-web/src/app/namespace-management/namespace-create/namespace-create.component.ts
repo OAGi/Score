@@ -11,6 +11,7 @@ import {LibraryService} from '../../library-management/domain/library.service';
 import {loadLibrary, saveLibrary} from '../../common/utility';
 
 @Component({
+  standalone: false,
   selector: 'score-namespace-create',
   templateUrl: './namespace-create.component.html',
   styleUrls: ['./namespace-create.component.css']

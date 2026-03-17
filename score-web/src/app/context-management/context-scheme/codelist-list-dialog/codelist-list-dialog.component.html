@@ -13,7 +13,7 @@
     <mat-card style="box-shadow: none;">
       <score-search-bar placeholder="Search by Name" [(model)]="request.filters.name"
                         (modelChange)="onChange('filters.name', request.filters.name);"
-                        (search)="onSearch();">
+                        (searchTriggered)="onSearch();">
         <div branchSelector class="branch-selector d-flex" style="width: 8rem; padding: 0 0.5rem 0 1rem;">
           <mat-form-field appearance="outline">
             <mat-label>Branch</mat-label>
@@ -167,7 +167,7 @@
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
                     score-table-column-resize [defaultWidth]="width('Name')" (onResize)="onResizeWidth($event)"> Name</th>
                 <td mat-cell *matCellDef="let element">
-                  <div class="den word-break-all">
+                  <div class="den score-break-word">
                     <span class="new-component mr-2" *ngIf="element.newComponent">New</span>
                     <a rel="noopener noreferrer" href="/code_list/{{ element.codeListManifestId }}">
                       <span>{{ element.name }}</span>
@@ -227,7 +227,7 @@
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
                     score-table-column-resize [defaultWidth]="width('Owner')" (onResize)="onResizeWidth($event)"> Owner</th>
                 <td mat-cell *matCellDef="let element">
-                  <span class="word-break-all" [matTooltip]="element.owner.username" [innerHTML]="element.owner.loginId"></span>
+                  <span class="score-line-clamp-2 score-break-word" [matTooltip]="element.owner.username" [innerHTML]="element.owner.loginId"></span>
                 </td>
               </ng-container>
 
@@ -235,7 +235,7 @@
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
                     score-table-column-resize [defaultWidth]="width('Module')" (onResize)="onResizeWidth($event)"> Module</th>
                 <td mat-cell *matCellDef="let element">
-                  <div class="word-break-all"
+                  <div class="score-line-clamp-2 score-break-word"
                        [innerHTML]="element.module | highlight : highlightTextForModule : ['bg-warning']"></div>
                 </td>
               </ng-container>
@@ -244,8 +244,10 @@
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
                     score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
                 <td mat-cell *matCellDef="let element">
-                  <div class="ellipsis">{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-                  <div class="description"><span class="pr-1">by</span><b class="word-break-all">{{ element.lastUpdated.who.loginId }}</b></div>
+                  <div class="score-line-clamp-2 score-break-word">
+                    <div>{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                    <div class="description"><span class="pr-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
+                  </div>
                 </td>
               </ng-container>
 

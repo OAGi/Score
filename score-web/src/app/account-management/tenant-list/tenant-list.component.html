@@ -12,7 +12,7 @@
   <mat-card class="pt-3">
     <score-search-bar placeholder="Search by Name" [(model)]="request.name"
                       (modelChange)="onChange('name', request.name);"
-                      (search)="onSearch();"
+                      (searchTriggered)="onSearch();"
                       [advancedSearch]="false">
     </score-search-bar>
 
@@ -39,7 +39,7 @@
                   score-table-column-resize [defaultWidth]="width('Tenant Name')" (onResize)="onResizeWidth($event)">Tenant Name</th>
               <td mat-cell *matCellDef="let element">
                 <a routerLink="{{ element.tenantId }}">
-                  <span class="word-break-all">{{ element.name }}</span>
+                  <span class="score-line-clamp-2 score-break-word">{{ element.name }}</span>
                 </a>
               </td>
             </ng-container>

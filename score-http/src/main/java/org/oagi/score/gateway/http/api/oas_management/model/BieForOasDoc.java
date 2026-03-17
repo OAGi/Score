@@ -15,9 +15,9 @@ public class BieForOasDoc extends Auditable {
 
     private TopLevelAsbiepId topLevelAsbiepId;
     private ReleaseId releaseId;
-    private BigInteger oasDocId;
-    private BigInteger oasResourceId;
-    private BigInteger oasOperationId;
+    private OasDocId oasDocId;
+    private OasResourceId oasResourceId;
+    private OasOperationId oasOperationId;
     private String den;
     private String propertyTerm;
     private String displayName;
@@ -61,11 +61,11 @@ public class BieForOasDoc extends Auditable {
         this.releaseId = releaseId;
     }
 
-    public BigInteger getOasDocId() {
+    public OasDocId getOasDocId() {
         return oasDocId;
     }
 
-    public void setOasDocId(BigInteger oasDocId) {
+    public void setOasDocId(OasDocId oasDocId) {
         this.oasDocId = oasDocId;
     }
 
@@ -213,19 +213,19 @@ public class BieForOasDoc extends Auditable {
         this.operationId = operationId;
     }
 
-    public BigInteger getOasResourceId() {
+    public OasResourceId getOasResourceId() {
         return oasResourceId;
     }
 
-    public void setOasResourceId(BigInteger oasResourceId) {
+    public void setOasResourceId(OasResourceId oasResourceId) {
         this.oasResourceId = oasResourceId;
     }
 
-    public BigInteger getOasOperationId() {
+    public OasOperationId getOasOperationId() {
         return oasOperationId;
     }
 
-    public void setOasOperationId(BigInteger oasOperationId) {
+    public void setOasOperationId(OasOperationId oasOperationId) {
         this.oasOperationId = oasOperationId;
     }
 

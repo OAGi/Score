@@ -7,7 +7,7 @@ import jakarta.mail.internet.MimeMultipart;
 import jakarta.mail.internet.PreencodedMimeBodyPart;
 import org.apache.commons.text.StringSubstitutor;
 import org.jooq.DSLContext;
-import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
+import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationQueryService;
 import org.oagi.score.gateway.http.api.mail.controller.payload.SendMailRequest;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.model.base.ScoreDataAccessException;
@@ -28,7 +28,7 @@ import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.T
 public class MailService {
 
     @Autowired
-    private ApplicationConfigurationService applicationConfigurationService;
+    private ApplicationConfigurationQueryService applicationConfigurationService;
 
     @Autowired
     private DSLContext dslContext;

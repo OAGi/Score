@@ -64,7 +64,7 @@
                        [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
                        {key: 'ownerLoginIdList', value: element.username}])}">
-                      <span class="word-break-all">{{ element.username }}</span>
+                      <span class="score-line-clamp-2 score-break-word">{{ element.username }}</span>
                     </a>
                   </td>
                 </ng-container>
@@ -153,10 +153,10 @@
                 <ng-container matColumnDef="den">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
                   <td mat-cell *matCellDef="let element">
-                    <div class="den word-break-all">
+                    <div class="den score-break-word">
                       <a routerLink="/core_component/{{ element.type.endsWith('DT') ? 'dt' : element.type.toLowerCase() }}/{{ element.manifestId }}"
                          matTooltip="{{ element.den }}">
-                        <span>{{ element.den }}</span>
+                        <span class="score-line-clamp-2 score-break-word">{{ element.den }}</span>
                       </a>
                     </div>
                     <div class="cc-guid">{{ element.guid }}</div>
@@ -166,8 +166,10 @@
                 <ng-container matColumnDef="lastUpdateTimestamp">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
                   <td mat-cell *matCellDef="let element">
-                    <div class="ellipsis">{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-                    <div class="description"><span class="pr-1">by</span><b class="word-break-all">{{ element.lastUpdated.who.loginId }}</b></div>
+                    <div class="score-line-clamp-2 score-break-word">
+                      <div>{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                      <div class="description"><span class="pr-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
+                    </div>
                   </td>
                 </ng-container>
 
@@ -255,7 +257,7 @@
                        [queryParams]="{q: q([
                        {key: 'ownerLoginIdList', value: element.username},
                        {key: 'releaseIds', value: selectedRelease.releaseId}])}">
-                      <span class="word-break-all">{{ element.username }}</span>
+                      <span class="score-line-clamp-2 score-break-word">{{ element.username }}</span>
                     </a>
                   </td>
                 </ng-container>
@@ -344,10 +346,10 @@
                 <ng-container matColumnDef="den">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
                   <td mat-cell *matCellDef="let element">
-                    <div class="den word-break-all">
+                    <div class="den score-break-word">
                       <a routerLink="/profile_bie/{{ element.topLevelAsbiepId }}"
                          matTooltip="{{ element.den }}">
-                        <span>{{ element.den }}</span>
+                        <span class="score-line-clamp-2 score-break-word">{{ element.den }}</span>
                       </a>
                     </div>
                     <div class="bie-guid">{{ element.guid }}</div>
@@ -362,22 +364,26 @@
                 <ng-container matColumnDef="businessContexts">
                   <th mat-header-cell *matHeaderCellDef> Business Contexts</th>
                   <td mat-cell *matCellDef="let element">
-                    <ng-container *ngFor="let businessContext of element.businessContextList">
-                      <span class="businessContext word-break-all">
-                        <a target="_blank" rel="noopener noreferrer"
-                           routerLink="/context_management/business_context/{{ businessContext.businessContextId }}">
-                          <span class="word-break-all">{{ businessContext.name }}</span>
-                        </a>
-                      </span>
-                    </ng-container>
+                    <div class="business-context-list score-line-clamp-2 score-break-word">
+                      <ng-container *ngFor="let businessContext of element.businessContextList; let i = index">
+                        <span class="businessContext">
+                          <a target="_blank" rel="noopener noreferrer"
+                             routerLink="/context_management/business_context/{{ businessContext.businessContextId }}">
+                            <span>{{ businessContext.name }}</span>
+                          </a>
+                        </span>
+                      </ng-container>
+                    </div>
                   </td>
                 </ng-container>
 
                 <ng-container matColumnDef="lastUpdateTimestamp">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
                   <td mat-cell *matCellDef="let element">
-                    <div class="ellipsis">{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-                    <div class="description"><span class="pr-1">by</span><b class="word-break-all">{{ element.lastUpdated.who.loginId }}</b></div>
+                    <div class="score-line-clamp-2 score-break-word">
+                      <div>{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                      <div class="description"><span class="pr-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
+                    </div>
                   </td>
                 </ng-container>
 
@@ -468,7 +474,7 @@
                        {key: 'releaseId', value:  selectedRelease.releaseId},
                        {key: 'types', value:  ['ACC']},
                        {key: 'componentTypes', value: [UEGValue]}]) }">
-                      <span class="word-break-all">{{ element.username }}</span>
+                      <span class="score-line-clamp-2 score-break-word">{{ element.username }}</span>
                     </a>
                   </td>
                 </ng-container>
@@ -578,7 +584,7 @@
                 <ng-container matColumnDef="objectClassTerm">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> User Extension</th>
                   <td mat-cell *matCellDef="let element">
-                    <div class="den word-break-all">
+                    <div class="den score-break-word">
                       <a routerLink="{{ '/core_component/extension/'  + element.accManifestId }}">
                         <span>{{ element.objectClassTerm }}</span>
                       </a>
@@ -590,8 +596,10 @@
                 <ng-container matColumnDef="lastUpdateTimestamp">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
                   <td mat-cell *matCellDef="let element">
-                    <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-                    <div class="description"><span class="pr-1">by</span><b class="word-break-all">{{ element.lastUpdateUser }}</b></div>
+                    <div class="score-line-clamp-2 score-break-word">
+                      <div>{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                      <div class="description"><span class="pr-1">by</span><b class="score-break-word">{{ element.lastUpdateUser }}</b></div>
+                    </div>
                   </td>
                 </ng-container>
 
@@ -607,10 +615,10 @@
                 <ng-container matColumnDef="topLevelBIE">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> Top-Level BIE</th>
                   <td mat-cell *matCellDef="let element">
-                    <div class="den word-break-all">
+                    <div class="den score-break-word">
                       <a routerLink="/profile_bie/{{ element.topLevelAsbiepId }}"
                          matTooltip="{{ element.den }}">
-                        <span>{{ element.den }}</span>
+                        <span class="score-line-clamp-2 score-break-word">{{ element.den }}</span>
                       </a>
                     </div>
                   </td>
@@ -619,7 +627,7 @@
                 <ng-container matColumnDef="associationDen">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> Association DEN</th>
                   <td mat-cell *matCellDef="let element">
-                    <div class="den word-break-all">{{ element.associationDen }}</div>
+                    <div class="den score-line-clamp-2 score-break-word">{{ element.associationDen }}</div>
                   </td>
                 </ng-container>
 

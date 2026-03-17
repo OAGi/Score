@@ -2,6 +2,7 @@ package org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsFo
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -50,7 +51,8 @@ public class TC_10_5_CreatingNewRevisionDeveloperACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_5_1() {
+    @DisplayName("TC_10_5_TA_1")
+    public void published_acc_can_be_revised_with_same_initial_values() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -78,7 +80,8 @@ public class TC_10_5_CreatingNewRevisionDeveloperACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_5_2() {
+    @DisplayName("TC_10_5_TA_2")
+    public void non_published_acc_cannot_be_revised() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 

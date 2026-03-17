@@ -21,11 +21,15 @@ import org.oagi.score.e2e.page.context.ViewEditBusinessContextPage;
 import org.oagi.score.e2e.page.context.ViewEditContextCategoryPage;
 import org.oagi.score.e2e.page.context.ViewEditContextSchemePage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.oagi.score.e2e.page.core_component.ViewEditDataTypePage;
 import org.oagi.score.e2e.page.help.AboutPage;
 import org.oagi.score.e2e.page.help.UserGuidePage;
+import org.oagi.score.e2e.page.library.ViewLibraryPage;
+import org.oagi.score.e2e.page.message.MessageListPage;
 import org.oagi.score.e2e.page.module.ViewEditModuleSetPage;
 import org.oagi.score.e2e.page.module.ViewEditModuleSetReleasePage;
 import org.oagi.score.e2e.page.namespace.ViewEditNamespacePage;
+import org.oagi.score.e2e.page.oas.OpenAPIDocumentPage;
 import org.oagi.score.e2e.page.release.ViewEditReleasePage;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
@@ -33,6 +37,7 @@ import org.openqa.selenium.WebElement;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -134,6 +139,40 @@ public class TC_3_1_EndUsersAuthorizedFunctionalities extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_3_1_TA_1_1 (BIE - BIE Package Menu)")
+    public void test_bie_package_menu_end_user() {
+        HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        assertTrue(bieMenu.getBIEPackageSubMenu().isEnabled());
+
+        ViewBIEPackagePage viewBIEPackagePage = bieMenu.openBIEPackageSubMenu();
+        WebElement title = viewBIEPackagePage.getTitle();
+        assertTrue(title.isDisplayed());
+        String titleText = title.getText();
+
+        homePage.openPage();
+        viewBIEPackagePage.openPage();
+        assertEquals(viewBIEPackagePage.getTitle().getText(), titleText);
+    }
+
+    @Test
+    @DisplayName("TC_3_1_TA_1_1 (BIE - OpenAPI Document Menu)")
+    public void test_openapi_document_menu_end_user() {
+        HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        assertTrue(bieMenu.getOpenAPIDocumentSubMenu().isEnabled());
+
+        OpenAPIDocumentPage openAPIDocumentPage = bieMenu.openOpenAPIDocumentSubMenu();
+        WebElement title = openAPIDocumentPage.getTitle();
+        assertTrue(title.isDisplayed());
+        String titleText = title.getText();
+
+        homePage.openPage();
+        openAPIDocumentPage.openPage();
+        assertEquals(openAPIDocumentPage.getTitle().getText(), titleText);
+    }
+
+    @Test
     @DisplayName("TC_3_1_TA_1_1 (BIE - Reuse Report Menu)")
     public void test_reuse_report_menu_end_user() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
@@ -185,7 +224,7 @@ public class TC_3_1_EndUsersAuthorizedFunctionalities extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_3_1_TA_1_1 (Context - View/Edit Context Category Menu)")
+    @DisplayName("TC_3_1_TA_1_2 (Context - View/Edit Context Category Menu)")
     public void test_view_edit_context_category_menu_end_user() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         ContextMenu contextMenu = homePage.getContextMenu();
@@ -202,7 +241,7 @@ public class TC_3_1_EndUsersAuthorizedFunctionalities extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_3_1_TA_1_1 (Context - View/Edit Context Scheme Menu)")
+    @DisplayName("TC_3_1_TA_1_2 (Context - View/Edit Context Scheme Menu)")
     public void test_view_edit_context_scheme_menu_end_user() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         ContextMenu contextMenu = homePage.getContextMenu();
@@ -219,7 +258,7 @@ public class TC_3_1_EndUsersAuthorizedFunctionalities extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_3_1_TA_1_1 (Context - View/Edit Business Context Menu)")
+    @DisplayName("TC_3_1_TA_1_2 (Context - View/Edit Business Context Menu)")
     public void test_view_edit_business_context_menu_end_user() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         ContextMenu contextMenu = homePage.getContextMenu();
@@ -236,9 +275,10 @@ public class TC_3_1_EndUsersAuthorizedFunctionalities extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_3_1_TA_1_1 (Core Component - View/Edit Core Component Menu)")
+    @DisplayName("TC_3_1_TA_1_3 (Core Component - View/Edit Core Component Menu)")
     public void test_view_edit_core_component_menu_end_user() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
+        assumeFalse(homePage.hasBrowseStandardMenu());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         assertTrue(coreComponentMenu.getViewEditCoreComponentSubMenu().isEnabled());
 
@@ -253,9 +293,28 @@ public class TC_3_1_EndUsersAuthorizedFunctionalities extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_3_1_TA_1_1 (Core Component - View/Edit Code List Menu)")
+    @DisplayName("TC_3_1_TA_1_3 (Core Component - View/Edit Data Type Menu)")
+    public void test_view_edit_data_type_menu_end_user() {
+        HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
+        assumeFalse(homePage.hasBrowseStandardMenu());
+        CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
+        assertTrue(coreComponentMenu.getViewEditDataTypeSubMenu().isEnabled());
+
+        ViewEditDataTypePage viewEditDataTypePage = coreComponentMenu.openViewEditDataTypeSubMenu();
+        WebElement title = viewEditDataTypePage.getTitle();
+        assertTrue(title.isDisplayed());
+        String titleText = title.getText();
+
+        homePage.openPage();
+        viewEditDataTypePage.openPage();
+        assertEquals(viewEditDataTypePage.getTitle().getText(), titleText);
+    }
+
+    @Test
+    @DisplayName("TC_3_1_TA_1_3 (Core Component - View/Edit Code List Menu)")
     public void test_core_component_view_edit_code_list_menu_end_user() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
+        assumeFalse(homePage.hasBrowseStandardMenu());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         assertTrue(coreComponentMenu.getViewEditCodeListSubMenu().isEnabled());
 
@@ -270,9 +329,10 @@ public class TC_3_1_EndUsersAuthorizedFunctionalities extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_3_1_TA_1_1 (Core Component - View/Edit Agency ID List Menu)")
+    @DisplayName("TC_3_1_TA_1_3 (Core Component - View/Edit Agency ID List Menu)")
     public void test_core_component_view_edit_agency_id_list_menu_end_user() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
+        assumeFalse(homePage.hasBrowseStandardMenu());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         assertTrue(coreComponentMenu.getViewEditAgencyIDListSubMenu().isEnabled());
 
@@ -287,9 +347,10 @@ public class TC_3_1_EndUsersAuthorizedFunctionalities extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_3_1_TA_1_1 (Core Component - View/Edit Release Menu)")
+    @DisplayName("TC_3_1_TA_1_3 (Core Component - View/Edit Release Menu)")
     public void test_core_component_view_edit_release_menu_end_user() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
+        assumeFalse(homePage.hasBrowseStandardMenu());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         assertTrue(coreComponentMenu.getViewEditReleaseSubMenu().isEnabled());
 
@@ -304,9 +365,10 @@ public class TC_3_1_EndUsersAuthorizedFunctionalities extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_3_1_TA_1_1 (Core Component - View/Edit Namespace Menu)")
+    @DisplayName("TC_3_1_TA_1_3 (Core Component - View/Edit Namespace Menu)")
     public void test_core_component_view_edit_namespace_menu_end_user() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
+        assumeFalse(homePage.hasBrowseStandardMenu());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         assertTrue(coreComponentMenu.getViewEditNamespaceSubMenu().isEnabled());
 
@@ -321,7 +383,7 @@ public class TC_3_1_EndUsersAuthorizedFunctionalities extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_3_1_TA_1_1 (Module - View Module Set Menu)")
+    @DisplayName("TC_3_1_TA_1_4 (Module - View Module Set Menu)")
     public void test_module_view_module_set_menu_end_user() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         ModuleMenu moduleMenu = homePage.getModuleMenu();
@@ -338,7 +400,7 @@ public class TC_3_1_EndUsersAuthorizedFunctionalities extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_3_1_TA_1_1 (Module - View Module Set Release Menu)")
+    @DisplayName("TC_3_1_TA_1_4 (Module - View Module Set Release Menu)")
     public void test_module_view_module_set_release_menu_end_user() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         ModuleMenu moduleMenu = homePage.getModuleMenu();
@@ -355,7 +417,24 @@ public class TC_3_1_EndUsersAuthorizedFunctionalities extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_3_1_TA_1_1 (Admin Menu - Hidden)")
+    @DisplayName("TC_3_1_TA_1_5 (Library - View Library Menu)")
+    public void test_library_view_library_menu_end_user() {
+        HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
+        LibraryMenu libraryMenu = homePage.getLibraryMenu();
+        assertTrue(libraryMenu.getViewLibrarySubMenu().isEnabled());
+
+        ViewLibraryPage viewLibraryPage = libraryMenu.openViewLibrarySubMenu();
+        WebElement title = viewLibraryPage.getTitle();
+        assertTrue(title.isDisplayed());
+        String titleText = title.getText();
+
+        homePage.openPage();
+        viewLibraryPage.openPage();
+        assertEquals(viewLibraryPage.getTitle().getText(), titleText);
+    }
+
+    @Test
+    @DisplayName("TC_3_1_TA_1_6 (Admin Menu - Hidden)")
     public void test_admin_menu_end_user() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         AdminMenu adminMenu = homePage.getAdminMenu();
@@ -364,7 +443,7 @@ public class TC_3_1_EndUsersAuthorizedFunctionalities extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_3_1_TA_1_1 (Help - About Menu)")
+    @DisplayName("TC_3_1_TA_1_7 (Help - About Menu)")
     public void test_help_about_menu_end_user() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         HelpMenu helpMenu = homePage.getHelpMenu();
@@ -382,7 +461,7 @@ public class TC_3_1_EndUsersAuthorizedFunctionalities extends BaseTest {
 
     @Test
     @DisabledIf("isLocalhost")
-    @DisplayName("TC_3_1_TA_1_1 (Help - User Guide Menu)")
+    @DisplayName("TC_3_1_TA_1_7 (Help - User Guide Menu)")
     public void test_help_user_guide_menu_end_user() {
         // TODO:
         // Conditional test execution mechanism in JUnit 5 using pre-defined annotations such as
@@ -418,7 +497,23 @@ public class TC_3_1_EndUsersAuthorizedFunctionalities extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_3_1_TA_1_1 (Login ID - Signed in Label)")
+    @DisplayName("TC_3_1_TA_1_8 (Notification - Message List Navigation)")
+    public void test_notification_icon_message_list_navigation_end_user() {
+        HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
+        assertTrue(homePage.getNotificationIcon().isDisplayed());
+
+        MessageListPage messageListPage = homePage.openMessageListPage();
+        WebElement title = messageListPage.getTitle();
+        assertTrue(title.isDisplayed());
+        String titleText = title.getText();
+
+        homePage.openPage();
+        messageListPage.openPage();
+        assertEquals(messageListPage.getTitle().getText(), titleText);
+    }
+
+    @Test
+    @DisplayName("TC_3_1_TA_1_9 (Login ID - Signed in Label)")
     public void test_login_id_sign_in_label_end_user() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         LoginIDMenu loginIDMenu = homePage.getLoginIDMenu();
@@ -428,7 +523,7 @@ public class TC_3_1_EndUsersAuthorizedFunctionalities extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_3_1_TA_1_1 (Login ID - OAGIS Terminology Button)")
+    @DisplayName("TC_3_1_TA_1_10 (Login ID - connectSpec Terminology Button)")
     public void test_login_id_oagis_terminology_button_end_user() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         LoginIDMenu loginIDMenu = homePage.getLoginIDMenu();
@@ -443,7 +538,7 @@ public class TC_3_1_EndUsersAuthorizedFunctionalities extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_3_1_TA_1_1 (Login ID - CCTS Terminology Button)")
+    @DisplayName("TC_3_1_TA_1_11 (Login ID - CCTS Terminology Button)")
     public void test_login_id_ccts_terminology_button_end_user() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         LoginIDMenu loginIDMenu = homePage.getLoginIDMenu();
@@ -452,13 +547,13 @@ public class TC_3_1_EndUsersAuthorizedFunctionalities extends BaseTest {
         loginIDMenu.checkCCTSTerminology();
         assertTrue(loginIDMenu.isCCTSTerminologyChecked());
 
-        // Check if it's exclusively working with 'OAGIS Terminology' button.
+        // Check if it's exclusively working with 'connectSpec Terminology' button.
         loginIDMenu.checkConnectSpecTerminology();
         assertFalse(loginIDMenu.isCCTSTerminologyChecked());
     }
 
     @Test
-    @DisplayName("TC_3_1_TA_1_1 (Login ID - Settings Menu)")
+    @DisplayName("TC_3_1_TA_1_12 (Login ID - Settings Menu)")
     public void test_login_id_settings_menu_end_user() {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         LoginIDMenu loginIDMenu = homePage.getLoginIDMenu();
@@ -475,7 +570,7 @@ public class TC_3_1_EndUsersAuthorizedFunctionalities extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_3_1_TA_1_1 (Login ID - Logout Button)")
+    @DisplayName("TC_3_1_TA_1_12 (Login ID - Logout Button)")
     public void test_login_id_logout_button_end_user() throws URISyntaxException {
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         LoginIDMenu loginIDMenu = homePage.getLoginIDMenu();

@@ -597,7 +597,9 @@ public class LogSerializer {
         properties.put("revisionDoc", xbtDetails.revisionDoc());
         properties.put("schemaDefinition", xbtDetails.schemaDefinition());
         properties.put("jbtDraft05Map", xbtDetails.jbtDraft05Map());
+        properties.put("jbt202012Map", xbtDetails.jbt202012Map());
         properties.put("openapi30Map", xbtDetails.openApi30Map());
+        properties.put("openapi31Map", xbtDetails.openApi31Map());
         properties.put("state", xbtDetails.state());
         properties.put("deprecated", xbtDetails.deprecated());
 

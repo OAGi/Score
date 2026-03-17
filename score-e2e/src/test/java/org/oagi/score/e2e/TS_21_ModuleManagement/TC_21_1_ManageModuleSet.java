@@ -39,7 +39,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
 
     @Test
     @DisplayName("TC_21_1_TA_1")
-    public void test_TA_1() {
+    public void from_the_module_set_list_page_the_developer_can_invoke_create_a_module_set() {
         AppUserObject developer;
         {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -53,7 +53,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
 
     @Test
     @DisplayName("TC_21_1_TA_2")
-    public void test_TA_2() {
+    public void name_is_required() {
         AppUserObject developer;
         {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -81,7 +81,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
 
     @Test
     @DisplayName("TC_21_1_TA_2_a")
-    public void test_TA_2_a() {
+    public void developer_can_also_create_a_corresponding_module_set_release_based_module_set_in_this_case_the_devel() {
         AppUserObject developer;
         {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -117,7 +117,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
 
     @Test
     @DisplayName("TC_21_1_TA_3")
-    public void test_TA_3() {
+    public void developer_can_edit_the_details_of_an_existing_module_set_in_particular_the_developer_can_edit_the_na() {
         AppUserObject developer;
         {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -152,7 +152,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
 
     @Test
     @DisplayName("TC_21_1_TA_4_a")
-    public void test_TA_4_a() {
+    public void developer_can_create_a_new_module_file_and_add_it_to_the_set_for_the_detail_of_the_module_file_only() {
         AppUserObject developer;
         NamespaceObject namespace;
         {
@@ -191,7 +191,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
 
     @Test
     @DisplayName("TC_21_1_TA_4_b")
-    public void test_TA_4_b() {
+    public void developer_can_change_the_details_of_a_module_using_a_dialog_view_or_edit_a_module_the_name_of_the_mo() {
         AppUserObject developer;
         NamespaceObject namespace;
         {
@@ -248,7 +248,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
 
     @Test
     @DisplayName("TC_21_1_TA_4_c")
-    public void test_TA_4_c() {
+    public void developer_can_create_a_new_module_directory_and_add_it_to_the_set_for_the_detail_of_the_module_direc() {
         AppUserObject developer;
         {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -278,7 +278,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
 
     @Test
     @DisplayName("TC_21_1_TA_4_d")
-    public void test_TA_4_d() {
+    public void developer_can_modify_the_name_of_a_module_directory_it_cannot_be_left_empty_though_the_name_of_the_m() {
         AppUserObject developer;
         {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -321,7 +321,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
 
     @Test
     @DisplayName("TC_21_1_TA_4_e")
-    public void test_TA_4_e() {
+    public void developer_can_copy_a_module_directory_from_another_module_set_the_developer_should_also_have_the_opt() {
         AppUserObject developer;
         {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -361,7 +361,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
 
     @Test
     @DisplayName("TC_21_1_TA_4_f")
-    public void test_TA_4_f() {
+    public void developer_can_select_a_module_to_copy_from_another_module_set_rather_than_a_directory_in_that_case_o() {
         AppUserObject developer;
         {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -398,7 +398,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
 
     @Test
     @DisplayName("TC_21_1_TA_5_a_and_b")
-    public void test_TA_5_a_and_b() {
+    public void manage_module_set_covers_ta_5_a_and_b() {
         AppUserObject developer;
         NamespaceObject namespace;
         {
@@ -452,12 +452,12 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
 
     @Test
     @DisplayName("TC_21_1_TA_5_c")
-    public void test_TA_5_c() {
+    public void a_module_directory_contains_a_module_file_is_used_in_a_module_release_set_the_system_should_ask_the() {
     }
 
     @Test
     @DisplayName("TC_21_1_TA_6")
-    public void test_TA_6() {
+    public void developer_can_discard_a_module_set_when_it_has_not_been_assigned_to_any_release() {
         AppUserObject developer;
         {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -480,7 +480,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
 
     @Test
     @DisplayName("TC_21_1_TA_7")
-    public void test_TA_7() {
+    public void developer_cannot_discard_a_module_set_that_has_been_assigned_to_a_release() {
         AppUserObject developer;
         ReleaseObject release;
         {
@@ -517,7 +517,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
 
     @Test
     @DisplayName("TC_21_1_TA_8")
-    public void test_TA_8() {
+    public void end_user_can_view_module_sets_but_cannot_make_any_change_or_add_a_new_one() {
         AppUserObject developer;
         AppUserObject endUser;
         {
@@ -548,7 +548,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
 
     @Test
     @DisplayName("TC_21_1_TA_9")
-    public void test_TA_9() {
+    public void developer_can_view_any_existing_module_set_he_can_also_edit_its_details() {
         AppUserObject developerA;
         AppUserObject developerB;
         {

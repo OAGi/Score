@@ -31,6 +31,7 @@ import {NamespaceSummary} from '../../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../../namespace-management/domain/namespace.service';
 
 @Component({
+  standalone: false,
   selector: 'score-create-bdt-dialog',
   templateUrl: './create-bdt-dialog.component.html',
   styleUrls: ['./create-bdt-dialog.component.css'],

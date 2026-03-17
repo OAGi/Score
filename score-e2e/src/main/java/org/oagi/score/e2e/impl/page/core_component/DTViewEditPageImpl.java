@@ -121,6 +121,11 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         this.dt = dt;
     }
 
+    private WebElement detailField(By locator) {
+        invisibilityOfLoadingContainerElement(getDriver());
+        return visibilityOfElementLocated(PageHelper.longWait(getDriver()), locator);
+    }
+
     @Override
     protected String getPageUrl() {
         return getConfig().getBaseUrl().resolve("/data_type/" + this.dt.getDtManifestId()).toString();
@@ -131,7 +136,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         String url = getPageUrl();
         getDriver().get(url);
         invisibilityOfLoadingContainerElement(getDriver());
-        waitFor(ofSeconds(2L));
+        detailField(CORE_COMPONENT_FIELD_LOCATOR);
         assert "DT".equals(getCoreComponentTypeFieldValue());
         assert getText(getTitle()).equals(dt.getDen());
     }
@@ -145,7 +150,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public WebElement getCoreComponentTypeField() {
-        return visibilityOfElementLocated(getDriver(), CORE_COMPONENT_FIELD_LOCATOR);
+        return detailField(CORE_COMPONENT_FIELD_LOCATOR);
     }
 
     @Override
@@ -155,7 +160,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public WebElement getReleaseField() {
-        return visibilityOfElementLocated(getDriver(), RELEASE_FIELD_LOCATOR);
+        return detailField(RELEASE_FIELD_LOCATOR);
     }
 
     @Override
@@ -165,7 +170,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public WebElement getRevisionField() {
-        return visibilityOfElementLocated(getDriver(), REVISION_FIELD_LOCATOR);
+        return detailField(REVISION_FIELD_LOCATOR);
     }
 
     @Override
@@ -175,7 +180,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public WebElement getStateField() {
-        return visibilityOfElementLocated(getDriver(), STATE_FIELD_LOCATOR);
+        return detailField(STATE_FIELD_LOCATOR);
     }
 
     @Override
@@ -185,7 +190,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public WebElement getOwnerField() {
-        return visibilityOfElementLocated(getDriver(), OWNER_FIELD_LOCATOR);
+        return detailField(OWNER_FIELD_LOCATOR);
     }
 
     @Override
@@ -195,7 +200,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public WebElement getGUIDField() {
-        return visibilityOfElementLocated(getDriver(), GUID_FIELD_LOCATOR);
+        return detailField(GUID_FIELD_LOCATOR);
     }
 
     @Override
@@ -205,7 +210,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public WebElement getDENField() {
-        return visibilityOfElementLocated(getDriver(), DEN_FIELD_LOCATOR);
+        return detailField(DEN_FIELD_LOCATOR);
     }
 
     @Override
@@ -215,7 +220,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public WebElement getDataTypeTermField() {
-        return visibilityOfElementLocated(getDriver(), DATA_TYPE_TERM_FIELD_LOCATOR);
+        return detailField(DATA_TYPE_TERM_FIELD_LOCATOR);
     }
 
     @Override
@@ -230,7 +235,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public WebElement getRepresentationTermField() {
-        return visibilityOfElementLocated(getDriver(), REPRESENTATION_TERM_FIELD_LOCATOR);
+        return detailField(REPRESENTATION_TERM_FIELD_LOCATOR);
     }
 
     @Override
@@ -245,7 +250,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public WebElement getNamespaceField() {
-        return visibilityOfElementLocated(getDriver(), NAMESPACE_FIELD_LOCATOR);
+        return detailField(NAMESPACE_FIELD_LOCATOR);
     }
 
     @Override
@@ -255,7 +260,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public WebElement getDefinitionSourceField() {
-        return visibilityOfElementLocated(getDriver(), DEFINITION_SOURCE_FIELD_LOCATOR);
+        return detailField(DEFINITION_SOURCE_FIELD_LOCATOR);
     }
 
     @Override
@@ -265,7 +270,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public WebElement getDefinitionField() {
-        return visibilityOfElementLocated(getDriver(), DEFINITION_FIELD_LOCATOR);
+        return detailField(DEFINITION_FIELD_LOCATOR);
     }
 
     @Override
@@ -294,22 +299,22 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public void addCodeListValueDomain(String valueDomainName) {
-        click(getAddValueDomainButton());
+        click(getDriver(), getAddValueDomainButton());
         WebElement tr = getTheLastTableRecord();
         WebElement tdDomainType = getColumnByName(tr, "type");
-        click(tdDomainType);
-        click(elementToBeClickable(getDriver(), By.xpath(
-                "//span[contains(text(), \"Code List\")]//ancestor::mat-option[1]")));
+        click(getDriver(), tdDomainType);
+        click(getDriver(), elementToBeClickable(PageHelper.longWait(getDriver()), By.xpath(
+                "//div[contains(@class, \"cdk-overlay-container\")]//span[contains(text(), \"Code List\")]//ancestor::mat-option[1]")));
         WebElement tdDomainName = getColumnByName(tr, "name");
-        click(tdDomainName);
-        click(elementToBeClickable(getDriver(), By.xpath(
-                "//span[contains(text(), \"" + valueDomainName + "\")]//ancestor::mat-option[1]")));
+        click(getDriver(), tdDomainName);
+        click(getDriver(), elementToBeClickable(PageHelper.longWait(getDriver()), By.xpath(
+                "//div[contains(@class, \"cdk-overlay-container\")]//span[contains(text(), \"" + valueDomainName + "\")]//ancestor::mat-option[1]")));
     }
 
     @Override
     public WebElement getTheLastTableRecord() {
-        defaultWait(getDriver());
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-expansion-panel//table//tbody//tr[last()]"));
+        return visibilityOfElementLocated(PageHelper.longWait(getDriver()),
+                By.xpath("//mat-expansion-panel//table//tbody//tr[last()]"));
     }
 
     @Override
@@ -359,7 +364,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public WebElement getQualifierField() {
-        return visibilityOfElementLocated(getDriver(), QUALIFIER_FIELD_LOCATOR);
+        return detailField(QUALIFIER_FIELD_LOCATOR);
     }
 
     @Override
@@ -388,14 +393,14 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public void setDefaultValueDomain(String name) {
-        click(getDefaultValueDomainField());
-        click(elementToBeClickable(getDriver(), By.xpath(
-                "//span[contains(text(), \"" + name + "\")]//ancestor::mat-option[1]")));
+        click(getDriver(), getDefaultValueDomainField());
+        click(getDriver(), elementToBeClickable(PageHelper.longWait(getDriver()), By.xpath(
+                "//div[contains(@class, \"cdk-overlay-container\")]//span[contains(text(), \"" + name + "\")]//ancestor::mat-option[1]")));
     }
 
     @Override
     public WebElement getDefaultValueDomainField() {
-        return visibilityOfElementLocated(getDriver(), DEFAULT_VALUE_DOMAIN_SELECT_LOCATOR);
+        return detailField(DEFAULT_VALUE_DOMAIN_SELECT_LOCATOR);
     }
 
     @Override
@@ -515,7 +520,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public WebElement getBasedDataTypeField() {
-        return visibilityOfElementLocated(getDriver(), BASED_DATA_TYPE_FIELD_LOCATOR);
+        return detailField(BASED_DATA_TYPE_FIELD_LOCATOR);
     }
 
     @Override
@@ -525,7 +530,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public WebElement getSixHexadecimalIdentifierField() {
-        return visibilityOfElementLocated(getDriver(), SIX_HEXADECIMAL_IDENTIFIER_FIELD_LOCATOR);
+        return detailField(SIX_HEXADECIMAL_IDENTIFIER_FIELD_LOCATOR);
     }
 
     @Override
@@ -535,7 +540,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public WebElement getContentComponentDefinitionField() {
-        return visibilityOfElementLocated(getDriver(), CONTENT_COMPONENT_DEFINITION_FIELD_LOCATOR);
+        return detailField(CONTENT_COMPONENT_DEFINITION_FIELD_LOCATOR);
     }
 
     @Override
@@ -567,7 +572,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public void discardValueDomain() {
-        click(getDiscardValueDomainButton());
+        click(getDriver(), getDiscardValueDomainButton());
     }
 
     @Override
@@ -582,7 +587,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public WebElement getTableRecordByValue(String value) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-expansion-panel//table//tbody//span[contains(text(), \"" + value + "\")]/ancestor::tr"));
+        return visibilityOfElementLocated(PageHelper.longWait(getDriver()),
+                By.xpath("//mat-expansion-panel//table//tbody//span[contains(text(), \"" + value + "\")]/ancestor::tr"));
     }
 
     @Override
@@ -590,7 +596,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         retry(() -> {
             WebElement tr = getTableRecordByValue(name);
             WebElement td = getColumnByName(tr, "select");
-            click(td.findElement(By.tagName("mat-checkbox")));
+            click(getDriver(), td.findElement(By.tagName("mat-checkbox")));
         });
 
         invisibilityOfLoadingContainerElement(getDriver());
@@ -789,7 +795,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     @Override
     public SupplementaryComponentPanel getSCPanel(WebElement scNode) {
         return retry(() -> {
-            click(scNode);
+            click(getDriver(), scNode);
             waitFor(ofMillis(1000L));
             String nodeText = getText(scNode);
             String panelTitle = getText(getTitle());
@@ -801,30 +807,30 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     private class SupplementaryComponentPanelImpl implements DTViewEditPage.SupplementaryComponentPanel {
         @Override
         public void setCardinality(String cardinality) {
-            click(getCardinalityField());
+            click(getDriver(), getCardinalityField());
             waitFor(ofMillis(1000L));
-            WebElement option = elementToBeClickable(getDriver(), By.xpath(
-                    "//span[contains(text(), \"" + cardinality + "\")]//ancestor::mat-option"));
-            click(option);
+            WebElement option = elementToBeClickable(PageHelper.longWait(getDriver()), By.xpath(
+                    "//div[contains(@class, \"cdk-overlay-container\")]//span[contains(text(), \"" + cardinality + "\")]//ancestor::mat-option"));
+            click(getDriver(), option);
         }
 
         @Override
         public WebElement getCardinalityField() {
-            return visibilityOfElementLocated(getDriver(), CARDINALITY_FIELD_LOCATOR);
+            return detailField(CARDINALITY_FIELD_LOCATOR);
         }
 
         @Override
         public void setValueConstraintType(String valueConstraintType) {
-            click(getValueConstraintTypeField());
+            click(getDriver(), getValueConstraintTypeField());
             waitFor(ofMillis(1000L));
-            WebElement option = elementToBeClickable(getDriver(), By.xpath(
-                    "//span[contains(text(), \"" + valueConstraintType + "\")]//ancestor::mat-option"));
-            click(option);
+            WebElement option = elementToBeClickable(PageHelper.longWait(getDriver()), By.xpath(
+                    "//div[contains(@class, \"cdk-overlay-container\")]//span[contains(text(), \"" + valueConstraintType + "\")]//ancestor::mat-option"));
+            click(getDriver(), option);
         }
 
         @Override
         public WebElement getValueConstraintTypeField() {
-            return visibilityOfElementLocated(getDriver(), VALUE_CONSTRAINT_TYPE_FIELD_LOCATOR);
+            return detailField(VALUE_CONSTRAINT_TYPE_FIELD_LOCATOR);
         }
 
         @Override
@@ -865,7 +871,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
         @Override
         public WebElement getObjectClassTermField() {
-            return visibilityOfElementLocated(getDriver(), OBJECT_CLASS_TERM_FIELD_LOCATOR);
+            return detailField(OBJECT_CLASS_TERM_FIELD_LOCATOR);
         }
 
         @Override
@@ -890,34 +896,35 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
         @Override
         public WebElement getPropertyTermField() {
-            return visibilityOfElementLocated(getDriver(), PROPERTY_TERM_FIELD_LOCATOR);
+            return detailField(PROPERTY_TERM_FIELD_LOCATOR);
         }
 
         @Override
         public WebElement getRepresentationSelectField() {
-            return visibilityOfElementLocated(getDriver(), REPRESENTATION_TERM_SELECTOR_LOCATOR);
+            return detailField(REPRESENTATION_TERM_SELECTOR_LOCATOR);
         }
 
         @Override
         public WebElement getDefinitionField() {
-            return visibilityOfElementLocated(getDriver(), DEFINITION_FIELD_LOCATOR);
+            return detailField(DEFINITION_FIELD_LOCATOR);
         }
 
         @Override
         public WebElement getDefinitionSourceField() {
-            return visibilityOfElementLocated(getDriver(), DEFINITION_SOURCE_FIELD_LOCATOR);
+            return detailField(DEFINITION_SOURCE_FIELD_LOCATOR);
         }
 
         @Override
         public void selectRepresentationTerm(String representationTerm) {
-            click(getRepresentationSelectField());
-            click(elementToBeClickable(getDriver(), By.xpath(
-                    "//span[text() = \"" + representationTerm + "\"]//ancestor::mat-option[1]")));
+            click(getDriver(), getRepresentationSelectField());
+            click(getDriver(), elementToBeClickable(PageHelper.longWait(getDriver()), By.xpath(
+                    "//div[contains(@class, \"cdk-overlay-container\")]//span[text() = \"" + representationTerm + "\"]//ancestor::mat-option[1]")));
         }
 
         @Override
         public WebElement getTableRecordByValue(String value) {
-            return visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(), \"" + value + "\")]/ancestor::tr"));
+            return visibilityOfElementLocated(PageHelper.longWait(getDriver()),
+                    By.xpath("//span[contains(text(), \"" + value + "\")]/ancestor::tr"));
         }
 
         @Override
@@ -937,14 +944,14 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
         @Override
         public void setDefaultValueDomain(String valueDomain) {
-            click(getDefaultValueDomainField());
-            click(elementToBeClickable(getDriver(), By.xpath(
-                    "//span[contains(text(), \"" + valueDomain + "\")]//ancestor::mat-option[1]")));
+            click(getDriver(), getDefaultValueDomainField());
+            click(getDriver(), elementToBeClickable(PageHelper.longWait(getDriver()), By.xpath(
+                    "//div[contains(@class, \"cdk-overlay-container\")]//span[contains(text(), \"" + valueDomain + "\")]//ancestor::mat-option[1]")));
         }
 
         @Override
         public WebElement getDefaultValueDomainField() {
-            return visibilityOfElementLocated(getDriver(), DEFAULT_VALUE_DOMAIN_SELECT_LOCATOR);
+            return detailField(DEFAULT_VALUE_DOMAIN_SELECT_LOCATOR);
         }
 
         @Override

@@ -59,9 +59,12 @@ import java.math.BigInteger;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toSet;
@@ -118,6 +121,9 @@ public class CcQueryController {
 
             @Parameter(description = "DEN (Dictionary Entry Name) filter.", required = false)
             @RequestParam(name = "den", required = false) String den,
+
+            @Parameter(description = "Name filter.", required = false)
+            @RequestParam(name = "name", required = false) String name,
 
             @Parameter(description = "Definition filter.", required = false)
             @RequestParam(name = "definition", required = false) String definition,
@@ -199,8 +205,12 @@ public class CcQueryController {
             @RequestParam(name = "pageSize", required = false) Integer pageSize) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
 
         ScoreUser requester = sessionService.asScoreUser(user);
+        // Issue #1700:
+        // Browse Standards searches by `name`, while existing CC pages search by `den`.
+        // The frontend keeps these mutually exclusive and sends exactly one of them.
         CcListFilterCriteria filterCriteria =
                 CcListFilterCriteria.builder(releaseId)
+                        .name(name)
                         .den(den)
                         .definition(definition)
                         .module(module)
@@ -209,7 +219,7 @@ public class CcQueryController {
                         .tags(separate(tags).collect(toSet()))
                         .namespaceIds(separate(namespaces).map(e -> NamespaceId.from(e)).collect(Collectors.toSet()))
                         .componentTypes(separate(componentTypes).map(e -> OagisComponentType.valueOf(e)).collect(toSet()))
-                        .asccpTypes(separate(asccpTypes).map(e -> AsccpType.valueOf(e)).collect(toSet()))
+                        .asccpTypes(parseAsccpTypes(asccpTypes))
                         .asccpManifestIds(
                                 (hasLength(den) && den.startsWith("AI:")) ?
                                         interpreter.interpret(requester, releaseId, den.substring(3).trim()) : Collections.emptyList()
@@ -244,6 +254,35 @@ public class CcQueryController {
         response.setSize(pageRequest.pageSize());
         response.setLength(resultAndCount.count());
         return response;
+    }
+
+    private Set<AsccpType> parseAsccpTypes(String asccpTypes) {
+        List<String> filters = separate(asccpTypes)
+                .map(String::trim)
+                .filter(org.springframework.util.StringUtils::hasLength)
+                .collect(Collectors.toCollection(ArrayList::new));
+        if (filters.isEmpty()) {
+            return Collections.emptySet();
+        }
+
+        EnumSet<AsccpType> include = EnumSet.noneOf(AsccpType.class);
+        EnumSet<AsccpType> exclude = EnumSet.noneOf(AsccpType.class);
+        for (String filter : filters) {
+            boolean excluded = filter.startsWith("!");
+            String normalized = excluded ? filter.substring(1) : filter;
+            AsccpType type = AsccpType.valueOf(normalized);
+            if (excluded) {
+                exclude.add(type);
+            } else {
+                include.add(type);
+            }
+        }
+
+        EnumSet<AsccpType> resolved = include.isEmpty()
+                ? EnumSet.allOf(AsccpType.class)
+                : EnumSet.copyOf(include);
+        resolved.removeAll(exclude);
+        return resolved;
     }
 
     @GetMapping(value = "/acc/{accManifestId:[\\d]+}")
@@ -406,16 +445,21 @@ public class CcQueryController {
     @GetMapping(value = "/export/standalone")
     public ResponseEntity<DeleteOnCloseFileSystemResource> exportStandaloneSchema(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @RequestParam(name = "asccpManifestIdList") String asccpManifestIdList) throws Exception {
+            @RequestParam(name = "asccpManifestIdList") String asccpManifestIdList,
+            @RequestParam(name = "expressionOption", required = false) String expressionOption,
+            @RequestParam(name = "expressionVersion", required = false) String expressionVersion) throws Exception {
 
         ExportStandaloneSchemaResponse response =
                 releaseQueryService.exportStandaloneSchema(sessionService.asScoreUser(user),
-                        separate(asccpManifestIdList).map(e -> AsccpManifestId.from(e)).collect(toSet()));
+                        separate(asccpManifestIdList).map(e -> AsccpManifestId.from(e)).collect(toSet()),
+                        expressionOption, expressionVersion);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + response.filename() + "\"")
                 .contentType(MediaType.parseMediaType(
-                        (response.filename().endsWith(".zip") ? "application/zip" : "application/xml")
+                        response.filename().endsWith(".zip") ? "application/zip" :
+                                response.filename().endsWith(".json") ? "application/schema+json" :
+                                        "application/xml"
                 ))
                 .contentLength(response.file().length())
                 .body(new DeleteOnCloseFileSystemResource(response.file()));

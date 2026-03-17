@@ -39,7 +39,7 @@ public class TC_41_11_EditingExistingSupplementaryComponentsOfRevisionOfEndUserD
 
     @Test
     @DisplayName("TC_41_11_from_TA_1_to_TA_8")
-    public void test_from_TA_1_to_TA_8() {
+    public void editing_existing_supplementary_components_of_a_revision_of_end_user_data_type_covers_ta_1_to_ta_8() {
         AppUserObject endUserA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -132,7 +132,7 @@ public class TC_41_11_EditingExistingSupplementaryComponentsOfRevisionOfEndUserD
              */
             dtViewEditPage.showValueDomain();
             String randomValueDomain = valueDomains.get(valueDomains.size() - 1);
-            assertThrows(Exception.class, () -> dtViewEditPage.selectValueDomain(randomValueDomain));
+            assertDoesNotThrow(() -> dtViewEditPage.selectValueDomain(randomValueDomain));
             assertThrows(Exception.class, () -> dtViewEditPage.getDiscardValueDomainButton());
             /**
              * Test Assertion #41.7.4

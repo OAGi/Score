@@ -27,6 +27,7 @@ import {ScoreTableColumnResizeDirective} from '../../../common/score-table-colum
 import {SearchBarComponent} from '../../../common/search-bar/search-bar.component';
 
 @Component({
+  standalone: false,
   selector: 'score-context-scheme',
   templateUrl: './context-scheme-list.component.html',
   styleUrls: ['./context-scheme-list.component.css']

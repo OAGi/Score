@@ -71,6 +71,18 @@ mat-toolbar > .mat-icon-button {
   font-size: 13px;
 }
 
+.den-with-tags {
+  display: inline-flex;
+  align-items: flex-start;
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+
+.den-with-tags > a {
+  min-width: 0;
+  flex: 0 1 auto;
+}
+
 .cc-source {
   font-size: 11px !important;
   color: #767676 !important;
@@ -158,7 +170,9 @@ mat-toolbar .mat-icon {
 }
 
 .tag-list {
-  display: inline-block;
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
 }
 
 .tag {

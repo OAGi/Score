@@ -17,6 +17,10 @@ export class FunctionsRequiringEmailTransmissionProperties {
   enabled: boolean;
 }
 
+export class BrowseStandardModeProperties {
+  enabled: boolean;
+}
+
 export class TenantProperties {
   enabled: boolean;
   roles: string[];
@@ -32,6 +36,7 @@ export class UserToken {
   businessTerm: BusinessTermProperties;
   bie: BIEProperties;
   functionsRequiringEmailTransmission: FunctionsRequiringEmailTransmissionProperties;
+  browseStandardMode: BrowseStandardModeProperties;
 
   constructor() {
     this.roles = ['', ];
@@ -51,6 +56,9 @@ export class UserToken {
 
     this.functionsRequiringEmailTransmission = new FunctionsRequiringEmailTransmissionProperties();
     this.functionsRequiringEmailTransmission.enabled = false;
+
+    this.browseStandardMode = new BrowseStandardModeProperties();
+    this.browseStandardMode.enabled = false;
   }
 }
 

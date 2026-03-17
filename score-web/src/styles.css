@@ -114,14 +114,32 @@ b {
   width: 100%;
 }
 
-.mat-mdc-table .mat-column-select {
+.mat-mdc-table .mat-column-select,
+.mat-mdc-table .cdk-column-select {
   width: 66px !important;
+  min-width: 66px !important;
+  max-width: 66px !important;
 }
 
 .ellipsis {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.score-line-clamp-2 {
+  display: -webkit-box;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.score-break-word {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .f10 {
@@ -1008,6 +1026,10 @@ span.context-menu-item.disabled, span.context-menu-item[disabled] {
   flex-grow: 1;
 }
 
+.table-wrapper.mat-elevation-z1 {
+  box-shadow: var(--mat-app-elevation-shadow-level-1, none);
+}
+
 /* Angular 17 fixes */
 .mdc-button {
   letter-spacing: normal !important;
@@ -1043,6 +1065,11 @@ span.context-menu-item.disabled, span.context-menu-item[disabled] {
 .mat-mdc-header-cell {
   color: #0000008a;
   font-size: 12px;
+}
+
+.mat-mdc-header-cell .mat-sort-header-container {
+  width: 100%;
+  justify-content: flex-start;
 }
 
 .mdc-data-table__cell, .mdc-data-table__header-cell {

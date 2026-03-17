@@ -52,7 +52,7 @@ public class TC_20_1_DeveloperManagementOfNamespaces extends BaseTest {
     }
 
     @Test
-    public void test_TA_20_1_1_a_b_c_d() {
+    public void developer_management_of_namespaces() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -84,7 +84,7 @@ public class TC_20_1_DeveloperManagementOfNamespaces extends BaseTest {
     }
 
     @Test
-    public void test_TA_20_1_2() {
+    public void developer_who_is_an_owner_of_the_namespace_can_change_details_of_an_existing_namespace_the() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -126,7 +126,7 @@ public class TC_20_1_DeveloperManagementOfNamespaces extends BaseTest {
     }
 
     @Test
-    public void test_TA_20_1_3_and_5() {
+    public void developer_management_of_namespaces_the_developer_and_end_user_who_does_not_own_the_namespace() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -169,7 +169,7 @@ public class TC_20_1_DeveloperManagementOfNamespaces extends BaseTest {
     }
 
     @Test
-    public void test_TA_20_1_4() {
+    public void developer_who_is_the_owner_of_the_namespace_can_discard_it_if_the_namespace_has_no() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -187,7 +187,7 @@ public class TC_20_1_DeveloperManagementOfNamespaces extends BaseTest {
     }
 
     @Test
-    public void test_TA_20_1_6() {
+    public void owner_developer_of_the_namespace_can_transfer_ownership_only_to_another_developer() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);

@@ -2,6 +2,7 @@ package org.oagi.score.gateway.http.api.export.model;
 
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListSummaryRecord;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListValueSummaryRecord;
+import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId;
 import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
 
 import java.util.ArrayList;
@@ -32,6 +33,10 @@ public class AgencyId implements Component {
 
     public String getEnumGuid() {
         return agencyIdList.enumTypeGuid();
+    }
+
+    public AgencyIdListManifestId agencyIdListManifestId() {
+        return agencyIdList.agencyIdListManifestId();
     }
 
     @Override

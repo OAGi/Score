@@ -9,6 +9,7 @@ import {WebPageInfo} from '../about/domain/about';
 import {WebPageInfoService} from '../basis.service';
 
 @Component({
+  standalone: false,
   selector: 'score-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']

@@ -37,7 +37,7 @@ public class TC_17_7_RestoringEndUserCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_7_TA_1")
-    public void test_TA_1() {
+    public void end_user_can_open_a_deleted_end_user_code_list_and_restore_it_or_select_one_or_more_from_deleted_cod() {
         AppUserObject endUserA;
         ReleaseObject branch;
         List<CodeListObject> codeListForTesting = new ArrayList<>();

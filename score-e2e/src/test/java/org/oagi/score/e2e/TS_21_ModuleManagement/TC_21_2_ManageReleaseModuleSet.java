@@ -58,7 +58,7 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
 
     @Test
     @DisplayName("TC_21_2_TA_1")
-    public void test_TA_1() throws InterruptedException {
+    public void developer_can_create_a_release_module_set_the_fields_module_set_and_release_are_mandatories_the_form() throws InterruptedException {
         AppUserObject developer;
         {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -93,7 +93,7 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
 
     @Test
     @DisplayName("TC_21_2_TA_1_a")
-    public void test_TA_1_a() throws InterruptedException {
+    public void developer_can_select_this_release_module_set_to_be_the_default_one_for_the_specific_selected_branch() throws InterruptedException {
         String releaseNumber = "10.8.4";
         AppUserObject developer;
         ModuleSetReleaseObject moduleSetRelease;
@@ -138,7 +138,7 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
 
     @Test
     @DisplayName("TC_21_2_TA_2")
-    public void test_TA_2() {
+    public void after_working_on_assignment_to_another_release_the_developer_selects_a_release_previously_worked_on() {
         String releaseNumber = "10.8.2";
         AppUserObject developer;
         ModuleSetReleaseObject moduleSetRelease;
@@ -195,7 +195,7 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
 
     @Test
     @DisplayName("TC_21_2_TA_3")
-    public void test_TA_3() {
+    public void release_module_set_can_be_edited_by_any_other_developer_the_fields_module_set_and_release_are_mandat() {
         String releaseNumber = "10.8.3";
         AppUserObject developerA;
         AppUserObject developerB;
@@ -240,7 +240,7 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
 
     @Test
     @DisplayName("TC_21_2_TA_4")
-    public void test_TA_4() {
+    public void developer_can_export_a_module_set_release_while_viewing_the_details_of_a_module_set_release() {
         String releaseNumber = "10.8.3";
         AppUserObject developerA;
         {
@@ -266,7 +266,7 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
 
     @Test
     @DisplayName("TC_21_2_TA_5")
-    public void test_TA_5() {
+    public void end_user_can_view_the_release_module_set_but_cannot_make_any_change() {
         String releaseNumber = "10.8.3";
         AppUserObject developer;
         AppUserObject endUser;
@@ -303,7 +303,7 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
 
     @Test
     @DisplayName("TC_21_2_TA_6b")
-    public void test_TA_6b() {
+    public void manage_release_module_set_covers_ta_6b() {
         AppUserObject developer;
         NamespaceObject namespace;
         {
@@ -346,7 +346,7 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
 
     @Test
     @DisplayName("TC_21_2_TA_7")
-    public void test_TA_7() {
+    public void developer_can_validate_all_schemas_in_the_release_module_set_the_validated_result_can_be_downloaded() {
         AppUserObject developerA;
         {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -377,7 +377,7 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
 
     @Test
     @DisplayName("TC_21_2_TA_8")
-    public void test_TA_8() {
+    public void manage_release_module_set_covers_ta_8() {
         AppUserObject developerA;
         {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);

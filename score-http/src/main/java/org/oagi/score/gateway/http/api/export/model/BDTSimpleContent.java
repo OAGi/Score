@@ -26,13 +26,15 @@ public class BDTSimpleContent extends AbstractBDTSimple {
     private CcDocument ccDocument;
 
     private Function<DtSummaryRecord, String> nameResolver;
+    private final SchemaNamingStrategy namingStrategy;
 
     public BDTSimpleContent(DtSummaryRecord dataType,
                             DtSummaryRecord baseDataType,
                             boolean isDefaultBDT,
                             Map<DtScManifestId, DtScSummaryRecord> dtScMap,
                             CcDocument ccDocument,
-                            Function<DtSummaryRecord, String> nameResolver) {
+                            Function<DtSummaryRecord, String> nameResolver,
+                            SchemaNamingStrategy namingStrategy) {
         super(ccDocument);
 
         this.dataType = dataType;
@@ -40,12 +42,13 @@ public class BDTSimpleContent extends AbstractBDTSimple {
         this.isDefaultBDT = isDefaultBDT;
         this.ccDocument = ccDocument;
         this.nameResolver = nameResolver;
+        this.namingStrategy = namingStrategy;
         this.dtScList = map(dtScMap);
     }
 
     private List<BDTSC> map(Map<DtScManifestId, DtScSummaryRecord> dtScMap) {
         return dtScMap.entrySet().stream()
-                .map(entry -> new BDTSC(entry.getValue(), ccDocument))
+                .map(entry -> new BDTSC(entry.getValue(), ccDocument, namingStrategy))
                 .collect(Collectors.toList());
     }
 

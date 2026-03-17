@@ -21,7 +21,7 @@ import {CcNodeService} from '../domain/core-component-node.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatTableDataSource} from '@angular/material/table';
 import {FormControl} from '@angular/forms';
-import {initFilter, loadBranch, loadLibrary, saveBranch, saveLibrary} from '../../common/utility';
+import {initFilter, loadBranch, loadLibrary, saveAsBlobResponse, saveBranch, saveLibrary} from '../../common/utility';
 import {ReleaseSummary, WorkingRelease} from '../../release-management/domain/release';
 import {OagisComponentType, OagisComponentTypes} from '../domain/core-component-node';
 import {finalize} from 'rxjs/operators';
@@ -30,7 +30,6 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 import {AboutService} from '../../basis/about/domain/about.service';
 import {TagService} from '../../tag-management/domain/tag.service';
 import {Tag} from '../../tag-management/domain/tag';
-import {saveAs} from 'file-saver';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {NamespaceSummary} from '../../namespace-management/domain/namespace';
 import {WebPageInfoService} from '../../basis/basis.service';
@@ -43,6 +42,7 @@ import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryService} from '../../library-management/domain/library.service';
 
 @Component({
+  standalone: false,
   selector: 'score-dt-list',
   templateUrl: './dt-list.component.html',
   styleUrls: ['./dt-list.component.css'],
@@ -517,7 +517,11 @@ export class DtListComponent implements OnInit {
         }
 
       case 'BCCP':
-        return '/core_component/bccp/' + ccList.manifestId;
+        if (this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode) {
+          return '/core_component/browser/bccp/' + ccList.manifestId;
+        } else {
+          return '/core_component/bccp/' + ccList.manifestId;
+        }
 
       case 'DT':
         return '/data_type/' + ccList.manifestId;
@@ -673,18 +677,11 @@ export class DtListComponent implements OnInit {
 
     this.loading = true;
     this.service.exportStandaloneSchemas(this.selection.selected).subscribe(resp => {
-      const blob = new Blob([resp.body], {type: resp.headers.get('Content-Type')});
-      saveAs(blob, this._getFilenameFromContentDisposition(resp));
+      saveAsBlobResponse(resp);
       this.loading = false;
     }, err => {
       this.loading = false;
     });
-  }
-
-  _getFilenameFromContentDisposition(resp) {
-    const contentDisposition = resp.headers.get('Content-Disposition') || '';
-    const matches = /filename=([^;]+)/ig.exec(contentDisposition);
-    return (matches[1] || 'untitled').replace(/\"/gi, '').trim();
   }
 
   hasCreatePermission(): boolean {

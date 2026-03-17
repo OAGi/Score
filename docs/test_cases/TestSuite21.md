@@ -8,6 +8,8 @@
 
 > Note: Because entities related module management have no ownership. Multiple developers may edit them at the same time. Two-phase commit needs to be implemented to manage the concurrent edits of these entities.
 
+> Current TS_21 automation covers Module Set, Release Module Set, and CC-Module Assignment. Within Module Set, test assertion [#21.1.5.c](#test-assertion-2115c) is not automated yet.
+
 ## Test Case 21.1
 
 **Manage Module Set**
@@ -70,11 +72,15 @@ The end user can view module sets but cannot make any change or add a new one.
 The developer can view any existing module set. He can also edit its details (i.e., there is no ownership).
 
 ### Test Step Pre-condition:
-
-
+1. Developer and end-user accounts needed for module-set scenarios are available in connectCenter.
+2. Existing module sets, module directories, module files, and releases are available so copy, discard, release-assignment, and access-control flows can be exercised.
 
 ### Test Step:
-
+1. A developer signs in to connectCenter and opens the View/Edit Module Set page.
+2. Create a module set, verify the required name field, and verify that a paired release module set can also be created from the same flow. (Assertions [#21.1.1](#test-assertion-2111), [#21.1.2](#test-assertion-2112))
+3. Update an existing module set and verify that another developer can also open and edit it. (Assertions [#21.1.3](#test-assertion-2113), [#21.1.9](#test-assertion-2119))
+4. Add module files and directories, update them, and copy directories or individual modules from other module sets. Verify duplicate-name validation for module files and discard confirmation for used directories where implemented. (Assertions [#21.1.4](#test-assertion-2114), [#21.1.5](#test-assertion-2115))
+5. Discard an unused module set, verify that a release-assigned module set cannot be discarded, and verify that an end user can view but not update a module set. (Assertions [#21.1.6](#test-assertion-2116), [#21.1.7](#test-assertion-2117), [#21.1.8](#test-assertion-2118))
 ## Test Case 21.2
 
 **Manage Release Module Set**
@@ -116,15 +122,19 @@ The developer can move the Release to Draft state again. In this case, the Relea
 #### Test Assertion #21.2.7
 The developer can validate all the schemas in a Module Set Release.
 
-#### Test Assertion #21.2.7
-The developer can validate all schemas in the release module set.  The validated result can be downloaded or copy-pasted. 
+#### Test Assertion #21.2.8
+The developer can copy the release-module-set validation result to the clipboard after validation completes.
 
 ### Test Step Pre-condition:
-
-
+1. Developer and end-user accounts needed for release-module-set scenarios are available in connectCenter.
+2. Existing module sets and releases are available so defaulting, export, validation, and draft-release integration flows can be exercised.
 
 ### Test Step:
-
+1. A developer signs in to connectCenter and opens the View/Edit Module Set Release page.
+2. Create a release module set, verify required fields, verify default-selection behavior for a branch, and verify that another developer can update an existing release module set. (Assertions [#21.2.1](#test-assertion-2121), [#21.2.2](#test-assertion-2122), [#21.2.3](#test-assertion-2123))
+3. Export a release module set and verify that the exported file is generated. Then verify that an end user can open the release module set but cannot update it. (Assertions [#21.2.4](#test-assertion-2124), [#21.2.5](#test-assertion-2125))
+4. Verify the draft-release integration scenarios covered by the suite: a draft release can be assigned to a release module set, moving the release back to Initialized discards the CC assignments, the release cannot be discarded while a release module set depends on it, and moving the release to Draft again recreates the assignment context. (Assertion [#21.2.6](#test-assertion-2126))
+5. Validate all schemas in the release module set, verify that the validation dialog opens, and verify that the validation result can be copied to the clipboard after completion. (Assertions [#21.2.7](#test-assertion-2127), [#21.2.8](#test-assertion-2128))
 ## Test Case 21.3
 
 **Manage CC-Module Assignment**
@@ -162,57 +172,12 @@ With a module selected in the Module pane, the developer can select multiple CCs
 The end user can view CC-Module assignment but cannot make any change.
 
 ### Test Step Pre-condition:
-
-
-
-### Test Step:
-
-## Test Case 21.4
-
-**Manage module dependency**
-
-> This functionality allows the developer to add/discard dependencies between modules about, e.g., include or import. The assumption is that the module dependency does not change for a module set used in different releases.
-
-Pre-condition: N/A
-
-
-### Test Assertion:
-
-#### Test Assertion #21.4.1
-The developer can access module dependency management from the Module Set List page. Once the Module Dependency page is opened. The module set from which the function is invoked is selected.
-
-#### Test Assertion #21.4.2
-The developer can access module dependency management from the application menu. In this case, the newest module set is selected by default.
-
-#### Test Assertion #21.4.3
-On the Module Dependency page, the developer can select another module set to retrieve module dependencies for the module set.
-
-#### Test Assertion #21.4.4
-When there is no module dependency information for the module set, the Module Dependency Tree simply lists all the modules in the set.
-
-#### Test Assertion #21.4.5
-The developer can drag one or more modules over another module to create dependencies. If both modules have namespaces and the namespaces are the same then the dependency type shall be ‘include’; otherwise ‘import’. If one both modules don’t have namespaces, assign the ‘Default Dependency Type’ specified on the UI.
-
-#### Test Assertion #21.4.6
-The developer can discard one or more dependencies at a time.
-
-#### Test Assertion #21.4.7
-The developer cannot add a duplicate dependency to the same module.
-
-#### Test Assertion #21.4.8
-The developer can Derive Dependencies. This allows the dependencies to be derived based on CC-Module Assignment. A dialog shall pop up for the developer to a CC-Module assignment by selecting a release and one of the assigned module sets. The system has to cluster CCs into modules and create a module dependency graph based on CC dependencies. The derived dependencies shall be added to existing dependencies ignoring the duplicated ones that already exist. The same rules about dependency types specified in TA 5 are applied.
-
-#### Test Assertion #21.4.9
-The developer can Copy Dependencies. This allows the developer to select a module set. Then for modules common across the current and selected module set, the system copies the dependencies of each module into this module set, ignoring the dependencies pointing to a module absence from the current module set.
-
-#### Test Assertion #21.4.10
-The developer can check for cyclical dependencies in the module set. A cyclical dependency exist b/w two modules A & B if A depends on B and B also depends on A. The dialog box shall list the pairs of modules that have a cyclical dependency where the developer can discard some dependencies.
-
-#### Test Assertion #21.4.11
-The end user can view module dependency but cannot make any change.
-
-### Test Step Pre-condition:
-
-
+1. The stated test-case pre-condition is satisfied: The developer is on the CC-Module Assignment page. At least two releases are available in the database. Each release has at least two module sets assigned.
+2. Developer and end-user accounts needed for CC-module-assignment scenarios are available in connectCenter.
+3. The suite prepares draft releases and module set releases so CC assignment and read-only access can be exercised.
 
 ### Test Step:
+1. A developer signs in to connectCenter, opens the CC-Module Assignment flow from a module set release, and selects the prepared release and module set.
+2. Verify that only the release-assigned module sets are available, that candidate CCs and modules are listed, and that ASCC and BCC rows are excluded. (Assertions [#21.3.1](#test-assertion-2131), [#21.3.2](#test-assertion-2132), [#21.3.3](#test-assertion-2133))
+3. Assign one or more CCs to a module, verify that the assigned rows move to the module pane, and then unassign selected CCs back to the unassigned pane. (Assertion [#21.3.3](#test-assertion-2133))
+4. Sign in as an end user, open the same assignment view, and verify that the assignment is visible but cannot be changed. (Assertion [#21.3.4](#test-assertion-2134))

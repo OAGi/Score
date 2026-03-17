@@ -109,7 +109,8 @@ public class JooqTopLevelAsbiepQueryRepository extends JooqBaseRepository implem
                         ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.notEqual(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID)
                 ))
                 .where(and(
-                        ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.in(topLevelAsbiepIdList)
+                        ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.in(topLevelAsbiepIdList),
+                        ASBIE.IS_USED.eq((byte) 1)
                 ))
                 .fetch(queryBuilder.mapper());
     }

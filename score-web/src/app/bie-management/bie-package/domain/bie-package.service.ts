@@ -9,6 +9,7 @@ import {
 import {map} from 'rxjs/operators';
 import {BieListEntry} from '../../bie-list/domain/bie-list';
 import {zip} from '../../../common/utility';
+import {BieExpressOption} from '../../bie-express/domain/generate-expression';
 
 @Injectable()
 export class BiePackageService {
@@ -241,14 +242,33 @@ export class BiePackageService {
     }
   }
 
-  generateBiePackage(biePackageId: number, options: {}, ...topLevelAsbiepIdList: number[]): Observable<HttpResponse<Blob>> {
+  generateBiePackage(biePackageId: number, option: BieExpressOption, ...topLevelAsbiepIdList: number[]): Observable<HttpResponse<Blob>> {
     let params: HttpParams = new HttpParams();
     if (topLevelAsbiepIdList && topLevelAsbiepIdList.length > 0) {
       params = params.set('topLevelAsbiepIdList', topLevelAsbiepIdList.map(e => e.toString()).join(','));
     }
-    if (!!options) {
-      Object.entries(options).forEach(([key, value]) => {
-        params = params.set(key, options[key]);
+    if (!!option) {
+      const requestOption = {
+        schemaExpression: option.expressionOption,
+        expressionVersion: option.expressionVersion,
+        packageOption: option.packageOption,
+        bieDefinition: option.bieDefinition,
+        bieCctsMetaData: option.bieCctsMetaData,
+        includeCctsDefinitionTag: option.includeCctsDefinitionTag,
+        bieGuid: option.bieGuid,
+        businessContext: option.businessContext,
+        bieOagiScoreMetaData: option.bieOagiScoreMetaData,
+        includeWhoColumns: option.includeWhoColumns,
+        basedCcMetaData: option.basedCcMetaData,
+        includeBusinessContextInFilename: option.includeBusinessContextInFilename,
+        includeVersionInFilename: option.includeVersionInFilename,
+        arrayForJsonExpression: option.arrayForJsonExpression,
+        separateFileReferencesForReusedSchemas: option.separateFileReferencesForReusedSchemas
+      };
+      Object.entries(requestOption).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          params = params.set(key, value as any);
+        }
       });
     }
 

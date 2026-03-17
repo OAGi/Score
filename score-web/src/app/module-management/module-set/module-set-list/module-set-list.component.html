@@ -15,7 +15,7 @@
   <mat-card class="pt-3">
     <score-search-bar placeholder="Search by Name" [(model)]="request.filters.name"
                       (modelChange)="onChange('filters.name', request.filters.name);"
-                      (search)="onSearch();">
+                      (searchTriggered)="onSearch();">
       <div advancedSearchContent style="padding-left: 3rem;">
         <mat-card-content class="mat-card-container">
           <div class="container-fluid" style="padding: 0;">
@@ -106,7 +106,7 @@
               <th *matHeaderCellDef mat-header-cell mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Name')" (onResize)="onResizeWidth($event)"> Name</th>
               <td *matCellDef="let element" mat-cell>
-                <div class="den word-break-all">
+                <div class="den score-break-word">
                   <a routerLink="{{ element.moduleSetId }}">
                     <span>{{ element.name }}</span>
                   </a>
@@ -119,7 +119,7 @@
               <th *matHeaderCellDef mat-header-cell mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Description')" (onResize)="onResizeWidth($event)"> Description</th>
               <td *matCellDef="let element" mat-cell>
-                <div class="description word-break-all"
+                <div class="description score-line-clamp-2 score-break-word"
                      [innerHTML]="element.description | highlight : highlightText : ['bg-warning']"></div>
               </td>
             </ng-container>
@@ -128,8 +128,10 @@
               <th *matHeaderCellDef mat-header-cell mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
               <td *matCellDef="let element" mat-cell>
-                <div class="ellipsis">{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-                <div class="description"><span class="pr-1">by</span><b class="word-break-all">{{ element.lastUpdated.who.loginId }}</b></div>
+                <div class="score-line-clamp-2 score-break-word">
+                  <div>{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                  <div class="description"><span class="pr-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
+                </div>
               </td>
             </ng-container>
 

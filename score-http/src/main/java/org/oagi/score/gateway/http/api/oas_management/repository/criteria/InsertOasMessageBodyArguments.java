@@ -3,6 +3,7 @@ package org.oagi.score.gateway.http.api.oas_management.repository.criteria;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
+import org.oagi.score.gateway.http.api.oas_management.model.OasMessageBodyId;
 import org.oagi.score.gateway.http.api.oas_management.repository.OasDocCommandRepository;
 
 import java.sql.Timestamp;
@@ -13,8 +14,8 @@ public class InsertOasMessageBodyArguments {
 
     private final OasDocCommandRepository repository;
 
-    private ULong userId;
-    private ULong topLevelAsbiepId;
+    private UserId userId;
+    private TopLevelAsbiepId topLevelAsbiepId;
     private LocalDateTime timestamp = new Timestamp(System.currentTimeMillis()).toLocalDateTime();
 
     public InsertOasMessageBodyArguments(OasDocCommandRepository repository) {
@@ -22,19 +23,11 @@ public class InsertOasMessageBodyArguments {
     }
 
     public InsertOasMessageBodyArguments setUserId(UserId userId) {
-        return setUserId(ULong.valueOf(userId.value()));
-    }
-
-    public InsertOasMessageBodyArguments setUserId(ULong userId) {
         this.userId = userId;
         return this;
     }
 
     public InsertOasMessageBodyArguments setTopLevelAsbiepId(TopLevelAsbiepId topLevelAsbiepId) {
-        return setTopLevelAsbiepId(ULong.valueOf(topLevelAsbiepId.value()));
-    }
-
-    public InsertOasMessageBodyArguments setTopLevelAsbiepId(ULong topLevelAsbiepId) {
         this.topLevelAsbiepId = topLevelAsbiepId;
         return this;
     }
@@ -52,11 +45,11 @@ public class InsertOasMessageBodyArguments {
         return this;
     }
 
-    public ULong getUserId() {
+    public UserId getUserId() {
         return userId;
     }
 
-    public ULong getTopLevelAsbiepId() {
+    public TopLevelAsbiepId getTopLevelAsbiepId() {
         return topLevelAsbiepId;
     }
 
@@ -64,7 +57,7 @@ public class InsertOasMessageBodyArguments {
         return timestamp;
     }
 
-    public ULong execute() {
+    public OasMessageBodyId execute() {
         return repository.insertOasMessageBody(this);
     }
 }

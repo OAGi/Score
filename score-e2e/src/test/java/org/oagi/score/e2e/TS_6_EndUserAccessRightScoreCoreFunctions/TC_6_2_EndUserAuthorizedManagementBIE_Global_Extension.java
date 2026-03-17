@@ -54,7 +54,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
 
     @Test
     @DisplayName("TC_6_2_TA_7_1")
-    public void test_TA_7_1() {
+    public void end_user_can_invoke_global_extension_only_for_wip_bie_and_revision_increments() {
         ASCCPObject asccp;
         ACCObject acc;
         AppUserObject usera;
@@ -127,7 +127,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
 
     @Test
     @DisplayName("TC_6_2_TA_7_2")
-    public void test_TA_7_2() {
+    public void end_user_sees_attention_dialog_and_read_only_qa_global_extension_when_another_user_owns_it() {
         ASCCPObject asccp;
         ACCObject acc;
         AppUserObject usera;
@@ -235,7 +235,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
 
     @Test
     @DisplayName("TC_6_2_TA_7_3")
-    public void test_TA_7_3() {
+    public void end_user_can_reopen_owned_global_extension_in_wip_and_qa_states() {
         ASCCPObject asccp;
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
@@ -305,7 +305,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
 
     @Test
     @DisplayName("TC_6_2_TA_7_4")
-    public void test_TA_7_4() {
+    public void end_user_cannot_append_asccp_to_global_extension() {
         ASCCPObject asccp;
         AppUserObject usera;
         TopLevelASBIEPObject useraBIEWIP;
@@ -387,7 +387,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
 
     @Test
     @DisplayName("TC_6_2_TA_7_5_1_and_TC_6_2_TA_7_5_3")
-    public void test_TA_7_5_1_and_TA_7_5_3() {
+    public void end_user_cannot_edit_global_extension_nodes_for_non_production_child_asccp_or_bccp() {
         ASCCPObject asccp;
         ACCObject acc;
         AppUserObject usera;
@@ -534,7 +534,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
 
     @Test
     @DisplayName("TC_6_2_TA_7_5_2")
-    public void test_TA_7_5_2() {
+    public void end_user_cannot_edit_global_extension_nodes_when_child_asccp_owner_acc_is_not_in_production() {
         ASCCPObject asccp;
         ACCObject acc;
         AppUserObject usera;
@@ -631,7 +631,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
 
     @Test
     @DisplayName("TC_6_2_TA_7_5_4")
-    public void test_TA_7_5_4() {
+    public void end_user_cannot_edit_amended_global_extension_descendants_when_nested_asccp_is_not_in_production() {
         ASCCPObject asccp;
         ACCObject acc;
         AppUserObject usera;
@@ -748,7 +748,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
 
     @Test
     @DisplayName("TC_6_2_TA_7_5_5")
-    public void test_TA_7_5_5() {
+    public void end_user_cannot_edit_group_global_extension_children_when_group_acc_is_not_in_production() {
         ASCCPObject asccp;
         ACCObject acc;
         AppUserObject usera;

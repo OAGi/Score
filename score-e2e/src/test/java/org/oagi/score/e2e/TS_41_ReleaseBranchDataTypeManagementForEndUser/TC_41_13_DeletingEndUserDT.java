@@ -37,7 +37,7 @@ public class TC_41_13_DeletingEndUserDT extends BaseTest {
 
     @Test
     @DisplayName("TC_41_13_TA_1")
-    public void test_TA_1() {
+    public void data_type_revision_number_is_1_the_end_user_owner_can_delete_it_when_it_is_in_wip_state_a_confirmati() {
         AppUserObject endUserA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -78,7 +78,7 @@ public class TC_41_13_DeletingEndUserDT extends BaseTest {
     }
     @Test
     @DisplayName("TC_41_13_TA_2")
-    public void test_TA_2() {
+    public void upon_opening_data_type_that_uses_a_deleted_data_type_as_a_base_the_system_can_flag_that_the_opening() {
         AppUserObject endUserA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -134,7 +134,7 @@ public class TC_41_13_DeletingEndUserDT extends BaseTest {
 
     @Test
     @DisplayName("TC_41_13_TA_3")
-    public void test_TA_3() {
+    public void data_type_whose_revision_number_is_more_than_1_and_is_in_any_state_cannot_be_deleted() {
         AppUserObject endUserA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();

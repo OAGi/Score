@@ -43,7 +43,7 @@ public class TC_15_13_EndUserASCCPStateManagement extends BaseTest {
     }
 
     @Test
-    public void test_TA_15_13_1() {
+    public void end_user_can_change_the_state_of_asccp_he_owns_from_wip_to_qa() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -92,7 +92,7 @@ public class TC_15_13_EndUserASCCPStateManagement extends BaseTest {
     }
 
     @Test
-    public void test_TA_15_13_2() {
+    public void end_user_can_change_the_state_of_asccp_he_owns_from_qa_back_to_wip() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -148,7 +148,7 @@ public class TC_15_13_EndUserASCCPStateManagement extends BaseTest {
     }
 
     @Test
-    public void test_TA_15_13_3() {
+    public void end_user_can_change_the_state_of_asccp_he_owns_from_qa_to_production() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 

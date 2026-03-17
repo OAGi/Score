@@ -955,6 +955,11 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         }
 
         @Override
+        public String getDENFieldLabel() {
+            return getText(getDENField().findElement(By.xpath("parent::div//label")));
+        }
+
+        @Override
         public WebElement getPropertyTermField() {
             return getInputFieldByName(baseXPath, "Property Term");
         }

@@ -16,6 +16,7 @@ import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-r
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
 
 @Component({
+  standalone: false,
   selector: 'score-pending-list',
   templateUrl: './pending-list.component.html',
   styleUrls: ['./pending-list.component.css']

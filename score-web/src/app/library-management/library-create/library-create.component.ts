@@ -9,6 +9,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {AuthService} from '../../authentication/auth.service';
 
 @Component({
+  standalone: false,
   selector: 'score-library-create',
   templateUrl: './library-create.component.html',
   styleUrl: './library-create.component.css'

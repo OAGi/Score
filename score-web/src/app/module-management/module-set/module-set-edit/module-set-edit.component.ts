@@ -17,6 +17,7 @@ import {UserToken} from '../../../authentication/domain/auth';
 import {forkJoin} from 'rxjs';
 
 @Component({
+  standalone: false,
   selector: 'score-module-set-edit',
   templateUrl: './module-set-edit.component.html',
   styleUrls: ['./module-set-edit.component.css']

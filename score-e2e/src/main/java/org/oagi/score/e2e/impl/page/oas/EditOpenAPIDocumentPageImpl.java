@@ -250,4 +250,47 @@ public class EditOpenAPIDocumentPageImpl extends BasePageImpl implements EditOpe
         assert addBIEForOpenAPIDocumentDialog.isOpened();
         return addBIEForOpenAPIDocumentDialog;
     }
+
+    @Override
+    public WebElement getTableRecordAtIndex(int idx) {
+        return visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + idx + "]"));
+    }
+
+    @Override
+    public WebElement getTableRecordByValue(String value) {
+        return visibilityOfElementLocated(getDriver(),
+                By.xpath("//td//*[contains(normalize-space(.), " +
+                        org.oagi.score.e2e.impl.PageHelper.xpathLiteral(value) + ")]/ancestor::tr"));
+    }
+
+    @Override
+    public WebElement getColumnByName(WebElement tableRecord, String columnName) {
+        return tableRecord.findElement(By.className("mat-column-" + columnName));
+    }
+
+    @Override
+    public void toggleSelect(WebElement tableRecord) {
+        WebElement selectCell = getColumnByName(tableRecord, "select");
+        click(selectCell.findElement(By.tagName("mat-checkbox")));
+    }
+
+    @Override
+    public WebElement getRemoveButton(boolean enabled) {
+        By removeButtonLocator = By.xpath("//span[contains(text(), \"Remove\")]//ancestor::button[1]");
+        if (enabled) {
+            return elementToBeClickable(getDriver(), removeButtonLocator);
+        }
+        return visibilityOfElementLocated(getDriver(), removeButtonLocator);
+    }
+
+    @Override
+    public void removeSelectedBIEs() {
+        click(getRemoveButton(true));
+        WebElement confirmRemoveButton = elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Remove\")]//ancestor::button[1]"
+        ));
+        click(confirmRemoveButton);
+        waitFor(ofMillis(500L));
+        assert "Removed".equals(getSnackBarMessage(getDriver()));
+    }
 }

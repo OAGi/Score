@@ -7,11 +7,11 @@ import java.math.BigInteger;
 import java.util.Date;
 
 public class OasRequest extends Auditable {
-    private BigInteger oasRequestId;
-    private BigInteger oasOperationId;
+    private OasRequestId oasRequestId;
+    private OasOperationId oasOperationId;
     private String description;
     private boolean required;
-    private BigInteger oasMessageBodyId;
+    private OasMessageBodyId oasMessageBodyId;
     private boolean makeArrayIndicator;
     private boolean suppressRootIndicator;
     private BigInteger metaHeaderTopLevelAsbiepId;
@@ -22,23 +22,23 @@ public class OasRequest extends Auditable {
     private UserSummaryRecord createdBy;
     private UserSummaryRecord lastUpdatedBy;
 
-    public OasRequest(){
+    public OasRequest() {
 
     }
 
-    public BigInteger getOasRequestId() {
+    public OasRequestId getOasRequestId() {
         return oasRequestId;
     }
 
-    public void setOasRequestId(BigInteger oasRequestId) {
+    public void setOasRequestId(OasRequestId oasRequestId) {
         this.oasRequestId = oasRequestId;
     }
 
-    public BigInteger getOasOperationId() {
+    public OasOperationId getOasOperationId() {
         return oasOperationId;
     }
 
-    public void setOasOperationId(BigInteger oasOperationId) {
+    public void setOasOperationId(OasOperationId oasOperationId) {
         this.oasOperationId = oasOperationId;
     }
 
@@ -58,11 +58,11 @@ public class OasRequest extends Auditable {
         this.required = required;
     }
 
-    public BigInteger getOasMessageBodyId() {
+    public OasMessageBodyId getOasMessageBodyId() {
         return oasMessageBodyId;
     }
 
-    public void setOasMessageBodyId(BigInteger oasMessageBodyId) {
+    public void setOasMessageBodyId(OasMessageBodyId oasMessageBodyId) {
         this.oasMessageBodyId = oasMessageBodyId;
     }
 

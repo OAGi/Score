@@ -1,6 +1,6 @@
 # Test Suite 5
 
-**OAGIS developer access right to Score core functions**
+**OAGIS developer access right to connectCenter core functions**
 
 
 ## Test Case 5.1
@@ -13,7 +13,7 @@ Pre-condition: N/A
 ### Test Assertion:
 
 #### Test Assertion #5.1.1
-The developer can create a context category with only required information. See Create a Context Category in Score User Guide for Mandatory/Optional fields.
+The developer can create a context category with only required information. See Create a Context Category in the connectCenter User Guide for Mandatory/Optional fields.
 
 #### Test Assertion #5.1.2
 The developer can create a context category with all information specified.
@@ -40,60 +40,34 @@ The developer cannot update a context category with missing required information
 The developer can discard context categories created by any user provided that there is no context scheme referencing it.
 
 #### Test Assertion #5.1.10
-The developer cannot discard a context category that has a context scheme referencing it. The system shall indicate context schemes referencing the context category when the developer tries to delete the context category.
+The developer cannot discard a context category that has a context scheme referencing it.
 
 #### Test Assertion #5.1.11
-The search feature is at least working.
+The search feature works for the `Updater`, `Name`, and `Description` fields.
 
 #### Test Assertion #5.1.12
 The developer can select a Context Category from the Context Category List page, navigate through the pages of the paginator while the forenamed Context Category remains selected.
 
 ### Test Step Pre-condition:
 
-1. There are context categories already created by various end users, say CATa and CATb, and also created developers, CATx and CATy, with all fields populated. CATa is already used by a context scheme. CATx has the name “Business Process Context”. There is also the context category “Business Search Process” created by the devx developer.
+1. The test creates developer, developer admin, end user, and end user admin accounts and their context categories as needed.
+2. One context category is referenced by a context scheme for the discard-negative scenario.
 
 ### Test Step:
 
 1. An OAGi developer logs into the system.
-2. The developer creates a new context category, say CAT0, specifying only the Name field.
-3. Verify that CAT0 exists on the “Context Category” page. (Assertion [#1](#test-assertion-511))
-4. The developer creates a new context category, say CAT1, specifying the Name field and Description field.
-5. The developer opens CAT1 to view its detail. Verify that both the Name and Description are correct. (Assertion [#2](#test-assertion-512))
-6. The developer tries to create a new context category, say CAT3, specifying only the Description field.
-7. Verify that the “Create” button is disabled. (Assertion [#3](#test-assertion-513))
-8. The developer visits the “Context Category” page.
-9. Verify that the developer can see in the list CATa, CATb, CATx, CATy, CAT0 and CAT1 (Assertion [#4](#test-assertion-514))
-10. Verify that the developer can open a CATa and that it is editable. (Assertion [#5](#test-assertion-515))
-11. The developer visits the “Context Category” page again.
-12. Verify that the developer can open CATx and that it is editable. (Assertion [#5](#test-assertion-515))
-13. The developer removes all the content in the Description field of CATx and click “Update”.
-14. Verify that both the Description content in the “Context Category” page match the input value of the previous change. (Assertion [#6](#test-assertion-516))
-15. The developer opens a context category CATa.
-16. The developer changes both the Name and Description and click “Update”.
-17. Verify that both the Name and Description contents in the “Context Category” page and in the “Context Category Detail” page match the new input values. (Assertion [#7](#test-assertion-517))
-18. The developer opens CATb.
-19. The developer removes the content in the Name field and tries to click “Update” button.
-20. Verify that the “Update” button is disabled. (Assertion [#8](#test-assertion-518))
-21. The developer opens CATb.
-22. Clicks “Discard”.
-23. Verify that CATb does not shown up on the “Context Category” page. (Assertion [#9](#test-assertion-519))
-24. The developer opens CATy.
-25. Clicks “Discard”.
-26. Verify that CATy does not shown up on the “Context Category” page. (Assertion [#9](#test-assertion-519))
-27. The developer opens CATa.
-28. Clicks “Discard”.
-29. Verify that the system indicates that the context category cannot be discarded and that it is still listed on the “Context Category” page. Also verify that the checkbox located in front of the CATa in the “Context Category” page is disabled.  (Assertion [#10](#test-assertion-5110))
-30. The developer visits the “Context Category” page.
-31. Developer enters the search term “usiness” that is partially match some names of the context categories into the Name field.
-32. Verify that at least CATx is returned. (Assertion [#11](#test-assertion-5111))
-33. The developer enters the search term “searchDesc” that is partially match some names of the context categories into the Description field.
-34. Verify that at least CATa is returned. (Assertion [#11](#test-assertion-5111))
-35. The developer enters the term “business process” to the Name field.
-36. Verify that at least the “Business Process Context” and the “Business Search Process” are returned. (Assertion [#11](#test-assertion-5111))
-37. The developer enters the term “”business process”” to the Name field.
-38. Verify that the “Business Process Context” is returned but not the “Business Search Process”. (Assertion [#11](#test-assertion-5111))
-39. The developer visits the Context Category page, he selects a Context Category (clicking the corresponding checkbox), goes to the next paginator pages and then returns back.
-40. Verify that the checkbox of the selected Context Category is checked. (Assertion [#12](#test-assertion-5112))
+2. The developer creates a context category with only the `Name` field specified and verifies that the saved category has no description. (Assertion [#1](#test-assertion-511))
+3. The developer creates a context category with both `Name` and `Description` specified and verifies that both fields are saved correctly. (Assertion [#2](#test-assertion-512))
+4. The developer tries to create a context category with only `Description` specified and verifies that creation is blocked. (Assertion [#3](#test-assertion-513))
+5. The developer opens the Context Category list and verifies that context categories created by a developer, a developer admin, an end user, and an end user admin are all visible. (Assertion [#4](#test-assertion-514))
+6. The developer opens context categories created by those different user types and verifies that they are editable. (Assertion [#5](#test-assertion-515))
+7. The developer updates a context category by changing the `Name` and removing the `Description`, then verifies that only the required information remains. (Assertion [#6](#test-assertion-516))
+8. The developer updates a context category with a new `Name` and `Description`, then verifies that both values are saved correctly. (Assertion [#7](#test-assertion-517))
+9. The developer clears the `Name` field of an existing context category and verifies that the update is blocked. (Assertion [#8](#test-assertion-518))
+10. The developer discards unreferenced context categories created by different user types and verifies that they are removed from the list. (Assertion [#9](#test-assertion-519))
+11. The developer attempts to discard a context category that is referenced by a context scheme and verifies that the discard operation is blocked and an error message is shown. (Assertion [#10](#test-assertion-5110))
+12. The developer verifies that search works with the `Updater`, `Name`, and `Description` filters. (Assertion [#11](#test-assertion-5111))
+13. The developer selects a context category, navigates to another paginator page and back, and verifies that the selection is retained. (Assertion [#12](#test-assertion-5112))
 
 ## Test Case 5.2
 
@@ -105,7 +79,7 @@ Pre-condition: N/A
 ### Test Assertion:
 
 #### Test Assertion #5.2.1
-The developer can create a context scheme with only required information. See the Score User Guide for Mandatory/Optional fields.
+The developer can create a context scheme without context scheme values.
 
 #### Test Assertion #5.2.2
 The developer can create a context scheme with all information specified.
@@ -114,22 +88,22 @@ The developer can create a context scheme with all information specified.
 Adding and removing scheme values on the creation page works.
 
 #### Test Assertion #5.2.4
-The developer cannot create a context scheme with missing required information including those of a context scheme value.
+The developer cannot create a context scheme when required header fields or a required context scheme value field are missing.
 
 #### Test Assertion #5.2.5
 The developer cannot create a context scheme when the uniqueness requirement is not met. See the design document for the uniqueness requirement.
 
 #### Test Assertion #5.2.6
-The application gives correct warning when the developer tries to create a context scheme with the Scheme ID and Agency ID that are the same as those off an existing context scheme but gives a different Name.
+The application gives the correct warning when the developer tries to create a context scheme with the same `Scheme ID` and `Agency ID` as an existing context scheme but a different `Name`.
 
 #### Test Assertion #5.2.7
-The developer can see, in the context scheme list, all context schemes created by any user.
+The developer can see, in the context scheme list, context schemes created by a developer, a developer admin, an end user, and an end user admin.
 
 #### Test Assertion #5.2.8
 The developer can edit a context scheme created by any user.
 
 #### Test Assertion #5.2.9
-The developer can update a context scheme with only required information.
+The developer can update a context scheme without context scheme values.
 
 #### Test Assertion #5.2.10
 The developer can update a context scheme with all information specified.
@@ -141,7 +115,7 @@ The developer cannot update a context scheme with missing required information.
 The developer can discard context schemes created by any user provided that there is no business context referencing it.
 
 #### Test Assertion #5.2.13
-The developer cannot discard a context scheme that has a business context referencing it. The system shall indicate business contexts referencing the context category when the developer tries to delete the context scheme. Checkbox is disabled.
+The developer cannot discard a context scheme that is referenced by a business context.
 
 #### Test Assertion #5.2.14
 The developer can update a context scheme created by any user, even when there is already a business context referencing it. Also, verify that the respective business context is updated accordingly.
@@ -153,150 +127,71 @@ The developer cannot remove a Context Scheme value if it is used by a Business C
 The developer cannot add a duplicate context scheme value.
 
 #### Test Assertion #5.2.17
-The search feature is at least working.
+The search feature works for the `Updater` and `Name` fields.
 
 #### Test Assertion #5.2.18
-The developer can add to a context scheme code list values from Published or Production Code Lists. (The code values are simply copied into the context scheme). The fields Scheme ID, Agency ID and Version can be still changed. The developer shall be notified that existing values will be removed. Test for: 
+The developer can load context scheme values from code lists and save the resulting context scheme. Test for:
 
 ##### Test Assertion #5.2.18.a
 Developer code list in the latest release
 ##### Test Assertion #5.2.18.b
 Developer code list in an older release
 ##### Test Assertion #5.2.18.c
-End user code list the latest release that is derived from a developer code list
+Derived end user code list in the latest release
 ##### Test Assertion #5.2.18.d
-End user code list in an older release that is derived from another end user code list
+Derived end user code list in an older release
 
 #### Test Assertion #5.2.19
-The developer can add to a context scheme code list values from Production End User Code Lists. Test for a non-latest release and the latest release. The fields Scheme ID, Agency ID and Version can be still changed.
+The developer can load values from derived end user code lists in both the latest and older releases as part of the `Load from Code List` scenarios above.
 
 #### Test Assertion #5.2.20
 The developer can change the context scheme values added by a code list.
 
 #### Test Assertion #5.2.21
-The developer can add a value to a context scheme after he has loaded values from a code list.
+The developer can add a value to a context scheme after loading values from a code list.
 
 #### Test Assertion #5.2.22
 The developer can delete a value from a context scheme added by a selected code list.
 
 #### Test Assertion #5.2.23
-The developer cannot use the “Load from code list” function, if a value of this Context Scheme is used by a Business Context.
+The developer cannot use the `Load from Code List` function if a value of the context scheme is used by a business context.
 
 #### Test Assertion #5.2.24
-The developer can select a Context Scheme from the Context Scheme List page, navigate thought different paginator pages while the forenamed Context Scheme remains checked.
+The developer can select a context scheme from the Context Scheme List page, navigate through different paginator pages, and keep that context scheme selected.
+
+#### Test Assertion #5.2.25
+The developer can search the Context Scheme List by an exact `Name` value and reliably retrieve the matching context scheme.
 
 ### Test Step Pre-condition:
 
-1. There are context schemes already created by various end users, say CSa and CSb, and also created by developers, namely CSx and CSy, with all fields populated. CSa and CSx are already used by a business context. CSb has the name “Business Process Context Schema”. CSa has a value named “csaValue” which is used by a Business Context, say BCa.
+1. The test creates developer, developer admin, end user, and end user admin accounts and their context schemes as needed.
+2. Referenced business contexts and code lists are created as needed for the discard, update, and load-from-code-list scenarios.
 
 ### Test Step:
 
 1. An OAGi developer logs into the system.
-2. The developer creates new context schemes, say CS0 and CS1, with the Context Category, Name, Scheme ID, Agency ID, and Version specified with some texts, while leaving the Description field blank. Ensure that both CS0 and CS1 use context categories created by different users. Add some scheme values to CS1 (but not CS0) without specifying the meaning.
-3. Verify that both CS0 and CS1 are successfully recorded by the application by verifying that their values exists both in the “Context Schemes” page and “Context Scheme Detail” page. (Assertion [#1](#test-assertion-521))
-4. The developer creates a new context scheme, say CS2, with all data fields specified. Use a context category created by the developer himself. Add some scheme values with the meaning specified. During the creation, also do some scheme value deletions. Moreover, he tries to add a value that already exists.
-5. Verify that CS2 is successfully recorded by the application and that he could not add one value more than one times. (Assertion [#2](#test-assertion-522), [#3](#test-assertion-523), [#16](#test-assertion-5216))
-6. The developer tries to create a new context scheme with all fields specified except the Context Category field.
-7. Verify that the “Create” button is disabled. (Assertion [#4](#test-assertion-524))
-8. The developer tries to create a new context scheme with all fields specified except the Name field.
-9. Verify that the “Create” button is disabled. (Assertion [#4](#test-assertion-524))
-10. The developer tries to create a new context scheme with all fields specified except the Scheme ID field.
-11. Verify that the “Create” button is disabled. (Assertion [#4](#test-assertion-524))
-12. The developer tries to create a new context scheme with all fields specified except the Agency ID field.
-13. Verify that the “Create” button is disabled. (Assertion [#4](#test-assertion-524))
-14. The developer tries to create a new context scheme with all fields specified except the Version field.
-15. Verify that the “Create” button is disabled. (Assertion [#4](#test-assertion-524))
-16. The developer tries to create a new context scheme with all fields specified by trying to add a new context scheme value with all fields specified except the value field.
-17. Verify that the “Add” button value is disabled. (Assertion [#4](#test-assertion-524))
-18. The developer tries to create a new context scheme by giving the Scheme ID, Agency ID, and Version the same as those of CS0.
-19. Verify that the application indicates an error message to the extent that the same context scheme version cannot be created. (Assertion [#5](#test-assertion-525))
-20. The developer creates a new context scheme and gives the Name, Scheme ID, Agency ID the same as those of CS0, while keeping the Version different.
-21. Verify that the application gives a warning message to the extent that the user is creating a context scheme with the same attributes while giving a different name and that he/she should confirm his/her intention. Also verify that the new context scheme is successfully created. (Assertion [#5](#test-assertion-525))
-22. The developer creates a new context scheme and gives the Scheme ID and Agency ID the same as those of CS0, while keeping the Name and Version different.
-23. Verify that the application gives a warning message to the extent that the user is creating a context scheme with the same Scheme ID and Agency ID while giving a different name and that he/she should confirm the intention. Also verify that the new context scheme is successfully created. (Assertion [#6](#test-assertion-526))
-24. The developer visits the Context Scheme page.
-25. Verify that he can see in the list CS0, CS1, CS2,CS3, CSa, CSb, CSx, and CSy. (Assertion [#7](#test-assertion-527))
-26. The developer clicks to view CSa.
-27. Verify that fields are editable including those of its values, and that the Update and Discard buttons are present. (Assertion [#8](#test-assertion-528))
-28. Go back to the Context Scheme page.
-29. The developer clicks to view CSy.
-30. Verify that fields are editable including those of its values, and the Update and Discard buttons are present. (Assertion [#8](#test-assertion-528))
-31. The developer deletes all scheme values and Description so that only mandatory field is present; and click Update.
-32. Verify that the context scheme has been successfully updated with the new content. (Assertion [#9](#test-assertion-529))
-33. The developer opens CS0.
-34. The developer populates all the data fields, adds some context scheme values to CS0 and clicks Update. Moreover, he tries to add a value that already exists.
-35. Verify that CS0 is successfully updated with the new content and that he could not add a value that already exists. (Assertion [#10](#test-assertion-5210), [#16](#test-assertion-5216))
-36. The developer opens CS0.
-37. Changes the content of some fields of some context scheme values and clicks Update.
-38. Verify that CS0 is successfully updated with the new content. (Assertion [#10](#test-assertion-5210))
-39. The developer tries to update CS0 with all fields specified except the Name field.
-40. Verify that the Update button is disabled. (Assertion [#11](#test-assertion-5211))
-41. The developer tries to update CS0 with all fields specified except the Scheme ID field.
-42. Verify that the Update button is disabled. (Assertion [#11](#test-assertion-5211))
-43. The developer tries to update CS0 with all fields specified except the Agency ID field.
-44. Verify that the Update button is disabled. (Assertion [#11](#test-assertion-5211))
-45. The developer tries to update CS0 with all fields specified except the Version field.
-46. Verify that the Update button is disabled. (Assertion [#11](#test-assertion-5211))
-47. The developer tries to update CS0 with all fields specified except the Value field of a Context Scheme Value.
-48. Verify that the Edit button of the value is disabled. (Assertion [#11](#test-assertion-5211))
-49. The developer discards CS0 (which should have no business context using it).
-50. Verify that CS0 is no longer on the Context Scheme page. (Assertion [#12](#test-assertion-5212))
-51. The developer opens CSx.
-52. The developer tries to discard CSx.
-53. Verify that the application shows an error message and that CSx still exists on the Context Scheme page. (Assertion [#13](#test-assertion-5213))
-54. The developer opens CSa and makes some valid updates.
-55. Verify that CSa is successfully updated. Also, verify that the corresponding value of the BCa has been updated (i.e., the content of the Context Scheme and Context Scheme values fields has been changed) (Assertion [#14](#test-assertion-5214))
-56. The developer opens CSa.
-57. The developer tries to discard a context scheme value of the CSa which is used by a Business Context.
-58. Verify that the application shows an error message and that this value still exists. (Assertion [#15](#test-assertion-5215))
-59. The developer goes to the Context Scheme page and enter the keyword “usera” to the search drop-down box of the “Updater” search field.
-60. Verify that the user “usera” appears only. Also verify that “oagi”, “devx” and the “userb” users do not appear. (Assertion [#17](#test-assertion-5217))
-61. The developer clears the field and enters an all lowercase search term “process”.
-62. Verify that CSb is returned in the search result. (Assertion [#17](#test-assertion-5217))
-63. The developer clears the search filters and he choose devx as value of the Updater selector.
-64. Verify that CSx is returned in the search result. (Assertion [#17](#test-assertion-5217))
-65. The developer clears the search filters and he choose today's date as value of the Updated start date selector.
-66. Verify that CSx is returned in the search result. (Assertion [#17](#test-assertion-5217))
-67. The developer clears Name field and enters the term “Process Context”.
-68. Verify that at least the “CSBusiness Process Schema Context” and the “CSBusiness Process Context Schema” are returned.  (Assertion [#17](#test-assertion-5217))
-69. The developer clears Name field and enters the term ““Process Context””.
-70. Verify that at least the “CSBusiness Process Context Schema” is returned but not the “CSBusiness Process Schema Context”.  (Assertion [#17](#test-assertion-5217))
-71. The developer opens the Context Scheme CSy and clicks on the “Code List” field to select a code list to import values from.
-72. He enters the keyword “dateformat” into the search drop-down list field.
-73. Verify that the clm6DateFormatCode1_DateFormatCode appears but not the clm6TimeFormatCode1_TimeFormatCode. (Assertion [#17](#test-assertion-5217))
-74. The developer creates a Code List, say CL1CodeList, and adds some values into it.
-75. He creates a new context scheme, say cscl1, and he chooses the code list clm6ConditionTypeCode1_ConditionTypeCode to add values from.
-76. Verify that he cannot choose the CL1CodeList as it is in Editing state. (Assertion [#18](#test-assertion-5218))
-77. Verify that he cannot change the fields “Scheme ID”, “Agency ID” and “Version” as he has selected a code list to import values from. (Assertion [#19](#test-assertion-5219))
-78. He creates the context scheme by clicking the “Create” button.
-79. Verify that the cscl1 was successfully created and that it contains all the values of the code list clm6ConditionTypeCode1. Also verify that the Agency ID and the Version are automatically stored, and they are the same as the Code list clm6ConditionTypeCode1_ConditionTypeCode. (Assertion [#18](#test-assertion-5218))
-80. The developer opens the context scheme cscl1 and tries to edit a value.
-81. Verify that he cannot click on a value and that the dialog box used for editing values is not displayed. (Assertion [#19](#test-assertion-5219))
-82. The developer tries to add a new value.
-83. Verify that the Add button is disabled. (Assertion [#20](#test-assertion-5220))
-84. He tries to remove a value.
-85. Verify that the checkbox used for deleting context scheme values is disabled. (Assertion [#21](#test-assertion-5221))
-86. The developer opens CSa.
-87. Verify that both the checkbox “Import from Code List” and the field where you can select a code list are disabled. (Assertion [#22](#test-assertion-5222))
-88. The developer opens BCa and adds a new value from cscl1.
-89. He opens cscl1 and tries to uncheck the checkbox “Import from Code List” so that he can add more values.
-90. Verify that the checkbox “Import from Code List” is disabled. (Assertion [#22](#test-assertion-5222))
-91. The developer tries to select another code list to add values from.
-92. Verify that he cannot select another code list by verifying that the mat-select button used to select a code list is disabled. (Assertion [#22](#test-assertion-5222))
-93. The developer opens BCa and removes all its values.
-94. The developer opens cscl1and use the “Import from Code List” checkbox and adds values from a different code list.
-95. Verify that the cscl1 updated with the new values. (Assertion [#22](#test-assertion-5222))
-96. The developer opens cscl1, unchecks the "Import from Code List” and adds some values manually.
-97. Verify that the cscl1 updated with the new values. (Assertion [#22](#test-assertion-5222))
-98. The developer opens CSa and tries to add values from another Code List.
-99. Verify that the “Import from Code List” checkbox is disabled. (Assertion [#23](#test-assertion-5223))
-100. The developer removes all values and then adds values from a Code List. Afterwards, he updates the CSa.
-101. Verify that the CSa has been updated successfully. (Assertion [#23](#test-assertion-5223))
-102. The developer creates a new Business Context and uses a value of the Context Scheme CSa.
-103. He opens the Context Scheme CSa and tries to import values by selecting a different Code list.
-104. Verify that the selector field used for selecting the Code List to import values from is disabled. (Assertion [#24](#test-assertion-5224))
-105. The developer visits the Context Scheme List page, he selects a Context Scheme (clicking the corresponding checkbox), goes to the next paginator pages and then returns back.
-106. Verify that the checkbox of the selected Context Scheme is checked. (Assertion [#25](#test-assertion-5225))
+2. The developer creates a context scheme without context scheme values and verifies that the header fields are saved correctly. (Assertion [#1](#test-assertion-521))
+3. The developer creates a context scheme with context scheme values and verifies that all saved values are available on the edit page. (Assertion [#2](#test-assertion-522))
+4. On the create page, the developer adds multiple context scheme values, removes some of them, saves the scheme, and verifies that only the remaining values are stored. (Assertion [#3](#test-assertion-523))
+5. The developer verifies that creation is blocked when required header fields or the required `Value` field of a context scheme value are missing. (Assertion [#4](#test-assertion-524))
+6. The developer attempts to create another context scheme with the same `Scheme ID`, `Agency ID`, and `Version` as an existing scheme and verifies that creation is rejected. (Assertion [#5](#test-assertion-525))
+7. The developer creates a context scheme with the same `Scheme ID` and `Agency ID` as an existing scheme but a different `Name` and `Version`, verifies that a warning is shown, and completes creation with `Create anyway`. (Assertion [#6](#test-assertion-526))
+8. The developer verifies that context schemes created by a developer, a developer admin, an end user, and an end user admin are all visible in the list. (Assertion [#7](#test-assertion-527))
+9. The developer opens context schemes created by those different user types, verifies that they are editable, and updates their header fields without context scheme values. (Assertions [#8](#test-assertion-528), [#9](#test-assertion-529))
+10. The developer updates a context scheme with new header fields and new context scheme values and verifies that all changes are saved. (Assertion [#10](#test-assertion-5210))
+11. The developer verifies that update is blocked when required header fields or the required `Value` field of a context scheme value are missing. (Assertion [#11](#test-assertion-5211))
+12. The developer discards unreferenced context schemes created by different user types and verifies that they are removed from the list. (Assertion [#12](#test-assertion-5212))
+13. The developer attempts to discard a context scheme referenced by a business context and verifies that the discard operation is blocked. (Assertion [#13](#test-assertion-5213))
+14. The developer updates a context scheme that is already referenced by a business context and verifies that the related business context reflects the new category, scheme, and value data. (Assertion [#14](#test-assertion-5214))
+15. The developer attempts to remove a context scheme value that is used by a business context and verifies that the removal is blocked. (Assertion [#15](#test-assertion-5215))
+16. The developer attempts to add a duplicate context scheme value and verifies that duplicate creation is blocked. (Assertion [#16](#test-assertion-5216))
+17. The developer verifies that search works with the `Updater` and `Name` filters. (Assertion [#17](#test-assertion-5217))
+18. The developer loads values from published developer code lists in the latest and older releases and verifies that the imported values and scheme metadata are populated correctly. (Assertions [#18.a](#test-assertion-5218a), [#18.b](#test-assertion-5218b))
+19. The developer loads values from derived end user code lists in the latest and older releases and verifies that the imported values and scheme metadata are populated correctly, thereby also covering the dedicated derived-code-list assertion. (Assertions [#18.c](#test-assertion-5218c), [#18.d](#test-assertion-5218d), [#19](#test-assertion-5219))
+20. After loading values from a code list, the developer changes imported values, adds manual values, and deletes imported values, then verifies that the saved context scheme reflects those changes. (Assertions [#20](#test-assertion-5220), [#21](#test-assertion-5221), [#22](#test-assertion-5222))
+21. The developer attempts to use `Load from Code List` for a context scheme whose value is already used by a business context and verifies that the action is blocked. (Assertion [#23](#test-assertion-5223))
+22. The developer selects a context scheme in the list, navigates to another paginator page and back, and verifies that the selection is retained. (Assertion [#24](#test-assertion-5224))
+23. The developer searches the Context Scheme List using the exact `Name` of a saved context scheme and verifies that the correct matching row is returned reliably. (Assertion [#25](#test-assertion-5225))
 
 ## Test Case 5.3
 
@@ -308,7 +203,7 @@ Pre-condition: N/A
 ### Test Assertion:
 
 #### Test Assertion #5.3.1
-The OAGi developer can create a business context with only required information. See Create a Business Context in Score User Guide for Mandatory/Optional fields.
+The OAGi developer can create a business context with only required information. See Create a Business Context in the connectCenter User Guide for Mandatory/Optional fields.
 
 #### Test Assertion #5.3.2
 The developer can remove a context value during the business context creation.
@@ -320,7 +215,7 @@ The OAGi developer can create a business context with all information specified 
 The OAGi developer cannot create a business context with missing required information.
 
 #### Test Assertion #5.3.5
-The developer can see, in the business context list, all business context created by any user.
+The developer can see, in the business context list, all business contexts created by any user.
 
 #### Test Assertion #5.3.6
 The OAGi developer can edit a business context created by any user.
@@ -341,107 +236,45 @@ The developer cannot update a business context with missing required information
 The developer can discard a business context created by any user provided that there is no BIE referencing it.
 
 #### Test Assertion #5.3.12
-The developer cannot discard a business context that a BIE is referencing it. The Discard button should be disable and there should be a tooltip on it providing the reason it cannot be deleted or what actions are needed to discard the BC.
+The developer cannot discard a business context that is referenced by a BIE.
 
 #### Test Assertion #5.3.13
 The developer can update a business context created by any user, even when there is already a BIE referencing it. Verify that the business context name of the respective BIE has been updated accordingly.
 
 #### Test Assertion #5.3.14
-The search feature is at least working including the exact match feature.
+The search feature works for the `Name` field.
 
 #### Test Assertion #5.3.15
-The developer can select a Business Context from the Business Context List page, navigate thought different paginator pages while the forenamed Business Context remains checked.
+The developer can select a business context from the Business Context List page, navigate through different paginator pages, and keep that business context selected.
 
 #### Test Assertion #5.3.16
-Verify that all the business context values (i.e., their Context Category, Context Scheme and Context Scheme Value) are listed in the Edit Business Context page.
+The all-information business context creation scenario verifies that all business context values are listed on the Edit Business Context page.
 
 #### Test Assertion #5.3.17
-In the dialog used for adding a business context value, verify that all the details of the Context Category, Context Scheme and Context Scheme Value are displayed.
+The all-information business context creation scenario verifies that the Business Context Value dialog displays all details of the selected Context Category, Context Scheme, and Context Scheme Value.
 
 ### Test Step Pre-condition:
 
-1. There are business contexts already created by various end users, say BCa and BCb, and also created by developers, namely BCx and BCy, with all fields populated. BCa and BCx are already used by a BIE. BCa has the name “Business Process Business Context”.
+1. The test creates developer, developer admin, end user, and end user admin accounts and their business contexts as needed.
+2. Referenced BIEs are created as needed for the discard-negative and propagation scenarios.
 
 ### Test Step:
 
 1. An OAGi developer logs into the system.
-2. The developer creates new business contexts, say BC0 and BC1, with the Name field specified. Also, he adds some business context values with all their fields specified to BC0 (but not to BC1). Moreover, he tries to add a new value which is the same as an existing one.
-3. Verify that the BC0 and BC1 are successfully recorded by the application and that he couldn’t add a duplicate value. (Assertion [#1](#test-assertion-531), [#9](#test-assertion-539))
-4. The developer creates a new business context, say BC2, with the Name field specified, while adding some business context values and removing some of them during the business’s context creation.
-5. Verify that the business context is successfully recorded by the application (Assertion [#2](#test-assertion-532))
-6. The developer creates a new business context, say BC3, with the Name field specified and adds some business context values, with all their fields specified.
-7. Verify that the business context is successfully recorded by the application. (Assertion [#3](#test-assertion-533))
-8. The developer tries to create a new business context leaving the Name field bank and without adding any business context values.
-9. Verify that the Create button is disabled. (Assertion [#4](#test-assertion-534))
-10. The developer tries to create a new business context, leaves the Name field blank and adds a business context value with all its fields specified.
-11. Verify that the Create button is disabled. (Assertion [#4](#test-assertion-534))
-12. The developer tries to create a new business context with the Name field specified and adds a business context value without any field specified.
-13. Verify that the Add button is disabled. (Assertion [#4](#test-assertion-534))
-14. The developer tries to create a new business context with the Name field specified and adds a value with all its fields specified except the context scheme value field.
-15. Verify that the Add button is disabled. (Assertion [#4](#test-assertion-534))
-16. The developer tries to create a new business context with the Name field specified and adds a value with only the context category field specified.
-17. Verify that the Add button is disabled. (Assertion [#4](#test-assertion-534))
-18. The developer visits the Business Context page.
-19. Verify that he can see in the list BC0, BC1, BC2, BC3, BCa, BCb, BCx, and BCy. (Assertion [#5](#test-assertion-535))
-20. The developer clicks to view BCa.
-21. Verify that all fields are editable, and the Update button is present. (Assertion [#6](#test-assertion-536))
-22. Go back to the Business Context page.
-23. The developer clicks to view BC1.
-24. Verify that fields are editable, and the Update button is present. (Assertion [#6](#test-assertion-536))
-25. Go back to the Business Context page.
-26. The developer clicks to view BC0.
-27. Verify that fields are editable, and the Update button is present. (Assertion [#6](#test-assertion-536))
-28. Go back to the Business Context page.
-29. The developer clicks to view BCx.
-30. Verify that fields are editable, and the Update button is present. (Assertion [#6](#test-assertion-536))
-31. The developer changes the Name of the BC1 and clicks Update.
-32. Verify that the BC1 has been successfully updated with the new content. (Assertion [#7](#test-assertion-537))
-33. The developer clicks to view BCx.
-34. The developer deletes all business context values so that only the mandatory Name field is present and clicks Update.
-35. Verify that the BCx has been successfully updated with the new content. (Assertion [#7](#test-assertion-537))
-36. The developer opens BC0.
-37. He changes the content of the Name field, adds some business context values with all their fields specified and clicks Update.
-38. Verify that BC0 is successfully updated with the new content. (Assertion [#8](#test-assertion-538))
-39. The developer opens BC0.
-40. He tries to add a duplicate value, namely a value that has the same Context Category, Context Scheme and Context Scheme value with an existing one.
-41. Verify that the new value was not added. (Assertion [#9](#test-assertion-539))
-42. The developer clicks to view BC0.
-43. The developer removes the content of the Name field and tries to click update.
-44. Verify that the Update button is disabled. (Assertion [#10](#test-assertion-5310))
-45. The developer undoes the changes of the previous step and tries to add a business context value without specifying its context.
-46. Verify that the Add value button is disabled. (Assertion [#10](#test-assertion-5310))
-47. The developer undoes the changes of the previous step and tries to add a business context value without specifying its context scheme value.
-48. Verify that the Add value button is disabled. (Assertion [#10](#test-assertion-5310))
-49. The developer undoes the changes of the previous step and tries to add a business context value with no field specified.
-50. Verify that the Add value button is disabled. (Assertion [#10](#test-assertion-5310))
-51. The developer discards BC0.
-52. Verify that BC0 is no longer on the Business Context page. (Assertion [#11](#test-assertion-5311))
-53. Go back to the Business Context page.
-54. The developer clicks to view BCb.
-55. The developer discards BCb.
-56. Verify that BCb is no longer on the Business Context page. (Assertion [#11](#test-assertion-5311))
-57. Go back to the Business Context page.
-58. The developer clicks to view BCa.
-59. The developer tries to discard BCa.
-60. Verify that the there is a tooltip providing the reason that the BCa cannot be discarded. (Assertion [#12](#test-assertion-5312))
-61. The developer clicks to view BCx.
-62. The developer opens BCx, change the content of the Name field and clicks update.
-63. Verify that BCx is successfully updated. Also, verify that the change is reflected to the BIE that uses the BCx (Assertion [#13](#test-assertion-5313))
-64. The developer visits the Business Context page.
-65. He enters the keyword “userb” to the search drop-down box of the “Updater” search field.
-66. Verify that the user “userb” appears only. Also verify that “oagi”, “devx” and “usera” users do not appear.
-67. The developer clears everything, and he enters the search term “usiness” that is partially match some names of the business contexts.
-68. Verify that at least BCa is returned. (Assertion [#14](#test-assertion-5314))
-69. The developer clears the search filters and he choose “oagis” as value of the Updater selector.
-70. Verify that BCx is returned in the search result. (Assertion [#14](#test-assertion-5314))
-71. The developer clears the search filters and he choose today’s date as value of the Updated start date.
-72. Verify that BCx is returned in the search result. (Assertion [#14](#test-assertion-5314))
-73. The developer clears all fields and enters the term “Process Business” to the Name field.
-74. Verify that at least the BCa and the BCs are returned. (Assertion [#14](#test-assertion-5314))
-75. He clears the field and enters the term “”Process Business””.
-76. Verify that the BCa is returned but not the BCs. (Assertion [#14](#test-assertion-5314))
-77. The developer visits the Business Context List page, he selects a Business Context (clicking the corresponding checkbox), goes to the next paginator pages and then returns back.
-78. Verify that the checkbox of the selected Business Context is checked. (Assertion [#15](#test-assertion-5315))
+2. The developer creates a business context with only the required `Name` field and verifies that it is saved successfully. (Assertion [#1](#test-assertion-531))
+3. The developer creates a business context while adding several context values and removing some of them during creation, then verifies that only the remaining values are saved. (Assertion [#2](#test-assertion-532))
+4. The developer creates a business context with multiple context values and verifies that the edit page lists those values and that each Business Context Value dialog shows the related category, scheme, and scheme value details. (Assertions [#3](#test-assertion-533), [#16](#test-assertion-5316), [#17](#test-assertion-5317))
+5. The developer tries to create a business context with the `Name` field missing and verifies that creation is blocked. (Assertion [#4](#test-assertion-534))
+6. The developer verifies that business contexts created by a developer, a developer admin, an end user, and an end user admin are all visible in the list. (Assertion [#5](#test-assertion-535))
+7. The developer opens business contexts created by those different user types, verifies that they are editable, and updates them with only the required information by changing the `Name` field. (Assertions [#6](#test-assertion-536), [#7](#test-assertion-537))
+8. The developer updates a business context with a new `Name` and a new set of business context values and verifies that all changes are saved. (Assertion [#8](#test-assertion-538))
+9. The developer attempts to add a duplicate business context value and verifies that the duplicate is rejected. (Assertion [#9](#test-assertion-539))
+10. The developer clears the `Name` field of an existing business context and verifies that the update is blocked. (Assertion [#10](#test-assertion-5310))
+11. The developer discards unreferenced business contexts created by different user types and verifies that they are removed from the list. (Assertion [#11](#test-assertion-5311))
+12. The developer attempts to discard a business context that is referenced by a BIE and verifies that the discard operation is blocked. (Assertion [#12](#test-assertion-5312))
+13. The developer updates BIE-referenced business contexts created by different user types and verifies that the new business context name is reflected in related BIE search results. (Assertion [#13](#test-assertion-5313))
+14. The developer verifies that search works with the `Name` filter. (Assertion [#14](#test-assertion-5314))
+15. The developer selects a business context in the list, navigates to another paginator page and back, and verifies that the selection is retained. (Assertion [#15](#test-assertion-5315))
 
 ## Test Case 5.4
 
@@ -455,7 +288,7 @@ Pre-condition: N/A
 ### Test Assertion:
 
 #### Test Assertion #5.4.1
-The developer can create a code list without base with only required information. See Create a Brand New Code List in Score User Guide for Mandatory/Optional fields. In addition, Code list value cannot be duplicated.
+The developer can create a code list without base with only required information. See Create a Brand New Code List in the connectCenter User Guide for Mandatory/Optional fields. In addition, Code list value cannot be duplicated.
 
 #### Test Assertion #5.4.2
 The developer can create a code list without base with all information specified and multiple code values.
@@ -467,7 +300,7 @@ The developer can remove a code value during the code list without base creation
 The developer cannot create a code list without base with missing required information including missing required information in the code value table.
 
 #### Test Assertion #5.4.5
-The developer cannot create a code list without base, when it does not meet a uniqueness constraint. See Create a Brand New Code List in Score User Guide for the uniqueness constraint.
+The developer cannot create a code list without base, when it does not meet a uniqueness constraint. See Create a Brand New Code List in the connectCenter User Guide for the uniqueness constraint.
 
 #### Test Assertion #5.4.6
 The developer can see, in the code list page, all code lists created by any user.
@@ -506,7 +339,7 @@ Only published code lists without base can be used in BIE (and CC – we will no
 The developer cannot discard a code list once it has been published.
 
 #### Test Assertion #5.4.18
-The developer can create a code list with base that has only required information. See Create a Brand New Code List in Score User Guide for Mandatory/Optional fields.
+The developer can create a code list with base that has only required information. See Create a Brand New Code List in the connectCenter User Guide for Mandatory/Optional fields.
 
 #### Test Assertion #5.4.19
 The developer can create a code list with base with all information specified and with some code value restrictions and extensions added. The developer cannot change any field of the inherited code value.
@@ -518,7 +351,7 @@ The developer can remove a code value during the code list with base creation.
 The developer cannot create a code list with base with missing required information including missing required information in the code value table.
 
 #### Test Assertion #5.4.22
-The developer cannot create a code list with base, when it does not meet a uniqueness constraint. See Create a Brand New Code List in Score User Guide for the uniqueness constraint.
+The developer cannot create a code list with base, when it does not meet a uniqueness constraint. See Create a Brand New Code List in the connectCenter User Guide for the uniqueness constraint.
 
 #### Test Assertion #5.4.23
 The developer can update a code list with base that has only required information including adding, removing and restricting, unrestricting code values. The developer cannot change any field of the inherited code value.
@@ -795,22 +628,18 @@ One of its BCCPs was revised to be NOT nillable.
 One of its ASCCPs was revised to be NOT nillable.
 
 ##### Test Assertion #5.5.2.e
-Has an addition ASCC to an ASCCP that is a group.
+Has an additional ASCC to an ASCCP that is a group.
 ##### Test Assertion #5.5.2.f
 Max cardinality of a BCC and an ASCC changed from unbounded to 1.
 ##### Test Assertion #5.5.2.g
 One of its BCCPs has its BDT changed.
 ##### Test Assertion #5.5.2.h
-One of its BCCPs has its BDT that tied to a code list changed to another BDT tied to another code list (verified that code lists available in the BIE changes).
-##### Test Assertion #5.5.2.i
 One of its ASCCPs is deprecated.
-##### Test Assertion #5.5.2.j
-A new ASCC is inserted in between previously existed associations.
-##### Test Assertion #5.5.2.k
+##### Test Assertion #5.5.2.i
 One of its BCCPs has its default value revised from no default value to a default value.
 
 #### Test Assertion #5.5.3
-The developer cannot create a BIE based on a working branch ASCCP.
+The developer cannot create a BIE based on an ASCCP in the Working branch.
 
 #### Test Assertion #5.5.4
 The developer can see, in the BIE list page, all BIEs owned by any user.
@@ -858,7 +687,7 @@ The developer cannot discard a Production BIE he owns.
 The developer can discard his own BIE that is in WIP.
 
 #### Test Assertion #5.5.19
-The developer can update a BIE, which has different type of nodes enabled, with all their fields specified with valid data type. During the creation, he expands the BIE tree and he enables and disables nodes using both the pane depicting the tree structure and the Details pane.
+The developer can update a BIE, which has different types of nodes enabled, with all their fields specified with valid data types. During the creation, he expands the BIE tree and he enables and disables nodes using both the pane depicting the tree structure and the Details pane.
 
 ##### Test Assertion #5.5.19.a
 For root BIE node, the following fields should be editable; Version, Status, Business Term, Remark and Context Definition.
@@ -1003,12 +832,12 @@ The developer can visit a BIE node and choose the option “Set Max Cardinality 
 The developer can click the Detail Reset button of a specific BIE node to reset the values back to initial the values of the BIE node. These values are based on the corresponding CC of the BIE node. A confirmation dialog should be also returned in order for the developer to confirm his intension of resetting the BIE node values
 
 #### Test Assertion #5.5.55
-The developer can Exclude SCs or not from the Searching Field by checking or unchecking the “Exclude SCs” checkbox accordingly.
+The former `Exclude SCs` option is no longer available in the UI. This behavior is not automated because the option has been removed.
 
 ##### Test Assertion #5.5.55.a
-If the “Exclude SCs” checkbox is enabled (i.e., checked) the SCs are excluding from the searching field
+Not automated.
 ##### Test Assertion #5.5.55.b
-If the “Exclude SCs” checkbox is disabled (i.e., unchecked) the SCs are excluding from the searching field
+Not automated.
 
 #### Test Assertion #5.5.56
 The developer can see the cardinalities of nodes in the BIE tree.
@@ -1016,228 +845,99 @@ The developer can see the cardinalities of nodes in the BIE tree.
 ##### Test Assertion #5.5.56.a
 The developer can hide and display the cardinalities of the nodes in the BIE tree.
 ##### Test Assertion #5.5.56.b
-Changed cardinalities of the node must be correctly shown in the BIE tree.
+Changed cardinalities of the nodes must be correctly shown in the BIE tree and remain visible after reopening the page.
+
+#### Test Assertion #5.5.57
+When a BIE is created from adjacent releases where a related BCCP was renamed between releases, the BBIE node must preserve the correct default-value and value-constraint behavior for each release.
 
 ### Test Step Pre-condition:
 
-1. There are BIEs already created and owned by various end users, say BIEa, BIEb, BIEc, which are in editing, candidate and published state respectively.
-2. There are BIEs already created and owned by a developer different than the one in the test steps below, say BIE0, BIE1 and BIE2, which are in editing state, candidate and published state respectively.
-3. There is a BIE already created by the developer same as the one in the test step below, say BIE3, which is in candidate state and its Name is “Service Elements”.
-4. There is an ASCCP with Property Term “Acknowledge Production Order”
-5. There is the Module “Model\BODs\AcknowledgeProductionOrder”.
-6. There is no extension to oacl_LanguageCode.
+1. The test provisions the developer, business contexts, top-level concepts, releases, BIEs, and related core components that it needs for each assertion.
+2. For assertions about revised core components, the test creates or revises the underlying ACCs, ASCCPs, BCCPs, and related objects in adjacent published releases before creating the BIE.
+3. For assertions about ownership or state transitions, the test creates BIEs in the required owner and state combinations before opening the relevant BIE page.
 
 ### Test Step:
 
-1. An OAGi developer logs into the system.
-2. The developer creates a BIE, say BIE4, with name “Cancel Require Product”, having chosen a Business Context and an ASCCP. Finally, he leaves the Edit BIE page having done no changes.
-3. Verify that the BIE is successfully recorded by the application. (Assertion [#1](#test-assertion-551))
-4. The developer visits the BIE List page.
-5. Verify that he can see in the list BIE0, BIE1, BIE2, BIE3, BIE4, BIEa, BIEb and BIEc. (Assertion [#2](#test-assertion-552))
-6. The developer clicks to view BIE4.
-7. Verify that he can view the BIE4 and that he can expand the BIE tree so that the four different types of nodes are displayed (Assertion [#3](#test-assertion-553))
-8. The developer goes back to the BIE List page.
-9. He clicks to view BIEa.
-10. Verify that he cannot view the BIEa by verifying that there is no link (<a>) to the BIEa and that he could not visit the Edit BIE page. (Assertion [#4](#test-assertion-554))
-11. The developer clicks to view BIEb and tries to update it.
-12. Verify that he can view the BIEb, but the fields of BIE’s nodes are not editable. (Assertion [#5](#test-assertion-555))
-13. The developer clicks to view BIE1 and tries to update it.
-14. Verify that he can view the BIE1, but the fields of BIE’s nodes are not editable. (Assertion [#5](#test-assertion-555))
-15. The developer goes back to the BIE List page.
-16. He clicks to view BIEc and tries to update it.
-17. Verify that he can view the BIEc, but the fields of BIE’s nodes are not editable. (Assertion [#6](#test-assertion-556))
-18. The developer goes back to the BIE List page.
-19. He clicks to view BIE2 and tries to update it.
-20. Verify that he can view the BIE2, but the fields of BIE’s nodes are not editable. (Assertion [#6](#test-assertion-556))
-21. The developer goes back to the BIE List page.
-22. The developer clicks to view BIE4, makes some changes, updates the BIE and then sets BIE’s state to Candidate.
-23. Verify the BIE is successfully updated with the new content and that the BIE’s state is successfully recorded by the application. (Assertion [#7](#test-assertion-557))
-24. The developer clicks to view BIE4, change it back to Editing state, reopen it and makes some changes.  (Assertion [#9](#test-assertion-559))
-25. Verify that the Candidate button is present. (Assertion [#8](#test-assertion-558))
-26. The developer clicks Update and then clicks Candidate.
-27. He reopens BIE4 and he publishes it.
-28. Verify that the BIE’s state is successfully recorded by the application. (Assertion [#10](#test-assertion-5510))
-29. He clicks to view BIE4.
-30. Verify that the Back to Editing, Candidate and Publish buttons are not present and no field is editable. (Assertion [#11](#test-assertion-5511))
-31. The developer creates a new BIE, BIE5.
-32. He clicks to view BIE5.
-33. Verify that he can enable some nodes of the BIE and make some changes to them. Verify that the BIE has been stored successfully. (Assertion [#12](#test-assertion-5512))
-34. He sets the BIE’s state to candidate.
-35. Verify that the fields of the BIE’s nodes are not editable. (Assertion [#13](#test-assertion-5513))
-36. He publishes the BIE5.
-37. Verify that the fields of the BIE’s nodes are not editable. (Assertion [#13](#test-assertion-5513))
-38. The developer goes back to the BIE List page.
-39. Verify that the Discard button is not enabled for BIEa, BIEb, BIEc, BIE0, BIE1, BIE2, BIE4 and BIE5. (Assertion [#14](#test-assertion-5514), [#15](#test-assertion-5515))
-40. The developer creates BIE6.
-41. The developer discards BIE6 by clicking the Discard button and accepting the warning message.
-42. Verify that the BIE6 has  successfully been discarded by verifying it is not displayed in the BIE List page. (Assertion [#16](#test-assertion-5516))
-43. The developer discards BIE3 by clicking the Discard button and accepting the warning message.
-44. Verify that the BIE3 has successfully been discarded by verifying it is not displayed in the BIE List page neither it is returned using the Property Term search field and searching for it. (Assertion [#16](#test-assertion-5516))
-45. The developer creates a BIE, say BIE7. Afterwards, he expands the BIE tree so that all different types of nodes are displayed and enables an ASBIE and a BBIE node by clicking its corresponding box existing in tree structure and an SC node using the Used checkbox. Finally, he updates the BIE.
-46. Verify that the Version, Status, Business Term, Remark and Context Definition fields of the root BIE node are editable. (Assertion [[#1](#test-assertion-551)7.a](#test-assertion-5517a))
-47. Verify that the Min, Max, Nillable, Business Term, Remark and Context Definition fields of the ASBIE node are editable and that the Association Definition, Component Definition and Type Definition fields are not. (Assertion [[#1](#test-assertion-551)7.b](#test-assertion-5517b))
-48. Verify that the Min, Max, Nillable, Fixed Value, Business Term, Remark, Primitive Restriction and Context Definition fields of the BBIE node are editable and that the Association and Component Definition fields are not. (Assertion [[#1](#test-assertion-551)7.c](#test-assertion-5517c))
-49. Verify that the Min, Max, Nillable, Fixed Value, Business Term, Remark, Primitive Restriction and Context Definition fields of the SC node are editable, and the Association and Component Definition fields are not. (Assertion [[#1](#test-assertion-551)7.c](#test-assertion-5517c))
-50. The developer clicks Update, go to the BIE List page, and reopen BIE7.
-51. Verify that the BIE7 is successfully updated with the new content specified in step 45. (Assertion [#17](#test-assertion-5517))
-52. The developer clicks to view BIE7 and enables different descendant nodes.
-53. He tries to fill out the Min and Max fields with some string value.
-54. Verify that a message is returned that the string value is not accepted and that the Update button is disabled. (Assertion [#18](#test-assertion-5518))
-55. He fills out the Max field with the value “unbounded”.
-56. Verify that the field is successfully updated. (Assertion [#18](#test-assertion-5518))
-57. He deletes the content of Min and Max fields.
-58. Verify that the application indicated an error and that the Update button is disabled. (Assertion [#18](#test-assertion-5518))
-59. The developer enables a node (e.g. Version Identifier) which has Min Cardinality 0 and changes its Min cardinality from 0 to 7 and clicks Update.
-60. Verify that an error is returned and that the Update button is disabled (Assertion [[#1](#test-assertion-551)8.a](#test-assertion-5518a))
-61. He enables some nodes with original Min Cardinality 0, he changes it to 1 and Updates the BIE.
-62. Verify that the BIE is successfully updated with the new content. (Assertion [[#1](#test-assertion-551)8.a](#test-assertion-5518a) [#1](#test-assertion-551)8.2)
-63. The developer enables a node (e.g. Intermediary) whose Min cardinality is 0 and Max is unbounded, sets its Min Cardinality to 10 and updates the BIE.
-64. Verify that the BIE is successfully updated with the new content. (Assertion [[#1](#test-assertion-551)8.b](#test-assertion-5518b))
-65. He sets the above Min Cardinality to -1.
-66. Verify that the application indicates an error and that the Update button is disabled. (Assertion [[#1](#test-assertion-551)8.b](#test-assertion-5518b))
-67. The developer enables a node (e.g. System Environment Code) whose Min Cardinality is 0, Max is 1 and the Context definition field is blank, set the Max Cardinality to 0 and updates the BIE.
-68. Verify that the application gives a warning message that the Context Definition field is blank. (Assertion [[#1](#test-assertion-551)8.c](#test-assertion-5518c))
-69. The developer enables a node (e.g. Release Identifier) whose Min and Max Cardinality are 1, sets the Min to 0 and updates the BIE.
-70. Verify that the application indicates an error and that the Update button is disabled (Assertion [[#1](#test-assertion-551)8.d](#test-assertion-5518d))
-71. Then he sets the Max Cardinality to 0.
-72. Verify that the application indicates an error and that the Update button is disabled. (Assertion [[#1](#test-assertion-551)8.d](#test-assertion-5518d))
-73. Then he sets Min Cardinality to -1.
-74. Verify that the application indicates an error and that the Update button is disabled. (Assertion [[#1](#test-assertion-551)8.e](#test-assertion-5518e))
-75. Then He sets Min Cardinality to -5.
-76. Verify that the application indicates an error and that the Update button is disabled. (Assertion [[#1](#test-assertion-551)8.e](#test-assertion-5518e))
-77. The developer enables a node (e.g. Intermediary) whose Min cardinality is 0 and Max is unbounded, sets Max Cardinality to 10 and updates the BIE.
-78. Verify that the BIE is successfully updated with the new content. (Assertion [[#1](#test-assertion-551)8.f](#test-assertion-5518f))
-79. He sets the Min Cardinality of a node (e.g. Release Identifier) to a higher value than the value of Max Cardinality.
-80. Verify that the application indicates an error and that the Update button is disabled. (Assertion [[#1](#test-assertion-551)8.g](#test-assertion-5518g))
-81. He sets the Max Cardinality of different nodes to -1.
-82. Verify that the BIE is updated with the new content and that Max Cardinality field is set to “unbounded”. (Assertion [[#1](#test-assertion-551)8.h](#test-assertion-5518h))
-83. He restores the previous values of the elements and he sets their Max Cardinality to “unbounded”.
-84. Verify that the BIE is updated with the new content and that Max Cardinality field is set to “unbounded”. (Assertion [[#1](#test-assertion-551)8.i](#test-assertion-5518i))
-85. The developer enables Creation Date Time node.
-86. Set its Primitive Type to “Code” (without specifying a code).
-87. He enables another node on the tree.
-88. The developer clicks Update.
-89. Verify that the application reset the Primitive Type of the Creation Date Time node to “Primitive” and the Primitive is reset back to “Token”. (Assertion [[#1](#test-assertion-551)9.a](#test-assertion-5519a))
-90. The developer sets its Primitive Type to “Agency”.
-91. He clicks Update.
-92. Verify that the application reset the Primitive Type of the Creation Date Time node to “Primitive” and the Primitive is reset back to “Token”. (Assertion [[#1](#test-assertion-551)9.a](#test-assertion-5519a))
-93. Verify that “string” and “integer” are not included in the Primitive drop down list. (Partially covering Assertion [[#1](#test-assertion-551)9.b](#test-assertion-5519b))
-94. The developer logs out.
-95. An end user logs in. Create a new code list, say oacl_ LanguageCodeExtension based on oacl_LanguageCode and publishes it.
-96. The end user logs out. A developer logs in. He opens up a top-level BIE, which has a Language Code BBIE.
-97. The developer enables and clicks on the Language Code node.
-98. He sets the Primitive Type to “Code”.
-99. Verify that only oacl_LanguageCode, clm56392A20081107_LanguageCode, and oacl_ LanguageCodeExtension are present in the dropdown list. (Assertion [[#1](#test-assertion-551)9.c](#test-assertion-5519c), [#20](#test-assertion-5520))
-100. The developer opens BIE7 for editing.
-101. He expands the BIE7 tree and clicks on the node which has not been enabled as used.
-102. Verify that the fields of node on the right pane are not editable. (Assertion [#20](#test-assertion-5520))
-103. The developer ensures that a few nodes in the same hierarchy are enabled (e.g., if the top-level BIE is a BOD, the developer enables Application Area, Sender, and Type Code underneath).
-104. Verify that the fields of the unused nodes cannot be changed. (Assertion [#21](#test-assertion-5521))
-105. The developer opens BIE7 clicks the Hide unused checkbox.
-106. Verify that only the nodes that are enabled/used are displayed when expanding the BIE7’s tree structure. (Assertion [#24](#test-assertion-5524))
-107. The developer clicks Hide unused checkbox.
-108. Verify that at least a few of unused nodes of BIE7 are visible. (Assertion [#24](#test-assertion-5524))
-109. The developer makes a change. For instance, he enables the “System Environment Code”, change the “Business Term” field and clicks the Hide unused checkbox.
-110. Verify that the changes has successfully recorder and they have not been lost. (Assertion [#24](#test-assertion-5524))
-111. The developer goes to Copy BIE page.
-112. Verify that the BIEa is not displayed in the list. (Assertion [#23](#test-assertion-5523))
-113. He chooses a Business Context and in the next page chooses the BIE7.
-114. Verify that the BIE is successfully copied (by checking using some nodes enabled in BIE7 are also enabled in the new BIE) and recorded by the application. (Assertion [#24](#test-assertion-5524))
-115. The developer goes to Copy BIE page.
-116. Verify that the BIEb, BIEc, BIE1, and BIE2 are available for copying. (Assertion [#25](#test-assertion-5525))
-117. The developer logouts and the developer devx logins
-118. He opens BIE0 for editing and changes it to the Candidate state.
-119. Verify that the transfer ownership button is not available for BIE0 and BIE1. (Assertion [#26](#test-assertion-5526), [#27](#test-assertion-5527))
-120. The developer opens BIE0. Change it back to the Editing state.
-121. He clicks the transfer ownership button on BIE0.
-122. Verify that there is no username of an end user available for selection.
-123. He selects a username of another developer (e.g. devy).
-124. Verify that the BIE’s ownership is transferred to the new user and there is no transfer button available for BIE0 on the BIE List page. (Assertion [#26](#test-assertion-5526), 27)
-125. The developer goes to the Create BIE page.
-126. He enters the keyword “userb” to the search drop-down box of the “Updater” search field.
-127. Verify that the user “userb” appears only. Also verify that “oagi”, “devx” and “usera” users do not appear. (Assertion [#28](#test-assertion-5528))
-128. He chooses a Business Context and goes to the second page where he can select a Top-Level Concept to create a BIE.
-129. He enters the keyword “userb” to the search drop-down box of the “Updater” search field.
-130. Verify that the user “userb” appears only. Also verify that “oagi”, “devx” and “usera” users do not appear. (Assertion [#28](#test-assertion-5528))
-131. The developer clears everything and he enters the search term “BOM Extension” into the Property Term field.
-132. Verify that at least the “Revised BOM Component Extension” and the “Revised BOM Extension” are returned.  (Assertion [#28](#test-assertion-5528))
-133. He clears everything and he enters the search term “”BOM Extension”” into the Property Term field.
-134. Verify that the “Revised BOM Extension” is returned and not the “Revised BOM Component Extension”.  (Assertion [#28](#test-assertion-5528))
-135. The developer clears everything and he enters the search term “Acknowledge Production” into the Property Term field that partially matches some ASCCPs’ Property Terms names.
-136. Verify that at least the ASCCP Property Term “Acknowledge Production Order” is returned. (Assertion [#28](#test-assertion-5528))
-137. The developer enters the search term “AcknowledgeProduction” into the Module field that partially matches some Modules’ names.
-138. Verify that at least the Module “ModelBODsAcknowledgeProductionOrder” is returned. (Assertion [#28](#test-assertion-5528))
-139. The developer enters the search keyword “cknowledgeProductionOrder Business Object Document is to” into the Definition field that partially matches some definitions of ASCCP.
-140. Verify that at least the ASCCP Property Term “Acknowledge Production Order”. (Assertion [#28](#test-assertion-5528))
-141. The developer opens a BIE, say the BIE7, he selects “Code” as a “Primitive type” and he enters the keyword “Extension” into the drop-down search field.
-142. Verify that the oacl_LanguageCode_Extension appears but not the clm56392A20081107_LanguageCode. (Assertion [#28](#test-assertion-5528))
-143. The developer goes to BIE List page.
-144. He enters the keyword “userb” to the search drop-down box of the “Updater” search field.
-145. Verify that the user “usberb” appears only. Also verify that “oagi”, “devx” and “usera” users do  not appear. (Assertion [#29](#test-assertion-5529))
-146. The developer clears everything and he enters the search term “BOM Extension” into the Property Term field.
-147. Verify that at least the “Revised BOM Component Extension” and the “Revised BOM Extension” are returned.  (Assertion [#29](#test-assertion-5529))
-148. He clears everything and he enters the search term “”BOM Extension”” into the Property Term field.
-149. Verify that the “Revised BOM Extension” is returned and not the “Revised BOM Component Extension”.  (Assertion [#29](#test-assertion-5529))
-150. He clears everything and he enters the search term “aster” that partially matches some BIEs’ names.
-151. Verify that at least the BIE “Sync Project Master” is returned. (Assertion [#29](#test-assertion-5529))
-152. He enters the search term “initBC” in the “Business Context” search field.
-153. Verify that at least the BIE “Sync Project Master” is returned. (Assertion [#29](#test-assertion-5529)).
-154. He chooses "Editing” state to filter BIEs.
-155. Verify that there is at least one BIE in Editing state and no BIE in Candidate or Published state (Assertion [#29](#test-assertion-5529)).
-156. He chooses "Candidate” state to filter BIEs.
-157. Verify that there is at least one BIE in Candidate state and no BIE in Editing or Candidate state (Assertion [#29](#test-assertion-5529)).
-158. He chooses "Published” state to filter BIEs.
-159. Verify that there is at least one BIE in Published state and no BIE in Editing or Candidate state (Assertion [#29](#test-assertion-5529)).
-160. He clears everything and he chooses “oagis” user in the “Owner” selector field.
-161. Verify that there is at least one BIE with the Oagi user as the owner but no BIEs with other owners (Assertion [#29](#test-assertion-5529)).
-162. He clears everything and he chooses “oagis” user in the “Updater” selector field.
-163. Verify that there is at least one BIE with the Oagi user as the updater but no BIEs with other updaters (Assertion [#29](#test-assertion-5529)).
-164. The developer goes to Copy BIE page.
-165. He enters the keyword “userb” to the search drop-down box of the “Updater” search field.
-166. Verify that the user “userb” appears only. Also verify that “oagi”, “devx” and “usera” users do not appear. (Assertion [#30](#test-assertion-5530))
-167. The developer clears everything and he enters the search term “BOM Extension” into the Property Term field.
-168. Verify that at least the “Revised BOM Component Extension” and the “Revised BOM Extension” are returned.  (Assertion [#30](#test-assertion-5530))
-169. He clears everything and he enters the search term “”BOM Extension”” into the Property Term field.
-170. Verify that the “Revised BOM Extension” is returned and not the “Revised BOM Component Extension”.  (Assertion [#30](#test-assertion-5530))
-171. He clears everything and he enters the search term “redit” that partially matches some BIEs’ names.
-172. Verify that at least the BIE “Show Credit” is returned. (Assertion [#30](#test-assertion-5530))
-173. The developer creates a new BIE using the Property Term “Tool Actual”.
-174. He opens the BIE tree, expands Identifier node and the Identifier Set node.
-175. Check that the Identifier node is not displayed again inside the Identifier Set and so there is no loop of the same-name node. (Assertion 31)
-176. The developer goes to Copy BIE page, selects a random Business Context and then clicks next button. Afterwards, he counts the BIEs to check if they are the same as the index number displaying at the bottom right of the page. (Assertion [#32](#test-assertion-5532))
-177. The developer creates some business contexts.
-178. The developer creates a new BIE, say BIE9, and during its creation he chooses multiple business contexts.
-179. Verify that these business contexts are successfully assigned to the BIE9. (Assertion [#33](#test-assertion-5533))
-180. He opens BIE BIE8 and adds some business contexts to it (e.g BusCon0, BusCon1).
-181. Verify that the business contexts have successfully assigned to the BIE8. (Assertion [#34](#test-assertion-5534))
-182. The developer opens BIE8 and he tries to assign a business context already assigned (e.g. BusCon0)
-183. Verify that the business context BusCon0 is not available for assignment. (Assertion [#35](#test-assertion-5535))
-184. The developer opens BIE8 and removes the BusCon0.
-185. Verify that the no was successfully removed via BIE list, View/Edit and BIE expression page. Also verify that the others assigned business contexts was not removed. (Assertion [#36](#test-assertion-5536))
-186. The developer opens BIE8 and removes all business contexts.
-187. Verify that there is at least one business process assigned and displayed in BIE list, View/Edit and BIE expression page. (Assertion [#37](#test-assertion-5537))
-188. The developer opens BIE8, enables some BBIEPs and BBIE_SC nodes that have an “Example” field (e.g. Action Code, Total Cost Amount, Unit Code), he adds some values and Updates the BIE.
-189. Verify that the BIE has been successfully updated.  (Assertion [#38](#test-assertion-5538))
-190. The developer opens BIE8, enables a node that has Value Constraint field (e.g. Action Code). Afterwards, he selects the Fixed value as a value of that field, adds a value to its corresponding input field and clicks update.
-191. Verify that he could not choose Default value as a value of the Constraint field and that the BIE has been successfully updated.  (Assertion [#39](#test-assertion-5539))
-192. The developer opens BIE8, enables a node that has Value Constraint field (e.g. Action Code). Afterwards, he selects the Default value as a value of that field, adds a value to its corresponding input field and clicks update.
-193. Verify that he could not choose Fixed value as a value of the Constraint field and that the BIE has been successfully updated.  (Assertion [#39](#test-assertion-5539))
-194. The developer opens BIE9 and clicks on a node that has Min Cardinality 1 (e.g. Release Identifier)
-195. Verify that it is enabled by default and that it cannot be disabled. (Assertion [#40](#test-assertion-5540))
-196. The developer expands the BIE tree and clicks a child node that has Min Cardinality 1 (e.g. Identifier of Document Identifier Set of Match Document Header)
-197. Verify that the node is enabled by default and that it cannot be disabled. Also, verify that some of its parent nodes are disabled. (Assertion [#40](#test-assertion-5540))
-198. The developer visits the BIE List page, he selects a BIE (clicking the corresponding checkbox), goes to the next paginator pages and then returns back.
-199. Verify that the checkbox of the selected BIE is checked. (Assertion [#41](#test-assertion-5541))
-200. The developer create a random BIE, "Change Acknowledge Match Document", open it.
-201. Verify that the displayed cardinality label for the root node in the BIE tree is "1..1". (Assertion [#56](#test-assertion-5556))
-201. Click "Version Identifier" at the second level of the BIE tree, and verify that the displayed cardinality label of the node in the tree is "0..1". (Assertion [#56](#test-assertion-5556))
-202. Expand "Application Area" node at the second level of the BIE tree, click "Receiver" child node of "Application Area" node, and verify that the displayed cardinality label of the node in the tree is "0..∞". (Assertion [#56](#test-assertion-5556))
-203. Check "Hide cardinality" checkbox, and verify that the displayed cardinality labels in the BIE tree are disappeared. (Assertion [#56a](#test-assertion-5556a))
-204. Click "Hide cardinality" checkbox to uncheck it, and verify that the displayed cardinality labels in the BIE tree are appeared. (Assertion [#56a](#test-assertion-5556a))
-204. Check "Used" checkbox for "Version Identifier" node, set the Cardinality Min to 1, hit the "Update" button, and verify that the displayed cardinality label of the node in the tree is changed to "1..1". (Assertion [#56b](#test-assertion-5556b))
-205. Refresh the page, expands the root node, and verify that the displayed cardinality label of "Version Identifier" node in the tree is still "1..1". (Assertion [#56b](#test-assertion-5556b))
-207. Check "Used" checkbox for "Receiver" node, set the Cardinality Max to 10, and verify that the displayed cardinality label of the node in the tree is changed to "0..10". (Assertion [#56b](#test-assertion-5556b))
-208. Refresh the page, expands the root node and "Application Area" node sequentially, and verify that the displayed cardinality label of "Receiver" node in the tree is still "0..10". (Assertion [#56b](#test-assertion-5556b))
+1. The developer signs in, opens the Create BIE flow, selects published top-level concepts from non-latest published releases, creates BIEs, and verifies that each created BIE opens in the selected release branch. This covers Assertion [#5.5.1](#test-assertion-551).
+2. The developer creates a BIE from a revised top-level concept whose based ACC has changed and verifies that the generated BIE tree reflects the revised based ACC structure. This covers Assertion [#5.5.2.a](#test-assertion-552a).
+3. The developer creates a BIE from a revised top-level concept whose ACC has additional BCCs and ASCCs and verifies that the additional descendant nodes are present in the BIE tree. This covers Assertion [#5.5.2.b](#test-assertion-552b).
+4. The developer creates a BIE from a revised top-level concept whose BCCP was revised to be not nillable and verifies that the corresponding BBIE node is displayed as not nillable and not editable for nillability. This covers Assertion [#5.5.2.c](#test-assertion-552c).
+5. The developer creates a BIE from a revised top-level concept whose ASCCP was revised to be not nillable and verifies that the corresponding ASBIE node is displayed as not nillable and not editable for nillability. This covers Assertion [#5.5.2.d](#test-assertion-552d).
+6. The developer creates a BIE from a revised top-level concept that adds an ASCC to an ASCCP that is a group and verifies that the group content is reflected in the resulting BIE tree. This covers Assertion [#5.5.2.e](#test-assertion-552e).
+7. The developer creates a BIE from a revised top-level concept whose BCC and ASCC cardinality max changed from `unbounded` to `1` and verifies that the resulting BIE nodes display max cardinality `1`. This covers Assertion [#5.5.2.f](#test-assertion-552f).
+8. The developer creates a BIE from a revised top-level concept whose BCCP has a changed BDT and verifies that the descendant supplementary component structure matches the revised BDT. This covers Assertion [#5.5.2.g](#test-assertion-552g).
+9. The developer creates a BIE from a revised top-level concept whose ASCCP is deprecated and verifies that the corresponding BIE node is marked as deprecated. This covers Assertion [#5.5.2.h](#test-assertion-552h).
+10. The developer creates a BIE from a revised top-level concept whose BCCP default value changed from none to a default value and verifies that the resulting BBIE node shows the default value. This covers Assertion [#5.5.2.i](#test-assertion-552i).
+11. The developer opens the Create BIE flow and verifies that published release branches are available for top-level concept selection while a `Working` branch top-level concept cannot be used to create a BIE. This covers Assertion [#5.5.3](#test-assertion-553).
+12. The developer opens the BIE List page and verifies that BIEs owned by any user are listed. This covers Assertion [#5.5.4](#test-assertion-554).
+13. The developer opens his own WIP BIE and verifies that the BIE details can be viewed and edited. This covers Assertion [#5.5.5](#test-assertion-555).
+14. The developer attempts to open another user's WIP BIE and verifies that the edit view is not available. This covers Assertion [#5.5.6](#test-assertion-556).
+15. The developer opens QA-state BIEs owned by himself or another user and verifies that the details can be viewed but cannot be changed. This covers Assertion [#5.5.7](#test-assertion-557).
+16. The developer opens Production-state BIEs owned by himself or another user and verifies that the details can be viewed but cannot be changed. This covers Assertion [#5.5.8](#test-assertion-558).
+17. The developer saves changes to his own WIP BIE and then changes its state from WIP to QA. This covers Assertion [#5.5.9](#test-assertion-559).
+18. The developer makes additional unsaved changes to his own WIP BIE and verifies that the state cannot be changed from WIP to QA until the BIE is updated successfully. This covers Assertion [#5.5.10](#test-assertion-5510).
+19. The developer changes the state of his own QA BIE back to WIP. This covers Assertion [#5.5.11](#test-assertion-5511).
+20. The developer changes the state of his own QA BIE to Production. This covers Assertion [#5.5.12](#test-assertion-5512).
+21. The developer opens his own Production BIE and verifies that no change can be made. This covers Assertion [#5.5.13](#test-assertion-5513).
+22. The developer updates his own WIP BIE and verifies that the changes are saved successfully. This covers Assertion [#5.5.14](#test-assertion-5514).
+23. The developer opens his own QA or Production BIE and verifies that the BIE cannot be updated. This covers Assertion [#5.5.15](#test-assertion-5515).
+24. The developer attempts to discard a BIE owned by another user and verifies that the discard action is not allowed. This covers Assertion [#5.5.16](#test-assertion-5516).
+25. The developer attempts to discard his own Production BIE and verifies that the discard action is not allowed. This covers Assertion [#5.5.17](#test-assertion-5517).
+26. The developer discards his own WIP BIE and verifies that the BIE is removed from the list. This covers Assertion [#5.5.18](#test-assertion-5518).
+27. The developer enables root, ASBIE, BBIE, and SC nodes in a WIP BIE and verifies that the root node fields `Version`, `Status`, `Business Term`, `Remark`, and `Context Definition` are editable. This covers Assertion [#5.5.19.a](#test-assertion-5519a).
+28. The developer selects enabled ASBIE nodes and verifies that `Used`, `Min`, `Max`, `Nillable`, `Business Term`, `Remark`, and `Context Definition` are editable, while derived definition fields remain derived from the underlying core component. This covers Assertion [#5.5.19.b](#test-assertion-5519b).
+29. The developer selects enabled BBIE and SC nodes and verifies that `Used`, `Min`, `Max`, `Nillable`, `Fixed Value`, `Business Term`, `Remark`, value-domain-related fields, and `Context Definition` are editable, while derived definition fields remain derived from the underlying core component. This covers Assertion [#5.5.19.c](#test-assertion-5519c).
+30. The developer enters blank values and non-integer strings into `Cardinality Min` and `Cardinality Max` and verifies that validation errors are shown and the Update button is disabled. This covers Assertion [#5.5.20](#test-assertion-5520).
+31. The developer changes `Cardinality Min` from `0` to `1` where allowed and verifies that the change is saved. This covers Assertion [#5.5.20.a](#test-assertion-5520a).
+32. The developer changes `Cardinality Min` to a positive integer greater than zero when `Cardinality Max` is `unbounded` and verifies that the change is saved. This covers Assertion [#5.5.20.b](#test-assertion-5520b).
+33. The developer changes `Cardinality Max` from `1` to `0` where allowed and verifies the resulting warning when `Context Definition` is blank. This covers Assertion [#5.5.20.c](#test-assertion-5520c).
+34. The developer attempts to change `Cardinality Min` or `Cardinality Max` to `0` when the original minimum cardinality is `1` and verifies that validation blocks the change. This covers Assertion [#5.5.20.d](#test-assertion-5520d).
+35. The developer attempts to change `Cardinality Min` to `-1` and `-5` and verifies that validation blocks both values. This covers Assertion [#5.5.20.e](#test-assertion-5520e).
+36. The developer changes `Cardinality Max` from `unbounded` to a finite positive integer and verifies that the change is saved. This covers Assertion [#5.5.20.f](#test-assertion-5520f).
+37. The developer attempts to set `Cardinality Min` greater than `Cardinality Max` and verifies that validation blocks the change. This covers Assertion [#5.5.20.g](#test-assertion-5520g).
+38. The developer sets `Cardinality Max` to `-1` and verifies that the value is treated as `unbounded`. This covers Assertion [#5.5.20.h](#test-assertion-5520h).
+39. The developer sets `Cardinality Max` to `unbounded` and verifies that the value is saved as `unbounded`. This covers Assertion [#5.5.20.i](#test-assertion-5520i).
+40. The developer sets a `Value Domain Type` without supplying the corresponding value-domain selection and verifies that the BIE cannot be updated. This covers Assertion [#5.5.21.a](#test-assertion-5521a).
+41. The developer selects `Value Domain` and verifies that only primitives compatible with the underlying core component are offered. This covers Assertion [#5.5.21.b](#test-assertion-5521b).
+42. The developer selects `Code` and verifies that only code lists compatible with the underlying core component are offered. This covers Assertion [#5.5.21.c](#test-assertion-5521c).
+43. The developer opens the code-list selection for a BBIE whose default value domain is a code list and verifies that only published, compatible code lists in the same release are listed and that each candidate displays its version. This covers Assertions [#5.5.22](#test-assertion-5522) and [#5.5.22.a](#test-assertion-5522a).
+44. The developer clicks a node that is not used and verifies that its fields cannot be updated. This covers Assertion [#5.5.23](#test-assertion-5523).
+45. The developer checks `Hide unused` and verifies that unused nodes disappear from the BIE tree, unchecks `Hide unused` and verifies that unused nodes are shown again, then changes a node while toggling the option and verifies that the change is preserved. This covers Assertion [#5.5.24](#test-assertion-5524).
+46. The developer opens the Copy BIE page and verifies that a WIP BIE created by another user is not available for copy. This covers Assertion [#5.5.25](#test-assertion-5525).
+47. The developer opens the Copy BIE page, copies his own WIP BIE, and verifies that the copied BIE is created successfully. This covers Assertion [#5.5.26](#test-assertion-5526).
+48. The developer opens the Copy BIE page, copies QA and Production BIEs owned by another developer, and copies QA and Production BIEs owned by an end user with extension content, then verifies that copying is allowed and that descendant BIEs added by the end user to Extension BIEs are ignored. This covers Assertion [#5.5.27](#test-assertion-5527).
+49. The developer opens the transfer-ownership function for a WIP BIE and verifies that only developer accounts are available as transfer targets. This covers Assertion [#5.5.28](#test-assertion-5528).
+50. The developer attempts to transfer ownership of his BIE in WIP, QA, and Production states and verifies that transfer is allowed only in WIP. This covers Assertion [#5.5.29](#test-assertion-5529).
+51. In the Create BIE flow, the developer verifies that business context search works with the `Updater`, `Name`, `Update Start Date`, and `Update End Date` fields, and that top-level concept search works with the `DEN`, `Definition`, and `Module` fields. This covers Assertion [#5.5.30](#test-assertion-5530).
+52. In the BIE List page, the developer verifies that search works with the `State`, `Update Start Date`, `Update End Date`, `DEN`, and `Business Context` fields. This covers Assertion [#5.5.31](#test-assertion-5531).
+53. In the Copy BIE flow, the developer verifies that business context search works with the `Updater`, `Name`, `Update Start Date`, and `Update End Date` fields, and that BIE search works with the `DEN`, `Business Context`, and `State` fields. This covers Assertion [#5.5.32](#test-assertion-5532).
+54. The developer opens a BIE whose tree contains same-name nodes and verifies that expanding one node does not incorrectly auto-expand another same-name node. This covers Assertion [#5.5.33](#test-assertion-5533).
+55. The developer opens the Copy BIE page, counts the returned BIEs, and verifies that the count matches the page index summary. This covers Assertion [#5.5.34](#test-assertion-5534).
+56. The developer creates a BIE while assigning multiple business contexts and verifies that all selected business contexts are assigned to the created BIE. This covers Assertion [#5.5.35](#test-assertion-5535).
+57. The developer opens his own WIP BIE, assigns multiple business contexts by updating the BIE, and verifies that the assignments are saved. This covers Assertion [#5.5.36](#test-assertion-5536).
+58. The developer assigns multiple business contexts to a BIE that is not in WIP and verifies that the assignments are saved. This covers Assertion [#5.5.37](#test-assertion-5537).
+59. The developer opens a BIE that is not in WIP and is owned by another user, assigns multiple business contexts, and verifies that the assignments are saved. This covers Assertion [#5.5.38](#test-assertion-5538).
+60. The developer attempts to assign the same business context more than once to a BIE and verifies that the duplicate assignment is blocked. This covers Assertion [#5.5.39](#test-assertion-5539).
+61. The developer removes one assigned business context from his own WIP BIE and verifies that the selected business context is removed while the remaining assignments are kept. This covers Assertion [#5.5.40](#test-assertion-5540).
+62. The developer attempts to remove all assigned business contexts from a BIE and verifies that at least one business context must remain assigned. This covers Assertion [#5.5.41](#test-assertion-5541).
+63. The developer opens BBIE and BBIE_SC nodes and verifies that an `Example` input field exists and that example data can be entered and saved. This covers Assertion [#5.5.42](#test-assertion-5542).
+64. The developer sets a fixed value on a node with a value-constraint field and verifies that a default value cannot be selected at the same time, then sets a default value and verifies that a fixed value cannot be selected at the same time. This covers Assertion [#5.5.43](#test-assertion-5543).
+65. The developer opens BCC and ASCC nodes whose minimum cardinality is greater than zero and verifies that those nodes are enabled by default, cannot be disabled, and may still appear under unused parent nodes. This covers Assertion [#5.5.44](#test-assertion-5544).
+66. The developer selects a BIE in the BIE List page, changes paginator pages, and verifies that the selection remains checked after navigation. This covers Assertion [#5.5.45](#test-assertion-5545).
+67. The developer opens a BIE and verifies that neither local extension nor global extension can be created from it. This covers Assertion [#5.5.46](#test-assertion-5546).
+68. The developer attempts to create a BIE without assigning any business context and verifies that creation is rejected. This covers Assertion [#5.5.47](#test-assertion-5547).
+69. The developer edits the Version metadata field and verifies that the fixed value of the `Version Identifier` node is synchronized automatically. This covers Assertion [#5.5.48](#test-assertion-5548).
+70. The developer changes the fixed value of the `Version Identifier` node after synchronization and verifies that the node value can still be edited independently. This covers Assertion [#5.5.49](#test-assertion-5549).
+71. The developer opens primitive date time BBIE nodes and verifies that the default value-domain selection is `Primitive` with the value `date time`. This covers Assertion [#5.5.50](#test-assertion-5550).
+72. The developer attempts to create a BIE from an ASCCP whose ACC has a group component type and verifies that creation is not allowed. This covers Assertion [#5.5.51](#test-assertion-5551).
+73. The developer uses the `Enable Children` action on ASBIE and BBIE nodes and verifies that all child nodes become enabled. This covers Assertion [#5.5.52](#test-assertion-5552).
+74. The developer uses the `Set Max Cardinality 1` action and verifies that the maximum cardinality of all child nodes is set to `1`. This covers Assertion [#5.5.53](#test-assertion-5553).
+75. The developer uses the detail reset action for top-level, ASBIE, and BBIE nodes, confirms the reset, and verifies that node values are restored to their initial values derived from the corresponding core component. This covers Assertion [#5.5.54](#test-assertion-5554).
+76. The developer verifies that the former `Exclude SCs` option is no longer present in the current UI, so the former behavior is not automated. This covers Assertion [#5.5.55](#test-assertion-5555).
+77. The developer opens a BIE tree and verifies that node cardinality labels such as `1..1`, `0..1`, and `0..∞` are displayed in the tree. This covers Assertion [#5.5.56](#test-assertion-5556).
+78. The developer toggles `Hide cardinality` and verifies that the cardinality labels are hidden and shown again. This covers Assertion [#5.5.56.a](#test-assertion-5556a).
+79. The developer changes node cardinalities, updates the BIE, reopens the page, and verifies that the cardinality labels in the tree reflect the saved values. This covers Assertion [#5.5.56.b](#test-assertion-5556b).
+80. The developer creates BIEs from adjacent releases where a related BCCP has been renamed between releases and verifies that the earlier-release BBIE node keeps the revised default value while the later-release node keeps the correct `Value Constraint` state. This covers Assertion [#5.5.57](#test-assertion-5557).
 
 ## Test Case 5.6
 
@@ -1273,13 +973,13 @@ The developer can generate an expression of a single BIE, in XML Schema, in the 
 The developer can generate an expression of a single BIE, in XML Schema, in the same package, with the BIE CCTS Meta Data annotation selected but not the Include CCTS_Definition Tag annotation.
 
 #### Test Assertion #5.6.9
-The developer can generate an expression of a single BIE, in XML Schema, in the same package, with the BIE OAGi/Score Meta Data annotation selected but not the Include WHO Columns annotation.
+The developer can generate an expression of a single BIE, in XML Schema, in the same package, with the BIE OAGi/connectCenter Meta Data annotation selected but not the Include WHO Columns annotation.
 
 #### Test Assertion #5.6.10
 The developer cannot generate an expression of a single BIE, in XML Schema, with the Include CCTS_Definition Tag annotation selected but not the BIE CCTS Meta Data annotation.
 
 #### Test Assertion #5.6.11
-The developer cannot generate an expression of a single BIE, in XML Schema, with the Include WHO Columns annotation selected but not the BIE OAGi/Score Meta Data annotation.
+The developer cannot generate an expression of a single BIE, in XML Schema, with the Include WHO Columns annotation selected but not the BIE OAGi/connectCenter Meta Data annotation.
 
 #### Test Assertion #5.6.12
 The developer can generate an expression of a single BIE, in JSON Schema, in the same package, with no annotation selected.
@@ -1288,7 +988,7 @@ The developer can generate an expression of a single BIE, in JSON Schema, in the
 The developer can generate an expression of a single BIE, in JSON Schema, in the same package, with the BIE Definition annotation selected.
 
 #### Test Assertion #5.6.14
-The developer cannot generate an expression of a single BIE, in JSON Schema, in the same package, with any of the BIE CCTS Meta Data, Include CCTS_Definition Tag, BIE GUID, Business Context, BIE OAGi/Score Meta Data, Include WHO Columns, Based CC Meta Data annotations selected.
+The developer cannot generate an expression of a single BIE, in JSON Schema, in the same package, with any of the BIE CCTS Meta Data, Include CCTS_Definition Tag, BIE GUID, Business Context, BIE OAGi/connectCenter Meta Data, or Include WHO Columns annotations selected. `Based CC Meta Data` remains available for JSON Schema and is unchecked by default.
 
 #### Test Assertion #5.6.15
 The developer can generate an expression of multiple BIEs, in multiple XML Schemas, saved in the same package, with some annotations selected.
@@ -1386,9 +1086,16 @@ The developer can generate an expression of a single BIE, in Open API 3.0 in JSO
 #### Test Assertion #5.6.45
 The developer can generate an expression of multiple BIEs, in Open API 3.0 in JSON with Code Generation Friendly, GET Operation Template that includes Meta Header, Pagination Response, and Make Array option as well as POST Operation Template that includes Meta Header, Pagination Response, and Make Array option, in different packages.
 
+#### Test Assertion #5.6.46
+The developer can generate an XML Schema expression of a single BIE while including the BIE version in the generated filename.
+
+#### Test Assertion #5.6.47
+The developer can refresh the Express BIE page during OpenAPI generation setup and still select a Meta Header BIE for the POST Operation Template before generating the expression.
+
 ### Test Step Pre-condition:
 
 1. There are some BIEs created by users, namely BIEa, BIEb, BIEc, which are in Editing, Candidate and Published correspondingly. Additionally, there are some BIEs created by a developer, namely BIE0, BIE1, BIE2, which are in Editing, Candidate and Published correspondingly. The name of the BIE1 is “Receive Item”. Finally, there is a BIE, BIE3, created by a developer with multiple business contexts assigned.
+2. A developer-owned BIE with a version value is available or is created during the test for generated-filename verification.
 
 ### Test Step:
 
@@ -1401,18 +1108,18 @@ The developer can generate an expression of multiple BIEs, in Open API 3.0 in JS
 7. Verify that the Schema is successfully generated and saved in the same package. (Assertion [#6](#test-assertion-566))
 8. The developer generates an expression from BIE1, in XML Schema, selecting the BIE CCTS Meta Data annotation but not the Include CCTS_Definition Tag annotation and that the scheme will be saved in the same package.
 9. Verify that the Schema is successfully generated and saved in the same package. (Assertion [#7](#test-assertion-567))
-10. The developer generates an expression from BIE2, in XML Schema, selecting the BIE OAGi/Score Meta Data annotation but not the Include WHO Columns annotation and that the schema will be saved in the same package.
+10. The developer generates an expression from BIE2, in XML Schema, selecting the BIE OAGi/connectCenter Meta Data annotation but not the Include WHO Columns annotation and that the schema will be saved in the same package.
 11. Verify that the Schema is successfully generated and saved in the same package. (Assertion [#8](#test-assertion-568))
 12. The developer generates an expression from BIE2, in XML Schema, selecting the Include CCTS_Definition Tag annotation but not the BIE CCTS Meta Data annotation.
 13. Verify that the Include CCTS_Definition Tag annotation cannot be selected without selecting the BIE CCTS Meta Data annotation first. (Assertion [#9](#test-assertion-569))
-14. The developer generates an expression from BIE2, in XML Schema, selecting the Include WHO Columns annotation but not the BIE OAGi/Score Meta Data annotation.
-15. Verify that the Include WHO Columns annotation cannot be selected without selecting the BIE OAGi/Score Meta Data annotation first. (Assertion [#10](#test-assertion-5610))
+14. The developer generates an expression from BIE2, in XML Schema, selecting the Include WHO Columns annotation but not the BIE OAGi/connectCenter Meta Data annotation.
+15. Verify that the Include WHO Columns annotation cannot be selected without selecting the BIE OAGi/connectCenter Meta Data annotation first. (Assertion [#10](#test-assertion-5610))
 16. The developer generates an expression from BIEb, in JSON Schema, selecting that the schema will be saved in the same package and without selecting any annotation.
 17. Verify that the Schema is successfully generated. (Assertion [#11](#test-assertion-5611))
 18. The developer generates an expression from BIE1, in JSON Schema, selecting the BIE Definition annotation and that the schema will be saved in the same package.
 19. Verify that the Schema is successfully generated and saved in the same package. (Assertion [#12](#test-assertion-5612))
-20. The developer generates an expression from BIE2, in JSON Schema, selecting the BIE CCTS Meta Data, Include CCTS_Definition Tag, BIE GUID, Business Context, BIE OAGi/Score Meta Data, Include WHO Columns, Based CC Meta Data annotations.
-21. Verify that the aforementioned annotations cannot be selected. (Assertion [#13](#test-assertion-5613))
+20. The developer generates an expression from BIE2, in JSON Schema, attempting to select BIE CCTS Meta Data, Include CCTS_Definition Tag, BIE GUID, Business Context, BIE OAGi/connectCenter Meta Data, and Include WHO Columns. He also verifies that `Based CC Meta Data` remains available but unchecked by default.
+21. Verify that the former annotations cannot be selected and that `Based CC Meta Data` remains enabled but unchecked. (Assertion [#13](#test-assertion-5613))
 22. The developer generates an expression from BIEb and BIE1, in XML Schemas, selecting some annotations and that the XML Schemas will be saved in the same package.
 23. Verify that the Schemas are successfully generated and saved in the same package. (Assertion [#14](#test-assertion-5614))
 24. The developer generates an expression from BIEb and BIE1, in XML Schemas, selecting some annotations and that the XML Schemas will be saved in different packages.
@@ -1442,3 +1149,51 @@ The developer can generate an expression of multiple BIEs, in Open API 3.0 in JS
 48. The developer opens the “Express BIE” page.
 49. The developer generates an expression from BIE3, in XML Schema, selecting the Business Context annotation.
 50. Verify that the Schema is successfully generated. (Assertion [#22](#test-assertion-5622))
+51. The developer generates Open API 3.0 in JSON for a single BIE using GET Operation Template with Meta Header and Pagination Response and POST Operation Template with Meta Header, selecting developer-owned Meta Header and Pagination Response BIEs in any state.
+52. Verify that the expression is successfully generated. (Assertion [#23](#test-assertion-5624))
+53. The developer generates Open API 3.0 in YAML for a single BIE using GET Operation Template with Meta Header, Pagination Response, and Make Array and POST Operation Template with Meta Header and Make Array, selecting other users' Meta Header and Pagination Response BIEs only in QA or Production state.
+54. Verify that the expression is successfully generated. (Assertion [#24](#test-assertion-5625))
+55. The developer generates Open API 3.0 in YAML with Code Generation Friendly for a single BIE in a single file.
+56. Verify that the expression is successfully generated. (Assertion [#25](#test-assertion-5626))
+57. The developer generates Open API 3.0 in YAML with Code Generation Friendly for multiple BIEs saved in different packages.
+58. Verify that the expressions are successfully generated. (Assertion [#26](#test-assertion-5627))
+59. The developer generates Open API 3.0 in JSON with Code Generation Friendly for a single BIE in a single file.
+60. Verify that the expression is successfully generated. (Assertion [#27](#test-assertion-5628))
+61. The developer generates Open API 3.0 in JSON with Code Generation Friendly for multiple BIEs saved in different packages.
+62. Verify that the expressions are successfully generated. (Assertion [#28](#test-assertion-5629))
+63. The developer generates Open API 3.0 in YAML with Code Generation Friendly for a single BIE using GET Operation Template with Make Array in a single file.
+64. Verify that the expression is successfully generated. (Assertion [#29](#test-assertion-5630))
+65. The developer generates Open API 3.0 in YAML with Code Generation Friendly for multiple BIEs using GET Operation Template with Make Array in different packages.
+66. Verify that the expressions are successfully generated. (Assertion [#30](#test-assertion-5631))
+67. The developer generates Open API 3.0 in YAML with Code Generation Friendly for a single BIE using GET Operation Template with Meta Header in a single file.
+68. Verify that the expression is successfully generated. (Assertion [#31](#test-assertion-5632))
+69. The developer generates Open API 3.0 in YAML with Code Generation Friendly for multiple BIEs using GET Operation Template with Meta Header in different packages.
+70. Verify that the expressions are successfully generated. (Assertion [#32](#test-assertion-5633))
+71. The developer generates Open API 3.0 in YAML with Code Generation Friendly for a single BIE using GET Operation Template with Meta Header and Pagination Response in a single file.
+72. Verify that the expression is successfully generated. (Assertion [#33](#test-assertion-5634))
+73. The developer generates Open API 3.0 in YAML with Code Generation Friendly for multiple BIEs using GET Operation Template with Meta Header and Pagination Response in different packages.
+74. Verify that the expressions are successfully generated. (Assertion [#34](#test-assertion-5635))
+75. The developer generates Open API 3.0 in YAML with Code Generation Friendly for a single BIE using POST Operation Template with Make Array in a single file.
+76. Verify that the expression is successfully generated. (Assertion [#35](#test-assertion-5636))
+77. The developer generates Open API 3.0 in YAML with Code Generation Friendly for multiple BIEs using POST Operation Template with Make Array in different packages.
+78. Verify that the expressions are successfully generated. (Assertion [#36](#test-assertion-5637))
+79. The developer generates Open API 3.0 in YAML with Code Generation Friendly for a single BIE using POST Operation Template with Meta Header in a single file.
+80. Verify that the expression is successfully generated. (Assertion [#37](#test-assertion-5638))
+81. The developer generates Open API 3.0 in YAML with Code Generation Friendly for multiple BIEs using POST Operation Template with Meta Header in different packages.
+82. Verify that the expressions are successfully generated. (Assertion [#38](#test-assertion-5639))
+83. The developer generates Open API 3.0 in YAML with Code Generation Friendly for a single BIE using GET Operation Template with Meta Header, Pagination Response, and Make Array in a single file.
+84. Verify that the expression is successfully generated. (Assertion [#39](#test-assertion-5640))
+85. The developer generates Open API 3.0 in YAML with Code Generation Friendly for multiple BIEs using GET Operation Template with Meta Header, Pagination Response, and Make Array in different packages.
+86. Verify that the expressions are successfully generated. (Assertion [#40](#test-assertion-5641))
+87. The developer generates Open API 3.0 in YAML with Code Generation Friendly for a single BIE using both GET and POST Operation Templates with Meta Header, Pagination Response, and Make Array in a single file.
+88. Verify that the expression is successfully generated. (Assertion [#41](#test-assertion-5642))
+89. The developer generates Open API 3.0 in YAML with Code Generation Friendly for multiple BIEs using both GET and POST Operation Templates with Meta Header, Pagination Response, and Make Array in different packages.
+90. Verify that the expressions are successfully generated. (Assertion [#42](#test-assertion-5643))
+91. The developer generates Open API 3.0 in JSON with Code Generation Friendly for a single BIE using both GET and POST Operation Templates with Meta Header, Pagination Response, and Make Array in a single file.
+92. Verify that the expression is successfully generated. (Assertion [#43](#test-assertion-5644))
+93. The developer generates Open API 3.0 in JSON with Code Generation Friendly for multiple BIEs using both GET and POST Operation Templates with Meta Header, Pagination Response, and Make Array in different packages.
+94. Verify that the expressions are successfully generated. (Assertion [#44](#test-assertion-5645))
+95. The developer generates an XML Schema expression for a single BIE while enabling the option to include the BIE version in the filename.
+96. Verify that the expression is successfully generated and that the filename includes the BIE version. (Assertion [#46](#test-assertion-5646))
+97. The developer begins OpenAPI generation for a BIE, selects a Meta Header for the POST Operation Template, refreshes the Express BIE page, reselects the same BIE and OpenAPI options, and verifies that the Meta Header can still be selected.
+98. Verify that the expression is successfully generated after refreshing the page. (Assertion [#47](#test-assertion-5647))

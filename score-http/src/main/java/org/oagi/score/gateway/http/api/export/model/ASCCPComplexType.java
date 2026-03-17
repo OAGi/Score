@@ -5,8 +5,9 @@ import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpSummaryRec
 
 public class ASCCPComplexType extends ASCCP {
 
-    ASCCPComplexType(AsccpSummaryRecord asccp, AccSummaryRecord roleOfAcc) {
-        super(asccp, roleOfAcc);
+    ASCCPComplexType(AsccpSummaryRecord asccp, AccSummaryRecord roleOfAcc,
+                     SchemaNamingStrategy namingStrategy) {
+        super(asccp, roleOfAcc, namingStrategy);
     }
 
 }

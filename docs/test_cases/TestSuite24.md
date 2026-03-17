@@ -80,11 +80,16 @@ Enable the global schema for reused BIE references no matter it has nested reuse
 Retain all enabled properties under the reused BIE hierarchy when the user clicks the 'Retain Reused BIE' context menu.
 
 ### Test Step Pre-condition:
-
-
+1. The stated test-case pre-condition is satisfied: In a latest release, there are existing top-level BIEs in Production, QA, and WIP state that reference the same CC as a BIE under another top-level BIE being edited (we will call these “BIEs to be reused”). There are also some other top-level BIEs in Production state that do not reference that same CC. There are BIEs with the same DENs as “BIEs to be reused” in an older release.
+2. The end-user, developer, release, business-context, and BIE records needed to exercise BIE reuse scenarios are available in connectCenter.
+3. Assertions [#24.1.13](#test-assertion-24113) and [#24.1.15](#test-assertion-24115) are not currently automated in `TS_24`. The express-BIE assertion is present but disabled in the test class, and the global-schema assertion has a placeholder test method with no executable steps.
 
 ### Test Step:
-
+1. The relevant end user signs in to connectCenter, opens a top-level BIE for editing, and navigates to reusable descendant ASBIE nodes.
+2. Invoke `Reuse BIE` on valid descendant nodes, verify the selection dialog contents, and reuse top-level BIEs owned by the same user, other end users, and developers where covered by the suite. (Assertions [#24.1.1](#test-assertion-2411), [#24.1.2](#test-assertion-2412))
+3. Verify the reused-node UI behavior: reuse icon, detail-pane content, nested reuse behavior, remove-reuse behavior, and visibility of reused BIEs owned by another user. (Assertions [#24.1.1](#test-assertion-2411), [#24.1.3](#test-assertion-2413), [#24.1.4](#test-assertion-2414), [#24.1.12](#test-assertion-24112), [#24.1.14](#test-assertion-24114), [#24.1.16](#test-assertion-24116))
+4. Verify the state-transition restrictions and allowed transitions between reusing and reused BIEs across WIP, QA, and Production scenarios. (Assertions [#24.1.5](#test-assertion-2415), [#24.1.6](#test-assertion-2416), [#24.1.7](#test-assertion-2417), [#24.1.8](#test-assertion-2418), [#24.1.9](#test-assertion-2419), [#24.1.10](#test-assertion-24110), [#24.1.11](#test-assertion-24111))
+5. Verify reused-node retain behavior on the reusing BIE so that reused references are removed while retained association details remain editable in the resulting node. (Assertion [#24.1.16](#test-assertion-24116))
 ## Test Case 24.2
 
 **Create a Top-level BIE from a BIE node**
@@ -107,7 +112,11 @@ The newly created top-level BIE shall be in WIP state (after finish copying) and
 The new top-level BIE is owned by the end user invoking the creation.
 
 ### Test Step Pre-condition:
-
+1. The end-user, release, business-context, and top-level BIE records needed to exercise this test case are available in connectCenter.
+2. The originating top-level BIE contains a descendant non-reuse ASBIE/ASBIEP/ABIE node from which a reusable top-level BIE can be created.
 
 
 ### Test Step:
+1. One end user prepares a top-level BIE whose details are later reused, and another end user opens a different top-level BIE in the same release for editing.
+2. Reuse the prepared descendant BIE under the second user’s top-level BIE, customize the association details on the reused node, and invoke `Create top-level BIE` from the ancestor descendant node.
+3. Open the newly created top-level BIE and verify that it exists in the same release branch, retains the reused subtree content, and is owned by the user who invoked the creation. (Assertion [#24.2.1](#test-assertion-2421))

@@ -3,6 +3,7 @@ package org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsFo
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
@@ -50,7 +51,8 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_21_1_a() {
+    @DisplayName("TC_10_21_TA_1.a")
+    public void bccp_revision_locks_guid_den_namespace_and_property_term() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -86,7 +88,8 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_21_1_b() {
+    @DisplayName("TC_10_21_TA_1.b")
+    public void bccp_revision_keeps_fixed_value_locked() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -122,7 +125,8 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_21_1_c_deprecated_in_previous_revision() {
+    @DisplayName("TC_10_21_TA_1.c (previous revision deprecated)")
+    public void deprecated_bccp_revision_locks_deprecated_and_replaced_by_fields() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -156,7 +160,8 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_21_1_c_not_deprecated_in_previous_revision() {
+    @DisplayName("TC_10_21_TA_1.c (previous revision not deprecated)")
+    public void non_deprecated_bccp_revision_allows_setting_replacement_bccp() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -190,7 +195,8 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_21_1_d_nillable_in_previous_revision() {
+    @DisplayName("TC_10_21_TA_1.d (previous revision nillable)")
+    public void previously_nillable_bccp_revision_cannot_be_changed_to_false() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -224,7 +230,8 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_21_1_d_not_nillable_in_previous_revision() {
+    @DisplayName("TC_10_21_TA_1.d (previous revision not nillable)")
+    public void non_nillable_bccp_revision_can_be_changed_to_true() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -258,7 +265,8 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_21_1_e() {
+    @DisplayName("TC_10_21_TA_1.e")
+    public void bccp_revision_allows_valid_default_value_changes() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -292,7 +300,8 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_21_1_f() {
+    @DisplayName("TC_10_21_TA_1.f")
+    public void bccp_revision_allows_definition_and_definition_source_changes() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -342,7 +351,8 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_21_1_g() {
+    @DisplayName("TC_10_21_TA_1.g")
+    public void bccp_revision_warns_when_definition_is_empty() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -381,7 +391,8 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_21_1_h() {
+    @DisplayName("TC_10_21_TA_1.h")
+    public void bccp_revision_locks_bdt_and_supplementary_component_fields() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -429,8 +440,9 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_10_21_TA_2")
     @Disabled
-    public void test_TA_10_21_2() {
+    public void bccp_revision_can_change_associated_bdt() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -460,7 +472,8 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_21_3() {
+    @DisplayName("TC_10_21_TA_3")
+    public void bccp_revision_can_be_canceled_and_reverted() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 

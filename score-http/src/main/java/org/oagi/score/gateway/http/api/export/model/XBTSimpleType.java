@@ -1,6 +1,7 @@
 package org.oagi.score.gateway.http.api.export.model;
 
 import org.oagi.score.gateway.http.api.xbt_management.model.XbtSummaryRecord;
+import org.oagi.score.gateway.http.api.xbt_management.model.XbtManifestId;
 
 public class XBTSimpleType {
 
@@ -20,8 +21,16 @@ public class XBTSimpleType {
         return xbt.guid().value();
     }
 
+    public XbtManifestId xbtManifestId() {
+        return xbt.xbtManifestId();
+    }
+
     public String getSchemaDefinition() {
         return xbt.schemaDefinition();
+    }
+
+    public String getJsonSchemaDefinition() {
+        return xbt.jbt202012Map();
     }
 
     public String getBaseName() {

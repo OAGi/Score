@@ -2,6 +2,7 @@ import {Attribute, Component, OnInit} from '@angular/core';
 import {AuthService} from '../../authentication/auth.service';
 
 @Component({
+  standalone: false,
   selector: 'score-settings-menu',
   templateUrl: './settings-menu.component.html',
   styleUrls: ['./settings-menu.component.css']

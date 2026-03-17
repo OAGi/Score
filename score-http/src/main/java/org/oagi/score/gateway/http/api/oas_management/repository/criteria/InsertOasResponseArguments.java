@@ -1,10 +1,11 @@
 package org.oagi.score.gateway.http.api.oas_management.repository.criteria;
 
-import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
+import org.oagi.score.gateway.http.api.oas_management.model.OasMessageBodyId;
+import org.oagi.score.gateway.http.api.oas_management.model.OasOperationId;
+import org.oagi.score.gateway.http.api.oas_management.model.OasResponseId;
 import org.oagi.score.gateway.http.api.oas_management.repository.OasDocCommandRepository;
 
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -13,9 +14,9 @@ public class InsertOasResponseArguments {
 
     private final OasDocCommandRepository repository;
 
-    private ULong userId;
-    private ULong oasOperationId;
-    private ULong oasMessageBodyId;
+    private UserId userId;
+    private OasOperationId oasOperationId;
+    private OasMessageBodyId oasMessageBodyId;
     private String description;
     private String httpStatusCode;
     private boolean makeArrayIndicator;
@@ -30,23 +31,15 @@ public class InsertOasResponseArguments {
     }
 
     public InsertOasResponseArguments setUserId(UserId userId) {
-        return setUserId(ULong.valueOf(userId.value()));
-    }
-
-    public InsertOasResponseArguments setUserId(ULong userId) {
         this.userId = userId;
         return this;
     }
 
-    public ULong getOasOperationId() {
+    public OasOperationId getOasOperationId() {
         return oasOperationId;
     }
 
-    public InsertOasResponseArguments setOasOperationId(BigInteger oasOperationId) {
-        return setOasOperationId(ULong.valueOf(oasOperationId));
-    }
-
-    public InsertOasResponseArguments setOasOperationId(ULong oasOperationId) {
+    public InsertOasResponseArguments setOasOperationId(OasOperationId oasOperationId) {
         this.oasOperationId = oasOperationId;
         return this;
     }
@@ -60,11 +53,11 @@ public class InsertOasResponseArguments {
         return this;
     }
 
-    public ULong getOasMessageBodyId() {
+    public OasMessageBodyId getOasMessageBodyId() {
         return oasMessageBodyId;
     }
 
-    public InsertOasResponseArguments setOasMessageBodyId(ULong oasMessageBodyId) {
+    public InsertOasResponseArguments setOasMessageBodyId(OasMessageBodyId oasMessageBodyId) {
         this.oasMessageBodyId = oasMessageBodyId;
         return this;
     }
@@ -136,7 +129,7 @@ public class InsertOasResponseArguments {
         return this;
     }
 
-    public ULong getUserId() {
+    public UserId getUserId() {
         return userId;
     }
 
@@ -144,7 +137,7 @@ public class InsertOasResponseArguments {
         return timestamp;
     }
 
-    public ULong execute() {
+    public OasResponseId execute() {
         return repository.insertOasResponse(this);
     }
 

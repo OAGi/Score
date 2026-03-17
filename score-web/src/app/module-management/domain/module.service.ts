@@ -229,16 +229,25 @@ export class ModuleService {
     );
   }
 
-  validate(moduleSetReleaseId: number): Observable<ModuleSetReleaseValidateResponse> {
-    return this.http.get<ModuleSetReleaseValidateResponse>('/api/module-set-releases/' + moduleSetReleaseId + '/validate');
+  validate(moduleSetReleaseId: number, expressionOption: 'XML' | 'JSON' = 'XML', expressionVersion?: string): Observable<ModuleSetReleaseValidateResponse> {
+    let params = new HttpParams().set('expressionOption', expressionOption);
+    if (expressionVersion) {
+      params = params.set('expressionVersion', expressionVersion);
+    }
+    return this.http.get<ModuleSetReleaseValidateResponse>('/api/module-set-releases/' + moduleSetReleaseId + '/validate', {params});
   }
 
   progressValidation(moduleSetReleaseId: number, requestId: string): Observable<ModuleSetReleaseValidateResponse> {
     return this.http.get<ModuleSetReleaseValidateResponse>('/api/module-set-releases/' + moduleSetReleaseId + '/validate/' + requestId);
   }
 
-  export(moduleSetReleaseId: number): Observable<HttpResponse<Blob>> {
+  export(moduleSetReleaseId: number, expressionOption: 'XML' | 'JSON' = 'XML', expressionVersion?: string): Observable<HttpResponse<Blob>> {
+    let params = new HttpParams().set('expressionOption', expressionOption);
+    if (expressionVersion) {
+      params = params.set('expressionVersion', expressionVersion);
+    }
     return this.http.get('/api/module-set-releases/' + moduleSetReleaseId + '/export', {
+      params,
       observe: 'response',
       responseType: 'blob'
     });

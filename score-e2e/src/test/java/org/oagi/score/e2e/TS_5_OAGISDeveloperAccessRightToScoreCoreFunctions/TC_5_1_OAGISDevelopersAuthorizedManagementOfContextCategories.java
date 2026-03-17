@@ -330,7 +330,7 @@ public class TC_5_1_OAGISDevelopersAuthorizedManagementOfContextCategories exten
 
     @Test
     @DisplayName("TC_5_1_TA_11 (Updater field)")
-    public void test_search_feature_using_updater_field() {
+    public void developer_can_search_context_category_list_by_updater() {
         ContextCategoryObject randomContextCategory = ContextCategoryObject.newRandomContextCategory(appUser);
         getAPIFactory().getContextCategoryAPI().createContextCategory(randomContextCategory, appUser);
 
@@ -352,7 +352,7 @@ public class TC_5_1_OAGISDevelopersAuthorizedManagementOfContextCategories exten
     @Test
     @DisplayName("TC_5_1_TA_11 (Update Start/End Date fields)")
     @Disabled
-    public void test_search_feature_using_date_fields() {
+    public void developer_can_search_context_category_list_by_update_date_range() {
         /* TODO:
          * Score does not allow to input texts to <mat-datepicker>.
          */
@@ -393,7 +393,7 @@ public class TC_5_1_OAGISDevelopersAuthorizedManagementOfContextCategories exten
 
     @Test
     @DisplayName("TC_5_1_TA_11 (Name field)")
-    public void test_search_feature_using_name_field() {
+    public void developer_can_search_context_category_list_by_name() {
         ContextCategoryObject randomContextCategory = ContextCategoryObject.newRandomContextCategory(appUser);
         getAPIFactory().getContextCategoryAPI().createContextCategory(randomContextCategory, appUser);
 
@@ -414,7 +414,7 @@ public class TC_5_1_OAGISDevelopersAuthorizedManagementOfContextCategories exten
 
     @Test
     @DisplayName("TC_5_1_TA_11 (Description field)")
-    public void test_search_feature_using_description_field() {
+    public void developer_can_search_context_category_list_by_description() {
         ContextCategoryObject randomContextCategory = ContextCategoryObject.newRandomContextCategory(appUser);
         getAPIFactory().getContextCategoryAPI().createContextCategory(randomContextCategory, appUser);
 
@@ -443,7 +443,7 @@ public class TC_5_1_OAGISDevelopersAuthorizedManagementOfContextCategories exten
 
     @Test
     @DisplayName("TC_5_1_TA_12")
-    public void test_checkbox_selection() {
+    public void developer_can_keep_context_category_selection_when_paginating() {
         String namePrefix = "cs_TC51_TA12";
         List<ContextCategoryObject> randomContextCategories = new ArrayList<>();
         for (int i = 0; i < RandomUtils.secure().randomInt(11, 20); ++i) {

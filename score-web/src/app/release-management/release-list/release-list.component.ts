@@ -29,6 +29,7 @@ import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {ReleaseDiagramDialogComponent} from '../release-diagram-dialog/release-diagram-dialog.component';
 
 @Component({
+  standalone: false,
   selector: 'score-release-list',
   templateUrl: './release-list.component.html',
   styleUrls: ['./release-list.component.css']

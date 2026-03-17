@@ -1,5 +1,7 @@
 package org.oagi.score.e2e.impl.page.business_term;
 
+import org.oagi.score.e2e.Configuration;
+import org.oagi.score.e2e.api.APIFactory;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.impl.page.BaseSearchBarPageImpl;
 import org.oagi.score.e2e.obj.BusinessTermObject;
@@ -8,6 +10,7 @@ import org.oagi.score.e2e.page.business_term.AssignBusinessTermBIEPage;
 import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WebDriver;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -73,13 +76,24 @@ public class BusinessTermAssignmentPageImpl extends BaseSearchBarPageImpl implem
         this.bieId = bieId;
     }
 
+    public BusinessTermAssignmentPageImpl(WebDriver driver, Configuration config, APIFactory apiFactory,
+                                          List<String> bieTypes, BigInteger bieId) {
+        super(driver, config, apiFactory);
+        this.bieTypes = bieTypes;
+        this.bieId = bieId;
+    }
+
     @Override
     protected String getPageUrl() {
         List<String> queries = new ArrayList<>();
         if (bieId != null) {
             queries.add("bieId=" + this.bieId);
+            if (this.bieTypes != null && !this.bieTypes.isEmpty()) {
+                queries.add("bieType=" + this.bieTypes.get(0));
+            }
+        } else if (this.bieTypes != null && !this.bieTypes.isEmpty()) {
+            queries.add("bieTypes=" + String.join(",", this.bieTypes));
         }
-        queries.add("bieType=" + String.join(",", this.bieTypes));
         String path = "/business_term_management/assign_business_term";
         if (!queries.isEmpty()) {
             path += "?" + queries.stream().collect(Collectors.joining("&"));
@@ -92,6 +106,7 @@ public class BusinessTermAssignmentPageImpl extends BaseSearchBarPageImpl implem
         String url = getPageUrl();
         getDriver().get(url);
         assert "Business Term Assignment".equals(getText(getTitle()));
+        invisibilityOfLoadingContainerElement(getDriver());
     }
 
     @Override
@@ -154,10 +169,9 @@ public class BusinessTermAssignmentPageImpl extends BaseSearchBarPageImpl implem
 
     @Override
     public void setType(String bieType) {
-        click(getUpdaterSelectField());
-        sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), bieType);
+        click(getTypeField());
         WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[contains(text(), \"" + bieType + "\")]"));
+                By.xpath("//mat-option//span[normalize-space(.) = \"" + bieType + "\"]"));
         click(searchedSelectField);
         escape(getDriver());
     }
@@ -225,6 +239,8 @@ public class BusinessTermAssignmentPageImpl extends BaseSearchBarPageImpl implem
     @Override
     public void hitSearchButton() {
         retry(() -> click(getSearchButton()));
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
     }
 
     @Override
@@ -281,12 +297,16 @@ public class BusinessTermAssignmentPageImpl extends BaseSearchBarPageImpl implem
 
     @Override
     public WebElement getTableRecordAtIndex(int idx) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + idx + "]"));
+        return visibilityOfElementLocated(org.oagi.score.e2e.impl.PageHelper.wait(
+                        getDriver(), java.time.Duration.ofSeconds(10L), ofMillis(100L)),
+                By.xpath("//tbody/tr[" + idx + "]"));
     }
 
     @Override
     public WebElement getTableRecordByValue(String value) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//td//span[contains(text(), \"" + value + "\")]/ancestor::tr"));
+        return visibilityOfElementLocated(org.oagi.score.e2e.impl.PageHelper.wait(
+                        getDriver(), java.time.Duration.ofSeconds(10L), ofMillis(100L)),
+                By.xpath("//td//span[contains(text(), \"" + value + "\")]/ancestor::tr"));
     }
 
     @Override

@@ -536,7 +536,7 @@ public class TC_5_3_OAGISDevelopersAuthorizedManagementOfBusinessContexts extend
 
     @Test
     @DisplayName("TC_5_3_TA_14 (Name field)")
-    public void test_search_feature_using_name_field() {
+    public void developer_can_search_business_context_list_by_name() {
         BusinessContextObject businessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(appUser);
 
@@ -564,7 +564,7 @@ public class TC_5_3_OAGISDevelopersAuthorizedManagementOfBusinessContexts extend
 
     @Test
     @DisplayName("TC_5_3_TA_15")
-    public void test_checkbox_selection() {
+    public void developer_can_keep_business_context_selection_when_paginating() {
         String namePrefix = "bc_TC53_TA15";
         List<BusinessContextObject> randomBusinessContexts = new ArrayList<>();
         for (int i = 0; i < RandomUtils.secure().randomInt(11, 20); ++i) {
@@ -609,14 +609,14 @@ public class TC_5_3_OAGISDevelopersAuthorizedManagementOfBusinessContexts extend
     @Test
     @DisplayName("TC_5_3_TA_16")
     @Disabled("Tested by TC_5_3_TA_3")
-    public void test_business_context_values_are_listed() {
+    public void developer_can_see_business_context_values_in_details() {
         developer_can_create_business_context_with_all_information();
     }
 
     @Test
     @DisplayName("TC_5_3_TA_17")
     @Disabled("Tested by TC_5_3_TA_3")
-    public void test_all_details_of_business_context_are_displayed() {
+    public void developer_can_see_all_business_context_details() {
         developer_can_create_business_context_with_all_information();
     }
 

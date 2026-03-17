@@ -34,6 +34,7 @@ export class DisabledActivate implements CanActivate {
 }
 
 @Component({
+  standalone: false,
   selector: 'score-disabled',
   templateUrl: './disabled.component.html',
   styleUrls: ['./disabled.component.css']

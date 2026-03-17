@@ -73,11 +73,15 @@ public abstract class PageHelper {
     }
 
     public static Wait<WebDriver> defaultWait(WebDriver driver) {
-        return wait(driver, Duration.ofSeconds(3L), ofMillis(100L));
+        return wait(driver, Duration.ofSeconds(5L), ofMillis(100L));
     }
 
     public static Wait<WebDriver> shortWait(WebDriver driver) {
         return wait(driver, Duration.ofSeconds(1L), ofMillis(100L));
+    }
+
+    public static Wait<WebDriver> longWait(WebDriver driver) {
+        return wait(driver, Duration.ofSeconds(10L), ofMillis(100L));
     }
 
     public static Wait<WebDriver> wait(WebDriver driver, Duration timeout, Duration interval) {
@@ -90,6 +94,14 @@ public abstract class PageHelper {
 
     public static WebElement visibilityOfElementLocated(Wait<WebDriver> wait, By locator) {
         return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+    }
+
+    public static WebElement presenceOfElementLocated(WebDriver driver, By locator) {
+        return presenceOfElementLocated(defaultWait(driver), locator);
+    }
+
+    public static WebElement presenceOfElementLocated(Wait<WebDriver> wait, By locator) {
+        return wait.until(ExpectedConditions.presenceOfElementLocated(locator));
     }
 
     public static List<WebElement> visibilityOfAllElementsLocatedBy(WebDriver driver, By locator) {
@@ -191,8 +203,13 @@ public abstract class PageHelper {
 
     public static WebElement click(WebDriver driver, WebElement element) {
         if (element != null) {
+            waitForSnackBarToDisappear(driver);
             String tagName = element.getTagName();
             try {
+                if (driver != null) {
+                    ((JavascriptExecutor) driver).executeScript(
+                            "arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", element);
+                }
                 element.click();
             } catch (ElementClickInterceptedException e) {
                 if ("mat-select".equals(tagName)) {
@@ -200,8 +217,13 @@ public abstract class PageHelper {
                     click(driver, arrowWrapper);
                 } else {
                     if (driver != null) {
+                        waitForSnackBarToDisappear(driver);
                         JavascriptExecutor executor = (JavascriptExecutor) driver;
-                        executor.executeScript("arguments[0].click();", element);
+                        try {
+                            element.click();
+                        } catch (ElementClickInterceptedException ignored) {
+                            executor.executeScript("arguments[0].click();", element);
+                        }
                     } else {
                         throw e;
                     }
@@ -234,7 +256,7 @@ public abstract class PageHelper {
      */
     public static String getSnackBarMessage(WebDriver driver) {
         String xpathExpr = "//simple-snack-bar/div";
-        WebElement snackBar = retry(() -> visibilityOfElementLocated(driver, By.xpath(xpathExpr)));
+        WebElement snackBar = retry(() -> visibilityOfElementLocated(longWait(driver), By.xpath(xpathExpr)));
         return getText(snackBar);
     }
 
@@ -254,6 +276,17 @@ public abstract class PageHelper {
         String xpathExpr = "//mat-dialog-container//div[contains(@class, \"header\")]/span";
         WebElement snackBar = retry(() -> visibilityOfElementLocated(driver, By.xpath(xpathExpr)));
         return getText(snackBar);
+    }
+
+    public static void waitForSnackBarToDisappear(WebDriver driver) {
+        if (driver == null) {
+            return;
+        }
+        try {
+            invisibilityOfElementLocated(longWait(driver),
+                    By.cssSelector("simple-snack-bar, snack-bar-container, .mat-mdc-snack-bar-container"));
+        } catch (WebDriverException ignore) {
+        }
     }
 
     public static WebElement getDialogButtonByName(WebDriver driver, String buttonName) {
@@ -278,6 +311,23 @@ public abstract class PageHelper {
         } catch (NoSuchElementException e) {
             return false;
         }
+    }
+
+    public static String xpathLiteral(String value) {
+        if (!value.contains("\"")) {
+            return "\"" + value + "\"";
+        }
+
+        String[] parts = value.split("\"", -1);
+        StringBuilder builder = new StringBuilder("concat(");
+        for (int i = 0; i < parts.length; i++) {
+            if (i > 0) {
+                builder.append(", '\"', ");
+            }
+            builder.append("\"").append(parts[i]).append("\"");
+        }
+        builder.append(")");
+        return builder.toString();
     }
 
     public static void waitFor(Duration duration) {

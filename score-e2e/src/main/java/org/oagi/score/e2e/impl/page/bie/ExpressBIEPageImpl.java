@@ -55,6 +55,10 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
             By.xpath("//span[contains(text(), \"Generate\")]//ancestor::button[1]");
     private static final By OPEN_API_FORMAT_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Format\")]//ancestor::mat-form-field[1]//mat-select");
+    private static final By JSON_SCHEMA_VERSION_SELECT_FIELD_LOCATOR =
+            By.xpath("//mat-radio-button[@id = 'expr-JSON']/following-sibling::div[1]//mat-label[contains(text(), 'Version')]//ancestor::mat-form-field[1]//mat-select");
+    private static final By OPEN_API_VERSION_SELECT_FIELD_LOCATOR =
+            By.xpath("//mat-radio-button[@id = 'expr-OPENAPI3']/following-sibling::div[1]//mat-label[contains(text(), 'Version')]//ancestor::mat-form-field[1]//mat-select");
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public ExpressBIEPageImpl(BasePage parent) {
@@ -83,16 +87,16 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
     }
 
     @Override
-    public void selectBIEForExpression(TopLevelASBIEPObject topLevelASBIEP) {
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseById(topLevelASBIEP.getReleaseId());
+    public void selectBIEForExpression(TopLevelASBIEPObject topLevelAsbiep) {
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseById(topLevelAsbiep.getReleaseId());
         showAdvancedSearchPanel();
         setBranch(release.getReleaseNumber());
-        setState(topLevelASBIEP.getState());
-        setDEN(topLevelASBIEP.getDen());
+        setState(topLevelAsbiep.getState());
+        setDEN(topLevelAsbiep.getDen());
         hitSearchButton();
 
         retry(() -> {
-            WebElement tr = getTableRecordByValue(topLevelASBIEP.getDen());
+            WebElement tr = getTableRecordByValue(topLevelAsbiep.getDen());
             WebElement td = getColumnByName(tr, "select");
             WebElement ele = td.findElement(By.xpath("mat-checkbox"));
             click(getDriver(), ele);
@@ -100,13 +104,13 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
     }
 
     @Override
-    public void selectBIEForExpression(String releaseNum, String topLevelASBIEPDEN) {
+    public void selectBIEForExpression(String releaseNum, String topLevelAsbiepDen) {
         setBranch(releaseNum);
-        setDEN(topLevelASBIEPDEN);
+        setDEN(topLevelAsbiepDen);
         hitSearchButton();
 
         retry(() -> {
-            WebElement tr = getTableRecordByValue(topLevelASBIEPDEN);
+            WebElement tr = getTableRecordByValue(topLevelAsbiepDen);
             WebElement td = getColumnByName(tr, "select");
             click(td.findElement(By.xpath("mat-checkbox")));
         });
@@ -229,9 +233,10 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
 
     @Override
     public File hitGenerateButton(ExpressionFormat format, Function<String, Boolean> expectedFilenameMatcher, boolean compressed) {
+        long startedAt = System.currentTimeMillis();
         click(getGenerateButton());
         try {
-            return waitForDownloadFile(ofMillis(60000L), expectedFilenameMatcher, getValidator(format, compressed));
+            return waitForDownloadFile(ofMillis(60000L), startedAt, expectedFilenameMatcher, getValidator(format, compressed));
         } catch (IOException | InterruptedException e) {
             throw new IllegalStateException(e);
         }
@@ -343,13 +348,18 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
     }
 
     private File waitForDownloadFile(Duration duration,
+                                     long startedAt,
                                      Function<String, Boolean> expectedFilenameMatcher,
                                      Function<File, Boolean> validator) throws IOException, InterruptedException {
         String userHome = System.getProperty("user.home");
         Path path = Paths.get(new File(userHome, "Downloads").toURI());
-        if (expectedFilenameMatcher != null) {
-            Optional<Path> matchedFile = Files.list(path)
-                    .filter(child -> expectedFilenameMatcher.apply(child.toFile().getName())).findFirst();
+        try (var files = Files.list(path)) {
+            Optional<Path> matchedFile = files
+                    .filter(child -> child.toFile().lastModified() >= startedAt)
+                    .filter(child -> expectedFilenameMatcher == null || expectedFilenameMatcher.apply(child.toFile().getName()))
+                    .filter(child -> child.toFile().exists() && child.toFile().length() > 0L)
+                    .filter(child -> validator.apply(child.toFile()))
+                    .max((left, right) -> Long.compare(left.toFile().lastModified(), right.toFile().lastModified()));
             if (matchedFile.isPresent()) {
                 return matchedFile.get().toFile();
             }
@@ -359,24 +369,28 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
         path.register(watchService, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
 
         long timeout = duration.toMillis();
-        File downloadedFile = null;
         WatchKey key;
         do {
             key = watchService.poll(1000L, TimeUnit.MILLISECONDS);
             if (key != null && key.isValid()) {
+                File downloadedFile = null;
                 for (WatchEvent<?> event : key.pollEvents()) {
-                    downloadedFile = new File(path.toFile(), event.context().toString());
-                    if (expectedFilenameMatcher != null && !expectedFilenameMatcher.apply(downloadedFile.getName())) {
-                        break;
+                    File candidate = new File(path.toFile(), event.context().toString());
+                    if (expectedFilenameMatcher != null && !expectedFilenameMatcher.apply(candidate.getName())) {
+                        continue;
                     }
-                    if (validator.apply(downloadedFile)) {
-                        return downloadedFile;
+                    if (!candidate.exists() || candidate.length() == 0L) {
+                        continue;
                     }
+                    if (candidate.lastModified() < startedAt) {
+                        continue;
+                    }
+                    downloadedFile = candidate;
                 }
                 key.reset();
-            }
-            if (downloadedFile != null && validator.apply(downloadedFile)) {
-                return downloadedFile;
+                if (downloadedFile != null && validator.apply(downloadedFile)) {
+                    return downloadedFile;
+                }
             }
             timeout -= 1000L;
         } while (timeout > 0L);
@@ -492,7 +506,17 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
 
     @Override
     public WebElement getOpenAPIExpressionRadioButton() {
-        return getElementByID("expr-OpenAPI30");
+        return getElementByID("expr-OPENAPI3");
+    }
+
+    @Override
+    public WebElement getSeparateFileReferencesForReusedSchemasCheckbox() {
+        return getCheckboxByName("Separate file references for reused schemas");
+    }
+
+    @Override
+    public void toggleSeparateFileReferencesForReusedSchemas() {
+        click(getSeparateFileReferencesForReusedSchemasCheckbox().findElement(By.tagName("input")));
     }
 
     @Override
@@ -586,15 +610,40 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
 
     @Override
     public void selectJSONOpenAPIFormat() {
+        selectOption(getOpenAPIFormatSelectField(), "JSON");
+    }
+
+    private void selectOption(WebElement selectField, String optionName) {
         retry(() -> {
-            click(getOpenAPIFormatSelectField());
+            click(selectField);
             WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//mat-option/span[contains(text(), \"JSON\")]"));
+                    By.xpath("//mat-option/span[contains(text(), \"" + optionName + "\")]"));
             click(optionField);
+            escape(getDriver());
         });
     }
 
     private class JSONSchemaExpressionOptionsImpl implements JSONSchemaExpressionOptions {
+        @Override
+        public WebElement getVersionSelectField() {
+            return visibilityOfElementLocated(getDriver(), JSON_SCHEMA_VERSION_SELECT_FIELD_LOCATOR);
+        }
+
+        @Override
+        public void selectVersion(String version) {
+            selectOption(getVersionSelectField(), version);
+        }
+
+        @Override
+        public WebElement getSeparateFileReferencesForReusedSchemasCheckbox() {
+            return ExpressBIEPageImpl.this.getSeparateFileReferencesForReusedSchemasCheckbox();
+        }
+
+        @Override
+        public void toggleSeparateFileReferencesForReusedSchemas() {
+            ExpressBIEPageImpl.this.toggleSeparateFileReferencesForReusedSchemas();
+        }
+
         @Override
         public WebElement getMakeAsAnArrayCheckbox() {
             return getCheckboxByName("Make as an array");
@@ -649,13 +698,18 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
 
     private class OpenAPIExpressionOptionsImpl implements OpenAPIExpressionOptions {
         @Override
+        public WebElement getVersionSelectField() {
+            return visibilityOfElementLocated(getDriver(), OPEN_API_VERSION_SELECT_FIELD_LOCATOR);
+        }
+
+        @Override
+        public void selectVersion(String version) {
+            selectOption(getVersionSelectField(), version);
+        }
+
+        @Override
         public void selectYAMLOpenAPIFormat() {
-            retry(() -> {
-                click(getOpenAPIFormatSelectField());
-                WebElement optionField = visibilityOfElementLocated(getDriver(),
-                        By.xpath("//mat-option/span[contains(text(), \"YAML\")]"));
-                click(optionField);
-            });
+            selectOption(getOpenAPIFormatSelectField(), "YAML");
         }
 
         @Override
@@ -682,12 +736,7 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
 
         @Override
         public void selectJSONOpenAPIFormat() {
-            retry(() -> {
-                click(getOpenAPIFormatSelectField());
-                WebElement optionField = visibilityOfElementLocated(getDriver(),
-                        By.xpath("//mat-option/span[contains(text(), \"JSON\")]"));
-                click(optionField);
-            });
+            selectOption(getOpenAPIFormatSelectField(), "JSON");
         }
     }
 

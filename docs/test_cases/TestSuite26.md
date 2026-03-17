@@ -19,15 +19,9 @@ Link to the User Guide is available to the OAGIS developer and is resolved.
 Link to the User Guide is available to the end user and is resolved.
 
 ### Test Step Pre-condition:
-
-
+1. Developer and end-user accounts are available for sign-in.
+2. `TC_26_1_UserGuideIsAccessible` is annotated with `@DisabledIfLocalhost`, so the automated checks are skipped when the app is running in localhost mode.
 
 ### Test Step:
-
-1. Login as an OAGIS developer.
-2. Click on the User Guide menu.
-3. Verify that the User Guide page is displayed. (Assertion [#1](#test-assertion-2611))
-4. Log out.
-5. Login as an end user.
-6. Click on the User Guide menu.
-7. Verify that the User Guide page is displayed. (Assertion [#2](#test-assertion-2612))
+1. Sign in as a developer, open the `Help > User Guide` menu, and verify that the User Guide page title is displayed. (Assertion [#26.1.1](#test-assertion-2611))
+2. Sign in as an end user, open the `Help > User Guide` menu, and verify that the User Guide page title is displayed. (Assertion [#26.1.2](#test-assertion-2612))

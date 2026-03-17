@@ -32,6 +32,7 @@ import {FindUsagesDialogComponent} from '../find-usages-dialog/find-usages-dialo
 
 
 @Component({
+  standalone: false,
   selector: 'score-model-browser',
   templateUrl: './model-browser.component.html',
   styleUrls: ['./model-browser.component.css']

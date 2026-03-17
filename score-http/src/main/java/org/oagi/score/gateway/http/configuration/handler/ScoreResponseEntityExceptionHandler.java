@@ -27,6 +27,21 @@ public class ScoreResponseEntityExceptionHandler extends ResponseEntityException
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    /**
+     * Flattens backend error messages so they are safe to expose through HTTP
+     * headers such as X-Error-Message, which cannot contain CR/LF characters.
+     */
+    private String toHeaderValue(String message) {
+        if (message == null) {
+            return null;
+        }
+        return message
+                .replace("\r\n", " ")
+                .replace('\n', ' ')
+                .replace('\r', ' ')
+                .trim();
+    }
+
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity handleAuthenticationException(
             AuthenticationException ex, WebRequest webRequest) {
@@ -47,7 +62,7 @@ public class ScoreResponseEntityExceptionHandler extends ResponseEntityException
         logger.debug(ex.getMessage(), ex);
 
         MultiValueMap<String, String> headers = new HttpHeaders();
-        headers.set("X-Error-Message", ex.getMessage());
+        headers.set("X-Error-Message", toHeaderValue(ex.getMessage()));
         return new ResponseEntity(headers, HttpStatus.BAD_REQUEST);
     }
 
@@ -57,7 +72,7 @@ public class ScoreResponseEntityExceptionHandler extends ResponseEntityException
         logger.debug(ex.getMessage(), ex);
 
         MultiValueMap<String, String> headers = new HttpHeaders();
-        headers.set("X-Error-Message", ex.getMessage());
+        headers.set("X-Error-Message", toHeaderValue(ex.getMessage()));
         return new ResponseEntity(headers, HttpStatus.BAD_REQUEST);
     }
 
@@ -67,7 +82,7 @@ public class ScoreResponseEntityExceptionHandler extends ResponseEntityException
         logger.debug(ex.getMessage(), ex);
 
         MultiValueMap<String, String> headers = new HttpHeaders();
-        headers.set("X-Error-Message", ex.getMessage());
+        headers.set("X-Error-Message", toHeaderValue(ex.getMessage()));
         return new ResponseEntity(headers, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -77,7 +92,7 @@ public class ScoreResponseEntityExceptionHandler extends ResponseEntityException
         logger.debug(ex.getMessage(), ex);
 
         MultiValueMap<String, String> headers = new HttpHeaders();
-        headers.set("X-Error-Message", ex.getMessage());
+        headers.set("X-Error-Message", toHeaderValue(ex.getMessage()));
         if (ex.getErrorMessageId() != null) {
             headers.set("X-Error-Message-Id", ex.getErrorMessageId().toString());
         }
@@ -90,7 +105,7 @@ public class ScoreResponseEntityExceptionHandler extends ResponseEntityException
         logger.debug(ex.getMessage(), ex);
 
         MultiValueMap<String, String> headers = new HttpHeaders();
-        headers.set("X-Error-Message", ex.getMessage());
+        headers.set("X-Error-Message", toHeaderValue(ex.getMessage()));
         return new ResponseEntity(headers, HttpStatus.SERVICE_UNAVAILABLE);
     }
 
@@ -100,7 +115,7 @@ public class ScoreResponseEntityExceptionHandler extends ResponseEntityException
         logger.debug(ex.getMessage(), ex);
 
         MultiValueMap<String, String> headers = new HttpHeaders();
-        headers.set("X-Error-Message", ex.getMessage());
+        headers.set("X-Error-Message", toHeaderValue(ex.getMessage()));
         return new ResponseEntity(headers, HttpStatus.SERVICE_UNAVAILABLE);
     }
 
@@ -110,7 +125,7 @@ public class ScoreResponseEntityExceptionHandler extends ResponseEntityException
         logger.debug(ex.getMessage(), ex);
 
         MultiValueMap<String, String> headers = new HttpHeaders();
-        headers.set("X-Error-Message", ex.getMessage());
+        headers.set("X-Error-Message", toHeaderValue(ex.getMessage()));
         return new ResponseEntity(headers, HttpStatus.BAD_REQUEST);
     }
 
@@ -120,8 +135,8 @@ public class ScoreResponseEntityExceptionHandler extends ResponseEntityException
         logger.debug(ex.getMessage(), ex);
 
         MultiValueMap<String, String> headers = new HttpHeaders();
-        headers.set("X-Error-Message", "Not enough memory to perform the request: " + ex.getMessage() + ". " +
-                "Please consider either increasing available heap space or cleaning data to reduce the size of the request.");
+        headers.set("X-Error-Message", toHeaderValue("Not enough memory to perform the request: " + ex.getMessage() + ". " +
+                "Please consider either increasing available heap space or cleaning data to reduce the size of the request."));
         return new ResponseEntity(headers, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

@@ -66,17 +66,30 @@ public class CreateModuleSetReleasePageImpl extends BasePageImpl implements Crea
         return visibilityOfElementLocated(getDriver(), DESCRIPTION_FIELD_LOCATOR);
     }
 
-    @Override
-    public void setModuleSet(String name) {
+    private void selectFromDropdown(By selectFieldLocator, String value, By optionLocator) {
         retry(() -> {
-            click(getModuleSetSelectField());
-            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), name);
-            WebElement optionField = elementToBeClickable(getDriver(),
-                    By.xpath("//span[contains(text(), \"" + name + "\")]//ancestor::mat-option[1]"));
-            click(optionField);
+            escape(getDriver());
+            click(getDriver(), visibilityOfElementLocated(getDriver(), selectFieldLocator));
+            waitFor(ofMillis(500L));
+
+            for (WebElement searchField : getDriver().findElements(DROPDOWN_SEARCH_FIELD_LOCATOR)) {
+                if (searchField.isDisplayed()) {
+                    sendKeys(searchField, value);
+                    break;
+                }
+            }
+
+            WebElement optionField = elementToBeClickable(getDriver(), optionLocator);
+            click(getDriver(), optionField);
             waitFor(ofMillis(500L));
             escape(getDriver());
         });
+    }
+
+    @Override
+    public void setModuleSet(String name) {
+        selectFromDropdown(MODULE_SET_SELECT_FIELD_LOCATOR, name,
+                By.xpath("//span[contains(text(), \"" + name + "\")]//ancestor::mat-option[1]"));
     }
 
     @Override
@@ -86,15 +99,8 @@ public class CreateModuleSetReleasePageImpl extends BasePageImpl implements Crea
 
     @Override
     public void setRelease(String releaseNumber) {
-        retry(() -> {
-            click(getReleaseSelectField());
-            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), releaseNumber);
-            WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//mat-option//span[text() = \"" + releaseNumber + "\"]"));
-            click(searchedSelectField);
-            waitFor(ofMillis(500L));
-            escape(getDriver());
-        });
+        selectFromDropdown(RELEASE_SELECT_FIELD_LOCATOR, releaseNumber,
+                By.xpath("//mat-option//span[text() = \"" + releaseNumber + "\"]"));
     }
     @Override
     public WebElement getReleaseSelectField() {

@@ -74,15 +74,23 @@
         Update
       </button>
 
-      <button (click)="validateSchemas()"
+      <button [matMenuTriggerFor]="validateMenu"
               color="accent" mat-raised-button>
         Validate
       </button>
+      <mat-menu #validateMenu="matMenu">
+        <button mat-menu-item (click)="validateSchemas('XML')">XML Schema</button>
+        <button mat-menu-item (click)="validateSchemas('JSON')">JSON Schema</button>
+      </mat-menu>
 
-      <button (click)="exportSchemas()"
+      <button [matMenuTriggerFor]="exportMenu"
               color="primary" mat-raised-button>
         Export
       </button>
+      <mat-menu #exportMenu="matMenu">
+        <button mat-menu-item (click)="exportSchemas('XML')">XML Schema</button>
+        <button mat-menu-item (click)="exportSchemas('JSON')">JSON Schema</button>
+      </mat-menu>
 
       <button (click)="assignCCs()"
               color="primary" mat-raised-button>

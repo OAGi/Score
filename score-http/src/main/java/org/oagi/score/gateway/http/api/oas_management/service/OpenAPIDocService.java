@@ -4,8 +4,7 @@ import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.context_management.business_context.service.BusinessContextQueryService;
 import org.oagi.score.gateway.http.api.oas_management.controller.payload.*;
-import org.oagi.score.gateway.http.api.oas_management.model.BieForOasDoc;
-import org.oagi.score.gateway.http.api.oas_management.model.OasDoc;
+import org.oagi.score.gateway.http.api.oas_management.model.*;
 import org.oagi.score.gateway.http.api.oas_management.repository.BieForOasDocCommandRepository;
 import org.oagi.score.gateway.http.api.oas_management.repository.BieForOasDocQueryRepository;
 import org.oagi.score.gateway.http.api.oas_management.repository.OasDocCommandRepository;
@@ -23,11 +22,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDoc.OAS_DOC;
 import static org.oagi.score.gateway.http.common.util.ScoreGuidUtils.randomGuid;
 
 @Service
 @Transactional(readOnly = true)
 public class OpenAPIDocService {
+
+    private static final int OPEN_API_VERSION_MAX_LENGTH = OAS_DOC.OPEN_API_VERSION.getDataType().length();
+    private static final int TERMS_OF_SERVICE_MAX_LENGTH = OAS_DOC.TERMS_OF_SERVICE.getDataType().length();
+    private static final int VERSION_MAX_LENGTH = OAS_DOC.VERSION.getDataType().length();
+    private static final int CONTACT_URL_MAX_LENGTH = OAS_DOC.CONTACT_URL.getDataType().length();
+    private static final int LICENSE_NAME_MAX_LENGTH = OAS_DOC.LICENSE_NAME.getDataType().length();
+    private static final int LICENSE_URL_MAX_LENGTH = OAS_DOC.LICENSE_URL.getDataType().length();
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -65,12 +72,26 @@ public class OpenAPIDocService {
 
     @Transactional
     public CreateOasDocResponse createOasDoc(ScoreUser requester, CreateOasDocRequest request) {
+        validateOasDocRequest(
+                request.getOpenAPIVersion(),
+                request.getTermsOfService(),
+                request.getVersion(),
+                request.getContactUrl(),
+                request.getLicenseName(),
+                request.getLicenseUrl());
         CreateOasDocResponse response = command(requester).createOasDoc(request);
         return response;
     }
 
     @Transactional
     public UpdateOasDocResponse updateOasDoc(ScoreUser requester, UpdateOasDocRequest request) {
+        validateOasDocRequest(
+                request.getOpenAPIVersion(),
+                request.getTermsOfService(),
+                request.getVersion(),
+                request.getContactUrl(),
+                request.getLicenseName(),
+                request.getLicenseUrl());
         UpdateOasDocResponse response = command(requester).updateOasDoc(request);
         return response;
     }
@@ -145,13 +166,13 @@ public class OpenAPIDocService {
 
         var command = repositoryFactory.oasDocCommandRepository(requester);
 
-        ULong oasMessageBodyId = new InsertOasMessageBodyArguments(command)
+        OasMessageBodyId oasMessageBodyId = new InsertOasMessageBodyArguments(command)
                 .setUserId(userId)
                 .setTopLevelAsbiepId(request.getTopLevelAsbiepId())
                 .setTimestamp(millis)
                 .execute();
 
-        ULong oasResourceId = new InsertOasResourceArguments(command)
+        OasResourceId oasResourceId = new InsertOasResourceArguments(command)
                 .setUserId(userId)
                 .setOasDocId(request.getOasDocId())
                 .setPath(request.getPath())
@@ -159,7 +180,7 @@ public class OpenAPIDocService {
                 .setTimestamp(millis)
                 .execute();
 
-        ULong oasOperationId = new InsertOasOperationArguments(command)
+        OasOperationId oasOperationId = new InsertOasOperationArguments(command)
                 .setUserId(userId)
                 .setOperationId(request.getOperationId())
                 .setOasResourceId(oasResourceId)
@@ -171,7 +192,7 @@ public class OpenAPIDocService {
                 .execute();
 
         if (request.getTagName() != null) {
-            ULong oasTagId = new InsertOasTagArguments(command)
+            OasTagId oasTagId = new InsertOasTagArguments(command)
                     .setUserId(userId)
                     .setGuid(randomGuid())
                     .setName(request.getTagName())
@@ -182,8 +203,8 @@ public class OpenAPIDocService {
                     .setOasTagId(oasTagId)
                     .execute();
         }
-        ULong oasRequestId = null;
-        ULong oasResponseId = null;
+        OasRequestId oasRequestId = null;
+        OasResponseId oasResponseId = null;
         if (request.isOasRequest()) {
             oasRequestId = new InsertOasRequestArguments(command)
                     .setUserId(userId)
@@ -210,8 +231,29 @@ public class OpenAPIDocService {
                     .setTimestamp(millis)
                     .execute();
         }
-        return new AddBieForOasDocResponse(oasRequestId != null ? oasRequestId.toBigInteger() : null,
-                oasResponseId != null ? oasResponseId.toBigInteger() : null);
+        return new AddBieForOasDocResponse(oasRequestId != null ? oasRequestId : null,
+                oasResponseId != null ? oasResponseId : null);
+    }
+
+    private void validateOasDocRequest(String openApiVersion,
+                                       String termsOfService,
+                                       String version,
+                                       String contactUrl,
+                                       String licenseName,
+                                       String licenseUrl) {
+        validateMaxLength("openAPIVersion", openApiVersion, OPEN_API_VERSION_MAX_LENGTH);
+        validateMaxLength("termsOfService", termsOfService, TERMS_OF_SERVICE_MAX_LENGTH);
+        validateMaxLength("version", version, VERSION_MAX_LENGTH);
+        validateMaxLength("contactUrl", contactUrl, CONTACT_URL_MAX_LENGTH);
+        validateMaxLength("licenseName", licenseName, LICENSE_NAME_MAX_LENGTH);
+        validateMaxLength("licenseUrl", licenseUrl, LICENSE_URL_MAX_LENGTH);
+    }
+
+    private void validateMaxLength(String fieldName, String value, int maxLength) {
+        if (value != null && value.length() > maxLength) {
+            throw new IllegalArgumentException(
+                    String.format("`%s` must not exceed %d characters.", fieldName, maxLength));
+        }
     }
 
     @Transactional

@@ -9,6 +9,7 @@ import {loadBooleanProperty, loadProperty, saveBooleanProperty, saveProperty} fr
 export class SettingsPreferencesService {
 
   TABLE_COLUMNS_FOR_CORE_COMPONENT_PAGE_KEY = 'TableColumns-CoreComponentPage';
+  TABLE_COLUMNS_FOR_BROWSE_STANDARDS_PAGE_KEY = 'TableColumns-BrowseStandardsPage';
   TABLE_COLUMNS_FOR_DATA_TYPE_PAGE_KEY = 'TableColumns-DataTypePage';
   TABLE_COLUMNS_FOR_CORE_COMPONENT_WITHOUT_TYPE_COLUMN_PAGE_KEY = 'TableColumns-CoreComponentWithoutTypeColumnPage';
   TABLE_COLUMNS_FOR_DATA_TYPE_WITHOUT_TYPE_COLUMN_PAGE_KEY = 'TableColumns-DataTypeWithoutTypeColumnPage';
@@ -84,6 +85,8 @@ export class SettingsPreferencesService {
 
       this.loadColumnsInfo(preferencesInfo, userToken,
           this.TABLE_COLUMNS_FOR_CORE_COMPONENT_PAGE_KEY, 'columnsOfCoreComponentPage');
+      this.loadColumnsInfo(preferencesInfo, userToken,
+          this.TABLE_COLUMNS_FOR_BROWSE_STANDARDS_PAGE_KEY, 'columnsOfBrowseStandardsPage');
       this.loadColumnsInfo(preferencesInfo, userToken,
           this.TABLE_COLUMNS_FOR_DATA_TYPE_PAGE_KEY, 'columnsOfDataTypePage');
       this.loadColumnsInfo(preferencesInfo, userToken,
@@ -184,6 +187,11 @@ export class SettingsPreferencesService {
   updateTableColumnsForCoreComponentPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
     return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_PAGE_KEY,
       preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage);
+  }
+
+  updateTableColumnsForBrowseStandardsPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_BROWSE_STANDARDS_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfBrowseStandardsPage);
   }
 
   updateTableColumnsForDataTypePage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {

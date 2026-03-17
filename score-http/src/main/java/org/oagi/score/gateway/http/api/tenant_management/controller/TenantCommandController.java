@@ -2,7 +2,7 @@ package org.oagi.score.gateway.http.api.tenant_management.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
-import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
+import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationQueryService;
 import org.oagi.score.gateway.http.api.context_management.business_context.model.BusinessContextId;
 import org.oagi.score.gateway.http.api.tenant_management.model.TenantId;
 import org.oagi.score.gateway.http.api.tenant_management.service.TenantCommandService;
@@ -28,7 +28,7 @@ public class TenantCommandController {
     private SessionService sessionService;
 
     @Autowired
-    private ApplicationConfigurationService configService;
+    private ApplicationConfigurationQueryService configService;
 
     @PostMapping()
     public ResponseEntity createTenant(

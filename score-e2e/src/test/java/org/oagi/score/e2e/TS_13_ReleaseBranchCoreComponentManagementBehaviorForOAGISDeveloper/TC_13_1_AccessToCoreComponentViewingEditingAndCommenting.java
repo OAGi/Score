@@ -39,7 +39,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
 
     @Test
     @DisplayName("TC_13_1_TA_1")
-    public void test_TA_1() {
+    public void developer_can_see_in_the_core_component_view_or_edit_page_all_core_components_owned_by_any_user_in_a() {
         AppUserObject developerA;
         LibraryObject library;
         ReleaseObject release;
@@ -291,7 +291,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
 
     @Test
     @DisplayName("TC_13_1_TA_2")
-    public void test_TA_2() {
+    public void developer_can_view_but_cannot_edit_the_details_of_a_end_user_core_component_in_the_selected_release() {
         AppUserObject developerA;
         LibraryObject library;
         ReleaseObject release;
@@ -435,7 +435,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
 
     @Test
     @DisplayName("TC_13_1_TA_3")
-    public void test_TA_3() {
+    public void developer_can_view_the_details_of_end_user_core_component_that_is_in_qa_or_deleted_state_and_owned_b() {
         AppUserObject developerA;
         LibraryObject library;
         ReleaseObject release;
@@ -629,7 +629,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
 
     @Test
     @DisplayName("TC_13_1_TA_4")
-    public void test_TA_4() {
+    public void developer_can_view_the_details_of_end_user_core_component_which_is_in_production_state_owned_by_any() {
         AppUserObject developerA;
         LibraryObject library;
         ReleaseObject release;
@@ -786,8 +786,8 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
     }
 
     @Test
-    @DisplayName("TC_13_1_TA_5_and_TC_13_1_TA_5")
-    public void test_TA_5_and_TA_6() {
+    @DisplayName("TC_13_1_TA_5_and_TA_6")
+    public void developer_can_view_details_of_any_published_core_component_but_cannot_make_any_change_except_adding() {
         AppUserObject developerA;
         ReleaseObject release;
         ArrayList<ACCObject> accForTesting = new ArrayList<>();
@@ -892,7 +892,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
 
     @Test
     @DisplayName("TC_13_1_TA_7")
-    public void test_TA_7() {
+    public void developer_cannot_create_any_new_core_component() {
         AppUserObject developerA;
         ReleaseObject release;
         {

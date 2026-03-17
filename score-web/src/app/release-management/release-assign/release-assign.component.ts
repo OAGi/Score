@@ -24,6 +24,7 @@ import {filter, hashCode} from '../../common/utility';
 import {WebPageInfoService} from '../../basis/basis.service';
 
 @Component({
+  standalone: false,
   selector: 'score-release-list',
   templateUrl: './release-assign.component.html',
   styleUrls: ['./release-assign.component.css']

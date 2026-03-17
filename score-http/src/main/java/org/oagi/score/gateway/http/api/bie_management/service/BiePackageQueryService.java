@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.oagi.score.gateway.http.common.util.StringUtils.hasLength;
+
 @Service
 @Transactional(readOnly = true)
 public class BiePackageQueryService {
@@ -63,7 +65,7 @@ public class BiePackageQueryService {
 
     public BieGenerateExpressionResult generate(
             ScoreUser requester, BiePackageId biePackageId,
-            Collection<TopLevelAsbiepId> topLevelAsbiepIdList, String schemaExpression,
+            Collection<TopLevelAsbiepId> topLevelAsbiepIdList, GenerateExpressionOption option,
             String pathDelimiter) throws IOException {
 
         var query = query(requester);
@@ -85,13 +87,28 @@ public class BiePackageQueryService {
                 topLevelAsbiepIdList.stream().map(e -> topLevelAsbiepQuery.getTopLevelAsbiepSummary(e))
                         .collect(Collectors.toList());
 
-        GenerateExpressionOption option = new GenerateExpressionOption();
-        option.setExpressionOption(schemaExpression);
+        if (option == null) {
+            option = new GenerateExpressionOption();
+        }
+        if (!hasLength(option.getExpressionOption())) {
+            option.setExpressionOption("XML");
+        }
+        // BIE package export always generates each schema file with split reused-schema references.
+        option.setPackageOption("EACH");
+        option.setSeparateFileReferencesForReusedSchemas(true);
+        // #1711: Package export filenames always use package pattern metadata.
+        option.setIncludeBusinessContextInFilename(true);
+        option.setIncludeVersionInFilename(true);
+        option.setFilenames(Collections.emptyMap());
         option.setBiePackage(biePackage);
 
-        Map<TopLevelAsbiepId, File> result = bieGenerateService.generateSchemaForEach(requester, topLevelAsbiepList, option);
+        Map<TopLevelAsbiepId, File> result =
+                bieGenerateService.generateSchemaForEach(requester, topLevelAsbiepList, option);
+        Map<TopLevelAsbiepId, String> generatedFilesByTopLevelAsbiepId = result.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getName()));
         BiePackageManifestResponse biePackageManifestResponse =
-                biePackageManifestService.getBiePackageManifest(requester, biePackageId, pathDelimiter);
+                biePackageManifestService.getBiePackageManifest(
+                        requester, biePackageId, pathDelimiter, generatedFilesByTopLevelAsbiepId);
 
         return makeGenerateBiePackageResponse(biePackage, result, biePackageManifestResponse);
     }

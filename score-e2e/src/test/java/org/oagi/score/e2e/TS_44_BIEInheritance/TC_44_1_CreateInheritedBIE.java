@@ -49,8 +49,8 @@ public class TC_44_1_CreateInheritedBIE extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_44_1_1")
-    public void enduser_create_InheritedBIE() {
+    @DisplayName("TC_44_1_1_and_TC_44_1_2_and_TC_44_1_3")
+    public void create_inherited_bie_from_base_bie() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 

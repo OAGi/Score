@@ -9,8 +9,7 @@ import org.oagi.score.gateway.http.api.oas_management.controller.payload.GetAssi
 import org.oagi.score.gateway.http.api.oas_management.controller.payload.GetAssignedOasTagResponse;
 import org.oagi.score.gateway.http.api.oas_management.controller.payload.GetBieForOasDocRequest;
 import org.oagi.score.gateway.http.api.oas_management.controller.payload.GetBieForOasDocResponse;
-import org.oagi.score.gateway.http.api.oas_management.model.BieForOasDoc;
-import org.oagi.score.gateway.http.api.oas_management.model.OasTag;
+import org.oagi.score.gateway.http.api.oas_management.model.*;
 import org.oagi.score.gateway.http.api.oas_management.repository.BieForOasDocQueryRepository;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.common.model.AccessControl;
@@ -22,7 +21,6 @@ import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.OasResourceTagRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.OasTagRecord;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -143,7 +141,7 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
             bieForOasDoc.setMessageBody(record.get(field("oas_doc_message_body_type", String.class)));
             ULong oasDocId = record.get(OAS_DOC.as("oas_doc").OAS_DOC_ID.as("oas_doc_id"));
             if (oasDocId != null) {
-                bieForOasDoc.setOasDocId(oasDocId.toBigInteger());
+                bieForOasDoc.setOasDocId(new OasDocId(oasDocId.toBigInteger()));
             }
             bieForOasDoc.setVerb(record.get(OAS_OPERATION.as("oas_operation").VERB.as("verb")));
             Byte arrayIndicator = record.get(OAS_REQUEST.MAKE_ARRAY_INDICATOR.as("array_indicator"));
@@ -159,11 +157,11 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
             bieForOasDoc.setTagName(record.get(OAS_TAG.as("oas_tag").NAME.as("tag_name")));
             ULong oasResourceId = record.get(OAS_RESOURCE.as("oas_resource").OAS_RESOURCE_ID.as("oas_resource_id"));
             if (oasResourceId != null) {
-                bieForOasDoc.setOasResourceId(oasResourceId.toBigInteger());
+                bieForOasDoc.setOasResourceId(new OasResourceId(oasResourceId.toBigInteger()));
             }
             ULong oasOperationId = record.get(OAS_OPERATION.as("oas_operation").OAS_OPERATION_ID.as("oas_operation_id"));
             if (oasOperationId != null) {
-                bieForOasDoc.setOasOperationId(oasOperationId.toBigInteger());
+                bieForOasDoc.setOasOperationId(new OasOperationId(oasOperationId.toBigInteger()));
             }
             bieForOasDoc.setReleaseId(new ReleaseId(record.get(TOP_LEVEL_ASBIEP.RELEASE_ID).toBigInteger()));
             bieForOasDoc.setOwner(fetchOwnerSummary(record));
@@ -177,9 +175,9 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
 
     private Collection<Condition> getConditions(GetBieForOasDocRequest request) {
         List<Condition> conditions = new ArrayList();
-        BigInteger oasDocId = request.getOasDocId();
+        OasDocId oasDocId = request.getOasDocId();
         if (oasDocId != null) {
-            conditions.add(OAS_DOC.as("oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId)));
+            conditions.add(OAS_DOC.as("oas_doc").OAS_DOC_ID.eq(valueOf(oasDocId)));
         }
         TopLevelAsbiepId topLevelAsbiepId = request.getTopLevelAsbiepId();
         if (topLevelAsbiepId != null) {
@@ -281,7 +279,7 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
         if (request.getMessageBodyType().equals("Request")) {
             //Get oasTag
             OasResourceTagRecord req_oasResourceTagRecord = dslContext().selectFrom(OAS_RESOURCE_TAG.as("req_oas_resource_tag"))
-                    .where(OAS_RESOURCE_TAG.as("req_oas_resource_tag").OAS_OPERATION_ID.eq(ULong.valueOf(request.getOasOperationId())))
+                    .where(OAS_RESOURCE_TAG.as("req_oas_resource_tag").OAS_OPERATION_ID.eq(valueOf(request.getOasOperationId())))
                     .fetchOptional().orElse(null);
             if (req_oasResourceTagRecord == null) {
                 return EMPTY_INSTANCE;
@@ -293,7 +291,7 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
         } else if (request.getMessageBodyType().equals("Response")) {
             //Get oasTag
             OasResourceTagRecord res_oasResourceTagRecord = dslContext().selectFrom(OAS_RESOURCE_TAG.as("res_oas_resource_tag"))
-                    .where(OAS_RESOURCE_TAG.as("res_oas_resource_tag").OAS_OPERATION_ID.eq(ULong.valueOf(request.getOasOperationId())))
+                    .where(OAS_RESOURCE_TAG.as("res_oas_resource_tag").OAS_OPERATION_ID.eq(valueOf(request.getOasOperationId())))
                     .fetchOptional().orElse(null);
             if (res_oasResourceTagRecord == null) {
                 return EMPTY_INSTANCE;

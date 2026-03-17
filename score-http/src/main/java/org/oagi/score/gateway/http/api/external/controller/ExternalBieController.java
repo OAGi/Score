@@ -2,7 +2,7 @@ package org.oagi.score.gateway.http.api.external.controller;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import org.jooq.exception.IOException;
-import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
+import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationQueryService;
 import org.oagi.score.gateway.http.api.bie_management.model.BieListEntryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.BieState;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
@@ -54,7 +54,7 @@ public class ExternalBieController {
         private BieGenerateService bieGenerateService;
 
         @Autowired
-        private ApplicationConfigurationService configService;
+        private ApplicationConfigurationQueryService configService;
 
         @Autowired
         private TenantQueryService tenantService;

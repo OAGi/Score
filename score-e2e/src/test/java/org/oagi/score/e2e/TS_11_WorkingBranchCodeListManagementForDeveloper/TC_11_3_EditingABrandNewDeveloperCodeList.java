@@ -38,7 +38,7 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_11_3_TA_1")
-    public void test_TA_1() {
+    public void brand_new_code_list_editing_enforces_business_rules() {
         AppUserObject developer;
         LibraryObject library;
         ReleaseObject workingBranch;
@@ -137,7 +137,7 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_11_3_TA_2")
-    public void test_TA_2() {
+    public void code_list_values_require_only_code_and_meaning() {
         AppUserObject developer;
         LibraryObject library;
         ReleaseObject workingBranch;
@@ -164,7 +164,7 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_11_3_TA_3")
-    public void test_TA_3() {
+    public void developer_can_remove_code_list_value_from_brand_new_code_list() {
         AppUserObject developer;
         LibraryObject library;
         ReleaseObject workingBranch;
@@ -190,7 +190,7 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_11_3_TA_4")
-    public void test_TA_4() {
+    public void developer_can_edit_brand_new_code_list_value_without_changing_deprecated_flag() {
         AppUserObject developer;
         LibraryObject library;
         ReleaseObject workingBranch;
@@ -217,20 +217,20 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
         editCodeListValueDialog.setMeaning("new meaning");
         editCodeListValueDialog.setDefinition("new definition");
         editCodeListValueDialog.setDefinitionSource("new definition source");
-        assertDisabled(editCodeListPage.getDeprecatedSelectField());
+        assertDisabled(editCodeListValueDialog.getDeprecatedSelectField());
         editCodeListValueDialog.hitSaveButton();
 
         editCodeListValueDialog = editCodeListPage.editCodeListValue(codeListValueTwo.getValue());
         editCodeListValueDialog.setMeaning("new meaning");
         editCodeListValueDialog.setDefinition("new definition");
         editCodeListValueDialog.setDefinitionSource("new definition source");
-        assertDisabled(editCodeListPage.getDeprecatedSelectField());
+        assertDisabled(editCodeListValueDialog.getDeprecatedSelectField());
         editCodeListValueDialog.hitSaveButton();
     }
 
     @Test
     @DisplayName("TC_11_3_TA_5")
-    public void test_TA_5() {
+    public void duplicate_code_list_values_are_rejected_in_brand_new_code_list() {
         AppUserObject developer;
         LibraryObject library;
         ReleaseObject workingBranch;

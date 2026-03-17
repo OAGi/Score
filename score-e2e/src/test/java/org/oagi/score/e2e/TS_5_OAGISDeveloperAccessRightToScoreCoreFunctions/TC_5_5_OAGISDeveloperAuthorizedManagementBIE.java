@@ -48,7 +48,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_1")
-    public void test_TA_1() {
+    public void developer_can_create_bie_from_non_latest_published_top_level_concepts() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -70,7 +70,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_2_1 (Change Based ACC)")
-    public void test_TA_2_1() {
+    public void developer_can_create_bie_from_revised_top_level_concept_with_changed_based_acc() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -128,7 +128,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_2_2 (Additional BCCs and ASCCs)")
-    public void test_TA_2_2() {
+    public void developer_can_create_bie_from_revised_top_level_concept_with_additional_bccs_and_asccs() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -203,7 +203,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_2_3 (BCCP was revised to be NOT nillable)")
-    public void test_TA_2_3() {
+    public void developer_can_create_bie_from_revised_top_level_concept_with_non_nillable_bccp() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -272,7 +272,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_2_4 (ASCCP was revised to be NOT nillable)")
-    public void test_TA_2_4() {
+    public void developer_can_create_bie_from_revised_top_level_concept_with_non_nillable_asccp() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -334,7 +334,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_2_5 (Additional ASCC to an ASCCP that is a group)")
-    public void test_TA_2_5() {
+    public void developer_can_create_bie_from_revised_top_level_concept_with_additional_ascc_in_group_asccp() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -370,7 +370,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_2_6 (Max cardinality of a BCC and an ASCC changed from unbounded to 1)")
-    public void test_TA_2_6() {
+    public void developer_can_create_bie_from_revised_top_level_concept_with_restricted_max_cardinality() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -423,7 +423,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_2_7 (BCCP has its BDT changed)")
-    public void test_TA_2_7() {
+    public void developer_can_create_bie_from_revised_top_level_concept_with_changed_bdt() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -484,7 +484,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_2_9 (ASCCP is deprecated)")
-    public void test_TA_2_9() {
+    public void developer_can_create_bie_from_revised_top_level_concept_with_deprecated_asccp() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -538,7 +538,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_2_11 (BCCP has its default value revised from no default value to a default value)")
-    public void test_TA_2_11() {
+    public void developer_can_create_bie_from_revised_top_level_concept_with_revised_bccp_default_value() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1417,7 +1417,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_20 (BBIE)")
-    public void test_TA_20_for_BBIE_node() {
+    public void developer_cannot_update_bbie_cardinality_with_invalid_values() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1477,7 +1477,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_20 (BBIE_SC)")
-    public void test_TA_20_for_BBIE_SC_node() {
+    public void developer_cannot_update_bbie_sc_cardinality_with_invalid_values() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1556,9 +1556,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         bbiePanel.toggleUsed();
 
-        bbiePanel.setCardinalityMin(2);
+        int currentCardinalityMax = Integer.parseInt(getText(bbiePanel.getCardinalityMaxField()));
+        bbiePanel.setCardinalityMin(currentCardinalityMax + 1);
         assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
-                "//mat-error[contains(text(), \"Cardinality Min must be less than or equals to 1\")]")).isDisplayed());
+                "//mat-error[contains(text(), \"Cardinality Min must be less than or equals to " + currentCardinalityMax + "\")]")).isDisplayed());
         assertFalse(editBIEPage.getUpdateButton(false).isEnabled());
 
         bbiePanel.setCardinalityMin(1);
@@ -1685,8 +1686,9 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         assertEquals("unbounded", getText(bbiePanel.getCardinalityMaxField()));
 
         bbiePanel.setCardinalityMin(0);
+        int currentCardinalityMin = Integer.parseInt(getText(bbiePanel.getCardinalityMinField()));
         assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
-                "//mat-error[contains(text(), \"Cardinality Min must be greater than or equals to 1\")]")).isDisplayed());
+                "//mat-error[contains(text(), \"Cardinality Min must be greater than or equals to " + currentCardinalityMin + "\")]")).isDisplayed());
 
         bbiePanel.setCardinalityMax(0);
         assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
@@ -1718,10 +1720,11 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         bbiePanel.toggleUsed();
 
-        int randCardinalityMin = RandomUtils.secure().randomInt(2, 100);
+        int currentCardinalityMax = Integer.parseInt(getText(bbiePanel.getCardinalityMaxField()));
+        int randCardinalityMin = RandomUtils.secure().randomInt(currentCardinalityMax + 1, currentCardinalityMax + 100);
         bbiePanel.setCardinalityMin(randCardinalityMin);
         assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
-                "//mat-error[contains(text(), \"Cardinality Min must be less than or equals to 1\")]")).isDisplayed());
+                "//mat-error[contains(text(), \"Cardinality Min must be less than or equals to " + currentCardinalityMax + "\")]")).isDisplayed());
     }
 
     @Test
@@ -2643,7 +2646,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_30 (Create BIE Business Contexts - Updater/Name field)")
-    public void test_search_feature_using_updater_name_field_in_create_BIE_business_contexts() {
+    public void developer_can_search_create_bie_business_contexts_by_updater_or_name() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -2668,7 +2671,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_30 (Create BIE Business Contexts - Update Start/End Date fields)")
-    public void test_search_feature_using_date_fields_in_create_BIE_business_contexts() {
+    public void developer_can_search_create_bie_business_contexts_by_update_date_range() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -2724,7 +2727,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_30 (Create BIE Top-Level Concept - DEN field)")
-    public void test_search_feature_using_den_field_in_create_BIE_top_level_concept() {
+    public void developer_can_search_create_bie_top_level_concepts_by_den() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -2747,7 +2750,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_30 (Create BIE Top-Level Concept - Definition field)")
-    public void test_search_feature_using_definition_field_in_create_BIE_top_level_concept() {
+    public void developer_can_search_create_bie_top_level_concepts_by_definition() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -2770,7 +2773,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_30 (Create BIE Top-Level Concept - Module field)")
-    public void test_search_feature_using_module_field_in_create_BIE_top_level_concept() {
+    public void developer_can_search_create_bie_top_level_concepts_by_module() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -2802,7 +2805,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_31 (View BIE - State field)")
-    public void test_search_feature_using_state_field_in_BIE_list() {
+    public void developer_can_search_bie_list_by_state() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -2854,7 +2857,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_31 (View BIE - Update Start/End Date fields)")
-    public void test_search_feature_using_date_fields_in_BIE_list() {
+    public void developer_can_search_bie_list_by_update_date_range() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -2881,7 +2884,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_31 (View BIE - DEN field)")
-    public void test_search_feature_using_den_field_in_BIE_list() {
+    public void developer_can_search_bie_list_by_den() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -2907,7 +2910,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_31 (View BIE - Updater/Name field Business Context field)")
-    public void test_search_feature_using_business_context_field_in_BIE_list() {
+    public void developer_can_search_bie_list_by_business_context() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -2942,7 +2945,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_32 (Copy BIE Business Contexts - Updater/Name field)")
-    public void test_search_feature_using_updater_name_field_in_copy_BIE_business_contexts() {
+    public void developer_can_search_copy_bie_business_contexts_by_updater_or_name() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -2967,7 +2970,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_32 (Copy BIE Business Contexts - Update Start/End Date fields)")
-    public void test_search_feature_using_date_fields_in_copy_BIE_business_contexts() {
+    public void developer_can_search_copy_bie_business_contexts_by_update_date_range() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -3023,7 +3026,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_32 (Copy BIE Top-Level Concept - DEN field)")
-    public void test_search_feature_using_den_field_in_copy_BIE_top_level_concept() {
+    public void developer_can_search_copy_bie_top_level_concepts_by_den() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -3053,7 +3056,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_32 (Copy BIE Top-Level Concept - Business Context field)")
-    public void test_search_feature_using_business_context_field_in_copy_BIE_top_level_concept() {
+    public void developer_can_search_copy_bie_top_level_concepts_by_business_context() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -3083,7 +3086,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_32 (Copy BIE Top-Level Concept - State field)")
-    public void test_search_feature_using_state_field_in_copy_BIE_top_level_concept() {
+    public void developer_can_search_copy_bie_top_level_concepts_by_state() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -3148,7 +3151,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_33")
-    public void issue_653() {
+    public void developer_cannot_auto_expand_same_name_node_when_another_same_name_node_is_expanded() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -3909,7 +3912,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_52 (Enable Children - ASBIE)")
-    public void test_TA_52_asbie() {
+    public void developer_can_enable_all_children_from_asbie_node() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -3950,7 +3953,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_52 (Enable Children - BBIE)")
-    public void test_TA_52_bbie() {
+    public void developer_can_enable_all_children_from_bbie_node() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -3986,7 +3989,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_53")
-    public void test_TA_53() {
+    public void developer_can_set_max_cardinality_to_one_for_all_child_nodes() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -4028,7 +4031,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_54")
-    public void test_TA_54() {
+    public void developer_can_reset_bie_node_details_to_initial_values() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -4090,13 +4093,13 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
     @Disabled
     @Test
     @DisplayName("TC_5_5_TA_55")
-    public void test_TA_55() {
+    public void developer_can_verify_exclude_scs_option_is_no_longer_available() {
         // 'Exclude SCs' option has been removed.
     }
 
     @Test
-    @DisplayName("TC_5_5_issue1234")
-    public void test_issue1234() {
+    @DisplayName("TC_5_5_TA_57")
+    public void developer_can_preserve_default_value_and_value_constraint_behavior_across_renamed_bccp_releases() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -4144,7 +4147,8 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
     }
 
     @Test
-    public void test_TA_5_5_56() {
+    @DisplayName("TC_5_5_TA_56")
+    public void developer_can_see_cardinalities_of_nodes_in_bie_tree() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -4180,7 +4184,8 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
     }
 
     @Test
-    public void test_TA_5_5_56a() {
+    @DisplayName("TC_5_5_TA_56.a")
+    public void developer_can_hide_and_display_cardinalities_of_nodes_in_bie_tree() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -4217,7 +4222,8 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
     }
 
     @Test
-    public void test_TA_5_5_56b() {
+    @DisplayName("TC_5_5_TA_56.b")
+    public void developer_can_see_changed_cardinalities_of_nodes_after_reopening_bie_page() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 

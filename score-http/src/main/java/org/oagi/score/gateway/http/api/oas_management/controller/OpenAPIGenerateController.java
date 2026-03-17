@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -47,7 +46,7 @@ public class OpenAPIGenerateController {
 
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/generate", method = RequestMethod.GET)
     public ResponseEntity<InputStreamResource> generate(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                                        @PathVariable("id") BigInteger oasDocId,
+                                                        @PathVariable("id") OasDocId oasDocId,
                                                         @RequestParam(name = "sortActives") String sortActives,
                                                         @RequestParam(name = "sortDirections") String sortDirections,
                                                         HttpServletRequest httpServletRequest) throws IOException {

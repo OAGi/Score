@@ -1,10 +1,11 @@
 package org.oagi.score.gateway.http.api.oas_management.repository.criteria;
 
-import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
+import org.oagi.score.gateway.http.api.oas_management.model.OasOperationId;
+import org.oagi.score.gateway.http.api.oas_management.model.OasResourceTagId;
+import org.oagi.score.gateway.http.api.oas_management.model.OasTagId;
 import org.oagi.score.gateway.http.api.oas_management.repository.OasDocCommandRepository;
 
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -13,9 +14,9 @@ public class InsertOasResourceTagArguments {
 
     private final OasDocCommandRepository repository;
 
-    private ULong userId;
-    private ULong oasOperationId;
-    private ULong oasTagId;
+    private UserId userId;
+    private OasOperationId oasOperationId;
+    private OasTagId oasTagId;
     private LocalDateTime timestamp = new Timestamp(System.currentTimeMillis()).toLocalDateTime();
 
     public InsertOasResourceTagArguments(OasDocCommandRepository repository) {
@@ -23,28 +24,16 @@ public class InsertOasResourceTagArguments {
     }
 
     public InsertOasResourceTagArguments setUserId(UserId userId) {
-        return setUserId(ULong.valueOf(userId.value()));
-    }
-
-    public InsertOasResourceTagArguments setUserId(ULong userId) {
         this.userId = userId;
         return this;
     }
 
-    public InsertOasResourceTagArguments setOasOperationId(BigInteger oasOperationId) {
-        return setOasOperationId(ULong.valueOf(oasOperationId));
-    }
-
-    public InsertOasResourceTagArguments setOasOperationId(ULong oasOperationId) {
+    public InsertOasResourceTagArguments setOasOperationId(OasOperationId oasOperationId) {
         this.oasOperationId = oasOperationId;
         return this;
     }
 
-    public InsertOasResourceTagArguments setOasTagId(BigInteger oasTagId) {
-        return setOasTagId(ULong.valueOf(oasTagId));
-    }
-
-    public InsertOasResourceTagArguments setOasTagId(ULong oasTagId) {
+    public InsertOasResourceTagArguments setOasTagId(OasTagId oasTagId) {
         this.oasTagId = oasTagId;
         return this;
     }
@@ -62,15 +51,15 @@ public class InsertOasResourceTagArguments {
         return this;
     }
 
-    public ULong getUserId() {
+    public UserId getUserId() {
         return userId;
     }
 
-    public ULong getOasOperationId() {
+    public OasOperationId getOasOperationId() {
         return oasOperationId;
     }
 
-    public ULong getOasTagId() {
+    public OasTagId getOasTagId() {
         return oasTagId;
     }
 
@@ -78,7 +67,7 @@ public class InsertOasResourceTagArguments {
         return timestamp;
     }
 
-    public ULong execute() {
+    public OasResourceTagId execute() {
         return repository.insertOasResourceTag(this);
     }
 

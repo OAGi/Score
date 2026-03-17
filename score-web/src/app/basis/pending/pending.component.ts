@@ -34,6 +34,7 @@ export class PendingActivate implements CanActivate {
 }
 
 @Component({
+  standalone: false,
   selector: 'score-pending',
   templateUrl: './pending.component.html',
   styleUrls: ['./pending.component.css']

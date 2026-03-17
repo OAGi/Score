@@ -7,6 +7,8 @@ import org.oagi.score.gateway.http.api.bie_management.model.abie.AbieSummaryReco
 import org.oagi.score.gateway.http.api.bie_management.model.asbie.AsbieSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.asbiep.AsbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.bbie.BbieSummaryRecord;
+import org.oagi.score.gateway.http.api.bie_management.model.expression.GenerateExpressionOption;
+import org.oagi.score.gateway.http.api.cc_management.model.Definition;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.OagisComponentType;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpManifestId;
@@ -60,7 +62,15 @@ public class Helper {
         return xbt;
     }
 
-    public static String getCodeListTypeName(CodeListSummaryRecord codeList, AgencyIdListValueSummaryRecord agencyIdListValue) {
+    public static String getCodeListTypeName(CodeListSummaryRecord codeList,
+                                             AgencyIdListValueSummaryRecord agencyIdListValue) {
+        return getCodeListTypeName(codeList, agencyIdListValue,
+                Helper::normalizeReusableDefinitionName);
+    }
+
+    public static String getCodeListTypeName(CodeListSummaryRecord codeList,
+                                             AgencyIdListValueSummaryRecord agencyIdListValue,
+                                             Function<String, String> nameConverter) {
         StringBuilder sb = new StringBuilder();
 
         sb.append(CODE_LIST_NAME_PREFIX);
@@ -72,14 +82,22 @@ public class Helper {
         sb.append(codeList.versionId()).append('_');
         String name = codeList.name();
         if (StringUtils.hasLength(name)) {
-            sb.append(Utility.toCamelCase(name)).append("ContentType").append('_');
+            sb.append(nameConverter.apply(name)).append("ContentType").append('_');
         }
         sb.append(codeList.listId());
 
         return sb.toString().replaceAll(" ", "_");
     }
 
-    public static String getAgencyListTypeName(AgencyIdListSummaryRecord agencyIdList, AgencyIdListValueSummaryRecord agencyIdListValue) {
+    public static String getAgencyListTypeName(AgencyIdListSummaryRecord agencyIdList,
+                                               AgencyIdListValueSummaryRecord agencyIdListValue) {
+        return getAgencyListTypeName(agencyIdList, agencyIdListValue,
+                Helper::normalizeReusableDefinitionName);
+    }
+
+    public static String getAgencyListTypeName(AgencyIdListSummaryRecord agencyIdList,
+                                               AgencyIdListValueSummaryRecord agencyIdListValue,
+                                               Function<String, String> nameConverter) {
         StringBuilder sb = new StringBuilder();
 
         sb.append(AGENCY_ID_LIST_NAME_PREFIX);
@@ -90,7 +108,7 @@ public class Helper {
         sb.append(agencyIdList.versionId()).append('_');
         String name = agencyIdList.name();
         if (StringUtils.hasLength(name)) {
-            sb.append(Utility.toCamelCase(name)).append("ContentType").append('_');
+            sb.append(nameConverter.apply(name)).append("ContentType").append('_');
         }
         sb.append(agencyIdList.listId());
 
@@ -103,6 +121,35 @@ public class Helper {
         }
         return str.replaceAll("Identifier", "Id")
                 .replaceAll("identifier", "id");
+    }
+
+    private static String normalizeReusableDefinitionName(String name) {
+        StringBuilder sb = new StringBuilder(name.length());
+        StringBuilder segment = new StringBuilder();
+        for (int i = 0; i < name.length(); i++) {
+            char ch = name.charAt(i);
+            if (Character.isLetterOrDigit(ch) || Character.isWhitespace(ch)) {
+                segment.append(ch);
+            } else {
+                if (segment.length() > 0) {
+                    String normalized = Utility.toLowerCamelCase(
+                            Utility.spaceSeparator(segment.toString().trim()));
+                    if (StringUtils.hasLength(normalized)) {
+                        sb.append(normalized);
+                    }
+                }
+                segment.setLength(0);
+                sb.append(ch);
+            }
+        }
+        if (segment.length() > 0) {
+            String normalized = Utility.toLowerCamelCase(
+                    Utility.spaceSeparator(segment.toString().trim()));
+            if (StringUtils.hasLength(normalized)) {
+                sb.append(normalized);
+            }
+        }
+        return sb.toString();
     }
 
     public static String camelCase(String... terms) {
@@ -138,6 +185,37 @@ public class Helper {
         return facet.minLength() != null ||
                 facet.maxLength() != null ||
                 StringUtils.hasLength(facet.pattern());
+    }
+
+    public static String resolveDescription(GenerateExpressionOption option,
+                                            String[] bieDefinitions,
+                                            Object... basedCcDefinitions) {
+        if (option.isBieDefinition()) {
+            for (String bieDefinition : bieDefinitions) {
+                if (StringUtils.hasLength(bieDefinition)) {
+                    return bieDefinition;
+                }
+            }
+        }
+        if (option.isBasedCcMetaData()) {
+            for (Object basedCcDefinition : basedCcDefinitions) {
+                String definitionText;
+                if (basedCcDefinition == null) {
+                    definitionText = null;
+                } else if (basedCcDefinition instanceof String) {
+                    definitionText = (String) basedCcDefinition;
+                } else if (basedCcDefinition instanceof Definition) {
+                    definitionText = ((Definition) basedCcDefinition).content();
+                } else {
+                    throw new IllegalArgumentException(
+                            "Unsupported definition type: " + basedCcDefinition.getClass().getName());
+                }
+                if (StringUtils.hasLength(definitionText)) {
+                    return definitionText;
+                }
+            }
+        }
+        return null;
     }
 
     public static String toName(String propertyTerm, String representationTerm,

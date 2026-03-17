@@ -134,7 +134,7 @@ public class TC_18_2_CodeListAccess extends BaseTest {
     }
 
     @Test
-    public void test_TA_18_2_1() {
+    public void developer_can_only_search_and_view_details_of_cls_i_e_no_cl_creation() {
         thisAccountWillBeDeletedAfterTests(developer);
         thisAccountWillBeDeletedAfterTests(endUser);
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -165,7 +165,7 @@ public class TC_18_2_CodeListAccess extends BaseTest {
     }
 
     @Test
-    public void test_TA_18_2_2() {
+    public void no_cl_shall_be_listed_for_the_developer_when_state_filter_is_selected_that_is_not() {
         thisAccountWillBeDeletedAfterTests(developer);
         thisAccountWillBeDeletedAfterTests(endUser);
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -186,7 +186,7 @@ public class TC_18_2_CodeListAccess extends BaseTest {
     }
 
     @Test
-    public void test_TA_18_2_3() {
+    public void end_user_can_only_search_and_view_details_of_cls_i_e_no_cl_creation() {
         thisAccountWillBeDeletedAfterTests(developer);
         thisAccountWillBeDeletedAfterTests(endUser);
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());

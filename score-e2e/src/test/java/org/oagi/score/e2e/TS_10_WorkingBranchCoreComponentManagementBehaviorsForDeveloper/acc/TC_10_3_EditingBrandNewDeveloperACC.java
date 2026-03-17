@@ -3,6 +3,7 @@ package org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsFo
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -51,7 +52,8 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_3_1_a() {
+    @DisplayName("TC_10_3_TA_1.a")
+    public void base_component_type_forces_abstract_true_and_locked() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -74,7 +76,8 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_3_1_b() {
+    @DisplayName("TC_10_3_TA_1.b")
+    public void semantic_group_component_type_disables_abstract_and_keeps_it_false() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -100,7 +103,8 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_3_1_c() {
+    @DisplayName("TC_10_3_TA_1.c")
+    public void acc_requires_standard_namespace_and_hides_non_standard_component_types() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -157,7 +161,8 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_3_1_d() {
+    @DisplayName("TC_10_3_TA_1.d")
+    public void first_revision_acc_locks_deprecated_flag() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -179,7 +184,8 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_3_1_e() {
+    @DisplayName("TC_10_3_TA_1.e")
+    public void acc_update_warns_when_definition_is_empty() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -209,7 +215,8 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_3_1_f() {
+    @DisplayName("TC_10_3_TA_1.f")
+    public void updating_acc_object_class_term_updates_dependent_asccp_den() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -254,7 +261,8 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_3_1_g() {
+    @DisplayName("TC_10_3_TA_1.g")
+    public void brand_new_acc_only_offers_base_semantics_and_semantic_group_component_types() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -284,7 +292,8 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_3_2_a() {
+    @DisplayName("TC_10_3_TA_2.a")
+    public void semantics_acc_can_create_extension_acc_based_on_all_extension() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -333,7 +342,8 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_3_2_b() {
+    @DisplayName("TC_10_3_TA_2.b")
+    public void semantics_acc_creates_extension_asccp_with_extension_property_term() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -376,7 +386,8 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_3_2_c() {
+    @DisplayName("TC_10_3_TA_2.c")
+    public void semantics_acc_creates_extension_ascc_with_zero_to_unbounded_cardinality() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -419,7 +430,8 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_3_2_d() {
+    @DisplayName("TC_10_3_TA_2.d")
+    public void acc_without_namespace_cannot_create_oagi_extension_component() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 

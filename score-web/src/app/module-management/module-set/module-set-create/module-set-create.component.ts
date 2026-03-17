@@ -17,6 +17,7 @@ import {LibrarySummary} from '../../../library-management/domain/library';
 import {LibraryService} from '../../../library-management/domain/library.service';
 
 @Component({
+  standalone: false,
   selector: 'score-module-set-create',
   templateUrl: './module-set-create.component.html',
   styleUrls: ['./module-set-create.component.css']

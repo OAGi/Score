@@ -1,24 +1,24 @@
 package org.oagi.score.gateway.http.api.oas_management.controller.payload;
 
+import org.oagi.score.gateway.http.api.oas_management.model.OasRequestId;
+import org.oagi.score.gateway.http.api.oas_management.model.OasResponseId;
 import org.oagi.score.gateway.http.common.model.base.Auditable;
-
-import java.math.BigInteger;
 
 public class AddBieForOasDocResponse extends Auditable {
 
-    private final BigInteger oasRequestId;
-    private final BigInteger oasResponseId;
+    private final OasRequestId oasRequestId;
+    private final OasResponseId oasResponseId;
 
-    public AddBieForOasDocResponse(BigInteger oasRequestId, BigInteger oasResponseId) {
+    public AddBieForOasDocResponse(OasRequestId oasRequestId, OasResponseId oasResponseId) {
         this.oasRequestId = oasRequestId;
         this.oasResponseId = oasResponseId;
     }
 
-    public BigInteger getOasRequestId() {
+    public OasRequestId getOasRequestId() {
         return oasRequestId;
     }
 
-    public BigInteger getOasResponseId() {
+    public OasResponseId getOasResponseId() {
         return oasResponseId;
     }
 }

@@ -34,7 +34,7 @@ public class TC_41_12_EndUserDTStateManagement extends BaseTest {
 
     @Test
     @DisplayName("TC_41_12_from_TA_1_to_TA_3")
-    public void test_from_TA_1_to_TA_3() {
+    public void end_user_data_type_state_management_covers_ta_1_to_ta_3() {
         AppUserObject endUserA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();

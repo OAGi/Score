@@ -1,0 +1,66 @@
+{
+  "root": true,
+  "ignorePatterns": [
+    "dist/",
+    "node_modules/",
+    "**/*.spec.ts"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "*.ts"
+      ],
+      "parser": "@typescript-eslint/parser",
+      "parserOptions": {
+        "project": [
+          "tsconfig.eslint.json"
+        ],
+        "createDefaultProgram": true
+      },
+      "plugins": [
+        "@typescript-eslint",
+        "@angular-eslint"
+      ],
+      "extends": [
+        "plugin:@angular-eslint/recommended",
+        "plugin:@angular-eslint/template/process-inline-templates"
+      ],
+      "rules": {
+        "@angular-eslint/component-selector": [
+          "error",
+          {
+            "type": "element",
+            "prefix": "score",
+            "style": "kebab-case"
+          }
+        ],
+        "@angular-eslint/directive-selector": [
+          "error",
+          {
+            "type": "attribute",
+            "prefix": "score",
+            "style": "camelCase"
+          }
+        ],
+        "@angular-eslint/component-class-suffix": "off",
+        "@angular-eslint/contextual-lifecycle": "off",
+        "@angular-eslint/directive-selector": "off",
+        "@angular-eslint/no-empty-lifecycle-method": "off",
+        "@angular-eslint/no-output-on-prefix": "off",
+        "@angular-eslint/prefer-standalone": "off",
+        "@angular-eslint/use-lifecycle-interface": "off"
+      }
+    },
+    {
+      "files": [
+        "*.html"
+      ],
+      "extends": [
+        "plugin:@angular-eslint/template/recommended"
+      ],
+      "rules": {
+        "@angular-eslint/template/eqeqeq": "off"
+      }
+    }
+  ]
+}

@@ -75,7 +75,7 @@ Pre-condition: OAGi terminology has been selected
 The first page used in creating a BIE, namely the page where a Business Context is selected should have the title “Create BIE (Profiled Component, Noun, BOD)”.
 
 #### Test Assertion #7.3.2
-The second page used in creating a BIE, namely the page where a top level concept is selected, should have the title “Create BIE (Profiled Component, Noun, BOD)”.
+The second page used in creating a BIE, namely the page where a top level concept is selected, should have the title “Create BIE (Profiled Component, Noun, BOD) with [selected business context name]”.
 
 ### Test Step Pre-condition:
 
@@ -85,9 +85,9 @@ The second page used in creating a BIE, namely the page where a top level concep
 
 1. An OAGi developer logs into the system.
 2. He visits the Create BIE page.
-3. Verify that the title is “Profiled Component, Noun, BOD”. (Assertion [#1](#test-assertion-731))
+3. Verify that the title is “Create BIE (Profiled Component, Noun, BOD)”. (Assertion [#1](#test-assertion-731))
 4. He chooses a business context and clicks the Next button
-5. Verify that the title is “Profiled Component, Noun, BOD”. (Assertion [#2](#test-assertion-732))
+5. Verify that the title is “Create BIE (Profiled Component, Noun, BOD) with [selected business context name]”. (Assertion [#2](#test-assertion-732))
 
 ## Test Case 7.4
 
@@ -102,7 +102,7 @@ Pre-condition: N/A
 The Copy BIE page (BIE -> Copy BIE) should have the name “Copy BIE (Profiled Component, Noun, BOD)”.
 
 #### Test Assertion #7.4.2
-The subtitle of the second step/page of creating a BIE should be “Select BIE (Profiled Component, Noun, BOD)”.
+The title of the second step/page of copying a BIE should be “Copy BIE (Profiled Component, Noun, BOD) with [selected business context name]”.
 
 ### Test Step Pre-condition:
 
@@ -114,7 +114,7 @@ The subtitle of the second step/page of creating a BIE should be “Select BIE (
 2. He visits the Copy BIE page
 3. Verify that the title is “Copy BIE (Profiled Component, Noun, BOD)”. (Assertion [#1](#test-assertion-741))
 4. He chooses a business context and click the Next button.
-5. Verify that the subtitle of the second page is “Select BIE (Profiled Component, Noun, BOD)”. (Assertion [#2](#test-assertion-742))
+5. Verify that the title of the second page is “Copy BIE (Profiled Component, Noun, BOD) with [selected business context name]”. (Assertion [#2](#test-assertion-742))
 
 ## Test Case 7.5
 
@@ -126,13 +126,13 @@ Pre-condition: N/A
 ### Test Assertion:
 
 #### Test Assertion #7.5.1
-The Den field of the dialog where you append an ASCCP while editing an extension (local or global) should be “DEN (Dictionary Entry Name)”.
+The Den field of the dialog where you append an ASCCP while editing an extension (local or global) should be “Search by DEN (Dictionary Entry Name)”.
 
 #### Test Assertion #7.5.2
 The Module field filter of the dialog where you append an ASCCP while editing an extension (local or global) should be “Module (Part of schema file path, no extension)”.
 
 #### Test Assertion #7.5.3
-The Den field of the dialog where you append a BCCP while editing an extension (local or global) should be “DEN (Dictionary Entry Name)”.
+The Den field of the dialog where you append a BCCP while editing an extension (local or global) should be “Search by DEN (Dictionary Entry Name)”.
 
 #### Test Assertion #7.5.4
 The Module field filter of the dialog where you append a BCCP while editing an extension (local or global) should be “Module (Part of schema file path, no extension)”.
@@ -147,11 +147,11 @@ The Module field filter of the dialog where you append a BCCP while editing an e
 2. The developer opens the BIE0 and extends it locally.
 3. He opens the BIE0’s local extension.
 4. He appends an ASCCP.
-5. Verify that the dialog where you select an ASCCP to append has the search field “DEN (Directory Entry Name)”. (Assertion [#1](#test-assertion-751))
+5. Verify that the dialog where you select an ASCCP to append has the search field “Search by DEN (Dictionary Entry Name)”. (Assertion [#1](#test-assertion-751))
 6. Verify that the dialog where you select an ASCCP to append has the search field “Module (Part of schema file path, no extension)”. (Assertion [#2](#test-assertion-752))
 7. He closes the dialog and tries to append a BCCP.
-8. Verify that the dialog where you select an BCCP to append has the search field “DEN (Directory Entry Name)”. (Assertion [#3](#test-assertion-753))
-9. Verify that the dialog where you select an BCCP to append has the search field “Module (Part of schema file path, no extension)”. (Assertion [#4](#test-assertion-754))
+8. Verify that the dialog where you select a BCCP to append has the search field “Search by DEN (Dictionary Entry Name)”. (Assertion [#3](#test-assertion-753))
+9. Verify that the dialog where you select a BCCP to append has the search field “Module (Part of schema file path, no extension)”. (Assertion [#4](#test-assertion-754))
 
 ## Test Case 7.6
 
@@ -163,10 +163,10 @@ Pre-condition: N/A
 ### Test Assertion:
 
 #### Test Assertion #7.6.1
-The name of the Core Component page should be “Core Components (Model Library)”.
+The name of the Core Component page should be “Core Component (Model Library)”.
 
 #### Test Assertion #7.6.2
-The Den field filter of the Core Component page should be “DEN (Dictionary Entry Name)”.
+The Den field filter of the Core Component page should be “Search by DEN (Dictionary Entry Name)”.
 
 #### Test Assertion #7.6.3
 The Module field filter of the Core Component page should be “Module (Part of schema file path, no extension)”.
@@ -217,7 +217,7 @@ The title of the right pane where the details of a BCC are displayed should be �
 The Max Cardinality field of a BCC should be “Cardinality Max (-1 for unbounded)”.
 
 #### Test Assertion #7.6.19
-The Den of n BCC should be “DEN (Dictionary Entry Name)”.
+The Den of a BCC should be “DEN (Dictionary Entry Name)”.
 
 #### Test Assertion #7.6.20
 The title of the right pane where the details of a supplementary component are displayed should be “Supplementary Component (Field Metadata)”. (It cannot be checked yet)
@@ -240,8 +240,8 @@ The Den of a Data type component should be “DEN (Dictionary Entry Name)”.
 
 1. An OAGi developer logon into the system.
 2. He visits the Core Component page.
-3. Verify that the title of the page is “Core Components (Model Library)”. (Assertion [#1](#test-assertion-761))
-4. Verify that there is the search field “DEN (Directory Entry Name)”. (Assertion [#2](#test-assertion-762))
+3. Verify that the title of the page is “Core Component (Model Library)”. (Assertion [#1](#test-assertion-761))
+4. Verify that there is the search field “Search by DEN (Dictionary Entry Name)”. (Assertion [#2](#test-assertion-762))
 5. Verify that there is the search field “Module (Part of schema file path, no extension)”. (Assertion [#3](#test-assertion-763))
 6. He opens the ACC0
 7. Verify that the left panel where the tree of the ACC0 is displayed has the title “ACC (Component Type or Group Definition)”. (Assertion [#4](#test-assertion-764))
@@ -249,45 +249,45 @@ The Den of a Data type component should be “DEN (Dictionary Entry Name)”.
 9. Verify that there is the “DEN (Dictionary Entry Name)” input field. (Assertion [#6](#test-assertion-766))
 10. The developer visits the Core Component page.
 11. He opens the ASCCP0
-12. Verify that the left panel where the tree of the ASCCP0 is displayed has the title “ASCCP (Associated Component) Detail”. (Assertion [#7](#test-assertion-767))
+12. Verify that the left panel where the tree of the ASCCP0 is displayed has the title “ASCCP (Associated Component)”. (Assertion [#7](#test-assertion-767))
 13. Verify that the title of the right panel where the details of an ASCCP are displayed is “ASCCP (Associated Component) Detail”. (Assertion [#8](#test-assertion-768))
 14. Verify that there is the field “Property Term (Component Name)”. (Assertion [#9](#test-assertion-769))
 15. Verify that there is the “DEN (Dictionary Entry Name)” input field. (Assertion [#10](#test-assertion-7610))
 16. The developer opens the BIEa’s local extension and clicks to view an ASCCP.
-17. Verify that Object Class Term is “ASCCP (Associated Component) Detail”. (Assertion [#8](#test-assertion-768))
+17. Verify that the title of the right panel where the details of an ASCCP are displayed is “ASCCP (Associated Component) Detail”. (Assertion [#8](#test-assertion-768))
 18. Verify that there is the “DEN (Dictionary Entry Name)” input field. (Assertion [#10](#test-assertion-7610))
 19. Verify that there is the field “Property Term (Component Name)”. (Assertion [#9](#test-assertion-769))
 20. The developer opens the BIEa’s global extension and clicks to view an ASCCP
-21. Verify that Object Class Term is “ASCCP (Associated Component) Detail (Assertion [#8](#test-assertion-768))
+21. Verify that the title of the right panel where the details of an ASCCP are displayed is “ASCCP (Associated Component) Detail”. (Assertion [#8](#test-assertion-768))
 22. Verify that there is the “DEN (Dictionary Entry Name)” input field. (Assertion [#10](#test-assertion-7610))
 23. Verify that there is the field “Property Term (Component Name)”. (Assertion [#9](#test-assertion-769))
 24. The developer visits the Core Component page.
 25. He opens the BCCP0
-26. Verify that the object class term is “BCCP (Associated Field) Detail”. (Assertion [#11](#test-assertion-7611))
-27. Verify that there is the field “Property Term (Component Name)”. (Assertion [#12](#test-assertion-7612))
+26. Verify that the title of the right panel where the details of a BCCP are displayed is “BCCP (Associated Field) Detail”. (Assertion [#11](#test-assertion-7611))
+27. Verify that there is the field “Property Term (Field Name)”. (Assertion [#12](#test-assertion-7612))
 28. Verify that there is the “DEN (Dictionary Entry Name)” input field. (Assertion [#13](#test-assertion-7613))
-29. The developer opens the BIEa’s local extension and clicks to view an BCCP.
-30. Verify that the class term is “BCCP (Associated Field) Detail”. (Assertion [#11](#test-assertion-7611))
-31. Verify that there is the field “Property Term (Component Name)”. (Assertion [#12](#test-assertion-7612))
+29. The developer opens the BIEa’s local extension and clicks to view a BCCP.
+30. Verify that the title of the right panel where the details of a BCCP are displayed is “BCCP (Associated Field) Detail”. (Assertion [#11](#test-assertion-7611))
+31. Verify that there is the field “Property Term (Field Name)”. (Assertion [#12](#test-assertion-7612))
 32. Verify that there is the “DEN (Dictionary Entry Name)” input field. (Assertion [#13](#test-assertion-7613))
-33. The developer opens the BIEa’s global extension and clicks to view an BCCP.
-34. Verify that the class term is “BCCP (Associated Field) Detail”. (Assertion [#11](#test-assertion-7611))
-35. Verify that there is the field “Property Term (Component Name)”. (Assertion [#12](#test-assertion-7612))
+33. The developer opens the BIEa’s global extension and clicks to view a BCCP.
+34. Verify that the title of the right panel where the details of a BCCP are displayed is “BCCP (Associated Field) Detail”. (Assertion [#11](#test-assertion-7611))
+35. Verify that there is the field “Property Term (Field Name)”. (Assertion [#12](#test-assertion-7612))
 36. Verify that there is the “DEN (Dictionary Entry Name)” input field. (Assertion [#13](#test-assertion-7613))
 37. The developer opens the BIEa’s local extension and clicks to view an ASCC.
-38. Verify that the class term is “ASCC (Component Association) Detail”. (Assertion [#14](#test-assertion-7614))
+38. Verify that the title of the right pane where the details of an ASCC are displayed is “ASCC (Component Association) Detail”. (Assertion [#14](#test-assertion-7614))
 39. Verify that the name of the Max Cardinality field is “Cardinality Max (-1 for unbounded)”. (Assertion [#15](#test-assertion-7615))
 40. Verify that there is the field “DEN (Dictionary Entry Name)”. (Assertion [#16](#test-assertion-7616))
 41. The developer opens the BIEa’s global extension and clicks to view an ASCC.
-42. Verify that the class term is “ASCC (Component Association) Detail”. (Assertion [#14](#test-assertion-7614))
+42. Verify that the title of the right pane where the details of an ASCC are displayed is “ASCC (Component Association) Detail”. (Assertion [#14](#test-assertion-7614))
 43. Verify that the name of the Max Cardinality field is “Cardinality Max (-1 for unbounded)”. (Assertion [#15](#test-assertion-7615))
 44. Verify that there is the field “DEN (Dictionary Entry Name)”. (Assertion [#16](#test-assertion-7616))
 45. The developer opens the BIEa’s local extension and clicks to view a BCC.
-46. Verify that the class term is “BCC (Field Association) Detail”. (Assertion [#17](#test-assertion-7617))
+46. Verify that the title of the right pane where the details of a BCC are displayed is “BCC (Field Association) Detail”. (Assertion [#17](#test-assertion-7617))
 47. Verify that the name of the Max Cardinality field is “Cardinality Max (-1 for unbounded)”. (Assertion [#18](#test-assertion-7618))
 48. Verify that there is the field “DEN (Dictionary Entry Name)”. (Assertion [#19](#test-assertion-7619))
 49. The developer opens the BIEa’s global extension and clicks to view a BCC.
-50. Verify that the class term is “BCC (Field Association) Detail”. (Assertion [#17](#test-assertion-7617))
+50. Verify that the title of the right pane where the details of a BCC are displayed is “BCC (Field Association) Detail”. (Assertion [#17](#test-assertion-7617))
 51. Verify that the name of the Max Cardinality field is “Cardinality Max (-1 for unbounded)”. (Assertion [#18](#test-assertion-7618))
 52. Verify that there is the field “DEN (Dictionary Entry Name)”. (Assertion [#19](#test-assertion-7619))
 53. The developer opens the BIEa’s local extension and clicks to view a supplementary component.

@@ -25,6 +25,7 @@ import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
 
 
 @Component({
+  standalone: false,
   selector: 'score-assign-business-term',
   templateUrl: './assign-business-term-bt.component.html',
   styleUrls: ['./assign-business-term-bt.component.css']

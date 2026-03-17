@@ -47,7 +47,7 @@ public class TC_25_2_CreateTopLevelBIEFromBIENode extends BaseTest {
     }
 
     @Test
-    public void test_TA_25_2_1_a_b_c() {
+    public void create_a_top_level_bie_from_a_bie_node_a_top_level_bie_is() {
         ASCCPObject asccp, asccp_for_devx, asccp_lv2;
         ACCObject acc, acc_association, acc_association_lv2;
         AppUserObject devx, devy;

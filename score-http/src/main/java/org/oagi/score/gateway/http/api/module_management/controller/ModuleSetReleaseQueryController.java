@@ -137,10 +137,12 @@ public class ModuleSetReleaseQueryController {
             @AuthenticationPrincipal AuthenticatedPrincipal user,
 
             @PathVariable("moduleSetReleaseId")
-            ModuleSetReleaseId moduleSetReleaseId) throws Exception {
+            ModuleSetReleaseId moduleSetReleaseId,
+            @RequestParam(value = "expressionOption", required = false) String expressionOption,
+            @RequestParam(value = "expressionVersion", required = false) String expressionVersion) throws Exception {
 
         return moduleSetReleaseQueryService.validateModuleSetRelease(
-                sessionService.asScoreUser(user), moduleSetReleaseId);
+                sessionService.asScoreUser(user), moduleSetReleaseId, expressionOption, expressionVersion);
     }
 
     @GetMapping(value = "/{moduleSetReleaseId:[\\d]+}/validate/{requestId}")
@@ -156,14 +158,20 @@ public class ModuleSetReleaseQueryController {
     @GetMapping(value = "/{moduleSetReleaseId:[\\d]+}/export")
     public ResponseEntity<DeleteOnCloseFileSystemResource> exportModuleSetRelease(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @PathVariable("moduleSetReleaseId") ModuleSetReleaseId moduleSetReleaseId) throws Exception {
+            @PathVariable("moduleSetReleaseId") ModuleSetReleaseId moduleSetReleaseId,
+            @RequestParam(value = "expressionOption", required = false) String expressionOption,
+            @RequestParam(value = "expressionVersion", required = false) String expressionVersion) throws Exception {
 
         ExportModuleSetReleaseResponse response =
-                moduleSetReleaseQueryService.exportModuleSetRelease(sessionService.asScoreUser(user), moduleSetReleaseId);
+                moduleSetReleaseQueryService.exportModuleSetRelease(
+                        sessionService.asScoreUser(user), moduleSetReleaseId, expressionOption, expressionVersion);
+
+        MediaType contentType = response.filename().endsWith(".json") ?
+                MediaType.parseMediaType("application/schema+json") : MediaType.parseMediaType("application/zip");
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + response.filename() + "\"")
-                .contentType(MediaType.parseMediaType("application/zip"))
+                .contentType(contentType)
                 .contentLength(response.file().length())
                 .body(new DeleteOnCloseFileSystemResource(response.file()));
     }

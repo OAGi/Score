@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.oagi.score.gateway.http.api.export.model.ConnectSpecNameResolvers.*;
 import static org.oagi.score.gateway.http.api.export.model.Namespace.newNamespace;
 import static org.oagi.score.gateway.http.common.ScoreConstants.ANY_ASCCP_DEN;
 
@@ -41,13 +40,21 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
     private final CcDocument ccDocument;
 
     private final Map<String, Integer> pathCounter;
+    private final SchemaNamingStrategy namingStrategy;
 
     private Map<String, SchemaModule> schemaModuleMap = new HashMap<>();
 
     public StandaloneExportContextBuilder(CcDocument ccDocument,
                                           Map<String, Integer> pathCounter) {
+        this(ccDocument, pathCounter, new XmlSchemaNamingStrategy());
+    }
+
+    public StandaloneExportContextBuilder(CcDocument ccDocument,
+                                          Map<String, Integer> pathCounter,
+                                          SchemaNamingStrategy namingStrategy) {
         this.ccDocument = ccDocument;
         this.pathCounter = pathCounter;
+        this.namingStrategy = namingStrategy;
     }
 
     private SchemaModule getModuleByNamespace(NamespaceSummaryRecord namespace) {
@@ -112,7 +119,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
                 parentSchemaModule.addNamespace(schemaModule.getNamespace());
             }
 
-            if (!schemaModule.addASCCP(ASCCP.newInstance(asccp, ccDocument))) {
+            if (!schemaModule.addASCCP(ASCCP.newInstance(asccp, ccDocument, namingStrategy))) {
                 return;
             }
         }
@@ -133,7 +140,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
             }
 
             DtSummaryRecord dt = ccDocument.getDt(bccp.dtManifestId());
-            if (!bccpSchemaModule.addBCCP(new BCCP(bccp, dt))) {
+            if (!bccpSchemaModule.addBCCP(new BCCP(bccp, dt, namingStrategy))) {
                 return;
             }
         }
@@ -157,7 +164,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
                 parentSchemaModule.addNamespace(schemaModule.getNamespace());
             }
 
-            if (!schemaModule.addACC(ACC.newInstance(acc, ccDocument))) {
+            if (!schemaModule.addACC(ACC.newInstance(acc, ccDocument, namingStrategy))) {
                 return;
             }
 
@@ -218,15 +225,15 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
                         .collect(Collectors.toList());
                 bdtSimple = new BDTSimpleType(
                         dt, baseDataType, isDefaultBDT,
-                        dtAwdPriList, xbtList, ccDocument, dtNameResolver);
+                        dtAwdPriList, xbtList, ccDocument, namingStrategy.dtNameResolver());
             } else {
                 bdtSimple = new BDTSimpleType(
-                        dt, baseDataType, isDefaultBDT, ccDocument, dtNameResolver);
+                        dt, baseDataType, isDefaultBDT, ccDocument, namingStrategy.dtNameResolver());
             }
         } else {
             Map<DtScManifestId, DtScSummaryRecord> dtScMap = dtScList.stream()
                     .collect(Collectors.toMap(DtScSummaryRecord::dtScManifestId, Function.identity()));
-            bdtSimple = new BDTSimpleContent(dt, baseDataType, isDefaultBDT, dtScMap, ccDocument, dtNameResolver);
+            bdtSimple = new BDTSimpleContent(dt, baseDataType, isDefaultBDT, dtScMap, ccDocument, namingStrategy.dtNameResolver(), namingStrategy);
             dtScList.forEach(dtSc -> {
                 List<DtScAwdPriSummaryRecord> dtScAwdPriList = ccDocument.getDtScAwdPriList(dtSc.dtScManifestId());
 
@@ -262,7 +269,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
                                 schemaModule.addNamespace(agencyIdListSchemaModule.getNamespace());
                             }
 
-                            agencyIdListSchemaModule.addAgencyId(new AgencyId(agencyIdList, agencyIdListNameResolver));
+                            agencyIdListSchemaModule.addAgencyId(new AgencyId(agencyIdList, namingStrategy.agencyIdListNameResolver()));
                         });
             });
         }
@@ -302,7 +309,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
                         schemaModule.addNamespace(agencyIdListSchemaModule.getNamespace());
                     }
 
-                    agencyIdListSchemaModule.addAgencyId(new AgencyId(agencyIdList, agencyIdListNameResolver));
+                    agencyIdListSchemaModule.addAgencyId(new AgencyId(agencyIdList, namingStrategy.agencyIdListNameResolver()));
                 });
     }
 
@@ -323,7 +330,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
             addCodeList(parentSchemaModule, baseCodeList);
         }
 
-        SchemaCodeList schemaCodeList = new SchemaCodeList(codeList, codeList.codeListManifestId(), codeList.namespaceId(), codeListNameResolver);
+        SchemaCodeList schemaCodeList = new SchemaCodeList(codeList, codeList.codeListManifestId(), codeList.namespaceId(), namingStrategy.codeListNameResolver());
         schemaCodeList.setGuid(codeList.guid().value());
         schemaCodeList.setName(codeList.name());
         schemaCodeList.setEnumTypeGuid(codeList.enumTypeGuid());
@@ -343,7 +350,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
     }
 
     @Override
-    public void traverse(SchemaModule schemaModule, XMLExportSchemaModuleVisitor schemaModuleVisitor) throws Exception {
+    public void traverse(SchemaModule schemaModule, ExportSchemaModuleVisitor schemaModuleVisitor) throws Exception {
         for (SchemaModule include : schemaModule.getIncludeModules()) {
             schemaModuleVisitor.visitIncludeModule(include);
         }
@@ -427,7 +434,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
         }
     }
 
-    private void visit(ACC acc, XMLExportSchemaModuleVisitor schemaModuleVisitor) throws Exception {
+    private void visit(ACC acc, ExportSchemaModuleVisitor schemaModuleVisitor) throws Exception {
         if (acc instanceof ACCComplexType) {
             schemaModuleVisitor.visitACCComplexType((ACCComplexType) acc);
         } else if (acc instanceof ACCGroup) {
@@ -435,7 +442,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
         }
     }
 
-    private void visit(ASCCP asccp, XMLExportSchemaModuleVisitor schemaModuleVisitor) throws Exception {
+    private void visit(ASCCP asccp, ExportSchemaModuleVisitor schemaModuleVisitor) throws Exception {
         if (asccp instanceof ASCCPComplexType) {
             schemaModuleVisitor.visitASCCPComplexType((ASCCPComplexType) asccp);
         } else if (asccp instanceof ASCCPGroup) {
@@ -443,11 +450,11 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
         }
     }
 
-    private void visit(BCCP bccp, XMLExportSchemaModuleVisitor schemaModuleVisitor) throws Exception {
+    private void visit(BCCP bccp, ExportSchemaModuleVisitor schemaModuleVisitor) throws Exception {
         schemaModuleVisitor.visitBCCP(bccp);
     }
 
-    private void visit(BDTSimple bdtSimple, XMLExportSchemaModuleVisitor schemaModuleVisitor) throws Exception {
+    private void visit(BDTSimple bdtSimple, ExportSchemaModuleVisitor schemaModuleVisitor) throws Exception {
         if (bdtSimple instanceof BDTSimpleType) {
             schemaModuleVisitor.visitBDTSimpleType((BDTSimpleType) bdtSimple);
         } else if (bdtSimple instanceof BDTSimpleContent) {
@@ -455,15 +462,15 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
         }
     }
 
-    private void visit(XBTSimpleType xbtSimple, XMLExportSchemaModuleVisitor schemaModuleVisitor) throws Exception {
+    private void visit(XBTSimpleType xbtSimple, ExportSchemaModuleVisitor schemaModuleVisitor) throws Exception {
         schemaModuleVisitor.visitXBTSimpleType(xbtSimple);
     }
 
-    private void visit(SchemaCodeList codeList, XMLExportSchemaModuleVisitor schemaModuleVisitor) throws Exception {
+    private void visit(SchemaCodeList codeList, ExportSchemaModuleVisitor schemaModuleVisitor) throws Exception {
         schemaModuleVisitor.visitCodeList(codeList);
     }
 
-    private void visit(AgencyId agencyId, XMLExportSchemaModuleVisitor schemaModuleVisitor) throws Exception {
+    private void visit(AgencyId agencyId, ExportSchemaModuleVisitor schemaModuleVisitor) throws Exception {
         schemaModuleVisitor.visitAgencyId(agencyId);
     }
 

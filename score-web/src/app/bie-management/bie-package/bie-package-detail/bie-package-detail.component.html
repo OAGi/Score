@@ -82,7 +82,7 @@
     <div class="loading-container" *ngIf="loading">
       <mat-spinner [diameter]="40"></mat-spinner>
     </div>
-    <mat-card-header class="align-items-baseline">
+    <mat-card-header class="align-items-baseline pt-0">
       <mat-toolbar class="bg-white p-0" style="box-shadow: none;">
         <span class="title">BIE List</span>
         <div style="padding: 8px 12px 8px 24px;">
@@ -104,14 +104,10 @@
             <mat-icon>delete</mat-icon>
             Remove
           </button>
-          <button mat-raised-button class="mr-2" color="primary" (click)="generate()"
-                  [hidden]="table.dataSource.data.length == 0">
-            Generate
-          </button>
         </div>
       </mat-toolbar>
     </mat-card-header>
-    <mat-card-content class="mat-card-container">
+    <mat-card-content class="mat-card-container mb-4">
       <div class="table-container">
         <div class="d-flex">
           <mat-multi-sort-table-settings [tableData]="table" [closeDialogOnChoice]="false">
@@ -178,11 +174,11 @@
               <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="den"
                   score-table-column-resize [defaultWidth]="width('DEN')" (onResize)="onResizeWidth($event)"> DEN</th>
               <td mat-cell *matCellDef="let element" [ngSwitch]="element.access">
-                <div class="den word-break-all">
+                <div class="den score-break-word">
                   <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}"
                      matTooltip="{{ element.den }}">
                     <div class="d-inline-flex align-items-center">
-                      <span>{{ element.den }}</span>
+                      <span class="score-line-clamp-2 score-break-word">{{ element.den }}</span>
                       <span *ngIf="element.displayName" class="bie-display-name ml-2">{{ element.displayName }}</span>
                     </div>
                   </a>
@@ -196,7 +192,7 @@
                       releaseIds: element.source.release.releaseId,
                       topLevelAsbiepIds: element.source.topLevelAsbiepId }) }}">
                     <span class="d-inline" matTooltip="{{ element.source.sourceAction | pastTense }} at {{ element.source.when | date: 'yyyy-MM-dd HH:mm:ss' }}">
-                      {{ element.source.den + ((element.source.displayName) ? (' (' + element.source.displayName + ')') : '') }} in {{ element.source.release.releaseNum }}
+                      {{ element.source.den + ((element.source.displayName) ? (' (' + element.source.displayName + ')') : '') }}&nbsp;in&nbsp;{{ element.source.release.releaseNum }}
                     </span>
                   </a>
                 </div>
@@ -208,7 +204,7 @@
                       releaseIds: element.based.release.releaseId,
                       topLevelAsbiepIds: element.based.topLevelAsbiepId }) }}">
                     <span class="d-inline">
-                      {{ element.based.den + ((element.based.displayName) ? (' (' + element.based.displayName + ')') : '') }} in {{ element.based.release.releaseNum }}
+                      {{ element.based.den + ((element.based.displayName) ? (' (' + element.based.displayName + ')') : '') }}&nbsp;in&nbsp;{{ element.based.release.releaseNum }}
                     </span>
                   </a>
                 </div>
@@ -219,7 +215,7 @@
               <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="owner"
                   score-table-column-resize [defaultWidth]="width('Owner')" (onResize)="onResizeWidth($event)"> Owner</th>
               <td mat-cell *matCellDef="let element">
-                <span class="word-break-all" [matTooltip]="element.owner.username" [innerHTML]="element.owner.loginId"></span>
+                <span class="score-line-clamp-2 score-break-word" [matTooltip]="element.owner.username" [innerHTML]="element.owner.loginId"></span>
               </td>
             </ng-container>
 
@@ -227,14 +223,27 @@
               <th mat-header-cell *matHeaderCellDef
                   score-table-column-resize [defaultWidth]="width('Business Contexts')" (onResize)="onResizeWidth($event)"> Business Contexts</th>
               <td mat-cell *matCellDef="let element">
-                <ng-container *ngFor="let businessContext of element.businessContextList">
-                <span class="businessContext word-break-all">
-                  <a target="_blank" rel="noopener noreferrer"
-                     routerLink="/context_management/business_context/{{ businessContext.businessContextId }}">
-                    <span class="word-break-all">{{ businessContext.name }}</span>
-                  </a>
-                </span>
-                </ng-container>
+                <div class="business-contexts-menu-wrapper">
+                  <div class="business-contexts-menu-trigger"
+                       [class.is-clickable]="element.businessContextList.length > 1"
+                       [matMenuTriggerFor]="businessContextsMenu"
+                       (click)="$event.stopPropagation()">
+                    <span class="business-contexts-menu-label score-line-clamp-2 score-break-word"
+                          [matTooltip]="businessContextSelection[element.topLevelAsbiepId]?.name || element.businessContextList[0]?.name || ''">
+                      {{ businessContextSelection[element.topLevelAsbiepId]?.name || element.businessContextList[0]?.name || '' }}
+                    </span>
+                    <mat-icon *ngIf="element.businessContextList.length > 1"
+                              class="business-contexts-menu-icon">arrow_drop_down</mat-icon>
+                  </div>
+
+                  <mat-menu #businessContextsMenu="matMenu">
+                    <button mat-menu-item type="button"
+                            *ngFor="let businessContext of element.businessContextList"
+                            (click)="businessContextSelection[element.topLevelAsbiepId] = businessContext">
+                      <span class="score-break-word">{{ businessContext.name }}</span>
+                    </button>
+                  </mat-menu>
+                </div>
               </td>
             </ng-container>
 
@@ -242,7 +251,7 @@
               <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="version"
                   score-table-column-resize [defaultWidth]="width('Version')" (onResize)="onResizeWidth($event)"> Version</th>
               <td mat-cell *matCellDef="let element">
-                <div class="word-break-all" [matTooltip]="element.version" [innerHTML]="element.version"></div>
+                <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.version" [innerHTML]="element.version"></div>
               </td>
             </ng-container>
 
@@ -250,7 +259,7 @@
               <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="status"
                   score-table-column-resize [defaultWidth]="width('Status')" (onResize)="onResizeWidth($event)"> Status</th>
               <td mat-cell *matCellDef="let element">
-                <div class="word-break-all" [matTooltip]="element.status" [innerHTML]="element.status"></div>
+                <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.status" [innerHTML]="element.status"></div>
               </td>
             </ng-container>
 
@@ -258,7 +267,7 @@
               <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="bizTerm"
                   score-table-column-resize [defaultWidth]="width('Business Term')" (onResize)="onResizeWidth($event)"> Business Term</th>
               <td mat-cell *matCellDef="let element">
-                <div class="word-break-all" [matTooltip]="element.bizTerm" [innerHTML]="element.bizTerm"></div>
+                <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.bizTerm" [innerHTML]="element.bizTerm"></div>
               </td>
             </ng-container>
 
@@ -266,7 +275,7 @@
               <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="remark"
                   score-table-column-resize [defaultWidth]="width('Remark')" (onResize)="onResizeWidth($event)"> Remark</th>
               <td mat-cell *matCellDef="let element">
-                <div class="word-break-all" [innerHTML]="element.remark"></div>
+                <div class="score-line-clamp-2 score-break-word" [innerHTML]="element.remark"></div>
               </td>
             </ng-container>
 
@@ -274,8 +283,10 @@
               <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="lastUpdateTimestamp"
                   score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
               <td mat-cell *matCellDef="let element">
-                <div class="ellipsis">{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-                <div class="description"><span class="pr-1">by</span><b class="word-break-all">{{ element.lastUpdated.who.loginId }}</b></div>
+                <div class="score-line-clamp-2 score-break-word">
+                  <div>{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                  <div class="description"><span class="pr-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
+                </div>
               </td>
             </ng-container>
 
@@ -287,6 +298,94 @@
             [pageSizeOptions]="[10, 25, 50]"
             (page)="onPageChange($event)"
             showFirstLastButtons></mat-paginator>
+        </div>
+      </div>
+    </mat-card-content>
+    <mat-card-content class="mat-card-container mt-4">
+      <div class="row">
+        <div class="col-md-4 col-sm-12">
+          <span class="option-header">Select annotation to generate for BIEs</span>
+          <div class="option-body">
+            <div class="generate-option">
+              <mat-checkbox [(ngModel)]="option.bieDefinition">
+                BIE Definition
+              </mat-checkbox>
+            </div>
+            <div class="generate-option">
+              <mat-checkbox [(ngModel)]="option.bieCctsMetaData"
+                            [disabled]="option.expressionOption !== 'XML'"
+                            (change)="bieAnnotationChange()">
+                <span class="{{ (option.expressionOption !== 'XML') ? 'toggle-disabled' : '' }}">BIE CCTS Meta Data</span>
+              </mat-checkbox>
+            </div>
+            <div class="generate-option dependent-option">
+              <mat-checkbox [(ngModel)]="option.includeCctsDefinitionTag"
+                            [disabled]="option.expressionOption !== 'XML' || option.bieCctsMetaData !== true">
+                <span
+                  class="{{ (option.expressionOption !== 'XML' || option.bieCctsMetaData !== true) ? 'toggle-disabled' : '' }}">Include CCTS_Definition Tag</span>
+              </mat-checkbox>
+            </div>
+            <div class="generate-option">
+              <mat-checkbox [(ngModel)]="option.bieGuid"
+                            [disabled]="option.expressionOption !== 'XML'">
+                <span class="{{ (option.expressionOption !== 'XML') ? 'toggle-disabled' : '' }}">BIE GUID</span>
+              </mat-checkbox>
+            </div>
+            <div class="generate-option">
+              <mat-checkbox [(ngModel)]="option.businessContext"
+                            [disabled]="option.expressionOption !== 'XML'">
+                <span class="{{ (option.expressionOption !== 'XML') ? 'toggle-disabled' : '' }}">Business Context</span>
+              </mat-checkbox>
+            </div>
+            <div class="generate-option">
+              <mat-checkbox [(ngModel)]="option.bieOagiScoreMetaData"
+                            [disabled]="option.expressionOption !== 'XML'"
+                            (change)="bieAnnotationChange()">
+                <span class="{{ (option.expressionOption !== 'XML') ? 'toggle-disabled' : '' }}">BIE OAGi/connectCenter Meta Data</span>
+              </mat-checkbox>
+            </div>
+            <div class="generate-option dependent-option">
+              <mat-checkbox [(ngModel)]="option.includeWhoColumns"
+                            [disabled]="option.expressionOption !== 'XML' || option.bieOagiScoreMetaData !== true">
+                <span
+                  class="{{ (option.expressionOption !== 'XML' || option.bieOagiScoreMetaData !== true) ? 'toggle-disabled' : '' }}">Include WHO Columns</span>
+              </mat-checkbox>
+            </div>
+            <div class="generate-option">
+              <mat-checkbox [(ngModel)]="option.basedCcMetaData"
+                            [disabled]="isBasedCcMetaDataDisabled()">
+                <span class="{{ isBasedCcMetaDataDisabled() ? 'toggle-disabled' : '' }}">Based CC Meta Data</span>
+              </mat-checkbox>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 col-sm-12">
+          <span class="option-header">Select an expression</span>
+          <div class="option-body">
+            <mat-radio-group class="option-radio-group" [(ngModel)]="option.expressionOption"
+                             (change)="expressionOptionChange()">
+              <mat-radio-button class="option-radio-button" value="XML">
+                XML Schema
+              </mat-radio-button>
+              <mat-radio-button class="option-radio-button" value="JSON">
+                JSON Schema
+              </mat-radio-button>
+            </mat-radio-group>
+          </div>
+        </div>
+
+        <div class="col-md-4 col-sm-12">
+          <!--
+          <span class="option-header">Generate</span>
+          -->
+          <div class="option-body">
+            <div class="actions">
+              <button mat-raised-button class="mr-2" color="primary" (click)="generate()"
+                      [hidden]="table.dataSource.data.length == 0">Generate
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </mat-card-content>

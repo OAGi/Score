@@ -8,6 +8,7 @@ import {AbstractControl, FormControl, NgForm, ValidatorFn, Validators} from '@an
 import {UserToken} from '../../authentication/domain/auth';
 
 @Component({
+  standalone: false,
   selector: 'score-settings-account',
   templateUrl: './settings-account.component.html',
   styleUrls: ['./settings-account.component.css']

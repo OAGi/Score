@@ -14,6 +14,7 @@ import {LibraryService} from '../../library-management/domain/library.service';
 import {loadLibrary, saveLibrary} from '../../common/utility';
 
 @Component({
+  standalone: false,
   selector: 'score-release-list',
   templateUrl: './release-create.component.html',
   styleUrls: ['./release-create.component.css']

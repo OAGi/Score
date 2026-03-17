@@ -24,6 +24,7 @@ import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-r
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
 
 @Component({
+  standalone: false,
   selector: 'score-business-term',
   templateUrl: './business-term-list.component.html',
   styleUrls: ['./business-term-list.component.css']

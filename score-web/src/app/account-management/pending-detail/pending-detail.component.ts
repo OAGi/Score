@@ -12,6 +12,7 @@ import {switchMap} from 'rxjs/operators';
 import {PendingListService} from '../domain/pending-list.service';
 
 @Component({
+  standalone: false,
   selector: 'score-account-detail',
   templateUrl: './pending-detail.component.html',
   styleUrls: ['./pending-detail.component.css']

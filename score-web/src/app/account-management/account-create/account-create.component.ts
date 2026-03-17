@@ -6,6 +6,7 @@ import {AccountList} from '../domain/accounts';
 import {PendingAccount} from '../domain/pending-list';
 
 @Component({
+  standalone: false,
   selector: 'score-account-create',
   templateUrl: './account-create.component.html',
   styleUrls: ['./account-create.component.css']

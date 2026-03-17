@@ -62,7 +62,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Test
-    public void test_TA_19_1_1() {
+    public void developer_can_create_a_release_the_following_information_can_be_specified_release_number_release() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
@@ -85,7 +85,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Test
-    public void test_TA_19_1_2() {
+    public void developer_can_discard_a_release_that_is_in_the_initialized_state_if_there_is() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
@@ -226,7 +226,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
     
     @Test
-    public void test_TA_19_1_3a() {
+    public void developer_can_add_ccs_in_the_working_branch_that_are_in_the_candidate_state() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
@@ -257,7 +257,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Test
-    public void test_TA_19_1_3c_case2_and_case3() {
+    public void validate_references_this_is_an_error_validation_the_system_ensures_that_those_new_and() {
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(devx);
         LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
@@ -294,7 +294,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Test
-    public void test_TA_19_1_3c_case1() {
+    public void validate_references_this_is_an_error_validation_the_system_ensures_that_those_new_and_scenario_2() {
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(devx);
         LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
@@ -328,7 +328,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Test
-    public void test_TA_19_1_3c_case7() {
+    public void validate_references_this_is_an_error_validation_the_system_ensures_that_those_new_and_scenario_3() {
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(devx);
         LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
@@ -363,12 +363,12 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Ignore
-    public void test_TA_19_1_3c_case8_and_case9_and_case10_and_test_TA_19_1_3h() {
+    public void validate_references_for_based_and_replaced_by_components_is_not_implemented_yet() {
         //replaced by field is not implemented yet
     }
 
     @Test
-    public void test_TA_19_1_3d_and_1_3e_and_1_3f_and_1_3g() {
+    public void release_management_validate_extension_this_is_a_warning_validation_give_a_warning_warning_this() {
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(devx);
         LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
@@ -426,12 +426,12 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Ignore
-    public void test_TA_19_1_3i() {
+    public void validate_non_reusable_asccp_usage_is_ensured_in_ui() {
         //Validate non-reusable ASCCP is ensured in UI
     }
 
     @Test
-    public void test_TA_19_1_3j() {
+    public void if_the_reference_validation_fails_the_developer_can_cancel_the_release_draft_creation_he() {
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(devx);
         LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
@@ -494,7 +494,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Test
-    public void test_TA_19_1_3k() {
+    public void if_the_reference_validation_is_successful_the_user_can_hit_the_finish_button_the() {
         // Only the administrators can publish the draft release.
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(devx);
@@ -557,7 +557,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Test
-    public void test_TA_19_1_4() {
+    public void initialized_releases_shall_not_show_up_in_the_branch_drop_down_box_in_the() {
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(devx);
         LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
@@ -588,12 +588,12 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Ignore
-    public void test_TA_19_1_5() {
+    public void while_a_release_draft_is_being_created_all_working_branch_ccs_in_the_candidate_state_that() {
         //cannot be checked needs two phase commit
     }
 
     @Test
-    public void test_TA_19_1_6_and_TA_19_1_7_and_TA_19_1_8() {
+    public void release_management_the_created_release_draft_shall_show_up_in_the_branch_drop_down() {
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(devx);
         LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
@@ -701,7 +701,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Test
-    public void test_TA_19_1_9_and_TA_19_1_10() {
+    public void release_management_a_developer_can_move_a_release_draft_into_the_published_state_there() {
         // Only the administrators can publish the draft release.
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(devx);
@@ -790,7 +790,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Test
-    public void test_TA_19_1_11() {
+    public void after_the_release_is_published_no_further_action_can_be_done_to_the_release() {
         // Only the administrators can publish the draft release.
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(devx);
@@ -857,7 +857,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Test
-    public void test_TA_19_1_12_and_TA_19_1_13() {
+    public void release_management_end_users_cannot_manage_releases_i_e_cannot_initialize_a_release_and() {
         // Only the administrators can publish the draft release.
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(devx);

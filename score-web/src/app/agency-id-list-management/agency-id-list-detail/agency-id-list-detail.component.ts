@@ -30,6 +30,7 @@ import {SettingsPreferencesService} from '../../settings-management/settings-pre
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 
 @Component({
+  standalone: false,
   selector: 'score-agency-id-list-detail',
   templateUrl: './agency-id-list-detail.component.html',
   styleUrls: ['./agency-id-list-detail.component.css']

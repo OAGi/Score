@@ -17,6 +17,7 @@ import {AboutService} from '../about/domain/about.service';
 import {WebPageInfoService} from '../basis.service';
 
 @Component({
+  standalone: false,
   selector: 'score-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
@@ -52,8 +53,7 @@ export class NavbarComponent implements OnInit {
   }
 
   get isTenantEnabled(): boolean {
-    const userToken = this.auth.getUserToken();
-    return userToken.tenant.enabled;
+    return this.auth.isTenantEnabled();
   }
 
   get hasTenantRole(): boolean {
@@ -64,6 +64,10 @@ export class NavbarComponent implements OnInit {
   get isBusinessTermEnabled(): boolean {
     const userToken = this.auth.getUserToken();
     return userToken.businessTerm.enabled;
+  }
+
+  get isBrowseStandardsMenuEnabled(): boolean {
+    return this.auth.isBrowseStandardsMenuEnabled();
   }
 
   get userRole(): string {

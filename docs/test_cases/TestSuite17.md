@@ -29,11 +29,14 @@ The end user can view the details of a CL that is in QA or Production state and 
 The end user can view details of any developer code list in the selected release branch. The CL must always be in the Published state. He cannot make any change. He can add comments.
 
 ### Test Step Pre-condition:
-
-
+1. The stated test-case pre-condition is satisfied: A release branch is selected.
+2. The users, branches, releases, and records needed to exercise "Code list access" are available in connectCenter.
 
 ### Test Step:
-
+1. The relevant user signs in to connectCenter.
+2. The user opens the page, branch, release, or entity required for "Code list access".
+3. The user performs the workflow described by the assertions.
+4. The user verifies the expected result for each assertion in this test case.
 ## Test Case 17.2
 
 **Creating a brand-new end user code list**
@@ -44,7 +47,7 @@ Pre-condition: A release branch is selected.
 ### Test Assertion:
 
 #### Test Assertion #17.2.1
-On the Code List View/Edit page where a release branch is selected, the end user can create a brand-new code list without base with only required information, See Create a Brand New Code List in Score User Guide for Mandatory/Optional fields. The following are default values – Based Code List = Null and cannot be changed; Name = “a code list”; List ID = Randomly Generated GUID; Agency ID = default to the “Mutually Defined” one; Version = blank; Definition = blank; Definition Source= blank; Remark = blank; Deprecated = false (and locked); Namespace = null; Comments = empty. It must not appear in any other branch. It has a revision number 1. There must be no “Extensible” Checkbox.
+On the Code List View/Edit page where a release branch is selected, the end user can create a brand-new code list without base with only required information, See Create a Brand New Code List in connectCenter User Guide for Mandatory/Optional fields. The following are default values – Based Code List = Null and cannot be changed; Name = “a code list”; List ID = Randomly Generated GUID; Agency ID = default to the “Mutually Defined” one; Version = blank; Definition = blank; Definition Source= blank; Remark = blank; Deprecated = false (and locked); Namespace = null; Comments = empty. It must not appear in any other branch. It has a revision number 1. There must be no “Extensible” Checkbox.
 
 #### Test Assertion #17.2.2
 The end user can create a code list without base with all information specified and multiple code values. In addition, Code list value cannot be duplicated.
@@ -53,7 +56,7 @@ The end user can create a code list without base with all information specified 
 The end user can remove a code value during the code list without base creation.
 
 #### Test Assertion #17.2.4
-The end user cannot create a code list without base, when it does not meet a uniqueness constraint. See Create a Brand New Code List in Score User Guide for the uniqueness constraint.
+The end user cannot create a code list without base, when it does not meet a uniqueness constraint. See Create a Brand New Code List in connectCenter User Guide for the uniqueness constraint.
 
 #### Test Assertion #17.2.5
 The end user can create a brand-new code list based on another published developer code list in the same branch.
@@ -65,11 +68,14 @@ The end user CANNOT create a brand-new CL based on another end-user code list.
 There is a developer code list that has different revisions in two releases, one of which is the release currently selected by the end user and is a later release. The end user must not be able to create a brand-new code list based on the earlier revision of the developer code list.
 
 ### Test Step Pre-condition:
-
-
+1. The stated test-case pre-condition is satisfied: A release branch is selected.
+2. The users, branches, releases, and records needed to exercise "Creating a brand-new end user code list" are available in connectCenter.
 
 ### Test Step:
-
+1. The relevant user signs in to connectCenter.
+2. The user opens the page, branch, release, or entity required for "Creating a brand-new end user code list".
+3. The user performs the workflow described by the assertions.
+4. The user verifies the expected result for each assertion in this test case.
 ## Test Case 17.3
 
 **Editing a brand-new end user code list**
@@ -113,11 +119,14 @@ The end user can edit a newly added Code List Value details except the Deprecate
 The end user can select an end user Agency ID list in Production state under the Code List.
 
 ### Test Step Pre-condition:
-
-
+1. The stated test-case pre-condition is satisfied: The brand-new CL is created by the end user and is in the WIP state. The end user accesses these functionalities by opening the brand-new CL from the CL View/Edit page on a particular release branch or after creating a brand-new end user CL.
+2. The users, branches, releases, and records needed to exercise "Editing a brand-new end user code list" are available in connectCenter.
 
 ### Test Step:
-
+1. The relevant user signs in to connectCenter.
+2. The user opens the page, branch, release, or entity required for "Editing a brand-new end user code list".
+3. The user performs the workflow described by the assertions.
+4. The user verifies the expected result for each assertion in this test case.
 ## Test Case 17.4
 
 **Amend an end user code list**
@@ -162,11 +171,14 @@ The end user can cancel the amendment. In this case, the system rollbacks the wh
 Test expressing BIE that uses an amended end user code list and make sure that it is generated with the expected differences. Test with end user code list that is based on a developer code list and one that has no based.
 
 ### Test Step Pre-condition:
-
-
+1. The stated test-case pre-condition is satisfied: The end user has selected a particular release branch.
+2. The users, branches, releases, and records needed to exercise "Amend an end user code list" are available in connectCenter.
 
 ### Test Step:
-
+1. The relevant user signs in to connectCenter.
+2. The user opens the page, branch, release, or entity required for "Amend an end user code list".
+3. The user performs the workflow described by the assertions.
+4. The user verifies the expected result for each assertion in this test case.
 ## Test Case 17.5
 
 **End user code list state management**
@@ -196,11 +208,14 @@ No state change can be in the Production state.
 The end user cannot change the CL state from WIP directly to Production.
 
 ### Test Step Pre-condition:
-
-
+1. The stated test-case pre-condition is satisfied: The end user is on the Code List detail page, which he owns.
+2. The users, branches, releases, and records needed to exercise "End user code list state management" are available in connectCenter.
 
 ### Test Step:
-
+1. The relevant user signs in to connectCenter.
+2. The user opens the page, branch, release, or entity required for "End user code list state management".
+3. The user performs the workflow described by the assertions.
+4. The user verifies the expected result for each assertion in this test case.
 ## Test Case 17.6
 
 **Deleting a Code List**
@@ -222,11 +237,14 @@ Upon opening an end user BDT that uses a deleted CL, the system shall be able to
 End user CL whose revision number is more than 1 in any state cannot be deleted, check particularly the WIP state.
 
 ### Test Step Pre-condition:
-
-
+1. The users, branches, releases, and records needed to exercise this test case are available in connectCenter.
+2. Any additional data required by the assertions has been prepared before execution.
 
 ### Test Step:
-
+1. The relevant user signs in to connectCenter.
+2. The user opens the page, branch, release, or entity required for "Deleting a Code List".
+3. The user performs the workflow described by the assertions.
+4. The user verifies the expected result for each assertion in this test case.
 ## Test Case 17.7
 
 **Restoring end user code list**
@@ -240,7 +258,12 @@ Pre-condition: The end user is on the CL View/Edit page with a release branch se
 The end user can open a deleted end user CL and restore it or select one or more from deleted code list and restore them. All of its Code List Values shall be restored as well. The code list shall have the same data as before it was deleted.
 
 ### Test Step Pre-condition:
-
+1. The stated test-case pre-condition is satisfied: The end user is on the CL View/Edit page with a release branch selected. Deleted end user CLs are shown in the list (e.g., “Deleted” state is selected in the state filter box).
+2. The users, branches, releases, and records needed to exercise "Restoring end user code list" are available in connectCenter.
 
 
 ### Test Step:
+1. The relevant user signs in to connectCenter.
+2. The user opens the page, branch, release, or entity required for "Restoring end user code list".
+3. The user performs the workflow described by the assertions.
+4. The user verifies the expected result for each assertion in this test case.

@@ -1,21 +1,22 @@
 package org.oagi.score.gateway.http.api.oas_management.model;
 
 import org.oagi.score.gateway.http.api.account_management.model.UserSummaryRecord;
+import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.common.model.base.Auditable;
 
 import java.math.BigInteger;
 import java.util.Date;
 
 public class OasResponse extends Auditable {
-    private BigInteger oasResponseId;
-    private BigInteger oasOperationId;
+    private OasResponseId oasResponseId;
+    private OasOperationId oasOperationId;
     private int httpStatusCode;
     private String description;
-    private BigInteger oasMessageBodyId;
+    private OasMessageBodyId oasMessageBodyId;
     private boolean makeArrayIndicator;
     private boolean suppressRootIndicator;
-    private BigInteger metaHeaderTopLevelAsbiepId;
-    private BigInteger paginationTopLevelAsbiepId;
+    private TopLevelAsbiepId metaHeaderTopLevelAsbiepId;
+    private TopLevelAsbiepId paginationTopLevelAsbiepId;
     private boolean includeConfirmIndicator;
     private Date lastUpdateTimestamp;
     private Date creationTimestamp;
@@ -26,19 +27,19 @@ public class OasResponse extends Auditable {
 
     }
 
-    public BigInteger getOasResponseId() {
+    public OasResponseId getOasResponseId() {
         return oasResponseId;
     }
 
-    public void setOasResponseId(BigInteger oasResponseId) {
+    public void setOasResponseId(OasResponseId oasResponseId) {
         this.oasResponseId = oasResponseId;
     }
 
-    public BigInteger getOasOperationId() {
+    public OasOperationId getOasOperationId() {
         return oasOperationId;
     }
 
-    public void setOasOperationId(BigInteger oasOperationId) {
+    public void setOasOperationId(OasOperationId oasOperationId) {
         this.oasOperationId = oasOperationId;
     }
 
@@ -58,11 +59,11 @@ public class OasResponse extends Auditable {
         this.description = description;
     }
 
-    public BigInteger getOasMessageBodyId() {
+    public OasMessageBodyId getOasMessageBodyId() {
         return oasMessageBodyId;
     }
 
-    public void setOasMessageBodyId(BigInteger oasMessageBodyId) {
+    public void setOasMessageBodyId(OasMessageBodyId oasMessageBodyId) {
         this.oasMessageBodyId = oasMessageBodyId;
     }
 
@@ -82,19 +83,19 @@ public class OasResponse extends Auditable {
         this.suppressRootIndicator = suppressRootIndicator;
     }
 
-    public BigInteger getMetaHeaderTopLevelAsbiepId() {
+    public TopLevelAsbiepId getMetaHeaderTopLevelAsbiepId() {
         return metaHeaderTopLevelAsbiepId;
     }
 
-    public void setMetaHeaderTopLevelAsbiepId(BigInteger metaHeaderTopLevelAsbiepId) {
+    public void setMetaHeaderTopLevelAsbiepId(TopLevelAsbiepId metaHeaderTopLevelAsbiepId) {
         this.metaHeaderTopLevelAsbiepId = metaHeaderTopLevelAsbiepId;
     }
 
-    public BigInteger getPaginationTopLevelAsbiepId() {
+    public TopLevelAsbiepId getPaginationTopLevelAsbiepId() {
         return paginationTopLevelAsbiepId;
     }
 
-    public void setPaginationTopLevelAsbiepId(BigInteger paginationTopLevelAsbiepId) {
+    public void setPaginationTopLevelAsbiepId(TopLevelAsbiepId paginationTopLevelAsbiepId) {
         this.paginationTopLevelAsbiepId = paginationTopLevelAsbiepId;
     }
 

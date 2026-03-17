@@ -4,6 +4,7 @@ import {FormControl} from '@angular/forms';
 import {Observable, ReplaySubject} from 'rxjs';
 import {UserToken} from '../authentication/domain/auth';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
+import {saveAs} from 'file-saver';
 
 export function base64Encode(str): string {
   return CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(str));
@@ -245,7 +246,27 @@ export function trim(value: string): string {
   return value.trim();
 }
 
-@Pipe({name: 'unbounded'})
+export function getFilenameFromContentDisposition(resp): string | undefined {
+  const contentDisposition = resp?.headers?.get('Content-Disposition') || '';
+  const matches = /filename=([^;]+)/ig.exec(contentDisposition);
+  if (!matches || !matches[1]) {
+    return undefined;
+  }
+  const filename = matches[1].replace(/\"/gi, '').trim();
+  return filename || undefined;
+}
+
+export function saveAsBlobResponse(resp): void {
+  const blob = new Blob([resp.body], {type: resp.headers.get('Content-Type')});
+  const filename = getFilenameFromContentDisposition(resp);
+  if (filename) {
+    saveAs(blob, filename);
+  } else {
+    saveAs(blob);
+  }
+}
+
+@Pipe({name: 'unbounded', standalone: false})
 export class UnboundedPipe implements PipeTransform {
   transform(value): string {
     if (!value || value === 'unbounded') {
@@ -258,7 +279,7 @@ export class UnboundedPipe implements PipeTransform {
   }
 }
 
-@Pipe({name: 'highlight'})
+@Pipe({name: 'highlight', standalone: false})
 export class HighlightSearch implements PipeTransform {
   constructor(private sanitizer: DomSanitizer) {}
 
@@ -301,7 +322,7 @@ export class HighlightSearch implements PipeTransform {
   }
 }
 
-@Pipe({name: 'dateAgo', pure: true})
+@Pipe({name: 'dateAgo', pure: true, standalone: false})
 export class DateAgoPipe implements PipeTransform {
 
   transform(value: Date, args?: any): any {
@@ -342,7 +363,7 @@ export class DateAgoPipe implements PipeTransform {
   }
 }
 
-@Pipe({name: 'undefined', pure: true})
+@Pipe({name: 'undefined', pure: true, standalone: false})
 export class UndefinedPipe implements PipeTransform {
 
   transform(value: any, args?: any): any {
@@ -353,7 +374,7 @@ export class UndefinedPipe implements PipeTransform {
   }
 }
 
-@Pipe({name: 'separate', pure: true})
+@Pipe({name: 'separate', pure: true, standalone: false})
 export class SeparatePipe implements PipeTransform {
 
   transform(value: string, args?: any): any {
@@ -365,7 +386,7 @@ export class SeparatePipe implements PipeTransform {
   }
 }
 
-@Pipe({name: 'join', pure: true})
+@Pipe({name: 'join', pure: true, standalone: false})
 export class JoinPipe implements PipeTransform {
 
   transform(input: Array<any>, sep = ','): string {
@@ -374,6 +395,7 @@ export class JoinPipe implements PipeTransform {
 }
 
 @Pipe({
+  standalone: false,
   name: 'sort'
 })
 export class ArraySortPipe implements PipeTransform {
@@ -392,6 +414,7 @@ export class ArraySortPipe implements PipeTransform {
 }
 
 @Pipe({
+  standalone: false,
   name: 'truncate'
 })
 export class TruncatePipe implements PipeTransform {
@@ -403,6 +426,7 @@ export class TruncatePipe implements PipeTransform {
 }
 
 @Pipe({
+  standalone: false,
   name: 'pastTense'
 })
 export class PastTensePipe implements PipeTransform {
@@ -420,6 +444,7 @@ export class PastTensePipe implements PipeTransform {
 }
 
 @Pipe({
+  standalone: false,
   name: 'replaceAll'
 })
 export class ReplaceAllPipe implements PipeTransform {

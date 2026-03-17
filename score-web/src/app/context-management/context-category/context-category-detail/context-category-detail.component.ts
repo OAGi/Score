@@ -11,6 +11,7 @@ import {ContextScheme} from '../../context-scheme/domain/context-scheme';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 
 @Component({
+  standalone: false,
   selector: 'score-context-category-detail',
   templateUrl: './context-category-detail.component.html',
   styleUrls: ['./context-category-detail.component.css']

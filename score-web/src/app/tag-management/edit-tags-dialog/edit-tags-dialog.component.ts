@@ -6,6 +6,7 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
+  standalone: false,
   selector: 'score-edit-tags-dialog',
   templateUrl: './edit-tags-dialog.component.html',
   styleUrls: ['./edit-tags-dialog.component.css']

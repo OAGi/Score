@@ -38,7 +38,6 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.oagi.score.gateway.http.api.export.model.ConnectSpecNameResolvers.*;
 import static org.oagi.score.gateway.http.common.ScoreConstants.ANY_ASCCP_DEN;
 
 public class DefaultExportContextBuilder implements SchemaModuleTraversal {
@@ -48,13 +47,22 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
     private ModuleCcDocument moduleCcDocument;
 
     private ModuleSetReleaseId moduleSetReleaseId;
+    private final SchemaNamingStrategy namingStrategy;
 
     public DefaultExportContextBuilder(ModuleQueryRepository moduleQueryRepository,
                                        ModuleCcDocument moduleCcDocument,
                                        ModuleSetReleaseId moduleSetReleaseId) {
+        this(moduleQueryRepository, moduleCcDocument, moduleSetReleaseId, new XmlSchemaNamingStrategy());
+    }
+
+    public DefaultExportContextBuilder(ModuleQueryRepository moduleQueryRepository,
+                                       ModuleCcDocument moduleCcDocument,
+                                       ModuleSetReleaseId moduleSetReleaseId,
+                                       SchemaNamingStrategy namingStrategy) {
         this.moduleQueryRepository = moduleQueryRepository;
         this.moduleCcDocument = moduleCcDocument;
         this.moduleSetReleaseId = moduleSetReleaseId;
+        this.namingStrategy = namingStrategy;
     }
 
     @Transactional
@@ -109,7 +117,7 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
         for (ModuleCCID<AgencyIdListManifestId> moduleCCID : moduleCcDocument.getModuleAgencyIdList()) {
             SchemaModule schemaModule = moduleMap.get(moduleCCID.moduleId());
             AgencyIdListSummaryRecord agencyIdList = moduleCcDocument.getAgencyIdList(moduleCCID.manifestId());
-            schemaModule.addAgencyId(new AgencyId(agencyIdList, agencyIdListNameResolver));
+            schemaModule.addAgencyId(new AgencyId(agencyIdList, namingStrategy.agencyIdListNameResolver()));
         }
     }
 
@@ -119,7 +127,7 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
             SchemaModule schemaModule = moduleMap.get(moduleCCID.moduleId());
             CodeListSummaryRecord codeList = moduleCcDocument.getCodeList(moduleCCID.manifestId());
             SchemaCodeList schemaCodeList =
-                    new SchemaCodeList(codeList, codeList.codeListManifestId(), codeList.namespaceId(), codeListNameResolver);
+                    new SchemaCodeList(codeList, codeList.codeListManifestId(), codeList.namespaceId(), namingStrategy.codeListNameResolver());
             schemaCodeList.setGuid(codeList.guid().value());
             schemaCodeList.setName(codeList.name());
             schemaCodeList.setEnumTypeGuid(codeList.enumTypeGuid());
@@ -188,17 +196,53 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
                             .filter(e -> e.xbtManifestId() != null)
                             .map(e -> moduleCcDocument.getXbt(e.xbtManifestId()))
                             .collect(Collectors.toList());
-                    bdtSimple = new BDTSimpleType(dt, basedDt, isDefaultBDT, dtAwdPriList, xbtList, moduleCcDocument, dtNameResolver);
-                    xbtList.forEach(xbt -> {
-                        ModuleCCID<XbtManifestId> xbtModuleCCID = moduleCcDocument.getModuleXbt(xbt.xbtManifestId());
-                        if (xbtModuleCCID != null) {
-                            addDependency(schemaModule,
-                                    moduleMap.get(xbtModuleCCID.moduleId()));
+                    bdtSimple = new BDTSimpleType(dt, basedDt, isDefaultBDT, dtAwdPriList, xbtList, moduleCcDocument, namingStrategy.dtNameResolver());
+                    List<DtAwdPriSummaryRecord> agencyIdDtAwdPri = dtAwdPriList.stream()
+                            .filter(e -> e.agencyIdListManifestId() != null)
+                            .collect(Collectors.toList());
+                    if (agencyIdDtAwdPri.size() > 1) {
+                        throw new IllegalStateException();
+                    }
+
+                    if (!agencyIdDtAwdPri.isEmpty()) {
+                        AgencyIdListSummaryRecord agencyIdList = moduleCcDocument.getAgencyIdList(
+                                agencyIdDtAwdPri.get(0).agencyIdListManifestId());
+                        ModuleCCID agencyIdListModuleCCID = moduleCcDocument.getModuleAgencyIdList(
+                                agencyIdList.agencyIdListManifestId());
+                        addDependency(schemaModule, moduleMap.get(agencyIdListModuleCCID.moduleId()));
+                    } else {
+                        List<DtAwdPriSummaryRecord> codeListDtAwdPri = dtAwdPriList.stream()
+                                .filter(e -> e.codeListManifestId() != null)
+                                .collect(Collectors.toList());
+                        if (codeListDtAwdPri.size() > 1) {
+                            throw new IllegalStateException();
                         }
-                    });
+
+                        if (!codeListDtAwdPri.isEmpty()) {
+                            CodeListSummaryRecord codeList = moduleCcDocument.getCodeList(
+                                    codeListDtAwdPri.get(0).codeListManifestId());
+                            ModuleCCID codeListModuleCCID = moduleCcDocument.getModuleCodeList(
+                                    codeList.codeListManifestId());
+                            addDependency(schemaModule, moduleMap.get(codeListModuleCCID.moduleId()));
+                        } else {
+                            List<DtAwdPriSummaryRecord> defaultDtAwdPri = dtAwdPriList.stream()
+                                    .filter(DtAwdPriSummaryRecord::isDefault)
+                                    .collect(Collectors.toList());
+                            if (defaultDtAwdPri.isEmpty() || defaultDtAwdPri.size() > 1) {
+                                throw new IllegalStateException();
+                            }
+
+                            XbtSummaryRecord xbt =
+                                    moduleCcDocument.getXbt(defaultDtAwdPri.get(0).xbtManifestId());
+                            ModuleCCID<XbtManifestId> xbtModuleCCID = moduleCcDocument.getModuleXbt(xbt.xbtManifestId());
+                            if (xbtModuleCCID != null) {
+                                addDependency(schemaModule, moduleMap.get(xbtModuleCCID.moduleId()));
+                            }
+                        }
+                    }
                 } else {
                     bdtSimple = new BDTSimpleType(
-                            dt, basedDt, isDefaultBDT, moduleCcDocument, dtNameResolver);
+                            dt, basedDt, isDefaultBDT, moduleCcDocument, namingStrategy.dtNameResolver());
                 }
             } else {
                 Map<DtScManifestId, DtScSummaryRecord> dtScMap = new HashMap();
@@ -206,29 +250,41 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
                     dtScMap.put(dtSc.dtScManifestId(), dtSc);
                 }
                 bdtSimple = new BDTSimpleContent(
-                        dt, basedDt, isDefaultBDT, dtScMap, moduleCcDocument, dtNameResolver);
+                        dt, basedDt, isDefaultBDT, dtScMap, moduleCcDocument, namingStrategy.dtNameResolver(), namingStrategy);
                 dtScList.forEach(dtSc -> {
                     List<DtScAwdPriSummaryRecord> dtScAwdPriList =
                             moduleCcDocument.getDtScAwdPriList(dtSc.dtScManifestId());
 
-                    List<DtScAwdPriSummaryRecord> codeListDtScAwdPri =
+                    List<DtScAwdPriSummaryRecord> agencyIdDtScAwdPri =
                             dtScAwdPriList.stream()
-                                    .filter(e -> e.codeListManifestId() != null)
+                                    .filter(e -> e.agencyIdListManifestId() != null)
                                     .collect(Collectors.toList());
-                    if (codeListDtScAwdPri.size() > 1) {
+                    if (agencyIdDtScAwdPri.size() > 1) {
                         throw new IllegalStateException();
                     }
 
-                    if (codeListDtScAwdPri.isEmpty()) {
-                        List<DtScAwdPriSummaryRecord> agencyIdDtScAwdPri =
+                    if (!agencyIdDtScAwdPri.isEmpty()) {
+                        AgencyIdListSummaryRecord agencyIdList = moduleCcDocument.getAgencyIdList(
+                                agencyIdDtScAwdPri.get(0).agencyIdListManifestId());
+                        ModuleCCID agencyIdListModuleCCID = moduleCcDocument.getModuleAgencyIdList(
+                                agencyIdList.agencyIdListManifestId());
+                        addDependency(schemaModule, moduleMap.get(agencyIdListModuleCCID.moduleId()));
+                    } else {
+                        List<DtScAwdPriSummaryRecord> codeListDtScAwdPri =
                                 dtScAwdPriList.stream()
-                                        .filter(e -> e.agencyIdListManifestId() != null)
+                                        .filter(e -> e.codeListManifestId() != null)
                                         .collect(Collectors.toList());
-                        if (agencyIdDtScAwdPri.size() > 1) {
+                        if (codeListDtScAwdPri.size() > 1) {
                             throw new IllegalStateException();
                         }
 
-                        if (agencyIdDtScAwdPri.isEmpty()) {
+                        if (!codeListDtScAwdPri.isEmpty()) {
+                            CodeListSummaryRecord codeList = moduleCcDocument.getCodeList(
+                                    codeListDtScAwdPri.get(0).codeListManifestId());
+                            ModuleCCID codeListModuleCCID = moduleCcDocument.getModuleCodeList(
+                                    codeList.codeListManifestId());
+                            addDependency(schemaModule, moduleMap.get(codeListModuleCCID.moduleId()));
+                        } else {
                             List<DtScAwdPriSummaryRecord> defaultDtScAwdPri =
                                     dtScAwdPriList.stream()
                                             .filter(e -> e.isDefault())
@@ -243,19 +299,7 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
                             if (xbtModuleCCID != null) {
                                 addDependency(schemaModule, moduleMap.get(xbtModuleCCID.moduleId()));
                             }
-                        } else {
-                            AgencyIdListSummaryRecord agencyIdList = moduleCcDocument.getAgencyIdList(
-                                    agencyIdDtScAwdPri.get(0).agencyIdListManifestId());
-                            ModuleCCID agencyIdListModuleCCID = moduleCcDocument.getModuleAgencyIdList(
-                                    agencyIdList.agencyIdListManifestId());
-                            addDependency(schemaModule, moduleMap.get(agencyIdListModuleCCID.moduleId()));
                         }
-                    } else {
-                        CodeListSummaryRecord codeList = moduleCcDocument.getCodeList(
-                                codeListDtScAwdPri.get(0).codeListManifestId());
-                        ModuleCCID codeListModuleCCID = moduleCcDocument.getModuleCodeList(
-                                codeList.codeListManifestId());
-                        addDependency(schemaModule, moduleMap.get(codeListModuleCCID.moduleId()));
                     }
                 });
             }
@@ -273,7 +317,7 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
                 DtSummaryRecord dt = moduleCcDocument.getDt(bccp.dtManifestId());
 
                 SchemaModule schemaModule = moduleMap.get(moduleCCID.moduleId());
-                schemaModule.addBCCP(new BCCP(bccp, dt));
+                schemaModule.addBCCP(new BCCP(bccp, dt, namingStrategy));
 
                 ModuleCCID dtModuleCCID = moduleCcDocument.getModuleDt(dt.dtManifestId());
                 if (dtModuleCCID == null) {
@@ -307,7 +351,7 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
             if (schemaModule == null) {
                 throw new IllegalStateException();
             }
-            schemaModule.addACC(ACC.newInstance(acc, moduleCcDocument));
+            schemaModule.addACC(ACC.newInstance(acc, moduleCcDocument, namingStrategy));
 
             if (acc.basedAccManifestId() != null) {
                 AccSummaryRecord basedAcc = moduleCcDocument.getAcc(acc.basedAccManifestId());
@@ -353,7 +397,7 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
             }
 
             SchemaModule schemaModule = moduleMap.get(moduleCCID.moduleId());
-            schemaModule.addASCCP(ASCCP.newInstance(asccp, moduleCcDocument));
+            schemaModule.addASCCP(ASCCP.newInstance(asccp, moduleCcDocument, namingStrategy));
 
             ModuleCCID roleOfAccModuleCCID = moduleCcDocument.getModuleAcc(asccp.roleOfAccManifestId());
             if (roleOfAccModuleCCID == null) {
@@ -372,7 +416,7 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
     }
 
     @Override
-    public void traverse(SchemaModule schemaModule, XMLExportSchemaModuleVisitor schemaModuleVisitor) throws Exception {
+    public void traverse(SchemaModule schemaModule, ExportSchemaModuleVisitor schemaModuleVisitor) throws Exception {
         for (SchemaModule include : schemaModule.getIncludeModules()) {
             schemaModuleVisitor.visitIncludeModule(include);
         }

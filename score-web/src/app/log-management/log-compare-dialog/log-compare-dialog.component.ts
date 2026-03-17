@@ -15,6 +15,7 @@ import {LogService} from '../domain/log.service';
 import {forkJoin} from 'rxjs';
 
 @Component({
+  standalone: false,
   selector: 'score-log-compare-dialog',
   templateUrl: './log-compare-dialog.component.html',
   styleUrls: ['./log-compare-dialog.component.css'],

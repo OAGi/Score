@@ -11,6 +11,7 @@ import {finalize, switchMap} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 
 @Component({
+  standalone: false,
   selector: 'score-namespace-detail',
   templateUrl: './namespace-detail.component.html',
   styleUrls: ['./namespace-detail.component.css']

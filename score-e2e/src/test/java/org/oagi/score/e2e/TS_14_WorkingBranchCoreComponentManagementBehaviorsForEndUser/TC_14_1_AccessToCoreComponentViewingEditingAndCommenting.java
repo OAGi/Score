@@ -40,7 +40,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
 
     @Test
     @DisplayName("TC_14_1_TA_1")
-    public void test_TA_1() {
+    public void end_user_can_see_in_the_core_component_view_or_edit_page_all_core_components_owned_by_any_user_in_an() {
         AppUserObject endUser;
         ReleaseObject workingBranch;
         ArrayList<ACCObject> accForTesting = new ArrayList<>();
@@ -229,7 +229,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
 
     @Test
     @DisplayName("TC_14_1_TA_2")
-    public void test_TA_2() {
+    public void there_shall_not_be_any_core_component_listed_that_is_owned_by_any_end_user_particularly_there_shall() {
         AppUserObject endUserA;
         AppUserObject endUserB;
         LibraryObject library;
@@ -401,7 +401,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
 
     @Test
     @DisplayName("TC_14_1_TA_3")
-    public void test_TA_3() {
+    public void end_user_can_view_but_cannot_edit_the_details_of_a_core_component_that_is_in_wip_state_and_owned_by() {
         AppUserObject endUser;
         ReleaseObject workingBranch;
         ArrayList<ACCObject> accForTesting = new ArrayList<>();
@@ -495,7 +495,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
 
     @Test
     @DisplayName("TC_14_1_TA_4")
-    public void test_TA_4() {
+    public void end_user_can_view_the_details_of_a_core_component_that_is_in_draft_state_and_owned_by_a_developer_bu() {
         AppUserObject endUser;
         ReleaseObject workingBranch;
         ArrayList<ACCObject> accForTesting = new ArrayList<>();
@@ -589,7 +589,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
 
     @Test
     @DisplayName("TC_14_1_TA_5")
-    public void test_TA_5() {
+    public void end_user_can_view_the_details_of_a_candidate_core_component_owned_by_a_developer_but_he_cannot_make() {
         AppUserObject endUser;
         ReleaseObject workingBranch;
         ArrayList<ACCObject> accForTesting = new ArrayList<>();
@@ -684,7 +684,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
 
     @Test
     @DisplayName("TC_14_1_TA_6")
-    public void test_TA_6() {
+    public void end_user_can_view_the_details_of_a_release_draft_core_component_owned_by_a_developer_but_he_cannot_m() {
         AppUserObject endUser;
         ReleaseObject workingBranch;
         ArrayList<ACCObject> accForTesting = new ArrayList<>();
@@ -778,7 +778,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
 
     @Test
     @DisplayName("TC_14_1_TA_7")
-    public void test_TA_7() {
+    public void end_user_can_view_the_details_of_a_published_core_component_owned_by_a_developer_but_he_cannot_make() {
         AppUserObject endUser;
         ReleaseObject workingBranch;
         ArrayList<ACCObject> accForTesting = new ArrayList<>();
@@ -872,7 +872,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
 
     @Test
     @DisplayName("TC_14_1_TA_8")
-    public void test_TA_8() {
+    public void end_user_cannot_create_a_brand_new_acc_asccp_or_a_bccp() {
         AppUserObject endUser;
         ReleaseObject release;
         {
@@ -898,7 +898,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
 
     @Test
     @DisplayName("TC_14_1_TA_9")
-    public void test_TA_9() {
+    public void end_user_cannot_revise_an_existing_acc_asccp_or_a_bccp() {
         AppUserObject endUser;
         ReleaseObject workingBranch;
         ArrayList<ACCObject> accForTesting = new ArrayList<>();

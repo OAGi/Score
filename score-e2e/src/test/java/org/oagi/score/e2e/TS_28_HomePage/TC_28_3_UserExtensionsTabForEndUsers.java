@@ -584,7 +584,8 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         HomePage.MyUnusedUEsInBIEsPanel myUnusedUEsInBIEsPanel = homePage.openMyUnusedUEsInBIEsPanel();
         String ueName = asccp.getPropertyTerm() + " User Extension Group";
         WebElement td = myUnusedUEsInBIEsPanel.getTableRecordByUEAndDEN(ueName, bccpToAppend.getDen());
-        click(td);
+        click(getDriver(), td.findElement(By.tagName("a")));
+        invisibilityOfLoadingContainerElement(getDriver());
         By AMEND_BUTTON_LOCATOR = By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
         assertTrue(elementToBeClickable(getDriver(), AMEND_BUTTON_LOCATOR).isDisplayed());
     }

@@ -12,6 +12,7 @@ import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
 
 @Component({
+  standalone: false,
   selector: 'score-module-edit-dialog',
   templateUrl: './module-edit-dialog.component.html',
   styleUrls: ['./module-edit-dialog.component.css']

@@ -86,3 +86,11 @@
   opacity: 1;
   padding: 0 24px;
 }
+
+.mat-column-businessContexts .businessContext {
+  display: block;
+}
+
+.mat-column-businessContexts .businessContext:not(:last-child) {
+  margin-bottom: 2px;
+}

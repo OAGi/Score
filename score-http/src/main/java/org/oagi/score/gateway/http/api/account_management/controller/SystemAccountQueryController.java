@@ -11,7 +11,7 @@ import org.oagi.score.gateway.http.api.account_management.model.OAuth2UserRecord
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.account_management.service.AccountQueryService;
 import org.oagi.score.gateway.http.api.account_management.service.PendingListService;
-import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
+import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationQueryService;
 import org.oagi.score.gateway.http.api.tenant_management.model.TenantId;
 import org.oagi.score.gateway.http.api.tenant_management.service.TenantQueryService;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
@@ -57,7 +57,7 @@ public class SystemAccountQueryController implements InitializingBean {
     private OidcClientInitiatedLogoutSuccessHandler oidcClientInitiatedLogoutSuccessHandler;
 
     @Autowired
-    private ApplicationConfigurationService configService;
+    private ApplicationConfigurationQueryService configService;
 
     @Autowired
     private TenantQueryService tenantService;
@@ -138,6 +138,10 @@ public class SystemAccountQueryController implements InitializingBean {
 
         resp.put("functionsRequiringEmailTransmission", ImmutableMap.builder()
                 .put("enabled", configService.isFunctionsRequiringEmailTransmissionEnabled(requester))
+                .build());
+
+        resp.put("browseStandardMode", ImmutableMap.builder()
+                .put("enabled", configService.isBrowseStandardModeEnabled(requester))
                 .build());
 
         return resp;

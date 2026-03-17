@@ -171,9 +171,10 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
 
     @Override
     public EditBIEPage uplift() {
-        click(getNextButton());
+        invisibilityOfLoadingContainerElement(getDriver());
+        click(getDriver(), getNextButton());
         invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-        click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
+        click(getDriver(), elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
         invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
         waitFor(ofMillis(1000L));
 

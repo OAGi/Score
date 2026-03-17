@@ -1,8 +1,11 @@
 package org.oagi.score.gateway.http.api.bie_management.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.oagi.score.gateway.http.api.bie_management.controller.payload.BieStateDependenciesRequest;
 import org.oagi.score.gateway.http.api.bie_management.controller.payload.DeprecateBIERequest;
+import org.oagi.score.gateway.http.api.bie_management.controller.payload.UpdateBieStateRequest;
 import org.oagi.score.gateway.http.api.bie_management.model.BieState;
+import org.oagi.score.gateway.http.api.bie_management.service.state_transition.BieStateDependencyTarget;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.abie.AbieDetailsRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.abie.AbieId;
@@ -22,6 +25,7 @@ import org.oagi.score.gateway.http.api.bie_management.model.bie_edit.tree.BieEdi
 import org.oagi.score.gateway.http.api.bie_management.model.bie_edit.tree.BieEditRef;
 import org.oagi.score.gateway.http.api.bie_management.service.BieCreateFromExistingBieService;
 import org.oagi.score.gateway.http.api.bie_management.service.BieEditService;
+import org.oagi.score.gateway.http.api.bie_management.service.state_transition.BieStateTransitionService;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.ascc.AsccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpManifestId;
@@ -37,7 +41,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 public class BieEditController {
@@ -50,6 +53,9 @@ public class BieEditController {
 
     @Autowired
     private SessionService sessionService;
+
+    @Autowired
+    private BieStateTransitionService bieStateTransitionService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -174,11 +180,49 @@ public class BieEditController {
 
     @RequestMapping(value = "/profile_bie/node/root/{id:[\\d]+}/state", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
+    /**
+     * Applies a state transition to a single root BIE after dependency validation has
+     * been completed in the UI.
+     *
+     * <p>The request may include additional dependency rows that should be updated
+     * together with the root BIE.</p>
+     */
     public void updateState(@AuthenticationPrincipal AuthenticatedPrincipal user,
                             @PathVariable("id") TopLevelAsbiepId topLevelAsbiepId,
-                            @RequestBody Map<String, Object> body) {
-        BieState state = BieState.valueOf((String) body.get("state"));
-        service.updateState(sessionService.asScoreUser(user), topLevelAsbiepId, state);
+                            @RequestBody UpdateBieStateRequest request) {
+        bieStateTransitionService.updateState(sessionService.asScoreUser(user), topLevelAsbiepId,
+                request.getState(), request.getDependencyTopLevelAsbiepIds());
+    }
+
+    @GetMapping(value = "/profile_bie/node/root/{id:[\\d]+}/state/dependencies",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    /**
+     * Builds the dependency preview graph for a single root BIE and destination state.
+     */
+    public List<BieStateDependencyTarget> getStateDependencies(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("id") TopLevelAsbiepId topLevelAsbiepId,
+            @RequestParam("state") BieState state) {
+        return bieStateTransitionService.getStateDependencies(
+                sessionService.asScoreUser(user),
+                List.of(topLevelAsbiepId),
+                state);
+    }
+
+    @PostMapping(value = "/profile_bie/node/root/{id:[\\d]+}/state/dependencies/validate",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    /**
+     * Revalidates the dependency dialog after the client changes checkbox selection.
+     */
+    public List<BieStateDependencyTarget> validateStateDependencies(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("id") TopLevelAsbiepId topLevelAsbiepId,
+            @RequestBody BieStateDependenciesRequest request) {
+        return bieStateTransitionService.validateStateDependencies(
+                sessionService.asScoreUser(user),
+                List.of(topLevelAsbiepId),
+                request.getState(),
+                request.getSelectedTopLevelAsbiepIds());
     }
 
     @RequestMapping(value = "/profile_bie/{topLevelAsbiepId:[\\d]+}/detail", method = RequestMethod.POST,

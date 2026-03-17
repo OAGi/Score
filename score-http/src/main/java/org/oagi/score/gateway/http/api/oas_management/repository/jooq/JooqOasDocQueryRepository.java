@@ -22,7 +22,6 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.OasResponseRecord;
 import org.oagi.score.gateway.http.common.util.StringUtils;
 
-import java.math.BigInteger;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -82,6 +81,7 @@ public class JooqOasDocQueryRepository extends JooqBaseRepository
             oasDoc.setContactEmail(record.get(OAS_DOC.CONTACT_EMAIL));
             oasDoc.setLicenseName(record.get(OAS_DOC.LICENSE_NAME));
             oasDoc.setLicenseUrl(record.get(OAS_DOC.LICENSE_URL));
+            oasDoc.setOwnerUserId(fetchOwnerUserId(record));
             oasDoc.setCreatedBy(fetchCreatorSummary(record));
             oasDoc.setLastUpdatedBy(fetchUpdaterSummary(record));
             oasDoc.setCreationTimestamp(toDate(record.get(OAS_DOC.CREATION_TIMESTAMP)));
@@ -95,10 +95,10 @@ public class JooqOasDocQueryRepository extends JooqBaseRepository
             GetOasDocRequest request) throws ScoreDataAccessException {
         OasDoc oasDoc = null;
 
-        BigInteger oasDocId = request.getOasDocId();
+        OasDocId oasDocId = request.getOasDocId();
         if (oasDocId != null) {
             oasDoc = (OasDoc) select()
-                    .where(OAS_DOC.OAS_DOC_ID.eq(ULong.valueOf(oasDocId)))
+                    .where(OAS_DOC.OAS_DOC_ID.eq(valueOf(oasDocId)))
                     .fetchOne(mapper());
         }
 
@@ -228,10 +228,10 @@ public class JooqOasDocQueryRepository extends JooqBaseRepository
     @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public GetOasOperationResponse getOasOperation(GetOasOperationRequest request) throws ScoreDataAccessException {
         OasOperation oasOperation = null;
-        BigInteger oasResourceId = request.getOasResourceId();
+        OasResourceId oasResourceId = request.getOasResourceId();
         if (oasResourceId != null) {
             oasOperation = (OasOperation) selectForOasOperation()
-                    .where(OAS_OPERATION.OAS_RESOURCE_ID.eq(ULong.valueOf(oasResourceId)))
+                    .where(OAS_OPERATION.OAS_RESOURCE_ID.eq(valueOf(oasResourceId)))
                     .fetchOne(mapperForOasOperation());
         }
         return new GetOasOperationResponse(oasOperation);
@@ -240,8 +240,8 @@ public class JooqOasDocQueryRepository extends JooqBaseRepository
     private RecordMapper<Record, OasOperation> mapperForOasOperation() {
         return record -> {
             OasOperation oasOperation = new OasOperation();
-            oasOperation.setOasOperationId(record.get(OAS_OPERATION.OAS_OPERATION_ID).toBigInteger());
-            oasOperation.setOasResourceId(record.get(OAS_OPERATION.OAS_RESOURCE_ID).toBigInteger());
+            oasOperation.setOasOperationId(new OasOperationId(record.get(OAS_OPERATION.OAS_OPERATION_ID).toBigInteger()));
+            oasOperation.setOasResourceId(new OasResourceId(record.get(OAS_OPERATION.OAS_RESOURCE_ID).toBigInteger()));
             oasOperation.setVerb(record.get(OAS_OPERATION.VERB));
             oasOperation.setDeprecated((byte) 1 == record.get(OAS_OPERATION.DEPRECATED));
             oasOperation.setOperationId(record.get(OAS_OPERATION.OPERATION_ID));
@@ -249,16 +249,14 @@ public class JooqOasDocQueryRepository extends JooqBaseRepository
             oasOperation.setDescription(record.get(OAS_OPERATION.DESCRIPTION));
             oasOperation.setCreatedBy(fetchCreatorSummary(record));
             oasOperation.setLastUpdatedBy(fetchUpdaterSummary(record));
-            oasOperation.setCreationTimestamp(
-                    Date.from(record.get(OAS_DOC.CREATION_TIMESTAMP).atZone(ZoneId.systemDefault()).toInstant()));
-            oasOperation.setLastUpdateTimestamp(
-                    Date.from(record.get(OAS_DOC.LAST_UPDATE_TIMESTAMP).atZone(ZoneId.systemDefault()).toInstant()));
+            oasOperation.setCreationTimestamp(toDate(record.get(OAS_OPERATION.CREATION_TIMESTAMP)));
+            oasOperation.setLastUpdateTimestamp(toDate(record.get(OAS_OPERATION.LAST_UPDATE_TIMESTAMP)));
             return oasOperation;
         };
     }
 
     private SelectOnConditionStep selectForOasOperation() {
-        return dslContext().select(
+        return dslContext().select(concat(fields(
                         OAS_OPERATION.OAS_OPERATION_ID,
                         OAS_OPERATION.OAS_RESOURCE_ID,
                         OAS_OPERATION.DESCRIPTION,
@@ -266,19 +264,12 @@ public class JooqOasDocQueryRepository extends JooqBaseRepository
                         OAS_OPERATION.VERB,
                         OAS_OPERATION.SUMMARY,
                         OAS_OPERATION.DEPRECATED,
-                        APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
-                        APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
-                        APP_USER.as("creator").NAME.as("creator_name"),
-                        APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
-                        APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
-                        APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
-                        APP_USER.as("updater").NAME.as("updater_name"),
-                        APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"),
                         OAS_OPERATION.CREATION_TIMESTAMP,
-                        OAS_OPERATION.LAST_UPDATE_TIMESTAMP)
+                        OAS_OPERATION.LAST_UPDATE_TIMESTAMP
+                ), creatorFields(), updaterFields()))
                 .from(OAS_OPERATION)
-                .join(APP_USER.as("creator")).on(OAS_OPERATION.CREATED_BY.eq(APP_USER.as("creator").APP_USER_ID))
-                .join(APP_USER.as("updater")).on(OAS_OPERATION.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID));
+                .join(creatorTable()).on(creatorTablePk().eq(OAS_OPERATION.CREATED_BY))
+                .join(updaterTable()).on(updaterTablePk().eq(OAS_OPERATION.LAST_UPDATED_BY));
     }
 
     @Override
@@ -286,14 +277,14 @@ public class JooqOasDocQueryRepository extends JooqBaseRepository
     public GetOasRequestTableResponse getOasRequestTable(GetOasRequestTableRequest request) throws ScoreDataAccessException {
         OasRequest oasRequest = null;
         OasRequestRecord oasRequestRecord = null;
-        BigInteger oasOperationId = request.getOasOperationId();
+        OasOperationId oasOperationId = request.getOasOperationId();
         if (oasOperationId != null) {
             oasRequestRecord = dslContext().selectFrom(OAS_REQUEST).where(OAS_REQUEST.OAS_OPERATION_ID
-                    .eq(ULong.valueOf(oasOperationId))).fetchOptional().orElse(null);
+                    .eq(valueOf(oasOperationId))).fetchOptional().orElse(null);
         }
         if (oasRequestRecord != null) {
             oasRequest = (OasRequest) selectForOasRequestTable()
-                    .where(OAS_REQUEST.OAS_OPERATION_ID.eq(ULong.valueOf(oasOperationId)))
+                    .where(OAS_REQUEST.OAS_OPERATION_ID.eq(valueOf(oasOperationId)))
                     .fetchOne(mapperForOasRequestTable());
             return new GetOasRequestTableResponse(oasRequest);
         }
@@ -301,7 +292,7 @@ public class JooqOasDocQueryRepository extends JooqBaseRepository
     }
 
     private SelectOnConditionStep selectForOasRequestTable() {
-        return dslContext().select(
+        return dslContext().select(concat(fields(
                         OAS_REQUEST.OAS_REQUEST_ID,
                         OAS_REQUEST.OAS_OPERATION_ID,
                         OAS_REQUEST.DESCRIPTION,
@@ -310,38 +301,29 @@ public class JooqOasDocQueryRepository extends JooqBaseRepository
                         OAS_REQUEST.MAKE_ARRAY_INDICATOR,
                         OAS_REQUEST.SUPPRESS_ROOT_INDICATOR,
                         OAS_REQUEST.IS_CALLBACK,
-                        APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
-                        APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
-                        APP_USER.as("creator").NAME.as("creator_name"),
-                        APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
-                        APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
-                        APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
-                        APP_USER.as("updater").NAME.as("updater_name"),
-                        APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"),
                         OAS_REQUEST.CREATION_TIMESTAMP,
-                        OAS_REQUEST.LAST_UPDATE_TIMESTAMP)
+                        OAS_REQUEST.LAST_UPDATE_TIMESTAMP
+                ), creatorFields(), updaterFields()))
                 .from(OAS_REQUEST)
-                .join(APP_USER.as("creator")).on(OAS_REQUEST.CREATED_BY.eq(APP_USER.as("creator").APP_USER_ID))
-                .join(APP_USER.as("updater")).on(OAS_REQUEST.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID));
+                .join(creatorTable()).on(creatorTablePk().eq(OAS_REQUEST.CREATED_BY))
+                .join(updaterTable()).on(updaterTablePk().eq(OAS_REQUEST.LAST_UPDATED_BY));
     }
 
     private RecordMapper<Record, OasRequest> mapperForOasRequestTable() {
         return record -> {
             OasRequest oasRequest = new OasRequest();
-            oasRequest.setOasRequestId(record.get(OAS_REQUEST.OAS_REQUEST_ID).toBigInteger());
-            oasRequest.setOasOperationId(record.get(OAS_REQUEST.OAS_OPERATION_ID).toBigInteger());
+            oasRequest.setOasRequestId(new OasRequestId(record.get(OAS_REQUEST.OAS_REQUEST_ID).toBigInteger()));
+            oasRequest.setOasOperationId(new OasOperationId(record.get(OAS_REQUEST.OAS_OPERATION_ID).toBigInteger()));
             oasRequest.setDescription(record.get(OAS_REQUEST.DESCRIPTION));
             oasRequest.setRequired((byte) 1 == record.get(OAS_REQUEST.REQUIRED));
-            oasRequest.setOasMessageBodyId(record.get(OAS_REQUEST.OAS_MESSAGE_BODY_ID).toBigInteger());
+            oasRequest.setOasMessageBodyId(new OasMessageBodyId(record.get(OAS_REQUEST.OAS_MESSAGE_BODY_ID).toBigInteger()));
             oasRequest.setMakeArrayIndicator((byte) 1 == record.get(OAS_REQUEST.MAKE_ARRAY_INDICATOR));
             oasRequest.setSuppressRootIndicator((byte) 1 == record.get(OAS_REQUEST.SUPPRESS_ROOT_INDICATOR));
             oasRequest.setCallback((byte) 1 == record.get(OAS_REQUEST.IS_CALLBACK));
             oasRequest.setCreatedBy(fetchCreatorSummary(record));
             oasRequest.setLastUpdatedBy(fetchUpdaterSummary(record));
-            oasRequest.setCreationTimestamp(
-                    Date.from(record.get(OAS_DOC.CREATION_TIMESTAMP).atZone(ZoneId.systemDefault()).toInstant()));
-            oasRequest.setLastUpdateTimestamp(
-                    Date.from(record.get(OAS_DOC.LAST_UPDATE_TIMESTAMP).atZone(ZoneId.systemDefault()).toInstant()));
+            oasRequest.setCreationTimestamp(toDate(record.get(OAS_REQUEST.CREATION_TIMESTAMP)));
+            oasRequest.setLastUpdateTimestamp(toDate(record.get(OAS_REQUEST.LAST_UPDATE_TIMESTAMP)));
             return oasRequest;
         };
     }
@@ -351,21 +333,21 @@ public class JooqOasDocQueryRepository extends JooqBaseRepository
     public GetOasResponseTableResponse getOasResponseTable(GetOasResponseTableRequest request) throws ScoreDataAccessException {
         OasResponse oasResponse = null;
         OasResponseRecord oasResponseRecord = null;
-        BigInteger oasOperationId = request.getOasOperationId();
+        OasOperationId oasOperationId = request.getOasOperationId();
         if (oasOperationId != null) {
             oasResponseRecord = dslContext().selectFrom(OAS_RESPONSE).
-                    where(OAS_RESPONSE.OAS_OPERATION_ID.eq(ULong.valueOf(oasOperationId))).fetchOptional().orElse(null);
+                    where(OAS_RESPONSE.OAS_OPERATION_ID.eq(valueOf(oasOperationId))).fetchOptional().orElse(null);
         }
         if (oasResponseRecord != null) {
             oasResponse = (OasResponse) selectForOasResponseTable()
-                    .where(OAS_RESPONSE.OAS_OPERATION_ID.eq(ULong.valueOf(oasOperationId)))
+                    .where(OAS_RESPONSE.OAS_OPERATION_ID.eq(valueOf(oasOperationId)))
                     .fetchOne(mapperForOasResponseTable());
         }
         return new GetOasResponseTableResponse(oasResponse);
     }
 
     private SelectOnConditionStep selectForOasResponseTable() {
-        return dslContext().select(
+        return dslContext().select(concat(fields(
                         OAS_RESPONSE.OAS_RESPONSE_ID,
                         OAS_RESPONSE.OAS_OPERATION_ID,
                         OAS_RESPONSE.DESCRIPTION,
@@ -373,37 +355,28 @@ public class JooqOasDocQueryRepository extends JooqBaseRepository
                         OAS_RESPONSE.MAKE_ARRAY_INDICATOR,
                         OAS_RESPONSE.SUPPRESS_ROOT_INDICATOR,
                         OAS_RESPONSE.INCLUDE_CONFIRM_INDICATOR,
-                        APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
-                        APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
-                        APP_USER.as("creator").NAME.as("creator_name"),
-                        APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
-                        APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
-                        APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
-                        APP_USER.as("updater").NAME.as("updater_name"),
-                        APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"),
                         OAS_RESPONSE.CREATION_TIMESTAMP,
-                        OAS_RESPONSE.LAST_UPDATE_TIMESTAMP)
+                        OAS_RESPONSE.LAST_UPDATE_TIMESTAMP
+                ), creatorFields(), updaterFields()))
                 .from(OAS_RESPONSE)
-                .join(APP_USER.as("creator")).on(OAS_RESPONSE.CREATED_BY.eq(APP_USER.as("creator").APP_USER_ID))
-                .join(APP_USER.as("updater")).on(OAS_RESPONSE.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID));
+                .join(creatorTable()).on(creatorTablePk().eq(OAS_RESPONSE.CREATED_BY))
+                .join(updaterTable()).on(updaterTablePk().eq(OAS_RESPONSE.LAST_UPDATED_BY));
     }
 
     private RecordMapper<Record, OasResponse> mapperForOasResponseTable() {
         return record -> {
             OasResponse oasResponse = new OasResponse();
-            oasResponse.setOasResponseId(record.get(OAS_RESPONSE.OAS_RESPONSE_ID).toBigInteger());
-            oasResponse.setOasOperationId(record.get(OAS_RESPONSE.OAS_OPERATION_ID).toBigInteger());
+            oasResponse.setOasResponseId(new OasResponseId(record.get(OAS_RESPONSE.OAS_RESPONSE_ID).toBigInteger()));
+            oasResponse.setOasOperationId(new OasOperationId(record.get(OAS_RESPONSE.OAS_OPERATION_ID).toBigInteger()));
             oasResponse.setDescription(record.get(OAS_RESPONSE.DESCRIPTION));
-            oasResponse.setOasMessageBodyId(record.get(OAS_RESPONSE.OAS_MESSAGE_BODY_ID).toBigInteger());
+            oasResponse.setOasMessageBodyId(new OasMessageBodyId(record.get(OAS_RESPONSE.OAS_MESSAGE_BODY_ID).toBigInteger()));
             oasResponse.setMakeArrayIndicator((byte) 1 == record.get(OAS_RESPONSE.MAKE_ARRAY_INDICATOR));
             oasResponse.setSuppressRootIndicator((byte) 1 == record.get(OAS_RESPONSE.SUPPRESS_ROOT_INDICATOR));
             oasResponse.setIncludeConfirmIndicator((byte) 1 == record.get(OAS_RESPONSE.INCLUDE_CONFIRM_INDICATOR));
             oasResponse.setCreatedBy(fetchCreatorSummary(record));
             oasResponse.setLastUpdatedBy(fetchUpdaterSummary(record));
-            oasResponse.setCreationTimestamp(
-                    Date.from(record.get(OAS_DOC.CREATION_TIMESTAMP).atZone(ZoneId.systemDefault()).toInstant()));
-            oasResponse.setLastUpdateTimestamp(
-                    Date.from(record.get(OAS_DOC.LAST_UPDATE_TIMESTAMP).atZone(ZoneId.systemDefault()).toInstant()));
+            oasResponse.setCreationTimestamp(toDate(record.get(OAS_RESPONSE.CREATION_TIMESTAMP)));
+            oasResponse.setLastUpdateTimestamp(toDate(record.get(OAS_RESPONSE.LAST_UPDATE_TIMESTAMP)));
             return oasResponse;
         };
     }

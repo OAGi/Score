@@ -3,10 +3,9 @@ import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {hashCode} from 'src/app/common/utility';
+import {hashCode, saveAsBlobResponse} from 'src/app/common/utility';
 import {SelectionModel} from '@angular/cdk/collections';
 import {catchError, finalize, map} from 'rxjs/operators';
-import {saveAs} from 'file-saver';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatMultiSort, MatMultiSortTableDataSource, TableData} from 'ngx-mat-multi-sort';
 import {AuthService} from '../../../authentication/auth.service';
@@ -25,8 +24,10 @@ import {
 import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {forkJoin, of} from 'rxjs';
+import {BieExpressOption} from '../../bie-express/domain/generate-expression';
 
 @Component({
+  standalone: false,
   selector: 'score-bie-package-detail',
   templateUrl: './bie-package-detail.component.html',
   styleUrls: ['./bie-package-detail.component.css']
@@ -35,9 +36,9 @@ export class BiePackageDetailComponent implements OnInit {
 
   title = 'Edit BIE Package';
   biePackage: BiePackageDetails = new BiePackageDetails();
-  schemaExpression = 'XML';
   hashCode;
   disabled: boolean;
+  option: BieExpressOption;
 
   get columns(): TableColumnsProperty[] {
     if (!this.preferencesInfo) {
@@ -193,6 +194,7 @@ export class BiePackageDetailComponent implements OnInit {
 
   table: TableData<BieListEntry>;
   selection = new SelectionModel<BieListEntry>(true, []);
+  businessContextSelection = {};
   request: BieListInBiePackageRequest;
   preferencesInfo: PreferencesInfo;
   loading = false;
@@ -214,6 +216,16 @@ export class BiePackageDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.option = new BieExpressOption();
+    this.option.bieDefinition = true;
+    this.option.expressionOption = 'XML';
+    this.option.expressionVersion = '';
+    this.option.arrayForJsonExpression = false;
+    this.option.packageOption = 'EACH';
+    this.option.separateFileReferencesForReusedSchemas = true;
+    this.option.includeBusinessContextInFilename = true;
+    this.option.includeVersionInFilename = true;
+
     this.table = new TableData<BieListEntry>(this.defaultDisplayedColumns, {});
     this.table.dataSource = new MatMultiSortTableDataSource<BieListEntry>(this.sort, false);
 
@@ -305,12 +317,16 @@ export class BiePackageDetailComponent implements OnInit {
     ).subscribe(resp => {
       this.paginator.length = resp.length;
       this.table.dataSource.data = resp.list;
+      this.table.dataSource.data.forEach((elm: BieListEntry) => {
+        this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContextList[0];
+      });
 
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
       }
     }, error => {
       this.table.dataSource.data = [];
+      this.businessContextSelection = {};
     });
   }
 
@@ -497,25 +513,41 @@ export class BiePackageDetailComponent implements OnInit {
       topLevelAsbiepIdList = selectedBieLists.map(e => e.topLevelAsbiepId);
     }
 
+    // Package export uses JSON Schema 2020-12 only when JSON is selected.
+    if (this.option.expressionOption === 'JSON') {
+      this.option.expressionVersion = '2020-12';
+    } else {
+      this.option.expressionVersion = '';
+    }
+    // Package export is intentionally fixed to per-file mode with split reused-schema refs.
+    this.option.packageOption = 'EACH';
+    this.option.arrayForJsonExpression = false;
+    this.option.separateFileReferencesForReusedSchemas = true;
+    this.option.includeBusinessContextInFilename = true;
+    this.option.includeVersionInFilename = true;
+    this.option.filenames = {};
+    this.option.bizCtxIds = {};
+
+    const targetBieLists = (selectedBieLists && selectedBieLists.length > 0)
+      ? selectedBieLists
+      : this.table.dataSource.data;
+    for (const bieList of targetBieLists) {
+      const selectedBusinessContext = this.businessContextSelection[bieList.topLevelAsbiepId];
+      if (!!selectedBusinessContext) {
+        this.option.bizCtxIds[bieList.topLevelAsbiepId] = selectedBusinessContext.businessContextId;
+      }
+    }
+
     this.loading = true;
     this.biePackageService.generateBiePackage(
-      this.biePackage.biePackageId, {
-        schemaExpression: this.schemaExpression
-      }, ...topLevelAsbiepIdList).subscribe(resp => {
-      const blob = new Blob([resp.body], {type: resp.headers.get('Content-Type')});
-      saveAs(blob, this._getFilenameFromContentDisposition(resp));
+      this.biePackage.biePackageId, this.option, ...topLevelAsbiepIdList).subscribe(resp => {
+      saveAsBlobResponse(resp);
 
       this.loading = false;
     }, err => {
       this.loading = false;
       throw err;
     });
-  }
-
-  _getFilenameFromContentDisposition(resp) {
-    const contentDisposition = resp.headers.get('Content-Disposition') || '';
-    const matches = /filename=([^;]+)/ig.exec(contentDisposition);
-    return (matches[1] || 'untitled').replace(/\"/gi, '').trim();
   }
 
   getManifest(): any {
@@ -605,6 +637,42 @@ export class BiePackageDetailComponent implements OnInit {
           });
         }
       });
+  }
+
+  expressionOptionChange() {
+    // Keep package export behavior deterministic regardless of expression switch.
+    this.option.packageOption = 'EACH';
+    this.option.separateFileReferencesForReusedSchemas = true;
+    this.option.expressionVersion = (this.option.expressionOption === 'JSON') ? '2020-12' : '';
+    this.option.arrayForJsonExpression = false;
+    this.option.includeBusinessContextInFilename = true;
+    this.option.includeVersionInFilename = true;
+
+    if (this.option.expressionOption !== 'XML') {
+      this.option.bieCctsMetaData = false;
+      this.option.includeCctsDefinitionTag = false;
+      this.option.bieGuid = false;
+      this.option.businessContext = false;
+      this.option.bieOagiScoreMetaData = false;
+      this.option.includeWhoColumns = false;
+    }
+    if (this.option.expressionOption !== 'XML' && this.option.expressionOption !== 'JSON') {
+      this.option.basedCcMetaData = false;
+    }
+  }
+
+  bieAnnotationChange() {
+    if (!this.option.bieCctsMetaData) {
+      this.option.includeCctsDefinitionTag = false;
+    }
+
+    if (!this.option.bieOagiScoreMetaData) {
+      this.option.includeWhoColumns = false;
+    }
+  }
+
+  isBasedCcMetaDataDisabled(): boolean {
+    return this.option.expressionOption !== 'XML' && this.option.expressionOption !== 'JSON';
   }
 
   makeNewRevision() {

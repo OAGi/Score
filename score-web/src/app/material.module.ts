@@ -43,10 +43,15 @@ import {MatTreeModule} from '@angular/material/tree';
 import {NgModule} from '@angular/core';
 import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 import {MatBadgeModule} from '@angular/material/badge';
-import {MatMultiSortModule} from 'ngx-mat-multi-sort';
+import {MatMultiSort, MatMultiSortHeaderComponent, MatMultiSortModule, MatMultiSortTableSettingsComponent} from 'ngx-mat-multi-sort';
 import {MatIconButtonSizesModule} from 'mat-icon-button-sizes';
 
 @NgModule({
+  imports: [
+    MatMultiSort,
+    MatMultiSortHeaderComponent,
+    MatMultiSortTableSettingsComponent
+  ],
   exports: [
     // CDK
     A11yModule,
@@ -89,6 +94,9 @@ import {MatIconButtonSizesModule} from 'mat-icon-button-sizes';
     MatStepperModule,
     MatTableModule,
     MatMultiSortModule,
+    MatMultiSort,
+    MatMultiSortHeaderComponent,
+    MatMultiSortTableSettingsComponent,
     MatTreeModule,
     MatPaginatorModule,
     MatTabsModule,

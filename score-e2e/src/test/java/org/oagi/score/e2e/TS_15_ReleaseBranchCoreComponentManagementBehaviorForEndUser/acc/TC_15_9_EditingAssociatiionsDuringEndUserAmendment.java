@@ -50,7 +50,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_1_a() {
+    public void selected_asccp_can_be_in_any_state() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -119,7 +119,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_1_b() {
+    public void warning_shall_be_given_if_the_asccp_is_deprecated() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -165,7 +165,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_1_c() {
+    public void asccp_shall_not_violate_the_property_uniqueness_constraint_of_the_acc_in_other_words() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -207,7 +207,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_1_d() {
+    public void resulting_ascc_shall_be_in_the_wip_state() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -236,7 +236,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_1_e() {
+    public void if_the_asccp_is_not_reusable_check_that_there_is_no_ascc_already_using() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -279,7 +279,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_2() {
+    public void end_user_can_right_click_on_any_associations_and_insert_an_asccp_before_or() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -324,7 +324,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_3_a() {
+    public void min_0() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -373,7 +373,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_3_b() {
+    public void max_1_and_max_min_when_max_1() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -426,7 +426,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_3_c() {
+    public void user_may_type_in_unbounded_in_place_of_1_for_max_if_the_user() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -466,7 +466,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_3_d() {
+    public void min_max_and_deprecated_are_required() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -509,7 +509,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_3_e() {
+    public void warning_should_be_given_when_the_definition_is_empty() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -550,7 +550,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_3_f() {
+    public void deprecated_must_be_false_and_locked_because_it_is_a_new_association_it_shouldn() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -588,7 +588,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_4_a() {
+    public void selected_bccp_can_be_in_any_state() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -660,7 +660,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_4_b() {
+    public void warning_shall_be_given_if_the_bccp_is_deprecated() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -716,7 +716,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_4_c() {
+    public void added_bccp_shall_not_cause_a_property_uniqueness_violation_to_the_acc() {
         AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherUser);
 
@@ -770,7 +770,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_4_d() {
+    public void resulting_bcc_shall_be_in_the_wip_state() {
         AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherUser);
 
@@ -811,7 +811,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_4_e() {
+    public void if_the_entity_type_is_changed_from_element_to_attribute_the_min_cardinality_should() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -871,7 +871,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_4_f() {
+    public void entity_type_can_be_changed_to_attribute_only_when_the_bccp_has_no_sc() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -942,7 +942,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_5() {
+    public void end_user_can_right_click_on_any_associations_and_insert_a_bccp_before_or() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -998,7 +998,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_6_a() {
+    public void min_0_scenario_2() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -1045,7 +1045,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_6_b() {
+    public void max_1_and_max_min_when_max_1_scenario_2() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -1095,7 +1095,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_6_c() {
+    public void user_may_type_in_unbounded_in_place_of_1_for_max_if_the_user_scenario_2() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -1135,7 +1135,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_6_d() {
+    public void all_fields_except_definition_and_definition_source_are_required_however_a_warning_should_be() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -1184,7 +1184,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_6_e() {
+    public void deprecated_must_be_false_because_it_is_a_new_association_it_shouldn_t_be() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -1225,7 +1225,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_6_f() {
+    public void default_and_fixed_value_shall_be_disabled_and_cleared_of_value_if_the_entity() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -1276,17 +1276,17 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_7() {
+    public void end_user_can_change_move_up_or_down_position_of_the_brand_new_association() {
 
     }
 
     @Test
-    public void test_TA_15_9_8() {
+    public void end_user_can_change_move_up_or_down_position_of_the_brand_new_association_scenario_2() {
 
     }
 
     @Test
-    public void test_TA_15_9_9() {
+    public void end_user_can_remove_a_brand_new_association_ascc_or_bcc_if_the_association() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         String branch = "10.8.7.1";
@@ -1332,7 +1332,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_10_a() {
+    public void new_based_acc_can_be_in_any_state() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -1385,7 +1385,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_10_b() {
+    public void if_the_chosen_based_acc_is_deprecated_a_warning_shall_be_given() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         String branch = "10.8.7.1";
@@ -1440,7 +1440,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_10_c() {
+    public void based_acc_can_only_be_base_or_semantics_component_type() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -1491,7 +1491,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_10_d() {
+    public void end_user_cannot_change_the_fields_of_the_base_acc() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -1541,7 +1541,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_10_e() {
+    public void based_acc_should_not_contain_an_asccp_or_a_bccp_with_the_same_property() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -1617,7 +1617,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_11() {
+    public void end_user_can_remove_the_based_acc_when_one_already_exists_before_the_amendment() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         String branch = "10.8.7.1";
@@ -1650,7 +1650,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_12() {
+    public void end_user_can_transfer_the_ownership_of_an_acc_which_is_in_wip_states() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -1746,7 +1746,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_13() {
+    public void end_user_cannot_remove_assc_or_bcc_existed_before_the_amendment() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         String branch = "10.8.7.1";
@@ -1795,7 +1795,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_14_a() {
+    public void scenario_0_min_previousmin() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -1835,7 +1835,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_14_b() {
+    public void if_previous_max_1_it_cannot_be_changed_otherwise_max_1_or_max_previous() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -1876,7 +1876,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_14_c_deprecated_in_previous_version() {
+    public void if_the_deprecated_was_already_true_before_the_amendment_the_field_along_with_the() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -1919,7 +1919,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_14_c_not_deprecated_in_previous_version() {
+    public void if_the_deprecated_was_already_true_before_the_amendment_the_field_along_with_the_scenario_2() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -1962,7 +1962,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_14_d() {
+    public void warning_should_be_given_when_the_definition_is_empty_scenario_2() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -2005,7 +2005,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
     }
 
     @Test
-    public void test_TA_15_9_15() {
+    public void end_user_can_cancel_the_amendment_in_such_case_all_changes_to_the_acc() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);

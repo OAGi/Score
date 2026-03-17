@@ -40,45 +40,15 @@ In the “My recent BIEs” panel, the developer can see the last 5 BIEs that he
 In the “My recent BIEs” panel, the developer can click on a BIE to view it in the Edit BIE page.
 
 ### Test Step Pre-condition:
-
-1. There are at least three BIEs created by the OAGi developer and they are in different states (Editing, Candidate, Published).
-2. There are at least three BIEs created by an end user and developer (e.g., usera and devx) and they are in different states.
+1. Developer accounts and top-level BIE data exist across `WIP`, `QA`, and `Production` states for release `10.8.4`, and additional developer BIE data exists in another release (for example `10.8.3`) so `All`-branch aggregation checks can be exercised.
+2. Additional developer and end-user BIE data exists so the `BIEs by users and states` table can show multiple users and totals.
 
 ### Test Step:
-
-1. An OAGi developer logins.
-2. He visits the Home page and clicks on the BIEs tab.
-3. Verify that the “Total BIEs by state” panel contains the number of the BIEs existing in Score per their state (e.g., by first navigating to the BIE List and count them – without using the Database) (Assertion [#1](#test-assertion-2811))
-4. He clicks on the Editing state of the “Total BIEs by state” panel.
-5. Verify that the BIE list is returned where all BIEs in Editing state are displayed. Also verify that their number is the same as the number displayed inside the Editing bar of the “Total BIEs by state” panel. Finally, verify that there are BIEs owned by different users (e.g., usera) but not BIEs in Candidate or Published state. (Assertion [#2](#test-assertion-2812))
-6. The developer goes back to home page and clicks the BIEs tab.
-7. He clicks on the Candidate state of the “Total BIEs by state” panel.
-8. Verify that the BIE list is returned where all BIEs in Candidate state are displayed. Also verify that their number is the same as the number displayed inside the Candidate bar of the “Total BIEs by state” panel.  Finally, verify that there are BIEs owned by different users (e.g., usera) but not BIEs in Editing or Published state. (Assertion [#2](#test-assertion-2812))
-9. The developer goes back to home page and clicks the BIEs tab.
-10. He clicks on the Published state of the “Total BIEs by state” panel.
-11. Verify that the BIE list is returned where all BIEs in Published state are displayed. Also verify that their number is the same as the number displayed inside the Published bar of the “Total BIEs by state” panel. Finally, verify that there are BIEs owned by different users (e.g., usera) but not BIEs in Editing or Candidate state. (Assertion [#2](#test-assertion-2812))
-12. The developer goes back to home page and clicks the BIEs tab.
-13. Verify that the “My BIEs by state” panel contains the number of his BIEs per their state (e.g., by first navigating to the BIE List and count them – without using the Database) (Assertion [#3](#test-assertion-2813))
-14. He clicks on the Editing state of the “My BIEs by state” panel.
-15. Verify that the BIE list is returned where the BIEs owned by the developer and are in Editing state are displayed. Also verify that their number is the same as the number displayed inside the Editing bar of the “My BIEs by state” panel. Finally, verify that there is no BIEs owned by another user or developer (e.g., usera or devx) as well as there is no BIEs in Candidate or in Published state. (Assertion [#4](#test-assertion-2814))
-16. The developer goes back to home page and clicks the BIEs tab.
-17. He clicks on the Candidate state of the “My BIEs by state” panel.
-18. Verify that the BIE list is returned where the BIEs owned by the developer and are in Candidate state are displayed. Also verify that their number is the same as the number displayed inside the Candidate bar of the “My BIEs by state” panel. Finally, verify that there is no BIEs owned by another user or developer (e.g., usera or devx) as well as there is no BIEs in Editing or in Published state. (Assertion [#4](#test-assertion-2814))
-19. The developer goes back to home page and clicks the BIEs tab.
-20. He clicks on the Published state of the “My BIEs by state” panel.
-21. Verify that the BIE list is returned where the BIEs owned by the developer and are in Published state are displayed. Also verify that their number is the same as the number displayed inside the Published bar of the “My BIEs by state” panel. Finally, verify that there is no BIEs owned by another user or developer (e.g., usera or devx) as well as there is no BIEs in Editing or in Candidate state. (Assertion [#4](#test-assertion-2814))
-22. The developer goes back to home page and clicks the BIEs tab.
-23. Verify that the “BIEs by users and states” panel displays the correct number of BIEs per state and per user (e.g., by first counting them using BIE List page and then compare their number to the ones displayed in the “BIEs by users and states” panel) (Assertion [#5](#test-assertion-2815))
-24. The developer clicks on the “User” filter of the “BIEs by users and states” panel and chooses his name.
-25. Verify that the “BIEs by users and states” panel displays only the number of the BIEs that he owns. Also, verify that the number of the BIEs per state is correct as well as the Total Number of the BIEs that he owns. (Assertion [#6](#test-assertion-2816))
-26. The developer clicks on the “User” filter of the “BIEs by users and states” panel and chooses another username (e.g., usera)
-27. Verify that the “BIEs by users and states” panel displays only the number of the BIEs that the usera owns. Also, verify that the number of the BIEs per state is correct as well as the Total Number of the BIEs that the usera owns. (Assertion [#6](#test-assertion-2816))
-28. The developer clicks on the number of BIEs that exist under the Editing cell of a developer (e.g., “oagi” developer).
-29. Verify that the BIE List page is returned where the BIEs onwed by the “oagi” developer are displayed. Also, verify that the number of them is the same as the number that was displayed in the “BIEs by users and states”. Finally, verify that there is no BIE owned by another user or developer (e.g., devx or usera) (Assertion [#7](#test-assertion-2817))
-30. The developer visits the Home page and clicks on BIEs tab.
-31. Verify that the “My recent BIEs” contains the last modified BIEs owned by him or the last created BIEs by him. (Assertion [#8](#test-assertion-2818))
-32. The developer clicks on a BIE of the “My recent BIEs” panel.
-33. Verify that the “Edit BIE” page is returned where he can view or edit the BIE clicked. (Assertion [#9](#test-assertion-2819))
+1. A developer signs in, opens the Home page, selects the `BIEs` tab, and uses the relevant branch filter (`10.8.4` for branch-specific panels and `All` where the suite checks cross-release multi-user totals).
+2. Verify the `Total BIEs by state` panel counts and open `WIP`, `QA`, and `Production` state bars to confirm that the returned BIE list contains only records in the selected state. (Assertions [#28.1.1](#test-assertion-2811), [#28.1.2](#test-assertion-2812))
+3. Verify the `My BIEs by state` panel counts and open its `WIP`, `QA`, and `Production` state bars to confirm that only the developer’s BIEs in the selected state are listed. (Assertions [#28.1.3](#test-assertion-2813), [#28.1.4](#test-assertion-2814))
+4. Verify the `BIEs by users and states` panel totals, apply the user filter, and open the `WIP`, `QA`, `Production`, and `Total` table cells to confirm the linked BIE list results. (Assertions [#28.1.5](#test-assertion-2815), [#28.1.6](#test-assertion-2816), [#28.1.7](#test-assertion-2817))
+5. Verify the `My recent BIEs` panel and open a recent BIE from that panel into the BIE editor. (Assertions [#28.1.8](#test-assertion-2818), [#28.1.9](#test-assertion-2819))
 
 ## Test Case 28.2
 
@@ -105,46 +75,13 @@ In the “User Extensions by users and states” panel, the developer can select
 In the “User Extensions by users and states” panel, the developer can click on a table cell, which contains the number of UEGs for a user and a state, to view the relevant UEGs into the CC List page.
 
 ### Test Step Pre-condition:
-
-1. There are at least three UEG created by the OAGi and they are in three editing states  (Editing, Candidate, Published).
-2. There is at least one association of a UEG that is not used in any BIE.
-3. There are at least three UEG created by an end user and they are in three editing states  (Editing, Candidate, Published).
+1. Developer and end-user accounts, release `10.8.4`, and user extension groups exist across `WIP`, `QA`, and `Production` states.
+2. The current `TS_28` developer user-extension coverage automates only the `Total User Extensions` panel and the `User Extensions by users and states` panel for developers.
 
 ### Test Step:
-
-1. An OAGi developer logins.
-2. He visits the User Extension Tab of the Home Page.
-3. Verify that the “Total User Extensions by state” panel contains the number of the UEGs existing in Score per their state (Assertion [#1](#test-assertion-2821))
-4. He clicks on the Editing state of the “Total User Extensions by state” panel.
-5. Verify that the CC list page is returned where all UEGs in Editing state are displayed. Also verify that their number is the same as the number displayed inside the Editing bar of the “Total User Extensions by state” panel. Finally, verify that there are UEGs owned by different users (e.g., usera) but not UEGs in Candidate or Published state. (Assertion [#2](#test-assertion-2822))
-6. The developer goes back to home page and clicks the User Extension tab.
-7. He clicks on the Candidate state of the “Total User Extensions by state” panel.
-8. Verify that the CC list page is returned where all UEGs in Candidate state are displayed. Also verify that their number is the same as the number displayed inside the Candidate bar of the “Total User Extensions by state” panel.  Finally, verify that there are UEGs owned by different users (e.g., usera) but not UEGs in Editing or Published state. (Assertion [#2](#test-assertion-2822))
-9. The developer goes back to home page and clicks the User Extension tab.
-10. He clicks on the Published state of the “Total User Extensions by state” panel.
-11. Verify that the CC list page is returned where all UEGs in Published state are displayed. Also verify that their number is the same as the number displayed inside the Published bar of the “Total User Extensions by state” panel. Finally, verify that there are UEGs owned by different users (e.g., usera) but not CCs in Editing or Candidate state. (Assertion [#2](#test-assertion-2822))
-12. The developer goes back to home page and clicks the User Extension tab.
-13. Verify that the “My User Extensions by states” panel contains the number of his UEGs per their state (Assertion [#3](#test-assertion-2823))
-14. He clicks on the Editing state of the “My User Extensions by states” panel.
-15. Verify that the CC list page is returned where the UEGs owned by the developer and are in Editing state are displayed. Also verify that their number is the same as the number displayed inside the Editing bar of the “My User Extensions by states” panel. Finally, verify that there is no UEGs owned by another user or developer (e.g., usera or devx) as well as there is no CCs in Candidate or in Published state. (Assertion [#4](#test-assertion-2824))
-16. The developer goes back to home page and clicks the User Extension tab.
-17. He clicks on the Candidate state of the “My User Extensions by states” panel.
-18. Verify that the CC list page is returned where the UEGs owned by the developer and are in Candidate state are displayed. Also verify that their number is the same as the number displayed inside the Candidate bar of the “My User Extensions by states” panel. Finally, verify that there is no UEGs owned by another user or developer (e.g., usera or devx) as well as there is no CCs in Editing or in Published state. (Assertion [#4](#test-assertion-2824))
-19. The developer goes back to home page and clicks the User Extension tab.
-20. He clicks on the Published state of the “My User Extensions by states” panel.
-21. Verify that the CC list page is returned where the UEGs owned by the developer and are in Published state are displayed. Also verify that their number is the same as the number displayed inside the Published bar of the “My User Extensions by states” panel. Finally, verify that there is no CCs owned by another user or developer (e.g., usera or devx) as well as there is no CCs in Editing or in Candidate state. (Assertion [#4](#test-assertion-2824))
-22. The developer goes back to home page and clicks the User Extension tab.
-23. Verify that the “User Extensions by users and states” panel displays the correct number of UEGs per state and per user (Assertion [#5](#test-assertion-2825))
-24. The developer clicks on the “User” filter of the “User Extensions by users and states” panel and chooses his name.
-25. Verify that the “User Extensions by users and states” panel displays only the number of the UEGs that he owns. Also, verify that the number of the UEGs per state is correct as well as the Total Number of the UEGs that he owns. (Assertion [#6](#test-assertion-2826))
-26. The developer clicks on the “User” filter of the “User Extensions by users and states” panel and chooses another username (e.g., usera)
-27. Verify that the “User Extensions by users and states” panel displays only the number of the UEGs that the usera owns. Also, verify that the number of the UEGs per state is correct as well as the Total Number of the UEG that the usera owns. (Assertion [#6](#test-assertion-2826))
-28. The developer clicks on the number of UEGs that exist under the Editing cell of a developer (e.g., “oagi” developer).
-29. Verify that the CC List page is returned where the UEGs onwed by the “oagi” developer are displayed. Also, verify that the number of them is the same as the number that was displayed in the “User Extensions by users and states”. Finally, verify that there is no CC owned by another user or developer (e.g., devx or usera) (Assertion [#7](#test-assertion-2827))
-30. The developer visits the Home page and clicks on User Extension tab.
-31. Verify that the “My unused extensions in BIEs” contains the UEGs that he owns and not used in any BIE. (Assertion [#8](#test-assertion-2828))
-32. The developer clicks on a UEG of the “My unused extensions in BIEs” panel.
-33. Verify that the page where he can view or edit the UEG that he clicked is returned. (Assertion [#9](#test-assertion-2829))
+1. A developer signs in, opens the Home page, selects the `User Extensions` tab, and sets branch `10.8.4` where required.
+2. Verify the `Total User Extensions` panel counts and open the `WIP`, `QA`, and `Production` state bars to confirm the returned core component list contains only extensions in the selected state. (Assertions [#28.2.1](#test-assertion-2821), [#28.2.2](#test-assertion-2822))
+3. Verify the `User Extensions by users and states` table, apply the user filter, and open a user-state table cell to confirm the linked core component list results. (Assertions [#28.2.3](#test-assertion-2823), [#28.2.4](#test-assertion-2824), [#28.2.5](#test-assertion-2825))
 
 ## Test Case 28.3
 
@@ -183,7 +120,13 @@ In the “My unused extensions in BIEs” panel, the end user can see the associ
 In the “My unused extensions in BIEs” panel, the end user can click on a UEG to view it in the page where he can edit it.
 
 ### Test Step Pre-condition:
-
+1. End-user accounts, release `10.8.4`, and end-user-owned user extension groups exist across `WIP`, `QA`, and `Production` states.
+2. There are end-user BIEs with local extensions so the `My unused extensions in BIEs` panel can be populated.
 
 
 ### Test Step:
+1. An end user signs in, opens the Home page, selects the `User Extensions` tab, and sets branch `10.8.4` where required.
+2. Verify the `Total User Extensions` panel counts and open the `WIP`, `QA`, and `Production` state bars to confirm the returned core component list contains only extensions in the selected state. (Assertions [#28.3.1](#test-assertion-2831), [#28.3.2](#test-assertion-2832))
+3. Verify the `My User Extensions by states` panel counts and open its state bars to confirm only the end user’s extensions in the selected state are listed. (Assertions [#28.3.3](#test-assertion-2833), [#28.3.4](#test-assertion-2834))
+4. Verify the `User Extensions by users and states` panel, apply the user filter, and open a user-state table cell to confirm the linked core component list results. (Assertions [#28.3.5](#test-assertion-2835), [#28.3.6](#test-assertion-2836), [#28.3.7](#test-assertion-2837))
+5. Verify the `My unused extensions in BIEs` panel entries and open an unused extension from that panel into its edit page. (Assertions [#28.3.8](#test-assertion-2838), [#28.3.9](#test-assertion-2839))

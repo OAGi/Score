@@ -13,7 +13,7 @@ import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.LoginPage;
 import org.oagi.score.e2e.page.SettingsAccountPage;
-import org.oagi.score.e2e.page.admin.AccountsPage;
+import org.oagi.score.e2e.page.admin.AccountPage;
 import org.oagi.score.e2e.page.admin.EditAccountPage;
 import org.oagi.score.e2e.page.admin.NewAccountPage;
 import org.openqa.selenium.TimeoutException;
@@ -50,8 +50,8 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
     public void test_create_new_developer_account() {
         HomePage homePage = loginPage().signIn(oagisUser.getLoginId(), oagisUser.getPassword());
         AdminMenu adminMenu = homePage.getAdminMenu();
-        AccountsPage accountsPage = adminMenu.openAccountsSubMenu();
-        NewAccountPage newAccountPage = accountsPage.openNewAccountPage();
+        AccountPage accountPage = adminMenu.openAccountSubMenu();
+        NewAccountPage newAccountPage = accountPage.openNewAccountPage();
 
         AppUserObject newUser = new AppUserObject();
         newUser.setLoginId("dev_" + RandomStringUtils.secure().nextAlphanumeric(5, 10));
@@ -83,8 +83,8 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
 
         HomePage homePage = loginPage().signIn(oagisUser.getLoginId(), oagisUser.getPassword());
         AdminMenu adminMenu = homePage.getAdminMenu();
-        AccountsPage accountsPage = adminMenu.openAccountsSubMenu();
-        NewAccountPage newAccountPage = accountsPage.openNewAccountPage();
+        AccountPage accountPage = adminMenu.openAccountSubMenu();
+        NewAccountPage newAccountPage = accountPage.openNewAccountPage();
 
         assertThrows(TimeoutException.class, () ->
                 newAccountPage.createNewAccount(appUser));
@@ -95,8 +95,8 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
     public void should_not_create_new_developer_account_with_short_password() {
         HomePage homePage = loginPage().signIn(oagisUser.getLoginId(), oagisUser.getPassword());
         AdminMenu adminMenu = homePage.getAdminMenu();
-        AccountsPage accountsPage = adminMenu.openAccountsSubMenu();
-        NewAccountPage newAccountPage = accountsPage.openNewAccountPage();
+        AccountPage accountPage = adminMenu.openAccountSubMenu();
+        NewAccountPage newAccountPage = accountPage.openNewAccountPage();
 
         AppUserObject newUser = new AppUserObject();
         newUser.setLoginId("dev_" + RandomStringUtils.secure().nextAlphanumeric(5, 10));
@@ -124,8 +124,8 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
 
         HomePage homePage = loginPage().signIn(oagisUser.getLoginId(), oagisUser.getPassword());
         AdminMenu adminMenu = homePage.getAdminMenu();
-        AccountsPage accountsPage = adminMenu.openAccountsSubMenu();
-        EditAccountPage editAccountPage = accountsPage.openEditAccountPageByLoginID(appUser.getLoginId());
+        AccountPage accountPage = adminMenu.openAccountSubMenu();
+        EditAccountPage editAccountPage = accountPage.openEditAccountPageByLoginID(appUser.getLoginId());
         assertTrue(editAccountPage.getLoginIDField().isEnabled());
     }
 
@@ -139,8 +139,8 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
 
         HomePage homePage = loginPage().signIn(oagisUser.getLoginId(), oagisUser.getPassword());
         AdminMenu adminMenu = homePage.getAdminMenu();
-        AccountsPage accountsPage = adminMenu.openAccountsSubMenu();
-        EditAccountPage editAccountPage = accountsPage.openEditAccountPageByLoginID(appUser.getLoginId());
+        AccountPage accountPage = adminMenu.openAccountSubMenu();
+        EditAccountPage editAccountPage = accountPage.openEditAccountPageByLoginID(appUser.getLoginId());
 
         String newPassword = "dev_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         editAccountPage.updatePassword(newPassword);
@@ -161,8 +161,8 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
 
         HomePage homePage = loginPage().signIn(oagisUser.getLoginId(), oagisUser.getPassword());
         AdminMenu adminMenu = homePage.getAdminMenu();
-        AccountsPage accountsPage = adminMenu.openAccountsSubMenu();
-        EditAccountPage editAccountPage = accountsPage.openEditAccountPageByLoginID(appUser.getLoginId());
+        AccountPage accountPage = adminMenu.openAccountSubMenu();
+        EditAccountPage editAccountPage = accountPage.openEditAccountPageByLoginID(appUser.getLoginId());
 
         String newPassword = RandomStringUtils.secure().nextAlphanumeric(1, 1);
         assertThrows(TimeoutException.class, () ->
@@ -186,8 +186,8 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
 
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         AdminMenu adminMenu = homePage.getAdminMenu();
-        AccountsPage accountsPage = adminMenu.openAccountsSubMenu();
-        EditAccountPage editAccountPage = accountsPage.openEditAccountPageByLoginID(appUser.getLoginId());
+        AccountPage accountPage = adminMenu.openAccountSubMenu();
+        EditAccountPage editAccountPage = accountPage.openEditAccountPageByLoginID(appUser.getLoginId());
         assertTrue(editAccountPage.getLoginIDField().isEnabled());
     }
 
@@ -283,8 +283,8 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
 
         HomePage homePage = loginPage().signIn(oagisUser.getLoginId(), oagisUser.getPassword());
         AdminMenu adminMenu = homePage.getAdminMenu();
-        AccountsPage accountsPage = adminMenu.openAccountsSubMenu();
-        EditAccountPage editAccountPage = accountsPage.openEditAccountPageByLoginID(appUser.getLoginId());
+        AccountPage accountPage = adminMenu.openAccountSubMenu();
+        EditAccountPage editAccountPage = accountPage.openEditAccountPageByLoginID(appUser.getLoginId());
         editAccountPage.disableAccount();
 
         homePage.logout();
@@ -306,8 +306,8 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
 
         HomePage homePage = loginPage().signIn(oagisUser.getLoginId(), oagisUser.getPassword());
         AdminMenu adminMenu = homePage.getAdminMenu();
-        AccountsPage accountsPage = adminMenu.openAccountsSubMenu();
-        EditAccountPage editAccountPage = accountsPage.openEditAccountPageByLoginID(appUser.getLoginId());
+        AccountPage accountPage = adminMenu.openAccountSubMenu();
+        EditAccountPage editAccountPage = accountPage.openEditAccountPageByLoginID(appUser.getLoginId());
         editAccountPage.enableAccount();
 
         homePage.logout();
@@ -319,7 +319,7 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
     @Test
     @DisplayName("TC_2_1_TA_14")
     @Disabled
-    public void test_TA_14() {
+    public void single_sign_on_for_developer_accounts_cannot_be_tested_yet() {
         // SSO cannot be tested yet
     }
 

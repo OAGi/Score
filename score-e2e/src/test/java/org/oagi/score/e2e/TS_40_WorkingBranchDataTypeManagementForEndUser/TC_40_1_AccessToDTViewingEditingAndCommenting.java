@@ -37,7 +37,7 @@ public class TC_40_1_AccessToDTViewingEditingAndCommenting extends BaseTest {
 
     @Test
     @DisplayName("TC_40_1_TA_1")
-    public void test_TA_1() {
+    public void end_user_can_see_in_the_core_component_view_or_edit_page_all_data_types_owned_by_any_user_in_any_sta() {
         AppUserObject endUserA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -82,7 +82,7 @@ public class TC_40_1_AccessToDTViewingEditingAndCommenting extends BaseTest {
     }
     @Test
     @DisplayName("TC_40_1_TA_2")
-    public void test_TA_2() {
+    public void end_user_can_view_but_cannot_edit_the_details_of_data_type_in_the_working_release_that_is_in_wip_sta() {
         AppUserObject endUserA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -124,7 +124,7 @@ public class TC_40_1_AccessToDTViewingEditingAndCommenting extends BaseTest {
 
     @Test
     @DisplayName("TC_40_1_TA_3")
-    public void test_TA_3() {
+    public void end_user_can_view_the_details_of_data_type_that_is_in_draft_and_owned_by_any_user_but_he_cannot_make() {
         AppUserObject endUserA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -166,7 +166,7 @@ public class TC_40_1_AccessToDTViewingEditingAndCommenting extends BaseTest {
 
     @Test
     @DisplayName("TC_40_1_TA_4")
-    public void test_TA_4() {
+    public void end_user_can_view_the_details_of_data_type_which_is_in_candidate_state_owned_by_any_user_but_he_cann() {
         AppUserObject endUserA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -209,7 +209,7 @@ public class TC_40_1_AccessToDTViewingEditingAndCommenting extends BaseTest {
 
     @Test
     @DisplayName("TC_40_1_TA_5")
-    public void test_TA_5() {
+    public void end_user_can_view_the_details_of_data_type_that_is_in_deleted_but_he_cannot_make_any_change_except_a() {
         AppUserObject endUserA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -252,7 +252,7 @@ public class TC_40_1_AccessToDTViewingEditingAndCommenting extends BaseTest {
 
     @Test
     @DisplayName("TC_40_1_TA_6")
-    public void test_TA_6() {
+    public void end_user_can_view_details_of_any_published_data_type_but_cannot_make_any_change_except_adding_commen() {
         AppUserObject endUserA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -294,7 +294,7 @@ public class TC_40_1_AccessToDTViewingEditingAndCommenting extends BaseTest {
 
     @Test
     @DisplayName("TC_40_1_TA_7")
-    public void test_TA_7() {
+    public void developer_cannot_make_a_new_revision_on_any_data_type() {
         AppUserObject endUserA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -331,7 +331,7 @@ public class TC_40_1_AccessToDTViewingEditingAndCommenting extends BaseTest {
 
     @Test
     @DisplayName("TC_40_1_TA_8")
-    public void test_TA_8() {
+    public void developer_cannot_create_any_new_data_type() {
         AppUserObject endUserA;
         LibraryObject library;
         ReleaseObject branch;

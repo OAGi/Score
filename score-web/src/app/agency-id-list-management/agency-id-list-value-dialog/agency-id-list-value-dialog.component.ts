@@ -4,6 +4,7 @@ import {AgencyIdListValue} from '../domain/agency-id-list';
 import {hashCode} from '../../common/utility';
 
 @Component({
+  standalone: false,
   selector: 'score-agency-id-list-value-dialog',
   templateUrl: './agency-id-list-value-dialog.component.html',
   styleUrls: ['./agency-id-list-value-dialog.component.css']

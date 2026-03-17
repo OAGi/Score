@@ -28,6 +28,7 @@ import {AuthService} from '../../../authentication/auth.service';
 import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
 
 @Component({
+  standalone: false,
   selector: 'score-append-association-dialog',
   templateUrl: './append-association-dialog.component.html',
   styleUrls: ['./append-association-dialog.component.css'],

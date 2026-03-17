@@ -48,10 +48,6 @@
   display: flex;
 }
 
-.filename-option {
-  padding-top: 5px;
-}
-
 tr.detail-row {
   height: 0;
 }
@@ -72,13 +68,52 @@ tr.element-row:not(.expanded-row):active {
 .bie-source, .bie-based {
   font-size: 11px !important;
   color: #767676 !important;
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.bie-source > a,
+.bie-based > a {
+  min-width: 0;
 }
 
 .mat-column-owner {
   font-size: 13px;
 }
 
-/* @TODO: <mat-select>'s width should be synchronized with the <th>'s width. */
-.mat-column-businessContexts mat-select {
-  width: 140px;
+.business-contexts-menu-wrapper {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.business-contexts-menu-trigger {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  max-width: 100%;
+  min-width: 0;
+  padding: 0;
+  text-align: left;
+  overflow: hidden;
+}
+
+.business-contexts-menu-trigger.is-clickable {
+  cursor: pointer;
+}
+
+.business-contexts-menu-label {
+  max-width: 100%;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.business-contexts-menu-icon {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.54);
 }

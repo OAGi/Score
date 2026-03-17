@@ -4,11 +4,17 @@ import org.apache.commons.io.FileUtils;
 import org.jooq.DSLContext;
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocument;
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocumentImpl;
+import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpManifestId;
 import org.oagi.score.gateway.http.api.export.ExportContext;
+import org.oagi.score.gateway.http.api.export.impl.ExportSchemaModuleVisitor;
+import org.oagi.score.gateway.http.api.export.impl.JSONExportSchemaModuleVisitor;
 import org.oagi.score.gateway.http.api.export.impl.StandaloneExportContextBuilder;
 import org.oagi.score.gateway.http.api.export.impl.XMLExportSchemaModuleVisitor;
+import org.oagi.score.gateway.http.api.export.model.JsonSchemaNamingStrategy;
+import org.oagi.score.gateway.http.api.export.model.SchemaNamingStrategy;
 import org.oagi.score.gateway.http.api.export.model.SchemaModule;
+import org.oagi.score.gateway.http.api.export.model.XmlSchemaNamingStrategy;
 import org.oagi.score.gateway.http.api.library_management.model.LibraryDetailsRecord;
 import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
 import org.oagi.score.gateway.http.api.library_management.repository.LibraryQueryRepository;
@@ -130,27 +136,37 @@ public class ReleaseQueryService {
 
     public ExportStandaloneSchemaResponse exportStandaloneSchema(
             ScoreUser requester, Collection<AsccpManifestId> asccpManifestIdList) throws Exception {
+        return exportStandaloneSchema(requester, asccpManifestIdList, "XML", null);
+    }
+
+    public ExportStandaloneSchemaResponse exportStandaloneSchema(
+            ScoreUser requester, Collection<AsccpManifestId> asccpManifestIdList,
+            String expressionOption, String expressionVersion) throws Exception {
         if (asccpManifestIdList == null || asccpManifestIdList.isEmpty()) {
             throw new IllegalArgumentException();
         }
+
+        String normalizedExpressionOption = normalizeExpressionOption(expressionOption);
+        validateExpressionVersion(normalizedExpressionOption, expressionVersion);
 
         File baseDir = new File(FileUtils.getTempDirectory(), UUID.randomUUID().toString());
         FileUtils.forceMkdir(baseDir);
 
         try {
-            List<File> files = new ArrayList<>();
+            List<File> files = Collections.synchronizedList(new ArrayList<>());
 
             Map<AsccpManifestId, ReleaseId> releaseIdMap = getReleaseIdMapByAsccpManifestIdList(requester, asccpManifestIdList);
             CcDocument ccDocument = new CcDocumentImpl(requester, repositoryFactory, releaseIdMap.values());
             Map<String, Integer> pathCounter = new ConcurrentHashMap<>();
-            List<Exception> exceptions = new ArrayList<>();
+            List<Exception> exceptions = Collections.synchronizedList(new ArrayList<>());
             asccpManifestIdList.parallelStream().forEach(asccpManifestId -> {
                 try {
-                    XMLExportSchemaModuleVisitor visitor = new XMLExportSchemaModuleVisitor(ccDocument);
+                    SchemaNamingStrategy namingStrategy = newSchemaNamingStrategy(normalizedExpressionOption);
+                    ExportSchemaModuleVisitor visitor = newSchemaModuleVisitor(ccDocument, normalizedExpressionOption);
                     visitor.setBaseDirectory(baseDir);
 
                     StandaloneExportContextBuilder builder =
-                            new StandaloneExportContextBuilder(ccDocument, pathCounter);
+                            new StandaloneExportContextBuilder(ccDocument, pathCounter, namingStrategy);
                     ExportContext exportContext = builder.build(asccpManifestId);
 
                     for (SchemaModule schemaModule : exportContext.getSchemaModules()) {
@@ -190,6 +206,66 @@ public class ReleaseQueryService {
     public Map<AsccpManifestId, ReleaseId> getReleaseIdMapByAsccpManifestIdList(
             ScoreUser requester, Collection<AsccpManifestId> asccpManifestIdList) {
         return query(requester).getReleaseIdMapByAsccpManifestIdList(asccpManifestIdList);
+    }
+
+    private String normalizeExpressionOption(String expressionOption) {
+        if (!org.springframework.util.StringUtils.hasLength(expressionOption)) {
+            return "XML";
+        }
+        String normalized = expressionOption.trim().toUpperCase();
+        if ("XML".equals(normalized) || "JSON".equals(normalized)) {
+            return normalized;
+        }
+        throw new IllegalArgumentException("Unsupported expression option: " + expressionOption);
+    }
+
+    private ExportSchemaModuleVisitor newSchemaModuleVisitor(CcDocument ccDocument, String expressionOption) {
+        if ("JSON".equals(expressionOption)) {
+            return new JSONExportSchemaModuleVisitor(ccDocument, new JsonSchemaNamingStrategy());
+        }
+        return new XMLExportSchemaModuleVisitor(ccDocument, new XmlSchemaNamingStrategy());
+    }
+
+    private SchemaNamingStrategy newSchemaNamingStrategy(String expressionOption) {
+        if ("JSON".equals(expressionOption)) {
+            return new JsonSchemaNamingStrategy();
+        }
+        return new XmlSchemaNamingStrategy();
+    }
+
+    private void validateExpressionVersion(String expressionOption, String expressionVersion) {
+        if (!"JSON".equals(expressionOption)) {
+            return;
+        }
+        if (!org.springframework.util.StringUtils.hasLength(expressionVersion)) {
+            return;
+        }
+        String normalizedVersion = expressionVersion.trim().toUpperCase();
+        if (!"2020-12".equals(normalizedVersion) && !"202012".equals(normalizedVersion)) {
+            throw new IllegalArgumentException("Unsupported JSON expression version: " + expressionVersion);
+        }
+    }
+
+    private String standaloneSchemaFilenameBase(
+            CcDocument ccDocument, Map<String, Integer> pathCounter, AsccpManifestId asccpManifestId) {
+        var asccp = ccDocument.getAsccp(asccpManifestId);
+        AccSummaryRecord roleOfAcc = ccDocument.getAcc(asccp.roleOfAccManifestId());
+
+        String term;
+        if (asccp.propertyTerm().equals(roleOfAcc.objectClassTerm())) {
+            term = asccp.propertyTerm();
+        } else {
+            term = asccp.propertyTerm() + roleOfAcc.objectClassTerm();
+        }
+        String path = term.replaceAll(" ", "").replace("Identifier", "ID");
+        synchronized (pathCounter) {
+            int count = pathCounter.getOrDefault(path, 0);
+            if (count > 0) {
+                path = path + "_" + count;
+            }
+            pathCounter.put(path, count + 1);
+        }
+        return path;
     }
 
     public String generatePlantUmlText(

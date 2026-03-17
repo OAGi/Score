@@ -37,7 +37,7 @@ public class TC_11_4_CreatingANewRevisionOfADeveloperCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_11_4_TA_1")
-    public void test_TA_1() {
+    public void developer_can_create_new_revision_from_published_code_list_with_copied_values() {
         AppUserObject developerA;
         LibraryObject library;
         ReleaseObject workingBranch;

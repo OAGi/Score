@@ -25,6 +25,7 @@ import {LibrarySummary} from '../../../library-management/domain/library';
 import {LibraryService} from '../../../library-management/domain/library.service';
 
 @Component({
+  standalone: false,
   selector: 'score-bie-package-uplift-dialog',
   templateUrl: './bie-package-uplift-dialog.component.html',
   styleUrls: ['./bie-package-uplift-dialog.component.css']

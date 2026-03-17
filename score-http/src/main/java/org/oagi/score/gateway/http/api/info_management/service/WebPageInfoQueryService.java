@@ -1,7 +1,7 @@
 package org.oagi.score.gateway.http.api.info_management.service;
 
 import com.google.common.collect.ObjectArrays;
-import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
+import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationQueryService;
 import org.oagi.score.gateway.http.api.cc_management.model.CcState;
 import org.oagi.score.gateway.http.api.info_management.model.BoxColorSet;
 import org.oagi.score.gateway.http.api.info_management.model.WebPageInfoRecord;
@@ -16,14 +16,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService.*;
+import static org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationProperties.*;
 
 @Service
 @Transactional(readOnly = true)
 public class WebPageInfoQueryService {
 
     @Autowired
-    private ApplicationConfigurationService configService;
+    private ApplicationConfigurationQueryService configService;
 
     public WebPageInfoRecord getWebPageInfo(ScoreUser requester) {
         String brand = configService.getProperty(requester, NAVBAR_BRAND_CONFIG_PARAM_NAME);

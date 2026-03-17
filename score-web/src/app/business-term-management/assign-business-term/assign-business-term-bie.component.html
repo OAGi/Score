@@ -11,7 +11,7 @@
   <mat-card class="pt-3">
     <score-search-bar placeholder="Search by DEN" [(model)]="request.filters.den"
                       (modelChange)="onChange('filters.den', request.filters.den);"
-                      (search)="onSearch();">
+                      (searchTriggered)="onSearch();">
       <div advancedSearchContent style="padding-left: 3rem;">
         <mat-card-content class="mat-card-container">
           <div class="container-fluid" style="padding: 0;">
@@ -166,16 +166,18 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('DEN')" (onResize)="onResizeWidth($event)"> DEN</th>
               <td mat-cell *matCellDef="let element">
-                <div class="den word-break-all">
+                <div class="den score-break-word">
                 <span *ngIf='!isAdmin && element.access === "Prohibited"'
+                      class="score-line-clamp-2 score-break-word"
                       matTooltip="Only the owner can access BIE in this state.">{{ element.den + ((element.displayName) ? (' (' + element.displayName + ')') : '') }}</span>
                   <span *ngIf='!isAdmin && element.access === "Unprepared"'
+                        class="score-line-clamp-2 score-break-word"
                         matTooltip="This profile BIE is in progress.">{{ element.den }}</span>
                   <a *ngIf="isAdmin || (element.access !== 'Prohibited' && element.access !== 'Unprepared')"
                      href="/profile_bie/{{ element.topLevelAsbiepId }}"
                      matTooltip="{{ element.den }}">
                     <div class="d-inline-flex align-items-center">
-                      <span>{{ element.den }}</span>
+                      <span class="score-line-clamp-2 score-break-word">{{ element.den }}</span>
                       <span *ngIf="element.displayName" class="bie-display-name ml-2">{{ element.displayName }}</span>
                     </div>
                   </a>
@@ -190,7 +192,7 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Owner')" (onResize)="onResizeWidth($event)"> Owner</th>
               <td mat-cell *matCellDef="let element">
-                <span class="word-break-all" [matTooltip]="element.owner.username" [innerHTML]="element.owner.loginId"></span>
+                <span class="score-line-clamp-2 score-break-word" [matTooltip]="element.owner.username" [innerHTML]="element.owner.loginId"></span>
               </td>
             </ng-container>
 
@@ -198,14 +200,16 @@
               <th mat-header-cell *matHeaderCellDef
                   score-table-column-resize [defaultWidth]="width('Business Contexts')" (onResize)="onResizeWidth($event)"> Business Contexts</th>
               <td mat-cell *matCellDef="let element">
-                <ng-container *ngFor="let businessContext of element.businessContextList">
-                  <span class="businessContext word-break-all">
-                    <a target="_blank" rel="noopener noreferrer"
-                       routerLink="/context_management/business_context/{{ businessContext.businessContextId }}">
-                      <span class="word-break-all">{{ businessContext.name }}</span>
-                    </a>
-                  </span>
-                </ng-container>
+                <div class="business-context-list score-line-clamp-2 score-break-word">
+                  <ng-container *ngFor="let businessContext of element.businessContextList; let i = index">
+                    <span class="businessContext">
+                      <a target="_blank" rel="noopener noreferrer"
+                         routerLink="/context_management/business_context/{{ businessContext.businessContextId }}">
+                        <span>{{ businessContext.name }}</span>
+                      </a>
+                    </span>
+                  </ng-container>
+                </div>
               </td>
             </ng-container>
 
@@ -213,7 +217,7 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Version')" (onResize)="onResizeWidth($event)"> Version</th>
               <td mat-cell *matCellDef="let element">
-                <div class="word-break-all" [matTooltip]="element.version" [innerHTML]="element.version"></div>
+                <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.version" [innerHTML]="element.version"></div>
               </td>
             </ng-container>
 
@@ -221,7 +225,7 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Status')" (onResize)="onResizeWidth($event)"> Status</th>
               <td mat-cell *matCellDef="let element">
-                <div class="word-break-all" [matTooltip]="element.status" [innerHTML]="element.status"></div>
+                <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.status" [innerHTML]="element.status"></div>
               </td>
             </ng-container>
 
@@ -229,7 +233,7 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Business Term')" (onResize)="onResizeWidth($event)"> Business Term</th>
               <td mat-cell *matCellDef="let element">
-                <div class="word-break-all" [matTooltip]="element.bizTerm" [innerHTML]="element.bizTerm"></div>
+                <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.bizTerm" [innerHTML]="element.bizTerm"></div>
               </td>
             </ng-container>
 
@@ -237,7 +241,7 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Remark')" (onResize)="onResizeWidth($event)"> Remark</th>
               <td mat-cell *matCellDef="let element">
-                <div class="word-break-all" [innerHTML]="element.remark"></div>
+                <div class="score-line-clamp-2 score-break-word" [innerHTML]="element.remark"></div>
               </td>
             </ng-container>
 
@@ -245,8 +249,10 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
               <td mat-cell *matCellDef="let element">
-                <div class="ellipsis">{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-                <div class="description"><span class="pr-1">by</span><b class="word-break-all">{{ element.lastUpdated.who.loginId }}</b></div>
+                <div class="score-line-clamp-2 score-break-word">
+                  <div>{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                  <div class="description"><span class="pr-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
+                </div>
               </td>
             </ng-container>
 

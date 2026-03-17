@@ -1,13 +1,10 @@
 package org.oagi.score.gateway.http.api.info_management.service;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
 import org.oagi.score.gateway.http.api.info_management.model.ProductInfoRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisServerCommands;
@@ -19,9 +16,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -30,7 +29,6 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class ProductInfoQueryService {
 
-    private static final String groupId = "org.oagi";
     private static final String artifactId = "score-http";
     private static final String unknownVersion = "0.0.0.0";
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -41,54 +39,50 @@ public class ProductInfoQueryService {
     @Autowired
     private RedisConnectionFactory redisConnectionFactory;
 
-    private InputStream getResourceAsStream(String resourcePath) {
-        InputStream inputStream = getClass().getResourceAsStream(resourcePath);
-        if (inputStream == null) {
-            inputStream = getClass().getClassLoader().getResourceAsStream(resourcePath);
-        }
-        return inputStream;
-    }
+    @Autowired(required = false)
+    private BuildProperties buildProperties;
 
     public ProductInfoRecord gatewayMetadata() {
+        return new ProductInfoRecord(artifactId, resolveGatewayVersion());
+    }
 
-        String resourcePath = "META-INF/maven/" + groupId + "/" + artifactId + "/pom.xml";
-        InputStream inputStream;
-        try {
-            logger.info("Current resource path: " + getClass().getResource(".").getFile());
-            logger.info("Current system resource path: " + getClass().getClassLoader().getResource(".").getFile());
+    private String resolveGatewayVersion() {
+        return readBuildVersion()
+                .or(() -> readPlainVersionFromFile(new File("VERSION")))
+                .or(() -> readPlainVersionFromFile(new File("score-http/VERSION")))
+                .orElseGet(() -> {
+                    logger.warn("Could not read " + artifactId + " version.");
+                    return unknownVersion;
+                });
+    }
 
-            inputStream = getResourceAsStream(resourcePath);
-            if (inputStream == null) {
-                inputStream = getResourceAsStream("/" + resourcePath);
-            }
-            if (inputStream == null) {
-                inputStream = getResourceAsStream("../" + resourcePath);
-            }
-            if (inputStream == null) {
-                inputStream = getResourceAsStream("../../" + resourcePath);
-            }
-            if (inputStream == null) {
-                inputStream = new FileInputStream(new File("pom.xml"));
-            }
+    private Optional<String> readBuildVersion() {
+        if (buildProperties == null) {
+            return Optional.empty();
+        }
+        return extractVersion(buildProperties.getVersion(), "BuildProperties", "version");
+    }
 
-            return new ProductInfoRecord(artifactId, readProductVersion(inputStream));
-        } catch (IOException | JDOMException e) {
-            logger.error("Could not retrieve " + artifactId + " version.", e);
-            return new ProductInfoRecord(artifactId, unknownVersion);
+    private Optional<String> readPlainVersionFromFile(File file) {
+        if (!file.isFile()) {
+            return Optional.empty();
+        }
+
+        try (InputStream inputStream = new FileInputStream(file)) {
+            String version = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8).trim();
+            return extractVersion(version, file.getPath(), "plain version");
+        } catch (IOException e) {
+            logger.debug("Could not read version information from {}", file.getPath(), e);
+            return Optional.empty();
         }
     }
 
-    private String readProductVersion(InputStream stream) throws JDOMException, IOException {
-        SAXBuilder sax = new SAXBuilder();
-        Document doc = sax.build(stream);
-        Element root = doc.getRootElement();
-        Element versionElement = root.getChild("version", root.getNamespace());
-        if (versionElement != null) {
-            return versionElement.getTextTrim();
-        } else {
-            logger.warn("Could not read " + artifactId + " version.");
-            return unknownVersion;
+    private Optional<String> extractVersion(String version, String sourceName, String key) {
+        if (version == null || version.isBlank()) {
+            logger.debug("No {} value found in {}", key, sourceName);
+            return Optional.empty();
         }
+        return Optional.of(version.trim());
     }
 
     public ProductInfoRecord databaseMetadata() {

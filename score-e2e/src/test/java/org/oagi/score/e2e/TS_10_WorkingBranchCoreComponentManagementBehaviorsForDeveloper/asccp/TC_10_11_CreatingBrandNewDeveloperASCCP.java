@@ -2,6 +2,7 @@ package org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsFo
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -51,7 +52,8 @@ public class TC_10_11_CreatingBrandNewDeveloperASCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_11_1() {
+    @DisplayName("TC_10_11_TA_1")
+    public void brand_new_asccp_uses_expected_default_values_for_selected_acc() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -92,7 +94,8 @@ public class TC_10_11_CreatingBrandNewDeveloperASCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_11_2() {
+    @DisplayName("TC_10_11_TA_2")
+    public void asccp_picks_up_underlying_acc_definition_changes() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -120,7 +123,8 @@ public class TC_10_11_CreatingBrandNewDeveloperASCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_11_3() {
+    @DisplayName("TC_10_11_TA_3")
+    public void developer_cannot_create_brand_new_asccp_in_release_branch() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -133,13 +137,15 @@ public class TC_10_11_CreatingBrandNewDeveloperASCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_11_4() {
+    @DisplayName("TC_10_11_TA_4")
+    public void developer_cannot_create_brand_new_asccp_in_draft_release_branch() {
 
 
     }
 
     @Test
-    public void test_TA_10_11_5() {
+    @DisplayName("TC_10_11_TA_5")
+    public void extension_acc_cannot_be_selected_when_creating_asccp() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -155,7 +161,8 @@ public class TC_10_11_CreatingBrandNewDeveloperASCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_11_6() {
+    @DisplayName("TC_10_11_TA_6")
+    public void only_semantics_and_semantic_group_accs_can_be_selected_when_creating_asccp() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -199,7 +206,8 @@ public class TC_10_11_CreatingBrandNewDeveloperASCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_11_7() {
+    @DisplayName("TC_10_11_TA_7")
+    public void developer_can_create_asccp_from_acc_detail_page() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 

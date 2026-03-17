@@ -26,6 +26,7 @@ import {AuthService} from '../../../authentication/auth.service';
 import {forkJoin} from 'rxjs';
 
 @Component({
+  standalone: false,
   selector: 'score-business-context-detail',
   templateUrl: './business-context-detail.component.html',
   styleUrls: ['./business-context-detail.component.css']

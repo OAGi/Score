@@ -2,6 +2,7 @@ package org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsFo
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -43,7 +44,8 @@ public class TC_10_24_RestoringDeveloperBCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_24_1_owned_by_myself() {
+    @DisplayName("TC_10_24_TA_1 (owned by myself)")
+    public void developer_can_restore_owned_deleted_bccp_with_live_bdt() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -73,7 +75,8 @@ public class TC_10_24_RestoringDeveloperBCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_24_1_owned_by_another_developer() {
+    @DisplayName("TC_10_24_TA_1 (owned by another developer)")
+    public void developer_can_restore_another_developers_deleted_bccp_with_live_bdt() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -107,7 +110,8 @@ public class TC_10_24_RestoringDeveloperBCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_24_2() {
+    @DisplayName("TC_10_24_TA_2")
+    public void restored_deleted_bccp_still_shows_deleted_bdt_flag() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 

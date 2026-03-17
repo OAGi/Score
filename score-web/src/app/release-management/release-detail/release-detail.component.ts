@@ -10,13 +10,13 @@ import {NamespaceSummary} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
-import {hashCode} from '../../common/utility';
+import {hashCode, saveAsBlobResponse} from '../../common/utility';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
-import {saveAs} from 'file-saver';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {ReleaseWhatsChangedDialogComponent} from './release-whats-changed-dialog/release-whats-changed-dialog.component';
 
 @Component({
+  standalone: false,
   selector: 'score-release-list',
   templateUrl: './release-detail.component.html',
   styleUrls: ['./release-detail.component.css']
@@ -201,17 +201,10 @@ export class ReleaseDetailComponent implements OnInit {
   generateMigrationScript() {
     this.isLoading = true;
     this.service.generateMigrationScript(this.releaseDetail.releaseId).subscribe(resp => {
-      const blob = new Blob([resp.body], {type: resp.headers.get('Content-Type')});
-      saveAs(blob, this._getFilenameFromContentDisposition(resp));
+      saveAsBlobResponse(resp);
       this.isLoading = false;
     }, err => {
       this.isLoading = false;
     });
-  }
-
-  _getFilenameFromContentDisposition(resp) {
-    const contentDisposition = resp.headers.get('Content-Disposition') || '';
-    const matches = /filename=([^;]+)/ig.exec(contentDisposition);
-    return (matches[1] || 'untitled').replace(/\"/gi, '').trim();
   }
 }

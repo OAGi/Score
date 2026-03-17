@@ -49,7 +49,7 @@ public class TC_6_1_EndUserAuthorizedManagementContextSchemes extends BaseTest {
 
     @Test
     @DisplayName("TC_6_1_TA_1")
-    public void test_TA_1() {
+    public void end_user_can_see_context_schemes_created_by_any_user() {
         List<ContextSchemeObject> schemeForTesting = new ArrayList<>();
         {
             /**
@@ -110,7 +110,7 @@ public class TC_6_1_EndUserAuthorizedManagementContextSchemes extends BaseTest {
 
     @Test
     @DisplayName("TC_6_1_TA_2")
-    public void test_TA_2() {
+    public void end_user_can_open_and_edit_context_schemes_created_by_any_user() {
         List<ContextSchemeObject> schemeForTesting = new ArrayList<>();
         Map<String, ContextSchemeValueObject> contextSchemeValueMap = new HashMap<>();
         {
@@ -178,7 +178,7 @@ public class TC_6_1_EndUserAuthorizedManagementContextSchemes extends BaseTest {
 
     @Test
     @DisplayName("TC_6_1_TA_3")
-    public void test_TA_3() {
+    public void end_user_can_load_context_scheme_values_from_published_developer_code_lists() {
         ContextSchemeObject endUserScheme;
         Map<ContextSchemeObject, ContextSchemeValueObject> contextSchemeValueMap = new HashMap<>();
         Map<CodeListObject, CodeListValueObject> codeListValueMap = new HashMap<>();
@@ -265,7 +265,7 @@ public class TC_6_1_EndUserAuthorizedManagementContextSchemes extends BaseTest {
 
     @Test
     @DisplayName("TC_6_1_TA_4")
-    public void test_TA_4() {
+    public void end_user_can_load_context_scheme_values_from_production_code_lists_only() {
         ContextSchemeObject endUserScheme;
         Map<ContextSchemeObject, ContextSchemeValueObject> contextSchemeValueMap = new HashMap<>();
         Map<CodeListObject, CodeListValueObject> codeListValueMap = new HashMap<>();
@@ -371,7 +371,7 @@ public class TC_6_1_EndUserAuthorizedManagementContextSchemes extends BaseTest {
 
     @Test
     @DisplayName("TC_6_1_TA_5")
-    public void test_TA_5() {
+    public void end_user_can_keep_context_scheme_selection_when_paginating() {
         ContextSchemeObject endUserScheme;
         {
             /**

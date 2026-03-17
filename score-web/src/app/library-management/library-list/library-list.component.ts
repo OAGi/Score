@@ -24,6 +24,7 @@ import {LibraryListEntry, LibraryListRequest, LibrarySummary} from '../domain/li
 import {LibraryService} from '../../library-management/domain/library.service';
 
 @Component({
+  standalone: false,
   selector: 'score-library-list',
   templateUrl: './library-list.component.html',
   styleUrls: ['./library-list.component.css']

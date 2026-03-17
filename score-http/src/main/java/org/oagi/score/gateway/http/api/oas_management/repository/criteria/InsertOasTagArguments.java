@@ -1,7 +1,7 @@
 package org.oagi.score.gateway.http.api.oas_management.repository.criteria;
 
-import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
+import org.oagi.score.gateway.http.api.oas_management.model.OasTagId;
 import org.oagi.score.gateway.http.api.oas_management.repository.OasDocCommandRepository;
 
 import java.sql.Timestamp;
@@ -12,7 +12,7 @@ public class InsertOasTagArguments {
 
     private final OasDocCommandRepository repository;
 
-    private ULong userId;
+    private UserId userId;
     private String guid;
     private String name;
     private String description;
@@ -23,10 +23,6 @@ public class InsertOasTagArguments {
     }
 
     public InsertOasTagArguments setUserId(UserId userId) {
-        return setUserId(ULong.valueOf(userId.value()));
-    }
-
-    public InsertOasTagArguments setUserId(ULong userId) {
         this.userId = userId;
         return this;
     }
@@ -56,7 +52,7 @@ public class InsertOasTagArguments {
         return this;
     }
 
-    public ULong getUserId() {
+    public UserId getUserId() {
         return userId;
     }
 
@@ -76,7 +72,7 @@ public class InsertOasTagArguments {
         return timestamp;
     }
 
-    public ULong execute() {
+    public OasTagId execute() {
         return repository.insertOasTag(this);
     }
 

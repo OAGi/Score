@@ -17,6 +17,7 @@ import {forkJoin} from 'rxjs';
 import {IssuedCc} from './domain/refactor-dialog';
 
 @Component({
+  standalone: false,
   selector: 'score-based-acc-dialog',
   templateUrl: './refactor-dialog.component.html',
   styleUrls: ['./refactor-dialog.component.css'],

@@ -179,7 +179,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
     }
 
     @Test
-    public void test_TA_18_1_1() {
+    public void developer_can_only_search_and_view_details_of_ccs_i_e_no_cc_creation() {
         thisAccountWillBeDeletedAfterTests(developer);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -207,7 +207,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
     }
 
     @Test
-    public void test_TA_18_1_2() {
+    public void no_cc_shall_be_listed_for_the_developer_when_state_filter_is_selected_that() {
         thisAccountWillBeDeletedAfterTests(developer);
         thisAccountWillBeDeletedAfterTests(endUser);
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -229,7 +229,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
     }
 
     @Test
-    public void test_TA_18_1_3() {
+    public void end_user_can_only_search_and_view_details_of_ccs_i_e_no_cc() {
         thisAccountWillBeDeletedAfterTests(developer);
         thisAccountWillBeDeletedAfterTests(endUser);
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
@@ -256,7 +256,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
     }
 
     @Test
-    public void test_TA_18_1_4() {
+    public void no_cc_shall_be_listed_for_the_end_user_when_state_filter_is_selected() {
         thisAccountWillBeDeletedAfterTests(developer);
         thisAccountWillBeDeletedAfterTests(endUser);
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
@@ -279,7 +279,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
     }
 
     @Test
-    public void test_TA_18_1_5_a_b_c() {
+    public void core_component_access_new_property_added_to_an_acc_based_acc_changes() {
         thisAccountWillBeDeletedAfterTests(developer);
         thisAccountWillBeDeletedAfterTests(endUser);
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -302,7 +302,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
      */
     @Test
     @Disabled
-    public void test_TA_18_1_5_d() {
+    public void changing_bdt_is_not_covered_yet() {
         thisAccountWillBeDeletedAfterTests(developer);
         thisAccountWillBeDeletedAfterTests(endUser);
     }
@@ -312,7 +312,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
      */
     @Test
     @Disabled
-    public void test_TA_18_1_5_e() {
+    public void changing_association_position_is_not_covered_yet() {
         thisAccountWillBeDeletedAfterTests(developer);
         thisAccountWillBeDeletedAfterTests(endUser);
     }

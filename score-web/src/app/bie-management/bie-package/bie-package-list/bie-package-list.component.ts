@@ -37,6 +37,7 @@ import {LibraryService} from '../../../library-management/domain/library.service
 import {LibrarySummary} from '../../../library-management/domain/library';
 
 @Component({
+  standalone: false,
   selector: 'score-bie-package-list',
   templateUrl: './bie-package-list.component.html',
   styleUrls: ['./bie-package-list.component.css']

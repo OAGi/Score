@@ -219,7 +219,8 @@ public class UpliftBIEPageImpl extends BaseSearchBarPageImpl implements UpliftBI
 
     @Override
     public UpliftBIEVerificationPage next() {
-        click(getNextButton());
+        invisibilityOfLoadingContainerElement(getDriver());
+        click(getDriver(), getNextButton());
         invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         UpliftBIEVerificationPage upliftBIEVerificationPage = new UpliftBIEVerificationPageImpl(this);
         assert upliftBIEVerificationPage.isOpened();

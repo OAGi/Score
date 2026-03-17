@@ -42,7 +42,7 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_3_TA_1")
-    public void test_TA_1() {
+    public void end_user_can_change_the_properties_of_the_code_list_and_save_changes() {
         AppUserObject endUser;
         LibraryObject library;
         ReleaseObject branch;
@@ -108,7 +108,7 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_3_TA_2")
-    public void test_TA_2() {
+    public void end_user_can_add_a_code_list_value_the_code_list_value_shall_have_the_following_field_code_short_nam() {
         AppUserObject endUser;
         LibraryObject library;
         ReleaseObject branch;
@@ -155,7 +155,7 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_3_TA_3")
-    public void test_TA_3() {
+    public void a_code_list_with_base_the_end_user_can_remove_derived_code_list_values_and_save() {
         AppUserObject endUser;
         LibraryObject library;
         ReleaseObject branch;
@@ -190,7 +190,7 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_3_TA_4")
-    public void test_TA_4() {
+    public void a_code_list_with_base_the_end_user_can_change_existing_code_list_values_and_their_details() {
         AppUserObject endUser;
         LibraryObject library;
         ReleaseObject branch;
@@ -228,7 +228,7 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_3_TA_5")
-    public void test_TA_5() {
+    public void new_code_list_value_only_the_code_and_short_name_are_required() {
         AppUserObject endUser;
         LibraryObject library;
         ReleaseObject branch;
@@ -264,7 +264,7 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_3_TA_6")
-    public void test_TA_6() {
+    public void added_code_list_value_can_be_removed() {
         AppUserObject endUser;
         LibraryObject library;
         ReleaseObject branch;
@@ -298,7 +298,7 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_3_TA_7")
-    public void test_TA_7() {
+    public void end_user_can_edit_a_newly_added_code_list_value_details_except_the_deprecated_field_with_and_without() {
         AppUserObject endUser;
         LibraryObject library;
         ReleaseObject branch;
@@ -336,7 +336,7 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_3_TA_8")
-    public void test_TA_8() {
+    public void end_user_can_select_end_user_agency_id_list_in_production_state_under_the_code_list() {
         AppUserObject endUser;
         LibraryObject library;
         ReleaseObject branch;

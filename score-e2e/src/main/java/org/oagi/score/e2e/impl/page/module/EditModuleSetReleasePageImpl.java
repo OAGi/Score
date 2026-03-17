@@ -14,6 +14,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.*;
 import java.time.Duration;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static java.nio.file.StandardWatchEventKinds.*;
@@ -38,6 +39,8 @@ public class EditModuleSetReleasePageImpl extends BasePageImpl implements EditMo
             By.xpath("//span[contains(text(), \"Export\")]//ancestor::button[1]");
     private static final By VALIDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Validate\")]//ancestor::button[1]");
+    private static final By XML_SCHEMA_MENU_ITEM_LOCATOR =
+            By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]//button//span[contains(text(), \"XML Schema\")]//ancestor::button[1]");
     private static final By ASSIGN_CC_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Assign CCs\")]//ancestor::button[1]");
     private static final By VIEW_ASSIGNED_CC_BUTTON_LOCATOR =
@@ -129,9 +132,15 @@ public class EditModuleSetReleasePageImpl extends BasePageImpl implements EditMo
 
     @Override
     public File hitExportButton() {
-        click(getExportButton());
+        long startedAt = System.currentTimeMillis();
+        retry(() -> {
+            click(getDriver(), getExportButton());
+            waitFor(ofMillis(500L));
+            click(getDriver(), elementToBeClickable(getDriver(), XML_SCHEMA_MENU_ITEM_LOCATOR));
+            waitFor(ofMillis(500L));
+        });
         try {
-            return waitForDownloadFile(Duration.ofMillis(30000));
+            return waitForDownloadFile(Duration.ofMillis(60000), startedAt);
         } catch (IOException | InterruptedException e) {
             throw new IllegalStateException(e);
         }
@@ -154,10 +163,13 @@ public class EditModuleSetReleasePageImpl extends BasePageImpl implements EditMo
 
     @Override
     public ModuleSetReleaseXMLSchemaValidationDialog hitValidateButton() {
-        click(getValidateButton());
-        ModuleSetReleaseXMLSchemaValidationDialog validateDialog = new ModuleSetReleaseXMLSchemaValidationDialogImpl(this);
-        assert validateDialog.isOpened();
-        return validateDialog;
+        retry(() -> {
+            click(getDriver(), getValidateButton());
+            waitFor(ofMillis(500L));
+            click(getDriver(), elementToBeClickable(getDriver(), XML_SCHEMA_MENU_ITEM_LOCATOR));
+            waitFor(ofMillis(500L));
+        });
+        return new ModuleSetReleaseXMLSchemaValidationDialogImpl(this);
     }
 
 
@@ -182,26 +194,43 @@ public class EditModuleSetReleasePageImpl extends BasePageImpl implements EditMo
         return elementToBeClickable(getDriver(), VIEW_ASSIGNED_CC_BUTTON_LOCATOR);
     }
 
-    private File waitForDownloadFile(Duration duration) throws IOException, InterruptedException {
+    private File waitForDownloadFile(Duration duration, long startedAt) throws IOException, InterruptedException {
         String userHome = System.getProperty("user.home");
         Path path = Paths.get(new File(userHome, "Downloads").toURI());
+        Optional<Path> existingZip = Files.list(path)
+                .filter(child -> child.toFile().getName().endsWith(".zip"))
+                .filter(child -> child.toFile().lastModified() >= startedAt)
+                .max((left, right) -> Long.compare(left.toFile().lastModified(), right.toFile().lastModified()));
+        if (existingZip.isPresent() && existingZip.get().toFile().length() > 0L) {
+            return existingZip.get().toFile();
+        }
 
         WatchService watchService = FileSystems.getDefault().newWatchService();
         path.register(watchService, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
 
         long timeout = duration.toMillis();
-        File downloadedFile = null;
         WatchKey key;
         do {
             key = watchService.poll(1000L, TimeUnit.MILLISECONDS);
             if (key != null && key.isValid()) {
+                File downloadedFile = null;
                 for (WatchEvent<?> event : key.pollEvents()) {
-                    downloadedFile = new File(path.toFile(), event.context().toString());
+                    File candidate = new File(path.toFile(), event.context().toString());
+                    if (!candidate.getName().endsWith(".zip")) {
+                        continue;
+                    }
+                    if (!candidate.exists() || candidate.length() == 0L) {
+                        continue;
+                    }
+                    if (candidate.lastModified() < startedAt) {
+                        continue;
+                    }
+                    downloadedFile = candidate;
                 }
                 key.reset();
-            }
-            if (downloadedFile != null) {
-                return downloadedFile;
+                if (downloadedFile != null) {
+                    return downloadedFile;
+                }
             }
             timeout -= 1000L;
         } while (timeout > 0L);

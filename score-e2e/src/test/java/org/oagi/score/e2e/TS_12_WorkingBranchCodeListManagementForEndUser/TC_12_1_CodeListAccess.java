@@ -41,7 +41,7 @@ public class TC_12_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_12_1_TA_1")
-    public void test_TA_1() {
+    public void end_user_can_see_in_the_list_code_lists_owned_by_developers_in_any_state() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject endUser;
         ReleaseObject workingBranch;
@@ -84,7 +84,7 @@ public class TC_12_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_12_1_TA_2")
-    public void test_TA_2() {
+    public void end_user_can_view_details_of_code_lists_and_values_in_any_state_but_he_cannot_make_any_change_except() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject endUser;
         ReleaseObject workingBranch;
@@ -144,7 +144,7 @@ public class TC_12_1_CodeListAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_12_1_TA_3")
-    public void test_TA_3() {
+    public void working_branch_does_not_have_any_end_user_code_list_therefore_it_cannot_have_any_end_user_code_list() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject endUserA;
         ReleaseObject workingBranch;

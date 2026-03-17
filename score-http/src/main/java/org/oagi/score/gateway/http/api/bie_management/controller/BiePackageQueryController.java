@@ -11,6 +11,7 @@ import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BiePacka
 import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BiePackageListEntryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BiePackageManifestResponse;
 import org.oagi.score.gateway.http.api.bie_management.model.expression.BieGenerateExpressionResult;
+import org.oagi.score.gateway.http.api.bie_management.model.expression.GenerateExpressionOption;
 import org.oagi.score.gateway.http.api.bie_management.repository.criteria.BieListInBiePackageFilterCriteria;
 import org.oagi.score.gateway.http.api.bie_management.repository.criteria.BiePackageListFilterCriteria;
 import org.oagi.score.gateway.http.api.bie_management.service.BiePackageManifestService;
@@ -40,6 +41,7 @@ import java.io.IOException;
 import static java.util.stream.Collectors.toSet;
 import static org.oagi.score.gateway.http.common.util.ControllerUtils.pageRequest;
 import static org.oagi.score.gateway.http.common.util.Utility.separate;
+import static org.oagi.score.gateway.http.common.util.StringUtils.hasLength;
 
 @RestController
 @Tag(name = "BIE Package - Queries", description = "API for retrieving BIE package-related data")
@@ -150,13 +152,20 @@ public class BiePackageQueryController {
             @RequestParam(name = "topLevelAsbiepIdList", required = false) String topLevelAsbiepIdList,
             @RequestParam(name = "schemaExpression", required = false) String schemaExpression,
             @RequestParam(name = "pathDelimiter", required = false, defaultValue = ".") String pathDelimiter,
+            GenerateExpressionOption option,
             HttpServletRequest httpServletRequest) throws IOException {
 
         ScoreUser requester = sessionService.asScoreUser(user);
+        if (option == null) {
+            option = new GenerateExpressionOption();
+        }
+        if (hasLength(schemaExpression)) {
+            option.setExpressionOption(schemaExpression);
+        }
 
         BieGenerateExpressionResult response = biePackageQueryService.generate(requester, biePackageId,
                 separate(topLevelAsbiepIdList).map(e -> TopLevelAsbiepId.from(e)).collect(toSet()),
-                schemaExpression, pathDelimiter);
+                option, pathDelimiter);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + response.filename() + "\"")

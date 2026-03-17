@@ -49,7 +49,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_4_TA_1")
-    public void test_TA_1() {
+    public void code_list_detail_page_of_end_user_code_list_in_production_state_the_end_user_can_amend_the_code_list() {
         AppUserObject endUserA;
         ReleaseObject branch;
         List<CodeListObject> codeListForTesting = new ArrayList<>();
@@ -122,7 +122,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_4_TA_2")
-    public void test_TA_2() {
+    public void end_user_cannot_amend_a_developer_code_list_in_the_release_branch() {
         AppUserObject endUserA;
         ReleaseObject branch;
         List<CodeListObject> codeListForTesting = new ArrayList<>();
@@ -162,7 +162,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_4_TA_3")
-    public void test_TA_3() {
+    public void end_user_can_change_the_properties_of_the_code_list_and_save_changes() {
         AppUserObject endUserA;
         ReleaseObject branch;
         List<CodeListObject> codeListForTesting = new ArrayList<>();
@@ -239,7 +239,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_4_TA_4")
-    public void test_TA_4() {
+    public void existing_locally_defined_code_list_value_from_the_previous_revisions_cannot_be_discarded_only_its_sh() {
         AppUserObject endUserA;
         ReleaseObject branch;
         List<CodeListObject> codeListForTesting = new ArrayList<>();
@@ -305,7 +305,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_4_TA_5")
-    public void test_TA_5() {
+    public void the_code_list_value_inherited_from_the_based_code_list_the_values_cannot_be_removed_since_it_is_an_a() {
         AppUserObject endUserA;
         ReleaseObject branch;
         List<CodeListObject> codeListForTesting = new ArrayList<>();
@@ -363,7 +363,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_4_TA_6")
-    public void test_TA_6() {
+    public void new_code_list_value_can_be_added_and_all_of_its_details_can_be_edited() {
         AppUserObject endUserA;
         ReleaseObject branch;
         List<CodeListObject> codeListForTesting = new ArrayList<>();
@@ -411,7 +411,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_4_TA_7")
-    public void test_TA_7() {
+    public void brand_new_code_list_value_added_in_this_revision_can_be_discarded_if_it_is_not_a_replacement_of_a_de() {
         AppUserObject endUserA;
         ReleaseObject branch;
         List<CodeListObject> codeListForTesting = new ArrayList<>();
@@ -455,7 +455,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_4_TA_8")
-    public void test_TA_8() {
+    public void end_user_can_cancel_the_amendment_in_this_case_the_system_rollbacks_the_whole_code_list_details_and() {
         AppUserObject endUserA;
         ReleaseObject branch;
         List<CodeListObject> codeListForTesting = new ArrayList<>();
@@ -515,7 +515,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_4_TA_9")
-    public void test_TA_9() {
+    public void expressing_bie_that_uses_an_amended_end_user_code_list_generates_expected_differences() {
         AppUserObject endUserA;
         AppUserObject developer;
         LibraryObject library;
@@ -603,16 +603,35 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
                 file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode root = mapper.readTree(file);
-                JsonNode rootNode = root.path("definitions");
-                List<JsonNode> values = rootNode.findValues("enum");
-                JsonNode value = values.get(0);
-                ArrayList<String> jsonValues = new ArrayList<>();
-                for (int i = 0; i < value.size(); i++) {
-                    jsonValues.add(value.get(i).asText());
-                }
                 List<CodeListValueObject> codeListValues = getAPIFactory().getCodeListValueAPI().getCodeListValuesByCodeListManifestId(cl.getCodeListManifestId());
-                for (CodeListValueObject codeListalue : codeListValues) {
-                    assertTrue(jsonValues.contains(codeListalue.getValue()));
+                ArrayList<String> expectedValues = new ArrayList<>();
+                for (CodeListValueObject codeListValue : codeListValues) {
+                    expectedValues.add(codeListValue.getValue());
+                }
+
+                List<JsonNode> enums = root.findValues("enum");
+                JsonNode matchingEnum = null;
+                for (JsonNode enumNode : enums) {
+                    if (!enumNode.isArray()) {
+                        continue;
+                    }
+                    ArrayList<String> jsonValues = new ArrayList<>();
+                    for (int i = 0; i < enumNode.size(); i++) {
+                        jsonValues.add(enumNode.get(i).asText());
+                    }
+                    if (jsonValues.containsAll(expectedValues)) {
+                        matchingEnum = enumNode;
+                        break;
+                    }
+                }
+
+                assertNotNull(matchingEnum, "Generated JSON schema did not contain the amended code list enum values.");
+                ArrayList<String> jsonValues = new ArrayList<>();
+                for (int i = 0; i < matchingEnum.size(); i++) {
+                    jsonValues.add(matchingEnum.get(i).asText());
+                }
+                for (CodeListValueObject codeListValue : codeListValues) {
+                    assertTrue(jsonValues.contains(codeListValue.getValue()));
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);

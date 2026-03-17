@@ -1,6 +1,8 @@
-FROM --platform=linux/amd64 tomcat:10.1.43-jdk21-temurin
+FROM --platform=linux/amd64 tomcat:10.1.52-jdk21-temurin
 
 LABEL maintainer="Hakju Oh <hakju.oh@nist.gov>"
+
+ARG MARIADB_CLIENT_VERSION
 
 ENV DB_HOST localhost
 ENV DB_PORT 3306
@@ -13,7 +15,7 @@ ENV REDIS_PORT 6379
 RUN apt-get -y update
 RUN apt-get -y upgrade
 
-COPY mariadb-java-client-3.5.7.jar /usr/local/tomcat/lib/mariadb-java-client-3.5.7.jar
+COPY mariadb-java-client-${MARIADB_CLIENT_VERSION}.jar /usr/local/tomcat/lib/mariadb-java-client-${MARIADB_CLIENT_VERSION}.jar
 
 RUN rm -rf /usr/local/tomcat/webapps/* && \
     chgrp -R 0 /usr/local/tomcat/ && \
@@ -21,6 +23,6 @@ RUN rm -rf /usr/local/tomcat/webapps/* && \
 
 USER 1001
 COPY web.xml /usr/local/tomcat/conf/web.xml
-COPY score-http-3.4.2.war /usr/local/tomcat/webapps/ROOT.war
+COPY score-http.war /usr/local/tomcat/webapps/ROOT.war
 
 CMD ["catalina.sh", "run"]

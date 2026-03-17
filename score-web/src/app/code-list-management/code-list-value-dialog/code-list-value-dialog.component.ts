@@ -4,6 +4,7 @@ import {CodeListValue} from '../domain/code-list';
 import {hashCode} from '../../common/utility';
 
 @Component({
+  standalone: false,
   selector: 'score-code-list-value-dialog',
   templateUrl: './code-list-value-dialog.component.html',
   styleUrls: ['./code-list-value-dialog.component.css']

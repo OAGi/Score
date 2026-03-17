@@ -1,7 +1,7 @@
 package org.oagi.score.gateway.http.api.info_management.service;
 
 import org.oagi.score.gateway.http.api.application_management.controller.payload.ApplicationConfigurationChangeRequest;
-import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
+import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationCommandService;
 import org.oagi.score.gateway.http.api.info_management.model.BoxColorSet;
 import org.oagi.score.gateway.http.api.info_management.model.WebPageInfoRecord;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
@@ -11,14 +11,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
-import static org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService.*;
+import static org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationProperties.*;
 
 @Service
 @Transactional
 public class WebPageInfoCommandService {
 
     @Autowired
-    private ApplicationConfigurationService configService;
+    private ApplicationConfigurationCommandService configService;
 
     public void updateWebPageInfo(ScoreUser requester, WebPageInfoRecord webPageInfo) {
         ApplicationConfigurationChangeRequest request = new ApplicationConfigurationChangeRequest()

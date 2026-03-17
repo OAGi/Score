@@ -37,7 +37,12 @@ The developer cannot make a new revision on any DT.
 The developer shall not be able to create any new DT.
 
 ### Test Step Pre-condition:
-
+1. The stated test-case pre-condition is satisfied: A release branch, i.e., one of the release branches, is selected.
+2. The users, branches, releases, and records needed to exercise "Access to DT viewing, editing and commenting" are available in connectCenter.
 
 
 ### Test Step:
+1. The developer signs in to connectCenter, opens `Core Component > View/Edit Core Component`, and selects the target release branch.
+2. Verify DT visibility for the selected release and confirm that DT records in non-published release branches are not listed. (Assertion [#39.1.1](#test-assertion-3911))
+3. Open DT detail pages in `WIP`, `QA`, `Production`, `Deleted`, and `Published` states and verify view, edit, comment, amend, and restore permissions by state and ownership. (Assertions [#39.1.2](#test-assertion-3912), [#39.1.3](#test-assertion-3913), [#39.1.4](#test-assertion-3914), [#39.1.5](#test-assertion-3915), [#39.1.6](#test-assertion-3916))
+4. Verify that creating a new revision and creating a new DT are unavailable in this release-branch access scenario. (Assertions [#39.1.7](#test-assertion-3917), [#39.1.8](#test-assertion-3918))

@@ -51,7 +51,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
     @Test
     @DisplayName("TC_10_1_TA_1")
-    public void test_TA_1() {
+    public void developer_can_list_working_branch_core_components_owned_by_any_developer_in_any_state() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -101,7 +101,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
     @Test
     @DisplayName("TC_10_1_TA_2")
-    public void test_TA_2() {
+    public void developer_can_edit_owned_wip_acc_bcc_and_ascc_components() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -180,7 +180,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
     @Test
     @DisplayName("TC_10_1_TA_3")
-    public void test_TA_3() {
+    public void developer_can_view_read_only_another_developers_wip_components_and_add_comments() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -265,7 +265,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
     @Test
     @DisplayName("TC_10_1_TA_4")
-    public void test_TA_4() {
+    public void developer_can_view_read_only_draft_and_candidate_components_and_add_comments() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -347,7 +347,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
     @Test
     @DisplayName("TC_10_1_TA_5")
-    public void test_TA_5() {
+    public void developer_can_view_published_components_in_read_only_mode_and_add_comments() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -425,7 +425,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
     @Test
     @DisplayName("TC_10_1_TA_6")
-    public void test_TA_6() {
+    public void end_user_cannot_see_create_core_component_action_in_working_branch() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(true);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -440,7 +440,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
     @Test
     @DisplayName("TC_10_1_TA_7")
-    public void test_TA_7() {
+    public void developer_can_view_deleted_components_owned_by_another_developer() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -517,7 +517,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
     @Test
     @DisplayName("TC_10_1_TA_8")
-    public void test_TA_8() {
+    public void developer_can_view_read_only_deleted_components_owned_by_self_and_add_comments() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -590,7 +590,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
     @Test
     @DisplayName("TC_10_1_TA_9")
-    public void test_TA_9() {
+    public void developer_can_view_read_only_deleted_components_owned_by_another_developer_and_add_comments() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -667,13 +667,13 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
     @Test
     @DisplayName("TC_10_1_TA_10")
-    public void test_TA_10() {
+    public void developer_can_filter_core_components_by_branch() {
 
     }
 
     @Test
     @DisplayName("TC_10_1_TA_11")
-    public void test_TA_11() {
+    public void developer_can_filter_core_components_by_type() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -763,7 +763,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
     @Test
     @DisplayName("TC_10_1_TA_12")
-    public void test_TA_12() {
+    public void developer_can_filter_core_components_by_state() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -816,7 +816,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
     @Test
     @DisplayName("TC_10_1_TA_13")
-    public void test_TA_13() {
+    public void developer_can_filter_core_components_by_updated_date() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -899,7 +899,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
     @Test
     @DisplayName("TC_10_1_TA_14")
-    public void test_TA_14() {
+    public void developer_can_search_core_components_by_exact_den() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -917,7 +917,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
     @Test
     @DisplayName("TC_10_1_TA_15")
-    public void test_TA_15() {
+    public void developer_can_search_core_components_by_definition_with_exact_match_support() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -941,7 +941,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
     @Test
     @DisplayName("TC_10_1_TA_16")
-    public void test_TA_16() {
+    public void developer_can_search_core_components_by_module() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -964,7 +964,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
     @Test
     @DisplayName("TC_10_1_TA_17")
-    public void test_TA_17() {
+    public void developer_can_search_core_components_by_component_type() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1067,13 +1067,13 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
     @Test
     @DisplayName("TC_10_1_TA_18")
-    public void test_TA_18() {
+    public void developer_can_sort_core_components_by_den() {
 
     }
 
     @Test
     @DisplayName("TC_10_1_TA_19")
-    public void test_TA_19() {
+    public void developer_can_bulk_move_core_component_states_and_transfer_ownership() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1307,7 +1307,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
     @Test
     @DisplayName("TC_10_1_TA_20")
-    public void test_TA_20() {
+    public void developer_can_find_where_core_component_nodes_are_used() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 

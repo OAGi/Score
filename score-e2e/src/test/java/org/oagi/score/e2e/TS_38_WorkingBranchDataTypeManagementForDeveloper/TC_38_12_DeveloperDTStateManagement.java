@@ -35,7 +35,7 @@ public class TC_38_12_DeveloperDTStateManagement extends BaseTest {
 
     @Test
     @DisplayName("TC_38_12_from_TA_1_to_TA_4")
-    public void test_from_TA_1_to_TA_4() {
+    public void developer_data_type_state_management_covers_ta_1_to_ta_4() {
         AppUserObject developerA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();

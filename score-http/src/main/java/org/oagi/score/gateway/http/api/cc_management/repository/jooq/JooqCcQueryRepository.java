@@ -220,6 +220,12 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                         field = field("den");
                         break;
 
+                    case "name":
+                    case "term":
+                        // Issue #1700: "Name" sort in Browse Standards maps to the unified `term` projection.
+                        field = field("term");
+                        break;
+
                     case "valueDomain":
                         field = field("default_value_domain");
                         break;
@@ -255,7 +261,8 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                 }
             }
 
-            if (filterCriteria != null && hasLength(filterCriteria.den())) {
+            if (filterCriteria != null && (hasLength(filterCriteria.den()) || hasLength(filterCriteria.name()))) {
+                // Issue #1700: Keep fuzzy relevance ordering available for both DEN and Name search paths.
                 sortFields.add(field("score").desc());
             }
 
@@ -429,6 +436,13 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                                         .div(greatest(length(ACC_MANIFEST.DEN), length(filterCriteria.den()))))
                                 .as("score")
                 );
+            } else if (filterCriteria != null && hasLength(filterCriteria.name())) {
+                // Issue #1700: for ACC, "Name" means OBJECT_CLASS_TERM, not DEN.
+                fields.add(
+                        val(1).minus(levenshtein(lower(ACC.OBJECT_CLASS_TERM), val(filterCriteria.name().toLowerCase()))
+                                        .div(greatest(length(ACC.OBJECT_CLASS_TERM), length(filterCriteria.name()))))
+                                .as("score")
+                );
             }
 
             return dslContext().select(concat(fields.stream(), libraryFields(), releaseFields(), ownerFields(), creatorFields(), updaterFields()))
@@ -495,6 +509,8 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
             }
             if (hasLength(filterCriteria.den())) {
                 conditions.addAll(ContainsFilterBuilder.contains(filterCriteria.den(), ACC_MANIFEST.DEN));
+            } else if (hasLength(filterCriteria.name())) {
+                conditions.addAll(ContainsFilterBuilder.contains(filterCriteria.name(), ACC.OBJECT_CLASS_TERM));
             }
             if (hasLength(filterCriteria.definition())) {
                 conditions.addAll(ContainsFilterBuilder.contains(filterCriteria.definition(), ACC.DEFINITION));
@@ -617,6 +633,9 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                                         .div(greatest(length(ASCC_MANIFEST.DEN), length(filterCriteria.den()))))
                                 .as("score")
                 );
+            } else if (filterCriteria != null && hasLength(filterCriteria.name())) {
+                // Issue #1700: ASCC has no term/name column for Browse Standards; keep `score` projected for union sorting.
+                fields.add(val(0).as("score"));
             }
 
             return dslContext().select(concat(fields.stream(), libraryFields(), releaseFields(), ownerFields(), creatorFields(), updaterFields()))
@@ -686,6 +705,8 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
             }
             if (hasLength(filterCriteria.den())) {
                 conditions.addAll(ContainsFilterBuilder.contains(filterCriteria.den(), ASCC_MANIFEST.DEN));
+            } else if (hasLength(filterCriteria.name())) {
+                conditions.add(falseCondition());
             }
             if (hasLength(filterCriteria.definition())) {
                 conditions.addAll(ContainsFilterBuilder.contains(filterCriteria.definition(), ASCC.DEFINITION));
@@ -742,6 +763,9 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                                         .div(greatest(length(BCC_MANIFEST.DEN), length(filterCriteria.den()))))
                                 .as("score")
                 );
+            } else if (filterCriteria != null && hasLength(filterCriteria.name())) {
+                // Issue #1700: BCC has no term/name column for Browse Standards; keep `score` projected for union sorting.
+                fields.add(val(0).as("score"));
             }
 
             return dslContext().select(concat(fields.stream(), libraryFields(), releaseFields(), ownerFields(), creatorFields(), updaterFields()))
@@ -809,6 +833,8 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
             }
             if (hasLength(filterCriteria.den())) {
                 conditions.addAll(ContainsFilterBuilder.contains(filterCriteria.den(), BCC_MANIFEST.DEN));
+            } else if (hasLength(filterCriteria.name())) {
+                conditions.add(falseCondition());
             }
             if (hasLength(filterCriteria.definition())) {
                 conditions.addAll(ContainsFilterBuilder.contains(filterCriteria.definition(), BCC.DEFINITION));
@@ -863,6 +889,13 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                 fields.add(
                         val(1).minus(levenshtein(lower(ASCCP_MANIFEST.DEN), val(filterCriteria.den().toLowerCase()))
                                         .div(greatest(length(ASCCP_MANIFEST.DEN), length(filterCriteria.den()))))
+                                .as("score")
+                );
+            } else if (filterCriteria != null && hasLength(filterCriteria.name())) {
+                // Issue #1700: ASCCP "Name" search uses PROPERTY_TERM.
+                fields.add(
+                        val(1).minus(levenshtein(lower(ASCCP.PROPERTY_TERM), val(filterCriteria.name().toLowerCase()))
+                                        .div(greatest(length(ASCCP.PROPERTY_TERM), length(filterCriteria.name()))))
                                 .as("score")
                 );
             }
@@ -939,6 +972,8 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                 conditions.add(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.in(valueOf(filterCriteria.asccpManifestIds())));
             } else if (hasLength(filterCriteria.den())) {
                 conditions.addAll(ContainsFilterBuilder.contains(filterCriteria.den(), ASCCP_MANIFEST.DEN));
+            } else if (hasLength(filterCriteria.name())) {
+                conditions.addAll(ContainsFilterBuilder.contains(filterCriteria.name(), ASCCP.PROPERTY_TERM));
             }
             if (hasLength(filterCriteria.definition())) {
                 conditions.addAll(ContainsFilterBuilder.contains(filterCriteria.definition(), ASCCP.DEFINITION));
@@ -1007,6 +1042,13 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                                         .div(greatest(length(BCCP_MANIFEST.DEN), length(filterCriteria.den()))))
                                 .as("score")
                 );
+            } else if (filterCriteria != null && hasLength(filterCriteria.name())) {
+                // Issue #1700: BCCP "Name" search uses PROPERTY_TERM.
+                fields.add(
+                        val(1).minus(levenshtein(lower(BCCP.PROPERTY_TERM), val(filterCriteria.name().toLowerCase()))
+                                        .div(greatest(length(BCCP.PROPERTY_TERM), length(filterCriteria.name()))))
+                                .as("score")
+                );
             }
 
             return dslContext().select(concat(fields.stream(), libraryFields(), releaseFields(), ownerFields(), creatorFields(), updaterFields()))
@@ -1069,6 +1111,8 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
             }
             if (hasLength(filterCriteria.den())) {
                 conditions.addAll(ContainsFilterBuilder.contains(filterCriteria.den(), BCCP_MANIFEST.DEN));
+            } else if (hasLength(filterCriteria.name())) {
+                conditions.addAll(ContainsFilterBuilder.contains(filterCriteria.name(), BCCP.PROPERTY_TERM));
             }
             if (hasLength(filterCriteria.definition())) {
                 conditions.addAll(ContainsFilterBuilder.contains(filterCriteria.definition(), BCCP.DEFINITION));
@@ -1126,6 +1170,13 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                 fields.add(
                         val(1).minus(levenshtein(lower(DT_MANIFEST.DEN), val(filterCriteria.den().toLowerCase()))
                                         .div(greatest(length(DT_MANIFEST.DEN), length(filterCriteria.den()))))
+                                .as("score")
+                );
+            } else if (filterCriteria != null && hasLength(filterCriteria.name())) {
+                // Issue #1700: DT "Name" search uses DATA_TYPE_TERM.
+                fields.add(
+                        val(1).minus(levenshtein(lower(DT.DATA_TYPE_TERM), val(filterCriteria.name().toLowerCase()))
+                                        .div(greatest(length(DT.DATA_TYPE_TERM), length(filterCriteria.name()))))
                                 .as("score")
                 );
             }
@@ -1201,6 +1252,8 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
             }
             if (hasLength(filterCriteria.den())) {
                 conditions.addAll(ContainsFilterBuilder.contains(filterCriteria.den(), DT_MANIFEST.DEN));
+            } else if (hasLength(filterCriteria.name())) {
+                conditions.addAll(ContainsFilterBuilder.contains(filterCriteria.name(), DT.DATA_TYPE_TERM));
             }
             if (hasLength(filterCriteria.definition())) {
                 conditions.addAll(ContainsFilterBuilder.contains(filterCriteria.definition(), DT.DEFINITION));

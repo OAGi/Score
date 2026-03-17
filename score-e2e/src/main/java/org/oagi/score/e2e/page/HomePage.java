@@ -4,6 +4,7 @@ import org.oagi.score.e2e.menu.*;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.oagi.score.e2e.page.message.MessageListPage;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
@@ -56,6 +57,13 @@ public interface HomePage extends Page {
     ModuleMenu getModuleMenu();
 
     /**
+     * Return the menu object of the 'Library' menu.
+     *
+     * @return the menu object of the 'Library' menu
+     */
+    LibraryMenu getLibraryMenu();
+
+    /**
      * Return the menu object of the 'Admin' menu.
      *
      * @return the menu object of the 'Admin' menu
@@ -97,6 +105,69 @@ public interface HomePage extends Page {
      * @return the UI element of the 'User Extensions' tab
      */
     WebElement getUserExtensionsTab();
+
+    /**
+     * Return the UI element of the 'Browse Standard' menu.
+     *
+     * @return the UI element of the 'Browse Standard' menu
+     */
+    WebElement getBrowseStandardMenu();
+
+    /**
+     * Return {@code true} if the 'Browse Standard' menu is visible, otherwise {@code false}.
+     *
+     * @return {@code true} if the 'Browse Standard' menu is visible, otherwise {@code false}
+     */
+    boolean hasBrowseStandardMenu();
+
+    /**
+     * Return {@code true} if the 'Context' menu is visible, otherwise {@code false}.
+     *
+     * @return {@code true} if the 'Context' menu is visible, otherwise {@code false}
+     */
+    boolean hasContextMenu();
+
+    /**
+     * Return {@code true} if the 'Core Component' menu is visible, otherwise {@code false}.
+     *
+     * @return {@code true} if the 'Core Component' menu is visible, otherwise {@code false}
+     */
+    boolean hasCoreComponentMenu();
+
+    /**
+     * Return {@code true} if the 'Module' menu is visible, otherwise {@code false}.
+     *
+     * @return {@code true} if the 'Module' menu is visible, otherwise {@code false}
+     */
+    boolean hasModuleMenu();
+
+    /**
+     * Return {@code true} if the 'Library' menu is visible, otherwise {@code false}.
+     *
+     * @return {@code true} if the 'Library' menu is visible, otherwise {@code false}
+     */
+    boolean hasLibraryMenu();
+
+    /**
+     * Open the 'Browse Standard' menu to enter the page.
+     *
+     * @return the 'Core Component' page object
+     */
+    ViewEditCoreComponentPage openBrowseStandardMenu();
+
+    /**
+     * Return the UI element of the notification icon.
+     *
+     * @return the UI element of the notification icon
+     */
+    WebElement getNotificationIcon();
+
+    /**
+     * Open the message list page from the notification icon.
+     *
+     * @return the 'Message' page object
+     */
+    MessageListPage openMessageListPage();
 
     /**
      * Log out of the current account.

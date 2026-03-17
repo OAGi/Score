@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.oas_management.model;
 
+import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.account_management.model.UserSummaryRecord;
 import org.oagi.score.gateway.http.common.model.base.Auditable;
 
@@ -19,7 +20,7 @@ public class OasDoc extends Auditable {
     private String contactEmail;
     private String licenseName;
     private String licenseUrl;
-    private String ownerUserId;
+    private UserId ownerUserId;
     private Date lastUpdateTimestamp;
     private Date creationTimestamp;
     private UserSummaryRecord createdBy;
@@ -144,11 +145,11 @@ public class OasDoc extends Auditable {
         this.creationTimestamp = creationTimestamp;
     }
 
-    public String getOwnerUserId() {
+    public UserId getOwnerUserId() {
         return ownerUserId;
     }
 
-    public void setOwnerUserId(String ownerUserId) {
+    public void setOwnerUserId(UserId ownerUserId) {
         this.ownerUserId = ownerUserId;
     }
 

@@ -9,6 +9,7 @@ import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListSu
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListValueSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.BIE;
 import org.oagi.score.gateway.http.api.bie_management.model.Facet;
+import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.abie.AbieSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.asbie.AsbieSummaryRecord;
@@ -55,6 +56,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.*;
 import java.util.*;
+import java.util.function.Function;
 
 import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.hasAnyValuesInFacets;
 import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.toName;
@@ -77,6 +79,12 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
     private GenerateExpressionOption option;
 
     private final Map<String, Element> processedElements = new HashMap();
+    // Prevent duplicate <xsd:include schemaLocation="...">.
+    private final Set<String> includedSchemaLocations = new LinkedHashSet<>();
+    // Prevent duplicate <xsd:import namespace="..." schemaLocation="...">.
+    private final Set<String> importedSchemaLocations = new LinkedHashSet<>();
+    // Stable namespace prefix per referenced top-level ASBIEP to avoid prefix drift in one document.
+    private final Map<TopLevelAsbiepId, String> topLevelNamespacePrefixes = new HashMap<>();
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -86,6 +94,9 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
     @Override
     public void afterPropertiesSet() {
         this.processedElements.clear();
+        this.includedSchemaLocations.clear();
+        this.importedSchemaLocations.clear();
+        this.topLevelNamespacePrefixes.clear();
         this.document = new Document();
         this.schemaNode = null;
     }
@@ -152,7 +163,9 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
     private void generateTopLevelAsbiep(TopLevelAsbiepSummaryRecord topLevelAsbiep) {
         AsbiepSummaryRecord asbiep = generationContext.findASBIEP(topLevelAsbiep.asbiepId(), topLevelAsbiep);
         AsccpSummaryRecord asccp = generationContext.getAsccp(asbiep.basedAsccpManifestId());
-        Namespace targetNamespace = getNamespace(generationContext, asccp.namespaceId());
+        Namespace declaredNamespace = getNamespace(generationContext, asccp.namespaceId());
+        Namespace targetNamespace = resolveSchemaNamespace(declaredNamespace);
+        boolean referencedSchemaFile = isReferencedSchemaFile(topLevelAsbiep.topLevelAsbiepId());
 
         if (this.schemaNode == null) {
             this.schemaNode = generateSchema(targetNamespace);
@@ -170,7 +183,18 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
             rootElementNode = generateTopLevelASBIEP(asbiep, topLevelAsbiep);
 
             AbieSummaryRecord abie = generationContext.queryTargetABIE(asbiep);
-            Element rootSeqNode = generateABIE(abie, rootElementNode);
+            Element rootSeqNode;
+            if (isSeparateFileReferencesForReusedSchemasEnabled() && referencedSchemaFile) {
+                // Referenced schemas should expose a reusable named global type and bind the root
+                // element by type. This keeps dependent schemas using type-based references.
+                String topLevelTypeName = resolveUniqueTopLevelGlobalTypeName(
+                        asccp, topLevelAsbiep.topLevelAsbiepId());
+                rootElementNode.setAttribute("type",
+                        resolveTypeQName(targetNamespace, topLevelAsbiep.topLevelAsbiepId(), topLevelTypeName));
+                rootSeqNode = generateGlobalABIEType(abie, topLevelTypeName);
+            } else {
+                rootSeqNode = generateABIE(abie, rootElementNode);
+            }
             generateBIEs(abie, rootSeqNode);
             if (rootSeqNode.getChildren().isEmpty()) {
                 rootSeqNode.detach();
@@ -664,18 +688,19 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         }
 
         AsccpSummaryRecord asccp = generationContext.queryBasedASCCP(asbiep);
-        Namespace namespace = getNamespace(generationContext, asccp.namespaceId());
-        this.schemaNode.setAttribute("targetNamespace", namespace.getURI());
-        this.schemaNode.addNamespaceDeclaration(namespace);
+        Namespace declaredNamespace = getNamespace(generationContext, asccp.namespaceId());
+        Namespace schemaNamespace = resolveSchemaNamespace(declaredNamespace);
+        this.schemaNode.setAttribute("targetNamespace", schemaNamespace.getURI());
+        this.schemaNode.addNamespaceDeclaration(schemaNamespace);
         Element rootEleNode = newElement("element");
         schemaNode.addContent(rootEleNode);
 
-        rootEleNode.setAttribute("name", asccp.propertyTerm().replaceAll(" ", ""));
+        rootEleNode.setAttribute("name", resolveTopLevelElementName(asccp, topLevelAsbiep.topLevelAsbiepId()));
         if (option.isBieGuid()) {
             rootEleNode.setAttribute("id", ID_ATTRIBUTE_PREFIX + asbiep.getGuid());
         }
 
-        setDefinition(rootEleNode, asbiep.definition(), namespace);
+        setDefinition(rootEleNode, asbiep.definition(), schemaNamespace);
         setBusinessContext(rootEleNode, topLevelAsbiep);
         setOptionalDocumentation(rootEleNode,
                 new ASBIEPDocumentation(asbiep, asccp, topLevelAsbiep));
@@ -708,6 +733,30 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         return element;
     }
 
+    private Element generateGlobalABIEType(AbieSummaryRecord abie, String typeName) {
+        // Used for split referenced schemas: root element + reusable global complexType.
+        Element complexType = newElement("complexType");
+        complexType.setAttribute("name", typeName);
+        if (option.isBieGuid()) {
+            complexType.setAttribute("id", ID_ATTRIBUTE_PREFIX + abie.getGuid());
+        }
+        schemaNode.addContent(complexType);
+
+        AccSummaryRecord acc = generationContext.queryBasedACC(abie);
+        setDefinition(complexType, abie.definition(), getNamespace(generationContext, acc.namespaceId()));
+        setOptionalDocumentation(complexType, abie, acc);
+
+        Element element;
+        if (OagisComponentType.Choice == acc.componentType()) {
+            element = newElement("choice");
+            complexType.addContent(element);
+        } else {
+            element = newElement("sequence");
+            complexType.addContent(element);
+        }
+        return element;
+    }
+
     public void generateBIEs(AbieSummaryRecord abie, Element parent) {
         List<BIE> childBIEs = generationContext.queryChildBIEs(abie);
         for (BIE bie : childBIEs) {
@@ -723,6 +772,10 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                 } else {
                     Element node = generateASBIE(asbie, parent);
                     AsbiepSummaryRecord asbiep = generationContext.queryAssocToASBIEP(asbie);
+                    if (shouldGenerateASBIEReference(asbie, asbiep)) {
+                        generateASBIEReference(node, asbiep);
+                        continue;
+                    }
                     Element asbiepNode = generateASBIEP(asbiep, node);
                     AbieSummaryRecord childAbie = generationContext.queryTargetABIE(asbiep);
                     Element compositorNode = generateABIE(childAbie, asbiepNode);
@@ -737,6 +790,203 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                 }
             }
         }
+    }
+
+    private boolean shouldGenerateASBIEReference(AsbieSummaryRecord asbie, AsbiepSummaryRecord asbiep) {
+        if (!isSeparateFileReferencesForReusedSchemasEnabled()) {
+            return false;
+        }
+        // Cross top-level association means this node points to an external schema file.
+        return !Objects.equals(asbie.ownerTopLevelAsbiepId(), asbiep.ownerTopLevelAsbiepId());
+    }
+
+    private boolean isSeparateFileReferencesForReusedSchemasEnabled() {
+        return (option != null) && (option.isSeparateFileReferencesForReusedSchemas());
+    }
+
+    /**
+     * Emits an ASBIE as a local element with a typed reference to a globally named complex type
+     * from another top-level schema file, and registers {@code xsd:include}/{@code xsd:import}
+     * depending on namespace compatibility.
+     */
+    private void generateASBIEReference(Element asbieNode, AsbiepSummaryRecord asbiep) {
+        AsccpSummaryRecord asccp = generationContext.queryBasedASCCP(asbiep);
+        TopLevelAsbiepSummaryRecord refTopLevelAsbiep =
+                generationContext.findTopLevelAsbiep(asbiep.ownerTopLevelAsbiepId());
+        TopLevelAsbiepId refTopLevelAsbiepId = (refTopLevelAsbiep != null) ?
+                refTopLevelAsbiep.topLevelAsbiepId() : asbiep.ownerTopLevelAsbiepId();
+        Namespace refNamespace = getNamespace(generationContext, asccp.namespaceId());
+
+        String schemaLocation = resolveExternalRefSchemaLocation(refTopLevelAsbiep, asccp);
+        registerSchemaDirective(refNamespace, schemaLocation);
+
+        // Keep local element semantics (name/cardinality/nillable/docs) and bind it by type.
+        generateASBIEP(asbiep, asbieNode);
+        asbieNode.setAttribute("type", resolveTypeQName(
+                refNamespace, refTopLevelAsbiepId, resolveUniqueTopLevelGlobalTypeName(asccp, refTopLevelAsbiepId)));
+    }
+
+    private String resolveExternalRefSchemaLocation(TopLevelAsbiepSummaryRecord refTopLevelAsbiep,
+                                                    AsccpSummaryRecord asccp) {
+        Map<TopLevelAsbiepId, String> filenames = option.getFilenames();
+        if (filenames != null && refTopLevelAsbiep != null) {
+            String filename = filenames.get(refTopLevelAsbiep.topLevelAsbiepId());
+            if (hasLength(filename)) {
+                return filename + ".xsd";
+            }
+        }
+        return resolveTopLevelElementName(asccp) + ".xsd";
+    }
+
+    private String resolveTopLevelElementName(AsccpSummaryRecord asccp) {
+        if (asccp == null) {
+            return "Schema";
+        }
+        if (hasLength(asccp.propertyTerm())) {
+            return asccp.propertyTerm().replaceAll("\\s+", "");
+        }
+        return Utility.first(asccp.den(), true);
+    }
+
+    private String resolveTopLevelElementName(AsccpSummaryRecord asccp, TopLevelAsbiepId topLevelAsbiepId) {
+        // Keep top-level element (ASCCP property-term-derived) name stable even for reused/referenced files.
+        return resolveTopLevelElementName(asccp);
+    }
+
+    /**
+     * Resolves runtime "referenced schema file" marker from generation context.
+     */
+    private boolean isReferencedSchemaFile(TopLevelAsbiepId topLevelAsbiepId) {
+        return generationContext != null
+                && generationContext.getSchemaReferenceInfo(topLevelAsbiepId).isReferencedSchemaFile();
+    }
+
+    private String resolveUniqueTopLevelGlobalTypeName(AsccpSummaryRecord asccp, TopLevelAsbiepId topLevelAsbiepId) {
+        String baseName = resolveTopLevelElementName(asccp);
+        if (topLevelAsbiepId == null) {
+            return baseName + "Type";
+        }
+        return baseName + "_" + topLevelAsbiepId.value() + "Type";
+    }
+
+    private void registerSchemaDirective(Namespace refNamespace, String schemaLocation) {
+        String targetNamespace = (schemaNode != null) ? schemaNode.getAttributeValue("targetNamespace") : null;
+        String refNamespaceUri = (refNamespace != null) ? refNamespace.getURI() : null;
+        if (!hasLength(refNamespaceUri) || Objects.equals(targetNamespace, refNamespaceUri)) {
+            // Same namespace uses xsd:include.
+            ensureSchemaInclude(schemaLocation);
+            return;
+        }
+        // Different namespace uses xsd:import.
+        ensureSchemaImport(refNamespace, schemaLocation);
+    }
+
+    private void ensureSchemaInclude(String schemaLocation) {
+        if (!hasLength(schemaLocation) || !includedSchemaLocations.add(schemaLocation)) {
+            return;
+        }
+        Element include = newElement("include");
+        include.setAttribute("schemaLocation", schemaLocation);
+        insertSchemaDirective(include);
+    }
+
+    private void ensureSchemaImport(Namespace namespace, String schemaLocation) {
+        if (namespace == null || !hasLength(namespace.getURI()) || !hasLength(schemaLocation)) {
+            return;
+        }
+        String key = namespace.getURI() + "|" + schemaLocation;
+        if (!importedSchemaLocations.add(key)) {
+            return;
+        }
+        Element imports = newElement("import");
+        imports.setAttribute("namespace", namespace.getURI());
+        imports.setAttribute("schemaLocation", schemaLocation);
+        insertSchemaDirective(imports);
+    }
+
+    private void insertSchemaDirective(Element directive) {
+        if (schemaNode == null) {
+            return;
+        }
+        int insertionIndex = 0;
+        for (Content content : schemaNode.getContent()) {
+            if (!(content instanceof Element)) {
+                break;
+            }
+            String name = ((Element) content).getName();
+            if ("annotation".equals(name)
+                    || "include".equals(name)
+                    || "import".equals(name)
+                    || "redefine".equals(name)
+                    || "override".equals(name)) {
+                insertionIndex++;
+            } else {
+                break;
+            }
+        }
+        schemaNode.addContent(insertionIndex, directive);
+    }
+
+    private String resolveTypeQName(
+            Namespace refNamespace, TopLevelAsbiepId topLevelAsbiepId, String localName) {
+        if (refNamespace == null || !hasLength(refNamespace.getURI())) {
+            return localName;
+        }
+        String targetNamespace = (schemaNode != null) ? schemaNode.getAttributeValue("targetNamespace") : null;
+        if (Objects.equals(targetNamespace, refNamespace.getURI())) {
+            // For same-target-namespace type references, keep it unqualified.
+            return localName;
+        }
+        String prefix = ensureNamespaceDeclaration(refNamespace, topLevelAsbiepId);
+        return hasLength(prefix) ? prefix + ":" + localName : localName;
+    }
+
+    /**
+     * Ensures a namespace declaration exists and returns the chosen prefix.
+     * <p>
+     * For top-level-aware calls, prefix is anchored by top-level ASBIEP ID (`ns{id}`) and only
+     * falls back to suffixed variants when the same prefix is already used for a different URI.
+     */
+    private String ensureNamespaceDeclaration(Namespace namespace, TopLevelAsbiepId topLevelAsbiepId) {
+        if (schemaNode == null || namespace == null || !hasLength(namespace.getURI())) {
+            return "";
+        }
+        if (topLevelAsbiepId == null) {
+            String basePrefix = hasLength(namespace.getPrefix()) ? namespace.getPrefix() : "ns";
+            String prefix = basePrefix;
+            int suffix = 1;
+            while (schemaNode.getNamespace(prefix) != null
+                    && !Objects.equals(schemaNode.getNamespace(prefix).getURI(), namespace.getURI())) {
+                prefix = basePrefix + "_" + suffix++;
+            }
+            if (schemaNode.getNamespace(prefix) == null) {
+                schemaNode.addNamespaceDeclaration(Namespace.getNamespace(prefix, namespace.getURI()));
+            }
+            return prefix;
+        }
+
+        String savedPrefix = topLevelNamespacePrefixes.get(topLevelAsbiepId);
+        if (hasLength(savedPrefix)) {
+            return savedPrefix;
+        }
+
+        String basePrefix = "ns" + topLevelAsbiepId.value();
+        String prefix = basePrefix;
+        int suffix = 1;
+        while (schemaNode.getNamespace(prefix) != null &&
+                !Objects.equals(schemaNode.getNamespace(prefix).getURI(), namespace.getURI())) {
+            prefix = basePrefix + "_" + suffix++;
+        }
+        if (schemaNode.getNamespace(prefix) == null) {
+            schemaNode.addNamespaceDeclaration(Namespace.getNamespace(prefix, namespace.getURI()));
+        }
+        topLevelNamespacePrefixes.put(topLevelAsbiepId, prefix);
+        return prefix;
+    }
+
+    private Namespace resolveSchemaNamespace(Namespace declaredNamespace) {
+        // Keep the namespace declared by the underlying ASCCP. Do not derive namespace URIs.
+        return declaredNamespace;
     }
 
     private Element generateAnyABIE(AsbieSummaryRecord asbie, Element parent) {
@@ -782,7 +1032,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         simpleContent.addContent(extNode);
 
         AgencyIdListValueSummaryRecord agencyIdListValue = generationContext.findAgencyIdListValue(codeList.agencyIdListValueManifestId());
-        String codeListTypeName = Helper.getCodeListTypeName(codeList, agencyIdListValue);
+        String codeListTypeName = getCodeListTypeName(codeList, agencyIdListValue);
         extNode.setAttribute("base", codeListTypeName);
         eNode.addContent(complexType);
         return eNode;
@@ -1094,7 +1344,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
 
                     AgencyIdListValueSummaryRecord agencyIdListValue =
                             generationContext.findAgencyIdListValue(agencyIdList.agencyIdListValueManifestId());
-                    String agencyListTypeName = Helper.getAgencyListTypeName(agencyIdList, agencyIdListValue);
+                    String agencyListTypeName = getAgencyListTypeName(agencyIdList, agencyIdListValue);
 
                     generateAgencyList(agencyIdList, agencyListTypeName);
                     if (StringUtils.hasLength(agencyListTypeName)) {
@@ -1125,7 +1375,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
 
                 if (bbieScList.isEmpty()) {
                     AgencyIdListValueSummaryRecord agencyIdListValue = generationContext.findAgencyIdListValue(codeList.agencyIdListValueManifestId());
-                    eNode.setAttribute("type", Helper.getCodeListTypeName(codeList, agencyIdListValue));
+                    eNode.setAttribute("type", getCodeListTypeName(codeList, agencyIdListValue));
                 } else {
                     eNode = generateBDT(bbie, eNode, codeList);
                     eNode = generateSCs(bbie, eNode, bbieScList);
@@ -1145,7 +1395,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
 
                     AgencyIdListValueSummaryRecord agencyIdListValue =
                             generationContext.findAgencyIdListValue(agencyIdList.agencyIdListValueManifestId());
-                    String agencyListTypeName = Helper.getAgencyListTypeName(agencyIdList, agencyIdListValue);
+                    String agencyListTypeName = getAgencyListTypeName(agencyIdList, agencyIdListValue);
 
                     generateAgencyList(agencyIdList, agencyListTypeName);
                     if (StringUtils.hasLength(agencyListTypeName)) {
@@ -1178,7 +1428,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
 
                 if (bbieScList.isEmpty()) {
                     AgencyIdListValueSummaryRecord agencyIdListValue = generationContext.findAgencyIdListValue(codeList.agencyIdListValueManifestId());
-                    String codeListTypeName = Helper.getCodeListTypeName(codeList, agencyIdListValue);
+                    String codeListTypeName = getCodeListTypeName(codeList, agencyIdListValue);
                     if (StringUtils.hasLength(codeListTypeName)) {
                         eNode.setAttribute("type", codeListTypeName);
                     }
@@ -1188,7 +1438,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                         eNode = setBBIE_Attr_Type(bdt, eNode);
                     } else {
                         AgencyIdListValueSummaryRecord agencyIdListValue = generationContext.findAgencyIdListValue(codeList.agencyIdListValueManifestId());
-                        String codeListTypeName = Helper.getCodeListTypeName(codeList, agencyIdListValue);
+                        String codeListTypeName = getCodeListTypeName(codeList, agencyIdListValue);
                         if (StringUtils.hasLength(codeListTypeName)) {
                             eNode.setAttribute("type", codeListTypeName);
                         }
@@ -1253,7 +1503,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         Element stNode = newElement("simpleType");
 
         AgencyIdListValueSummaryRecord agencyIdListValue = generationContext.findAgencyIdListValue(codeList.agencyIdListValueManifestId());
-        stNode.setAttribute("name", Helper.getCodeListTypeName(codeList, agencyIdListValue));
+        stNode.setAttribute("name", getCodeListTypeName(codeList, agencyIdListValue));
         if (option.isBieGuid()) {
             stNode.setAttribute("id", ID_ATTRIBUTE_PREFIX + codeList.guid());
         }
@@ -1401,7 +1651,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
 
                     AgencyIdListValueSummaryRecord agencyIdListValue =
                             generationContext.findAgencyIdListValue(agencyIdList.agencyIdListValueManifestId());
-                    String agencyListTypeName = Helper.getAgencyListTypeName(agencyIdList, agencyIdListValue);
+                    String agencyListTypeName = getAgencyListTypeName(agencyIdList, agencyIdListValue);
 
                     generateAgencyList(agencyIdList, agencyListTypeName);
                     if (StringUtils.hasLength(agencyListTypeName)) {
@@ -1416,7 +1666,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                 generateCodeList(codeList, bbieSc);
 
                 AgencyIdListValueSummaryRecord agencyIdListValue = generationContext.findAgencyIdListValue(codeList.agencyIdListValueManifestId());
-                String codeListTypeName = Helper.getCodeListTypeName(codeList, agencyIdListValue);
+                String codeListTypeName = getCodeListTypeName(codeList, agencyIdListValue);
                 if (StringUtils.hasLength(codeListTypeName)) {
                     aNode.setAttribute("type", codeListTypeName);
                 }
@@ -2215,5 +2465,17 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         public Collection<Definition> getCoreComponentDefinitions() {
             return (dt.definition() != null) ? Arrays.asList(dt.definition()) : Collections.emptyList();
         }
+    }
+
+    public String getCodeListTypeName(CodeListSummaryRecord codeList,
+                                             AgencyIdListValueSummaryRecord agencyIdListValue) {
+        return Helper.getCodeListTypeName(codeList, agencyIdListValue,
+                (name) -> name.contains(" ") ? Utility.toCamelCase(name) : name);
+    }
+
+    public String getAgencyListTypeName(AgencyIdListSummaryRecord agencyIdList,
+                                               AgencyIdListValueSummaryRecord agencyIdListValue) {
+        return Helper.getAgencyListTypeName(agencyIdList, agencyIdListValue,
+                (name) -> name.contains(" ") ? Utility.toCamelCase(name) : name);
     }
 }

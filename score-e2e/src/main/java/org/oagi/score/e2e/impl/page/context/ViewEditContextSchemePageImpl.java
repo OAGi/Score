@@ -63,12 +63,28 @@ public class ViewEditContextSchemePageImpl extends BaseSearchBarPageImpl impleme
 
     @Override
     public void setUpdater(String updater) {
-        click(getUpdaterSelectField());
-        sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), updater);
-        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[contains(text(), \"" + updater + "\")]"));
-        click(searchedSelectField);
-        escape(getDriver());
+        retry(() -> {
+            click(getDriver(), getUpdaterSelectField());
+            By searchedSelectFieldLocator =
+                    By.xpath("//mat-option//span[contains(text(), \"" + updater + "\")]");
+
+            WebElement searchedSelectField;
+            try {
+                searchedSelectField = visibilityOfElementLocated(
+                        org.oagi.score.e2e.impl.PageHelper.wait(getDriver(), java.time.Duration.ofSeconds(3L), ofMillis(100L)),
+                        searchedSelectFieldLocator);
+            } catch (TimeoutException e) {
+                WebElement dropdownSearchField = visibilityOfElementLocated(
+                        org.oagi.score.e2e.impl.PageHelper.wait(getDriver(), java.time.Duration.ofSeconds(10L), ofMillis(100L)),
+                        DROPDOWN_SEARCH_FIELD_LOCATOR);
+                sendKeys(dropdownSearchField, updater);
+                searchedSelectField = visibilityOfElementLocated(
+                        org.oagi.score.e2e.impl.PageHelper.wait(getDriver(), java.time.Duration.ofSeconds(10L), ofMillis(100L)),
+                        searchedSelectFieldLocator);
+            }
+            click(getDriver(), searchedSelectField);
+            escape(getDriver());
+        });
     }
 
     @Override

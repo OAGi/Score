@@ -7,6 +7,7 @@ import {PreferencesInfo} from './domain/preferences';
 import {SettingsPreferencesService} from './domain/settings-preferences.service';
 
 @Component({
+  standalone: false,
   selector: 'score-settings-preferences',
   templateUrl: './settings-preferences.component.html',
   styleUrls: ['./settings-preferences.component.css']

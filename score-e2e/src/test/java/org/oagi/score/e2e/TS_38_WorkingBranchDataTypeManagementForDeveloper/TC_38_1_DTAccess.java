@@ -42,7 +42,7 @@ public class TC_38_1_DTAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_38_1_TA_1")
-    public void test_TA_1() {
+    public void developer_can_see_in_the_core_component_list_page_all_data_types_owned_by_any_developer_in_any_state() {
         AppUserObject developerA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -86,7 +86,7 @@ public class TC_38_1_DTAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_38_1_TA_2")
-    public void test_TA_2() {
+    public void developer_can_view_and_edit_the_details_of_data_type_that_is_in_wip_state_and_owned_by_him() {
         AppUserObject developerA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -121,7 +121,7 @@ public class TC_38_1_DTAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_38_1_TA_3")
-    public void test_TA_3() {
+    public void developer_can_view_but_cannot_edit_the_details_of_data_type_that_is_in_wip_state_and_owned_by_anothe() {
         AppUserObject developerA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -162,7 +162,7 @@ public class TC_38_1_DTAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_38_1_TA_4")
-    public void test_TA_4() {
+    public void developer_can_view_the_details_of_data_type_that_is_in_draft_candidate_or_release_draft_state_not_ow() {
         AppUserObject developerA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -209,7 +209,7 @@ public class TC_38_1_DTAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_38_1_TA_5")
-    public void test_TA_5() {
+    public void developer_can_view_the_details_of_a_published_data_type_owned_by_any_developer_but_he_cannot_make_an() {
         AppUserObject developerA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -253,7 +253,7 @@ public class TC_38_1_DTAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_38_1_TA_6")
-    public void test_TA_6() {
+    public void there_cannot_be_any_end_user_data_type_in_the_working_branch() {
         AppUserObject developerA;
         AppUserObject endUser;
         ReleaseObject branch;
@@ -276,7 +276,7 @@ public class TC_38_1_DTAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_38_1_TA_7")
-    public void test_TA_7() {
+    public void developer_can_view_details_of_a_deleted_data_type_owned_by_another_developer() {
         AppUserObject developerA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -315,7 +315,7 @@ public class TC_38_1_DTAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_38_1_TA_8")
-    public void test_TA_8() {
+    public void developer_cannot_edit_details_of_a_deleted_data_type_owned_by_him_he_can_add_comments() {
         AppUserObject developerA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -353,7 +353,7 @@ public class TC_38_1_DTAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_38_1_TA_9")
-    public void test_TA_9() {
+    public void developer_cannot_edit_details_of_a_deleted_data_type_owned_by_another_developer_he_can_add_comments() {
         AppUserObject developerA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -394,7 +394,7 @@ public class TC_38_1_DTAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_38_1_TA_10")
-    public void test_TA_10() {
+    public void developer_can_restore_a_deleted_data_type_owned_by_him() {
         AppUserObject developerA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -428,7 +428,7 @@ public class TC_38_1_DTAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_38_1_TA_11")
-    public void test_TA_11() {
+    public void developer_can_restore_a_deleted_data_type_owned_by_another_developer() {
         AppUserObject developerA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -465,7 +465,7 @@ public class TC_38_1_DTAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_38_1_TA_12_a")
-    public void test_TA_12_a() {
+    public void changing_state_from_wip_to_draft() {
         AppUserObject developerA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -510,7 +510,7 @@ public class TC_38_1_DTAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_38_1_TA_12_b")
-    public void test_TA_12_b() {
+    public void changing_state_from_draft_to_wip() {
         AppUserObject developerA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -556,7 +556,7 @@ public class TC_38_1_DTAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_38_1_TA_12_c")
-    public void test_TA_12_c() {
+    public void changing_state_from_draft_to_candidate() {
         AppUserObject developerA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -602,7 +602,7 @@ public class TC_38_1_DTAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_38_1_TA_12_d")
-    public void test_TA_12_d() {
+    public void transfer_the_ownership() {
         AppUserObject developerA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -646,7 +646,7 @@ public class TC_38_1_DTAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_38_1_TA_12_e")
-    public void test_TA_12_e() {
+    public void deleting() {
         AppUserObject developerA;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
@@ -690,7 +690,7 @@ public class TC_38_1_DTAccess extends BaseTest {
 
     @Test
     @DisplayName("TC_38_1_TA_13")
-    public void test_TA_13() {
+    public void developer_cannot_move_states_of_several_data_types_in_one_shot_if_all_selected_data_types_are_not_ow() {
         AppUserObject developerA, developerB;
         ReleaseObject branch;
         List<DTObject> dtForTesting = new ArrayList<>();

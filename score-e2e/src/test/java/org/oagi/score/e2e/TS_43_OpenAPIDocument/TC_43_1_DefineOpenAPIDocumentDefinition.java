@@ -16,6 +16,8 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.oas.CreateOpenAPIDocumentPage;
 import org.oagi.score.e2e.page.oas.EditOpenAPIDocumentPage;
 import org.oagi.score.e2e.page.oas.OpenAPIDocumentPage;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
@@ -25,6 +27,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.oagi.score.e2e.impl.PageHelper.click;
+import static org.oagi.score.e2e.impl.PageHelper.elementToBeClickable;
+import static org.oagi.score.e2e.impl.PageHelper.getSnackBarMessage;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -245,6 +250,55 @@ public class TC_43_1_DefineOpenAPIDocumentDefinition extends BaseTest {
         assertEquals(randomOpenAPIDocument.getLicenseName(), getText(editOpenAPIDocumentPage.getLicenseNameField()));
         assertEquals(randomOpenAPIDocument.getLicenseUrl(), getText(editOpenAPIDocumentPage.getLicenseURLField()));
         assertEquals(randomOpenAPIDocument.getDescription(), getText(editOpenAPIDocumentPage.getDescriptionField()));
+    }
+
+    @Test
+    @DisplayName("TC_43_1_8")
+    public void enduser_cannot_discard_OpenAPI_document_in_openapi_document_page_if_it_is_used() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        OpenAPIDocumentObject randomOpenAPIDocument = getAPIFactory().getOpenAPIDocumentAPI().createRandomOpenAPIDocument(endUser);
+        getAPIFactory().getOpenAPIDocumentAPI().createRandomServer(randomOpenAPIDocument, endUser);
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        OpenAPIDocumentPage openAPIDocumentPage = bieMenu.openOpenAPIDocumentSubMenu();
+
+        openAPIDocumentPage.setTitle(randomOpenAPIDocument.getTitle());
+        openAPIDocumentPage.hitSearchButton();
+
+        WebElement tr = openAPIDocumentPage.getTableRecordByValue(randomOpenAPIDocument.getTitle());
+        WebElement td = openAPIDocumentPage.getColumnByName(tr, "select");
+        click(td);
+        click(openAPIDocumentPage.getDiscardButton(true));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]")));
+
+        assertEquals("Discard's forbidden! The oas doc is used.", getSnackBarMessage(getDriver()));
+        assertDoesNotThrow(() -> openAPIDocumentPage.openEditOpenAPIDocumentPage(randomOpenAPIDocument));
+    }
+
+    @Test
+    @DisplayName("TC_43_1_10")
+    public void enduser_can_discard_OpenAPI_document_in_edit_openapi_document_page_if_it_is_not_used() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        OpenAPIDocumentObject randomOpenAPIDocument = getAPIFactory().getOpenAPIDocumentAPI().createRandomOpenAPIDocument(endUser);
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        OpenAPIDocumentPage openAPIDocumentPage = bieMenu.openOpenAPIDocumentSubMenu();
+        EditOpenAPIDocumentPage editOpenAPIDocumentPage = openAPIDocumentPage.openEditOpenAPIDocumentPage(randomOpenAPIDocument);
+
+        openAPIDocumentPage = editOpenAPIDocumentPage.hitDiscardButton();
+        OpenAPIDocumentPage discardedOpenAPIDocumentPage = openAPIDocumentPage;
+
+        discardedOpenAPIDocumentPage.setTitle(randomOpenAPIDocument.getTitle());
+        discardedOpenAPIDocumentPage.hitSearchButton();
+        assertThrows(TimeoutException.class, () -> discardedOpenAPIDocumentPage.getTableRecordAtIndex(1));
+        assertThrows(NoSuchElementException.class, () -> discardedOpenAPIDocumentPage.openEditOpenAPIDocumentPage(randomOpenAPIDocument));
     }
 
     @AfterEach

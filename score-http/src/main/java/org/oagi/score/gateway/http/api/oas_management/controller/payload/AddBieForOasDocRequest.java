@@ -1,10 +1,10 @@
 package org.oagi.score.gateway.http.api.oas_management.controller.payload;
 
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
+import org.oagi.score.gateway.http.api.oas_management.model.OasDocId;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.model.base.Request;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
@@ -12,7 +12,7 @@ public class AddBieForOasDocRequest extends Request {
     private boolean isOasRequest;
     private TopLevelAsbiepId topLevelAsbiepId;
     private String businessContext;
-    private BigInteger oasDocId;
+    private OasDocId oasDocId;
     private String operationId;
     private String path;
     private String ref;
@@ -62,11 +62,11 @@ public class AddBieForOasDocRequest extends Request {
         this.businessContext = businessContext;
     }
 
-    public BigInteger getOasDocId() {
+    public OasDocId getOasDocId() {
         return oasDocId;
     }
 
-    public void setOasDocId(BigInteger oasDocId) {
+    public void setOasDocId(OasDocId oasDocId) {
         this.oasDocId = oasDocId;
     }
 

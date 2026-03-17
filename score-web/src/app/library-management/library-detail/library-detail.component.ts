@@ -11,6 +11,7 @@ import {LibraryService} from '../domain/library.service';
 import {hashCode} from 'src/app/common/utility';
 
 @Component({
+  standalone: false,
   selector: 'score-library-detail',
   templateUrl: './library-detail.component.html',
   styleUrl: './library-detail.component.css'

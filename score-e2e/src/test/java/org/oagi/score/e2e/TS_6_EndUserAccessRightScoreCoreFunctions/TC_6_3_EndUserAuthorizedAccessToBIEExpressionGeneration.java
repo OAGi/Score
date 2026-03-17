@@ -46,7 +46,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_1")
-    public void test_TA_1() {
+    public void end_user_can_generate_expression_for_owned_bie_in_any_state_across_releases() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
@@ -128,7 +128,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_2")
-    public void test_TA_2() {
+    public void end_user_cannot_generate_expression_for_another_users_wip_bie() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
@@ -166,7 +166,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_3")
-    public void test_TA_3() {
+    public void end_user_can_generate_expression_for_another_users_qa_bie() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
@@ -211,7 +211,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_4")
-    public void test_TA_4() {
+    public void end_user_can_generate_expression_for_another_users_production_bie() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
@@ -256,7 +256,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_5")
-    public void test_TA_5() {
+    public void end_user_can_generate_single_xml_schema_in_same_package_without_annotations() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
@@ -311,7 +311,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_6")
-    public void test_TA_6() {
+    public void end_user_can_generate_single_xml_schema_in_same_package_with_all_annotations() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
@@ -371,7 +371,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_7")
-    public void test_TA_7() {
+    public void end_user_can_generate_single_xml_schema_with_ccts_metadata_without_definition_tag() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
@@ -429,7 +429,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_8")
-    public void test_TA_8() {
+    public void end_user_can_generate_single_xml_schema_with_score_metadata_without_who_columns() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
@@ -487,7 +487,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_9")
-    public void test_TA_9() {
+    public void end_user_cannot_select_include_ccts_definition_tag_without_ccts_metadata() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
@@ -527,7 +527,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_10")
-    public void test_TA_10() {
+    public void end_user_cannot_select_include_who_columns_without_score_metadata() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
@@ -568,7 +568,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_11")
-    public void test_TA_11() {
+    public void end_user_can_generate_single_json_schema_in_same_package_without_annotations() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
@@ -625,7 +625,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_12")
-    public void test_TA_12() {
+    public void end_user_can_generate_single_json_schema_with_bie_definition_annotation() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
@@ -680,7 +680,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_13")
-    public void test_TA_13() {
+    public void end_user_can_only_use_based_cc_metadata_option_for_json_schema() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
@@ -718,7 +718,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertDisabled(expressBIEPage.getBusinessContextCheckbox());
             assertDisabled(expressBIEPage.getBIEOAGIConnectCenterMetaDataCheckbox());
             assertDisabled(expressBIEPage.getIncludeWHOColumnsCheckbox());
-            assertDisabled(expressBIEPage.getBasedCCMetaDataCheckbox());
+            assertEnabled(expressBIEPage.getBasedCCMetaDataCheckbox());
+            assertNotChecked(expressBIEPage.getBasedCCMetaDataCheckbox());
 
             File generatedBIEExpression = null;
             try {
@@ -735,7 +736,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_14")
-    public void test_TA_14() {
+    public void end_user_can_generate_multiple_xml_schemas_in_same_package_with_selected_annotations() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
@@ -801,7 +802,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_15")
-    public void test_TA_15() {
+    public void end_user_can_generate_multiple_xml_schemas_in_different_packages_with_selected_annotations() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
@@ -866,7 +867,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_16")
-    public void test_TA_16() {
+    public void end_user_can_generate_multiple_json_schemas_in_same_package_with_bie_definition() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
@@ -921,7 +922,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_17")
-    public void test_TA_17() {
+    public void end_user_can_generate_multiple_json_schemas_in_different_packages_with_bie_definition() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
@@ -975,7 +976,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_18")
-    public void test_TA_18() {
+    public void end_user_can_generate_single_json_schema_with_meta_header_object() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
@@ -1041,7 +1042,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_18a")
-    public void test_TA_18a() {
+    public void end_user_can_generate_single_json_schema_with_meta_header_make_array_and_keep_meta_header_as_object() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
@@ -1108,7 +1109,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_18b")
-    public void test_TA_18b() {
+    public void end_user_can_generate_single_json_schema_with_meta_header_and_pagination_response_as_objects() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
@@ -1180,7 +1181,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_18c")
-    public void test_TA_18c() {
+    public void end_user_can_generate_single_json_schema_with_meta_header_pagination_response_and_make_array_while_keeping_objects() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
@@ -1253,7 +1254,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_19")
-    public void test_TA_19() {
+    public void end_user_can_generate_multiple_json_schemas_with_selected_meta_header() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
@@ -1316,7 +1317,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_20")
-    public void test_TA_20() {
+    public void end_user_can_search_bies_in_express_bie_page() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         BusinessContextObject context;
@@ -1363,7 +1364,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_21")
-    public void test_TA_21() {
+    public void end_user_can_see_matching_bie_count_in_grid_and_index_summary() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         BusinessContextObject context;
@@ -1409,7 +1410,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_22")
-    public void test_TA_22() {
+    public void end_user_can_generate_xml_expression_for_bie_with_multiple_business_contexts() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject asccp;
@@ -1463,7 +1464,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_23")
-    public void test_TA_23() {
+    public void end_user_can_generate_single_openapi_yaml_expression_with_end_user_owned_meta_header_and_pagination_response() {
         AppUserObject usera;
         AppUserObject userb;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
@@ -1543,7 +1544,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_24")
-    public void test_TA_24() {
+    public void end_user_can_generate_single_openapi_json_expression_with_developer_owned_meta_header_and_pagination_response() {
         AppUserObject usera;
         AppUserObject userb;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
@@ -1623,7 +1624,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_25")
-    public void test_TA_25() {
+    public void end_user_can_generate_single_json_schema_with_pagination_response_object() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
@@ -1687,7 +1688,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_25a")
-    public void test_TA_25a() {
+    public void end_user_can_generate_single_json_schema_with_pagination_response_make_array_and_keep_pagination_response_as_object() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
@@ -1752,7 +1753,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_26")
-    public void test_TA_26() {
+    public void end_user_cannot_put_all_json_schemas_in_same_file_when_meta_header_or_pagination_response_is_selected() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
@@ -1808,7 +1809,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_27")
-    public void test_TA_27() {
+    public void end_user_can_generate_expression_for_reusing_bie_referenced_multiple_times() {
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject reusableASCCP;
@@ -1899,7 +1900,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_28")
-    public void test_TA_28() {
+    public void end_user_can_generate_single_openapi_yaml_expression_with_code_generation_friendly_option() {
         AppUserObject usera;
         AppUserObject userb;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
@@ -1952,7 +1953,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_29")
-    public void test_TA_29() {
+    public void end_user_can_generate_multiple_openapi_yaml_expressions_with_code_generation_friendly_option() {
         AppUserObject usera;
         AppUserObject userb;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
@@ -2010,7 +2011,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_30")
-    public void test_TA_30() {
+    public void end_user_can_generate_single_openapi_json_expression_with_code_generation_friendly_option() {
         AppUserObject usera;
         AppUserObject userb;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
@@ -2063,7 +2064,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_31")
-    public void test_TA_31() {
+    public void end_user_can_generate_multiple_openapi_json_expressions_with_code_generation_friendly_option() {
         AppUserObject usera;
         AppUserObject userb;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
@@ -2122,7 +2123,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_32")
-    public void test_TA_32() {
+    public void end_user_can_generate_single_openapi_yaml_expression_with_get_template_make_array_option() {
         AppUserObject usera;
         AppUserObject userb;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
@@ -2177,7 +2178,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_33")
-    public void test_TA_33() {
+    public void end_user_can_generate_multiple_openapi_yaml_expressions_with_get_template_make_array_option() {
         AppUserObject usera;
         AppUserObject userb;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
@@ -2238,7 +2239,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_34")
-    public void test_TA_34() {
+    public void end_user_can_generate_single_openapi_yaml_expression_with_get_template_meta_header() {
         AppUserObject usera;
         AppUserObject userb;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
@@ -2299,7 +2300,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_35")
-    public void test_TA_35() {
+    public void end_user_can_generate_multiple_openapi_yaml_expressions_with_get_template_meta_header() {
         AppUserObject usera;
         AppUserObject userb;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
@@ -2365,7 +2366,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_36")
-    public void test_TA_36() {
+    public void end_user_can_generate_single_openapi_yaml_expression_with_get_template_meta_header_and_pagination_response() {
         AppUserObject usera;
         AppUserObject userb;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
@@ -2433,7 +2434,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_37")
-    public void test_TA_37() {
+    public void end_user_can_generate_multiple_openapi_yaml_expressions_with_get_template_meta_header_and_pagination_response() {
         AppUserObject usera;
         AppUserObject userb;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
@@ -2506,7 +2507,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_38")
-    public void test_TA_38() {
+    public void end_user_can_generate_single_openapi_yaml_expression_with_post_template_make_array_option() {
         AppUserObject usera;
         AppUserObject userb;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
@@ -2561,7 +2562,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_39")
-    public void test_TA_39() {
+    public void end_user_can_generate_multiple_openapi_yaml_expressions_with_post_template_make_array_option() {
         AppUserObject usera;
         AppUserObject userb;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
@@ -2621,7 +2622,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_40")
-    public void test_TA_40() {
+    public void end_user_can_generate_single_openapi_yaml_expression_with_post_template_meta_header() {
         AppUserObject usera;
         AppUserObject userb;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
@@ -2682,7 +2683,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_41")
-    public void test_TA_41() {
+    public void end_user_can_generate_multiple_openapi_yaml_expressions_with_post_template_meta_header() {
         AppUserObject usera;
         AppUserObject userb;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
@@ -2748,7 +2749,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_42")
-    public void test_TA_42() {
+    public void end_user_can_generate_single_openapi_yaml_expression_with_get_template_meta_header_pagination_response_and_make_array() {
         AppUserObject usera;
         AppUserObject userb;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
@@ -2817,7 +2818,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_43")
-    public void test_TA_43() {
+    public void end_user_can_generate_multiple_openapi_yaml_expressions_with_get_template_meta_header_pagination_response_and_make_array() {
         AppUserObject usera;
         AppUserObject userb;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
@@ -2890,7 +2891,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_44")
-    public void test_TA_44() {
+    public void end_user_can_generate_single_openapi_yaml_expression_with_get_and_post_templates_meta_header_pagination_response_and_make_array() {
         AppUserObject usera;
         AppUserObject userb;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
@@ -2963,7 +2964,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_45")
-    public void test_TA_45() {
+    public void end_user_can_generate_multiple_openapi_yaml_expressions_with_get_and_post_templates_meta_header_pagination_response_and_make_array() {
         AppUserObject usera;
         AppUserObject userb;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
@@ -3040,7 +3041,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_46")
-    public void test_TA_46() {
+    public void end_user_can_generate_single_openapi_json_expression_with_get_and_post_templates_meta_header_pagination_response_and_make_array() {
         AppUserObject usera;
         AppUserObject userb;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
@@ -3113,7 +3114,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
     @Test
     @DisplayName("TC_6_3_TA_47")
-    public void test_TA_47() {
+    public void end_user_can_generate_multiple_openapi_json_expressions_with_get_and_post_templates_meta_header_pagination_response_and_make_array() {
         AppUserObject usera;
         AppUserObject userb;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();

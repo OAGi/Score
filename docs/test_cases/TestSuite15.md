@@ -46,11 +46,14 @@ The end user can open a CC and find the usages of its nodes (i.e., ACC, ASCCP or
 If an ACC is selected to view wherein it is used, then the ACCs which are based on this ACC either directly or indirectly should be listed in the returned dialog.
 
 ### Test Step Pre-condition:
-
-
+1. The users, branches, releases, and records needed to exercise this test case are available in connectCenter.
+2. Any additional data required by the assertions has been prepared before execution.
 
 ### Test Step:
-
+1. The relevant user signs in to connectCenter.
+2. The user opens the page, branch, release, or entity required for "Access to core component viewing, editing, and commenting".
+3. The user performs the workflow described by the assertions.
+4. The user verifies the expected result for each assertion in this test case.
 ## Test Case 15.2
 
 **Creating a brand-new end user ACC**
@@ -61,17 +64,20 @@ Pre-condition: N/A
 ### Test Assertion:
 
 #### Test Assertion #15.2.1
-The end user cannot create a brand-new end user ACC on the working branch.
+The end user cannot create a brand-new end user ACC on the Working branch.
 
 #### Test Assertion #15.2.2
 On the CC list page with a particular, release branch selected, the end user can create a brand-new end user ACC with the following default values – Object Class Term = “Object Class Term”; DEN= [Object Class Term] + “. Details” and locked, Component Type = “Semantics”; Abstract = false; Definition = blank; Definition Source = blank; Deprecated = false and locked; Namespace = null, Comments = empty. The brand-new ACC must have the selected release number assigned right away, i.e., it must not appear in any release except the release the user has selected at the time of creation. It has a revision number of 1.
 
 ### Test Step Pre-condition:
-
-
+1. The users, branches, releases, and records needed to exercise this test case are available in connectCenter.
+2. Any additional data required by the assertions has been prepared before execution.
 
 ### Test Step:
-
+1. The relevant user signs in to connectCenter.
+2. The user opens the page, branch, release, or entity required for "Creating a brand-new end user ACC".
+3. The user performs the workflow described by the assertions.
+4. The user verifies the expected result for each assertion in this test case.
 ## Test Case 15.3
 
 **Editing a brand-new end user ACC**
@@ -112,11 +118,14 @@ If the “Exclude SCs” checkbox is enabled (i.e., checked) the SCs are excludi
 If the “Exclude SCs” checkbox is disabled (i.e., unchecked) the SCs are excluding from the searching field
 
 ### Test Step Pre-condition:
-
-
+1. The stated test-case pre-condition is satisfied: The brand-new ACC is created by the end user and is in the WIP state. The end user accesses these functionalities by opening the brand-new ACC from the CC list page or after creating a brand-new ACC.
+2. The users, branches, releases, and records needed to exercise "Editing a brand-new end user ACC" are available in connectCenter.
 
 ### Test Step:
-
+1. The relevant user signs in to connectCenter.
+2. The user opens the page, branch, release, or entity required for "Editing a brand-new end user ACC".
+3. The user performs the workflow described by the assertions.
+4. The user verifies the expected result for each assertion in this test case.
 ## Test Case 15.4
 
 **Amend an end user ACC**
@@ -155,11 +164,14 @@ Definition and Definition Source can be changed. However, a warning should be gi
 Place holder for testing about undoing changes to the ACC in the future or about displaying history during the amendment.
 
 ### Test Step Pre-condition:
-
-
+1. The stated test-case pre-condition is satisfied: The end user has selected a particular release branch.
+2. The users, branches, releases, and records needed to exercise "Amend an end user ACC" are available in connectCenter.
 
 ### Test Step:
-
+1. The relevant user signs in to connectCenter.
+2. The user opens the page, branch, release, or entity required for "Amend an end user ACC".
+3. The user performs the workflow described by the assertions.
+4. The user verifies the expected result for each assertion in this test case.
 ## Test Case 15.5
 
 **End user ACC state management**
@@ -181,11 +193,14 @@ The end user can change the ACC state from QA back to WIP. State of the associat
 The end user can change the ACC state from QA to Production. State of the associations also go to Production.
 
 ### Test Step Pre-condition:
-
-
+1. The stated test-case pre-condition is satisfied: The end user is on the ACC detail page, which he owns.
+2. The users, branches, releases, and records needed to exercise "End user ACC state management" are available in connectCenter.
 
 ### Test Step:
-
+1. The relevant user signs in to connectCenter.
+2. The user opens the page, branch, release, or entity required for "End user ACC state management".
+3. The user performs the workflow described by the assertions.
+4. The user verifies the expected result for each assertion in this test case.
 ## Test Case 15.6
 
 **Deleting an end user ACC**
@@ -219,11 +234,14 @@ Upon opening an ASCCP that uses the deleted ACC, the ASCCP shall be highlighted 
 ACC whose revision number is more than 1 and is in any state cannot be deleted.
 
 ### Test Step Pre-condition:
-
-
+1. The users, branches, releases, and records needed to exercise this test case are available in connectCenter.
+2. Any additional data required by the assertions has been prepared before execution.
 
 ### Test Step:
-
+1. The relevant user signs in to connectCenter.
+2. The user opens the page, branch, release, or entity required for "Deleting an end user ACC".
+3. The user performs the workflow described by the assertions.
+4. The user verifies the expected result for each assertion in this test case.
 ## Test Case 15.7
 
 **Restoring end user ACC**
@@ -237,11 +255,14 @@ Pre-condition: The end user is on the CC View/Edit page with a release branch op
 The end user can open an ACC and restore it. All of its associations shall be restored as well.
 
 ### Test Step Pre-condition:
-
-
+1. The stated test-case pre-condition is satisfied: The end user is on the CC View/Edit page with a release branch open. Deleted CCs are shown in the list.
+2. The users, branches, releases, and records needed to exercise "Restoring end user ACC" are available in connectCenter.
 
 ### Test Step:
-
+1. The relevant user signs in to connectCenter.
+2. The user opens the page, branch, release, or entity required for "Restoring end user ACC".
+3. The user performs the workflow described by the assertions.
+4. The user verifies the expected result for each assertion in this test case.
 ## Test Case 15.8
 
 **Editing associations of a brand-new end user ACC**
@@ -349,11 +370,14 @@ The end user can remove the based ACC when one exists.
 The end user can transfer the ownership of an ACC, which is in WIP states and he owns, to another end user but not developer. In that case the ownership of the associations (ASCC and BCC) are transferred as well.
 
 ### Test Step Pre-condition:
-
-
+1. The stated test-case pre-condition is satisfied: The revision number of ACC under test is 1 and it is in WIP state.
+2. The users, branches, releases, and records needed to exercise "Editing associations of a brand-new end user ACC" are available in connectCenter.
 
 ### Test Step:
-
+1. The relevant user signs in to connectCenter.
+2. The user opens the page, branch, release, or entity required for "Editing associations of a brand-new end user ACC".
+3. The user performs the workflow described by the assertions.
+4. The user verifies the expected result for each assertion in this test case.
 ## Test Case 15.9
 
 **Editing associations during an end-user ACC amendment**
@@ -479,11 +503,14 @@ A warning should be given when the Definition is empty.
 The end user can cancel the amendment. In such case, all changes to the ACC during the amendment including changes to its associations and based ACC addition are rolled back. The changes made before the cancellation are still kept in the history record.
 
 ### Test Step Pre-condition:
-
-
+1. The stated test-case pre-condition is satisfied: An end-user ACC is opened and its revision is higher than 1.
+2. The users, branches, releases, and records needed to exercise "Editing associations during an end-user ACC amendment" are available in connectCenter.
 
 ### Test Step:
-
+1. The relevant user signs in to connectCenter.
+2. The user opens the page, branch, release, or entity required for "Editing associations during an end-user ACC amendment".
+3. The user performs the workflow described by the assertions.
+4. The user verifies the expected result for each assertion in this test case.
 ## Test Case 15.10
 
 **Creating a brand-new end user ASCCP**
@@ -494,7 +521,7 @@ Pre-condition: N/A
 ### Test Assertion:
 
 #### Test Assertion #15.10.1
-The end user cannot create a brand-new ASCCP when the working branch is selected.
+The end user cannot create a brand-new ASCCP when the Working branch is selected.
 
 #### Test Assertion #15.10.2
 On the CC list page where a release branch is selected, the end user can create a brand-new ASCCP by selecting an (developer or end user) ACC in the same release, in any state, and owned by any user. The ASCCP should have the following default values – Property Term = [ACC Object Class Term]; DEN = [Property Term] + [ACC Object Class Term] and locked; Reusable = true; Definition = blank; Definition_Source=blank; Deprecated = false and disable; Nillable = false; Namespace = null; Comments = empty. The brand-new ASCCP must have the selected release number assigned right away, i.e., it must not appear in any other release except the release the user has selected at the time of creation. It has a revision number of 1. The ASCCP should have the associated ACC along with its properties but they cannot be changed. Only ACC whose Component Type is Semantics or Semantic Group can be selected.
@@ -506,11 +533,14 @@ If the underlying ACC has changed, particularly the Object Class Term of the ACC
 The end user can create an ASCCP from an ACC in WIP state using the function “Create ASCCP from this”. The Property Term of the created ASCCP is based on the Object Class Term of the ACC.
 
 ### Test Step Pre-condition:
-
-
+1. The users, branches, releases, and records needed to exercise this test case are available in connectCenter.
+2. Any additional data required by the assertions has been prepared before execution.
 
 ### Test Step:
-
+1. The relevant user signs in to connectCenter.
+2. The user opens the page, branch, release, or entity required for "Creating a brand-new end user ASCCP".
+3. The user performs the workflow described by the assertions.
+4. The user verifies the expected result for each assertion in this test case.
 ## Test Case 15.11
 
 **Editing a brand-new end user ASCCP**
@@ -560,11 +590,14 @@ If the “Exclude SCs” checkbox is enabled (i.e., checked) the SCs are excludi
 If the “Exclude SCs” checkbox is disabled (i.e., unchecked) the SCs are excluding from the searching field
 
 ### Test Step Pre-condition:
-
-
+1. The users, branches, releases, and records needed to exercise this test case are available in connectCenter.
+2. Any additional data required by the assertions has been prepared before execution.
 
 ### Test Step:
-
+1. The relevant user signs in to connectCenter.
+2. The user opens the page, branch, release, or entity required for "Editing a brand-new end user ASCCP".
+3. The user performs the workflow described by the assertions.
+4. The user verifies the expected result for each assertion in this test case.
 ## Test Case 15.12
 
 **Amend an end user ASCCP**
@@ -612,11 +645,14 @@ The end user cannot change the ACC to another one.
 The end user can cancel the amendment, in which case, the system rollbacks all changes during the amendment. History records throughout the course of the amendment are in the history record.
 
 ### Test Step Pre-condition:
-
-
+1. The stated test-case pre-condition is satisfied: The end user has selected a particular release branch.
+2. The users, branches, releases, and records needed to exercise "Amend an end user ASCCP" are available in connectCenter.
 
 ### Test Step:
-
+1. The relevant user signs in to connectCenter.
+2. The user opens the page, branch, release, or entity required for "Amend an end user ASCCP".
+3. The user performs the workflow described by the assertions.
+4. The user verifies the expected result for each assertion in this test case.
 ## Test Case 15.13
 
 **End user ASCCP state management**
@@ -638,11 +674,14 @@ The end user can change the state of ASCCP he owns from QA back to WIP.
 The end user can change the state of ASCCP he owns from QA to Production.
 
 ### Test Step Pre-condition:
-
-
+1. The stated test-case pre-condition is satisfied: The user is on the ASCCP detail page, which he owns.
+2. The users, branches, releases, and records needed to exercise "End user ASCCP state management" are available in connectCenter.
 
 ### Test Step:
-
+1. The relevant user signs in to connectCenter.
+2. The user opens the page, branch, release, or entity required for "End user ASCCP state management".
+3. The user performs the workflow described by the assertions.
+4. The user verifies the expected result for each assertion in this test case.
 ## Test Case 15.14
 
 **Creating a brand-new end user BCCP**
@@ -656,14 +695,17 @@ Pre-condition: N/A
 On the CC View/Edit page where a particular release branch is selected, the end user can create a brand-new BCCP by selecting a BDT which can be in any state and belongs to any user. The BDT choice shall, by default, be all BDT types and Commonly Used filter set to Empty-All. (see section 4.1.1.12.1 in the SRT Design Document version 2.4 to understand what is unqualified BDT), but the user has a choice to be able to select any BDT (type > 1). The BCCP should have the following default values – Property Term = “Property Term”; DEN = Property Term + “. “ + BDT_Data_Type_Term and locked; Nillable = false; Deprecated = false and disabled; Value Constraint= None (Default and Fixed value should be empty); Definition = blank; ; Definition Source = blank; Namespace = null, Comments = empty. The brand-new BCCP must have the selected release number assigned right away, i.e., it must not appear in any release except the release the user has selected at the time of creation. It has a revision number of 1. The BCCP should display the associated BDT details but cannot be changed. BDT supplementary components are displayed in the tree but their details cannot be changed.
 
 #### Test Assertion #15.14.2
-The end user cannot create a brand-new BCCP when the working branch is selected.
+The end user cannot create a brand-new BCCP when the Working branch is selected.
 
 ### Test Step Pre-condition:
-
-
+1. The users, branches, releases, and records needed to exercise this test case are available in connectCenter.
+2. Any additional data required by the assertions has been prepared before execution.
 
 ### Test Step:
-
+1. The relevant user signs in to connectCenter.
+2. The user opens the page, branch, release, or entity required for "Creating a brand-new end user BCCP".
+3. The user performs the workflow described by the assertions.
+4. The user verifies the expected result for each assertion in this test case.
 ## Test Case 15.15
 
 **Editing a brand-new end user BCCP**
@@ -711,11 +753,14 @@ If the “Exclude SCs” checkbox is enabled (i.e., checked) the SCs are excludi
 If the “Exclude SCs” checkbox is disabled (i.e., unchecked) the SCs are excluding from the searching field
 
 ### Test Step Pre-condition:
-
-
+1. The stated test-case pre-condition is satisfied: The brand-new BCCP is created by the end user and it is in the WIP state. The end user accesses these functionalities by opening the brand-new BCCP from the CC list page or after creating a brand-new BCCP.
+2. The users, branches, releases, and records needed to exercise "Editing a brand-new end user BCCP" are available in connectCenter.
 
 ### Test Step:
-
+1. The relevant user signs in to connectCenter.
+2. The user opens the page, branch, release, or entity required for "Editing a brand-new end user BCCP".
+3. The user performs the workflow described by the assertions.
+4. The user verifies the expected result for each assertion in this test case.
 ## Test Case 15.16
 
 **Amend an end user BCCP**
@@ -763,11 +808,14 @@ The end user can cancel the amendment, in which case, the system rollbacks all c
 Place holder for testing about undoing changes to the BCCP or cancel the amendment in the future or about displaying history during the amendment.
 
 ### Test Step Pre-condition:
-
-
+1. The users, branches, releases, and records needed to exercise this test case are available in connectCenter.
+2. Any additional data required by the assertions has been prepared before execution.
 
 ### Test Step:
-
+1. The relevant user signs in to connectCenter.
+2. The user opens the page, branch, release, or entity required for "Amend an end user BCCP".
+3. The user performs the workflow described by the assertions.
+4. The user verifies the expected result for each assertion in this test case.
 ## Test Case 15.17
 
 **End user BCCP state management**
@@ -789,11 +837,14 @@ The end user can change the BCCP state from QA back to WIP, only if he is the ow
 The end user can change the BCCP state from QA to Production, only if he is the owner.
 
 ### Test Step Pre-condition:
-
-
+1. The stated test-case pre-condition is satisfied: The user is on the BCCP detail page, which he owns.
+2. The users, branches, releases, and records needed to exercise "End user BCCP state management" are available in connectCenter.
 
 ### Test Step:
-
+1. The relevant user signs in to connectCenter.
+2. The user opens the page, branch, release, or entity required for "End user BCCP state management".
+3. The user performs the workflow described by the assertions.
+4. The user verifies the expected result for each assertion in this test case.
 ## Test Case 15.18
 
 **Deleting an ender user BCCP**
@@ -818,11 +869,14 @@ Upon opening an ACC that uses the BCCP, the BCC that uses that BCCP shall be hig
 BCCP whose revision number is more than 1 in any state cannot be deleted.
 
 ### Test Step Pre-condition:
-
-
+1. The users, branches, releases, and records needed to exercise this test case are available in connectCenter.
+2. Any additional data required by the assertions has been prepared before execution.
 
 ### Test Step:
-
+1. The relevant user signs in to connectCenter.
+2. The user opens the page, branch, release, or entity required for "Deleting an ender user BCCP".
+3. The user performs the workflow described by the assertions.
+4. The user verifies the expected result for each assertion in this test case.
 ## Test Case 15.19
 
 **Restoring end user BCCP**
@@ -839,7 +893,12 @@ The end user can restore the deleted BCCP whose BDT is still alive in both cases
 The end user can restore a deleted BCCP whose BDT is deleted. The UI display a flag in the BCCP detail page that its BDT is in deleted state.
 
 ### Test Step Pre-condition:
-
+1. The stated test-case pre-condition is satisfied: The end user is on the CC View/Edit page with the release branch open. Deleted CCs are shown in the list (“Deleted” state is selected in the state filter box). The end user opens a deleted BCCP to view its detail.
+2. The users, branches, releases, and records needed to exercise "Restoring end user BCCP" are available in connectCenter.
 
 
 ### Test Step:
+1. The relevant user signs in to connectCenter.
+2. The user opens the page, branch, release, or entity required for "Restoring end user BCCP".
+3. The user performs the workflow described by the assertions.
+4. The user verifies the expected result for each assertion in this test case.

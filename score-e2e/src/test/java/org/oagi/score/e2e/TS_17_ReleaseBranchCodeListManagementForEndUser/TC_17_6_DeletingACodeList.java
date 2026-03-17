@@ -39,7 +39,7 @@ public class TC_17_6_DeletingACodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_6_TA_1")
-    public void test_TA_1() {
+    public void end_user_code_list_revision_number_is_1_the_end_user_owner_can_delete_it_when_it_is_in_wip_state_and() {
         AppUserObject endUser;
         ReleaseObject branch;
         CodeListObject codeList;
@@ -74,7 +74,7 @@ public class TC_17_6_DeletingACodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_6_TA_2")
-    public void test_TA_2() {
+    public void upon_opening_end_user_bdt_that_uses_a_deleted_code_list_the_system_can_flag_that_the_code_list_is_in() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -125,7 +125,7 @@ public class TC_17_6_DeletingACodeList extends BaseTest {
 
     @Test
     @DisplayName("TC_17_6_TA_3")
-    public void test_TA_3() {
+    public void end_user_code_list_whose_revision_number_is_more_than_1_in_any_state_cannot_be_deleted_check_particu() {
         AppUserObject endUser;
         ReleaseObject branch;
         List<CodeListObject> codeListForTesting = new ArrayList<>();

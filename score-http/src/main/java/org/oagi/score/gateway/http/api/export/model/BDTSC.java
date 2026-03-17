@@ -16,44 +16,26 @@ import static org.oagi.score.gateway.http.common.ScoreConstants.OAGIS_VERSION;
 
 public class BDTSC implements Component {
 
-    private DtScSummaryRecord dtSc;
+    private final DtScSummaryRecord dtSc;
 
-    private DtSummaryRecord ownerDt;
+    private final DtSummaryRecord ownerDt;
 
-    private CcDocument ccDocument;
+    private final CcDocument ccDocument;
+    private final SchemaNamingStrategy namingStrategy;
 
     public BDTSC(DtScSummaryRecord dtSc, CcDocument ccDocument) {
+        this(dtSc, ccDocument, new XmlSchemaNamingStrategy());
+    }
+
+    public BDTSC(DtScSummaryRecord dtSc, CcDocument ccDocument, SchemaNamingStrategy namingStrategy) {
         this.ccDocument = ccDocument;
         this.dtSc = dtSc;
-
+        this.namingStrategy = namingStrategy;
         this.ownerDt = ccDocument.getDt(dtSc.ownerDtManifestId());
     }
 
     public String getName() {
-        String propertyTerm = dtSc.propertyTerm();
-        if ("MIME".equals(propertyTerm) || "URI".equals(propertyTerm)) {
-            propertyTerm = propertyTerm.toLowerCase();
-        }
-        String representationTerm = dtSc.representationTerm();
-        if (propertyTerm.equals(representationTerm) ||
-                "Text".equals(representationTerm)) { // exceptional case. 'expressionLanguageText' must be 'expressionLanguage'.
-            representationTerm = "";
-        }
-        if (OAGIS_VERSION < 10.3D) {
-            // exceptional case. 'preferredIndicator' must be 'preferred'.
-            if ("9bb9add40b5b415c8489b08bd4484907".equals(dtSc.getId().value())) {
-                representationTerm = "";
-            }
-        }
-
-        if (propertyTerm.contains(representationTerm)) {
-            String attrName = Character.toLowerCase(propertyTerm.charAt(0)) + propertyTerm.substring(1);
-            return attrName.replaceAll(" ", "");
-        } else {
-            String attrName = Character.toLowerCase(propertyTerm.charAt(0)) + propertyTerm.substring(1) +
-                    representationTerm.replace("Identifier", "ID");
-            return attrName.replaceAll(" ", "");
-        }
+        return namingStrategy.bdtScName(dtSc);
     }
 
     public String getGuid() {
@@ -110,24 +92,32 @@ public class BDTSC implements Component {
         List<DtScAwdPriSummaryRecord> dtScAwdPriList =
                 ccDocument.getDtScAwdPriList(dtSc.dtScManifestId());
 
-        List<DtScAwdPriSummaryRecord> codeListBdtScPriRestri =
+        List<DtScAwdPriSummaryRecord> agencyIdBdtScPriRestri =
                 dtScAwdPriList.stream()
-                        .filter(e -> e.codeListManifestId() != null && e.isDefault())
+                        .filter(e -> e.agencyIdListManifestId() != null)
                         .collect(Collectors.toList());
-        if (codeListBdtScPriRestri.size() > 1) {
+        if (agencyIdBdtScPriRestri.size() > 1) {
             throw new IllegalStateException();
         }
 
-        if (codeListBdtScPriRestri.isEmpty()) {
-            List<DtScAwdPriSummaryRecord> agencyIdBdtScPriRestri =
+        if (!agencyIdBdtScPriRestri.isEmpty()) {
+            agencyIdList = ccDocument.getAgencyIdList(agencyIdBdtScPriRestri.get(0).agencyIdListManifestId());
+            typeName = namingStrategy.agencyIdListTypeName(agencyIdList);
+            namespaceId = agencyIdList.namespaceId();
+        } else {
+            List<DtScAwdPriSummaryRecord> codeListBdtScPriRestri =
                     dtScAwdPriList.stream()
-                            .filter(e -> e.agencyIdListManifestId() != null && e.isDefault())
+                            .filter(e -> e.codeListManifestId() != null)
                             .collect(Collectors.toList());
-            if (agencyIdBdtScPriRestri.size() > 1) {
+            if (codeListBdtScPriRestri.size() > 1) {
                 throw new IllegalStateException();
             }
 
-            if (agencyIdBdtScPriRestri.isEmpty()) {
+            if (!codeListBdtScPriRestri.isEmpty()) {
+                codeList = ccDocument.getCodeList(codeListBdtScPriRestri.get(0).codeListManifestId());
+                typeName = namingStrategy.codeListTypeName(codeList);
+                namespaceId = codeList.namespaceId();
+            } else {
                 List<DtScAwdPriSummaryRecord> defaultBdtScPriRestri =
                         dtScAwdPriList.stream()
                                 .filter(e -> e.isDefault())
@@ -140,15 +130,7 @@ public class BDTSC implements Component {
                 xbt = ccDocument.getXbt(dtScAwdPri.xbtManifestId());
                 typeName = xbt.builtInType();
                 namespaceId = this.ownerDt.namespaceId();
-            } else {
-                agencyIdList = ccDocument.getAgencyIdList(agencyIdBdtScPriRestri.get(0).agencyIdListManifestId());
-                typeName = agencyIdList.name().replaceAll(" ", "").replace("Identifier", "ID") + "ContentType";
-                namespaceId = agencyIdList.namespaceId();
             }
-        } else {
-            codeList = ccDocument.getCodeList(codeListBdtScPriRestri.get(0).codeListManifestId());
-            typeName = codeList.name().replaceAll(" ", "").replace("Identifier", "ID") + "ContentType";
-            namespaceId = codeList.namespaceId();
         }
     }
 

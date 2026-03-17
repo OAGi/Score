@@ -47,8 +47,8 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
     }
 
     @Test
-    @DisplayName("TC_5_2_TA_issue1245")
-    public void test_TA_issue1245() {
+    @DisplayName("TC_5_2_TA_25")
+    public void developer_can_search_context_scheme_list_by_exact_name() {
         ContextCategoryObject randomContextCategory =
                 getAPIFactory().getContextCategoryAPI().createRandomContextCategory(appUser);
         ContextSchemeObject contextScheme =
@@ -138,7 +138,7 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
 
     @Test
     @DisplayName("TC_5_2_TA_3")
-    public void test_adding_and_removing_scheme_values_on_the_creation_page() {
+    public void developer_can_add_and_remove_context_scheme_values_during_creation() {
         ContextCategoryObject randomContextCategory =
                 getAPIFactory().getContextCategoryAPI().createRandomContextCategory(appUser);
 
@@ -262,7 +262,7 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
 
     @Test
     @DisplayName("TC_5_2_TA_6")
-    public void test_developer_tries_to_create_context_scheme_with_scheme_ID_and_agency_ID_that_are_the_same_as_existing_context_scheme_but_different_name() {
+    public void developer_cannot_create_context_scheme_with_duplicate_scheme_id_and_agency_id_even_if_name_differs() {
         ContextCategoryObject randomContextCategory =
                 getAPIFactory().getContextCategoryAPI().createRandomContextCategory(appUser);
         ContextSchemeObject randomContextScheme =
@@ -1064,7 +1064,7 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
 
     @Test
     @DisplayName("TC_5_2_TA_17 (Updater field)")
-    public void test_search_feature_using_updater_field() {
+    public void developer_can_search_context_scheme_list_by_updater() {
         ContextCategoryObject randomContextCategory =
                 getAPIFactory().getContextCategoryAPI().createRandomContextCategory(appUser);
         ContextSchemeObject randomContextScheme =
@@ -1086,7 +1086,7 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
 
     @Test
     @DisplayName("TC_5_2_TA_17 (Name field)")
-    public void test_search_feature_using_name_field() {
+    public void developer_can_search_context_scheme_list_by_name() {
         ContextCategoryObject randomContextCategory =
                 getAPIFactory().getContextCategoryAPI().createRandomContextCategory(appUser);
         ContextSchemeObject randomContextScheme =
@@ -1514,7 +1514,7 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
 
     @Test
     @DisplayName("TC_5_2_TA_24")
-    public void test_checkbox_selection() {
+    public void developer_can_keep_context_scheme_selection_when_paginating() {
         ContextCategoryObject randomContextCategory =
                 getAPIFactory().getContextCategoryAPI().createRandomContextCategory(appUser);
         String namePrefix = "cs_TC52_TA24";

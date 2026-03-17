@@ -1,7 +1,7 @@
 package org.oagi.score.gateway.http.api.info_management.service;
 
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
-import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
+import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationQueryService;
 import org.oagi.score.gateway.http.api.bie_management.model.BieListEntryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.BieState;
 import org.oagi.score.gateway.http.api.bie_management.repository.criteria.BieListFilterCriteria;
@@ -37,7 +37,7 @@ public class BieInfoQueryService {
     private BieQueryService bieQueryService;
 
     @Autowired
-    private ApplicationConfigurationService configService;
+    private ApplicationConfigurationQueryService configService;
 
     @Autowired
     private TenantQueryService tenantService;

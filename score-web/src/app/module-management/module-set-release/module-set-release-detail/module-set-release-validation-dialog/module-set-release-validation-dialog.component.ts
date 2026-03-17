@@ -8,6 +8,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {HttpErrorResponse} from '@angular/common/http';
 
 @Component({
+  standalone: false,
   selector: 'score-module-set-release-validation-dialog',
   templateUrl: './module-set-release-validation-dialog.component.html',
   styleUrls: ['./module-set-release-validation-dialog.component.css']
@@ -31,7 +32,11 @@ export class ModuleSetReleaseValidationDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.moduleService.validate(this.data.moduleSetReleaseId).subscribe(resp => {
+    this.moduleService.validate(
+      this.data.moduleSetReleaseId,
+      this.data.expressionOption ?? 'XML',
+      this.data.expressionVersion
+    ).subscribe(resp => {
       const closeTimer$ = new Subject<any>();
       interval(2000).pipe(
         mergeMap(() => this.moduleService.progressValidation(this.data.moduleSetReleaseId, resp.requestId)),
@@ -93,6 +98,10 @@ export class ModuleSetReleaseValidationDialogComponent implements OnInit {
 
   onNoClick(): void {
     this.dialogRef.close();
+  }
+
+  get schemaTypeLabel(): string {
+    return this.data.expressionOption === 'JSON' ? 'JSON Schema' : 'XML Schema';
   }
 
 }

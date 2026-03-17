@@ -4,6 +4,7 @@ import {HttpParams} from '@angular/common/http';
 import {base64Encode} from '../utility';
 
 @Component({
+  standalone: false,
   selector: 'score-state-progress-bar',
   templateUrl: './state-progress-bar.component.html',
   styleUrls: ['./state-progress-bar.component.css']

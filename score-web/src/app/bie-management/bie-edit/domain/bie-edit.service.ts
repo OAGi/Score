@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpContext, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {CcGraph, DtAwdPriSummary, DtScAwdPriSummary} from '../../../cc-management/domain/core-component-node';
 import {sha256} from '../../../common/utility';
@@ -18,6 +18,8 @@ import {
 import {CodeListSummary} from '../../../code-list-management/domain/code-list';
 import {AgencyIdListSummary} from '../../../agency-id-list-management/domain/agency-id-list';
 import {map} from 'rxjs/operators';
+import {StateDependencyTarget} from '../../domain/state-dependency-target';
+import {SUPPRESS_ERROR_ALERT} from '../../../authentication/auth.service';
 
 @Injectable()
 export class BieEditService {
@@ -298,10 +300,46 @@ export class BieEditService {
     return this.http.post<BieDetailUpdateResponse>('/api/profile_bie/' + topLevelAsbiepId + '/detail', request.json);
   }
 
-  setState(topLevelAsbiepId: number, state: string): Observable<any> {
+  /**
+   * Submits the final single-BIE state transition together with any approved dependency rows.
+   */
+  setState(topLevelAsbiepId: number, state: string, dependencyTopLevelAsbiepIds?: number[]): Observable<any> {
     return this.http.post('/api/profile_bie/node/root/' + topLevelAsbiepId + '/state', {
-      state
+      state,
+      dependencyTopLevelAsbiepIds
+    }, {
+      context: this.suppressErrorAlert()
     });
+  }
+
+  /**
+   * Loads the dependency preview graph for the requested single-BIE state transition.
+   */
+  getStateDependencies(topLevelAsbiepId: number, state: string): Observable<StateDependencyTarget[]> {
+    return this.http.get<StateDependencyTarget[]>('/api/profile_bie/node/root/' + topLevelAsbiepId + '/state/dependencies', {
+      params: new HttpParams().set('state', state),
+      context: this.suppressErrorAlert()
+    });
+  }
+
+  /**
+   * Revalidates the dependency selection after the dialog checkbox state changes.
+   */
+  validateStateDependencies(topLevelAsbiepId: number, state: string, selectedTopLevelAsbiepIds: number[]): Observable<StateDependencyTarget[]> {
+    return this.http.post<StateDependencyTarget[]>(
+      '/api/profile_bie/node/root/' + topLevelAsbiepId + '/state/dependencies/validate',
+      {
+        state,
+        selectedTopLevelAsbiepIds
+      },
+      {
+        context: this.suppressErrorAlert()
+      }
+    );
+  }
+
+  private suppressErrorAlert(): HttpContext {
+    return new HttpContext().set(SUPPRESS_ERROR_ALERT, true);
   }
 
   reuseBIE(asbiepNode: AsbiepFlatNode, reuseTopLevelAsbiepId: number): Observable<any> {

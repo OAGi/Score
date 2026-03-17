@@ -95,8 +95,13 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     @Override
     public WebElement getTitle() {
         invisibilityOfLoadingContainerElement(getDriver());
-        return visibilityOfElementLocated(PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
-                By.xpath("//mat-tab-header//div[@class=\"mat-mdc-tab-labels\"]/div[contains(@class, \"mdc-tab\")][1]"));
+        try {
+            return visibilityOfElementLocated(PageHelper.wait(getDriver(), Duration.ofSeconds(15L), ofMillis(100L)),
+                    By.xpath("//mat-tab-header//div[@class=\"mat-mdc-tab-labels\"]/div[contains(@class, \"mdc-tab\")][1]"));
+        } catch (WebDriverException e) {
+            return visibilityOfElementLocated(PageHelper.wait(getDriver(), Duration.ofSeconds(15L), ofMillis(100L)),
+                    CORE_COMPONENT_FIELD_LOCATOR);
+        }
     }
 
     @Override

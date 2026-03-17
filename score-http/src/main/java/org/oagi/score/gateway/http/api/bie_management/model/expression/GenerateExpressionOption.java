@@ -23,14 +23,20 @@ public class GenerateExpressionOption {
     private boolean basedCcMetaData;
 
     private String expressionOption;
+    private String expressionVersion;
     private String packageOption;
     // Issue #1615
     private BiePackageSummaryRecord biePackage;
 
     private boolean includeBusinessContextInFilename;
     private boolean includeVersionInFilename;
+    private String bieSchemaFilenameExpression;
+    private String biePackageSchemaFilenameExpression;
+    private String bieSchemaFilenameDuplicateHandlerExpression;
+    private String biePackageSchemaFilenameDuplicateHandlerExpression;
 
     private boolean arrayForJsonExpression;
+    private boolean separateFileReferencesForReusedSchemas;
     private boolean includeMetaHeaderForJson;
     private TopLevelAsbiepId metaHeaderTopLevelAsbiepId;
     private boolean includePaginationResponseForJson;

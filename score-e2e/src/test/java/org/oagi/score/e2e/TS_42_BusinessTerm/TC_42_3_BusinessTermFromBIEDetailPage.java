@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
+import org.oagi.score.e2e.condition.DisabledIfBusinessTermProperty;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
@@ -22,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.oagi.score.e2e.impl.PageHelper.click;
 
 @Execution(ExecutionMode.CONCURRENT)
+@DisabledIfBusinessTermProperty(value = false)
 public class TC_42_3_BusinessTermFromBIEDetailPage extends BaseTest {
 
     private final List<AppUserObject> randomAccounts = new ArrayList<>();
@@ -87,8 +89,8 @@ public class TC_42_3_BusinessTermFromBIEDetailPage extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_42_3_2")
-    public void end_user_can_click_assign_business_term_button_in_descendent_bie_panel_assign_business_terms() {
+    @DisplayName("TC_42_3_3")
+    public void end_user_can_assign_business_terms_from_the_descendant_bie_panel() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);

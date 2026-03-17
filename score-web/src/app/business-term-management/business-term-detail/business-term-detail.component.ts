@@ -12,6 +12,7 @@ import {forkJoin} from 'rxjs';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 
 @Component({
+  standalone: false,
   selector: 'score-business-term-detail',
   templateUrl: './business-term-detail.component.html',
   styleUrls: ['./business-term-detail.component.css']

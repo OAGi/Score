@@ -3,6 +3,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {AuthService} from '../../authentication/auth.service';
 
 @Component({
+  standalone: false,
   selector: 'score-bie-deprecate-dialog',
   templateUrl: './bie-deprecate-dialog.component.html',
   styleUrls: ['./bie-deprecate-dialog.component.css']

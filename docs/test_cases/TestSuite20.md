@@ -41,11 +41,15 @@ Any user can see the detail of developer namespace.
 The owner developer of the namespace can transfer ownership only to another developer.
 
 ### Test Step Pre-condition:
-
-
+1. Developer and end-user accounts needed for namespace scenarios are available in connectCenter.
+2. Existing standard and end-user namespaces are available so that uniqueness, visibility, and ownership-transfer checks can be exercised.
 
 ### Test Step:
-
+1. The developer signs in to connectCenter and opens the View/Edit Namespace page.
+2. Create a developer namespace and verify the required URI and prefix rules, the locked standard flag, and duplicate-URI validation. (Assertion [#20.1.1](#test-assertion-2011))
+3. Open the created namespace as the owner, update its details, and verify that uniqueness rules are still enforced. (Assertion [#20.1.2](#test-assertion-2012))
+4. Open namespaces owned by other users and verify that developer and end-user non-owners have read-only access. (Assertions [#20.1.3](#test-assertion-2013), [#20.1.5](#test-assertion-2015))
+5. Discard an unused developer-owned namespace and verify it is removed from the list. Then transfer namespace ownership to another developer and verify the new owner. (Assertions [#20.1.4](#test-assertion-2014), [#20.1.6](#test-assertion-2016))
 ## Test Case 20.2
 
 **End user management of namespaces**
@@ -83,7 +87,13 @@ Any user can see the detail of end user namespace.
 The owner end user of the namespace can transfer ownership only to another end user.
 
 ### Test Step Pre-condition:
-
+1. Developer and end-user accounts needed for namespace scenarios are available in connectCenter.
+2. Existing end-user namespaces are available so that uniqueness, visibility, and ownership-transfer checks can be exercised.
 
 
 ### Test Step:
+1. The end user signs in to connectCenter and opens the View/Edit Namespace page.
+2. Create an end-user namespace and verify the required URI and prefix rules, the locked non-standard flag, and duplicate-URI validation. (Assertion [#20.2.1](#test-assertion-2021))
+3. Open the created namespace as the owner, update its details, and verify that uniqueness rules are still enforced. (Assertion [#20.2.2](#test-assertion-2022))
+4. Open an end-user namespace as a developer and as another end user, and verify that non-owners have read-only access. (Assertions [#20.2.3](#test-assertion-2023), [#20.2.5](#test-assertion-2025))
+5. Discard an unused end-user-owned namespace and verify it is removed from the list. Then transfer namespace ownership to another end user and verify the new owner. (Assertions [#20.2.4](#test-assertion-2024), [#20.2.6](#test-assertion-2026))

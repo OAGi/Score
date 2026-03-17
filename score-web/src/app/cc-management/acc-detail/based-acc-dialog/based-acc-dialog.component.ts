@@ -28,6 +28,7 @@ import {AuthService} from '../../../authentication/auth.service';
 import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
 
 @Component({
+  standalone: false,
   selector: 'score-based-acc-dialog',
   templateUrl: './based-acc-dialog.component.html',
   styleUrls: ['./based-acc-dialog.component.css'],

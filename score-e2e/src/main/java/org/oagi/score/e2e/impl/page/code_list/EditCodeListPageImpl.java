@@ -170,7 +170,12 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
 
     @Override
     public EditCodeListValueDialog addCodeListValue() {
-        click(getAddCodeListValueButton());
+        // Some amend flows leave a stale overlay open over the add button.
+        retry(() -> {
+            escape(getDriver());
+            waitFor(ofMillis(500L));
+            click(getDriver(), getAddCodeListValueButton());
+        });
         waitFor(ofSeconds(1L));
         EditCodeListValueDialog editCodeListValueDialog = new EditCodeListValueDialogImpl(this);
         assert editCodeListValueDialog.isOpened();
