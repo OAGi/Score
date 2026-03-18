@@ -6,7 +6,7 @@
 
     <groupId>org.oagi.score.e2e</groupId>
     <artifactId>score-e2e</artifactId>
-    <version>3.5.0</version>
+    <version>${revision}</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -19,22 +19,23 @@
         <db.user>oagi</db.user>
         <db.password>oagi</db.password>
 
-        <selenium.version>4.41.0</selenium.version>
+        <selenium.version>4.33.0</selenium.version>
         <junit.version>5.14.2</junit.version>
         <junit.platform.version>1.14.2</junit.platform.version>
+        <junit4.version>4.13.2</junit4.version>
         <slf4j.version>2.0.17</slf4j.version>
-        <log4j.version>2.25.3</log4j.version>
-        <jackson.version>2.21.0</jackson.version>
-        <commons-lang3.version>3.20.0</commons-lang3.version>
+        <jackson-bom.version>2.21.1</jackson-bom.version>
+        <commons-lang.version>3.20.0</commons-lang.version>
         <commons-math3.version>3.6.1</commons-math3.version>
         <commons-io.version>2.21.0</commons-io.version>
         <commons-csv.version>1.14.1</commons-csv.version>
-        <lombok.version>1.18.42</lombok.version>
+        <lombok.version>1.18.44</lombok.version>
         <awaitility.version>4.3.0</awaitility.version>
         <snakeyaml.version>2.5</snakeyaml.version>
         <mariadb-client.version>3.5.7</mariadb-client.version>
         <hikariCP.version>6.3.3</hikariCP.version>
         <jOOQ.version>3.20.11</jOOQ.version>
+        <json.version>20250517</json.version>
     </properties>
 
     <dependencies>
@@ -46,7 +47,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>${commons-lang3.version}</version>
+            <version>${commons-lang.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -116,7 +117,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20231013</version>
+            <version>${json.version}</version>
         </dependency>
         <dependency>
             <groupId>org.yaml</groupId>
@@ -139,13 +140,13 @@
         <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson-bom.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.13.2</version>
+            <version>${junit4.version}</version>
             <scope>test</scope>
         </dependency>
 
