@@ -7,6 +7,17 @@ body {
   word-wrap: break-word;
 }
 
+.example-container mat-sidenav-content {
+  position: relative;
+}
+
+.main-content-loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.32);
+}
+
 @media (min-width: 1400px) {
   .container,
   .container-sm,
@@ -230,15 +241,15 @@ table a:hover, svg a:hover {
   cursor: pointer;
 }
 
-mat-checkbox > .mat-checkbox-layout {
-  vertical-align: super;
+mat-checkbox > .mat-internal-form-field {
+  vertical-align: middle;
 }
 
-.mat-tooltip {
+.mat-mdc-tooltip-surface {
   font-size: 13px;
 }
 
-.mat-input-element:disabled {
+.mat-mdc-input-element:disabled {
   color: rgba(0, 0, 0, 0.54);
 }
 
@@ -260,9 +271,13 @@ mat-multi-sort-table-settings .table-settings-menu {
 }
 
 .mat-mdc-snack-bar-container {
-  --mat-snackbar-container-color: #fff;
-  --mat-mdc-snack-bar-button-color: #333;
-  --mat-snackbar-supporting-text-color: #333;
+  --mat-snack-bar-container-color: #fff;
+  --mat-snack-bar-button-color: #333;
+  --mat-snack-bar-supporting-text-color: #333;
+}
+
+.mat-mdc-snack-bar-container .mat-mdc-snackbar-surface {
+  border: 1px solid #333;
 }
 
 .mat-icon.fa {
@@ -350,7 +365,7 @@ span.cc-type, span.cc-state, span.bie-state {
   margin-top: 2px;
 }
 
-.mat-tooltip {
+.mat-mdc-tooltip-surface {
   white-space: pre-line;
 }
 
@@ -1003,13 +1018,6 @@ span.context-menu-item.disabled, span.context-menu-item[disabled] {
 
 .flex-11-auto {
   flex: 1 1 auto;
-}
-
-.mat-snack-bar-container {
-  color: #333;
-  background-color: #fff;
-  border-color: #333;
-  border: 1px solid;
 }
 
 .table-container {

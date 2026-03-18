@@ -25,14 +25,15 @@
           <textarea [(ngModel)]="moduleSet.description" cols="30" data-id="moduleSet.description" matInput
           rows="6" [disabled]="!roles.includes('developer')"></textarea>
         </mat-form-field>
-        <div class="row action-group m-0">
-          <div class="actions-wrap">
-            <button (click)="updateModuleSet()" [disabled]="updateDisabled"
-            mat-raised-button class="float-end" color="primary">Update</button>
-          </div>
-        </div>
       </mat-card-content>
     </mat-card>
+  </div>
+
+  <div class="row action-group m-0">
+    <div class="col-12 actions-wrap">
+      <button (click)="updateModuleSet()" [disabled]="updateDisabled"
+        mat-raised-button color="primary">Update</button>
+    </div>
   </div>
 
   <mat-card>
