@@ -1,70 +1,74 @@
 <div class="d-block">
-  <div class="loading-container" *ngIf="loading">
-    <mat-spinner [diameter]="40"></mat-spinner>
-  </div>
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner [diameter]="40"></mat-spinner>
+    </div>
+  }
   <div class="header d-flex align-items-center" mat-dialog-title>
     <span>Edit Tags</span>
-    <div class="close pr-2">
+    <div class="close pe-2">
       <button mat-icon-button mat-small-icon-button (click)="onNoClick()">
         <mat-icon>close</mat-icon>
       </button>
     </div>
   </div>
   <div class="content" mat-dialog-content>
-    <mat-card class="mb-2" *ngFor="let tag of tagList">
-      <mat-card-content>
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col-2">
-              <mat-label class="font-weight-bold">Tag preview</mat-label>
+    @for (tag of tagList; track tag) {
+      <mat-card class="mb-2">
+        <mat-card-content>
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-2">
+                <mat-label class="font-weight-bold">Tag preview</mat-label>
+              </div>
+              <div class="col-2">
+                <span class="tag ms-2"
+                  [style.background-color]="tag.backgroundColor"
+                [style.color]="tag.textColor">{{ tag.name }}</span>
+              </div>
             </div>
-            <div class="col-2">
-              <span class="tag ml-2"
-                    [style.background-color]="tag.backgroundColor"
-                    [style.color]="tag.textColor">{{ tag.name }}</span>
+            <div class="row mt-3">
+              <div class="col-2">
+                <mat-form-field>
+                  <mat-label>Name</mat-label>
+                  <input matInput required placeholder="Name" [(ngModel)]="tag.name" maxlength="100"/>
+                </mat-form-field>
+              </div>
+              <div class="col-2">
+                <mat-form-field>
+                  <mat-label>Text Color</mat-label>
+                  <input matInput required placeholder="Text Color" [(ngModel)]="tag.textColor" maxlength="10"/>
+                </mat-form-field>
+              </div>
+              <div class="col-2">
+                <mat-form-field>
+                  <mat-label>Background Color</mat-label>
+                  <input matInput required placeholder="Background Color" [(ngModel)]="tag.backgroundColor"
+                    maxlength="10"/>
+                </mat-form-field>
+              </div>
+              <div class="col-6">
+                <mat-form-field>
+                  <mat-label>Description</mat-label>
+                  <input matInput placeholder="Description (Optional)" [(ngModel)]="tag.description"/>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <button mat-raised-button color="primary" (click)="update(tag)"
+                  [disabled]="!tag.name || !tag.textColor || !tag.backgroundColor">
+                  Update
+                </button>
+                <button mat-raised-button class="ms-2" color="warn" (click)="discard(tag)">
+                  Discard
+                </button>
+              </div>
             </div>
           </div>
-          <div class="row mt-3">
-            <div class="col-2">
-              <mat-form-field>
-                <mat-label>Name</mat-label>
-                <input matInput required placeholder="Name" [(ngModel)]="tag.name" maxlength="100"/>
-              </mat-form-field>
-            </div>
-            <div class="col-2">
-              <mat-form-field>
-                <mat-label>Text Color</mat-label>
-                <input matInput required placeholder="Text Color" [(ngModel)]="tag.textColor" maxlength="10"/>
-              </mat-form-field>
-            </div>
-            <div class="col-2">
-              <mat-form-field>
-                <mat-label>Background Color</mat-label>
-                <input matInput required placeholder="Background Color" [(ngModel)]="tag.backgroundColor"
-                       maxlength="10"/>
-              </mat-form-field>
-            </div>
-            <div class="col-6">
-              <mat-form-field>
-                <mat-label>Description</mat-label>
-                <input matInput placeholder="Description (Optional)" [(ngModel)]="tag.description"/>
-              </mat-form-field>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-12">
-              <button mat-raised-button color="primary" (click)="update(tag)"
-                      [disabled]="!tag.name || !tag.textColor || !tag.backgroundColor">
-                Update
-              </button>
-              <button mat-raised-button class="ml-2" color="warn" (click)="discard(tag)">
-                Discard
-              </button>
-            </div>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
+        </mat-card-content>
+      </mat-card>
+    }
 
     <mat-card>
       <mat-card-content>
@@ -74,9 +78,9 @@
               <mat-label class="font-weight-bold">Tag preview</mat-label>
             </div>
             <div class="col-2">
-              <span class="tag ml-2"
-                    [style.background-color]="newTag.backgroundColor"
-                    [style.color]="newTag.textColor">{{ newTag.name }}</span>
+              <span class="tag ms-2"
+                [style.background-color]="newTag.backgroundColor"
+              [style.color]="newTag.textColor">{{ newTag.name }}</span>
             </div>
           </div>
           <div class="row mt-3">
@@ -96,7 +100,7 @@
               <mat-form-field>
                 <mat-label>Background Color</mat-label>
                 <input matInput required placeholder="Background Color" [(ngModel)]="newTag.backgroundColor"
-                       maxlength="10"/>
+                  maxlength="10"/>
               </mat-form-field>
             </div>
             <div class="col-6">
@@ -109,7 +113,7 @@
           <div class="row">
             <div class="col-12">
               <button mat-raised-button color="primary" (click)="add(newTag)"
-                      [disabled]="!newTag.name || !newTag.textColor || !newTag.backgroundColor">
+                [disabled]="!newTag.name || !newTag.textColor || !newTag.backgroundColor">
                 Add
               </button>
             </div>
@@ -118,7 +122,7 @@
       </mat-card-content>
     </mat-card>
   </div>
-  <div class="actions ml-auto" mat-dialog-actions>
+  <div class="actions ms-auto" mat-dialog-actions>
     <button mat-raised-button color="warn" (click)="onNoClick()">
       Cancel
     </button>

@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatTableDataSource} from '@angular/material/table';
 import {finalize} from 'rxjs/operators';
@@ -20,6 +20,12 @@ import {forkJoin} from 'rxjs';
   styleUrls: ['./report-dialog.component.css']
 })
 export class ReportDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<ReportDialogComponent>>(MatDialogRef);
+  service = inject(BieUpliftService);
+  private auth = inject(AuthService);
+  private preferencesService = inject(SettingsPreferencesService);
+  data = inject(MAT_DIALOG_DATA);
+
 
   dataSource = new MatTableDataSource<MatchInfo>();
 
@@ -130,14 +136,6 @@ export class ReportDialogComponent implements OnInit {
   preferencesInfo: PreferencesInfo;
   downloadHeader: string;
   loading = false;
-
-  constructor(
-    public dialogRef: MatDialogRef<ReportDialogComponent>,
-    public service: BieUpliftService,
-    private auth: AuthService,
-    private preferencesService: SettingsPreferencesService,
-    @Inject(MAT_DIALOG_DATA) public data: any) {
-  }
 
   ngOnInit() {
     this.loading = true;

@@ -1,11 +1,11 @@
 <div class="context-section">
-  <div class="pl-2 pr-2">
+  <div class="ps-2 pe-2">
     <mat-toolbar class="bg-white">
       <span class="title">History</span>
       <span class="flex-11-auto"></span>
-      <button mat-raised-button class="ml-2" color="primary"
-              [disabled]="selection.selected.length != 2"
-              (click)="openCompareDialog()">
+      <button mat-raised-button class="ms-2" color="primary"
+        [disabled]="selection.selected.length != 2"
+        (click)="openCompareDialog()">
         <mat-icon matTooltip="Compare">compare</mat-icon> Compare
       </button>
     </mat-toolbar>
@@ -13,9 +13,11 @@
 
   <mat-card class="pt-3">
     <mat-card-content class="mat-card-container">
-      <div class="loading-container" *ngIf="loading">
-        <mat-spinner [diameter]="40"></mat-spinner>
-      </div>
+      @if (loading) {
+        <div class="loading-container">
+          <mat-spinner [diameter]="40"></mat-spinner>
+        </div>
+      }
 
       <div class="table-container">
         <div class="score-column-container align-items-center">
@@ -28,21 +30,21 @@
         </div>
         <div class="mat-elevation-z1 table-wrapper mt-3">
           <table mat-table multiTemplateDataRows
-                 matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
-                 [dataSource]="dataSource">
+            matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
+            [dataSource]="dataSource">
 
             <ng-container matColumnDef="check">
               <th mat-header-cell *matHeaderCellDef>Compare</th>
               <td mat-cell *matCellDef="let element">
                 <mat-checkbox (click)="$event.stopPropagation()"
-                              (change)="$event ? toggle(element) : null"
-                              [checked]="isSelected(element)"></mat-checkbox>
+                  (change)="$event ? toggle(element) : null"
+                [checked]="isSelected(element)"></mat-checkbox>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="commit">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Commit')" (onResize)="onResizeWidth($event)"> Commit</th>
+              score-table-column-resize [defaultWidth]="width('Commit')" (onResize)="onResizeWidth($event)"> Commit</th>
               <td mat-cell *matCellDef="let element" [matTooltip]="element.hash">
                 {{ element.hash.substring(0, 8) }}
               </td>
@@ -50,7 +52,7 @@
 
             <ng-container matColumnDef="revisionNum">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Revision')" (onResize)="onResizeWidth($event)"> Revision</th>
+              score-table-column-resize [defaultWidth]="width('Revision')" (onResize)="onResizeWidth($event)"> Revision</th>
               <td mat-cell *matCellDef="let element">
                 {{ element.revisionNum }}
               </td>
@@ -58,7 +60,7 @@
 
             <ng-container matColumnDef="revisionAction">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Action')" (onResize)="onResizeWidth($event)"> Action</th>
+              score-table-column-resize [defaultWidth]="width('Action')" (onResize)="onResizeWidth($event)"> Action</th>
               <td mat-cell *matCellDef="let element">
                 <span [class]="element.logAction">{{ logAction(element) }}</span>
               </td>
@@ -66,7 +68,7 @@
 
             <ng-container matColumnDef="loginId">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Actor')" (onResize)="onResizeWidth($event)"> Actor</th>
+              score-table-column-resize [defaultWidth]="width('Actor')" (onResize)="onResizeWidth($event)"> Actor</th>
               <td mat-cell *matCellDef="let element">
                 <span class="score-line-clamp-2 score-break-word">{{ element.loginId }}</span>
               </td>
@@ -74,7 +76,7 @@
 
             <ng-container matColumnDef="timestamp">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Created At')" (onResize)="onResizeWidth($event)"> Created at</th>
+              score-table-column-resize [defaultWidth]="width('Created At')" (onResize)="onResizeWidth($event)"> Created at</th>
               <td mat-cell *matCellDef="let element">
                 {{ element.timestamp | dateAgo }}
               </td>
@@ -87,7 +89,7 @@
           <mat-paginator
             [pageSizeOptions]="[10, 25, 50]"
             (page)="onPageChange($event)"
-            showFirstLastButtons></mat-paginator>
+          showFirstLastButtons></mat-paginator>
         </div>
       </div>
     </mat-card-content>

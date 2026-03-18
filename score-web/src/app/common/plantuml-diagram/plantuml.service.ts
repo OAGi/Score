@@ -1,13 +1,11 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {HttpClient, HttpResponse} from '@angular/common/http';
 import {Observable} from 'rxjs';
 
 @Injectable()
 export class PlantUmlService {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-
-  }
 
   getDiagram(encodedText: string, format?: string): Observable<HttpResponse<Blob>> {
     format = format || 'svg';

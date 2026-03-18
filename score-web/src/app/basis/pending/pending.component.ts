@@ -1,5 +1,5 @@
 import {HttpClient} from '@angular/common/http';
-import {Component, Injectable, OnInit} from '@angular/core';
+import { Component, Injectable, OnInit, inject } from '@angular/core';
 import {map} from 'rxjs/operators';
 import {environment} from '../../../environments/environment';
 import {AuthService} from '../../authentication/auth.service';
@@ -9,10 +9,10 @@ import {UserToken} from '../../authentication/domain/auth';
 
 @Injectable()
 export class PendingActivate implements CanActivate {
-  constructor(private auth: AuthService,
-              private router: Router,
-              private http: HttpClient) {
-  }
+  private auth = inject(AuthService);
+  private router = inject(Router);
+  private http = inject(HttpClient);
+
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot):
     Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
@@ -40,8 +40,8 @@ export class PendingActivate implements CanActivate {
   styleUrls: ['./pending.component.css']
 })
 export class PendingComponent implements OnInit {
+  auth = inject(AuthService);
 
-  constructor(public auth: AuthService) { }
 
   ngOnInit(): void {
   }

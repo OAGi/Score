@@ -1,4 +1,4 @@
-import {Component, HostListener} from '@angular/core';
+import { Component, HostListener, inject } from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
@@ -17,6 +17,14 @@ import {hashCode} from 'src/app/common/utility';
   styleUrl: './library-detail.component.css'
 })
 export class LibraryDetailComponent {
+  private service = inject(LibraryService);
+  private snackBar = inject(MatSnackBar);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private location = inject(Location);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private auth = inject(AuthService);
+
 
   title = 'Library Detail';
   loading = false;
@@ -24,15 +32,6 @@ export class LibraryDetailComponent {
 
   uriForm = new FormControl('');
   hashCode;
-
-  constructor(private service: LibraryService,
-              private snackBar: MatSnackBar,
-              private confirmDialogService: ConfirmDialogService,
-              private location: Location,
-              private route: ActivatedRoute,
-              private router: Router,
-              private auth: AuthService) {
-  }
 
   ngOnInit() {
     this.library = new LibraryDetails();

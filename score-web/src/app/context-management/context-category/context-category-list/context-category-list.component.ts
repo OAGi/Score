@@ -1,4 +1,4 @@
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {ContextCategoryService} from '../domain/context-category.service';
 import {ContextCategoryListEntry, ContextCategoryListRequest} from '../domain/context-category';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
@@ -33,6 +33,16 @@ import {SearchBarComponent} from '../../../common/search-bar/search-bar.componen
   styleUrls: ['./context-category-list.component.css']
 })
 export class ContextCategoryListComponent implements OnInit {
+  private service = inject(ContextCategoryService);
+  private accountService = inject(AccountListService);
+  private auth = inject(AuthService);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private snackBar = inject(MatSnackBar);
+
 
   title = 'Context Category';
 
@@ -143,17 +153,6 @@ export class ContextCategoryListComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
-
-  constructor(private service: ContextCategoryService,
-              private accountService: AccountListService,
-              private auth: AuthService,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute,
-              private snackBar: MatSnackBar) {
-  }
 
   ngOnInit() {
     this.request = new ContextCategoryListRequest(this.route.snapshot.queryParamMap,

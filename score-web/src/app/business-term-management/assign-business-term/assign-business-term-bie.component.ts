@@ -1,4 +1,4 @@
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, SortDirection} from '@angular/material/sort';
@@ -42,6 +42,17 @@ import {AsbieBbieListEntry} from '../domain/business-term';
   ],
 })
 export class AssignBusinessTermBieComponent implements OnInit {
+  private businessTermService = inject(BusinessTermService);
+  private releaseService = inject(ReleaseService);
+  private libraryService = inject(LibraryService);
+  private accountService = inject(AccountListService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private auth = inject(AuthService);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  webPageInfo = inject(WebPageInfoService);
+
 
   title = 'Assign Business Term';
   subtitle = 'Select BIE';
@@ -171,18 +182,6 @@ export class AssignBusinessTermBieComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
-
-  constructor(private businessTermService: BusinessTermService,
-              private releaseService: ReleaseService,
-              private libraryService: LibraryService,
-              private accountService: AccountListService,
-              private preferencesService: SettingsPreferencesService,
-              private auth: AuthService,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute,
-              public webPageInfo: WebPageInfoService) {
-  }
 
   ngOnInit() {
     this.request = new BieListRequest(this.route.snapshot.queryParamMap,

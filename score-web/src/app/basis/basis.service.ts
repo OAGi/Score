@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {BoxColorSet, WebPageInfo} from './about/domain/about';
 import {Observable, tap} from 'rxjs';
@@ -7,13 +7,12 @@ import {Observable, tap} from 'rxjs';
   providedIn: 'root',
 })
 export class WebPageInfoService {
+  private http = inject(HttpClient);
+
 
   WEB_PAGE_INFO_KEY = 'X-Score-WebPageInfo';
 
   private fetching = false;
-
-  constructor(private http: HttpClient) {
-  }
 
   get webPageInfo(): WebPageInfo {
     let item = localStorage.getItem(this.WEB_PAGE_INFO_KEY);

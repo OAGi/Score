@@ -1,8 +1,10 @@
 <div class="context-section">
-  <div class="loading-container" *ngIf="isLoading">
-    <mat-spinner [diameter]="40"></mat-spinner>
-  </div>
-  <div class="pl-2 pr-2">
+  @if (isLoading) {
+    <div class="loading-container">
+      <mat-spinner [diameter]="40"></mat-spinner>
+    </div>
+  }
+  <div class="ps-2 pe-2">
     <mat-toolbar class="bg-white">
       <span class="title">{{ title }}</span>
       <span class="flex-11-auto"></span>
@@ -15,88 +17,101 @@
         <mat-form-field>
           <mat-label>Release Number</mat-label>
           <input matInput [(ngModel)]="releaseDetail.releaseNum" maxlength="45"
-                 [required]="true"
-                 [disabled]="isDisabled()"/>
+            [required]="true"
+            [disabled]="isDisabled()"/>
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Release Namespace</mat-label>
           <mat-select [(ngModel)]="selectedNamespace" (ngModelChange)="onChangeNamespace()"
-                      [required]="true"
-                      [disabled]="isDisabled()">
+            [required]="true"
+            [disabled]="isDisabled()">
             <mat-option>
               <ngx-mat-select-search [formControl]="namespaceListFilterCtrl"
-                                     [placeholderLabel]="'Search...'"
-                                     [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
+                [placeholderLabel]="'Search...'"
+              [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
             </mat-option>
-            <mat-option *ngFor="let namespace of filteredNamespaceList | async" [value]="namespace">
-              {{ namespace.uri }}
-            </mat-option>
+            @for (namespace of filteredNamespaceList | async; track namespace) {
+              <mat-option [value]="namespace">
+                {{ namespace.uri }}
+              </mat-option>
+            }
           </mat-select>
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Release Note</mat-label>
           <textarea rows="6" cols="30" matInput [(ngModel)]="releaseDetail.releaseNote"
-                    [disabled]="isDisabled()"></textarea>
+          [disabled]="isDisabled()"></textarea>
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Release License</mat-label>
           <textarea rows="6" cols="30" matInput [(ngModel)]="releaseDetail.releaseLicense"
-                    [disabled]="isDisabled()"></textarea>
+          [disabled]="isDisabled()"></textarea>
         </mat-form-field>
       </mat-card-content>
     </mat-card>
   </div>
 
-  <div class="row action-group m-0" *ngIf="userToken.roles.includes('developer')">
-    <div class="col-12 actions-wrap">
-      <div class="actions">
-        <button mat-raised-button color="primary"
-                *ngIf="releaseDetail.state === 'Initialized' || releaseDetail.state === 'Draft'"
-                [disabled]="updateDisabled"
-                (click)="update()">
-          Update
-        </button>
-        <button mat-raised-button color="warn"
-                *ngIf="releaseDetail.state === 'Initialized'"
-                (click)="createDraft()">
-          Create Draft
-        </button>
-        <button mat-raised-button color="warn"
-                *ngIf="releaseDetail.state === 'Draft'"
-                (click)="updateState('Initialized')">
-          Back to Initialized
-        </button>
-        <button mat-raised-button color="accent"
-                *ngIf="releaseDetail.state === 'Draft'"
-                (click)="updateState('Published')">
-          Publish
-        </button>
-        <button mat-raised-button color="info"
-                *ngIf="releaseDetail.state === 'Draft' || releaseDetail.state === 'Published'"
-                (click)="openWhatsChangedDialog()">
-          What's changed
-        </button>
-        <button mat-raised-button color="accent"
-                *ngIf="releaseDetail.state === 'Published' && releaseDetail.latestRelease"
-                (click)="generateMigrationScript()">
-          Generate Migration Script
-        </button>
+  @if (userToken.roles.includes('developer')) {
+    <div class="row action-group m-0">
+      <div class="col-12 actions-wrap">
+        <div class="actions">
+          @if (releaseDetail.state === 'Initialized' || releaseDetail.state === 'Draft') {
+            <button mat-raised-button color="primary"
+              [disabled]="updateDisabled"
+              (click)="update()">
+              Update
+            </button>
+          }
+          @if (releaseDetail.state === 'Initialized') {
+            <button mat-raised-button color="warn"
+              (click)="createDraft()">
+              Create Draft
+            </button>
+          }
+          @if (releaseDetail.state === 'Draft') {
+            <button mat-raised-button color="warn"
+              (click)="updateState('Initialized')">
+              Back to Initialized
+            </button>
+          }
+          @if (releaseDetail.state === 'Draft') {
+            <button mat-raised-button color="accent"
+              (click)="updateState('Published')">
+              Publish
+            </button>
+          }
+          @if (releaseDetail.state === 'Draft' || releaseDetail.state === 'Published') {
+            <button mat-raised-button color="info"
+              (click)="openWhatsChangedDialog()">
+              What's changed
+            </button>
+          }
+          @if (releaseDetail.state === 'Published' && releaseDetail.latestRelease) {
+            <button mat-raised-button color="accent"
+              (click)="generateMigrationScript()">
+              Generate Migration Script
+            </button>
+          }
+        </div>
       </div>
     </div>
-  </div>
+  }
 
-  <div class="row action-group m-0" *ngIf="!userToken.roles.includes('developer')">
-    <div class="col-12 actions-wrap">
-      <div class="actions">
-        <button mat-raised-button color="info"
-                *ngIf="releaseDetail.state === 'Draft' || releaseDetail.state === 'Published'"
-                (click)="openWhatsChangedDialog()">
-          What's changed
-        </button>
+  @if (!userToken.roles.includes('developer')) {
+    <div class="row action-group m-0">
+      <div class="col-12 actions-wrap">
+        <div class="actions">
+          @if (releaseDetail.state === 'Draft' || releaseDetail.state === 'Published') {
+            <button mat-raised-button color="info"
+              (click)="openWhatsChangedDialog()">
+              What's changed
+            </button>
+          }
+        </div>
       </div>
     </div>
-  </div>
+  }
 </div>

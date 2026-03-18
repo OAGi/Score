@@ -11,8 +11,8 @@
         </div>
         <mat-card style="box-shadow: none;">
           <score-search-bar placeholder="Search by DEN" [(model)]="verbRequest.filters.den"
-                            (modelChange)="onChange('verb', 'filters.den', verbRequest.filters.den)"
-                            (searchTriggered)="onSearch('verb');">
+            (modelChange)="onChange('verb', 'filters.den', verbRequest.filters.den)"
+            (searchTriggered)="onSearch('verb');">
             <div advancedSearchContent style="padding-left: 3rem;">
               <mat-card-content class="mat-card-container">
                 <div class="container-fluid" style="padding: 0;">
@@ -20,36 +20,44 @@
                     <div class="col-md-3 col-sm-12">
                       <mat-form-field>
                         <mat-label>State</mat-label>
-                        <mat-select *ngIf="verbRequest.release.workingRelease" [(ngModel)]="verbRequest.states"
-                                    floatLabel="never" multiple>
-                          <mat-option *ngFor="let state of workingStateList" [value]="state">
-                            <span>{{ state | separate }}</span>
-                          </mat-option>
-                        </mat-select>
-                        <mat-select *ngIf="!verbRequest.release.workingRelease" [(ngModel)]="verbRequest.states"
-                                    floatLabel="never" multiple>
-                          <mat-option *ngFor="let state of releaseStateList" [value]="state">
-                            <span>{{ state | separate }}</span>
-                          </mat-option>
-                        </mat-select>
+                        @if (verbRequest.release.workingRelease) {
+                          <mat-select [(ngModel)]="verbRequest.states"
+                            floatLabel="never" multiple>
+                            @for (state of workingStateList; track state) {
+                              <mat-option [value]="state">
+                                <span>{{ state | separate }}</span>
+                              </mat-option>
+                            }
+                          </mat-select>
+                        }
+                        @if (!verbRequest.release.workingRelease) {
+                          <mat-select [(ngModel)]="verbRequest.states"
+                            floatLabel="never" multiple>
+                            @for (state of releaseStateList; track state) {
+                              <mat-option [value]="state">
+                                <span>{{ state | separate }}</span>
+                              </mat-option>
+                            }
+                          </mat-select>
+                        }
                       </mat-form-field>
                     </div>
                     <div class="col-md-3 col-sm-12">
                       <mat-form-field>
                         <mat-label>Definition</mat-label>
                         <input matInput [(ngModel)]="verbRequest.filters.definition"
-                               (ngModelChange)="onChange('verb', 'filters.definition', verbRequest.filters.definition)"
-                               (keyup.enter)="onSearch('verb');"
-                               placeholder="Definition">
+                          (ngModelChange)="onChange('verb', 'filters.definition', verbRequest.filters.definition)"
+                          (keyup.enter)="onSearch('verb');"
+                          placeholder="Definition">
                       </mat-form-field>
                     </div>
                     <div class="col-md-3 col-sm-12">
                       <mat-form-field>
                         <mat-label>Module</mat-label>
                         <input matInput [(ngModel)]="verbRequest.filters.module"
-                               (ngModelChange)="onChange('verb', 'filters.module', verbRequest.filters.module)"
-                               (keyup.enter)="onSearch('verb');"
-                               placeholder="{{'CORE_COMPONENT_LIST.MODULE' | translate}}">
+                          (ngModelChange)="onChange('verb', 'filters.module', verbRequest.filters.module)"
+                          (keyup.enter)="onSearch('verb');"
+                          placeholder="{{'CORE_COMPONENT_LIST.MODULE' | translate}}">
                       </mat-form-field>
                     </div>
                   </div>
@@ -63,11 +71,13 @@
                         <mat-select [(ngModel)]="verbRequest.updaterLoginIdList" multiple>
                           <mat-option>
                             <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
-                                                   [placeholderLabel]="'Search...'"
-                                                   [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                              [placeholderLabel]="'Search...'"
+                            [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
                           </mat-option>
-                          <mat-option *ngFor="let loginId of filteredUpdaterIdList | async"
-                                      [value]="loginId">{{ loginId }}</mat-option>
+                          @for (loginId of filteredUpdaterIdList | async; track loginId) {
+                            <mat-option
+                            [value]="loginId">{{ loginId }}</mat-option>
+                          }
                         </mat-select>
                       </mat-form-field>
                     </div>
@@ -75,7 +85,7 @@
                       <mat-form-field>
                         <mat-label>Updated start date</mat-label>
                         <input matInput [matDatepicker]="verbDateStart" placeholder="Updated start date"
-                               [(ngModel)]="verbRequest.updatedDate.start" [max]="verbRequest.updatedDate.end">
+                          [(ngModel)]="verbRequest.updatedDate.start" [max]="verbRequest.updatedDate.end">
                         <mat-datepicker-toggle matSuffix [for]="verbDateStart"></mat-datepicker-toggle>
                         <mat-datepicker #verbDateStart></mat-datepicker>
                       </mat-form-field>
@@ -91,7 +101,7 @@
                       <mat-form-field>
                         <mat-label>Updated end date</mat-label>
                         <input matInput [matDatepicker]="verbDateEnd" placeholder="Updated end date"
-                               [(ngModel)]="verbRequest.updatedDate.end" [min]="verbRequest.updatedDate.start">
+                          [(ngModel)]="verbRequest.updatedDate.end" [min]="verbRequest.updatedDate.start">
                         <mat-datepicker-toggle matSuffix [for]="verbDateEnd"></mat-datepicker-toggle>
                         <mat-datepicker #verbDateEnd></mat-datepicker>
                       </mat-form-field>
@@ -110,9 +120,11 @@
           </score-search-bar>
 
           <mat-card-content class="mat-card-container">
-            <div class="loading-container" *ngIf="loading">
-              <mat-spinner [diameter]="40"></mat-spinner>
-            </div>
+            @if (loading) {
+              <div class="loading-container">
+                <mat-spinner [diameter]="40"></mat-spinner>
+              </div>
+            }
 
             <div class="table-container">
               <div class="score-column-container align-items-center">
@@ -124,67 +136,71 @@
               </div>
               <div class="mat-elevation-z1 table-wrapper mt-3">
                 <table mat-table multiTemplateDataRows
-                       #verbSort="matSort"
-                       matSort [matSortActive]="verbSort.active" [matSortDirection]="verbSort.direction" [matSortStart]="'desc'"
-                       [dataSource]="verbDataSource">
+                  #verbSort="matSort"
+                  matSort [matSortActive]="verbSort.active" [matSortDirection]="verbSort.direction" [matSortStart]="'desc'"
+                  [dataSource]="verbDataSource">
 
                   <!-- Checkbox Column -->
                   <ng-container matColumnDef="select">
                     <th mat-header-cell *matHeaderCellDef>
                       <mat-checkbox (click)="masterToggle('verb', $event)"
-                                    [checked]="verbSelection.selected.length === verbPaginator.length"
-                                    [indeterminate]="!(verbSelection.selected.length === verbPaginator.length) && verbSelection.hasValue()">
+                        [checked]="verbSelection.selected.length === verbPaginator.length"
+                        [indeterminate]="!(verbSelection.selected.length === verbPaginator.length) && verbSelection.hasValue()">
                       </mat-checkbox>
                     </th>
                     <td mat-cell *matCellDef="let row">
                       <mat-checkbox (click)="$event.stopPropagation()"
-                                    (change)="$event ? toggle(row, 'verb') : null"
-                                    [checked]="isSelected(row, 'verb')">
+                        (change)="$event ? toggle(row, 'verb') : null"
+                        [checked]="isSelected(row, 'verb')">
                       </mat-checkbox>
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="state">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header
-                        score-table-column-resize [defaultWidth]="verbWidth('State')" (onResize)="onResizeVerbWidth($event)"> State</th>
+                    score-table-column-resize [defaultWidth]="verbWidth('State')" (onResize)="onResizeVerbWidth($event)"> State</th>
                     <td mat-cell *matCellDef="let element">
                       <span class="cc-state {{ element.state }}"
                             [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
                             'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state | separate }}</span>
-                      <span *ngIf="element.deprecated" class="cc-state Deprecated"
+                      @if (element.deprecated) {
+                        <span class="cc-state Deprecated"
                             [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
                     'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
+                      }
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="den">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header
-                        score-table-column-resize [defaultWidth]="verbWidth('DEN')" (onResize)="onResizeVerbWidth($event)"> DEN</th>
+                    score-table-column-resize [defaultWidth]="verbWidth('DEN')" (onResize)="onResizeVerbWidth($event)"> DEN</th>
                     <td mat-cell *matCellDef="let element">
                       <div class="den den-with-tags score-break-word">
                         <a routerLink="{{ 'core_component/asccp/' + element.manifestId }}"
-                           target="_blank" rel="noopener noreferrer"
-                           matTooltip="{{ element.den }}">
+                          target="_blank" rel="noopener noreferrer"
+                          matTooltip="{{ element.den }}">
                           <span class="score-line-clamp-2 score-break-word">{{ element.den }}</span>
                         </a>
                         <div class="tag-list">
-                          <span class="tag ml-2" *ngFor="let tag of element.tagList"
-                                [style.background-color]="tag.backgroundColor"
-                                [style.color]="tag.textColor">{{ tag.name }}</span>
+                          @for (tag of element.tagList; track tag) {
+                            <span class="tag ms-2"
+                              [style.background-color]="tag.backgroundColor"
+                            [style.color]="tag.textColor">{{ tag.name }}</span>
+                          }
                         </div>
                       </div>
                       <div class="description score-line-clamp-2 score-break-word"
-                           [innerHTML]="element.module | highlight : highlightTextForVerbModule : ['bg-warning']"></div>
+                      [innerHTML]="element.module | highlight : highlightTextForVerbModule : ['bg-warning']"></div>
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="lastUpdateTimestamp">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header
-                        score-table-column-resize [defaultWidth]="verbWidth('Updated On')" (onResize)="onResizeVerbWidth($event)"> Updated on</th>
+                    score-table-column-resize [defaultWidth]="verbWidth('Updated On')" (onResize)="onResizeVerbWidth($event)"> Updated on</th>
                     <td mat-cell *matCellDef="let element">
                       <div class="score-line-clamp-2 score-break-word">
                         <div>{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-                        <div class="description"><span class="pr-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
+                        <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
                       </div>
                     </td>
                   </ng-container>
@@ -192,15 +208,17 @@
                   <ng-container matColumnDef="expandedDetail">
                     <td mat-cell *matCellDef="let element" [attr.colspan]="displayedVerbColumns.length">
                       <div class="element-detail"
-                           [@detailExpand]="element == verbExpandedElement ? 'expanded' : 'collapsed'">
+                        [@detailExpand]="element == verbExpandedElement ? 'expanded' : 'collapsed'">
                         <div class="element-detail-wrapper">
                           <mat-card class="mb-2">
-                            <mat-card-header class="element-detail-header" *ngIf="element.definition.source">
-                              <mat-card-subtitle class="element-detail-subtitle">{{ element.definition.source }}</mat-card-subtitle>
-                            </mat-card-header>
+                            @if (element.definition.source) {
+                              <mat-card-header class="element-detail-header">
+                                <mat-card-subtitle class="element-detail-subtitle">{{ element.definition.source }}</mat-card-subtitle>
+                              </mat-card-header>
+                            }
                             <mat-card-content>
                               <p [innerHTML]="element.definition.content | highlight : highlightTextForVerbDefinition : ['bg-warning']"
-                                 class="element-detail-content"></p>
+                              class="element-detail-content"></p>
                             </mat-card-content>
                           </mat-card>
                         </div>
@@ -210,15 +228,15 @@
 
                   <tr mat-header-row *matHeaderRowDef="displayedVerbColumns"></tr>
                   <tr mat-row *matRowDef="let element; columns: displayedVerbColumns;" class="element-row"
-                      [class.expanded-row]="verbExpandedElement === element"
-                      (click)="verbExpandedElement = verbExpandedElement === element ? null : element; toggle(element, 'verb');"></tr>
+                    [class.expanded-row]="verbExpandedElement === element"
+                  (click)="verbExpandedElement = verbExpandedElement === element ? null : element; toggle(element, 'verb');"></tr>
                   <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"
-                      (click)="toggle(row, 'verb');"></tr>
+                  (click)="toggle(row, 'verb');"></tr>
                 </table>
                 <mat-paginator #verbPaginator
-                               [pageSizeOptions]="[10, 25, 50]"
-                               (page)="onPageChange($event, 'verb')"
-                               showFirstLastButtons></mat-paginator>
+                  [pageSizeOptions]="[10, 25, 50]"
+                  (page)="onPageChange($event, 'verb')"
+                showFirstLastButtons></mat-paginator>
               </div>
             </div>
           </mat-card-content>
@@ -234,8 +252,8 @@
         </div>
         <mat-card style="box-shadow: none;">
           <score-search-bar placeholder="Search by DEN" [(model)]="nounRequest.filters.den"
-                            (modelChange)="onChange('noun', 'filters.den', nounRequest.filters.den)"
-                            (searchTriggered)="onSearch('noun');">
+            (modelChange)="onChange('noun', 'filters.den', nounRequest.filters.den)"
+            (searchTriggered)="onSearch('noun');">
             <div advancedSearchContent style="padding-left: 3rem;">
               <mat-card-content class="mat-card-container">
                 <div class="container-fluid" style="padding: 0;">
@@ -243,36 +261,44 @@
                     <div class="col-md-3 col-sm-12">
                       <mat-form-field>
                         <mat-label>State</mat-label>
-                        <mat-select *ngIf="nounRequest.release.workingRelease" [(ngModel)]="nounRequest.states"
-                                    floatLabel="never" multiple>
-                          <mat-option *ngFor="let state of workingStateList" [value]="state">
-                            <span>{{ state | separate }}</span>
-                          </mat-option>
-                        </mat-select>
-                        <mat-select *ngIf="!nounRequest.release.workingRelease" [(ngModel)]="nounRequest.states"
-                                    floatLabel="never" multiple>
-                          <mat-option *ngFor="let state of releaseStateList" [value]="state">
-                            <span>{{ state | separate }}</span>
-                          </mat-option>
-                        </mat-select>
+                        @if (nounRequest.release.workingRelease) {
+                          <mat-select [(ngModel)]="nounRequest.states"
+                            floatLabel="never" multiple>
+                            @for (state of workingStateList; track state) {
+                              <mat-option [value]="state">
+                                <span>{{ state | separate }}</span>
+                              </mat-option>
+                            }
+                          </mat-select>
+                        }
+                        @if (!nounRequest.release.workingRelease) {
+                          <mat-select [(ngModel)]="nounRequest.states"
+                            floatLabel="never" multiple>
+                            @for (state of releaseStateList; track state) {
+                              <mat-option [value]="state">
+                                <span>{{ state | separate }}</span>
+                              </mat-option>
+                            }
+                          </mat-select>
+                        }
                       </mat-form-field>
                     </div>
                     <div class="col-md-3 col-sm-12">
                       <mat-form-field>
                         <mat-label>Definition</mat-label>
                         <input matInput [(ngModel)]="nounRequest.filters.definition"
-                               (ngModelChange)="onChange('noun', 'filters.definition', nounRequest.filters.definition)"
-                               (keyup.enter)="onSearch('noun');"
-                               placeholder="Definition">
+                          (ngModelChange)="onChange('noun', 'filters.definition', nounRequest.filters.definition)"
+                          (keyup.enter)="onSearch('noun');"
+                          placeholder="Definition">
                       </mat-form-field>
                     </div>
                     <div class="col-md-3 col-sm-12">
                       <mat-form-field>
                         <mat-label>Module</mat-label>
                         <input matInput [(ngModel)]="nounRequest.filters.module"
-                               (ngModelChange)="onChange('noun', 'filters.module', nounRequest.filters.module)"
-                               (keyup.enter)="onSearch('noun');"
-                               placeholder="{{'CORE_COMPONENT_LIST.MODULE' | translate}}">
+                          (ngModelChange)="onChange('noun', 'filters.module', nounRequest.filters.module)"
+                          (keyup.enter)="onSearch('noun');"
+                          placeholder="{{'CORE_COMPONENT_LIST.MODULE' | translate}}">
                       </mat-form-field>
                     </div>
                   </div>
@@ -286,11 +312,13 @@
                         <mat-select [(ngModel)]="nounRequest.updaterLoginIdList" multiple>
                           <mat-option>
                             <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
-                                                   [placeholderLabel]="'Search...'"
-                                                   [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                              [placeholderLabel]="'Search...'"
+                            [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
                           </mat-option>
-                          <mat-option *ngFor="let loginId of filteredUpdaterIdList | async"
-                                      [value]="loginId">{{ loginId }}</mat-option>
+                          @for (loginId of filteredUpdaterIdList | async; track loginId) {
+                            <mat-option
+                            [value]="loginId">{{ loginId }}</mat-option>
+                          }
                         </mat-select>
                       </mat-form-field>
                     </div>
@@ -298,7 +326,7 @@
                       <mat-form-field>
                         <mat-label>Updated start date</mat-label>
                         <input matInput [matDatepicker]="nounDateStart" placeholder="Updated start date"
-                               [(ngModel)]="nounRequest.updatedDate.start" [max]="nounRequest.updatedDate.end">
+                          [(ngModel)]="nounRequest.updatedDate.start" [max]="nounRequest.updatedDate.end">
                         <mat-datepicker-toggle matSuffix [for]="nounDateStart"></mat-datepicker-toggle>
                         <mat-datepicker #nounDateStart></mat-datepicker>
                       </mat-form-field>
@@ -314,7 +342,7 @@
                       <mat-form-field>
                         <mat-label>Updated end date</mat-label>
                         <input matInput [matDatepicker]="nounDateEnd" placeholder="Updated end date"
-                               [(ngModel)]="nounRequest.updatedDate.end" [min]="nounRequest.updatedDate.start">
+                          [(ngModel)]="nounRequest.updatedDate.end" [min]="nounRequest.updatedDate.start">
                         <mat-datepicker-toggle matSuffix [for]="nounDateEnd"></mat-datepicker-toggle>
                         <mat-datepicker #nounDateEnd></mat-datepicker>
                       </mat-form-field>
@@ -333,9 +361,11 @@
           </score-search-bar>
 
           <mat-card-content class="mat-card-container">
-            <div class="loading-container" *ngIf="loading">
-              <mat-spinner [diameter]="40"></mat-spinner>
-            </div>
+            @if (loading) {
+              <div class="loading-container">
+                <mat-spinner [diameter]="40"></mat-spinner>
+              </div>
+            }
 
             <div class="table-container">
               <div class="score-column-container align-items-center">
@@ -347,67 +377,71 @@
               </div>
               <div class="mat-elevation-z1 table-wrapper mt-3">
                 <table mat-table multiTemplateDataRows
-                       #nounSort="matSort"
-                       matSort [matSortActive]="nounSort.active" [matSortDirection]="nounSort.direction" [matSortStart]="'desc'"
-                       [dataSource]="nounDataSource">
+                  #nounSort="matSort"
+                  matSort [matSortActive]="nounSort.active" [matSortDirection]="nounSort.direction" [matSortStart]="'desc'"
+                  [dataSource]="nounDataSource">
 
                   <!-- Checkbox Column -->
                   <ng-container matColumnDef="select">
                     <th mat-header-cell *matHeaderCellDef>
                       <mat-checkbox (click)="masterToggle('noun', $event)"
-                                    [checked]="nounSelection.selected.length === nounPaginator.length"
-                                    [indeterminate]="!(nounSelection.selected.length === nounPaginator.length) && nounSelection.hasValue()">
+                        [checked]="nounSelection.selected.length === nounPaginator.length"
+                        [indeterminate]="!(nounSelection.selected.length === nounPaginator.length) && nounSelection.hasValue()">
                       </mat-checkbox>
                     </th>
                     <td mat-cell *matCellDef="let row">
                       <mat-checkbox (click)="$event.stopPropagation()"
-                                    (change)="$event ? toggle(row, 'noun') : null"
-                                    [checked]="isSelected(row, 'noun')">
+                        (change)="$event ? toggle(row, 'noun') : null"
+                        [checked]="isSelected(row, 'noun')">
                       </mat-checkbox>
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="state">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header
-                        score-table-column-resize [defaultWidth]="nounWidth('State')" (onResize)="onResizeNounWidth($event)"> State</th>
+                    score-table-column-resize [defaultWidth]="nounWidth('State')" (onResize)="onResizeNounWidth($event)"> State</th>
                     <td mat-cell *matCellDef="let element">
                       <span class="cc-state {{ element.state }}"
                             [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
                             'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state | separate }}</span>
-                      <span *ngIf="element.deprecated" class="cc-state Deprecated"
+                      @if (element.deprecated) {
+                        <span class="cc-state Deprecated"
                             [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
                     'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
+                      }
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="den">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header
-                        score-table-column-resize [defaultWidth]="nounWidth('DEN')" (onResize)="onResizeNounWidth($event)"> DEN</th>
+                    score-table-column-resize [defaultWidth]="nounWidth('DEN')" (onResize)="onResizeNounWidth($event)"> DEN</th>
                     <td mat-cell *matCellDef="let element">
                       <div class="den den-with-tags score-break-word">
                         <a routerLink="{{ 'core_component/acc/' + element.manifestId }}"
-                           target="_blank" rel="noopener noreferrer"
-                           matTooltip="{{ element.den }}">
+                          target="_blank" rel="noopener noreferrer"
+                          matTooltip="{{ element.den }}">
                           <span class="score-line-clamp-2 score-break-word">{{ element.den }}</span>
                         </a>
                         <div class="tag-list">
-                          <span class="tag ml-2" *ngFor="let tag of element.tagList"
-                                [style.background-color]="tag.backgroundColor"
-                                [style.color]="tag.textColor">{{ tag.name }}</span>
+                          @for (tag of element.tagList; track tag) {
+                            <span class="tag ms-2"
+                              [style.background-color]="tag.backgroundColor"
+                            [style.color]="tag.textColor">{{ tag.name }}</span>
+                          }
                         </div>
                       </div>
                       <div class="description score-line-clamp-2 score-break-word"
-                           [innerHTML]="element.module | highlight : highlightTextForNounModule : ['bg-warning']"></div>
+                      [innerHTML]="element.module | highlight : highlightTextForNounModule : ['bg-warning']"></div>
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="lastUpdateTimestamp">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header
-                        score-table-column-resize [defaultWidth]="nounWidth('Updated On')" (onResize)="onResizeNounWidth($event)"> Updated on</th>
+                    score-table-column-resize [defaultWidth]="nounWidth('Updated On')" (onResize)="onResizeNounWidth($event)"> Updated on</th>
                     <td mat-cell *matCellDef="let element">
                       <div class="score-line-clamp-2 score-break-word">
                         <div>{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-                        <div class="description"><span class="pr-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
+                        <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
                       </div>
                     </td>
                   </ng-container>
@@ -415,15 +449,17 @@
                   <ng-container matColumnDef="expandedDetail">
                     <td mat-cell *matCellDef="let element" [attr.colspan]="displayedNounColumns.length">
                       <div class="element-detail"
-                           [@detailExpand]="element == nounExpandedElement ? 'expanded' : 'collapsed'">
+                        [@detailExpand]="element == nounExpandedElement ? 'expanded' : 'collapsed'">
                         <div class="element-detail-wrapper">
                           <mat-card class="mb-2">
-                            <mat-card-header class="element-detail-header" *ngIf="element.definition.source">
-                              <mat-card-subtitle class="element-detail-subtitle">{{ element.definition.source }}</mat-card-subtitle>
-                            </mat-card-header>
+                            @if (element.definition.source) {
+                              <mat-card-header class="element-detail-header">
+                                <mat-card-subtitle class="element-detail-subtitle">{{ element.definition.source }}</mat-card-subtitle>
+                              </mat-card-header>
+                            }
                             <mat-card-content>
                               <p [innerHTML]="element.definition.content | highlight : highlightTextForNounDefinition : ['bg-warning']"
-                                 class="element-detail-content"></p>
+                              class="element-detail-content"></p>
                             </mat-card-content>
                           </mat-card>
                         </div>
@@ -433,16 +469,16 @@
 
                   <tr mat-header-row *matHeaderRowDef="displayedNounColumns"></tr>
                   <tr mat-row *matRowDef="let element; columns: displayedNounColumns;" class="element-row"
-                      [class.expanded-row]="nounExpandedElement === element"
-                      (click)="nounExpandedElement = nounExpandedElement === element ? null : element; toggle(element, 'noun');"></tr>
+                    [class.expanded-row]="nounExpandedElement === element"
+                  (click)="nounExpandedElement = nounExpandedElement === element ? null : element; toggle(element, 'noun');"></tr>
                   <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"
-                      (click)="toggle(row, 'noun');"></tr>
+                  (click)="toggle(row, 'noun');"></tr>
                 </table>
 
                 <mat-paginator #nounPaginator
-                               [pageSizeOptions]="[10, 25, 50]"
-                               (page)="onPageChange($event, 'noun')"
-                               showFirstLastButtons></mat-paginator>
+                  [pageSizeOptions]="[10, 25, 50]"
+                  (page)="onPageChange($event, 'noun')"
+                showFirstLastButtons></mat-paginator>
               </div>
             </div>
           </mat-card-content>
@@ -452,15 +488,20 @@
   </div>
 </div>
 
-<div class="actions ml-auto" mat-dialog-actions>
+<div class="actions ms-auto" mat-dialog-actions>
   <button mat-raised-button color="warn" (click)="onNoClick()">
     Cancel
   </button>
-  <button mat-raised-button color="primary"
-          *ngIf="action === 'create'"
-          [disabled]="nounSelection.selected.length === 0 || verbSelection.selected.length === 0"
-          (click)="onClick()">
-    <span *ngIf="BODName === ''">Create</span>
-    <span *ngIf="BODName !== ''">Create '{{BODName}}'{{ (totalNumberOfBODs > 1) ? ' and ' + (totalNumberOfBODs - 1) + ' more' : ''}}</span>
-  </button>
+  @if (action === 'create') {
+    <button mat-raised-button color="primary"
+      [disabled]="nounSelection.selected.length === 0 || verbSelection.selected.length === 0"
+      (click)="onClick()">
+      @if (BODName === '') {
+        <span>Create</span>
+      }
+      @if (BODName !== '') {
+        <span>Create '{{BODName}}'{{ (totalNumberOfBODs > 1) ? ' and ' + (totalNumberOfBODs - 1) + ' more' : ''}}</span>
+      }
+    </button>
+  }
 </div>

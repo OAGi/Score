@@ -1,8 +1,10 @@
 <div class="context-section">
-  <div *ngIf="isUpdating" class="loading-container">
-    <mat-spinner [diameter]="40"></mat-spinner>
-  </div>
-  <div class="pl-2 pr-2">
+  @if (isUpdating) {
+    <div class="loading-container">
+      <mat-spinner [diameter]="40"></mat-spinner>
+    </div>
+  }
+  <div class="ps-2 pe-2">
     <mat-toolbar class="bg-white">
       <span class="title">{{ title }}</span>
       <span class="flex-11-auto"></span>
@@ -15,50 +17,60 @@
         <mat-form-field>
           <mat-label>Name</mat-label>
           <input matInput [(ngModel)]="moduleSetRelease.name" maxlength="100"
-                [disabled]="!roles.includes('developer')">
+            [disabled]="!roles.includes('developer')">
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Description</mat-label>
           <textarea [(ngModel)]="moduleSetRelease.description"
-                    [disabled]="!roles.includes('developer')"
-                    cols="30" data-id="moduleSetRelease.description" matInput
-                    rows="6"></textarea>
+            [disabled]="!roles.includes('developer')"
+            cols="30" data-id="moduleSetRelease.description" matInput
+          rows="6"></textarea>
         </mat-form-field>
 
-        <mat-form-field *ngIf="moduleSetRelease.moduleSet">
-          <mat-label>Module Set</mat-label>
-          <mat-select [(ngModel)]="moduleSetRelease.moduleSet.moduleSetId" [disabled]="true">
-            <mat-option>
-              <ngx-mat-select-search [formControl]="moduleSetListFilterCtrl"
-                                     [noEntriesFoundLabel]="'No matching release found.'"
-                                     [placeholderLabel]="'Search...'"></ngx-mat-select-search>
-            </mat-option>
-            <mat-option *ngFor="let moduleSet of filteredModuleSetList | async" [value]="moduleSet.moduleSetId">
-              {{ moduleSet.name }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+        @if (moduleSetRelease.moduleSet) {
+          <mat-form-field>
+            <mat-label>Module Set</mat-label>
+            <mat-select [(ngModel)]="moduleSetRelease.moduleSet.moduleSetId" [disabled]="true">
+              <mat-option>
+                <ngx-mat-select-search [formControl]="moduleSetListFilterCtrl"
+                  [noEntriesFoundLabel]="'No matching release found.'"
+                [placeholderLabel]="'Search...'"></ngx-mat-select-search>
+              </mat-option>
+              @for (moduleSet of filteredModuleSetList | async; track moduleSet) {
+                <mat-option [value]="moduleSet.moduleSetId">
+                  {{ moduleSet.name }}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        }
 
-        <mat-form-field *ngIf="moduleSetRelease.release">
-          <mat-label>Release</mat-label>
-          <mat-select [(ngModel)]="moduleSetRelease.release.releaseId" [disabled]="true">
-            <mat-option>
-              <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
-                                     [noEntriesFoundLabel]="'No matching release found.'"
-                                     [placeholderLabel]="'Search...'"></ngx-mat-select-search>
-            </mat-option>
-            <mat-option *ngFor="let release of filteredReleaseList | async" [value]="release.releaseId">
-              <div class="d-flex">
-                <span class="release-num">{{release.releaseNum}}</span>
-                <span *ngIf="!release.workingRelease"
-                      class="f12 ml-auto {{release.state}}">
+        @if (moduleSetRelease.release) {
+          <mat-form-field>
+            <mat-label>Release</mat-label>
+            <mat-select [(ngModel)]="moduleSetRelease.release.releaseId" [disabled]="true">
+              <mat-option>
+                <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
+                  [noEntriesFoundLabel]="'No matching release found.'"
+                [placeholderLabel]="'Search...'"></ngx-mat-select-search>
+              </mat-option>
+              @for (release of filteredReleaseList | async; track release) {
+                <mat-option [value]="release.releaseId">
+                  <div class="d-flex">
+                    <span class="release-num">{{release.releaseNum}}</span>
+                    @if (!release.workingRelease) {
+                      <span
+                        class="f12 ms-auto {{release.state}}">
                         {{ release.state | separate }}
                       </span>
-              </div>
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+                    }
+                  </div>
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        }
 
         <mat-checkbox [(ngModel)]="moduleSetRelease.isDefault" [disabled]="!roles.includes('developer')">Default</mat-checkbox>
       </mat-card-content>
@@ -67,15 +79,16 @@
 
   <div class="row action-group m-0">
     <div class="col-12 actions-wrap">
-      <button (click)="updateModuleSetRelease()"
-              *ngIf="roles.includes('developer')"
-              [disabled]="updateDisabled" color="primary"
-              mat-raised-button>
-        Update
-      </button>
+      @if (roles.includes('developer')) {
+        <button (click)="updateModuleSetRelease()"
+          [disabled]="updateDisabled" color="primary"
+          mat-raised-button>
+          Update
+        </button>
+      }
 
       <button [matMenuTriggerFor]="validateMenu"
-              color="accent" mat-raised-button>
+        color="accent" mat-raised-button>
         Validate
       </button>
       <mat-menu #validateMenu="matMenu">
@@ -84,7 +97,7 @@
       </mat-menu>
 
       <button [matMenuTriggerFor]="exportMenu"
-              color="primary" mat-raised-button>
+        color="primary" mat-raised-button>
         Export
       </button>
       <mat-menu #exportMenu="matMenu">
@@ -93,7 +106,7 @@
       </mat-menu>
 
       <button (click)="assignCCs()"
-              color="primary" mat-raised-button>
+        color="primary" mat-raised-button>
         {{ roles.includes('developer') ? 'Assign CCs' : 'View Assigned CCs' }}
       </button>
     </div>

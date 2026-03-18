@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {AboutService} from './domain/about.service';
 import {ProductInfo} from './domain/about';
 import {projectVersion} from '../../../environments/version';
@@ -10,10 +10,12 @@ import {projectVersion} from '../../../environments/version';
   styleUrls: ['./about.component.css']
 })
 export class AboutComponent implements OnInit {
+  private service = inject(AboutService);
+
 
   productInfos: ProductInfo[] = [];
 
-  constructor(private service: AboutService) {
+  constructor() {
     const webProductInfo = new ProductInfo();
     webProductInfo.productName = 'score-web';
     webProductInfo.productVersion = projectVersion;

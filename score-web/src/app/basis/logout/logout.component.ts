@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {AuthService} from '../../authentication/auth.service';
 
 @Component({
@@ -8,9 +8,8 @@ import {AuthService} from '../../authentication/auth.service';
   styleUrls: ['./logout.component.css']
 })
 export class LogoutComponent implements OnInit {
+  auth = inject(AuthService);
 
-  constructor(public auth: AuthService) {
-  }
 
   ngOnInit(): void {
     this.auth.logout();

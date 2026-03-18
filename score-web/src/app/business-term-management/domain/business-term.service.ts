@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {PageRequest, PageResponse} from '../../basis/basis';
@@ -17,9 +17,8 @@ import {map} from 'rxjs/operators';
 
 @Injectable()
 export class BusinessTermService {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-  }
 
   getBusinessTermList(request: BusinessTermListRequest, byAssignedBies: BieToAssign[]): Observable<PageResponse<BusinessTermListEntry>> {
     let params = new HttpParams();

@@ -1,34 +1,34 @@
 <div class="context-section">
-  <div class="pl-2 pr-2">
+  <div class="ps-2 pe-2">
     <mat-toolbar class="bg-white">
       <span class="title">{{ title }}</span>
       <span class="flex-11-auto"></span>
-      <button mat-raised-button class="ml-2" color="primary" (click)="update()"
+      <button mat-raised-button class="ms-2" color="primary" (click)="update()"
               *ngIf="biePackage.state === 'WIP' && (biePackage.access === 'CanEdit' || isAdmin)"
               [disabled]="!isChanged() || isDisabled(biePackage)">
         Update
       </button>
-      <button mat-raised-button class="ml-2" color="accent" (click)="updateState('QA')"
+      <button mat-raised-button class="ms-2" color="accent" (click)="updateState('QA')"
               *ngIf="biePackage.state === 'WIP' && (biePackage.access === 'CanEdit' || isAdmin)"
               [disabled]="loading || isChanged()">
         Move to QA
       </button>
-      <button mat-raised-button class="ml-2" color="warn" (click)="updateState('WIP')"
+      <button mat-raised-button class="ms-2" color="warn" (click)="updateState('WIP')"
               *ngIf="biePackage.state === 'QA' && (biePackage.access === 'CanMove' || isAdmin)"
               [disabled]="loading">
         Back to WIP
       </button>
-      <button mat-raised-button class="ml-2" color="accent" (click)="updateState('Production')"
+      <button mat-raised-button class="ms-2" color="accent" (click)="updateState('Production')"
               *ngIf="biePackage.state === 'QA' && (biePackage.access === 'CanMove' || isAdmin)"
               [disabled]="loading">
         Move to Production
       </button>
-      <button mat-raised-button class="ml-2" color="warn" (click)="makeNewRevision()"
+      <button mat-raised-button class="ms-2" color="warn" (click)="makeNewRevision()"
               *ngIf="biePackage.state === 'Production'"
               [disabled]="loading">
         Revise
       </button>
-      <button mat-raised-button class="ml-2" color="warn" (click)="discard()"
+      <button mat-raised-button class="ms-2" color="warn" (click)="discard()"
               *ngIf="biePackage.state === 'WIP' && (biePackage.access === 'CanEdit' || isAdmin)">
         Discard
       </button>
@@ -86,17 +86,17 @@
       <mat-toolbar class="bg-white p-0" style="box-shadow: none;">
         <span class="title">BIE List</span>
         <div style="padding: 8px 12px 8px 24px;">
-          <button mat-raised-button class="mr-2" (click)="openAddDialog($event)" color="primary"
+          <button mat-raised-button class="me-2" (click)="openAddDialog($event)" color="primary"
                   *ngIf="biePackage.state === 'WIP' && biePackage.access === 'CanEdit'">
             <mat-icon>add</mat-icon>
             Add
           </button>
-          <button mat-raised-button class="mr-2" (click)="openReplaceDialog($event, this.selection.selected[0])" color="accent"
+          <button mat-raised-button class="me-2" (click)="openReplaceDialog($event, this.selection.selected[0])" color="accent"
                   *ngIf="biePackage.state === 'WIP' && biePackage.access === 'CanEdit' && !!biePackage.prev && this.selection.selected.length === 1">
             <mat-icon>update</mat-icon>
             Replace
           </button>
-          <button mat-raised-button class="mr-2" (click)="removeBieInBiePackage()"
+          <button mat-raised-button class="me-2" (click)="removeBieInBiePackage()"
                   [hidden]="table.dataSource.data.length == 0"
                   [disabled]="this.selection.selected.length == 0"
                   *ngIf="biePackage.state === 'WIP' && biePackage.access === 'CanEdit'"
@@ -115,7 +115,7 @@
             <button mat-stroked-button>
               <div class="d-inline-flex align-items-center">
                 <span class="p-1 f12">Edit columns</span>
-                <mat-icon class="pl-1">menu</mat-icon>
+                <mat-icon class="ps-1">menu</mat-icon>
               </div>
             </button>
             -->
@@ -173,13 +173,13 @@
             <ng-container matColumnDef="den">
               <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="den"
                   score-table-column-resize [defaultWidth]="width('DEN')" (onResize)="onResizeWidth($event)"> DEN</th>
-              <td mat-cell *matCellDef="let element" [ngSwitch]="element.access">
+              <td mat-cell *matCellDef="let element">
                 <div class="den score-break-word">
                   <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}"
                      matTooltip="{{ element.den }}">
                     <div class="d-inline-flex align-items-center">
                       <span class="score-line-clamp-2 score-break-word">{{ element.den }}</span>
-                      <span *ngIf="element.displayName" class="bie-display-name ml-2">{{ element.displayName }}</span>
+                      <span *ngIf="element.displayName" class="bie-display-name ms-2">{{ element.displayName }}</span>
                     </div>
                   </a>
                 </div>
@@ -285,7 +285,7 @@
               <td mat-cell *matCellDef="let element">
                 <div class="score-line-clamp-2 score-break-word">
                   <div>{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-                  <div class="description"><span class="pr-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
+                  <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
                 </div>
               </td>
             </ng-container>
@@ -381,7 +381,7 @@
           -->
           <div class="option-body">
             <div class="actions">
-              <button mat-raised-button class="mr-2" color="primary" (click)="generate()"
+              <button mat-raised-button class="me-2" color="primary" (click)="generate()"
                       [hidden]="table.dataSource.data.length == 0">Generate
               </button>
             </div>

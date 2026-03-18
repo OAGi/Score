@@ -24,28 +24,36 @@
         <button mat-menu-item routerLink="bie_package" title="{{'BIE_NAV.PACKAGE' | translate}}">
           BIE Package
         </button>
-        <button *ngIf="!roles.includes('developer')" mat-menu-item routerLink="profile_bie/express/oas_doc" title="{{'BIE_NAV.OPENAPIDOC' | translate}}">
-          OpenAPI Document
-        </button>
+        @if (!roles.includes('developer')) {
+          <button mat-menu-item routerLink="profile_bie/express/oas_doc" title="{{'BIE_NAV.OPENAPIDOC' | translate}}">
+            OpenAPI Document
+          </button>
+        }
         <button mat-menu-item routerLink="profile_bie/report" title="{{'BIE_NAV.REPORT' | translate}}">
           Reuse Report
         </button>
         <mat-divider></mat-divider>
         <button mat-menu-item
-                [routerLink]="['/code_list']"
-                [queryParams]="{q: q([{key: 'cookieType', value: 'BIE'}]) }"
+          [routerLink]="['/code_list']"
+          [queryParams]="{q: q([{key: 'cookieType', value: 'BIE'}]) }"
           [disabled] ='showTermsAndCodeListButton()'>
           View/Edit Code List
         </button>
         <button mat-menu-item routerLink="code_list/uplift" [disabled]="roles.includes('developer') || showTermsAndCodeListButton()">Uplift Code List</button>
-        <mat-divider *ngIf="isBusinessTermEnabled && !roles.includes('developer')"></mat-divider>
-        <button *ngIf="isBusinessTermEnabled && !roles.includes('developer')" mat-menu-item
-          routerLink="business_term_management/business_term" title="{{'BIZTERM_NAV.VIEW' | translate}}"> View/Edit
+        @if (isBusinessTermEnabled && !roles.includes('developer')) {
+          <mat-divider></mat-divider>
+        }
+        @if (isBusinessTermEnabled && !roles.includes('developer')) {
+          <button mat-menu-item
+            routerLink="business_term_management/business_term" title="{{'BIZTERM_NAV.VIEW' | translate}}"> View/Edit
           Business Term</button>
+        }
       </ng-template>
     </mat-menu>
 
-    <button mat-button [matMenuTriggerFor]="contextMenu" *ngIf="showContextButton()">Context</button>
+    @if (showContextButton()) {
+      <button mat-button [matMenuTriggerFor]="contextMenu">Context</button>
+    }
     <mat-menu #contextMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>
         <button mat-menu-item routerLink="context_management/context_category">View/Edit Context Category</button>
@@ -54,8 +62,12 @@
       </ng-template>
     </mat-menu>
 
-    <button *ngIf="isBrowseStandardsMenuEnabled" mat-button routerLink="core_component" title="Browse Standard">Browse Standard</button>
-    <button *ngIf="!isBrowseStandardsMenuEnabled" mat-button [matMenuTriggerFor]="ccMenu" title="{{'CC_NAV.TITLE' | translate}}">Core Component</button>
+    @if (isBrowseStandardsMenuEnabled) {
+      <button mat-button routerLink="core_component" title="Browse Standard">Browse Standard</button>
+    }
+    @if (!isBrowseStandardsMenuEnabled) {
+      <button mat-button [matMenuTriggerFor]="ccMenu" title="{{'CC_NAV.TITLE' | translate}}">Core Component</button>
+    }
     <mat-menu #ccMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>
         <button mat-menu-item routerLink="core_component">View/Edit Core Component</button>
@@ -68,7 +80,9 @@
       </ng-template>
     </mat-menu>
 
-    <button *ngIf="!isTenantEnabled" mat-button [matMenuTriggerFor]="moduleMenu" title="Module">Module</button>
+    @if (!isTenantEnabled) {
+      <button mat-button [matMenuTriggerFor]="moduleMenu" title="Module">Module</button>
+    }
     <mat-menu #moduleMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>
         <button mat-menu-item routerLink="module_management/module_set">
@@ -80,7 +94,9 @@
       </ng-template>
     </mat-menu>
 
-    <button *ngIf="!isTenantEnabled" mat-button [matMenuTriggerFor]="libraryMenu" title="Library">Library</button>
+    @if (!isTenantEnabled) {
+      <button mat-button [matMenuTriggerFor]="libraryMenu" title="Library">Library</button>
+    }
     <mat-menu #libraryMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>
         <button mat-menu-item routerLink="library">
@@ -89,13 +105,17 @@
       </ng-template>
     </mat-menu>
 
-    <button mat-button [matMenuTriggerFor]="adminMenu" *ngIf="roles.includes('admin')">Admin</button>
+    @if (roles.includes('admin')) {
+      <button mat-button [matMenuTriggerFor]="adminMenu">Admin</button>
+    }
     <mat-menu #adminMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>
         <button mat-menu-item routerLink="account">Account</button>
         <button mat-menu-item routerLink="account/transfer_ownership">Transfer Ownership</button>
         <button mat-menu-item routerLink="account/pending">Pending SSO</button>
-        <button *ngIf="isTenantEnabled" mat-menu-item routerLink="tenant">Tenant</button>
+        @if (isTenantEnabled) {
+          <button mat-menu-item routerLink="tenant">Tenant</button>
+        }
       </ng-template>
     </mat-menu>
 
@@ -114,14 +134,14 @@
     <button mat-button>
       <div>
         <mat-icon class="notIcon"
-                  aria-hidden="false"
-                  (click)="navigateMessageListPage()"
-                  matBadge="{{ notiCount }}"
-                  matBadgeColor="primary"
-                  [matBadgeHidden]="notiCount <= 0"
-                  matTooltip="You have {{ (!!notiCount && notiCount > 0) ? notiCount : 'no' }} unread notification{{ (!!notiCount && notiCount == 1) ? '' : 's' }}"
-                  matTooltipPosition="below"
-                  matTooltipClass="notiTooltip">{{ notiMatIcon }}</mat-icon>
+          aria-hidden="false"
+          (click)="navigateMessageListPage()"
+          matBadge="{{ notiCount }}"
+          matBadgeColor="primary"
+          [matBadgeHidden]="notiCount <= 0"
+          matTooltip="You have {{ (!!notiCount && notiCount > 0) ? notiCount : 'no' }} unread notification{{ (!!notiCount && notiCount == 1) ? '' : 's' }}"
+          matTooltipPosition="below"
+        matTooltipClass="notiTooltip">{{ notiMatIcon }}</mat-icon>
       </div>
     </button>
 
@@ -131,17 +151,23 @@
         <button mat-menu-item class="disabled" disabled="disabled"><span class="word-break-all">Signed in as {{ username }}</span></button>
         <mat-divider></mat-divider>
         <button mat-menu-item (click)="languageCurrentOagis(translate)">
-          <mat-icon *ngIf="!getActiveCcts(translate)">done</mat-icon>
+          @if (!getActiveCcts(translate)) {
+            <mat-icon>done</mat-icon>
+          }
           <span>connectSpec Terminology </span>
         </button>
         <button mat-menu-item (click)="languageCurrentCcts(translate)">
-          <mat-icon *ngIf="getActiveCcts(translate)">done</mat-icon>
+          @if (getActiveCcts(translate)) {
+            <mat-icon>done</mat-icon>
+          }
           <span>CCTS Terminology </span>
         </button>
 
         <mat-divider></mat-divider>
 
-        <button mat-menu-item routerLink="settings/account" *ngIf="roles.length > 0">Settings</button>
+        @if (roles.length > 0) {
+          <button mat-menu-item routerLink="settings/account">Settings</button>
+        }
         <button mat-menu-item (click)="logout()">Logout</button>
       </ng-template>
     </mat-menu>

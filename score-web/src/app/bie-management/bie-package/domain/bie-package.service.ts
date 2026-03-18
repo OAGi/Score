@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {PageResponse} from '../../../basis/basis';
@@ -13,9 +13,8 @@ import {BieExpressOption} from '../../bie-express/domain/generate-expression';
 
 @Injectable()
 export class BiePackageService {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-  }
 
   getBiePackageList(request: BiePackageListRequest): Observable<PageResponse<BiePackageListEntry>> {
     let params = new HttpParams()

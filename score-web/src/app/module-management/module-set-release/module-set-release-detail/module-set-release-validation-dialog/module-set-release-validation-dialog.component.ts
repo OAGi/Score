@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {interval, mergeMap, Subject, takeUntil} from 'rxjs';
 import {ModuleService} from '../../../domain/module.service';
@@ -14,16 +14,17 @@ import {HttpErrorResponse} from '@angular/common/http';
   styleUrls: ['./module-set-release-validation-dialog.component.css']
 })
 export class ModuleSetReleaseValidationDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<ModuleSetReleaseValidationDialogComponent>>(MatDialogRef);
+  moduleService = inject(ModuleService);
+  clipboard = inject(Clipboard);
+  snackBar = inject(MatSnackBar);
+  data = inject(MAT_DIALOG_DATA);
+
 
   determinate: boolean;
   resp: ModuleSetReleaseValidateResponse;
 
-  constructor(
-    public dialogRef: MatDialogRef<ModuleSetReleaseValidationDialogComponent>,
-    public moduleService: ModuleService,
-    public clipboard: Clipboard,
-    public snackBar: MatSnackBar,
-    @Inject(MAT_DIALOG_DATA) public data: any) {
+  constructor() {
 
     this.determinate = false;
     this.resp = new ModuleSetReleaseValidateResponse();

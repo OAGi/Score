@@ -1,4 +1,4 @@
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -34,6 +34,18 @@ import {LibraryService} from '../../library-management/domain/library.service';
   styleUrls: ['./namespace-list.component.css']
 })
 export class NamespaceListComponent implements OnInit {
+  private service = inject(NamespaceService);
+  private libraryService = inject(LibraryService);
+  private accountService = inject(AccountListService);
+  private auth = inject(AuthService);
+  private snackBar = inject(MatSnackBar);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private dialog = inject(MatDialog);
+
 
   title = 'Namespace';
 
@@ -164,19 +176,6 @@ export class NamespaceListComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
-
-  constructor(private service: NamespaceService,
-              private libraryService: LibraryService,
-              private accountService: AccountListService,
-              private auth: AuthService,
-              private snackBar: MatSnackBar,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute,
-              private dialog: MatDialog) {
-  }
 
   ngOnInit() {
     this.request = new NamespaceListRequest(this.route.snapshot.queryParamMap,

@@ -1,4 +1,4 @@
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
@@ -31,6 +31,16 @@ import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
   styleUrls: ['./assign-business-term-bt.component.css']
 })
 export class AssignBusinessTermBtComponent implements OnInit {
+  private businessTermService = inject(BusinessTermService);
+  private accountService = inject(AccountListService);
+  private auth = inject(AuthService);
+  private location = inject(Location);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private snackBar = inject(MatSnackBar);
+
   title = 'Assign Business Term';
   subtitle = 'Select Business Term';
 
@@ -128,17 +138,6 @@ export class AssignBusinessTermBtComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
-
-  constructor(private businessTermService: BusinessTermService,
-              private accountService: AccountListService,
-              private auth: AuthService,
-              private location: Location,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService,
-              private router: Router,
-              private route: ActivatedRoute,
-              private snackBar: MatSnackBar) {
-  }
 
   ngOnInit() {
     this.request = new BusinessTermListRequest(this.route.snapshot.queryParamMap,

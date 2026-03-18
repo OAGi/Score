@@ -35,7 +35,9 @@ echo "Building docker image $image_name..."
 
 if command -v trivy >/dev/null 2>&1; then
   echo "Scanning vulnerabilities with Trivy (HIGH/CRITICAL, fixed only)..."
-  trivy image --format table --severity HIGH,CRITICAL --ignore-unfixed "$image_name"
+  # Skip the base-image gosu helper because we intentionally inherit it from mariadb
+  # and do not manage patching that upstream binary in this image build.
+  trivy image --format table --scanners vuln --skip-files /usr/local/bin/gosu --severity HIGH,CRITICAL --ignore-unfixed "$image_name"
 else
   echo "Info: trivy is not installed. Install Trivy to scan vulnerabilities for $image_name."
 fi

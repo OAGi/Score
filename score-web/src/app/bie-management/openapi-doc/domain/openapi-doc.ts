@@ -1,7 +1,7 @@
 import {PageRequest} from '../../../basis/basis';
 import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
-import {ReleaseSummary} from 'src/app/release-management/domain/release';
+import {ReleaseSummary} from '../../../release-management/domain/release';
 import {base64Decode, base64Encode, hashCode4Array} from '../../../common/utility';
 import {ScoreUser} from '../../../authentication/domain/auth';
 import {BusinessContext} from '../../../context-management/business-context/domain/business-context';

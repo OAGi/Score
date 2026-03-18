@@ -1,17 +1,17 @@
 <div class="context-section">
-  <div class="pl-2 pr-2">
+  <div class="ps-2 pe-2">
     <mat-toolbar class="bg-white d-flex flex-column align-items-start">
       <score-title-with-library-selector [title]="title"
-                                         [subtitle]="subtitle + ' owned by ' + this.username"
-                                         [libraries]="mappedLibraries"
-                                         (libraryChange)="onLibraryChange($event)"/>
+        [subtitle]="subtitle + ' owned by ' + this.username"
+        [libraries]="mappedLibraries"
+        (libraryChange)="onLibraryChange($event)"/>
     </mat-toolbar>
   </div>
 
   <mat-card class="pt-3">
     <score-search-bar placeholder="Search by DEN" [(model)]="request.filters.den"
-                      (modelChange)="onChange('filters.den', request.filters.den);"
-                      (searchTriggered)="onSearch();">
+      (modelChange)="onChange('filters.den', request.filters.den);"
+      (searchTriggered)="onSearch();">
       <div advancedSearchContent style="padding-left: 3rem;">
         <mat-card-content class="mat-card-container">
           <div class="container-fluid" style="padding: 0;">
@@ -20,7 +20,9 @@
                 <mat-form-field>
                   <mat-label>Type</mat-label>
                   <mat-select [(ngModel)]="request.types" multiple>
-                    <mat-option *ngFor="let type of typeList" [value]="type">{{ type }}</mat-option>
+                    @for (type of typeList; track type) {
+                      <mat-option [value]="type">{{ type }}</mat-option>
+                    }
                   </mat-select>
                 </mat-form-field>
               </div>
@@ -28,7 +30,9 @@
                 <mat-form-field>
                   <mat-label>State</mat-label>
                   <mat-select [(ngModel)]="request.states" multiple>
-                    <mat-option *ngFor="let state of states" [value]="state">{{ state }}</mat-option>
+                    @for (state of states; track state) {
+                      <mat-option [value]="state">{{ state }}</mat-option>
+                    }
                   </mat-select>
                 </mat-form-field>
               </div>
@@ -36,27 +40,27 @@
                 <mat-form-field>
                   <mat-label>Business Context</mat-label>
                   <input matInput [(ngModel)]="request.filters.businessContext"
-                         (ngModelChange)="onChange('filters.businessContext', request.filters.businessContext)"
-                         (keyup.enter)="this.onSearch();"
-                         placeholder="Business Context">
+                    (ngModelChange)="onChange('filters.businessContext', request.filters.businessContext)"
+                    (keyup.enter)="this.onSearch();"
+                    placeholder="Business Context">
                 </mat-form-field>
               </div>
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
                   <mat-label>Version</mat-label>
                   <input matInput [(ngModel)]="request.filters.version"
-                         (ngModelChange)="onChange('filters.version', request.filters.version)"
-                         (keyup.enter)="onSearch();"
-                         placeholder="Version">
+                    (ngModelChange)="onChange('filters.version', request.filters.version)"
+                    (keyup.enter)="onSearch();"
+                    placeholder="Version">
                 </mat-form-field>
               </div>
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
                   <mat-label>Remark</mat-label>
                   <input matInput [(ngModel)]="request.filters.remark"
-                         (ngModelChange)="onChange('filters.remark', request.filters.remark)"
-                         (keyup.enter)="onSearch();"
-                         placeholder="Remark">
+                    (ngModelChange)="onChange('filters.remark', request.filters.remark)"
+                    (keyup.enter)="onSearch();"
+                    placeholder="Remark">
                 </mat-form-field>
               </div>
             </div>
@@ -69,12 +73,14 @@
                     <mat-select [(ngModel)]="request.updaterLoginIdList" multiple>
                       <mat-option>
                         <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
-                                               [placeholderLabel]="'Search...'"
-                                               [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                          [placeholderLabel]="'Search...'"
+                        [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
                       </mat-option>
-                      <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
-                        {{ loginId }}
-                      </mat-option>
+                      @for (loginId of filteredUpdaterIdList | async; track loginId) {
+                        <mat-option [value]="loginId">
+                          {{ loginId }}
+                        </mat-option>
+                      }
                     </mat-select>
                   </mat-form-field>
                 </div>
@@ -82,7 +88,7 @@
                   <mat-form-field>
                     <mat-label>Updated start date</mat-label>
                     <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
-                           [(ngModel)]="request.updatedDate.start" [max]="request.updatedDate.end">
+                      [(ngModel)]="request.updatedDate.start" [max]="request.updatedDate.end">
                     <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
                     <mat-datepicker #dateStart></mat-datepicker>
                   </mat-form-field>
@@ -98,7 +104,7 @@
                   <mat-form-field>
                     <mat-label>Updated end date</mat-label>
                     <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
-                           [(ngModel)]="request.updatedDate.end" [min]="request.updatedDate.start">
+                      [(ngModel)]="request.updatedDate.end" [min]="request.updatedDate.start">
                     <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
                     <mat-datepicker #dateEnd></mat-datepicker>
                   </mat-form-field>
@@ -118,35 +124,37 @@
     </score-search-bar>
 
     <mat-card-content class="mat-card-container">
-      <div class="loading-container" *ngIf="loading">
-        <mat-spinner [diameter]="40"></mat-spinner>
-      </div>
+      @if (loading) {
+        <div class="loading-container">
+          <mat-spinner [diameter]="40"></mat-spinner>
+        </div>
+      }
 
       <div class="table-container">
         <div class="mat-elevation-z1 table-wrapper mt-3">
           <table mat-table multiTemplateDataRows
-                 matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
-                 [dataSource]="dataSource">
+            matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
+            [dataSource]="dataSource">
 
             <!-- Checkbox Column -->
             <ng-container matColumnDef="select">
               <th mat-header-cell *matHeaderCellDef>
                 <mat-checkbox (change)="$event ? masterToggle() : null"
-                              [checked]="selection.hasValue() && isAllSelected()"
-                              [indeterminate]="selection.hasValue() && !isAllSelected()">
+                  [checked]="selection.hasValue() && isAllSelected()"
+                  [indeterminate]="selection.hasValue() && !isAllSelected()">
                 </mat-checkbox>
               </th>
               <td mat-cell *matCellDef="let row">
                 <mat-checkbox (click)="$event.stopPropagation()"
-                              (change)="$event ? toggle(row) : null"
-                              [checked]="isSelected(row)">
+                  (change)="$event ? toggle(row) : null"
+                  [checked]="isSelected(row)">
                 </mat-checkbox>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="state">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('State')" (onResize)="onResizeWidth($event)"> State</th>
+              score-table-column-resize [defaultWidth]="width('State')" (onResize)="onResizeWidth($event)"> State</th>
               <td mat-cell *matCellDef="let element">
                 <span class="bie-state {{ element.state }}"
                       [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
@@ -156,7 +164,7 @@
 
             <ng-container matColumnDef="branch">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Branch')" (onResize)="onResizeWidth($event)"> Branch</th>
+              score-table-column-resize [defaultWidth]="width('Branch')" (onResize)="onResizeWidth($event)"> Branch</th>
               <td mat-cell *matCellDef="let element">
                 <span [matTooltip]="element.release.releaseNum">{{ element.release.releaseNum }}</span>
               </td>
@@ -164,23 +172,31 @@
 
             <ng-container matColumnDef="den">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('DEN')" (onResize)="onResizeWidth($event)"> DEN</th>
+              score-table-column-resize [defaultWidth]="width('DEN')" (onResize)="onResizeWidth($event)"> DEN</th>
               <td mat-cell *matCellDef="let element">
                 <div class="den score-break-word">
-                <span *ngIf='!isAdmin && element.access === "Prohibited"'
+                  @if (!isAdmin && element.access === "Prohibited") {
+                    <span
                       class="score-line-clamp-2 score-break-word"
-                      matTooltip="Only the owner can access BIE in this state.">{{ element.den + ((element.displayName) ? (' (' + element.displayName + ')') : '') }}</span>
-                  <span *ngIf='!isAdmin && element.access === "Unprepared"'
-                        class="score-line-clamp-2 score-break-word"
-                        matTooltip="This profile BIE is in progress.">{{ element.den }}</span>
-                  <a *ngIf="isAdmin || (element.access !== 'Prohibited' && element.access !== 'Unprepared')"
-                     href="/profile_bie/{{ element.topLevelAsbiepId }}"
-                     matTooltip="{{ element.den }}">
-                    <div class="d-inline-flex align-items-center">
-                      <span class="score-line-clamp-2 score-break-word">{{ element.den }}</span>
-                      <span *ngIf="element.displayName" class="bie-display-name ml-2">{{ element.displayName }}</span>
-                    </div>
-                  </a>
+                    matTooltip="Only the owner can access BIE in this state.">{{ element.den + ((element.displayName) ? (' (' + element.displayName + ')') : '') }}</span>
+                  }
+                  @if (!isAdmin && element.access === "Unprepared") {
+                    <span
+                      class="score-line-clamp-2 score-break-word"
+                    matTooltip="This profile BIE is in progress.">{{ element.den }}</span>
+                  }
+                  @if (isAdmin || (element.access !== 'Prohibited' && element.access !== 'Unprepared')) {
+                    <a
+                      href="/profile_bie/{{ element.topLevelAsbiepId }}"
+                      matTooltip="{{ element.den }}">
+                      <div class="d-inline-flex align-items-center">
+                        <span class="score-line-clamp-2 score-break-word">{{ element.den }}</span>
+                        @if (element.displayName) {
+                          <span class="bie-display-name ms-2">{{ element.displayName }}</span>
+                        }
+                      </div>
+                    </a>
+                  }
                 </div>
                 <div class="bie-guid">
                   <span>{{ element.guid }}</span>
@@ -190,7 +206,7 @@
 
             <ng-container matColumnDef="owner">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Owner')" (onResize)="onResizeWidth($event)"> Owner</th>
+              score-table-column-resize [defaultWidth]="width('Owner')" (onResize)="onResizeWidth($event)"> Owner</th>
               <td mat-cell *matCellDef="let element">
                 <span class="score-line-clamp-2 score-break-word" [matTooltip]="element.owner.username" [innerHTML]="element.owner.loginId"></span>
               </td>
@@ -198,24 +214,24 @@
 
             <ng-container matColumnDef="businessContexts">
               <th mat-header-cell *matHeaderCellDef
-                  score-table-column-resize [defaultWidth]="width('Business Contexts')" (onResize)="onResizeWidth($event)"> Business Contexts</th>
+              score-table-column-resize [defaultWidth]="width('Business Contexts')" (onResize)="onResizeWidth($event)"> Business Contexts</th>
               <td mat-cell *matCellDef="let element">
                 <div class="business-context-list score-line-clamp-2 score-break-word">
-                  <ng-container *ngFor="let businessContext of element.businessContextList; let i = index">
+                  @for (businessContext of element.businessContextList; track businessContext; let i = $index) {
                     <span class="businessContext">
                       <a target="_blank" rel="noopener noreferrer"
-                         routerLink="/context_management/business_context/{{ businessContext.businessContextId }}">
+                        routerLink="/context_management/business_context/{{ businessContext.businessContextId }}">
                         <span>{{ businessContext.name }}</span>
                       </a>
                     </span>
-                  </ng-container>
+                  }
                 </div>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="version">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Version')" (onResize)="onResizeWidth($event)"> Version</th>
+              score-table-column-resize [defaultWidth]="width('Version')" (onResize)="onResizeWidth($event)"> Version</th>
               <td mat-cell *matCellDef="let element">
                 <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.version" [innerHTML]="element.version"></div>
               </td>
@@ -223,7 +239,7 @@
 
             <ng-container matColumnDef="status">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Status')" (onResize)="onResizeWidth($event)"> Status</th>
+              score-table-column-resize [defaultWidth]="width('Status')" (onResize)="onResizeWidth($event)"> Status</th>
               <td mat-cell *matCellDef="let element">
                 <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.status" [innerHTML]="element.status"></div>
               </td>
@@ -231,7 +247,7 @@
 
             <ng-container matColumnDef="bizTerm">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Business Term')" (onResize)="onResizeWidth($event)"> Business Term</th>
+              score-table-column-resize [defaultWidth]="width('Business Term')" (onResize)="onResizeWidth($event)"> Business Term</th>
               <td mat-cell *matCellDef="let element">
                 <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.bizTerm" [innerHTML]="element.bizTerm"></div>
               </td>
@@ -239,7 +255,7 @@
 
             <ng-container matColumnDef="remark">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Remark')" (onResize)="onResizeWidth($event)"> Remark</th>
+              score-table-column-resize [defaultWidth]="width('Remark')" (onResize)="onResizeWidth($event)"> Remark</th>
               <td mat-cell *matCellDef="let element">
                 <div class="score-line-clamp-2 score-break-word" [innerHTML]="element.remark"></div>
               </td>
@@ -247,24 +263,24 @@
 
             <ng-container matColumnDef="lastUpdateTimestamp">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
+              score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
               <td mat-cell *matCellDef="let element">
                 <div class="score-line-clamp-2 score-break-word">
                   <div>{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-                  <div class="description"><span class="pr-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
+                  <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
                 </div>
               </td>
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let element; columns: displayedColumns;" class="element-row"
-                (click)="toggle(element)"></tr>
+            (click)="toggle(element)"></tr>
           </table>
 
           <mat-paginator
             [pageSizeOptions]="[10, 25, 50]"
             (page)="onPageChange($event)"
-            showFirstLastButtons></mat-paginator>
+          showFirstLastButtons></mat-paginator>
         </div>
       </div>
     </mat-card-content>
@@ -274,8 +290,8 @@
     <div class="col-12 actions-wrap">
       <div class="actions">
         <button mat-raised-button color="primary" (click)="next()"
-                [hidden]="dataSource.data.length == 0"
-                [disabled]="this.selection.selected.length == 0">
+          [hidden]="dataSource.data.length == 0"
+          [disabled]="this.selection.selected.length == 0">
           Next
         </button>
       </div>

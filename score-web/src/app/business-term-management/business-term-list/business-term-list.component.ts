@@ -1,4 +1,4 @@
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {BusinessTermListEntry, BusinessTermListRequest} from '../domain/business-term';
 import {BusinessTermService} from '../domain/business-term.service';
 import {MatDialog} from '@angular/material/dialog';
@@ -30,6 +30,17 @@ import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
   styleUrls: ['./business-term-list.component.css']
 })
 export class BusinessTermListComponent implements OnInit {
+  private service = inject(BusinessTermService);
+  private accountService = inject(AccountListService);
+  private auth = inject(AuthService);
+  private dialog = inject(MatDialog);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private snackBar = inject(MatSnackBar);
+
 
   title = 'Business Term';
 
@@ -149,18 +160,6 @@ export class BusinessTermListComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
-
-  constructor(private service: BusinessTermService,
-              private accountService: AccountListService,
-              private auth: AuthService,
-              private dialog: MatDialog,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute,
-              private snackBar: MatSnackBar) {
-  }
 
   ngOnInit() {
     this.request = new BusinessTermListRequest(this.route.snapshot.queryParamMap,

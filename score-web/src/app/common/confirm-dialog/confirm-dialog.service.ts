@@ -1,13 +1,12 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {MatDialog, MatDialogConfig, MatDialogRef} from '@angular/material/dialog';
 import {ConfirmDialogConfig} from './confirm-dialog.domain';
 import {ConfirmDialogComponent} from './confirm-dialog.component';
 
 @Injectable()
 export class ConfirmDialogService {
+  private dialog = inject(MatDialog);
 
-  constructor(private dialog: MatDialog) {
-  }
 
   newConfig(): MatDialogConfig {
     const dialogConfig = new MatDialogConfig();

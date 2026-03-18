@@ -1,4 +1,4 @@
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {BieCreateService} from './domain/bie-create.service';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
@@ -47,6 +47,21 @@ import {LibraryService} from '../../library-management/domain/library.service';
   ],
 })
 export class BieCreateAsccpComponent implements OnInit {
+  private bizCtxService = inject(BusinessContextService);
+  private releaseService = inject(ReleaseService);
+  private libraryService = inject(LibraryService);
+  private ccListService = inject(CcListService);
+  private accountService = inject(AccountListService);
+  private service = inject(BieCreateService);
+  private tagService = inject(TagService);
+  private auth = inject(AuthService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private snackBar = inject(MatSnackBar);
+  webPageInfo = inject(WebPageInfoService);
+
 
   title = 'Create BIE';
   subtitle = 'Select Top-Level Concept';
@@ -197,22 +212,6 @@ export class BieCreateAsccpComponent implements OnInit {
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
 
   HIDE_UNUSED_PROPERTY_KEY = 'BIE-Settings-Hide-Unused';
-
-  constructor(private bizCtxService: BusinessContextService,
-              private releaseService: ReleaseService,
-              private libraryService: LibraryService,
-              private ccListService: CcListService,
-              private accountService: AccountListService,
-              private service: BieCreateService,
-              private tagService: TagService,
-              private auth: AuthService,
-              private preferencesService: SettingsPreferencesService,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute,
-              private snackBar: MatSnackBar,
-              public webPageInfo: WebPageInfoService) {
-  }
 
   ngOnInit() {
     // Init ASCCP table

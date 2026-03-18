@@ -1,6 +1,6 @@
 import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
   AssignableMap,
   ReleaseDetails,
@@ -16,9 +16,8 @@ import {map} from 'rxjs/operators';
 
 @Injectable()
 export class ReleaseService {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-  }
 
   getReleaseSummaryList(libraryId: number, states?: string[]): Observable<ReleaseSummary[]> {
     let params = new HttpParams().set('libraryId', libraryId);

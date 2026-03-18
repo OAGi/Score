@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {CodelistListDialogComponent} from '../codelist-list-dialog/codelist-list-dialog.component';
@@ -34,6 +34,18 @@ import {CodeListService} from '../../../code-list-management/domain/code-list.se
   styleUrls: ['./context-scheme-create.component.css']
 })
 export class ContextSchemeCreateComponent implements OnInit {
+  private service = inject(ContextSchemeService);
+  private contextCategoryService = inject(ContextCategoryService);
+  private codeListService = inject(CodeListService);
+  private location = inject(Location);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
+  private auth = inject(AuthService);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+
 
   title = 'Create Context Scheme';
   ctxCategories: ContextCategorySummary[];
@@ -138,19 +150,6 @@ export class ContextSchemeCreateComponent implements OnInit {
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-
-  constructor(private service: ContextSchemeService,
-              private contextCategoryService: ContextCategoryService,
-              private codeListService: CodeListService,
-              private location: Location,
-              private route: ActivatedRoute,
-              private router: Router,
-              private snackBar: MatSnackBar,
-              private dialog: MatDialog,
-              private auth: AuthService,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService) {
-  }
 
   ngOnInit() {
     this.disabled = false;

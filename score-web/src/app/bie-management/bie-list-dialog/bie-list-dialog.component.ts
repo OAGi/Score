@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {faRecycle} from '@fortawesome/free-solid-svg-icons';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatTableDataSource} from '@angular/material/table';
@@ -18,6 +18,13 @@ import {forkJoin} from 'rxjs';
   styleUrls: ['./bie-list-dialog.component.css']
 })
 export class BieListDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<BieListDialogComponent>>(MatDialogRef);
+  private service = inject(BieReportService);
+  private auth = inject(AuthService);
+  webPageInfo = inject(WebPageInfoService);
+  private preferencesService = inject(SettingsPreferencesService);
+  data = inject(MAT_DIALOG_DATA);
+
 
   faRecycle = faRecycle;
 
@@ -163,14 +170,6 @@ export class BieListDialogComponent implements OnInit {
   dataSource = new MatTableDataSource<ReuseReport>();
   preferencesInfo: PreferencesInfo;
   loading = false;
-
-  constructor(public dialogRef: MatDialogRef<BieListDialogComponent>,
-              private service: BieReportService,
-              private auth: AuthService,
-              public webPageInfo: WebPageInfoService,
-              private preferencesService: SettingsPreferencesService,
-              @Inject(MAT_DIALOG_DATA) public data: any) {
-  }
 
   onNoClick(): void {
     this.dialogRef.close();

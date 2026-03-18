@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {PreferencesInfo, TableColumnsProperty} from './preferences';
@@ -7,6 +7,8 @@ import {loadBooleanProperty, loadProperty, saveBooleanProperty, saveProperty} fr
 
 @Injectable()
 export class SettingsPreferencesService {
+  private http = inject(HttpClient);
+
 
   TABLE_COLUMNS_FOR_CORE_COMPONENT_PAGE_KEY = 'TableColumns-CoreComponentPage';
   TABLE_COLUMNS_FOR_BROWSE_STANDARDS_PAGE_KEY = 'TableColumns-BrowseStandardsPage';
@@ -59,9 +61,6 @@ export class SettingsPreferencesService {
 
   PAGE_SETTINGS_BROWSER_VIEW_MODE_PROPERTY_KEY = 'PageSettings-BrowserViewMode';
   TREE_SETTINGS_PATH_DELIMITER_PROPERTY_KEY = 'TreeSettings-PathDelimiter';
-
-  constructor(private http: HttpClient) {
-  }
 
   loadColumnsInfo(preferencesInfo: PreferencesInfo, userToken: UserToken,
                   key: string, propertyName: string) {

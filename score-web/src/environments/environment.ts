@@ -7,7 +7,7 @@ export const environment = {
   loginPath: 'login',
   logoutPath: 'logout',
   statePath: 'state',
-  stompBrokerUrl: 'ws://[::1]:9000/ws'
+  stompBrokerUrl: 'ws://127.0.0.1:9000/ws'
 };
 
 /*

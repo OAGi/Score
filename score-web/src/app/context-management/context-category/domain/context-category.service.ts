@@ -1,4 +1,4 @@
-import {Injectable, OnInit} from '@angular/core';
+import { Injectable, OnInit, inject } from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ContextCategoryDetails, ContextCategoryListEntry, ContextCategoryListRequest, ContextCategorySummary} from './context-category';
@@ -8,9 +8,8 @@ import {map} from 'rxjs/operators';
 
 @Injectable()
 export class ContextCategoryService implements OnInit {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-  }
 
   ngOnInit() {
   }

@@ -1,5 +1,5 @@
 import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {FormControl} from '@angular/forms';
 import {faAngleDoubleLeft, faAngleDoubleRight, faSort} from '@fortawesome/free-solid-svg-icons';
 import {forkJoin, ReplaySubject} from 'rxjs';
@@ -30,6 +30,15 @@ import {WebPageInfoService} from '../../basis/basis.service';
   styleUrls: ['./release-assign.component.css']
 })
 export class ReleaseAssignComponent implements OnInit {
+  private service = inject(ReleaseService);
+  private accountService = inject(AccountListService);
+  private snackBar = inject(MatSnackBar);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private auth = inject(AuthService);
+  private confirmDialogService = inject(ConfirmDialogService);
+  webPageInfo = inject(WebPageInfoService);
+
 
   faAngleDoubleLeft = faAngleDoubleLeft;
   faAngleDoubleRight = faAngleDoubleRight;
@@ -54,16 +63,6 @@ export class ReleaseAssignComponent implements OnInit {
   };
 
   isValidated = false;
-
-  constructor(private service: ReleaseService,
-              private accountService: AccountListService,
-              private snackBar: MatSnackBar,
-              private route: ActivatedRoute,
-              private router: Router,
-              private auth: AuthService,
-              private confirmDialogService: ConfirmDialogService,
-              public webPageInfo: WebPageInfoService) {
-  }
 
   ngOnInit() {
     const userToken = this.auth.getUserToken();

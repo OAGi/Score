@@ -1,5 +1,5 @@
 import {Location} from '@angular/common';
-import {Component, HostListener, OnInit, ViewChild} from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild, inject } from '@angular/core';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -23,6 +23,15 @@ import {forkJoin} from 'rxjs';
   styleUrls: ['./module-set-edit.component.css']
 })
 export class ModuleSetEditComponent implements OnInit {
+  private service = inject(ModuleService);
+  private location = inject(Location);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
+  private auth = inject(AuthService);
+  private confirmDialogService = inject(ConfirmDialogService);
+
 
   title;
   isUpdating: boolean;
@@ -34,14 +43,7 @@ export class ModuleSetEditComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   private $hashCode: string;
 
-  constructor(private service: ModuleService,
-              private location: Location,
-              private route: ActivatedRoute,
-              private router: Router,
-              private snackBar: MatSnackBar,
-              private dialog: MatDialog,
-              private auth: AuthService,
-              private confirmDialogService: ConfirmDialogService) {
+  constructor() {
     this.title = (this.roles.includes('developer')) ? 'Edit Module Set' : 'View Module Set';
   }
 

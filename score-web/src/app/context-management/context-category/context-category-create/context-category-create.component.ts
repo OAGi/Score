@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ContextCategoryService} from '../domain/context-category.service';
@@ -12,16 +12,15 @@ import {MatSnackBar} from '@angular/material/snack-bar';
   styleUrls: ['./context-category-create.component.css']
 })
 export class ContextCategoryCreateComponent implements OnInit {
+  private service = inject(ContextCategoryService);
+  private location = inject(Location);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
+
 
   title = 'Create Context Category';
   contextCategory: ContextCategoryDetails;
-
-  constructor(private service: ContextCategoryService,
-              private location: Location,
-              private route: ActivatedRoute,
-              private router: Router,
-              private snackBar: MatSnackBar) {
-  }
 
   ngOnInit() {
     this.contextCategory = new ContextCategoryDetails();

@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {CcListEntry} from '../../cc-list/domain/cc-list';
@@ -7,10 +7,8 @@ import {ValidateRefactoringResponse} from './refactor-dialog';
 
 @Injectable()
 export class RefactorDialogService {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-
-  }
 
   baseAccList(manifestId: number): Observable<CcListEntry[]> {
     return this.http.get<CcListEntry[]>('/api/core-components/acc/' + manifestId + '/base-acc-list').pipe(

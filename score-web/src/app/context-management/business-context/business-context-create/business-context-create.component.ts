@@ -1,4 +1,4 @@
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {BusinessContextService} from '../domain/business-context.service';
@@ -29,6 +29,16 @@ import {forkJoin} from 'rxjs';
   styleUrls: ['./business-context-create.component.css']
 })
 export class BusinessContextCreateComponent implements OnInit {
+  private service = inject(BusinessContextService);
+  private location = inject(Location);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
+  private auth = inject(AuthService);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+
 
   title = 'Create Business Context';
   disabled: boolean;
@@ -129,17 +139,6 @@ export class BusinessContextCreateComponent implements OnInit {
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
-
-  constructor(private service: BusinessContextService,
-              private location: Location,
-              private route: ActivatedRoute,
-              private router: Router,
-              private snackBar: MatSnackBar,
-              private dialog: MatDialog,
-              private auth: AuthService,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService) {
-  }
 
   ngOnInit() {
     this.disabled = false;

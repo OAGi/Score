@@ -1,4 +1,4 @@
-import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, inject } from '@angular/core';
 import {AuthService} from '../../authentication/auth.service';
 import {SettingsApplicationSettingsService} from './domain/settings-application-settings.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -19,6 +19,14 @@ import {HttpErrorResponse} from '@angular/common/http';
   styleUrls: ['./settings-application-settings.component.css']
 })
 export class SettingsApplicationSettingsComponent implements OnInit, OnDestroy {
+  private auth = inject(AuthService);
+  private sanitizer = inject(DomSanitizer);
+  private settingsService = inject(SettingsApplicationSettingsService);
+  private mailService = inject(MailService);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private webPageInfoService = inject(WebPageInfoService);
+  private snackBar = inject(MatSnackBar);
+
 
   applicationSettingsInfo: ApplicationSettingsInfo;
   webPageInfo: WebPageInfo;
@@ -34,15 +42,6 @@ export class SettingsApplicationSettingsComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
   private readonly bieSchemaPreview$ = new Subject<FilenameExpressionPreviewRequest>();
   private readonly biePackageSchemaPreview$ = new Subject<FilenameExpressionPreviewRequest>();
-
-  constructor(private auth: AuthService,
-              private sanitizer: DomSanitizer,
-              private settingsService: SettingsApplicationSettingsService,
-              private mailService: MailService,
-              private confirmDialogService: ConfirmDialogService,
-              private webPageInfoService: WebPageInfoService,
-              private snackBar: MatSnackBar) {
-  }
 
   ngOnInit() {
     this.initializeFilenamePreviewStreams();

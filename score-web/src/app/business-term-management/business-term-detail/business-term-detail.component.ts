@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {BusinessTermService} from '../domain/business-term.service';
@@ -18,6 +18,14 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
   styleUrls: ['./business-term-detail.component.css']
 })
 export class BusinessTermDetailComponent implements OnInit {
+  private service = inject(BusinessTermService);
+  private location = inject(Location);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
+  private confirmDialogService = inject(ConfirmDialogService);
+
 
   title = 'Edit Business Term';
   businessTerm: BusinessTermDetails;
@@ -27,15 +35,6 @@ export class BusinessTermDetailComponent implements OnInit {
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-
-  constructor(private service: BusinessTermService,
-              private location: Location,
-              private route: ActivatedRoute,
-              private router: Router,
-              private snackBar: MatSnackBar,
-              private dialog: MatDialog,
-              private confirmDialogService: ConfirmDialogService) {
-  }
 
   ngOnInit() {
     this.businessTerm = new BusinessTermDetails();

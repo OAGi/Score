@@ -1,5 +1,5 @@
 <div class="context-section">
-  <div class="pl-2 pr-2">
+  <div class="ps-2 pe-2">
     <mat-toolbar class="bg-white">
       <span class="title">{{ title }}</span>
       <span class="flex-11-auto"></span>
@@ -10,111 +10,126 @@
     <div class="row">
       <div class="{{ isOAuth2User ? 'col-6' : 'col-12' }}">
         <mat-card class="mb-2">
-          <mat-card-content class="mat-card-container" *ngIf="account !== undefined">
-            <mat-form-field>
-              <mat-label>Login ID</mat-label>
-              <input matInput required data-id="user.loginId"
-                     [(ngModel)]="account.loginId" [disabled]="!isAdmin" maxlength="255"/>
-            </mat-form-field>
-
-            <div class="col-6 pb-3">
-              <div class="checkbox">
-                <mat-checkbox color="primary"
-                              data-id="user.developer"
-                              [disabled]="true"
-                              [(ngModel)]="account.developer">
-                  Standard Developer
-                </mat-checkbox>
+          @if (account !== undefined) {
+            <mat-card-content class="mat-card-container">
+              <mat-form-field>
+                <mat-label>Login ID</mat-label>
+                <input matInput required data-id="user.loginId"
+                  [(ngModel)]="account.loginId" [disabled]="!isAdmin" maxlength="255"/>
+              </mat-form-field>
+              <div class="col-6 pb-3">
+                <div class="checkbox">
+                  <mat-checkbox color="primary"
+                    data-id="user.developer"
+                    [disabled]="true"
+                    [(ngModel)]="account.developer">
+                    Standard Developer
+                  </mat-checkbox>
+                </div>
+                <div class="checkbox">
+                  <mat-checkbox color="primary"
+                    data-id="user.admin"
+                    [(ngModel)]="account.admin">
+                    Admin
+                  </mat-checkbox>
+                </div>
               </div>
-              <div class="checkbox">
-                <mat-checkbox color="primary"
-                              data-id="user.admin"
-                              [(ngModel)]="account.admin">
-                  Admin
-                </mat-checkbox>
-              </div>
-            </div>
-
-            <mat-form-field>
-              <mat-label>Name</mat-label>
-              <input matInput data-id="user.name"
-                     [(ngModel)]="account.username" maxlength="255"/>
-            </mat-form-field>
-
-            <mat-form-field>
-              <mat-label>Organization</mat-label>
-              <input matInput data-id="user.organization"
-                     [(ngModel)]="account.organization" maxlength="255"/>
-            </mat-form-field>
-          </mat-card-content>
+              <mat-form-field>
+                <mat-label>Name</mat-label>
+                <input matInput data-id="user.name"
+                  [(ngModel)]="account.username" maxlength="255"/>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Organization</mat-label>
+                <input matInput data-id="user.organization"
+                  [(ngModel)]="account.organization" maxlength="255"/>
+              </mat-form-field>
+            </mat-card-content>
+          }
         </mat-card>
 
-        <mat-card class="mb-2" *ngIf="account && (account.oAuth2UserId === 0 || !account.oAuth2UserId)">
-          <mat-card-content class="mat-card-container">
-            <mat-form-field>
-              <mat-label>New password</mat-label>
-              <input matInput type="password" data-id="user.newPassword" autocomplete="new-password"
-                     [(ngModel)]="newPassword" minlength="5" maxlength="100"/>
-              <mat-error *ngIf="hasMinLengthError(newPassword) && newPassword !== ''">
-                Password must be at least 5 characters.
-              </mat-error>
-            </mat-form-field>
-
-            <mat-form-field>
-              <mat-label>Confirm new password</mat-label>
-              <input matInput type="password" data-id="user.confirmPassword"
-                     [(ngModel)]="confirmPassword" minlength="5" maxlength="100"/>
-              <mat-error *ngIf="hasMinLengthError(confirmPassword) && confirmPassword !== ''">
-                Password must be at least 5 characters.
-              </mat-error>
-              <mat-error *ngIf="hasConfirmPasswordError()">
-                New password does not match the confirm password.
-              </mat-error>
-            </mat-form-field>
-          </mat-card-content>
-        </mat-card>
+        @if (account && (account.oAuth2UserId === 0 || !account.oAuth2UserId)) {
+          <mat-card class="mb-2">
+            <mat-card-content class="mat-card-container">
+              <mat-form-field>
+                <mat-label>New password</mat-label>
+                <input matInput type="password" data-id="user.newPassword" autocomplete="new-password"
+                  [(ngModel)]="newPassword" minlength="5" maxlength="100"/>
+                @if (hasMinLengthError(newPassword) && newPassword !== '') {
+                  <mat-error>
+                    Password must be at least 5 characters.
+                  </mat-error>
+                }
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Confirm new password</mat-label>
+                <input matInput type="password" data-id="user.confirmPassword"
+                  [(ngModel)]="confirmPassword" minlength="5" maxlength="100"/>
+                @if (hasMinLengthError(confirmPassword) && confirmPassword !== '') {
+                  <mat-error>
+                    Password must be at least 5 characters.
+                  </mat-error>
+                }
+                @if (hasConfirmPasswordError()) {
+                  <mat-error>
+                    New password does not match the confirm password.
+                  </mat-error>
+                }
+              </mat-form-field>
+            </mat-card-content>
+          </mat-card>
+        }
       </div>
-      <div class="col-6" *ngIf="isOAuth2User">
-        <mat-card class="mb-2">
-          <mat-card-content class="mat-card-container">
-            <mat-form-field *ngIf="!!account.providerName">
-              <mat-label>Provider</mat-label>
-              <input matInput data-id="account.providerName"
-                     [(ngModel)]="account.providerName" [disabled]="true" [readonly]="true" maxlength="255"/>
-            </mat-form-field>
-
-            <mat-form-field *ngIf="!!account.sub">
-              <mat-label>Sub</mat-label>
-              <input matInput data-id="account.sub"
-                     [(ngModel)]="account.sub" [disabled]="true" [readonly]="true" maxlength="255"/>
-            </mat-form-field>
-
-            <mat-form-field *ngIf="!!account.email">
-              <mat-label>Email</mat-label>
-              <input matInput data-id="account.email"
-                     [(ngModel)]="account.email" [disabled]="true" [readonly]="true" maxlength="255"/>
-            </mat-form-field>
-
-            <mat-form-field *ngIf="!!account.nickname">
-              <mat-label>Nickname</mat-label>
-              <input matInput data-id="account.nickname"
-                     [(ngModel)]="account.nickname" [disabled]="true" [readonly]="true" maxlength="255"/>
-            </mat-form-field>
-
-            <mat-form-field *ngIf="!!account.preferredUsername">
-              <mat-label>Preferred Username</mat-label>
-              <input matInput data-id="account.preferredUsername"
-                     [(ngModel)]="account.preferredUsername" [disabled]="true" [readonly]="true" maxlength="255"/>
-            </mat-form-field>
-
-            <mat-form-field *ngIf="!!account.phoneNumber">
-              <mat-label>Phone</mat-label>
-              <input matInput data-id="account.phoneNumber"
-                     [(ngModel)]="account.phoneNumber" [disabled]="true" [readonly]="true" maxlength="255"/>
-            </mat-form-field>
-          </mat-card-content>
-        </mat-card>
-      </div>
+      @if (isOAuth2User) {
+        <div class="col-6">
+          <mat-card class="mb-2">
+            <mat-card-content class="mat-card-container">
+              @if (!!account.providerName) {
+                <mat-form-field>
+                  <mat-label>Provider</mat-label>
+                  <input matInput data-id="account.providerName"
+                    [(ngModel)]="account.providerName" [disabled]="true" [readonly]="true" maxlength="255"/>
+                </mat-form-field>
+              }
+              @if (!!account.sub) {
+                <mat-form-field>
+                  <mat-label>Sub</mat-label>
+                  <input matInput data-id="account.sub"
+                    [(ngModel)]="account.sub" [disabled]="true" [readonly]="true" maxlength="255"/>
+                </mat-form-field>
+              }
+              @if (!!account.email) {
+                <mat-form-field>
+                  <mat-label>Email</mat-label>
+                  <input matInput data-id="account.email"
+                    [(ngModel)]="account.email" [disabled]="true" [readonly]="true" maxlength="255"/>
+                </mat-form-field>
+              }
+              @if (!!account.nickname) {
+                <mat-form-field>
+                  <mat-label>Nickname</mat-label>
+                  <input matInput data-id="account.nickname"
+                    [(ngModel)]="account.nickname" [disabled]="true" [readonly]="true" maxlength="255"/>
+                </mat-form-field>
+              }
+              @if (!!account.preferredUsername) {
+                <mat-form-field>
+                  <mat-label>Preferred Username</mat-label>
+                  <input matInput data-id="account.preferredUsername"
+                    [(ngModel)]="account.preferredUsername" [disabled]="true" [readonly]="true" maxlength="255"/>
+                </mat-form-field>
+              }
+              @if (!!account.phoneNumber) {
+                <mat-form-field>
+                  <mat-label>Phone</mat-label>
+                  <input matInput data-id="account.phoneNumber"
+                    [(ngModel)]="account.phoneNumber" [disabled]="true" [readonly]="true" maxlength="255"/>
+                </mat-form-field>
+              }
+            </mat-card-content>
+          </mat-card>
+        </div>
+      }
     </div>
   </div>
 
@@ -122,30 +137,39 @@
     <div class="{{ isOAuth2User ? 'col-6' : 'col-12' }} actions-wrap">
       <div class="actions">
         <button mat-raised-button color="primary" (click)="update()"
-                [disabled]="updateDisabled">
+          [disabled]="updateDisabled">
           Update
         </button>
-        <button mat-raised-button color="warn" *ngIf="!!account && account.enabled" (click)="setEnable(false)">
-          Disable this account
-        </button>
-        <button mat-raised-button color="accent" *ngIf="!!account && !account.enabled" (click)="setEnable(true)">
-          Enable this account
-        </button>
-        <button mat-raised-button style="color: #d1242f; font-weight: bold;"
-                *ngIf="!account.enabled && canRemove"
-                [matTooltip]="'The account can be removed if it has no data created or owned.'"
-                (click)="removeAccount()">
-          Remove this account
-        </button>
+        @if (!!account && account.enabled) {
+          <button mat-raised-button color="warn" (click)="setEnable(false)">
+            Disable this account
+          </button>
+        }
+        @if (!!account && !account.enabled) {
+          <button mat-raised-button color="accent" (click)="setEnable(true)">
+            Enable this account
+          </button>
+        }
+        @if (!account.enabled && canRemove) {
+          <button mat-raised-button style="color: #d1242f; font-weight: bold;"
+            [matTooltip]="'The account can be removed if it has no data created or owned.'"
+            (click)="removeAccount()">
+            Remove this account
+          </button>
+        }
       </div>
     </div>
-    <div class="col-6 actions-wrap" *ngIf="isOAuth2User">
-      <div class="actions">
-        <button mat-raised-button color="accent" *ngIf="!!account && (!!account.oAuth2UserId && account.oAuth2UserId > 0)"
-                (click)="disassociateSSO()">
-          Disassociate SSO
-        </button>
+    @if (isOAuth2User) {
+      <div class="col-6 actions-wrap">
+        <div class="actions">
+          @if (!!account && (!!account.oAuth2UserId && account.oAuth2UserId > 0)) {
+            <button mat-raised-button color="accent"
+              (click)="disassociateSSO()">
+              Disassociate SSO
+            </button>
+          }
+        </div>
       </div>
-    </div>
+    }
   </div>
 </div>

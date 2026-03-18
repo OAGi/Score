@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import { Component, HostListener, OnInit, inject } from '@angular/core';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {of} from 'rxjs';
@@ -15,20 +15,19 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
   styleUrls: ['./account-detail.component.css']
 })
 export class AccountDetailComponent implements OnInit {
+  private service = inject(AccountListService);
+  private auth = inject(AuthService);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private snackBar = inject(MatSnackBar);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
   title = 'Edit Account';
   accountId;
   account: AccountDetails;
   newPassword: string;
   confirmPassword: string;
   loading: boolean;
-
-  constructor(private service: AccountListService,
-              private auth: AuthService,
-              private confirmDialogService: ConfirmDialogService,
-              private snackBar: MatSnackBar,
-              private route: ActivatedRoute,
-              private router: Router) {
-  }
 
   ngOnInit() {
     this.route.paramMap.pipe(

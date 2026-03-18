@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {AccountListService} from '../domain/account-list.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -12,18 +12,17 @@ import {PendingAccount} from '../domain/pending-list';
   styleUrls: ['./account-create.component.css']
 })
 export class AccountCreateComponent implements OnInit {
+  private service = inject(AccountListService);
+  private snackBar = inject(MatSnackBar);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
   title = 'Create Account';
   newPassword: string;
   confirmPassword: string;
   account: AccountList;
   pending: PendingAccount;
   enable = false;
-
-  constructor(private service: AccountListService,
-              private snackBar: MatSnackBar,
-              private route: ActivatedRoute,
-              private router: Router) {
-  }
 
   ngOnInit() {
     this.pending = new PendingAccount(this.route.snapshot.queryParamMap);

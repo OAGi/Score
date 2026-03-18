@@ -1,13 +1,11 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 
 @Injectable()
 export class SettingsAccountService {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-
-  }
 
   updatePersonalInfo(personalInfo: any, parameters: any): Observable<any> {
     return this.http.put('/api/accounts/email', {

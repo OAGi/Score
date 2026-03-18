@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import { Component, HostListener, OnInit, inject } from '@angular/core';
 import {finalize, switchMap} from 'rxjs/operators';
 import {AuthService} from '../../authentication/auth.service';
 import {ReleaseService} from '../domain/release.service';
@@ -22,6 +22,16 @@ import {ReleaseWhatsChangedDialogComponent} from './release-whats-changed-dialog
   styleUrls: ['./release-detail.component.css']
 })
 export class ReleaseDetailComponent implements OnInit {
+  private service = inject(ReleaseService);
+  private accountService = inject(AccountListService);
+  private namespaceService = inject(NamespaceService);
+  private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private auth = inject(AuthService);
+  private confirmDialogService = inject(ConfirmDialogService);
+
 
   title = 'Releases Detail';
   $hashCode: string;
@@ -35,17 +45,6 @@ export class ReleaseDetailComponent implements OnInit {
 
   assignable: string[];
   assigned: string[];
-
-  constructor(private service: ReleaseService,
-              private accountService: AccountListService,
-              private namespaceService: NamespaceService,
-              private snackBar: MatSnackBar,
-              private dialog: MatDialog,
-              private route: ActivatedRoute,
-              private router: Router,
-              private auth: AuthService,
-              private confirmDialogService: ConfirmDialogService) {
-  }
 
   ngOnInit() {
     this.isLoading = true;

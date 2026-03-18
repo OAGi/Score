@@ -1,5 +1,5 @@
 <div class="context-section">
-  <div class="pl-2 pr-2">
+  <div class="ps-2 pe-2">
     <mat-toolbar class="bg-white">
       <span class="title">{{ title }}</span>
       <span class="flex-11-auto"></span>
@@ -8,66 +8,76 @@
 
   <div class="p-3">
     <mat-card>
-      <mat-card-content class="mat-card-container" *ngIf="pending !== undefined">
-        <mat-form-field *ngIf="!!pending.providerName">
-          <mat-label>Provider</mat-label>
-          <input matInput data-id="pending.providerName"
-                 [(ngModel)]="pending.providerName" [readonly]="true" maxlength="255"/>
-        </mat-form-field>
-
-        <mat-form-field *ngIf="!!pending.email">
-          <mat-label>Email</mat-label>
-          <input matInput data-id="pending.email"
-                 [(ngModel)]="pending.email" [readonly]="true" maxlength="255"/>
-        </mat-form-field>
-
-        <mat-form-field *ngIf="!!pending.name">
-          <mat-label>Name</mat-label>
-          <input matInput data-id="pending.name"
-                 [(ngModel)]="pending.name" [readonly]="true" maxlength="255"/>
-        </mat-form-field>
-
-        <mat-form-field *ngIf="!!pending.nickname">
-          <mat-label>Nickname</mat-label>
-          <input matInput data-id="pending.nickname"
-                 [(ngModel)]="pending.nickname" [readonly]="true" maxlength="255"/>
-        </mat-form-field>
-
-        <mat-form-field *ngIf="!!pending.preferredUsername">
-          <mat-label>Preferred Username</mat-label>
-          <input matInput data-id="pending.preferredUsername"
-                 [(ngModel)]="pending.preferredUsername" [readonly]="true" maxlength="255"/>
-        </mat-form-field>
-
-        <mat-form-field *ngIf="!!pending.phoneNumber">
-          <mat-label>Phone</mat-label>
-          <input matInput data-id="pending.phoneNumber"
-                 [(ngModel)]="pending.phoneNumber" [readonly]="true" maxlength="255"/>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Status</mat-label>
-          <input matInput [value]="status" [readonly]="true" maxlength="255"/>
-        </mat-form-field>
-      </mat-card-content>
+      @if (pending !== undefined) {
+        <mat-card-content class="mat-card-container">
+          @if (!!pending.providerName) {
+            <mat-form-field>
+              <mat-label>Provider</mat-label>
+              <input matInput data-id="pending.providerName"
+                [(ngModel)]="pending.providerName" [readonly]="true" maxlength="255"/>
+            </mat-form-field>
+          }
+          @if (!!pending.email) {
+            <mat-form-field>
+              <mat-label>Email</mat-label>
+              <input matInput data-id="pending.email"
+                [(ngModel)]="pending.email" [readonly]="true" maxlength="255"/>
+            </mat-form-field>
+          }
+          @if (!!pending.name) {
+            <mat-form-field>
+              <mat-label>Name</mat-label>
+              <input matInput data-id="pending.name"
+                [(ngModel)]="pending.name" [readonly]="true" maxlength="255"/>
+            </mat-form-field>
+          }
+          @if (!!pending.nickname) {
+            <mat-form-field>
+              <mat-label>Nickname</mat-label>
+              <input matInput data-id="pending.nickname"
+                [(ngModel)]="pending.nickname" [readonly]="true" maxlength="255"/>
+            </mat-form-field>
+          }
+          @if (!!pending.preferredUsername) {
+            <mat-form-field>
+              <mat-label>Preferred Username</mat-label>
+              <input matInput data-id="pending.preferredUsername"
+                [(ngModel)]="pending.preferredUsername" [readonly]="true" maxlength="255"/>
+            </mat-form-field>
+          }
+          @if (!!pending.phoneNumber) {
+            <mat-form-field>
+              <mat-label>Phone</mat-label>
+              <input matInput data-id="pending.phoneNumber"
+                [(ngModel)]="pending.phoneNumber" [readonly]="true" maxlength="255"/>
+            </mat-form-field>
+          }
+          <mat-form-field>
+            <mat-label>Status</mat-label>
+            <input matInput [value]="status" [readonly]="true" maxlength="255"/>
+          </mat-form-field>
+        </mat-card-content>
+      }
     </mat-card>
   </div>
 
-  <div class="row action-group m-0" *ngIf="this.status === 'Pending'">
-    <div class="col-12 actions-wrap">
-      <div class="actions">
-        <button mat-raised-button color="primary"
-                (click)="createNewAccount()" style="margin-right: 10px">
-          Create new account
-        </button>
-        <button mat-raised-button color="accent"
-                (click)="linkToAccount()" style="margin-right: 10px">
-          Link to existing account
-        </button>
-        <button mat-raised-button color="warn" (click)="reject()" style="margin-right: 10px">
-          Reject
-        </button>
+  @if (this.status === 'Pending') {
+    <div class="row action-group m-0">
+      <div class="col-12 actions-wrap">
+        <div class="actions">
+          <button mat-raised-button color="primary"
+            (click)="createNewAccount()" style="margin-right: 10px">
+            Create new account
+          </button>
+          <button mat-raised-button color="accent"
+            (click)="linkToAccount()" style="margin-right: 10px">
+            Link to existing account
+          </button>
+          <button mat-raised-button color="warn" (click)="reject()" style="margin-right: 10px">
+            Reject
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+  }
 </div>

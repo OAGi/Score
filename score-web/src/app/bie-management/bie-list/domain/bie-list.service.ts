@@ -1,5 +1,5 @@
 import {HttpClient, HttpContext, HttpParams} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {BieListEntry, BieListRequest, SummaryBieInfo} from './bie-list';
@@ -9,8 +9,8 @@ import {StateDependencyTarget} from '../../domain/state-dependency-target';
 
 @Injectable()
 export class BieListService {
-  constructor(private http: HttpClient) {
-  }
+  private http = inject(HttpClient);
+
 
   getSummaryBieList(libraryId: number, releaseId: number): Observable<SummaryBieInfo> {
     let params = new HttpParams()

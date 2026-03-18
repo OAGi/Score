@@ -1,5 +1,5 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {Observable} from 'rxjs';
 import {
   AgencyIdListCreateResponse,
@@ -16,9 +16,8 @@ import {NamespaceSummary} from '../../namespace-management/domain/namespace';
 
 @Injectable()
 export class AgencyIdListService {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-  }
 
   getAgencyIdListList(request: AgencyIdListForListRequest): Observable<PageResponse<AgencyIdListListEntry>> {
     let params = new HttpParams()

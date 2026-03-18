@@ -1,5 +1,5 @@
 import {HttpParams} from '@angular/common/http';
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
@@ -18,16 +18,15 @@ import {PendingListService} from '../domain/pending-list.service';
   styleUrls: ['./pending-detail.component.css']
 })
 export class PendingDetailComponent implements OnInit {
+  private service = inject(PendingListService);
+  private snackBar = inject(MatSnackBar);
+  private route = inject(ActivatedRoute);
+  private dialog = inject(MatDialog);
+  private router = inject(Router);
+
 
   title = 'Review Pending Account';
   pending: PendingAccount;
-
-  constructor(private service: PendingListService,
-              private snackBar: MatSnackBar,
-              private route: ActivatedRoute,
-              private dialog: MatDialog,
-              private router: Router) {
-  }
 
   ngOnInit() {
     this.route.paramMap.pipe(

@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {ContextSchemeValue} from '../domain/context-scheme';
 
@@ -9,15 +9,12 @@ import {ContextSchemeValue} from '../domain/context-scheme';
   styleUrls: ['./context-scheme-value-dialog.component.css']
 })
 export class ContextSchemeValueDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<ContextSchemeValueDialogComponent>>(MatDialogRef);
+  contextSchemeValue = inject<ContextSchemeValue>(MAT_DIALOG_DATA);
+
 
   isAddAction;
   actionName;
-
-  constructor(
-    public dialogRef: MatDialogRef<ContextSchemeValueDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public contextSchemeValue: ContextSchemeValue
-  ) {
-  }
 
   onNoClick(): void {
     this.dialogRef.close();

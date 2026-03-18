@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatTableDataSource} from '@angular/material/table';
@@ -30,6 +30,17 @@ import {IssuedCc} from './domain/refactor-dialog';
   ]
 })
 export class RefactorDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<ExtensionDetailComponent>>(MatDialogRef);
+  private service = inject(RefactorDialogService);
+  private accountService = inject(AccountListService);
+  private auth = inject(AuthService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  webPageInfo = inject(WebPageInfoService);
+  data = inject(MAT_DIALOG_DATA);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+
 
   // ACC Table
   get columns(): TableColumnsProperty[] {
@@ -268,18 +279,6 @@ export class RefactorDialogComponent implements OnInit {
   highlightTextForDefinition: string;
   action: string;
   title: string;
-
-  constructor(public dialogRef: MatDialogRef<ExtensionDetailComponent>,
-              private service: RefactorDialogService,
-              private accountService: AccountListService,
-              private auth: AuthService,
-              private router: Router,
-              private route: ActivatedRoute,
-              public webPageInfo: WebPageInfoService,
-              @Inject(MAT_DIALOG_DATA) public data: any,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService) {
-  }
 
   ngOnInit() {
     this.loading = true;

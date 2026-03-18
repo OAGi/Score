@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {LibraryDetails} from '../domain/library';
 import {FormControl, Validators} from '@angular/forms';
 import {LibraryService} from '../domain/library.service';
@@ -15,20 +15,19 @@ import {AuthService} from '../../authentication/auth.service';
   styleUrl: './library-create.component.css'
 })
 export class LibraryCreateComponent {
+  private service = inject(LibraryService);
+  private snackBar = inject(MatSnackBar);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private location = inject(Location);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private auth = inject(AuthService);
+
 
   title = 'Create Library';
   loading = false;
   library: LibraryDetails;
   uriForm = new FormControl('');
-
-  constructor(private service: LibraryService,
-              private snackBar: MatSnackBar,
-              private confirmDialogService: ConfirmDialogService,
-              private location: Location,
-              private route: ActivatedRoute,
-              private router: Router,
-              private auth: AuthService) {
-  }
 
   ngOnInit() {
     this.library = new LibraryDetails();

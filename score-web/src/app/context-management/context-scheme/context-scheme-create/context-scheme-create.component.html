@@ -1,5 +1,5 @@
 <div class="context-section">
-  <div class="pl-2 pr-2">
+  <div class="ps-2 pe-2">
     <mat-toolbar class="bg-white">
       <span class="title">{{ title }}</span>
       <span class="flex-11-auto"></span>
@@ -14,12 +14,14 @@
           <mat-select placeholder="Context Category" required [(ngModel)]="contextSchemeCreateRequest.contextCategoryId">
             <mat-option>
               <ngx-mat-select-search [formControl]="ctxCategoriesFilterCtrl"
-                                     [placeholderLabel]="'Search...'"
-                                     [noEntriesFoundLabel]="'No matching context category found.'"></ngx-mat-select-search>
+                [placeholderLabel]="'Search...'"
+              [noEntriesFoundLabel]="'No matching context category found.'"></ngx-mat-select-search>
             </mat-option>
-            <mat-option *ngFor="let contextCategory of filteredCtxCategories | async" [value]="contextCategory.contextCategoryId">
-              {{contextCategory.name}}
-            </mat-option>
+            @for (contextCategory of filteredCtxCategories | async; track contextCategory) {
+              <mat-option [value]="contextCategory.contextCategoryId">
+                {{contextCategory.name}}
+              </mat-option>
+            }
           </mat-select>
         </mat-form-field>
 
@@ -66,21 +68,23 @@
         <div class="table-container">
           <div class="score-column-container align-items-center justify-content-between">
             <score-column-selector
-                [columns]="columns"
-                (columnsChange)="onColumnsChange($event)"
-                (onReset)="onColumnsReset()">
+              [columns]="columns"
+              (columnsChange)="onColumnsChange($event)"
+              (onReset)="onColumnsReset()">
             </score-column-selector>
 
-            <div class="ml-3">
+            <div class="ms-3">
               <mat-form-field>
                 <mat-label>Search</mat-label>
                 <input matInput [(ngModel)]="valueSearch" (keyup.enter)="applyFilter(valueSearch)" maxlength="100"/>
                 <button mat-icon-button matSuffix (click)="applyFilter(valueSearch)">
                   <mat-icon>search</mat-icon>
                 </button>
-                <button mat-icon-button matSuffix *ngIf="valueSearch && valueSearch.length > 0" (click)="clearFilter()">
-                  <mat-icon>cancel</mat-icon>
-                </button>
+                @if (valueSearch && valueSearch.length > 0) {
+                  <button mat-icon-button matSuffix (click)="clearFilter()">
+                    <mat-icon>cancel</mat-icon>
+                  </button>
+                }
               </mat-form-field>
             </div>
           </div>
@@ -90,39 +94,39 @@
               <ng-container matColumnDef="select">
                 <th mat-header-cell *matHeaderCellDef>
                   <mat-checkbox (click)="$event.stopPropagation()"
-                                [checked]="selection.hasValue() && isAllSelected()"
-                                (change)="masterToggle()"
-                                [indeterminate]="selection.hasValue() && !isAllSelected()">
+                    [checked]="selection.hasValue() && isAllSelected()"
+                    (change)="masterToggle()"
+                    [indeterminate]="selection.hasValue() && !isAllSelected()">
                   </mat-checkbox>
                 </th>
                 <td mat-cell *matCellDef="let row">
                   <mat-checkbox (click)="$event.stopPropagation()"
-                                (change)="$event ? toggle(row) : null"
-                                [checked]="isSelected(row)">
+                    (change)="$event ? toggle(row) : null"
+                    [checked]="isSelected(row)">
                   </mat-checkbox>
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="value">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
-                    score-table-column-resize [defaultWidth]="width('Value')" (onResize)="onResizeWidth($event)"> Value</th>
+                score-table-column-resize [defaultWidth]="width('Value')" (onResize)="onResizeWidth($event)"> Value</th>
                 <td mat-cell *matCellDef="let element"> {{ element.value }}</td>
               </ng-container>
 
               <ng-container matColumnDef="meaning">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
-                    score-table-column-resize [defaultWidth]="width('Meaning')" (onResize)="onResizeWidth($event)"> Meaning</th>
+                score-table-column-resize [defaultWidth]="width('Meaning')" (onResize)="onResizeWidth($event)"> Meaning</th>
                 <td mat-cell *matCellDef="let element"> {{ element.meaning }}</td>
               </ng-container>
 
               <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
               <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-                  (click)="openDialog(row)"></tr>
+              (click)="openDialog(row)"></tr>
             </table>
 
             <mat-paginator
               [pageSizeOptions]="[10, 25, 50]"
-              showFirstLastButtons></mat-paginator>
+            showFirstLastButtons></mat-paginator>
           </div>
         </div>
       </mat-card-content>
@@ -131,10 +135,10 @@
           <mat-icon>add</mat-icon>
           Add
         </button>
-        <button mat-raised-button (click)="removeSchemeValues()" class="ml-2"
-                [hidden]="dataSource.data.length === 0"
-                [disabled]="this.selection.selected.length === 0"
-                color="warn">
+        <button mat-raised-button (click)="removeSchemeValues()" class="ms-2"
+          [hidden]="dataSource.data.length === 0"
+          [disabled]="this.selection.selected.length === 0"
+          color="warn">
           <mat-icon>delete</mat-icon>
           Remove
         </button>
@@ -146,7 +150,7 @@
     <div class="col-12 actions-wrap">
       <div class="actions">
         <button mat-raised-button color="primary" (click)="create()"
-                [disabled]="isDisabled()">
+          [disabled]="isDisabled()">
           Create
         </button>
       </div>

@@ -1,4 +1,4 @@
-import {Pipe, PipeTransform} from '@angular/core';
+import { Pipe, PipeTransform, inject } from '@angular/core';
 import * as CryptoJS from 'crypto-js';
 import {FormControl} from '@angular/forms';
 import {Observable, ReplaySubject} from 'rxjs';
@@ -281,7 +281,8 @@ export class UnboundedPipe implements PipeTransform {
 
 @Pipe({name: 'highlight', standalone: false})
 export class HighlightSearch implements PipeTransform {
-  constructor(private sanitizer: DomSanitizer) {}
+  private sanitizer = inject(DomSanitizer);
+
 
   transform(value: string, keyword: string, classes?: string[]): SafeHtml {
     if (!value) {

@@ -1,4 +1,4 @@
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, SortDirection} from '@angular/material/sort';
@@ -37,6 +37,19 @@ import {LibraryService} from '../../library-management/domain/library.service';
   styleUrls: ['./bie-express.component.css']
 })
 export class BieExpressComponent implements OnInit {
+  private service = inject(BieExpressService);
+  private bieListService = inject(BieListService);
+  private accountService = inject(AccountListService);
+  private releaseService = inject(ReleaseService);
+  private libraryService = inject(LibraryService);
+  private auth = inject(AuthService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private dialog = inject(MatDialog);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  webPageInfo = inject(WebPageInfoService);
+
 
   title = 'Express BIE';
   subtitle = 'Selected Top-Level ASBIEPs';
@@ -200,20 +213,6 @@ export class BieExpressComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
-
-  constructor(private service: BieExpressService,
-              private bieListService: BieListService,
-              private accountService: AccountListService,
-              private releaseService: ReleaseService,
-              private libraryService: LibraryService,
-              private auth: AuthService,
-              private preferencesService: SettingsPreferencesService,
-              private dialog: MatDialog,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute,
-              public webPageInfo: WebPageInfoService) {
-  }
 
   ngOnInit() {
     this.option = new BieExpressOption();

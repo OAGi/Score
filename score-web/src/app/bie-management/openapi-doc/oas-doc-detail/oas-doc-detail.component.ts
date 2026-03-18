@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {
   BieForOasDoc,
   BieForOasDocDeleteRequest,
@@ -42,6 +42,19 @@ import {SettingsPreferencesService} from '../../../settings-management/settings-
   styleUrls: ['./oas-doc-detail.component.css']
 })
 export class OasDocDetailComponent implements OnInit {
+  private bizCtxService = inject(BusinessContextService);
+  private openAPIService = inject(OpenAPIService);
+  private accountService = inject(AccountListService);
+  private auth = inject(AuthService);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private snackBar = inject(MatSnackBar);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private dialog = inject(MatDialog);
+  webPageInfo = inject(WebPageInfoService);
+
 
   title = 'Edit OpenAPI Document';
   oasDocs: SimpleOasDoc[];
@@ -214,20 +227,6 @@ export class OasDocDetailComponent implements OnInit {
   @ViewChild(MatMultiSort, {static: true}) sort: MatMultiSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
-
-  constructor(private bizCtxService: BusinessContextService,
-              private openAPIService: OpenAPIService,
-              private accountService: AccountListService,
-              private auth: AuthService,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute,
-              private snackBar: MatSnackBar,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService,
-              private dialog: MatDialog,
-              public webPageInfo: WebPageInfoService) {
-  }
 
   ngOnInit(): void {
     this.table = new TableData<BieForOasDoc>(this.defaultDisplayedColumns, {});

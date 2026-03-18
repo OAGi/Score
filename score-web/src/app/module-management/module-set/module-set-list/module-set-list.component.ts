@@ -1,6 +1,6 @@
 import {SelectionModel} from '@angular/cdk/collections';
 import {Location} from '@angular/common';
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {FormControl} from '@angular/forms';
 import {MatDatepicker} from '@angular/material/datepicker';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
@@ -36,6 +36,17 @@ import {LibraryService} from '../../../library-management/domain/library.service
   styleUrls: ['./module-set-list.component.css']
 })
 export class ModuleSetListComponent implements OnInit {
+  private service = inject(ModuleService);
+  private accountService = inject(AccountListService);
+  private libraryService = inject(LibraryService);
+  private auth = inject(AuthService);
+  private snackBar = inject(MatSnackBar);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
 
   title = 'Module Set';
 
@@ -154,18 +165,6 @@ export class ModuleSetListComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
-
-  constructor(private service: ModuleService,
-              private accountService: AccountListService,
-              private libraryService: LibraryService,
-              private auth: AuthService,
-              private snackBar: MatSnackBar,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute) {
-  }
 
   ngOnInit() {
     this.request = new ModuleSetListRequest(this.route.snapshot.queryParamMap,

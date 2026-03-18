@@ -1,4 +1,4 @@
-import {Component, Inject, ViewChild} from '@angular/core';
+import { Component, ViewChild, inject } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatTable} from '@angular/material/table';
 import {Observable} from 'rxjs';
@@ -22,16 +22,17 @@ export interface BieStateDependencyDialogData {
   styleUrls: ['./bie-state-dependency-dialog.component.css']
 })
 export class BieStateDependencyDialogComponent {
+  dialogRef = inject<MatDialogRef<BieStateDependencyDialogComponent>>(MatDialogRef);
+  webPageInfo = inject(WebPageInfoService);
+  data = inject<BieStateDependencyDialogData>(MAT_DIALOG_DATA);
+
 
   displayedColumns: string[] = ['select', 'displayName', 'dependencies', 'businessContexts', 'version', 'status', 'remark', 'state'];
   isValidating = false;
   private validationRequestId = 0;
   @ViewChild(MatTable) table?: MatTable<StateDependencyTarget>;
 
-  constructor(
-    public dialogRef: MatDialogRef<BieStateDependencyDialogComponent>,
-    public webPageInfo: WebPageInfoService,
-    @Inject(MAT_DIALOG_DATA) public data: BieStateDependencyDialogData) {
+  constructor() {
     this.applyTargets(this.data.targets || []);
   }
 

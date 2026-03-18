@@ -1,5 +1,5 @@
 import {Location} from '@angular/common';
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -23,6 +23,17 @@ import {LibraryService} from '../../../library-management/domain/library.service
   styleUrls: ['./module-set-create.component.css']
 })
 export class ModuleSetCreateComponent implements OnInit {
+  private service = inject(ModuleService);
+  private location = inject(Location);
+  private releaseService = inject(ReleaseService);
+  private libraryService = inject(LibraryService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
+  private auth = inject(AuthService);
+  private confirmDialogService = inject(ConfirmDialogService);
+
 
   title = 'Create Module Set';
   isUpdating: boolean;
@@ -39,18 +50,6 @@ export class ModuleSetCreateComponent implements OnInit {
   filteredReleaseList: ReplaySubject<ReleaseSummary[]> = new ReplaySubject<ReleaseSummary[]>(1);
 
   private $hashCode: string;
-
-  constructor(private service: ModuleService,
-              private location: Location,
-              private releaseService: ReleaseService,
-              private libraryService: LibraryService,
-              private route: ActivatedRoute,
-              private router: Router,
-              private snackBar: MatSnackBar,
-              private dialog: MatDialog,
-              private auth: AuthService,
-              private confirmDialogService: ConfirmDialogService) {
-  }
 
   get canCreate(): boolean {
     if (!this.moduleSet) {

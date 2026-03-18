@@ -1,5 +1,5 @@
 <div class="context-section">
-  <div class="pl-2 pr-2">
+  <div class="ps-2 pe-2">
     <mat-toolbar class="bg-white">
       <span class="title">{{ title }}</span>
       <span class="flex-11-auto"></span>
@@ -8,8 +8,8 @@
 
   <mat-card class="pt-3">
     <score-search-bar placeholder="Search by Preferred Username" [(model)]="request.filters.preferredUsername"
-                      (modelChange)="onChange('filters.preferredUsername', request.filters.preferredUsername);"
-                      (searchTriggered)="onSearch();">
+      (modelChange)="onChange('filters.preferredUsername', request.filters.preferredUsername);"
+      (searchTriggered)="onSearch();">
       <div advancedSearchContent style="padding-left: 3rem;">
         <mat-card-content class="mat-card-container">
           <div class="container-fluid" style="padding: 0;">
@@ -17,17 +17,17 @@
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
                   <input matInput [(ngModel)]="request.filters.email"
-                         (ngModelChange)="onChange('filters.email', request.filters.email)"
-                         (keyup.enter)="onSearch();"
-                         placeholder="Email">
+                    (ngModelChange)="onChange('filters.email', request.filters.email)"
+                    (keyup.enter)="onSearch();"
+                    placeholder="Email">
                 </mat-form-field>
               </div>
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
                   <input matInput [(ngModel)]="request.filters.providerName"
-                         (ngModelChange)="onChange('filters.providerName', request.filters.providerName)"
-                         (keyup.enter)="onSearch();"
-                         placeholder="Provider">
+                    (ngModelChange)="onChange('filters.providerName', request.filters.providerName)"
+                    (keyup.enter)="onSearch();"
+                    placeholder="Provider">
                 </mat-form-field>
               </div>
 
@@ -35,7 +35,7 @@
                 <mat-form-field>
                   <mat-label>Created start date</mat-label>
                   <input matInput [matDatepicker]="dateStart" placeholder="Created start date"
-                         [(ngModel)]="request.createdDate.start" [max]="request.createdDate.end">
+                    [(ngModel)]="request.createdDate.start" [max]="request.createdDate.end">
                   <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
                   <mat-datepicker #dateStart></mat-datepicker>
                 </mat-form-field>
@@ -52,7 +52,7 @@
                 <mat-form-field>
                   <mat-label>Created end date</mat-label>
                   <input matInput [matDatepicker]="dateEnd" placeholder="Created end date"
-                         [(ngModel)]="request.createdDate.end" [min]="request.createdDate.start">
+                    [(ngModel)]="request.createdDate.end" [min]="request.createdDate.start">
                   <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
                   <mat-datepicker #dateEnd></mat-datepicker>
                 </mat-form-field>
@@ -71,9 +71,11 @@
     </score-search-bar>
 
     <mat-card-content class="mat-card-container">
-      <div class="loading-container" *ngIf="loading">
-        <mat-spinner [diameter]="40"></mat-spinner>
-      </div>
+      @if (loading) {
+        <div class="loading-container">
+          <mat-spinner [diameter]="40"></mat-spinner>
+        </div>
+      }
 
       <div class="table-container">
         <div class="score-column-container align-items-center">
@@ -85,12 +87,12 @@
         </div>
         <div class="mat-elevation-z1 table-wrapper mt-3">
           <table mat-table
-                 matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
-                 [dataSource]="dataSource">
+            matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
+            [dataSource]="dataSource">
 
             <ng-container matColumnDef="preferredUsername">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Preferred Username')" (onResize)="onResizeWidth($event)"> Preferred Username</th>
+              score-table-column-resize [defaultWidth]="width('Preferred Username')" (onResize)="onResizeWidth($event)"> Preferred Username</th>
               <td mat-cell *matCellDef="let element">
                 <a routerLink="/account/pending/{{ element.appOauth2UserId }}">
                   <span class="score-line-clamp-2 score-break-word">{{ element.preferredUsername }}</span>
@@ -100,7 +102,7 @@
 
             <ng-container matColumnDef="email">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Email')" (onResize)="onResizeWidth($event)"> Email</th>
+              score-table-column-resize [defaultWidth]="width('Email')" (onResize)="onResizeWidth($event)"> Email</th>
               <td mat-cell *matCellDef="let element">
                 <a routerLink="/account/pending/{{ element.appOauth2UserId }}">
                   <span class="score-line-clamp-2 score-break-word">{{ element.email }}</span>
@@ -110,7 +112,7 @@
 
             <ng-container matColumnDef="providerName">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Provider')" (onResize)="onResizeWidth($event)"> Provider</th>
+              score-table-column-resize [defaultWidth]="width('Provider')" (onResize)="onResizeWidth($event)"> Provider</th>
               <td mat-cell *matCellDef="let element">
                 <span class="score-line-clamp-2 score-break-word">{{ element.providerName }}</span>
               </td>
@@ -118,7 +120,7 @@
 
             <ng-container matColumnDef="creationTimestamp">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Created On')" (onResize)="onResizeWidth($event)"> Created</th>
+              score-table-column-resize [defaultWidth]="width('Created On')" (onResize)="onResizeWidth($event)"> Created</th>
               <td mat-cell *matCellDef="let element">
                 <span class="score-line-clamp-2 score-break-word">{{ element.creationTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</span>
               </td>
@@ -131,7 +133,7 @@
           <mat-paginator
             [pageSizeOptions]="[10, 25, 50]"
             (page)="onPageChange($event)"
-            showFirstLastButtons></mat-paginator>
+          showFirstLastButtons></mat-paginator>
         </div>
       </div>
     </mat-card-content>

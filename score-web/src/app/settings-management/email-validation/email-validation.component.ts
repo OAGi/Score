@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {SettingsApplicationSettingsService} from '../settings-application-settings/domain/settings-application-settings.service';
@@ -10,15 +10,13 @@ import {SettingsApplicationSettingsService} from '../settings-application-settin
   styleUrls: ['email-validation.component.css']
 })
 export class EmailValidationComponent implements OnInit {
+  private service = inject(SettingsApplicationSettingsService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private snackBar = inject(MatSnackBar);
+
 
   loading: boolean;
-
-  constructor(private service: SettingsApplicationSettingsService,
-              private router: Router,
-              private route: ActivatedRoute,
-              private snackBar: MatSnackBar) {
-
-  }
 
   ngOnInit(): void {
     this.loading = true;

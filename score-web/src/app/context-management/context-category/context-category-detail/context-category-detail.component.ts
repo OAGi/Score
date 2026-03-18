@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import { Component, HostListener, OnInit, inject } from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {switchMap} from 'rxjs/operators';
@@ -17,20 +17,19 @@ import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialo
   styleUrls: ['./context-category-detail.component.css']
 })
 export class ContextCategoryDetailComponent implements OnInit {
+  private service = inject(ContextCategoryService);
+  private location = inject(Location);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
+  private confirmDialogService = inject(ConfirmDialogService);
+
 
   title = 'Edit Context Category';
   contextCategory: ContextCategoryDetails;
   hashCode;
   contextSchemes: ContextScheme[];
-
-  constructor(private service: ContextCategoryService,
-              private location: Location,
-              private route: ActivatedRoute,
-              private router: Router,
-              private snackBar: MatSnackBar,
-              private dialog: MatDialog,
-              private confirmDialogService: ConfirmDialogService) {
-  }
 
   ngOnInit() {
     this.contextCategory = new ContextCategoryDetails();

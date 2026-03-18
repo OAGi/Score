@@ -1,12 +1,14 @@
 <div class="context-section">
-  <div class="loading-container" *ngIf="loading">
-    <mat-spinner [diameter]="40"></mat-spinner>
-  </div>
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner [diameter]="40"></mat-spinner>
+    </div>
+  }
 
   <div class="row p-3">
     <div class="col-3">
       <button mat-raised-button color="primary" (click)="backToMessages()">
-        <span class="pr-2">&larr;</span>
+        <span class="pe-2">&larr;</span>
         <span>Back to messages</span>
       </button>
     </div>

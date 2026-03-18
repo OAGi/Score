@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit, ViewChild} from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {FindUsagesDialogService} from './domain/find-usages-dialog.service';
 import {AsccpFlatNode, BccpFlatNode, CcFlatNode, CcFlatNodeDatabase, CcFlatNodeDataSource, DtFlatNode} from '../domain/cc-flat-tree';
@@ -94,6 +94,13 @@ class FindUsagesCcFlatNodeDatabase<T extends CcFlatNode> extends CcFlatNodeDatab
   styleUrls: ['./find-usages-dialog.component.css']
 })
 export class FindUsagesDialogComponent implements OnInit {
+  private dialogRef = inject<MatDialogRef<FindUsagesDialogComponent>>(MatDialogRef);
+  private service = inject(FindUsagesDialogService);
+  private ccNodeService = inject(CcNodeService);
+  private auth = inject(AuthService);
+  private preferencesService = inject(SettingsPreferencesService);
+  data = inject(MAT_DIALOG_DATA);
+
 
   title: string;
   _innerHeight: number = window.innerHeight;
@@ -126,14 +133,6 @@ export class FindUsagesDialogComponent implements OnInit {
     }
 
     return this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode;
-  }
-
-  constructor(private dialogRef: MatDialogRef<FindUsagesDialogComponent>,
-              private service: FindUsagesDialogService,
-              private ccNodeService: CcNodeService,
-              private auth: AuthService,
-              private preferencesService: SettingsPreferencesService,
-              @Inject(MAT_DIALOG_DATA) public data: any) {
   }
 
   ngOnInit(): void {

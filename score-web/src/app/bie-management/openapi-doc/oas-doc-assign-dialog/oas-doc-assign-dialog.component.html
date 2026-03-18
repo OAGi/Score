@@ -3,7 +3,7 @@
     <score-title-with-library-selector [title]="title"
                                        [libraries]="mappedLibraries"
                                        (libraryChange)="onLibraryChange($event)"/>
-    <div class="close pr-2">
+    <div class="close pe-2">
       <button mat-icon-button mat-small-icon-button (click)="onNoClick()">
         <mat-icon>close</mat-icon>
       </button>
@@ -202,13 +202,13 @@
               <ng-container matColumnDef="den">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
                     score-table-column-resize [defaultWidth]="width('DEN')" (onResize)="onResizeWidth($event)"> DEN</th>
-                <td mat-cell *matCellDef="let element" [ngSwitch]="element.access">
+                <td mat-cell *matCellDef="let element">
                   <div class="den score-break-word">
                     <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}"
                        matTooltip="{{ element.den }}">
                       <div class="d-inline-flex align-items-center">
                         <span class="score-line-clamp-2 score-break-word">{{ element.den }}</span>
-                        <span *ngIf="element.displayName" class="bie-display-name ml-2">{{ element.displayName }}</span>
+                        <span *ngIf="element.displayName" class="bie-display-name ms-2">{{ element.displayName }}</span>
                       </div>
                     </a>
                   </div>
@@ -329,15 +329,15 @@
       </mat-card-content>
     </mat-card>
   </div>
-  <div class="actions ml-auto" mat-dialog-actions>
-    <button mat-raised-button class="mr-2" (click)="addBieForOasDoc()" color="primary"
+  <div class="actions ms-auto" mat-dialog-actions>
+    <button mat-raised-button class="me-2" (click)="addBieForOasDoc()" color="primary"
             [disabled]="selection.isEmpty() || isOptionMissing()">
       <mat-icon>add</mat-icon>
-      <span class="pl-2">Add</span>
+      <span class="ps-2">Add</span>
     </button>
     <button mat-raised-button color="warn" (click)="onNoClick()">
       <mat-icon>close</mat-icon>
-      <span class="pl-2">Close</span>
+      <span class="ps-2">Close</span>
     </button>
   </div>
 </div>

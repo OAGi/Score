@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {FormControl} from '@angular/forms';
@@ -34,6 +34,21 @@ import {LibraryService} from '../../../library-management/domain/library.service
   styleUrls: ['./oas-doc-assign-dialog.component.css']
 })
 export class OasDocAssignDialogComponent implements OnInit {
+  private openAPIService = inject(OpenAPIService);
+  private accountService = inject(AccountListService);
+  private releaseService = inject(ReleaseService);
+  private libraryService = inject(LibraryService);
+  private auth = inject(AuthService);
+  private dialog = inject(MatDialog);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private snackBar = inject(MatSnackBar);
+  webPageInfo = inject(WebPageInfoService);
+  private preferencesService = inject(SettingsPreferencesService);
+  dialogRef = inject<MatDialogRef<OasDocAssignDialogComponent>>(MatDialogRef);
+  data = inject(MAT_DIALOG_DATA);
+
 
   title = 'Add BIE For OpenAPI Document';
 
@@ -173,24 +188,6 @@ export class OasDocAssignDialogComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
-
-  constructor(
-    private openAPIService: OpenAPIService,
-    private accountService: AccountListService,
-    private releaseService: ReleaseService,
-    private libraryService: LibraryService,
-    private auth: AuthService,
-    private dialog: MatDialog,
-    private location: Location,
-    private router: Router,
-    private route: ActivatedRoute,
-    private snackBar: MatSnackBar,
-    public webPageInfo: WebPageInfoService,
-    private preferencesService: SettingsPreferencesService,
-    public dialogRef: MatDialogRef<OasDocAssignDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
-  ) {
-  }
 
   ngOnInit(): void {
     this.oasDoc = this.data.oasDoc;

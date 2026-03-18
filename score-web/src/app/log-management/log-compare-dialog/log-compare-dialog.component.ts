@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {OagisComponentTypes} from '../../cc-management/domain/core-component-node';
 import {
@@ -21,15 +21,13 @@ import {forkJoin} from 'rxjs';
   styleUrls: ['./log-compare-dialog.component.css'],
 })
 export class LogCompareDialogComponent implements OnInit {
+  private service = inject(LogService);
+  dialogRef = inject<MatDialogRef<LogCompareDialogComponent>>(MatDialogRef);
+  data = inject(MAT_DIALOG_DATA);
+
 
   componentTypes = OagisComponentTypes;
   pair: SnapshotPair;
-
-  constructor(
-    private service: LogService,
-    public dialogRef: MatDialogRef<LogCompareDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any) {
-  }
 
   ngOnInit() {
     forkJoin([

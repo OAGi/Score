@@ -1,5 +1,5 @@
 <div class="context-section">
-  <div class="pl-2 pr-2">
+  <div class="ps-2 pe-2">
     <mat-toolbar class="bg-white">
       <span class="title">{{ title }}</span>
       <span class="flex-11-auto"></span>
@@ -92,7 +92,7 @@
           <mat-icon>add</mat-icon>
           Add
         </button>
-        <button mat-raised-button (click)="removeBizCtxValues()" class="ml-2"
+        <button mat-raised-button (click)="removeBizCtxValues()" class="ms-2"
                 [hidden]="dataSource.data.length == 0"
                 [disabled]="this.selection.selected.length == 0"
                 color="warn">

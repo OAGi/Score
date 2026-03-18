@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {CodeListValue} from '../domain/code-list';
 import {hashCode} from '../../common/utility';
@@ -10,6 +10,9 @@ import {hashCode} from '../../common/utility';
   styleUrls: ['./code-list-value-dialog.component.css']
 })
 export class CodeListValueDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<CodeListValueDialogComponent>>(MatDialogRef);
+  data = inject(MAT_DIALOG_DATA);
+
 
   _hashCode;
   isAddAction;
@@ -18,9 +21,9 @@ export class CodeListValueDialogComponent implements OnInit {
   lastRevisionValue: CodeListValue;
   isEditable = false;
 
-  constructor(
-    public dialogRef: MatDialogRef<CodeListValueDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any) {
+  constructor() {
+    const data = this.data;
+
 
     this.codeListValue = data.codeListValue;
     this.lastRevisionValue = data.lastRevisionValue;

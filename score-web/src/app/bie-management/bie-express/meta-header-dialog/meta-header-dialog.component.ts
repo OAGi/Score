@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, SortDirection} from '@angular/material/sort';
@@ -30,6 +30,17 @@ import {LibrarySummary} from '../../../library-management/domain/library';
   styleUrls: ['./meta-header-dialog.component.css']
 })
 export class MetaHeaderDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<MetaHeaderDialogComponent>>(MatDialogRef);
+  private bieListService = inject(BieListService);
+  private accountService = inject(AccountListService);
+  private auth = inject(AuthService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  webPageInfo = inject(WebPageInfoService);
+  data = inject(MAT_DIALOG_DATA);
+
 
   get columns(): TableColumnsProperty[] {
     if (!this.preferencesInfo) {
@@ -152,17 +163,9 @@ export class MetaHeaderDialogComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
 
-  constructor(
-    public dialogRef: MatDialogRef<MetaHeaderDialogComponent>,
-    private bieListService: BieListService,
-    private accountService: AccountListService,
-    private auth: AuthService,
-    private preferencesService: SettingsPreferencesService,
-    private location: Location,
-    private router: Router,
-    private route: ActivatedRoute,
-    public webPageInfo: WebPageInfoService,
-    @Inject(MAT_DIALOG_DATA) public data: any) {
+  constructor() {
+    const data = this.data;
+
     this.library = data.library;
     this.release = data.release;
   }

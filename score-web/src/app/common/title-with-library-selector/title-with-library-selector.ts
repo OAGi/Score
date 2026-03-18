@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewEncapsulation} from '@angular/core';
 import {LibrarySummary} from '../../library-management/domain/library';
 import {ColumnSelectorModule} from '../column-selector/column-selector.module';
-import {NgIf} from '@angular/common';
+
 
 @Component({
   selector: 'score-title-with-library-selector',
@@ -9,9 +9,8 @@ import {NgIf} from '@angular/common';
   styleUrls: ['./title-with-library-selector.css'],
   encapsulation: ViewEncapsulation.None,
   imports: [
-    ColumnSelectorModule,
-    NgIf
-  ],
+    ColumnSelectorModule
+],
   standalone: true
 })
 export class TitleWithLibrarySelector implements OnInit, OnChanges {

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {BieListService} from '../bie-list/domain/bie-list.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -10,14 +10,13 @@ import {MatSnackBar} from '@angular/material/snack-bar';
   styleUrls: ['bie-accept-ownership-transfer-request.component.css']
 })
 export class BieAcceptOwnershipTransferRequestComponent implements OnInit {
+  private service = inject(BieListService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private snackBar = inject(MatSnackBar);
+
 
   loading: boolean;
-
-  constructor(private service: BieListService,
-              private router: Router,
-              private route: ActivatedRoute,
-              private snackBar: MatSnackBar) {
-  }
 
   ngOnInit(): void {
     this.loading = true;

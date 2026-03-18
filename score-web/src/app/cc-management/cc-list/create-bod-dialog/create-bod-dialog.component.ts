@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
@@ -39,6 +39,15 @@ import {ScoreTableColumnResizeDirective} from '../../../common/score-table-colum
   ]
 })
 export class CreateBodDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<CcListComponent>>(MatDialogRef);
+  private auth = inject(AuthService);
+  private ccListService = inject(CcListService);
+  private accountService = inject(AccountListService);
+  webPageInfo = inject(WebPageInfoService);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+  data = inject(MAT_DIALOG_DATA);
+
 
   workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
   releaseStateList = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
@@ -256,16 +265,6 @@ export class CreateBodDialogComponent implements OnInit {
   @ViewChild('verbPaginator', {static: true}) verbPaginator: MatPaginator;
   @ViewChild('nounPaginator', {static: true}) nounPaginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
-
-  constructor(public dialogRef: MatDialogRef<CcListComponent>,
-              private auth: AuthService,
-              private ccListService: CcListService,
-              private accountService: AccountListService,
-              public webPageInfo: WebPageInfoService,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService,
-              @Inject(MAT_DIALOG_DATA) public data: any) {
-  }
 
   ngOnInit() {
     this.verbRequest = new CcListRequest();

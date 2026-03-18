@@ -1,5 +1,5 @@
 <div class="context-section">
-  <div class="pl-2 pr-2">
+  <div class="ps-2 pe-2">
     <mat-toolbar class="bg-white">
       <span class="title">{{ title }}</span>
       <span class="flex-11-auto"></span>
@@ -37,21 +37,21 @@
               <ng-container matColumnDef="select">
                 <th mat-header-cell *matHeaderCellDef>
                   <mat-checkbox (change)="$event ? masterToggle() : null"
-                                [checked]="selection.hasValue() && isAllSelected()"
-                                [indeterminate]="selection.hasValue() && !isAllSelected()">
+                    [checked]="selection.hasValue() && isAllSelected()"
+                    [indeterminate]="selection.hasValue() && !isAllSelected()">
                   </mat-checkbox>
                 </th>
                 <td mat-cell *matCellDef="let row">
                   <mat-checkbox (click)="$event.stopPropagation()"
-                                (change)="$event ? toggle(row) : null"
-                                [checked]="isSelected(row)">
+                    (change)="$event ? toggle(row) : null"
+                    [checked]="isSelected(row)">
                   </mat-checkbox>
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="contextCategoryName">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
-                    score-table-column-resize [defaultWidth]="width('Context Category')" (onResize)="onResizeWidth($event)"> Context Category</th>
+                score-table-column-resize [defaultWidth]="width('Context Category')" (onResize)="onResizeWidth($event)"> Context Category</th>
                 <td mat-cell *matCellDef="let element">
                   <span class="score-line-clamp-2 score-break-word">{{ element.contextCategoryName }}</span>
                 </td>
@@ -59,7 +59,7 @@
 
               <ng-container matColumnDef="contextSchemeName">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
-                    score-table-column-resize [defaultWidth]="width('Context Scheme')" (onResize)="onResizeWidth($event)"> Context Scheme</th>
+                score-table-column-resize [defaultWidth]="width('Context Scheme')" (onResize)="onResizeWidth($event)"> Context Scheme</th>
                 <td mat-cell *matCellDef="let element">
                   <span class="score-line-clamp-2 score-break-word">{{ element.contextSchemeName }}</span>
                 </td>
@@ -67,7 +67,7 @@
 
               <ng-container matColumnDef="contextSchemeValue">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
-                    score-table-column-resize [defaultWidth]="width('Context Scheme Value')" (onResize)="onResizeWidth($event)"> Context Scheme Value</th>
+                score-table-column-resize [defaultWidth]="width('Context Scheme Value')" (onResize)="onResizeWidth($event)"> Context Scheme Value</th>
                 <td mat-cell *matCellDef="let element">
                   <span>{{ element.contextSchemeValue }}</span>
                   <div class="description score-line-clamp-2 score-break-word">
@@ -78,12 +78,12 @@
 
               <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
               <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-                  (click)="openDialog(row)"></tr>
+              (click)="openDialog(row)"></tr>
             </table>
 
             <mat-paginator
               [pageSizeOptions]="[10, 25, 50]"
-              showFirstLastButtons></mat-paginator>
+            showFirstLastButtons></mat-paginator>
           </div>
         </div>
       </mat-card-content>
@@ -92,10 +92,10 @@
           <mat-icon>add</mat-icon>
           Add
         </button>
-        <button mat-raised-button (click)="removeBizCtxValues()" class="ml-2"
-                [hidden]="dataSource.data.length == 0"
-                [disabled]="this.selection.selected.length == 0"
-                color="warn">
+        <button mat-raised-button (click)="removeBizCtxValues()" class="ms-2"
+          [hidden]="dataSource.data.length == 0"
+          [disabled]="this.selection.selected.length == 0"
+          color="warn">
           <mat-icon>delete</mat-icon>
           Remove
         </button>
@@ -107,13 +107,15 @@
     <div class="col-12 actions-wrap">
       <div class="actions">
         <button mat-raised-button color="primary" (click)="update()"
-                [disabled]="updateDisabled">
+          [disabled]="updateDisabled">
           Update
         </button>
-        <button mat-raised-button color="warn" (click)="discard()"
-                *ngIf="!businessContext.used">
-          Discard
-        </button>
+        @if (!businessContext.used) {
+          <button mat-raised-button color="warn" (click)="discard()"
+            >
+            Discard
+          </button>
+        }
       </div>
     </div>
   </div>

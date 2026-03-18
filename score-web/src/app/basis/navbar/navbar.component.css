@@ -25,6 +25,27 @@ mat-toolbar button:focus, .mat-mdc-menu-item:focus {
   color: inherit;
 }
 
+.navbar-brand {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  text-align: left;
+  word-wrap: break-word;
+  letter-spacing: normal !important;
+  font-family: var(--mat-toolbar-title-text-font, var(--mat-sys-title-large-font));
+  font-weight: var(--mat-toolbar-title-text-weight, var(--mat-sys-title-large-weight));
+  box-sizing: inherit;
+  display: inline-block;
+  padding-top: 0.3125rem;
+  padding-bottom: 0.3125rem;
+  margin-right: 1rem;
+  font-size: 1.25rem;
+  line-height: inherit;
+  white-space: nowrap;
+  text-decoration: none;
+  color: inherit;
+  background-color: transparent;
+}
+
 .navbar-brand > img {
   border: 0;
   padding: 0;
@@ -48,4 +69,3 @@ mat-toolbar button:focus, .mat-mdc-menu-item:focus {
 .notIcon {
   vertical-align: middle;
 }
-

@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {HttpClient, HttpContext} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ApplicationSettingsInfo} from './application-settings';
@@ -6,10 +6,8 @@ import {SUPPRESS_ERROR_ALERT} from '../../../authentication/auth.service';
 
 @Injectable()
 export class SettingsApplicationSettingsService {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-
-  }
 
   load(): Observable<ApplicationSettingsInfo> {
     return this.http.get<ApplicationSettingsInfo>('/api/application/settings');

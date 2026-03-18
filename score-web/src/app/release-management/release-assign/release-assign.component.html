@@ -1,7 +1,9 @@
 <div class="context-section">
-  <div class="loading-container" *ngIf="isLoading">
-    <mat-spinner [diameter]="40"></mat-spinner>
-  </div>
+  @if (isLoading) {
+    <div class="loading-container">
+      <mat-spinner [diameter]="40"></mat-spinner>
+    </div>
+  }
 
   <div class="row action-group m-0">
     <div class="col-3 title-wrap">
@@ -18,7 +20,7 @@
               <mat-form-field>
                 <mat-label>DEN</mat-label>
                 <input matInput [(ngModel)]="filter.den"
-                       (keyup.enter)="this.filterList();"/>
+                  (keyup.enter)="this.filterList();"/>
               </mat-form-field>
             </div>
 
@@ -26,9 +28,11 @@
               <mat-form-field>
                 <mat-label>Type</mat-label>
                 <mat-select [(ngModel)]="filter.type" multiple>
-                  <mat-option *ngFor="let type of typeList" [value]="type">
-                    <span>{{ type }}</span>
-                  </mat-option>
+                  @for (type of typeList; track type) {
+                    <mat-option [value]="type">
+                      <span>{{ type }}</span>
+                    </mat-option>
+                  }
                 </mat-select>
               </mat-form-field>
             </div>
@@ -39,14 +43,16 @@
                 <mat-select [(ngModel)]="filter.owner" multiple>
                   <mat-option>
                     <ngx-mat-select-search [formControl]="loginIdListFilterCtrl"
-                                           [placeholderLabel]="'Search...'"
-                                           [noEntriesFoundLabel]="'No matching owner found.'">
+                      [placeholderLabel]="'Search...'"
+                      [noEntriesFoundLabel]="'No matching owner found.'">
 
                     </ngx-mat-select-search>
                   </mat-option>
-                  <mat-option *ngFor="let loginId of filteredLoginIdList | async" [value]="loginId">
-                    {{ loginId }}
-                  </mat-option>
+                  @for (loginId of filteredLoginIdList | async; track loginId) {
+                    <mat-option [value]="loginId">
+                      {{ loginId }}
+                    </mat-option>
+                  }
                 </mat-select>
               </mat-form-field>
             </div>
@@ -57,9 +63,9 @@
         <div class="row d-flex">
           <div class="col-md-3 col-sm-12 pb-md-0 pb-3">
             <button mat-raised-button color="primary" type="submit"
-                    (click)="this.filterList();">
+              (click)="this.filterList();">
               <mat-icon>search</mat-icon>
-              <span class="ml-2">Search</span>
+              <span class="ms-2">Search</span>
             </button>
           </div>
         </div>
@@ -79,58 +85,62 @@
               </span>
               <span class="drop-box-head-icon">
                 <fa-icon [icon]="faAngleDoubleRight"
-                         matTooltip="Assign All"
-                         class="pointer ml-2"
-                         (click)="assignAll()"></fa-icon>
+                  matTooltip="Assign All"
+                  class="pointer ms-2"
+                (click)="assignAll()"></fa-icon>
               </span>
-              <span class="drop-box-head-icon float-right">
+              <span class="drop-box-head-icon float-end">
                 <fa-icon [icon]="faSort"
-                         matTooltip="Sort"
-                         class="pointer"
-                         (click)="sortList(itemsList.assignableList)"></fa-icon>
+                  matTooltip="Sort"
+                  class="pointer"
+                (click)="sortList(itemsList.assignableList)"></fa-icon>
               </span>
             </div>
             <div class="drop-box-content"
-                 cdkDropList
-                 #assignableListAll="cdkDropList"
-                 [cdkDropListData]="itemsList.assignableList"
-                 [cdkDropListConnectedTo]="[assignedListAll]"
-                 (cdkDropListDropped)="drop($event)">
-              <div [class]="classList(item)"
-                   [cdkDragDisabled]="item.state !== 'Candidate' || !item.visible"
-                   [class.cdk-visually-hidden]="!item.visible"
-                   *ngFor="let item of itemsList.assignableList" cdkDrag>
-                <div class="dragPlaceholder" *cdkDragPlaceholder></div>
-                <div class="head">
-                  <span class="item-type">
-                    <span class="chip">
-                      {{ item.type }}
+              cdkDropList
+              #assignableListAll="cdkDropList"
+              [cdkDropListData]="itemsList.assignableList"
+              [cdkDropListConnectedTo]="[assignedListAll]"
+              (cdkDropListDropped)="drop($event)">
+              @for (item of itemsList.assignableList; track item) {
+                <div [class]="classList(item)"
+                  [cdkDragDisabled]="item.state !== 'Candidate' || !item.visible"
+                  [class.cdk-visually-hidden]="!item.visible"
+                  cdkDrag>
+                  <div class="dragPlaceholder" *cdkDragPlaceholder></div>
+                  <div class="head">
+                    <span class="item-type">
+                      <span class="chip">
+                        {{ item.type }}
+                      </span>
                     </span>
-                  </span>
-                  <span class="item-display-name">
-                    <a [routerLink]="hrefLink(item)" target="_blank">
-                      {{ item.den }}
-                    </a>
-                  </span>
-                </div>
-                <div class="tail">
-                  <span class="item-owner">
-                    <span class="{{ item.state }} cc-state"
+                    <span class="item-display-name">
+                      <a [routerLink]="hrefLink(item)" target="_blank">
+                        {{ item.den }}
+                      </a>
+                    </span>
+                  </div>
+                  <div class="tail">
+                    <span class="item-owner">
+                      <span class="{{ item.state }} cc-state"
                           [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(item.state).background,
                           'color': webPageInfo.getComponentStateColorSet(item.state).font}">{{ item.state | separate }}</span>
-                    &nbsp;Revision <b>{{ item.revision }}</b> owned by <b>{{ item.ownerUsername }}</b>
-                  </span>
-                  <span class="item-timestamp">
-                    {{ item.timestamp | dateAgo }}
-                  </span>
+                      &nbsp;Revision <b>{{ item.revision }}</b> owned by <b>{{ item.ownerUsername }}</b>
+                    </span>
+                    <span class="item-timestamp">
+                      {{ item.timestamp | dateAgo }}
+                    </span>
+                  </div>
+                  <div class="errors">
+                    @for (error of item.errors; track error) {
+                      <mat-error role="alert" class="item-error"
+                        >
+                        <span class="message {{ error.level.toLowerCase() }}">[{{ error.level }}] {{ error.message }}</span>
+                      </mat-error>
+                    }
+                  </div>
                 </div>
-                <div class="errors">
-                  <mat-error role="alert" class="item-error"
-                             *ngFor="let error of item.errors">
-                    <span class="message {{ error.level.toLowerCase() }}">[{{ error.level }}] {{ error.message }}</span>
-                  </mat-error>
-                </div>
-              </div>
+              }
             </div>
           </div>
         </div>
@@ -140,64 +150,68 @@
             <div class="drop-box-head">
               <span class="drop-box-head-icon">
                 <fa-icon [icon]="faAngleDoubleLeft"
-                         matTooltip="Unassign All"
-                         class="pointer"
-                         (click)="unassignAll()"></fa-icon>
+                  matTooltip="Unassign All"
+                  class="pointer"
+                (click)="unassignAll()"></fa-icon>
               </span>
-              <span class="drop-box-head-badge ml-2">
+              <span class="drop-box-head-badge ms-2">
                 {{ count(itemsList.assignedList) }}
               </span>
               <span>
                 Assigned
               </span>
-              <span class="drop-box-head-icon float-right">
+              <span class="drop-box-head-icon float-end">
                 <fa-icon [icon]="faSort"
-                         matTooltip="Sort"
-                         class="pointer"
-                         (click)="sortList(itemsList.assignedList)"></fa-icon>
+                  matTooltip="Sort"
+                  class="pointer"
+                (click)="sortList(itemsList.assignedList)"></fa-icon>
               </span>
             </div>
             <div class="drop-box-content"
-                 cdkDropList
-                 #assignedListAll="cdkDropList"
-                 [cdkDropListData]="itemsList.assignedList"
-                 [cdkDropListConnectedTo]="[assignableListAll]"
-                 (cdkDropListDropped)="drop($event)">
-              <div [class]="classList(item)"
-                   [cdkDragDisabled]="item.state !== 'Candidate' || !item.visible"
-                   [class.cdk-visually-hidden]="!item.visible"
-                   *ngFor="let item of itemsList.assignedList" cdkDrag>
-                <div class="dragPlaceholder" *cdkDragPlaceholder></div>
-                <div class="head">
-                  <span class="item-type">
-                    <span class="chip">
-                      {{ item.type }}
+              cdkDropList
+              #assignedListAll="cdkDropList"
+              [cdkDropListData]="itemsList.assignedList"
+              [cdkDropListConnectedTo]="[assignableListAll]"
+              (cdkDropListDropped)="drop($event)">
+              @for (item of itemsList.assignedList; track item) {
+                <div [class]="classList(item)"
+                  [cdkDragDisabled]="item.state !== 'Candidate' || !item.visible"
+                  [class.cdk-visually-hidden]="!item.visible"
+                  cdkDrag>
+                  <div class="dragPlaceholder" *cdkDragPlaceholder></div>
+                  <div class="head">
+                    <span class="item-type">
+                      <span class="chip">
+                        {{ item.type }}
+                      </span>
                     </span>
-                  </span>
-                  <span class="item-display-name">
-                    <a [routerLink]="hrefLink(item)" target="_blank">
-                      {{ item.den }}
-                    </a>
-                  </span>
-                </div>
-                <div class="tail">
-                  <span class="item-owner">
-                    <span class="{{ item.state }} cc-state"
+                    <span class="item-display-name">
+                      <a [routerLink]="hrefLink(item)" target="_blank">
+                        {{ item.den }}
+                      </a>
+                    </span>
+                  </div>
+                  <div class="tail">
+                    <span class="item-owner">
+                      <span class="{{ item.state }} cc-state"
                           [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(item.state).background,
                           'color': webPageInfo.getComponentStateColorSet(item.state).font}">{{ item.state | separate }}</span>
-                    &nbsp;Revision <b>{{ item.revision }}</b> owned by <b>{{ item.ownerUsername }}</b>
-                  </span>
-                  <span class="item-timestamp">
-                    {{ item.timestamp | dateAgo }}
-                  </span>
+                      &nbsp;Revision <b>{{ item.revision }}</b> owned by <b>{{ item.ownerUsername }}</b>
+                    </span>
+                    <span class="item-timestamp">
+                      {{ item.timestamp | dateAgo }}
+                    </span>
+                  </div>
+                  <div class="errors">
+                    @for (error of item.errors; track error) {
+                      <mat-error role="alert" class="item-error"
+                        >
+                        <span class="message {{ error.level.toLowerCase() }}">[{{ error.level }}] {{ error.message }}</span>
+                      </mat-error>
+                    }
+                  </div>
                 </div>
-                <div class="errors">
-                  <mat-error role="alert" class="item-error"
-                             *ngFor="let error of item.errors">
-                    <span class="message {{ error.level.toLowerCase() }}">[{{ error.level }}] {{ error.message }}</span>
-                  </mat-error>
-                </div>
-              </div>
+              }
             </div>
           </div>
         </div>
@@ -208,17 +222,19 @@
   <div class="row action-group m-0">
     <div class="col-12 actions-wrap">
       <div class="actions">
-        <button mat-raised-button color="warn"
-                *ngIf="releaseDetail.state === 'Initialized'"
-                [disabled]="isValidated"
-                (click)="validate()">
-          Validate
-        </button>
-        <button mat-raised-button color="accent"
-                *ngIf="releaseDetail.state === 'Initialized'"
-                (click)="makeDraft()">
-          Create
-        </button>
+        @if (releaseDetail.state === 'Initialized') {
+          <button mat-raised-button color="warn"
+            [disabled]="isValidated"
+            (click)="validate()">
+            Validate
+          </button>
+        }
+        @if (releaseDetail.state === 'Initialized') {
+          <button mat-raised-button color="accent"
+            (click)="makeDraft()">
+            Create
+          </button>
+        }
       </div>
     </div>
   </div>

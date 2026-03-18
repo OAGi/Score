@@ -1,4 +1,4 @@
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort, SortDirection} from '@angular/material/sort';
@@ -34,6 +34,19 @@ import {LibraryService} from '../../library-management/domain/library.service';
   styleUrls: ['./bie-uplift-profile-bie.component.css']
 })
 export class BieUpliftProfileBieComponent implements OnInit {
+  private bizCtxService = inject(BusinessContextService);
+  private bieListService = inject(BieListService);
+  private accountService = inject(AccountListService);
+  private releaseService = inject(ReleaseService);
+  private libraryService = inject(LibraryService);
+  private auth = inject(AuthService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private snackBar = inject(MatSnackBar);
+  webPageInfo = inject(WebPageInfoService);
+
 
   title = 'Uplift BIE';
   subtitle = 'Select BIE';
@@ -199,20 +212,6 @@ export class BieUpliftProfileBieComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
-
-  constructor(private bizCtxService: BusinessContextService,
-              private bieListService: BieListService,
-              private accountService: AccountListService,
-              private releaseService: ReleaseService,
-              private libraryService: LibraryService,
-              private auth: AuthService,
-              private preferencesService: SettingsPreferencesService,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute,
-              private snackBar: MatSnackBar,
-              public webPageInfo: WebPageInfoService) {
-  }
 
   ngOnInit() {
     this.request = new BieListRequest(this.route.snapshot.queryParamMap,

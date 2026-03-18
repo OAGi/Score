@@ -7,37 +7,47 @@
   </button>
 
   <ng-template cdkConnectedOverlay
-               [cdkConnectedOverlayOrigin]="trigger"
-               [cdkConnectedOverlayOpen]="overlayVisible"
-               [cdkConnectedOverlayHasBackdrop]="true"
-               [cdkConnectedOverlayBackdropClass]="'cdk-overlay-transparent-backdrop'"
-               [cdkConnectedOverlayViewportMargin]="8"
-               (backdropClick)="closeOverlay()">
+    [cdkConnectedOverlayOrigin]="trigger"
+    [cdkConnectedOverlayOpen]="overlayVisible"
+    [cdkConnectedOverlayHasBackdrop]="true"
+    [cdkConnectedOverlayBackdropClass]="'cdk-overlay-transparent-backdrop'"
+    [cdkConnectedOverlayViewportMargin]="8"
+    (backdropClick)="closeOverlay()">
     <div class="column-selector overlay-spacing" cdkDropList (cdkDropListDropped)="drop($event)"
-         (click)="handleOverlayClick($event)"
-         style="min-width: 132px;">
-      <div class="column" *ngFor="let column of columns" cdkDrag>
-        <mat-checkbox *ngIf="multiple" [checked]="column.selected">
-          <span class="f12 mr-2">{{ column.name }}</span>
-        </mat-checkbox>
+      (click)="handleOverlayClick($event)"
+      style="min-width: 132px;">
+      @for (column of columns; track column) {
+        <div class="column" cdkDrag>
+          @if (multiple) {
+            <mat-checkbox [checked]="column.selected">
+              <span class="f12 me-2">{{ column.name }}</span>
+            </mat-checkbox>
+          }
+          <!-- Radio button for single selection -->
+          @if (!multiple) {
+            <mat-radio-button [checked]="column.selected">
+              <span class="f12 me-2">{{ column.name }}</span>
+            </mat-radio-button>
+          }
+          @if (draggable) {
+            <mat-icon class="drag-handle me-2"
+              cdkDragHandle>drag_handle
+            </mat-icon>
+          }
+        </div>
+      }
 
-        <!-- Radio button for single selection -->
-        <mat-radio-button *ngIf="!multiple" [checked]="column.selected">
-          <span class="f12 mr-2">{{ column.name }}</span>
-        </mat-radio-button>
+      @if (onReset.observed) {
+        <mat-divider/>
+      }
 
-        <mat-icon class="drag-handle mr-2" *ngIf="draggable"
-                  cdkDragHandle>drag_handle
-        </mat-icon>
-      </div>
-
-      <mat-divider *ngIf="onReset.observed"/>
-
-      <div class="d-flex justify-content-end mt-2" *ngIf="onReset.observed">
-        <button mat-stroked-button (click)="onResetButtonClick()">
-          <span class="f12">Reset</span>
-        </button>
-      </div>
+      @if (onReset.observed) {
+        <div class="d-flex justify-content-end mt-2">
+          <button mat-stroked-button (click)="onResetButtonClick()">
+            <span class="f12">Reset</span>
+          </button>
+        </div>
+      }
     </div>
   </ng-template>
 </div>

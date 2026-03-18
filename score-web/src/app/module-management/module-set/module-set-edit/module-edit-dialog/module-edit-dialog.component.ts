@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {finalize} from 'rxjs/operators';
@@ -18,6 +18,13 @@ import {ReplaySubject} from 'rxjs';
   styleUrls: ['./module-edit-dialog.component.css']
 })
 export class ModuleEditDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<ModuleEditDialogComponent>>(MatDialogRef);
+  private service = inject(ModuleService);
+  private snackBar = inject(MatSnackBar);
+  private namespaceService = inject(NamespaceService);
+  private confirmDialogService = inject(ConfirmDialogService);
+  data = inject(MAT_DIALOG_DATA);
+
 
   $hashCode: string;
 
@@ -33,12 +40,9 @@ export class ModuleEditDialogComponent implements OnInit {
 
   isUpdating = false;
 
-  constructor(public dialogRef: MatDialogRef<ModuleEditDialogComponent>,
-              private service: ModuleService,
-              private snackBar: MatSnackBar,
-              private namespaceService: NamespaceService,
-              private confirmDialogService: ConfirmDialogService,
-              @Inject(MAT_DIALOG_DATA) public data: any ) {
+  constructor() {
+    const data = this.data;
+
     this.element = data.module;
     this.moduleSet = data.moduleSet;
   }

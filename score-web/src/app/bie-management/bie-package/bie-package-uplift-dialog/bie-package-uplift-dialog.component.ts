@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit, ViewChild} from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import {SelectionModel} from '@angular/cdk/collections';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
@@ -31,6 +31,21 @@ import {LibraryService} from '../../../library-management/domain/library.service
   styleUrls: ['./bie-package-uplift-dialog.component.css']
 })
 export class BiePackageUpliftDialogComponent implements OnInit {
+  private biePackageService = inject(BiePackageService);
+  private accountService = inject(AccountListService);
+  private releaseService = inject(ReleaseService);
+  private libraryService = inject(LibraryService);
+  private auth = inject(AuthService);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private snackBar = inject(MatSnackBar);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private dialog = inject(MatDialog);
+  webPageInfo = inject(WebPageInfoService);
+  dialogRef = inject<MatDialogRef<BiePackageUpliftDialogComponent>>(MatDialogRef);
+  data = inject(MAT_DIALOG_DATA);
+
 
   title = 'Uplift BIE Package';
   biePackage: BiePackageDetails = new BiePackageDetails();
@@ -75,22 +90,6 @@ export class BiePackageUpliftDialogComponent implements OnInit {
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatMultiSort, {static: true}) sort: MatMultiSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-
-  constructor(private biePackageService: BiePackageService,
-              private accountService: AccountListService,
-              private releaseService: ReleaseService,
-              private libraryService: LibraryService,
-              private auth: AuthService,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute,
-              private snackBar: MatSnackBar,
-              private confirmDialogService: ConfirmDialogService,
-              private dialog: MatDialog,
-              public webPageInfo: WebPageInfoService,
-              public dialogRef: MatDialogRef<BiePackageUpliftDialogComponent>,
-              @Inject(MAT_DIALOG_DATA) public data: any) {
-  }
 
   ngOnInit(): void {
     this.table = new TableData<BieListEntry>(this.displayedColumns, {});

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {SettingsAccountService} from './domain/settings-account.service';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -14,6 +14,12 @@ import {UserToken} from '../../authentication/domain/auth';
   styleUrls: ['./settings-account.component.css']
 })
 export class SettingsAccountComponent implements OnInit {
+  private service = inject(SettingsAccountService);
+  private accountService = inject(AccountListService);
+  private snackBar = inject(MatSnackBar);
+  private auth = inject(AuthService);
+  private router = inject(Router);
+
 
   loading: boolean;
 
@@ -26,13 +32,6 @@ export class SettingsAccountComponent implements OnInit {
   confirmPasswordFormControl: FormControl = new FormControl();
 
   hideChangePassword: boolean;
-
-  constructor(private service: SettingsAccountService,
-              private accountService: AccountListService,
-              private snackBar: MatSnackBar,
-              private auth: AuthService,
-              private router: Router) {
-  }
 
   get userToken(): UserToken {
     return this.auth.getUserToken();

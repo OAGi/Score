@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {BusinessTermService} from '../domain/business-term.service';
@@ -14,19 +14,18 @@ import {BusinessTermDetails} from '../domain/business-term';
   styleUrls: ['./business-term-create.component.css']
 })
 export class BusinessTermCreateComponent implements OnInit {
+  private service = inject(BusinessTermService);
+  private location = inject(Location);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
+  private confirmDialogService = inject(ConfirmDialogService);
+
 
   title = 'Create Business Term';
   businessTerm: BusinessTermDetails;
   disabled: boolean;
-
-  constructor(private service: BusinessTermService,
-              private location: Location,
-              private route: ActivatedRoute,
-              private router: Router,
-              private snackBar: MatSnackBar,
-              private dialog: MatDialog,
-              private confirmDialogService: ConfirmDialogService) {
-  }
 
   ngOnInit() {
     this.disabled = false;
