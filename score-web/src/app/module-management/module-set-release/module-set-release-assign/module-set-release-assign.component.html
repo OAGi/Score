@@ -2,7 +2,7 @@
   <div *ngIf="isUpdating" class="loading-container">
     <mat-spinner [diameter]="40"></mat-spinner>
   </div>
-  <div class="pl-2 pr-2">
+  <div class="ps-2 pe-2">
     <mat-toolbar class="bg-white">
       <span class="title">Core Component Assignment</span>
       <span class="flex-11-auto"></span>
@@ -19,9 +19,9 @@
                 <div *ngFor="let element of tile.elements" class="grid-element">
                   <div (click)="onClickElement(tile, element)"
                        [ngClass]="{'grid-element-content': true, 'selected': tile.current === element}">
-                    <mat-icon *ngIf="element.directory" class="float-left" inline=true>folder_open</mat-icon>
-                    <mat-icon *ngIf="!element.directory" class="float-left" inline=true>insert_drive_file</mat-icon>
-                    <div class="float-left element-title">
+                    <mat-icon *ngIf="element.directory" class="float-start" inline=true>folder_open</mat-icon>
+                    <mat-icon *ngIf="!element.directory" class="float-start" inline=true>insert_drive_file</mat-icon>
+                    <div class="float-start element-title">
                       <span>{{ element.name }}</span>
                     </div>
                   </div>
@@ -158,7 +158,7 @@
                 <th *matHeaderCellDef mat-header-cell mat-sort-header> Updated on</th>
                 <td *matCellDef="let element" mat-cell>
                   <div class="ellipsis">{{ element.timestamp | dateAgo }}</div>
-                  <div class="description"><span class="pr-1">by</span><b>{{ element.ownerUsername }}</b></div>
+                  <div class="description"><span class="pe-1">by</span><b>{{ element.ownerUsername }}</b></div>
                 </td>
               </ng-container>
 
@@ -234,7 +234,7 @@
                 <th *matHeaderCellDef mat-header-cell mat-sort-header> Updated on</th>
                 <td *matCellDef="let element" mat-cell>
                   <div class="ellipsis">{{ element.timestamp | dateAgo }}</div>
-                  <div class="description"><span class="pr-1">by</span><b>{{ element.ownerUsername }}</b></div>
+                  <div class="description"><span class="pe-1">by</span><b>{{ element.ownerUsername }}</b></div>
                 </td>
               </ng-container>
 

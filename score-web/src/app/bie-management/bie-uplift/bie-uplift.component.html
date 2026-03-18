@@ -1,5 +1,5 @@
 <div class="context-section">
-  <div class="pl-2 pr-2">
+  <div class="ps-2 pe-2">
     <mat-toolbar class="bg-white d-flex flex-column align-items-start">
       <span class="title">{{ "BIE_UPLIFT.TITLE" | translate }}</span>
       <mat-card-subtitle>Verification</mat-card-subtitle>
@@ -13,15 +13,15 @@
       </div>
       <div class="row" [hidden]="loading">
         <div class="col-md-12 pt-2 pb-2 d-flex">
-          <button mat-icon-button mat-tiny-icon-button class="nav-button mr-2" (click)="lookUpUnmatched(-1)"
+          <button mat-icon-button mat-tiny-icon-button class="nav-button me-2" (click)="lookUpUnmatched(-1)"
                   [hidden]="unmatchedSource.length === 0">
             <mat-icon>arrow_back_ios</mat-icon>
           </button>
-          <button mat-icon-button mat-tiny-icon-button class="nav-button mr-2" (click)="lookUpUnmatched(1)"
+          <button mat-icon-button mat-tiny-icon-button class="nav-button me-2" (click)="lookUpUnmatched(1)"
                   [hidden]="unmatchedSource.length === 0">
             <mat-icon>arrow_forward_ios</mat-icon>
           </button>
-          <div class="ml-2">
+          <div class="ms-2">
             <span *ngIf="unmatchedSource.length === 0">All contents are mapped.</span>
             <span *ngIf="unmatchedSource.length > 0" class="nav-number">
               {{unmatchedSource.indexOf(this.currentUnmatchedSource) + 1}}/{{unmatchedSource.length}}
@@ -30,8 +30,8 @@
         </div>
       </div>
 
-      <div class="row ml-0 mr-0" (window:resize)="onResize($event)">
-        <div class="col-6 pl-0">
+      <div class="row ms-0 me-0" (window:resize)="onResize($event)">
+        <div class="col-6 ps-0">
           <div class="row tree-search-box" *ngIf="sourceSearcher && sourceDataSource">
             <div class="col-8">
               <mat-form-field>
@@ -77,7 +77,7 @@
               </div>
             </div>
             <div class="col-1 buttons">
-              <div class="actions ml-auto">
+              <div class="actions ms-auto">
                 <button mat-icon-button mat-small-icon-button [matMenuTriggerFor]="sourceSettingsContextMenu">
                   <mat-icon>settings</mat-icon>
                 </button>
@@ -85,7 +85,7 @@
             </div>
             <mat-menu class="context-menu" #sourceSettingsContextMenu="matMenu">
               <button mat-menu-item>
-                <mat-checkbox class="d-inline-flex pr-2"
+                <mat-checkbox class="d-inline-flex pe-2"
                               [(ngModel)]="sourceDataSource.hideCardinality">
                   <span>Hide cardinality</span>
                 </mat-checkbox>
@@ -141,16 +141,16 @@
                             [innerHTML]="(node.displayName ? node.displayName : node.name) | highlight : sourceSearcher.searchKeyword">
                       </span>
 
-                      <span [class]="['pl-4']" *ngIf="!sourceDataSource.hideCardinality">
+                      <span [class]="['ps-4']" *ngIf="!sourceDataSource.hideCardinality">
                         {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
                       </span>
 
                       <fa-icon [icon]="faRecycle"
                                matTooltip="Reused"
-                               [class]="['pl-3', 'pointer']" class="pointer"
+                               [class]="['ps-3', 'pointer']" class="pointer"
                                *ngIf="node.reused"></fa-icon>
 
-                      <div class="ml-auto mr-2">
+                      <div class="ms-auto me-2">
                         <mat-icon *ngIf="sourceDataSource.isExpandable(node)"
                                   class="context-menu-icon"
                                   [matMenuTriggerFor]="contextMenu"
@@ -170,7 +170,7 @@
             </div>
           </div>
         </div>
-        <div class="col-6 pl-0 pr-0">
+        <div class="col-6 ps-0 pe-0">
           <div class="row tree-search-box" *ngIf="targetSearcher && targetDataSource">
             <div class="col-8">
               <mat-form-field>
@@ -216,7 +216,7 @@
               </div>
             </div>
             <div class="col-1 buttons">
-              <div class="actions ml-auto">
+              <div class="actions ms-auto">
                 <button mat-icon-button mat-small-icon-button [matMenuTriggerFor]="targetSettingsContextMenu">
                   <mat-icon>settings</mat-icon>
                 </button>
@@ -224,7 +224,7 @@
             </div>
             <mat-menu class="context-menu" #targetSettingsContextMenu="matMenu">
               <button mat-menu-item>
-                <mat-checkbox class="d-inline-flex pr-2"
+                <mat-checkbox class="d-inline-flex pe-2"
                               [(ngModel)]="targetDataSource.hideCardinality">
                   <span>Hide cardinality</span>
                 </mat-checkbox>
@@ -281,22 +281,22 @@
                             [innerHTML]="node.name | highlight : targetSearcher.searchKeyword">
                       </span>
 
-                      <span [class]="['pl-4']" *ngIf="!targetDataSource.hideCardinality">
+                      <span [class]="['ps-4']" *ngIf="!targetDataSource.hideCardinality">
                         {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
                       </span>
 
                       <fa-icon [icon]="faCircleExclamation"
                                matTooltip="Select BIE"
                                (click)="matchReused(node)"
-                               [class]="['pl-3', 'pointer', 'warn']" class="pointer"
+                               [class]="['ps-3', 'pointer', 'warn']" class="pointer"
                                *ngIf="node.source && node.source.reused && !node.reusedTopLevelAsbiepId"></fa-icon>
                       <fa-icon [icon]="faRecycle"
                                matTooltip="Reused"
                                (click)="matchReused(node)"
-                               [class]="['pl-3', 'pointer']" class="pointer"
+                               [class]="['ps-3', 'pointer']" class="pointer"
                                *ngIf="node.reusedTopLevelAsbiepId"></fa-icon>
 
-                      <div class="ml-auto mr-2">
+                      <div class="ms-auto me-2">
                         <mat-icon *ngIf="targetDataSource.isExpandable(node)"
                                   class="context-menu-icon"
                                   [matMenuTriggerFor]="contextMenu"

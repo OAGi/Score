@@ -4,14 +4,12 @@
     <form role="form" (submit)="login()" *ngIf="!roles.includes('pending') && !roles.includes('reject')">
       <div class="auth-form-header">
         <h1>Sign in to NIST/OAGi connectCenter</h1>
-        <h4 class="pt-1 pr-3 text-align-end">(formerly "Score")</h4>
+        <h4 class="pt-1 pe-3 text-align-end">(formerly "Score")</h4>
       </div>
 
       <div [hidden]="err === undefined" class="alert alert-danger alert-dismissible fade show" role="alert">
         {{ errorMessage }}
-        <button type="button" class="close" aria-label="Close" (click)="onClose()">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="btn-close" aria-label="Close" (click)="onClose()"></button>
       </div>
 
       <div class="auth-form-body">
@@ -26,7 +24,7 @@
         </label>
         <input type="password" name="password" id="password" class="form-control form-control input-block" tabindex="2"
                [(ngModel)]="credentials.password">
-        <input type="submit" name="commit" value="Sign in" tabindex="3" class="btn btn-primary btn-block"
+        <input type="submit" name="commit" value="Sign in" tabindex="3" class="btn btn-primary w-100"
                data-disable-with="Signing in…">
       </div>
 
@@ -44,7 +42,7 @@
                      [style.background-color]="oauth2AppInfo.backgroundColor"
                      [style.border-color]="oauth2AppInfo.backgroundColor"
                      [style.color]="oauth2AppInfo.fontColor"
-                     class="btn btn-primary btn-block">
+                     class="btn btn-primary w-100">
             </a>
           </div>
         </div>

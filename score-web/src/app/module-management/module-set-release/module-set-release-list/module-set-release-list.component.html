@@ -1,12 +1,12 @@
 <div class="context-section">
-  <div class="pl-2 pr-2">
+  <div class="ps-2 pe-2">
     <mat-toolbar class="bg-white">
       <score-title-with-library-selector [title]="title"
                                          [libraries]="mappedLibraries"
                                          (libraryChange)="onLibraryChange($event)"/>
       <span class="flex-11-auto"></span>
       <button *ngIf="roles.includes('developer')"
-              (click)="create()" class="ml-2" color="primary" mat-raised-button>
+              (click)="create()" class="ms-2" color="primary" mat-raised-button>
         New Module Set Release
       </button>
     </mat-toolbar>
@@ -126,7 +126,7 @@
               <td *matCellDef="let element" mat-cell>
                 <div class="score-line-clamp-2 score-break-word">
                   <div>{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-                  <div class="description"><span class="pr-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
+                  <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
                 </div>
               </td>
             </ng-container>

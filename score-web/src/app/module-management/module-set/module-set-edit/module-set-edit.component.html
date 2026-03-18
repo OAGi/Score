@@ -2,7 +2,7 @@
   <div *ngIf="isUpdating" class="loading-container">
     <mat-spinner [diameter]="40"></mat-spinner>
   </div>
-  <div class="pl-2 pr-2">
+  <div class="ps-2 pe-2">
     <mat-toolbar class="bg-white">
       <span class="title">{{ title }}</span>
       <span class="flex-11-auto"></span>
@@ -26,7 +26,7 @@
         <div class="row action-group m-0">
           <div class="actions-wrap">
             <button (click)="updateModuleSet()" [disabled]="updateDisabled"
-                    mat-raised-button class="float-right" color="primary">Update</button>
+                    mat-raised-button class="float-end" color="primary">Update</button>
           </div>
         </div>
       </mat-card-content>
@@ -37,7 +37,7 @@
     <mat-toolbar class="bg-white" style="box-shadow: none;">
       <div class="title">
         <span>Modules</span>
-        <span class="pl-2" style="font-size: 14px;">(Total directory: {{ moduleSetMetadata.numberOfDirectories }}, Total file: {{ moduleSetMetadata.numberOfFiles }})</span>
+        <span class="ps-2" style="font-size: 14px;">(Total directory: {{ moduleSetMetadata.numberOfDirectories }}, Total file: {{ moduleSetMetadata.numberOfFiles }})</span>
       </div>
     </mat-toolbar>
     <mat-card class="mb-2">
@@ -49,9 +49,9 @@
                 <div *ngFor="let element of tile.elements" class="grid-element">
                   <div (click)="onClickElement(tile, element)"
                        [ngClass]="{'grid-element-content': true, 'selected': tile.current === element}">
-                    <mat-icon *ngIf="element.directory" class="float-left" inline=true>folder_open</mat-icon>
-                    <mat-icon *ngIf="!element.directory" class="float-left" inline=true>insert_drive_file</mat-icon>
-                    <div class="float-left element-title">
+                    <mat-icon *ngIf="element.directory" class="float-start" inline=true>folder_open</mat-icon>
+                    <mat-icon *ngIf="!element.directory" class="float-start" inline=true>insert_drive_file</mat-icon>
+                    <div class="float-start element-title">
                       <span>{{ element.name }}</span>
                     </div>
                     <mat-icon *ngIf="roles.includes('developer')"
@@ -61,8 +61,8 @@
                 </div>
                 <div class="grid-element" *ngIf="roles.includes('developer')">
                   <div (click)="openAddDialog(tile)" class="grid-element-content">
-                    <mat-icon class="float-left" inline=true>add</mat-icon>
-                    <div class="float-left element-title">
+                    <mat-icon class="float-start" inline=true>add</mat-icon>
+                    <div class="float-start element-title">
                       <span>Add</span>
                     </div>
                   </div>

@@ -7,6 +7,17 @@ body {
   word-wrap: break-word;
 }
 
+@media (min-width: 1400px) {
+  .container,
+  .container-sm,
+  .container-md,
+  .container-lg,
+  .container-xl,
+  .container-xxl {
+    max-width: 1140px;
+  }
+}
+
 .h1, .h2, .h3, .h4, .h5, .h6 {
   font-weight: 600 !important
 }
@@ -117,8 +128,6 @@ b {
 .mat-mdc-table .mat-column-select,
 .mat-mdc-table .cdk-column-select {
   width: 66px !important;
-  min-width: 66px !important;
-  max-width: 66px !important;
 }
 
 .ellipsis {
@@ -209,10 +218,6 @@ th > div {
 .mat-mdc-form-field {
   font-size: 14px;
   width: 100%;
-}
-
-.mat-column-select {
-  overflow: initial;
 }
 
 table a {
@@ -919,10 +924,6 @@ th.mat-mdc-header-cell, td.mat-mdc-cell {
 
 .subtitle {
   color: rgba(0, 0, 0, 0.54);
-}
-
-.ml-auto {
-  margin-left: auto;
 }
 
 .actions {

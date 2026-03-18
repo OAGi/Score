@@ -59,7 +59,7 @@
             <button mat-raised-button color="primary" type="submit"
                     (click)="this.filterList();">
               <mat-icon>search</mat-icon>
-              <span class="ml-2">Search</span>
+              <span class="ms-2">Search</span>
             </button>
           </div>
         </div>
@@ -80,10 +80,10 @@
               <span class="drop-box-head-icon">
                 <fa-icon [icon]="faAngleDoubleRight"
                          matTooltip="Assign All"
-                         class="pointer ml-2"
+                         class="pointer ms-2"
                          (click)="assignAll()"></fa-icon>
               </span>
-              <span class="drop-box-head-icon float-right">
+              <span class="drop-box-head-icon float-end">
                 <fa-icon [icon]="faSort"
                          matTooltip="Sort"
                          class="pointer"
@@ -144,13 +144,13 @@
                          class="pointer"
                          (click)="unassignAll()"></fa-icon>
               </span>
-              <span class="drop-box-head-badge ml-2">
+              <span class="drop-box-head-badge ms-2">
                 {{ count(itemsList.assignedList) }}
               </span>
               <span>
                 Assigned
               </span>
-              <span class="drop-box-head-icon float-right">
+              <span class="drop-box-head-icon float-end">
                 <fa-icon [icon]="faSort"
                          matTooltip="Sort"
                          class="pointer"

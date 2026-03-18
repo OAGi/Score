@@ -18,15 +18,15 @@
          style="min-width: 132px;">
       <div class="column" *ngFor="let column of columns" cdkDrag>
         <mat-checkbox *ngIf="multiple" [checked]="column.selected">
-          <span class="f12 mr-2">{{ column.name }}</span>
+          <span class="f12 me-2">{{ column.name }}</span>
         </mat-checkbox>
 
         <!-- Radio button for single selection -->
         <mat-radio-button *ngIf="!multiple" [checked]="column.selected">
-          <span class="f12 mr-2">{{ column.name }}</span>
+          <span class="f12 me-2">{{ column.name }}</span>
         </mat-radio-button>
 
-        <mat-icon class="drag-handle mr-2" *ngIf="draggable"
+        <mat-icon class="drag-handle me-2" *ngIf="draggable"
                   cdkDragHandle>drag_handle
         </mat-icon>
       </div>

@@ -1,0 +1,51 @@
+$primary: #007bff;
+$secondary: #6c757d;
+$success: #28a745;
+$info: #17a2b8;
+$warning: #ffc107;
+$danger: #dc3545;
+$light: #f8f9fa;
+$dark: #343a40;
+
+$grid-gutter-width: 30px;
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1140px,
+  xxl: 1320px
+);
+
+$border-radius: 0.25rem;
+$border-radius-sm: 0.2rem;
+$border-radius-lg: 0.3rem;
+
+$btn-hover-bg-shade-amount: 15%;
+$btn-hover-border-shade-amount: 20%;
+$btn-active-bg-shade-amount: 20%;
+$btn-active-border-shade-amount: 25%;
+
+$input-focus-border-color: #80bdff;
+$input-focus-box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+
+@use "bootstrap/scss/bootstrap" with (
+  $primary: $primary,
+  $secondary: $secondary,
+  $success: $success,
+  $info: $info,
+  $warning: $warning,
+  $danger: $danger,
+  $light: $light,
+  $dark: $dark,
+  $grid-gutter-width: $grid-gutter-width,
+  $container-max-widths: $container-max-widths,
+  $border-radius: $border-radius,
+  $border-radius-sm: $border-radius-sm,
+  $border-radius-lg: $border-radius-lg,
+  $btn-hover-bg-shade-amount: $btn-hover-bg-shade-amount,
+  $btn-hover-border-shade-amount: $btn-hover-border-shade-amount,
+  $btn-active-bg-shade-amount: $btn-active-bg-shade-amount,
+  $btn-active-border-shade-amount: $btn-active-border-shade-amount,
+  $input-focus-border-color: $input-focus-border-color,
+  $input-focus-box-shadow: $input-focus-box-shadow
+);

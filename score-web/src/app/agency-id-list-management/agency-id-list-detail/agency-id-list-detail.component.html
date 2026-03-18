@@ -10,7 +10,7 @@
     </div>
     <div class="ui feed">
       <div class="event" *ngFor="let comment of commentControl.comments" [class.new-message]="comment.isNew">
-        <div class="content" [class]="comment.prevCommentId ? 'pl-4' : ''">
+        <div class="content" [class]="comment.prevCommentId ? 'ps-4' : ''">
           <div class="summary">
             <a>{{ comment.created.who.loginId }}</a>
             <div class="date">{{ comment.timestamp | dateAgo }}</div>
@@ -64,7 +64,7 @@
       <div class="loading-container" *ngIf="isUpdating">
         <mat-spinner [diameter]="40"></mat-spinner>
       </div>
-      <div class="pl-2 pr-2">
+      <div class="ps-2 pe-2">
         <mat-toolbar class="bg-white">
           <span class="title">{{ title }}</span>
           <button mat-icon-button (click)="openComments()"><mat-icon>comments</mat-icon></button>
@@ -324,12 +324,12 @@
         <mat-toolbar class="bg-white">
           <span class="title">Agency ID List Values</span>
           <div style="padding: 8px 0 8px 12px;" *ngIf="state === 'WIP' && access === 'CanEdit'">
-            <button mat-raised-button class="mr-2" (click)="openDialog()" color="primary"
+            <button mat-raised-button class="me-2" (click)="openDialog()" color="primary"
                     [disabled]="access !== 'CanEdit' || isDisabled(agencyIdList)">
               <mat-icon>add</mat-icon>
-              <span class="ml-2">Add</span>
+              <span class="ms-2">Add</span>
             </button>
-            <button mat-raised-button class="mr-2" (click)="removeAgencyIdListValues()"
+            <button mat-raised-button class="me-2" (click)="removeAgencyIdListValues()"
                     [hidden]="dataSource.data.length == 0"
                     [disabled]="isDisabled(agencyIdList) || this.selection.selected.length == 0"
                     color="warn">
@@ -348,7 +348,7 @@
                   (onReset)="onColumnsReset()">
                 </score-column-selector>
 
-                <div class="ml-3">
+                <div class="ms-3">
                   <mat-form-field>
                     <mat-label>Search</mat-label>
                     <input matInput [(ngModel)]="valueSearch" (keyup.enter)="applyFilter(valueSearch)" maxlength="100"/>

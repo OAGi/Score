@@ -10,7 +10,7 @@
     </div>
     <div class="ui feed">
       <div class="event" *ngFor="let comment of commentControl.comments" [class.new-message]="comment.isNew">
-        <div class="content" [class]="comment.prevCommentId ? 'pl-4' : ''">
+        <div class="content" [class]="comment.prevCommentId ? 'ps-4' : ''">
           <div class="summary">
             <a>{{ comment.created.who.loginId }}</a>
             <div class="date">{{ comment.timestamp | dateAgo }}</div>
@@ -119,7 +119,7 @@
                     </div>
                   </div>
                   <div class="col-7 actions-wrap">
-                    <div class="actions ml-auto" *ngIf="isWorkingRelease()">
+                    <div class="actions ms-auto" *ngIf="isWorkingRelease()">
                       <button mat-icon-button mat-small-icon-button [id]="'cc-settings'"
                               [matMenuTriggerFor]="settingsContextMenu"
                               [matMenuTriggerData]="{'menuId': 'settingsContextMenu'}">
@@ -168,7 +168,7 @@
                         Cancel
                       </button>
                     </div>
-                    <div class="actions ml-auto" *ngIf="!isWorkingRelease()">
+                    <div class="actions ms-auto" *ngIf="!isWorkingRelease()">
                       <button mat-icon-button [id]="'cc-settings'"
                               [matMenuTriggerFor]="settingsContextMenu"
                               [matMenuTriggerData]="{'menuId': 'settingsContextMenu'}">
@@ -217,12 +217,12 @@
                 </div>
                 <mat-menu class="context-menu" #settingsContextMenu="matMenu">
                   <button mat-menu-item [id]="'cc-settings-hide-cardinality'">
-                    <mat-checkbox class="d-inline-flex pr-2" [(ngModel)]="hideCardinality">
+                    <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="hideCardinality">
                       <span>Hide cardinality</span>
                     </mat-checkbox>
                   </button>
                   <button mat-menu-item [id]="'bie-settings-hide-unused'">
-                    <mat-checkbox class="d-inline-flex pr-2" [(ngModel)]="hideProhibited">
+                    <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="hideProhibited">
                       <span>Hide Prohibited SCs</span>
                     </mat-checkbox>
                   </button>
@@ -274,7 +274,7 @@
                           <button mat-icon-button disabled></button>
                         </ng-template>
 
-                        <span [class]="['pr-2', 'align-self-center', node.typeClass.toLowerCase(),
+                        <span [class]="['pe-2', 'align-self-center', node.typeClass.toLowerCase(),
                                         this.searcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
                               [class.search-index]="this.searcher.searchResult.indexOf(node) === this.searcher.searchIndex"
                               [class.inhibited]="node.inhibited"
@@ -285,22 +285,22 @@
                               [innerHTML]="node.name | highlight : searcher.searchKeyword">
                         </span>
 
-                        <div class="pl-2 align-self-center" *ngIf="isInvalidState(node)">
+                        <div class="ps-2 align-self-center" *ngIf="isInvalidState(node)">
                           <mat-icon matTooltip="Invalid state">error</mat-icon>
                         </div>
 
-                        <span [class]="['pl-2', 'align-self-center']"
+                        <span [class]="['ps-2', 'align-self-center']"
                               *ngIf="!dataSource.hideCardinality && node.cardinalityMin !== undefined && node.cardinalityMax !== undefined">
                           {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
                         </span>
 
-                        <div class="tag-list pl-2 align-self-center">
-                            <span class="tag ml-2" *ngFor="let tag of node.tagList"
+                        <div class="tag-list ps-2 align-self-center">
+                            <span class="tag ms-2" *ngFor="let tag of node.tagList"
                                   [style.background-color]="tag.backgroundColor"
                                   [style.color]="tag.textColor">{{ tag.name }}</span>
                         </div>
 
-                        <div class="ml-auto align-self-center mr-2">
+                        <div class="ms-auto align-self-center me-2">
                           <mat-icon style="{{ node.showCopyLinkIcon ? '' : 'visibility: hidden' }}"
                                     matTooltip="Copy Link"
                                     (click)="copyLink(node, $event)">
@@ -545,11 +545,11 @@
                               </mat-panel-description>
                             </mat-expansion-panel-header>
                             <mat-action-row *ngIf="hasTokenPrimitive(asBdtDetail()) && isEditable()">
-                              <button mat-stroked-button class="ml-auto" matTooltip="Add Value Domain"
+                              <button mat-stroked-button class="ms-auto" matTooltip="Add Value Domain"
                                       [disabled]="!isEditable()"
                                       (click)="addValueDomain(asBdtDetail())">Add
                               </button>
-                              <button mat-stroked-button class="ml-2" matTooltip="Discard Value Domain"
+                              <button mat-stroked-button class="ms-2" matTooltip="Discard Value Domain"
                                       [disabled]="!selectedValueDomain || selectedValueDomain.isDefault || selectedValueDomain.inherited"
                                       (click)="deleteValueDomain(asBdtDetail())">Discard
                               </button>
@@ -603,7 +603,7 @@
                                       <mat-option *ngFor="let codeList of filteredCodeLists(element)" [value]="codeList"
                                                   [disabled]="!isEditable() || element.dtAwdPri.inherited">
                                         <span class="{{ codeList.state === 'Deleted' ? 'text-line-through' : '' }}">{{ codeList.name }}</span>
-                                        <span class="f12 ml-auto pr-2"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
+                                        <span class="f12 ms-auto pe-2"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
                                       </mat-option>
                                     </mat-select>
                                   </mat-form-field>
@@ -627,7 +627,7 @@
                                     <mat-select [(ngModel)]="element.xbtList" multiple>
                                       <mat-select-trigger class="d-flex" *ngIf="(element.xbtList.length || 0) > 2">
                                         <span>{{ ((element.xbtList.length || 0) > 0) ? element.xbtList[0].name : '' }}</span>
-                                        <span *ngIf="(element.xbtList.length || 0) > 1" class="ml-2 additional-selection">
+                                        <span *ngIf="(element.xbtList.length || 0) > 1" class="ms-2 additional-selection">
                                           (+{{ (element.xbtList.length || 0) - 1 }} {{ element.xbtList.length === 2 ? 'other' : 'others' }})
                                         </span>
                                       </mat-select-trigger>
@@ -643,7 +643,7 @@
                             </table>
                             <mat-toolbar>
                               <mat-toolbar-row class="p-0">
-                                <mat-form-field class="pt-2 w-50 pl-2">
+                                <mat-form-field class="pt-2 w-50 ps-2">
                                   <mat-label>Default</mat-label>
                                   <mat-select [(ngModel)]="asBdtDetail().defaultValueDomain">
                                     <mat-optgroup *ngFor="let valueDomain of asBdtDetail().dtAwdPriListByGroup"
@@ -903,11 +903,11 @@
                               </mat-panel-description>
                             </mat-expansion-panel-header>
                             <mat-action-row *ngIf="hasTokenPrimitive(asDtScDetail()) && isEditable()">
-                              <button mat-stroked-button class="ml-auto" matTooltip="Add Value Domain"
+                              <button mat-stroked-button class="ms-auto" matTooltip="Add Value Domain"
                                       [disabled]="!isEditable()"
                                       (click)="addValueDomain(asDtScDetail())">Add
                               </button>
-                              <button mat-stroked-button class="ml-2" matTooltip="Discard Value Domain"
+                              <button mat-stroked-button class="ms-2" matTooltip="Discard Value Domain"
                                       [disabled]="!selectedValueDomain || selectedValueDomain.isDefault || selectedValueDomain.inherited"
                                       (click)="deleteValueDomain(asDtScDetail())">Discard</button>
                             </mat-action-row>
@@ -960,7 +960,7 @@
                                       <mat-option *ngFor="let codeList of filteredCodeLists(element)" [value]="codeList"
                                                   [disabled]="!isEditable() || element.dtScAwdPri.inherited">
                                         <span class="{{ codeList.state === 'Deleted' ? 'text-line-through' : '' }}">{{ codeList.name }}</span>
-                                        <span class="f12 ml-auto pr-2"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
+                                        <span class="f12 ms-auto pe-2"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
                                       </mat-option>
                                     </mat-select>
                                   </mat-form-field>
@@ -984,7 +984,7 @@
                                     <mat-select [(ngModel)]="element.xbtList" multiple>
                                       <mat-select-trigger class="d-flex" *ngIf="(element.xbtList.length || 0) > 2">
                                         <span>{{ ((element.xbtList.length || 0) > 0) ? element.xbtList[0].name : '' }}</span>
-                                        <span *ngIf="(element.xbtList.length || 0) > 1" class="ml-2 additional-selection">
+                                        <span *ngIf="(element.xbtList.length || 0) > 1" class="ms-2 additional-selection">
                                           (+{{ (element.xbtList.length || 0) - 1 }} {{ element.xbtList.length === 2 ? 'other' : 'others' }})
                                         </span>
                                       </mat-select-trigger>
@@ -1000,7 +1000,7 @@
                             </table>
                             <mat-toolbar>
                               <mat-toolbar-row class="p-0">
-                                <mat-form-field class="pt-2 w-50 pl-2">
+                                <mat-form-field class="pt-2 w-50 ps-2">
                                   <mat-label>Default</mat-label>
                                   <mat-select [(ngModel)]="asDtScDetail().defaultValueDomain">
                                     <mat-optgroup *ngFor="let valueDomain of asDtScDetail().dtScAwdPriListByGroup"

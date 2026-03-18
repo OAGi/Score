@@ -1,5 +1,5 @@
 <div class="context-section">
-  <div class="pl-2 pr-2">
+  <div class="ps-2 pe-2">
     <mat-toolbar class="bg-white">
       <span class="title">{{ title }}</span>
       <span class="flex-11-auto"></span>
@@ -71,7 +71,7 @@
                 (onReset)="onColumnsReset()">
             </score-column-selector>
 
-            <div class="ml-3">
+            <div class="ms-3">
               <mat-form-field>
                 <mat-label>Search</mat-label>
                 <input matInput [(ngModel)]="valueSearch" (keyup.enter)="applyFilter(valueSearch)" maxlength="100"/>
@@ -131,7 +131,7 @@
           <mat-icon>add</mat-icon>
           Add
         </button>
-        <button mat-raised-button (click)="removeSchemeValues()" class="ml-2"
+        <button mat-raised-button (click)="removeSchemeValues()" class="ms-2"
                 [hidden]="dataSource.data.length === 0"
                 [disabled]="this.selection.selected.length === 0"
                 color="warn">

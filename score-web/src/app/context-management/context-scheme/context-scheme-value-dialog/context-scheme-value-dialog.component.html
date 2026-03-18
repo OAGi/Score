@@ -17,12 +17,12 @@
       </mat-card-content>
     </mat-card>
   </div>
-  <div class="actions ml-auto" mat-dialog-actions>
+  <div class="actions ms-auto" mat-dialog-actions>
     <button mat-raised-button color="primary"
             [disabled]="isDisabled()"
             [mat-dialog-close]="contextSchemeValue">
       <mat-icon>{{ (actionName === 'Add') ? 'add' : 'save' }}</mat-icon>
-      <span class="ml-2">{{ (actionName === 'Add') ? 'Add' : 'Save' }}</span>
+      <span class="ms-2">{{ (actionName === 'Add') ? 'Add' : 'Save' }}</span>
     </button>
   </div>
 </div>

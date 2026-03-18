@@ -5,7 +5,7 @@
 <div class="d-block">
   <div class="header d-flex align-items-center" mat-dialog-title>
     <span>Edit '{{title}}' {{(element.directory) ? 'directory' : 'file'}}</span>
-    <div class="close pr-2">
+    <div class="close pe-2">
       <button mat-icon-button mat-small-icon-button (click)="onNoClick()">
         <mat-icon>close</mat-icon>
       </button>
@@ -43,7 +43,7 @@
       </mat-form-field>
     </div>
   </div>
-  <div class="actions ml-auto" mat-dialog-actions>
+  <div class="actions ms-auto" mat-dialog-actions>
     <button (click)="cancel()" color="warn" mat-raised-button>
       <mat-icon>close</mat-icon>
       Cancel
@@ -54,7 +54,7 @@
       Update
     </button>
 
-    <button mat-raised-button class="float-right" color="accent" (click)="deleteModule()">
+    <button mat-raised-button class="float-end" color="accent" (click)="deleteModule()">
       <mat-icon>delete</mat-icon>
       Discard
     </button>

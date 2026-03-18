@@ -10,7 +10,7 @@
     </div>
     <div class="ui feed">
       <div class="event" *ngFor="let comment of commentControl.comments" [class.new-message]="comment.isNew">
-        <div class="content" [class]="comment.prevCommentId ? 'pl-4' : ''">
+        <div class="content" [class]="comment.prevCommentId ? 'ps-4' : ''">
           <div class="summary">
             <a>{{ comment.created.who.loginId }}</a>
             <div class="date">{{ comment.timestamp | dateAgo }}</div>
@@ -119,7 +119,7 @@
                     </div>
                   </div>
                   <div class="col-7 actions-wrap">
-                    <div class="actions ml-auto" *ngIf="isWorkingRelease()">
+                    <div class="actions ms-auto" *ngIf="isWorkingRelease()">
                       <button mat-icon-button mat-small-icon-button [id]="'cc-settings'"
                               [matMenuTriggerFor]="settingsContextMenu"
                               [matMenuTriggerData]="{'menuId': 'settingsContextMenu'}">
@@ -168,7 +168,7 @@
                         Cancel
                       </button>
                     </div>
-                    <div class="actions ml-auto" *ngIf="!isWorkingRelease()">
+                    <div class="actions ms-auto" *ngIf="!isWorkingRelease()">
                       <button mat-icon-button [id]="'cc-settings'"
                               [matMenuTriggerFor]="settingsContextMenu"
                               [matMenuTriggerData]="{'menuId': 'settingsContextMenu'}">
@@ -217,7 +217,7 @@
                 </div>
                 <mat-menu class="context-menu" #settingsContextMenu="matMenu">
                   <button mat-menu-item [id]="'cc-settings-hide-cardinality'">
-                    <mat-checkbox class="d-inline-flex pr-2" [(ngModel)]="hideCardinality">
+                    <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="hideCardinality">
                       <span>Hide cardinality</span>
                     </mat-checkbox>
                   </button>
@@ -276,7 +276,7 @@
                             <button mat-icon-button disabled></button>
                           </ng-template>
 
-                          <span [class]="['pr-2', 'align-self-center', node.typeClass.toLowerCase(),
+                          <span [class]="['pe-2', 'align-self-center', node.typeClass.toLowerCase(),
                                 this.searcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
                                 [class.search-index]="this.searcher.searchResult.indexOf(node) === this.searcher.searchIndex"
                                 [class.deprecated]="node.deprecated"
@@ -286,18 +286,18 @@
                                 [innerHTML]="node.name | highlight : searcher.searchKeyword">
                           </span>
 
-                          <span [class]="['pl-2', 'align-self-center']"
+                          <span [class]="['ps-2', 'align-self-center']"
                                 *ngIf="!dataSource.hideCardinality && node.cardinalityMin !== undefined && node.cardinalityMax !== undefined">
                             {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
                           </span>
 
-                          <div class="tag-list pl-2 align-self-center">
-                            <span class="tag ml-2" *ngFor="let tag of node.tagList"
+                          <div class="tag-list ps-2 align-self-center">
+                            <span class="tag ms-2" *ngFor="let tag of node.tagList"
                                  [style.background-color]="tag.backgroundColor"
                                  [style.color]="tag.textColor">{{ tag.name }}</span>
                           </div>
 
-                          <div class="ml-auto align-self-center mr-2 d-inline-flex">
+                          <div class="ms-auto align-self-center me-2 d-inline-flex">
                             <mat-icon style="{{ node.showCopyLinkIcon ? '' : 'visibility: hidden' }}"
                                       matTooltip="Copy Link"
                                       (click)="copyLink(node, $event)">
@@ -568,7 +568,7 @@
                               <span>Deprecated</span>
                               <span *ngIf="asAccDetail().replacement">, replaced by </span>
                             </mat-checkbox>
-                            <div class="ml-1 d-inline-block" style="vertical-align: super" *ngIf="asAccDetail().replacement">
+                            <div class="ms-1 d-inline-block" style="vertical-align: super" *ngIf="asAccDetail().replacement">
                               <span>
                                 <a target="_blank" rel="noopener noreferrer"
                                    href="/core_component/acc/{{ asAccDetail().replacement.accManifestId }}">{{ asAccDetail().replacement.den }}</a>
@@ -958,7 +958,7 @@
                               <span>Deprecated</span>
                               <span *ngIf="asAsccpDetail().asccp.replacement">, replaced by </span>
                             </mat-checkbox>
-                            <div class="ml-1 d-inline-block" style="vertical-align: super" *ngIf="asAsccpDetail().asccp.replacement">
+                            <div class="ms-1 d-inline-block" style="vertical-align: super" *ngIf="asAsccpDetail().asccp.replacement">
                               <span>
                                 <a target="_blank" rel="noopener noreferrer"
                                    href="/core_component/asccp/{{ asAsccpDetail().asccp.replacement.asccpManifestId }}">{{ asAsccpDetail().asccp.replacement.den }}</a>
@@ -1341,7 +1341,7 @@
                               <span>Deprecated</span>
                               <span *ngIf="asBccpDetail().bccp.replacement">, replaced by </span>
                             </mat-checkbox>
-                            <div class="ml-1 d-inline-block" style="vertical-align: super" *ngIf="asBccpDetail().bccp.replacement">
+                            <div class="ms-1 d-inline-block" style="vertical-align: super" *ngIf="asBccpDetail().bccp.replacement">
                               <span>
                                 <a target="_blank" rel="noopener noreferrer"
                                    href="/core_component/bccp/{{ asBccpDetail().bccp.replacement.bccpManifestId }}">{{ asBccpDetail().bccp.replacement.den }}</a>

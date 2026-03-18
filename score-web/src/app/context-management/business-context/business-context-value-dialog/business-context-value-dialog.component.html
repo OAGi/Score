@@ -3,7 +3,7 @@
     <h4>{{ actionName }} Business Context Value</h4>
   </div>
   <div class="content" mat-dialog-content>
-    <mat-card class="p-3 mr-2">
+    <mat-card class="p-3 me-2">
       <mat-card-content>
         <mat-form-field>
           <mat-label>Context Category</mat-label>
@@ -25,7 +25,7 @@
         </mat-form-field>
       </mat-card-content>
     </mat-card>
-    <mat-card class="p-3 mr-2">
+    <mat-card class="p-3 me-2">
       <mat-card-content>
         <mat-form-field>
           <mat-label>Context Scheme</mat-label>
@@ -98,12 +98,12 @@
       </mat-card-content>
     </mat-card>
   </div>
-  <div class="actions ml-auto" mat-dialog-actions>
+  <div class="actions ms-auto" mat-dialog-actions>
     <button mat-raised-button color="primary"
             [disabled]="!isChanged() || isDisabled()"
             [mat-dialog-close]="businessContextValue">
       <mat-icon>{{ (actionName === 'Add') ? 'add' : 'save' }}</mat-icon>
-      <span class="ml-2">{{ (actionName === 'Add') ? 'Add' : 'Save' }}</span>
+      <span class="ms-2">{{ (actionName === 'Add') ? 'Add' : 'Save' }}</span>
     </button>
   </div>
 </div>

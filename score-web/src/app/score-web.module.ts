@@ -2,7 +2,6 @@ import {NgModule} from '@angular/core';
 import {ActivatedRouteSnapshot, BaseRouteReuseStrategy, RouteReuseStrategy, RouterModule} from '@angular/router';
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {FlexLayoutModule} from '@angular/flex-layout';
 import {MatIconRegistry} from '@angular/material/icon';
 import {HTTP_INTERCEPTORS, HttpClient, HttpClientModule} from '@angular/common/http';
 import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
@@ -56,7 +55,6 @@ class ShouldReuseRouteFalseRouteReuseStrategy extends BaseRouteReuseStrategy {
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    FlexLayoutModule,
     RouterModule.forRoot(SCORE_WEBAPP_ROUTES, { onSameUrlNavigation: 'reload' }),
     HttpClientModule,
     TranslateModule.forRoot({
