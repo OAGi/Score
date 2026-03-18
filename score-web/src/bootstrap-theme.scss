@@ -49,3 +49,10 @@ $input-focus-box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
   $input-focus-border-color: $input-focus-border-color,
   $input-focus-box-shadow: $input-focus-box-shadow
 );
+
+.btn-primary {
+  --bs-btn-color: #fff;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-active-color: #fff;
+  --bs-btn-disabled-color: #fff;
+}
