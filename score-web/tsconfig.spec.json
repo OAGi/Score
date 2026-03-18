@@ -3,14 +3,14 @@
   "compilerOptions": {
     "outDir": "./out-tsc/spec",
     "esModuleInterop": true,
+    "target": "es2022",
     "types": [
-      "jest",
+      "vitest/globals",
       "node"
     ]
   },
   "files": [
-    "setup-jest.ts",
-    "src/polyfills.ts"
+    "src/test-setup.ts"
   ],
   "include": [
     "src/**/*.spec.ts",

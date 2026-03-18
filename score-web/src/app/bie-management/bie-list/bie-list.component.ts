@@ -1,4 +1,4 @@
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ReleaseSummary} from '../../release-management/domain/release';
 import {ReleaseService} from '../../release-management/domain/release.service';
@@ -47,6 +47,24 @@ import {BieStateTransitionFlowService} from '../domain/bie-state-transition-flow
   styleUrls: ['./bie-list.component.css']
 })
 export class BieListComponent implements OnInit {
+  private service = inject(BieListService);
+  private bieCreateService = inject(BieCreateService);
+  private bieEditService = inject(BieEditService);
+  private accountService = inject(AccountListService);
+  private releaseService = inject(ReleaseService);
+  private libraryService = inject(LibraryService);
+  private mailService = inject(MailService);
+  private auth = inject(AuthService);
+  private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  webPageInfo = inject(WebPageInfoService);
+  private stateTransitionFlowService = inject(BieStateTransitionFlowService);
+
 
   title = 'BIE';
 
@@ -201,25 +219,6 @@ export class BieListComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
-
-  constructor(private service: BieListService,
-              private bieCreateService: BieCreateService,
-              private bieEditService: BieEditService,
-              private accountService: AccountListService,
-              private releaseService: ReleaseService,
-              private libraryService: LibraryService,
-              private mailService: MailService,
-              private auth: AuthService,
-              private snackBar: MatSnackBar,
-              private dialog: MatDialog,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute,
-              public webPageInfo: WebPageInfoService,
-              private stateTransitionFlowService: BieStateTransitionFlowService) {
-  }
 
   ngOnInit() {
     this.request = new BieListRequest(this.route.snapshot.queryParamMap,

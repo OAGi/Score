@@ -1,5 +1,5 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {Observable} from 'rxjs';
 import {NamespaceDetails, NamespaceListEntry, NamespaceListRequest, NamespaceSummary} from './namespace';
 import {PageResponse} from '../../basis/basis';
@@ -7,9 +7,8 @@ import {map} from 'rxjs/operators';
 
 @Injectable()
 export class NamespaceService {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-  }
 
   getNamespaceList(request: NamespaceListRequest): Observable<PageResponse<NamespaceListEntry>> {
     let params = new HttpParams()

@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {CodelistListDialogComponent} from '../codelist-list-dialog/codelist-list-dialog.component';
@@ -39,6 +39,19 @@ import {finalize} from 'rxjs/operators';
   styleUrls: ['./context-scheme-detail.component.css']
 })
 export class ContextSchemeDetailComponent implements OnInit {
+  private service = inject(ContextSchemeService);
+  private contextCategoryService = inject(ContextCategoryService);
+  private codeListService = inject(CodeListService);
+  private businessContextService = inject(BusinessContextService);
+  private location = inject(Location);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
+  private auth = inject(AuthService);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+
 
   title = 'Edit Context Scheme';
   isUpdating: boolean;
@@ -148,20 +161,6 @@ export class ContextSchemeDetailComponent implements OnInit {
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
-
-  constructor(private service: ContextSchemeService,
-              private contextCategoryService: ContextCategoryService,
-              private codeListService: CodeListService,
-              private businessContextService: BusinessContextService,
-              private location: Location,
-              private route: ActivatedRoute,
-              private router: Router,
-              private snackBar: MatSnackBar,
-              private dialog: MatDialog,
-              private auth: AuthService,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService) {
-  }
 
   ngOnInit() {
     this.contextSchemeUpdateRequest = new ContextSchemeUpdateRequest();

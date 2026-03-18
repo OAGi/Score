@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {
@@ -16,9 +16,8 @@ import {map} from 'rxjs/operators';
 
 @Injectable()
 export class ContextSchemeService {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-  }
 
   getContextSchemeSummaries(): Observable<ContextSchemeSummary[]> {
     return this.http.get<ContextSchemeSummary[]>('/api/context-schemes/summaries');

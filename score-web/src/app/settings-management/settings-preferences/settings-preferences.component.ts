@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {AuthService} from '../../authentication/auth.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
@@ -13,18 +13,17 @@ import {SettingsPreferencesService} from './domain/settings-preferences.service'
   styleUrls: ['./settings-preferences.component.css']
 })
 export class SettingsPreferencesComponent implements OnInit {
+  private auth = inject(AuthService);
+  private sanitizer = inject(DomSanitizer);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private snackBar = inject(MatSnackBar);
+
 
   preferencesInfo: PreferencesInfo;
 
   title = 'Preferences';
   loading = false;
-
-  constructor(private auth: AuthService,
-              private sanitizer: DomSanitizer,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService,
-              private snackBar: MatSnackBar) {
-  }
 
   ngOnInit() {
     this.loading = true;

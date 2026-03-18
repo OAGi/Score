@@ -1,4 +1,4 @@
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {forkJoin, of} from 'rxjs';
 import {AuthService} from '../../authentication/auth.service';
@@ -25,6 +25,14 @@ import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
 })
 
 export class TenantUserDetailComponent implements OnInit {
+  private auth = inject(AuthService);
+  private service = inject(TenantListService);
+  private accountService = inject(AccountListService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
 
   title = 'Users Management';
   loading = false;
@@ -145,15 +153,6 @@ export class TenantUserDetailComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
-
-  constructor(private auth: AuthService,
-              private service: TenantListService,
-              private accountService: AccountListService,
-              private preferencesService: SettingsPreferencesService,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute) {
-  }
 
   ngOnInit(): void {
     this.request = new AccountListRequest(this.route.snapshot.queryParamMap,

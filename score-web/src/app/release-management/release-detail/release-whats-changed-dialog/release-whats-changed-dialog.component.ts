@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {Clipboard} from '@angular/cdk/clipboard';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -13,6 +13,12 @@ import {compare} from '../../../common/utility';
   styleUrls: ['./release-whats-changed-dialog.component.css']
 })
 export class ReleaseWhatsChangedDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<ReleaseWhatsChangedDialogComponent>>(MatDialogRef);
+  ccListService = inject(CcListService);
+  clipboard = inject(Clipboard);
+  snackBar = inject(MatSnackBar);
+  data = inject(MAT_DIALOG_DATA);
+
 
   newACCs: CcChange[] = [];
   newASCCPs: CcChange[] = [];
@@ -31,15 +37,6 @@ export class ReleaseWhatsChangedDialogComponent implements OnInit {
   revisedDTs: CcChange[] = [];
   revisedCodeLists: CcChange[] = [];
   revisedAgencyIdLists: CcChange[] = [];
-
-  constructor(
-    public dialogRef: MatDialogRef<ReleaseWhatsChangedDialogComponent>,
-    public ccListService: CcListService,
-    public clipboard: Clipboard,
-    public snackBar: MatSnackBar,
-    @Inject(MAT_DIALOG_DATA) public data: any) {
-
-  }
 
   ngOnInit(): void {
     this.ccListService.getCcChanges(this.data.releaseId).subscribe(resp => {

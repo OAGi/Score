@@ -1,12 +1,11 @@
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {Injectable, OnInit} from '@angular/core';
+import { Injectable, OnInit, inject } from '@angular/core';
 
 @Injectable()
 export class BieCopyService implements OnInit {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-  }
 
   ngOnInit() {
   }

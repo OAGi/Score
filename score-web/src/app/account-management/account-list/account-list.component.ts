@@ -1,4 +1,4 @@
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, SortDirection} from '@angular/material/sort';
@@ -22,6 +22,13 @@ import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
   styleUrls: ['./account-list.component.css']
 })
 export class AccountListComponent implements OnInit {
+  private auth = inject(AuthService);
+  private service = inject(AccountListService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
 
   title = 'Account';
 
@@ -131,14 +138,6 @@ export class AccountListComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
-
-  constructor(private auth: AuthService,
-              private service: AccountListService,
-              private preferencesService: SettingsPreferencesService,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute) {
-  }
 
   ngOnInit() {
     this.request = new AccountListRequest(this.route.snapshot.queryParamMap,

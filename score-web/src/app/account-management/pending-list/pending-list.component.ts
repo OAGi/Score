@@ -1,4 +1,4 @@
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, SortDirection} from '@angular/material/sort';
@@ -22,6 +22,13 @@ import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
   styleUrls: ['./pending-list.component.css']
 })
 export class PendingListComponent implements OnInit {
+  private auth = inject(AuthService);
+  private service = inject(PendingListService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
 
   title = 'Pending Account';
 
@@ -130,14 +137,6 @@ export class PendingListComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
-
-  constructor(private auth: AuthService,
-              private service: PendingListService,
-              private preferencesService: SettingsPreferencesService,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute) {
-  }
 
   ngOnInit() {
     this.request = new PendingListRequest(this.route.snapshot.queryParamMap,

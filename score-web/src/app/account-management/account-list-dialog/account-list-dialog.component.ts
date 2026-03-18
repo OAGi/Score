@@ -1,6 +1,6 @@
 import {SelectionModel} from '@angular/cdk/collections';
 import {Location} from '@angular/common';
-import {Component, Inject, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, SortDirection} from '@angular/material/sort';
@@ -24,6 +24,15 @@ import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-r
   styleUrls: ['./account-list-dialog.component.css']
 })
 export class AccountListDialogComponent implements OnInit {
+  private auth = inject(AuthService);
+  private service = inject(AccountListService);
+  private preferencesService = inject(SettingsPreferencesService);
+  dialogRef = inject<MatDialogRef<AccountListDialogComponent>>(MatDialogRef);
+  private location = inject(Location);
+  private router = inject(Router);
+  pending = inject<PendingAccount>(MAT_DIALOG_DATA);
+  private route = inject(ActivatedRoute);
+
 
   title = 'Link to existing account';
 
@@ -105,16 +114,6 @@ export class AccountListDialogComponent implements OnInit {
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
-
-  constructor(private auth: AuthService,
-              private service: AccountListService,
-              private preferencesService: SettingsPreferencesService,
-              public dialogRef: MatDialogRef<AccountListDialogComponent>,
-              private location: Location,
-              private router: Router,
-              @Inject(MAT_DIALOG_DATA) public pending: PendingAccount,
-              private route: ActivatedRoute) {
-  }
 
   ngOnInit() {
     this.request = new AccountListRequest(this.route.snapshot.queryParamMap,

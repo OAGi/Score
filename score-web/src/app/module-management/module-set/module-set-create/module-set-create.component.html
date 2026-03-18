@@ -1,12 +1,14 @@
 <div class="context-section">
-  <div *ngIf="isUpdating" class="loading-container">
-    <mat-spinner [diameter]="40"></mat-spinner>
-  </div>
+  @if (isUpdating) {
+    <div class="loading-container">
+      <mat-spinner [diameter]="40"></mat-spinner>
+    </div>
+  }
   <div class="ps-2 pe-2">
     <mat-toolbar class="bg-white">
       <score-title-with-library-selector [title]="title"
-                                         [libraries]="mappedLibraries"
-                                         (libraryChange)="onLibraryChange($event)"/>
+        [libraries]="mappedLibraries"
+        (libraryChange)="onLibraryChange($event)"/>
       <span class="flex-11-auto"></span>
     </mat-toolbar>
   </div>
@@ -22,11 +24,11 @@
         <mat-form-field>
           <mat-label>Description</mat-label>
           <textarea [(ngModel)]="moduleSet.description" cols="30" data-id="moduleSet.description" matInput
-                    rows="6"></textarea>
+          rows="6"></textarea>
         </mat-form-field>
 
         <mat-checkbox color="primary"
-                      [(ngModel)]="moduleSet.createModuleSetRelease">
+          [(ngModel)]="moduleSet.createModuleSetRelease">
           <span>Create Module Set Release</span>
         </mat-checkbox>
 
@@ -35,18 +37,22 @@
           <mat-select [(ngModel)]="moduleSet.targetReleaseId" [disabled]="!moduleSet.createModuleSetRelease">
             <mat-option>
               <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
-                                     [noEntriesFoundLabel]="'No matching release found.'"
-                                     [placeholderLabel]="'Search...'"></ngx-mat-select-search>
+                [noEntriesFoundLabel]="'No matching release found.'"
+              [placeholderLabel]="'Search...'"></ngx-mat-select-search>
             </mat-option>
-            <mat-option *ngFor="let release of filteredReleaseList | async" [value]="release.releaseId">
-              <div class="d-flex">
-                <span class="release-num">{{release.releaseNum}}</span>
-                <span *ngIf="!release.workingRelease"
+            @for (release of filteredReleaseList | async; track release) {
+              <mat-option [value]="release.releaseId">
+                <div class="d-flex">
+                  <span class="release-num">{{release.releaseNum}}</span>
+                  @if (!release.workingRelease) {
+                    <span
                       class="f12 ms-auto {{release.state}}">
-                        {{ release.state | separate }}
-                      </span>
-              </div>
-            </mat-option>
+                      {{ release.state | separate }}
+                    </span>
+                  }
+                </div>
+              </mat-option>
+            }
           </mat-select>
         </mat-form-field>
 
@@ -55,15 +61,17 @@
           <mat-select [(ngModel)]="moduleSet.targetModuleSetReleaseId" [disabled]="!moduleSet.createModuleSetRelease">
             <mat-option>
               <ngx-mat-select-search [formControl]="moduleSetReleaseListFilterCtrl"
-                                     [noEntriesFoundLabel]="'No matching module set release found.'"
-                                     [placeholderLabel]="'Search...'"></ngx-mat-select-search>
+                [noEntriesFoundLabel]="'No matching module set release found.'"
+              [placeholderLabel]="'Search...'"></ngx-mat-select-search>
             </mat-option>
-            <mat-option *ngFor="let moduleSetRelease of filteredModuleSetReleaseList | async" [value]="moduleSetRelease.moduleSetReleaseId">
-              <div class="d-flex">
-                <span class="release-num">{{moduleSetRelease.name}}</span>
-                &nbsp;<span class="release-num">{{moduleSetRelease.release.releaseNum}}</span>
-              </div>
-            </mat-option>
+            @for (moduleSetRelease of filteredModuleSetReleaseList | async; track moduleSetRelease) {
+              <mat-option [value]="moduleSetRelease.moduleSetReleaseId">
+                <div class="d-flex">
+                  <span class="release-num">{{moduleSetRelease.name}}</span>
+                  &nbsp;<span class="release-num">{{moduleSetRelease.release.releaseNum}}</span>
+                </div>
+              </mat-option>
+            }
           </mat-select>
         </mat-form-field>
       </mat-card-content>
@@ -73,7 +81,7 @@
   <div class="row action-group m-0">
     <div class="col-12 actions-wrap">
       <button (click)="createModuleSet()" [disabled]="!canCreate" color="primary"
-              mat-raised-button>
+        mat-raised-button>
         Create
       </button>
     </div>

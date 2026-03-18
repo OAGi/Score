@@ -1,6 +1,6 @@
 import {SelectionModel} from '@angular/cdk/collections';
 import {Location} from '@angular/common';
-import {Component, OnInit, ViewChild} from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort} from '@angular/material/sort';
@@ -25,6 +25,17 @@ import {WebPageInfoService} from '../../../basis/basis.service';
   styleUrls: ['./module-set-release-assign.component.css']
 })
 export class ModuleSetReleaseAssignComponent implements OnInit {
+  private moduleService = inject(ModuleService);
+  private releaseService = inject(ReleaseService);
+  private location = inject(Location);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
+  private auth = inject(AuthService);
+  private confirmDialogService = inject(ConfirmDialogService);
+  webPageInfo = inject(WebPageInfoService);
+
 
   title = 'Edit Module Set Release';
   displayedColumns = ['checkbox', 'type', 'state', 'den', 'timestamp'];
@@ -49,18 +60,6 @@ export class ModuleSetReleaseAssignComponent implements OnInit {
   @ViewChild('leftPaginator', {static: true}) leftPaginator: MatPaginator;
   @ViewChild('rightSort', {static: true}) rightSort: MatSort;
   @ViewChild('rightPaginator', {static: true}) rightPaginator: MatPaginator;
-
-  constructor(private moduleService: ModuleService,
-              private releaseService: ReleaseService,
-              private location: Location,
-              private route: ActivatedRoute,
-              private router: Router,
-              private snackBar: MatSnackBar,
-              private dialog: MatDialog,
-              private auth: AuthService,
-              private confirmDialogService: ConfirmDialogService,
-              public webPageInfo: WebPageInfoService) {
-  }
 
   ngOnInit(): void {
     this.leftDataSource = new MatTableDataSource<AssignableNode>();

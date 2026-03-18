@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {Location} from '@angular/common';
 import {MatSidenav} from '@angular/material/sidenav';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
@@ -36,6 +36,18 @@ import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-r
   styleUrls: ['./agency-id-list-detail.component.css']
 })
 export class AgencyIdListDetailComponent implements OnInit {
+  private service = inject(AgencyIdListService);
+  private namespaceService = inject(NamespaceService);
+  private location = inject(Location);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
+  private auth = inject(AuthService);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private stompService = inject(RxStompService);
+
 
   title = 'Edit Agency ID List';
   namespaces: NamespaceSummary[] = [];
@@ -160,19 +172,6 @@ export class AgencyIdListDetailComponent implements OnInit {
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
 
   commentControl: AgencyIdListCommentControl;
-
-  constructor(private service: AgencyIdListService,
-              private namespaceService: NamespaceService,
-              private location: Location,
-              private route: ActivatedRoute,
-              private router: Router,
-              private snackBar: MatSnackBar,
-              private dialog: MatDialog,
-              private auth: AuthService,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService,
-              private stompService: RxStompService) {
-  }
 
   ngOnInit() {
     this.commentControl = new AgencyIdListCommentControl(this.sidenav, this.service);

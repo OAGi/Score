@@ -1,4 +1,4 @@
-import {Injectable, OnInit} from '@angular/core';
+import { Injectable, OnInit, inject } from '@angular/core';
 import {
   HttpClient,
   HttpContextToken,
@@ -29,16 +29,15 @@ import {Clipboard} from '@angular/cdk/clipboard';
 
 @Injectable()
 export class AuthService implements OnInit, CanActivate {
+  private http = inject(HttpClient);
+  private router = inject(Router);
+
 
   RESTRICTED_NEXT_PARAMS = ['login', 'pending', 'reject'];
   USER_INFO_KEY = 'X-Score-UserInfo';
   ROLE_DEVELOPER = 'developer';
   ROLE_END_USER = 'end-user';
   ROLE_ADMIN = 'admin';
-
-  constructor(private http: HttpClient,
-              private router: Router) {
-  }
 
   ngOnInit() {
   }
@@ -248,11 +247,11 @@ export const SUPPRESS_ERROR_ALERT = new HttpContextToken<boolean>(() => false);
 
 @Injectable()
 export class ErrorAlertInterceptor implements HttpInterceptor {
-  constructor(private auth: AuthService,
-              private router: Router,
-              private snackBar: MatSnackBar,
-              private clipboard: Clipboard) {
-  }
+  private auth = inject(AuthService);
+  private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
+  private clipboard = inject(Clipboard);
+
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(req).pipe(
@@ -352,9 +351,8 @@ function getResolvedUrl(route: ActivatedRouteSnapshot): string {
 
 @Injectable()
 export class CanActivateDeveloper implements CanActivate {
+  private authService = inject(AuthService);
 
-  constructor(private authService: AuthService) {
-  }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot):
     Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
@@ -372,9 +370,8 @@ export class CanActivateDeveloper implements CanActivate {
 
 @Injectable()
 export class CanActivateAdmin implements CanActivate {
+  private authService = inject(AuthService);
 
-  constructor(private authService: AuthService) {
-  }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot):
     Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
@@ -392,9 +389,8 @@ export class CanActivateAdmin implements CanActivate {
 
 @Injectable()
 export class CanActivateUser implements CanActivate {
+  private authService = inject(AuthService);
 
-  constructor(private authService: AuthService) {
-  }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot):
     Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
@@ -412,9 +408,8 @@ export class CanActivateUser implements CanActivate {
 
 @Injectable()
 export class CanActivateTenantInstance implements CanActivate {
+  private authService = inject(AuthService);
 
-  constructor(private authService: AuthService) {
-  }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot):
     Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {

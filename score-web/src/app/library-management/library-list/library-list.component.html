@@ -13,8 +13,8 @@
 
   <mat-card class="pt-3">
     <score-search-bar placeholder="Search by Name" [(model)]="request.filters.name"
-                      (modelChange)="onChange('filters.name', request.filters.name);"
-                      (searchTriggered)="onSearch();">
+      (modelChange)="onChange('filters.name', request.filters.name);"
+      (searchTriggered)="onSearch();">
       <div advancedSearchContent style="padding-left: 3rem;">
         <mat-card-content class="mat-card-container">
           <div class="container-fluid" style="padding: 0;">
@@ -25,12 +25,14 @@
                   <mat-select [(ngModel)]="request.updaterLoginIdList" multiple>
                     <mat-option>
                       <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
-                                             [placeholderLabel]="'Search...'"
-                                             [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                        [placeholderLabel]="'Search...'"
+                      [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
                     </mat-option>
-                    <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
-                      {{loginId}}
-                    </mat-option>
+                    @for (loginId of filteredUpdaterIdList | async; track loginId) {
+                      <mat-option [value]="loginId">
+                        {{loginId}}
+                      </mat-option>
+                    }
                   </mat-select>
                 </mat-form-field>
               </div>
@@ -38,7 +40,7 @@
                 <mat-form-field>
                   <mat-label>Updated start date</mat-label>
                   <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
-                         [(ngModel)]="request.updatedDate.start" [max]="request.updatedDate.end">
+                    [(ngModel)]="request.updatedDate.start" [max]="request.updatedDate.end">
                   <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
                   <mat-datepicker #dateStart></mat-datepicker>
                 </mat-form-field>
@@ -54,7 +56,7 @@
                 <mat-form-field>
                   <mat-label>Updated end date</mat-label>
                   <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
-                         [(ngModel)]="request.updatedDate.end" [min]="request.updatedDate.start">
+                    [(ngModel)]="request.updatedDate.end" [min]="request.updatedDate.start">
                   <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
                   <mat-datepicker #dateEnd></mat-datepicker>
                 </mat-form-field>
@@ -74,36 +76,36 @@
                   <mat-form-field>
                     <mat-label>Type</mat-label>
                     <input matInput [(ngModel)]="request.filters.type"
-                           (ngModelChange)="onChange('filters.type', request.filters.type)"
-                           (keyup.enter)="onSearch();"
-                           placeholder="Type">
+                      (ngModelChange)="onChange('filters.type', request.filters.type)"
+                      (keyup.enter)="onSearch();"
+                      placeholder="Type">
                   </mat-form-field>
                 </div>
                 <div class="col-md-2 col-sm-12">
                   <mat-form-field>
                     <mat-label>Organization</mat-label>
                     <input matInput [(ngModel)]="request.filters.organization"
-                           (ngModelChange)="onChange('filters.organization', request.filters.organization)"
-                           (keyup.enter)="onSearch();"
-                           placeholder="Organization">
+                      (ngModelChange)="onChange('filters.organization', request.filters.organization)"
+                      (keyup.enter)="onSearch();"
+                      placeholder="Organization">
                   </mat-form-field>
                 </div>
                 <div class="col-md-2 col-sm-12">
                   <mat-form-field>
                     <mat-label>Domain</mat-label>
                     <input matInput [(ngModel)]="request.filters.domain"
-                           (ngModelChange)="onChange('filters.domain', request.filters.domain)"
-                           (keyup.enter)="onSearch();"
-                           placeholder="Domain">
+                      (ngModelChange)="onChange('filters.domain', request.filters.domain)"
+                      (keyup.enter)="onSearch();"
+                      placeholder="Domain">
                   </mat-form-field>
                 </div>
                 <div class="col-md-2 col-sm-12">
                   <mat-form-field>
                     <mat-label>Description</mat-label>
                     <input matInput [(ngModel)]="request.filters.description"
-                           (ngModelChange)="onChange('filters.description', request.filters.description)"
-                           (keyup.enter)="onSearch();"
-                           placeholder="Description">
+                      (ngModelChange)="onChange('filters.description', request.filters.description)"
+                      (keyup.enter)="onSearch();"
+                      placeholder="Description">
                   </mat-form-field>
                 </div>
               </div>
@@ -114,9 +116,11 @@
     </score-search-bar>
 
     <mat-card-content class="mat-card-container">
-      <div class="loading-container" *ngIf="loading">
-        <mat-spinner [diameter]="40"></mat-spinner>
-      </div>
+      @if (loading) {
+        <div class="loading-container">
+          <mat-spinner [diameter]="40"></mat-spinner>
+        </div>
+      }
 
       <div class="table-container">
         <div class="score-column-container align-items-center">
@@ -128,12 +132,12 @@
         </div>
         <div class="mat-elevation-z1 table-wrapper mt-3">
           <table mat-table
-                 matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
-                 [dataSource]="dataSource">
+            matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
+            [dataSource]="dataSource">
 
             <ng-container matColumnDef="type">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Type')" (onResize)="onResizeWidth($event)"> Type</th>
+              score-table-column-resize [defaultWidth]="width('Type')" (onResize)="onResizeWidth($event)"> Type</th>
               <td mat-cell *matCellDef="let element">
                 <span class="score-line-clamp-2 score-break-word">{{ element.type }}</span>
               </td>
@@ -141,12 +145,14 @@
 
             <ng-container matColumnDef="name">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Name')" (onResize)="onResizeWidth($event)"> Name</th>
+              score-table-column-resize [defaultWidth]="width('Name')" (onResize)="onResizeWidth($event)"> Name</th>
               <td mat-cell *matCellDef="let element">
                 <a routerLink="{{ element.libraryId }}">
                   <div class="score-line-clamp-2 score-break-word">
                     <span>{{ element.name }}</span>
-                    <span *ngIf="element.isDefault" class="ms-2 default-indicator">Default</span>
+                    @if (element.isDefault) {
+                      <span class="ms-2 default-indicator">Default</span>
+                    }
                   </div>
                 </a>
               </td>
@@ -154,18 +160,22 @@
 
             <ng-container matColumnDef="organization">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Organization')" (onResize)="onResizeWidth($event)"> Organization</th>
+              score-table-column-resize [defaultWidth]="width('Organization')" (onResize)="onResizeWidth($event)"> Organization</th>
               <td mat-cell *matCellDef="let element">
-                <a target="_blank" rel="noopener noreferrer" href="{{ element.link }}" *ngIf="element.link">
+                @if (element.link) {
+                  <a target="_blank" rel="noopener noreferrer" href="{{ element.link }}">
+                    <span class="score-line-clamp-2 score-break-word">{{ element.organization }}</span>
+                  </a>
+                }
+                @if (!element.link) {
                   <span class="score-line-clamp-2 score-break-word">{{ element.organization }}</span>
-                </a>
-                <span class="score-line-clamp-2 score-break-word" *ngIf="!element.link">{{ element.organization }}</span>
+                }
               </td>
             </ng-container>
 
             <ng-container matColumnDef="domain">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Domain')" (onResize)="onResizeWidth($event)"> Domain</th>
+              score-table-column-resize [defaultWidth]="width('Domain')" (onResize)="onResizeWidth($event)"> Domain</th>
               <td mat-cell *matCellDef="let element">
                 <span class="score-line-clamp-2 score-break-word">{{ element.domain }}</span>
               </td>
@@ -173,16 +183,16 @@
 
             <ng-container matColumnDef="description">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Description')" (onResize)="onResizeWidth($event)"> Description</th>
+              score-table-column-resize [defaultWidth]="width('Description')" (onResize)="onResizeWidth($event)"> Description</th>
               <td mat-cell *matCellDef="let element">
                 <div class="description score-line-clamp-2 score-break-word"
-                     [innerHTML]="element.description | highlight : highlightText : ['bg-warning']"></div>
+                [innerHTML]="element.description | highlight : highlightText : ['bg-warning']"></div>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="lastUpdateTimestamp">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
+              score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
               <td mat-cell *matCellDef="let element">
                 <div class="score-line-clamp-2 score-break-word">
                   <div>{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
@@ -193,12 +203,12 @@
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-                (click)="toggle(row)"></tr>
+            (click)="toggle(row)"></tr>
           </table>
 
           <mat-paginator
             [pageSizeOptions]="[10, 25, 50]"
-            showFirstLastButtons></mat-paginator>
+          showFirstLastButtons></mat-paginator>
         </div>
       </div>
     </mat-card-content>

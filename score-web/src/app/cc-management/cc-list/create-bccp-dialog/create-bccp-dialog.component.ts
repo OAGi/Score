@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
@@ -43,6 +43,16 @@ import {SearchBarComponent} from '../../../common/search-bar/search-bar.componen
   ]
 })
 export class CreateBccpDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<CcListComponent>>(MatDialogRef);
+  private auth = inject(AuthService);
+  private ccListService = inject(CcListService);
+  private accountService = inject(AccountListService);
+  private tagService = inject(TagService);
+  webPageInfo = inject(WebPageInfoService);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+  data = inject(MAT_DIALOG_DATA);
+
 
   workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
   releaseStateList = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
@@ -187,17 +197,6 @@ export class CreateBccpDialogComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
-
-  constructor(public dialogRef: MatDialogRef<CcListComponent>,
-              private auth: AuthService,
-              private ccListService: CcListService,
-              private accountService: AccountListService,
-              private tagService: TagService,
-              public webPageInfo: WebPageInfoService,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService,
-              @Inject(MAT_DIALOG_DATA) public data: any) {
-  }
 
   ngOnInit() {
     this.request = new CcListRequest();

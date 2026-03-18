@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import {BieExpressOption} from './generate-expression';
 import {Observable} from 'rxjs';
@@ -6,9 +6,8 @@ import {base64Encode} from '../../../common/utility';
 
 @Injectable()
 export class BieExpressService {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-  }
 
   generate(topLevelAsbiepIds: number[], option: BieExpressOption): Observable<HttpResponse<Blob>> {
     let params: HttpParams = new HttpParams()

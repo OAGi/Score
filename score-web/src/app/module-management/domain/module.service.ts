@@ -1,5 +1,5 @@
 import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {PageResponse} from '../../basis/basis';
@@ -21,9 +21,8 @@ import {
 
 @Injectable()
 export class ModuleService {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-  }
 
   getModuleSetSummaries(libraryId: number): Observable<ModuleSetSummary[]> {
     let params = new HttpParams()

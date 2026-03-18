@@ -1,4 +1,4 @@
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
@@ -32,6 +32,16 @@ import {LibraryService} from '../../library-management/domain/library.service';
   styleUrls: ['./code-list-for-deriving.component.css']
 })
 export class CodeListForDerivingComponent implements OnInit {
+  private service = inject(CodeListService);
+  private releaseService = inject(ReleaseService);
+  private libraryService = inject(LibraryService);
+  private accountService = inject(AccountListService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private auth = inject(AuthService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  webPageInfo = inject(WebPageInfoService);
+
 
   faLocationArrow = faLocationArrow;
   title = 'Derive Code List';
@@ -165,17 +175,6 @@ export class CodeListForDerivingComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
-
-  constructor(private service: CodeListService,
-              private releaseService: ReleaseService,
-              private libraryService: LibraryService,
-              private accountService: AccountListService,
-              private preferencesService: SettingsPreferencesService,
-              private auth: AuthService,
-              private router: Router,
-              private route: ActivatedRoute,
-              public webPageInfo: WebPageInfoService) {
-  }
 
   ngOnInit() {
     this.request = new CodeListListEntryRequest(this.route.snapshot.queryParamMap,

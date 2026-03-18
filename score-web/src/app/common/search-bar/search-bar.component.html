@@ -6,19 +6,23 @@
     </button>
     <mat-form-field appearance="outline">
       <input matInput [(ngModel)]="model"
-             (ngModelChange)="onModelChange(model)"
-             (keyup.enter)="onSearch()"
-             placeholder="{{ placeholder }}"
-             [disabled]="disabled"/>
+        (ngModelChange)="onModelChange(model)"
+        (keyup.enter)="onSearch()"
+        placeholder="{{ placeholder }}"
+        [disabled]="disabled"/>
     </mat-form-field>
-    <button mat-icon-button *ngIf="advancedSearch"
-            [matTooltip]="(showAdvancedSearch ? 'Hide' : 'Show') + ' Advanced Search'"
-            (click)="toggleAdvancedSearch()">
-      <mat-icon>{{ showAdvancedSearch ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
-    </button>
+    @if (advancedSearch) {
+      <button mat-icon-button
+        [matTooltip]="(showAdvancedSearch ? 'Hide' : 'Show') + ' Advanced Search'"
+        (click)="toggleAdvancedSearch()">
+        <mat-icon>{{ showAdvancedSearch ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
+      </button>
+    }
   </div>
 
-  <div class="advanced-search" *ngIf="showAdvancedSearch">
-    <ng-content select="[advancedSearchContent]"></ng-content>  <!-- Placeholder for advanced search content -->
-  </div>
+  @if (showAdvancedSearch) {
+    <div class="advanced-search">
+      <ng-content select="[advancedSearchContent]"></ng-content>  <!-- Placeholder for advanced search content -->
+    </div>
+  }
 </mat-card>

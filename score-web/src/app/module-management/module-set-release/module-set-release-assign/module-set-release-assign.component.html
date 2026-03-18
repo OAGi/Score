@@ -1,7 +1,9 @@
 <div class="context-section">
-  <div *ngIf="isUpdating" class="loading-container">
-    <mat-spinner [diameter]="40"></mat-spinner>
-  </div>
+  @if (isUpdating) {
+    <div class="loading-container">
+      <mat-spinner [diameter]="40"></mat-spinner>
+    </div>
+  }
   <div class="ps-2 pe-2">
     <mat-toolbar class="bg-white">
       <span class="title">Core Component Assignment</span>
@@ -14,20 +16,28 @@
       <mat-card-content class="mat-card-container">
         <div class="finder-wrapper">
           <div class="finder-content">
-            <div *ngFor="let tile of tiles;" class="finder-grid">
-              <div class="finder-grid-left">
-                <div *ngFor="let element of tile.elements" class="grid-element">
-                  <div (click)="onClickElement(tile, element)"
-                       [ngClass]="{'grid-element-content': true, 'selected': tile.current === element}">
-                    <mat-icon *ngIf="element.directory" class="float-start" inline=true>folder_open</mat-icon>
-                    <mat-icon *ngIf="!element.directory" class="float-start" inline=true>insert_drive_file</mat-icon>
-                    <div class="float-start element-title">
-                      <span>{{ element.name }}</span>
+            @for (tile of tiles; track tile) {
+              <div class="finder-grid">
+                <div class="finder-grid-left">
+                  @for (element of tile.elements; track element) {
+                    <div class="grid-element">
+                      <div (click)="onClickElement(tile, element)"
+                        [ngClass]="{'grid-element-content': true, 'selected': tile.current === element}">
+                        @if (element.directory) {
+                          <mat-icon class="float-start" inline=true>folder_open</mat-icon>
+                        }
+                        @if (!element.directory) {
+                          <mat-icon class="float-start" inline=true>insert_drive_file</mat-icon>
+                        }
+                        <div class="float-start element-title">
+                          <span>{{ element.name }}</span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  }
                 </div>
               </div>
-            </div>
+            }
           </div>
         </div>
       </mat-card-content>
@@ -50,7 +60,9 @@
                   <mat-form-field>
                     <mat-label>Type</mat-label>
                     <mat-select (ngModelChange)="updateLeftFilterTypes($event)" [(ngModel)]="leftFilteredValues.types" multiple>
-                      <mat-option *ngFor="let type of ccTypes" [value]="type">{{type}}</mat-option>
+                      @for (type of ccTypes; track type) {
+                        <mat-option [value]="type">{{type}}</mat-option>
+                      }
                     </mat-select>
                   </mat-form-field>
                 </div>
@@ -58,9 +70,11 @@
                   <mat-form-field>
                     <mat-label>State</mat-label>
                     <mat-select (ngModelChange)="updateLeftFilterStates($event)" [(ngModel)]="leftFilteredValues.states" multiple>
-                      <mat-option *ngFor="let state of workingStateList" [value]="state">
-                        <span>{{ state | separate }}</span>
-                      </mat-option>
+                      @for (state of workingStateList; track state) {
+                        <mat-option [value]="state">
+                          <span>{{ state | separate }}</span>
+                        </mat-option>
+                      }
                     </mat-select>
                   </mat-form-field>
                 </div>
@@ -76,13 +90,17 @@
           <div style="width: 6%;"></div>
           <div style="width: 47%;">
             <div class="assign-cc-table-header">
-              <h4>Assigned <span *ngIf="selectedModuleElement">"{{ selectedModuleElement.name }}"</span></h4>
+              <h4>Assigned @if (selectedModuleElement) {
+                <span>"{{ selectedModuleElement.name }}"</span>
+              }</h4>
               <div class="assign-cc-table-filter">
                 <div class="assign-cc-table-filter-type">
                   <mat-form-field>
                     <mat-label>Type</mat-label>
                     <mat-select (ngModelChange)="updateRightFilterTypes($event)" [(ngModel)]="rightFilteredValues.types" multiple>
-                      <mat-option *ngFor="let type of ccTypes" [value]="type">{{type}}</mat-option>
+                      @for (type of ccTypes; track type) {
+                        <mat-option [value]="type">{{type}}</mat-option>
+                      }
                     </mat-select>
                   </mat-form-field>
                 </div>
@@ -90,9 +108,11 @@
                   <mat-form-field>
                     <mat-label>State</mat-label>
                     <mat-select (ngModelChange)="updateRightFilterStates($event)" [(ngModel)]="rightFilteredValues.states" multiple>
-                      <mat-option *ngFor="let state of workingStateList" [value]="state">
-                        <span>{{ state | separate }}</span>
-                      </mat-option>
+                      @for (state of workingStateList; track state) {
+                        <mat-option [value]="state">
+                          <span>{{ state | separate }}</span>
+                        </mat-option>
+                      }
                     </mat-select>
                   </mat-form-field>
                 </div>
@@ -109,18 +129,18 @@
         <div class="assign-cc-wrapper">
           <div class="assign-cc-table-wrapper">
             <table #leftSort="matSort" [dataSource]="leftDataSource" class="assign-cc-table-border" mat-table
-                   matSort>
+              matSort>
               <ng-container matColumnDef="checkbox">
                 <th *matHeaderCellDef mat-header-cell>
                   <mat-checkbox (change)="$event ? masterToggle(leftSelection, leftDataSource) : null"
-                                [checked]="leftSelection.hasValue() && isAllSelected(leftSelection, leftDataSource)"
-                                [indeterminate]="leftSelection.hasValue() && !isAllSelected(leftSelection, leftDataSource)">
+                    [checked]="leftSelection.hasValue() && isAllSelected(leftSelection, leftDataSource)"
+                    [indeterminate]="leftSelection.hasValue() && !isAllSelected(leftSelection, leftDataSource)">
                   </mat-checkbox>
                 </th>
                 <td *matCellDef="let element" mat-cell>
                   <mat-checkbox (change)="$event ? leftSelection.toggle(element) : null"
-                                (click)="$event.stopPropagation()"
-                                [checked]="leftSelection.isSelected(element)">
+                    (click)="$event.stopPropagation()"
+                    [checked]="leftSelection.isSelected(element)">
                   </mat-checkbox>
                 </td>
               </ng-container>
@@ -135,22 +155,30 @@
                   <span class="cc-state {{ element.state }}"
                         [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
                         'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state | separate }}</span>
-                  <span *ngIf="element.deprecated" class="cc-state Deprecated"
+                  @if (element.deprecated) {
+                    <span class="cc-state Deprecated"
                         [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
                     'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
+                  }
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="den">
                 <th *matHeaderCellDef mat-header-cell mat-sort-header> Den</th>
                 <td *matCellDef="let element" mat-cell>
-                  <a *ngIf="['ACC', 'ASCCP', 'BCCP'].indexOf(element.type) !== -1" class="den score-line-clamp-2 score-break-word"
-                     routerLink="/core_component/{{element.type.toLowerCase()}}/{{ element.manifestId }}"
-                     target="_blank">{{element.den}}</a>
-                  <a *ngIf="element.type === 'CODE_LIST'" class="den score-line-clamp-2 score-break-word" routerLink="/code_list/{{ element.manifestId }}"
-                     target="_blank">{{element.den}}</a>
-                  <span class="score-line-clamp-2 score-break-word"
-                    *ngIf="['ACC', 'ASCCP', 'BCCP', 'CODE_LIST'].indexOf(element.type) === -1">{{element.den}}</span>
+                  @if (['ACC', 'ASCCP', 'BCCP'].indexOf(element.type) !== -1) {
+                    <a class="den score-line-clamp-2 score-break-word"
+                      routerLink="/core_component/{{element.type.toLowerCase()}}/{{ element.manifestId }}"
+                    target="_blank">{{element.den}}</a>
+                  }
+                  @if (element.type === 'CODE_LIST') {
+                    <a class="den score-line-clamp-2 score-break-word" routerLink="/code_list/{{ element.manifestId }}"
+                    target="_blank">{{element.den}}</a>
+                  }
+                  @if (['ACC', 'ASCCP', 'BCCP', 'CODE_LIST'].indexOf(element.type) === -1) {
+                    <span class="score-line-clamp-2 score-break-word"
+                    >{{element.den}}</span>
+                  }
                 </td>
               </ng-container>
 
@@ -164,39 +192,43 @@
 
               <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
               <tr (click)="leftSelection.toggle(element)" *matRowDef="let element; columns: displayedColumns;"
-                  class="pointer"
-                  mat-row></tr>
+                class="pointer"
+              mat-row></tr>
             </table>
 
             <mat-paginator #leftPaginator
-                           [pageSizeOptions]="[10, 25, 50]"
-                           showFirstLastButtons></mat-paginator>
+              [pageSizeOptions]="[10, 25, 50]"
+            showFirstLastButtons></mat-paginator>
           </div>
           <div class="assign-cc-middle">
-            <button (click)="assign()" *ngIf="roles.includes('developer')"
-                    class="mb-3" mat-stroked-button matTooltip="Assign">
-              <mat-icon>arrow_forward</mat-icon>
-            </button>
+            @if (roles.includes('developer')) {
+              <button (click)="assign()"
+                class="mb-3" mat-stroked-button matTooltip="Assign">
+                <mat-icon>arrow_forward</mat-icon>
+              </button>
+            }
 
-            <button (click)="unassign()" *ngIf="roles.includes('developer')"
-                    mat-stroked-button matTooltip="Unassign">
-              <mat-icon>arrow_back</mat-icon>
-            </button>
+            @if (roles.includes('developer')) {
+              <button (click)="unassign()"
+                mat-stroked-button matTooltip="Unassign">
+                <mat-icon>arrow_back</mat-icon>
+              </button>
+            }
           </div>
           <div class="assign-cc-table-wrapper">
             <table #rightSort="matSort" [dataSource]="rightDataSource" class="assign-cc-table-border" mat-table
-                   matSort>
+              matSort>
               <ng-container matColumnDef="checkbox">
                 <th *matHeaderCellDef mat-header-cell>
                   <mat-checkbox (change)="$event ? masterToggle(rightSelection, rightDataSource) : null"
-                                [checked]="rightSelection.hasValue() && isAllSelected(rightSelection, rightDataSource)"
-                                [indeterminate]="rightSelection.hasValue() && !isAllSelected(rightSelection, rightDataSource)">
+                    [checked]="rightSelection.hasValue() && isAllSelected(rightSelection, rightDataSource)"
+                    [indeterminate]="rightSelection.hasValue() && !isAllSelected(rightSelection, rightDataSource)">
                   </mat-checkbox>
                 </th>
                 <td *matCellDef="let element" mat-cell>
                   <mat-checkbox (change)="$event ? rightSelection.toggle(element) : null"
-                                (click)="$event.stopPropagation()"
-                                [checked]="rightSelection.isSelected(element)">
+                    (click)="$event.stopPropagation()"
+                    [checked]="rightSelection.isSelected(element)">
                   </mat-checkbox>
                 </td>
               </ng-container>
@@ -211,22 +243,30 @@
                   <span class="cc-state {{ element.state }}"
                         [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
                         'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state | separate }}</span>
-                  <span *ngIf="element.deprecated" class="cc-state Deprecated"
+                  @if (element.deprecated) {
+                    <span class="cc-state Deprecated"
                         [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
                     'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
+                  }
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="den">
                 <th *matHeaderCellDef mat-header-cell mat-sort-header> Den</th>
                 <td *matCellDef="let element" mat-cell>
-                  <a *ngIf="['ACC', 'ASCCP', 'BCCP', 'DT'].indexOf(element.type) !== -1" class="den score-line-clamp-2 score-break-word"
-                     routerLink="/core_component/{{element.type.toLowerCase()}}/{{ element.manifestId }}"
-                     target="_blank">{{element.den}}</a>
-                  <a *ngIf="element.type === 'CODE_LIST'" class="den score-line-clamp-2 score-break-word" routerLink="/code_list/{{ element.manifestId }}"
-                     target="_blank">{{element.den}}</a>
-                  <span class="score-line-clamp-2 score-break-word"
-                    *ngIf="['ACC', 'ASCCP', 'BCCP', 'CODE_LIST', 'DT'].indexOf(element.type) === -1">{{element.den}}</span>
+                  @if (['ACC', 'ASCCP', 'BCCP', 'DT'].indexOf(element.type) !== -1) {
+                    <a class="den score-line-clamp-2 score-break-word"
+                      routerLink="/core_component/{{element.type.toLowerCase()}}/{{ element.manifestId }}"
+                    target="_blank">{{element.den}}</a>
+                  }
+                  @if (element.type === 'CODE_LIST') {
+                    <a class="den score-line-clamp-2 score-break-word" routerLink="/code_list/{{ element.manifestId }}"
+                    target="_blank">{{element.den}}</a>
+                  }
+                  @if (['ACC', 'ASCCP', 'BCCP', 'CODE_LIST', 'DT'].indexOf(element.type) === -1) {
+                    <span class="score-line-clamp-2 score-break-word"
+                    >{{element.den}}</span>
+                  }
                 </td>
               </ng-container>
 
@@ -240,13 +280,13 @@
 
               <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
               <tr (click)="rightSelection.toggle(element)" *matRowDef="let element; columns: displayedColumns;"
-                  class="pointer"
-                  mat-row></tr>
+                class="pointer"
+              mat-row></tr>
             </table>
 
             <mat-paginator #rightPaginator
               [pageSizeOptions]="[10, 25, 50]"
-              showFirstLastButtons></mat-paginator>
+            showFirstLastButtons></mat-paginator>
           </div>
         </div>
       </mat-card-content>

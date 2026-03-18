@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
@@ -41,6 +41,15 @@ import {ScoreTableColumnResizeDirective} from '../../../common/score-table-colum
   ]
 })
 export class BasedAccDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<ExtensionDetailComponent>>(MatDialogRef);
+  private auth = inject(AuthService);
+  private ccListService = inject(CcListService);
+  private accountService = inject(AccountListService);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+  webPageInfo = inject(WebPageInfoService);
+  data = inject(MAT_DIALOG_DATA);
+
 
   workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published'];
   releaseStateList = ['WIP', 'QA', 'Production', 'Published'];
@@ -174,16 +183,6 @@ export class BasedAccDialogComponent implements OnInit {
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
-
-  constructor(public dialogRef: MatDialogRef<ExtensionDetailComponent>,
-              private auth: AuthService,
-              private ccListService: CcListService,
-              private accountService: AccountListService,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService,
-              public webPageInfo: WebPageInfoService,
-              @Inject(MAT_DIALOG_DATA) public data: any) {
-  }
 
   ngOnInit() {
     this.action = this.data.action;

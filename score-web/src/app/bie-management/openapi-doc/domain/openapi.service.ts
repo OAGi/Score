@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import {
   AssignBieForOasDoc,
@@ -15,8 +15,8 @@ import {PageRequest, PageResponse} from '../../../basis/basis';
 
 @Injectable()
 export class OpenAPIService {
-  constructor(private http: HttpClient) {
-  }
+  private http = inject(HttpClient);
+
 
   getOasDocList(request: OasDocListRequest): Observable<PageResponse<OasDoc>> {
     let params = new HttpParams()

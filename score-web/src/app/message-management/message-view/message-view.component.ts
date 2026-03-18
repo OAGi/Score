@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AuthService} from '../../authentication/auth.service';
@@ -14,19 +14,17 @@ import {MatSnackBar} from '@angular/material/snack-bar';
   styleUrls: ['./message-view.component.css']
 })
 export class MessageViewComponent implements OnInit {
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private auth = inject(AuthService);
+  private snackBar = inject(MatSnackBar);
+  private messageService = inject(MessageService);
+
 
   loading: boolean;
   messageId: number;
   message: MessageDetails = new MessageDetails();
-
-  constructor(
-    private location: Location,
-    private router: Router,
-    private route: ActivatedRoute,
-    private auth: AuthService,
-    private snackBar: MatSnackBar,
-    private messageService: MessageService) {
-  }
 
   ngOnInit(): void {
     this.loading = true;

@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {PageResponse} from '../../basis/basis';
@@ -8,9 +8,8 @@ import {CcListEntry} from '../../cc-management/cc-list/domain/cc-list';
 
 @Injectable()
 export class LogService {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-  }
 
   getRevisions(request: LogListRequest): Observable<PageResponse<Log>> {
     const params = new HttpParams()

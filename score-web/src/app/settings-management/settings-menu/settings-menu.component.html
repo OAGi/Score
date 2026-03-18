@@ -12,7 +12,7 @@
         </div>
       </a>
       <a class="vertical-align" mat-list-item class="nav-item {{ active === 'Preferences' ? 'active' : '' }}"
-         routerLink="/settings/preferences">
+        routerLink="/settings/preferences">
         <div class="d-flex">
           <mat-icon mat-list-icon class="mat-icon">edit</mat-icon>
           <div mat-line class="mat-line" style="padding-left: 10px; align-content: center;">
@@ -21,12 +21,14 @@
         </div>
       </a>
       <mat-list-item class="nav-item {{ active === 'ApplicationSettings' ? 'active' : '' }}"
-                     [routerLink]="isAdmin ? '/settings/application_settings' : null" [disabled]="!isAdmin">
+        [routerLink]="isAdmin ? '/settings/application_settings' : null" [disabled]="!isAdmin">
         <div class="d-flex">
           <mat-icon mat-list-icon>developer_mode</mat-icon>
           <div mat-line style="padding-left: 10px; align-content: center;">
             <span>Application settings</span>
-            <div class="admin-only" *ngIf="!isAdmin">Admin only</div>
+            @if (!isAdmin) {
+              <div class="admin-only">Admin only</div>
+            }
           </div>
         </div>
       </mat-list-item>

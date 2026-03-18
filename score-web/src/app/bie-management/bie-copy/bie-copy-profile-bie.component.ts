@@ -1,4 +1,4 @@
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {BieCopyService} from './domain/bie-copy.service';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -38,6 +38,20 @@ import {LibraryService} from '../../library-management/domain/library.service';
   styleUrls: ['./bie-copy-profile-bie.component.css']
 })
 export class BieCopyProfileBieComponent implements OnInit {
+  private bizCtxService = inject(BusinessContextService);
+  private service = inject(BieCopyService);
+  private bieListService = inject(BieListService);
+  private accountService = inject(AccountListService);
+  private releaseService = inject(ReleaseService);
+  private libraryService = inject(LibraryService);
+  private auth = inject(AuthService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private snackBar = inject(MatSnackBar);
+  webPageInfo = inject(WebPageInfoService);
+
 
   title = 'Copy BIE';
   subtitle = 'Select BIE';
@@ -196,21 +210,6 @@ export class BieCopyProfileBieComponent implements OnInit {
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
 
   HIDE_UNUSED_PROPERTY_KEY = 'BIE-Settings-Hide-Unused';
-
-  constructor(private bizCtxService: BusinessContextService,
-              private service: BieCopyService,
-              private bieListService: BieListService,
-              private accountService: AccountListService,
-              private releaseService: ReleaseService,
-              private libraryService: LibraryService,
-              private auth: AuthService,
-              private preferencesService: SettingsPreferencesService,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute,
-              private snackBar: MatSnackBar,
-              public webPageInfo: WebPageInfoService) {
-  }
 
   ngOnInit() {
     this.request = new BieListRequest(this.route.snapshot.queryParamMap,

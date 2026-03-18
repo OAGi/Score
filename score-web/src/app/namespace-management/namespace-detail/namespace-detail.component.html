@@ -12,23 +12,25 @@
         <mat-form-field>
           <mat-label>URI</mat-label>
           <input matInput required
-                 [formControl]="uriForm"
-                 [value]="uriForm.value">
-          <mat-error *ngIf="uriForm.hasError('pattern')">
-            '{{ uriForm.value }}' is not allow for URI format
-          </mat-error>
+            [formControl]="uriForm"
+            [value]="uriForm.value">
+          @if (uriForm.hasError('pattern')) {
+            <mat-error>
+              '{{ uriForm.value }}' is not allow for URI format
+            </mat-error>
+          }
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Prefix</mat-label>
           <input matInput [(ngModel)]="namespace.prefix" maxlength="45"
-                 [disabled]="!namespace.canEdit"/>
+            [disabled]="!namespace.canEdit"/>
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Description</mat-label>
           <textarea rows="6" cols="30" matInput [(ngModel)]="namespace.description"
-                    [disabled]="!namespace.canEdit"></textarea>
+          [disabled]="!namespace.canEdit"></textarea>
         </mat-form-field>
 
         <mat-checkbox [checked]="namespace.standard" [disabled]="true">Standard</mat-checkbox>
@@ -41,16 +43,20 @@
     <div class="col-12 actions-wrap">
       <div class="actions">
         <button mat-raised-button (click)="back()">Back</button>
-        <button mat-raised-button color="primary" *ngIf="namespace.canEdit"
-                [disabled]="updateDisabled"
-                (click)="update()">
-          Update
-        </button>
-        <button mat-raised-button color="warn" *ngIf="namespace.canEdit"
-                [disabled]="!namespace.canEdit"
-                (click)="discard()">
-          Discard
-        </button>
+        @if (namespace.canEdit) {
+          <button mat-raised-button color="primary"
+            [disabled]="updateDisabled"
+            (click)="update()">
+            Update
+          </button>
+        }
+        @if (namespace.canEdit) {
+          <button mat-raised-button color="warn"
+            [disabled]="!namespace.canEdit"
+            (click)="discard()">
+            Discard
+          </button>
+        }
       </div>
     </div>
   </div>

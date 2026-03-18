@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {BusinessTermService} from '../domain/business-term.service';
@@ -15,6 +15,12 @@ import {saveAs} from 'file-saver';
   styleUrls: ['./business-term-upload-file.component.css']
 })
 export class BusinessTermUploadFileComponent implements OnInit {
+  private service = inject(BusinessTermService);
+  private location = inject(Location);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
+
 
   title = 'Upload Business Terms';
 
@@ -23,13 +29,6 @@ export class BusinessTermUploadFileComponent implements OnInit {
   fileName = '';
   uploadProgress: number;
   uploadSub: Subscription;
-
-  constructor(private service: BusinessTermService,
-              private location: Location,
-              private route: ActivatedRoute,
-              private router: Router,
-              private snackBar: MatSnackBar) {
-  }
 
   ngOnInit() {
   }

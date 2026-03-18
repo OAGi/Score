@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {BusinessContextValue} from '../domain/business-context';
 import {ContextSchemeSummary, ContextSchemeValueListRequest, ContextSchemeValueSummary} from '../../context-scheme/domain/context-scheme';
@@ -18,6 +18,11 @@ import {finalize} from 'rxjs/operators';
   styleUrls: ['./business-context-value-dialog.component.css']
 })
 export class BusinessContextValueDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<BusinessContextValueDialogComponent>>(MatDialogRef);
+  private contextCategoryService = inject(ContextCategoryService);
+  private contextSchemeService = inject(ContextSchemeService);
+  businessContextValue = inject<BusinessContextValue>(MAT_DIALOG_DATA);
+
 
   isLoading;
   isAddAction;
@@ -35,13 +40,6 @@ export class BusinessContextValueDialogComponent implements OnInit {
   contextSchemeValueList: ContextSchemeValueSummary[] = [];
   contextSchemeValueListFilterCtrl: FormControl = new FormControl();
   filteredContextSchemeValueList: ReplaySubject<ContextSchemeValueSummary[]> = new ReplaySubject<ContextSchemeValueSummary[]>(1);
-
-  constructor(
-    public dialogRef: MatDialogRef<BusinessContextValueDialogComponent>,
-    private contextCategoryService: ContextCategoryService,
-    private contextSchemeService: ContextSchemeService,
-    @Inject(MAT_DIALOG_DATA) public businessContextValue: BusinessContextValue) {
-  }
 
   get contextCategory(): ContextCategorySummary {
     if (this.businessContextValue.contextCategoryId) {

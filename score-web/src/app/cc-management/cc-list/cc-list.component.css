@@ -197,7 +197,7 @@ mat-toolbar .mat-icon {
   width: 172px;
   padding: 4px 8px;
   border-radius: 4px;
-  box-shadow: var(--mdc-protected-button-container-elevation-shadow);
+  box-shadow: var(--mat-button-protected-container-elevation-shadow);
 }
 
 .library-divider {

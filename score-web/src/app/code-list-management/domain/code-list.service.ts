@@ -1,5 +1,5 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {Observable} from 'rxjs';
 import {CodeListCreateResponse, CodeListDetails, CodeListListEntry, CodeListListEntryRequest, CodeListSummary} from './code-list';
 import {PageResponse} from '../../basis/basis';
@@ -10,9 +10,8 @@ import {NamespaceSummary} from '../../namespace-management/domain/namespace';
 
 @Injectable()
 export class CodeListService {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-  }
 
   getCodeListSummaries(releaseId: number): Observable<CodeListSummary[]> {
     const params = new HttpParams()

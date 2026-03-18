@@ -1,6 +1,6 @@
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
-import {Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
 import {finalize, switchMap} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
@@ -74,6 +74,22 @@ import {SettingsPreferencesService} from '../../settings-management/settings-pre
   styleUrls: ['./extension-detail.component.css']
 })
 export class ExtensionDetailComponent implements OnInit {
+  private service = inject(CcNodeService);
+  private searchOptionsService = inject(SearchOptionsService);
+  private releaseService = inject(ReleaseService);
+  private snackBar = inject(MatSnackBar);
+  private namespaceService = inject(NamespaceService);
+  private dialog = inject(MatDialog);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private tagService = inject(TagService);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private auth = inject(AuthService);
+  private stompService = inject(RxStompService);
+  private clipboard = inject(Clipboard);
+
 
   protected readonly trim = trim;
 
@@ -134,23 +150,6 @@ export class ExtensionDetailComponent implements OnInit {
   set hideCardinality(hideCardinality: boolean) {
     this.dataSource.hideCardinality = hideCardinality;
     saveBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, hideCardinality);
-  }
-
-  constructor(private service: CcNodeService,
-              private searchOptionsService: SearchOptionsService,
-              private releaseService: ReleaseService,
-              private snackBar: MatSnackBar,
-              private namespaceService: NamespaceService,
-              private dialog: MatDialog,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService,
-              private tagService: TagService,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute,
-              private auth: AuthService,
-              private stompService: RxStompService,
-              private clipboard: Clipboard) {
   }
 
   ngOnInit() {

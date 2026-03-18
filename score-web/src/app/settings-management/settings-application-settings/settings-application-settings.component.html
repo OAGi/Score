@@ -1,7 +1,9 @@
 <div class="context-section">
-  <div class="loading-container" *ngIf="loading">
-    <mat-spinner [diameter]="40"></mat-spinner>
-  </div>
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner [diameter]="40"></mat-spinner>
+    </div>
+  }
 
   <div class="settings-layout">
     <score-settings-menu active="ApplicationSettings"></score-settings-menu>
@@ -23,32 +25,32 @@
                     <mat-label>Multi-tenant mode</mat-label>
                     <div class="actions">
                       <button mat-raised-button color="primary"
-                              (click)="updateTenantConfiguration(true)"
-                              [disabled]="isTenantEnabled">
+                        (click)="updateTenantConfiguration(true)"
+                        [disabled]="isTenantEnabled">
                         Enable
                       </button>
                       <button mat-raised-button color="warn"
-                              (click)="updateTenantConfiguration(false)"
-                              [disabled]="!isTenantEnabled">
+                        (click)="updateTenantConfiguration(false)"
+                        [disabled]="!isTenantEnabled">
                         Disable
                       </button>
                     </div>
                   </div>
                   <div class="col-md-4 col-sm-12">
                     <mat-label [matTooltip]="'Unavailable in multi-tenant mode'"
-                               [matTooltipDisabled]="!isTenantEnabled"
-                               [class.feature-disabled-label]="isTenantEnabled">
+                      [matTooltipDisabled]="!isTenantEnabled"
+                      [class.feature-disabled-label]="isTenantEnabled">
                       Business term function
                     </mat-label>
                     <div class="actions">
                       <button mat-raised-button color="primary"
-                              (click)="updateBusinessTermConfiguration(true)"
-                              [disabled]="isTenantEnabled || isBusinessTermEnabled">
+                        (click)="updateBusinessTermConfiguration(true)"
+                        [disabled]="isTenantEnabled || isBusinessTermEnabled">
                         Enable
                       </button>
                       <button mat-raised-button color="warn"
-                              (click)="updateBusinessTermConfiguration(false)"
-                              [disabled]="isTenantEnabled || !isBusinessTermEnabled">
+                        (click)="updateBusinessTermConfiguration(false)"
+                        [disabled]="isTenantEnabled || !isBusinessTermEnabled">
                         Disable
                       </button>
                     </div>
@@ -57,13 +59,13 @@
                     <mat-label>BIE Inverse Mode</mat-label>
                     <div class="actions">
                       <button mat-raised-button color="primary"
-                              (click)="updateBIEInverseModeConfiguration(true)"
-                              [disabled]="isBIEInverseModeEnabled">
+                        (click)="updateBIEInverseModeConfiguration(true)"
+                        [disabled]="isBIEInverseModeEnabled">
                         Enable
                       </button>
                       <button mat-raised-button color="warn"
-                              (click)="updateBIEInverseModeConfiguration(false)"
-                              [disabled]="!isBIEInverseModeEnabled">
+                        (click)="updateBIEInverseModeConfiguration(false)"
+                        [disabled]="!isBIEInverseModeEnabled">
                         Disable
                       </button>
                     </div>
@@ -74,13 +76,13 @@
                     <mat-label>Email-Based Workflows</mat-label>
                     <div class="actions">
                       <button mat-raised-button color="primary"
-                              (click)="updateFunctionsRequiringEmailTransmissionConfiguration(true)"
-                              [disabled]="isFunctionsRequiringEmailTransmissionEnabled">
+                        (click)="updateFunctionsRequiringEmailTransmissionConfiguration(true)"
+                        [disabled]="isFunctionsRequiringEmailTransmissionEnabled">
                         Enable
                       </button>
                       <button mat-raised-button color="warn"
-                              (click)="updateFunctionsRequiringEmailTransmissionConfiguration(false)"
-                              [disabled]="!isFunctionsRequiringEmailTransmissionEnabled">
+                        (click)="updateFunctionsRequiringEmailTransmissionConfiguration(false)"
+                        [disabled]="!isFunctionsRequiringEmailTransmissionEnabled">
                         Disable
                       </button>
                     </div>
@@ -89,612 +91,624 @@
                     <mat-label>Browse Standard mode</mat-label>
                     <div class="actions">
                       <button mat-raised-button color="primary"
-                              (click)="updateBrowseStandardModeConfiguration(true)"
-                              [disabled]="isBrowseStandardModeEnabled">
+                        (click)="updateBrowseStandardModeConfiguration(true)"
+                        [disabled]="isBrowseStandardModeEnabled">
                         Enable
                       </button>
                       <button mat-raised-button color="warn"
-                              (click)="updateBrowseStandardModeConfiguration(false)"
-                              [disabled]="!isBrowseStandardModeEnabled">
+                        (click)="updateBrowseStandardModeConfiguration(false)"
+                        [disabled]="!isBrowseStandardModeEnabled">
                         Disable
                       </button>
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="mt-4" *ngIf="!!applicationSettingsInfo">
-                <div class="subhead">
-                  <h4 class="subhead-heading">SMTP settings</h4>
+              @if (!!applicationSettingsInfo) {
+                <div class="mt-4">
+                  <div class="subhead">
+                    <h4 class="subhead-heading">SMTP settings</h4>
+                  </div>
+                  <div class="webpage-setting">
+                    <div class="row">
+                      <div class="col-3">
+                        <div class="subsubhead">
+                          <h5 class="subsubhead-heading">Host</h5>
+                        </div>
+                        <input class="width-max"
+                          [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.host" />
+                      </div>
+                      <div class="col-3">
+                        <div class="subsubhead">
+                          <h5 class="subsubhead-heading">Port</h5>
+                        </div>
+                        <input class="width-max"
+                          [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.port" />
+                      </div>
+                    </div>
+                    <div class="row mt-2">
+                      <div class="col-3">
+                        <mat-checkbox [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.auth">Enable Auth</mat-checkbox>
+                      </div>
+                      <div class="col-3">
+                        <mat-checkbox [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.startTlsEnable">Enable STARTTLS</mat-checkbox>
+                      </div>
+                      <div class="col-3">
+                        <mat-checkbox [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.sslEnable">Enable SSL</mat-checkbox>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-3">
+                        <div class="subsubhead">
+                          <h5 class="subsubhead-heading">Auth Method</h5>
+                        </div>
+                        <input class="width-max"
+                          [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.authMethod" />
+                      </div>
+                      <div class="col-3">
+                        <div class="subsubhead">
+                          <h5 class="subsubhead-heading">Auth Username</h5>
+                        </div>
+                        <input class="width-max"
+                          [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.authUsername" />
+                      </div>
+                      <div class="col-3">
+                        <div class="subsubhead">
+                          <h5 class="subsubhead-heading">Auth Password</h5>
+                        </div>
+                        <input type="password" class="width-max"
+                          [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.authPassword" />
+                      </div>
+                    </div>
+                    <div class="actions pt-4">
+                      <div>
+                        <button mat-raised-button color="primary" (click)="updateApplicationSettingsInfo()">
+                          Update
+                        </button>
+                        <button mat-raised-button color="warn" (click)="testEmailSettings()">
+                          Test
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div class="webpage-setting">
-                  <div class="row">
-                    <div class="col-3">
-                      <div class="subsubhead">
-                        <h5 class="subsubhead-heading">Host</h5>
-                      </div>
-                      <input class="width-max"
-                             [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.host" />
-                    </div>
-                    <div class="col-3">
-                      <div class="subsubhead">
-                        <h5 class="subsubhead-heading">Port</h5>
-                      </div>
-                      <input class="width-max"
-                             [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.port" />
-                    </div>
+              }
+              @if (!!applicationSettingsInfo) {
+                <div class="mt-4">
+                  <div class="subhead">
+                    <h4 class="subhead-heading">Filename Expressions</h4>
                   </div>
-                  <div class="row mt-2">
-                    <div class="col-3">
-                      <mat-checkbox [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.auth">Enable Auth</mat-checkbox>
-                    </div>
-                    <div class="col-3">
-                      <mat-checkbox [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.startTlsEnable">Enable STARTTLS</mat-checkbox>
-                    </div>
-                    <div class="col-3">
-                      <mat-checkbox [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.sslEnable">Enable SSL</mat-checkbox>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-3">
-                      <div class="subsubhead">
-                        <h5 class="subsubhead-heading">Auth Method</h5>
+                  <div class="webpage-setting">
+                    <div class="row">
+                      <div class="col-12">
+                        <details>
+                          <summary><b>Guide</b></summary>
+                          <div class="pt-2">
+                            <div class="filename-expression-guide-syntax">
+                              <b>Filename Syntax</b>:
+                              <pre class="filename-expression-ebnf"><code ngNonBindable>expression       = &#123; literal | optional-group | placeholder &#125; ;
+                                optional-group   = "(" , expression , ")" ;
+                                placeholder      = "&#123;" , placeholder-name , [ "?" , flag-name ] , [ ":" , modifier-chain ] , "&#125;" ;
+                                modifier-chain   = modifier-token , &#123; ":" , modifier-token &#125; ;
+                                modifier-token   = "separator" , "(" , quoted-arg , ")"
+                                | "replace" , "(" , quoted-arg , "," , quoted-arg , ")"
+                              | raw-separator ;</code></pre>
+                            </div>
+                            <div class="pt-2"><b>Duplicate Handler Syntax</b>: <code>-&#123;Incremental&#125;</code>, <code>~&#123;BIE ID&#125;</code></div>
+                            <div class="pt-2"><b>Flags</b>: `includeBusinessContext`, `includeVersion`</div>
+                            <div class="pt-2"><b>Common placeholders</b>: `BIE Property Term`, `BIE Display Name`, `BIE Version`, `BIE DEN`, `BIE Status`, `BIE Remark`, `BIE ID`, `Business Context Names`, `Business Context Name[0]`</div>
+                            <div class="pt-2"><b>BIE Package only</b>: `BIE Package Name`, `BIE Package Version ID`, `BIE Package Version Name`</div>
+                            <div class="pt-2"><b>Duplicate handler placeholders</b>: `Incremental`, `BIE ID`</div>
+                            <div class="pt-2"><b>Example (BIE Schema)</b>: <code>&#123;BIE Property Term:separator('-')&#125;(-&#123;Business Context Name[0]?includeBusinessContext&#125;)(-&#123;BIE Version?includeVersion:replace('\\.', '_')&#125;)</code></div>
+                            <div class="pt-2"><b>Example (BIE Package Schema)</b>: <code>&#123;BIE Package Name&#125;-&#123;BIE Package Version ID&#125;_&#123;Business Context Names:replace('\\s+', ''):separator('+')&#125;_&#123;BIE Property Term&#125;([&#123;BIE Display Name&#125;])(-&#123;BIE Version&#125;)</code></div>
+                          </div>
+                        </details>
                       </div>
-                      <input class="width-max"
-                             [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.authMethod" />
                     </div>
-                    <div class="col-3">
-                      <div class="subsubhead">
-                        <h5 class="subsubhead-heading">Auth Username</h5>
+                    <div class="row pt-2">
+                      <div class="col-6">
+                        <div class="subsubhead">
+                          <h5 class="subsubhead-heading">BIE Schema Expression</h5>
+                        </div>
+                        <textarea class="width-max"
+                          [class.filename-expression-input-error]="!!bieSchemaFilenameExpressionError"
+                          cdkTextareaAutosize
+                          [cdkAutosizeMinRows]="3"
+                          [cdkAutosizeMaxRows]="8"
+                          [(ngModel)]="applicationSettingsInfo.bieSchemaFilenameExpression"
+                        (ngModelChange)="queueBieSchemaFilenamePreview()"></textarea>
+                        <div class="subsubhead pt-2">
+                          <h5 class="subsubhead-heading">Duplicate Handler Expression</h5>
+                        </div>
+                        <textarea class="width-max"
+                          [class.filename-expression-input-error]="!!bieSchemaFilenameExpressionError"
+                          cdkTextareaAutosize
+                          [cdkAutosizeMinRows]="2"
+                          [cdkAutosizeMaxRows]="4"
+                          [(ngModel)]="applicationSettingsInfo.bieSchemaFilenameDuplicateHandlerExpression"
+                        (ngModelChange)="queueBieSchemaFilenamePreview()"></textarea>
+                        @if (bieSchemaFilenameExpressionError) {
+                          <div
+                            class="filename-expression-error"
+                            role="alert">
+                            {{ bieSchemaFilenameExpressionError }}
+                          </div>
+                        }
+                        <div class="pt-2"><b>Sample Filename:</b> <code>{{ bieSchemaSampleFilename || '-' }}</code></div>
+                        <div class="pt-1"><b>Sample Duplicate Filename:</b> <code>{{ bieSchemaSampleDuplicateFilename || '-' }}</code></div>
                       </div>
-                      <input class="width-max"
-                             [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.authUsername" />
-                    </div>
-                    <div class="col-3">
-                      <div class="subsubhead">
-                        <h5 class="subsubhead-heading">Auth Password</h5>
+                      <div class="col-6">
+                        <div class="subsubhead">
+                          <h5 class="subsubhead-heading">BIE Package Schema Expression</h5>
+                        </div>
+                        <textarea class="width-max"
+                          [class.filename-expression-input-error]="!!biePackageSchemaFilenameExpressionError"
+                          cdkTextareaAutosize
+                          [cdkAutosizeMinRows]="3"
+                          [cdkAutosizeMaxRows]="8"
+                          [(ngModel)]="applicationSettingsInfo.biePackageSchemaFilenameExpression"
+                        (ngModelChange)="queueBiePackageSchemaFilenamePreview()"></textarea>
+                        <div class="subsubhead pt-2">
+                          <h5 class="subsubhead-heading">Duplicate Handler Expression</h5>
+                        </div>
+                        <textarea class="width-max"
+                          [class.filename-expression-input-error]="!!biePackageSchemaFilenameExpressionError"
+                          cdkTextareaAutosize
+                          [cdkAutosizeMinRows]="2"
+                          [cdkAutosizeMaxRows]="4"
+                          [(ngModel)]="applicationSettingsInfo.biePackageSchemaFilenameDuplicateHandlerExpression"
+                        (ngModelChange)="queueBiePackageSchemaFilenamePreview()"></textarea>
+                        @if (biePackageSchemaFilenameExpressionError) {
+                          <div
+                            class="filename-expression-error"
+                            role="alert">
+                            {{ biePackageSchemaFilenameExpressionError }}
+                          </div>
+                        }
+                        <div class="pt-2"><b>Sample Filename:</b> <code>{{ biePackageSchemaSampleFilename || '-' }}</code></div>
+                        <div class="pt-1"><b>Sample Duplicate Filename:</b> <code>{{ biePackageSchemaSampleDuplicateFilename || '-' }}</code></div>
                       </div>
-                      <input type="password" class="width-max"
-                             [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.authPassword" />
                     </div>
-                  </div>
-                  <div class="actions pt-4">
-                    <div>
-                      <button mat-raised-button color="primary" (click)="updateApplicationSettingsInfo()">
+                    <div class="actions pt-4">
+                      <button mat-raised-button color="primary" (click)="updateBieFilenameExpressions()">
                         Update
                       </button>
-                      <button mat-raised-button color="warn" (click)="testEmailSettings()">
-                        Test
+                    </div>
+                  </div>
+                </div>
+              }
+              @if (!!webPageInfo) {
+                <div class="mt-4">
+                  <div class="subhead">
+                    <h4 class="subhead-heading">Web Page Settings</h4>
+                  </div>
+                  <div class="webpage-setting">
+                    <div class="row">
+                      <div class="col-8">
+                        <div class="subsubhead">
+                          <h5 class="subsubhead-heading">Brand Logo (Supported format: SVG, Recommended size: 160x26)</h5>
+                        </div>
+                        <textarea class="width-max"
+                          cdkTextareaAutosize
+                          [cdkAutosizeMinRows]="6"
+                          [cdkAutosizeMaxRows]="20"
+                        [(ngModel)]="webPageInfo.brand"></textarea>
+                      </div>
+                      <div class="col-4">
+                        <div class="subsubhead">
+                          <h5 class="subsubhead-heading">Preview</h5>
+                        </div>
+                        <div class="brand-preview-container">
+                          <div class="brand-preview" [innerHTML]="safetHtml(webPageInfo.brand)">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="webpage-setting">
+                    <div class="row">
+                      <div class="col-8">
+                        <div class="subsubhead">
+                          <h5 class="subsubhead-heading">Favicon Link (URL)</h5>
+                        </div>
+                        <textarea class="width-max"
+                          cdkTextareaAutosize
+                          [cdkAutosizeMinRows]="3"
+                          [cdkAutosizeMaxRows]="6"
+                        [(ngModel)]="webPageInfo.favicon"></textarea>
+                      </div>
+                      <div class="col-4">
+                        <div class="subsubhead">
+                          <h5 class="subsubhead-heading">Preview</h5>
+                        </div>
+                        <div class="favicon-preview-container">
+                          @if (webPageInfo.favicon) {
+                            <img class="favicon-preview" [src]="webPageInfo.favicon">
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="webpage-setting">
+                    <div class="row">
+                      <div class="col-8">
+                        <div class="subsubhead">
+                          <h5 class="subsubhead-heading">Sign-in Page Statement (formatted in Markdown)</h5>
+                        </div>
+                        <textarea class="width-max"
+                          cdkTextareaAutosize
+                          [cdkAutosizeMinRows]="6"
+                          [cdkAutosizeMaxRows]="20"
+                        [(ngModel)]="webPageInfo.signInStatement"></textarea>
+                      </div>
+                      <div class="col-4">
+                        <div class="subsubhead">
+                          <h5 class="subsubhead-heading">Preview</h5>
+                        </div>
+                        <div class="statement-container">
+                          <markdown [data]="webPageInfo.signInStatement"></markdown>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="webpage-setting component-state-colors pt-2">
+                    <div class="row">
+                      <div class="col-12">
+                        <div class="subsubhead">
+                          <h5 class="subsubhead-heading">Component State Colors</h5>
+                        </div>
+                        <div class="container-fluid">
+                          <div class="row">
+                            <div class="col-lg-2 col-md-3 col-sm-6">
+                              <div class="state WIP" [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('WIP').background, 'color': webPageInfo.getComponentStateColorSet('WIP').font}">
+                                <span>WIP</span>
+                              </div>
+                              <div class="row pt-2">
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Font</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('WIP').font">
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Background</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('WIP').background">
+                                  </mat-form-field>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-lg-2 col-md-3 col-sm-6">
+                              <div class="state QA" [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('QA').background, 'color': webPageInfo.getComponentStateColorSet('QA').font}">
+                                <span>QA</span>
+                              </div>
+                              <div class="row pt-2">
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Font</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('QA').font">
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Background</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('QA').background">
+                                  </mat-form-field>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-lg-2 col-md-3 col-sm-6">
+                              <div class="state Draft" [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Draft').background, 'color': webPageInfo.getComponentStateColorSet('Draft').font}">
+                                <span>Draft</span>
+                              </div>
+                              <div class="row pt-2">
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Font</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('Draft').font">
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Background</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('Draft').background">
+                                  </mat-form-field>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-lg-2 col-md-3 col-sm-6">
+                              <div class="state Candidate" [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Candidate').background, 'color': webPageInfo.getComponentStateColorSet('Candidate').font}">
+                                <span>Candidate</span>
+                              </div>
+                              <div class="row pt-2">
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Font</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('Candidate').font">
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Background</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('Candidate').background">
+                                  </mat-form-field>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-lg-2 col-md-3 col-sm-6">
+                              <div class="state Production" [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Production').background, 'color': webPageInfo.getComponentStateColorSet('Production').font}">
+                                <span>Production</span>
+                              </div>
+                              <div class="row pt-2">
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Font</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('Production').font">
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Background</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('Production').background">
+                                  </mat-form-field>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-lg-2 col-md-3 col-sm-6">
+                              <div class="state Published" [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Published').background, 'color': webPageInfo.getComponentStateColorSet('Published').font}">
+                                <span>Published</span>
+                              </div>
+                              <div class="row pt-2">
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Font</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('Published').font">
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Background</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('Published').background">
+                                  </mat-form-field>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-lg-2 col-md-3 col-sm-6">
+                              <div class="state ReleaseDraft" [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('ReleaseDraft').background, 'color': webPageInfo.getComponentStateColorSet('ReleaseDraft').font}">
+                                <span>ReleaseDraft</span>
+                              </div>
+                              <div class="row pt-2">
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Font</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('ReleaseDraft').font">
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Background</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('ReleaseDraft').background">
+                                  </mat-form-field>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-lg-2 col-md-3 col-sm-6">
+                              <div class="state Deleted" [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deleted').background, 'color': webPageInfo.getComponentStateColorSet('Deleted').font}">
+                                <span>Deleted</span>
+                              </div>
+                              <div class="row pt-2">
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Font</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('Deleted').font">
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Background</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('Deleted').background">
+                                  </mat-form-field>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-lg-2 col-md-3 col-sm-6">
+                              <div class="state Deprecated" [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background, 'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">
+                                <span>Deprecated</span>
+                              </div>
+                              <div class="row pt-2">
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Font</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('Deprecated').font">
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Background</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('Deprecated').background">
+                                  </mat-form-field>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="webpage-setting release-state-colors pt-2">
+                    <div class="row">
+                      <div class="col-12">
+                        <div class="subsubhead">
+                          <h5 class="subsubhead-heading">Release State Colors</h5>
+                        </div>
+                        <div class="container-fluid">
+                          <div class="row">
+                            <div class="col-lg-2 col-md-3 col-sm-6">
+                              <div class="state Processing" [ngStyle]="{'background-color': webPageInfo.getReleaseStateColorSet('Processing').background, 'color': webPageInfo.getReleaseStateColorSet('Processing').font}">
+                                <span>Processing</span>
+                              </div>
+                              <div class="row pt-2">
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Font</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getReleaseStateColorSet('Processing').font">
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Background</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getReleaseStateColorSet('Processing').background">
+                                  </mat-form-field>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-lg-2 col-md-3 col-sm-6">
+                              <div class="state Initialized" [ngStyle]="{'background-color': webPageInfo.getReleaseStateColorSet('Initialized').background, 'color': webPageInfo.getReleaseStateColorSet('Initialized').font}">
+                                <span>Initialized</span>
+                              </div>
+                              <div class="row pt-2">
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Font</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getReleaseStateColorSet('Initialized').font">
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Background</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getReleaseStateColorSet('Initialized').background">
+                                  </mat-form-field>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-lg-2 col-md-3 col-sm-6">
+                              <div class="state Draft" [ngStyle]="{'background-color': webPageInfo.getReleaseStateColorSet('Draft').background, 'color': webPageInfo.getReleaseStateColorSet('Draft').font}">
+                                <span>Draft</span>
+                              </div>
+                              <div class="row pt-2">
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Font</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getReleaseStateColorSet('Draft').font">
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Background</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getReleaseStateColorSet('Draft').background">
+                                  </mat-form-field>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-lg-2 col-md-3 col-sm-6">
+                              <div class="state Published" [ngStyle]="{'background-color': webPageInfo.getReleaseStateColorSet('Published').background, 'color': webPageInfo.getReleaseStateColorSet('Published').font}">
+                                <span>Published</span>
+                              </div>
+                              <div class="row pt-2">
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Font</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getReleaseStateColorSet('Published').font">
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Background</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getReleaseStateColorSet('Published').background">
+                                  </mat-form-field>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="webpage-setting user-role-colors pt-2">
+                    <div class="row">
+                      <div class="col-12">
+                        <div class="subsubhead">
+                          <h5 class="subsubhead-heading">User Role Colors</h5>
+                        </div>
+                        <div class="container-fluid">
+                          <div class="row">
+                            <div class="col-lg-2 col-md-3 col-sm-6">
+                              <div class="state Admin" [ngStyle]="{'background-color': webPageInfo.getUserRoleColorSet('Admin').background, 'color': webPageInfo.getUserRoleColorSet('Admin').font}">
+                                <span>Admin</span>
+                              </div>
+                              <div class="row pt-2">
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Font</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getUserRoleColorSet('Admin').font">
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Background</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getUserRoleColorSet('Admin').background">
+                                  </mat-form-field>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-lg-2 col-md-3 col-sm-6">
+                              <div class="state Developer" [ngStyle]="{'background-color': webPageInfo.getUserRoleColorSet('Developer').background, 'color': webPageInfo.getUserRoleColorSet('Developer').font}">
+                                <span>Developer</span>
+                              </div>
+                              <div class="row pt-2">
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Font</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getUserRoleColorSet('Developer').font">
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Background</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getUserRoleColorSet('Developer').background">
+                                  </mat-form-field>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-lg-2 col-md-3 col-sm-6">
+                              <div class="state End-User" [ngStyle]="{'background-color': webPageInfo.getUserRoleColorSet('End-User').background, 'color': webPageInfo.getUserRoleColorSet('End-User').font}">
+                                <span>End-User</span>
+                              </div>
+                              <div class="row pt-2">
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Font</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getUserRoleColorSet('End-User').font">
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-6">
+                                  <mat-form-field>
+                                    <mat-label>Background</mat-label>
+                                    <input matInput [(ngModel)]="webPageInfo.getUserRoleColorSet('End-User').background">
+                                  </mat-form-field>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="actions pt-2">
+                    <div>
+                      <button mat-raised-button color="primary" (click)="updateWebPageInfo()">
+                        Update
                       </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="mt-4" *ngIf="!!applicationSettingsInfo">
-                <div class="subhead">
-                  <h4 class="subhead-heading">Filename Expressions</h4>
-                </div>
-                <div class="webpage-setting">
-                  <div class="row">
-                    <div class="col-12">
-                      <details>
-                        <summary><b>Guide</b></summary>
-                        <div class="pt-2">
-                          <div class="filename-expression-guide-syntax">
-                            <b>Filename Syntax</b>:
-                            <pre class="filename-expression-ebnf"><code ngNonBindable>expression       = &#123; literal | optional-group | placeholder &#125; ;
-optional-group   = "(" , expression , ")" ;
-placeholder      = "&#123;" , placeholder-name , [ "?" , flag-name ] , [ ":" , modifier-chain ] , "&#125;" ;
-modifier-chain   = modifier-token , &#123; ":" , modifier-token &#125; ;
-modifier-token   = "separator" , "(" , quoted-arg , ")"
-                                 | "replace" , "(" , quoted-arg , "," , quoted-arg , ")"
-                                 | raw-separator ;</code></pre>
-                          </div>
-                          <div class="pt-2"><b>Duplicate Handler Syntax</b>: <code>-&#123;Incremental&#125;</code>, <code>~&#123;BIE ID&#125;</code></div>
-                          <div class="pt-2"><b>Flags</b>: `includeBusinessContext`, `includeVersion`</div>
-                          <div class="pt-2"><b>Common placeholders</b>: `BIE Property Term`, `BIE Display Name`, `BIE Version`, `BIE DEN`, `BIE Status`, `BIE Remark`, `BIE ID`, `Business Context Names`, `Business Context Name[0]`</div>
-                          <div class="pt-2"><b>BIE Package only</b>: `BIE Package Name`, `BIE Package Version ID`, `BIE Package Version Name`</div>
-                          <div class="pt-2"><b>Duplicate handler placeholders</b>: `Incremental`, `BIE ID`</div>
-                          <div class="pt-2"><b>Example (BIE Schema)</b>: <code>&#123;BIE Property Term:separator('-')&#125;(-&#123;Business Context Name[0]?includeBusinessContext&#125;)(-&#123;BIE Version?includeVersion:replace('\\.', '_')&#125;)</code></div>
-                          <div class="pt-2"><b>Example (BIE Package Schema)</b>: <code>&#123;BIE Package Name&#125;-&#123;BIE Package Version ID&#125;_&#123;Business Context Names:replace('\\s+', ''):separator('+')&#125;_&#123;BIE Property Term&#125;([&#123;BIE Display Name&#125;])(-&#123;BIE Version&#125;)</code></div>
-                        </div>
-                      </details>
-                    </div>
-                  </div>
-                  <div class="row pt-2">
-                    <div class="col-6">
-                      <div class="subsubhead">
-                        <h5 class="subsubhead-heading">BIE Schema Expression</h5>
-                      </div>
-                      <textarea class="width-max"
-                                [class.filename-expression-input-error]="!!bieSchemaFilenameExpressionError"
-                                cdkTextareaAutosize
-                                [cdkAutosizeMinRows]="3"
-                                [cdkAutosizeMaxRows]="8"
-                                [(ngModel)]="applicationSettingsInfo.bieSchemaFilenameExpression"
-                                (ngModelChange)="queueBieSchemaFilenamePreview()"></textarea>
-                      <div class="subsubhead pt-2">
-                        <h5 class="subsubhead-heading">Duplicate Handler Expression</h5>
-                      </div>
-                      <textarea class="width-max"
-                                [class.filename-expression-input-error]="!!bieSchemaFilenameExpressionError"
-                                cdkTextareaAutosize
-                                [cdkAutosizeMinRows]="2"
-                                [cdkAutosizeMaxRows]="4"
-                                [(ngModel)]="applicationSettingsInfo.bieSchemaFilenameDuplicateHandlerExpression"
-                                (ngModelChange)="queueBieSchemaFilenamePreview()"></textarea>
-                      <div *ngIf="bieSchemaFilenameExpressionError"
-                           class="filename-expression-error"
-                           role="alert">
-                        {{ bieSchemaFilenameExpressionError }}
-                      </div>
-                      <div class="pt-2"><b>Sample Filename:</b> <code>{{ bieSchemaSampleFilename || '-' }}</code></div>
-                      <div class="pt-1"><b>Sample Duplicate Filename:</b> <code>{{ bieSchemaSampleDuplicateFilename || '-' }}</code></div>
-                    </div>
-                    <div class="col-6">
-                      <div class="subsubhead">
-                        <h5 class="subsubhead-heading">BIE Package Schema Expression</h5>
-                      </div>
-                      <textarea class="width-max"
-                                [class.filename-expression-input-error]="!!biePackageSchemaFilenameExpressionError"
-                                cdkTextareaAutosize
-                                [cdkAutosizeMinRows]="3"
-                                [cdkAutosizeMaxRows]="8"
-                                [(ngModel)]="applicationSettingsInfo.biePackageSchemaFilenameExpression"
-                                (ngModelChange)="queueBiePackageSchemaFilenamePreview()"></textarea>
-                      <div class="subsubhead pt-2">
-                        <h5 class="subsubhead-heading">Duplicate Handler Expression</h5>
-                      </div>
-                      <textarea class="width-max"
-                                [class.filename-expression-input-error]="!!biePackageSchemaFilenameExpressionError"
-                                cdkTextareaAutosize
-                                [cdkAutosizeMinRows]="2"
-                                [cdkAutosizeMaxRows]="4"
-                                [(ngModel)]="applicationSettingsInfo.biePackageSchemaFilenameDuplicateHandlerExpression"
-                                (ngModelChange)="queueBiePackageSchemaFilenamePreview()"></textarea>
-                      <div *ngIf="biePackageSchemaFilenameExpressionError"
-                           class="filename-expression-error"
-                           role="alert">
-                        {{ biePackageSchemaFilenameExpressionError }}
-                      </div>
-                      <div class="pt-2"><b>Sample Filename:</b> <code>{{ biePackageSchemaSampleFilename || '-' }}</code></div>
-                      <div class="pt-1"><b>Sample Duplicate Filename:</b> <code>{{ biePackageSchemaSampleDuplicateFilename || '-' }}</code></div>
-                    </div>
-                  </div>
-                  <div class="actions pt-4">
-                    <button mat-raised-button color="primary" (click)="updateBieFilenameExpressions()">
-                      Update
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div class="mt-4" *ngIf="!!webPageInfo">
-                <div class="subhead">
-                  <h4 class="subhead-heading">Web Page Settings</h4>
-                </div>
-                <div class="webpage-setting">
-                  <div class="row">
-                    <div class="col-8">
-                      <div class="subsubhead">
-                        <h5 class="subsubhead-heading">Brand Logo (Supported format: SVG, Recommended size: 160x26)</h5>
-                      </div>
-                      <textarea class="width-max"
-                                cdkTextareaAutosize
-                                [cdkAutosizeMinRows]="6"
-                                [cdkAutosizeMaxRows]="20"
-                                [(ngModel)]="webPageInfo.brand"></textarea>
-                    </div>
-                    <div class="col-4">
-                      <div class="subsubhead">
-                        <h5 class="subsubhead-heading">Preview</h5>
-                      </div>
-                      <div class="brand-preview-container">
-                        <div class="brand-preview" [innerHTML]="safetHtml(webPageInfo.brand)">
-                        </div>
+                      <div class="pt-2 d-flex align-items-center info">
+                        <mat-icon fontIcon="info"></mat-icon>
+                        <mat-label class="ps-1">Some changes will take effect on users after they sign in again.</mat-label>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div class="webpage-setting">
-                  <div class="row">
-                    <div class="col-8">
-                      <div class="subsubhead">
-                        <h5 class="subsubhead-heading">Favicon Link (URL)</h5>
-                      </div>
-                      <textarea class="width-max"
-                                cdkTextareaAutosize
-                                [cdkAutosizeMinRows]="3"
-                                [cdkAutosizeMaxRows]="6"
-                                [(ngModel)]="webPageInfo.favicon"></textarea>
-                    </div>
-                    <div class="col-4">
-                      <div class="subsubhead">
-                        <h5 class="subsubhead-heading">Preview</h5>
-                      </div>
-                      <div class="favicon-preview-container">
-                        <img class="favicon-preview" *ngIf="webPageInfo.favicon" [src]="webPageInfo.favicon">
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="webpage-setting">
-                  <div class="row">
-                    <div class="col-8">
-                      <div class="subsubhead">
-                        <h5 class="subsubhead-heading">Sign-in Page Statement (formatted in Markdown)</h5>
-                      </div>
-                      <textarea class="width-max"
-                                cdkTextareaAutosize
-                                [cdkAutosizeMinRows]="6"
-                                [cdkAutosizeMaxRows]="20"
-                                [(ngModel)]="webPageInfo.signInStatement"></textarea>
-                    </div>
-                    <div class="col-4">
-                      <div class="subsubhead">
-                        <h5 class="subsubhead-heading">Preview</h5>
-                      </div>
-                      <div class="statement-container">
-                        <markdown [data]="webPageInfo.signInStatement"></markdown>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="webpage-setting component-state-colors pt-2">
-                  <div class="row">
-                    <div class="col-12">
-                      <div class="subsubhead">
-                        <h5 class="subsubhead-heading">Component State Colors</h5>
-                      </div>
-                      <div class="container-fluid">
-                        <div class="row">
-                          <div class="col-lg-2 col-md-3 col-sm-6">
-                            <div class="state WIP" [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('WIP').background, 'color': webPageInfo.getComponentStateColorSet('WIP').font}">
-                              <span>WIP</span>
-                            </div>
-                            <div class="row pt-2">
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Font</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('WIP').font">
-                                </mat-form-field>
-                              </div>
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Background</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('WIP').background">
-                                </mat-form-field>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="col-lg-2 col-md-3 col-sm-6">
-                            <div class="state QA" [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('QA').background, 'color': webPageInfo.getComponentStateColorSet('QA').font}">
-                              <span>QA</span>
-                            </div>
-                            <div class="row pt-2">
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Font</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('QA').font">
-                                </mat-form-field>
-                              </div>
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Background</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('QA').background">
-                                </mat-form-field>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="col-lg-2 col-md-3 col-sm-6">
-                            <div class="state Draft" [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Draft').background, 'color': webPageInfo.getComponentStateColorSet('Draft').font}">
-                              <span>Draft</span>
-                            </div>
-                            <div class="row pt-2">
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Font</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('Draft').font">
-                                </mat-form-field>
-                              </div>
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Background</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('Draft').background">
-                                </mat-form-field>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="col-lg-2 col-md-3 col-sm-6">
-                            <div class="state Candidate" [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Candidate').background, 'color': webPageInfo.getComponentStateColorSet('Candidate').font}">
-                              <span>Candidate</span>
-                            </div>
-                            <div class="row pt-2">
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Font</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('Candidate').font">
-                                </mat-form-field>
-                              </div>
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Background</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('Candidate').background">
-                                </mat-form-field>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="col-lg-2 col-md-3 col-sm-6">
-                            <div class="state Production" [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Production').background, 'color': webPageInfo.getComponentStateColorSet('Production').font}">
-                              <span>Production</span>
-                            </div>
-                            <div class="row pt-2">
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Font</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('Production').font">
-                                </mat-form-field>
-                              </div>
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Background</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('Production').background">
-                                </mat-form-field>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="col-lg-2 col-md-3 col-sm-6">
-                            <div class="state Published" [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Published').background, 'color': webPageInfo.getComponentStateColorSet('Published').font}">
-                              <span>Published</span>
-                            </div>
-                            <div class="row pt-2">
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Font</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('Published').font">
-                                </mat-form-field>
-                              </div>
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Background</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('Published').background">
-                                </mat-form-field>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="col-lg-2 col-md-3 col-sm-6">
-                            <div class="state ReleaseDraft" [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('ReleaseDraft').background, 'color': webPageInfo.getComponentStateColorSet('ReleaseDraft').font}">
-                              <span>ReleaseDraft</span>
-                            </div>
-                            <div class="row pt-2">
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Font</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('ReleaseDraft').font">
-                                </mat-form-field>
-                              </div>
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Background</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('ReleaseDraft').background">
-                                </mat-form-field>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="col-lg-2 col-md-3 col-sm-6">
-                            <div class="state Deleted" [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deleted').background, 'color': webPageInfo.getComponentStateColorSet('Deleted').font}">
-                              <span>Deleted</span>
-                            </div>
-                            <div class="row pt-2">
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Font</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('Deleted').font">
-                                </mat-form-field>
-                              </div>
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Background</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('Deleted').background">
-                                </mat-form-field>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="col-lg-2 col-md-3 col-sm-6">
-                            <div class="state Deprecated" [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background, 'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">
-                              <span>Deprecated</span>
-                            </div>
-                            <div class="row pt-2">
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Font</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('Deprecated').font">
-                                </mat-form-field>
-                              </div>
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Background</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getComponentStateColorSet('Deprecated').background">
-                                </mat-form-field>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="webpage-setting release-state-colors pt-2">
-                  <div class="row">
-                    <div class="col-12">
-                      <div class="subsubhead">
-                        <h5 class="subsubhead-heading">Release State Colors</h5>
-                      </div>
-                      <div class="container-fluid">
-                        <div class="row">
-                          <div class="col-lg-2 col-md-3 col-sm-6">
-                            <div class="state Processing" [ngStyle]="{'background-color': webPageInfo.getReleaseStateColorSet('Processing').background, 'color': webPageInfo.getReleaseStateColorSet('Processing').font}">
-                              <span>Processing</span>
-                            </div>
-                            <div class="row pt-2">
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Font</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getReleaseStateColorSet('Processing').font">
-                                </mat-form-field>
-                              </div>
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Background</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getReleaseStateColorSet('Processing').background">
-                                </mat-form-field>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="col-lg-2 col-md-3 col-sm-6">
-                            <div class="state Initialized" [ngStyle]="{'background-color': webPageInfo.getReleaseStateColorSet('Initialized').background, 'color': webPageInfo.getReleaseStateColorSet('Initialized').font}">
-                              <span>Initialized</span>
-                            </div>
-                            <div class="row pt-2">
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Font</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getReleaseStateColorSet('Initialized').font">
-                                </mat-form-field>
-                              </div>
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Background</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getReleaseStateColorSet('Initialized').background">
-                                </mat-form-field>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="col-lg-2 col-md-3 col-sm-6">
-                            <div class="state Draft" [ngStyle]="{'background-color': webPageInfo.getReleaseStateColorSet('Draft').background, 'color': webPageInfo.getReleaseStateColorSet('Draft').font}">
-                              <span>Draft</span>
-                            </div>
-                            <div class="row pt-2">
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Font</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getReleaseStateColorSet('Draft').font">
-                                </mat-form-field>
-                              </div>
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Background</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getReleaseStateColorSet('Draft').background">
-                                </mat-form-field>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="col-lg-2 col-md-3 col-sm-6">
-                            <div class="state Published" [ngStyle]="{'background-color': webPageInfo.getReleaseStateColorSet('Published').background, 'color': webPageInfo.getReleaseStateColorSet('Published').font}">
-                              <span>Published</span>
-                            </div>
-                            <div class="row pt-2">
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Font</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getReleaseStateColorSet('Published').font">
-                                </mat-form-field>
-                              </div>
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Background</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getReleaseStateColorSet('Published').background">
-                                </mat-form-field>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="webpage-setting user-role-colors pt-2">
-                  <div class="row">
-                    <div class="col-12">
-                      <div class="subsubhead">
-                        <h5 class="subsubhead-heading">User Role Colors</h5>
-                      </div>
-                      <div class="container-fluid">
-                        <div class="row">
-                          <div class="col-lg-2 col-md-3 col-sm-6">
-                            <div class="state Admin" [ngStyle]="{'background-color': webPageInfo.getUserRoleColorSet('Admin').background, 'color': webPageInfo.getUserRoleColorSet('Admin').font}">
-                              <span>Admin</span>
-                            </div>
-                            <div class="row pt-2">
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Font</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getUserRoleColorSet('Admin').font">
-                                </mat-form-field>
-                              </div>
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Background</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getUserRoleColorSet('Admin').background">
-                                </mat-form-field>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="col-lg-2 col-md-3 col-sm-6">
-                            <div class="state Developer" [ngStyle]="{'background-color': webPageInfo.getUserRoleColorSet('Developer').background, 'color': webPageInfo.getUserRoleColorSet('Developer').font}">
-                              <span>Developer</span>
-                            </div>
-                            <div class="row pt-2">
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Font</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getUserRoleColorSet('Developer').font">
-                                </mat-form-field>
-                              </div>
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Background</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getUserRoleColorSet('Developer').background">
-                                </mat-form-field>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="col-lg-2 col-md-3 col-sm-6">
-                            <div class="state End-User" [ngStyle]="{'background-color': webPageInfo.getUserRoleColorSet('End-User').background, 'color': webPageInfo.getUserRoleColorSet('End-User').font}">
-                              <span>End-User</span>
-                            </div>
-                            <div class="row pt-2">
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Font</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getUserRoleColorSet('End-User').font">
-                                </mat-form-field>
-                              </div>
-                              <div class="col-6">
-                                <mat-form-field>
-                                  <mat-label>Background</mat-label>
-                                  <input matInput [(ngModel)]="webPageInfo.getUserRoleColorSet('End-User').background">
-                                </mat-form-field>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="actions pt-2">
-                  <div>
-                    <button mat-raised-button color="primary" (click)="updateWebPageInfo()">
-                      Update
-                    </button>
-                    <div class="pt-2 d-flex align-items-center info">
-                      <mat-icon fontIcon="info"></mat-icon>
-                      <mat-label class="ps-1">Some changes will take effect on users after they sign in again.</mat-label>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              }
             </mat-card-content>
           </mat-card>
         </mat-card>

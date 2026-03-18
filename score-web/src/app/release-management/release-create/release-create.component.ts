@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {AuthService} from '../../authentication/auth.service';
 import {ReleaseService} from '../domain/release.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -20,6 +20,14 @@ import {loadLibrary, saveLibrary} from '../../common/utility';
   styleUrls: ['./release-create.component.css']
 })
 export class ReleaseCreateComponent implements OnInit {
+  private service = inject(ReleaseService);
+  private accountService = inject(AccountListService);
+  private namespaceService = inject(NamespaceService);
+  private libraryService = inject(LibraryService);
+  private snackBar = inject(MatSnackBar);
+  private router = inject(Router);
+  private auth = inject(AuthService);
+
 
   title = 'Releases Detail';
 
@@ -34,13 +42,7 @@ export class ReleaseCreateComponent implements OnInit {
   loading = false;
   states: string[] = ['Draft', 'Final'];
 
-  constructor(private service: ReleaseService,
-              private accountService: AccountListService,
-              private namespaceService: NamespaceService,
-              private libraryService: LibraryService,
-              private snackBar: MatSnackBar,
-              private router: Router,
-              private auth: AuthService) {
+  constructor() {
     this.library.libraryId = 0;
   }
 

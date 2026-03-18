@@ -8,18 +8,26 @@
     </div>
   </div>
   <div class="content" mat-dialog-content>
-    <p *ngFor="let text of config.content">
-      {{ text }}
-    </p>
-    <ul *ngIf="config.list">
-      <li *ngFor="let item of config.list">{{ item }}</li>
-    </ul>
+    @for (text of config.content; track text) {
+      <p>
+        {{ text }}
+      </p>
+    }
+    @if (config.list) {
+      <ul>
+        @for (item of config.list; track item) {
+          <li>{{ item }}</li>
+        }
+      </ul>
+    }
   </div>
   <div class="actions ms-auto" mat-dialog-actions>
-    <button mat-button class="btn btn-outline-primary" color="primary" *ngIf="config.action"
-            [mat-dialog-close]="true">
-      {{ config.action }}
-    </button>
+    @if (config.action) {
+      <button mat-button class="btn btn-outline-primary" color="primary"
+        [mat-dialog-close]="true">
+        {{ config.action }}
+      </button>
+    }
     <button mat-button class="btn" color="warn" (click)="onNoClick()">
       {{ (config.action) ? 'Cancel' : 'Close' }}
     </button>

@@ -1,4 +1,4 @@
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {AuthService} from '../../authentication/auth.service';
 import {ReleaseService} from '../domain/release.service';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
@@ -35,6 +35,19 @@ import {ReleaseDiagramDialogComponent} from '../release-diagram-dialog/release-d
   styleUrls: ['./release-list.component.css']
 })
 export class ReleaseListComponent implements OnInit {
+  private service = inject(ReleaseService);
+  private libraryService = inject(LibraryService);
+  private accountService = inject(AccountListService);
+  private namespaceService = inject(NamespaceService);
+  private snackBar = inject(MatSnackBar);
+  private auth = inject(AuthService);
+  private dialog = inject(MatDialog);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
 
   title = 'Release';
 
@@ -166,20 +179,6 @@ export class ReleaseListComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
-
-  constructor(private service: ReleaseService,
-              private libraryService: LibraryService,
-              private accountService: AccountListService,
-              private namespaceService: NamespaceService,
-              private snackBar: MatSnackBar,
-              private auth: AuthService,
-              private dialog: MatDialog,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute) {
-  }
 
   ngOnInit() {
     this.request = new ReleaseListRequest(this.route.snapshot.queryParamMap,

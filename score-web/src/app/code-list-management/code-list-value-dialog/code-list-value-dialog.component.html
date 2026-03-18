@@ -13,36 +13,36 @@
         <mat-form-field>
           <mat-label>Code</mat-label>
           <input matInput required maxlength="255"
-                 [disabled]="!isEditable || codeListValue.derived || hasRevision"
-                 [(ngModel)]="codeListValue.value">
+            [disabled]="!isEditable || codeListValue.derived || hasRevision"
+            [(ngModel)]="codeListValue.value">
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Meaning</mat-label>
           <input matInput required maxlength="100"
-                 [disabled]="!isEditable"
-                 [(ngModel)]="codeListValue.meaning">
+            [disabled]="!isEditable"
+            [(ngModel)]="codeListValue.meaning">
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Definition</mat-label>
           <textarea matInput rows="6" cols="30"
-                    [disabled]="!isEditable"
-                    [(ngModel)]="codeListValue.definition.content"></textarea>
+            [disabled]="!isEditable"
+          [(ngModel)]="codeListValue.definition.content"></textarea>
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Definition Source</mat-label>
           <input matInput maxlength="100"
-                 [disabled]="!isEditable"
-                 [(ngModel)]="codeListValue.definition.source">
+            [disabled]="!isEditable"
+            [(ngModel)]="codeListValue.definition.source">
         </mat-form-field>
 
         <div class="row">
           <div class="col-12">
             <mat-checkbox color="warn"
-                          [disabled]="!isEditable || actionName === 'Add' || !isDeprecatedChangeable"
-                          [(ngModel)]="codeListValue.deprecated">
+              [disabled]="!isEditable || actionName === 'Add' || !isDeprecatedChangeable"
+              [(ngModel)]="codeListValue.deprecated">
               <span>Deprecated</span>
             </mat-checkbox>
           </div>
@@ -50,12 +50,14 @@
       </mat-card-content>
     </mat-card>
   </div>
-  <div class="actions ms-auto" mat-dialog-actions *ngIf="isEditable">
-    <button mat-raised-button color="primary"
-            [disabled]="isDisabled()"
-            [mat-dialog-close]="codeListValue">
-      <mat-icon>{{ (actionName === 'Add') ? 'add' : 'save' }}</mat-icon>
-      <span class="ms-2">{{ (actionName === 'Add') ? 'Add' : 'Save' }}</span>
-    </button>
-  </div>
+  @if (isEditable) {
+    <div class="actions ms-auto" mat-dialog-actions>
+      <button mat-raised-button color="primary"
+        [disabled]="isDisabled()"
+        [mat-dialog-close]="codeListValue">
+        <mat-icon>{{ (actionName === 'Add') ? 'add' : 'save' }}</mat-icon>
+        <span class="ms-2">{{ (actionName === 'Add') ? 'Add' : 'Save' }}</span>
+      </button>
+    </div>
+  }
 </div>

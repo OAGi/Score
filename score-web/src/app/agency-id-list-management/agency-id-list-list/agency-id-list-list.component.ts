@@ -1,5 +1,5 @@
 import {animate, state, style, transition, trigger} from '@angular/animations';
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -47,6 +47,21 @@ import {LibraryService} from '../../library-management/domain/library.service';
   ]
 })
 export class AgencyIdListListComponent implements OnInit {
+  private service = inject(AgencyIdListService);
+  private releaseService = inject(ReleaseService);
+  private libraryService = inject(LibraryService);
+  private accountService = inject(AccountListService);
+  private namespaceService = inject(NamespaceService);
+  private auth = inject(AuthService);
+  private dialog = inject(MatDialog);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private snackBar = inject(MatSnackBar);
+  webPageInfo = inject(WebPageInfoService);
+
 
   title = 'Agency ID List';
   workingRelease = WorkingRelease;
@@ -197,22 +212,6 @@ export class AgencyIdListListComponent implements OnInit {
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
   contextMenuItem: AgencyIdListListEntry;
-
-  constructor(private service: AgencyIdListService,
-              private releaseService: ReleaseService,
-              private libraryService: LibraryService,
-              private accountService: AccountListService,
-              private namespaceService: NamespaceService,
-              private auth: AuthService,
-              private dialog: MatDialog,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute,
-              private snackBar: MatSnackBar,
-              public webPageInfo: WebPageInfoService) {
-  }
 
   ngOnInit() {
     this.request = new AgencyIdListForListRequest(this.route.snapshot.queryParamMap,

@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {Observable, of} from 'rxjs';
 import {catchError, map, switchMap} from 'rxjs/operators';
@@ -33,12 +33,11 @@ export interface BieStateTransitionFlowRequest {
   providedIn: 'root'
 })
 export class BieStateTransitionFlowService {
+  private dialog = inject(MatDialog);
+  private confirmDialogService = inject(ConfirmDialogService);
+
 
   private static readonly NO_UPDATE_MESSAGE = 'This BIE will not be updated.';
-
-  constructor(private dialog: MatDialog,
-              private confirmDialogService: ConfirmDialogService) {
-  }
 
   /**
    * Resolves the dependency selection required for a state transition.

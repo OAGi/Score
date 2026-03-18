@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {ActivatedRoute, Router} from '@angular/router';
 import {BieListService} from '../bie-list/domain/bie-list.service';
@@ -12,6 +12,14 @@ import {PlantUmlService} from '../../common/plantuml-diagram/plantuml.service';
   styleUrls: ['./bie-diagram-dialog.component.css']
 })
 export class BieDiagramDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<BieDiagramDialogComponent>>(MatDialogRef);
+  private service = inject(BieListService);
+  private plantUmlService = inject(PlantUmlService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private sanitizer = inject(DomSanitizer);
+  data = inject(MAT_DIALOG_DATA);
+
 
   loading: boolean = false;
   topLevelAsbiepId: number;
@@ -19,13 +27,9 @@ export class BieDiagramDialogComponent implements OnInit {
   public plantUmlTxt: string;
   public sanitizedSvgContent: SafeHtml;
 
-  constructor(public dialogRef: MatDialogRef<BieDiagramDialogComponent>,
-              private service: BieListService,
-              private plantUmlService: PlantUmlService,
-              private router: Router,
-              private route: ActivatedRoute,
-              private sanitizer: DomSanitizer,
-              @Inject(MAT_DIALOG_DATA) public data: any) {
+  constructor() {
+    const data = this.data;
+
     // Sanitize the SVG content to render it correctly
 
     this.topLevelAsbiepId = data.topLevelAsbiepId;

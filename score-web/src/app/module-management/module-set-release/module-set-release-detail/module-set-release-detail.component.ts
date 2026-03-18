@@ -1,5 +1,5 @@
 import {Location} from '@angular/common';
-import {Component, HostListener, OnInit} from '@angular/core';
+import { Component, HostListener, OnInit, inject } from '@angular/core';
 import {FormControl} from '@angular/forms';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -26,6 +26,16 @@ import {ReleaseSummary} from '../../../release-management/domain/release';
   styleUrls: ['./module-set-release-detail.component.css']
 })
 export class ModuleSetReleaseDetailComponent implements OnInit {
+  private moduleService = inject(ModuleService);
+  private releaseService = inject(ReleaseService);
+  private location = inject(Location);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
+  private auth = inject(AuthService);
+  private confirmDialogService = inject(ConfirmDialogService);
+
 
   title: string;
   isUpdating: boolean;
@@ -40,15 +50,7 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
 
   private $hashCode: string;
 
-  constructor(private moduleService: ModuleService,
-              private releaseService: ReleaseService,
-              private location: Location,
-              private route: ActivatedRoute,
-              private router: Router,
-              private snackBar: MatSnackBar,
-              private dialog: MatDialog,
-              private auth: AuthService,
-              private confirmDialogService: ConfirmDialogService) {
+  constructor() {
     this.title = (this.roles.includes('developer')) ? 'Edit Module Set Release' : 'View Module Set Release';
   }
 

@@ -9,237 +9,303 @@
       </div>
     </div>
     <div class="ui feed">
-      <div class="event" *ngFor="let comment of commentControl.comments" [class.new-message]="comment.isNew">
-        <div class="content" [class]="comment.prevCommentId ? 'ps-4' : ''">
-          <div class="summary">
-            <a>{{ comment.created.who.loginId }}</a>
-            <div class="date">{{ comment.timestamp | dateAgo }}</div>
-            <mat-icon class="pointer icon"
-                      *ngIf="comment.created.who.loginId === currentUser && !comment.hidden"
+      @for (comment of commentControl.comments; track comment) {
+        <div class="event" [class.new-message]="comment.isNew">
+          <div class="content" [class]="comment.prevCommentId ? 'ps-4' : ''">
+            <div class="summary">
+              <a>{{ comment.created.who.loginId }}</a>
+              <div class="date">{{ comment.timestamp | dateAgo }}</div>
+              @if (comment.created.who.loginId === currentUser && !comment.hidden) {
+                <mat-icon class="pointer icon"
+                  [inline]="true"
+                (click)="commentControl.deleteComment(comment)">close</mat-icon>
+              }
+            </div>
+            <div class="extra text">
+              @if (!comment.isEditing) {
+                <div>
+                  @if (!comment.hidden) {
+                    <span>{{ comment.text }}</span>
+                  }
+                  @if (comment.hidden) {
+                    <span class="text-muted">(This message has been deleted.)</span>
+                  }
+                  @if (comment.created.who.loginId === currentUser && !comment.hidden) {
+                    <mat-icon class="pointer icon mt-1"
                       [inline]="true"
-                      (click)="commentControl.deleteComment(comment)">close</mat-icon>
-          </div>
-          <div class="extra text">
-            <div *ngIf="!comment.isEditing">
-              <span *ngIf="!comment.hidden">{{ comment.text }}</span>
-              <span *ngIf="comment.hidden" class="text-muted">(This message has been deleted.)</span>
-              <mat-icon class="pointer icon mt-1"
-                        *ngIf="comment.created.who.loginId === currentUser && !comment.hidden"
-                        [inline]="true"
-                        (click)="commentControl.openEditComment(comment)">edit</mat-icon>
+                    (click)="commentControl.openEditComment(comment)">edit</mat-icon>
+                  }
+                </div>
+              }
+              @if (comment.isEditing) {
+                <div>
+                  <mat-form-field>
+                    <textarea matInput rows="3" [(ngModel)]="comment.textTemp"></textarea>
+                  </mat-form-field>
+                  <button mat-stroked-button (click)="commentControl.editComment(comment)">Edit</button>&nbsp;
+                  <button mat-stroked-button (click)="commentControl.cancelEditComment(comment)">Cancel</button>
+                </div>
+              }
             </div>
-            <div *ngIf="comment.isEditing">
-              <mat-form-field>
-                <textarea matInput rows="3" [(ngModel)]="comment.textTemp"></textarea>
-              </mat-form-field>
-              <button mat-stroked-button (click)="commentControl.editComment(comment)">Edit</button>&nbsp;
-              <button mat-stroked-button (click)="commentControl.cancelEditComment(comment)">Cancel</button>
-            </div>
-          </div>
-          <div class="meta" *ngIf="comment.prevCommentId === null && commentControl.replyCommentId !== comment.commentId">
-            <a class="like" (click)="commentControl.openReply(comment)">Reply</a>
-          </div>
-          <div class="reply-box" *ngIf="commentControl.replyCommentId === comment.commentId">
-            <mat-form-field>
-              <textarea matInput rows="3" [(ngModel)]="commentControl.replyMessage"></textarea>
-            </mat-form-field>
-            <button mat-stroked-button (click)="commentControl.addComment(comment)">Reply</button>&nbsp;
-            <button mat-stroked-button (click)="commentControl.closeReply()">Cancel</button>
+            @if (comment.prevCommentId === null && commentControl.replyCommentId !== comment.commentId) {
+              <div class="meta">
+                <a class="like" (click)="commentControl.openReply(comment)">Reply</a>
+              </div>
+            }
+            @if (commentControl.replyCommentId === comment.commentId) {
+              <div class="reply-box">
+                <mat-form-field>
+                  <textarea matInput rows="3" [(ngModel)]="commentControl.replyMessage"></textarea>
+                </mat-form-field>
+                <button mat-stroked-button (click)="commentControl.addComment(comment)">Reply</button>&nbsp;
+                <button mat-stroked-button (click)="commentControl.closeReply()">Cancel</button>
+              </div>
+            }
           </div>
         </div>
-      </div>
-      <div *ngIf="commentControl.replyOpened === false">
-        <mat-form-field>
-          <textarea matInput rows="3" [(ngModel)]="commentControl.commentMessage"></textarea>
-        </mat-form-field>
-        <button mat-stroked-button (click)="commentControl.addComment()">
-          Comment
-        </button>
-      </div>
+      }
+      @if (commentControl.replyOpened === false) {
+        <div>
+          <mat-form-field>
+            <textarea matInput rows="3" [(ngModel)]="commentControl.commentMessage"></textarea>
+          </mat-form-field>
+          <button mat-stroked-button (click)="commentControl.addComment()">
+            Comment
+          </button>
+        </div>
+      }
     </div>
   </mat-sidenav>
 
   <mat-sidenav-content (click)="sidenav.close();">
-    <div class="cdk-overlay-backdrop cdk-overlay-dark-backdrop cdk-overlay-backdrop-showing" *ngIf="isUpdating">
-      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-    </div>
+    @if (isUpdating) {
+      <div class="cdk-overlay-backdrop cdk-overlay-dark-backdrop cdk-overlay-backdrop-showing">
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      </div>
+    }
     <div class="context-section">
       <div class="row m-0">
         <div class="col-12 p-0">
           <mat-card class="search-box-container mb-1">
             <mat-card-content>
-              <div class="container-fluid" *ngIf="searcher && dataSource">
-                <div class="row">
-                  <div class="col-5 tree-search-box">
-                    <div class="row align-items-center">
-                      <div class="col-9">
-                        <mat-form-field>
-                          <mat-label *ngIf="!selectedNode">Search</mat-label>
-                          <mat-label *ngIf="selectedNode">Search > {{ selectedNode.name }}</mat-label>
-                          <input matInput type="search" [(ngModel)]="searcher.inputKeyword"
-                                 [disabled]="searcher.isSearching"
-                                 (keyup.enter)="search(searcher.inputKeyword)">
-                          <mat-hint matSuffix *ngIf="searcher.searchKeyword && searcher.searchResult.length > 0"
-                                    align="end">{{searcher.searchIndex + 1}}/{{searcher.searchResult.length}} in {{ searcher.searchedItemCount }}{{ searcher.fullSearched ? '' : '+' }} nodes</mat-hint>
-                          <mat-hint matSuffix *ngIf="searcher.searchKeyword && !searcher.fullSearched && searcher.searchResult.length === 0"
-                                    align="end">0 results in {{ searcher.searchedItemCount }} nodes</mat-hint>
-                          <mat-hint matSuffix *ngIf="searcher.searchKeyword && searcher.fullSearched && searcher.searchResult.length === 0"
-                                    align="end">0 results</mat-hint>
-                        </mat-form-field>
-                      </div>
-                      <div class="col-3 buttons">
-                        <button mat-icon-button mat-small-icon-button
-                                [disabled]="searcher.isSearching || !searcher.searchResult || searcher.searchResult.length === 0"
-                                (click)="move(-1)">
-                          <mat-icon>keyboard_arrow_up</mat-icon>
-                        </button>
-                        <button mat-icon-button mat-small-icon-button
-                                [disabled]="searcher.isSearching || !searcher.searchResult || searcher.searchResult.length === 0"
-                                (click)="move(1)">
-                          <mat-icon>keyboard_arrow_down</mat-icon>
-                        </button>
-                        <button mat-icon-button mat-small-icon-button
-                                [hidden]="searcher.fullSearched"
-                                [disabled]="searcher.isSearching"
-                                [matTooltip]="(searcher.searchKeyword && !searcher.fullSearched) ? 'Search more...' : 'Search'"
-                                (click)="search(searcher.inputKeyword, false, true)">
-                          <mat-icon>{{ (searcher.searchKeyword && !searcher.fullSearched) ? 'repeat' : 'search' }}</mat-icon>
-                        </button>
-                        <button mat-icon-button mat-small-icon-button
-                                [disabled]="searcher.isSearching"
-                                [hidden]="!searcher.inputKeyword"
-                                (click)="searcher.inputKeyword = ''; searcher.resetSearch()">
-                          <mat-icon>close</mat-icon>
-                        </button>
-                        <div style="height: 19px;">
-                          <mat-progress-spinner mode="indeterminate" [diameter]="15" class="search-progress-bar"
-                                                [hidden]="!searcher.isSearching"></mat-progress-spinner>
+              @if (searcher && dataSource) {
+                <div class="container-fluid">
+                  <div class="row">
+                    <div class="col-5 tree-search-box">
+                      <div class="row align-items-center">
+                        <div class="col-9">
+                          <mat-form-field>
+                            @if (!selectedNode) {
+                              <mat-label>Search</mat-label>
+                            }
+                            @if (selectedNode) {
+                              <mat-label>Search > {{ selectedNode.name }}</mat-label>
+                            }
+                            <input matInput type="search" [(ngModel)]="searcher.inputKeyword"
+                              [disabled]="searcher.isSearching"
+                              (keyup.enter)="search(searcher.inputKeyword)">
+                            @if (searcher.searchKeyword && searcher.searchResult.length > 0) {
+                              <mat-hint matSuffix
+                              align="end">{{searcher.searchIndex + 1}}/{{searcher.searchResult.length}} in {{ searcher.searchedItemCount }}{{ searcher.fullSearched ? '' : '+' }} nodes</mat-hint>
+                            }
+                            @if (searcher.searchKeyword && !searcher.fullSearched && searcher.searchResult.length === 0) {
+                              <mat-hint matSuffix
+                              align="end">0 results in {{ searcher.searchedItemCount }} nodes</mat-hint>
+                            }
+                            @if (searcher.searchKeyword && searcher.fullSearched && searcher.searchResult.length === 0) {
+                              <mat-hint matSuffix
+                              align="end">0 results</mat-hint>
+                            }
+                          </mat-form-field>
+                        </div>
+                        <div class="col-3 buttons">
+                          <button mat-icon-button mat-small-icon-button
+                            [disabled]="searcher.isSearching || !searcher.searchResult || searcher.searchResult.length === 0"
+                            (click)="move(-1)">
+                            <mat-icon>keyboard_arrow_up</mat-icon>
+                          </button>
+                          <button mat-icon-button mat-small-icon-button
+                            [disabled]="searcher.isSearching || !searcher.searchResult || searcher.searchResult.length === 0"
+                            (click)="move(1)">
+                            <mat-icon>keyboard_arrow_down</mat-icon>
+                          </button>
+                          <button mat-icon-button mat-small-icon-button
+                            [hidden]="searcher.fullSearched"
+                            [disabled]="searcher.isSearching"
+                            [matTooltip]="(searcher.searchKeyword && !searcher.fullSearched) ? 'Search more...' : 'Search'"
+                            (click)="search(searcher.inputKeyword, false, true)">
+                            <mat-icon>{{ (searcher.searchKeyword && !searcher.fullSearched) ? 'repeat' : 'search' }}</mat-icon>
+                          </button>
+                          <button mat-icon-button mat-small-icon-button
+                            [disabled]="searcher.isSearching"
+                            [hidden]="!searcher.inputKeyword"
+                            (click)="searcher.inputKeyword = ''; searcher.resetSearch()">
+                            <mat-icon>close</mat-icon>
+                          </button>
+                          <div style="height: 19px;">
+                            <mat-progress-spinner mode="indeterminate" [diameter]="15" class="search-progress-bar"
+                            [hidden]="!searcher.isSearching"></mat-progress-spinner>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                  <div class="col-7 actions-wrap">
-                    <div class="actions ms-auto" *ngIf="isWorkingRelease()">
-                      <button mat-icon-button mat-small-icon-button [id]="'cc-settings'"
-                              [matMenuTriggerFor]="settingsContextMenu"
-                              [matMenuTriggerData]="{'menuId': 'settingsContextMenu'}">
-                        <mat-icon>settings</mat-icon>
-                      </button>
-                      <button mat-raised-button color="primary" (click)="updateDetails()"
-                              *ngIf="state === 'WIP' && access === 'CanEdit'"
+                    <div class="col-7 actions-wrap">
+                      @if (isWorkingRelease()) {
+                        <div class="actions ms-auto">
+                          <button mat-icon-button mat-small-icon-button [id]="'cc-settings'"
+                            [matMenuTriggerFor]="settingsContextMenu"
+                            [matMenuTriggerData]="{'menuId': 'settingsContextMenu'}">
+                            <mat-icon>settings</mat-icon>
+                          </button>
+                          @if (state === 'WIP' && access === 'CanEdit') {
+                            <button mat-raised-button color="primary" (click)="updateDetails()"
                               [disabled]="updateDisabled">
-                        Update
-                      </button>
-                      <button mat-raised-button color="accent" (click)="updateState('Draft')"
-                              *ngIf="state === 'WIP' && (access === 'CanMove' || access === 'CanEdit')"
+                              Update
+                            </button>
+                          }
+                          @if (state === 'WIP' && (access === 'CanMove' || access === 'CanEdit')) {
+                            <button mat-raised-button color="accent" (click)="updateState('Draft')"
                               [disabled]="isUpdating || isChanged || !isEditable()">
-                        Move to Draft
-                      </button>
-                      <button mat-raised-button color="warn" (click)="updateState('WIP')"
-                              *ngIf="(state === 'Draft' || state === 'Candidate') && (access === 'CanMove' || access === 'CanEdit')"
+                              Move to Draft
+                            </button>
+                          }
+                          @if ((state === 'Draft' || state === 'Candidate') && (access === 'CanMove' || access === 'CanEdit')) {
+                            <button mat-raised-button color="warn" (click)="updateState('WIP')"
                               [disabled]="isUpdating">
-                        Back to WIP
-                      </button>
-                      <button mat-raised-button color="accent" (click)="updateState('Candidate')"
-                              *ngIf="state === 'Draft' && (access === 'CanMove' || access === 'CanEdit')"
+                              Back to WIP
+                            </button>
+                          }
+                          @if (state === 'Draft' && (access === 'CanMove' || access === 'CanEdit')) {
+                            <button mat-raised-button color="accent" (click)="updateState('Candidate')"
                               [disabled]="isUpdating">
-                        Move to Candidate
-                      </button>
-                      <button mat-raised-button color="warn" (click)="makeNewRevision()"
-                              *ngIf="state === 'Published' && userRoles.includes('developer') && (access === 'CanMove' || access === 'CanEdit') && rootNode.basedManifestId"
+                              Move to Candidate
+                            </button>
+                          }
+                          @if (state === 'Published' && userRoles.includes('developer') && (access === 'CanMove' || access === 'CanEdit') && rootNode.basedManifestId) {
+                            <button mat-raised-button color="warn" (click)="makeNewRevision()"
                               [disabled]="isUpdating">
-                        {{ userRoles.includes('developer') ? 'Revise' : 'Amend' }}
-                      </button>
-                      <button mat-raised-button color="warn" (click)="markAsDeleteNode()"
-                              *ngIf="state === 'WIP' && !hasRevision() && access === 'CanEdit'"
+                              {{ userRoles.includes('developer') ? 'Revise' : 'Amend' }}
+                            </button>
+                          }
+                          @if (state === 'WIP' && !hasRevision() && access === 'CanEdit') {
+                            <button mat-raised-button color="warn" (click)="markAsDeleteNode()"
                               [disabled]="isUpdating || isChanged">
-                        Delete
-                      </button>
-                      <button mat-raised-button color="warn" (click)="purgeNode()"
-                              *ngIf="state === 'Deleted' && (access === 'CanMove' || access === 'CanEdit')">
-                        Purge
-                      </button>
-                      <button mat-raised-button color="primary" (click)="restoreNode()"
-                              *ngIf="state === 'Deleted' && (access === 'CanMove' || access === 'CanEdit')">
-                        Restore
-                      </button>
-                      <button mat-raised-button color="primary" (click)="cancelRevision()"
-                              *ngIf="state === 'WIP' && hasRevision() && access === 'CanEdit'">
-                        Cancel
-                      </button>
-                    </div>
-                    <div class="actions ms-auto" *ngIf="!isWorkingRelease()">
-                      <button mat-icon-button [id]="'cc-settings'"
-                              [matMenuTriggerFor]="settingsContextMenu"
-                              [matMenuTriggerData]="{'menuId': 'settingsContextMenu'}">
-                        <mat-icon>settings</mat-icon>
-                      </button>
-                      <button mat-raised-button color="primary" (click)="updateDetails()"
-                              *ngIf="state === 'WIP' && access === 'CanEdit'"
+                              Delete
+                            </button>
+                          }
+                          @if (state === 'Deleted' && (access === 'CanMove' || access === 'CanEdit')) {
+                            <button mat-raised-button color="warn" (click)="purgeNode()"
+                              >
+                              Purge
+                            </button>
+                          }
+                          @if (state === 'Deleted' && (access === 'CanMove' || access === 'CanEdit')) {
+                            <button mat-raised-button color="primary" (click)="restoreNode()"
+                              >
+                              Restore
+                            </button>
+                          }
+                          @if (state === 'WIP' && hasRevision() && access === 'CanEdit') {
+                            <button mat-raised-button color="primary" (click)="cancelRevision()"
+                              >
+                              Cancel
+                            </button>
+                          }
+                        </div>
+                      }
+                      @if (!isWorkingRelease()) {
+                        <div class="actions ms-auto">
+                          <button mat-icon-button [id]="'cc-settings'"
+                            [matMenuTriggerFor]="settingsContextMenu"
+                            [matMenuTriggerData]="{'menuId': 'settingsContextMenu'}">
+                            <mat-icon>settings</mat-icon>
+                          </button>
+                          @if (state === 'WIP' && access === 'CanEdit') {
+                            <button mat-raised-button color="primary" (click)="updateDetails()"
                               [disabled]="!isChanged">
-                        Update
-                      </button>
-                      <button mat-raised-button color="accent" (click)="updateState('QA')"
-                              *ngIf="state === 'WIP' && (access === 'CanMove' || access === 'CanEdit')"
+                              Update
+                            </button>
+                          }
+                          @if (state === 'WIP' && (access === 'CanMove' || access === 'CanEdit')) {
+                            <button mat-raised-button color="accent" (click)="updateState('QA')"
                               [disabled]="isUpdating || isChanged || !isEditable()">
-                        Move to QA
-                      </button>
-                      <button mat-raised-button color="warn" (click)="updateState('WIP')"
-                              *ngIf="state === 'QA' && (access === 'CanMove' || access === 'CanEdit')"
+                              Move to QA
+                            </button>
+                          }
+                          @if (state === 'QA' && (access === 'CanMove' || access === 'CanEdit')) {
+                            <button mat-raised-button color="warn" (click)="updateState('WIP')"
                               [disabled]="isUpdating">
-                        Back to WIP
-                      </button>
-                      <button mat-raised-button color="accent" (click)="updateState('Production')"
-                              *ngIf="state === 'QA' && (access === 'CanMove' || access === 'CanEdit')"
+                              Back to WIP
+                            </button>
+                          }
+                          @if (state === 'QA' && (access === 'CanMove' || access === 'CanEdit')) {
+                            <button mat-raised-button color="accent" (click)="updateState('Production')"
                               [disabled]="isUpdating">
-                        Move to Production
-                      </button>
-                      <button mat-raised-button color="warn" (click)="makeNewRevision()"
-                              *ngIf="state === 'Production' && !userRoles.includes('developer') && (access === 'CanMove' || access === 'CanEdit') && rootNode.basedManifestId"
+                              Move to Production
+                            </button>
+                          }
+                          @if (state === 'Production' && !userRoles.includes('developer') && (access === 'CanMove' || access === 'CanEdit') && rootNode.basedManifestId) {
+                            <button mat-raised-button color="warn" (click)="makeNewRevision()"
                               [disabled]="isUpdating">
-                        {{ userRoles.includes('developer') ? 'Revise' : 'Amend' }}
-                      </button>
-                      <button mat-raised-button color="warn" (click)="markAsDeleteNode()"
-                              *ngIf="state === 'WIP' && !hasRevision() && access === 'CanEdit'"
+                              {{ userRoles.includes('developer') ? 'Revise' : 'Amend' }}
+                            </button>
+                          }
+                          @if (state === 'WIP' && !hasRevision() && access === 'CanEdit') {
+                            <button mat-raised-button color="warn" (click)="markAsDeleteNode()"
                               [disabled]="isUpdating || isChanged">
-                        Delete
-                      </button>
-                      <button mat-raised-button color="primary" (click)="restoreNode()"
-                              *ngIf="state === 'Deleted' && (access === 'CanMove' || access === 'CanEdit')">
-                        Restore
-                      </button>
-                      <button mat-raised-button color="primary" (click)="cancelRevision()"
-                              *ngIf="state === 'WIP' && hasRevision() && access === 'CanEdit'">
-                        Cancel
-                      </button>
+                              Delete
+                            </button>
+                          }
+                          @if (state === 'Deleted' && (access === 'CanMove' || access === 'CanEdit')) {
+                            <button mat-raised-button color="primary" (click)="restoreNode()"
+                              >
+                              Restore
+                            </button>
+                          }
+                          @if (state === 'WIP' && hasRevision() && access === 'CanEdit') {
+                            <button mat-raised-button color="primary" (click)="cancelRevision()"
+                              >
+                              Cancel
+                            </button>
+                          }
+                        </div>
+                      }
                     </div>
                   </div>
-                </div>
-                <mat-menu class="context-menu" #settingsContextMenu="matMenu">
-                  <button mat-menu-item [id]="'cc-settings-hide-cardinality'">
-                    <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="hideCardinality">
-                      <span>Hide cardinality</span>
-                    </mat-checkbox>
-                  </button>
-                  <button mat-menu-item [id]="'bie-settings-hide-unused'">
-                    <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="hideProhibited">
-                      <span>Hide Prohibited SCs</span>
-                    </mat-checkbox>
-                  </button>
-                </mat-menu>
-                <div class="row">
-                  <div class="tree-breadcrumbs-wrap" id="cc-tree-breadcrumbs-wrap" *ngIf="selectedNode">
-                    <div class="tree-breadcrumb"
-                         *ngFor="let bread of selectedNode.parents; let last = last;">
-                      <span aria-hidden="true" class="tree-breadcrumb-separator">/</span>
-                      <span *ngIf="last"
-                            class="tree-breadcrumb-item-last">{{ bread.name }} {{ last ? scrollBreadcrumb('cc-tree-breadcrumbs-wrap') : '' }}</span>
-                      <span *ngIf="!last" class="tree-breadcrumb-item"
-                            (click)="scrollToNode(bread)">{{ bread.name }}</span>
-                    </div>
+                  <mat-menu class="context-menu" #settingsContextMenu="matMenu">
+                    <button mat-menu-item [id]="'cc-settings-hide-cardinality'">
+                      <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="hideCardinality">
+                        <span>Hide cardinality</span>
+                      </mat-checkbox>
+                    </button>
+                    <button mat-menu-item [id]="'bie-settings-hide-unused'">
+                      <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="hideProhibited">
+                        <span>Hide Prohibited SCs</span>
+                      </mat-checkbox>
+                    </button>
+                  </mat-menu>
+                  <div class="row">
+                    @if (selectedNode) {
+                      <div class="tree-breadcrumbs-wrap" id="cc-tree-breadcrumbs-wrap">
+                        @for (bread of selectedNode.parents; track bread; let last = $last) {
+                          <div class="tree-breadcrumb"
+                            >
+                            <span aria-hidden="true" class="tree-breadcrumb-separator">/</span>
+                            @if (last) {
+                              <span
+                              class="tree-breadcrumb-item-last">{{ bread.name }} {{ last ? scrollBreadcrumb('cc-tree-breadcrumbs-wrap') : '' }}</span>
+                            }
+                            @if (!last) {
+                              <span class="tree-breadcrumb-item"
+                              (click)="scrollToNode(bread)">{{ bread.name }}</span>
+                            }
+                          </div>
+                        }
+                      </div>
+                    }
                   </div>
                 </div>
-              </div>
+              }
             </mat-card-content>
           </mat-card>
         </div>
@@ -251,65 +317,74 @@
               <mat-card class="cc-node-tree-panel">
                 <mat-card-content class="mat-card-container">
                   <cdk-virtual-scroll-viewport itemSize="{{ virtualScrollItemSize }}" minBufferPx="{{ minBufferPx }}" maxBufferPx="{{ maxBufferPx }}"
-                                               [style.height.px]="innerHeight" #virtualScroll>
+                    [style.height.px]="innerHeight" #virtualScroll>
                     <div *cdkVirtualFor="let node of dataSource" class="example-item"
-                         (mouseover)="node.showCopyLinkIcon = true" (mouseout)="node.showCopyLinkIcon = false">
+                      (mouseover)="node.showCopyLinkIcon = true" (mouseout)="node.showCopyLinkIcon = false">
                       <div class="mat-tree-node d-flex pointer"
-                           tabIndex="0"
-                           [class]="{'tree-node-selected': cursorNode === node}"
-                           (click)="onClick(node, $event)"
-                           (keydown)="keyNavigation(node, $event)"
-                           [matTooltip]="'Circular reference detected.'"
-                           [matTooltipDisabled]="!node.isCycle"
-                           [style.padding-left]="node.level * paddingPixel + 'px'">
-                        <button *ngIf="dataSource.isExpandable(node); else disabledRef;"
-                                (click)="toggle(node, $event)"
-                                class="align-self-center"
-                                mat-icon-button>
-                          <mat-icon class="mat-icon-rtl-mirror" *ngIf="dataSource.isExpandable(node)">
-                            {{ dataSource.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
-                          </mat-icon>
-                        </button>
-                        <ng-template #disabledRef>
+                        tabIndex="0"
+                        [class]="{'tree-node-selected': cursorNode === node}"
+                        (click)="onClick(node, $event)"
+                        (keydown)="keyNavigation(node, $event)"
+                        [matTooltip]="'Circular reference detected.'"
+                        [matTooltipDisabled]="!node.isCycle"
+                        [style.padding-left]="node.level * paddingPixel + 'px'">
+                        @if (dataSource.isExpandable(node)) {
+                          <button
+                            (click)="toggle(node, $event)"
+                            class="align-self-center"
+                            mat-icon-button>
+                            @if (dataSource.isExpandable(node)) {
+                              <mat-icon class="mat-icon-rtl-mirror">
+                                {{ dataSource.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+                              </mat-icon>
+                            }
+                          </button>
+                        } @else {
                           <button mat-icon-button disabled></button>
-                        </ng-template>
+                        }
 
                         <span [class]="['pe-2', 'align-self-center', node.typeClass.toLowerCase(),
                                         this.searcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
                               [class.search-index]="this.searcher.searchResult.indexOf(node) === this.searcher.searchIndex"
-                              [class.inhibited]="node.inhibited"
-                              [class.deprecated]="node.deprecated"
-                              [class.text-danger]="node.state === 'Deleted'"
-                              [class.text-line-through]="node.state === 'Deleted'"
-                              [matTooltip]="node.state === 'Deleted' ? 'Deleted' : (node.deprecated ? 'Deprecated' : '')"
-                              [innerHTML]="node.name | highlight : searcher.searchKeyword">
+                          [class.inhibited]="node.inhibited"
+                          [class.deprecated]="node.deprecated"
+                          [class.text-danger]="node.state === 'Deleted'"
+                          [class.text-line-through]="node.state === 'Deleted'"
+                          [matTooltip]="node.state === 'Deleted' ? 'Deleted' : (node.deprecated ? 'Deprecated' : '')"
+                          [innerHTML]="node.name | highlight : searcher.searchKeyword">
                         </span>
 
-                        <div class="ps-2 align-self-center" *ngIf="isInvalidState(node)">
-                          <mat-icon matTooltip="Invalid state">error</mat-icon>
-                        </div>
+                        @if (isInvalidState(node)) {
+                          <div class="ps-2 align-self-center">
+                            <mat-icon matTooltip="Invalid state">error</mat-icon>
+                          </div>
+                        }
 
-                        <span [class]="['ps-2', 'align-self-center']"
-                              *ngIf="!dataSource.hideCardinality && node.cardinalityMin !== undefined && node.cardinalityMax !== undefined">
-                          {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
-                        </span>
+                        @if (!dataSource.hideCardinality && node.cardinalityMin !== undefined && node.cardinalityMax !== undefined) {
+                          <span [class]="['ps-2', 'align-self-center']"
+                            >
+                            {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
+                          </span>
+                        }
 
                         <div class="tag-list ps-2 align-self-center">
-                            <span class="tag ms-2" *ngFor="let tag of node.tagList"
-                                  [style.background-color]="tag.backgroundColor"
-                                  [style.color]="tag.textColor">{{ tag.name }}</span>
+                          @for (tag of node.tagList; track tag) {
+                            <span class="tag ms-2"
+                              [style.background-color]="tag.backgroundColor"
+                            [style.color]="tag.textColor">{{ tag.name }}</span>
+                          }
                         </div>
 
                         <div class="ms-auto align-self-center me-2">
                           <mat-icon style="{{ node.showCopyLinkIcon ? '' : 'visibility: hidden' }}"
-                                    matTooltip="Copy Link"
-                                    (click)="copyLink(node, $event)">
+                            matTooltip="Copy Link"
+                            (click)="copyLink(node, $event)">
                             link
                           </mat-icon>
                           <mat-icon [style.visibility]="!node.isCycle ? '' : 'hidden'"
-                                    [matMenuTriggerFor]="contextMenu"
-                                    [matMenuTriggerData]="{'menuId': 'contextMenu', 'hashPath': node.hashPath}"
-                                    (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
+                            [matMenuTriggerFor]="contextMenu"
+                            [matMenuTriggerData]="{'menuId': 'contextMenu', 'hashPath': node.hashPath}"
+                            (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
                           </mat-icon>
                         </div>
                       </div>
@@ -327,20 +402,28 @@
                     <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 3)">
                       <span class="context-menu-item">Expand 3</span>
                     </button>
-                    <mat-divider *ngIf="!!contextMenuItem && isEditable()"></mat-divider>
-                    <button mat-menu-item (click)="appendSc(contextMenuItem)"
-                            *ngIf="!!contextMenuItem && contextMenuItem.level === 0 && isEditable()">
-                      <span class="context-menu-item">Add Supplementary Component</span>
-                    </button>
-                    <button mat-menu-item (click)="discardSc(contextMenuItem)"
-                            *ngIf="!!contextMenuItem && contextMenuItem.level === 1 && isEditable() && canDiscard(contextMenuItem)">
-                      <span class="context-menu-item">Remove</span>
-                    </button>
+                    @if (!!contextMenuItem && isEditable()) {
+                      <mat-divider></mat-divider>
+                    }
+                    @if (!!contextMenuItem && contextMenuItem.level === 0 && isEditable()) {
+                      <button mat-menu-item (click)="appendSc(contextMenuItem)"
+                        >
+                        <span class="context-menu-item">Add Supplementary Component</span>
+                      </button>
+                    }
+                    @if (!!contextMenuItem && contextMenuItem.level === 1 && isEditable() && canDiscard(contextMenuItem)) {
+                      <button mat-menu-item (click)="discardSc(contextMenuItem)"
+                        >
+                        <span class="context-menu-item">Remove</span>
+                      </button>
+                    }
                     <mat-divider></mat-divider>
-                    <button mat-menu-item (click)="openCoreComponent(contextMenuItem)"
-                            *ngIf="!!contextMenuItem && contextMenuItem.level !== 0">
-                      <span class="context-menu-item">Open in new tab</span>
-                    </button>
+                    @if (!!contextMenuItem && contextMenuItem.level !== 0) {
+                      <button mat-menu-item (click)="openCoreComponent(contextMenuItem)"
+                        >
+                        <span class="context-menu-item">Open in new tab</span>
+                      </button>
+                    }
                     <button mat-menu-item (click)="openHistory(contextMenuItem)">
                       <span class="context-menu-item">Show History</span>
                     </button>
@@ -348,18 +431,22 @@
                       <span class="context-menu-item">Comments</span>
                     </button>
                     <button mat-menu-item (click)="findUsages(contextMenuItem)"
-                            [disabled]="!visibleFindUsages(contextMenuItem)">
+                      [disabled]="!visibleFindUsages(contextMenuItem)">
                       <span class="context-menu-item">Where Used</span>
                     </button>
                     <button mat-menu-item [matMenuTriggerFor]="editTagsSubMenu">Tags</button>
                   </mat-menu>
 
                   <mat-menu #editTagsSubMenu="matMenu">
-                    <button mat-menu-item *ngFor="let tag of tags" (click)="toggleTag(contextMenuItem, tag)">
-                      <mat-icon>{{ contains(contextMenuItem, tag) ? 'check' : '' }}</mat-icon>
-                      <span>{{ tag.name }}</span>
-                    </button>
-                    <mat-divider *ngIf="tags.length > 0"></mat-divider>
+                    @for (tag of tags; track tag) {
+                      <button mat-menu-item (click)="toggleTag(contextMenuItem, tag)">
+                        <mat-icon>{{ contains(contextMenuItem, tag) ? 'check' : '' }}</mat-icon>
+                        <span>{{ tag.name }}</span>
+                      </button>
+                    }
+                    @if (tags.length > 0) {
+                      <mat-divider></mat-divider>
+                    }
                     <button mat-menu-item (click)="openEditTags()">
                       <mat-icon>edit</mat-icon>
                       <span>Edit Tags</span>
@@ -371,688 +458,782 @@
             <as-split-area class="right-panel" size="70" [style.height.px]="innerHeight + 17">
 
               <!-- BCC & BCCP & BDT -->
-              <div class="cc-node-detail-panel" *ngIf="isBdtDetail()">
-                <mat-tab-group mat-align-tabs="start" animationDuration="0ms">
-                  <mat-tab label="{{ asBdtDetail().den }}">
-                    <div class="cc-node-detail-container">
-                      <div class="row">
-                        <div class="col-2">
-                          <mat-form-field>
-                            <mat-label>Library</mat-label>
-                            <input matInput [(ngModel)]="asBdtDetail().library.name" [disabled]="true">
-                          </mat-form-field>
-                        </div>
-                        <div class="col-2">
-                          <mat-form-field>
-                            <mat-label>Release</mat-label>
-                            <input matInput [(ngModel)]="asBdtDetail().release.releaseNum" [disabled]="true">
-                          </mat-form-field>
-                        </div>
-                        <div class="{{ asBdtDetail().lastChanged ? 'col-1' : 'col-2' }}"
-                             (click)="openInNewTab('/data_type/' + asBdtDetail().since.dtManifestId)"
-                             style="cursor: pointer;">
-                          <mat-form-field>
-                            <mat-label>Since</mat-label>
-                            <input matInput [(ngModel)]="asBdtDetail().since.release.releaseNum" [disabled]="true"
-                                   style="pointer-events: none;">
-                          </mat-form-field>
-                        </div>
-                        <div class="col-1" *ngIf="asBdtDetail().lastChanged"
-                             (click)="openInNewTab('/data_type/' + asBdtDetail().lastChanged.dtManifestId)"
-                             style="cursor: pointer;">
-                          <mat-form-field>
-                            <mat-label>Last Changed</mat-label>
-                            <input matInput [(ngModel)]="asBdtDetail().lastChanged.release.releaseNum" [disabled]="true"
-                                   style="pointer-events: none;">
-                          </mat-form-field>
-                        </div>
-                        <div class="col-2">
-                          <mat-form-field>
-                            <mat-label>Revision</mat-label>
-                            <input matInput [(ngModel)]="asBdtDetail().log.revisionNum" [disabled]="true">
-                          </mat-form-field>
-                        </div>
-                        <div class="col-2">
-                          <mat-form-field>
-                            <mat-label>State</mat-label>
-                            <input matInput [(ngModel)]="asBdtDetail().state" [disabled]="true">
-                          </mat-form-field>
-                        </div>
-                        <div class="col-2">
-                          <mat-form-field>
-                            <mat-label>Owner</mat-label>
-                            <input matInput [(ngModel)]="asBdtDetail().owner.loginId" [matTooltip]="asBdtDetail().owner.username" [disabled]="true">
-                          </mat-form-field>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-2">
-                          <mat-form-field matTooltip="Data Type">
-                            <mat-label>Core Component</mat-label>
-                            <input matInput value="DT" [disabled]="true">
-                          </mat-form-field>
-                        </div>
-                        <div class="col-4">
-                          <mat-form-field>
-                            <mat-label>GUID</mat-label>
-                            <input matInput maxlength="41"
-                                   [(ngModel)]="asBdtDetail().guid" [disabled]="true">
-                          </mat-form-field>
-                        </div>
-                        <div class="col-6">
-                          <mat-form-field>
-                            <mat-label>{{ 'DATA_TYPE_DETAIL.DEN' | translate }}</mat-label>
-                            <input matInput maxlength="200"
-                                   [(ngModel)]="asBdtDetail().den" [disabled]="true">
-                          </mat-form-field>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-4">
-                          <mat-form-field>
-                            <mat-label>Based Data Type</mat-label>
-                            <input matInput maxlength="200"
-                                   [(ngModel)]="asBdtDetail().basedBdtDen" [disabled]="true">
-                          </mat-form-field>
-                        </div>
-                        <div class="col-4">
-                          <mat-form-field>
-                            <mat-label>Data Type Term</mat-label>
-                            <input matInput placeholder="Data Type Term" maxlength="45"
-                                   [(ngModel)]="asBdtDetail().dataTypeTerm" [disabled]="true">
-                          </mat-form-field>
-                        </div>
-                        <div class="col-4">
-                          <mat-form-field>
-                            <mat-label>Representation Term</mat-label>
-                            <input matInput placeholder="Representation Term" maxlength="100"
-                                   [(ngModel)]="asBdtDetail().representationTerm" [disabled]="true">
-                          </mat-form-field>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-12">
-                          <mat-form-field *ngIf="selectedNode.level === 0 && isEditable() && !hasRevision()">
-                            <mat-label>Namespace</mat-label>
-                            <mat-select placeholder="Namespace"
-                                        [(ngModel)]="asBdtDetail().namespaceId"
-                                        [required]="true">
-                              <mat-option>
-                                <ngx-mat-select-search [formControl]="namespaceListFilterCtrl"
-                                                       [placeholderLabel]="'Search...'"
-                                                       [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
-                              </mat-option>
-                              <mat-option *ngFor="let namespace of filteredNamespaceList | async"
-                                          [value]="namespace.namespaceId">{{ namespace.uri }}</mat-option>
-                            </mat-select>
-                          </mat-form-field>
-                          <mat-form-field *ngIf="selectedNode.level !== 0 || !isEditable() || hasRevision()">
-                            <mat-label>Namespace</mat-label>
-                            <mat-select placeholder="Namespace"
-                                        [(ngModel)]="asBdtDetail().namespaceId"
-                                        [required]="true"
-                                        [disabled]="true">
-                              <mat-option *ngFor="let namespace of getSelectableNamespaces(asBdtDetail().namespaceId)"
-                                          [value]="namespace.namespaceId">{{ namespace.uri }}</mat-option>
-                            </mat-select>
-                          </mat-form-field>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-6">
-                          <mat-form-field>
-                            <mat-label>Qualifier</mat-label>
-                            <input matInput placeholder="Qualifier" maxlength="100"
-                                   [(ngModel)]="asBdtDetail().qualifier"
-                                   (focusout)="asBdtDetail().qualifier = trim(asBdtDetail().qualifier)"
-                                   [disabled]="!isEditable() || hasRevision()"/>
-                          </mat-form-field>
-                        </div>
-                        <div class="col-6">
-                          <mat-form-field>
-                            <mat-label>Six Hexadecimal Identifier</mat-label>
-                            <input matInput placeholder="Six Hexadecimal Identifier" maxlength="100"
-                                   [(ngModel)]="asBdtDetail().sixDigitId" [disabled]="true">
-                            <button matSuffix mat-icon-button aria-label="{{ isEmpty(asBdtDetail().sixDigitId) ? 'Generate' : 'Renew' }}"
-                                    matTooltip="{{ isEmpty(asBdtDetail().sixDigitId) ? 'Generate' : 'Renew' }}"
-                                    *ngIf="!hasRevision()"
-                                    [disabled]="!isEditable() || hasRevision()"
-                                    (click)="asBdtDetail().sixDigitId = randSixDigitId()">
-                              <mat-icon>autorenew</mat-icon>
-                            </button>
-                            <button matSuffix mat-icon-button aria-label="Clear"
-                                    matTooltip="Clear"
-                                    *ngIf="!hasRevision()"
-                                    [disabled]="!isEditable() || hasRevision() || isEmpty(asBdtDetail().sixDigitId)"
-                                    (click)="asBdtDetail().sixDigitId = undefined">
-                              <mat-icon>clear</mat-icon>
-                            </button>
-                          </mat-form-field>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-12 pb-3">
-                          <mat-expansion-panel #dtValueDomain style="margin-bottom: 8px !important;">
-                            <mat-expansion-panel-header>
-                              <mat-panel-title>Value Domain</mat-panel-title>
-                              <mat-panel-description *ngIf="!dtValueDomain.expanded && asBdtDetail().defaultValueDomain !== undefined">
-                                <span>Default - {{ asBdtDetail().defaultValueDomain.name }}</span>
-                              </mat-panel-description>
-                            </mat-expansion-panel-header>
-                            <mat-action-row *ngIf="hasTokenPrimitive(asBdtDetail()) && isEditable()">
-                              <button mat-stroked-button class="ms-auto" matTooltip="Add Value Domain"
-                                      [disabled]="!isEditable()"
-                                      (click)="addValueDomain(asBdtDetail())">Add
-                              </button>
-                              <button mat-stroked-button class="ms-2" matTooltip="Discard Value Domain"
-                                      [disabled]="!selectedValueDomain || selectedValueDomain.isDefault || selectedValueDomain.inherited"
-                                      (click)="deleteValueDomain(asBdtDetail())">Discard
-                              </button>
-                            </mat-action-row>
-                            <table mat-table [dataSource]="restrictionDataSource">
-                              <!-- Checkbox Column -->
-                              <ng-container matColumnDef="select">
-                                <th mat-header-cell *matHeaderCellDef></th>
-                                <td mat-cell *matCellDef="let row">
-                                  <mat-checkbox (click)="$event.stopPropagation()"
-                                                [disabled]="!isEditable() || row.type === 'Primitive' || row.dtAwdPri.inherited"
-                                                (change)="$event ? toggleValueDomain(row) : null"
-                                                [checked]="isSelected(row)">
-                                  </mat-checkbox>
-                                </td>
-                              </ng-container>
-                              <ng-container matColumnDef="type">
-                                <th mat-header-cell *matHeaderCellDef> Value Domain Type</th>
-                                <td mat-cell *matCellDef="let element">
-                                  <mat-form-field *ngIf="element.type === 'Primitive'">
-                                    <mat-select [(ngModel)]="element.type">
-                                      <mat-option *ngFor="let type of [element.type,]" [value]="type"
-                                                  [disabled]="true">{{ type }}</mat-option>
-                                    </mat-select>
-                                  </mat-form-field>
-                                  <mat-form-field *ngIf="element.type !== 'Primitive'">
-                                    <mat-select [(ngModel)]="element.type"
-                                                (ngModelChange)="onChangeValueDomain(asBdtDetail())">
-                                      <mat-option *ngFor="let type of ['Code List', 'Agency ID List']" [value]="type"
-                                                  [disabled]="!isEditable() || element.dtAwdPri.inherited">
-                                        {{ type }}</mat-option>
-                                    </mat-select>
-                                  </mat-form-field>
-                                </td>
-                              </ng-container>
-                              <ng-container matColumnDef="name">
-                                <th mat-header-cell *matHeaderCellDef> Name</th>
-                                <td mat-cell *matCellDef="let element">
-                                  <mat-form-field *ngIf="element.type === 'Primitive'">
-                                    <mat-select [(ngModel)]="element.name">
-                                      <mat-option *ngFor="let primitive of primitiveList" [value]="primitive" [disabled]="true">
-                                        <span>{{ primitive }}</span>
-                                      </mat-option>
-                                    </mat-select>
-                                  </mat-form-field>
-                                  <mat-form-field *ngIf="element.type === 'Code List'">
-                                    <mat-select [(ngModel)]="element.dtAwdPri.codeList"
-                                                [required]="true"
-                                                [compareWith]="compareCodeList"
-                                                (ngModelChange)="onChangeValueDomain(asBdtDetail())">
-                                      <mat-option *ngFor="let codeList of filteredCodeLists(element)" [value]="codeList"
-                                                  [disabled]="!isEditable() || element.dtAwdPri.inherited">
-                                        <span class="{{ codeList.state === 'Deleted' ? 'text-line-through' : '' }}">{{ codeList.name }}</span>
-                                        <span class="f12 ms-auto pe-2"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
-                                      </mat-option>
-                                    </mat-select>
-                                  </mat-form-field>
-                                  <mat-form-field *ngIf="element.type === 'Agency ID List'">
-                                    <mat-select [(ngModel)]="element.dtAwdPri.agencyIdList"
-                                                [required]="true"
-                                                [compareWith]="compareAgencyIdList"
-                                                (ngModelChange)="onChangeValueDomain(asBdtDetail())">
-                                      <mat-option *ngFor="let agencyIdList of filteredAgencyIdLists(element)" [value]="agencyIdList"
-                                                  [disabled]="!isEditable() || element.dtAwdPri.inherited">
-                                        <span>{{ agencyIdList.name }}</span>
-                                      </mat-option>
-                                    </mat-select>
-                                  </mat-form-field>
-                                </td>
-                              </ng-container>
-                              <ng-container matColumnDef="xbt">
-                                <th mat-header-cell *matHeaderCellDef> XSD Expression</th>
-                                <td mat-cell *matCellDef="let element">
-                                  <mat-form-field *ngIf="element.type === 'Primitive'">
-                                    <mat-select [(ngModel)]="element.xbtList" multiple>
-                                      <mat-select-trigger class="d-flex" *ngIf="(element.xbtList.length || 0) > 2">
-                                        <span>{{ ((element.xbtList.length || 0) > 0) ? element.xbtList[0].name : '' }}</span>
-                                        <span *ngIf="(element.xbtList.length || 0) > 1" class="ms-2 additional-selection">
-                                          (+{{ (element.xbtList.length || 0) - 1 }} {{ element.xbtList.length === 2 ? 'other' : 'others' }})
-                                        </span>
-                                      </mat-select-trigger>
-                                      <mat-option *ngFor="let xbt of element.xbtList" [value]="xbt" [disabled]="true">
-                                        <span>{{ xbt.name }}</span>
-                                      </mat-option>
-                                    </mat-select>
-                                  </mat-form-field>
-                                </td>
-                              </ng-container>
-                              <tr mat-header-row *matHeaderRowDef="restrictionListDisplayedColumns"></tr>
-                              <tr mat-row *cdkRowDef="let row; columns: restrictionListDisplayedColumns;"></tr>
-                            </table>
-                            <mat-toolbar>
-                              <mat-toolbar-row class="p-0">
-                                <mat-form-field class="pt-2 w-50 ps-2">
-                                  <mat-label>Default</mat-label>
-                                  <mat-select [(ngModel)]="asBdtDetail().defaultValueDomain">
-                                    <mat-optgroup *ngFor="let valueDomain of asBdtDetail().dtAwdPriListByGroup"
-                                                  [label]="valueDomain.label">
-                                      <mat-option *ngFor="let item of valueDomain.list" [value]="item" [disabled]="!isEditable()">
-                                        {{ (item.type === 'Primitive') ? item.self.cdtPriName + ' - ' + item.name : item.name }}
-                                      </mat-option>
-                                    </mat-optgroup>
-                                  </mat-select>
-                                </mat-form-field>
-                              </mat-toolbar-row>
-                            </mat-toolbar>
-                          </mat-expansion-panel>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-12">
-                          <mat-form-field>
-                            <mat-label>Definition Source</mat-label>
-                            <input matInput placeholder="Definition Source" maxlength="100"
-                                   [(ngModel)]="asBdtDetail().definitionSource"
-                                   (focusout)="asBdtDetail().definitionSource = trim(asBdtDetail().definitionSource)"
-                                   [disabled]="!isEditable()">
-                          </mat-form-field>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-12">
-                          <mat-form-field>
-                            <mat-label>Definition</mat-label>
-                            <div class="textarea-container">
-                              <textarea matInput rows="6" cols="30"
-                                        placeholder="Definition"
-                                        [(ngModel)]="asBdtDetail().definition"
-                                        (focusout)="asBdtDetail().definition = trim(asBdtDetail().definition)"
-                                        [readonly]="!isEditable()"></textarea>
-                              <button mat-icon-button mat-small-icon-button
-                                      *ngIf="this.state === 'WIP' && this.access === 'CanEdit' && selectedNode.level !== 0"
-                                      (click)="copyToDefinition(asBdtDetail().definition)"
-                                      matTooltip="Copy to Definition">
-                                <mat-icon>content_paste</mat-icon>
-                              </button>
+              @if (isBdtDetail()) {
+                <div class="cc-node-detail-panel">
+                  <mat-tab-group mat-align-tabs="start" animationDuration="0ms">
+                    <mat-tab label="{{ asBdtDetail().den }}">
+                      <div class="cc-node-detail-container">
+                        <div class="row">
+                          <div class="col-2">
+                            <mat-form-field>
+                              <mat-label>Library</mat-label>
+                              <input matInput [(ngModel)]="asBdtDetail().library.name" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                          <div class="col-2">
+                            <mat-form-field>
+                              <mat-label>Release</mat-label>
+                              <input matInput [(ngModel)]="asBdtDetail().release.releaseNum" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                          <div class="{{ asBdtDetail().lastChanged ? 'col-1' : 'col-2' }}"
+                            (click)="openInNewTab('/data_type/' + asBdtDetail().since.dtManifestId)"
+                            style="cursor: pointer;">
+                            <mat-form-field>
+                              <mat-label>Since</mat-label>
+                              <input matInput [(ngModel)]="asBdtDetail().since.release.releaseNum" [disabled]="true"
+                                style="pointer-events: none;">
+                            </mat-form-field>
+                          </div>
+                          @if (asBdtDetail().lastChanged) {
+                            <div class="col-1"
+                              (click)="openInNewTab('/data_type/' + asBdtDetail().lastChanged.dtManifestId)"
+                              style="cursor: pointer;">
+                              <mat-form-field>
+                                <mat-label>Last Changed</mat-label>
+                                <input matInput [(ngModel)]="asBdtDetail().lastChanged.release.releaseNum" [disabled]="true"
+                                  style="pointer-events: none;">
+                              </mat-form-field>
                             </div>
-                          </mat-form-field>
+                          }
+                          <div class="col-2">
+                            <mat-form-field>
+                              <mat-label>Revision</mat-label>
+                              <input matInput [(ngModel)]="asBdtDetail().log.revisionNum" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                          <div class="col-2">
+                            <mat-form-field>
+                              <mat-label>State</mat-label>
+                              <input matInput [(ngModel)]="asBdtDetail().state" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                          <div class="col-2">
+                            <mat-form-field>
+                              <mat-label>Owner</mat-label>
+                              <input matInput [(ngModel)]="asBdtDetail().owner.loginId" [matTooltip]="asBdtDetail().owner.username" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-2">
+                            <mat-form-field matTooltip="Data Type">
+                              <mat-label>Core Component</mat-label>
+                              <input matInput value="DT" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                          <div class="col-4">
+                            <mat-form-field>
+                              <mat-label>GUID</mat-label>
+                              <input matInput maxlength="41"
+                                [(ngModel)]="asBdtDetail().guid" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                          <div class="col-6">
+                            <mat-form-field>
+                              <mat-label>{{ 'DATA_TYPE_DETAIL.DEN' | translate }}</mat-label>
+                              <input matInput maxlength="200"
+                                [(ngModel)]="asBdtDetail().den" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-4">
+                            <mat-form-field>
+                              <mat-label>Based Data Type</mat-label>
+                              <input matInput maxlength="200"
+                                [(ngModel)]="asBdtDetail().basedBdtDen" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                          <div class="col-4">
+                            <mat-form-field>
+                              <mat-label>Data Type Term</mat-label>
+                              <input matInput placeholder="Data Type Term" maxlength="45"
+                                [(ngModel)]="asBdtDetail().dataTypeTerm" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                          <div class="col-4">
+                            <mat-form-field>
+                              <mat-label>Representation Term</mat-label>
+                              <input matInput placeholder="Representation Term" maxlength="100"
+                                [(ngModel)]="asBdtDetail().representationTerm" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-12">
+                            @if (selectedNode.level === 0 && isEditable() && !hasRevision()) {
+                              <mat-form-field>
+                                <mat-label>Namespace</mat-label>
+                                <mat-select placeholder="Namespace"
+                                  [(ngModel)]="asBdtDetail().namespaceId"
+                                  [required]="true">
+                                  <mat-option>
+                                    <ngx-mat-select-search [formControl]="namespaceListFilterCtrl"
+                                      [placeholderLabel]="'Search...'"
+                                    [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
+                                  </mat-option>
+                                  @for (namespace of filteredNamespaceList | async; track namespace) {
+                                    <mat-option
+                                    [value]="namespace.namespaceId">{{ namespace.uri }}</mat-option>
+                                  }
+                                </mat-select>
+                              </mat-form-field>
+                            }
+                            @if (selectedNode.level !== 0 || !isEditable() || hasRevision()) {
+                              <mat-form-field>
+                                <mat-label>Namespace</mat-label>
+                                <mat-select placeholder="Namespace"
+                                  [(ngModel)]="asBdtDetail().namespaceId"
+                                  [required]="true"
+                                  [disabled]="true">
+                                  @for (namespace of getSelectableNamespaces(asBdtDetail().namespaceId); track namespace) {
+                                    <mat-option
+                                    [value]="namespace.namespaceId">{{ namespace.uri }}</mat-option>
+                                  }
+                                </mat-select>
+                              </mat-form-field>
+                            }
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-6">
+                            <mat-form-field>
+                              <mat-label>Qualifier</mat-label>
+                              <input matInput placeholder="Qualifier" maxlength="100"
+                                [(ngModel)]="asBdtDetail().qualifier"
+                                (focusout)="asBdtDetail().qualifier = trim(asBdtDetail().qualifier)"
+                                [disabled]="!isEditable() || hasRevision()"/>
+                            </mat-form-field>
+                          </div>
+                          <div class="col-6">
+                            <mat-form-field>
+                              <mat-label>Six Hexadecimal Identifier</mat-label>
+                              <input matInput placeholder="Six Hexadecimal Identifier" maxlength="100"
+                                [(ngModel)]="asBdtDetail().sixDigitId" [disabled]="true">
+                              @if (!hasRevision()) {
+                                <button matSuffix mat-icon-button aria-label="{{ isEmpty(asBdtDetail().sixDigitId) ? 'Generate' : 'Renew' }}"
+                                  matTooltip="{{ isEmpty(asBdtDetail().sixDigitId) ? 'Generate' : 'Renew' }}"
+                                  [disabled]="!isEditable() || hasRevision()"
+                                  (click)="asBdtDetail().sixDigitId = randSixDigitId()">
+                                  <mat-icon>autorenew</mat-icon>
+                                </button>
+                              }
+                              @if (!hasRevision()) {
+                                <button matSuffix mat-icon-button aria-label="Clear"
+                                  matTooltip="Clear"
+                                  [disabled]="!isEditable() || hasRevision() || isEmpty(asBdtDetail().sixDigitId)"
+                                  (click)="asBdtDetail().sixDigitId = undefined">
+                                  <mat-icon>clear</mat-icon>
+                                </button>
+                              }
+                            </mat-form-field>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-12 pb-3">
+                            <mat-expansion-panel #dtValueDomain style="margin-bottom: 8px !important;">
+                              <mat-expansion-panel-header>
+                                <mat-panel-title>Value Domain</mat-panel-title>
+                                @if (!dtValueDomain.expanded && asBdtDetail().defaultValueDomain !== undefined) {
+                                  <mat-panel-description>
+                                    <span>Default - {{ asBdtDetail().defaultValueDomain.name }}</span>
+                                  </mat-panel-description>
+                                }
+                              </mat-expansion-panel-header>
+                              @if (hasTokenPrimitive(asBdtDetail()) && isEditable()) {
+                                <mat-action-row>
+                                  <button mat-stroked-button class="ms-auto" matTooltip="Add Value Domain"
+                                    [disabled]="!isEditable()"
+                                    (click)="addValueDomain(asBdtDetail())">Add
+                                  </button>
+                                  <button mat-stroked-button class="ms-2" matTooltip="Discard Value Domain"
+                                    [disabled]="!selectedValueDomain || selectedValueDomain.isDefault || selectedValueDomain.inherited"
+                                    (click)="deleteValueDomain(asBdtDetail())">Discard
+                                  </button>
+                                </mat-action-row>
+                              }
+                              <table mat-table [dataSource]="restrictionDataSource">
+                                <!-- Checkbox Column -->
+                                <ng-container matColumnDef="select">
+                                  <th mat-header-cell *matHeaderCellDef></th>
+                                  <td mat-cell *matCellDef="let row">
+                                    <mat-checkbox (click)="$event.stopPropagation()"
+                                      [disabled]="!isEditable() || row.type === 'Primitive' || row.dtAwdPri.inherited"
+                                      (change)="$event ? toggleValueDomain(row) : null"
+                                      [checked]="isSelected(row)">
+                                    </mat-checkbox>
+                                  </td>
+                                </ng-container>
+                                <ng-container matColumnDef="type">
+                                  <th mat-header-cell *matHeaderCellDef> Value Domain Type</th>
+                                  <td mat-cell *matCellDef="let element">
+                                    @if (element.type === 'Primitive') {
+                                      <mat-form-field>
+                                        <mat-select [(ngModel)]="element.type">
+                                          @for (type of [element.type,]; track type) {
+                                            <mat-option [value]="type"
+                                            [disabled]="true">{{ type }}</mat-option>
+                                          }
+                                        </mat-select>
+                                      </mat-form-field>
+                                    }
+                                    @if (element.type !== 'Primitive') {
+                                      <mat-form-field>
+                                        <mat-select [(ngModel)]="element.type"
+                                          (ngModelChange)="onChangeValueDomain(asBdtDetail())">
+                                          @for (type of ['Code List', 'Agency ID List']; track type) {
+                                            <mat-option [value]="type"
+                                              [disabled]="!isEditable() || element.dtAwdPri.inherited">
+                                            {{ type }}</mat-option>
+                                          }
+                                        </mat-select>
+                                      </mat-form-field>
+                                    }
+                                  </td>
+                                </ng-container>
+                                <ng-container matColumnDef="name">
+                                  <th mat-header-cell *matHeaderCellDef> Name</th>
+                                  <td mat-cell *matCellDef="let element">
+                                    @if (element.type === 'Primitive') {
+                                      <mat-form-field>
+                                        <mat-select [(ngModel)]="element.name">
+                                          @for (primitive of primitiveList; track primitive) {
+                                            <mat-option [value]="primitive" [disabled]="true">
+                                              <span>{{ primitive }}</span>
+                                            </mat-option>
+                                          }
+                                        </mat-select>
+                                      </mat-form-field>
+                                    }
+                                    @if (element.type === 'Code List') {
+                                      <mat-form-field>
+                                        <mat-select [(ngModel)]="element.dtAwdPri.codeList"
+                                          [required]="true"
+                                          [compareWith]="compareCodeList"
+                                          (ngModelChange)="onChangeValueDomain(asBdtDetail())">
+                                          @for (codeList of filteredCodeLists(element); track codeList) {
+                                            <mat-option [value]="codeList"
+                                              [disabled]="!isEditable() || element.dtAwdPri.inherited">
+                                              <span class="{{ codeList.state === 'Deleted' ? 'text-line-through' : '' }}">{{ codeList.name }}</span>
+                                              <span class="f12 ms-auto pe-2"> ({{ codeList.versionId }}@if (codeList.deprecated) {
+                                                <span>, Deprecated</span>
+                                                }@if (codeList.state === 'Deleted') {
+                                                <span>, Deleted</span>
+                                              })</span>
+                                            </mat-option>
+                                          }
+                                        </mat-select>
+                                      </mat-form-field>
+                                    }
+                                    @if (element.type === 'Agency ID List') {
+                                      <mat-form-field>
+                                        <mat-select [(ngModel)]="element.dtAwdPri.agencyIdList"
+                                          [required]="true"
+                                          [compareWith]="compareAgencyIdList"
+                                          (ngModelChange)="onChangeValueDomain(asBdtDetail())">
+                                          @for (agencyIdList of filteredAgencyIdLists(element); track agencyIdList) {
+                                            <mat-option [value]="agencyIdList"
+                                              [disabled]="!isEditable() || element.dtAwdPri.inherited">
+                                              <span>{{ agencyIdList.name }}</span>
+                                            </mat-option>
+                                          }
+                                        </mat-select>
+                                      </mat-form-field>
+                                    }
+                                  </td>
+                                </ng-container>
+                                <ng-container matColumnDef="xbt">
+                                  <th mat-header-cell *matHeaderCellDef> XSD Expression</th>
+                                  <td mat-cell *matCellDef="let element">
+                                    @if (element.type === 'Primitive') {
+                                      <mat-form-field>
+                                        <mat-select [(ngModel)]="element.xbtList" multiple>
+                                          @if ((element.xbtList.length || 0) > 2) {
+                                            <mat-select-trigger class="d-flex">
+                                              <span>{{ ((element.xbtList.length || 0) > 0) ? element.xbtList[0].name : '' }}</span>
+                                              @if ((element.xbtList.length || 0) > 1) {
+                                                <span class="ms-2 additional-selection">
+                                                  (+{{ (element.xbtList.length || 0) - 1 }} {{ element.xbtList.length === 2 ? 'other' : 'others' }})
+                                                </span>
+                                              }
+                                            </mat-select-trigger>
+                                          }
+                                          @for (xbt of element.xbtList; track xbt) {
+                                            <mat-option [value]="xbt" [disabled]="true">
+                                              <span>{{ xbt.name }}</span>
+                                            </mat-option>
+                                          }
+                                        </mat-select>
+                                      </mat-form-field>
+                                    }
+                                  </td>
+                                </ng-container>
+                                <tr mat-header-row *matHeaderRowDef="restrictionListDisplayedColumns"></tr>
+                                <tr mat-row *cdkRowDef="let row; columns: restrictionListDisplayedColumns;"></tr>
+                              </table>
+                              <mat-toolbar>
+                                <mat-toolbar-row class="p-0">
+                                  <mat-form-field class="pt-2 w-50 ps-2">
+                                    <mat-label>Default</mat-label>
+                                    <mat-select [(ngModel)]="asBdtDetail().defaultValueDomain">
+                                      @for (valueDomain of asBdtDetail().dtAwdPriListByGroup; track valueDomain) {
+                                        <mat-optgroup
+                                          [label]="valueDomain.label">
+                                          @for (item of valueDomain.list; track item) {
+                                            <mat-option [value]="item" [disabled]="!isEditable()">
+                                              {{ (item.type === 'Primitive') ? item.self.cdtPriName + ' - ' + item.name : item.name }}
+                                            </mat-option>
+                                          }
+                                        </mat-optgroup>
+                                      }
+                                    </mat-select>
+                                  </mat-form-field>
+                                </mat-toolbar-row>
+                              </mat-toolbar>
+                            </mat-expansion-panel>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-12">
+                            <mat-form-field>
+                              <mat-label>Definition Source</mat-label>
+                              <input matInput placeholder="Definition Source" maxlength="100"
+                                [(ngModel)]="asBdtDetail().definitionSource"
+                                (focusout)="asBdtDetail().definitionSource = trim(asBdtDetail().definitionSource)"
+                                [disabled]="!isEditable()">
+                            </mat-form-field>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-12">
+                            <mat-form-field>
+                              <mat-label>Definition</mat-label>
+                              <div class="textarea-container">
+                                <textarea matInput rows="6" cols="30"
+                                  placeholder="Definition"
+                                  [(ngModel)]="asBdtDetail().definition"
+                                  (focusout)="asBdtDetail().definition = trim(asBdtDetail().definition)"
+                                [readonly]="!isEditable()"></textarea>
+                                @if (this.state === 'WIP' && this.access === 'CanEdit' && selectedNode.level !== 0) {
+                                  <button mat-icon-button mat-small-icon-button
+                                    (click)="copyToDefinition(asBdtDetail().definition)"
+                                    matTooltip="Copy to Definition">
+                                    <mat-icon>content_paste</mat-icon>
+                                  </button>
+                                }
+                              </div>
+                            </mat-form-field>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-12">
+                            <mat-form-field>
+                              <mat-label>Content Component Definition</mat-label>
+                              <div class="textarea-container">
+                                <textarea matInput rows="6" cols="30"
+                                  placeholder="Content Component Definition"
+                                  [(ngModel)]="asBdtDetail().contentComponentDefinition"
+                                  (focusout)="asBdtDetail().contentComponentDefinition = trim(asBdtDetail().contentComponentDefinition)"
+                                [readonly]="!isEditable()"></textarea>
+                                @if (this.state === 'WIP' && this.access === 'CanEdit') {
+                                  <button mat-icon-button mat-small-icon-button
+                                    (click)="copyToDefinition(asBdtDetail().contentComponentDefinition)"
+                                    matTooltip="Copy to Definition">
+                                    <mat-icon>content_paste</mat-icon>
+                                  </button>
+                                }
+                              </div>
+                            </mat-form-field>
+                          </div>
                         </div>
                       </div>
-
-                      <div class="row">
-                        <div class="col-12">
-                          <mat-form-field>
-                            <mat-label>Content Component Definition</mat-label>
-                            <div class="textarea-container">
-                              <textarea matInput rows="6" cols="30"
-                                        placeholder="Content Component Definition"
-                                        [(ngModel)]="asBdtDetail().contentComponentDefinition"
-                                        (focusout)="asBdtDetail().contentComponentDefinition = trim(asBdtDetail().contentComponentDefinition)"
-                                        [readonly]="!isEditable()"></textarea>
-                              <button mat-icon-button mat-small-icon-button
-                                      *ngIf="this.state === 'WIP' && this.access === 'CanEdit'"
-                                      (click)="copyToDefinition(asBdtDetail().contentComponentDefinition)"
-                                      matTooltip="Copy to Definition">
-                                <mat-icon>content_paste</mat-icon>
-                              </button>
-                            </div>
-                          </mat-form-field>
-                        </div>
-                      </div>
-                    </div>
-                  </mat-tab>
-                </mat-tab-group>
-              </div>
+                    </mat-tab>
+                  </mat-tab-group>
+                </div>
+              }
 
               <!-- BDT_SC -->
-              <div class="cc-node-detail-panel" *ngIf="isDtScDetail()">
-                <mat-tab-group mat-align-tabs="start" animationDuration="0ms">
-                  <mat-tab label="{{ asDtScDetail().den }}">
-                    <div class="cc-node-detail-container">
-                      <div class="row">
-                        <div class="col-2">
-                          <mat-form-field>
-                            <mat-label>Library</mat-label>
-                            <input matInput [(ngModel)]="asDtScDetail().library.name" [disabled]="true">
-                          </mat-form-field>
-                        </div>
-                        <div class="col-2">
-                          <mat-form-field>
-                            <mat-label>Release</mat-label>
-                            <input matInput [(ngModel)]="asDtScDetail().release.releaseNum" [disabled]="true">
-                          </mat-form-field>
-                        </div>
-                        <div class="{{ asDtScDetail().lastChanged ? 'col-1' : 'col-2' }}">
-                          <mat-form-field>
-                            <mat-label>Since</mat-label>
-                            <input matInput [(ngModel)]="asDtScDetail().since.release.releaseNum" [disabled]="true">
-                          </mat-form-field>
-                        </div>
-                        <div class="col-1" *ngIf="asDtScDetail().lastChanged">
-                          <mat-form-field>
-                            <mat-label>Last Changed</mat-label>
-                            <input matInput [(ngModel)]="asDtScDetail().lastChanged.release.releaseNum" [disabled]="true">
-                          </mat-form-field>
-                        </div>
-                        <div class="col-2">
-                          <mat-form-field>
-                            <mat-label>Revision</mat-label>
-                            <input matInput [(ngModel)]="asDtScDetail().log.revisionNum" [disabled]="true">
-                          </mat-form-field>
-                        </div>
-                        <div class="col-2">
-                          <mat-form-field>
-                            <mat-label>State</mat-label>
-                            <input matInput [(ngModel)]="asDtScDetail().state" [disabled]="true">
-                          </mat-form-field>
-                        </div>
-                        <div class="col-2">
-                          <mat-form-field>
-                            <mat-label>Owner</mat-label>
-                            <input matInput [(ngModel)]="asDtScDetail().owner.loginId" [matTooltip]="asDtScDetail().owner.username" [disabled]="true">
-                          </mat-form-field>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-2">
-                          <mat-form-field matTooltip="Data Type Supplementary Component">
-                            <mat-label>Core Component</mat-label>
-                            <input matInput value="DTSC" [disabled]="true">
-                          </mat-form-field>
-                        </div>
-                        <div class="col-4">
-                          <mat-form-field>
-                            <mat-label>GUID</mat-label>
-                            <input matInput maxlength="41"
-                                   [(ngModel)]="asDtScDetail().guid" [disabled]="true">
-                          </mat-form-field>
-                        </div>
-                        <div class="col-6">
-                          <mat-form-field>
-                            <mat-label>{{ 'BDT_SC_DETAIL.DEN' | translate }}</mat-label>
-                            <input matInput maxlength="200"
-                                   [(ngModel)]="asDtScDetail().den" [disabled]="true">
-                          </mat-form-field>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-4">
-                          <mat-form-field>
-                            <mat-label>Object Class Term</mat-label>
-                            <input matInput maxlength="60"
-                                   [(ngModel)]="asDtScDetail().objectClassTerm" [disabled]="true">
-                          </mat-form-field>
-                        </div>
-                        <div class="col-4">
-                          <mat-form-field>
-                            <mat-label>Property Term</mat-label>
-                            <input matInput maxlength="60"
-                                   [(ngModel)]="asDtScDetail().propertyTerm"
-                                   (focusout)="asDtScDetail().propertyTerm = trim(asDtScDetail().propertyTerm)"
-                                   [disabled]="!isEditable() || asDtScDetail().cardinality === 'Prohibited' || !!asDtScDetail().based"
-                                   [required]="true">
-                          </mat-form-field>
-                        </div>
-                        <div class="col-4">
-                          <mat-form-field>
-                            <mat-label>Representation Term</mat-label>
-                            <mat-select [(ngModel)]="asDtScDetail().representationTerm"
-                                        (ngModelChange)="loadDefaultPrimitiveValues(asDtScDetail())"
-                                        [disabled]="!isEditable() || asDtScDetail().cardinality === 'Prohibited' || !!asDtScDetail().based"
-                                        [required]="true">
-                              <mat-option value="" *ngIf="asDtScDetail().representationTerm === ''"></mat-option>
-                              <mat-option value="Amount">Amount</mat-option>
-                              <mat-option value="Binary Object">Binary Object</mat-option>
-                              <mat-option value="Code">Code</mat-option>
-                              <mat-option value="Date">Date</mat-option>
-                              <mat-option value="Date Time">Date Time</mat-option>
-                              <mat-option value="Duration">Duration</mat-option>
-                              <mat-option value="Graphic">Graphic</mat-option>
-                              <mat-option value="Identifier">Identifier</mat-option>
-                              <mat-option value="Indicator">Indicator</mat-option>
-                              <mat-option value="Measure">Measure</mat-option>
-                              <mat-option value="Name">Name</mat-option>
-                              <mat-option value="Number">Number</mat-option>
-                              <mat-option value="Ordinal">Ordinal</mat-option>
-                              <mat-option value="Percent">Percent</mat-option>
-                              <mat-option value="Picture">Picture</mat-option>
-                              <mat-option value="Quantity">Quantity</mat-option>
-                              <mat-option value="Rate">Rate</mat-option>
-                              <mat-option value="Ratio">Ratio</mat-option>
-                              <mat-option value="Sound">Sound</mat-option>
-                              <mat-option value="Text">Text</mat-option>
-                              <mat-option value="Time">Time</mat-option>
-                              <mat-option value="Value">Value</mat-option>
-                              <mat-option value="Video">Video</mat-option>
-                            </mat-select>
-                          </mat-form-field>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-12">
-                          <mat-form-field>
-                            <mat-label>Cardinality</mat-label>
-                            <mat-select [(ngModel)]="asDtScDetail().cardinality"
-                                        [disabled]="!isEditable() || !asDtScDetail().isCardinalityEditable">
-                              <mat-option *ngFor="let option of asDtScDetail().allowedCardinalities"
-                                          [value]="option.value" [disabled]="option.disabled">{{option.value}}</mat-option>
-                            </mat-select>
-                          </mat-form-field>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-md-3 col-sm-3">
-                          <mat-form-field>
-                            <mat-label>Value Constraint</mat-label>
-                            <mat-select [(ngModel)]="asDtScDetail().fixedOrDefault"
-                                        [disabled]="!isEditable() || asDtScDetail().cardinality === 'Prohibited'">
-                              <mat-option value="none">None</mat-option>
-                              <mat-option value="fixed">Fixed Value</mat-option>
-                              <mat-option value="default">Default Value</mat-option>
-                            </mat-select>
-                          </mat-form-field>
-                        </div>
-                        <div class="col-md-9 col-sm-9">
-                          <mat-form-field *ngIf="asDtScDetail().fixedOrDefault == 'none'">
-                            <mat-label>No value constraints</mat-label>
-                            <input matInput placeholder="No value constraints"
-                                   [disabled]="true">
-                          </mat-form-field>
-
-                          <mat-form-field *ngIf="asDtScDetail().fixedOrDefault == 'fixed'">
-                            <mat-label>Fixed Value</mat-label>
-                            <input matInput placeholder="Fixed Value"
-                                   [(ngModel)]="asDtScDetail().fixedValue"
-                                   [disabled]="!isEditable()">
-                          </mat-form-field>
-
-                          <mat-form-field *ngIf="asDtScDetail().fixedOrDefault == 'default'">
-                            <mat-label>Default Value</mat-label>
-                            <input matInput placeholder="Default Value"
-                                   [(ngModel)]="asDtScDetail().defaultValue"
-                                   [disabled]="!isEditable()">
-                          </mat-form-field>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-12 pb-3">
-                          <mat-expansion-panel #dtScValueDomain style="margin-bottom: 8px !important;">
-                            <mat-expansion-panel-header>
-                              <mat-panel-title>Value Domain</mat-panel-title>
-                              <mat-panel-description *ngIf="!dtScValueDomain.expanded && asDtScDetail().defaultValueDomain !== undefined">
-                                <span>Default - {{ asDtScDetail().defaultValueDomain.name }}</span>
-                              </mat-panel-description>
-                            </mat-expansion-panel-header>
-                            <mat-action-row *ngIf="hasTokenPrimitive(asDtScDetail()) && isEditable()">
-                              <button mat-stroked-button class="ms-auto" matTooltip="Add Value Domain"
-                                      [disabled]="!isEditable()"
-                                      (click)="addValueDomain(asDtScDetail())">Add
-                              </button>
-                              <button mat-stroked-button class="ms-2" matTooltip="Discard Value Domain"
-                                      [disabled]="!selectedValueDomain || selectedValueDomain.isDefault || selectedValueDomain.inherited"
-                                      (click)="deleteValueDomain(asDtScDetail())">Discard</button>
-                            </mat-action-row>
-                            <table mat-table [dataSource]="restrictionDataSource">
-                              <!-- Checkbox Column -->
-                              <ng-container matColumnDef="select">
-                                <th mat-header-cell *matHeaderCellDef></th>
-                                <td mat-cell *matCellDef="let row">
-                                  <mat-checkbox (click)="$event.stopPropagation()"
-                                                [disabled]="!isEditable() || row.type === 'Primitive' || row.dtScAwdPri.inherited"
-                                                (change)="$event ? toggleValueDomain(row) : null"
-                                                [checked]="isSelected(row)">
-                                  </mat-checkbox>
-                                </td>
-                              </ng-container>
-                              <ng-container matColumnDef="type">
-                                <th mat-header-cell *matHeaderCellDef> Value Domain Type</th>
-                                <td mat-cell *matCellDef="let element">
-                                  <mat-form-field *ngIf="element.type === 'Primitive'">
-                                    <mat-select [(ngModel)]="element.type">
-                                      <mat-option *ngFor="let type of [element.type,]" [value]="type"
-                                                  [disabled]="true">{{ type }}</mat-option>
-                                    </mat-select>
-                                  </mat-form-field>
-                                  <mat-form-field *ngIf="element.type !== 'Primitive'">
-                                    <mat-select [(ngModel)]="element.type"
-                                                (ngModelChange)="onChangeValueDomain(asDtScDetail())">
-                                      <mat-option *ngFor="let type of ['Code List', 'Agency ID List']" [value]="type"
-                                                  [disabled]="!isEditable() || element.dtScAwdPri.inherited">
-                                        {{ type }}</mat-option>
-                                    </mat-select>
-                                  </mat-form-field>
-                                </td>
-                              </ng-container>
-                              <ng-container matColumnDef="name">
-                                <th mat-header-cell *matHeaderCellDef> Name</th>
-                                <td mat-cell *matCellDef="let element">
-                                  <mat-form-field *ngIf="element.type === 'Primitive'">
-                                    <mat-select [(ngModel)]="element.name">
-                                      <mat-option *ngFor="let primitive of primitiveList" [value]="primitive" [disabled]="true">
-                                        <span>{{ primitive }}</span>
-                                      </mat-option>
-                                    </mat-select>
-                                  </mat-form-field>
-                                  <mat-form-field *ngIf="element.type === 'Code List'">
-                                    <mat-select [(ngModel)]="element.dtScAwdPri.codeList"
-                                                [required]="true"
-                                                [compareWith]="compareCodeList"
-                                                (ngModelChange)="onChangeValueDomain(asDtScDetail())">
-                                      <mat-option *ngFor="let codeList of filteredCodeLists(element)" [value]="codeList"
-                                                  [disabled]="!isEditable() || element.dtScAwdPri.inherited">
-                                        <span class="{{ codeList.state === 'Deleted' ? 'text-line-through' : '' }}">{{ codeList.name }}</span>
-                                        <span class="f12 ms-auto pe-2"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
-                                      </mat-option>
-                                    </mat-select>
-                                  </mat-form-field>
-                                  <mat-form-field *ngIf="element.type === 'Agency ID List'">
-                                    <mat-select [(ngModel)]="element.dtScAwdPri.agencyIdList"
-                                                [required]="true"
-                                                [compareWith]="compareAgencyIdList"
-                                                (ngModelChange)="onChangeValueDomain(asDtScDetail())">
-                                      <mat-option *ngFor="let agencyIdList of filteredAgencyIdLists(element)" [value]="agencyIdList"
-                                                  [disabled]="!isEditable() || element.dtScAwdPri.inherited">
-                                        <span>{{ agencyIdList.name }}</span>
-                                      </mat-option>
-                                    </mat-select>
-                                  </mat-form-field>
-                                </td>
-                              </ng-container>
-                              <ng-container matColumnDef="xbt">
-                                <th mat-header-cell *matHeaderCellDef> XSD Expression</th>
-                                <td mat-cell *matCellDef="let element">
-                                  <mat-form-field *ngIf="element.type === 'Primitive'">
-                                    <mat-select [(ngModel)]="element.xbtList" multiple>
-                                      <mat-select-trigger class="d-flex" *ngIf="(element.xbtList.length || 0) > 2">
-                                        <span>{{ ((element.xbtList.length || 0) > 0) ? element.xbtList[0].name : '' }}</span>
-                                        <span *ngIf="(element.xbtList.length || 0) > 1" class="ms-2 additional-selection">
-                                          (+{{ (element.xbtList.length || 0) - 1 }} {{ element.xbtList.length === 2 ? 'other' : 'others' }})
-                                        </span>
-                                      </mat-select-trigger>
-                                      <mat-option *ngFor="let xbt of element.xbtList" [value]="xbt" [disabled]="true">
-                                        <span>{{ xbt.name }}</span>
-                                      </mat-option>
-                                    </mat-select>
-                                  </mat-form-field>
-                                </td>
-                              </ng-container>
-                              <tr mat-header-row *matHeaderRowDef="restrictionListDisplayedColumns"></tr>
-                              <tr mat-row *cdkRowDef="let row; columns: restrictionListDisplayedColumns;"></tr>
-                            </table>
-                            <mat-toolbar>
-                              <mat-toolbar-row class="p-0">
-                                <mat-form-field class="pt-2 w-50 ps-2">
-                                  <mat-label>Default</mat-label>
-                                  <mat-select [(ngModel)]="asDtScDetail().defaultValueDomain">
-                                    <mat-optgroup *ngFor="let valueDomain of asDtScDetail().dtScAwdPriListByGroup"
-                                                  [label]="valueDomain.label">
-                                      <mat-option *ngFor="let item of valueDomain.list" [value]="item" [disabled]="!isEditable()">
-                                        {{ (item.type === 'Primitive') ? item.self.cdtPriName + ' - ' + item.name : item.name }}
-                                      </mat-option>
-                                    </mat-optgroup>
-                                  </mat-select>
-                                </mat-form-field>
-                              </mat-toolbar-row>
-                            </mat-toolbar>
-                          </mat-expansion-panel>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-12">
-                          <mat-form-field>
-                            <mat-label>Definition Source</mat-label>
-                            <input matInput placeholder="Definition Source" maxlength="100"
-                                   [(ngModel)]="asDtScDetail().definitionSource"
-                                   (focusout)="asDtScDetail().definitionSource = trim(asDtScDetail().definitionSource)"
-                                   [disabled]="!isEditable()">
-                          </mat-form-field>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-12">
-                          <mat-form-field>
-                            <mat-label>Definition</mat-label>
-                            <div class="textarea-container">
-                              <textarea matInput rows="6" cols="30"
-                                        placeholder="Definition"
-                                        [(ngModel)]="asDtScDetail().definition"
-                                        (focusout)="asDtScDetail().definition = trim(asDtScDetail().definition)"
-                                        [readonly]="!isEditable()"></textarea>
-                              <button mat-icon-button mat-small-icon-button
-                                      *ngIf="this.state === 'WIP' && this.access === 'CanEdit'"
-                                      (click)="copyToDefinition(asDtScDetail().definition)"
-                                      matTooltip="Copy to Definition">
-                                <mat-icon>content_paste</mat-icon>
-                              </button>
+              @if (isDtScDetail()) {
+                <div class="cc-node-detail-panel">
+                  <mat-tab-group mat-align-tabs="start" animationDuration="0ms">
+                    <mat-tab label="{{ asDtScDetail().den }}">
+                      <div class="cc-node-detail-container">
+                        <div class="row">
+                          <div class="col-2">
+                            <mat-form-field>
+                              <mat-label>Library</mat-label>
+                              <input matInput [(ngModel)]="asDtScDetail().library.name" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                          <div class="col-2">
+                            <mat-form-field>
+                              <mat-label>Release</mat-label>
+                              <input matInput [(ngModel)]="asDtScDetail().release.releaseNum" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                          <div class="{{ asDtScDetail().lastChanged ? 'col-1' : 'col-2' }}">
+                            <mat-form-field>
+                              <mat-label>Since</mat-label>
+                              <input matInput [(ngModel)]="asDtScDetail().since.release.releaseNum" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                          @if (asDtScDetail().lastChanged) {
+                            <div class="col-1">
+                              <mat-form-field>
+                                <mat-label>Last Changed</mat-label>
+                                <input matInput [(ngModel)]="asDtScDetail().lastChanged.release.releaseNum" [disabled]="true">
+                              </mat-form-field>
                             </div>
-                          </mat-form-field>
+                          }
+                          <div class="col-2">
+                            <mat-form-field>
+                              <mat-label>Revision</mat-label>
+                              <input matInput [(ngModel)]="asDtScDetail().log.revisionNum" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                          <div class="col-2">
+                            <mat-form-field>
+                              <mat-label>State</mat-label>
+                              <input matInput [(ngModel)]="asDtScDetail().state" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                          <div class="col-2">
+                            <mat-form-field>
+                              <mat-label>Owner</mat-label>
+                              <input matInput [(ngModel)]="asDtScDetail().owner.loginId" [matTooltip]="asDtScDetail().owner.username" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-2">
+                            <mat-form-field matTooltip="Data Type Supplementary Component">
+                              <mat-label>Core Component</mat-label>
+                              <input matInput value="DTSC" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                          <div class="col-4">
+                            <mat-form-field>
+                              <mat-label>GUID</mat-label>
+                              <input matInput maxlength="41"
+                                [(ngModel)]="asDtScDetail().guid" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                          <div class="col-6">
+                            <mat-form-field>
+                              <mat-label>{{ 'BDT_SC_DETAIL.DEN' | translate }}</mat-label>
+                              <input matInput maxlength="200"
+                                [(ngModel)]="asDtScDetail().den" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-4">
+                            <mat-form-field>
+                              <mat-label>Object Class Term</mat-label>
+                              <input matInput maxlength="60"
+                                [(ngModel)]="asDtScDetail().objectClassTerm" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                          <div class="col-4">
+                            <mat-form-field>
+                              <mat-label>Property Term</mat-label>
+                              <input matInput maxlength="60"
+                                [(ngModel)]="asDtScDetail().propertyTerm"
+                                (focusout)="asDtScDetail().propertyTerm = trim(asDtScDetail().propertyTerm)"
+                                [disabled]="!isEditable() || asDtScDetail().cardinality === 'Prohibited' || !!asDtScDetail().based"
+                                [required]="true">
+                            </mat-form-field>
+                          </div>
+                          <div class="col-4">
+                            <mat-form-field>
+                              <mat-label>Representation Term</mat-label>
+                              <mat-select [(ngModel)]="asDtScDetail().representationTerm"
+                                (ngModelChange)="loadDefaultPrimitiveValues(asDtScDetail())"
+                                [disabled]="!isEditable() || asDtScDetail().cardinality === 'Prohibited' || !!asDtScDetail().based"
+                                [required]="true">
+                                @if (asDtScDetail().representationTerm === '') {
+                                  <mat-option value=""></mat-option>
+                                }
+                                <mat-option value="Amount">Amount</mat-option>
+                                <mat-option value="Binary Object">Binary Object</mat-option>
+                                <mat-option value="Code">Code</mat-option>
+                                <mat-option value="Date">Date</mat-option>
+                                <mat-option value="Date Time">Date Time</mat-option>
+                                <mat-option value="Duration">Duration</mat-option>
+                                <mat-option value="Graphic">Graphic</mat-option>
+                                <mat-option value="Identifier">Identifier</mat-option>
+                                <mat-option value="Indicator">Indicator</mat-option>
+                                <mat-option value="Measure">Measure</mat-option>
+                                <mat-option value="Name">Name</mat-option>
+                                <mat-option value="Number">Number</mat-option>
+                                <mat-option value="Ordinal">Ordinal</mat-option>
+                                <mat-option value="Percent">Percent</mat-option>
+                                <mat-option value="Picture">Picture</mat-option>
+                                <mat-option value="Quantity">Quantity</mat-option>
+                                <mat-option value="Rate">Rate</mat-option>
+                                <mat-option value="Ratio">Ratio</mat-option>
+                                <mat-option value="Sound">Sound</mat-option>
+                                <mat-option value="Text">Text</mat-option>
+                                <mat-option value="Time">Time</mat-option>
+                                <mat-option value="Value">Value</mat-option>
+                                <mat-option value="Video">Video</mat-option>
+                              </mat-select>
+                            </mat-form-field>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-12">
+                            <mat-form-field>
+                              <mat-label>Cardinality</mat-label>
+                              <mat-select [(ngModel)]="asDtScDetail().cardinality"
+                                [disabled]="!isEditable() || !asDtScDetail().isCardinalityEditable">
+                                @for (option of asDtScDetail().allowedCardinalities; track option) {
+                                  <mat-option
+                                  [value]="option.value" [disabled]="option.disabled">{{option.value}}</mat-option>
+                                }
+                              </mat-select>
+                            </mat-form-field>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-3 col-sm-3">
+                            <mat-form-field>
+                              <mat-label>Value Constraint</mat-label>
+                              <mat-select [(ngModel)]="asDtScDetail().fixedOrDefault"
+                                [disabled]="!isEditable() || asDtScDetail().cardinality === 'Prohibited'">
+                                <mat-option value="none">None</mat-option>
+                                <mat-option value="fixed">Fixed Value</mat-option>
+                                <mat-option value="default">Default Value</mat-option>
+                              </mat-select>
+                            </mat-form-field>
+                          </div>
+                          <div class="col-md-9 col-sm-9">
+                            @if (asDtScDetail().fixedOrDefault == 'none') {
+                              <mat-form-field>
+                                <mat-label>No value constraints</mat-label>
+                                <input matInput placeholder="No value constraints"
+                                  [disabled]="true">
+                              </mat-form-field>
+                            }
+                            @if (asDtScDetail().fixedOrDefault == 'fixed') {
+                              <mat-form-field>
+                                <mat-label>Fixed Value</mat-label>
+                                <input matInput placeholder="Fixed Value"
+                                  [(ngModel)]="asDtScDetail().fixedValue"
+                                  [disabled]="!isEditable()">
+                              </mat-form-field>
+                            }
+                            @if (asDtScDetail().fixedOrDefault == 'default') {
+                              <mat-form-field>
+                                <mat-label>Default Value</mat-label>
+                                <input matInput placeholder="Default Value"
+                                  [(ngModel)]="asDtScDetail().defaultValue"
+                                  [disabled]="!isEditable()">
+                              </mat-form-field>
+                            }
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-12 pb-3">
+                            <mat-expansion-panel #dtScValueDomain style="margin-bottom: 8px !important;">
+                              <mat-expansion-panel-header>
+                                <mat-panel-title>Value Domain</mat-panel-title>
+                                @if (!dtScValueDomain.expanded && asDtScDetail().defaultValueDomain !== undefined) {
+                                  <mat-panel-description>
+                                    <span>Default - {{ asDtScDetail().defaultValueDomain.name }}</span>
+                                  </mat-panel-description>
+                                }
+                              </mat-expansion-panel-header>
+                              @if (hasTokenPrimitive(asDtScDetail()) && isEditable()) {
+                                <mat-action-row>
+                                  <button mat-stroked-button class="ms-auto" matTooltip="Add Value Domain"
+                                    [disabled]="!isEditable()"
+                                    (click)="addValueDomain(asDtScDetail())">Add
+                                  </button>
+                                  <button mat-stroked-button class="ms-2" matTooltip="Discard Value Domain"
+                                    [disabled]="!selectedValueDomain || selectedValueDomain.isDefault || selectedValueDomain.inherited"
+                                  (click)="deleteValueDomain(asDtScDetail())">Discard</button>
+                                </mat-action-row>
+                              }
+                              <table mat-table [dataSource]="restrictionDataSource">
+                                <!-- Checkbox Column -->
+                                <ng-container matColumnDef="select">
+                                  <th mat-header-cell *matHeaderCellDef></th>
+                                  <td mat-cell *matCellDef="let row">
+                                    <mat-checkbox (click)="$event.stopPropagation()"
+                                      [disabled]="!isEditable() || row.type === 'Primitive' || row.dtScAwdPri.inherited"
+                                      (change)="$event ? toggleValueDomain(row) : null"
+                                      [checked]="isSelected(row)">
+                                    </mat-checkbox>
+                                  </td>
+                                </ng-container>
+                                <ng-container matColumnDef="type">
+                                  <th mat-header-cell *matHeaderCellDef> Value Domain Type</th>
+                                  <td mat-cell *matCellDef="let element">
+                                    @if (element.type === 'Primitive') {
+                                      <mat-form-field>
+                                        <mat-select [(ngModel)]="element.type">
+                                          @for (type of [element.type,]; track type) {
+                                            <mat-option [value]="type"
+                                            [disabled]="true">{{ type }}</mat-option>
+                                          }
+                                        </mat-select>
+                                      </mat-form-field>
+                                    }
+                                    @if (element.type !== 'Primitive') {
+                                      <mat-form-field>
+                                        <mat-select [(ngModel)]="element.type"
+                                          (ngModelChange)="onChangeValueDomain(asDtScDetail())">
+                                          @for (type of ['Code List', 'Agency ID List']; track type) {
+                                            <mat-option [value]="type"
+                                              [disabled]="!isEditable() || element.dtScAwdPri.inherited">
+                                            {{ type }}</mat-option>
+                                          }
+                                        </mat-select>
+                                      </mat-form-field>
+                                    }
+                                  </td>
+                                </ng-container>
+                                <ng-container matColumnDef="name">
+                                  <th mat-header-cell *matHeaderCellDef> Name</th>
+                                  <td mat-cell *matCellDef="let element">
+                                    @if (element.type === 'Primitive') {
+                                      <mat-form-field>
+                                        <mat-select [(ngModel)]="element.name">
+                                          @for (primitive of primitiveList; track primitive) {
+                                            <mat-option [value]="primitive" [disabled]="true">
+                                              <span>{{ primitive }}</span>
+                                            </mat-option>
+                                          }
+                                        </mat-select>
+                                      </mat-form-field>
+                                    }
+                                    @if (element.type === 'Code List') {
+                                      <mat-form-field>
+                                        <mat-select [(ngModel)]="element.dtScAwdPri.codeList"
+                                          [required]="true"
+                                          [compareWith]="compareCodeList"
+                                          (ngModelChange)="onChangeValueDomain(asDtScDetail())">
+                                          @for (codeList of filteredCodeLists(element); track codeList) {
+                                            <mat-option [value]="codeList"
+                                              [disabled]="!isEditable() || element.dtScAwdPri.inherited">
+                                              <span class="{{ codeList.state === 'Deleted' ? 'text-line-through' : '' }}">{{ codeList.name }}</span>
+                                              <span class="f12 ms-auto pe-2"> ({{ codeList.versionId }}@if (codeList.deprecated) {
+                                                <span>, Deprecated</span>
+                                                }@if (codeList.state === 'Deleted') {
+                                                <span>, Deleted</span>
+                                              })</span>
+                                            </mat-option>
+                                          }
+                                        </mat-select>
+                                      </mat-form-field>
+                                    }
+                                    @if (element.type === 'Agency ID List') {
+                                      <mat-form-field>
+                                        <mat-select [(ngModel)]="element.dtScAwdPri.agencyIdList"
+                                          [required]="true"
+                                          [compareWith]="compareAgencyIdList"
+                                          (ngModelChange)="onChangeValueDomain(asDtScDetail())">
+                                          @for (agencyIdList of filteredAgencyIdLists(element); track agencyIdList) {
+                                            <mat-option [value]="agencyIdList"
+                                              [disabled]="!isEditable() || element.dtScAwdPri.inherited">
+                                              <span>{{ agencyIdList.name }}</span>
+                                            </mat-option>
+                                          }
+                                        </mat-select>
+                                      </mat-form-field>
+                                    }
+                                  </td>
+                                </ng-container>
+                                <ng-container matColumnDef="xbt">
+                                  <th mat-header-cell *matHeaderCellDef> XSD Expression</th>
+                                  <td mat-cell *matCellDef="let element">
+                                    @if (element.type === 'Primitive') {
+                                      <mat-form-field>
+                                        <mat-select [(ngModel)]="element.xbtList" multiple>
+                                          @if ((element.xbtList.length || 0) > 2) {
+                                            <mat-select-trigger class="d-flex">
+                                              <span>{{ ((element.xbtList.length || 0) > 0) ? element.xbtList[0].name : '' }}</span>
+                                              @if ((element.xbtList.length || 0) > 1) {
+                                                <span class="ms-2 additional-selection">
+                                                  (+{{ (element.xbtList.length || 0) - 1 }} {{ element.xbtList.length === 2 ? 'other' : 'others' }})
+                                                </span>
+                                              }
+                                            </mat-select-trigger>
+                                          }
+                                          @for (xbt of element.xbtList; track xbt) {
+                                            <mat-option [value]="xbt" [disabled]="true">
+                                              <span>{{ xbt.name }}</span>
+                                            </mat-option>
+                                          }
+                                        </mat-select>
+                                      </mat-form-field>
+                                    }
+                                  </td>
+                                </ng-container>
+                                <tr mat-header-row *matHeaderRowDef="restrictionListDisplayedColumns"></tr>
+                                <tr mat-row *cdkRowDef="let row; columns: restrictionListDisplayedColumns;"></tr>
+                              </table>
+                              <mat-toolbar>
+                                <mat-toolbar-row class="p-0">
+                                  <mat-form-field class="pt-2 w-50 ps-2">
+                                    <mat-label>Default</mat-label>
+                                    <mat-select [(ngModel)]="asDtScDetail().defaultValueDomain">
+                                      @for (valueDomain of asDtScDetail().dtScAwdPriListByGroup; track valueDomain) {
+                                        <mat-optgroup
+                                          [label]="valueDomain.label">
+                                          @for (item of valueDomain.list; track item) {
+                                            <mat-option [value]="item" [disabled]="!isEditable()">
+                                              {{ (item.type === 'Primitive') ? item.self.cdtPriName + ' - ' + item.name : item.name }}
+                                            </mat-option>
+                                          }
+                                        </mat-optgroup>
+                                      }
+                                    </mat-select>
+                                  </mat-form-field>
+                                </mat-toolbar-row>
+                              </mat-toolbar>
+                            </mat-expansion-panel>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-12">
+                            <mat-form-field>
+                              <mat-label>Definition Source</mat-label>
+                              <input matInput placeholder="Definition Source" maxlength="100"
+                                [(ngModel)]="asDtScDetail().definitionSource"
+                                (focusout)="asDtScDetail().definitionSource = trim(asDtScDetail().definitionSource)"
+                                [disabled]="!isEditable()">
+                            </mat-form-field>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-12">
+                            <mat-form-field>
+                              <mat-label>Definition</mat-label>
+                              <div class="textarea-container">
+                                <textarea matInput rows="6" cols="30"
+                                  placeholder="Definition"
+                                  [(ngModel)]="asDtScDetail().definition"
+                                  (focusout)="asDtScDetail().definition = trim(asDtScDetail().definition)"
+                                [readonly]="!isEditable()"></textarea>
+                                @if (this.state === 'WIP' && this.access === 'CanEdit') {
+                                  <button mat-icon-button mat-small-icon-button
+                                    (click)="copyToDefinition(asDtScDetail().definition)"
+                                    matTooltip="Copy to Definition">
+                                    <mat-icon>content_paste</mat-icon>
+                                  </button>
+                                }
+                              </div>
+                            </mat-form-field>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </mat-tab>
-                </mat-tab-group>
-              </div>
+                    </mat-tab>
+                  </mat-tab-group>
+                </div>
+              }
             </as-split-area>
           </as-split>
         </div>

@@ -1,5 +1,5 @@
 import {SelectionModel} from '@angular/cdk/collections';
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, SortDirection} from '@angular/material/sort';
@@ -24,6 +24,14 @@ import {AuthService} from '../../authentication/auth.service';
   styleUrls: ['./log-list.component.css'],
 })
 export class LogListComponent implements OnInit {
+  private service = inject(LogService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private auth = inject(AuthService);
+  private dialog = inject(MatDialog);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
 
   logs: Log[];
   request: LogListRequest;
@@ -136,15 +144,6 @@ export class LogListComponent implements OnInit {
 
   dataSource = new MatTableDataSource<Log>();
   selection = new SelectionModel<number>(true, []);
-
-  constructor(private service: LogService,
-              private preferencesService: SettingsPreferencesService,
-              private auth: AuthService,
-              private dialog: MatDialog,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute) {
-  }
 
   ngOnInit() {
     this.request = new LogListRequest(this.route.snapshot.queryParamMap,

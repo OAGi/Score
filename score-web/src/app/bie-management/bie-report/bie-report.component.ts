@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {faRecycle} from '@fortawesome/free-solid-svg-icons';
 import {AuthService} from '../../authentication/auth.service';
 import {base64Encode} from '../../common/utility';
@@ -18,6 +18,11 @@ import {SettingsPreferencesService} from '../../settings-management/settings-pre
   styleUrls: ['./bie-report.component.css']
 })
 export class BieReportComponent implements OnInit {
+  private service = inject(BieReportService);
+  private auth = inject(AuthService);
+  private preferencesService = inject(SettingsPreferencesService);
+  webPageInfo = inject(WebPageInfoService);
+
 
   faRecycle = faRecycle;
   title = 'Reuse Report';
@@ -164,12 +169,6 @@ export class BieReportComponent implements OnInit {
   dataSource = new MatTableDataSource<ReuseReport>();
   preferencesInfo: PreferencesInfo;
   loading = false;
-
-  constructor(private service: BieReportService,
-              private auth: AuthService,
-              private preferencesService: SettingsPreferencesService,
-              public webPageInfo: WebPageInfoService) {
-  }
 
   ngOnInit() {
     this.loading = true;

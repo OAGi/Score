@@ -1,6 +1,6 @@
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import {faCircleExclamation, faRecycle} from '@fortawesome/free-solid-svg-icons';
-import {Component, OnInit, ViewChild} from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {forkJoin} from 'rxjs';
 import {finalize} from 'rxjs/operators';
@@ -62,6 +62,20 @@ export class BieUpliftTargetFlatNodeDatabase<T extends BieFlatNode> extends BieF
   styleUrls: ['./bie-uplift.component.css']
 })
 export class BieUpliftComponent implements OnInit {
+  private bizCtxService = inject(BusinessContextService);
+  private bieListService = inject(BieListService);
+  private accountService = inject(AccountListService);
+  private releaseService = inject(ReleaseService);
+  private bieEditService = inject(BieEditService);
+  private ccNodeService = inject(CcNodeService);
+  private bieUpliftService = inject(BieUpliftService);
+  private auth = inject(AuthService);
+  private location = inject(Location);
+  private router = inject(Router);
+  private dialog = inject(MatDialog);
+  private route = inject(ActivatedRoute);
+  webPageInfo = inject(WebPageInfoService);
+
 
   faRecycle = faRecycle;
   faCircleExclamation = faCircleExclamation;
@@ -107,21 +121,6 @@ export class BieUpliftComponent implements OnInit {
   currentUnmatchedSource: BieUpliftSourceFlatNode;
 
   HIDE_UNUSED_PROPERTY_KEY = 'BIE-Settings-Hide-Unused';
-
-  constructor(private bizCtxService: BusinessContextService,
-              private bieListService: BieListService,
-              private accountService: AccountListService,
-              private releaseService: ReleaseService,
-              private bieEditService: BieEditService,
-              private ccNodeService: CcNodeService,
-              private bieUpliftService: BieUpliftService,
-              private auth: AuthService,
-              private location: Location,
-              private router: Router,
-              private dialog: MatDialog,
-              private route: ActivatedRoute,
-              public webPageInfo: WebPageInfoService) {
-  }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {

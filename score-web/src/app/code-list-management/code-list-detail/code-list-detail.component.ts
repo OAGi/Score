@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {Location} from '@angular/common';
 import {MatSidenav} from '@angular/material/sidenav';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
@@ -37,6 +37,19 @@ import {AgencyIdListSummary, AgencyIdListValueSummary} from '../../agency-id-lis
   styleUrls: ['./code-list-detail.component.css']
 })
 export class CodeListDetailComponent implements OnInit {
+  private service = inject(CodeListService);
+  private agencyIdListService = inject(AgencyIdListService);
+  private namespaceService = inject(NamespaceService);
+  private location = inject(Location);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
+  private auth = inject(AuthService);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private stompService = inject(RxStompService);
+
 
   title = 'Edit Code List';
 
@@ -172,20 +185,6 @@ export class CodeListDetailComponent implements OnInit {
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
 
   commentControl: CodeListCommentControl;
-
-  constructor(private service: CodeListService,
-              private agencyIdListService: AgencyIdListService,
-              private namespaceService: NamespaceService,
-              private location: Location,
-              private route: ActivatedRoute,
-              private router: Router,
-              private snackBar: MatSnackBar,
-              private dialog: MatDialog,
-              private auth: AuthService,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService,
-              private stompService: RxStompService) {
-  }
 
   ngOnInit() {
     this.commentControl = new CodeListCommentControl(this.sidenav, this.service);

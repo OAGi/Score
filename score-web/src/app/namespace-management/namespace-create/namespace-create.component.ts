@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {Location} from '@angular/common';
@@ -17,6 +17,14 @@ import {loadLibrary, saveLibrary} from '../../common/utility';
   styleUrls: ['./namespace-create.component.css']
 })
 export class NamespaceCreateComponent implements OnInit {
+  private service = inject(NamespaceService);
+  private libraryService = inject(LibraryService);
+  private location = inject(Location);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private auth = inject(AuthService);
+  private snackBar = inject(MatSnackBar);
+
 
   title = 'Create Namespace';
   disabled: boolean;
@@ -26,15 +34,6 @@ export class NamespaceCreateComponent implements OnInit {
   namespace: NamespaceDetails;
   uriForm: FormControl;
   hashCode;
-
-  constructor(private service: NamespaceService,
-              private libraryService: LibraryService,
-              private location: Location,
-              private route: ActivatedRoute,
-              private router: Router,
-              private auth: AuthService,
-              private snackBar: MatSnackBar) {
-  }
 
   ngOnInit() {
     this.disabled = false;

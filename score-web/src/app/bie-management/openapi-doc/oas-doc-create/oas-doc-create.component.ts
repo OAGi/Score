@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {OasDoc} from '../domain/openapi-doc';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -17,6 +17,16 @@ import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialo
   styleUrls: ['./oas-doc-create.component.css']
 })
 export class OasDocCreateComponent implements OnInit {
+  private bizCtxService = inject(BusinessContextService);
+  private openAPIService = inject(OpenAPIService);
+  private accountService = inject(AccountListService);
+  private auth = inject(AuthService);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private snackBar = inject(MatSnackBar);
+  private confirmDialogService = inject(ConfirmDialogService);
+
   title = 'Create OpenAPI Document';
   subtitle = 'OpenAPI Document Metadata';
   oasDoc: OasDoc;
@@ -27,16 +37,6 @@ export class OasDocCreateComponent implements OnInit {
   contactEmail = new FormControl('', [Validators.pattern(this.emailReg)]);
   licenseUrl = new FormControl('', [Validators.pattern(this.urlReg)]);
   termServiceUrl = new FormControl('', [Validators.pattern(this.urlReg)]);
-  constructor(private bizCtxService: BusinessContextService,
-              private openAPIService: OpenAPIService,
-              private accountService: AccountListService,
-              private auth: AuthService,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute,
-              private snackBar: MatSnackBar,
-              private confirmDialogService: ConfirmDialogService) {
-  }
 
   ngOnInit(): void {
     this.disabled = false;

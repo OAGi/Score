@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {switchMap} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {Location} from '@angular/common';
@@ -38,6 +38,19 @@ import {FindUsagesDialogComponent} from '../find-usages-dialog/find-usages-dialo
   styleUrls: ['./model-browser.component.css']
 })
 export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowserNode> {
+  private ccNodeService = inject(CcNodeService);
+  private snackBar = inject(MatSnackBar);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private dialog = inject(MatDialog);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private auth = inject(AuthService);
+  private stompService = inject(RxStompService);
+  private clipboard = inject(Clipboard);
+  webPageInfo = inject(WebPageInfoService);
+
 
   loading = false;
   paddingPixel = 12;
@@ -75,20 +88,6 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
   set hideCardinality(hideCardinality: boolean) {
     this.dataSource.hideCardinality = hideCardinality;
     saveBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, hideCardinality);
-  }
-
-  constructor(private ccNodeService: CcNodeService,
-              private snackBar: MatSnackBar,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute,
-              private dialog: MatDialog,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService,
-              private auth: AuthService,
-              private stompService: RxStompService,
-              private clipboard: Clipboard,
-              public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit(): void {

@@ -1,4 +1,4 @@
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
 import {AccountListEntry, AccountListRequest} from '../domain/accounts';
 import {MatSort, SortDirection} from '@angular/material/sort';
@@ -25,6 +25,15 @@ import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
   styleUrls: ['./transfer-ownership-list.component.css']
 })
 export class TransferOwnershipListComponent implements OnInit {
+  private auth = inject(AuthService);
+  private service = inject(AccountListService);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private snackBar = inject(MatSnackBar);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
 
   title = 'Transfer Ownership';
 
@@ -135,16 +144,6 @@ export class TransferOwnershipListComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
-
-  constructor(private auth: AuthService,
-              private service: AccountListService,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService,
-              private snackBar: MatSnackBar,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute) {
-  }
 
   ngOnInit() {
     this.request = new AccountListRequest(this.route.snapshot.queryParamMap,

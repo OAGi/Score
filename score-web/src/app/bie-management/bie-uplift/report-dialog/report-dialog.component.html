@@ -1,7 +1,9 @@
 <div class="d-block">
-  <div class="loading-container" *ngIf="loading">
-    <mat-spinner [diameter]="40"></mat-spinner>
-  </div>
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner [diameter]="40"></mat-spinner>
+    </div>
+  }
   <div class="header d-flex align-items-center" mat-dialog-title>
     <span>Uplift BIE Report</span>
     <div class="close pe-2">
@@ -11,23 +13,27 @@
     </div>
   </div>
   <div class="content" mat-dialog-content>
-    <div class="loading-container" *ngIf="loading">
-      <mat-spinner [diameter]="40"></mat-spinner>
-    </div>
-    <mat-card class="search-box" *ngIf="!loading">
-      <mat-card-content class="mat-card-container">
-        <div class="container-fluid" style="padding: 0;">
-          <div class="row">
-            <div class="col-md-12">
-              <mat-checkbox class="checklist-leaf-node"
-                            [(ngModel)]="hideSystemMatched"
-                            (ngModelChange)="onToggleHide()">View Issues Only
-              </mat-checkbox>
+    @if (loading) {
+      <div class="loading-container">
+        <mat-spinner [diameter]="40"></mat-spinner>
+      </div>
+    }
+    @if (!loading) {
+      <mat-card class="search-box">
+        <mat-card-content class="mat-card-container">
+          <div class="container-fluid" style="padding: 0;">
+            <div class="row">
+              <div class="col-md-12">
+                <mat-checkbox class="checklist-leaf-node"
+                  [(ngModel)]="hideSystemMatched"
+                  (ngModelChange)="onToggleHide()">View Issues Only
+                </mat-checkbox>
+              </div>
             </div>
           </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
+        </mat-card-content>
+      </mat-card>
+    }
 
     <div class="table-container">
       <div class="score-column-container align-items-center justify-content-between">
@@ -41,14 +47,14 @@
         <table mat-table matSort [dataSource]="dataSource">
           <ng-container matColumnDef="ccType" size="10">
             <th mat-header-cell *matHeaderCellDef
-                score-table-column-resize [defaultWidth]="width('Type')" (onResize)="onResizeWidth($event)">Type</th>
+            score-table-column-resize [defaultWidth]="width('Type')" (onResize)="onResizeWidth($event)">Type</th>
             <td mat-cell *matCellDef="let row">
               {{ row.ccType }}
             </td>
           </ng-container>
           <ng-container matColumnDef="displayPath">
             <th mat-header-cell *matHeaderCellDef
-                score-table-column-resize [defaultWidth]="width('Path')" (onResize)="onResizeWidth($event)">
+              score-table-column-resize [defaultWidth]="width('Path')" (onResize)="onResizeWidth($event)">
               Source {{ data.sourceReleaseNum }} Path &rarr;
               Target {{ data.targetReleaseNum }} Path
             </th>
@@ -63,7 +69,7 @@
 
           <ng-container matColumnDef="context">
             <th mat-header-cell *matHeaderCellDef
-                score-table-column-resize [defaultWidth]="width('Context Definition')" (onResize)="onResizeWidth($event)">Context Definition</th>
+            score-table-column-resize [defaultWidth]="width('Context Definition')" (onResize)="onResizeWidth($event)">Context Definition</th>
             <td mat-cell *matCellDef="let row">
               <div class="description score-line-clamp-2 score-break-word" [innerHTML]="row.context"></div>
             </td>
@@ -71,7 +77,7 @@
 
           <ng-container matColumnDef="match" size="10">
             <th mat-header-cell *matHeaderCellDef
-                score-table-column-resize [defaultWidth]="width('Matched')" (onResize)="onResizeWidth($event)">Matched</th>
+            score-table-column-resize [defaultWidth]="width('Matched')" (onResize)="onResizeWidth($event)">Matched</th>
             <td mat-cell *matCellDef="let row">
               {{ row.match }}
             </td>
@@ -79,7 +85,7 @@
 
           <ng-container matColumnDef="reuse" size="10">
             <th mat-header-cell *matHeaderCellDef
-                score-table-column-resize [defaultWidth]="width('Reused')" (onResize)="onResizeWidth($event)">Reused</th>
+            score-table-column-resize [defaultWidth]="width('Reused')" (onResize)="onResizeWidth($event)">Reused</th>
             <td mat-cell *matCellDef="let row">
               {{ row.reuse }}
             </td>
@@ -87,9 +93,11 @@
 
           <ng-container matColumnDef="validCode" size="10">
             <th mat-header-cell *matHeaderCellDef
-                score-table-column-resize [defaultWidth]="width('Issue')" (onResize)="onResizeWidth($event)">Issue</th>
+            score-table-column-resize [defaultWidth]="width('Issue')" (onResize)="onResizeWidth($event)">Issue</th>
             <td mat-cell *matCellDef="let row">
-              <span *ngIf="!row.valid && row.message">{{ row.message }}</span>
+              @if (!row.valid && row.message) {
+                <span>{{ row.message }}</span>
+              }
             </td>
           </ng-container>
 

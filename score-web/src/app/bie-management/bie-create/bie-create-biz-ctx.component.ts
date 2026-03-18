@@ -1,4 +1,4 @@
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
@@ -27,6 +27,14 @@ import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
   styleUrls: ['./bie-create-biz-ctx.component.css']
 })
 export class BieCreateBizCtxComponent implements OnInit {
+  private bizCtxService = inject(BusinessContextService);
+  private accountService = inject(AccountListService);
+  private auth = inject(AuthService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
   title = 'Create BIE';
   subtitle = 'Select Business Contexts';
 
@@ -153,15 +161,6 @@ export class BieCreateBizCtxComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
-
-  constructor(private bizCtxService: BusinessContextService,
-              private accountService: AccountListService,
-              private auth: AuthService,
-              private preferencesService: SettingsPreferencesService,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute) {
-  }
 
   ngOnInit() {
     this.request = new BusinessContextListRequest(this.route.snapshot.queryParamMap,

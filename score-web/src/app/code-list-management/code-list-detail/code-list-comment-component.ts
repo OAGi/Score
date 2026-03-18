@@ -1,11 +1,13 @@
-import {Injectable} from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
 import {CodeListDetails} from '../domain/code-list';
 import {CodeListService} from '../domain/code-list.service';
 import {Comment} from '../../cc-management/domain/core-component-node';
 
-@Injectable()
 export class CodeListCommentControl {
+  constructor(
+    private sidenav: MatSidenav,
+    private service: CodeListService,
+  ) {}
 
   comments: Comment[] = [];
   commentMessage: string = null;
@@ -13,10 +15,6 @@ export class CodeListCommentControl {
   replyCommentId: number = null;
   replyMessage: string = null;
   replyOpened = false;
-
-  constructor(private sidenav: MatSidenav,
-              private service: CodeListService) {
-  }
 
   toggleCommentSlide(codeList: CodeListDetails): void {
     this.commentReference = 'CODE_LIST-' + codeList.codeListManifestId;

@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import { Component, HostListener, OnInit, inject } from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {Location} from '@angular/common';
@@ -17,21 +17,20 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
   styleUrls: ['./namespace-detail.component.css']
 })
 export class NamespaceDetailComponent implements OnInit {
+  private service = inject(NamespaceService);
+  private snackBar = inject(MatSnackBar);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private location = inject(Location);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private auth = inject(AuthService);
+
 
   title = 'Namespace Detail';
   disabled: boolean;
   namespace: NamespaceDetails;
   uriForm = new FormControl('');
   hashCode;
-
-  constructor(private service: NamespaceService,
-              private snackBar: MatSnackBar,
-              private confirmDialogService: ConfirmDialogService,
-              private location: Location,
-              private route: ActivatedRoute,
-              private router: Router,
-              private auth: AuthService) {
-  }
 
   ngOnInit() {
     this.disabled = false;

@@ -1,5 +1,5 @@
 import {SelectionModel} from '@angular/cdk/collections';
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {faFlask} from '@fortawesome/free-solid-svg-icons';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {CreateBodDialogComponent} from './create-bod-dialog/create-bod-dialog.component';
@@ -58,6 +58,24 @@ import {LibraryService} from '../../library-management/domain/library.service';
   ]
 })
 export class CcListComponent implements OnInit {
+  private service = inject(CcListService);
+  private nodeService = inject(CcNodeService);
+  private releaseService = inject(ReleaseService);
+  private libraryService = inject(LibraryService);
+  private accountService = inject(AccountListService);
+  private namespaceService = inject(NamespaceService);
+  private aboutService = inject(AboutService);
+  private auth = inject(AuthService);
+  private tagService = inject(TagService);
+  private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  webPageInfo = inject(WebPageInfoService);
+
 
   faFlask = faFlask;
   title = 'Core Component';
@@ -310,25 +328,6 @@ export class CcListComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
-
-  constructor(private service: CcListService,
-              private nodeService: CcNodeService,
-              private releaseService: ReleaseService,
-              private libraryService: LibraryService,
-              private accountService: AccountListService,
-              private namespaceService: NamespaceService,
-              private aboutService: AboutService,
-              private auth: AuthService,
-              private tagService: TagService,
-              private snackBar: MatSnackBar,
-              private dialog: MatDialog,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute,
-              public webPageInfo: WebPageInfoService) {
-  }
 
   get currentUser(): string {
     const userToken = this.auth.getUserToken();

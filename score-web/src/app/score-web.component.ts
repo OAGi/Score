@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {AuthService} from './authentication/auth.service';
 import {Router} from '@angular/router';
 import WebFont from 'webfontloader';
@@ -15,12 +15,17 @@ const EXPORT_NOTES_ICON = `<svg xmlns="http://www.w3.org/2000/svg" height="48" v
   styleUrls: ['./score-web.component.css']
 })
 export class ScoreWebComponent implements OnInit {
+  private auth = inject(AuthService);
+  private router = inject(Router);
+  private matIconRegistry = inject(MatIconRegistry);
+  private sanitizer = inject(DomSanitizer);
+  webPageInfoService = inject(WebPageInfoService);
 
-  constructor(private auth: AuthService,
-              private router: Router,
-              private matIconRegistry: MatIconRegistry,
-              private sanitizer: DomSanitizer,
-              public webPageInfoService: WebPageInfoService) {
+
+  constructor() {
+    const matIconRegistry = this.matIconRegistry;
+    const sanitizer = this.sanitizer;
+
 
     matIconRegistry.addSvgIconLiteral('export_notes', sanitizer.bypassSecurityTrustHtml(EXPORT_NOTES_ICON));
   }

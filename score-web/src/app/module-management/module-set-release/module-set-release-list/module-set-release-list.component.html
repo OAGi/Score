@@ -2,20 +2,22 @@
   <div class="ps-2 pe-2">
     <mat-toolbar class="bg-white">
       <score-title-with-library-selector [title]="title"
-                                         [libraries]="mappedLibraries"
-                                         (libraryChange)="onLibraryChange($event)"/>
+        [libraries]="mappedLibraries"
+        (libraryChange)="onLibraryChange($event)"/>
       <span class="flex-11-auto"></span>
-      <button *ngIf="roles.includes('developer')"
-              (click)="create()" class="ms-2" color="primary" mat-raised-button>
-        New Module Set Release
-      </button>
+      @if (roles.includes('developer')) {
+        <button
+          (click)="create()" class="ms-2" color="primary" mat-raised-button>
+          New Module Set Release
+        </button>
+      }
     </mat-toolbar>
   </div>
 
   <mat-card class="pt-3">
     <score-search-bar placeholder="Search by Name" [(model)]="request.filters.name"
-                      (modelChange)="onChange('filters.name', request.filters.name);"
-                      (searchTriggered)="onSearch();">
+      (modelChange)="onChange('filters.name', request.filters.name);"
+      (searchTriggered)="onSearch();">
       <div advancedSearchContent style="padding-left: 3rem;">
         <mat-card-content class="mat-card-container">
           <div class="container-fluid" style="padding: 0;">
@@ -26,12 +28,14 @@
                   <mat-select [(ngModel)]="request.updaterLoginIdList" multiple>
                     <mat-option>
                       <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
-                                             [noEntriesFoundLabel]="'No matching updater found.'"
-                                             [placeholderLabel]="'Search...'"></ngx-mat-select-search>
+                        [noEntriesFoundLabel]="'No matching updater found.'"
+                      [placeholderLabel]="'Search...'"></ngx-mat-select-search>
                     </mat-option>
-                    <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
-                      {{loginId}}
-                    </mat-option>
+                    @for (loginId of filteredUpdaterIdList | async; track loginId) {
+                      <mat-option [value]="loginId">
+                        {{loginId}}
+                      </mat-option>
+                    }
                   </mat-select>
                 </mat-form-field>
               </div>
@@ -40,7 +44,7 @@
                 <mat-form-field>
                   <mat-label>Updated start date</mat-label>
                   <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
-                         [(ngModel)]="request.updatedDate.start" [max]="request.updatedDate.end">
+                    [(ngModel)]="request.updatedDate.start" [max]="request.updatedDate.end">
                   <mat-datepicker-toggle [for]="dateStart" matSuffix></mat-datepicker-toggle>
                   <mat-datepicker #dateStart></mat-datepicker>
                 </mat-form-field>
@@ -57,7 +61,7 @@
                 <mat-form-field>
                   <mat-label>Updated end date</mat-label>
                   <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
-                         [(ngModel)]="request.updatedDate.end" [min]="request.updatedDate.start">
+                    [(ngModel)]="request.updatedDate.end" [min]="request.updatedDate.start">
                   <mat-datepicker-toggle [for]="dateEnd" matSuffix></mat-datepicker-toggle>
                   <mat-datepicker #dateEnd></mat-datepicker>
                 </mat-form-field>
@@ -76,9 +80,11 @@
     </score-search-bar>
 
     <mat-card-content class="mat-card-container">
-      <div class="loading-container" *ngIf="loading">
-        <mat-spinner [diameter]="40"></mat-spinner>
-      </div>
+      @if (loading) {
+        <div class="loading-container">
+          <mat-spinner [diameter]="40"></mat-spinner>
+        </div>
+      }
 
       <div class="table-container">
         <div class="score-column-container align-items-center">
@@ -90,11 +96,11 @@
         </div>
         <div class="mat-elevation-z1 table-wrapper mt-3">
           <table [dataSource]="dataSource" [matSortActive]="sort.active" [matSortDirection]="sort.direction" mat-table
-                 matSort>
+            matSort>
 
             <ng-container matColumnDef="name">
               <th *matHeaderCellDef mat-header-cell mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Name')" (onResize)="onResizeWidth($event)"> Name</th>
+              score-table-column-resize [defaultWidth]="width('Name')" (onResize)="onResizeWidth($event)"> Name</th>
               <td *matCellDef="let element" mat-cell>
                 <div class="den score-line-clamp-2 score-break-word">
                   <a routerLink="{{ element.moduleSetReleaseId }}">{{ element.name }}</a>
@@ -104,7 +110,7 @@
 
             <ng-container matColumnDef="release">
               <th *matHeaderCellDef mat-header-cell mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Release Num')" (onResize)="onResizeWidth($event)"> Release Num</th>
+              score-table-column-resize [defaultWidth]="width('Release Num')" (onResize)="onResizeWidth($event)"> Release Num</th>
               <td *matCellDef="let element" mat-cell>
                 <div class="den score-line-clamp-2 score-break-word">
                   <a routerLink="/release/{{ element.releaseId }}">{{ element.releaseNum }}</a>
@@ -114,15 +120,17 @@
 
             <ng-container matColumnDef="default">
               <th *matHeaderCellDef mat-header-cell mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Default')" (onResize)="onResizeWidth($event)"> Default</th>
+              score-table-column-resize [defaultWidth]="width('Default')" (onResize)="onResizeWidth($event)"> Default</th>
               <td *matCellDef="let element" mat-cell>
-                <div *ngIf="element.isDefault">Y</div>
+                @if (element.isDefault) {
+                  <div>Y</div>
+                }
               </td>
             </ng-container>
 
             <ng-container matColumnDef="lastUpdateTimestamp">
               <th *matHeaderCellDef mat-header-cell mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
+              score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
               <td *matCellDef="let element" mat-cell>
                 <div class="score-line-clamp-2 score-break-word">
                   <div>{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
@@ -136,8 +144,8 @@
               </th>
               <td *matCellDef="let element" mat-cell>
                 <button mat-icon-button
-                        [matMenuTriggerFor]="contextMenu"
-                        (click)="contextMenuItem = element; $event.stopPropagation();">
+                  [matMenuTriggerFor]="contextMenu"
+                  (click)="contextMenuItem = element; $event.stopPropagation();">
                   <mat-icon>more_vert</mat-icon>
                 </button>
               </td>
@@ -150,7 +158,7 @@
           <mat-paginator
             [pageSizeOptions]="[10, 25, 50]"
             (page)="onPageChange($event)"
-            showFirstLastButtons></mat-paginator>
+          showFirstLastButtons></mat-paginator>
         </div>
       </div>
     </mat-card-content>

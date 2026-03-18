@@ -1,4 +1,4 @@
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -30,6 +30,17 @@ import {LibraryService} from '../../library-management/domain/library.service';
   styleUrls: ['./library-list.component.css']
 })
 export class LibraryListComponent implements OnInit {
+  private service = inject(LibraryService);
+  private accountService = inject(AccountListService);
+  private auth = inject(AuthService);
+  private snackBar = inject(MatSnackBar);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private dialog = inject(MatDialog);
+
 
   title = 'Library';
 
@@ -160,18 +171,6 @@ export class LibraryListComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
-
-  constructor(private service: LibraryService,
-              private accountService: AccountListService,
-              private auth: AuthService,
-              private snackBar: MatSnackBar,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute,
-              private dialog: MatDialog) {
-  }
 
   ngOnInit() {
     this.request = new LibraryListRequest(this.route.snapshot.queryParamMap,

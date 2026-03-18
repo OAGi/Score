@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {SelectionModel} from '@angular/cdk/collections';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
@@ -37,6 +37,19 @@ import {LibraryService} from '../../../library-management/domain/library.service
   styleUrls: ['./bie-package-bie-dialog.component.css']
 })
 export class BiePackageBieDialogComponent implements OnInit {
+  private service = inject(BieListService);
+  private accountService = inject(AccountListService);
+  private releaseService = inject(ReleaseService);
+  private libraryService = inject(LibraryService);
+  private auth = inject(AuthService);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  webPageInfo = inject(WebPageInfoService);
+  private preferencesService = inject(SettingsPreferencesService);
+  dialogRef = inject<MatDialogRef<BiePackageBieDialogComponent>>(MatDialogRef);
+  data = inject(MAT_DIALOG_DATA);
+
 
   action = 'Add';
   subtitle = 'Selected Top-Level ABIEs';
@@ -216,18 +229,9 @@ export class BiePackageBieDialogComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
 
-  constructor(private service: BieListService,
-              private accountService: AccountListService,
-              private releaseService: ReleaseService,
-              private libraryService: LibraryService,
-              private auth: AuthService,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute,
-              public webPageInfo: WebPageInfoService,
-              private preferencesService: SettingsPreferencesService,
-              public dialogRef: MatDialogRef<BiePackageBieDialogComponent>,
-              @Inject(MAT_DIALOG_DATA) public data: any) {
+  constructor() {
+    const data = this.data;
+
 
     this.action = data?.action;
   }

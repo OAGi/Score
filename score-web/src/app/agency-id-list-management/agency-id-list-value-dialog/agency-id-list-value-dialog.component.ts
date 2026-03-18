@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {AgencyIdListValue} from '../domain/agency-id-list';
 import {hashCode} from '../../common/utility';
@@ -10,6 +10,9 @@ import {hashCode} from '../../common/utility';
   styleUrls: ['./agency-id-list-value-dialog.component.css']
 })
 export class AgencyIdListValueDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<AgencyIdListValueDialogComponent>>(MatDialogRef);
+  data = inject(MAT_DIALOG_DATA);
+
 
   _hashCode;
   userRoles: string[] = [];
@@ -20,9 +23,9 @@ export class AgencyIdListValueDialogComponent implements OnInit {
   agencyId: number;
   isEditable = false;
 
-  constructor(
-    public dialogRef: MatDialogRef<AgencyIdListValueDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any) {
+  constructor() {
+    const data = this.data;
+
 
     this.agencyIdListValue = new AgencyIdListValue(data.agencyIdListValue);
     this.lastRevisionValue = data.lastRevisionValue;

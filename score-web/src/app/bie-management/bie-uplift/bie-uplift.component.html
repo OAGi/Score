@@ -116,14 +116,14 @@
                        [class]="{'tree-node-selected': sourceSelectedNode === node}"
                        (click)="onSourceClick(node)"
                        [style.padding-left]="node.level * paddingPixel + 'px'">
-                    <button *ngIf="sourceDataSource.isExpandable(node); else disabledRef;"
+                    <button *ngIf="sourceDataSource.isExpandable(node); else sourceDisabledRef;"
                             (click)="sourceDataSource.toggle(node)"
                             mat-icon-button>
                       <mat-icon class="mat-icon-rtl-mirror">
                         {{ sourceDataSource.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
                       </mat-icon>
                     </button>
-                    <ng-template #disabledRef>
+                    <ng-template #sourceDisabledRef>
                       <button mat-icon-button disabled></button>
                     </ng-template>
 
@@ -255,14 +255,14 @@
                        [class]="{'tree-node-selected': targetSelectedNode === node}"
                        (click)="onTargetClick(node)"
                        [style.padding-left]="node.level * paddingPixel + 'px'">
-                    <button *ngIf="targetDataSource.isExpandable(node); else disabledRef;"
+                    <button *ngIf="targetDataSource.isExpandable(node); else targetDisabledRef;"
                             (click)="targetDataSource.toggle(node)"
                             mat-icon-button>
                       <mat-icon class="mat-icon-rtl-mirror">
                         {{ targetDataSource.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
                       </mat-icon>
                     </button>
-                    <ng-template #disabledRef>
+                    <ng-template #targetDisabledRef>
                       <button mat-icon-button disabled></button>
                     </ng-template>
 

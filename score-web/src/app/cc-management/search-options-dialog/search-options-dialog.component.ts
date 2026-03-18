@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {SearchOptions} from './domain/search-options';
 import {SearchOptionsService} from './domain/search-options-service';
@@ -10,13 +10,12 @@ import {SearchOptionsService} from './domain/search-options-service';
   styleUrls: ['./search-options-dialog.component.css']
 })
 export class SearchOptionsDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<SearchOptionsDialogComponent>>(MatDialogRef);
+  private service = inject(SearchOptionsService);
+  data = inject(MAT_DIALOG_DATA);
+
 
   options: SearchOptions;
-
-  constructor(public dialogRef: MatDialogRef<SearchOptionsDialogComponent>,
-              private service: SearchOptionsService,
-              @Inject(MAT_DIALOG_DATA) public data: any) {
-  }
 
   ngOnInit(): void {
     this.options = this.service.loadOptions();

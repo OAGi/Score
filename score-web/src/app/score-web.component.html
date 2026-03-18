@@ -1,4 +1,6 @@
-<score-navbar *ngIf="isAuthenticated()"></score-navbar>
+@if (isAuthenticated()) {
+  <score-navbar></score-navbar>
+}
 
 <div class="body">
   <section class="container-fluid p-0">
@@ -6,4 +8,6 @@
   </section>
 </div>
 
-<score-footer *ngIf="isAuthenticated()"></score-footer>
+@if (isAuthenticated()) {
+  <score-footer></score-footer>
+}

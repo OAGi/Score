@@ -1,5 +1,5 @@
 import {HttpParams} from '@angular/common/http';
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild, inject } from '@angular/core';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
@@ -40,6 +40,14 @@ export interface UserStatesItem {
   styleUrls: ['./homepage.component.css']
 })
 export class HomepageComponent implements OnInit, AfterViewInit {
+  private bieService = inject(BieListService);
+  private ccService = inject(CcListService);
+  private auth = inject(AuthService);
+  private releaseService = inject(ReleaseService);
+  private libraryService = inject(LibraryService);
+  private router = inject(Router);
+  webPageInfo = inject(WebPageInfoService);
+
 
   stateColorList = [{state: 'WIP', color: '#D32F2F'},
     {state: 'Draft', color: '#7B1FA2'},
@@ -120,15 +128,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   /* End of User Extensions */
 
   UEGValue = UserExtensionGroup.value;
-
-  constructor(private bieService: BieListService,
-              private ccService: CcListService,
-              private auth: AuthService,
-              private releaseService: ReleaseService,
-              private libraryService: LibraryService,
-              private router: Router,
-              public webPageInfo: WebPageInfoService) {
-  }
 
   ngOnInit() {
     this.libraryService.getLibrarySummaryList().subscribe(libraries => {

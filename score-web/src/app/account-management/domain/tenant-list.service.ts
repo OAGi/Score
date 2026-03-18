@@ -1,4 +1,4 @@
-import {Injectable, OnInit} from '@angular/core';
+import { Injectable, OnInit, inject } from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {TenantInfo, TenantList, TenantListRequest} from './tenants';
@@ -6,9 +6,8 @@ import {PageResponse} from '../../basis/basis';
 
 @Injectable()
 export class TenantListService implements OnInit {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-  }
 
   ngOnInit() {
   }

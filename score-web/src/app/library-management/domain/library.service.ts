@@ -1,5 +1,5 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {Observable} from 'rxjs';
 import {LibraryDetails, LibraryListEntry, LibraryListRequest, LibrarySummary} from './library';
 import {PageResponse} from '../../basis/basis';
@@ -7,9 +7,8 @@ import {map} from 'rxjs/operators';
 
 @Injectable()
 export class LibraryService {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-  }
 
   getLibrarySummaryList(): Observable<LibrarySummary[]> {
     return this.http.get<LibrarySummary[]>('/api/libraries/summaries', {});

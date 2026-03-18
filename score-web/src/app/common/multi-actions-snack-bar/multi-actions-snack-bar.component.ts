@@ -1,4 +1,4 @@
-import {Component, Inject, inject} from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {Clipboard} from '@angular/cdk/clipboard';
 import {MAT_SNACK_BAR_DATA, MatSnackBarRef} from '@angular/material/snack-bar';
 
@@ -9,13 +9,10 @@ import {MAT_SNACK_BAR_DATA, MatSnackBarRef} from '@angular/material/snack-bar';
   styleUrls: ['./multi-actions-snack-bar.component.css']
 })
 export class MultiActionsSnackBarComponent {
+  private clipboard = inject(Clipboard);
+  data = inject(MAT_SNACK_BAR_DATA);
+
 
   snackBarRef = inject(MatSnackBarRef);
-
-  constructor(
-    private clipboard: Clipboard,
-    @Inject(MAT_SNACK_BAR_DATA) public data: any) {
-
-  }
 
 }

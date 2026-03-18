@@ -1,12 +1,11 @@
-import {Injectable, OnInit} from '@angular/core';
+import { Injectable, OnInit, inject } from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 
 @Injectable()
 export class MailService implements OnInit {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-  }
 
   ngOnInit() {
   }

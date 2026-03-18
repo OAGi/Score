@@ -1,5 +1,5 @@
 import {SelectionModel} from '@angular/cdk/collections';
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {FormControl} from '@angular/forms';
 import {MatDatepicker} from '@angular/material/datepicker';
 import {MatDialog, MatDialogRef} from '@angular/material/dialog';
@@ -37,6 +37,19 @@ import {LibraryService} from '../../../library-management/domain/library.service
   styleUrls: ['./codelist-list-dialog.component.css']
 })
 export class CodelistListDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<CodelistListDialogComponent>>(MatDialogRef);
+  private service = inject(CodeListService);
+  private releaseService = inject(ReleaseService);
+  private libraryService = inject(LibraryService);
+  private accountService = inject(AccountListService);
+  private auth = inject(AuthService);
+  private dialog = inject(MatDialog);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  webPageInfo = inject(WebPageInfoService);
+
 
   faLocationArrow = faLocationArrow;
   title = 'Code List';
@@ -192,20 +205,6 @@ export class CodelistListDialogComponent implements OnInit {
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
-
-  constructor(public dialogRef: MatDialogRef<CodelistListDialogComponent>,
-              private service: CodeListService,
-              private releaseService: ReleaseService,
-              private libraryService: LibraryService,
-              private accountService: AccountListService,
-              private auth: AuthService,
-              private dialog: MatDialog,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService,
-              private router: Router,
-              private route: ActivatedRoute,
-              public webPageInfo: WebPageInfoService) {
-  }
 
   ngOnInit() {
     this.request = new CodeListListEntryRequest(this.route.snapshot.queryParamMap,

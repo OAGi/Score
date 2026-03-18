@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -33,6 +33,17 @@ import {BieExpressOption} from '../../bie-express/domain/generate-expression';
   styleUrls: ['./bie-package-detail.component.css']
 })
 export class BiePackageDetailComponent implements OnInit {
+  private biePackageService = inject(BiePackageService);
+  private auth = inject(AuthService);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private snackBar = inject(MatSnackBar);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private dialog = inject(MatDialog);
+  webPageInfo = inject(WebPageInfoService);
+
 
   title = 'Edit BIE Package';
   biePackage: BiePackageDetails = new BiePackageDetails();
@@ -202,18 +213,6 @@ export class BiePackageDetailComponent implements OnInit {
   @ViewChild(MatMultiSort, {static: true}) sort: MatMultiSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
-
-  constructor(private biePackageService: BiePackageService,
-              private auth: AuthService,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute,
-              private snackBar: MatSnackBar,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService,
-              private dialog: MatDialog,
-              public webPageInfo: WebPageInfoService) {
-  }
 
   ngOnInit(): void {
     this.option = new BieExpressOption();

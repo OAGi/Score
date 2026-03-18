@@ -2,82 +2,94 @@
   <div class="ps-2 pe-2">
     <mat-toolbar class="bg-white">
       <score-title-with-library-selector [title]="title"
-                                         [libraries]="mappedLibraries"
-                                         (libraryChange)="onLibraryChange($event)"/>
+        [libraries]="mappedLibraries"
+        (libraryChange)="onLibraryChange($event)"/>
       <span class="flex-11-auto"></span>
-      <button mat-icon-button class="ms-2" matTooltip="Create Component"
-              *ngIf="!browserMode && hasCreatePermission()"
-              [matMenuTriggerFor]="contextMenu">
-        <mat-icon>add</mat-icon>
-      </button>
+      @if (!browserMode && hasCreatePermission()) {
+        <button mat-icon-button class="ms-2" matTooltip="Create Component"
+          [matMenuTriggerFor]="contextMenu">
+          <mat-icon>add</mat-icon>
+        </button>
+      }
 
-      <button mat-icon-button class="ms-2" matTooltip="Move to WIP"
-              *ngIf="!browserMode"
-              [hidden]="!canToolbarAction('WIP')"
-              (click)="multipleUpdate('WIP')">
-        <mat-icon>arrow_forward</mat-icon>
-      </button>
-      <button mat-icon-button class="ms-2" matTooltip="Move to Draft"
-              *ngIf="!browserMode"
-              [hidden]="!canToolbarAction('Draft')"
-              (click)="multipleUpdate('Draft')">
-        <mat-icon>arrow_forward</mat-icon>
-      </button>
-      <button mat-icon-button class="ms-2" matTooltip="Move to QA"
-              *ngIf="!browserMode"
-              [hidden]="!canToolbarAction('QA')"
-              (click)="multipleUpdate('QA')">
-        <mat-icon>arrow_forward</mat-icon>
-      </button>
-      <button mat-icon-button class="ms-2" matTooltip="Move to Candidate"
-              *ngIf="!browserMode"
-              [hidden]="!canToolbarAction('Candidate')"
-              (click)="multipleUpdate('Candidate')">
-        <mat-icon>arrow_forward</mat-icon>
-      </button>
-      <button mat-icon-button class="ms-2" matTooltip="Move to Production"
-              *ngIf="!browserMode"
-              [hidden]="!canToolbarAction('Production')"
-              (click)="multipleUpdate('Production')">
-        <mat-icon>arrow_forward</mat-icon>
-      </button>
-      <button mat-icon-button class="ms-2" matTooltip="Back to WIP"
-              *ngIf="!browserMode"
-              [hidden]="!canToolbarAction('WIP')"
-              (click)="multipleUpdate('WIP')">
-        <mat-icon>arrow_back</mat-icon>
-      </button>
+      @if (!browserMode) {
+        <button mat-icon-button class="ms-2" matTooltip="Move to WIP"
+          [hidden]="!canToolbarAction('WIP')"
+          (click)="multipleUpdate('WIP')">
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      }
+      @if (!browserMode) {
+        <button mat-icon-button class="ms-2" matTooltip="Move to Draft"
+          [hidden]="!canToolbarAction('Draft')"
+          (click)="multipleUpdate('Draft')">
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      }
+      @if (!browserMode) {
+        <button mat-icon-button class="ms-2" matTooltip="Move to QA"
+          [hidden]="!canToolbarAction('QA')"
+          (click)="multipleUpdate('QA')">
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      }
+      @if (!browserMode) {
+        <button mat-icon-button class="ms-2" matTooltip="Move to Candidate"
+          [hidden]="!canToolbarAction('Candidate')"
+          (click)="multipleUpdate('Candidate')">
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      }
+      @if (!browserMode) {
+        <button mat-icon-button class="ms-2" matTooltip="Move to Production"
+          [hidden]="!canToolbarAction('Production')"
+          (click)="multipleUpdate('Production')">
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      }
+      @if (!browserMode) {
+        <button mat-icon-button class="ms-2" matTooltip="Back to WIP"
+          [hidden]="!canToolbarAction('WIP')"
+          (click)="multipleUpdate('WIP')">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+      }
 
-      <button mat-icon-button class="ms-2" matTooltip="Delete"
-              *ngIf="!browserMode"
-              [hidden]="!canToolbarAction('Delete')"
-              (click)="multipleUpdate('Delete')">
-        <mat-icon>delete</mat-icon>
-      </button>
-      <button mat-icon-button class="ms-2" matTooltip="Purge"
-              *ngIf="!browserMode"
-              [hidden]="!canToolbarAction('Purge')"
-              (click)="multipleUpdate('Purge')">
-        <mat-icon>delete_forever</mat-icon>
-      </button>
-      <button mat-icon-button class="ms-2" matTooltip="Restore"
-              *ngIf="!browserMode"
-              [hidden]="!canToolbarAction('Restore')"
-              (click)="multipleUpdate('Restore')">
-        <mat-icon>restore_from_trash</mat-icon>
-      </button>
-      <button mat-icon-button class="ms-2" matTooltip="Transfer Ownership"
-              *ngIf="!browserMode"
-              [hidden]="!canToolbarAction('Transfer')"
-              (click)="openTransferDialogMultiple()">
-        <mat-icon>swap_horiz</mat-icon>
-      </button>
-      <button mat-icon-button class="ms-2" matTooltip="Export"
-              *ngIf="!isBrowseStandardMode"
-              [hidden]="!canToolbarAction('Export')"
-              [matMenuTriggerFor]="exportMenu">
-        <mat-icon svgIcon="export_notes"></mat-icon>
-      </button>
+      @if (!browserMode) {
+        <button mat-icon-button class="ms-2" matTooltip="Delete"
+          [hidden]="!canToolbarAction('Delete')"
+          (click)="multipleUpdate('Delete')">
+          <mat-icon>delete</mat-icon>
+        </button>
+      }
+      @if (!browserMode) {
+        <button mat-icon-button class="ms-2" matTooltip="Purge"
+          [hidden]="!canToolbarAction('Purge')"
+          (click)="multipleUpdate('Purge')">
+          <mat-icon>delete_forever</mat-icon>
+        </button>
+      }
+      @if (!browserMode) {
+        <button mat-icon-button class="ms-2" matTooltip="Restore"
+          [hidden]="!canToolbarAction('Restore')"
+          (click)="multipleUpdate('Restore')">
+          <mat-icon>restore_from_trash</mat-icon>
+        </button>
+      }
+      @if (!browserMode) {
+        <button mat-icon-button class="ms-2" matTooltip="Transfer Ownership"
+          [hidden]="!canToolbarAction('Transfer')"
+          (click)="openTransferDialogMultiple()">
+          <mat-icon>swap_horiz</mat-icon>
+        </button>
+      }
+      @if (!isBrowseStandardMode) {
+        <button mat-icon-button class="ms-2" matTooltip="Export"
+          [hidden]="!canToolbarAction('Export')"
+          [matMenuTriggerFor]="exportMenu">
+          <mat-icon svgIcon="export_notes"></mat-icon>
+        </button>
+      }
       <mat-menu #exportMenu="matMenu">
         <button mat-menu-item (click)="exportStandaloneSchemas('XML')">XML Schema</button>
         <button mat-menu-item (click)="exportStandaloneSchemas('JSON')">JSON Schema</button>
@@ -95,42 +107,50 @@
     <button mat-menu-item (click)="createBccp()">
       <span class="context-menu-item">BCCP</span>
     </button>
-    <mat-divider *ngIf="request.library.name === 'connectSpec' && request.release?.workingRelease"></mat-divider>
-    <button mat-menu-item (click)="createBOD()"
-            *ngIf="request.library.name === 'connectSpec' && request.release?.workingRelease">
-      <span class="context-menu-item"><fa-icon [icon]="faFlask" style="padding-right: 10px;"></fa-icon> Create OAGi BOD Component</span>
-    </button>
-    <button mat-menu-item (click)="createVerb()"
-            *ngIf="request.library.name === 'connectSpec' && request.release?.workingRelease">
-      <span class="context-menu-item"><fa-icon [icon]="faFlask" style="padding-right: 10px;"></fa-icon> Create OAGi Verb Component</span>
-    </button>
+    @if (request.library.name === 'connectSpec' && request.release?.workingRelease) {
+      <mat-divider></mat-divider>
+    }
+    @if (request.library.name === 'connectSpec' && request.release?.workingRelease) {
+      <button mat-menu-item (click)="createBOD()"
+        >
+        <span class="context-menu-item"><fa-icon [icon]="faFlask" style="padding-right: 10px;"></fa-icon> Create OAGi BOD Component</span>
+      </button>
+    }
+    @if (request.library.name === 'connectSpec' && request.release?.workingRelease) {
+      <button mat-menu-item (click)="createVerb()"
+        >
+        <span class="context-menu-item"><fa-icon [icon]="faFlask" style="padding-right: 10px;"></fa-icon> Create OAGi Verb Component</span>
+      </button>
+    }
   </mat-menu>
 
   <mat-card class="pt-3">
     <!-- Issue #1700: Browse Standards uses Name-only search and disables advanced search. -->
     <score-search-bar [placeholder]="isBrowseStandardMode ? 'Search by Name' : 'Search by DEN'"
-                      [model]="isBrowseStandardMode ? request.filters.name : request.filters.den"
-                      [advancedSearch]="!isBrowseStandardMode"
-                      (modelChange)="onSearchFilterChange($event)"
-                      (searchTriggered)="onSearch();">
+      [model]="isBrowseStandardMode ? request.filters.name : request.filters.den"
+      [advancedSearch]="!isBrowseStandardMode"
+      (modelChange)="onSearchFilterChange($event)"
+      (searchTriggered)="onSearch();">
       <div branchSelector class="branch-selector d-flex" style="width: 11rem; padding: 0 0.5rem 0 1rem;">
         <mat-form-field appearance="outline">
           <mat-label>Branch</mat-label>
           <mat-select [(ngModel)]="request.release"
-                      (ngModelChange)="onChange('branch', request.release); onSearch();">
+            (ngModelChange)="onChange('branch', request.release); onSearch();">
             <mat-select-trigger class="d-flex">
               <span>{{ request.release?.releaseNum }}</span>
             </mat-select-trigger>
             <mat-option>
               <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
-                                     [placeholderLabel]="'Search...'"
-                                     [noEntriesFoundLabel]="'No matching branch found.'"></ngx-mat-select-search>
+                [placeholderLabel]="'Search...'"
+              [noEntriesFoundLabel]="'No matching branch found.'"></ngx-mat-select-search>
             </mat-option>
-            <mat-option *ngFor="let release of filteredReleaseList | async" [value]="release">
-              <div class="d-flex">
-                <span class="release-num">{{release.releaseNum}}</span>
-              </div>
-            </mat-option>
+            @for (release of filteredReleaseList | async; track release) {
+              <mat-option [value]="release">
+                <div class="d-flex">
+                  <span class="release-num">{{release.releaseNum}}</span>
+                </div>
+              </mat-option>
+            }
           </mat-select>
         </mat-form-field>
         <mat-divider [vertical]="true" style="padding-left: 1.5rem;"/>
@@ -142,36 +162,44 @@
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
                   <mat-label>State</mat-label>
-                  <mat-select *ngIf="request.release?.workingRelease" [(ngModel)]="request.states"
-                              floatLabel="never" multiple>
-                    <mat-option *ngFor="let state of workingStateList" [value]="state">
-                      <span>{{ state | separate }}</span>
-                    </mat-option>
-                  </mat-select>
-                  <mat-select *ngIf="!request.release?.workingRelease" [(ngModel)]="request.states"
-                              floatLabel="never" multiple>
-                    <mat-option *ngFor="let state of releaseStateList" [value]="state">
-                      <span>{{ state | separate }}</span>
-                    </mat-option>
-                  </mat-select>
+                  @if (request.release?.workingRelease) {
+                    <mat-select [(ngModel)]="request.states"
+                      floatLabel="never" multiple>
+                      @for (state of workingStateList; track state) {
+                        <mat-option [value]="state">
+                          <span>{{ state | separate }}</span>
+                        </mat-option>
+                      }
+                    </mat-select>
+                  }
+                  @if (!request.release?.workingRelease) {
+                    <mat-select [(ngModel)]="request.states"
+                      floatLabel="never" multiple>
+                      @for (state of releaseStateList; track state) {
+                        <mat-option [value]="state">
+                          <span>{{ state | separate }}</span>
+                        </mat-option>
+                      }
+                    </mat-select>
+                  }
                 </mat-form-field>
               </div>
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
                   <mat-label>Definition</mat-label>
                   <input matInput [(ngModel)]="request.filters.definition"
-                         (ngModelChange)="onChange('filters.definition', request.filters.definition)"
-                         (keyup.enter)="onSearch();"
-                         placeholder="Definition">
+                    (ngModelChange)="onChange('filters.definition', request.filters.definition)"
+                    (keyup.enter)="onSearch();"
+                    placeholder="Definition">
                 </mat-form-field>
               </div>
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
                   <mat-label>{{ 'CORE_COMPONENT_LIST.MODULE' | translate }}</mat-label>
                   <input matInput [(ngModel)]="request.filters.module"
-                         (ngModelChange)="onChange('filters.module', request.filters.module)"
-                         (keyup.enter)="onSearch();"
-                         placeholder="{{ 'CORE_COMPONENT_LIST.MODULE' | translate }}">
+                    (ngModelChange)="onChange('filters.module', request.filters.module)"
+                    (keyup.enter)="onSearch();"
+                    placeholder="{{ 'CORE_COMPONENT_LIST.MODULE' | translate }}">
                 </mat-form-field>
               </div>
               <div class="col-md-2 col-sm-12">
@@ -187,9 +215,11 @@
                 <mat-form-field>
                   <mat-label>Component Type</mat-label>
                   <mat-select [(ngModel)]="request.componentTypes" multiple>
-                    <mat-option *ngFor="let componentType of componentTypeList" [value]="componentType">
-                      {{componentType.name}}
-                    </mat-option>
+                    @for (componentType of componentTypeList; track componentType) {
+                      <mat-option [value]="componentType">
+                        {{componentType.name}}
+                      </mat-option>
+                    }
                   </mat-select>
                 </mat-form-field>
               </div>
@@ -213,12 +243,14 @@
                   <mat-select [(ngModel)]="request.ownerLoginIdList" multiple>
                     <mat-option>
                       <ngx-mat-select-search [formControl]="loginIdListFilterCtrl"
-                                             [placeholderLabel]="'Search...'"
-                                             [noEntriesFoundLabel]="'No matching owner found.'"></ngx-mat-select-search>
+                        [placeholderLabel]="'Search...'"
+                      [noEntriesFoundLabel]="'No matching owner found.'"></ngx-mat-select-search>
                     </mat-option>
-                    <mat-option *ngFor="let loginId of filteredLoginIdList | async" [value]="loginId">
-                      <span>{{ loginId }}</span>
-                    </mat-option>
+                    @for (loginId of filteredLoginIdList | async; track loginId) {
+                      <mat-option [value]="loginId">
+                        <span>{{ loginId }}</span>
+                      </mat-option>
+                    }
                   </mat-select>
                 </mat-form-field>
               </div>
@@ -229,12 +261,14 @@
                   <mat-select [(ngModel)]="request.updaterLoginIdList" multiple>
                     <mat-option>
                       <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
-                                             [placeholderLabel]="'Search...'"
-                                             [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                        [placeholderLabel]="'Search...'"
+                      [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
                     </mat-option>
-                    <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
-                      <span>{{ loginId }}</span>
-                    </mat-option>
+                    @for (loginId of filteredUpdaterIdList | async; track loginId) {
+                      <mat-option [value]="loginId">
+                        <span>{{ loginId }}</span>
+                      </mat-option>
+                    }
                   </mat-select>
                 </mat-form-field>
               </div>
@@ -243,7 +277,7 @@
                 <mat-form-field>
                   <mat-label>Updated start date</mat-label>
                   <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
-                         [(ngModel)]="request.updatedDate.start" [max]="request.updatedDate.end">
+                    [(ngModel)]="request.updatedDate.start" [max]="request.updatedDate.end">
                   <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
                   <mat-datepicker #dateStart></mat-datepicker>
                 </mat-form-field>
@@ -260,7 +294,7 @@
                 <mat-form-field>
                   <mat-label>Updated end date</mat-label>
                   <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
-                         [(ngModel)]="request.updatedDate.end" [min]="request.updatedDate.start">
+                    [(ngModel)]="request.updatedDate.end" [min]="request.updatedDate.start">
                   <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
                   <mat-datepicker #dateEnd></mat-datepicker>
                 </mat-form-field>
@@ -279,12 +313,14 @@
                   <mat-select [(ngModel)]="request.namespaces" multiple>
                     <mat-option>
                       <ngx-mat-select-search [formControl]="namespaceListFilterCtrl"
-                                             [placeholderLabel]="'Search...'"
-                                             [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
+                        [placeholderLabel]="'Search...'"
+                      [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
                     </mat-option>
-                    <mat-option *ngFor="let namespace of filteredNamespaceList | async" [value]="namespace.namespaceId">
-                      <span>{{ namespace.uri }}</span>
-                    </mat-option>
+                    @for (namespace of filteredNamespaceList | async; track namespace) {
+                      <mat-option [value]="namespace.namespaceId">
+                        <span>{{ namespace.uri }}</span>
+                      </mat-option>
+                    }
                   </mat-select>
                 </mat-form-field>
               </div>
@@ -292,9 +328,11 @@
                 <mat-form-field>
                   <mat-label>Tag</mat-label>
                   <mat-select [(ngModel)]="request.tags" multiple>
-                    <mat-option *ngFor="let tag of tags" [value]="tag.name">
-                      {{tag.name}}
-                    </mat-option>
+                    @for (tag of tags; track tag) {
+                      <mat-option [value]="tag.name">
+                        {{tag.name}}
+                      </mat-option>
+                    }
                   </mat-select>
                 </mat-form-field>
               </div>
@@ -303,10 +341,12 @@
 
           <div class="container-fluid" style="padding: 0;">
             <div class="row">
-              <div class="col-md-2 col-sm-12" *ngIf="isElasticsearchOn">
-                <mat-slide-toggle [(ngModel)]="request.fuzzySearch"
-                                  (ngModelChange)="onChange('fuzzySearch', request.fuzzySearch)">Fuzzy Search</mat-slide-toggle>
-              </div>
+              @if (isElasticsearchOn) {
+                <div class="col-md-2 col-sm-12">
+                  <mat-slide-toggle [(ngModel)]="request.fuzzySearch"
+                  (ngModelChange)="onChange('fuzzySearch', request.fuzzySearch)">Fuzzy Search</mat-slide-toggle>
+                </div>
+              }
             </div>
           </div>
         </mat-card-content>
@@ -314,98 +354,111 @@
     </score-search-bar>
 
     <mat-card-content class="mat-card-container">
-      <div class="loading-container" *ngIf="loading">
-        <mat-spinner [diameter]="40"></mat-spinner>
-      </div>
+      @if (loading) {
+        <div class="loading-container">
+          <mat-spinner [diameter]="40"></mat-spinner>
+        </div>
+      }
 
       <div class="table-container">
-        <div class="score-column-container align-items-center" *ngIf="!isBrowseStandardMode">
-          <score-column-selector
-            [columns]="columns"
-            (columnsChange)="onColumnsChange($event)"
-            (onReset)="onColumnsReset()">
-          </score-column-selector>
-
-          <score-column-selector class="pe-2"
-                                 *ngIf="!browserMode || canSelectTypesInBrowserMode"
-                                 [title]="'Types'"
-                                 [columns]="visibleFilterTypes"
-                                 [draggable]="false"
-                                 (columnsChange)="onFilterTypesChange($event)"
-                                 (onReset)="onFilterTypesReset()">
-          </score-column-selector>
-
-          <section class="browser-mode-toggle-section me-2">
-            <div class="d-flex align-items-center">
-              <mat-icon class="me-2">{{ browserMode ? 'preview' : 'code_blocks' }}</mat-icon>
-              <mat-label>{{ browserMode ? 'Browser View' : 'Dev View' }}</mat-label>
-            </div>
-            <mat-slide-toggle labelPosition="before"
-                              [checked]="browserMode" (change)="onBrowserModeChange($event)">
-            </mat-slide-toggle>
-          </section>
-        </div>
+        @if (!isBrowseStandardMode) {
+          <div class="score-column-container align-items-center">
+            <score-column-selector
+              [columns]="columns"
+              (columnsChange)="onColumnsChange($event)"
+              (onReset)="onColumnsReset()">
+            </score-column-selector>
+            @if (!browserMode || canSelectTypesInBrowserMode) {
+              <score-column-selector class="pe-2"
+                [title]="'Types'"
+                [columns]="visibleFilterTypes"
+                [draggable]="false"
+                (columnsChange)="onFilterTypesChange($event)"
+                (onReset)="onFilterTypesReset()">
+              </score-column-selector>
+            }
+            <section class="browser-mode-toggle-section me-2">
+              <div class="d-flex align-items-center">
+                <mat-icon class="me-2">{{ browserMode ? 'preview' : 'code_blocks' }}</mat-icon>
+                <mat-label>{{ browserMode ? 'Browser View' : 'Dev View' }}</mat-label>
+              </div>
+              <mat-slide-toggle labelPosition="before"
+                [checked]="browserMode" (change)="onBrowserModeChange($event)">
+              </mat-slide-toggle>
+            </section>
+          </div>
+        }
         <div class="mat-elevation-z1 table-wrapper mt-3">
           <table mat-table multiTemplateDataRows
-                 matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
-                 [dataSource]="dataSource">
+            matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
+            [dataSource]="dataSource">
 
             <!-- Checkbox Column -->
             <ng-container matColumnDef="select">
               <th mat-header-cell *matHeaderCellDef>
                 <mat-checkbox (change)="$event ? masterToggle() : null"
-                              [checked]="selection.hasValue() && isAllSelected()"
-                              [indeterminate]="selection.hasValue() && !isAllSelected()">
+                  [checked]="selection.hasValue() && isAllSelected()"
+                  [indeterminate]="selection.hasValue() && !isAllSelected()">
                 </mat-checkbox>
               </th>
               <td mat-cell *matCellDef="let row">
                 <mat-checkbox (click)="$event.stopPropagation()"
-                              [disabled]="row.type === 'ASCC' || row.type === 'BCC'"
-                              (change)="$event ? toggle(row) : null"
-                              [checked]="isSelected(row)">
+                  [disabled]="row.type === 'ASCC' || row.type === 'BCC'"
+                  (change)="$event ? toggle(row) : null"
+                  [checked]="isSelected(row)">
                 </mat-checkbox>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="type">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Type')" [resizable]="!isBrowseStandardMode"
-                  (onResize)="onResizeWidth($event)"> Type</th>
+                score-table-column-resize [defaultWidth]="width('Type')" [resizable]="!isBrowseStandardMode"
+              (onResize)="onResizeWidth($event)"> Type</th>
               <td mat-cell *matCellDef="let element">
-                <mat-chip-list [ngSwitch]="element.type">
-                  <mat-chip *ngSwitchDefault>{{ displayType(element) }}</mat-chip>
+                <mat-chip-list>
+                  @switch (element.type) {
+                    @default {
+                      <mat-chip>{{ displayType(element) }}</mat-chip>
+                    }
+                  }
                 </mat-chip-list>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="state">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('State')" [resizable]="!isBrowseStandardMode"
-                  (onResize)="onResizeWidth($event)"> State</th>
+                score-table-column-resize [defaultWidth]="width('State')" [resizable]="!isBrowseStandardMode"
+              (onResize)="onResizeWidth($event)"> State</th>
               <td mat-cell *matCellDef="let element">
-              <span class="cc-state {{ element.state }}"
+                <span class="cc-state {{ element.state }}"
                     [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
                     'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state | separate }}</span>
-                <span *ngIf="element.deprecated" class="cc-state Deprecated"
+                @if (element.deprecated) {
+                  <span class="cc-state Deprecated"
                       [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
                     'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
+                }
               </td>
             </ng-container>
 
             <ng-container matColumnDef="den">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('DEN')" [resizable]="!isBrowseStandardMode"
-                  (onResize)="onResizeWidth($event)"> DEN</th>
+                score-table-column-resize [defaultWidth]="width('DEN')" [resizable]="!isBrowseStandardMode"
+              (onResize)="onResizeWidth($event)"> DEN</th>
               <td mat-cell *matCellDef="let element">
                 <div class="den den-with-tags score-break-word">
-                  <span class="new-component me-2" *ngIf="element.newComponent && !loading && element.libraryId === request.library.libraryId">New</span>
+                  @if (element.newComponent && !loading && element.libraryId === request.library.libraryId) {
+                    <span class="new-component me-2">New</span>
+                  }
                   <a routerLink="{{ getRouterLink(element) }}" matTooltip="{{ element.den }}">
                     <span class="score-line-clamp-2 score-break-word">{{ element.den }}</span>
                   </a>
                   <div class="tag-list">
-                  <span class="tag ms-2" *ngFor="let tag of element.tagList"
+                    @for (tag of element.tagList; track tag) {
+                      <span class="tag ms-2"
                         [style.background-color]="tag.backgroundColor"
-                        [style.color]="tag.textColor">{{ tag.name }}</span>
+                      [style.color]="tag.textColor">{{ tag.name }}</span>
+                    }
                   </div>
                 </div>
                 <div class="description">{{ element.guid }}</div>
@@ -414,8 +467,8 @@
 
             <ng-container matColumnDef="name">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Name')" [resizable]="!isBrowseStandardMode"
-                  (onResize)="onResizeWidth($event)"> Name</th>
+                score-table-column-resize [defaultWidth]="width('Name')" [resizable]="!isBrowseStandardMode"
+              (onResize)="onResizeWidth($event)"> Name</th>
               <td mat-cell *matCellDef="let element">
                 <div class="den score-break-word">
                   <a routerLink="{{ getRouterLink(element) }}" matTooltip="{{ element.name }}">
@@ -428,8 +481,8 @@
 
             <ng-container matColumnDef="valueDomain">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Value Domain')" [resizable]="!isBrowseStandardMode"
-                  (onResize)="onResizeWidth($event)"> Value Domain</th>
+                score-table-column-resize [defaultWidth]="width('Value Domain')" [resizable]="!isBrowseStandardMode"
+              (onResize)="onResizeWidth($event)"> Value Domain</th>
               <td mat-cell *matCellDef="let element">
                 <span class="score-line-clamp-2 score-break-word">{{ element.defaultValueDomain }}</span>
               </td>
@@ -437,8 +490,8 @@
 
             <ng-container matColumnDef="sixDigitId">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Six Hexadecimal ID')" [resizable]="!isBrowseStandardMode"
-                  (onResize)="onResizeWidth($event)"> Six Hexadecimal ID</th>
+                score-table-column-resize [defaultWidth]="width('Six Hexadecimal ID')" [resizable]="!isBrowseStandardMode"
+              (onResize)="onResizeWidth($event)"> Six Hexadecimal ID</th>
               <td mat-cell *matCellDef="let element">
                 <span class="score-line-clamp-2 score-break-word">{{ element.sixDigitId }}</span>
               </td>
@@ -446,8 +499,8 @@
 
             <ng-container matColumnDef="revision">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Revision')" [resizable]="!isBrowseStandardMode"
-                  (onResize)="onResizeWidth($event)"> Revision</th>
+                score-table-column-resize [defaultWidth]="width('Revision')" [resizable]="!isBrowseStandardMode"
+              (onResize)="onResizeWidth($event)"> Revision</th>
               <td mat-cell *matCellDef="let element">
                 <span>{{ element.log.revisionNum }}</span>
               </td>
@@ -455,32 +508,33 @@
 
             <ng-container matColumnDef="owner">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Owner')" [resizable]="!isBrowseStandardMode"
-                  (onResize)="onResizeWidth($event)"> Owner</th>
+                score-table-column-resize [defaultWidth]="width('Owner')" [resizable]="!isBrowseStandardMode"
+              (onResize)="onResizeWidth($event)"> Owner</th>
               <td mat-cell *matCellDef="let element" class="ellipsis">
                 <div class="d-flex align-items-center align-content-center justify-content-between">
                   <span class="score-line-clamp-2 score-break-word" [matTooltip]="element.owner.username" [innerHTML]="element.owner.loginId"></span>
-                  <mat-icon class="pointer align-self-center" style="padding-right: 24px;"
-                            *ngIf="isEditable(element) && !isAssociation(element)"
-                            (click)="openTransferDialog(element, $event)">swap_horiz</mat-icon>
+                  @if (isEditable(element) && !isAssociation(element)) {
+                    <mat-icon class="pointer align-self-center" style="padding-right: 24px;"
+                    (click)="openTransferDialog(element, $event)">swap_horiz</mat-icon>
+                  }
                 </div>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="module">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Module')" [resizable]="!isBrowseStandardMode"
-                  (onResize)="onResizeWidth($event)"> Module</th>
+                score-table-column-resize [defaultWidth]="width('Module')" [resizable]="!isBrowseStandardMode"
+              (onResize)="onResizeWidth($event)"> Module</th>
               <td mat-cell *matCellDef="let element">
                 <div class="score-line-clamp-2 score-break-word"
-                     [innerHTML]="element.module | highlight : highlightTextForModule : ['bg-warning']"></div>
+                [innerHTML]="element.module | highlight : highlightTextForModule : ['bg-warning']"></div>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="lastUpdateTimestamp">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  score-table-column-resize [defaultWidth]="width('Updated On')" [resizable]="!isBrowseStandardMode"
-                  (onResize)="onResizeWidth($event)"> Updated on</th>
+                score-table-column-resize [defaultWidth]="width('Updated On')" [resizable]="!isBrowseStandardMode"
+              (onResize)="onResizeWidth($event)"> Updated on</th>
               <td mat-cell *matCellDef="let element">
                 <div class="score-line-clamp-2 score-break-word">
                   <div>{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
@@ -492,15 +546,17 @@
             <ng-container matColumnDef="expandedDetail">
               <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
                 <div class="element-detail"
-                     [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+                  [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
                   <div class="element-detail-wrapper">
                     <mat-card class="mb-2">
-                      <mat-card-header class="element-detail-header" *ngIf="element.definition.source">
-                        <mat-card-subtitle class="element-detail-subtitle">{{ element.definition.source }}</mat-card-subtitle>
-                      </mat-card-header>
+                      @if (element.definition.source) {
+                        <mat-card-header class="element-detail-header">
+                          <mat-card-subtitle class="element-detail-subtitle">{{ element.definition.source }}</mat-card-subtitle>
+                        </mat-card-header>
+                      }
                       <mat-card-content>
                         <p [innerHTML]="element.definition.content | highlight : highlightTextForDefinition : ['bg-warning']"
-                           class="element-detail-content"></p>
+                        class="element-detail-content"></p>
                       </mat-card-content>
                     </mat-card>
                   </div>
@@ -510,16 +566,16 @@
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let element; columns: displayedColumns;" class="element-row"
-                [class.expanded-row]="expandedElement === element"
-                (click)="expandedElement = expandedElement === element ? null : element; !isBrowseStandardMode && toggle(element);"></tr>
+              [class.expanded-row]="expandedElement === element"
+            (click)="expandedElement = expandedElement === element ? null : element; !isBrowseStandardMode && toggle(element);"></tr>
             <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"
-                (click)="!isBrowseStandardMode && toggle(row);"></tr>
+            (click)="!isBrowseStandardMode && toggle(row);"></tr>
           </table>
 
           <mat-paginator
             [pageSizeOptions]="[10, 25, 50]"
             (page)="onPageChange($event)"
-            showFirstLastButtons></mat-paginator>
+          showFirstLastButtons></mat-paginator>
         </div>
       </div>
     </mat-card-content>

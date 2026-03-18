@@ -1,4 +1,4 @@
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {ContextSchemeListEntry, ContextSchemeListRequest} from '../domain/context-scheme';
 import {ContextSchemeService} from '../domain/context-scheme.service';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
@@ -33,6 +33,16 @@ import {SearchBarComponent} from '../../../common/search-bar/search-bar.componen
   styleUrls: ['./context-scheme-list.component.css']
 })
 export class ContextSchemeListComponent implements OnInit {
+  private service = inject(ContextSchemeService);
+  private accountService = inject(AccountListService);
+  private auth = inject(AuthService);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private snackBar = inject(MatSnackBar);
+
 
   title = 'Context Scheme';
 
@@ -157,17 +167,6 @@ export class ContextSchemeListComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
-
-  constructor(private service: ContextSchemeService,
-              private accountService: AccountListService,
-              private auth: AuthService,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute,
-              private snackBar: MatSnackBar) {
-  }
 
   ngOnInit() {
     this.request = new ContextSchemeListRequest(this.route.snapshot.queryParamMap,

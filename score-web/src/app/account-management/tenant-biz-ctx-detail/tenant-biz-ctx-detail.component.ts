@@ -1,4 +1,4 @@
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {Location} from '@angular/common';
@@ -31,6 +31,16 @@ import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
   styleUrls: ['./tenant-biz-ctx-detail.component.css']
 })
 export class TenantBusinessCtxDetailComponent implements OnInit {
+  private service = inject(TenantListService);
+  private bizCtxservice = inject(BusinessContextService);
+  private accountService = inject(AccountListService);
+  private auth = inject(AuthService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private location = inject(Location);
+  private snackBar = inject(MatSnackBar);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
   title = 'Business Context Management';
 
   get columns(): TableColumnsProperty[] {
@@ -142,18 +152,6 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
-
-
-  constructor(private service: TenantListService,
-              private bizCtxservice: BusinessContextService,
-              private accountService: AccountListService,
-              private auth: AuthService,
-              private preferencesService: SettingsPreferencesService,
-              private location: Location,
-              private snackBar: MatSnackBar,
-              private route: ActivatedRoute,
-              private router: Router) {
-  }
 
   ngOnInit() {
     this.request = new BusinessContextListRequest(this.route.snapshot.queryParamMap,

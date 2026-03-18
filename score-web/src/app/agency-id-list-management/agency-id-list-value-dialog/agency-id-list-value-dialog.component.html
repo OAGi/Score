@@ -13,65 +13,71 @@
         <mat-form-field>
           <mat-label>Value</mat-label>
           <input matInput required maxlength="255"
-                 [disabled]="!isEditable || derived || hasRevision"
-                 [(ngModel)]="agencyIdListValue.value">
+            [disabled]="!isEditable || derived || hasRevision"
+            [(ngModel)]="agencyIdListValue.value">
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Meaning</mat-label>
           <input matInput required maxlength="100"
-                 [disabled]="!isEditable"
-                 [(ngModel)]="agencyIdListValue.name">
+            [disabled]="!isEditable"
+            [(ngModel)]="agencyIdListValue.name">
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Definition</mat-label>
           <textarea matInput rows="6" cols="30"
-                    [disabled]="!isEditable"
-                    [(ngModel)]="agencyIdListValue.definition.content"></textarea>
+            [disabled]="!isEditable"
+          [(ngModel)]="agencyIdListValue.definition.content"></textarea>
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Definition Source</mat-label>
           <input matInput maxlength="100"
-                 [disabled]="!isEditable"
-                 [(ngModel)]="agencyIdListValue.definition.source">
+            [disabled]="!isEditable"
+            [(ngModel)]="agencyIdListValue.definition.source">
         </mat-form-field>
 
         <div class="row">
           <div class="col-4">
             <mat-checkbox color="warn"
-                          [disabled]="!isEditable || actionName === 'Add' || !isDeprecatedChangeable"
-                          [(ngModel)]="agencyIdListValue.deprecated">
+              [disabled]="!isEditable || actionName === 'Add' || !isDeprecatedChangeable"
+              [(ngModel)]="agencyIdListValue.deprecated">
               <span>Deprecated</span>
             </mat-checkbox>
           </div>
-          <div class="col-4" *ngIf="isDeveloper"
-               [matTooltip]="'When set, this will be used as the default agency ID list value in Code Lists created by developers.'">
-            <mat-checkbox color="warn"
-                          [disabled]="!isEditable"
-                          [(ngModel)]="agencyIdListValue.developerDefault">
-              <span>Developer Default</span>
-            </mat-checkbox>
-          </div>
-          <div class="col-4" *ngIf="isDeveloper"
-               [matTooltip]="'When set, this will be used as the default agency ID list value in Code Lists created by end-users.'">
-            <mat-checkbox color="warn"
-                          [disabled]="!isEditable"
-                          [(ngModel)]="agencyIdListValue.userDefault">
-              <span>User Default</span>
-            </mat-checkbox>
-          </div>
+          @if (isDeveloper) {
+            <div class="col-4"
+              [matTooltip]="'When set, this will be used as the default agency ID list value in Code Lists created by developers.'">
+              <mat-checkbox color="warn"
+                [disabled]="!isEditable"
+                [(ngModel)]="agencyIdListValue.developerDefault">
+                <span>Developer Default</span>
+              </mat-checkbox>
+            </div>
+          }
+          @if (isDeveloper) {
+            <div class="col-4"
+              [matTooltip]="'When set, this will be used as the default agency ID list value in Code Lists created by end-users.'">
+              <mat-checkbox color="warn"
+                [disabled]="!isEditable"
+                [(ngModel)]="agencyIdListValue.userDefault">
+                <span>User Default</span>
+              </mat-checkbox>
+            </div>
+          }
         </div>
       </mat-card-content>
     </mat-card>
   </div>
-  <div class="actions ms-auto" mat-dialog-actions *ngIf="isEditable">
-    <button mat-raised-button color="primary"
-            [disabled]="isDisabled()"
-            [mat-dialog-close]="agencyIdListValue">
-      <mat-icon>{{ (actionName === 'Add') ? 'add' : 'save' }}</mat-icon>
-      <span class="ms-2">{{ (actionName === 'Add') ? 'Add' : 'Save' }}</span>
-    </button>
-  </div>
+  @if (isEditable) {
+    <div class="actions ms-auto" mat-dialog-actions>
+      <button mat-raised-button color="primary"
+        [disabled]="isDisabled()"
+        [mat-dialog-close]="agencyIdListValue">
+        <mat-icon>{{ (actionName === 'Add') ? 'add' : 'save' }}</mat-icon>
+        <span class="ms-2">{{ (actionName === 'Add') ? 'Add' : 'Save' }}</span>
+      </button>
+    </div>
+  }
 </div>

@@ -1,10 +1,13 @@
-import {Directive, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, Renderer2, SimpleChanges} from '@angular/core';
+import { Directive, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, Renderer2, SimpleChanges, inject } from '@angular/core';
 
 @Directive({
   standalone: false,
   selector: '[score-table-column-resize]'
 })
 export class ScoreTableColumnResizeDirective implements OnInit, OnChanges {
+  private el = inject(ElementRef);
+  private renderer = inject(Renderer2);
+
   private startX: number;
   private startWidth: number;
   private resizeHandle: HTMLElement;
@@ -20,9 +23,6 @@ export class ScoreTableColumnResizeDirective implements OnInit, OnChanges {
   @Input() defaultWidth: number | string;
   @Input() resizable = true;
   @Output() onResize: EventEmitter<{ name: string; width: number | string }> = new EventEmitter();
-
-  constructor(private el: ElementRef, private renderer: Renderer2) {
-  }
 
   ngOnInit() {
     this.setInitialWidth();

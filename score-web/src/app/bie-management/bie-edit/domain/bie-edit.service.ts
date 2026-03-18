@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {HttpClient, HttpContext, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {CcGraph, DtAwdPriSummary, DtScAwdPriSummary} from '../../../cc-management/domain/core-component-node';
@@ -23,10 +23,8 @@ import {SUPPRESS_ERROR_ALERT} from '../../../authentication/auth.service';
 
 @Injectable()
 export class BieEditService {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-
-  }
 
   getGraphNode(topLevelAsbiepId: number): Observable<CcGraph> {
     return this.http.get<CcGraph>('/api/graphs/top_level_asbiep/' + topLevelAsbiepId);

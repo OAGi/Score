@@ -14,11 +14,12 @@
       {{ selectionHint() }}
     </p>
 
-    <ng-container *ngIf="hasTargets()">
-      <p *ngIf="hasInvalidTargets()" class="validation-summary">
-        {{ validationSummary() }}
-      </p>
-
+    @if (hasTargets()) {
+      @if (hasInvalidTargets()) {
+        <p class="validation-summary">
+          {{ validationSummary() }}
+        </p>
+      }
       <div class="table-container">
         <div class="mat-elevation-z1 table-wrapper mt-3">
           <table mat-table [dataSource]="data.targets" [trackBy]="trackByTopLevelAsbiepId">
@@ -33,11 +34,10 @@
               </th>
               <td mat-cell *matCellDef="let target">
                 <mat-checkbox [checked]="target.checked"
-                              [disabled]="!isSelectable(target) || isValidating"
-                              (change)="onTargetCheckedChange(target, $event.checked)"></mat-checkbox>
+                  [disabled]="!isSelectable(target) || isValidating"
+                (change)="onTargetCheckedChange(target, $event.checked)"></mat-checkbox>
               </td>
             </ng-container>
-
             <ng-container matColumnDef="displayName">
               <th mat-header-cell *matHeaderCellDef>Display Name</th>
               <td mat-cell *matCellDef="let target">
@@ -46,94 +46,101 @@
                     {{ value(target.displayName || target.propertyTerm) }}
                   </a>
                 </div>
-                <div *ngIf="target.displayName && target.propertyTerm" class="property-term score-line-clamp-2 score-break-word">
-                  {{ target.propertyTerm }}
-                </div>
+                @if (target.displayName && target.propertyTerm) {
+                  <div class="property-term score-line-clamp-2 score-break-word">
+                    {{ target.propertyTerm }}
+                  </div>
+                }
                 <div class="bie-guid">{{ value(target.guid) }}</div>
               </td>
             </ng-container>
-
             <ng-container matColumnDef="dependencies">
               <th mat-header-cell *matHeaderCellDef>Dependencies</th>
               <td mat-cell *matCellDef="let target">
-                <ng-container *ngIf="dependenciesRelations(target).length > 0; else noDependencies">
+                @if (dependenciesRelations(target).length > 0) {
                   <div class="score-line-clamp-2 score-break-word relation-summary"
-                       [matTooltip]="relationTooltip(dependenciesRelations(target))"
-                       [matTooltipDisabled]="!hasMoreRelations(dependenciesRelations(target))"
-                       matTooltipClass="dependency-relation-tooltip">
+                    [matTooltip]="relationTooltip(dependenciesRelations(target))"
+                    [matTooltipDisabled]="!hasMoreRelations(dependenciesRelations(target))"
+                    matTooltipClass="dependency-relation-tooltip">
                     <a target="_blank" rel="noopener noreferrer"
-                       href="/profile_bie/{{ primaryRelation(dependenciesRelations(target))?.topLevelAsbiepId }}">
+                      href="/profile_bie/{{ primaryRelation(dependenciesRelations(target))?.topLevelAsbiepId }}">
                       {{ relationSummaryText(primaryRelation(dependenciesRelations(target))) }}
                     </a>
-                    <span *ngIf="hasMoreRelations(dependenciesRelations(target))" class="relation-more">
-                      +{{ moreRelationsCount(dependenciesRelations(target)) }} more
-                    </span>
+                    @if (hasMoreRelations(dependenciesRelations(target))) {
+                      <span class="relation-more">
+                        +{{ moreRelationsCount(dependenciesRelations(target)) }} more
+                      </span>
+                    }
                   </div>
-                </ng-container>
-                <ng-template #noDependencies></ng-template>
+                } @else {
+                }
               </td>
             </ng-container>
-
             <ng-container matColumnDef="businessContexts">
               <th mat-header-cell *matHeaderCellDef>Business Contexts</th>
               <td mat-cell *matCellDef="let target">
-                <div *ngIf="target.businessContexts?.length; else noBusinessContexts"
-                     class="business-context-list score-line-clamp-2 score-break-word">
-                  <span *ngFor="let businessContext of target.businessContexts" class="businessContext">
-                    {{ businessContext }}
-                  </span>
-                </div>
-                <ng-template #noBusinessContexts></ng-template>
+                @if (target.businessContexts?.length) {
+                  <div
+                    class="business-context-list score-line-clamp-2 score-break-word">
+                    @for (businessContext of target.businessContexts; track businessContext) {
+                      <span class="businessContext">
+                        {{ businessContext }}
+                      </span>
+                    }
+                  </div>
+                } @else {
+                }
               </td>
             </ng-container>
-
             <ng-container matColumnDef="version">
               <th mat-header-cell *matHeaderCellDef>Version</th>
               <td mat-cell *matCellDef="let target">
                 <div class="score-line-clamp-2 score-break-word">{{ value(target.version) }}</div>
               </td>
             </ng-container>
-
             <ng-container matColumnDef="status">
               <th mat-header-cell *matHeaderCellDef>Status</th>
               <td mat-cell *matCellDef="let target">
                 <div class="score-line-clamp-2 score-break-word">{{ value(target.status) }}</div>
               </td>
             </ng-container>
-
             <ng-container matColumnDef="remark">
               <th mat-header-cell *matHeaderCellDef>Remark</th>
               <td mat-cell *matCellDef="let target">
                 <div class="score-line-clamp-2 score-break-word">{{ value(target.remark) }}</div>
               </td>
             </ng-container>
-
             <ng-container matColumnDef="state">
               <th mat-header-cell *matHeaderCellDef>State</th>
               <td mat-cell *matCellDef="let target">
                 <span class="bie-state {{ target.state }}"
                       [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(target.state).background,
                       'color': webPageInfo.getComponentStateColorSet(target.state).font}">{{ target.state }}</span>
-                <div *ngIf="!target.dependencyUpdateAllowed" class="dependency-message">
-                  {{ target.dependencyUpdateMessage }}
-                </div>
-                <div *ngIf="!target.stateTransitionAllowed" class="validation-message">
-                  {{ target.stateTransitionMessage }}
-                </div>
-                <div *ngIf="target.selectionConflict && target.dependencyUpdateAllowed && target.stateTransitionAllowed"
-                     class="validation-message">
-                  {{ target.selectionConflictMessage }}
-                </div>
+                @if (!target.dependencyUpdateAllowed) {
+                  <div class="dependency-message">
+                    {{ target.dependencyUpdateMessage }}
+                  </div>
+                }
+                @if (!target.stateTransitionAllowed) {
+                  <div class="validation-message">
+                    {{ target.stateTransitionMessage }}
+                  </div>
+                }
+                @if (target.selectionConflict && target.dependencyUpdateAllowed && target.stateTransitionAllowed) {
+                  <div
+                    class="validation-message">
+                    {{ target.selectionConflictMessage }}
+                  </div>
+                }
               </td>
             </ng-container>
-
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-                [class.invalid-row]="!row.stateTransitionAllowed || row.selectionConflict"></tr>
+            [class.invalid-row]="!row.stateTransitionAllowed || row.selectionConflict"></tr>
           </table>
         </div>
       </div>
-    </ng-container>
+    }
   </div>
 
   <div class="actions ms-auto" mat-dialog-actions>

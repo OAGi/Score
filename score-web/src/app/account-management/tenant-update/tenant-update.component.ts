@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {switchMap} from 'rxjs/operators';
@@ -15,20 +15,18 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
   templateUrl: './tenant-update.component.html'
 })
 export class UpdateTenantComponent implements OnInit {
+  private service = inject(TenantListService);
+  private location = inject(Location);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
+  private confirmDialogService = inject(ConfirmDialogService);
+
 
   title = 'Edit Tenant';
   tenant: TenantInfo;
   hashCode;
   HTTP_CONFLICT = 409;
-
-
-  constructor(private service: TenantListService,
-              private location: Location,
-              private route: ActivatedRoute,
-              private router: Router,
-              private snackBar: MatSnackBar,
-              private confirmDialogService: ConfirmDialogService) {
-  }
 
   ngOnInit() {
     this.tenant = new TenantInfo();

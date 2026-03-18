@@ -1,4 +1,4 @@
-import {Attribute, Component, OnInit} from '@angular/core';
+import { Component, OnInit, HostAttributeToken, inject } from '@angular/core';
 import {AuthService} from '../../authentication/auth.service';
 
 @Component({
@@ -8,10 +8,9 @@ import {AuthService} from '../../authentication/auth.service';
   styleUrls: ['./settings-menu.component.css']
 })
 export class SettingsMenuComponent implements OnInit {
+  active = inject(new HostAttributeToken('active'), { optional: true });
+  private auth = inject(AuthService);
 
-  constructor(@Attribute('active') public active: string,
-              private auth: AuthService) {
-  }
 
   ngOnInit(): void {
   }

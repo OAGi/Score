@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {finalize} from 'rxjs/operators';
@@ -17,6 +17,12 @@ import {initFilter} from '../../../../common/utility';
   styleUrls: ['./module-add-dialog.component.css']
 })
 export class ModuleAddDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<ModuleAddDialogComponent>>(MatDialogRef);
+  private snackBar = inject(MatSnackBar);
+  private namespaceService = inject(NamespaceService);
+  private moduleService = inject(ModuleService);
+  data = inject(MAT_DIALOG_DATA);
+
 
   parentDirName: string;
   moduleSetId: number;
@@ -45,11 +51,9 @@ export class ModuleAddDialogComponent implements OnInit {
 
   isUpdating = false;
 
-  constructor(public dialogRef: MatDialogRef<ModuleAddDialogComponent>,
-              private snackBar: MatSnackBar,
-              private namespaceService: NamespaceService,
-              private moduleService: ModuleService,
-              @Inject(MAT_DIALOG_DATA) public data: any) {
+  constructor() {
+    const data = this.data;
+
 
     this.moduleSetId = data.moduleSetId;
     this.libraryId = data.libraryId;

@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {PendingAccount, PendingListRequest} from './pending-list';
@@ -6,9 +6,8 @@ import {PageResponse} from '../../basis/basis';
 
 @Injectable()
 export class PendingListService{
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-  }
 
   getPendingList(request: PendingListRequest): Observable<PageResponse<PendingAccount>> {
     let params = new HttpParams()

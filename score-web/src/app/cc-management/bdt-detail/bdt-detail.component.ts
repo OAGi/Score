@@ -1,5 +1,5 @@
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
-import {Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {MatChipInputEvent} from '@angular/material/chips';
 import {MatSidenav} from '@angular/material/sidenav';
 import {MatTableDataSource} from '@angular/material/table';
@@ -71,6 +71,25 @@ import {SettingsPreferencesService} from '../../settings-management/settings-pre
   styleUrls: ['./bdt-detail.component.css']
 })
 export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
+  private service = inject(CcNodeService);
+  private codeListService = inject(CodeListService);
+  private agencyIdListservice = inject(AgencyIdListService);
+  private ccListService = inject(CcListService);
+  private searchOptionsService = inject(SearchOptionsService);
+  private releaseService = inject(ReleaseService);
+  private snackBar = inject(MatSnackBar);
+  private namespaceService = inject(NamespaceService);
+  private dialog = inject(MatDialog);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private tagService = inject(TagService);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private auth = inject(AuthService);
+  private stompService = inject(RxStompService);
+  private clipboard = inject(Clipboard);
+
 
   protected readonly trim = trim;
 
@@ -147,26 +166,6 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   set hideProhibited(hideProhibited: boolean) {
     this.dataSource.hideProhibited = hideProhibited;
     saveBooleanProperty(this.auth.getUserToken(), this.HIDE_PROHIBITED_PROPERTY_KEY, hideProhibited);
-  }
-
-  constructor(private service: CcNodeService,
-              private codeListService: CodeListService,
-              private agencyIdListservice: AgencyIdListService,
-              private ccListService: CcListService,
-              private searchOptionsService: SearchOptionsService,
-              private releaseService: ReleaseService,
-              private snackBar: MatSnackBar,
-              private namespaceService: NamespaceService,
-              private dialog: MatDialog,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService,
-              private tagService: TagService,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute,
-              private auth: AuthService,
-              private stompService: RxStompService,
-              private clipboard: Clipboard) {
   }
 
   ngOnInit() {

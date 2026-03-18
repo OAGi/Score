@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
@@ -12,6 +12,14 @@ import {ReleaseService} from '../domain/release.service';
   styleUrls: ['./release-diagram-dialog.component.css']
 })
 export class ReleaseDiagramDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<ReleaseDiagramDialogComponent>>(MatDialogRef);
+  private service = inject(ReleaseService);
+  private plantUmlService = inject(PlantUmlService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private sanitizer = inject(DomSanitizer);
+  data = inject(MAT_DIALOG_DATA);
+
 
   loading: boolean = false;
   releaseId: number;
@@ -19,13 +27,9 @@ export class ReleaseDiagramDialogComponent implements OnInit {
   public plantUmlTxt: string;
   public sanitizedSvgContent: SafeHtml;
 
-  constructor(public dialogRef: MatDialogRef<ReleaseDiagramDialogComponent>,
-              private service: ReleaseService,
-              private plantUmlService: PlantUmlService,
-              private router: Router,
-              private route: ActivatedRoute,
-              private sanitizer: DomSanitizer,
-              @Inject(MAT_DIALOG_DATA) public data: any) {
+  constructor() {
+    const data = this.data;
+
     // Sanitize the SVG content to render it correctly
 
     this.releaseId = data.releaseId;

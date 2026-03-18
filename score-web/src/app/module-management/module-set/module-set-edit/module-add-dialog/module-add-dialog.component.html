@@ -1,6 +1,8 @@
-<div *ngIf="isUpdating" class="loading-container">
-  <mat-spinner [diameter]="40"></mat-spinner>
-</div>
+@if (isUpdating) {
+  <div class="loading-container">
+    <mat-spinner [diameter]="40"></mat-spinner>
+  </div>
+}
 
 <div class="d-block">
   <div class="header d-flex align-items-center" mat-dialog-title>
@@ -27,15 +29,17 @@
           <mat-form-field>
             <mat-label>Namespace</mat-label>
             <mat-select data-id="module.namespace" placeholder="Namespace"
-                        [(ngModel)]="module.namespaceId">
+              [(ngModel)]="module.namespaceId">
               <mat-option>
                 <ngx-mat-select-search [formControl]="namespaceListFilterCtrl"
-                                       [placeholderLabel]="'Search...'"
-                                       [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
+                  [placeholderLabel]="'Search...'"
+                [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
               </mat-option>
-              <mat-option *ngFor="let namespace of filteredNamespaceList | async" [value]="namespace.namespaceId">
-                {{ namespace.uri }}
-              </mat-option>
+              @for (namespace of filteredNamespaceList | async; track namespace) {
+                <mat-option [value]="namespace.namespaceId">
+                  {{ namespace.uri }}
+                </mat-option>
+              }
             </mat-select>
           </mat-form-field>
           <mat-form-field>
@@ -75,29 +79,41 @@
           <mat-form-field>
             <mat-label>Module Set</mat-label>
             <mat-select [(ngModel)]="selectedModuleSetId" (ngModelChange)="onModuleSetChange(selectedModuleSetId)">
-              <mat-option *ngFor="let moduleSet of moduleSetList" [value]="moduleSet.moduleSetId">
-                {{moduleSet.name}}
-              </mat-option>
+              @for (moduleSet of moduleSetList; track moduleSet) {
+                <mat-option [value]="moduleSet.moduleSetId">
+                  {{moduleSet.name}}
+                </mat-option>
+              }
             </mat-select>
           </mat-form-field>
-          <div class="finder-wrapper" *ngIf="!!selectedModuleSetId">
-            <div class="finder-content">
-              <div *ngFor="let tile of tiles;" class="finder-grid">
-                <div class="finder-grid-left">
-                  <div *ngFor="let element of tile.elements" class="grid-element">
-                    <div (click)="onClickElement(tile, element)"
-                         [ngClass]="{'grid-element-content': true, 'selected': tile.current === element}">
-                      <mat-icon *ngIf="element.directory" class="float-start" inline=true>folder_open</mat-icon>
-                      <mat-icon *ngIf="!element.directory" class="float-start" inline=true>insert_drive_file</mat-icon>
-                      <div class="float-start element-title">
-                        <span>{{ element.name }}</span>
-                      </div>
+          @if (!!selectedModuleSetId) {
+            <div class="finder-wrapper">
+              <div class="finder-content">
+                @for (tile of tiles; track tile) {
+                  <div class="finder-grid">
+                    <div class="finder-grid-left">
+                      @for (element of tile.elements; track element) {
+                        <div class="grid-element">
+                          <div (click)="onClickElement(tile, element)"
+                            [ngClass]="{'grid-element-content': true, 'selected': tile.current === element}">
+                            @if (element.directory) {
+                              <mat-icon class="float-start" inline=true>folder_open</mat-icon>
+                            }
+                            @if (!element.directory) {
+                              <mat-icon class="float-start" inline=true>insert_drive_file</mat-icon>
+                            }
+                            <div class="float-start element-title">
+                              <span>{{ element.name }}</span>
+                            </div>
+                          </div>
+                        </div>
+                      }
                     </div>
                   </div>
-                </div>
+                }
               </div>
             </div>
-          </div>
+          }
           <div class="d-flex align-items-center">
             <button (click)="onCopy()" color="primary" mat-raised-button [disabled]="!this.selected">
               <mat-icon>content_copy</mat-icon>

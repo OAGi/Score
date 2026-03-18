@@ -1,13 +1,12 @@
 import {HttpClient} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {Observable} from 'rxjs';
 import {ProductInfo, WebPageInfo} from './about';
 
 @Injectable()
 export class AboutService {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-  }
 
 
   getProductInfo(): Observable<ProductInfo[]> {

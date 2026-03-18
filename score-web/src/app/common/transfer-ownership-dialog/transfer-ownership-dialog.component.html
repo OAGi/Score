@@ -10,8 +10,8 @@
   <div class="content">
     <mat-card style="box-shadow: none;">
       <score-search-bar placeholder="Search by Login ID" [(model)]="request.filters.loginId"
-                        (modelChange)="onChange('filters.loginId', request.filters.loginId);"
-                        (searchTriggered)="onSearch();">
+        (modelChange)="onChange('filters.loginId', request.filters.loginId);"
+        (searchTriggered)="onSearch();">
         <div advancedSearchContent style="padding-left: 3rem;">
           <mat-card-content class="mat-card-container">
             <div class="container-fluid" style="padding: 0;">
@@ -20,18 +20,18 @@
                   <mat-form-field>
                     <mat-label>Name</mat-label>
                     <input matInput [(ngModel)]="request.filters.name"
-                           (ngModelChange)="onChange('filters.name', request.filters.name)"
-                           (keyup.enter)="onSearch();"
-                           placeholder="Name">
+                      (ngModelChange)="onChange('filters.name', request.filters.name)"
+                      (keyup.enter)="onSearch();"
+                      placeholder="Name">
                   </mat-form-field>
                 </div>
                 <div class="col-md-2 col-sm-12">
                   <mat-form-field>
                     <mat-label>Organization</mat-label>
                     <input matInput [(ngModel)]="request.filters.organization"
-                           (ngModelChange)="onChange('filters.organization', request.filters.organization)"
-                           (keyup.enter)="onSearch();"
-                           placeholder="Organization">
+                      (ngModelChange)="onChange('filters.organization', request.filters.organization)"
+                      (keyup.enter)="onSearch();"
+                      placeholder="Organization">
                   </mat-form-field>
                 </div>
               </div>
@@ -41,9 +41,11 @@
       </score-search-bar>
 
       <mat-card-content class="mat-card-container">
-        <div class="loading-container" *ngIf="loading">
-          <mat-spinner [diameter]="40"></mat-spinner>
-        </div>
+        @if (loading) {
+          <div class="loading-container">
+            <mat-spinner [diameter]="40"></mat-spinner>
+          </div>
+        }
 
         <div class="table-container">
           <div class="score-column-container align-items-center">
@@ -55,23 +57,23 @@
           </div>
           <div class="mat-elevation-z1 table-wrapper mt-3">
             <table mat-table
-                   matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
-                   [dataSource]="dataSource">
+              matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
+              [dataSource]="dataSource">
 
               <!-- Checkbox Column -->
               <ng-container matColumnDef="select">
                 <th mat-header-cell *matHeaderCellDef></th>
                 <td mat-cell *matCellDef="let row">
                   <mat-checkbox (click)="$event.stopPropagation()"
-                                (change)="$event ? toggle(row) : null"
-                                [checked]="isSelected(row)">
+                    (change)="$event ? toggle(row) : null"
+                    [checked]="isSelected(row)">
                   </mat-checkbox>
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="loginId">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
-                    score-table-column-resize [defaultWidth]="width('Login ID')" (onResize)="onResizeWidth($event)"> Login ID</th>
+                score-table-column-resize [defaultWidth]="width('Login ID')" (onResize)="onResizeWidth($event)"> Login ID</th>
                 <td mat-cell *matCellDef="let element">
                   <span class="score-line-clamp-2 score-break-word">{{ element.loginId }}</span>
                 </td>
@@ -79,16 +81,22 @@
 
               <ng-container matColumnDef="role">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
-                    score-table-column-resize [defaultWidth]="width('Role')" (onResize)="onResizeWidth($event)"> Role</th>
-                <td mat-cell *matCellDef="let element" [ngSwitch]="element.developer">
-                  <span *ngSwitchCase="true">Developer</span>
-                  <span *ngSwitchCase="false">End User</span>
+                score-table-column-resize [defaultWidth]="width('Role')" (onResize)="onResizeWidth($event)"> Role</th>
+                <td mat-cell *matCellDef="let element">
+                  @switch (element.developer) {
+                    @case (true) {
+                      <span>Developer</span>
+                    }
+                    @case (false) {
+                      <span>End User</span>
+                    }
+                  }
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="name">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
-                    score-table-column-resize [defaultWidth]="width('Name')" (onResize)="onResizeWidth($event)"> Name</th>
+                score-table-column-resize [defaultWidth]="width('Name')" (onResize)="onResizeWidth($event)"> Name</th>
                 <td mat-cell *matCellDef="let element">
                   <span class="score-line-clamp-2 score-break-word">{{ element.name }}</span>
                 </td>
@@ -96,7 +104,7 @@
 
               <ng-container matColumnDef="organization">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
-                    score-table-column-resize [defaultWidth]="width('Organization')" (onResize)="onResizeWidth($event)"> Organization</th>
+                score-table-column-resize [defaultWidth]="width('Organization')" (onResize)="onResizeWidth($event)"> Organization</th>
                 <td mat-cell *matCellDef="let element">
                   <span class="score-line-clamp-2 score-break-word">{{ element.organization }}</span>
                 </td>
@@ -104,7 +112,7 @@
 
               <ng-container matColumnDef="status">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
-                    score-table-column-resize [defaultWidth]="width('Status')" (onResize)="onResizeWidth($event)"> Status</th>
+                score-table-column-resize [defaultWidth]="width('Status')" (onResize)="onResizeWidth($event)"> Status</th>
                 <td mat-cell *matCellDef="let element">
                   {{ (element.enabled) ? 'Enable' : 'Disable' }}
                 </td>
@@ -112,13 +120,13 @@
 
               <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
               <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-                  (click)="toggle(row)"></tr>
+              (click)="toggle(row)"></tr>
             </table>
 
             <mat-paginator
               [pageSizeOptions]="[10, 25, 50]"
               (page)="onPageChange($event)"
-              showFirstLastButtons></mat-paginator>
+            showFirstLastButtons></mat-paginator>
           </div>
         </div>
       </mat-card-content>
@@ -131,8 +139,8 @@
       Cancel
     </button>
     <button mat-raised-button color="primary"
-            [disabled]="selection.selected.length === 0"
-            [mat-dialog-close]="selection.selected[0]">
+      [disabled]="selection.selected.length === 0"
+      [mat-dialog-close]="selection.selected[0]">
       <mat-icon>send</mat-icon>
       Transfer
     </button>

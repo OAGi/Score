@@ -1,10 +1,12 @@
-import {Injectable} from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
 import {CcAccNodeInfo, CcAsccpNodeInfo, CcBccpNodeInfo, CcDtNodeInfo, CcDtScNodeInfo, CcNodeInfo, Comment} from './core-component-node';
 import {CcNodeService} from './core-component-node.service';
 
-@Injectable()
 export class CommentControl {
+  constructor(
+    private sidenav: MatSidenav,
+    private service: CcNodeService,
+  ) {}
 
   comments: Comment[] = [];
   commentMessage: string = null;
@@ -12,10 +14,6 @@ export class CommentControl {
   replyCommentId: number = null;
   replyMessage: string = null;
   replyOpened = false;
-
-  constructor(private sidenav: MatSidenav,
-              private service: CcNodeService) {
-  }
 
   /* For type casting of detail property */
   isAccDetail(detail: CcNodeInfo): boolean {

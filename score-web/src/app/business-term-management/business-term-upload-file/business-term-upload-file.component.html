@@ -15,14 +15,14 @@
       <mat-card-content class="mat-card-container">
 
         <input type="file" class="file-input"
-               [accept]="requiredFileType"
-               (change)="onFileSelected($event)" #fileUpload>
+          [accept]="requiredFileType"
+          (change)="onFileSelected($event)" #fileUpload>
 
         <div class="file-upload d-flex align-items-center">
           <span>{{ fileName || "No file uploaded yet." }}</span>
 
           <button mat-mini-fab color="primary" class="upload-btn ms-2"
-                  (click)="fileUpload.click()">
+            (click)="fileUpload.click()">
             <mat-icon>attach_file</mat-icon>
           </button>
 
@@ -30,14 +30,17 @@
 
         <div>
 
-          <mat-progress-bar class="progress-bar" mode="determinate"
-                            [value]="uploadProgress" *ngIf="uploadProgress">
+          @if (uploadProgress) {
+            <mat-progress-bar class="progress-bar" mode="determinate"
+              [value]="uploadProgress">
+            </mat-progress-bar>
+          }
 
-          </mat-progress-bar>
-
-          <mat-icon class="cancel-upload" (click)="cancelUpload()"
-                    *ngIf="uploadProgress">delete_forever
-          </mat-icon>
+          @if (uploadProgress) {
+            <mat-icon class="cancel-upload" (click)="cancelUpload()"
+              >delete_forever
+            </mat-icon>
+          }
 
         </div>
 

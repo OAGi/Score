@@ -5,9 +5,11 @@
     <p>You can find out more information at the following link: <a href="https://www.nist.gov/services-resources/software/score-standards-life-cycle-management-tool">Score: Standards Life Cycle Management Tool</a></p>
 
     <h2>Version</h2>
-    <ul *ngFor="let productInfo of productInfos">
-      <li><p><b>{{productInfo.productName}} :</b> {{productInfo.productVersion}}</p></li>
-    </ul>
+    @for (productInfo of productInfos; track productInfo) {
+      <ul>
+        <li><p><b>{{productInfo.productName}} :</b> {{productInfo.productVersion}}</p></li>
+      </ul>
+    }
 
     <p>You can learn more about the history of the project in
       <a href="https://github.com/OAGi/Score/wiki/Release-Detail">

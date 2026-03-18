@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {AuthService} from '../../authentication/auth.service';
 
@@ -9,11 +9,10 @@ import {AuthService} from '../../authentication/auth.service';
   styleUrls: ['./bie-deprecate-dialog.component.css']
 })
 export class BieDeprecateDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<BieDeprecateDialogComponent>>(MatDialogRef);
+  private auth = inject(AuthService);
+  data = inject(MAT_DIALOG_DATA);
 
-  constructor(public dialogRef: MatDialogRef<BieDeprecateDialogComponent>,
-              private auth: AuthService,
-              @Inject(MAT_DIALOG_DATA) public data: any) {
-  }
 
   onNoClick(): void {
     this.dialogRef.close();

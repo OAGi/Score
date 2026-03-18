@@ -1,13 +1,12 @@
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {Injectable, OnInit} from '@angular/core';
+import { Injectable, OnInit, inject } from '@angular/core';
 import {BieCreateResponse} from './bie-create-list';
 
 @Injectable()
 export class BieCreateService implements OnInit {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-  }
 
   ngOnInit() {
   }

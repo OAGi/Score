@@ -1,5 +1,5 @@
 import {HttpParams} from '@angular/common/http';
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {AuthService} from '../../authentication/auth.service';
 import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import {UserToken} from '../../authentication/domain/auth';
@@ -23,20 +23,26 @@ import {WebPageInfoService} from '../basis.service';
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent implements OnInit {
+  private auth = inject(AuthService);
+  private aboutService = inject(AboutService);
+  private configService = inject(SettingsApplicationSettingsService);
+  private sanitizer = inject(DomSanitizer);
+  private router = inject(Router);
+  private message = inject(MessageService);
+  private stompService = inject(RxStompService);
+  webPageInfo = inject(WebPageInfoService);
+  translate = inject(TranslateService);
+
 
   private _notiCount = -1;
   public notiMatIcon = 'notifications_none';
   public brand: SafeHtml;
 
-  constructor(private auth: AuthService,
-              private aboutService: AboutService,
-              private configService: SettingsApplicationSettingsService,
-              private sanitizer: DomSanitizer,
-              private router: Router,
-              private message: MessageService,
-              private stompService: RxStompService,
-              public webPageInfo: WebPageInfoService,
-              public translate: TranslateService) {
+  constructor() {
+    const sanitizer = this.sanitizer;
+    const webPageInfo = this.webPageInfo;
+    const translate = this.translate;
+
     translate.addLangs(['ccts', 'oagis']);
     translate.setDefaultLang('ccts');
     const browserLang = translate.getBrowserLang();

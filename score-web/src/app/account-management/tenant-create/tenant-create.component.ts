@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TenantListService} from '../domain/tenant-list.service';
@@ -10,17 +10,16 @@ import {MatSnackBar} from '@angular/material/snack-bar';
   templateUrl: './tenant-create.component.html'
 })
 export class TenantCreateComponent implements OnInit {
+  private service = inject(TenantListService);
+  private location = inject(Location);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
+
 
   title = 'Create Tenant';
   name;
   HTTP_CONFLICT = 409;
-
-  constructor(private service: TenantListService,
-              private location: Location,
-              private route: ActivatedRoute,
-              private router: Router,
-              private snackBar: MatSnackBar) {
-  }
 
   ngOnInit() {
     this.name = '';

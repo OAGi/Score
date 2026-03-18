@@ -2,8 +2,8 @@
   <div class="ps-2 pe-2">
     <mat-toolbar class="bg-white">
       <score-title-with-library-selector [title]="title"
-                                         [libraries]="mappedLibraries"
-                                         (libraryChange)="onLibraryChange($event)"/>
+        [libraries]="mappedLibraries"
+        (libraryChange)="onLibraryChange($event)"/>
       <span class="flex-11-auto"></span>
     </mat-toolbar>
   </div>
@@ -21,12 +21,14 @@
           <mat-select [(ngModel)]="selectedNamespace" [required]="true">
             <mat-option>
               <ngx-mat-select-search [formControl]="namespaceListFilterCtrl"
-                                     [placeholderLabel]="'Search...'"
-                                     [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
+                [placeholderLabel]="'Search...'"
+              [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
             </mat-option>
-            <mat-option *ngFor="let namespace of filteredNamespaceList | async" [value]="namespace">
-              {{ namespace.uri }}
-            </mat-option>
+            @for (namespace of filteredNamespaceList | async; track namespace) {
+              <mat-option [value]="namespace">
+                {{ namespace.uri }}
+              </mat-option>
+            }
           </mat-select>
         </mat-form-field>
 

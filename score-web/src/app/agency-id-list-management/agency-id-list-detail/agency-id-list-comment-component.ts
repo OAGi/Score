@@ -1,11 +1,13 @@
-import {Injectable} from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
 import {AgencyIdListDetails} from '../domain/agency-id-list';
 import {AgencyIdListService} from '../domain/agency-id-list.service';
 import {Comment} from '../../cc-management/domain/core-component-node';
 
-@Injectable()
 export class AgencyIdListCommentControl {
+  constructor(
+    private sidenav: MatSidenav,
+    private service: AgencyIdListService,
+  ) {}
 
   comments: Comment[] = [];
   commentMessage: string = null;
@@ -13,10 +15,6 @@ export class AgencyIdListCommentControl {
   replyCommentId: number = null;
   replyMessage: string = null;
   replyOpened = false;
-
-  constructor(private sidenav: MatSidenav,
-              private service: AgencyIdListService) {
-  }
 
   toggleCommentSlide(agencyIdList: AgencyIdListDetails): void {
     this.commentReference = 'AGENCY_ID_LIST-' + agencyIdList.agencyIdListManifestId;

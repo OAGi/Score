@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, QueryList, Renderer2, ViewChild, ViewChildren} from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, QueryList, Renderer2, ViewChild, ViewChildren, inject } from '@angular/core';
 import {HttpErrorResponse} from '@angular/common/http';
 import {faRecycle, faSitemap} from '@fortawesome/free-solid-svg-icons';
 import {BieEditService} from '../bie-edit/domain/bie-edit.service';
@@ -73,6 +73,26 @@ import {BieStateTransitionFlowService} from '../domain/bie-state-transition-flow
   styleUrls: ['./bie-edit.component.css']
 })
 export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
+  private service = inject(BieEditService);
+  private ccNodeService = inject(CcNodeService);
+  private bizCtxService = inject(BusinessContextService);
+  private snackBar = inject(MatSnackBar);
+  private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private dialog = inject(MatDialog);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private businessTermService = inject(BusinessTermService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private auth = inject(AuthService);
+  private stompService = inject(RxStompService);
+  private clipboard = inject(Clipboard);
+  private renderer = inject(Renderer2);
+  private el = inject(ElementRef);
+  private cdr = inject(ChangeDetectorRef);
+  webPageInfo = inject(WebPageInfoService);
+  private stateTransitionFlowService = inject(BieStateTransitionFlowService);
+
 
   BROWSER_SCHEMES = ['http:', 'https:', 'ftp:', 'file:', 'data:'];
   EXTERNAL_SCHEMES = ['mailto:', 'tel:', 'sms:', 'geo:', 'magnet:'];
@@ -232,27 +252,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   set hideUnused(hideUnused: boolean) {
     this.dataSource.hideUnused = hideUnused;
     saveBooleanProperty(this.auth.getUserToken(), this.HIDE_UNUSED_PROPERTY_KEY, hideUnused);
-  }
-
-  constructor(private service: BieEditService,
-              private ccNodeService: CcNodeService,
-              private bizCtxService: BusinessContextService,
-              private snackBar: MatSnackBar,
-              private location: Location,
-              private router: Router,
-              private route: ActivatedRoute,
-              private dialog: MatDialog,
-              private confirmDialogService: ConfirmDialogService,
-              private businessTermService: BusinessTermService,
-              private preferencesService: SettingsPreferencesService,
-              private auth: AuthService,
-              private stompService: RxStompService,
-              private clipboard: Clipboard,
-              private renderer: Renderer2,
-              private el: ElementRef,
-              private cdr: ChangeDetectorRef,
-              public webPageInfo: WebPageInfoService,
-              private stateTransitionFlowService: BieStateTransitionFlowService) {
   }
 
   ngOnInit(): void {

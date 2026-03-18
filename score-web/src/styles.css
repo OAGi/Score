@@ -260,9 +260,9 @@ mat-multi-sort-table-settings .table-settings-menu {
 }
 
 .mat-mdc-snack-bar-container {
-  --mdc-snackbar-container-color: #fff;
+  --mat-snackbar-container-color: #fff;
   --mat-mdc-snack-bar-button-color: #333;
-  --mdc-snackbar-supporting-text-color: #333;
+  --mat-snackbar-supporting-text-color: #333;
 }
 
 .mat-icon.fa {

@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {TagService} from '../domain/tag.service';
 import {Tag} from '../domain/tag';
@@ -12,19 +12,17 @@ import {MatSnackBar} from '@angular/material/snack-bar';
   styleUrls: ['./edit-tags-dialog.component.css']
 })
 export class EditTagsDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<EditTagsDialogComponent>>(MatDialogRef);
+  private tagService = inject(TagService);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private snackBar = inject(MatSnackBar);
+  data = inject(MAT_DIALOG_DATA);
+
 
   loading = false;
 
   tagList: Tag[] = [];
   newTag: Tag = new Tag();
-
-  constructor(public dialogRef: MatDialogRef<EditTagsDialogComponent>,
-              private tagService: TagService,
-              private confirmDialogService: ConfirmDialogService,
-              private snackBar: MatSnackBar,
-              @Inject(MAT_DIALOG_DATA) public data: any) {
-
-  }
 
   ngOnInit(): void {
     this.loading = true;

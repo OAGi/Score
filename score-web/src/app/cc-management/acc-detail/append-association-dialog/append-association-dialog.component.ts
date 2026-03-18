@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
@@ -41,6 +41,16 @@ import {ScoreTableColumnResizeDirective} from '../../../common/score-table-colum
   ]
 })
 export class AppendAssociationDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<AppendAssociationDialogComponent>>(MatDialogRef);
+  private auth = inject(AuthService);
+  private ccListService = inject(CcListService);
+  private accountService = inject(AccountListService);
+  private service = inject(CcNodeService);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private preferencesService = inject(SettingsPreferencesService);
+  webPageInfo = inject(WebPageInfoService);
+  data = inject(MAT_DIALOG_DATA);
+
 
   typeList: string[] = ['ASCCP', 'BCCP'];
   workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
@@ -180,15 +190,9 @@ export class AppendAssociationDialogComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
 
-  constructor(public dialogRef: MatDialogRef<AppendAssociationDialogComponent>,
-              private auth: AuthService,
-              private ccListService: CcListService,
-              private accountService: AccountListService,
-              private service: CcNodeService,
-              private confirmDialogService: ConfirmDialogService,
-              private preferencesService: SettingsPreferencesService,
-              public webPageInfo: WebPageInfoService,
-              @Inject(MAT_DIALOG_DATA) public data: any) {
+  constructor() {
+    const data = this.data;
+
     this.action = data.action;
     if (this.data.isGlobal) {
       this.typeList = ['BCCP'];

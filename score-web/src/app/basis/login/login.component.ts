@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {AuthService} from '../../authentication/auth.service';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -15,6 +15,13 @@ import {WebPageInfoService} from '../basis.service';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
+  auth = inject(AuthService);
+  private webPageInfoService = inject(WebPageInfoService);
+  private snackBar = inject(MatSnackBar);
+  private http = inject(HttpClient);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
 
   credentials = {username: '', password: ''};
   next = '';
@@ -23,12 +30,7 @@ export class LoginComponent {
   oauth2AppInfos: Observable<OAuth2AppInfo[]>;
   webPageInfo: Observable<WebPageInfo>;
 
-  constructor(public auth: AuthService,
-              private webPageInfoService: WebPageInfoService,
-              private snackBar: MatSnackBar,
-              private http: HttpClient,
-              private route: ActivatedRoute,
-              private router: Router) {
+  constructor() {
     this.route.queryParams.subscribe(params => {
       this.next = this.auth.nextParam(params.next);
       if (!this.next) {

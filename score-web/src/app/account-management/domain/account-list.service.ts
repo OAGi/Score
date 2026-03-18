@@ -1,4 +1,4 @@
-import {Injectable, OnInit} from '@angular/core';
+import { Injectable, OnInit, inject } from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {AccountDetails, AccountList, AccountListEntry, AccountListRequest} from './accounts';
@@ -7,9 +7,8 @@ import {PendingAccount} from './pending-list';
 
 @Injectable()
 export class AccountListService implements OnInit {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-  }
 
   ngOnInit() {
   }

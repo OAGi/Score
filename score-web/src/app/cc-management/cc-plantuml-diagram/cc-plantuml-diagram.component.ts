@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {switchMap} from 'rxjs/operators';
@@ -16,6 +16,14 @@ import {forkJoin} from 'rxjs';
   styleUrls: ['./cc-plantuml-diagram.component.css']
 })
 export class CcPlantumlDiagramComponent implements OnInit {
+  private ccService = inject(CcNodeService);
+  private plantUmlService = inject(PlantUmlService);
+  private auth = inject(AuthService);
+  private preferencesService = inject(SettingsPreferencesService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private sanitizer = inject(DomSanitizer);
+
 
   loading: boolean = false;
   manifestId: number;
@@ -32,16 +40,6 @@ export class CcPlantumlDiagramComponent implements OnInit {
 
   public plantUmlTxt: string;
   public sanitizedSvgContent: SafeHtml;
-
-  constructor(private ccService: CcNodeService,
-              private plantUmlService: PlantUmlService,
-              private auth: AuthService,
-              private preferencesService: SettingsPreferencesService,
-              private router: Router,
-              private route: ActivatedRoute,
-              private sanitizer: DomSanitizer) {
-    // Sanitize the SVG content to render it correctly
-  }
 
   ngOnInit() {
     this.loading = true;

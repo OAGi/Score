@@ -1,5 +1,5 @@
 import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {CcChangeResponse, CcListEntry, CcListRequest, SummaryCcExtInfo, SummaryCcInfo} from './cc-list';
@@ -11,9 +11,8 @@ import {BieEditNodeDetail} from '../../../bie-management/domain/bie-flat-tree';
 
 @Injectable()
 export class CcListService {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-  }
 
   getSummaryCcList(libraryId: number): Observable<SummaryCcInfo> {
     return this.http.get<SummaryCcInfo>('/api/info/cc-summaries?libraryId=' + libraryId).pipe(map(
