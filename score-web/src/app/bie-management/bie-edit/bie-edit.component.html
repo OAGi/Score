@@ -5,7 +5,7 @@
 
   <mat-sidenav-content (click)="sidenav.close();">
     @if (loading) {
-      <div class="cdk-overlay-backdrop cdk-overlay-dark-backdrop cdk-overlay-backdrop-showing">
+      <div class="main-content-loading-overlay">
         <mat-progress-bar mode="indeterminate"></mat-progress-bar>
       </div>
     }
@@ -196,9 +196,8 @@
                         }
 
                         @if (renamingNode !== node) {
-                          <div class="d-inline-flex align-items-center flex-grow-1"
-                            >
-                          <span [class]="[node.type.toLowerCase(),
+                          <div class="node-row-content d-flex align-items-center flex-grow-1">
+                          <span class="node-label" [class]="[node.type.toLowerCase(),
                                           this.searcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
                                 [style.padding-right.px]="2"
                               [class.deprecated]="node.deprecated"
@@ -208,22 +207,22 @@
                               (dblclick)="startChangingDisplayName(node)">
                             </span>
                             @if (!dataSource.hideCardinality) {
-                              <span [class]="['ps-4']">
+                              <span class="node-cardinality" [class]="['ps-4']">
                                 {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
                               </span>
                             }
                             @if (node.reused) {
                               <fa-icon [icon]="faRecycle"
                                 matTooltip="Reused"
-                                [class]="['ps-3', 'pointer']"
+                                [class]="['node-status-icon', 'ps-3', 'pointer']"
                               (click)="openNewEditBieTab(node, $event)"></fa-icon>
                             }
                             @if (node.inherited) {
                               <fa-icon [icon]="faSitemap"
                                 matTooltip="Inherited"
-                              [class]="['ps-3', 'pointer']"></fa-icon>
+                              [class]="['node-status-icon', 'ps-3', 'pointer']"></fa-icon>
                             }
-                            <div class="ms-auto me-2">
+                            <div class="node-action-icons ms-auto me-2">
                               <mat-icon style="{{ node.showCopyLinkIcon ? '' : 'visibility: hidden' }}"
                                 class="copy-link-icon"
                                 matTooltip="Copy Link"

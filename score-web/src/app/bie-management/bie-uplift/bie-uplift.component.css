@@ -128,6 +128,28 @@ tr.element-row:not(.expanded-row):active {
   text-shadow: inherit !important;
 }
 
+.mat-tree-node > .d-inline-flex.align-items-center.flex-grow-1 {
+  min-width: 0;
+  width: 100%;
+}
+
+.mat-tree-node > .d-inline-flex.align-items-center.flex-grow-1 > span:first-child {
+  min-width: 0;
+  flex: 0 1 auto;
+}
+
+.mat-tree-node > .d-inline-flex.align-items-center.flex-grow-1 > span.ps-4,
+.mat-tree-node > .d-inline-flex.align-items-center.flex-grow-1 > fa-icon,
+.mat-tree-node > .d-inline-flex.align-items-center.flex-grow-1 > .ms-auto.me-2 {
+  flex: 0 0 auto;
+}
+
+.mat-tree-node > .d-inline-flex.align-items-center.flex-grow-1 > .ms-auto.me-2 {
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+}
+
 .tree-search-box {
   align-items: center;
 }

@@ -79,7 +79,7 @@
 
   <mat-sidenav-content (click)="sidenav.close();">
     @if (isUpdating) {
-      <div class="cdk-overlay-backdrop cdk-overlay-dark-backdrop cdk-overlay-backdrop-showing">
+      <div class="main-content-loading-overlay">
         <mat-progress-bar mode="indeterminate"></mat-progress-bar>
       </div>
     }

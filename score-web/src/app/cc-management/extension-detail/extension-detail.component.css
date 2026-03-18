@@ -102,6 +102,25 @@
   text-overflow: ellipsis;
 }
 
+.mat-tree-node > span.pe-2.align-self-center {
+  min-width: 0;
+  flex: 0 1 auto;
+}
+
+.mat-tree-node > .tag-list {
+  min-width: 0;
+  flex: 0 1 auto;
+  overflow: hidden;
+}
+
+.mat-tree-node > .ms-auto.align-self-center.me-2,
+.mat-tree-node > .ms-auto.align-self-center.me-2.d-inline-flex {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+}
+
 .cc-node-title {
   display: flex;
   margin: 5px 0;

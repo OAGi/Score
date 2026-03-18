@@ -120,6 +120,28 @@
   text-overflow: ellipsis;
 }
 
+.mat-tree-node .node-row-content {
+  min-width: 0;
+  width: 100%;
+}
+
+.mat-tree-node .node-label {
+  min-width: 0;
+  flex: 0 1 auto;
+}
+
+.mat-tree-node .node-cardinality,
+.mat-tree-node .node-status-icon,
+.mat-tree-node .node-action-icons {
+  flex: 0 0 auto;
+}
+
+.mat-tree-node .node-action-icons {
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+}
+
 .bie-node-title {
   display: flex;
   margin: 5px 0;

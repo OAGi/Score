@@ -2412,7 +2412,17 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       rootTopLevelAsbiepIds: [this.rootNode.topLevelAsbiepId],
       loadDependencies: () => this.service.getStateDependencies(this.rootNode.topLevelAsbiepId, state),
       validateSelection: (selectedTopLevelAsbiepIds: number[]) =>
-        this.service.validateStateDependencies(this.rootNode.topLevelAsbiepId, state, selectedTopLevelAsbiepIds)
+        this.service.validateStateDependencies(this.rootNode.topLevelAsbiepId, state, selectedTopLevelAsbiepIds),
+      normalizeTargets: (dependencyTargets) => {
+        const rootTopLevelAsbiepId = this.rootNode.topLevelAsbiepId;
+        return dependencyTargets.map(target => ({
+          ...target,
+          dependencyUpdateAllowed: target.dependencyUpdateAllowed !== false,
+          // Match the list page behavior: keep the requested root BIE selected,
+          // but do not preselect dependency rows when the dialog first opens.
+          checked: target.topLevelAsbiepId === rootTopLevelAsbiepId
+        }));
+      }
     }).pipe(
       finalize(() => {
         this.isUpdating = false;

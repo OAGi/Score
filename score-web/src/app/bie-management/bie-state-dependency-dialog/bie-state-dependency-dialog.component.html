@@ -145,7 +145,6 @@
 
   <div class="actions ms-auto" mat-dialog-actions>
     <button mat-raised-button color="warn" (click)="onCancel()">
-      <mat-icon>close</mat-icon>
       Cancel
     </button>
     <button mat-raised-button color="primary" [disabled]="hasInvalidTargets() || isValidating" (click)="onConfirm()">
