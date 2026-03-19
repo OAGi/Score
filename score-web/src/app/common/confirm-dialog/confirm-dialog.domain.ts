@@ -1,6 +1,6 @@
 export class ConfirmDialogConfig {
   header: string;
-  content: string;
+  content: string[];
   action: string;
   list: string[];
 }

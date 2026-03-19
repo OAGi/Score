@@ -232,8 +232,22 @@ public class BieStateTransitionService {
      */
     @Transactional
     public void updateStateBieList(ScoreUser requester, BieUpdateStateListRequest request) {
+        if (request.getTopLevelAsbiepIds() == null || request.getTopLevelAsbiepIds().isEmpty()) {
+            return;
+        }
+
         request.getTopLevelAsbiepIds().forEach(topLevelAsbiepId ->
-                updateState(requester, topLevelAsbiepId, request.getToState(), request.getDependencyTopLevelAsbiepIds()));
+                validateStateChange(requester, topLevelAsbiepId, request.getToState()));
+        ensureDependencySelectionStateChange(
+                requester,
+                request.getTopLevelAsbiepIds(),
+                request.getToState(),
+                request.getDependencyTopLevelAsbiepIds());
+
+        request.getTopLevelAsbiepIds().forEach(topLevelAsbiepId -> {
+            BieEditTreeController treeController = getTreeController(requester, topLevelAsbiepId);
+            treeController.updateState(requester, request.getToState(), request.getDependencyTopLevelAsbiepIds());
+        });
     }
 
     /**
@@ -1229,12 +1243,26 @@ public class BieStateTransitionService {
                                                       TopLevelAsbiepId topLevelAsbiepId,
                                                       BieState state,
                                                       Collection<TopLevelAsbiepId> dependencyTopLevelAsbiepIds) {
+        ensureDependencySelectionStateChange(
+                requester,
+                List.of(topLevelAsbiepId),
+                state,
+                dependencyTopLevelAsbiepIds);
+    }
+
+    private void ensureDependencySelectionStateChange(ScoreUser requester,
+                                                      Collection<TopLevelAsbiepId> rootTopLevelAsbiepIds,
+                                                      BieState state,
+                                                      Collection<TopLevelAsbiepId> dependencyTopLevelAsbiepIds) {
         boolean hasInvalidSelection = validateStateDependencies(
-                requester, List.of(topLevelAsbiepId), state, dependencyTopLevelAsbiepIds).stream()
+                requester, rootTopLevelAsbiepIds, state, dependencyTopLevelAsbiepIds).stream()
                 .anyMatch(target -> !target.isStateTransitionAllowed() || target.isSelectionConflict());
         if (hasInvalidSelection) {
+            String subject = (rootTopLevelAsbiepIds != null && rootTopLevelAsbiepIds.size() > 1)
+                    ? "Selected BIEs cannot move to '"
+                    : "This BIE cannot move to '";
             throw new DataAccessForbiddenException("Failed to update BIE state\n" +
-                    "This BIE cannot move to '" + state + "'. Resolve the conflicting records to continue.");
+                    subject + state + "'. Resolve the conflicting records to continue.");
         }
     }
 
