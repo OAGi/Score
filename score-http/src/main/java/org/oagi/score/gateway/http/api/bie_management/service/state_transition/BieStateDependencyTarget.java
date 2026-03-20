@@ -46,14 +46,6 @@ public class BieStateDependencyTarget {
      */
     private List<TopLevelAsbiepId> dependencyTopLevelAsbiepIds;
     /**
-     * Direct graph parents whose transition path made this row relevant to the
-     * current dialog.
-     *
-     * <p>The service returns these ids so the client can preserve the same
-     * graph context across repeated validation requests.</p>
-     */
-    private List<TopLevelAsbiepId> requiredDependencyTopLevelAsbiepIds;
-    /**
      * UI-facing dependency relations for the "Dependencies" column.
      *
      * <p>Each relation is derived from the same graph as
@@ -148,6 +140,10 @@ public class BieStateDependencyTarget {
      * Whether this row may be toggled in the dialog.
      */
     private boolean selectable;
+    /**
+     * Whether selecting this row would still apply a state change.
+     */
+    private boolean stateChangeAvailable;
     /**
      * Server-normalized checkbox state for the current dialog selection.
      *

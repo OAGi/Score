@@ -66,13 +66,14 @@ export class BieStateDependencyDialogComponent {
   }
 
   /**
-   * A checkbox can be toggled only when the row is updateable by ownership and
-   * is not one of the originally requested root BIEs. Validation conflicts are
-   * shown as messages, but they should not erase the user's ability to
-   * re-select a row to resolve the conflict.
+   * A checkbox can be toggled only when the row is updateable by ownership,
+   * and either still has blocking issues to resolve or would apply a real
+   * state change, and is not one of the originally requested root BIEs.
    */
   isToggleable(target: StateDependencyTarget): boolean {
-    return !this.isRootTarget(target) && target.selectable;
+    return !this.isRootTarget(target) &&
+      target.selectable &&
+      (this.hasIssues(target) || target.stateChangeAvailable === true);
   }
 
   isSelectable(target: StateDependencyTarget): boolean {
@@ -92,11 +93,17 @@ export class BieStateDependencyDialogComponent {
   }
 
   bieTargets(): StateDependencyTarget[] {
-    return this.data.targets.filter(target => target.nodeType !== 'CODE_LIST');
+    return this.visibleTargets().filter(target => target.nodeType !== 'CODE_LIST');
   }
 
   codeListTargets(): StateDependencyTarget[] {
-    return this.data.targets.filter(target => target.nodeType === 'CODE_LIST');
+    return this.visibleTargets().filter(target => target.nodeType === 'CODE_LIST');
+  }
+
+  visibleTargets(): StateDependencyTarget[] {
+    return this.data.targets.filter(target =>
+      this.hasIssues(target) || target.stateChangeAvailable === true
+    );
   }
 
   selectionHint(): string {
@@ -316,7 +323,7 @@ export class BieStateDependencyDialogComponent {
         if (requestId !== this.validationRequestId) {
           return;
         }
-        this.applyTargets(this.filterActionableTargets(targets || []));
+        this.applyTargets(targets || []);
         this.isValidating = false;
       },
       error: () => {
@@ -329,20 +336,26 @@ export class BieStateDependencyDialogComponent {
   }
 
   /**
-   * Only user-toggleable dependency rows should be sent back to the validator
-   * and final update request. Root BIEs are already part of the original state
-   * update action and must not be treated as dialog selections.
+   * Returns the currently checked non-root BIE rows that should be sent back to
+   * validation and the final update request.
+   *
+   * <p>Rows may remain checked after their issues are resolved, so this must
+   * not depend on the current toggleable state.</p>
    */
   private getSelectedDependencyIds(): number[] {
     return this.data.targets
-      .filter(target => this.isToggleable(target) && target.checked)
+      .filter(target => !this.isRootTarget(target) && target.checked)
       .filter(target => target.nodeType === 'BIE')
       .map(target => target.topLevelAsbiepId);
   }
 
+  /**
+   * Returns the currently checked code-list rows that should be sent back to
+   * validation and the final update request.
+   */
   private getSelectedCodeListManifestIds(): number[] {
     return this.data.targets
-      .filter(target => this.isToggleable(target) && target.checked)
+      .filter(target => target.checked)
       .filter(target => target.nodeType === 'CODE_LIST')
       .map(target => target.codeListManifestId);
   }
@@ -392,20 +405,6 @@ export class BieStateDependencyDialogComponent {
     this.renderTables();
   }
 
-  /**
-   * Keeps only rows that still require user attention inside the dialog.
-   *
-   * <p>This mirrors the initial filtering performed before the dialog opens so
-   * subsequent validation responses do not suddenly introduce issue-free
-   * code-list rows.</p>
-   */
-  private filterActionableTargets(targets: StateDependencyTarget[]): StateDependencyTarget[] {
-    return (targets || []).filter(target =>
-      (target.issues || []).length > 0 ||
-      target.nodeType !== 'CODE_LIST'
-    );
-  }
-
   private normalizeTarget(target: StateDependencyTarget): StateDependencyTarget {
     const selectable = target.selectable !== false;
     return {
@@ -413,9 +412,9 @@ export class BieStateDependencyDialogComponent {
       nodeKey: target.nodeKey || `${target.nodeType || 'BIE'}:${target.topLevelAsbiepId ?? target.codeListManifestId ?? 'unknown'}`,
       nodeType: target.nodeType || 'BIE',
       dependencyTopLevelAsbiepIds: target.dependencyTopLevelAsbiepIds || [],
-      requiredDependencyTopLevelAsbiepIds: target.requiredDependencyTopLevelAsbiepIds || [],
       dependencies: target.dependencies || [],
       selectable,
+      stateChangeAvailable: target.stateChangeAvailable === true,
       checked: this.isRootTarget(target) || (selectable && target.checked !== false),
       issues: target.issues || []
     };

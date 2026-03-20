@@ -55,15 +55,14 @@ export class BieStateTransitionFlowService {
     return request.validateSelection(initialSelection).pipe(
       map(targets => request.normalizeTargets ? request.normalizeTargets(targets || []) : (targets || [])),
       switchMap(validatedTargets => {
-        const actionableTargets = this.filterActionableTargets(validatedTargets || []);
-        if (actionableTargets.length === 0) {
+        if (!this.hasBlockingIssues(validatedTargets || [])) {
           return this.openSimpleConfirmation(request.state);
         }
 
         const dialogData: BieStateDependencyDialogData = {
           state: request.state,
           rootTopLevelAsbiepIds: request.rootTopLevelAsbiepIds,
-          targets: actionableTargets,
+          targets: validatedTargets,
           validateSelection: request.validateSelection
         };
 
@@ -76,15 +75,14 @@ export class BieStateTransitionFlowService {
       catchError(() => request.loadDependencies().pipe(
         map(targets => request.normalizeTargets ? request.normalizeTargets(targets || []) : (targets || [])),
         switchMap(targets => {
-          const actionableTargets = this.filterActionableTargets(targets || []);
-          if (actionableTargets.length === 0) {
+          if (!this.hasBlockingIssues(targets || [])) {
             return this.openSimpleConfirmation(request.state);
           }
 
           const dialogData: BieStateDependencyDialogData = {
             state: request.state,
             rootTopLevelAsbiepIds: request.rootTopLevelAsbiepIds,
-            targets: actionableTargets,
+            targets,
             validateSelection: request.validateSelection
           };
 
@@ -117,16 +115,11 @@ export class BieStateTransitionFlowService {
   }
 
   /**
-   * Keeps rows that require user attention in the dependency dialog.
-   *
-   * <p>Issue-free code-list rows are excluded here because they do not require
-   * an explicit dependency selection from the user.</p>
+   * Returns whether the current dependency snapshot contains any blocking row
+   * that needs the dedicated state-transition dialog.
    */
-  private filterActionableTargets(targets: StateDependencyTarget[]): StateDependencyTarget[] {
-    return targets.filter(target =>
-      (target.issues || []).length > 0 ||
-      target.nodeType !== 'CODE_LIST'
-    );
+  private hasBlockingIssues(targets: StateDependencyTarget[]): boolean {
+    return (targets || []).some(target => (target.issues || []).length > 0);
   }
 
 }
