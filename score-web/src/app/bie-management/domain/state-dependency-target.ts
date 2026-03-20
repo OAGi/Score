@@ -31,7 +31,6 @@ export class StateDependencyTarget {
   topLevelAsbiepId: number;
   codeListManifestId: number;
   dependencyTopLevelAsbiepIds: number[];
-  requiredDependencyTopLevelAsbiepIds: number[];
   dependencies: StateDependencyRelation[];
   edgeDistance: number;
   den: string;
@@ -48,6 +47,7 @@ export class StateDependencyTarget {
   remark: string;
   state: string;
   selectable: boolean;
+  stateChangeAvailable: boolean;
   checked: boolean;
   issues: StateDependencyIssue[];
 }
