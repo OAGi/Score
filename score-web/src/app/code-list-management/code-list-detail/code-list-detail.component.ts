@@ -1,5 +1,6 @@
 import { Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {Location} from '@angular/common';
+import {HttpErrorResponse} from '@angular/common/http';
 import {MatSidenav} from '@angular/material/sidenav';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {AuthService} from '../../authentication/auth.service';
@@ -721,9 +722,106 @@ export class CodeListDetailComponent implements OnInit {
                 duration: 3000,
               });
             });
+          }, error => {
+            this.openStateUpdateErrorDialog(error);
           });
         }
       });
+  }
+
+  /**
+   * Normalizes backend state-update errors into the confirm-dialog content
+   * model so long validation messages are easier to read.
+   */
+  private openStateUpdateErrorDialog(error: HttpErrorResponse): void {
+    const errorMessage = error?.headers?.get('x-error-message') || error?.message || 'Failed to update code list state';
+    const lines = errorMessage.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    let header = lines[0] || 'Failed to update code list state';
+    let detailLines = lines.slice(1);
+
+    if (detailLines.length === 0) {
+      const flattenedMessage = errorMessage.replace(/\s+/g, ' ').trim();
+      const flattenedHeader = 'Failed to update code list state';
+      if (flattenedMessage.startsWith(flattenedHeader + ' ')) {
+        header = flattenedHeader;
+        detailLines = [flattenedMessage.substring(flattenedHeader.length + 1).trim()]
+          .filter(line => line.length > 0);
+      }
+    }
+
+    const parsedCodeListStateError = this.parseCodeListStateError(detailLines);
+    if (parsedCodeListStateError) {
+      detailLines = [
+        ...parsedCodeListStateError.content,
+        ...parsedCodeListStateError.list.map(item => `- ${item}`)
+      ];
+    } else {
+      detailLines = detailLines.map(line => this.formatStateUpdateErrorLine(line));
+    }
+
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = header;
+    dialogConfig.data.content = detailLines.filter(line => !line.startsWith('- '));
+    dialogConfig.data.list = detailLines
+      .filter(line => line.startsWith('- '))
+      .map(line => line.substring(2));
+    dialogConfig.data.action = undefined;
+    this.confirmDialogService.open(dialogConfig);
+  }
+
+  /**
+   * Reconstructs the special multi-line "related BIEs" validation message when
+   * it arrives flattened through the HTTP error header.
+   */
+  private parseCodeListStateError(detailLines: string[]): { content: string[]; list: string[] } | undefined {
+    const flattened = (detailLines || []).join(' ').replace(/\s+/g, ' ').trim();
+    if (!flattened) {
+      return undefined;
+    }
+
+    const summaryMatch = flattened.match(
+      /^(.*?) cannot move to ([^ ]+) because (the following related BIEs.+?):\s*(.*)$/);
+    if (!summaryMatch) {
+      return undefined;
+    }
+
+    const listPart = (summaryMatch[4] || '').trim();
+    const list = listPart.length > 0
+      ? Array.from(
+        listPart.matchAll(/-\s+(.+?(?:\([^)]+\))(?:\s+\([^)]+\))?)\s+-\s+([^ ]+)\s+state(?=\s+-\s+.+?(?:\([^)]+\))(?:\s+\([^)]+\))?\s+-\s+[^ ]+\s+state|$)/g),
+        match => `${match[1].trim()} - ${match[2]} state`
+      )
+      : [];
+
+    return {
+      content: [
+        `${summaryMatch[1]} cannot move to ${summaryMatch[2]} because ${summaryMatch[3]}:`
+      ],
+      list
+    };
+  }
+
+  /**
+   * Applies lighter-weight client-side rewrites to generic state-update error
+   * lines that do not match the special related-BIE format.
+   */
+  private formatStateUpdateErrorLine(line: string): string {
+    if (!line) {
+      return line;
+    }
+
+    const incompatibleBieSummaryMatch = line.match(
+      /^(.+?) cannot move to ([^ ]+) because (the following related BIEs.+):?$/);
+    if (incompatibleBieSummaryMatch) {
+      return `${incompatibleBieSummaryMatch[1]} cannot move to ${incompatibleBieSummaryMatch[2]} because ${incompatibleBieSummaryMatch[3]}.`;
+    }
+
+    const bieListItemMatch = line.match(/^-\s+(.+?)\s+\([^)]+\)\s+-\s+([^ ]+)\s+state$/);
+    if (bieListItemMatch) {
+      return `- ${bieListItemMatch[1]} (${bieListItemMatch[2]})`;
+    }
+
+    return line;
   }
 
   makeNewRevision() {

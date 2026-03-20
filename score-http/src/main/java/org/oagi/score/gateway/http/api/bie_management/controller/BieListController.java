@@ -104,7 +104,8 @@ public class BieListController {
     public List<BieStateDependencyTarget> validateStateDependencies(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                                  @RequestBody BieStateDependenciesRequest request) {
         return bieStateTransitionService.validateStateDependencies(sessionService.asScoreUser(user),
-                request.getTopLevelAsbiepIds(), request.getState(), request.getSelectedTopLevelAsbiepIds());
+                request.getTopLevelAsbiepIds(), request.getState(),
+                request.getSelectedTopLevelAsbiepIds(), request.getSelectedCodeListManifestIds());
     }
 
     @RequestMapping(value = "/bie_list/transfer_ownership/multiple",

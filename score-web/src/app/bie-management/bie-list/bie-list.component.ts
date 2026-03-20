@@ -39,6 +39,7 @@ import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryService} from '../../library-management/domain/library.service';
 import {BieDiagramDialogComponent} from '../bie-diagram-dialog/bie-diagram-dialog.component';
 import {BieStateTransitionFlowService} from '../domain/bie-state-transition-flow.service';
+import {StateDependencySelection} from '../domain/state-dependency-target';
 
 @Component({
   standalone: false,
@@ -632,21 +633,22 @@ export class BieListComponent implements OnInit {
       state: action,
       rootTopLevelAsbiepIds: this.selection.selected.map(e => e.topLevelAsbiepId),
       loadDependencies: () => this.service.getStateDependencies(this.selection.selected.map(e => e.topLevelAsbiepId), action),
-      validateSelection: (selectedTopLevelAsbiepIds: number[]) =>
+      validateSelection: (selection: StateDependencySelection) =>
         this.service.validateStateDependencies(
           this.selection.selected.map(e => e.topLevelAsbiepId),
           action,
-          selectedTopLevelAsbiepIds),
+          selection),
       normalizeTargets: (dependencyTargets) => {
         const selectedTopLevelAsbiepIdSet = new Set(this.selection.selected.map(e => e.topLevelAsbiepId));
         const visibleTopLevelAsbiepIdSet = new Set(this.dataSource.data.map(e => e.topLevelAsbiepId));
         return dependencyTargets.map(target => ({
           ...target,
-          dependencyUpdateAllowed: target.dependencyUpdateAllowed !== false,
+          selectable: target.selectable !== false,
           // Respect explicit omissions on the current list page. If a BIE is
           // visible in the grid but was left unchecked, keep it unchecked when
           // it appears as an optional dependency row in the dialog.
-          checked: target.dependencyUpdateAllowed === false ? false : (visibleTopLevelAsbiepIdSet.has(target.topLevelAsbiepId) ?
+          checked: target.selectable === false ? false : (target.nodeType === 'BIE' &&
+          visibleTopLevelAsbiepIdSet.has(target.topLevelAsbiepId) ?
             selectedTopLevelAsbiepIdSet.has(target.topLevelAsbiepId) :
             target.checked)
         }));
@@ -655,8 +657,8 @@ export class BieListComponent implements OnInit {
       finalize(() => {
         this.loading = false;
       })
-    ).subscribe((dependencyTopLevelAsbiepIds?: number[]) => {
-      if (dependencyTopLevelAsbiepIds === undefined) {
+    ).subscribe((selection?: StateDependencySelection) => {
+      if (selection === undefined) {
         return;
       }
       this.loading = true;
@@ -664,7 +666,8 @@ export class BieListComponent implements OnInit {
         actionType,
         toState,
         this.selection.selected,
-        dependencyTopLevelAsbiepIds
+        selection.topLevelAsbiepIds,
+        selection.codeListManifestIds
       ).pipe(
         finalize(() => {
           this.loading = false;
@@ -687,11 +690,23 @@ export class BieListComponent implements OnInit {
   private openStateUpdateErrorDialog(error: HttpErrorResponse): void {
     const errorMessage = error?.headers?.get('x-error-message') || error?.message || 'Failed to update BIE state';
     const lines = errorMessage.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    let header = lines[0] || 'Failed to update BIE state';
+    let detailLines = lines.slice(1);
+
+    if (detailLines.length === 0) {
+      const flattenedMessage = errorMessage.replace(/\s+/g, ' ').trim();
+      const flattenedHeader = 'Failed to update BIE state';
+      if (flattenedMessage.startsWith(flattenedHeader + ' ')) {
+        header = flattenedHeader;
+        detailLines = [flattenedMessage.substring(flattenedHeader.length + 1).trim()]
+          .filter(line => line.length > 0);
+      }
+    }
+
     const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = lines[0] || 'Failed to update BIE state';
-    dialogConfig.data.content = lines.slice(1).filter(line => !line.startsWith('- '));
-    dialogConfig.data.list = lines
-      .slice(1)
+    dialogConfig.data.header = header;
+    dialogConfig.data.content = detailLines.filter(line => !line.startsWith('- '));
+    dialogConfig.data.list = detailLines
       .filter(line => line.startsWith('- '))
       .map(line => line.substring(2));
     dialogConfig.data.action = undefined;

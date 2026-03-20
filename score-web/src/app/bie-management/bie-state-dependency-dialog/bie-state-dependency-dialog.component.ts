@@ -1,9 +1,14 @@
-import { Component, ViewChild, inject } from '@angular/core';
+import { Component, QueryList, ViewChildren, inject } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatTable} from '@angular/material/table';
 import {Observable} from 'rxjs';
 import {WebPageInfoService} from '../../basis/basis.service';
-import {StateDependencyRelation, StateDependencyTarget} from '../domain/state-dependency-target';
+import {
+  StateDependencyIssue,
+  StateDependencyRelation,
+  StateDependencySelection,
+  StateDependencyTarget
+} from '../domain/state-dependency-target';
 
 /**
  * Data contract passed into the dependency dialog.
@@ -12,7 +17,7 @@ export interface BieStateDependencyDialogData {
   state: string;
   rootTopLevelAsbiepIds: number[];
   targets: StateDependencyTarget[];
-  validateSelection?: (selectedTopLevelAsbiepIds: number[]) => Observable<StateDependencyTarget[]>;
+  validateSelection?: (selection: StateDependencySelection) => Observable<StateDependencyTarget[]>;
 }
 
 @Component({
@@ -26,11 +31,11 @@ export class BieStateDependencyDialogComponent {
   webPageInfo = inject(WebPageInfoService);
   data = inject<BieStateDependencyDialogData>(MAT_DIALOG_DATA);
 
-
-  displayedColumns: string[] = ['select', 'displayName', 'dependencies', 'businessContexts', 'version', 'status', 'remark', 'state'];
+  bieDisplayedColumns: string[] = ['select', 'den', 'dependencies', 'businessContexts', 'version', 'status', 'remark', 'owner', 'state'];
+  codeListDisplayedColumns: string[] = ['select', 'name', 'dependencies', 'agencyId', 'version', 'owner', 'state'];
   isValidating = false;
   private validationRequestId = 0;
-  @ViewChild(MatTable) table?: MatTable<StateDependencyTarget>;
+  @ViewChildren(MatTable) tables?: QueryList<MatTable<StateDependencyTarget>>;
 
   constructor() {
     this.applyTargets(this.data.targets || []);
@@ -44,11 +49,11 @@ export class BieStateDependencyDialogComponent {
     if (this.hasInvalidTargets() || this.isValidating) {
       return;
     }
-    this.dialogRef.close(this.getSelectedDependencyIds());
+    this.dialogRef.close(this.getSelection());
   }
 
-  trackByTopLevelAsbiepId(_index: number, target: StateDependencyTarget): number {
-    return target.topLevelAsbiepId;
+  trackByNodeKey(_index: number, target: StateDependencyTarget): string {
+    return target.nodeKey;
   }
 
   /**
@@ -56,7 +61,8 @@ export class BieStateDependencyDialogComponent {
    * not be deselected from the dependency dialog.
    */
   isRootTarget(target: StateDependencyTarget): boolean {
-    return (this.data.rootTopLevelAsbiepIds || []).includes(target.topLevelAsbiepId);
+    return target.nodeType === 'BIE' &&
+      (this.data.rootTopLevelAsbiepIds || []).includes(target.topLevelAsbiepId);
   }
 
   /**
@@ -66,7 +72,7 @@ export class BieStateDependencyDialogComponent {
    * re-select a row to resolve the conflict.
    */
   isToggleable(target: StateDependencyTarget): boolean {
-    return !this.isRootTarget(target) && target.dependencyUpdateAllowed;
+    return !this.isRootTarget(target) && target.selectable;
   }
 
   isSelectable(target: StateDependencyTarget): boolean {
@@ -77,27 +83,70 @@ export class BieStateDependencyDialogComponent {
     return this.data.targets.length > 0;
   }
 
+  hasBieTargets(): boolean {
+    return this.bieTargets().length > 0;
+  }
+
+  hasCodeListTargets(): boolean {
+    return this.codeListTargets().length > 0;
+  }
+
+  bieTargets(): StateDependencyTarget[] {
+    return this.data.targets.filter(target => target.nodeType !== 'CODE_LIST');
+  }
+
+  codeListTargets(): StateDependencyTarget[] {
+    return this.data.targets.filter(target => target.nodeType === 'CODE_LIST');
+  }
+
   selectionHint(): string {
     if (!this.hasTargets()) {
       return 'No associated BIEs will be updated.';
     }
-    return `This list shows associated BIEs by reuse or inheritance. Checked records will also be updated to '${this.data.state}'.`;
+
+    if (this.hasCodeListTargets()) {
+      return `Checked BIE records and eligible assigned code lists will also be updated to '${this.data.state}'. Assigned code lists are shown separately.`;
+    }
+
+    return `This list shows associated BIEs. Checked BIE records will also be updated to '${this.data.state}'.`;
   }
 
   allSelected(): boolean {
-    const selectableTargets = this.data.targets.filter(target => this.isToggleable(target));
+    const selectableTargets = this.bieTargets().filter(target => this.isToggleable(target));
     return selectableTargets.length > 0 && selectableTargets.every(target => target.checked);
   }
 
   someSelected(): boolean {
-    return this.data.targets.some(target => this.isToggleable(target) && target.checked) && !this.allSelected();
+    return this.bieTargets().some(target => this.isToggleable(target) && target.checked) && !this.allSelected();
+  }
+
+  codeListAllSelected(): boolean {
+    const selectableTargets = this.codeListTargets().filter(target => this.isToggleable(target));
+    return selectableTargets.length > 0 && selectableTargets.every(target => target.checked);
+  }
+
+  codeListSomeSelected(): boolean {
+    return this.codeListTargets().some(target => this.isToggleable(target) && target.checked) && !this.codeListAllSelected();
   }
 
   toggleAll(checked: boolean): void {
     const nextSelectedTopLevelAsbiepIds = checked ?
-      this.data.targets.filter(target => this.isToggleable(target)).map(target => target.topLevelAsbiepId) :
+      this.bieTargets().filter(target => this.isToggleable(target)).map(target => target.topLevelAsbiepId) :
       [];
-    this.validateSelection(nextSelectedTopLevelAsbiepIds);
+    this.validateSelection({
+      topLevelAsbiepIds: nextSelectedTopLevelAsbiepIds,
+      codeListManifestIds: this.getSelectedCodeListManifestIds()
+    });
+  }
+
+  toggleAllCodeLists(checked: boolean): void {
+    const nextSelectedCodeListManifestIds = checked ?
+      this.codeListTargets().filter(target => this.isToggleable(target)).map(target => target.codeListManifestId) :
+      [];
+    this.validateSelection({
+      topLevelAsbiepIds: this.getSelectedDependencyIds(),
+      codeListManifestIds: nextSelectedCodeListManifestIds
+    });
   }
 
   onTargetCheckedChange(target: StateDependencyTarget, checked: boolean): void {
@@ -105,7 +154,7 @@ export class BieStateDependencyDialogComponent {
       return;
     }
     target.checked = checked;
-    this.validateSelection(this.getSelectedDependencyIds());
+    this.validateSelection(this.getSelection());
   }
 
   value(text?: string): string {
@@ -121,11 +170,15 @@ export class BieStateDependencyDialogComponent {
       case 'REUSES':
         return 'Reuses';
       case 'REUSED_BY':
-        return 'Reused By';
+        return 'Reused by';
       case 'INHERITS_FROM':
-        return 'Inherits From';
+        return 'Inherits from';
       case 'IS_A_BASED_OF':
-        return 'Is a Base Of';
+        return 'Base of';
+      case 'USES_CODE_LIST':
+        return 'Uses code list';
+      case 'USED_BY_BIE':
+        return 'Used by';
       default:
         return '';
     }
@@ -133,8 +186,24 @@ export class BieStateDependencyDialogComponent {
 
   relationSummaryText(relation?: StateDependencyRelation): string {
     const relationLabel = this.relationText(relation);
-    const dependencyText = this.relationDependencyText(relation);
-    return dependencyText ? `${dependencyText}: ${relationLabel}` : relationLabel;
+    switch (relation?.dependency) {
+      case 'REUSES':
+        return relationLabel ? `Reuses ${relationLabel}` : 'Reuses';
+      case 'REUSED_BY':
+        return relationLabel ? `Reused by ${relationLabel}` : 'Reused by';
+      case 'INHERITS_FROM':
+        return relationLabel ? `Inherits from ${relationLabel}` : 'Inherits from';
+      case 'IS_A_BASED_OF':
+        return relationLabel ? `Base of ${relationLabel}` : 'Base of';
+      case 'USES_CODE_LIST':
+        return relationLabel ? `Uses code list ${relationLabel}` : 'Uses code list';
+      case 'USED_BY_BIE':
+        return relationLabel ? `Used by ${relationLabel}` : 'Used by';
+      default: {
+        const dependencyText = this.relationDependencyText(relation);
+        return relationLabel ? `${dependencyText} ${relationLabel}`.trim() : dependencyText;
+      }
+    }
   }
 
   relationList(values?: StateDependencyRelation[]): StateDependencyRelation[] {
@@ -165,7 +234,7 @@ export class BieStateDependencyDialogComponent {
   }
 
   hasInvalidTargets(): boolean {
-    return this.data.targets.some(target => target.selectionConflict || !target.stateTransitionAllowed);
+    return this.data.targets.some(target => this.issues(target).length > 0);
   }
 
   validationSummary(): string {
@@ -181,18 +250,60 @@ export class BieStateDependencyDialogComponent {
       return levelCompare;
     }
 
-    const displayNameCompare = this.value(left.displayName || left.propertyTerm)
-      .localeCompare(this.value(right.displayName || right.propertyTerm));
-    if (displayNameCompare !== 0) {
-      return displayNameCompare;
+    const titleCompare = this.targetTitle(left)
+      .localeCompare(this.targetTitle(right));
+    if (titleCompare !== 0) {
+      return titleCompare;
     }
 
-    return this.value(left.guid).localeCompare(this.value(right.guid));
+    return this.value(left.nodeKey || left.guid).localeCompare(this.value(right.nodeKey || right.guid));
   }
 
-  private validateSelection(selectedTopLevelAsbiepIds: number[]): void {
+  private targetTitle(target: StateDependencyTarget): string {
+    if (target.nodeType === 'CODE_LIST') {
+      return this.value(target.name);
+    }
+    return this.value(target.den || target.displayName || target.propertyTerm);
+  }
+
+  targetLink(target: StateDependencyTarget): string | null {
+    if (target.nodeType === 'BIE' && target.topLevelAsbiepId != null) {
+      return `/profile_bie/${target.topLevelAsbiepId}`;
+    }
+    if (target.nodeType === 'CODE_LIST' && target.codeListManifestId != null) {
+      return `/code_list/${target.codeListManifestId}`;
+    }
+    return null;
+  }
+
+  relationLink(relation?: StateDependencyRelation): string | null {
+    if (!relation) {
+      return null;
+    }
+    if (relation.nodeType === 'BIE' && relation.topLevelAsbiepId != null) {
+      return `/profile_bie/${relation.topLevelAsbiepId}`;
+    }
+    if (relation.nodeType === 'CODE_LIST' && relation.codeListManifestId != null) {
+      return `/code_list/${relation.codeListManifestId}`;
+    }
+    return null;
+  }
+
+  agencyIdTooltip(target: StateDependencyTarget): string {
+    return this.value(target.agencyIdName);
+  }
+
+  issues(target: StateDependencyTarget): StateDependencyIssue[] {
+    return target.issues || [];
+  }
+
+  hasIssues(target: StateDependencyTarget): boolean {
+    return this.issues(target).length > 0;
+  }
+
+  private validateSelection(selection: StateDependencySelection): void {
     if (!this.data.validateSelection) {
-      this.applyCheckedState(selectedTopLevelAsbiepIds);
+      this.applyCheckedState(selection);
       return;
     }
 
@@ -200,12 +311,12 @@ export class BieStateDependencyDialogComponent {
     // server can validate the previous request.
     const requestId = ++this.validationRequestId;
     this.isValidating = true;
-    this.data.validateSelection(selectedTopLevelAsbiepIds).subscribe({
+    this.data.validateSelection(selection).subscribe({
       next: (targets) => {
         if (requestId !== this.validationRequestId) {
           return;
         }
-        this.applyTargets(targets || []);
+        this.applyTargets(this.filterActionableTargets(targets || []));
         this.isValidating = false;
       },
       error: () => {
@@ -225,34 +336,49 @@ export class BieStateDependencyDialogComponent {
   private getSelectedDependencyIds(): number[] {
     return this.data.targets
       .filter(target => this.isToggleable(target) && target.checked)
+      .filter(target => target.nodeType === 'BIE')
       .map(target => target.topLevelAsbiepId);
   }
 
-  private applyCheckedState(selectedTopLevelAsbiepIds: number[]): void {
-    const selectedIdSet = new Set(selectedTopLevelAsbiepIds);
+  private getSelectedCodeListManifestIds(): number[] {
+    return this.data.targets
+      .filter(target => this.isToggleable(target) && target.checked)
+      .filter(target => target.nodeType === 'CODE_LIST')
+      .map(target => target.codeListManifestId);
+  }
+
+  private getSelection(): StateDependencySelection {
+    return {
+      topLevelAsbiepIds: this.getSelectedDependencyIds(),
+      codeListManifestIds: this.getSelectedCodeListManifestIds()
+    };
+  }
+
+  private applyCheckedState(selection: StateDependencySelection): void {
+    const selectedIdSet = new Set(selection.topLevelAsbiepIds || []);
+    const selectedCodeListIdSet = new Set(selection.codeListManifestIds || []);
     const nextTargets = this.data.targets
       .map(target => ({
         ...target,
-        checked: this.isRootTarget(target) || (this.isToggleable(target) && selectedIdSet.has(target.topLevelAsbiepId)),
-        selectionConflict: this.isToggleable(target) && !selectedIdSet.has(target.topLevelAsbiepId),
-        selectionConflictMessage: this.isToggleable(target) && !selectedIdSet.has(target.topLevelAsbiepId)
-          ? 'This BIE must be updated together.'
-          : undefined
+        checked: this.isRootTarget(target) || (this.isToggleable(target) && (
+          target.nodeType === 'CODE_LIST'
+            ? selectedCodeListIdSet.has(target.codeListManifestId)
+            : selectedIdSet.has(target.topLevelAsbiepId)))
       }))
       .sort((left, right) => this.compareTargets(left, right));
 
     this.data.targets.splice(0, this.data.targets.length, ...nextTargets);
-    this.table?.renderRows();
+    this.renderTables();
   }
 
   private applyTargets(targets: StateDependencyTarget[]): void {
     const normalizedTargets = (targets || [])
       .map(target => this.normalizeTarget(target))
       .sort((left, right) => this.compareTargets(left, right));
-    const currentTargetMap = new Map(this.data.targets.map(target => [target.topLevelAsbiepId, target]));
+    const currentTargetMap = new Map(this.data.targets.map(target => [target.nodeKey, target]));
 
     const nextTargets = normalizedTargets.map(target => {
-      const currentTarget = currentTargetMap.get(target.topLevelAsbiepId);
+      const currentTarget = currentTargetMap.get(target.nodeKey);
       if (!currentTarget) {
         return target;
       }
@@ -263,23 +389,39 @@ export class BieStateDependencyDialogComponent {
     // Keep the same array instance so mat-table updates rows in place instead
     // of tearing down the whole table between validation responses.
     this.data.targets.splice(0, this.data.targets.length, ...nextTargets);
-    this.table?.renderRows();
+    this.renderTables();
+  }
+
+  /**
+   * Keeps only rows that still require user attention inside the dialog.
+   *
+   * <p>This mirrors the initial filtering performed before the dialog opens so
+   * subsequent validation responses do not suddenly introduce issue-free
+   * code-list rows.</p>
+   */
+  private filterActionableTargets(targets: StateDependencyTarget[]): StateDependencyTarget[] {
+    return (targets || []).filter(target =>
+      (target.issues || []).length > 0 ||
+      target.nodeType !== 'CODE_LIST'
+    );
   }
 
   private normalizeTarget(target: StateDependencyTarget): StateDependencyTarget {
-    const dependencyUpdateAllowed = target.dependencyUpdateAllowed !== false;
+    const selectable = target.selectable !== false;
     return {
       ...target,
+      nodeKey: target.nodeKey || `${target.nodeType || 'BIE'}:${target.topLevelAsbiepId ?? target.codeListManifestId ?? 'unknown'}`,
+      nodeType: target.nodeType || 'BIE',
       dependencyTopLevelAsbiepIds: target.dependencyTopLevelAsbiepIds || [],
       requiredDependencyTopLevelAsbiepIds: target.requiredDependencyTopLevelAsbiepIds || [],
       dependencies: target.dependencies || [],
-      dependencyUpdateAllowed,
-      dependencyUpdateMessage: target.dependencyUpdateMessage,
-      stateTransitionAllowed: target.stateTransitionAllowed !== false,
-      stateTransitionMessage: target.stateTransitionMessage,
-      checked: this.isRootTarget(target) || (dependencyUpdateAllowed && target.checked !== false),
-      selectionConflict: target.selectionConflict === true,
-      selectionConflictMessage: target.selectionConflictMessage
+      selectable,
+      checked: this.isRootTarget(target) || (selectable && target.checked !== false),
+      issues: target.issues || []
     };
+  }
+
+  private renderTables(): void {
+    this.tables?.forEach(table => table.renderRows());
   }
 }

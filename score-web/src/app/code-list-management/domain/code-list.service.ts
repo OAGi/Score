@@ -1,4 +1,4 @@
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpContext, HttpParams} from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import {Observable} from 'rxjs';
 import {CodeListCreateResponse, CodeListDetails, CodeListListEntry, CodeListListEntryRequest, CodeListSummary} from './code-list';
@@ -7,6 +7,7 @@ import {Comment} from '../../cc-management/domain/core-component-node';
 import {map} from 'rxjs/operators';
 import {AgencyIdListValueSummary} from '../../agency-id-list-management/domain/agency-id-list';
 import {NamespaceSummary} from '../../namespace-management/domain/namespace';
+import {SUPPRESS_ERROR_ALERT} from '../../authentication/auth.service';
 
 @Injectable()
 export class CodeListService {
@@ -126,7 +127,9 @@ export class CodeListService {
         releaseId: codeList.release.releaseId,
         toState: state
       };
-      return this.http.patch('/api/code-lists/' + codeList.codeListManifestId + '/state', body);
+      return this.http.patch('/api/code-lists/' + codeList.codeListManifestId + '/state', body, {
+        context: this.suppressErrorAlert()
+      });
     } else {
       body = {
         releaseId: codeList.release.releaseId,
@@ -240,5 +243,9 @@ export class CodeListService {
 
   getComments(reference): Observable<Comment[]> {
     return this.http.get<Comment[]>('/api/comments/' + reference);
+  }
+
+  private suppressErrorAlert(): HttpContext {
+    return new HttpContext().set(SUPPRESS_ERROR_ALERT, true);
   }
 }

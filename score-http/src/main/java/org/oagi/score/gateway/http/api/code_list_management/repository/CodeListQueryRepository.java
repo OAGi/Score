@@ -1,6 +1,7 @@
 package org.oagi.score.gateway.http.api.code_list_management.repository;
 
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListValueManifestId;
+import org.oagi.score.gateway.http.api.bie_management.model.CodeListBieReferenceRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.CcState;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.DtManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScManifestId;
@@ -31,6 +32,17 @@ public interface CodeListQueryRepository {
     List<CodeListSummaryRecord> availableCodeListByDtManifestId(DtManifestId dtManifestId, List<CcState> states);
 
     List<CodeListSummaryRecord> availableCodeListByDtScManifestId(DtScManifestId dtScManifestId, List<CcState> states);
+
+    /**
+     * Returns the top-level BIEs that currently assign the given code list.
+     *
+     * <p>This reverse lookup is used when validating code-list state changes so
+     * a code list cannot be moved below one of its dependent BIEs.</p>
+     *
+     * @param codeListManifestId target code list
+     * @return assigned-BIE summaries for inverse dependency validation
+     */
+    List<CodeListBieReferenceRecord> getAssignedBieSummaryList(CodeListManifestId codeListManifestId);
 
     // Details
 

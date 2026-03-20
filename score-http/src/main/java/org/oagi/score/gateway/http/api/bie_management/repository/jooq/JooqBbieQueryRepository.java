@@ -6,6 +6,7 @@ import org.jooq.RecordMapper;
 import org.jooq.SelectJoinStep;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId;
+import org.oagi.score.gateway.http.api.bie_management.model.BieCodeListStateDependencyRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.BieState;
 import org.oagi.score.gateway.http.api.bie_management.model.Facet;
 import org.oagi.score.gateway.http.api.bie_management.model.PrimitiveRestriction;
@@ -18,6 +19,7 @@ import org.oagi.score.gateway.http.api.bie_management.model.bbiep.BbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.bie_edit.BieEditUsed;
 import org.oagi.score.gateway.http.api.bie_management.repository.BbieQueryRepository;
 import org.oagi.score.gateway.http.api.cc_management.model.Cardinality;
+import org.oagi.score.gateway.http.api.cc_management.model.CcState;
 import org.oagi.score.gateway.http.api.cc_management.model.ValueConstraint;
 import org.oagi.score.gateway.http.api.cc_management.model.bcc.BccManifestId;
 import org.oagi.score.gateway.http.api.code_list_management.model.CodeListManifestId;
@@ -322,6 +324,33 @@ public class JooqBbieQueryRepository extends JooqBaseRepository implements BbieQ
                     return bieEditUsed;
                 })
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Loads distinct code lists referenced by used BBIE rows under one
+     * top-level BIE.
+     */
+    @Override
+    public List<BieCodeListStateDependencyRecord> getAssignedCodeListSummaryList(TopLevelAsbiepId topLevelAsbiepId) {
+        if (topLevelAsbiepId == null) {
+            return Collections.emptyList();
+        }
+
+        return dslContext().selectDistinct(
+                        CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID,
+                        CODE_LIST.NAME,
+                        CODE_LIST.STATE)
+                .from(BBIE)
+                .join(CODE_LIST_MANIFEST).on(BBIE.CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID))
+                .join(CODE_LIST).on(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
+                .where(and(
+                        BBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(valueOf(topLevelAsbiepId)),
+                        BBIE.IS_USED.eq((byte) 1),
+                        BBIE.CODE_LIST_MANIFEST_ID.isNotNull()))
+                .fetch(record -> new BieCodeListStateDependencyRecord(
+                        new CodeListManifestId(record.get(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID).toBigInteger()),
+                        record.get(CODE_LIST.NAME),
+                        CcState.valueOf(record.get(CODE_LIST.STATE))));
     }
 
 }

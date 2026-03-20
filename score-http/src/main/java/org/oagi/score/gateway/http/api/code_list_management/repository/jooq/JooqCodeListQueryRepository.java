@@ -7,6 +7,9 @@ import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.account_management.model.UserSummaryRecord;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListValueManifestId;
 import org.oagi.score.gateway.http.api.agency_id_management.repository.AgencyIdListQueryRepository;
+import org.oagi.score.gateway.http.api.bie_management.model.CodeListBieReferenceRecord;
+import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
+import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.CcState;
 import org.oagi.score.gateway.http.api.cc_management.model.Definition;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.DtManifestId;
@@ -251,6 +254,56 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
         } else {
             return availableCodeListByReleaseId(dtSc.release().releaseId(), states);
         }
+    }
+
+    /**
+     * Loads all distinct top-level BIEs that currently assign the given code
+     * list through either BBIE or BBIE_SC nodes.
+     */
+    @Override
+    public List<CodeListBieReferenceRecord> getAssignedBieSummaryList(CodeListManifestId codeListManifestId) {
+        if (codeListManifestId == null) {
+            return Collections.emptyList();
+        }
+
+        List<TopLevelAsbiepId> topLevelAsbiepIds = dslContext()
+                .selectDistinct(BBIE.OWNER_TOP_LEVEL_ASBIEP_ID.as("top_level_asbiep_id"))
+                .from(BBIE)
+                .where(and(
+                        BBIE.IS_USED.eq((byte) 1),
+                        BBIE.CODE_LIST_MANIFEST_ID.eq(valueOf(codeListManifestId))))
+                .union(
+                        dslContext()
+                                .selectDistinct(BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID.as("top_level_asbiep_id"))
+                                .from(BBIE_SC)
+                                .where(and(
+                                        BBIE_SC.IS_USED.eq((byte) 1),
+                                        BBIE_SC.CODE_LIST_MANIFEST_ID.eq(valueOf(codeListManifestId)))))
+                .fetch(record -> new TopLevelAsbiepId(record.get("top_level_asbiep_id", ULong.class).toBigInteger()));
+        if (topLevelAsbiepIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        String codeListName = null;
+        CcState codeListState = null;
+        CodeListSummaryRecord codeListSummary = getCodeListSummary(codeListManifestId);
+        if (codeListSummary != null) {
+            codeListName = codeListSummary.name();
+            codeListState = codeListSummary.state();
+        }
+
+        var topLevelAsbiepQuery = repositoryFactory().topLevelAsbiepQueryRepository(requester());
+        String finalCodeListName = codeListName;
+        CcState finalCodeListState = codeListState;
+        return topLevelAsbiepIds.stream()
+                .map(topLevelAsbiepQuery::getTopLevelAsbiepSummary)
+                .filter(Objects::nonNull)
+                .map(topLevelAsbiep -> new CodeListBieReferenceRecord(
+                        codeListManifestId,
+                        finalCodeListName,
+                        finalCodeListState,
+                        topLevelAsbiep))
+                .collect(Collectors.toList());
     }
 
     private List<CodeListSummaryRecord> availableCodeListByCodeListManifestId(

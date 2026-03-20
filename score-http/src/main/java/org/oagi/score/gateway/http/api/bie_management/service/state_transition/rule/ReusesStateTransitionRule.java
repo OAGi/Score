@@ -1,7 +1,6 @@
 package org.oagi.score.gateway.http.api.bie_management.service.state_transition.rule;
 
-import org.oagi.score.gateway.http.api.bie_management.model.BieState;
-import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummaryRecord;
+import org.oagi.score.gateway.http.api.bie_management.model.BieStateLevel;
 import org.oagi.score.gateway.http.api.bie_management.service.state_transition.BieStateTransitionDependency;
 import org.oagi.score.gateway.http.api.bie_management.service.state_transition.BieStateTransitionRuleViolationException;
 import org.springframework.stereotype.Component;
@@ -14,23 +13,24 @@ import org.springframework.stereotype.Component;
  * higher state than the reused target.</p>
  */
 @Component
-public class ReusesStateTransitionRule implements BieStateTransitionRule {
+public class ReusesStateTransitionRule implements BieStateTransitionRule<BieFutureStateCarrier, BieFutureStateCarrier> {
 
     @Override
-    public void validate(TopLevelAsbiepSummaryRecord source,
-                         TopLevelAsbiepSummaryRecord target,
-                         BieStateTransitionDependency dependency,
-                         BieState sourceFutureState,
-                         BieState targetFutureState) throws BieStateTransitionRuleViolationException {
+    public void validate(BieFutureStateCarrier source,
+                         BieFutureStateCarrier target,
+                         BieStateTransitionDependency dependency)
+            throws BieStateTransitionRuleViolationException {
         if (dependency != BieStateTransitionDependency.REUSES ||
                 source == null ||
+                source.record() == null ||
                 target == null ||
-                sourceFutureState == null ||
-                targetFutureState == null) {
+                target.record() == null ||
+                source.futureState() == null ||
+                target.futureState() == null) {
             return;
         }
 
-        if (sourceFutureState.getLevel() > targetFutureState.getLevel()) {
+        if (!BieStateLevel.isCompatible(source.futureState(), target.futureState())) {
             throw new BieStateTransitionRuleViolationException();
         }
     }

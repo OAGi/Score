@@ -26,6 +26,11 @@
   color: #767676 !important;
 }
 
+.title-link {
+  display: inline-flex;
+  align-items: center;
+}
+
 .property-term {
   font-size: 12px;
   color: rgba(0, 0, 0, 0.6);
@@ -48,6 +53,21 @@
   margin-bottom: 0;
 }
 
+.table-container + .table-container {
+  margin-top: 24px;
+}
+
+.table-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.table-subtitle {
+  margin-top: 6px;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 12px;
+}
+
 .validation-summary {
   color: #b00020;
   font-weight: 500;
@@ -55,7 +75,6 @@
 
 .table-wrapper table {
   width: 100%;
-  min-width: 980px;
 }
 
 .invalid-row {
@@ -75,29 +94,40 @@
 }
 
 .mat-column-select {
-  width: 56px;
+  width: 66px;
+}
+
+.mat-column-den,
+.mat-column-name {
+  width: 25%;
+}
+
+.mat-column-dependencies {
+  width: 20%;
 }
 
 .mat-column-businessContexts .businessContext {
   display: block;
 }
 
+.mat-column-businessContexts {
+  width: 15%;
+}
+
 .mat-column-businessContexts .businessContext:not(:last-child) {
   margin-bottom: 2px;
 }
 
-.mat-column-version,
-.mat-column-status,
+.mat-column-agencyId {
+  width: 15%;
+}
+
+.mat-column-owner {
+  width: 140px;
+}
+
 .mat-column-state {
-  width: 110px;
-}
-
-.mat-column-dependsOn {
-  width: 190px;
-}
-
-.mat-column-remark {
-  width: 18%;
+  width: 160px;
 }
 
 .actions {

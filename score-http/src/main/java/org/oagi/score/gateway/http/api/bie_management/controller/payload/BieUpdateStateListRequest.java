@@ -3,6 +3,7 @@ package org.oagi.score.gateway.http.api.bie_management.controller.payload;
 import lombok.Data;
 import org.oagi.score.gateway.http.api.bie_management.model.BieState;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
+import org.oagi.score.gateway.http.api.code_list_management.model.CodeListManifestId;
 
 import java.util.List;
 
@@ -19,4 +20,6 @@ public class BieUpdateStateListRequest {
     private List<TopLevelAsbiepId> topLevelAsbiepIds;
     /** Dependency rows approved by the user for the bulk transition. */
     private List<TopLevelAsbiepId> dependencyTopLevelAsbiepIds;
+    /** Code list dependency rows approved by the user for the bulk transition. */
+    private List<CodeListManifestId> dependencyCodeListManifestIds;
 }

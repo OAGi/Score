@@ -2,6 +2,8 @@ package org.oagi.score.gateway.http.api.code_list_management.service;
 
 import org.oagi.score.gateway.http.api.cc_management.model.CcState;
 import org.oagi.score.gateway.http.api.cc_management.model.CcType;
+import org.oagi.score.gateway.http.api.bie_management.model.CodeListBieReferenceRecord;
+import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.code_list_management.controller.payload.CodeListUpliftingResponse;
 import org.oagi.score.gateway.http.api.code_list_management.controller.payload.CreateCodeListRequest;
 import org.oagi.score.gateway.http.api.code_list_management.controller.payload.UpdateCodeListRequest;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
@@ -29,6 +32,7 @@ import java.util.stream.Collectors;
 import static org.oagi.score.gateway.http.api.cc_management.model.CcState.*;
 import static org.oagi.score.gateway.http.api.cc_management.model.CcState.Deleted;
 import static org.oagi.score.gateway.http.api.log_management.model.LogAction.*;
+import static org.springframework.util.StringUtils.hasLength;
 
 @Service
 @Transactional
@@ -159,6 +163,8 @@ public class CodeListCommandService {
             }
         }
 
+        ensureBieDependenciesForChangingState(requester, codeListSummary, nextState);
+
         var command = command(requester);
 
         boolean result = command.updateState(codeListManifestId, nextState);
@@ -170,6 +176,159 @@ public class CodeListCommandService {
         command.updateLogId(codeListManifestId, logId);
 
         return result;
+    }
+
+    /**
+     * Rejects a code-list state change when any assigned BIE would become
+     * incompatible with the requested next code-list state.
+     */
+    private void ensureBieDependenciesForChangingState(ScoreUser requester,
+                                                       CodeListSummaryRecord codeListSummary,
+                                                       CcState nextState) {
+        if (codeListSummary == null || nextState == null) {
+            return;
+        }
+
+        List<CodeListBieReferenceRecord> blockingBies = query(requester)
+                .getAssignedBieSummaryList(codeListSummary.codeListManifestId()).stream()
+                .filter(reference -> reference.topLevelAsbiep() != null)
+                .filter(reference -> reference.topLevelAsbiep().state() != null)
+                .filter(reference -> !CodeListStateLevel.isCompatible(
+                        reference.topLevelAsbiep().state(),
+                        nextState,
+                        codeListSummary.owner()))
+                .sorted(Comparator
+                        .comparing((CodeListBieReferenceRecord reference) -> toName(reference.topLevelAsbiep()),
+                                Comparator.nullsLast(String::compareToIgnoreCase))
+                        .thenComparing(reference -> reference.topLevelAsbiep().guid().value()))
+                .toList();
+        if (blockingBies.isEmpty()) {
+            return;
+        }
+
+        StringBuilder failureMessageBody = new StringBuilder()
+                .append("\n---\n[**")
+                .append(codeListSummary.name())
+                .append("**](")
+                .append("/code_list/").append(codeListSummary.codeListManifestId())
+                .append(") cannot move to ")
+                .append(nextState)
+                .append(" because ")
+                .append(toBlockingBieStateMessage(nextState, codeListSummary))
+                .append("\n\n");
+        for (CodeListBieReferenceRecord reference : blockingBies) {
+            TopLevelAsbiepSummaryRecord topLevelAsbiep = reference.topLevelAsbiep();
+            failureMessageBody.append("- [")
+                    .append(toListItemLabel(topLevelAsbiep))
+                    .append("](")
+                    .append("/profile_bie/").append(topLevelAsbiep.topLevelAsbiepId())
+                    .append(") (")
+                    .append(toListItemIdentity(topLevelAsbiep))
+                    .append(") - ")
+                    .append(topLevelAsbiep.state()).append(" state")
+                    .append("\n");
+        }
+
+        throw new IllegalArgumentException(toPlainTextStateFailureMessage(
+                "Failed to update code list state", failureMessageBody.toString()));
+    }
+
+    /**
+     * Returns the preferred user-facing BIE name for sorting and simple
+     * messages.
+     */
+    private String toName(TopLevelAsbiepSummaryRecord topLevelAsbiep) {
+        if (topLevelAsbiep == null) {
+            return null;
+        }
+        return (topLevelAsbiep.displayName() != null && !topLevelAsbiep.displayName().isBlank()) ?
+                topLevelAsbiep.displayName() :
+                topLevelAsbiep.propertyTerm();
+    }
+
+    /**
+     * Returns the rich label used in blocking-BIE bullet items.
+     *
+     * <p>When a display name exists, the property term is preserved as the
+     * canonical BIE name and the display name is appended for disambiguation.</p>
+     */
+    private String toListItemLabel(TopLevelAsbiepSummaryRecord topLevelAsbiep) {
+        if (topLevelAsbiep == null) {
+            return null;
+        }
+        if (topLevelAsbiep.displayName() != null && !topLevelAsbiep.displayName().isBlank()) {
+            return topLevelAsbiep.propertyTerm() + " (" + topLevelAsbiep.displayName() + ")";
+        }
+        return topLevelAsbiep.propertyTerm();
+    }
+
+    /**
+     * Returns the secondary identifier block shown in blocking-BIE list items.
+     *
+     * <p>The GUID is always included. When the owner login ID is available, it
+     * is appended so the user knows who to contact for the required follow-up
+     * action.</p>
+     */
+    private String toListItemIdentity(TopLevelAsbiepSummaryRecord topLevelAsbiep) {
+        if (topLevelAsbiep == null || topLevelAsbiep.guid() == null) {
+            return null;
+        }
+
+        StringBuilder identity = new StringBuilder(topLevelAsbiep.guid().toString());
+        if (topLevelAsbiep.owner() != null && hasLength(topLevelAsbiep.owner().loginId())) {
+            identity.append(", owner: ").append(topLevelAsbiep.owner().loginId());
+        }
+        return identity.toString();
+    }
+
+    /**
+     * Returns the summary sentence fragment used before the blocking BIE list.
+     *
+     * <p>The wording names the exact BIE state set required by the requested
+     * future code-list state whenever that set is expressible.</p>
+     */
+    private String toBlockingBieStateMessage(CcState nextState, CodeListSummaryRecord codeListSummary) {
+        List<org.oagi.score.gateway.http.api.bie_management.model.BieState> compatibleBieStates =
+                CodeListStateLevel.compatibleBieStates(nextState, codeListSummary);
+        if (compatibleBieStates.size() == 1) {
+            return "the following related BIEs are not in '" + compatibleBieStates.get(0) + "' state:";
+        }
+        if (!compatibleBieStates.isEmpty()) {
+            return "the following related BIEs are not in one of these states: " +
+                    joinQuotedStates(compatibleBieStates) + ":";
+        }
+        return "the following related BIEs require a different compatible code list state:";
+    }
+
+    /**
+     * Joins state names into a natural-language quoted list.
+     */
+    private String joinQuotedStates(List<?> states) {
+        if (states == null || states.isEmpty()) {
+            return "";
+        }
+        if (states.size() == 1) {
+            return "'" + states.get(0) + "'";
+        }
+        if (states.size() == 2) {
+            return "'" + states.get(0) + "' or '" + states.get(1) + "'";
+        }
+        return states.subList(0, states.size() - 1).stream()
+                .map(state -> "'" + state + "'")
+                .collect(Collectors.joining(", ")) +
+                ", or '" + states.get(states.size() - 1) + "'";
+    }
+
+    /**
+     * Removes markdown-style formatting from multi-line validation messages so
+     * they can be safely returned through plain-text exception paths.
+     */
+    private String toPlainTextStateFailureMessage(String subject, String messageBody) {
+        String plainTextMessageBody = messageBody
+                .replace("\n---\n", "\n\n")
+                .replaceAll("\\*\\*(.*?)\\*\\*", "$1")
+                .replaceAll("\\[(.*?)\\]\\([^)]*\\)", "$1");
+        return subject + "\n" + plainTextMessageBody.trim();
     }
 
     public void revise(ScoreUser requester, CodeListManifestId codeListManifestId) {

@@ -64,6 +64,7 @@ import {SettingsPreferencesService} from '../../settings-management/settings-pre
 import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
 import {CcNodeService} from '../../cc-management/domain/core-component-node.service';
 import {BieStateTransitionFlowService} from '../domain/bie-state-transition-flow.service';
+import {StateDependencySelection} from '../domain/state-dependency-target';
 
 
 @Component({
@@ -1206,11 +1207,23 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   private openStateUpdateErrorDialog(error: HttpErrorResponse): void {
     const errorMessage = error?.headers?.get('x-error-message') || error?.message || 'Failed to update BIE state';
     const lines = errorMessage.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    let header = lines[0] || 'Failed to update BIE state';
+    let detailLines = lines.slice(1);
+
+    if (detailLines.length === 0) {
+      const flattenedMessage = errorMessage.replace(/\s+/g, ' ').trim();
+      const flattenedHeader = 'Failed to update BIE state';
+      if (flattenedMessage.startsWith(flattenedHeader + ' ')) {
+        header = flattenedHeader;
+        detailLines = [flattenedMessage.substring(flattenedHeader.length + 1).trim()]
+          .filter(line => line.length > 0);
+      }
+    }
+
     const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = lines[0] || 'Failed to update BIE state';
-    dialogConfig.data.content = lines.slice(1).filter(line => !line.startsWith('- '));
-    dialogConfig.data.list = lines
-      .slice(1)
+    dialogConfig.data.header = header;
+    dialogConfig.data.content = detailLines.filter(line => !line.startsWith('- '));
+    dialogConfig.data.list = detailLines
       .filter(line => line.startsWith('- '))
       .map(line => line.substring(2));
     dialogConfig.data.action = undefined;
@@ -2411,31 +2424,34 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       state,
       rootTopLevelAsbiepIds: [this.rootNode.topLevelAsbiepId],
       loadDependencies: () => this.service.getStateDependencies(this.rootNode.topLevelAsbiepId, state),
-      validateSelection: (selectedTopLevelAsbiepIds: number[]) =>
-        this.service.validateStateDependencies(this.rootNode.topLevelAsbiepId, state, selectedTopLevelAsbiepIds),
+      validateSelection: (selection: StateDependencySelection) =>
+        this.service.validateStateDependencies(this.rootNode.topLevelAsbiepId, state, selection),
       normalizeTargets: (dependencyTargets) => {
         const rootTopLevelAsbiepId = this.rootNode.topLevelAsbiepId;
         return dependencyTargets.map(target => ({
           ...target,
-          dependencyUpdateAllowed: target.dependencyUpdateAllowed !== false,
+          selectable: target.selectable !== false,
           // Match the list page behavior: keep the requested root BIE selected,
           // but do not preselect dependency rows when the dialog first opens.
-          checked: target.topLevelAsbiepId === rootTopLevelAsbiepId
+          checked: target.nodeType === 'BIE' && target.topLevelAsbiepId === rootTopLevelAsbiepId
+            ? true
+            : target.checked
         }));
       }
     }).pipe(
       finalize(() => {
         this.isUpdating = false;
       })
-    ).subscribe((dependencyTopLevelAsbiepIds?: number[]) => {
-      if (dependencyTopLevelAsbiepIds === undefined) {
+    ).subscribe((selection?: StateDependencySelection) => {
+      if (selection === undefined) {
         return;
       }
       this.isUpdating = true;
       this.service.setState(
         this.rootNode.topLevelAsbiepId,
         state,
-        dependencyTopLevelAsbiepIds
+        selection.topLevelAsbiepIds,
+        selection.codeListManifestIds
       ).subscribe(_ => {
         this.service.getRootNode(this.topLevelAsbiepId).subscribe(root => {
           (this.rootNode as BieEditAbieNode).topLevelAsbiepState = root.topLevelAsbiepState;
