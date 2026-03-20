@@ -12,6 +12,8 @@ package org.oagi.score.gateway.http.api.bie_management.service.state_transition;
  *     <li>{@link #REUSED_BY}: source is reused by target.</li>
  *     <li>{@link #INHERITS_FROM}: source inherits from target.</li>
  *     <li>{@link #IS_A_BASED_OF}: source is a base of target.</li>
+ *     <li>{@link #USES_CODE_LIST}: source uses target code list.</li>
+ *     <li>{@link #USED_BY_BIE}: source code list is used by target BIE.</li>
  * </ul>
  */
 public enum BieStateTransitionDependency {
@@ -33,5 +35,15 @@ public enum BieStateTransitionDependency {
     /**
      * Source is a base of target.
      */
-    IS_A_BASED_OF
+    IS_A_BASED_OF,
+
+    /**
+     * Source BIE uses target code list.
+     */
+    USES_CODE_LIST,
+
+    /**
+     * Source code list is used by target BIE.
+     */
+    USED_BY_BIE
 }

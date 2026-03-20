@@ -39,6 +39,7 @@ import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryService} from '../../library-management/domain/library.service';
 import {BieDiagramDialogComponent} from '../bie-diagram-dialog/bie-diagram-dialog.component';
 import {BieStateTransitionFlowService} from '../domain/bie-state-transition-flow.service';
+import {StateDependencySelection} from '../domain/state-dependency-target';
 
 @Component({
   standalone: false,
@@ -632,21 +633,22 @@ export class BieListComponent implements OnInit {
       state: action,
       rootTopLevelAsbiepIds: this.selection.selected.map(e => e.topLevelAsbiepId),
       loadDependencies: () => this.service.getStateDependencies(this.selection.selected.map(e => e.topLevelAsbiepId), action),
-      validateSelection: (selectedTopLevelAsbiepIds: number[]) =>
+      validateSelection: (selection: StateDependencySelection) =>
         this.service.validateStateDependencies(
           this.selection.selected.map(e => e.topLevelAsbiepId),
           action,
-          selectedTopLevelAsbiepIds),
+          selection),
       normalizeTargets: (dependencyTargets) => {
         const selectedTopLevelAsbiepIdSet = new Set(this.selection.selected.map(e => e.topLevelAsbiepId));
         const visibleTopLevelAsbiepIdSet = new Set(this.dataSource.data.map(e => e.topLevelAsbiepId));
         return dependencyTargets.map(target => ({
           ...target,
-          dependencyUpdateAllowed: target.dependencyUpdateAllowed !== false,
+          selectable: target.selectable !== false,
           // Respect explicit omissions on the current list page. If a BIE is
           // visible in the grid but was left unchecked, keep it unchecked when
           // it appears as an optional dependency row in the dialog.
-          checked: target.dependencyUpdateAllowed === false ? false : (visibleTopLevelAsbiepIdSet.has(target.topLevelAsbiepId) ?
+          checked: target.selectable === false ? false : (target.nodeType === 'BIE' &&
+          visibleTopLevelAsbiepIdSet.has(target.topLevelAsbiepId) ?
             selectedTopLevelAsbiepIdSet.has(target.topLevelAsbiepId) :
             target.checked)
         }));
@@ -655,8 +657,8 @@ export class BieListComponent implements OnInit {
       finalize(() => {
         this.loading = false;
       })
-    ).subscribe((dependencyTopLevelAsbiepIds?: number[]) => {
-      if (dependencyTopLevelAsbiepIds === undefined) {
+    ).subscribe((selection?: StateDependencySelection) => {
+      if (selection === undefined) {
         return;
       }
       this.loading = true;
@@ -664,7 +666,8 @@ export class BieListComponent implements OnInit {
         actionType,
         toState,
         this.selection.selected,
-        dependencyTopLevelAsbiepIds
+        selection.topLevelAsbiepIds,
+        selection.codeListManifestIds
       ).pipe(
         finalize(() => {
           this.loading = false;

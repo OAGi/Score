@@ -7,7 +7,7 @@ import {
   BieStateDependencyDialogComponent,
   BieStateDependencyDialogData
 } from '../bie-state-dependency-dialog/bie-state-dependency-dialog.component';
-import {StateDependencyTarget} from './state-dependency-target';
+import {StateDependencySelection, StateDependencyTarget} from './state-dependency-target';
 
 /**
  * Request contract for the shared state transition dialog workflow.
@@ -21,7 +21,7 @@ export interface BieStateTransitionFlowRequest {
   state: string;
   rootTopLevelAsbiepIds: number[];
   loadDependencies: () => Observable<StateDependencyTarget[]>;
-  validateSelection: (selectedTopLevelAsbiepIds: number[]) => Observable<StateDependencyTarget[]>;
+  validateSelection: (selection: StateDependencySelection) => Observable<StateDependencyTarget[]>;
   normalizeTargets?: (targets: StateDependencyTarget[]) => StateDependencyTarget[];
 }
 
@@ -36,51 +36,65 @@ export class BieStateTransitionFlowService {
   private dialog = inject(MatDialog);
   private confirmDialogService = inject(ConfirmDialogService);
 
-
-  private static readonly NO_UPDATE_MESSAGE = 'This BIE will not be updated.';
-
   /**
    * Resolves the dependency selection required for a state transition.
    *
-   * <p>When no dependency rows are returned, this falls back to the existing
-   * confirm dialog and returns an empty dependency selection on approval. When
-   * dependency rows exist, the shared dependency dialog is opened and the
-   * selected dependency ids are returned.</p>
+   * <p>The initial dialog load uses the same validation endpoint as checkbox
+   * changes so the UI receives one normalized dependency snapshot for the
+   * current root selection. When no dependency rows are returned, this falls
+   * back to the existing confirm dialog and returns an empty dependency
+   * selection on approval. When dependency rows exist, the shared dependency
+   * dialog is opened and the selected dependency ids are returned.</p>
    */
-  requestDependencySelection(request: BieStateTransitionFlowRequest): Observable<number[] | undefined> {
-    return request.loadDependencies().pipe(
+  requestDependencySelection(request: BieStateTransitionFlowRequest): Observable<StateDependencySelection | undefined> {
+    const initialSelection: StateDependencySelection = {
+      topLevelAsbiepIds: [],
+      codeListManifestIds: []
+    };
+
+    return request.validateSelection(initialSelection).pipe(
       map(targets => request.normalizeTargets ? request.normalizeTargets(targets || []) : (targets || [])),
-      map(targets => this.filterActionableTargets(targets || [])),
-      switchMap(targets => {
-        if (targets.length === 0) {
+      switchMap(validatedTargets => {
+        const actionableTargets = this.filterActionableTargets(validatedTargets || []);
+        if (actionableTargets.length === 0) {
           return this.openSimpleConfirmation(request.state);
         }
 
-        const initialSelectedTopLevelAsbiepIds = this.getInitiallySelectedDependencyIds(
-          targets,
-          request.rootTopLevelAsbiepIds
-        );
+        const dialogData: BieStateDependencyDialogData = {
+          state: request.state,
+          rootTopLevelAsbiepIds: request.rootTopLevelAsbiepIds,
+          targets: actionableTargets,
+          validateSelection: request.validateSelection
+        };
 
-        return request.validateSelection(initialSelectedTopLevelAsbiepIds).pipe(
-          map(validatedTargets => request.normalizeTargets ? request.normalizeTargets(validatedTargets || []) : (validatedTargets || [])),
-          map(validatedTargets => this.filterActionableTargets(validatedTargets || [])),
-          catchError(() => of(targets)),
-          switchMap(validatedTargets => {
-            const dialogData: BieStateDependencyDialogData = {
-              state: request.state,
-              rootTopLevelAsbiepIds: request.rootTopLevelAsbiepIds,
-              targets: validatedTargets,
-              validateSelection: request.validateSelection
-            };
+        return this.dialog.open(BieStateDependencyDialogComponent, {
+          width: '90vw',
+          maxWidth: '90vw',
+          data: dialogData
+        }).afterClosed();
+      }),
+      catchError(() => request.loadDependencies().pipe(
+        map(targets => request.normalizeTargets ? request.normalizeTargets(targets || []) : (targets || [])),
+        switchMap(targets => {
+          const actionableTargets = this.filterActionableTargets(targets || []);
+          if (actionableTargets.length === 0) {
+            return this.openSimpleConfirmation(request.state);
+          }
 
-            return this.dialog.open(BieStateDependencyDialogComponent, {
-              width: '1200px',
-              maxWidth: '95vw',
-              data: dialogData
-            }).afterClosed();
-          })
-        );
-      })
+          const dialogData: BieStateDependencyDialogData = {
+            state: request.state,
+            rootTopLevelAsbiepIds: request.rootTopLevelAsbiepIds,
+            targets: actionableTargets,
+            validateSelection: request.validateSelection
+          };
+
+          return this.dialog.open(BieStateDependencyDialogComponent, {
+            width: '90vw',
+            maxWidth: '90vw',
+            data: dialogData
+          }).afterClosed();
+        })
+      ))
     );
   }
 
@@ -88,38 +102,31 @@ export class BieStateTransitionFlowService {
    * Preserves the original simple confirm dialog for transitions without any
    * visible dependency rows.
    */
-  private openSimpleConfirmation(state: string): Observable<number[] | undefined> {
+  private openSimpleConfirmation(
+    state: string,
+    selection: StateDependencySelection = {topLevelAsbiepIds: [], codeListManifestIds: []}
+  ): Observable<StateDependencySelection | undefined> {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Update state to \'' + state + '\'?';
     dialogConfig.data.content = ['Are you sure you want to update the state to \'' + state + '\'?'];
     dialogConfig.data.action = 'Update';
 
     return this.confirmDialogService.open(dialogConfig).afterClosed().pipe(
-      map(result => result ? [] : undefined)
+      map(result => result ? selection : undefined)
     );
   }
 
   /**
-   * Hides dependency rows that would not be updated and do not currently
-   * contribute any conflict. When only those rows are returned, the shared
-   * flow should fall back to the simple confirmation dialog.
+   * Keeps rows that require user attention in the dependency dialog.
+   *
+   * <p>Issue-free code-list rows are excluded here because they do not require
+   * an explicit dependency selection from the user.</p>
    */
   private filterActionableTargets(targets: StateDependencyTarget[]): StateDependencyTarget[] {
     return targets.filter(target =>
-      target.selectionConflict === true ||
-      target.stateTransitionAllowed === false ||
-      target.dependencyUpdateMessage !== BieStateTransitionFlowService.NO_UPDATE_MESSAGE
+      (target.issues || []).length > 0 ||
+      target.nodeType !== 'CODE_LIST'
     );
   }
 
-  private getInitiallySelectedDependencyIds(
-    targets: StateDependencyTarget[],
-    rootTopLevelAsbiepIds: number[]
-  ): number[] {
-    const rootIdSet = new Set(rootTopLevelAsbiepIds || []);
-    return (targets || [])
-      .filter(target => !rootIdSet.has(target.topLevelAsbiepId))
-      .filter(target => target.dependencyUpdateAllowed !== false && target.checked !== false)
-      .map(target => target.topLevelAsbiepId);
-  }
 }

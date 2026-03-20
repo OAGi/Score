@@ -191,7 +191,7 @@ public class BieEditController {
                             @PathVariable("id") TopLevelAsbiepId topLevelAsbiepId,
                             @RequestBody UpdateBieStateRequest request) {
         bieStateTransitionService.updateState(sessionService.asScoreUser(user), topLevelAsbiepId,
-                request.getState(), request.getDependencyTopLevelAsbiepIds());
+                request.getState(), request.getDependencyTopLevelAsbiepIds(), request.getDependencyCodeListManifestIds());
     }
 
     @GetMapping(value = "/profile_bie/node/root/{id:[\\d]+}/state/dependencies",
@@ -222,7 +222,8 @@ public class BieEditController {
                 sessionService.asScoreUser(user),
                 List.of(topLevelAsbiepId),
                 request.getState(),
-                request.getSelectedTopLevelAsbiepIds());
+                request.getSelectedTopLevelAsbiepIds(),
+                request.getSelectedCodeListManifestIds());
     }
 
     @RequestMapping(value = "/profile_bie/{topLevelAsbiepId:[\\d]+}/detail", method = RequestMethod.POST,

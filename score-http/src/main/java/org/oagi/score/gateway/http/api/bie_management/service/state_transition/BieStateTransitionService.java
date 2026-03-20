@@ -1,7 +1,9 @@
 package org.oagi.score.gateway.http.api.bie_management.service.state_transition;
 
 import org.oagi.score.gateway.http.api.bie_management.controller.payload.BieUpdateStateListRequest;
+import org.oagi.score.gateway.http.api.bie_management.model.BieCodeListStateDependencyRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.BieState;
+import org.oagi.score.gateway.http.api.bie_management.model.BieStateLevel;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.asbiep.AsbiepSummaryRecord;
@@ -9,7 +11,15 @@ import org.oagi.score.gateway.http.api.bie_management.repository.TopLevelAsbiepQ
 import org.oagi.score.gateway.http.api.bie_management.service.BieService;
 import org.oagi.score.gateway.http.api.bie_management.service.edit_tree.BieEditTreeController;
 import org.oagi.score.gateway.http.api.bie_management.service.edit_tree.DefaultBieEditTreeController;
+import org.oagi.score.gateway.http.api.bie_management.service.state_transition.rule.BieFutureStateCarrier;
 import org.oagi.score.gateway.http.api.bie_management.service.state_transition.rule.BieStateTransitionRule;
+import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListValueSummaryRecord;
+import org.oagi.score.gateway.http.api.bie_management.service.state_transition.rule.CodeListFutureStateCarrier;
+import org.oagi.score.gateway.http.api.cc_management.model.CcState;
+import org.oagi.score.gateway.http.api.code_list_management.model.CodeListManifestId;
+import org.oagi.score.gateway.http.api.code_list_management.model.CodeListStateLevel;
+import org.oagi.score.gateway.http.api.code_list_management.model.CodeListSummaryRecord;
+import org.oagi.score.gateway.http.api.code_list_management.service.CodeListCommandService;
 import org.oagi.score.gateway.http.api.context_management.business_context.model.BusinessContextSummaryRecord;
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
@@ -21,19 +31,34 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.ASBIEP;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.ASCCP;
 import static org.springframework.util.StringUtils.hasLength;
 
 /**
- * Executes registered {@link BieStateTransitionRule} instances against the
- * projected BIE dependency graph and applies the resulting validation messages
- * to dialog rows.
+ * Builds the BIE/code-list dependency graph used by the state-transition
+ * dialog, projects future states from the user's current selection, and
+ * converts rule results into row-level blocking issues.
  */
 @Service
 @Transactional(readOnly = true)
 public class BieStateTransitionService {
+
+    /**
+     * The projected future states used during dependency-dialog evaluation.
+     *
+     * <p>{@code actualFutureStateMap} respects ownership/selectability and is
+     * used for the final BIE row validation, while
+     * {@code requiredFutureStateMap} ignores those ownership limits so the
+     * dialog can still surface dependent code lists and downstream blockers
+     * that become relevant through implied BIE movement.</p>
+     */
+    private record BieStateFutureStateProjection(
+            Map<TopLevelAsbiepId, BieState> actualFutureStateMap,
+            Map<TopLevelAsbiepId, BieState> requiredFutureStateMap) {
+    }
 
     /**
      * Immutable snapshot of the dependency graph and derived metadata for a
@@ -66,10 +91,12 @@ public class BieStateTransitionService {
             LinkedHashMap<TopLevelAsbiepId, LinkedHashSet<TopLevelAsbiepId>> dependencyMap,
             /**
              * Dependency parents that make a row mandatory when they are part of
-             * the active-changing set.
+             * the active-changing path for the requested transition.
              *
-             * <p>This drives checkbox validation and becomes
-             * {@link BieStateDependencyTarget#getRequiredDependencyTopLevelAsbiepIds()}.</p>
+             * <p>The information is preserved on
+             * {@link BieStateDependencyTarget#getRequiredDependencyTopLevelAsbiepIds()}
+             * so follow-up validation requests operate on the same graph
+             * snapshot as the initial preview.</p>
              */
             LinkedHashMap<TopLevelAsbiepId, LinkedHashSet<TopLevelAsbiepId>> requiredDependencyMap,
             /**
@@ -77,8 +104,8 @@ public class BieStateTransitionService {
              * traversed ownership/path rules.
              *
              * <p>Row projection converts this into
-             * {@link BieStateDependencyTarget#isDependencyUpdateAllowed()} and
-             * its matching explanatory message.</p>
+             * {@link BieStateDependencyTarget#isSelectable()} and later uses it
+             * when assembling ownership issues for the row.</p>
              */
             LinkedHashMap<TopLevelAsbiepId, Boolean> dependencyUpdateAllowedMap,
             /**
@@ -105,7 +132,24 @@ public class BieStateTransitionService {
              * evaluation needs both relationship direction and source/target
              * future states.</p>
              */
-            List<BieStateTransitionEdge> stateTransitionEdges,
+            List<BieStateTransitionEdge<TopLevelAsbiepId, TopLevelAsbiepId>> stateTransitionEdges,
+            /**
+             * Code list summaries referenced by visible BIE rows.
+             */
+            Map<CodeListManifestId, CodeListSummaryRecord> codeListMap,
+            /**
+             * Directed BIE-to-code-list dependency edges.
+             */
+            List<BieStateTransitionEdge<TopLevelAsbiepId, CodeListManifestId>> codeListStateTransitionEdges,
+            /**
+             * UI-facing dependency relations for each visible code list row.
+             */
+            Map<CodeListManifestId, List<BieStateDependencyRelation>> codeListDependenciesRelationMap,
+            /**
+             * Minimum graph distance from any requested root to each visible
+             * code list row.
+             */
+            Map<CodeListManifestId, Integer> codeListEdgeDistanceMap,
             /**
              * Reverse child lookup used to propagate blocking messages from
              * dependent rows back toward their ancestors.
@@ -125,8 +169,14 @@ public class BieStateTransitionService {
     @Autowired
     private BieService bieService;
 
+    @Autowired
+    private CodeListCommandService codeListCommandService;
+
     @Autowired(required = false)
-    private List<BieStateTransitionRule> stateTransitionRules = Collections.emptyList();
+    private List<BieStateTransitionRule<BieFutureStateCarrier, BieFutureStateCarrier>> stateTransitionRules = Collections.emptyList();
+
+    @Autowired(required = false)
+    private List<BieStateTransitionRule<BieFutureStateCarrier, CodeListFutureStateCarrier>> codeListStateTransitionRules = Collections.emptyList();
 
     /**
      * Builds the dependency graph for the requested transition and projects it
@@ -141,18 +191,12 @@ public class BieStateTransitionService {
         }
 
         BieStateDependencyGraph dependencyGraph = buildStateDependencyGraph(requester, rootTopLevelAsbiepIds, nextState);
-        List<BieStateDependencyTarget> targets = buildDependencyTargets(requester, dependencyGraph, nextState);
-        applyStateTransitionRules(
-                targets,
-                buildFutureStateMap(
-                        targets,
-                        dependencyGraph.rootTopLevelAsbiepIds(),
-                        nextState,
-                        new HashSet<>(),
-                        dependencyGraph.topLevelAsbiepMap()),
-                dependencyGraph.topLevelAsbiepMap(),
-                dependencyGraph.stateTransitionEdges(),
-                dependencyGraph.edgeDistanceMap());
+        List<BieStateDependencyTarget> targets = buildDependencyTargets(
+                requester,
+                dependencyGraph,
+                nextState,
+                null,
+                Collections.emptySet());
         return targets;
     }
 
@@ -164,32 +208,15 @@ public class BieStateTransitionService {
             ScoreUser requester,
             Collection<TopLevelAsbiepId> rootTopLevelAsbiepIds,
             BieState nextState,
-            Collection<TopLevelAsbiepId> selectedTopLevelAsbiepIds) {
+            Collection<TopLevelAsbiepId> selectedTopLevelAsbiepIds,
+            Collection<CodeListManifestId> selectedCodeListManifestIds) {
         BieStateDependencyGraph dependencyGraph = buildStateDependencyGraph(requester, rootTopLevelAsbiepIds, nextState);
-        List<BieStateDependencyTarget> targets = buildDependencyTargets(requester, dependencyGraph, nextState);
-        applyDependencySelection(targets, dependencyGraph.rootTopLevelAsbiepIds(), selectedTopLevelAsbiepIds);
-
-        Set<TopLevelAsbiepId> selectedIdSet = new HashSet<>();
-        if (selectedTopLevelAsbiepIds != null) {
-            selectedIdSet.addAll(selectedTopLevelAsbiepIds);
-        } else {
-            targets.stream()
-                    .filter(BieStateDependencyTarget::isChecked)
-                    .map(BieStateDependencyTarget::getTopLevelAsbiepId)
-                    .forEach(selectedIdSet::add);
-        }
-
-        applyStateTransitionRules(
-                targets,
-                buildFutureStateMap(
-                        targets,
-                        dependencyGraph.rootTopLevelAsbiepIds(),
-                        nextState,
-                        selectedIdSet,
-                        dependencyGraph.topLevelAsbiepMap()),
-                dependencyGraph.topLevelAsbiepMap(),
-                dependencyGraph.stateTransitionEdges(),
-                dependencyGraph.edgeDistanceMap());
+        List<BieStateDependencyTarget> targets = buildDependencyTargets(
+                requester,
+                dependencyGraph,
+                nextState,
+                selectedTopLevelAsbiepIds,
+                (selectedCodeListManifestIds != null) ? new LinkedHashSet<>(selectedCodeListManifestIds) : Collections.emptySet());
         return targets;
     }
 
@@ -198,6 +225,14 @@ public class BieStateTransitionService {
      * inheritance rules before any write is attempted.
      */
     public void validateStateChange(ScoreUser requester, TopLevelAsbiepId topLevelAsbiepId, BieState state) {
+        validateStateChange(requester, topLevelAsbiepId, state, Collections.emptyList());
+    }
+
+    public void validateStateChange(ScoreUser requester,
+                                    TopLevelAsbiepId topLevelAsbiepId,
+                                    BieState state,
+                                    Collection<CodeListManifestId> dependencyCodeListManifestIds) {
+        ensureCodeListDependenciesForChangingState(requester, List.of(topLevelAsbiepId), state, dependencyCodeListManifestIds);
         ensureBieRelationshipsForChangingState(requester, topLevelAsbiepId, state);
     }
 
@@ -207,7 +242,7 @@ public class BieStateTransitionService {
      */
     @Transactional
     public void updateState(ScoreUser requester, TopLevelAsbiepId topLevelAsbiepId, BieState state) {
-        updateState(requester, topLevelAsbiepId, state, null);
+        updateState(requester, topLevelAsbiepId, state, null, null);
     }
 
     /**
@@ -218,12 +253,14 @@ public class BieStateTransitionService {
     public void updateState(ScoreUser requester,
                             TopLevelAsbiepId topLevelAsbiepId,
                             BieState state,
-                            Collection<TopLevelAsbiepId> dependencyTopLevelAsbiepIds) {
-        validateStateChange(requester, topLevelAsbiepId, state);
-        ensureDependencySelectionStateChange(requester, topLevelAsbiepId, state, dependencyTopLevelAsbiepIds);
+                            Collection<TopLevelAsbiepId> dependencyTopLevelAsbiepIds,
+                            Collection<CodeListManifestId> dependencyCodeListManifestIds) {
+        validateStateChange(requester, topLevelAsbiepId, state, dependencyCodeListManifestIds);
+        ensureDependencySelectionStateChange(requester, topLevelAsbiepId, state, dependencyTopLevelAsbiepIds, dependencyCodeListManifestIds);
 
         BieEditTreeController treeController = getTreeController(requester, topLevelAsbiepId);
         treeController.updateState(requester, state, dependencyTopLevelAsbiepIds);
+        updateSelectedCodeLists(requester, state, dependencyCodeListManifestIds);
     }
 
     /**
@@ -237,17 +274,19 @@ public class BieStateTransitionService {
         }
 
         request.getTopLevelAsbiepIds().forEach(topLevelAsbiepId ->
-                validateStateChange(requester, topLevelAsbiepId, request.getToState()));
+                validateStateChange(requester, topLevelAsbiepId, request.getToState(), request.getDependencyCodeListManifestIds()));
         ensureDependencySelectionStateChange(
                 requester,
                 request.getTopLevelAsbiepIds(),
                 request.getToState(),
-                request.getDependencyTopLevelAsbiepIds());
+                request.getDependencyTopLevelAsbiepIds(),
+                request.getDependencyCodeListManifestIds());
 
         request.getTopLevelAsbiepIds().forEach(topLevelAsbiepId -> {
             BieEditTreeController treeController = getTreeController(requester, topLevelAsbiepId);
             treeController.updateState(requester, request.getToState(), request.getDependencyTopLevelAsbiepIds());
         });
+        updateSelectedCodeLists(requester, request.getToState(), request.getDependencyCodeListManifestIds());
     }
 
     /**
@@ -286,8 +325,16 @@ public class BieStateTransitionService {
                 buildConnectedRelationMap(topLevelAsbiepQuery, topLevelAsbiepMap, associatedTopLevelAsbiepIds);
         Map<TopLevelAsbiepId, Integer> edgeDistanceMap =
                 buildEdgeDistanceMap(rootIdSet, connectedRelationMap);
-        List<BieStateTransitionEdge> stateTransitionEdges =
+        List<BieStateTransitionEdge<TopLevelAsbiepId, TopLevelAsbiepId>> stateTransitionEdges =
                 buildStateTransitionEdges(topLevelAsbiepQuery, topLevelAsbiepMap, associatedTopLevelAsbiepIds);
+        Map<CodeListManifestId, CodeListSummaryRecord> codeListMap =
+                buildCodeListMap(requester, associatedTopLevelAsbiepIds);
+        List<BieStateTransitionEdge<TopLevelAsbiepId, CodeListManifestId>> codeListStateTransitionEdges =
+                buildCodeListStateTransitionEdges(requester, associatedTopLevelAsbiepIds, codeListMap.keySet());
+        Map<CodeListManifestId, List<BieStateDependencyRelation>> codeListDependenciesRelationMap =
+                buildCodeListDependenciesRelationMap(topLevelAsbiepMap, codeListStateTransitionEdges);
+        Map<CodeListManifestId, Integer> codeListEdgeDistanceMap =
+                buildCodeListEdgeDistanceMap(edgeDistanceMap, codeListStateTransitionEdges);
 
         Map<TopLevelAsbiepId, Set<TopLevelAsbiepId>> childMap = new LinkedHashMap<>();
         for (Map.Entry<TopLevelAsbiepId, LinkedHashSet<TopLevelAsbiepId>> entry : dependencyMap.entrySet()) {
@@ -311,36 +358,77 @@ public class BieStateTransitionService {
                 dependenciesRelationMap,
                 edgeDistanceMap,
                 stateTransitionEdges,
+                codeListMap,
+                codeListStateTransitionEdges,
+                codeListDependenciesRelationMap,
+                codeListEdgeDistanceMap,
                 childMap
         );
     }
 
     /**
-     * Converts the graph snapshot into the transport model used by the state
-     * transition dialog.
+     * Converts one dependency-graph snapshot into the transport rows used by
+     * the dialog.
+     *
+     * <p>The method keeps all preview logic in one place: it projects BIE rows
+     * first, applies the current checkbox state, computes future-state maps,
+     * then evaluates BIE rules and code-list rules against that projection.</p>
      */
     private List<BieStateDependencyTarget> buildDependencyTargets(
+            ScoreUser requester,
+            BieStateDependencyGraph dependencyGraph,
+            BieState nextState,
+            Collection<TopLevelAsbiepId> selectedTopLevelAsbiepIds,
+            Collection<CodeListManifestId> selectedCodeListManifestIds) {
+        List<BieStateDependencyTarget> targets = buildBieDependencyTargets(requester, dependencyGraph, nextState);
+        applyCheckedState(
+                targets,
+                selectedTopLevelAsbiepIds,
+                selectedCodeListManifestIds);
+
+        BieStateFutureStateProjection futureStateProjection = buildFutureStateProjection(
+                targets,
+                dependencyGraph,
+                nextState,
+                getSelectedTopLevelAsbiepIdSet(targets));
+        applyStateTransitionRules(
+                targets,
+                dependencyGraph,
+                nextState,
+                futureStateProjection.actualFutureStateMap());
+        applyCodeListStateTransitionRules(
+                requester,
+                targets,
+                dependencyGraph,
+                nextState,
+                futureStateProjection,
+                selectedCodeListManifestIds);
+        return targets;
+    }
+
+    /**
+     * Projects the visible BIE vertices in the graph into dialog rows before
+     * any checkbox-specific future-state evaluation runs.
+     */
+    private List<BieStateDependencyTarget> buildBieDependencyTargets(
             ScoreUser requester,
             BieStateDependencyGraph dependencyGraph,
             BieState nextState) {
         var topLevelAsbiepQuery = repositoryFactory.topLevelAsbiepQueryRepository(requester);
         var asbiepQuery = repositoryFactory.asbiepQueryRepository(requester);
         var businessContextQuery = repositoryFactory.businessContextQueryRepository(requester);
-        Map<TopLevelAsbiepId, String> stateTransitionMessageMap = new LinkedHashMap<>();
+        Map<TopLevelAsbiepId, BieStateDependencyIssue> stateTransitionIssueMap = new LinkedHashMap<>();
 
         return dependencyGraph.dependencyMap().entrySet().stream()
                 .map(entry -> {
                     TopLevelAsbiepSummaryRecord target = dependencyGraph.topLevelAsbiepMap().get(entry.getKey());
-                    String stateTransitionMessage = resolveStateTransitionMessage(
+                    BieStateDependencyIssue stateTransitionIssue = resolveStateTransitionIssue(
                             entry.getKey(),
                             nextState,
-                            dependencyGraph.topLevelAsbiepMap(),
-                            dependencyGraph.dependencyUpdateAllowedMap(),
-                            dependencyGraph.childMap(),
-                            dependencyGraph.rootTopLevelAsbiepIds(),
+                            dependencyGraph,
                             dependencyGraph.dependencyMap().keySet(),
                             topLevelAsbiepQuery,
-                            stateTransitionMessageMap,
+                            stateTransitionIssueMap,
                             new HashSet<>());
                     return toBieStateDependencyTarget(
                             target,
@@ -351,47 +439,55 @@ public class BieStateTransitionService {
                             new ArrayList<>(entry.getValue()),
                             new ArrayList<>(dependencyGraph.requiredDependencyMap().getOrDefault(entry.getKey(), new LinkedHashSet<>())),
                             dependencyGraph.dependencyUpdateAllowedMap().getOrDefault(entry.getKey(), false),
-                            stateTransitionMessage,
-                            nextState);
+                            nextState,
+                            stateTransitionIssue);
                 })
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    private Set<TopLevelAsbiepId> getSelectedTopLevelAsbiepIdSet(List<BieStateDependencyTarget> targets) {
+        return targets.stream()
+                .filter(target -> target.getNodeType() == BieStateDependencyNodeType.BIE)
+                .filter(BieStateDependencyTarget::isChecked)
+                .map(BieStateDependencyTarget::getTopLevelAsbiepId)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     /**
-     * Applies the current checkbox selection to the dialog rows before
-     * edge-based rule validation runs again.
+     * Applies the current checkbox selection to the row model without adding
+     * any validation issues.
+     *
+     * <p>The subsequent future-state projection uses this normalized checked
+     * state as its only selection input.</p>
      */
-    private void applyDependencySelection(
+    private void applyCheckedState(
             List<BieStateDependencyTarget> targets,
-            Collection<TopLevelAsbiepId> rootTopLevelAsbiepIds,
-            Collection<TopLevelAsbiepId> selectedTopLevelAsbiepIds) {
+            Collection<TopLevelAsbiepId> selectedTopLevelAsbiepIds,
+            Collection<CodeListManifestId> selectedCodeListManifestIds) {
         Set<TopLevelAsbiepId> selectedIdSet = new HashSet<>();
         if (selectedTopLevelAsbiepIds != null) {
             selectedIdSet.addAll(selectedTopLevelAsbiepIds);
         } else {
             targets.stream()
-                    .filter(BieStateDependencyTarget::isDependencyUpdateAllowed)
+                    .filter(target -> target.getNodeType() == BieStateDependencyNodeType.BIE)
+                    .filter(BieStateDependencyTarget::isSelectable)
                     .map(BieStateDependencyTarget::getTopLevelAsbiepId)
                     .forEach(selectedIdSet::add);
         }
-
-        Set<TopLevelAsbiepId> activeChangingIdSet = new HashSet<>(rootTopLevelAsbiepIds);
-        activeChangingIdSet.addAll(selectedIdSet);
+        Set<CodeListManifestId> selectedCodeListIdSet = (selectedCodeListManifestIds != null)
+                ? new HashSet<>(selectedCodeListManifestIds) : new HashSet<>();
 
         targets.forEach(target -> {
-            boolean selectable = target.isDependencyUpdateAllowed();
-            boolean checked = selectable && selectedIdSet.contains(target.getTopLevelAsbiepId());
-            boolean required = target.getRequiredDependencyTopLevelAsbiepIds() != null &&
-                    target.getRequiredDependencyTopLevelAsbiepIds().stream().anyMatch(activeChangingIdSet::contains);
-            target.setChecked(checked);
-            target.setSelectionConflict(selectable && required && !checked);
-            target.setSelectionConflictMessage(target.isSelectionConflict()
-                    ? "This BIE must be updated together."
-                    : null);
-            if (!checked && !required) {
-                target.setStateTransitionAllowed(true);
-                target.setStateTransitionMessage(null);
+            if (target.getNodeType() == BieStateDependencyNodeType.CODE_LIST) {
+                boolean checked = target.isSelectable() &&
+                        target.getCodeListManifestId() != null &&
+                        selectedCodeListIdSet.contains(target.getCodeListManifestId());
+                target.setChecked(checked);
+                return;
             }
+            boolean selectable = target.isSelectable();
+            boolean checked = selectable && selectedIdSet.contains(target.getTopLevelAsbiepId());
+            target.setChecked(checked);
         });
     }
 
@@ -407,30 +503,33 @@ public class BieStateTransitionService {
             List<TopLevelAsbiepId> dependencyTopLevelAsbiepIds,
             List<TopLevelAsbiepId> requiredDependencyTopLevelAsbiepIds,
             boolean dependencyUpdateAllowed,
-            String stateTransitionMessage,
-            BieState nextState) {
-        String dependencyUpdateMessage = getDependencyUpdateMessage(topLevelAsbiep, dependencyUpdateAllowed, nextState);
+            BieState nextState,
+            BieStateDependencyIssue stateTransitionIssue) {
         return new BieStateDependencyTarget(
+                toNodeKey(topLevelAsbiep.topLevelAsbiepId()),
+                BieStateDependencyNodeType.BIE,
                 topLevelAsbiep.topLevelAsbiepId(),
+                null,
                 dependencyTopLevelAsbiepIds,
                 requiredDependencyTopLevelAsbiepIds,
                 dependencies,
                 edgeDistance,
+                topLevelAsbiep.den(),
                 topLevelAsbiep.propertyTerm(),
                 topLevelAsbiep.displayName(),
+                null,
                 topLevelAsbiep.guid().value(),
+                ownerLoginId(topLevelAsbiep),
+                null,
+                null,
                 businessContexts.stream().map(BusinessContextSummaryRecord::name).toList(),
                 topLevelAsbiep.version(),
                 topLevelAsbiep.status(),
                 (asbiep != null) ? asbiep.remark() : null,
-                topLevelAsbiep.state(),
+                (topLevelAsbiep.state() != null) ? topLevelAsbiep.state().name() : null,
                 dependencyUpdateAllowed,
-                dependencyUpdateMessage,
-                stateTransitionMessage == null,
-                stateTransitionMessage,
-                dependencyUpdateAllowed && stateTransitionMessage == null,
-                false,
-                null
+                dependencyUpdateAllowed && stateTransitionIssue == null,
+                buildBieIssues(topLevelAsbiep, dependencyUpdateAllowed, nextState, stateTransitionIssue)
         );
     }
 
@@ -514,8 +613,9 @@ public class BieStateTransitionService {
     }
 
     /**
-     * Adds one dependency row and continues traversal through that row while
-     * preserving the ownership-aware dependency flags for the current path.
+     * Adds one dependency vertex/edge to the graph and continues traversal
+     * through that row while preserving the ownership-aware update flags for
+     * the current path.
      */
     private void collectDependencyTarget(
             Set<TopLevelAsbiepId> rootIdSet,
@@ -538,7 +638,7 @@ public class BieStateTransitionService {
 
         boolean sameOwner = currentTopLevelAsbiep.owner().userId().equals(target.owner().userId());
         boolean stateChangeNeeded = shouldApplyDependencyStateChange(target.state(), nextState);
-        boolean visible = !rootIdSet.contains(target.topLevelAsbiepId()) && (stateChangeNeeded || !sameOwner);
+        boolean visible = !rootIdSet.contains(target.topLevelAsbiepId());
         boolean nextDependencyPathAllowed = dependencyPathAllowed && sameOwner && dependencyUpdateAllowedOnPath;
         boolean nextRequiredPathAllowed = requiredPathAllowed && requiredOnPath;
 
@@ -576,7 +676,10 @@ public class BieStateTransitionService {
             TopLevelAsbiepSummaryRecord topLevelAsbiep,
             BieStateTransitionDependency dependency) {
         return new BieStateDependencyRelation(
+                toNodeKey(topLevelAsbiep.topLevelAsbiepId()),
+                BieStateDependencyNodeType.BIE,
                 topLevelAsbiep.topLevelAsbiepId(),
+                null,
                 dependency,
                 toName(topLevelAsbiep),
                 topLevelAsbiep.guid().value()
@@ -587,108 +690,270 @@ public class BieStateTransitionService {
         return nextState == BieState.WIP;
     }
 
-    private String resolveStateTransitionMessage(
+    /**
+     * Resolves the first blocking BIE-side issue for one dependency row and
+     * memoizes the result so repeated traversals of the same graph stay cheap.
+     *
+     * <p>The result can be a direct issue on the row itself or a propagated
+     * dependency conflict from a downstream child row.</p>
+     */
+    private BieStateDependencyIssue resolveStateTransitionIssue(
             TopLevelAsbiepId topLevelAsbiepId,
             BieState nextState,
-            Map<TopLevelAsbiepId, TopLevelAsbiepSummaryRecord> topLevelAsbiepMap,
-            Map<TopLevelAsbiepId, Boolean> dependencyUpdateAllowedMap,
-            Map<TopLevelAsbiepId, Set<TopLevelAsbiepId>> childMap,
-            Set<TopLevelAsbiepId> rootTopLevelAsbiepIds,
+            BieStateDependencyGraph dependencyGraph,
             Set<TopLevelAsbiepId> affectedTopLevelAsbiepIds,
             TopLevelAsbiepQueryRepository topLevelAsbiepQuery,
-            Map<TopLevelAsbiepId, String> stateTransitionMessageMap,
+            Map<TopLevelAsbiepId, BieStateDependencyIssue> stateTransitionIssueMap,
             Set<TopLevelAsbiepId> visitedTopLevelAsbiepIds) {
-        if (stateTransitionMessageMap.containsKey(topLevelAsbiepId)) {
-            return stateTransitionMessageMap.get(topLevelAsbiepId);
+        if (stateTransitionIssueMap.containsKey(topLevelAsbiepId)) {
+            return stateTransitionIssueMap.get(topLevelAsbiepId);
         }
         if (!visitedTopLevelAsbiepIds.add(topLevelAsbiepId)) {
             return null;
         }
 
-        TopLevelAsbiepSummaryRecord topLevelAsbiep = topLevelAsbiepMap.get(topLevelAsbiepId);
-        String directMessage = getStateTransitionMessage(
-                topLevelAsbiep.state(),
-                dependencyUpdateAllowedMap.getOrDefault(topLevelAsbiepId, false),
+        TopLevelAsbiepSummaryRecord topLevelAsbiep = dependencyGraph.topLevelAsbiepMap().get(topLevelAsbiepId);
+        BieStateDependencyIssue directIssue = getStateTransitionIssue(
+                topLevelAsbiep,
+                dependencyGraph.dependencyUpdateAllowedMap().getOrDefault(topLevelAsbiepId, false),
                 nextState);
-        if (directMessage == null) {
-            directMessage = resolveBackwardDependencyConflictMessage(
+        if (directIssue == null) {
+            directIssue = resolveBackwardDependencyConflictIssue(
                     topLevelAsbiep,
-                    rootTopLevelAsbiepIds,
+                    dependencyGraph.rootTopLevelAsbiepIds(),
                     affectedTopLevelAsbiepIds,
                     nextState,
                     topLevelAsbiepQuery);
         }
-        if (directMessage != null) {
-            stateTransitionMessageMap.put(topLevelAsbiepId, directMessage);
+        if (directIssue != null) {
+            stateTransitionIssueMap.put(topLevelAsbiepId, directIssue);
             visitedTopLevelAsbiepIds.remove(topLevelAsbiepId);
-            return directMessage;
+            return directIssue;
         }
 
-        for (TopLevelAsbiepId childTopLevelAsbiepId : childMap.getOrDefault(topLevelAsbiepId, Collections.emptySet())) {
-            String childMessage = resolveStateTransitionMessage(
-                    childTopLevelAsbiepId, nextState, topLevelAsbiepMap,
-                    dependencyUpdateAllowedMap, childMap, rootTopLevelAsbiepIds,
+        for (TopLevelAsbiepId childTopLevelAsbiepId : dependencyGraph.childMap().getOrDefault(topLevelAsbiepId, Collections.emptySet())) {
+            BieStateDependencyIssue childIssue = resolveStateTransitionIssue(
+                    childTopLevelAsbiepId, nextState, dependencyGraph,
                     affectedTopLevelAsbiepIds, topLevelAsbiepQuery,
-                    stateTransitionMessageMap, visitedTopLevelAsbiepIds);
-            if (childMessage != null) {
-                if (rootTopLevelAsbiepIds.contains(childTopLevelAsbiepId)) {
+                    stateTransitionIssueMap, visitedTopLevelAsbiepIds);
+            if (childIssue != null) {
+                if (dependencyGraph.rootTopLevelAsbiepIds().contains(childTopLevelAsbiepId)) {
                     continue;
                 }
-                String propagatedMessage = toRelatedConflictMessage(childMessage, nextState);
-                stateTransitionMessageMap.put(topLevelAsbiepId, propagatedMessage);
+                BieStateDependencyIssue propagatedIssue = toRelatedConflictIssue(nextState);
+                stateTransitionIssueMap.put(topLevelAsbiepId, propagatedIssue);
                 visitedTopLevelAsbiepIds.remove(topLevelAsbiepId);
-                return propagatedMessage;
+                return propagatedIssue;
             }
         }
 
-        stateTransitionMessageMap.put(topLevelAsbiepId, null);
+        stateTransitionIssueMap.put(topLevelAsbiepId, null);
         visitedTopLevelAsbiepIds.remove(topLevelAsbiepId);
         return null;
     }
 
-    private String getStateTransitionMessage(
-            BieState currentState,
+    /**
+     * Builds the direct issue for one BIE row, without looking at downstream
+     * dependencies.
+     */
+    private BieStateDependencyIssue getStateTransitionIssue(
+            TopLevelAsbiepSummaryRecord topLevelAsbiep,
             boolean dependencyUpdateAllowed,
             BieState nextState) {
+        BieState currentState = (topLevelAsbiep != null) ? topLevelAsbiep.state() : null;
         if (currentState == null || nextState == null) {
             return null;
         }
         if (!dependencyUpdateAllowed && shouldApplyDependencyStateChange(currentState, nextState)) {
-            return "This BIE is owned by another user and cannot be updated.";
+            return new BieStateDependencyIssue(
+                    BieStateDependencyIssueType.OWNERSHIP,
+                    buildBieOwnershipMessage(topLevelAsbiep));
         }
-        if (nextState.getLevel() <= BieState.WIP.getLevel()) {
-            return null;
-        }
-        BieState requiredState = requiredState(nextState);
-        if (currentState.getLevel() < requiredState.getLevel()) {
-            return "This BIE should be '" + requiredState + "' first to proceed.";
-        }
-        return null;
-    }
-
-    private String getDependencyUpdateMessage(
-            TopLevelAsbiepSummaryRecord topLevelAsbiep,
-            boolean dependencyUpdateAllowed,
-            BieState nextState) {
-        if (!shouldApplyDependencyStateChange(topLevelAsbiep.state(), nextState)) {
-            return "This BIE will not be updated.";
+        if (!requiredBieStatesForTransition(nextState).contains(currentState)) {
+            return new BieStateDependencyIssue(
+                    BieStateDependencyIssueType.STATE_COMPATIBILITY,
+                    buildBieComparableStateMessage(nextState));
         }
         return null;
     }
 
-    private String toRelatedConflictMessage(String childMessage, BieState nextState) {
-        if (childMessage != null) {
-            if (childMessage.startsWith("This BIE should be '")) {
-                return childMessage.replaceFirst("This BIE", "A related BIE");
-            }
-            if (childMessage.contains("owned by another user")) {
-                return "A related BIE is owned by another user and cannot be updated.";
-            }
-        }
-        return "A related BIE should be '" + nextState + "' first to proceed.";
+    /**
+     * Creates the propagated dependency-conflict issue used when a child row is
+     * still blocked.
+     */
+    private BieStateDependencyIssue toRelatedConflictIssue(BieState nextState) {
+        return new BieStateDependencyIssue(
+                BieStateDependencyIssueType.DEPENDENCY_CONFLICT,
+                buildBieComparableStateMessage(nextState));
     }
 
-    private String resolveBackwardDependencyConflictMessage(
+    private String buildBieOwnershipMessage(TopLevelAsbiepSummaryRecord topLevelAsbiep) {
+        return "This BIE is owned by " + toOwnerName(topLevelAsbiep) + " and cannot be updated.";
+    }
+
+    private String buildCodeListOwnershipMessage(CodeListSummaryRecord codeList) {
+        return "This code list is owned by " + toOwnerName(codeList) + " and cannot be updated.";
+    }
+
+    private String buildBieComparableStateMessage(BieState nextState) {
+        return "This BIE must be in " + toQuotedBieStateList(requiredBieStatesForTransition(nextState)) + ".";
+    }
+
+    private String buildCodeListComparableStateMessage(BieState bieState, CodeListSummaryRecord codeList) {
+        return "This code list must be in " + toQuotedStateList(CodeListStateLevel.compatibleStates(bieState, codeList)) + ".";
+    }
+
+    private String buildAssignedCodeListBlockingMessage(BieState bieState,
+                                                        CodeListSummaryRecord codeList,
+                                                        BieStateDependencyTarget codeListTarget) {
+        if (hasIssueType(codeListTarget.getIssues(), BieStateDependencyIssueType.OWNERSHIP)) {
+            return "An assigned code list for this BIE is owned by " + toOwnerName(codeList) + " and cannot be updated.";
+        }
+        return "An assigned code list for this BIE must be in " +
+                toQuotedStateList(CodeListStateLevel.compatibleStates(bieState, codeList)) + ".";
+    }
+
+    /**
+     * Assembles the direct and propagated issues shown on one BIE row.
+     *
+     * <p>A row can expose multiple issues at once, for example an ownership
+     * blocker and a direct state-compatibility requirement.</p>
+     */
+    private List<BieStateDependencyIssue> buildBieIssues(TopLevelAsbiepSummaryRecord topLevelAsbiep,
+                                                         boolean dependencyUpdateAllowed,
+                                                         BieState nextState,
+                                                         BieStateDependencyIssue stateTransitionIssue) {
+        List<BieStateDependencyIssue> issues = new ArrayList<>();
+        BieState currentState = (topLevelAsbiep != null) ? topLevelAsbiep.state() : null;
+
+        if (currentState != null && nextState != null &&
+                !dependencyUpdateAllowed &&
+                shouldApplyDependencyStateChange(currentState, nextState)) {
+            issues = addIssue(issues, new BieStateDependencyIssue(
+                    BieStateDependencyIssueType.OWNERSHIP,
+                    buildBieOwnershipMessage(topLevelAsbiep)));
+        }
+
+        if (currentState != null && nextState != null &&
+                !requiredBieStatesForTransition(nextState).contains(currentState)) {
+            issues = addIssue(issues, new BieStateDependencyIssue(
+                    BieStateDependencyIssueType.STATE_COMPATIBILITY,
+                    buildBieComparableStateMessage(nextState)));
+        }
+
+        if (stateTransitionIssue != null) {
+            issues = addIssue(issues, stateTransitionIssue);
+        }
+
+        return issues;
+    }
+
+    /**
+     * Assembles the issues shown on one code-list row.
+     *
+     * <p>Ownership/selectability is handled first because a cross-owner code
+     * list must surface that blocker even if its current state is otherwise
+     * incompatible.</p>
+     */
+    private List<BieStateDependencyIssue> buildCodeListIssues(ScoreUser requester,
+                                                              CodeListSummaryRecord codeList,
+                                                              BieState nextState,
+                                                              boolean selectable,
+                                                              String stateTransitionMessage) {
+        if (!selectable) {
+            String message = (codeList != null && codeList.owner() != null &&
+                    requester != null && requester.userId().equals(codeList.owner().userId()))
+                    ? buildCodeListComparableStateMessage(nextState, codeList)
+                    : buildCodeListOwnershipMessage(codeList);
+            return new ArrayList<>(List.of(
+                    new BieStateDependencyIssue(
+                            (message.startsWith("This code list is owned by "))
+                                    ? BieStateDependencyIssueType.OWNERSHIP
+                                    : BieStateDependencyIssueType.STATE_COMPATIBILITY,
+                            message)));
+        }
+        if (stateTransitionMessage == null) {
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(List.of(
+                new BieStateDependencyIssue(
+                        BieStateDependencyIssueType.STATE_COMPATIBILITY,
+                        stateTransitionMessage)));
+    }
+
+    private boolean hasIssueType(List<BieStateDependencyIssue> issues, BieStateDependencyIssueType issueType) {
+        return issues != null && issues.stream().anyMatch(issue -> issue.getType() == issueType);
+    }
+
+    private List<BieStateDependencyIssue> removeIssuesOfType(List<BieStateDependencyIssue> issues,
+                                                             BieStateDependencyIssueType issueType) {
+        if (issues == null || issues.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return issues.stream()
+                .filter(issue -> issue.getType() != issueType)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    private List<BieStateDependencyIssue> addIssue(List<BieStateDependencyIssue> issues,
+                                                   BieStateDependencyIssue issue) {
+        List<BieStateDependencyIssue> nextIssues = removeIssuesOfType(
+                issues, issue.getType());
+        if (nextIssues.stream().anyMatch(existing -> Objects.equals(existing.getMessage(), issue.getMessage()))) {
+            return nextIssues;
+        }
+        nextIssues.add(issue);
+        return nextIssues;
+    }
+
+    private List<BieStateDependencyIssue> mergeIssues(List<BieStateDependencyIssue> left,
+                                                      List<BieStateDependencyIssue> right) {
+        List<BieStateDependencyIssue> merged = new ArrayList<>();
+        if (left != null) {
+            merged.addAll(left);
+        }
+        if (right != null) {
+            for (BieStateDependencyIssue issue : right) {
+                merged = addIssue(merged, issue);
+            }
+        }
+        return merged;
+    }
+
+    private List<BieState> requiredBieStatesForTransition(BieState nextState) {
+        if (nextState == null) {
+            return List.of();
+        }
+        return isBackwardStateTransition(nextState) ? List.of(nextState) : BieStateLevel.compatibleStates(nextState);
+    }
+
+    private String toOwnerName(TopLevelAsbiepSummaryRecord topLevelAsbiep) {
+        if (topLevelAsbiep == null || topLevelAsbiep.owner() == null) {
+            return "another user";
+        }
+        if (hasLength(topLevelAsbiep.owner().loginId())) {
+            return "'" + topLevelAsbiep.owner().loginId() + "'";
+        }
+        if (hasLength(topLevelAsbiep.owner().username())) {
+            return "'" + topLevelAsbiep.owner().username() + "'";
+        }
+        return "another user";
+    }
+
+    private String toOwnerName(CodeListSummaryRecord codeList) {
+        if (codeList == null || codeList.owner() == null) {
+            return "another user";
+        }
+        if (hasLength(codeList.owner().loginId())) {
+            return "'" + codeList.owner().loginId() + "'";
+        }
+        if (hasLength(codeList.owner().username())) {
+            return "'" + codeList.owner().username() + "'";
+        }
+        return "another user";
+    }
+
+    private BieStateDependencyIssue resolveBackwardDependencyConflictIssue(
             TopLevelAsbiepSummaryRecord topLevelAsbiep,
             Set<TopLevelAsbiepId> rootTopLevelAsbiepIds,
             Set<TopLevelAsbiepId> affectedTopLevelAsbiepIds,
@@ -706,7 +971,9 @@ public class BieStateTransitionService {
             if (!changingTopLevelAsbiepIds.contains(dependency.topLevelAsbiepId()) &&
                     dependency.state() != null &&
                     dependency.state().getLevel() > nextState.getLevel()) {
-                return "A related BIE should be '" + nextState + "' first to proceed.";
+                return new BieStateDependencyIssue(
+                        BieStateDependencyIssueType.DEPENDENCY_CONFLICT,
+                        buildBieComparableStateMessage(nextState));
             }
         }
 
@@ -732,6 +999,12 @@ public class BieStateTransitionService {
                             target.topLevelAsbiepId(),
                             toBieStateDependencyRelation(target, BieStateTransitionDependency.REUSES)));
 
+            topLevelAsbiepQuery.getReusedTopLevelAsbiepSummaryList(topLevelAsbiepId).stream()
+                    .filter(target -> associatedTopLevelAsbiepIds.contains(target.topLevelAsbiepId()))
+                    .forEach(target -> relationMap.putIfAbsent(
+                            target.topLevelAsbiepId(),
+                            toBieStateDependencyRelation(target, BieStateTransitionDependency.REUSED_BY)));
+
             TopLevelAsbiepSummaryRecord topLevelAsbiep = topLevelAsbiepMap.get(topLevelAsbiepId);
             TopLevelAsbiepSummaryRecord basedTopLevelAsbiep =
                     (topLevelAsbiep != null)
@@ -742,6 +1015,12 @@ public class BieStateTransitionService {
                         basedTopLevelAsbiep.topLevelAsbiepId(),
                         toBieStateDependencyRelation(basedTopLevelAsbiep, BieStateTransitionDependency.INHERITS_FROM));
             }
+
+            topLevelAsbiepQuery.getDerivedTopLevelAsbiepSummaryList(topLevelAsbiepId).stream()
+                    .filter(target -> associatedTopLevelAsbiepIds.contains(target.topLevelAsbiepId()))
+                    .forEach(target -> relationMap.putIfAbsent(
+                            target.topLevelAsbiepId(),
+                            toBieStateDependencyRelation(target, BieStateTransitionDependency.IS_A_BASED_OF)));
 
             dependenciesRelationMap.put(topLevelAsbiepId, new ArrayList<>(relationMap.values()));
         }
@@ -817,35 +1096,113 @@ public class BieStateTransitionService {
     }
 
     /**
-     * Computes the future state of every visible node after applying the root
-     * transition and the currently selected dependency rows.
+     * Computes the two future-state maps used by dialog validation.
+     *
+     * <p>{@code actualFutureStateMap} contains only the rows that the current
+     * selection can truly move, while {@code requiredFutureStateMap} keeps
+     * expanding through BIE rules so downstream blockers such as assigned code
+     * lists remain visible even when an intermediate BIE cannot be selected.</p>
      */
-    private Map<TopLevelAsbiepId, BieState> buildFutureStateMap(
+    private BieStateFutureStateProjection buildFutureStateProjection(
             List<BieStateDependencyTarget> targets,
-            Set<TopLevelAsbiepId> rootTopLevelAsbiepIds,
+            BieStateDependencyGraph dependencyGraph,
             BieState nextState,
-            Set<TopLevelAsbiepId> selectedTopLevelAsbiepIds,
-            Map<TopLevelAsbiepId, TopLevelAsbiepSummaryRecord> topLevelAsbiepMap) {
-        Map<TopLevelAsbiepId, BieState> futureStateMap = new LinkedHashMap<>();
+            Set<TopLevelAsbiepId> selectedTopLevelAsbiepIds) {
+        Map<TopLevelAsbiepId, BieState> actualFutureStateMap = new LinkedHashMap<>();
+        Map<TopLevelAsbiepId, BieState> requiredFutureStateMap = new LinkedHashMap<>();
 
-        for (Map.Entry<TopLevelAsbiepId, TopLevelAsbiepSummaryRecord> entry : topLevelAsbiepMap.entrySet()) {
-            futureStateMap.put(entry.getKey(), entry.getValue().state());
+        for (Map.Entry<TopLevelAsbiepId, TopLevelAsbiepSummaryRecord> entry : dependencyGraph.topLevelAsbiepMap().entrySet()) {
+            actualFutureStateMap.put(entry.getKey(), entry.getValue().state());
+            requiredFutureStateMap.put(entry.getKey(), entry.getValue().state());
         }
 
-        for (TopLevelAsbiepId rootTopLevelAsbiepId : rootTopLevelAsbiepIds) {
-            futureStateMap.put(rootTopLevelAsbiepId, nextState);
+        for (TopLevelAsbiepId rootTopLevelAsbiepId : dependencyGraph.rootTopLevelAsbiepIds()) {
+            actualFutureStateMap.put(rootTopLevelAsbiepId, nextState);
+            requiredFutureStateMap.put(rootTopLevelAsbiepId, nextState);
         }
 
         for (BieStateDependencyTarget target : targets) {
-            if (!selectedTopLevelAsbiepIds.contains(target.getTopLevelAsbiepId()) ||
-                    !target.isDependencyUpdateAllowed() ||
-                    !shouldApplyDependencyStateChange(target.getState(), nextState)) {
+            if (target.getNodeType() != BieStateDependencyNodeType.BIE ||
+                    target.getTopLevelAsbiepId() == null ||
+                    !selectedTopLevelAsbiepIds.contains(target.getTopLevelAsbiepId()) ||
+                    !shouldApplyDependencyStateChange(
+                            dependencyGraph.topLevelAsbiepMap().get(target.getTopLevelAsbiepId()).state(), nextState)) {
                 continue;
             }
-            futureStateMap.put(target.getTopLevelAsbiepId(), nextState);
+            requiredFutureStateMap.put(target.getTopLevelAsbiepId(), nextState);
+            if (target.isSelectable()) {
+                actualFutureStateMap.put(target.getTopLevelAsbiepId(), nextState);
+            }
         }
 
-        return futureStateMap;
+        if (requiredFutureStateMap.isEmpty() || stateTransitionRules.isEmpty()) {
+            return new BieStateFutureStateProjection(actualFutureStateMap, requiredFutureStateMap);
+        }
+
+        List<BieStateTransitionEdge<TopLevelAsbiepId, TopLevelAsbiepId>> sortedEdges =
+                sortStateTransitionEdges(dependencyGraph.stateTransitionEdges(), dependencyGraph.edgeDistanceMap());
+
+        boolean changed;
+        do {
+            changed = false;
+
+            for (BieStateTransitionEdge<TopLevelAsbiepId, TopLevelAsbiepId> edge : sortedEdges) {
+                TopLevelAsbiepSummaryRecord source = dependencyGraph.topLevelAsbiepMap().get(edge.source());
+                TopLevelAsbiepSummaryRecord target = dependencyGraph.topLevelAsbiepMap().get(edge.target());
+                if (source == null || target == null) {
+                    continue;
+                }
+
+                changed |= applyFutureStateRule(
+                        requiredFutureStateMap,
+                        source,
+                        target,
+                        edge,
+                        nextState,
+                        true);
+            }
+        } while (changed);
+
+        return new BieStateFutureStateProjection(actualFutureStateMap, requiredFutureStateMap);
+    }
+
+    /**
+     * Applies one BIE-to-BIE rule edge to the in-progress required future-state
+     * map and reports whether the target had to be promoted to the requested
+     * state.
+     */
+    private boolean applyFutureStateRule(
+            Map<TopLevelAsbiepId, BieState> futureStateMap,
+            TopLevelAsbiepSummaryRecord source,
+            TopLevelAsbiepSummaryRecord target,
+            BieStateTransitionEdge<TopLevelAsbiepId, TopLevelAsbiepId> edge,
+            BieState nextState,
+            boolean targetAllowed) {
+        BieState sourceFutureState = futureStateMap.get(edge.source());
+        if (sourceFutureState == null || Objects.equals(source.state(), sourceFutureState)) {
+            return false;
+        }
+        if (!targetAllowed || !shouldApplyDependencyStateChange(target.state(), nextState)) {
+            return false;
+        }
+
+        BieState targetFutureState = futureStateMap.get(edge.target());
+        if (targetFutureState != null && !Objects.equals(target.state(), targetFutureState)) {
+            return false;
+        }
+
+        for (BieStateTransitionRule<BieFutureStateCarrier, BieFutureStateCarrier> stateTransitionRule : stateTransitionRules) {
+            try {
+                stateTransitionRule.validate(
+                        new BieFutureStateCarrier(source, sourceFutureState),
+                        new BieFutureStateCarrier(target, targetFutureState),
+                        edge.dependency());
+            } catch (BieStateTransitionRuleViolationException e) {
+                futureStateMap.put(edge.target(), nextState);
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -853,11 +1210,11 @@ public class BieStateTransitionService {
      * rules. Reuse and inheritance are emitted in both directions so rules can
      * describe the user action from either side of the relationship.
      */
-    private List<BieStateTransitionEdge> buildStateTransitionEdges(
+    private List<BieStateTransitionEdge<TopLevelAsbiepId, TopLevelAsbiepId>> buildStateTransitionEdges(
             TopLevelAsbiepQueryRepository topLevelAsbiepQuery,
             Map<TopLevelAsbiepId, TopLevelAsbiepSummaryRecord> topLevelAsbiepMap,
             Set<TopLevelAsbiepId> associatedTopLevelAsbiepIds) {
-        LinkedHashMap<String, BieStateTransitionEdge> edgeMap = new LinkedHashMap<>();
+        LinkedHashMap<String, BieStateTransitionEdge<TopLevelAsbiepId, TopLevelAsbiepId>> edgeMap = new LinkedHashMap<>();
 
         for (TopLevelAsbiepId sourceTopLevelAsbiepId : associatedTopLevelAsbiepIds) {
             topLevelAsbiepQuery.getReusingTopLevelAsbiepSummaryList(sourceTopLevelAsbiepId).stream()
@@ -898,65 +1255,330 @@ public class BieStateTransitionService {
     }
 
     /**
-     * Evaluates every registered rule across every directed dependency edge in
-     * the visible graph.
+     * Loads the distinct code lists assigned anywhere inside the visible BIE
+     * graph.
+     */
+    private Map<CodeListManifestId, CodeListSummaryRecord> buildCodeListMap(
+            ScoreUser requester,
+            Set<TopLevelAsbiepId> associatedTopLevelAsbiepIds) {
+        var codeListQuery = repositoryFactory.codeListQueryRepository(requester);
+
+        return buildAssignedCodeListRecords(requester, associatedTopLevelAsbiepIds).stream()
+                .map(BieCodeListStateDependencyRecord::codeListManifestId)
+                .distinct()
+                .map(codeListQuery::getCodeListSummary)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toMap(
+                        CodeListSummaryRecord::codeListManifestId,
+                        codeList -> codeList,
+                        (left, right) -> left,
+                        LinkedHashMap::new));
+    }
+
+    /**
+     * Collects assigned code-list references from BBIE and BBIE_SC nodes under
+     * the visible BIE graph.
+     */
+    private List<BieCodeListStateDependencyRecord> buildAssignedCodeListRecords(
+            ScoreUser requester,
+            Set<TopLevelAsbiepId> associatedTopLevelAsbiepIds) {
+        return associatedTopLevelAsbiepIds.stream()
+                .flatMap(topLevelAsbiepId -> Stream.concat(
+                        repositoryFactory.bbieQueryRepository(requester)
+                                .getAssignedCodeListSummaryList(topLevelAsbiepId).stream(),
+                        repositoryFactory.bbieScQueryRepository(requester)
+                                .getAssignedCodeListSummaryList(topLevelAsbiepId).stream()))
+                .collect(Collectors.toMap(
+                        BieCodeListStateDependencyRecord::codeListManifestId,
+                        record -> record,
+                        (left, right) -> left,
+                        LinkedHashMap::new))
+                .values().stream()
+                .toList();
+    }
+
+    /**
+     * Builds the directed BIE-to-code-list edges used by code-list transition
+     * rules.
+     */
+    private List<BieStateTransitionEdge<TopLevelAsbiepId, CodeListManifestId>> buildCodeListStateTransitionEdges(
+            ScoreUser requester,
+            Set<TopLevelAsbiepId> associatedTopLevelAsbiepIds,
+            Set<CodeListManifestId> associatedCodeListManifestIds) {
+        LinkedHashMap<String, BieStateTransitionEdge<TopLevelAsbiepId, CodeListManifestId>> edgeMap = new LinkedHashMap<>();
+
+        for (TopLevelAsbiepId sourceTopLevelAsbiepId : associatedTopLevelAsbiepIds) {
+            Stream.concat(
+                            repositoryFactory.bbieQueryRepository(requester)
+                                    .getAssignedCodeListSummaryList(sourceTopLevelAsbiepId).stream(),
+                            repositoryFactory.bbieScQueryRepository(requester)
+                                    .getAssignedCodeListSummaryList(sourceTopLevelAsbiepId).stream())
+                    .filter(record -> associatedCodeListManifestIds.contains(record.codeListManifestId()))
+                    .forEach(record -> edgeMap.putIfAbsent(
+                            sourceTopLevelAsbiepId + "|USES_CODE_LIST|" + record.codeListManifestId(),
+                            new BieStateTransitionEdge<>(
+                                    sourceTopLevelAsbiepId,
+                                    record.codeListManifestId(),
+                                    BieStateTransitionDependency.USES_CODE_LIST)));
+        }
+
+        return new ArrayList<>(edgeMap.values());
+    }
+
+    /**
+     * Builds the dialog-facing dependency labels for each visible code list.
+     */
+    private Map<CodeListManifestId, List<BieStateDependencyRelation>> buildCodeListDependenciesRelationMap(
+            Map<TopLevelAsbiepId, TopLevelAsbiepSummaryRecord> topLevelAsbiepMap,
+            List<BieStateTransitionEdge<TopLevelAsbiepId, CodeListManifestId>> codeListStateTransitionEdges) {
+        Map<CodeListManifestId, LinkedHashMap<String, BieStateDependencyRelation>> relationMap = new LinkedHashMap<>();
+
+        for (BieStateTransitionEdge<TopLevelAsbiepId, CodeListManifestId> edge : codeListStateTransitionEdges) {
+            TopLevelAsbiepSummaryRecord source = topLevelAsbiepMap.get(edge.source());
+            if (source == null) {
+                continue;
+            }
+
+            relationMap.computeIfAbsent(edge.target(), key -> new LinkedHashMap<>())
+                    .putIfAbsent(
+                            toNodeKey(source.topLevelAsbiepId()),
+                            toBieStateDependencyRelation(source, BieStateTransitionDependency.USED_BY_BIE));
+        }
+
+        return relationMap.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> new ArrayList<>(entry.getValue().values()),
+                        (left, right) -> left,
+                        LinkedHashMap::new));
+    }
+
+    /**
+     * Derives code-list edge distances from the already-computed BIE graph
+     * distances.
+     */
+    private Map<CodeListManifestId, Integer> buildCodeListEdgeDistanceMap(
+            Map<TopLevelAsbiepId, Integer> bieEdgeDistanceMap,
+            List<BieStateTransitionEdge<TopLevelAsbiepId, CodeListManifestId>> codeListStateTransitionEdges) {
+        Map<CodeListManifestId, Integer> edgeDistanceMap = new LinkedHashMap<>();
+
+        for (BieStateTransitionEdge<TopLevelAsbiepId, CodeListManifestId> edge : codeListStateTransitionEdges) {
+            int sourceDistance = bieEdgeDistanceMap.getOrDefault(edge.source(), Integer.MAX_VALUE);
+            if (sourceDistance == Integer.MAX_VALUE) {
+                continue;
+            }
+            edgeDistanceMap.merge(edge.target(), sourceDistance + 1, Math::min);
+        }
+
+        return edgeDistanceMap;
+    }
+
+    /**
+     * Evaluates every BIE-to-BIE rule edge against the actual projected future
+     * states and updates BIE rows with any direct compatibility issues.
      */
     private void applyStateTransitionRules(List<BieStateDependencyTarget> targets,
-                                          Map<TopLevelAsbiepId, BieState> futureStateMap,
-                                          Map<TopLevelAsbiepId, TopLevelAsbiepSummaryRecord> topLevelAsbiepMap,
-                                          List<BieStateTransitionEdge> stateTransitionEdges,
-                                          Map<TopLevelAsbiepId, Integer> edgeDistanceMap) {
+                                           BieStateDependencyGraph dependencyGraph,
+                                           BieState nextState,
+                                           Map<TopLevelAsbiepId, BieState> futureStateMap) {
         if (targets == null || targets.isEmpty() || stateTransitionRules.isEmpty()) {
             return;
         }
 
         Map<TopLevelAsbiepId, BieStateDependencyTarget> targetMap = targets.stream()
+                .filter(target -> target.getNodeType() == BieStateDependencyNodeType.BIE)
                 .collect(LinkedHashMap::new,
                         (map, target) -> map.put(target.getTopLevelAsbiepId(), target),
                         LinkedHashMap::putAll);
 
-        List<BieStateTransitionEdge> sortedEdges = new ArrayList<>(stateTransitionEdges);
-        sortedEdges.sort(Comparator
-                .comparingInt((BieStateTransitionEdge edge) ->
-                        edgeDistanceMap.getOrDefault(edge.sourceTopLevelAsbiepId(), Integer.MAX_VALUE) +
-                                edgeDistanceMap.getOrDefault(edge.targetTopLevelAsbiepId(), Integer.MAX_VALUE))
-                .thenComparingInt(edge ->
-                        Math.min(edgeDistanceMap.getOrDefault(edge.sourceTopLevelAsbiepId(), Integer.MAX_VALUE),
-                                edgeDistanceMap.getOrDefault(edge.targetTopLevelAsbiepId(), Integer.MAX_VALUE))));
+        // Recalculate the direct comparable-state issue after the user's
+        // current selection changes the projected future state of a BIE row.
+        // Without this refresh, rows that were initially invalid while
+        // unchecked keep their stale state issue even after being selected.
+        for (Map.Entry<TopLevelAsbiepId, BieStateDependencyTarget> entry : targetMap.entrySet()) {
+            BieStateDependencyTarget row = entry.getValue();
+            if (hasIssueType(row.getIssues(), BieStateDependencyIssueType.OWNERSHIP)) {
+                continue;
+            }
 
-        for (BieStateTransitionEdge edge : sortedEdges) {
-            TopLevelAsbiepSummaryRecord source = topLevelAsbiepMap.get(edge.sourceTopLevelAsbiepId());
-            TopLevelAsbiepSummaryRecord target = topLevelAsbiepMap.get(edge.targetTopLevelAsbiepId());
+            List<BieStateDependencyIssue> issues = removeIssuesOfType(
+                    row.getIssues(), BieStateDependencyIssueType.STATE_COMPATIBILITY);
+            BieState futureState = futureStateMap.get(entry.getKey());
+            if (!requiredBieStatesForTransition(nextState).contains(futureState)) {
+                issues = addIssue(issues, new BieStateDependencyIssue(
+                        BieStateDependencyIssueType.STATE_COMPATIBILITY,
+                        buildBieComparableStateMessage(nextState)));
+            }
+            row.setIssues(issues);
+        }
+
+        List<BieStateTransitionEdge<TopLevelAsbiepId, TopLevelAsbiepId>> sortedEdges =
+                sortStateTransitionEdges(dependencyGraph.stateTransitionEdges(), dependencyGraph.edgeDistanceMap());
+
+        for (BieStateTransitionEdge<TopLevelAsbiepId, TopLevelAsbiepId> edge : sortedEdges) {
+            TopLevelAsbiepSummaryRecord source = dependencyGraph.topLevelAsbiepMap().get(edge.source());
+            TopLevelAsbiepSummaryRecord target = dependencyGraph.topLevelAsbiepMap().get(edge.target());
             if (source == null || target == null) {
                 continue;
             }
 
-            BieState sourceFutureState = futureStateMap.get(edge.sourceTopLevelAsbiepId());
-            BieState targetFutureState = futureStateMap.get(edge.targetTopLevelAsbiepId());
+            BieState sourceFutureState = futureStateMap.get(edge.source());
+            BieState targetFutureState = futureStateMap.get(edge.target());
             if (sourceFutureState == null || Objects.equals(source.state(), sourceFutureState)) {
                 continue;
             }
 
-            BieStateDependencyTarget affectedRow = targetMap.get(edge.sourceTopLevelAsbiepId());
+            BieStateDependencyTarget affectedRow = targetMap.get(edge.source());
             if (affectedRow == null) {
-                affectedRow = targetMap.get(edge.targetTopLevelAsbiepId());
+                affectedRow = targetMap.get(edge.target());
             }
-            if (affectedRow == null || !affectedRow.isStateTransitionAllowed()) {
+            if (affectedRow == null || hasIssueType(affectedRow.getIssues(), BieStateDependencyIssueType.OWNERSHIP) ||
+                    hasIssueType(affectedRow.getIssues(), BieStateDependencyIssueType.STATE_COMPATIBILITY)) {
                 continue;
             }
 
             for (BieStateTransitionRule stateTransitionRule : stateTransitionRules) {
                 try {
-                    stateTransitionRule.validate(
-                            source, target, edge.dependency(), sourceFutureState, targetFutureState);
+                    BieFutureStateCarrier sourceState = new BieFutureStateCarrier(source, sourceFutureState);
+                    BieFutureStateCarrier targetState = new BieFutureStateCarrier(target, targetFutureState);
+                    stateTransitionRule.validate(sourceState, targetState, edge.dependency());
                 } catch (BieStateTransitionRuleViolationException e) {
-                    affectedRow.setStateTransitionAllowed(false);
-                    affectedRow.setStateTransitionMessage(
-                            buildStateTransitionMessage(edge.dependency(), sourceFutureState, target));
+                    affectedRow.setIssues(addIssue(
+                            affectedRow.getIssues(),
+                            new BieStateDependencyIssue(
+                                    BieStateDependencyIssueType.STATE_COMPATIBILITY,
+                                    buildBieComparableStateMessage(nextState))));
                     break;
                 }
             }
         }
+    }
+
+    /**
+     * Evaluates code-list dependency edges and appends the resulting code-list
+     * rows to the dialog while reflecting blocking code-list issues back onto
+     * the affected BIE rows.
+     *
+     * <p>This method uses the required future-state map so code lists attached
+     * to implied or cross-owner dependent BIEs still appear in the dialog.</p>
+     */
+    private void applyCodeListStateTransitionRules(ScoreUser requester,
+                                                   List<BieStateDependencyTarget> targets,
+                                                   BieStateDependencyGraph dependencyGraph,
+                                                   BieState nextState,
+                                                   BieStateFutureStateProjection futureStateProjection,
+                                                   Collection<CodeListManifestId> selectedCodeListManifestIds) {
+        if (dependencyGraph.codeListStateTransitionEdges().isEmpty() || codeListStateTransitionRules.isEmpty()) {
+            return;
+        }
+
+        Map<TopLevelAsbiepId, BieStateDependencyTarget> bieTargetMap = targets.stream()
+                .filter(target -> target.getNodeType() == BieStateDependencyNodeType.BIE)
+                .filter(target -> target.getTopLevelAsbiepId() != null)
+                .collect(Collectors.toMap(
+                        BieStateDependencyTarget::getTopLevelAsbiepId,
+                        target -> target,
+                        (left, right) -> left,
+                        LinkedHashMap::new));
+        LinkedHashMap<CodeListManifestId, BieStateDependencyTarget> codeListTargetMap = new LinkedHashMap<>();
+        Set<CodeListManifestId> selectedCodeListIdSet = (selectedCodeListManifestIds != null)
+                ? new LinkedHashSet<>(selectedCodeListManifestIds) : Collections.emptySet();
+
+        for (BieStateTransitionEdge<TopLevelAsbiepId, CodeListManifestId> edge : dependencyGraph.codeListStateTransitionEdges()) {
+            TopLevelAsbiepSummaryRecord sourceBie = dependencyGraph.topLevelAsbiepMap().get(edge.source());
+            CodeListSummaryRecord codeList = dependencyGraph.codeListMap().get(edge.target());
+            BieStateDependencyTarget bieTarget = bieTargetMap.get(edge.source());
+            if (sourceBie == null || codeList == null || codeList.state() == null) {
+                continue;
+            }
+
+            BieState sourceFutureState = futureStateProjection.requiredFutureStateMap().get(edge.source());
+            if (sourceFutureState == null || Objects.equals(sourceBie.state(), sourceFutureState)) {
+                continue;
+            }
+
+            boolean selected = selectedCodeListIdSet.contains(codeList.codeListManifestId());
+            BieFutureStateCarrier source = new BieFutureStateCarrier(sourceBie, sourceFutureState);
+            CcState codeListFutureState = selected
+                    ? CodeListStateLevel.preferredCascadeTargetState(nextState, codeList)
+                    : codeList.state();
+            CodeListFutureStateCarrier target = new CodeListFutureStateCarrier(codeList, codeListFutureState);
+            String stateTransitionMessage = null;
+            for (BieStateTransitionRule<BieFutureStateCarrier, CodeListFutureStateCarrier> rule : codeListStateTransitionRules) {
+                try {
+                    rule.validate(source, target, edge.dependency());
+                } catch (BieStateTransitionRuleViolationException e) {
+                    stateTransitionMessage = buildStateTransitionMessage(edge.dependency(), sourceFutureState, codeList);
+                    break;
+                }
+            }
+
+            BieStateDependencyTarget candidate = toCodeListStateDependencyTarget(
+                    requester,
+                    codeList,
+                    nextState,
+                    selected,
+                    dependencyGraph.codeListDependenciesRelationMap().getOrDefault(
+                            codeList.codeListManifestId(), Collections.emptyList()),
+                    dependencyGraph.codeListEdgeDistanceMap().getOrDefault(
+                            codeList.codeListManifestId(), Integer.MAX_VALUE),
+                    stateTransitionMessage);
+            codeListTargetMap.merge(codeList.codeListManifestId(), candidate, (current, next) -> {
+                current.setChecked(current.isChecked() || next.isChecked());
+                current.setIssues(mergeIssues(current.getIssues(), next.getIssues()));
+                return current;
+            });
+
+            if (!candidate.getIssues().isEmpty() &&
+                    bieTarget != null &&
+                    !hasIssueType(bieTarget.getIssues(), BieStateDependencyIssueType.OWNERSHIP)) {
+                bieTarget.setIssues(addIssue(
+                        bieTarget.getIssues(),
+                        new BieStateDependencyIssue(
+                                BieStateDependencyIssueType.DEPENDENCY_CONFLICT,
+                                buildAssignedCodeListBlockingMessage(sourceFutureState, codeList, candidate))));
+            }
+        }
+
+        for (CodeListManifestId selectedCodeListManifestId : selectedCodeListIdSet) {
+            if (codeListTargetMap.containsKey(selectedCodeListManifestId)) {
+                continue;
+            }
+            CodeListSummaryRecord codeList = dependencyGraph.codeListMap().get(selectedCodeListManifestId);
+            if (codeList == null) {
+                continue;
+            }
+            codeListTargetMap.put(selectedCodeListManifestId, toCodeListStateDependencyTarget(
+                    requester,
+                    codeList,
+                    nextState,
+                    true,
+                    dependencyGraph.codeListDependenciesRelationMap().getOrDefault(
+                            codeList.codeListManifestId(), Collections.emptyList()),
+                    dependencyGraph.codeListEdgeDistanceMap().getOrDefault(
+                            codeList.codeListManifestId(), Integer.MAX_VALUE),
+                    null));
+        }
+
+        targets.addAll(codeListTargetMap.values());
+    }
+
+    /**
+     * Returns BIE-to-BIE dependency edges in a stable near-to-far order so
+     * validations and implied-state expansion behave deterministically.
+     */
+    private List<BieStateTransitionEdge<TopLevelAsbiepId, TopLevelAsbiepId>> sortStateTransitionEdges(
+            List<BieStateTransitionEdge<TopLevelAsbiepId, TopLevelAsbiepId>> stateTransitionEdges,
+            Map<TopLevelAsbiepId, Integer> edgeDistanceMap) {
+        List<BieStateTransitionEdge<TopLevelAsbiepId, TopLevelAsbiepId>> sortedEdges = new ArrayList<>(stateTransitionEdges);
+        sortedEdges.sort(Comparator
+                .comparingInt((BieStateTransitionEdge<TopLevelAsbiepId, TopLevelAsbiepId> edge) ->
+                        edgeDistanceMap.getOrDefault(edge.source(), Integer.MAX_VALUE) +
+                                edgeDistanceMap.getOrDefault(edge.target(), Integer.MAX_VALUE))
+                .thenComparingInt(edge ->
+                        Math.min(edgeDistanceMap.getOrDefault(edge.source(), Integer.MAX_VALUE),
+                                edgeDistanceMap.getOrDefault(edge.target(), Integer.MAX_VALUE))));
+        return sortedEdges;
     }
 
     /**
@@ -966,20 +1588,159 @@ public class BieStateTransitionService {
      */
     private String buildStateTransitionMessage(BieStateTransitionDependency dependency,
                                                BieState sourceFutureState,
-                                               TopLevelAsbiepSummaryRecord target) {
-        String targetName = toName(target);
+                                               CodeListSummaryRecord target) {
         return switch (dependency) {
-            case REUSES -> "Reused BIE '" + targetName + "' must also be moved to '" + sourceFutureState + "'.";
-            case REUSED_BY -> "Reusing BIE '" + targetName + "' must also be moved to '" + sourceFutureState + "'.";
-            case INHERITS_FROM -> "Base BIE '" + targetName + "' must also be moved to '" + sourceFutureState + "'.";
-            case IS_A_BASED_OF -> "Inherited BIE '" + targetName + "' must also be moved to '" + sourceFutureState + "'.";
+            case USES_CODE_LIST, USED_BY_BIE -> buildCodeListComparableStateMessage(sourceFutureState, target);
+            default -> buildCodeListComparableStateMessage(sourceFutureState, target);
         };
     }
 
+    /**
+     * Returns the preferred display label for one BIE row.
+     */
     private String toName(TopLevelAsbiepSummaryRecord topLevelAsbiep) {
         return hasLength(topLevelAsbiep.displayName()) ?
                 topLevelAsbiep.displayName() :
                 topLevelAsbiep.propertyTerm();
+    }
+
+    /**
+     * Projects one code-list dependency into the shared dialog row transport
+     * model.
+     */
+    private BieStateDependencyTarget toCodeListStateDependencyTarget(
+            ScoreUser requester,
+            CodeListSummaryRecord codeList,
+            BieState nextState,
+            boolean checked,
+            List<BieStateDependencyRelation> dependencies,
+            int edgeDistance,
+            String stateTransitionMessage) {
+        AgencyIdListValueSummaryRecord agencyIdListValue = null;
+        if (codeList.agencyIdListValueManifestId() != null) {
+            agencyIdListValue = repositoryFactory.agencyIdListQueryRepository(requester)
+                    .getAgencyIdListValueSummary(codeList.agencyIdListValueManifestId());
+        }
+        boolean dependencyUpdateAllowed = isCodeListDependencyUpdateAllowed(requester, codeList, nextState);
+        return new BieStateDependencyTarget(
+                toNodeKey(codeList.codeListManifestId()),
+                BieStateDependencyNodeType.CODE_LIST,
+                null,
+                codeList.codeListManifestId(),
+                Collections.emptyList(),
+                Collections.emptyList(),
+                dependencies,
+                edgeDistance,
+                null,
+                codeList.listId(),
+                null,
+                codeList.name(),
+                (codeList.guid() != null) ? codeList.guid().value() : null,
+                ownerLoginId(codeList),
+                (agencyIdListValue != null) ? agencyIdListValue.value() : null,
+                (agencyIdListValue != null) ? agencyIdListValue.name() : null,
+                Collections.emptyList(),
+                codeList.versionId(),
+                null,
+                null,
+                (codeList.state() != null) ? codeList.state().name() : null,
+                dependencyUpdateAllowed,
+                checked && dependencyUpdateAllowed,
+                buildCodeListIssues(requester, codeList, nextState, dependencyUpdateAllowed, stateTransitionMessage)
+        );
+    }
+
+    /**
+     * Builds the stable dialog row key for one BIE node.
+     */
+    private String toNodeKey(TopLevelAsbiepId topLevelAsbiepId) {
+        return "BIE:" + topLevelAsbiepId;
+    }
+
+    /**
+     * Builds the stable dialog row key for one code-list node.
+     */
+    private String toNodeKey(CodeListManifestId codeListManifestId) {
+        return "CODE_LIST:" + codeListManifestId;
+    }
+
+    private String ownerLoginId(TopLevelAsbiepSummaryRecord topLevelAsbiep) {
+        if (topLevelAsbiep == null || topLevelAsbiep.owner() == null) {
+            return null;
+        }
+        return hasLength(topLevelAsbiep.owner().loginId()) ? topLevelAsbiep.owner().loginId() : null;
+    }
+
+    private String ownerLoginId(CodeListSummaryRecord codeList) {
+        if (codeList == null || codeList.owner() == null) {
+            return null;
+        }
+        return hasLength(codeList.owner().loginId()) ? codeList.owner().loginId() : null;
+    }
+
+    /**
+     * Formats a human-readable state list used in validation messages.
+     */
+    private String toQuotedStateList(List<CcState> states) {
+        if (states == null || states.isEmpty()) {
+            return "a compatible state";
+        }
+        if (states.size() == 1) {
+            return "'" + states.get(0) + "'";
+        }
+        if (states.size() == 2) {
+            return "'" + states.get(0) + "' or '" + states.get(1) + "'";
+        }
+
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < states.size(); i++) {
+            if (i > 0) {
+                builder.append(i == states.size() - 1 ? ", or " : ", ");
+            }
+            builder.append("'").append(states.get(i)).append("'");
+        }
+        return builder.toString();
+    }
+
+    /**
+     * Formats a human-readable BIE state list used in dependency messages.
+     */
+    private String toQuotedBieStateList(List<BieState> states) {
+        if (states == null || states.isEmpty()) {
+            return "a compatible state";
+        }
+        if (states.size() == 1) {
+            return "'" + states.get(0) + "'";
+        }
+        if (states.size() == 2) {
+            return "'" + states.get(0) + "' or '" + states.get(1) + "'";
+        }
+
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < states.size(); i++) {
+            if (i > 0) {
+                builder.append(i == states.size() - 1 ? ", or " : ", ");
+            }
+            builder.append("'").append(states.get(i)).append("'");
+        }
+        return builder.toString();
+    }
+
+    /**
+     * Returns whether the current user may cascade this code list together
+     * with the requested BIE transition.
+     */
+    private boolean isCodeListDependencyUpdateAllowed(ScoreUser requester,
+                                                      CodeListSummaryRecord codeList,
+                                                      BieState nextState) {
+        if (requester == null || codeList == null || nextState == null ||
+                codeList.owner() == null || !requester.userId().equals(codeList.owner().userId())) {
+            return false;
+        }
+        CcState targetState = CodeListStateLevel.preferredCascadeTargetState(nextState, codeList);
+        return targetState != null &&
+                codeList.state() != null &&
+                (codeList.state() == targetState || codeList.state().canMove(targetState));
     }
 
     /**
@@ -1161,6 +1922,76 @@ public class BieStateTransitionService {
         }
     }
 
+    private void ensureCodeListDependenciesForChangingState(ScoreUser requester,
+                                                            Collection<TopLevelAsbiepId> topLevelAsbiepIds,
+                                                            BieState state,
+                                                            Collection<CodeListManifestId> dependencyCodeListManifestIds) {
+        if (topLevelAsbiepIds == null || topLevelAsbiepIds.isEmpty() || state == null) {
+            return;
+        }
+
+        StringBuilder failureMessageBody = new StringBuilder();
+        var topLevelAsbiepQuery = repositoryFactory.topLevelAsbiepQueryRepository(requester);
+        var codeListQuery = repositoryFactory.codeListQueryRepository(requester);
+        Set<CodeListManifestId> selectedCodeListIdSet = (dependencyCodeListManifestIds != null)
+                ? new HashSet<>(dependencyCodeListManifestIds) : Collections.emptySet();
+
+        for (TopLevelAsbiepId topLevelAsbiepId : new LinkedHashSet<>(topLevelAsbiepIds)) {
+            TopLevelAsbiepSummaryRecord topLevelAsbiep = topLevelAsbiepQuery.getTopLevelAsbiepSummary(topLevelAsbiepId);
+            if (topLevelAsbiep == null) {
+                continue;
+            }
+
+            List<CodeListSummaryRecord> blockingCodeLists =
+                    Stream.concat(
+                                    repositoryFactory.bbieQueryRepository(requester)
+                                            .getAssignedCodeListSummaryList(topLevelAsbiepId).stream(),
+                                    repositoryFactory.bbieScQueryRepository(requester)
+                                            .getAssignedCodeListSummaryList(topLevelAsbiepId).stream())
+                            .map(BieCodeListStateDependencyRecord::codeListManifestId)
+                            .collect(Collectors.toMap(
+                                    codeListManifestId -> codeListManifestId,
+                                    codeListQuery::getCodeListSummary,
+                                    (left, right) -> left,
+                                    LinkedHashMap::new))
+                            .values().stream()
+                            .filter(Objects::nonNull)
+                            .filter(codeList -> codeList.state() != null)
+                            .filter(codeList -> !(selectedCodeListIdSet.contains(codeList.codeListManifestId()) &&
+                                    isCodeListDependencyUpdateAllowed(requester, codeList, state)))
+                            .filter(codeList -> !CodeListStateLevel.isCompatible(state, codeList))
+                            .sorted(Comparator.comparing(CodeListSummaryRecord::name,
+                                    Comparator.nullsLast(String::compareToIgnoreCase)))
+                            .toList();
+            if (blockingCodeLists.isEmpty()) {
+                continue;
+            }
+
+            failureMessageBody.append("\n---\n[**")
+                    .append(toName(topLevelAsbiep))
+                    .append("**](")
+                    .append("/profile_bie/").append(topLevelAsbiep.topLevelAsbiepId())
+                    .append(") (")
+                    .append(topLevelAsbiep.guid())
+                    .append(") cannot move to ")
+                    .append(state)
+                    .append(" because the following assigned code lists are in incompatible states:")
+                    .append("\n\n");
+            for (CodeListSummaryRecord codeList : blockingCodeLists) {
+                failureMessageBody.append("- ")
+                        .append(codeList.name())
+                        .append(" - ")
+                        .append(codeList.state()).append(" state")
+                        .append("\n");
+            }
+        }
+
+        if (failureMessageBody.length() > 0) {
+            throw new DataAccessForbiddenException(toPlainTextStateFailureMessage(
+                    "Failed to update BIE state", failureMessageBody.toString()));
+        }
+    }
+
     private void ensureSameOwnerDependencyTargetsForChangingState(ScoreUser requester,
                                                                   TopLevelAsbiepId topLevelAsbiepId,
                                                                   BieState state,
@@ -1242,27 +2073,51 @@ public class BieStateTransitionService {
     private void ensureDependencySelectionStateChange(ScoreUser requester,
                                                       TopLevelAsbiepId topLevelAsbiepId,
                                                       BieState state,
-                                                      Collection<TopLevelAsbiepId> dependencyTopLevelAsbiepIds) {
+                                                      Collection<TopLevelAsbiepId> dependencyTopLevelAsbiepIds,
+                                                      Collection<CodeListManifestId> dependencyCodeListManifestIds) {
         ensureDependencySelectionStateChange(
                 requester,
                 List.of(topLevelAsbiepId),
                 state,
-                dependencyTopLevelAsbiepIds);
+                dependencyTopLevelAsbiepIds,
+                dependencyCodeListManifestIds);
     }
 
     private void ensureDependencySelectionStateChange(ScoreUser requester,
                                                       Collection<TopLevelAsbiepId> rootTopLevelAsbiepIds,
                                                       BieState state,
-                                                      Collection<TopLevelAsbiepId> dependencyTopLevelAsbiepIds) {
+                                                      Collection<TopLevelAsbiepId> dependencyTopLevelAsbiepIds,
+                                                      Collection<CodeListManifestId> dependencyCodeListManifestIds) {
         boolean hasInvalidSelection = validateStateDependencies(
-                requester, rootTopLevelAsbiepIds, state, dependencyTopLevelAsbiepIds).stream()
-                .anyMatch(target -> !target.isStateTransitionAllowed() || target.isSelectionConflict());
+                requester, rootTopLevelAsbiepIds, state, dependencyTopLevelAsbiepIds, dependencyCodeListManifestIds).stream()
+                .anyMatch(target -> target.getIssues() != null && !target.getIssues().isEmpty());
         if (hasInvalidSelection) {
             String subject = (rootTopLevelAsbiepIds != null && rootTopLevelAsbiepIds.size() > 1)
                     ? "Selected BIEs cannot move to '"
                     : "This BIE cannot move to '";
             throw new DataAccessForbiddenException("Failed to update BIE state\n" +
                     subject + state + "'. Resolve the conflicting records to continue.");
+        }
+    }
+
+    private void updateSelectedCodeLists(ScoreUser requester,
+                                         BieState bieState,
+                                         Collection<CodeListManifestId> dependencyCodeListManifestIds) {
+        if (dependencyCodeListManifestIds == null || dependencyCodeListManifestIds.isEmpty() || bieState == null) {
+            return;
+        }
+
+        var codeListQuery = repositoryFactory.codeListQueryRepository(requester);
+        for (CodeListManifestId codeListManifestId : new LinkedHashSet<>(dependencyCodeListManifestIds)) {
+            CodeListSummaryRecord codeList = codeListQuery.getCodeListSummary(codeListManifestId);
+            if (codeList == null) {
+                continue;
+            }
+            CcState targetState = CodeListStateLevel.preferredCascadeTargetState(bieState, codeList);
+            if (targetState == null || codeList.state() == targetState) {
+                continue;
+            }
+            codeListCommandService.updateState(requester, codeListManifestId, targetState);
         }
     }
 

@@ -64,6 +64,7 @@ import {SettingsPreferencesService} from '../../settings-management/settings-pre
 import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
 import {CcNodeService} from '../../cc-management/domain/core-component-node.service';
 import {BieStateTransitionFlowService} from '../domain/bie-state-transition-flow.service';
+import {StateDependencySelection} from '../domain/state-dependency-target';
 
 
 @Component({
@@ -2423,31 +2424,34 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       state,
       rootTopLevelAsbiepIds: [this.rootNode.topLevelAsbiepId],
       loadDependencies: () => this.service.getStateDependencies(this.rootNode.topLevelAsbiepId, state),
-      validateSelection: (selectedTopLevelAsbiepIds: number[]) =>
-        this.service.validateStateDependencies(this.rootNode.topLevelAsbiepId, state, selectedTopLevelAsbiepIds),
+      validateSelection: (selection: StateDependencySelection) =>
+        this.service.validateStateDependencies(this.rootNode.topLevelAsbiepId, state, selection),
       normalizeTargets: (dependencyTargets) => {
         const rootTopLevelAsbiepId = this.rootNode.topLevelAsbiepId;
         return dependencyTargets.map(target => ({
           ...target,
-          dependencyUpdateAllowed: target.dependencyUpdateAllowed !== false,
+          selectable: target.selectable !== false,
           // Match the list page behavior: keep the requested root BIE selected,
           // but do not preselect dependency rows when the dialog first opens.
-          checked: target.topLevelAsbiepId === rootTopLevelAsbiepId
+          checked: target.nodeType === 'BIE' && target.topLevelAsbiepId === rootTopLevelAsbiepId
+            ? true
+            : target.checked
         }));
       }
     }).pipe(
       finalize(() => {
         this.isUpdating = false;
       })
-    ).subscribe((dependencyTopLevelAsbiepIds?: number[]) => {
-      if (dependencyTopLevelAsbiepIds === undefined) {
+    ).subscribe((selection?: StateDependencySelection) => {
+      if (selection === undefined) {
         return;
       }
       this.isUpdating = true;
       this.service.setState(
         this.rootNode.topLevelAsbiepId,
         state,
-        dependencyTopLevelAsbiepIds
+        selection.topLevelAsbiepIds,
+        selection.codeListManifestIds
       ).subscribe(_ => {
         this.service.getRootNode(this.topLevelAsbiepId).subscribe(root => {
           (this.rootNode as BieEditAbieNode).topLevelAsbiepState = root.topLevelAsbiepState;

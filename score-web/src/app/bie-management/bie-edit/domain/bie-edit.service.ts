@@ -18,7 +18,7 @@ import {
 import {CodeListSummary} from '../../../code-list-management/domain/code-list';
 import {AgencyIdListSummary} from '../../../agency-id-list-management/domain/agency-id-list';
 import {map} from 'rxjs/operators';
-import {StateDependencyTarget} from '../../domain/state-dependency-target';
+import {StateDependencySelection, StateDependencyTarget} from '../../domain/state-dependency-target';
 import {SUPPRESS_ERROR_ALERT} from '../../../authentication/auth.service';
 
 @Injectable()
@@ -301,10 +301,13 @@ export class BieEditService {
   /**
    * Submits the final single-BIE state transition together with any approved dependency rows.
    */
-  setState(topLevelAsbiepId: number, state: string, dependencyTopLevelAsbiepIds?: number[]): Observable<any> {
+  setState(topLevelAsbiepId: number, state: string,
+           dependencyTopLevelAsbiepIds?: number[],
+           dependencyCodeListManifestIds?: number[]): Observable<any> {
     return this.http.post('/api/profile_bie/node/root/' + topLevelAsbiepId + '/state', {
       state,
-      dependencyTopLevelAsbiepIds
+      dependencyTopLevelAsbiepIds,
+      dependencyCodeListManifestIds
     }, {
       context: this.suppressErrorAlert()
     });
@@ -323,12 +326,13 @@ export class BieEditService {
   /**
    * Revalidates the dependency selection after the dialog checkbox state changes.
    */
-  validateStateDependencies(topLevelAsbiepId: number, state: string, selectedTopLevelAsbiepIds: number[]): Observable<StateDependencyTarget[]> {
+  validateStateDependencies(topLevelAsbiepId: number, state: string, selection: StateDependencySelection): Observable<StateDependencyTarget[]> {
     return this.http.post<StateDependencyTarget[]>(
       '/api/profile_bie/node/root/' + topLevelAsbiepId + '/state/dependencies/validate',
       {
         state,
-        selectedTopLevelAsbiepIds
+        selectedTopLevelAsbiepIds: selection.topLevelAsbiepIds,
+        selectedCodeListManifestIds: selection.codeListManifestIds
       },
       {
         context: this.suppressErrorAlert()

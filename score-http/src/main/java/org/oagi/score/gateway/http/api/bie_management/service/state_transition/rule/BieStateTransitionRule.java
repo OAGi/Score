@@ -1,47 +1,34 @@
 package org.oagi.score.gateway.http.api.bie_management.service.state_transition.rule;
 
-import org.oagi.score.gateway.http.api.bie_management.model.BieState;
-import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.service.state_transition.BieStateTransitionDependency;
 import org.oagi.score.gateway.http.api.bie_management.service.state_transition.BieStateTransitionRuleViolationException;
 
 /**
- * Contract for a single state transition rule between two top-level BIEs.
+ * Contract for validating one directed dependency edge against projected
+ * future states.
  *
- * <p>The long-term goal is to move the current hard-coded validation branches
- * in the dependency graph builder into a small set of explicit rule
- * implementations. Each rule evaluates one dependency edge between two
- * top-level ASBIEPs for a requested future state and can either accept the
- * transition or throw a violation exception.</p>
- *
- * <p>The rule is evaluated from the point of view of the {@code source}
- * top-level ASBIEP attempting to move to {@code sourceFutureState}. The
- * {@code target} top-level ASBIEP is the BIE connected by the supplied
- * {@code dependency} edge.</p>
+ * <p>The source and target can represent different record types, such as
+ * BIE-to-BIE or BIE-to-code-list validation. Implementations only answer
+ * whether the supplied edge is compatible; the calling service owns message
+ * construction and row-level issue aggregation.</p>
  */
-public interface BieStateTransitionRule {
+public interface BieStateTransitionRule<S extends FutureStateCarrier<?, ?>, T extends FutureStateCarrier<?, ?>> {
 
     /**
-     * Validates whether the source BIE may move to the requested future state
-     * with respect to one connected target BIE.
+     * Validates whether the directed dependency edge is compatible with the
+     * projected future states of both participants.
      *
-     * @param source the top-level ASBIEP whose state transition is being
-     *               evaluated
-     * @param target the connected top-level ASBIEP referenced by the dependency
-     *               edge
+     * @param source the source participant, including its projected future
+     *               state
+     * @param target the target participant, including its projected future
+     *               state
      * @param dependency the business dependency type between {@code source} and
      *                   {@code target}
-     * @param sourceFutureState the destination state requested for
-     *                          {@code source}
-     * @param targetFutureState the destination state requested for
-     *                          {@code target}. This may be the target's current
-     *                          state when the target is not changing.
      * @throws BieStateTransitionRuleViolationException when the rule does not
-     *                                               allow the transition
+     *         allow the transition
      */
-    void validate(TopLevelAsbiepSummaryRecord source,
-                  TopLevelAsbiepSummaryRecord target,
-                  BieStateTransitionDependency dependency,
-                  BieState sourceFutureState,
-                  BieState targetFutureState) throws BieStateTransitionRuleViolationException;
+    void validate(S source,
+                  T target,
+                  BieStateTransitionDependency dependency)
+            throws BieStateTransitionRuleViolationException;
 }

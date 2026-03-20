@@ -5,7 +5,7 @@ import {map} from 'rxjs/operators';
 import {BieListEntry, BieListRequest, SummaryBieInfo} from './bie-list';
 import {PageResponse} from '../../../basis/basis';
 import {SUPPRESS_ERROR_ALERT} from '../../../authentication/auth.service';
-import {StateDependencyTarget} from '../../domain/state-dependency-target';
+import {StateDependencySelection, StateDependencyTarget} from '../../domain/state-dependency-target';
 
 @Injectable()
 export class BieListService {
@@ -176,12 +176,14 @@ export class BieListService {
    * Submits the final bulk state transition together with any approved dependency rows.
    */
   updateStateOnList(actionType: string, toState: string, bieLists: BieListEntry[],
-                    dependencyTopLevelAsbiepIds?: number[]): Observable<any> {
+                    dependencyTopLevelAsbiepIds?: number[],
+                    dependencyCodeListManifestIds?: number[]): Observable<any> {
     return this.http.post<any>('/api/bie_list/state/multiple', {
       action: actionType,
       toState,
       topLevelAsbiepIds: bieLists.map(e => e.topLevelAsbiepId),
-      dependencyTopLevelAsbiepIds
+      dependencyTopLevelAsbiepIds,
+      dependencyCodeListManifestIds
     }, {
       context: this.suppressErrorAlert()
     });
@@ -203,11 +205,12 @@ export class BieListService {
    * Revalidates the current bulk dependency selection on the server.
    */
   validateStateDependencies(topLevelAsbiepIds: number[], state: string,
-                            selectedTopLevelAsbiepIds: number[]): Observable<StateDependencyTarget[]> {
+                            selection: StateDependencySelection): Observable<StateDependencyTarget[]> {
     return this.http.post<StateDependencyTarget[]>('/api/bie_list/state/dependencies/validate', {
       topLevelAsbiepIds,
       state,
-      selectedTopLevelAsbiepIds
+      selectedTopLevelAsbiepIds: selection.topLevelAsbiepIds,
+      selectedCodeListManifestIds: selection.codeListManifestIds
     }, {
       context: this.suppressErrorAlert()
     });
