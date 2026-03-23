@@ -280,6 +280,7 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
                 .set(CODE_LIST.VERSION_ID, codeListWIP.getVersionId())
                 .set(CODE_LIST.NAME, codeListWIP.getName())
                 .set(CODE_LIST.DEFINITION, codeListWIP.getDefinition())
+                .set(CODE_LIST.STATE, codeListWIP.getState())
                 .where(CODE_LIST.CODE_LIST_ID.eq(ULong.valueOf(codeListWIP.getCodeListId())))
                 .execute();
     }

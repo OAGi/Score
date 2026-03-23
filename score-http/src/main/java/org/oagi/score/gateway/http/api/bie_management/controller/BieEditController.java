@@ -40,6 +40,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -206,6 +207,7 @@ public class BieEditController {
         return bieStateTransitionService.getStateDependencies(
                 sessionService.asScoreUser(user),
                 List.of(topLevelAsbiepId),
+                Collections.emptyList(),
                 state);
     }
 
@@ -221,6 +223,7 @@ public class BieEditController {
         return bieStateTransitionService.validateStateDependencies(
                 sessionService.asScoreUser(user),
                 List.of(topLevelAsbiepId),
+                request.getRequestedCodeListManifestIds(),
                 request.getState(),
                 request.getSelectedTopLevelAsbiepIds(),
                 request.getSelectedCodeListManifestIds());

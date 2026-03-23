@@ -10,6 +10,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
+import {Clipboard} from '@angular/cdk/clipboard';
 import {ActivatedRoute, Router} from '@angular/router';
 import {BieListEntry, BieListRequest} from './domain/bie-list';
 import {AccountListService} from '../../account-management/domain/account-list.service';
@@ -57,6 +58,7 @@ export class BieListComponent implements OnInit {
   private mailService = inject(MailService);
   private auth = inject(AuthService);
   private snackBar = inject(MatSnackBar);
+  private clipboard = inject(Clipboard);
   private dialog = inject(MatDialog);
   private confirmDialogService = inject(ConfirmDialogService);
   private preferencesService = inject(SettingsPreferencesService);
@@ -688,29 +690,26 @@ export class BieListComponent implements OnInit {
   }
 
   private openStateUpdateErrorDialog(error: HttpErrorResponse): void {
+    const errorMessageId = error?.headers?.get('x-error-message-id');
     const errorMessage = error?.headers?.get('x-error-message') || error?.message || 'Failed to update BIE state';
-    const lines = errorMessage.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-    let header = lines[0] || 'Failed to update BIE state';
-    let detailLines = lines.slice(1);
 
-    if (detailLines.length === 0) {
-      const flattenedMessage = errorMessage.replace(/\s+/g, ' ').trim();
-      const flattenedHeader = 'Failed to update BIE state';
-      if (flattenedMessage.startsWith(flattenedHeader + ' ')) {
-        header = flattenedHeader;
-        detailLines = [flattenedMessage.substring(flattenedHeader.length + 1).trim()]
-          .filter(line => line.length > 0);
+    this.snackBar.openFromComponent(MultiActionsSnackBarComponent, {
+      data: {
+        titleIcon: 'error',
+        title: 'Error',
+        message: errorMessage,
+        action: errorMessageId ? 'View detail in Notifications' : 'Copy to clipboard',
+        onAction: (data, snackBarRef) => {
+          if (errorMessageId) {
+            this.router.navigate(['/message/' + errorMessageId]);
+            snackBarRef.dismissWithAction();
+            return;
+          }
+
+          this.clipboard.copy(data.message);
+        }
       }
-    }
-
-    const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = header;
-    dialogConfig.data.content = detailLines.filter(line => !line.startsWith('- '));
-    dialogConfig.data.list = detailLines
-      .filter(line => line.startsWith('- '))
-      .map(line => line.substring(2));
-    dialogConfig.data.action = undefined;
-    this.confirmDialogService.open(dialogConfig);
+    });
   }
 
   openTransferDialogMultiple() {

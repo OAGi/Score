@@ -13,24 +13,24 @@ import org.springframework.stereotype.Component;
  * higher state than the reused target.</p>
  */
 @Component
-public class ReusesStateTransitionRule implements BieStateTransitionRule<BieFutureStateCarrier, BieFutureStateCarrier> {
+public class ReusesStateTransitionRule implements BieStateTransitionRule {
 
     @Override
-    public void validate(BieFutureStateCarrier source,
-                         BieFutureStateCarrier target,
+    public void validate(FutureStateCarrier<?, ?> source,
+                         FutureStateCarrier<?, ?> target,
                          BieStateTransitionDependency dependency)
             throws BieStateTransitionRuleViolationException {
         if (dependency != BieStateTransitionDependency.REUSES ||
-                source == null ||
-                source.record() == null ||
-                target == null ||
-                target.record() == null ||
-                source.futureState() == null ||
-                target.futureState() == null) {
+                !(source instanceof BieFutureStateCarrier bieSource) ||
+                !(target instanceof BieFutureStateCarrier bieTarget) ||
+                bieSource.record() == null ||
+                bieTarget.record() == null ||
+                bieSource.futureState() == null ||
+                bieTarget.futureState() == null) {
             return;
         }
 
-        if (!BieStateLevel.isCompatible(source.futureState(), target.futureState())) {
+        if (!BieStateLevel.isCompatible(bieSource.futureState(), bieTarget.futureState())) {
             throw new BieStateTransitionRuleViolationException();
         }
     }
