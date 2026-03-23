@@ -3380,7 +3380,7 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
           return callbackFn && callbackFn(node);
         };
 
-        if (!node.basedTopLevelAsbiepId) {
+        if (!node.inherited) {
           forkJoin([
             this.service.getBbieDetailsByPath(node.topLevelAsbiepId, bbiepNode.bccNode.manifestId, bbiepNode.bbiePath),
             this.service.getBbiepDetailsByPath(node.topLevelAsbiepId, bbiepNode.bccpNode.manifestId, bbiepNode.bbiepPath),
@@ -3435,7 +3435,7 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
               return callbackFn && callbackFn(node);
             };
 
-        if (!node.basedTopLevelAsbiepId) {
+        if (!node.inherited) {
           forkJoin([
             this.service.getBbieScDetailsByPath(node.topLevelAsbiepId, bbieScNode.bdtScNode.manifestId, bbieScNode.bbieScPath),
             this.ccService.getDtDetails(bbieScNode.bdtNode.manifestId)
