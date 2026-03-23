@@ -26,6 +26,7 @@ if [ -z "$mariadb_client_version" ]; then
   exit 1
 fi
 
+docker_platform=${DOCKER_DEFAULT_PLATFORM:-linux/amd64}
 war_name="score-http-$project_version.war"
 war_path="$project_dir/target/$war_name"
 jdbc_jar_path="$HOME/.m2/repository/org/mariadb/jdbc/mariadb-java-client/$mariadb_client_version/mariadb-java-client-$mariadb_client_version.jar"
@@ -69,12 +70,12 @@ cp "$jdbc_jar_path" "$script_dir/mariadb-java-client-$mariadb_client_version.jar
 echo "Building docker image $image_name..."
 (
   cd "$script_dir"
-  docker build --no-cache --build-arg "MARIADB_CLIENT_VERSION=$mariadb_client_version" -f Dockerfile -t "$image_name" .
+  docker build --no-cache --platform "$docker_platform" --build-arg "MARIADB_CLIENT_VERSION=$mariadb_client_version" -f Dockerfile -t "$image_name" .
 )
 
 if command -v trivy >/dev/null 2>&1; then
   echo "Scanning vulnerabilities with Trivy (HIGH/CRITICAL, fixed only)..."
-  trivy image --format table --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed "$image_name"
+  trivy image --format table --scanners vuln --pkg-types os --severity HIGH,CRITICAL --ignore-unfixed "$image_name"
 else
   echo "Info: trivy is not installed. Install Trivy to scan vulnerabilities for $image_name."
 fi

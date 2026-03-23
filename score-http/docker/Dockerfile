@@ -1,16 +1,15 @@
-FROM --platform=linux/amd64 tomcat:10.1.52-jdk21-temurin
+FROM tomcat:10.1.52-jdk21-temurin
 
 LABEL maintainer="Hakju Oh <hakju.oh@nist.gov>"
 
 ARG MARIADB_CLIENT_VERSION
 
-ENV DB_HOST localhost
-ENV DB_PORT 3306
-ENV DB_DATABASE oagi
-ENV DB_USERNAME oagi
-ENV DB_PASSWORD oagi
-ENV REDIS_HOST localhost
-ENV REDIS_PORT 6379
+ENV DB_HOST=localhost \
+    DB_PORT=3306 \
+    DB_DATABASE=oagi \
+    DB_USERNAME=oagi \
+    REDIS_HOST=localhost \
+    REDIS_PORT=6379
 
 RUN apt-get -y update
 RUN apt-get -y upgrade
