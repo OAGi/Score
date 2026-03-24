@@ -313,6 +313,16 @@ export class BieEditService {
     });
   }
 
+  discard(topLevelAsbiepId: number, dependencyTopLevelAsbiepIds?: number[]): Observable<any> {
+    return this.http.delete('/api/bies', {
+      body: {
+        topLevelAsbiepIdList: [topLevelAsbiepId],
+        dependencyTopLevelAsbiepIds
+      },
+      context: this.suppressErrorAlert()
+    });
+  }
+
   /**
    * Loads the dependency preview graph for the requested single-BIE state transition.
    */

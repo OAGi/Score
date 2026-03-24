@@ -66,7 +66,8 @@ public class LoginPageImpl extends BasePageImpl implements LoginPage {
 
     @Override
     public WebElement getSignInButton() {
-        By locator = By.cssSelector("input[value=\"Sign in\"]");
+        By locator = By.xpath("//button[@type=\"submit\" and contains(normalize-space(.), \"Sign in\")]"
+                + " | //input[@value=\"Sign in\"]");
         return elementToBeClickable(getDriver(), locator);
     }
 

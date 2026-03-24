@@ -1,6 +1,6 @@
 <div class="d-block">
   <div class="header d-flex align-items-center" mat-dialog-title>
-    <span>Update state to '{{ data.state }}'?</span>
+    <span>{{ dialogTitle() }}</span>
     <div class="close pe-2">
       <button mat-icon-button mat-small-icon-button (click)="onCancel()">
         <mat-icon>close</mat-icon>
@@ -9,7 +9,10 @@
   </div>
 
   <div class="content" mat-dialog-content>
-    <p>Are you sure you want to update the state to '{{ data.state }}'?</p>
+    <p>{{ dialogIntro() }}</p>
+    @if (dialogWarning()) {
+      <p>{{ dialogWarning() }}</p>
+    }
     <p class="selection-hint">
       {{ selectionHint() }}
     </p>
@@ -24,7 +27,7 @@
       @if (hasBieTargets()) {
         <div class="table-container">
           <div class="table-title">Associated BIEs</div>
-          <div class="table-subtitle">These BIEs may also need changes before this BIE state can be updated.</div>
+          <div class="table-subtitle">{{ bieTableSubtitle() }}</div>
           <div class="mat-elevation-z1 table-wrapper mt-3">
             <table mat-table [dataSource]="bieTargets()" [trackBy]="trackByNodeKey">
               <ng-container matColumnDef="select">
@@ -160,7 +163,7 @@
       @if (hasCodeListTargets()) {
         <div class="table-container conflict-table-container">
           <div class="table-title">Assigned Code Lists</div>
-          <div class="table-subtitle">These code lists may also need changes before this BIE state can be updated.</div>
+          <div class="table-subtitle">{{ codeListTableSubtitle() }}</div>
           <div class="mat-elevation-z1 table-wrapper mt-3">
             <table mat-table [dataSource]="codeListTargets()" [trackBy]="trackByNodeKey">
               <ng-container matColumnDef="select">
@@ -274,7 +277,7 @@
       Cancel
     </button>
     <button mat-raised-button color="primary" [disabled]="hasInvalidTargets() || isValidating" (click)="onConfirm()">
-      Update
+      {{ confirmActionLabel() }}
     </button>
   </div>
 </div>

@@ -4,5 +4,6 @@ import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 
 import java.util.List;
 
-public record DeleteBieListRequest(List<TopLevelAsbiepId> topLevelAsbiepIdList) {
+public record DeleteBieListRequest(List<TopLevelAsbiepId> topLevelAsbiepIdList,
+                                   List<TopLevelAsbiepId> dependencyTopLevelAsbiepIds) {
 }

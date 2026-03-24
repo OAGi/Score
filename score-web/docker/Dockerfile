@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 nginxinc/nginx-unprivileged:1.29.5-alpine
+FROM nginxinc/nginx-unprivileged:1.29.5-alpine
 
 LABEL maintainer="Hakju Oh <hakju.oh@nist.gov>"
 

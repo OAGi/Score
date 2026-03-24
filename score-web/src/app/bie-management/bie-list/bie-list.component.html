@@ -31,7 +31,7 @@
       </button>
 
       <button mat-icon-button class="ms-2" matTooltip="Discard"
-        [hidden]="selection.selected.length === 0"
+        [hidden]="!canToolbarAction('Discard')"
         (click)="discardAllSelected()">
         <mat-icon>delete</mat-icon>
       </button>

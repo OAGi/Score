@@ -1,6 +1,5 @@
 package org.oagi.score.gateway.http.api.bie_management.model;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -11,7 +10,12 @@ import java.util.List;
  * the same state or a higher state:
  * WIP -> WIP, QA, Production
  * QA -> QA, Production
- * Production -> Production</p>
+ * Production -> Production
+ *
+ * <p>Discard is a virtual transition target used only during dependency
+ * evaluation. It is not a persisted BIE state in the database. Discard is
+ * handled by the dependency-specific rule implementations rather than by this
+ * generic level comparison.</p>
  */
 public final class BieStateLevel {
 
@@ -26,10 +30,12 @@ public final class BieStateLevel {
             return List.of();
         }
 
-        return Arrays.stream(BieState.values())
-                .filter(state -> state != BieState.Initiating)
-                .filter(state -> state.getLevel() >= bieState.getLevel())
-                .toList();
+        return switch (bieState) {
+            case WIP -> List.of(BieState.WIP, BieState.QA, BieState.Production);
+            case QA -> List.of(BieState.QA, BieState.Production);
+            case Production -> List.of(BieState.Production);
+            default -> List.of();
+        };
     }
 
     /**

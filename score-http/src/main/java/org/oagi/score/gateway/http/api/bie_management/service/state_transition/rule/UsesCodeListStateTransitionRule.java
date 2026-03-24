@@ -1,7 +1,6 @@
 package org.oagi.score.gateway.http.api.bie_management.service.state_transition.rule;
 
 import org.oagi.score.gateway.http.api.bie_management.service.state_transition.BieStateTransitionDependency;
-import org.oagi.score.gateway.http.api.bie_management.service.state_transition.BieStateTransitionRuleViolationException;
 import org.oagi.score.gateway.http.api.code_list_management.model.CodeListStateLevel;
 import org.springframework.stereotype.Component;
 
@@ -14,30 +13,30 @@ import org.springframework.stereotype.Component;
  * rejected.</p>
  */
 @Component
-public class UsesCodeListStateTransitionRule implements BieStateTransitionRule<BieFutureStateCarrier, CodeListFutureStateCarrier> {
+public class UsesCodeListStateTransitionRule implements BieStateTransitionRule {
 
     /**
      * Rejects the edge when the projected code-list state would be below the
      * projected BIE state under the owner-specific compatibility rules.
      */
     @Override
-    public void validate(BieFutureStateCarrier source,
-                         CodeListFutureStateCarrier target,
+    public void validate(FutureStateCarrier<?, ?> source,
+                         FutureStateCarrier<?, ?> target,
                          BieStateTransitionDependency dependency) throws BieStateTransitionRuleViolationException {
         if (dependency != BieStateTransitionDependency.USES_CODE_LIST ||
-                source == null ||
-                source.record() == null ||
-                source.futureState() == null ||
-                target == null ||
-                target.record() == null ||
-                target.futureState() == null) {
+                !(source instanceof BieFutureStateCarrier bieSource) ||
+                !(target instanceof CodeListFutureStateCarrier codeListTarget) ||
+                bieSource.record() == null ||
+                bieSource.futureState() == null ||
+                codeListTarget.record() == null ||
+                codeListTarget.futureState() == null) {
             return;
         }
 
         if (!CodeListStateLevel.isCompatible(
-                source.futureState(),
-                target.futureState(),
-                target.record().owner())) {
+                bieSource.futureState(),
+                codeListTarget.futureState(),
+                codeListTarget.record().owner())) {
             throw new BieStateTransitionRuleViolationException();
         }
     }

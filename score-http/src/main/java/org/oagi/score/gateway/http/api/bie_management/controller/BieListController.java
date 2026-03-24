@@ -93,7 +93,9 @@ public class BieListController {
     public List<BieStateDependencyTarget> getStateDependencies(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                             @RequestBody BieStateDependenciesRequest request) {
         return bieStateTransitionService.getStateDependencies(sessionService.asScoreUser(user),
-                request.getTopLevelAsbiepIds(), request.getState());
+                request.getTopLevelAsbiepIds(),
+                request.getRequestedCodeListManifestIds(),
+                request.getState());
     }
 
     @PostMapping(value = "/bie_list/state/dependencies/validate",
@@ -104,7 +106,9 @@ public class BieListController {
     public List<BieStateDependencyTarget> validateStateDependencies(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                                  @RequestBody BieStateDependenciesRequest request) {
         return bieStateTransitionService.validateStateDependencies(sessionService.asScoreUser(user),
-                request.getTopLevelAsbiepIds(), request.getState(),
+                request.getTopLevelAsbiepIds(),
+                request.getRequestedCodeListManifestIds(),
+                request.getState(),
                 request.getSelectedTopLevelAsbiepIds(), request.getSelectedCodeListManifestIds());
     }
 

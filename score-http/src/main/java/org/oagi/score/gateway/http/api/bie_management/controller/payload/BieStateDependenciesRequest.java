@@ -20,6 +20,8 @@ public class BieStateDependenciesRequest {
     private BieState state;
     /** Root BIE ids whose dependency graph should be evaluated. */
     private List<TopLevelAsbiepId> topLevelAsbiepIds;
+    /** Optional requested code list ids whose dependency graph should be evaluated. */
+    private List<CodeListManifestId> requestedCodeListManifestIds;
     /** Dependency rows currently checked in the dialog. */
     private List<TopLevelAsbiepId> selectedTopLevelAsbiepIds;
     /** Code list dependency rows currently checked in the dialog. */

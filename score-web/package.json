@@ -1,6 +1,9 @@
 {
   "name": "score-web",
   "license": "MIT",
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

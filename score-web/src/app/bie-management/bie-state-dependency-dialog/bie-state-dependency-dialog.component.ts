@@ -106,9 +106,49 @@ export class BieStateDependencyDialogComponent {
     );
   }
 
+  dialogTitle(): string {
+    return this.data.state === 'Discard'
+      ? 'Discard BIE?'
+      : `Update state to '${this.data.state}'?`;
+  }
+
+  dialogIntro(): string {
+    return this.data.state === 'Discard'
+      ? 'Are you sure you want to discard this BIE?'
+      : `Are you sure you want to update the state to '${this.data.state}'?`;
+  }
+
+  dialogWarning(): string {
+    return this.data.state === 'Discard'
+      ? 'This BIE will be permanently removed.'
+      : '';
+  }
+
+  bieTableSubtitle(): string {
+    return this.data.state === 'Discard'
+      ? 'These BIEs may also need to be discarded before this BIE can be discarded.'
+      : 'These BIEs may also need changes before this BIE state can be updated.';
+  }
+
+  codeListTableSubtitle(): string {
+    return this.data.state === 'Discard'
+      ? 'These code lists are associated with the selected BIEs. Discard does not update code lists in this flow.'
+      : 'These code lists may also need changes before this BIE state can be updated.';
+  }
+
+  confirmActionLabel(): string {
+    return this.data.state === 'Discard' ? 'Discard' : 'Update';
+  }
+
   selectionHint(): string {
     if (!this.hasTargets()) {
-      return 'No associated BIEs will be updated.';
+      return this.data.state === 'Discard'
+        ? 'No associated BIEs will be discarded.'
+        : 'No associated BIEs will be updated.';
+    }
+
+    if (this.data.state === 'Discard') {
+      return 'This list shows associated BIEs. Checked BIE records will also be discarded.';
     }
 
     if (this.hasCodeListTargets()) {
@@ -245,6 +285,12 @@ export class BieStateDependencyDialogComponent {
   }
 
   validationSummary(): string {
+    if (this.data.state === 'Discard') {
+      if ((this.data.rootTopLevelAsbiepIds || []).length > 1) {
+        return 'Selected BIEs cannot be discarded. Resolve the conflicting records to continue.';
+      }
+      return 'This BIE cannot be discarded. Resolve the conflicting records to continue.';
+    }
     if ((this.data.rootTopLevelAsbiepIds || []).length > 1) {
       return `Selected BIEs cannot move to '${this.data.state}'. Resolve the conflicting records to continue.`;
     }

@@ -1205,29 +1205,26 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   private openStateUpdateErrorDialog(error: HttpErrorResponse): void {
+    const errorMessageId = error?.headers?.get('x-error-message-id');
     const errorMessage = error?.headers?.get('x-error-message') || error?.message || 'Failed to update BIE state';
-    const lines = errorMessage.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-    let header = lines[0] || 'Failed to update BIE state';
-    let detailLines = lines.slice(1);
 
-    if (detailLines.length === 0) {
-      const flattenedMessage = errorMessage.replace(/\s+/g, ' ').trim();
-      const flattenedHeader = 'Failed to update BIE state';
-      if (flattenedMessage.startsWith(flattenedHeader + ' ')) {
-        header = flattenedHeader;
-        detailLines = [flattenedMessage.substring(flattenedHeader.length + 1).trim()]
-          .filter(line => line.length > 0);
+    this.snackBar.openFromComponent(MultiActionsSnackBarComponent, {
+      data: {
+        titleIcon: 'error',
+        title: 'Error',
+        message: errorMessage,
+        action: errorMessageId ? 'View detail in Notifications' : 'Copy to clipboard',
+        onAction: (data, snackBarRef) => {
+          if (errorMessageId) {
+            this.router.navigate(['/message/' + errorMessageId]);
+            snackBarRef.dismissWithAction();
+            return;
+          }
+
+          this.clipboard.copy(data.message);
+        }
       }
-    }
-
-    const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = header;
-    dialogConfig.data.content = detailLines.filter(line => !line.startsWith('- '));
-    dialogConfig.data.list = detailLines
-      .filter(line => line.startsWith('- '))
-      .map(line => line.substring(2));
-    dialogConfig.data.action = undefined;
-    this.confirmDialogService.open(dialogConfig);
+    });
   }
 
   createGlobalAbieExtension(node: BieFlatNode) {
@@ -2465,6 +2462,52 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
             duration: 3000,
           });
         });
+      }, err => {
+        this.isUpdating = false;
+        this.openStateUpdateErrorDialog(err);
+      });
+    }, err => {
+      this.isUpdating = false;
+      this.openStateUpdateErrorDialog(err);
+    });
+  }
+
+  discard() {
+    this.isUpdating = true;
+    this.stateTransitionFlowService.requestDependencySelection({
+      state: 'Discard',
+      rootTopLevelAsbiepIds: [this.rootNode.topLevelAsbiepId],
+      loadDependencies: () => this.service.getStateDependencies(this.rootNode.topLevelAsbiepId, 'Discard'),
+      validateSelection: (selection: StateDependencySelection) =>
+        this.service.validateStateDependencies(this.rootNode.topLevelAsbiepId, 'Discard', selection),
+      normalizeTargets: (dependencyTargets) => {
+        const rootTopLevelAsbiepId = this.rootNode.topLevelAsbiepId;
+        return dependencyTargets.map(target => ({
+          ...target,
+          selectable: target.selectable !== false,
+          checked: target.nodeType === 'BIE' && target.topLevelAsbiepId === rootTopLevelAsbiepId
+            ? true
+            : target.checked
+        }));
+      }
+    }).pipe(
+      finalize(() => {
+        this.isUpdating = false;
+      })
+    ).subscribe((selection?: StateDependencySelection) => {
+      if (selection === undefined) {
+        return;
+      }
+      this.isUpdating = true;
+      this.service.discard(
+        this.rootNode.topLevelAsbiepId,
+        selection.topLevelAsbiepIds
+      ).subscribe(_ => {
+        this.isUpdating = false;
+        this.snackBar.open('Discarded', '', {
+          duration: 3000,
+        });
+        this.router.navigateByUrl('/profile_bie');
       }, err => {
         this.isUpdating = false;
         this.openStateUpdateErrorDialog(err);

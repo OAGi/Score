@@ -2,7 +2,6 @@ package org.oagi.score.e2e.impl.page;
 
 import org.oagi.score.e2e.page.SearchBarPage;
 import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -33,6 +32,20 @@ public class SearchBarPageImpl implements SearchBarPage {
         return By.xpath(xpathExpression);
     }
 
+    private By showAdvancedSearchButtonLocator() {
+        return xpath("//score-search-bar//div[contains(@class, \"main-search\")]"
+                + "//button[.//mat-icon[normalize-space(.)=\"keyboard_arrow_down\"]]");
+    }
+
+    private By hideAdvancedSearchButtonLocator() {
+        return xpath("//score-search-bar//div[contains(@class, \"main-search\")]"
+                + "//button[.//mat-icon[normalize-space(.)=\"keyboard_arrow_up\"]]");
+    }
+
+    private By advancedSearchPanelLocator() {
+        return xpath("//score-search-bar//div[contains(@class, \"advanced-search\")]");
+    }
+
     @Override
     public WebElement getSearchButton() {
         return visibilityOfElementLocated(getDriver(),
@@ -47,40 +60,30 @@ public class SearchBarPageImpl implements SearchBarPage {
 
     @Override
     public WebElement getShowAdvancedSearchButton() {
-        return visibilityOfElementLocated(getDriver(),
-                xpath("//score-search-bar//button[@ng-reflect-message=\"Show Advanced Search\"]"));
+        return visibilityOfElementLocated(getDriver(), showAdvancedSearchButtonLocator());
     }
 
     @Override
     public void showAdvancedSearchPanel() {
-        try {
-            invisibilityOfLoadingContainerElement(getDriver());
-            click(getDriver(), getShowAdvancedSearchButton());
-        } catch (TimeoutException e) {
-            if (getHideAdvancedSearchButton() != null) { // the panel has been opened already
-                return;
-            }
-            throw e;
+        invisibilityOfLoadingContainerElement(getDriver());
+        if (!getDriver().findElements(advancedSearchPanelLocator()).isEmpty()) {
+            return;
         }
+        click(getDriver(), getShowAdvancedSearchButton());
     }
 
     @Override
     public WebElement getHideAdvancedSearchButton() {
-        return visibilityOfElementLocated(getDriver(),
-                xpath("//score-search-bar//button[@ng-reflect-message=\"Hide Advanced Search\"]"));
+        return visibilityOfElementLocated(getDriver(), hideAdvancedSearchButtonLocator());
     }
 
     @Override
     public void hideAdvancedSearchPanel() {
-        try {
-            invisibilityOfLoadingContainerElement(getDriver());
-            click(getDriver(), getHideAdvancedSearchButton());
-        } catch (TimeoutException e) {
-            if (getShowAdvancedSearchButton() != null) { // the panel has been closed already
-                return;
-            }
-            throw e;
+        invisibilityOfLoadingContainerElement(getDriver());
+        if (getDriver().findElements(advancedSearchPanelLocator()).isEmpty()) {
+            return;
         }
+        click(getDriver(), getHideAdvancedSearchButton());
     }
 
 }

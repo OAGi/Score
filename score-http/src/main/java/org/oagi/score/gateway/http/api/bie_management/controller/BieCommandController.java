@@ -56,7 +56,10 @@ public class BieCommandController {
             @RequestBody DeleteBieListRequest request) {
 
         List<TopLevelAsbiepId> topLevelAsbiepIdList = request.topLevelAsbiepIdList();
-        bieCommandService.discardBieList(sessionService.asScoreUser(user), topLevelAsbiepIdList);
+        bieCommandService.discardBieList(
+                sessionService.asScoreUser(user),
+                topLevelAsbiepIdList,
+                request.dependencyTopLevelAsbiepIds());
         return ResponseEntity.noContent().build();
     }
 

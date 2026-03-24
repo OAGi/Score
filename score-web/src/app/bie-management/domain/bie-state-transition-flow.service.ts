@@ -23,6 +23,9 @@ export interface BieStateTransitionFlowRequest {
   loadDependencies: () => Observable<StateDependencyTarget[]>;
   validateSelection: (selection: StateDependencySelection) => Observable<StateDependencyTarget[]>;
   normalizeTargets?: (targets: StateDependencyTarget[]) => StateDependencyTarget[];
+  confirmationHeader?: string;
+  confirmationContent?: string[];
+  confirmationAction?: string;
 }
 
 /**
@@ -56,7 +59,7 @@ export class BieStateTransitionFlowService {
       map(targets => request.normalizeTargets ? request.normalizeTargets(targets || []) : (targets || [])),
       switchMap(validatedTargets => {
         if (!this.hasBlockingIssues(validatedTargets || [])) {
-          return this.openSimpleConfirmation(request.state);
+          return this.openSimpleConfirmation(request);
         }
 
         const dialogData: BieStateDependencyDialogData = {
@@ -76,7 +79,7 @@ export class BieStateTransitionFlowService {
         map(targets => request.normalizeTargets ? request.normalizeTargets(targets || []) : (targets || [])),
         switchMap(targets => {
           if (!this.hasBlockingIssues(targets || [])) {
-            return this.openSimpleConfirmation(request.state);
+            return this.openSimpleConfirmation(request);
           }
 
           const dialogData: BieStateDependencyDialogData = {
@@ -101,13 +104,13 @@ export class BieStateTransitionFlowService {
    * visible dependency rows.
    */
   private openSimpleConfirmation(
-    state: string,
+    request: BieStateTransitionFlowRequest,
     selection: StateDependencySelection = {topLevelAsbiepIds: [], codeListManifestIds: []}
   ): Observable<StateDependencySelection | undefined> {
     const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = 'Update state to \'' + state + '\'?';
-    dialogConfig.data.content = ['Are you sure you want to update the state to \'' + state + '\'?'];
-    dialogConfig.data.action = 'Update';
+    dialogConfig.data.header = request.confirmationHeader || this.confirmationHeader(request.state);
+    dialogConfig.data.content = request.confirmationContent || this.confirmationContent(request.state);
+    dialogConfig.data.action = request.confirmationAction || this.confirmationAction(request.state);
 
     return this.confirmDialogService.open(dialogConfig).afterClosed().pipe(
       map(result => result ? selection : undefined)
@@ -120,6 +123,25 @@ export class BieStateTransitionFlowService {
    */
   private hasBlockingIssues(targets: StateDependencyTarget[]): boolean {
     return (targets || []).some(target => (target.issues || []).length > 0);
+  }
+
+  private confirmationHeader(state: string): string {
+    return state === 'Discard'
+      ? 'Discard BIE?'
+      : ('Update state to \'' + state + '\'?');
+  }
+
+  private confirmationContent(state: string): string[] {
+    return state === 'Discard'
+      ? [
+        'Are you sure you want to discard this BIE?',
+        'This BIE will be permanently removed.'
+      ]
+      : ['Are you sure you want to update the state to \'' + state + '\'?'];
+  }
+
+  private confirmationAction(state: string): string {
+    return state === 'Discard' ? 'Discard' : 'Update';
   }
 
 }

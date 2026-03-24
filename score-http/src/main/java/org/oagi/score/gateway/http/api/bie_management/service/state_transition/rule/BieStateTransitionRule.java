@@ -1,7 +1,6 @@
 package org.oagi.score.gateway.http.api.bie_management.service.state_transition.rule;
 
 import org.oagi.score.gateway.http.api.bie_management.service.state_transition.BieStateTransitionDependency;
-import org.oagi.score.gateway.http.api.bie_management.service.state_transition.BieStateTransitionRuleViolationException;
 
 /**
  * Contract for validating one directed dependency edge against projected
@@ -12,7 +11,7 @@ import org.oagi.score.gateway.http.api.bie_management.service.state_transition.B
  * whether the supplied edge is compatible; the calling service owns message
  * construction and row-level issue aggregation.</p>
  */
-public interface BieStateTransitionRule<S extends FutureStateCarrier<?, ?>, T extends FutureStateCarrier<?, ?>> {
+public interface BieStateTransitionRule {
 
     /**
      * Validates whether the directed dependency edge is compatible with the
@@ -27,8 +26,8 @@ public interface BieStateTransitionRule<S extends FutureStateCarrier<?, ?>, T ex
      * @throws BieStateTransitionRuleViolationException when the rule does not
      *         allow the transition
      */
-    void validate(S source,
-                  T target,
+    void validate(FutureStateCarrier<?, ?> source,
+                  FutureStateCarrier<?, ?> target,
                   BieStateTransitionDependency dependency)
             throws BieStateTransitionRuleViolationException;
 }
