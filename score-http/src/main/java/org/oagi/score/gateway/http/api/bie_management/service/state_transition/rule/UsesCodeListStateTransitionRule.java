@@ -1,7 +1,6 @@
 package org.oagi.score.gateway.http.api.bie_management.service.state_transition.rule;
 
 import org.oagi.score.gateway.http.api.bie_management.service.state_transition.BieStateTransitionDependency;
-import org.oagi.score.gateway.http.api.bie_management.service.state_transition.BieStateTransitionRuleViolationException;
 import org.oagi.score.gateway.http.api.code_list_management.model.CodeListStateLevel;
 import org.springframework.stereotype.Component;
 

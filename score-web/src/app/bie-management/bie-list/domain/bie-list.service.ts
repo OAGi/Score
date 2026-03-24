@@ -151,10 +151,11 @@ export class BieListService {
       .pipe(map(resp => (resp.length !== 0) ? resp.list[0] : undefined));
   }
 
-  delete(topLevelAsbiepIdList: number[]): Observable<any> {
+  delete(topLevelAsbiepIdList: number[], dependencyTopLevelAsbiepIds?: number[]): Observable<any> {
     return this.http.delete<any>('/api/bies', {
       body: {
-        topLevelAsbiepIdList
+        topLevelAsbiepIdList,
+        dependencyTopLevelAsbiepIds
       }
     });
   }

@@ -13,21 +13,21 @@ import org.oagi.score.gateway.http.api.bie_management.repository.criteria.Insert
 import org.oagi.score.gateway.http.api.bie_management.repository.criteria.InsertAsbiepArguments;
 import org.oagi.score.gateway.http.api.bie_management.repository.criteria.InsertBizCtxAssignmentArguments;
 import org.oagi.score.gateway.http.api.bie_management.repository.criteria.InsertTopLevelAsbiepArguments;
+import org.oagi.score.gateway.http.api.bie_management.service.state_transition.BieStateTransitionService;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpSummaryRecord;
 import org.oagi.score.gateway.http.api.context_management.business_context.model.BusinessContextId;
-import org.oagi.score.gateway.http.api.message_management.model.MessageId;
-import org.oagi.score.gateway.http.api.message_management.service.MessageCommandService;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
-import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.oagi.score.gateway.http.common.model.ScoreRole.ADMINISTRATOR;
 
@@ -42,10 +42,7 @@ public class BieCommandService {
     private BusinessInformationEntityRepository bieRepository;
 
     @Autowired
-    private MessageCommandService messageCommandService;
-
-    @Autowired
-    private SessionService sessionService;
+    private BieStateTransitionService bieStateTransitionService;
 
     @Transactional
     public TopLevelAsbiepId createBie(ScoreUser requester, BieCreateRequest request) {
@@ -119,7 +116,9 @@ public class BieCommandService {
         return topLevelAsbiepId;
     }
 
-    public void discardBieList(ScoreUser requester, Collection<TopLevelAsbiepId> topLevelAsbiepIdList) {
+    public void discardBieList(ScoreUser requester,
+                               Collection<TopLevelAsbiepId> topLevelAsbiepIdList,
+                               Collection<TopLevelAsbiepId> dependencyTopLevelAsbiepIds) {
         if (topLevelAsbiepIdList == null || topLevelAsbiepIdList.isEmpty()) {
             return;
         }
@@ -127,83 +126,61 @@ public class BieCommandService {
         /*
          * Issue #772, #1010
          */
-        ensureProperDeleteBieRequest(requester, topLevelAsbiepIdList);
+        ensureProperDeleteBieRequest(requester, topLevelAsbiepIdList, dependencyTopLevelAsbiepIds);
+
+        Set<TopLevelAsbiepId> deleteTargetIds = new LinkedHashSet<>(topLevelAsbiepIdList);
+        if (dependencyTopLevelAsbiepIds != null) {
+            deleteTargetIds.addAll(dependencyTopLevelAsbiepIds);
+        }
 
         var command = repositoryFactory.bieCommandRepository(requester);
-        command.deleteByTopLevelAsbiepIdList(topLevelAsbiepIdList);
+        command.deleteByTopLevelAsbiepIdList(deleteTargetIds);
     }
 
-    private void ensureProperDeleteBieRequest(ScoreUser requester, Collection<TopLevelAsbiepId> topLevelAsbiepIdList) {
-
-        int failureCount = 0;
-        StringBuilder failureMessageBody = new StringBuilder();
-
+    private void ensureProperDeleteBieRequest(ScoreUser requester,
+                                              Collection<TopLevelAsbiepId> topLevelAsbiepIdList,
+                                              Collection<TopLevelAsbiepId> dependencyTopLevelAsbiepIds) {
+        Set<TopLevelAsbiepId> deleteTargetIds = new LinkedHashSet<>(topLevelAsbiepIdList);
+        if (dependencyTopLevelAsbiepIds != null) {
+            deleteTargetIds.addAll(dependencyTopLevelAsbiepIds);
+        }
         var topLevelAsbiepQuery = repositoryFactory.topLevelAsbiepQueryRepository(requester);
         var openApiDocumentQuery = repositoryFactory.openApiDocumentQueryRepository(requester);
 
-        // Issue #1569
-        // check to see if the BIE is referenced in an OpenAPI document
-        for (TopLevelAsbiepId topLevelAsbiepId : topLevelAsbiepIdList) {
+        for (TopLevelAsbiepId topLevelAsbiepId : deleteTargetIds) {
+            // Issue #1569
+            // check to see if the BIE is referenced in an OpenAPI document
             if (openApiDocumentQuery.hasTopLevelAsbiepReference(topLevelAsbiepId)) {
                 throw new DataAccessForbiddenException("Cannot delete the BIE '" + topLevelAsbiepId + "'. please remove the BIE from the OpenAPI document first.");
             }
 
-            TopLevelAsbiepSummaryRecord topLevelAsbiepSummary = null;
+            TopLevelAsbiepSummaryRecord topLevelAsbiepSummary =
+                    topLevelAsbiepQuery.getTopLevelAsbiepSummary(topLevelAsbiepId);
+            if (topLevelAsbiepSummary == null) {
+                continue;
+            }
+
+            if (!requester.hasRole(ADMINISTRATOR) && topLevelAsbiepSummary.state() != BieState.WIP) {
+                throw new DataAccessForbiddenException("Not allowed to delete the BIE in '" + topLevelAsbiepSummary.state() + "' state.");
+            }
 
             // Issue #1576
             // Administrator can discard BIEs in any state.
             if (!requester.hasRole(ADMINISTRATOR)) {
-                topLevelAsbiepSummary = topLevelAsbiepQuery.getTopLevelAsbiepSummary(topLevelAsbiepId);
-                if (topLevelAsbiepSummary.state() == BieState.Production) {
-                    throw new DataAccessForbiddenException("Not allowed to delete the BIE in '" + topLevelAsbiepSummary.state() + "' state.");
-                }
-
                 UserId requesterUserId = requester.userId();
                 if (!requesterUserId.equals(topLevelAsbiepSummary.owner().userId())) {
                     throw new DataAccessForbiddenException("Only allowed to delete the BIE by the owner.");
                 }
             }
-
-            // Issue #1010
-            List<TopLevelAsbiepSummaryRecord> reusedTopLevelAsbiepList =
-                    topLevelAsbiepQuery.getReusedTopLevelAsbiepSummaryList(topLevelAsbiepId);
-            if (!reusedTopLevelAsbiepList.isEmpty()) {
-                failureCount += 1;
-
-                if (topLevelAsbiepSummary == null) {
-                    topLevelAsbiepSummary = topLevelAsbiepQuery.getTopLevelAsbiepSummary(topLevelAsbiepId);
-                }
-                failureMessageBody = failureMessageBody.append("\n---\n[**")
-                        .append(topLevelAsbiepSummary.propertyTerm())
-                        .append("**](")
-                        .append("/profile_bie/").append(topLevelAsbiepId)
-                        .append(") (")
-                        .append(topLevelAsbiepSummary.guid())
-                        .append(") cannot be discarded due to the referential integrity violation by following BIEs:")
-                        .append("\n\n");
-                for (TopLevelAsbiepSummaryRecord target : reusedTopLevelAsbiepList) {
-                    failureMessageBody = failureMessageBody.append("- [")
-                            .append(target.propertyTerm())
-                            .append("](")
-                            .append("/profile_bie/").append(target.topLevelAsbiepId())
-                            .append(") (")
-                            .append(target.guid())
-                            .append(")\n");
-                }
-            }
         }
 
-        if (failureCount > 0) { // i.e. failed?
-            String subject = "Failed to discard BIE" + ((failureCount > 1) ? "s" : "");
-            MessageId errorMessageId = messageCommandService.asyncSendMessage(
-                    sessionService.getScoreSystemUser(),
-                    Arrays.asList(requester.userId()),
-                    subject,
-                    failureMessageBody.toString(),
-                    "text/markdown").join().values().iterator().next();
-
-            throw new DataAccessForbiddenException(subject, errorMessageId.value());
-        }
+        // Issue #1010
+        bieStateTransitionService.ensureDependencySelectionStateChange(
+                requester,
+                topLevelAsbiepIdList,
+                BieState.Discard,
+                dependencyTopLevelAsbiepIds,
+                List.of());
     }
 
 }

@@ -20,6 +20,7 @@ import java.util.List;
 import static java.time.Duration.ofMillis;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.oagi.score.e2e.impl.PageHelper.click;
 import static org.oagi.score.e2e.impl.PageHelper.elementToBeClickable;
@@ -35,11 +36,14 @@ public abstract class TS45Base extends BaseTest {
     protected static final String BIE_MUST_BE_IN_QA_MESSAGE = "This BIE must be in 'QA'.";
     protected static final String BIE_MUST_BE_IN_PRODUCTION_MESSAGE = "This BIE must be in 'Production'.";
     protected static final String BIE_MUST_BE_IN_WIP_MESSAGE = "This BIE must be in 'WIP'.";
+    protected static final String BIE_MUST_BE_DISCARDED_MESSAGE = "This BIE must be discarded.";
     protected static final String CODE_LIST_MUST_BE_IN_QA_MESSAGE = "This code list must be in 'QA'.";
     protected static final String CODE_LIST_MUST_BE_IN_PRODUCTION_MESSAGE = "This code list must be in 'Production'.";
     protected static final String VALIDATION_SUMMARY_QA = "This BIE cannot move to 'QA'.";
     protected static final String VALIDATION_SUMMARY_PRODUCTION = "This BIE cannot move to 'Production'.";
     protected static final String VALIDATION_SUMMARY_WIP = "This BIE cannot move to 'WIP'.";
+    protected static final String VALIDATION_SUMMARY_DISCARD = "This BIE cannot be discarded.";
+    protected static final String VALIDATION_SUMMARY_MULTI_DISCARD = "Selected BIEs cannot be discarded.";
 
     protected final List<AppUserObject> randomAccounts = new ArrayList<>();
 
@@ -106,6 +110,87 @@ public abstract class TS45Base extends BaseTest {
                 transitionOwner,
                 "WIP",
                 "WIP");
+    }
+
+    protected TestGraph createMinimalBaseDiscardTestGraph() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        BusinessContextObject businessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(endUser);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.11");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI()
+                .createRandomEndUserNamespace(endUser, library);
+
+        ASCCPObject bomHeaderAsccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum(library, "BOM Header. BOM Header", release.getReleaseNumber());
+        ASCCPObject bomAsccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum(library, "BOM. BOM", release.getReleaseNumber());
+        ASCCPObject securityClassificationAsccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum(
+                        library,
+                        "Security Classification. Security Classification",
+                        release.getReleaseNumber());
+
+        TopLevelASBIEPObject sharedHeaderBaseBIE = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(
+                        Arrays.asList(businessContext),
+                        bomHeaderAsccp,
+                        endUser,
+                        "WIP");
+        TopLevelASBIEPObject primaryBaseBIE = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(
+                        Arrays.asList(businessContext),
+                        bomAsccp,
+                        endUser,
+                        "WIP");
+        TopLevelASBIEPObject sharedReusableClassificationBIE = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(
+                        Arrays.asList(businessContext),
+                        securityClassificationAsccp,
+                        endUser,
+                        "WIP");
+
+        CodeListObject primaryAssignedCodeList = getAPIFactory().getCodeListAPI()
+                .createRandomCodeList(endUser, namespace, release, "WIP");
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(primaryBaseBIE);
+        WebElement rootTypeCodeNode = editBIEPage.getNodeByPath("/" + bomAsccp.getPropertyTerm() + "/Type Code");
+        EditBIEPage.BBIEPanel rootTypeCodePanel = editBIEPage.getBBIEPanel(rootTypeCodeNode);
+        rootTypeCodePanel.toggleUsed();
+        rootTypeCodePanel.setValueDomainRestriction("Code");
+        rootTypeCodePanel.setValueDomain(primaryAssignedCodeList.getName());
+
+        SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog =
+                editBIEPage.reuseBIEOnNode("/" + bomAsccp.getPropertyTerm() + "/BOM Header");
+        selectProfileBIEToReuseDialog.selectBIEToReuse(sharedHeaderBaseBIE);
+
+        editBIEPage.openPage();
+        selectProfileBIEToReuseDialog =
+                editBIEPage.reuseBIEOnNode("/" + bomAsccp.getPropertyTerm() + "/BOM Item Data/Security Classification");
+        selectProfileBIEToReuseDialog.selectBIEToReuse(sharedReusableClassificationBIE);
+        editBIEPage.openPage();
+
+        return new TestGraph(
+                endUser,
+                null,
+                businessContext,
+                release,
+                namespace,
+                library,
+                bomAsccp,
+                bomHeaderAsccp,
+                securityClassificationAsccp,
+                primaryBaseBIE,
+                null,
+                sharedHeaderBaseBIE,
+                null,
+                sharedReusableClassificationBIE,
+                primaryAssignedCodeList,
+                null,
+                homePage);
     }
 
     private TestGraph createConfiguredTestGraph(AppUserObject transitionOwner,
@@ -302,11 +387,23 @@ public abstract class TS45Base extends BaseTest {
         click(editBIEPage.getBackToWIPButton(true));
     }
 
+    protected void openDiscardDialog(EditBIEPage editBIEPage) {
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//button[.//span[normalize-space(.) = \"Discard\"] and not(ancestor::mat-dialog-container)]")));
+    }
+
     protected void confirmDependencyDialogUpdate() {
         click(getDependencyDialogUpdateButton());
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofMillis(1000L));
         assertEquals("State updated", getSnackBarMessage(getDriver()));
+    }
+
+    protected void confirmDependencyDialogDiscard() {
+        click(getDependencyDialogDiscardButton());
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
+        assertEquals("Discarded", getSnackBarMessage(getDriver()));
     }
 
     protected void cancelDependencyDialog() {
@@ -323,6 +420,11 @@ public abstract class TS45Base extends BaseTest {
         assertNotNull(getDependencyRowByValue(value));
     }
 
+    protected void assertDependencyRowNotDisplayed(String value) {
+        assertTrue(getDriver().findElements(By.xpath(
+                "//mat-dialog-container//td//*[contains(text(), \"" + value + "\")]/ancestor::tr")).isEmpty());
+    }
+
     protected void assertDependencyRowMessage(String value, String message) {
         WebElement row = getDependencyRowByValue(value);
         assertTrue(!row.findElements(By.xpath(
@@ -331,6 +433,10 @@ public abstract class TS45Base extends BaseTest {
 
     protected String bieOwnershipMessage(AppUserObject owner) {
         return "This BIE is owned by '" + owner.getLoginId() + "' and cannot be updated.";
+    }
+
+    protected String bieDiscardOwnershipMessage(AppUserObject owner) {
+        return "This BIE is owned by '" + owner.getLoginId() + "' and cannot be discarded.";
     }
 
     protected String codeListOwnershipMessage(AppUserObject owner) {
@@ -364,6 +470,11 @@ public abstract class TS45Base extends BaseTest {
     protected WebElement getDependencyDialogUpdateButton() {
         return visibilityOfElementLocated(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]"));
+    }
+
+    protected WebElement getDependencyDialogDiscardButton() {
+        return visibilityOfElementLocated(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]"));
     }
 
     protected WebElement getDependencyValidationSummary() {
@@ -428,6 +539,11 @@ public abstract class TS45Base extends BaseTest {
     protected WebElement getDependencyRowByValue(String value) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
                 "//mat-dialog-container//td//*[contains(text(), \"" + value + "\")]/ancestor::tr"));
+    }
+
+    protected void assertBIEDeleted(TopLevelASBIEPObject topLevelASBIEP) {
+        assertNull(getAPIFactory().getBusinessInformationEntityAPI()
+                .getTopLevelASBIEPByID(topLevelASBIEP.getTopLevelAsbiepId()));
     }
 
     protected static class TestGraph {

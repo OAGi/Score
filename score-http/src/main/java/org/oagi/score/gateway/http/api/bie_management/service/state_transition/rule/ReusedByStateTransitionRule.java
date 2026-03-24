@@ -1,8 +1,8 @@
 package org.oagi.score.gateway.http.api.bie_management.service.state_transition.rule;
 
+import org.oagi.score.gateway.http.api.bie_management.model.BieState;
 import org.oagi.score.gateway.http.api.bie_management.model.BieStateLevel;
 import org.oagi.score.gateway.http.api.bie_management.service.state_transition.BieStateTransitionDependency;
-import org.oagi.score.gateway.http.api.bie_management.service.state_transition.BieStateTransitionRuleViolationException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,6 +28,15 @@ public class ReusedByStateTransitionRule implements BieStateTransitionRule {
                 bieSource.futureState() == null ||
                 bieTarget.futureState() == null) {
             return;
+        }
+
+        // Case: A is reused by B. If the dependent B is discarded, A may still exist.
+        if (bieTarget.futureState() == BieState.Discard) {
+            return;
+        }
+        // Case: A is reused by B. If the prerequisite A is discarded while B survives, block it.
+        if (bieSource.futureState() == BieState.Discard) {
+            throw new BieStateTransitionRuleViolationException();
         }
 
         if (!BieStateLevel.isCompatible(bieTarget.futureState(), bieSource.futureState())) {

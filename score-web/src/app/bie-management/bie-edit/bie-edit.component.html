@@ -99,6 +99,12 @@
                               Move to QA
                             </button>
                           }
+                          @if ((state === 'WIP' && access === 'CanEdit') || isAdmin) {
+                            <button mat-raised-button color="warn" class="ms-2" (click)="discard()"
+                              [disabled]="isUpdating || isChanged">
+                              Discard
+                            </button>
+                          }
                           @if (state === 'QA' && (access === 'CanMove' || isAdmin)) {
                             <button mat-raised-button color="warn" (click)="updateState('WIP')"
                               [disabled]="isUpdating">

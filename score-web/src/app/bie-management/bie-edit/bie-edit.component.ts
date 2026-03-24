@@ -2472,6 +2472,52 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     });
   }
 
+  discard() {
+    this.isUpdating = true;
+    this.stateTransitionFlowService.requestDependencySelection({
+      state: 'Discard',
+      rootTopLevelAsbiepIds: [this.rootNode.topLevelAsbiepId],
+      loadDependencies: () => this.service.getStateDependencies(this.rootNode.topLevelAsbiepId, 'Discard'),
+      validateSelection: (selection: StateDependencySelection) =>
+        this.service.validateStateDependencies(this.rootNode.topLevelAsbiepId, 'Discard', selection),
+      normalizeTargets: (dependencyTargets) => {
+        const rootTopLevelAsbiepId = this.rootNode.topLevelAsbiepId;
+        return dependencyTargets.map(target => ({
+          ...target,
+          selectable: target.selectable !== false,
+          checked: target.nodeType === 'BIE' && target.topLevelAsbiepId === rootTopLevelAsbiepId
+            ? true
+            : target.checked
+        }));
+      }
+    }).pipe(
+      finalize(() => {
+        this.isUpdating = false;
+      })
+    ).subscribe((selection?: StateDependencySelection) => {
+      if (selection === undefined) {
+        return;
+      }
+      this.isUpdating = true;
+      this.service.discard(
+        this.rootNode.topLevelAsbiepId,
+        selection.topLevelAsbiepIds
+      ).subscribe(_ => {
+        this.isUpdating = false;
+        this.snackBar.open('Discarded', '', {
+          duration: 3000,
+        });
+        this.router.navigateByUrl('/profile_bie');
+      }, err => {
+        this.isUpdating = false;
+        this.openStateUpdateErrorDialog(err);
+      });
+    }, err => {
+      this.isUpdating = false;
+      this.openStateUpdateErrorDialog(err);
+    });
+  }
+
   /* For type casting of detail property */
   isAbieDetail(node?: BieFlatNode): boolean {
     if (!node) {

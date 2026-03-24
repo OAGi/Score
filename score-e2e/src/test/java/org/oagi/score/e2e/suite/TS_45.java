@@ -12,6 +12,9 @@ import org.oagi.score.e2e.TS_45_BIEStateTransitionAndValidationRules.TC_45_6_Mov
 import org.oagi.score.e2e.TS_45_BIEStateTransitionAndValidationRules.TC_45_7_MoveSharedHeaderBaseBIEFromQAToWIPWithSameOwnerDependentBIEs;
 import org.oagi.score.e2e.TS_45_BIEStateTransitionAndValidationRules.TC_45_8_BlockBaseBIEFromWIPToQAByDifferentOwnerHeaderDependency;
 import org.oagi.score.e2e.TS_45_BIEStateTransitionAndValidationRules.TC_45_9_BlockBaseBIEFromWIPToQAByDifferentOwnerAssignedCodeList;
+import org.oagi.score.e2e.TS_45_BIEStateTransitionAndValidationRules.TC_45_10_AdministratorDiscardsBaseBIEFromQA;
+import org.oagi.score.e2e.TS_45_BIEStateTransitionAndValidationRules.TC_45_11_AdministratorDiscardsDerivedBIEFromProduction;
+import org.oagi.score.e2e.TS_45_BIEStateTransitionAndValidationRules.TC_45_12_AdministratorBulkDiscardsQABIEsFromBIEList;
 
 @Suite
 @SuiteDisplayName("Test Suite 45")
@@ -24,7 +27,10 @@ import org.oagi.score.e2e.TS_45_BIEStateTransitionAndValidationRules.TC_45_9_Blo
         TC_45_6_MoveDerivedBIEFromQAToProductionWithCompatibleCodeLists.class,
         TC_45_7_MoveSharedHeaderBaseBIEFromQAToWIPWithSameOwnerDependentBIEs.class,
         TC_45_8_BlockBaseBIEFromWIPToQAByDifferentOwnerHeaderDependency.class,
-        TC_45_9_BlockBaseBIEFromWIPToQAByDifferentOwnerAssignedCodeList.class
+        TC_45_9_BlockBaseBIEFromWIPToQAByDifferentOwnerAssignedCodeList.class,
+        TC_45_10_AdministratorDiscardsBaseBIEFromQA.class,
+        TC_45_11_AdministratorDiscardsDerivedBIEFromProduction.class,
+        TC_45_12_AdministratorBulkDiscardsQABIEsFromBIEList.class
 })
 public class TS_45 {
 }

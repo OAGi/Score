@@ -1,6 +1,4 @@
-package org.oagi.score.gateway.http.api.bie_management.service.state_transition;
-
-import org.oagi.score.gateway.http.api.bie_management.service.state_transition.rule.BieStateTransitionRule;
+package org.oagi.score.gateway.http.api.bie_management.service.state_transition.rule;
 
 /**
  * Signals that a {@link BieStateTransitionRule} rejected one directed dependency

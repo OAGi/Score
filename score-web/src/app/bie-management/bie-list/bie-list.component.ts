@@ -459,29 +459,55 @@ export class BieListComponent implements OnInit {
   }
 
   openDialogBieDiscard(bieLists: BieListEntry[]) {
-    const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = 'Discard ' + (bieLists.length > 1 ? 'BIEs' : 'BIE') + '?';
-    dialogConfig.data.content = [
-      'Are you sure you want to discard the ' + (bieLists.length > 1 ? 'BIEs' : 'BIE') + '?',
-      'The ' + (bieLists.length > 1 ? 'BIEs' : 'BIE') + ' will be permanently removed.'
-    ];
-    dialogConfig.data.action = 'Discard';
-
-    this.confirmDialogService.open(dialogConfig).afterClosed()
-      .subscribe(result => {
-        if (result) {
-          this.loading = true;
-          this.service.delete(bieLists.map(e => e.topLevelAsbiepId)).pipe(finalize(() => {
-            this.loading = false;
-          })).subscribe(_ => {
-            this.snackBar.open('Discarded', '', {
-              duration: 3000,
-            });
-            this.selectionClear();
-            this.loadBieList();
-          });
-        }
+    this.loading = true;
+    this.stateTransitionFlowService.requestDependencySelection({
+      state: 'Discard',
+      rootTopLevelAsbiepIds: bieLists.map(e => e.topLevelAsbiepId),
+      loadDependencies: () => this.service.getStateDependencies(bieLists.map(e => e.topLevelAsbiepId), 'Discard'),
+      validateSelection: (selection: StateDependencySelection) =>
+        this.service.validateStateDependencies(
+          bieLists.map(e => e.topLevelAsbiepId),
+          'Discard',
+          selection),
+      normalizeTargets: (dependencyTargets) => {
+        const selectedTopLevelAsbiepIdSet = new Set(bieLists.map(e => e.topLevelAsbiepId));
+        const visibleTopLevelAsbiepIdSet = new Set(this.dataSource.data.map(e => e.topLevelAsbiepId));
+        return dependencyTargets.map(target => ({
+          ...target,
+          selectable: target.selectable !== false,
+          checked: target.selectable === false ? false : (target.nodeType === 'BIE' &&
+          visibleTopLevelAsbiepIdSet.has(target.topLevelAsbiepId) ?
+            selectedTopLevelAsbiepIdSet.has(target.topLevelAsbiepId) :
+            target.checked)
+        }));
+      }
+    }).pipe(
+      finalize(() => {
+        this.loading = false;
+      })
+    ).subscribe((selection?: StateDependencySelection) => {
+      if (selection === undefined) {
+        return;
+      }
+      this.loading = true;
+      this.service.delete(
+        bieLists.map(e => e.topLevelAsbiepId),
+        selection.topLevelAsbiepIds
+      ).pipe(finalize(() => {
+        this.loading = false;
+      })).subscribe(_ => {
+        this.snackBar.open('Discarded', '', {
+          duration: 3000,
+        });
+        this.selectionClear();
+        this.loadBieList();
+      }, error => {
+        this.openStateUpdateErrorDialog(error);
       });
+    }, error => {
+      this.openStateUpdateErrorDialog(error);
+      this.loading = false;
+    });
   }
 
   openTransferDialog(bieList: BieListEntry, $event?: Event) {
@@ -603,6 +629,15 @@ export class BieListComponent implements OnInit {
           }
         }).length === this.selection.selected.length;
       case 'Transfer':
+        return this.selection.selected.filter(e => {
+          if (e.state === 'WIP' && e.owner.loginId === this.username) {
+            return e;
+          }
+        }).length === this.selection.selected.length;
+      case 'Discard':
+        if (this.isAdmin) {
+          return true;
+        }
         return this.selection.selected.filter(e => {
           if (e.state === 'WIP' && e.owner.loginId === this.username) {
             return e;
