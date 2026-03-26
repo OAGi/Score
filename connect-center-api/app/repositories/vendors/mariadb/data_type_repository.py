@@ -286,6 +286,8 @@ async def _scs_by_owner_manifest_ids(
                     DtSc.definition_source,
                     DtSc.cardinality_min,
                     DtSc.cardinality_max,
+                    DtSc.default_value,
+                    DtSc.fixed_value,
                     DtSc.is_deprecated,
                 )
                 .select_from(DtScManifest)
@@ -312,6 +314,8 @@ async def _scs_by_owner_manifest_ids(
                 definition_source=(str(sc_row["definition_source"]) if sc_row.get("definition_source") is not None else None),
                 cardinality_min=int(sc_row["cardinality_min"]),
                 cardinality_max=int(sc_row["cardinality_max"]) if sc_row.get("cardinality_max") is not None else None,
+                default_value=str(sc_row["default_value"]) if sc_row.get("default_value") is not None else None,
+                fixed_value=str(sc_row["fixed_value"]) if sc_row.get("fixed_value") is not None else None,
                 is_deprecated=bool(sc_row["is_deprecated"]),
             )
         )

@@ -174,7 +174,6 @@ async def get_data_type_service(
                                         "release_num": {"type": "string", "description": "Release number",
                                                         "example": "10.6"},
                                         "state": {"type": "string",
-                                                  "enum": ["Processing", "Initialized", "Draft", "Published"],
                                                   "description": "Release state", "example": "Published"}
                                     },
                                     "required": ["release_id", "release_num", "state"]
@@ -300,7 +299,7 @@ async def get_data_type_service(
                                 "release_id": {"type": "integer", "description": "Unique identifier for the release",
                                                "example": 1},
                                 "release_num": {"type": "string", "description": "Release number", "example": "10.6"},
-                                "state": {"type": "string", "enum": ["Processing", "Initialized", "Draft", "Published"],
+                                "state": {"type": "string",
                                           "description": "Release state", "example": "Published"}
                             },
                             "required": ["release_id", "release_num", "state"]
@@ -594,7 +593,6 @@ async def get_data_types(
                             "release_num": {"type": "string", "description": "Release number",
                                             "example": "10.6"},
                             "state": {"type": "string",
-                                      "enum": ["Processing", "Initialized", "Draft", "Published"],
                                       "description": "Release state", "example": "Published"}
                         },
                         "required": ["release_id", "release_num", "state"]
@@ -710,7 +708,7 @@ async def get_data_types(
                 "properties": {
                     "release_id": {"type": "integer", "description": "Unique identifier for the release", "example": 1},
                     "release_num": {"type": "string", "description": "Release number", "example": "10.6"},
-                    "state": {"type": "string", "enum": ["Processing", "Initialized", "Draft", "Published"],
+                    "state": {"type": "string",
                               "description": "Release state", "example": "Published"}
                 },
                 "required": ["release_id", "release_num", "state"]

@@ -49,8 +49,20 @@ class DataTypeBaseSummaryRow(BaseModel):
 
     dt_manifest_id: int
     dt_id: int
+    based_dt_manifest_id: int | None = None
     guid: str
     den: str
+    data_type_term: str | None = None
+    qualifier: str | None = None
+    representation_term: str | None = None
+    six_digit_id: str | None = None
+    definition: str | None = None
+    definition_source: str | None = None
+    content_component_definition: str | None = None
+    is_deprecated: bool
+    namespace: NamespaceSummaryRow | None = None
+    library: LibrarySummaryRow
+    release: ReleaseSummaryRow
 
     model_config = ConfigDict(frozen=True, from_attributes=True)
 

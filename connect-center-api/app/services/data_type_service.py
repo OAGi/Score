@@ -12,7 +12,11 @@ from app.repositories.models.app_user import AppUserRow
 from app.security import AuthenticatedUser
 from app.services import load_users_by_ids, to_user_summary
 from app.services.models import WhoAndWhen
-from app.services.models.data_type import DataTypeServiceResult
+from app.services.models.data_type import (
+    DataTypeServiceResult,
+    DataTypeSupplementaryComponentServiceRecord,
+    DataTypeValueConstraintServiceRecord,
+)
 from app.services.release_service import ReleaseService
 from app.services.utils.date import DateRange
 from app.services.utils.pagination import PaginationParams, PaginationResponse
@@ -156,7 +160,10 @@ class DataTypeService:
             commonly_used=row.commonly_used,
             is_deprecated=row.is_deprecated,
             state=row.state,
-            supplementary_components=row.supplementary_components,
+            supplementary_components=[
+                self._to_supplementary_component_result(component)
+                for component in row.supplementary_components
+            ],
             namespace=row.namespace,
             library=row.library,
             release=row.release,
@@ -170,4 +177,27 @@ class DataTypeService:
                 who=to_user_summary(int(row.last_updated_by), users_by_id=users_by_id),
                 when=row.last_update_timestamp,
             ),
+        )
+
+    @staticmethod
+    def _to_supplementary_component_result(component: Any) -> DataTypeSupplementaryComponentServiceRecord:
+        value_constraint = None
+        if component.default_value is not None or component.fixed_value is not None:
+            value_constraint = DataTypeValueConstraintServiceRecord(
+                default_value=component.default_value,
+                fixed_value=component.fixed_value,
+            )
+        return DataTypeSupplementaryComponentServiceRecord(
+            dt_sc_manifest_id=component.dt_sc_manifest_id,
+            dt_sc_id=component.dt_sc_id,
+            guid=component.guid,
+            object_class_term=component.object_class_term,
+            property_term=component.property_term,
+            representation_term=component.representation_term,
+            definition=component.definition,
+            definition_source=component.definition_source,
+            cardinality_min=component.cardinality_min,
+            cardinality_max=component.cardinality_max,
+            value_constraint=value_constraint,
+            is_deprecated=component.is_deprecated,
         )

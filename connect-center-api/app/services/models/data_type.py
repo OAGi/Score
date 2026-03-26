@@ -102,6 +102,14 @@ class DataTypeBaseSummaryServiceRecord:
 
 
 @dataclass(kw_only=True)
+class DataTypeValueConstraintServiceRecord:
+    """Value constraint for a supplementary component."""
+
+    default_value: str | None = None
+    fixed_value: str | None = None
+
+
+@dataclass(kw_only=True)
 class DataTypeSupplementaryComponentServiceRecord:
     """Data type supplementary component information."""
 
@@ -114,7 +122,8 @@ class DataTypeSupplementaryComponentServiceRecord:
     definition: str | None = None
     definition_source: str | None = None
     cardinality_min: int
-    cardinality_max: int | None = None
+    cardinality_max: int
+    value_constraint: DataTypeValueConstraintServiceRecord | None = None
     is_deprecated: bool
 
 

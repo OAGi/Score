@@ -118,6 +118,7 @@ class BaseAccInfoRecord(BaseModel):
     """Manifest-scoped base ACC information."""
 
     acc_manifest_id: int = Field(..., ge=1, description="Base ACC manifest identifier.")
+    acc_id: int = Field(..., ge=1, description="Base ACC identifier.")
     guid: str = Field(..., description="Base ACC GUID.")
     den: str = Field(..., description="Base ACC DEN.")
     object_class_term: str = Field(..., description="Base ACC object class term.")
@@ -206,11 +207,14 @@ class AsccRelationshipInfoRecord(BaseModel):
     """ASCC relationship entry inside ACC detail."""
 
     component_type: Literal["ASCC"] = Field(default="ASCC", description='Component type. Always "ASCC".')
+    manifest_id: int = Field(..., ge=1, description="ASCC manifest identifier.")
     ascc_manifest_id: int = Field(..., ge=1, description="ASCC manifest identifier.")
+    ascc_id: int = Field(..., ge=1, description="ASCC identifier.")
     guid: str = Field(..., description="ASCC GUID.")
     den: str = Field(..., description="ASCC DEN.")
     cardinality_min: int = Field(..., description="Minimum cardinality.")
     cardinality_max: int = Field(..., description="Maximum cardinality. `-1` means unbounded.")
+    cardinality_display: str = Field(..., description="Human-readable cardinality display.")
     is_deprecated: bool = Field(..., description="Whether ASCC is deprecated.")
     definition: str | None = Field(default=None, description="ASCC definition.")
     definition_source: str | None = Field(default=None, description="ASCC definition source.")
@@ -224,11 +228,14 @@ class BccRelationshipInfoRecord(BaseModel):
     """BCC relationship entry inside ACC detail."""
 
     component_type: Literal["BCC"] = Field(default="BCC", description='Component type. Always "BCC".')
+    manifest_id: int = Field(..., ge=1, description="BCC manifest identifier.")
     bcc_manifest_id: int = Field(..., ge=1, description="BCC manifest identifier.")
+    bcc_id: int = Field(..., ge=1, description="BCC identifier.")
     guid: str = Field(..., description="BCC GUID.")
     den: str = Field(..., description="BCC DEN.")
     cardinality_min: int = Field(..., description="Minimum cardinality.")
     cardinality_max: int = Field(..., description="Maximum cardinality. `-1` means unbounded.")
+    cardinality_display: str = Field(..., description="Human-readable cardinality display.")
     entity_type: Literal["Attribute", "Element"] | None = Field(default=None, description="Entity type.")
     is_nillable: bool = Field(..., description="Whether BCC is nillable.")
     value_constraint: ValueConstraintRecord | None = Field(default=None, description="Value constraint.")
@@ -245,6 +252,7 @@ class GetAccByAccManifestIdResponse(BaseModel):
     """ACC detail response model (manifest-only identifiers)."""
 
     acc_manifest_id: int = Field(..., ge=1, description="ACC manifest identifier.")
+    acc_id: int = Field(..., ge=1, description="ACC identifier.")
     base_acc: BaseAccInfoRecord | None = Field(default=None, description="Base ACC information.")
     relationships: list[
         Annotated[AsccRelationshipInfoRecord | BccRelationshipInfoRecord, Field(discriminator="component_type")]
@@ -274,6 +282,7 @@ class GetAsccpByAsccpManifestIdResponse(BaseModel):
     """ASCCP detail response model (manifest-only identifiers)."""
 
     asccp_manifest_id: int = Field(..., ge=1, description="ASCCP manifest identifier.")
+    asccp_id: int = Field(..., ge=1, description="ASCCP identifier.")
     role_of_acc: BaseAccInfoRecord | None = Field(default=None, description="Role-of ACC information.")
     guid: str = Field(..., description="ASCCP GUID.")
     den: str | None = Field(default=None, description="ASCCP DEN.")
@@ -299,6 +308,7 @@ class GetBccpByBccpManifestIdResponse(BaseModel):
     """BCCP detail response model (manifest-only identifiers)."""
 
     bccp_manifest_id: int = Field(..., ge=1, description="BCCP manifest identifier.")
+    bccp_id: int = Field(..., ge=1, description="BCCP identifier.")
     bdt: DataTypeSummaryRecord = Field(..., description="Associated BDT information.")
     guid: str = Field(..., description="BCCP GUID.")
     den: str = Field(..., description="BCCP DEN.")

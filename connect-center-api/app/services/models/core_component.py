@@ -76,6 +76,7 @@ class DataTypeSummaryServiceRecord:
     """Manifest-scoped BDT summary."""
 
     dt_manifest_id: int
+    dt_id: int
     based_dt_manifest_id: int | None = None
     guid: str
     den: str
@@ -105,6 +106,7 @@ class AccSummaryServiceRecord:
     """Manifest-scoped ACC information."""
 
     acc_manifest_id: int
+    acc_id: int
     guid: str
     den: str
     object_class_term: str
@@ -118,6 +120,7 @@ class BaseAccSummaryServiceRecord:
     """Manifest-scoped base ACC information."""
 
     acc_manifest_id: int
+    acc_id: int
     guid: str
     den: str
     object_class_term: str
@@ -134,6 +137,7 @@ class AsccpSummaryServiceRecord:
     """Manifest-scoped ASCCP information."""
 
     asccp_manifest_id: int
+    asccp_id: int
     role_of_acc_manifest_id: int
     guid: str
     den: str | None = None
@@ -149,6 +153,7 @@ class AsccRelationshipServiceRecord:
 
     component_type: Literal["ASCC"] = 'ASCC'
     ascc_manifest_id: int
+    ascc_id: int
     guid: str
     den: str
     cardinality_min: int
@@ -158,6 +163,8 @@ class AsccRelationshipServiceRecord:
     definition_source: str | None = None
     from_acc: AccSummaryServiceRecord
     to_asccp: AsccpSummaryServiceRecord
+    manifest_id: int = 0
+    cardinality_display: str = ""
 
 
 @dataclass(kw_only=True)
@@ -165,6 +172,7 @@ class BccpSummaryServiceRecord:
     """Manifest-scoped BCCP information."""
 
     bccp_manifest_id: int
+    bccp_id: int
     guid: str
     den: str
     property_term: str
@@ -180,6 +188,7 @@ class BccSummaryServiceRecord:
     """Manifest-scoped BCC information."""
 
     bcc_manifest_id: int
+    bcc_id: int
     guid: str
     den: str
     cardinality_min: int
@@ -199,6 +208,7 @@ class BccRelationshipServiceRecord:
 
     component_type: Literal["BCC"] = 'BCC'
     bcc_manifest_id: int
+    bcc_id: int
     guid: str
     den: str
     cardinality_min: int
@@ -211,6 +221,8 @@ class BccRelationshipServiceRecord:
     definition_source: str | None = None
     from_acc: AccSummaryServiceRecord
     to_bccp: BccpSummaryServiceRecord
+    manifest_id: int = 0
+    cardinality_display: str = ""
 
 
 @dataclass(kw_only=True)

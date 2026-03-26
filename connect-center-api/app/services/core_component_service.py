@@ -21,6 +21,7 @@ deliver SCORE-style behavior in a backend-friendly contract:
 from __future__ import annotations
 
 import logging
+from dataclasses import replace
 
 from app.repositories.contracts.app_user import AppUserRepositoryContract
 from app.repositories.contracts.core_component import CoreComponentRepositoryContract
@@ -223,9 +224,9 @@ class CoreComponentService:
             acc_id=row.acc_id,
             base_acc=to_dataclass(BaseAccSummaryServiceRecord, row.base_acc) if row.base_acc is not None else None,
             relationships=[
-                to_dataclass(AsccRelationshipServiceRecord, relationship)
+                self._to_ascc_relationship_service_record(relationship)
                 if getattr(relationship, "component_type", None) == "ASCC"
-                else to_dataclass(BccRelationshipServiceRecord, relationship)
+                else self._to_bcc_relationship_service_record(relationship)
                 for relationship in row.relationships
             ],
             guid=row.guid,
@@ -389,3 +390,30 @@ class CoreComponentService:
         created_who = to_user_summary(created_id, users_by_id=users_by_id)
         updated_who = to_user_summary(updated_id, users_by_id=users_by_id)
         return owner, created_who, updated_who
+
+    @staticmethod
+    def _cardinality_display(*, cardinality_min: int, cardinality_max: int) -> str:
+        max_display = "unbounded" if cardinality_max == -1 else str(cardinality_max)
+        return f"{cardinality_min}..{max_display}"
+
+    def _to_ascc_relationship_service_record(self, relationship: object) -> AsccRelationshipServiceRecord:
+        record = to_dataclass(AsccRelationshipServiceRecord, relationship)
+        return replace(
+            record,
+            manifest_id=record.ascc_manifest_id,
+            cardinality_display=self._cardinality_display(
+                cardinality_min=record.cardinality_min,
+                cardinality_max=record.cardinality_max,
+            ),
+        )
+
+    def _to_bcc_relationship_service_record(self, relationship: object) -> BccRelationshipServiceRecord:
+        record = to_dataclass(BccRelationshipServiceRecord, relationship)
+        return replace(
+            record,
+            manifest_id=record.bcc_manifest_id,
+            cardinality_display=self._cardinality_display(
+                cardinality_min=record.cardinality_min,
+                cardinality_max=record.cardinality_max,
+            ),
+        )

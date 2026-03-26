@@ -12,6 +12,7 @@ from app.routes.models.shared import LogSummaryRecord
 from app.routes.models.shared import NamespaceSummaryRecord
 from app.routes.models.shared import ReleaseSummaryRecord
 from app.routes.models.shared import UserSummary
+from app.routes.models.shared import ValueConstraintRecord
 from app.routes.models.shared import WhoAndWhen
 from app.services.utils.string import Guid
 
@@ -34,7 +35,8 @@ class DataTypeSupplementaryComponentEntry(BaseModel):
     definition: str | None = Field(default=None, description="Definition of the supplementary component.")
     definition_source: str | None = Field(default=None, description="Definition source URL.")
     cardinality_min: int = Field(..., description="Minimum cardinality.")
-    cardinality_max: int | None = Field(default=None, description="Maximum cardinality.")
+    cardinality_max: int = Field(..., description="Maximum cardinality.")
+    value_constraint: ValueConstraintRecord | None = Field(default=None, description="Value constraint.")
     is_deprecated: bool = Field(..., description="Whether this supplementary component is deprecated.")
 
     model_config = ConfigDict(frozen=True)
@@ -244,5 +246,3 @@ class DataTypePathParams(BaseModel):
     """Path parameters for data type detail routes."""
 
     dt_manifest_id: int = Field(..., ge=1, description="Data type manifest ID.")
-
-
