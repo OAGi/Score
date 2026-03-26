@@ -1,0 +1,333 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Borrowed and slightly simplified from the reference Next app. */
+
+@font-face {
+  font-family: 'OpenAI Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('https://cdn.openai.com/common/fonts/openai-sans/OpenAISans-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'OpenAI Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('https://cdn.openai.com/common/fonts/openai-sans/OpenAISans-Semibold.woff2') format('woff2');
+}
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 0%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 0%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 0%;
+  --muted: 0 0% 96%;
+  --muted-foreground: 0 0% 35%;
+  --accent: 0 0% 96%;
+  --accent-foreground: 0 0% 0%;
+  --secondary: 0 0% 96%;
+  --secondary-foreground: 0 0% 0%;
+  --primary: 0 0% 0%;
+  --primary-foreground: 0 0% 100%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 214 32% 90%;
+  --input: 214 32% 90%;
+  --ring: 217 91% 60%;
+  --radius: 0.5rem;
+  --radius-full: 9999px;
+  --duration-fast: 0.12s;
+  --duration-normal: 0.2s;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --theme-toggle-accent: hsl(var(--foreground));
+  --theme-toggle-accent-foreground: hsl(var(--background));
+  --theme-toggle-track: hsl(var(--background));
+  --theme-toggle-border: hsl(var(--border));
+  --theme-toggle-text: hsl(var(--foreground));
+  --theme-toggle-muted: hsl(var(--muted-foreground));
+}
+
+.dark {
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 0%;
+  --card-foreground: 0 0% 100%;
+  --popover: 0 0% 0%;
+  --popover-foreground: 0 0% 100%;
+  --muted: 0 0% 8%;
+  --muted-foreground: 0 0% 75%;
+  --accent: 0 0% 8%;
+  --accent-foreground: 0 0% 100%;
+  --secondary: 0 0% 8%;
+  --secondary-foreground: 0 0% 100%;
+  --primary: 0 0% 100%;
+  --primary-foreground: 0 0% 0%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 20%;
+  --input: 0 0% 20%;
+  --ring: 212 100% 70%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+@keyframes theme-circle-transition {
+  0% {
+    clip-path: circle(0% at var(--theme-switch-x, 50%) var(--theme-switch-y, 50%));
+  }
+  to {
+    clip-path: circle(150% at var(--theme-switch-x, 50%) var(--theme-switch-y, 50%));
+  }
+}
+
+html.theme-transition {
+  view-transition-name: theme;
+}
+
+html.theme-transition::view-transition-old(theme) {
+  mix-blend-mode: normal;
+  animation: none;
+  z-index: 1;
+}
+
+html.theme-transition::view-transition-new(theme) {
+  mix-blend-mode: normal;
+  z-index: 2;
+  animation: theme-circle-transition 0.4s var(--ease-out) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.theme-transition::view-transition-old(theme),
+  html.theme-transition::view-transition-new(theme) {
+    animation: none !important;
+  }
+}
+
+.theme-toggle {
+  --theme-item: 28px;
+  --theme-gap: 2px;
+  --theme-pad: 4px;
+  position: relative;
+}
+
+.theme-toggle--compact {
+  --theme-item: 24px;
+  --theme-gap: 2px;
+  --theme-pad: 3px;
+}
+
+.theme-toggle__track {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, var(--theme-item));
+  gap: var(--theme-gap);
+  padding: var(--theme-pad);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--theme-toggle-border);
+  background: var(--theme-toggle-track);
+}
+
+.theme-toggle__indicator {
+  position: absolute;
+  top: 50%;
+  left: var(--theme-pad);
+  width: var(--theme-item);
+  height: var(--theme-item);
+  border-radius: var(--radius-full);
+  transform: translateY(-50%) translate(calc(var(--theme-index, 0) * (var(--theme-item) + var(--theme-gap))));
+  background: var(--theme-toggle-accent);
+  transition: transform var(--duration-normal) var(--ease-out);
+  z-index: 0;
+}
+
+.theme-toggle__button {
+  height: var(--theme-item);
+  width: var(--theme-item);
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--theme-toggle-muted);
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  transition: color var(--duration-fast) ease;
+}
+
+.theme-toggle__button:hover {
+  color: var(--theme-toggle-text);
+}
+
+.theme-toggle__button.active {
+  color: var(--theme-toggle-accent-foreground);
+}
+
+.theme-toggle__button.active .theme-icon {
+  stroke: var(--theme-toggle-accent-foreground);
+}
+
+.theme-icon {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.5px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Force readable black/white contrast for legacy hardcoded utility colors in dark mode */
+.dark .bg-white,
+.dark .bg-\[\#f8fafc\],
+.dark .bg-\[\#f3f4f6\],
+.dark .bg-\[\#fafafa\],
+.dark .bg-\[\#eef2f7\] {
+  background-color: #000 !important;
+}
+
+.dark .text-\[\#111827\],
+.dark .text-\[\#0f172a\],
+.dark .text-\[\#334155\],
+.dark .text-\[\#374151\],
+.dark .text-\[\#4b5563\],
+.dark .text-\[\#6b7280\],
+.dark .text-\[\#64748b\],
+.dark .text-\[\#9ca3af\] {
+  color: #fff !important;
+}
+.dark [class*='text-\[\#'] {
+  color: #fff !important;
+}
+
+/* NOTE: Avoid blanket border-color overrides in dark mode.
+   It breaks intentional semantic colors (e.g. method badges in the sidebar). */
+
+code,
+pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+}
+
+.font-brand {
+  font-family: 'OpenAI Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+.font-title {
+  font-family: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+@media (min-width: 1280px) {
+  body.docs-sidebar-collapsed .docs-sidebar-root {
+    display: none;
+  }
+}
+
+.syntax-highlight .syntax-line-number {
+  color: #94a3b8;
+}
+
+.syntax-highlight .syntax-token-plain {
+  color: #0f172a;
+}
+
+.syntax-highlight .syntax-token-key {
+  color: #1d4ed8;
+}
+
+.syntax-highlight .syntax-token-string {
+  color: #047857;
+}
+
+.syntax-highlight .syntax-token-number {
+  color: #b45309;
+}
+
+.syntax-highlight .syntax-token-keyword {
+  color: #7c3aed;
+}
+
+.syntax-highlight .syntax-token-method {
+  color: #9333ea;
+}
+
+.syntax-highlight .syntax-token-option {
+  color: #0f766e;
+}
+
+.syntax-highlight .syntax-token-url {
+  color: #2563eb;
+}
+
+.syntax-highlight .syntax-token-env {
+  color: #ca8a04;
+}
+
+.syntax-highlight .syntax-token-punct {
+  color: #64748b;
+}
+
+.dark .syntax-highlight .syntax-line-number {
+  color: #64748b !important;
+}
+
+.dark .syntax-highlight .syntax-token-plain {
+  color: #dbe5ff !important;
+}
+
+.dark .syntax-highlight .syntax-token-key {
+  color: #93c5fd !important;
+}
+
+.dark .syntax-highlight .syntax-token-string {
+  color: #86efac !important;
+}
+
+.dark .syntax-highlight .syntax-token-number {
+  color: #fdba74 !important;
+}
+
+.dark .syntax-highlight .syntax-token-keyword {
+  color: #c4b5fd !important;
+}
+
+.dark .syntax-highlight .syntax-token-method {
+  color: #d8b4fe !important;
+}
+
+.dark .syntax-highlight .syntax-token-option {
+  color: #99f6e4 !important;
+}
+
+.dark .syntax-highlight .syntax-token-url {
+  color: #93c5fd !important;
+}
+
+.dark .syntax-highlight .syntax-token-env {
+  color: #fcd34d !important;
+}
+
+.dark .syntax-highlight .syntax-token-punct {
+  color: #94a3b8 !important;
+}

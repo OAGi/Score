@@ -8,7 +8,7 @@ docs/user_guide/_build
 
 ###
 docker-compose.yml
-docs
+/docs
 misc
 ql-test
 *.sql
