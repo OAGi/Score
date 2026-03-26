@@ -14,7 +14,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.11</version>
+        <version>3.5.13</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -71,7 +71,7 @@
         <lombok.version>1.18.44</lombok.version>
         <mariadb-client.version>3.5.7</mariadb-client.version>
         <log4j.version>2.25.3</log4j.version>
-        <jOOQ.version>3.20.11</jOOQ.version>
+        <jOOQ.version>3.20.12</jOOQ.version>
         <guava.version>33.5.0-jre</guava.version>
         <gson.version>2.13.2</gson.version>
         <jdom2.version>2.0.6.1</jdom2.version>
@@ -85,9 +85,6 @@
         <springdoc.version>2.8.15</springdoc.version>
         <snakeyaml.version>2.5</snakeyaml.version>
         <json-schema-validator.version>2.0.1</json-schema-validator.version>
-        <!-- Spring Boot 3.5.11 manages the Jackson family with jackson-bom 2.19.4. -->
-        <!-- Override jackson-bom.version to 2.21.1 to pull in the GHSA-72hv-8253-57qq fix. -->
-        <jackson-bom.version>2.21.1</jackson-bom.version>
         <saxon.version>10.6</saxon.version>
         <xsom.version>4.0.6</xsom.version>
         <spring-ai.version>1.1.2</spring-ai.version>
@@ -151,7 +148,6 @@
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>
-            <version>${jackson-bom.version}</version>
         </dependency>
         <!-- Model Context Protocol (MCP) -->
         <dependency>
