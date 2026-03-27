@@ -353,7 +353,7 @@ public class Log extends TableImpl<LogRecord> {
     @Override
     public List<Check<LogRecord>> getChecks() {
         return Arrays.asList(
-            Internal.createCheck(this, DSL.name("log_chk_1"), "json_valid(`snapshot`)", true)
+            Internal.createCheck(this, DSL.name("snapshot"), "json_valid(`snapshot`)", true)
         );
     }
 

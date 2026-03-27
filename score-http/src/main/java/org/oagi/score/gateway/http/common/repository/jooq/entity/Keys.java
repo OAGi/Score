@@ -69,6 +69,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtScAwdP
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtScManifest;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtUsageRule;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Exception;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.FlywaySchemaHistory;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Library;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Log;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Message;
@@ -178,6 +179,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.DtScRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.DtUsageRuleRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.ExceptionRecord;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.FlywaySchemaHistoryRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.LibraryRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.LogRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.MessageRecord;
@@ -310,6 +312,7 @@ public class Keys {
     public static final UniqueKey<DtScManifestRecord> KEY_DT_SC_MANIFEST_PRIMARY = Internal.createUniqueKey(DtScManifest.DT_SC_MANIFEST, DSL.name("KEY_dt_sc_manifest_PRIMARY"), new TableField[] { DtScManifest.DT_SC_MANIFEST.DT_SC_MANIFEST_ID }, true);
     public static final UniqueKey<DtUsageRuleRecord> KEY_DT_USAGE_RULE_PRIMARY = Internal.createUniqueKey(DtUsageRule.DT_USAGE_RULE, DSL.name("KEY_dt_usage_rule_PRIMARY"), new TableField[] { DtUsageRule.DT_USAGE_RULE.DT_USAGE_RULE_ID }, true);
     public static final UniqueKey<ExceptionRecord> KEY_EXCEPTION_PRIMARY = Internal.createUniqueKey(Exception.EXCEPTION, DSL.name("KEY_exception_PRIMARY"), new TableField[] { Exception.EXCEPTION.EXCEPTION_ID }, true);
+    public static final UniqueKey<FlywaySchemaHistoryRecord> KEY_FLYWAY_SCHEMA_HISTORY_PRIMARY = Internal.createUniqueKey(FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY, DSL.name("KEY_flyway_schema_history_PRIMARY"), new TableField[] { FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY.INSTALLED_RANK }, true);
     public static final UniqueKey<LibraryRecord> KEY_LIBRARY_PRIMARY = Internal.createUniqueKey(Library.LIBRARY, DSL.name("KEY_library_PRIMARY"), new TableField[] { Library.LIBRARY.LIBRARY_ID }, true);
     public static final UniqueKey<LogRecord> KEY_LOG_PRIMARY = Internal.createUniqueKey(Log.LOG, DSL.name("KEY_log_PRIMARY"), new TableField[] { Log.LOG.LOG_ID }, true);
     public static final UniqueKey<MessageRecord> KEY_MESSAGE_PRIMARY = Internal.createUniqueKey(Message.MESSAGE, DSL.name("KEY_message_PRIMARY"), new TableField[] { Message.MESSAGE.MESSAGE_ID }, true);

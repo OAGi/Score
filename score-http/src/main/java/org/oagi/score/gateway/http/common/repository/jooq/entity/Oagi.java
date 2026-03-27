@@ -70,6 +70,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtScAwdP
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtScManifest;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtUsageRule;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Exception;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.FlywaySchemaHistory;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Library;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Log;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Message;
@@ -520,6 +521,11 @@ public class Oagi extends SchemaImpl {
     public final Exception EXCEPTION = Exception.EXCEPTION;
 
     /**
+     * The table <code>oagi.flyway_schema_history</code>.
+     */
+    public final FlywaySchemaHistory FLYWAY_SCHEMA_HISTORY = FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY;
+
+    /**
      * The table <code>oagi.library</code>.
      */
     public final Library LIBRARY = Library.LIBRARY;
@@ -857,6 +863,7 @@ public class Oagi extends SchemaImpl {
             DtScManifest.DT_SC_MANIFEST,
             DtUsageRule.DT_USAGE_RULE,
             Exception.EXCEPTION,
+            FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY,
             Library.LIBRARY,
             Log.LOG,
             Message.MESSAGE,

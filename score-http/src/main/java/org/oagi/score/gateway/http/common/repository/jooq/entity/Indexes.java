@@ -25,6 +25,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Comment;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Dt;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtSc;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Exception;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.FlywaySchemaHistory;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Log;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ModuleBlobContentManifest;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasMessageBody;
@@ -70,6 +71,7 @@ public class Indexes {
     public static final Index DT_DT_LAST_UPDATE_TIMESTAMP_DESC_IDX = Internal.createIndex(DSL.name("dt_last_update_timestamp_desc_idx"), Dt.DT, new OrderField[] { Dt.DT.LAST_UPDATE_TIMESTAMP }, false);
     public static final Index DT_SC_DT_SC_GUID_IDX = Internal.createIndex(DSL.name("dt_sc_guid_idx"), DtSc.DT_SC, new OrderField[] { DtSc.DT_SC.GUID }, false);
     public static final Index EXCEPTION_EXCEPTION_TAG_IDX = Internal.createIndex(DSL.name("exception_tag_idx"), Exception.EXCEPTION, new OrderField[] { Exception.EXCEPTION.TAG }, false);
+    public static final Index FLYWAY_SCHEMA_HISTORY_FLYWAY_SCHEMA_HISTORY_S_IDX = Internal.createIndex(DSL.name("flyway_schema_history_s_idx"), FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY, new OrderField[] { FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY.SUCCESS }, false);
     public static final Index MODULE_BLOB_CONTENT_MANIFEST_MMODULE_BLOB_CONTENT_MANIFEST_LAST_UPDATED_BY_FK = Internal.createIndex(DSL.name("mmodule_blob_content_manifest_last_updated_by_fk"), ModuleBlobContentManifest.MODULE_BLOB_CONTENT_MANIFEST, new OrderField[] { ModuleBlobContentManifest.MODULE_BLOB_CONTENT_MANIFEST.LAST_UPDATED_BY }, false);
     public static final Index MODULE_BLOB_CONTENT_MANIFEST_MODULE_BLOB_CONTENT_MANIFEST_BLOB_CONTENT_MANIFEST_ID_FK = Internal.createIndex(DSL.name("module_blob_content_manifest_blob_content_manifest_id_fk"), ModuleBlobContentManifest.MODULE_BLOB_CONTENT_MANIFEST, new OrderField[] { ModuleBlobContentManifest.MODULE_BLOB_CONTENT_MANIFEST.BLOB_CONTENT_MANIFEST_ID }, false);
     public static final Index OAS_MESSAGE_BODY_OAS_MESSAGE_BODY_OAS_ASBIEP_ID_FK = Internal.createIndex(DSL.name("oas_message_body_oas_asbiep_id_fk"), OasMessageBody.OAS_MESSAGE_BODY, new OrderField[] { OasMessageBody.OAS_MESSAGE_BODY.TOP_LEVEL_ASBIEP_ID }, false);

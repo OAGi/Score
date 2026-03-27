@@ -63,6 +63,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtScAwdP
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtScManifest;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtUsageRule;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Exception;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.FlywaySchemaHistory;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Library;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Log;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Message;
@@ -504,6 +505,11 @@ public class Tables {
      * The table <code>oagi.exception</code>.
      */
     public static final Exception EXCEPTION = Exception.EXCEPTION;
+
+    /**
+     * The table <code>oagi.flyway_schema_history</code>.
+     */
+    public static final FlywaySchemaHistory FLYWAY_SCHEMA_HISTORY = FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY;
 
     /**
      * The table <code>oagi.library</code>.

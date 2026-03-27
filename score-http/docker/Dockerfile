@@ -1,4 +1,4 @@
-FROM tomcat:10.1.52-jdk21-temurin
+FROM tomcat:10.1.53-jdk21-temurin
 
 LABEL maintainer="Hakju Oh <hakju.oh@nist.gov>"
 

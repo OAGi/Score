@@ -1,0 +1,16 @@
+.idea/
+.pytest_cache/
+.ruff_cache/
+.venv/
+.env
+.codeql-db/
+.pnpm-store/
+.claude/
+__pycache__/
+
+docs/node_modules
+docs/.next
+docs/out
+docs/tsconfig.tsbuildinfo
+app/static/docs
+docker/nginx.conf
