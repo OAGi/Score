@@ -41,7 +41,7 @@
     "crypto-js": "^4.1.1",
     "file-saver": "^2.0.5",
     "mat-icon-button-sizes": "^1.0.6",
-    "marked": "^15.0.12",
+    "marked": "^16.4.2",
     "ngx-markdown": "^20.0.0",
     "ngx-mat-multi-sort": "^20.1.0",
     "ngx-mat-select-search": "^8.0.4",
