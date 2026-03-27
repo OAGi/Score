@@ -15,8 +15,7 @@ dependencies = [
   "SQLAlchemy[asyncio]>=2.0,<3",
   "asyncmy>=0.2,<1",
   "pydantic-settings>=2.2,<3",
-  "passlib[bcrypt]>=1.7.4,<2",
-  "bcrypt<4",
+  "bcrypt>=3.2,<5",
   "httpx>=0.27,<1",
   "PyJWT[crypto]>=2.8,<3",
 ]

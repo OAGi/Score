@@ -7,7 +7,7 @@ Key features:
 - Supports Bearer (OIDC/JWT) auth when configured, with Basic as fallback.
 - Standardized 401 responses with `WWW-Authenticate` headers.
 - Optional debug logging for auth flows when `DEBUG=true`.
-- Lazy password hashing dependency to avoid import-time failures.
+- Lazy bcrypt loading for Basic auth password verification.
 """
 
 
@@ -25,9 +25,9 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBasic, HTTPBasicC
 from pydantic import BaseModel, Field, ConfigDict
 
 try:
-    from passlib.context import CryptContext
+    import bcrypt
 except ModuleNotFoundError:  # pragma: no cover - environment dependent
-    CryptContext = None  # type: ignore[assignment]
+    bcrypt = None  # type: ignore[assignment]
 
 from app.database import get_session
 from app.repositories.vendor_plugins import get_vendor_plugin
@@ -195,17 +195,14 @@ def _unauthorized(*, schemes: str = "Bearer, Basic") -> HTTPException:
     )
 
 
-def _get_pwd_context():
-    """Lazily create a password hashing context.
-
-    Returns:
-        Result of the operation.
-    """
-    if CryptContext is None:
+def _verify_password(password: str, password_hash: str) -> bool:
+    """Verify a plaintext password against a stored bcrypt hash."""
+    if bcrypt is None:
         # Lazy-fail: importing this module should not require optional password libs,
         # but actual auth checks do.
-        raise RuntimeError("passlib is required for password verification but is not installed.")
-    return CryptContext(schemes=["bcrypt"], deprecated="auto")
+        raise RuntimeError("bcrypt is required for password verification but is not installed.")
+
+    return bcrypt.checkpw(password.encode("utf-8"), password_hash.encode("utf-8"))
 
 
 class OAuth2Identity(BaseModel):
@@ -424,7 +421,7 @@ async def _authenticate_basic(credentials: HTTPBasicCredentials, *, session: Any
 
     ok = False
     try:
-        ok = _get_pwd_context().verify(credentials.password, auth_row.password_hash)
+        ok = _verify_password(credentials.password, auth_row.password_hash)
     except Exception:
         ok = False
     if not ok:
