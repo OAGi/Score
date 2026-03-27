@@ -368,7 +368,7 @@ class BizCtxService:
         return BizCtxServiceResult(
             biz_ctx_id=row.biz_ctx_id,
             guid=row.guid,
-            name=row.name,
+            name=str(row.name or ""),
             values=[
                 BizCtxValueServiceRecord(
                     biz_ctx_value_id=item.biz_ctx_value_id,

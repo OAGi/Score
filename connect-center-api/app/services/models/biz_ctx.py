@@ -35,7 +35,7 @@ class BizCtxServiceResult:
 
     biz_ctx_id: BizCtxId
     guid: Guid
-    name: str | None = None
+    name: str
     values: list["BizCtxValueServiceRecord"] = field(default_factory=list)
     created: WhoAndWhen
     last_updated: WhoAndWhen

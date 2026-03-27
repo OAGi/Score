@@ -2,17 +2,56 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 
-from app.routes.models.biz_ctx import GetBizCtxByBizCtxIdResponse, GetBizCtxListResponse
+from app.services.utils.string import Guid
+from app.tools.models.shared import WhoAndWhen
 
 
-class GetBizCtxResponse(GetBizCtxByBizCtxIdResponse):
+class CtxSchemeValueSummaryResponse(BaseModel):
+    """Context scheme value summary embedded in business-context responses."""
+
+    ctx_scheme_value_id: int
+    value: str
+
+    model_config = ConfigDict(frozen=True, from_attributes=True)
+
+
+class BizCtxValueResponse(BaseModel):
+    """Business-context value payload for MCP tools."""
+
+    biz_ctx_value_id: int
+    ctx_scheme_value: CtxSchemeValueSummaryResponse
+
+    model_config = ConfigDict(frozen=True, from_attributes=True)
+
+
+class BizCtxResponseEntry(BaseModel):
+    """Business-context payload for MCP tools."""
+
+    biz_ctx_id: int
+    guid: Guid
+    name: str
+    values: list[BizCtxValueResponse] = Field(default_factory=list)
+    created: WhoAndWhen
+    last_updated: WhoAndWhen
+
+    model_config = ConfigDict(frozen=True, from_attributes=True)
+
+
+class GetBizCtxResponse(BizCtxResponseEntry):
     """Response for get_business_context tool."""
 
 
-class GetBizCtxPaginationResponse(GetBizCtxListResponse):
+class GetBizCtxPaginationResponse(BaseModel):
     """Response for get_business_contexts tool."""
+
+    total_items: int
+    offset: int
+    limit: int
+    items: list[BizCtxResponseEntry]
+
+    model_config = ConfigDict(frozen=True)
 
 
 class CreateBizCtxResponse(BaseModel):
@@ -47,9 +86,13 @@ class DeleteBizCtxResponse(BaseModel):
     biz_ctx_id: int | None = None
     message: str | None = None
 
+    model_config = ConfigDict(frozen=True)
+
 
 class DeleteBizCtxValueResponse(BaseModel):
     """Response for delete_business_context_value tool."""
 
     biz_ctx_value_id: int | None = None
     message: str | None = None
+
+    model_config = ConfigDict(frozen=True)

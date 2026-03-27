@@ -51,12 +51,11 @@ from pydantic import Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.vendor_plugins import get_vendor_plugin
-from app.routes.models.namespace import GetNamespaceByNamespaceIdResponse
-from app.routes.utils.date import parse_date_range
+from app.utils.date import parse_date_range
 from app.security import AuthenticatedUser
 from app.services.namespace_service import NamespaceService
 from app.tools import _to_tool_error, get_tool_authenticated_user, str_to_bool, tool_session
-from app.tools.models.namespace import GetNamespacePaginationResponse, GetNamespaceResponse
+from app.tools.models.namespace import GetNamespacePaginationResponse, GetNamespaceResponse, NamespaceResponseEntry
 
 logger = logging.getLogger("connectcenter.mcp.namespace")
 
@@ -482,5 +481,5 @@ def _to_list_response(*, items: list[Any], total: int, offset: int, limit: int) 
         total_items=total,
         offset=offset,
         limit=limit,
-        items=[GetNamespaceByNamespaceIdResponse.model_validate(item, from_attributes=True) for item in items],
+        items=[NamespaceResponseEntry.model_validate(item, from_attributes=True) for item in items],
     )

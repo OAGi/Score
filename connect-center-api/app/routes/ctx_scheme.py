@@ -31,7 +31,7 @@ from app.routes.models.ctx_scheme import (
     UpdateCtxSchemeValueRequest,
     UpdateCtxSchemeValueResponse,
 )
-from app.routes.utils.date import parse_date_range
+from app.utils.date import parse_date_range
 from app.services.ctx_scheme_service import CtxSchemeService
 from app.types.identifiers import CtxSchemeId, CtxSchemeValueId
 from app.types.unset import UNSET

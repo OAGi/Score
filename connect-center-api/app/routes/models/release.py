@@ -7,6 +7,8 @@ library and namespace summaries.
 
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.routes.models.shared import WhoAndWhen
@@ -39,7 +41,7 @@ class ReleaseEntry(BaseModel):
     release_note: str | None = Field(default=None, description="Release notes.")
     release_license: str | None = Field(default=None, description="Release license information.")
     namespace: NamespaceSummary | None = Field(default=None, description="Default namespace information (if any).")
-    state: str = Field(..., description="Current state of the release.")
+    state: Literal["Processing", "Initialized", "Draft", "Published"] = Field(..., description="Current state of the release.")
     created: WhoAndWhen = Field(..., description="Information about who created the release and when.")
     last_updated: WhoAndWhen = Field(..., description="Information about who last updated the release and when.")
 
@@ -58,4 +60,3 @@ class GetReleaseByReleaseIdResponse(ReleaseEntry):
     """Response payload for retrieving a release by ID."""
 
     model_config = ConfigDict(frozen=True)
-

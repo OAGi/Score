@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Literal
 
 from app.services.models import WhoAndWhen
 from app.services.models.library import LibrarySummaryServiceRecord
@@ -42,11 +43,11 @@ class ReleaseServiceResult:
     release_id: ReleaseId
     library: LibrarySummaryServiceRecord
     guid: Guid
-    release_num: str | None = None
+    release_num: str = ""
     release_note: str | None = None
     release_license: str | None = None
     namespace: NamespaceSummaryServiceRecord | None = None
-    state: str
+    state: Literal["Processing", "Initialized", "Draft", "Published"]
     created: WhoAndWhen
     last_updated: WhoAndWhen
 
@@ -56,5 +57,5 @@ class ReleaseSummaryServiceRecord:
     """Service-layer release summary."""
 
     release_id: ReleaseId
-    release_num: str | None = None
-    state: str
+    release_num: str = ""
+    state: Literal["Processing", "Initialized", "Draft", "Published"]

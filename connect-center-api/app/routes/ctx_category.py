@@ -25,7 +25,7 @@ from app.routes.models.ctx_category import (
     GetContextCategoryByContextCategoryIdResponse,
     GetContextCategoryListResponse,
 )
-from app.routes.utils.date import parse_date_range
+from app.utils.date import parse_date_range
 from app.services.ctx_category_service import ContextCategoryService
 from app.types.identifiers import ContextCategoryId
 from app.types.unset import UNSET

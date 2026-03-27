@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from app.deps import get_tag_service
 from app.routes.models.tag import GetTagListResponse, TagEntry
-from app.routes.utils.date import parse_date_range
+from app.utils.date import parse_date_range
 from app.services.tag_service import TagService
 
 router = APIRouter(prefix="/tags", tags=["tag"])

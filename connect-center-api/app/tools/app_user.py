@@ -48,7 +48,7 @@ from app.security import AuthenticatedUser
 from app.services.app_user_service import AppUserService
 from app.services.models.app_user import AppUserServiceResult, Role
 from app.tools import _to_tool_error, get_tool_authenticated_user, str_to_bool, tool_session
-from app.tools.models.app_user import GetUserPaginationResponse, GetUserResponse
+from app.tools.models.app_user import GetUserListEntryResponse, GetUserPaginationResponse, GetUserResponse
 
 logger = logging.getLogger("connectcenter.mcp.app_user")
 
@@ -218,7 +218,7 @@ async def get_users(
             total_items=page.total,
             offset=page.offset,
             limit=page.limit,
-            items=[_to_user_response(item) for item in page.items],
+            items=[_to_user_list_entry(item) for item in page.items],
         )
     except Exception as exc:
         raise _to_tool_error(exc, fallback="Unable to retrieve users.") from exc
@@ -326,6 +326,19 @@ def _to_user_response(user: AppUserServiceResult) -> GetUserResponse:
         email=user.email,
         email_verified=user.email_verified,
         email_verified_timestamp=user.email_verified_timestamp,
+        is_enabled=user.is_enabled,
+    )
+
+
+def _to_user_list_entry(user: AppUserServiceResult) -> GetUserListEntryResponse:
+    """Convert a service-layer app-user record into the MCP list model."""
+    return GetUserListEntryResponse(
+        user_id=int(user.app_user_id),
+        login_id=user.login_id,
+        username=user.username,
+        organization=user.organization,
+        email=user.email,
+        roles=_build_roles(is_admin=user.is_admin, is_developer=user.is_developer),
         is_enabled=user.is_enabled,
     )
 

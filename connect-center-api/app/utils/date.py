@@ -1,4 +1,4 @@
-"""Route-layer parsing utilities for date range query parameters."""
+"""Shared parsing utilities for date range query parameters."""
 
 from __future__ import annotations
 
@@ -29,4 +29,3 @@ def _parse_dt(value: str) -> datetime:
     if len(v) == 10 and v[4] == "-" and v[7] == "-":
         v = v + "T00:00:00"
     return datetime.fromisoformat(v)
-

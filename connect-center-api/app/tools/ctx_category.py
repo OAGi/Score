@@ -64,16 +64,12 @@ from pydantic import Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.vendor_plugins import get_vendor_plugin
-from app.routes.models.ctx_category import (
-    CreateContextCategoryResponse as ApiCreateContextCategoryResponse,
-    GetContextCategoryByContextCategoryIdResponse,
-    UpdateContextCategoryResponse as ApiUpdateContextCategoryResponse,
-)
-from app.routes.utils.date import parse_date_range
+from app.utils.date import parse_date_range
 from app.security import AuthenticatedUser
 from app.services.ctx_category_service import ContextCategoryService
 from app.tools import _to_tool_error, get_tool_authenticated_user, tool_session
 from app.tools.models.ctx_category import (
+    CtxCategoryEntryResponse,
     CreateCtxCategoryResponse,
     DeleteCtxCategoryResponse,
     GetCtxCategoryPaginationResponse,
@@ -457,8 +453,7 @@ async def create_context_category(
     """
     try:
         created_id = await context_category_service.create(name=name, description=description)
-        response = ApiCreateContextCategoryResponse(context_category_id=created_id)
-        return CreateCtxCategoryResponse(ctx_category_id=response.context_category_id)
+        return CreateCtxCategoryResponse(ctx_category_id=created_id)
     except Exception as exc:
         raise _to_tool_error(exc, fallback="Unable to create the context category.") from exc
 
@@ -535,8 +530,7 @@ async def update_context_category(
         if result is None:
             raise ToolError(f"The context category with ID {ctx_category_id} was not found. Please check the ID and try again.")
         updated_id, updates = result
-        response = ApiUpdateContextCategoryResponse(ctx_category_id=updated_id, updates=updates)
-        return UpdateCtxCategoryResponse.model_validate(response.model_dump())
+        return UpdateCtxCategoryResponse(ctx_category_id=updated_id, updates=updates)
     except Exception as exc:
         raise _to_tool_error(exc, fallback=f"Unable to update context category {ctx_category_id}.") from exc
 
@@ -643,5 +637,5 @@ def _to_list_response(*, items: list[Any], total: int, offset: int, limit: int) 
         total_items=total,
         offset=offset,
         limit=limit,
-        items=[GetContextCategoryByContextCategoryIdResponse.model_validate(item, from_attributes=True) for item in items],
+        items=[CtxCategoryEntryResponse.model_validate(item, from_attributes=True) for item in items],
     )

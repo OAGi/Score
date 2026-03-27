@@ -15,7 +15,7 @@ from app.routes.models.code_list import (
     GetCodeListByCodeListManifestIdResponse,
     GetCodeListListResponse,
 )
-from app.routes.utils.date import parse_date_range
+from app.utils.date import parse_date_range
 from app.services.code_list_service import CodeListService
 from app.types.identifiers import CodeListManifestId
 from app.types.identifiers import ReleaseId

@@ -61,13 +61,13 @@ from pydantic import Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.vendor_plugins import get_vendor_plugin
-from app.routes.models.core_component import CoreComponentListEntry
-from app.routes.utils.date import parse_date_range
+from app.utils.date import parse_date_range
 from app.security import AuthenticatedUser
 from app.services.core_component_service import CoreComponentService
 from app.services.release_service import ReleaseService
 from app.tools import _to_tool_error, get_tool_authenticated_user, tool_session
 from app.tools.models.core_component import (
+    CoreComponentListEntryResponse,
     GetAccResponse,
     GetAsccpResponse,
     GetBccpResponse,
@@ -138,7 +138,7 @@ async def get_core_component_service(
                             "description": "Release information",
                             "properties": {
                                 "release_id": {"type": "integer", "description": "Unique identifier for the release", "example": 1},
-                                "release_num": {"type": ["string", "null"], "description": "Release number", "example": "10.6"},
+                                "release_num": {"type": "string", "description": "Release number", "example": "10.6"},
                                 "state": {"type": "string", "enum": ["Processing", "Initialized", "Draft", "Published"], "description": "Release state", "example": "Published"}
                             },
                             "required": ["release_id", "release_num", "state"]
@@ -362,7 +362,7 @@ async def get_core_components(
                         "description": "Release information",
                         "properties": {
                             "release_id": {"type": "integer", "description": "Unique identifier for the release", "example": 1},
-                            "release_num": {"type": ["string", "null"], "description": "Release number", "example": "10.6"},
+                            "release_num": {"type": "string", "description": "Release number", "example": "10.6"},
                             "state": {"type": "string", "description": "Release state", "example": "Published"}
                         },
                         "required": ["release_id", "release_num", "state"]
@@ -541,7 +541,7 @@ async def get_core_components(
                 "description": "Release information",
                 "properties": {
                     "release_id": {"type": "integer", "description": "Unique identifier for the release", "example": 1},
-                    "release_num": {"type": ["string", "null"], "description": "Release number", "example": "10.6"},
+                    "release_num": {"type": "string", "description": "Release number", "example": "10.6"},
                     "state": {"type": "string", "description": "Release state", "example": "Published"}
                 },
                 "required": ["release_id", "release_num", "state"]
@@ -733,7 +733,7 @@ async def get_acc(
                         "description": "Release information",
                         "properties": {
                             "release_id": {"type": "integer", "description": "Unique identifier for the release", "example": 1},
-                            "release_num": {"type": ["string", "null"], "description": "Release number", "example": "10.6"},
+                            "release_num": {"type": "string", "description": "Release number", "example": "10.6"},
                             "state": {"type": "string", "description": "Release state", "example": "Published"}
                         },
                         "required": ["release_id", "release_num", "state"]
@@ -774,7 +774,7 @@ async def get_acc(
                 "description": "Release information",
                 "properties": {
                     "release_id": {"type": "integer", "description": "Unique identifier for the release", "example": 1},
-                    "release_num": {"type": ["string", "null"], "description": "Release number", "example": "10.6"},
+                    "release_num": {"type": "string", "description": "Release number", "example": "10.6"},
                     "state": {"type": "string", "description": "Release state", "example": "Published"}
                 },
                 "required": ["release_id", "release_num", "state"]
@@ -954,7 +954,7 @@ async def get_asccp(
                         "description": "Release information",
                         "properties": {
                             "release_id": {"type": "integer", "description": "Unique identifier for the release", "example": 1},
-                            "release_num": {"type": ["string", "null"], "description": "Release number", "example": "10.6"},
+                            "release_num": {"type": "string", "description": "Release number", "example": "10.6"},
                             "state": {"type": "string", "description": "Release state", "example": "Published"}
                         },
                         "required": ["release_id", "release_num", "state"]
@@ -1003,7 +1003,7 @@ async def get_asccp(
                 "description": "Release information",
                 "properties": {
                     "release_id": {"type": "integer", "description": "Unique identifier for the release", "example": 1},
-                    "release_num": {"type": ["string", "null"], "description": "Release number", "example": "10.6"},
+                    "release_num": {"type": "string", "description": "Release number", "example": "10.6"},
                     "state": {"type": "string", "description": "Release state", "example": "Published"}
                 },
                 "required": ["release_id", "release_num", "state"]
@@ -1162,5 +1162,5 @@ def _to_list_response(*, items: list[Any], total: int, offset: int, limit: int) 
         total_items=total,
         offset=offset,
         limit=limit,
-        items=[CoreComponentListEntry.model_validate(item, from_attributes=True) for item in items],
+        items=[CoreComponentListEntryResponse.model_validate(item, from_attributes=True) for item in items],
     )

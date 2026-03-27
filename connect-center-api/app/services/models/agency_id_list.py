@@ -66,9 +66,9 @@ class AgencyIdListServiceResult:
     agency_id_list_id: AgencyIdListId
     guid: Guid
     enum_type_guid: str | None = None
-    name: str | None = None
-    list_id: str | None = None
-    version_id: str | None = None
+    name: str = ""
+    list_id: str = ""
+    version_id: str = ""
     definition: str | None = None
     remark: str | None = None
     definition_source: str | None = None

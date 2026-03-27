@@ -77,18 +77,12 @@ from pydantic import Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.vendor_plugins import get_vendor_plugin
-from app.routes.models.ctx_scheme import (
-    CreateCtxSchemeResponse as ApiCreateCtxSchemeResponse,
-    CreateCtxSchemeValueResponse as ApiCreateCtxSchemeValueResponse,
-    GetCtxSchemeByCtxSchemeIdResponse,
-    UpdateCtxSchemeResponse as ApiUpdateCtxSchemeResponse,
-    UpdateCtxSchemeValueResponse as ApiUpdateCtxSchemeValueResponse,
-)
-from app.routes.utils.date import parse_date_range
+from app.utils.date import parse_date_range
 from app.security import AuthenticatedUser
 from app.services.ctx_scheme_service import CtxSchemeService
 from app.tools import _to_tool_error, get_tool_authenticated_user, tool_session
 from app.tools.models.ctx_scheme import (
+    CtxSchemeListEntryResponse,
     CreateCtxSchemeResponse,
     CreateCtxSchemeValueResponse,
     DeleteCtxSchemeResponse,
@@ -525,8 +519,7 @@ async def create_context_scheme(
             scheme_version_id=scheme_version_id,
             ctx_category_id=ctx_category_id,
         )
-        response = ApiCreateCtxSchemeResponse(ctx_scheme_id=created_id)
-        return CreateCtxSchemeResponse(ctx_scheme_id=response.ctx_scheme_id)
+        return CreateCtxSchemeResponse(ctx_scheme_id=created_id)
     except Exception as exc:
         raise _to_tool_error(exc, fallback="Unable to create the context scheme.") from exc
 
@@ -587,8 +580,7 @@ async def create_context_scheme_value(
             value=value,
             meaning=meaning,
         )
-        response = ApiCreateCtxSchemeValueResponse(ctx_scheme_value_id=created_id)
-        return CreateCtxSchemeValueResponse(ctx_scheme_value_id=response.ctx_scheme_value_id)
+        return CreateCtxSchemeValueResponse(ctx_scheme_value_id=created_id)
     except Exception as exc:
         raise _to_tool_error(exc, fallback="Unable to create the context scheme value.") from exc
 
@@ -658,8 +650,7 @@ async def update_context_scheme_value(
                 f"The context scheme value with ID {ctx_scheme_value_id} was not found. Please check the ID and try again."
             )
         updated_id, updates = result
-        response = ApiUpdateCtxSchemeValueResponse(ctx_scheme_value_id=updated_id, updates=updates)
-        return UpdateCtxSchemeValueResponse.model_validate(response.model_dump())
+        return UpdateCtxSchemeValueResponse(ctx_scheme_value_id=updated_id, updates=updates)
     except Exception as exc:
         raise _to_tool_error(exc, fallback=f"Unable to update context scheme value {ctx_scheme_value_id}.") from exc
 
@@ -833,8 +824,7 @@ async def update_context_scheme(
         if result is None:
             raise ToolError(f"The context scheme with ID {ctx_scheme_id} was not found. Please check the ID and try again.")
         updated_id, updates = result
-        response = ApiUpdateCtxSchemeResponse(ctx_scheme_id=updated_id, updates=updates)
-        return UpdateCtxSchemeResponse.model_validate(response.model_dump())
+        return UpdateCtxSchemeResponse(ctx_scheme_id=updated_id, updates=updates)
     except Exception as exc:
         raise _to_tool_error(exc, fallback=f"Unable to update context scheme {ctx_scheme_id}.") from exc
 
@@ -942,5 +932,5 @@ def _to_list_response(*, items: list[Any], total: int, offset: int, limit: int) 
         total_items=total,
         offset=offset,
         limit=limit,
-        items=[GetCtxSchemeByCtxSchemeIdResponse.model_validate(item, from_attributes=True) for item in items],
+        items=[CtxSchemeListEntryResponse.model_validate(item, from_attributes=True) for item in items],
     )

@@ -49,14 +49,16 @@ from pydantic import Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.vendor_plugins import get_vendor_plugin
-from app.routes.models.agency_id_list import AgencyIdListEntry
-from app.routes.models.agency_id_list import GetAgencyIdListByAgencyIdListManifestIdResponse
-from app.routes.utils.date import parse_date_range
+from app.utils.date import parse_date_range
 from app.security import AuthenticatedUser
 from app.services.agency_id_list_service import AgencyIdListService
 from app.services.release_service import ReleaseService
 from app.tools import _to_tool_error, get_tool_authenticated_user, tool_session
-from app.tools.models.agency_id_list import GetAgencyIdListPaginationResponse, GetAgencyIdListResponse
+from app.tools.models.agency_id_list import (
+    AgencyIdListResponseEntry,
+    GetAgencyIdListPaginationResponse,
+    GetAgencyIdListResponse,
+)
 
 logger = logging.getLogger("connectcenter.mcp.agency_id_list")
 
@@ -544,5 +546,5 @@ def _to_list_response(*, items: list[Any], total: int, offset: int, limit: int) 
         total_items=total,
         offset=offset,
         limit=limit,
-        items=[AgencyIdListEntry.model_validate(item, from_attributes=True) for item in items],
+        items=[AgencyIdListResponseEntry.model_validate(item, from_attributes=True) for item in items],
     )

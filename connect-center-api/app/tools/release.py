@@ -48,12 +48,11 @@ from pydantic import Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.vendor_plugins import get_vendor_plugin
-from app.routes.models.release import GetReleaseByReleaseIdResponse
-from app.routes.utils.date import parse_date_range
+from app.utils.date import parse_date_range
 from app.security import AuthenticatedUser
 from app.services.release_service import ReleaseService
 from app.tools import _to_tool_error, get_tool_authenticated_user, tool_session
-from app.tools.models.release import GetReleasePaginationResponse, GetReleaseResponse
+from app.tools.models.release import GetReleasePaginationResponse, GetReleaseResponse, ReleaseResponseEntry
 
 logger = logging.getLogger("connectcenter.mcp.release")
 
@@ -398,5 +397,5 @@ def _to_list_response(*, items: list[Any], total: int, offset: int, limit: int) 
         total_items=total,
         offset=offset,
         limit=limit,
-        items=[GetReleaseByReleaseIdResponse.model_validate(item, from_attributes=True) for item in items],
+        items=[ReleaseResponseEntry.model_validate(item, from_attributes=True) for item in items],
     )

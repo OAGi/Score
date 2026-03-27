@@ -15,7 +15,7 @@ from app.routes.models.data_type import (
     GetDataTypeByDataTypeManifestIdResponse,
     GetDataTypeListResponse,
 )
-from app.routes.utils.date import parse_date_range
+from app.utils.date import parse_date_range
 from app.services.data_type_service import DataTypeService
 from app.types.identifiers import DataTypeManifestId
 from app.types.identifiers import ReleaseId

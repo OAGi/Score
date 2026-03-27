@@ -209,7 +209,7 @@ class ReleaseService:
             release_id=row.release_id,
             library=row.library,
             guid=row.guid,
-            release_num=row.release_num,
+            release_num=str(row.release_num or ""),
             release_note=row.release_note,
             release_license=row.release_license,
             namespace=row.namespace,

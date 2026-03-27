@@ -22,7 +22,7 @@ from app.routes.models.namespace import (
     GetNamespaceListResponse,
     NamespaceEntry,
 )
-from app.routes.utils.date import parse_date_range
+from app.utils.date import parse_date_range
 from app.services.namespace_service import NamespaceService
 from app.types.identifiers import LibraryId
 from app.types.identifiers import NamespaceId

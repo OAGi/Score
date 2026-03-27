@@ -80,19 +80,13 @@ from pydantic import Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.vendor_plugins import get_vendor_plugin
-from app.routes.models.biz_ctx import (
-    CreateBizCtxResponse as ApiCreateBizCtxResponse,
-    CreateBizCtxValueResponse as ApiCreateBizCtxValueResponse,
-    GetBizCtxByBizCtxIdResponse,
-    UpdateBizCtxResponse as ApiUpdateBizCtxResponse,
-    UpdateBizCtxValueResponse as ApiUpdateBizCtxValueResponse,
-)
-from app.routes.utils.date import parse_date_range
+from app.utils.date import parse_date_range
 from app.security import AuthenticatedUser
 from app.services.biz_ctx_service import BizCtxService
 from app.services.ctx_scheme_service import CtxSchemeService
 from app.tools import _to_tool_error, get_tool_authenticated_user, tool_session
 from app.tools.models.biz_ctx import (
+    BizCtxResponseEntry,
     CreateBizCtxResponse,
     CreateBizCtxValueResponse,
     DeleteBizCtxResponse,
@@ -473,8 +467,7 @@ async def create_business_context(
     """
     try:
         created_id = await biz_ctx_service.create(name=name)
-        response = ApiCreateBizCtxResponse(biz_ctx_id=created_id)
-        return CreateBizCtxResponse(biz_ctx_id=response.biz_ctx_id)
+        return CreateBizCtxResponse(biz_ctx_id=created_id)
     except Exception as exc:
         raise _to_tool_error(exc, fallback="Unable to create the business context.") from exc
 
@@ -535,8 +528,7 @@ async def create_business_context_value(
             biz_ctx_id=biz_ctx_id,
             ctx_scheme_value_id=ctx_scheme_value_id,
         )
-        response = ApiCreateBizCtxValueResponse(biz_ctx_value_id=created_id)
-        return CreateBizCtxValueResponse(biz_ctx_value_id=response.biz_ctx_value_id)
+        return CreateBizCtxValueResponse(biz_ctx_value_id=created_id)
     except Exception as exc:
         raise _to_tool_error(exc, fallback="Unable to create the business context value.") from exc
 
@@ -598,8 +590,7 @@ async def update_business_context(
         if result is None:
             raise ToolError(f"The business context with ID {biz_ctx_id} was not found. Please check the ID and try again.")
         updated_id, updates = result
-        response = ApiUpdateBizCtxResponse(biz_ctx_id=updated_id, updates=updates)
-        return UpdateBizCtxResponse.model_validate(response.model_dump())
+        return UpdateBizCtxResponse(biz_ctx_id=updated_id, updates=updates)
     except Exception as exc:
         raise _to_tool_error(exc, fallback=f"Unable to update business context {biz_ctx_id}.") from exc
 
@@ -666,8 +657,7 @@ async def update_business_context_value(
                 f"The business context value with ID {biz_ctx_value_id} was not found. Please check the ID and try again."
             )
         updated_id, updates = result
-        response = ApiUpdateBizCtxValueResponse(biz_ctx_value_id=updated_id, updates=updates)
-        return UpdateBizCtxValueResponse.model_validate(response.model_dump())
+        return UpdateBizCtxValueResponse(biz_ctx_value_id=updated_id, updates=updates)
     except Exception as exc:
         raise _to_tool_error(exc, fallback=f"Unable to update business context value {biz_ctx_value_id}.") from exc
 
@@ -894,5 +884,5 @@ def _to_list_response(*, items: list[Any], total: int, offset: int, limit: int) 
         total_items=total,
         offset=offset,
         limit=limit,
-        items=[GetBizCtxByBizCtxIdResponse.model_validate(item, from_attributes=True) for item in items],
+        items=[BizCtxResponseEntry.model_validate(item, from_attributes=True) for item in items],
     )

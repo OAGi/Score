@@ -18,7 +18,7 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 
 from app.deps import get_release_service
 from app.routes.models.release import GetReleaseByReleaseIdResponse, GetReleaseListResponse, ReleaseEntry
-from app.routes.utils.date import parse_date_range
+from app.utils.date import parse_date_range
 from app.services.release_service import ReleaseService
 from app.types.identifiers import LibraryId
 from app.types.identifiers import ReleaseId

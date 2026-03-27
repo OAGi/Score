@@ -23,7 +23,7 @@ from app.routes.models.core_component import (
     GetBccpByBccpManifestIdResponse,
     GetCoreComponentListResponse,
 )
-from app.routes.utils.date import parse_date_range
+from app.utils.date import parse_date_range
 from app.services.core_component_service import CoreComponentService
 from app.types.identifiers import AccManifestId, AsccpManifestId, BccpManifestId
 from app.types.identifiers import ReleaseId

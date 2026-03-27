@@ -39,7 +39,7 @@ from app.routes.models.business_information_entity import (
     UpdateTopLevelAsbiepStateResponse,
     UpdateTopLevelASBIEPStateRequest,
 )
-from app.routes.utils.date import parse_date_range
+from app.utils.date import parse_date_range
 from app.services.business_information_entity_service import (
     BusinessInformationEntityService,
     TopLevelAsbiepDependencyBlockedError,

@@ -47,13 +47,12 @@ from pydantic import Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.vendor_plugins import get_vendor_plugin
-from app.routes.models.code_list import CodeListEntry
-from app.routes.utils.date import parse_date_range
+from app.utils.date import parse_date_range
 from app.security import AuthenticatedUser
 from app.services.code_list_service import CodeListService
 from app.services.release_service import ReleaseService
 from app.tools import _to_tool_error, get_tool_authenticated_user, tool_session
-from app.tools.models.code_list import GetCodeListPaginationResponse, GetCodeListResponse
+from app.tools.models.code_list import CodeListResponseEntry, GetCodeListPaginationResponse, GetCodeListResponse
 
 logger = logging.getLogger("connectcenter.mcp.code_list")
 
@@ -541,5 +540,5 @@ def _to_list_response(*, items: list[Any], total: int, offset: int, limit: int) 
         total_items=total,
         offset=offset,
         limit=limit,
-        items=[CodeListEntry.model_validate(item, from_attributes=True) for item in items],
+        items=[CodeListResponseEntry.model_validate(item, from_attributes=True) for item in items],
     )

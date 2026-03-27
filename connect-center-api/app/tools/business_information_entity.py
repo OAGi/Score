@@ -88,7 +88,7 @@ from pydantic import Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.vendor_plugins import get_vendor_plugin
-from app.routes.utils.date import parse_date_range
+from app.utils.date import parse_date_range
 from app.security import AuthenticatedUser
 from app.services.app_user_service import AppUserService
 from app.services.business_information_entity_service import BusinessInformationEntityService
@@ -492,7 +492,7 @@ async def get_top_level_asbiep_list(
                                 "properties": {
                                     "release_id": {"type": "integer",
                                                    "description": "Unique identifier for the release", "example": 1},
-                                    "release_num": {"type": ["string", "null"], "description": "Release number",
+                                    "release_num": {"type": "string", "description": "Release number",
                                                     "example": "10.6"},
                                     "state": {"type": "string", "description": "Release state", "example": "Published"}
                                 },
@@ -1200,7 +1200,7 @@ async def get_top_level_asbiep(
                         "properties": {
                             "release_id": {"type": "integer", "description": "Unique identifier for the release",
                                            "example": 1},
-                            "release_num": {"type": ["string", "null"], "description": "Release number",
+                            "release_num": {"type": "string", "description": "Release number",
                                             "example": "10.6"},
                             "state": {"type": "string", "description": "Release state", "example": "Published"}
                         },
@@ -1296,7 +1296,7 @@ async def get_top_level_asbiep(
                                 "properties": {
                                     "release_id": {"type": "integer",
                                                    "description": "Unique identifier for the release", "example": 1},
-                                    "release_num": {"type": ["string", "null"], "description": "Release number",
+                                    "release_num": {"type": "string", "description": "Release number",
                                                     "example": "10.6"},
                                     "state": {"type": "string", "description": "Release state", "example": "Published"}
                                 },
@@ -1847,7 +1847,7 @@ async def get_asbie_by_asbie_id(
                         "properties": {
                             "release_id": {"type": "integer", "description": "Unique identifier for the release",
                                            "example": 1},
-                            "release_num": {"type": ["string", "null"], "description": "Release number",
+                            "release_num": {"type": "string", "description": "Release number",
                                             "example": "10.6"},
                             "state": {"type": "string", "description": "Release state", "example": "Published"}
                         },
@@ -1943,7 +1943,7 @@ async def get_asbie_by_asbie_id(
                                 "properties": {
                                     "release_id": {"type": "integer",
                                                    "description": "Unique identifier for the release", "example": 1},
-                                    "release_num": {"type": ["string", "null"], "description": "Release number",
+                                    "release_num": {"type": "string", "description": "Release number",
                                                     "example": "10.6"},
                                     "state": {"type": "string", "description": "Release state", "example": "Published"}
                                 },
@@ -2507,7 +2507,7 @@ async def get_asbie_by_based_ascc_manifest_id(
                         "properties": {
                             "release_id": {"type": "integer", "description": "Unique identifier for the release",
                                            "example": 1},
-                            "release_num": {"type": ["string", "null"], "description": "Release number",
+                            "release_num": {"type": "string", "description": "Release number",
                                             "example": "10.6"},
                             "state": {"type": "string", "description": "Release state", "example": "Published"}
                         },
@@ -2782,7 +2782,7 @@ async def get_asbie_by_based_ascc_manifest_id(
                                                 "release_id": {"type": "integer",
                                                                "description": "Unique identifier for the release",
                                                                "example": 1},
-                                                "release_num": {"type": ["string", "null"],
+                                                "release_num": {"type": "string",
                                                                 "description": "Release number", "example": "10.6"},
                                                 "state": {"type": "string", "description": "Release state",
                                                           "example": "Published"}
@@ -2853,7 +2853,7 @@ async def get_asbie_by_based_ascc_manifest_id(
                                 "properties": {
                                     "release_id": {"type": "integer",
                                                    "description": "Unique identifier for the release", "example": 1},
-                                    "release_num": {"type": ["string", "null"], "description": "Release number",
+                                    "release_num": {"type": "string", "description": "Release number",
                                                     "example": "10.6"},
                                     "state": {"type": "string", "description": "Release state", "example": "Published"}
                                 },
@@ -3045,7 +3045,7 @@ async def get_bbie_by_bbie_id(
                         "properties": {
                             "release_id": {"type": "integer", "description": "Unique identifier for the release",
                                            "example": 1},
-                            "release_num": {"type": ["string", "null"], "description": "Release number",
+                            "release_num": {"type": "string", "description": "Release number",
                                             "example": "10.6"},
                             "state": {"type": "string", "description": "Release state", "example": "Published"}
                         },
@@ -3320,7 +3320,7 @@ async def get_bbie_by_bbie_id(
                                                 "release_id": {"type": "integer",
                                                                "description": "Unique identifier for the release",
                                                                "example": 1},
-                                                "release_num": {"type": ["string", "null"],
+                                                "release_num": {"type": "string",
                                                                 "description": "Release number", "example": "10.6"},
                                                 "state": {"type": "string", "description": "Release state",
                                                           "example": "Published"}
@@ -3391,7 +3391,7 @@ async def get_bbie_by_bbie_id(
                                 "properties": {
                                     "release_id": {"type": "integer",
                                                    "description": "Unique identifier for the release", "example": 1},
-                                    "release_num": {"type": ["string", "null"], "description": "Release number",
+                                    "release_num": {"type": "string", "description": "Release number",
                                                     "example": "10.6"},
                                     "state": {"type": "string", "description": "Release state", "example": "Published"}
                                 },

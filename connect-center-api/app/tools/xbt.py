@@ -134,7 +134,7 @@ async def get_xbt_service(
                         "properties": {
                             "release_id": {"type": "integer", "description": "Unique identifier for the release",
                                            "example": 1},
-                            "release_num": {"type": ["string", "null"], "description": "Release number",
+                            "release_num": {"type": "string", "description": "Release number",
                                             "example": "10.6"},
                             "state": {"type": "string", "description": "Release state", "example": "Published"}
                         },
@@ -169,7 +169,7 @@ async def get_xbt_service(
                 "description": "Release information",
                 "properties": {
                     "release_id": {"type": "integer", "description": "Unique identifier for the release", "example": 1},
-                    "release_num": {"type": ["string", "null"], "description": "Release number", "example": "10.6"},
+                    "release_num": {"type": "string", "description": "Release number", "example": "10.6"},
                     "state": {"type": "string", "description": "Release state", "example": "Published"}
                 },
                 "required": ["release_id", "release_num", "state"]

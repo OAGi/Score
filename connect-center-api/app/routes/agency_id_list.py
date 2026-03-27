@@ -15,7 +15,7 @@ from app.routes.models.agency_id_list import (
     GetAgencyIDListResponse,
     GetAgencyIdListByAgencyIdListManifestIdResponse,
 )
-from app.routes.utils.date import parse_date_range
+from app.utils.date import parse_date_range
 from app.services.agency_id_list_service import AgencyIdListService
 from app.types.identifiers import AgencyIdListManifestId
 from app.types.identifiers import ReleaseId

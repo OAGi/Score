@@ -145,7 +145,7 @@ class CodeListService:
             code_list_id=row.code_list_id,
             guid=row.guid,
             enum_type_guid=row.enum_type_guid,
-            name=row.name,
+            name=str(row.name or ""),
             list_id=row.list_id,
             version_id=row.version_id,
             definition=row.definition,

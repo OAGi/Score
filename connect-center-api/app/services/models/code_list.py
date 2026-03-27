@@ -50,7 +50,7 @@ class CodeListServiceResult:
     code_list_id: CodeListId
     guid: Guid
     enum_type_guid: str | None = None
-    name: str | None = None
+    name: str = ""
     list_id: str
     version_id: str
     definition: str | None = None
