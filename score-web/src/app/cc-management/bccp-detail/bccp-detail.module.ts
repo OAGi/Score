@@ -20,6 +20,7 @@ const routes: Routes = [
         path: '**',
         component: BccpDetailComponent,
         canActivate: [AuthService],
+        title: 'Core Component'
       }
     ]
   }

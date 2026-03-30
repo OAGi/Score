@@ -20,16 +20,19 @@ const routes: Routes = [
         path: '',
         component: LibraryListComponent,
         canActivate: [AuthService],
+        title: 'Library'
       },
       {
         path: 'create',
         component: LibraryCreateComponent,
         canActivate: [AuthService],
+        title: 'Create Library'
       },
       {
         path: ':id',
         component: LibraryDetailComponent,
         canActivate: [AuthService],
+        title: 'Library'
       }
     ]
   }

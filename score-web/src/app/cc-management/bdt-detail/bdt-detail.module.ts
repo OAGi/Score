@@ -20,6 +20,7 @@ const routes: Routes = [
         path: '**',
         component: BdtDetailComponent,
         canActivate: [AuthService],
+        title: 'Data Type'
       }
     ]
   }

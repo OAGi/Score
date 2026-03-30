@@ -27,22 +27,26 @@ const routes: Routes = [
       {
         path: 'business_term',
         component: BusinessTermListComponent,
-        canActivate: [AuthService]
+        canActivate: [AuthService],
+        title: 'Business Term'
       },
       {
         path: 'business_term/create',
         component: BusinessTermCreateComponent,
-        canActivate: [AuthService]
+        canActivate: [AuthService],
+        title: 'Create Business Term'
       },
       {
         path: 'business_term/upload',
         component: BusinessTermUploadFileComponent,
-        canActivate: [AuthService]
+        canActivate: [AuthService],
+        title: 'Upload Business Term'
       },
       {
         path: 'business_term/:id',
         component: BusinessTermDetailComponent,
-        canActivate: [AuthService]
+        canActivate: [AuthService],
+        title: 'Business Term'
       },
       {
         path: 'assign_business_term',
@@ -50,12 +54,14 @@ const routes: Routes = [
           {
             path: '',
             component: AssignedBusinessTermListComponent,
-            canActivate: [AuthService]
+            canActivate: [AuthService],
+            title: 'Assign Business Term'
           },
           {
             path: 'details/:id',
             component: AssignedBusinessTermDetailComponent,
-            canActivate: [AuthService]
+            canActivate: [AuthService],
+            title: 'Assign Business Term'
           },
           {
             path: 'create',
@@ -63,12 +69,14 @@ const routes: Routes = [
               {
                 path: '',
                 component: AssignBusinessTermBieComponent,
-                canActivate: [AuthService]
+                canActivate: [AuthService],
+                title: 'Assign Business Term'
               },
               {
                 path: 'bt',
                 component: AssignBusinessTermBtComponent,
-                canActivate: [AuthService]
+                canActivate: [AuthService],
+                title: 'Assign Business Term'
               }
             ]
           }

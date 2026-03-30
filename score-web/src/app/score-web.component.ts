@@ -1,4 +1,4 @@
-import { Component, DoCheck, OnInit, inject } from '@angular/core';
+import {Component, DoCheck, OnInit, inject} from '@angular/core';
 import {AuthService} from './authentication/auth.service';
 import {Router} from '@angular/router';
 import WebFont from 'webfontloader';

@@ -25,6 +25,8 @@ import {ScoreTableColumnResizeDirective} from '../../../common/score-table-colum
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {forkJoin, of} from 'rxjs';
 import {BieExpressOption} from '../../bie-express/domain/generate-expression';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -42,6 +44,7 @@ export class BiePackageDetailComponent implements OnInit {
   private confirmDialogService = inject(ConfirmDialogService);
   private preferencesService = inject(SettingsPreferencesService);
   private dialog = inject(MatDialog);
+  private titleService = inject(Title);
   webPageInfo = inject(WebPageInfoService);
 
 
@@ -302,6 +305,7 @@ export class BiePackageDetailComponent implements OnInit {
   init(biePackage: BiePackageDetails) {
     this.hashCode = hashCode(biePackage);
     this.biePackage = biePackage;
+    setAppTitleIfPresent(this.titleService, this.biePackage.name, 'BIE Package');
     this.loading = false;
   }
 

@@ -20,6 +20,7 @@ const routes: Routes = [
     path: 'profile_bie/express',
     component: BieExpressComponent,
     canActivate: [AuthService],
+    title: 'Express BIE'
   }
 ];
 

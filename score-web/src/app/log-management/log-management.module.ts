@@ -21,6 +21,7 @@ const routes: Routes = [
             path: ':reference',
             component: LogListComponent,
             canActivate: [AuthService],
+            title: 'Log'
           }
         ]
       }

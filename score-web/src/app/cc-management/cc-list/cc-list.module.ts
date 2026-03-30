@@ -24,6 +24,7 @@ const routes: Routes = [
     path: 'core_component',
     component: CcListComponent,
     canActivate: [AuthService],
+    title: 'Core Component'
   }
 ];
 

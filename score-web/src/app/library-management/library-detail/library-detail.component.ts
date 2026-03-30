@@ -9,6 +9,8 @@ import {switchMap} from 'rxjs/operators';
 import {LibraryDetails} from '../domain/library';
 import {LibraryService} from '../domain/library.service';
 import {hashCode} from 'src/app/common/utility';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -24,6 +26,7 @@ export class LibraryDetailComponent {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private auth = inject(AuthService);
+  private titleService = inject(Title);
 
 
   title = 'Library Detail';
@@ -48,6 +51,7 @@ export class LibraryDetailComponent {
       }
 
       this.library = resp;
+      setAppTitleIfPresent(this.titleService, this.library.name, 'Library');
       this.uriForm = new FormControl({value: this.library.link, disabled: !this.isAdmin},
           Validators.pattern('\\w+:(\\/?\\/?)[^\\s]+'));
       this.hashCode = hashCode(resp);
@@ -123,6 +127,7 @@ export class LibraryDetailComponent {
     this.library.link = this.uriForm.value;
     this.service.update(this.library).subscribe(_ => {
       this.hashCode = hashCode(this.library);
+      setAppTitleIfPresent(this.titleService, this.library.name, 'Library');
       this.snackBar.open('Updated', '', {
         duration: 3000,
       });

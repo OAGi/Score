@@ -7,6 +7,8 @@ import {hashCode} from '../../common/utility';
 import {TenantListService} from '../domain/tenant-list.service';
 import {TenantInfo} from '../domain/tenants';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 
 
 @Component({
@@ -21,6 +23,7 @@ export class UpdateTenantComponent implements OnInit {
   private router = inject(Router);
   private snackBar = inject(MatSnackBar);
   private confirmDialogService = inject(ConfirmDialogService);
+  private titleService = inject(Title);
 
 
   title = 'Edit Tenant';
@@ -36,6 +39,7 @@ export class UpdateTenantComponent implements OnInit {
     ).subscribe(resp => {
       this.hashCode = hashCode(resp);
       this.tenant = resp;
+      setAppTitleIfPresent(this.titleService, this.tenant.name, 'Tenant');
     });
   }
 

@@ -24,6 +24,8 @@ import {ScoreTableColumnResizeDirective} from '../../../common/score-table-colum
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {AuthService} from '../../../authentication/auth.service';
 import {forkJoin} from 'rxjs';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -42,6 +44,7 @@ export class BusinessContextDetailComponent implements OnInit {
   private auth = inject(AuthService);
   private confirmDialogService = inject(ConfirmDialogService);
   private preferencesService = inject(SettingsPreferencesService);
+  private titleService = inject(Title);
 
 
   title = 'Edit Business Context';
@@ -169,6 +172,7 @@ export class BusinessContextDetailComponent implements OnInit {
       });
       this.hashCode = hashCode(businessContextDetails);
       this.businessContext = businessContextDetails;
+      setAppTitleIfPresent(this.titleService, this.businessContext.name, 'Business Context');
 
       this._updateDataSource(this.businessContext.businessContextValues);
     }, err => {
@@ -351,8 +355,9 @@ export class BusinessContextDetailComponent implements OnInit {
     }
 
     this.service.update(this.businessContext.businessContextId, this.businessContext.name,
-        this.businessContext.businessContextValues).subscribe(_ => {
+      this.businessContext.businessContextValues).subscribe(_ => {
       this.hashCode = hashCode(this.businessContext);
+      setAppTitleIfPresent(this.titleService, this.businessContext.name, 'Business Context');
       this.snackBar.open('Updated', '', {
         duration: 3000,
       });

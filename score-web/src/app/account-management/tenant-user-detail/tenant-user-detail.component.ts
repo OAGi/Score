@@ -17,6 +17,8 @@ import {SettingsPreferencesService} from '../../settings-management/settings-pre
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -34,6 +36,7 @@ export class TenantUserDetailComponent implements OnInit {
   private location = inject(Location);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private titleService = inject(Title);
 
 
   title = 'Users Management';
@@ -218,6 +221,7 @@ export class TenantUserDetailComponent implements OnInit {
       }
 
       this.tenantInfo = resp;
+      setAppTitleIfPresent(this.titleService, this.tenantInfo.name, 'Tenant Users');
       this.loadAccounts(true);
     }, error => {
       this.dataSource.data = [];

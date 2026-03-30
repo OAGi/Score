@@ -27,6 +27,7 @@ const routes: Routes = [
         path: '**',
         component: AccDetailComponent,
         canActivate: [AuthService],
+        title: 'Core Component'
       }
     ]
   }

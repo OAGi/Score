@@ -7,6 +7,8 @@ import {AccountListService} from '../domain/account-list.service';
 import {finalize, switchMap} from 'rxjs/operators';
 import {AuthService} from '../../authentication/auth.service';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -21,6 +23,7 @@ export class AccountDetailComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private titleService = inject(Title);
 
   title = 'Edit Account';
   accountId;
@@ -43,6 +46,7 @@ export class AccountDetailComponent implements OnInit {
         }
 
         this.account = resp;
+        setAppTitleIfPresent(this.titleService, this.account.loginId, 'Account');
       }, err => {
         if (err.status === 404) {
           this.redirectToAccountList();

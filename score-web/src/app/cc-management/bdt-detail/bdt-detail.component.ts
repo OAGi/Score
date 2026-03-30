@@ -62,6 +62,8 @@ import {FormControl} from '@angular/forms';
 import {FindUsagesDialogComponent} from '../find-usages-dialog/find-usages-dialog.component';
 import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 
 
 @Component({
@@ -83,6 +85,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   private confirmDialogService = inject(ConfirmDialogService);
   private preferencesService = inject(SettingsPreferencesService);
   private tagService = inject(TagService);
+  private titleService = inject(Title);
   private location = inject(Location);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -216,6 +219,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
 
       this.tags = tags;
       this.preferencesInfo = preferencesInfo;
+      setAppTitleIfPresent(this.titleService, dtDetails.den, 'Data Type');
 
       // subscribe an event
       this.stompService.watch('/topic/dt/' + this.manifestId).subscribe((message: Message) => {

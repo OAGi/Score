@@ -20,17 +20,20 @@ const routes: Routes = [
       {
         path: 'context_category',
         component: ContextCategoryListComponent,
-        canActivate: [AuthService]
+        canActivate: [AuthService],
+        title: 'Context Category'
       },
       {
         path: 'context_category/create',
         component: ContextCategoryCreateComponent,
-        canActivate: [AuthService]
+        canActivate: [AuthService],
+        title: 'Create Context Category'
       },
       {
         path: 'context_category/:id',
         component: ContextCategoryDetailComponent,
-        canActivate: [AuthService]
+        canActivate: [AuthService],
+        title: 'Context Category'
       }
     ]
   }

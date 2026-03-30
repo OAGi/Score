@@ -28,57 +28,68 @@ const routes: Routes = [
   {
     path: 'account',
     component: AccountListComponent,
-    canActivate: [CanActivateAdmin]
+    canActivate: [CanActivateAdmin],
+    title: 'Account'
   },
   {
     path: 'account/create',
     component: AccountCreateComponent,
-    canActivate: [CanActivateAdmin]
+    canActivate: [CanActivateAdmin],
+    title: 'Create Account'
   },
   {
     path: 'account/transfer_ownership',
     component: TransferOwnershipListComponent,
-    canActivate: [CanActivateAdmin]
+    canActivate: [CanActivateAdmin],
+    title: 'Transfer Ownership'
   },
   {
     path: 'account/pending',
     component: PendingListComponent,
-    canActivate: [CanActivateAdmin]
+    canActivate: [CanActivateAdmin],
+    title: 'Pending Account'
   },
   {
     path: 'account/pending/:id',
     component: PendingDetailComponent,
-    canActivate: [CanActivateAdmin]
+    canActivate: [CanActivateAdmin],
+    title: 'Pending Account'
   },
   {
     path: 'account/:id',
     component: AccountDetailComponent,
-    canActivate: [CanActivateAdmin]
+    canActivate: [CanActivateAdmin],
+    title: 'Account'
   },
   {
     path: 'tenant',
     component: TenantListComponent,
-    canActivate: [(CanActivateAdmin && CanActivateTenantInstance)]
+    canActivate: [(CanActivateAdmin && CanActivateTenantInstance)],
+    title: 'Tenant'
   },
   {
     path: 'tenant/create',
     component: TenantCreateComponent,
-    canActivate: [(CanActivateAdmin && CanActivateTenantInstance)]
+    canActivate: [(CanActivateAdmin && CanActivateTenantInstance)],
+    title: 'Create Tenant'
   },
   {
     path: 'tenant/:id',
     component: UpdateTenantComponent,
-    canActivate: [(CanActivateAdmin && CanActivateTenantInstance)]
+    canActivate: [(CanActivateAdmin && CanActivateTenantInstance)],
+    title: 'Tenant'
   },
   {
     path: 'tenant/bis-ctx/:id',
     component: TenantBusinessCtxDetailComponent,
-    canActivate: [(CanActivateAdmin && CanActivateTenantInstance)]
+    canActivate: [(CanActivateAdmin && CanActivateTenantInstance)],
+    title: 'Tenant Business Context'
   },
   {
     path: 'tenant/users/:id',
     component: TenantUserDetailComponent,
-    canActivate: [(CanActivateAdmin && CanActivateTenantInstance)]
+    canActivate: [(CanActivateAdmin && CanActivateTenantInstance)],
+    title: 'Tenant Users'
   },
 ];
 

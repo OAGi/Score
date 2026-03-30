@@ -66,6 +66,8 @@ import {TagService} from '../../tag-management/domain/tag.service';
 import {EditTagsDialogComponent} from '../../tag-management/edit-tags-dialog/edit-tags-dialog.component';
 import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -83,6 +85,7 @@ export class ExtensionDetailComponent implements OnInit {
   private confirmDialogService = inject(ConfirmDialogService);
   private preferencesService = inject(SettingsPreferencesService);
   private tagService = inject(TagService);
+  private titleService = inject(Title);
   private location = inject(Location);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -191,6 +194,7 @@ export class ExtensionDetailComponent implements OnInit {
       }
       this.tags = tags;
       this.preferencesInfo = preferencesInfo;
+      setAppTitleIfPresent(this.titleService, accDetails.den, 'ACC');
 
       // subscribe an event
       this.stompService.watch('/topic/acc/' + this.manifestId).subscribe((message: Message) => {

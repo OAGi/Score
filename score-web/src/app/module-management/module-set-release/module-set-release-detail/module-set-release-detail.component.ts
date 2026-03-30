@@ -18,6 +18,8 @@ import {
   ModuleSetReleaseValidationDialogComponent
 } from './module-set-release-validation-dialog/module-set-release-validation-dialog.component';
 import {ReleaseSummary} from '../../../release-management/domain/release';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -35,6 +37,7 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
   private dialog = inject(MatDialog);
   private auth = inject(AuthService);
   private confirmDialogService = inject(ConfirmDialogService);
+  private titleService = inject(Title);
 
 
   title: string;
@@ -109,6 +112,7 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
 
   init(moduleSetRelease: ModuleSetReleaseDetails) {
     this.moduleSetRelease = moduleSetRelease;
+    setAppTitleIfPresent(this.titleService, this.moduleSetRelease.name, 'Module Set Release');
     this.$hashCode = hashCode(this.moduleSetRelease);
   }
 
@@ -287,8 +291,7 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
           });
 
           this.moduleService.getModuleSetReleaseDetails(this.moduleSetRelease.moduleSetReleaseId).subscribe(moduleSetRelease => {
-            this.moduleSetRelease = moduleSetRelease;
-            this.$hashCode = hashCode(this.moduleSetRelease);
+            this.init(moduleSetRelease);
           });
         });
   }

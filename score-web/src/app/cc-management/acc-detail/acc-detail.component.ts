@@ -70,6 +70,8 @@ import {EditTagsDialogComponent} from '../../tag-management/edit-tags-dialog/edi
 import {WebPageInfoService} from '../../basis/basis.service';
 import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -87,6 +89,7 @@ export class AccDetailComponent implements OnInit {
   private confirmDialogService = inject(ConfirmDialogService);
   private preferencesService = inject(SettingsPreferencesService);
   private tagService = inject(TagService);
+  private titleService = inject(Title);
   private location = inject(Location);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -219,6 +222,7 @@ export class AccDetailComponent implements OnInit {
       this.preferencesInfo = preferencesInfo;
       this.availableModels = models;
       this.selectedModel = (!!this.availableModels && this.availableModels.length > 0) ? this.availableModels[0] : undefined;
+      setAppTitleIfPresent(this.titleService, accDetails.den, 'ACC');
       this.isDefinitionGenerating = false;
       this.isNameGenerating = false;
 

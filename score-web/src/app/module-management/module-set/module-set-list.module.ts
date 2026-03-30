@@ -22,16 +22,19 @@ const routes: Routes = [
         path: '',
         component: ModuleSetListComponent,
         canActivate: [AuthService],
+        title: 'Module Set'
       },
       {
         path: 'create',
         component: ModuleSetCreateComponent,
         canActivate: [AuthService],
+        title: 'Create Module Set'
       },
       {
         path: ':moduleSetId',
         component: ModuleSetEditComponent,
         canActivate: [AuthService],
+        title: 'Module Set'
       }
     ]
   }

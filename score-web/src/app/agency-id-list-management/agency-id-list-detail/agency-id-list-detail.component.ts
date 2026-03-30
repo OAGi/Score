@@ -28,6 +28,8 @@ import {hashCode, initFilter} from '../../common/utility';
 import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -47,6 +49,7 @@ export class AgencyIdListDetailComponent implements OnInit {
   private confirmDialogService = inject(ConfirmDialogService);
   private preferencesService = inject(SettingsPreferencesService);
   private stompService = inject(RxStompService);
+  private titleService = inject(Title);
 
 
   title = 'Edit Agency ID List';
@@ -298,6 +301,7 @@ export class AgencyIdListDetailComponent implements OnInit {
 
   _doInit(agencyIdList: AgencyIdListDetails) {
     this.agencyIdList = agencyIdList;
+    setAppTitleIfPresent(this.titleService, agencyIdList.name, 'Agency ID List');
     this.hashCode = hashCode(this.agencyIdList);
 
     this._updateDataSource(this.agencyIdList.valueList);

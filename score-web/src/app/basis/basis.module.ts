@@ -33,6 +33,7 @@ const routes: Routes = [
         path: '',
         component: AboutComponent,
         canActivate: [AuthService],
+        title: 'About'
       },
     ]
   }

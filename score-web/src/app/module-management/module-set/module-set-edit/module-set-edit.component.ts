@@ -15,6 +15,8 @@ import {ModuleAddDialogComponent} from './module-add-dialog/module-add-dialog.co
 import {ModuleEditDialogComponent} from './module-edit-dialog/module-edit-dialog.component';
 import {UserToken} from '../../../authentication/domain/auth';
 import {forkJoin} from 'rxjs';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -31,6 +33,7 @@ export class ModuleSetEditComponent implements OnInit {
   private dialog = inject(MatDialog);
   private auth = inject(AuthService);
   private confirmDialogService = inject(ConfirmDialogService);
+  private titleService = inject(Title);
 
 
   title;
@@ -105,6 +108,7 @@ export class ModuleSetEditComponent implements OnInit {
 
   init(moduleSet: ModuleSet) {
     this.moduleSet = moduleSet;
+    setAppTitleIfPresent(this.titleService, this.moduleSet.name, 'Module Set');
     this.$hashCode = hashCode(this.moduleSet);
   }
 

@@ -24,7 +24,8 @@ const routes: Routes = [
       {
         path: '',
         component: OasDocListComponent,
-        canActivate: [AuthService]
+        canActivate: [AuthService],
+        title: 'OpenAPI Document'
       },
       {
         path: 'create',
@@ -32,12 +33,14 @@ const routes: Routes = [
           {
             path: '',
             component: OasDocCreateComponent,
-            canActivate: [AuthService]
+            canActivate: [AuthService],
+            title: 'Create OpenAPI Document'
           }
         ]
       },
       {
         path: ':id',
+        title: 'OpenAPI Document',
         children: [
           {
             path: '',
@@ -48,6 +51,7 @@ const routes: Routes = [
             path: 'assign',
             component: OasDocAssignDialogComponent,
             canActivate: [AuthService],
+            title: 'Assign OpenAPI Document'
           }
         ]
       },

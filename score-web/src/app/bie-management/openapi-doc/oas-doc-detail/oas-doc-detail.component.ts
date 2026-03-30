@@ -34,6 +34,8 @@ import {
 } from '../../../settings-management/settings-preferences/domain/preferences';
 import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -53,6 +55,7 @@ export class OasDocDetailComponent implements OnInit {
   private confirmDialogService = inject(ConfirmDialogService);
   private preferencesService = inject(SettingsPreferencesService);
   private dialog = inject(MatDialog);
+  private titleService = inject(Title);
   webPageInfo = inject(WebPageInfoService);
 
 
@@ -314,6 +317,7 @@ export class OasDocDetailComponent implements OnInit {
   init(oasDoc: OasDoc) {
     this.hashCodeForOasDoc = hashCode(oasDoc);
     this.oasDoc = oasDoc;
+    setAppTitleIfPresent(this.titleService, this.oasDoc.title, 'OpenAPI Document');
     this.isUpdating = false;
   }
 

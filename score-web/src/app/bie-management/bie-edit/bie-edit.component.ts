@@ -65,6 +65,8 @@ import {PreferencesInfo} from '../../settings-management/settings-preferences/do
 import {CcNodeService} from '../../cc-management/domain/core-component-node.service';
 import {BieStateTransitionFlowService} from '../domain/bie-state-transition-flow.service';
 import {StateDependencySelection} from '../domain/state-dependency-target';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 
 
 @Component({
@@ -91,6 +93,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   private renderer = inject(Renderer2);
   private el = inject(ElementRef);
   private cdr = inject(ChangeDetectorRef);
+  private titleService = inject(Title);
   webPageInfo = inject(WebPageInfoService);
   private stateTransitionFlowService = inject(BieStateTransitionFlowService);
 
@@ -403,6 +406,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   initRootNode(rootNode) {
     this.rootNode = new BieEditAbieNode(rootNode);
+    setAppTitleIfPresent(this.titleService, this.rootNode.name, 'BIE');
     this.rootNode.reset();
     const that = this;
 

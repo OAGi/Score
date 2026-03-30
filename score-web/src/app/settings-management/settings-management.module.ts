@@ -18,22 +18,26 @@ const routes: Routes = [
   {
     path: 'settings/account',
     component: SettingsAccountComponent,
-    canActivate: [CanActivateUser]
+    canActivate: [CanActivateUser],
+    title: 'Settings'
   },
   {
     path: 'settings/email_validation',
     component: EmailValidationComponent,
     canActivate: [CanActivateUser],
+    title: 'Email Validation',
   },
   {
     path: 'settings/preferences',
     component: SettingsPreferencesComponent,
-    canActivate: [CanActivateUser]
+    canActivate: [CanActivateUser],
+    title: 'Preferences'
   },
   {
     path: 'settings/application_settings',
     component: SettingsApplicationSettingsComponent,
-    canActivate: [CanActivateUser]
+    canActivate: [CanActivateUser],
+    title: 'Application Settings'
   }
 ];
 

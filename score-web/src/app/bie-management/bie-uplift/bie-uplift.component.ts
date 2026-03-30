@@ -31,6 +31,8 @@ import {ReportDialogComponent} from './report-dialog/report-dialog.component';
 import {BieEditAbieNode} from '../bie-edit/domain/bie-edit-node';
 import {saveBooleanProperty} from '../../common/utility';
 import {WebPageInfoService} from '../../basis/basis.service';
+import {Title} from '@angular/platform-browser';
+import {formatAppTitle} from '../../common/app-title.strategy';
 
 
 export class BieUpliftSourceFlatNodeDatabase<T extends BieFlatNode> extends BieFlatNodeDatabase<T> {
@@ -74,6 +76,7 @@ export class BieUpliftComponent implements OnInit {
   private router = inject(Router);
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);
+  private titleService = inject(Title);
   webPageInfo = inject(WebPageInfoService);
 
 
@@ -131,9 +134,12 @@ export class BieUpliftComponent implements OnInit {
     });
 
     this.loading = true;
-    this.bieUpliftService.findTargetAsccpManifest(this.topLevelAsbiepId, this.targetReleaseId).subscribe(resp => {
+    forkJoin([
+      this.bieUpliftService.findTargetAsccpManifest(this.topLevelAsbiepId, this.targetReleaseId),
+      this.releaseService.getReleaseDetail(String(this.targetReleaseId))
+    ]).subscribe(([resp, targetRelease]) => {
       this.targetAsccpManifestId = resp.asccpManifestId;
-      this.targetReleaseNum = resp.releaseNum;
+      this.targetReleaseNum = resp.releaseNum || targetRelease?.releaseNum;
 
       forkJoin([
         this.bieEditService.getGraphNode(this.topLevelAsbiepId),
@@ -148,6 +154,7 @@ export class BieUpliftComponent implements OnInit {
         this.bieGuid = sourceRootNode.guid;
         this.bieName = sourceRootNode.name;
         this.sourceReleaseNum = sourceRootNode.releaseNum;
+        this.updatePageTitle();
 
         const sourceDatabase = new BieUpliftSourceFlatNodeDatabase<BieUpliftSourceFlatNode>(sourceCcGraph,
           sourceRootNode, this.topLevelAsbiepId, sourceUsedBieList, sourceRefBieList);
@@ -224,6 +231,20 @@ export class BieUpliftComponent implements OnInit {
         });
       });
     });
+  }
+
+  private updatePageTitle(): void {
+    const bieName = this.bieName?.trim();
+    const sourceReleaseNum = this.sourceReleaseNum?.trim();
+    const targetReleaseNum = this.targetReleaseNum?.trim();
+
+    if (!bieName || !sourceReleaseNum || !targetReleaseNum) {
+      return;
+    }
+
+    this.titleService.setTitle(
+      formatAppTitle(`${bieName} BIE from ${sourceReleaseNum} to ${targetReleaseNum}`)
+    );
   }
 
   _getLastTag(path: string): string {

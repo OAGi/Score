@@ -31,6 +31,8 @@ import {ContextCategoryService} from '../../context-category/domain/context-cate
 import {ContextCategorySummary} from '../../context-category/domain/context-category';
 import {CodeListService} from '../../../code-list-management/domain/code-list.service';
 import {finalize} from 'rxjs/operators';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -51,6 +53,7 @@ export class ContextSchemeDetailComponent implements OnInit {
   private auth = inject(AuthService);
   private confirmDialogService = inject(ConfirmDialogService);
   private preferencesService = inject(SettingsPreferencesService);
+  private titleService = inject(Title);
 
 
   title = 'Edit Context Scheme';
@@ -200,6 +203,7 @@ export class ContextSchemeDetailComponent implements OnInit {
 
       this.contextSchemeUpdateRequest.contextSchemeValueList = contextSchemeValues;
       this.contextSchemeUpdateRequest.used = contextScheme.used;
+      setAppTitleIfPresent(this.titleService, this.contextSchemeUpdateRequest.schemeName, 'Context Scheme');
 
       this.hashCode = hashCode(this.contextSchemeUpdateRequest);
       this.dataSource.data = this.contextSchemeUpdateRequest.contextSchemeValueList;
@@ -462,6 +466,7 @@ export class ContextSchemeDetailComponent implements OnInit {
       this.isUpdating = false;
     })).subscribe(_ => {
       this.hashCode = hashCode(this.contextSchemeUpdateRequest);
+      setAppTitleIfPresent(this.titleService, this.contextSchemeUpdateRequest.schemeName, 'Context Scheme');
       this.snackBar.open('Updated', '', {
         duration: 3000,
       });

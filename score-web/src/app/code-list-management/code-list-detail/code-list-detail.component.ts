@@ -30,6 +30,8 @@ import {SettingsPreferencesService} from '../../settings-management/settings-pre
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 import {AgencyIdListService} from '../../agency-id-list-management/domain/agency-id-list.service';
 import {AgencyIdListSummary, AgencyIdListValueSummary} from '../../agency-id-list-management/domain/agency-id-list';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -50,6 +52,7 @@ export class CodeListDetailComponent implements OnInit {
   private confirmDialogService = inject(ConfirmDialogService);
   private preferencesService = inject(SettingsPreferencesService);
   private stompService = inject(RxStompService);
+  private titleService = inject(Title);
 
 
   title = 'Edit Code List';
@@ -347,6 +350,7 @@ export class CodeListDetailComponent implements OnInit {
     }
     this.onAgencyIdListChange();
     this.codeList = codeList;
+    setAppTitleIfPresent(this.titleService, codeList.name, 'Code List');
 
     this._updateDataSource(this.codeList.valueList);
 

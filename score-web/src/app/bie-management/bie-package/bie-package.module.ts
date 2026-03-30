@@ -24,15 +24,18 @@ const routes: Routes = [
       {
         path: '',
         component: BiePackageListComponent,
-        canActivate: [AuthService]
+        canActivate: [AuthService],
+        title: 'BIE Package'
       },
       {
         path: ':id',
+        title: 'BIE Package',
         children: [
           {
             path: '**',
             component: BiePackageDetailComponent,
-            canActivate: [AuthService]
+            canActivate: [AuthService],
+            title: 'BIE Package'
           }
         ]
       }

@@ -43,6 +43,8 @@ import {EditTagsDialogComponent} from '../../tag-management/edit-tags-dialog/edi
 import {FormControl} from '@angular/forms';
 import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -60,6 +62,7 @@ export class BccpDetailComponent implements OnInit {
   private confirmDialogService = inject(ConfirmDialogService);
   private preferencesService = inject(SettingsPreferencesService);
   private tagService = inject(TagService);
+  private titleService = inject(Title);
   private location = inject(Location);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -171,6 +174,7 @@ export class BccpDetailComponent implements OnInit {
 
       this.tags = tags;
       this.preferencesInfo = preferencesInfo;
+      setAppTitleIfPresent(this.titleService, bccpDetails.den, 'BCCP');
 
       // subscribe an event
       this.stompService.watch('/topic/bccp/' + this.manifestId).subscribe((message: Message) => {
