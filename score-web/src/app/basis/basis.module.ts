@@ -11,6 +11,7 @@ import {NavbarComponent} from './navbar/navbar.component';
 import {FooterComponent} from './footer/footer.component';
 import {NotFoundComponent} from './not-found/not-found.component';
 import {PendingActivate, PendingComponent} from './pending/pending.component';
+import {ServiceUnavailableComponent} from './service-unavailable/service-unavailable.component';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {RouterModule, Routes} from '@angular/router';
 import {MaterialModule} from '../material.module';
@@ -64,6 +65,7 @@ const routes: Routes = [
     AboutComponent,
     PendingComponent,
     DisabledComponent,
+    ServiceUnavailableComponent,
   ],
   declarations: [
     HomepageComponent,
@@ -75,6 +77,7 @@ const routes: Routes = [
     AboutComponent,
     PendingComponent,
     DisabledComponent,
+    ServiceUnavailableComponent,
   ],
   providers: [
     AboutService,

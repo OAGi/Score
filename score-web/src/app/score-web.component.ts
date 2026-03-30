@@ -67,7 +67,8 @@ export class ScoreWebComponent implements OnInit, DoCheck {
       !currentUrl.startsWith('/' + environment.logoutPath) &&
       !currentUrl.startsWith('/join') &&
       !currentUrl.startsWith('/pending') &&
-      !currentUrl.startsWith('/disabled');
+      !currentUrl.startsWith('/disabled') &&
+      !currentUrl.startsWith('/service-unavailable');
   }
 
 }
