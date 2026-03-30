@@ -3,7 +3,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import {AuthService} from '../../authentication/auth.service';
 import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import {UserToken} from '../../authentication/domain/auth';
-import {base64Encode} from '../../common/utility';
+import {base64Encode, loadLibrary} from '../../common/utility';
 import {MessageService} from '../../message-management/domain/message.service';
 import {tap} from 'rxjs/operators';
 import {Router} from '@angular/router';
@@ -141,6 +141,10 @@ export class NavbarComponent implements OnInit {
 
   get isDeveloper(): boolean {
     return this.roles.includes('developer');
+  }
+
+  get hasSelectedLibrary(): boolean {
+    return !!loadLibrary(this.auth.getUserToken());
   }
 
   showContextButton() {

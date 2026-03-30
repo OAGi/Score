@@ -168,8 +168,8 @@ export function loadLibrary(userToken: UserToken): number | undefined {
   return Number(loadProperty(userToken, 'Library-Selection', '0'));
 }
 
-export function saveLibrary(userToken: UserToken, libraryId: number) {
-  saveProperty(userToken, 'Library-Selection', '' + libraryId);
+export function saveLibrary(userToken: UserToken, libraryId?: number) {
+  saveProperty(userToken, 'Library-Selection', '' + (libraryId || 0));
 }
 
 export function loadBranch(userToken: UserToken, type: string): number | undefined {

@@ -350,9 +350,16 @@ export class BieListComponent implements OnInit {
     this.request.releases = this.request.releases.map(e => this.releases.find(r => e.releaseId === r.releaseId));
   }
 
-  onLibraryChange(library: LibrarySummary) {
+  onLibraryChange(library?: LibrarySummary) {
     this.request.library = library;
     this.request.releases = [];
+    if (!this.request.library?.libraryId) {
+      saveLibrary(this.auth.getUserToken(), undefined);
+      this.releases = [];
+      this.filteredReleaseList.next([]);
+      this.onSearch();
+      return;
+    }
     this.releaseService.getReleaseSummaryList(this.request.library.libraryId, ['Published']).subscribe(releases => {
       saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
       this.initReleases(releases);
@@ -366,6 +373,14 @@ export class BieListComponent implements OnInit {
   }
 
   loadBieList(isInit?: boolean) {
+    if (!this.request.library?.libraryId) {
+      this.loading = false;
+      this.selection.clear();
+      this.dataSource.data = [];
+      this.paginator.length = 0;
+      return;
+    }
+
     this.loading = true;
 
     this.request.page = new PageRequest(
@@ -383,9 +398,16 @@ export class BieListComponent implements OnInit {
         this.location.replaceState(this.router.url.split('?')[0],
           this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));
       }
-    }, error => {
+  }, error => {
       this.dataSource.data = [];
     });
+  }
+
+  create() {
+    if (!this.request.library?.libraryId) {
+      return;
+    }
+    this.router.navigateByUrl('/profile_bie/create');
   }
 
   /** Whether the number of selected elements matches the total number of rows. */

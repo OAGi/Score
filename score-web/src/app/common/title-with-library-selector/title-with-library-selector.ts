@@ -18,7 +18,7 @@ export class TitleWithLibrarySelector implements OnInit, OnChanges {
   @Input() title: string;
   @Input() subtitle: string;
   @Input() libraries: { library: LibrarySummary, selected: boolean }[] = [];
-  @Output() libraryChange = new EventEmitter<LibrarySummary>();
+  @Output() libraryChange = new EventEmitter<LibrarySummary | undefined>();
 
   filterLibraries: {
     name: string;
@@ -48,16 +48,14 @@ export class TitleWithLibrarySelector implements OnInit, OnChanges {
   }
 
   onFilterLibraryChange(updatedColumns: { name: string; selected: boolean }[]) {
-    let selectedLibrary;
-    updatedColumns.filter(c => c.selected).forEach(c => {
-      this.libraries.forEach(l => {
-        if (c.name === l.library.name) {
-          l.selected = true;
-          selectedLibrary = l.library;
-        } else {
-          l.selected = false;
-        }
-      });
+    const selectedLibraryName = updatedColumns.find(c => c.selected)?.name;
+    let selectedLibrary: LibrarySummary | undefined;
+
+    this.libraries.forEach(library => {
+      library.selected = library.library.name === selectedLibraryName;
+      if (library.selected) {
+        selectedLibrary = library.library;
+      }
     });
 
     this.libraryChange.emit(selectedLibrary);
