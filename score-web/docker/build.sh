@@ -32,6 +32,8 @@ fi
 docker_platform=${DOCKER_DEFAULT_PLATFORM:-linux/amd64}
 image_name="oagi1docker/srt-web:$app_version"
 version_file="$project_dir/src/environments/version.ts"
+package_json="$project_dir/package.json"
+package_lock_json="$project_dir/package-lock.json"
 
 current_node_major=
 if command -v node >/dev/null 2>&1; then
@@ -73,6 +75,21 @@ else
 fi
 
 echo "Running 'npm install'..."
+echo "Updating package metadata version to $app_version..."
+run_project_command "node -e '
+const fs = require(\"fs\");
+const version = process.argv[1];
+const files = process.argv.slice(2);
+for (const file of files) {
+  if (!fs.existsSync(file)) continue;
+  const json = JSON.parse(fs.readFileSync(file, \"utf8\"));
+  json.version = version;
+  if (json.packages && json.packages[\"\"]) {
+    json.packages[\"\"].version = version;
+  }
+  fs.writeFileSync(file, JSON.stringify(json, null, 2) + \"\n\");
+}
+' \"$app_version\" \"$package_json\" \"$package_lock_json\""
 run_project_command "npm install"
 
 echo "Generating Angular version file..."
