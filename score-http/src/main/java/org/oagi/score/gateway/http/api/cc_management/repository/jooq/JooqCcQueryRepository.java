@@ -100,7 +100,14 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
             CcListFilterCriteria filterCriteria, PageRequest pageRequest) {
 
         var queryBuilder = new CcListQueryBuilder(filterCriteria);
+        if (!queryBuilder.hasIncludedReleases()) {
+            return new ResultAndCount(Collections.emptyList(), 0);
+        }
+
         var where = queryBuilder.select();
+        if (where == null) {
+            return new ResultAndCount(Collections.emptyList(), 0);
+        }
         int count = dslContext().fetchCount(where);
         List<CcListEntryRecord> result = queryBuilder.fetch(where, pageRequest);
         return new ResultAndCount(result, count);
@@ -152,6 +159,10 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
             this.includedReleaseSummarySet =
                     releaseQueryRepository.getIncludedReleaseSummaryList(filterCriteria.releaseId());
             this.filterCriteria = filterCriteria;
+        }
+
+        boolean hasIncludedReleases() {
+            return includedReleaseSummarySet != null && !includedReleaseSummarySet.isEmpty();
         }
 
         SelectOrderByStep<? extends org.jooq.Record> select() {

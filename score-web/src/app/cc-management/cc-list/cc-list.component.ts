@@ -380,6 +380,15 @@ export class CcListComponent implements OnInit {
         this.onSearch();
       });
 
+      if (!this.request.library?.libraryId) {
+        this.releases = [];
+        this.filteredReleaseList.next([]);
+        this.namespaces = [];
+        this.filteredNamespaceList.next([]);
+        this.clear();
+        return;
+      }
+
       this.loading = true;
       forkJoin([
         this.releaseService.getReleaseSummaryList(this.request.library.libraryId, ['Draft', 'Published']),

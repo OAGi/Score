@@ -259,10 +259,14 @@ public class JooqLibraryQueryRepository extends JooqBaseRepository implements Li
 
     @Override
     public boolean isReadOnly(LibraryId libraryId) {
+        if (libraryId == null) {
+            return false;
+        }
         return dslContext().select(LIBRARY.IS_READ_ONLY)
                 .from(LIBRARY)
                 .where(LIBRARY.LIBRARY_ID.eq(valueOf(libraryId)))
-                .fetchOneInto(Boolean.class);
+                .fetchOptionalInto(Boolean.class)
+                .orElse(false);
     }
 
     @Override
