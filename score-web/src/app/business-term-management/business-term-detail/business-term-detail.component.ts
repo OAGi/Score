@@ -44,10 +44,34 @@ export class BusinessTermDetailComponent implements OnInit {
       this.service.getBusinessTermDetails(businessTermId)
     )
       .subscribe(([businessTerm]) => {
+        if (!businessTerm) {
+          this.redirectToBusinessTermList();
+          return;
+        }
+
         this.businessTerm = businessTerm;
         this.hashCode = hashCode(this.businessTerm);
+      }, err => {
+        if (err.status === 404) {
+          this.redirectToBusinessTermList();
+          return;
+        }
+
+        const errorMessage = (err.status === 403) ?
+          'You do not have access permission.' : 'Something\'s wrong.';
+        this.snackBar.open(errorMessage, '', {
+          duration: 3000,
+        });
+        this.router.navigateByUrl('/business_term_management/business_term');
       });
 
+  }
+
+  private redirectToBusinessTermList() {
+    this.snackBar.open('The requested business term is unavailable.', '', {
+      duration: 3000,
+    });
+    this.router.navigateByUrl('/business_term_management/business_term');
   }
 
   isChanged() {

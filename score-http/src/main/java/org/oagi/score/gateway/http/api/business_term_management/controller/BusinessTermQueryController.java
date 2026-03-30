@@ -14,6 +14,7 @@ import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.common.model.AccessPrivilege;
 import org.oagi.score.gateway.http.common.model.DateRangeCriteria;
+import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.model.PageRequest;
 import org.oagi.score.gateway.http.common.model.PageResponse;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
@@ -171,7 +172,12 @@ public class BusinessTermQueryController {
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @PathVariable("businessTermId") BusinessTermId businessTermId) {
 
-        return businessTermQueryService.getBusinessTermDetails(sessionService.asScoreUser(user), businessTermId);
+        BusinessTermDetailsRecord businessTermDetails =
+                businessTermQueryService.getBusinessTermDetails(sessionService.asScoreUser(user), businessTermId);
+        if (businessTermDetails == null) {
+            throw new NotFoundException();
+        }
+        return businessTermDetails;
     }
 
     @GetMapping(value = "/assign")
@@ -296,11 +302,21 @@ public class BusinessTermQueryController {
 
         bieType = bieType.toUpperCase();
         if ("ASBIE".equals(bieType)) {
-            return businessTermQueryService.getAssignedBusinessTermDetails(
-                    sessionService.asScoreUser(user), new AsbieBusinessTermId(assignedBizTermId));
+            AssignedBusinessTermDetailsRecord assignedBusinessTermDetails =
+                    businessTermQueryService.getAssignedBusinessTermDetails(
+                            sessionService.asScoreUser(user), new AsbieBusinessTermId(assignedBizTermId));
+            if (assignedBusinessTermDetails == null) {
+                throw new NotFoundException();
+            }
+            return assignedBusinessTermDetails;
         } else if ("BBIE".equals(bieType)) {
-            return businessTermQueryService.getAssignedBusinessTermDetails(
-                    sessionService.asScoreUser(user), new BbieBusinessTermId(assignedBizTermId));
+            AssignedBusinessTermDetailsRecord assignedBusinessTermDetails =
+                    businessTermQueryService.getAssignedBusinessTermDetails(
+                            sessionService.asScoreUser(user), new BbieBusinessTermId(assignedBizTermId));
+            if (assignedBusinessTermDetails == null) {
+                throw new NotFoundException();
+            }
+            return assignedBusinessTermDetails;
         } else {
             throw new IllegalArgumentException();
         }

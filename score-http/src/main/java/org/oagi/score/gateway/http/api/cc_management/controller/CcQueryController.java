@@ -289,7 +289,11 @@ public class CcQueryController {
     public AccDetailsRecord getAccDetails(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @PathVariable("accManifestId") AccManifestId accManifestId) {
-        return ccQueryService.getAccDetails(sessionService.asScoreUser(user), accManifestId);
+        AccDetailsRecord accDetails = ccQueryService.getAccDetails(sessionService.asScoreUser(user), accManifestId);
+        if (accDetails == null) {
+            throw new NotFoundException();
+        }
+        return accDetails;
     }
 
     @GetMapping(value = "/acc/{accManifestId:[\\d]+}/prev")
@@ -381,7 +385,11 @@ public class CcQueryController {
     public AsccpDetailsRecord getAsccpDetails(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @PathVariable("asccpManifestId") AsccpManifestId asccpManifestId) {
-        return ccQueryService.getAsccpDetails(sessionService.asScoreUser(user), asccpManifestId);
+        AsccpDetailsRecord asccpDetails = ccQueryService.getAsccpDetails(sessionService.asScoreUser(user), asccpManifestId);
+        if (asccpDetails == null) {
+            throw new NotFoundException();
+        }
+        return asccpDetails;
     }
 
     @GetMapping(value = "/asccp/{asccpManifestId:[\\d]+}/prev")
@@ -395,7 +403,11 @@ public class CcQueryController {
     public BccpDetailsRecord getBccpDetails(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @PathVariable("bccpManifestId") BccpManifestId bccpManifestId) {
-        return ccQueryService.getBccpDetails(sessionService.asScoreUser(user), bccpManifestId);
+        BccpDetailsRecord bccpDetails = ccQueryService.getBccpDetails(sessionService.asScoreUser(user), bccpManifestId);
+        if (bccpDetails == null) {
+            throw new NotFoundException();
+        }
+        return bccpDetails;
     }
 
     @GetMapping(value = "/bccp/{bccpManifestId:[\\d]+}/prev")
@@ -409,7 +421,11 @@ public class CcQueryController {
     public DtDetailsRecord getDtDetails(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @PathVariable("dtManifestId") DtManifestId dtManifestId) {
-        return ccQueryService.getDtDetails(sessionService.asScoreUser(user), dtManifestId);
+        DtDetailsRecord dtDetails = ccQueryService.getDtDetails(sessionService.asScoreUser(user), dtManifestId);
+        if (dtDetails == null) {
+            throw new NotFoundException();
+        }
+        return dtDetails;
     }
 
     @GetMapping(value = "/dt/{dtManifestId:[\\d]+}/prev")

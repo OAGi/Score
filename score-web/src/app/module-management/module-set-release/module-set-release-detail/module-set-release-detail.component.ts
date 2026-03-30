@@ -59,6 +59,7 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.isUpdating = true;
     this.moduleSetList = [];
     this.releaseList = [];
 
@@ -68,7 +69,13 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
         return this.moduleService.getModuleSetReleaseDetails(moduleSetReleaseId);
       }))
       .subscribe(moduleSetRelease => {
+        if (!moduleSetRelease) {
+          this.redirectToModuleSetReleaseList();
+          return;
+        }
+
         this.init(moduleSetRelease);
+        this.isUpdating = false;
 
         this.moduleService.getModuleSetSummaries(moduleSetRelease.library.libraryId).subscribe(resp => {
           this.initModuleSetList(resp);
@@ -76,6 +83,17 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
 
         this.releaseService.getReleaseSummaryList(moduleSetRelease.library.libraryId).subscribe(list => {
           this.initReleaseList(list);
+        });
+      }, err => {
+        this.isUpdating = false;
+
+        if (err.status === 404) {
+          this.redirectToModuleSetReleaseList();
+          return;
+        }
+
+        this.snackBar.open('Something\'s wrong.', '', {
+          duration: 3000,
         });
       });
   }
@@ -92,6 +110,14 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
   init(moduleSetRelease: ModuleSetReleaseDetails) {
     this.moduleSetRelease = moduleSetRelease;
     this.$hashCode = hashCode(this.moduleSetRelease);
+  }
+
+  private redirectToModuleSetReleaseList() {
+    this.isUpdating = false;
+    this.snackBar.open('The requested module set release is unavailable.', '', {
+      duration: 3000,
+    });
+    this.router.navigateByUrl('/module_management/module_set_release');
   }
 
   initModuleSetList(list: ModuleSetSummary[]) {

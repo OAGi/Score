@@ -40,16 +40,32 @@ export class ContextCategoryDetailComponent implements OnInit {
     ).subscribe(contextCategory => {
 
       if (!contextCategory) {
-        this.snackBar.open('Access denied.', '', {
-          duration: 3000
-        });
-        this.router.navigateByUrl('/context_management/context_category');
+        this.redirectToContextCategoryList();
         return;
       }
 
       this.hashCode = hashCode(contextCategory);
       this.contextCategory = contextCategory;
+    }, err => {
+      if (err.status === 404) {
+        this.redirectToContextCategoryList();
+        return;
+      }
+
+      const errorMessage = (err.status === 403) ?
+        'You do not have access permission.' : 'Something\'s wrong.';
+      this.snackBar.open(errorMessage, '', {
+        duration: 3000
+      });
+      this.router.navigateByUrl('/context_management/context_category');
     });
+  }
+
+  private redirectToContextCategoryList() {
+    this.snackBar.open('The requested context category is unavailable.', '', {
+      duration: 3000
+    });
+    this.router.navigateByUrl('/context_management/context_category');
   }
 
   isChanged() {

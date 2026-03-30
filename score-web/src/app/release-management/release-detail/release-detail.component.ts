@@ -52,6 +52,15 @@ export class ReleaseDetailComponent implements OnInit {
       switchMap((params: ParamMap) =>
         this.service.getReleaseDetail(params.get('id')))
     ).subscribe(resp => {
+      if (!resp) {
+        this.isLoading = false;
+        this.snackBar.open('The requested release is unavailable.', '', {
+          duration: 3000,
+        });
+        this.router.navigateByUrl('/release');
+        return;
+      }
+
       this.releaseDetail = resp;
       this.$hashCode = hashCode(this.releaseDetail);
 
@@ -70,6 +79,20 @@ export class ReleaseDetailComponent implements OnInit {
         });
 
       this.isLoading = false;
+    }, err => {
+      this.isLoading = false;
+
+      if (err.status === 404) {
+        this.snackBar.open('The requested release is unavailable.', '', {
+          duration: 3000,
+        });
+        this.router.navigateByUrl('/release');
+        return;
+      }
+
+      this.snackBar.open('Something\'s wrong.', '', {
+        duration: 3000,
+      });
     });
   }
 

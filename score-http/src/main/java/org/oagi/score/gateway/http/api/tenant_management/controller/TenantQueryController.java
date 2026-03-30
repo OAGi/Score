@@ -8,6 +8,7 @@ import org.oagi.score.gateway.http.api.tenant_management.model.Tenant;
 import org.oagi.score.gateway.http.api.tenant_management.model.TenantId;
 import org.oagi.score.gateway.http.api.tenant_management.model.TenantInfo;
 import org.oagi.score.gateway.http.api.tenant_management.service.TenantQueryService;
+import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.model.PageRequest;
 import org.oagi.score.gateway.http.common.model.PageResponse;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
@@ -93,7 +94,11 @@ public class TenantQueryController {
         if (!configService.isTenantEnabled(requester)) {
             throw new AccessDeniedException("Unauthorized Access!");
         }
-        return tenantService.getTenantById(requester, tenantId);
+        TenantInfo tenantInfo = tenantService.getTenantById(requester, tenantId);
+        if (tenantInfo == null) {
+            throw new NotFoundException();
+        }
+        return tenantInfo;
     }
 
 }

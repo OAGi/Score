@@ -202,6 +202,8 @@ export class AgencyIdListDetailComponent implements OnInit {
       let errorMessage;
       if (err.status === 403) {
         errorMessage = 'You do not have access permission.';
+      } else if (err.status === 404) {
+        errorMessage = 'The requested agency ID list is unavailable.';
       } else {
         errorMessage = 'Something\'s wrong.';
       }

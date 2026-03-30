@@ -178,10 +178,7 @@ export class ContextSchemeDetailComponent implements OnInit {
                     contextScheme, contextSchemeValues, preferencesInfo]) => {
 
       if (!contextScheme) {
-        this.snackBar.open('Access denied.', '', {
-          duration: 3000
-        });
-        this.router.navigateByUrl('/context_management/context_scheme');
+        this.redirectToContextSchemeList();
         return;
       }
 
@@ -212,7 +209,10 @@ export class ContextSchemeDetailComponent implements OnInit {
     }, err => {
       this.isUpdating = false;
       let errorMessage;
-      if (err.status === 403) {
+      if (err.status === 404) {
+        this.redirectToContextSchemeList();
+        return;
+      } else if (err.status === 403) {
         errorMessage = 'You do not have access permission.';
       } else {
         errorMessage = 'Something\'s wrong.';
@@ -244,6 +244,14 @@ export class ContextSchemeDetailComponent implements OnInit {
       return (data.value && data.value.toLowerCase().indexOf(filter) > -1)
           || (data.meaning && data.meaning.toLowerCase().indexOf(filter) > -1);
     };
+  }
+
+  private redirectToContextSchemeList() {
+    this.isUpdating = false;
+    this.snackBar.open('The requested context scheme is unavailable.', '', {
+      duration: 3000
+    });
+    this.router.navigateByUrl('/context_management/context_scheme');
   }
 
   filterCtxCategories() {

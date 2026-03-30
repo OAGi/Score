@@ -123,6 +123,14 @@ export class BccpDetailComponent implements OnInit {
     saveBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, hideCardinality);
   }
 
+  private redirectToCcList() {
+    this.isUpdating = false;
+    this.snackBar.open('The requested BCCP is unavailable.', '', {
+      duration: 3000,
+    });
+    this.router.navigateByUrl('/core_component');
+  }
+
   ngOnInit() {
     this.commentControl = new CommentControl(this.sidenav, this.service);
 
@@ -137,6 +145,10 @@ export class BccpDetailComponent implements OnInit {
           this.preferencesService.load(this.auth.getUserToken())
         ]);
       })).subscribe(([ccGraph, bccpDetails, tags, preferencesInfo]) => {
+      if (!bccpDetails) {
+        this.redirectToCcList();
+        return;
+      }
 
       this.namespaceService.getNamespaceSummaries(bccpDetails.library.libraryId).subscribe(namespaces => {
         this.namespaces = namespaces;
@@ -211,6 +223,11 @@ export class BccpDetailComponent implements OnInit {
 
       this.isUpdating = false;
     }, err => {
+      this.isUpdating = false;
+      if (err.status === 404) {
+        this.redirectToCcList();
+        return;
+      }
       this.snackBar.open('Something\'s wrong.', '', {
         duration: 3000
       });

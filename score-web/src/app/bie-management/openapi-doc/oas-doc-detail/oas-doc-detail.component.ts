@@ -275,15 +275,40 @@ export class OasDocDetailComponent implements OnInit {
       this.openAPIService.getBieListForOasDoc(this.request, oasDocId),
       this.preferencesService.load(this.auth.getUserToken())
     ]).subscribe(([simpleOasDoc, bieForOasDoc, preferencesInfo]) => {
+      if (!simpleOasDoc) {
+        this.redirectToOasDocList();
+        return;
+      }
+
       this.preferencesInfo = preferencesInfo;
       this.onColumnsChange(this.preferencesInfo.tableColumnsInfo.columnsOfBieForOasDocPage);
 
       this.oasDoc = simpleOasDoc;
       this.init(this.oasDoc);
       this.loadBieListForOasDoc(true);
-    }, _ => {
+    }, err => {
       this.isUpdating = false;
+      if (err.status === 404) {
+        this.redirectToOasDocList();
+        return;
+      }
+
+      const errorMessage = (err.status === 403) ?
+        'You do not have access permission.' : 'Something\'s wrong.';
+      this.snackBar.open(errorMessage, '', {
+        duration: 3000,
+      });
+      this.router.navigateByUrl('/profile_bie/express/oas_doc');
     });
+  }
+
+  private redirectToOasDocList() {
+    this.loading = false;
+    this.isUpdating = false;
+    this.snackBar.open('The requested OpenAPI document is unavailable.', '', {
+      duration: 3000,
+    });
+    this.router.navigateByUrl('/profile_bie/express/oas_doc');
   }
 
   init(oasDoc: OasDoc) {

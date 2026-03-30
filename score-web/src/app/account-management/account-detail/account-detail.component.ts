@@ -37,13 +37,35 @@ export class AccountDetailComponent implements OnInit {
       this.service.getAccount(accountId).pipe(finalize(() => {
         this.loading = false;
       })).subscribe(resp => {
+        if (!resp) {
+          this.redirectToAccountList();
+          return;
+        }
+
         this.account = resp;
+      }, err => {
+        if (err.status === 404) {
+          this.redirectToAccountList();
+          return;
+        }
+
+        this.snackBar.open('Something\'s wrong.', '', {
+          duration: 3000,
+        });
       });
     });
 
 
     this.newPassword = '';
     this.confirmPassword = '';
+  }
+
+  private redirectToAccountList() {
+    this.loading = false;
+    this.snackBar.open('The requested account is unavailable.', '', {
+      duration: 3000,
+    });
+    this.router.navigateByUrl('/account');
   }
 
   get isOAuth2User(): boolean {

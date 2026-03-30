@@ -41,11 +41,35 @@ export class NamespaceDetailComponent implements OnInit {
       switchMap((params: ParamMap) =>
         this.service.getNamespaceDetails(params.get('id')))
     ).subscribe(resp => {
+      if (!resp) {
+        this.redirectToNamespaceList();
+        return;
+      }
+
       this.namespace = resp;
       this.uriForm = new FormControl({value: this.namespace.uri, disabled: !this.namespace.canEdit},
         Validators.pattern('\\w+:(\\/?\\/?)[^\\s]+'));
       this.hashCode = hashCode(resp);
+    }, err => {
+      if (err.status === 404) {
+        this.redirectToNamespaceList();
+        return;
+      }
+
+      const errorMessage = (err.status === 403) ?
+        'You do not have access permission.' : 'Something\'s wrong.';
+      this.snackBar.open(errorMessage, '', {
+        duration: 3000,
+      });
+      this.router.navigateByUrl('/namespace');
     });
+  }
+
+  private redirectToNamespaceList() {
+    this.snackBar.open('The requested namespace is unavailable.', '', {
+      duration: 3000,
+    });
+    this.router.navigateByUrl('/namespace');
   }
 
   isChanged() {

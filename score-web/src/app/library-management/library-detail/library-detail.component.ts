@@ -34,6 +34,7 @@ export class LibraryDetailComponent {
   hashCode;
 
   ngOnInit() {
+    this.loading = true;
     this.library = new LibraryDetails();
 
     // load library
@@ -41,11 +42,36 @@ export class LibraryDetailComponent {
         switchMap((params: ParamMap) =>
             this.service.getLibraryById(Number(params.get('id'))))
     ).subscribe(resp => {
+      if (!resp) {
+        this.redirectToLibraryList();
+        return;
+      }
+
       this.library = resp;
       this.uriForm = new FormControl({value: this.library.link, disabled: !this.isAdmin},
           Validators.pattern('\\w+:(\\/?\\/?)[^\\s]+'));
       this.hashCode = hashCode(resp);
+      this.loading = false;
+    }, err => {
+      this.loading = false;
+
+      if (err.status === 404) {
+        this.redirectToLibraryList();
+        return;
+      }
+
+      this.snackBar.open('Something\'s wrong.', '', {
+        duration: 3000,
+      });
     });
+  }
+
+  private redirectToLibraryList() {
+    this.loading = false;
+    this.snackBar.open('The requested library is unavailable.', '', {
+      duration: 3000,
+    });
+    this.router.navigateByUrl('/library');
   }
 
   isChanged() {

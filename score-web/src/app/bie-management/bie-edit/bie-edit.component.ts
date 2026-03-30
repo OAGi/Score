@@ -278,6 +278,11 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         ]);
       })).subscribe(([ccGraph, usedBieList, refBieList, rootNode,
                        bizCtxResp, allBizCtxResp, preferencesInfo]) => {
+      if (!rootNode) {
+        this.redirectToBieList();
+        return;
+      }
+
       this.initRootNode(rootNode);
 
       if (this.state === 'WIP' && (this.access !== 'CanEdit' && !this.auth.isAdmin())) {
@@ -339,17 +344,26 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         doAfter();
       }
     }, err => {
-      let errorMessage;
-      if (err.status === 403) {
-        errorMessage = 'You do not have access permission.';
-      } else {
-        errorMessage = 'Something\'s wrong.';
+      if (err.status === 404) {
+        this.redirectToBieList();
+        return;
       }
+
+      const errorMessage = (err.status === 403) ?
+        'You do not have access permission.' : 'Something\'s wrong.';
       this.snackBar.open(errorMessage, '', {
         duration: 3000
       });
       this.router.navigateByUrl('/profile_bie');
     });
+  }
+
+  private redirectToBieList() {
+    this.loading = false;
+    this.snackBar.open('The requested BIE is unavailable.', '', {
+      duration: 3000
+    });
+    this.router.navigateByUrl('/profile_bie');
   }
 
   extractDelimiter(path: string): string {

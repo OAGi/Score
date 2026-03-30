@@ -167,6 +167,14 @@ export class AccDetailComponent implements OnInit {
     saveBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, hideCardinality);
   }
 
+  private redirectToCcList() {
+    this.isUpdating = false;
+    this.snackBar.open('The requested ACC is unavailable.', '', {
+      duration: 3000,
+    });
+    this.router.navigateByUrl('/core_component');
+  }
+
   ngOnInit() {
     this.commentControl = new CommentControl(this.sidenav, this.service);
     this.hasBasedAcc = false;
@@ -183,6 +191,10 @@ export class AccDetailComponent implements OnInit {
           this.service.availableModels()
         ]);
       })).subscribe(([ccGraph, accDetails, tags, preferencesInfo, models]) => {
+      if (!accDetails) {
+        this.redirectToCcList();
+        return;
+      }
 
       this.namespaceService.getNamespaceSummaries(accDetails.library.libraryId).subscribe(namespaces => {
         this.namespaces = namespaces;
@@ -266,6 +278,11 @@ export class AccDetailComponent implements OnInit {
 
       this.isUpdating = false;
     }, err => {
+      this.isUpdating = false;
+      if (err.status === 404) {
+        this.redirectToCcList();
+        return;
+      }
       this.snackBar.open('Something\'s wrong.', '', {
         duration: 3000
       });

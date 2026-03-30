@@ -65,6 +65,11 @@ export class ModuleSetEditComponent implements OnInit {
         ]);
       }))
       .subscribe(([moduleSet, moduleSetMetadata]) => {
+        if (!moduleSet) {
+          this.redirectToModuleSetList();
+          return;
+        }
+
         this.init(moduleSet);
         this.service.getModules(this.moduleSet.moduleSetId).subscribe(resp => {
           this.rootElement = resp as ModuleElement;
@@ -77,6 +82,15 @@ export class ModuleSetEditComponent implements OnInit {
         this.isUpdating = false;
       }, error => {
         this.isUpdating = false;
+
+        if (error.status === 404) {
+          this.redirectToModuleSetList();
+          return;
+        }
+
+        this.snackBar.open('Something\'s wrong.', '', {
+          duration: 3000,
+        });
       });
   }
 
@@ -92,6 +106,14 @@ export class ModuleSetEditComponent implements OnInit {
   init(moduleSet: ModuleSet) {
     this.moduleSet = moduleSet;
     this.$hashCode = hashCode(this.moduleSet);
+  }
+
+  private redirectToModuleSetList() {
+    this.isUpdating = false;
+    this.snackBar.open('The requested module set is unavailable.', '', {
+      duration: 3000,
+    });
+    this.router.navigateByUrl('/module_management/module_set');
   }
 
   @HostListener('document:keydown', ['$event'])

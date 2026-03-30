@@ -20,6 +20,7 @@ import org.oagi.score.gateway.http.api.bie_management.service.BieQueryService;
 import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.common.model.DateRangeCriteria;
+import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.model.PageRequest;
 import org.oagi.score.gateway.http.common.model.PageResponse;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
@@ -142,7 +143,12 @@ public class BiePackageQueryController {
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @PathVariable("biePackageId") BiePackageId biePackageId) throws ScoreDataAccessException {
 
-        return biePackageQueryService.getBiePackageDetails(sessionService.asScoreUser(user), biePackageId);
+        BiePackageDetailsRecord biePackageDetails =
+                biePackageQueryService.getBiePackageDetails(sessionService.asScoreUser(user), biePackageId);
+        if (biePackageDetails == null) {
+            throw new NotFoundException();
+        }
+        return biePackageDetails;
     }
 
     @GetMapping(value = "/{biePackageId:[\\d]+}/generate")

@@ -12,6 +12,7 @@ import org.oagi.score.gateway.http.api.context_management.context_scheme.model.*
 import org.oagi.score.gateway.http.api.context_management.context_scheme.repository.criteria.ContextSchemeListFilterCriteria;
 import org.oagi.score.gateway.http.api.context_management.context_scheme.service.ContextSchemeQueryService;
 import org.oagi.score.gateway.http.common.model.DateRangeCriteria;
+import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.model.PageRequest;
 import org.oagi.score.gateway.http.common.model.PageResponse;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
@@ -60,7 +61,8 @@ public class ContextSchemeQueryController {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ContextSchemeDetailsRecord.class))),
             @ApiResponse(responseCode = "400", description = "Invalid parameters"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "Record not found")
     })
     @GetMapping(value = "/{ctxSchemeId:[\\d]+}")
     public ContextSchemeDetailsRecord getContextSchemeDetails(
@@ -69,7 +71,12 @@ public class ContextSchemeQueryController {
             @Parameter(description = "The ID of the context scheme.")
             @PathVariable("ctxSchemeId") ContextSchemeId contextSchemeId) {
 
-        return contextSchemeQueryService.getContextSchemeDetails(sessionService.asScoreUser(user), contextSchemeId);
+        ContextSchemeDetailsRecord contextSchemeDetails =
+                contextSchemeQueryService.getContextSchemeDetails(sessionService.asScoreUser(user), contextSchemeId);
+        if (contextSchemeDetails == null) {
+            throw new NotFoundException();
+        }
+        return contextSchemeDetails;
     }
 
     @Operation(summary = "Retrieve context scheme list", description = "Fetches a paginated list of context schemes based on various filter criteria.")

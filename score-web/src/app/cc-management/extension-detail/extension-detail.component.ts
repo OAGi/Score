@@ -166,6 +166,10 @@ export class ExtensionDetailComponent implements OnInit {
           this.preferencesService.load(this.auth.getUserToken())
         ]);
       })).subscribe(([ccGraph, accDetails, tags, preferencesInfo]) => {
+      if (!accDetails) {
+        this.redirectToCcList();
+        return;
+      }
 
       this.namespaceService.getNamespaceSummaries(accDetails.library.libraryId).subscribe(namespaces => {
         this.namespaces = namespaces;
@@ -239,10 +243,27 @@ export class ExtensionDetailComponent implements OnInit {
 
       this.isUpdating = false;
     }, err => {
-      this.snackBar.open('Something\'s wrong.', '', {
+      this.isUpdating = false;
+      if (err.status === 404) {
+        this.redirectToCcList();
+        return;
+      }
+
+      const errorMessage = (err.status === 403) ?
+        'You do not have access permission.' : 'Something\'s wrong.';
+      this.snackBar.open(errorMessage, '', {
         duration: 3000
       });
+      this.router.navigateByUrl('/core_component');
     });
+  }
+
+  private redirectToCcList() {
+    this.isUpdating = false;
+    this.snackBar.open('The requested extension is unavailable.', '', {
+      duration: 3000
+    });
+    this.router.navigateByUrl('/core_component');
   }
 
   goToPath(path: string) {

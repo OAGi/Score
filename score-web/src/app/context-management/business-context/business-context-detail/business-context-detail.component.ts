@@ -159,10 +159,7 @@ export class BusinessContextDetailComponent implements OnInit {
       this.preferencesInfo = preferencesInfo;
 
       if (!businessContextDetails) {
-        this.snackBar.open('Access denied.', '', {
-          duration: 3000
-        });
-        this.router.navigateByUrl('/context_management/business_context');
+        this.redirectToBusinessContextList();
         return;
       }
 
@@ -174,6 +171,20 @@ export class BusinessContextDetailComponent implements OnInit {
       this.businessContext = businessContextDetails;
 
       this._updateDataSource(this.businessContext.businessContextValues);
+    }, err => {
+      let errorMessage;
+      if (err.status === 404) {
+        this.redirectToBusinessContextList();
+        return;
+      } else if (err.status === 403) {
+        errorMessage = 'You do not have access permission.';
+      } else {
+        errorMessage = 'Something\'s wrong.';
+      }
+      this.snackBar.open(errorMessage, '', {
+        duration: 3000
+      });
+      this.router.navigateByUrl('/context_management/business_context');
     });
 
     // Prevent the sorting event from being triggered if any columns are currently resizing.
@@ -187,6 +198,13 @@ export class BusinessContextDetailComponent implements OnInit {
     };
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
+  }
+
+  private redirectToBusinessContextList() {
+    this.snackBar.open('The requested business context is unavailable.', '', {
+      duration: 3000
+    });
+    this.router.navigateByUrl('/context_management/business_context');
   }
 
   isChanged() {

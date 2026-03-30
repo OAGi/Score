@@ -213,11 +213,27 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
         this.loading = false;
       })
     ).subscribe(resp => {
+      if (!resp) {
+        this.redirectToTenantList();
+        return;
+      }
+
       this.tenantInfo = resp;
       this.loadBusinessContextList(true);
     }, error => {
       this.dataSource.data = [];
+      if (error.status === 404) {
+        this.redirectToTenantList();
+      }
     });
+  }
+
+  private redirectToTenantList() {
+    this.loading = false;
+    this.snackBar.open('The requested tenant is unavailable.', '', {
+      duration: 3000,
+    });
+    this.router.navigateByUrl('/tenant');
   }
 
   loadBusinessContextList(isInit?: boolean) {

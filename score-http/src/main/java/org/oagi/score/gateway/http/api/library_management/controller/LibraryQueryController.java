@@ -2,6 +2,10 @@ package org.oagi.score.gateway.http.api.library_management.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oagi.score.gateway.http.api.library_management.model.LibraryDetailsRecord;
 import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
@@ -10,6 +14,7 @@ import org.oagi.score.gateway.http.api.library_management.model.LibrarySummaryRe
 import org.oagi.score.gateway.http.api.library_management.repository.criteria.LibraryListFilterCriteria;
 import org.oagi.score.gateway.http.api.library_management.service.LibraryQueryService;
 import org.oagi.score.gateway.http.common.model.DateRangeCriteria;
+import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.model.PageRequest;
 import org.oagi.score.gateway.http.common.model.PageResponse;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
@@ -53,14 +58,25 @@ public class LibraryQueryController {
             description = "Retrieve detailed information for a specific library by its unique ID. " +
                     "Includes full metadata, status, ownership, and versioning info."
     )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful retrieval",
+                    content = @Content(schema = @Schema(implementation = LibraryDetailsRecord.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid parameters"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "Record not found")
+    })
     @GetMapping(value = "/{libraryId:[\\d]+}")
     public LibraryDetailsRecord getLibraryDetails(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @PathVariable("libraryId")
             @Parameter(description = "Unique identifier of the library to retrieve details for.")
             LibraryId libraryId) {
-
-        return libraryQueryService.getLibraryDetails(sessionService.asScoreUser(user), libraryId);
+        LibraryDetailsRecord libraryDetails =
+                libraryQueryService.getLibraryDetails(sessionService.asScoreUser(user), libraryId);
+        if (libraryDetails == null) {
+            throw new NotFoundException();
+        }
+        return libraryDetails;
     }
 
     @Operation(

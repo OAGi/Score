@@ -142,9 +142,15 @@ public class GraphService {
 
         var topLevelAsbiepQuery = repositoryFactory.topLevelAsbiepQueryRepository(requester);
         TopLevelAsbiepSummaryRecord topLevelAsbiepSummary = topLevelAsbiepQuery.getTopLevelAsbiepSummary(topLevelAsbiepId);
+        if (topLevelAsbiepSummary == null) {
+            throw new IllegalArgumentException();
+        }
 
         var asbiepQuery = repositoryFactory.asbiepQueryRepository(requester);
         AsbiepSummaryRecord asbiepSummary = asbiepQuery.getAsbiepSummary(topLevelAsbiepSummary.asbiepId());
+        if (asbiepSummary == null) {
+            throw new IllegalArgumentException();
+        }
 
         AsccpManifestId asccpManifestId = asbiepSummary.basedAsccpManifestId();
         return getAsccpGraph(requester, asccpManifestId, excludeUEG);

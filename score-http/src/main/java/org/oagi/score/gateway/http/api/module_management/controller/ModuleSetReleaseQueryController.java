@@ -1,6 +1,11 @@
 package org.oagi.score.gateway.http.api.module_management.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
 import org.oagi.score.gateway.http.api.module_management.controller.payload.ExportModuleSetReleaseResponse;
@@ -12,6 +17,7 @@ import org.oagi.score.gateway.http.api.module_management.repository.criteria.Mod
 import org.oagi.score.gateway.http.api.module_management.service.ModuleSetReleaseQueryService;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.common.model.DateRangeCriteria;
+import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.model.PageRequest;
 import org.oagi.score.gateway.http.common.model.PageResponse;
 import org.oagi.score.gateway.http.common.util.DeleteOnCloseFileSystemResource;
@@ -52,13 +58,27 @@ public class ModuleSetReleaseQueryController {
                 sessionService.asScoreUser(user), libraryId);
     }
 
+    @Operation(summary = "Get Module Set Release Details", description = "Retrieves details of a specific module set release.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful retrieval",
+                    content = @Content(schema = @Schema(implementation = ModuleSetReleaseDetailsRecord.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid parameters"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "Record not found")
+    })
     @GetMapping(value = "/{moduleSetReleaseId:[\\d]+}")
     public ModuleSetReleaseDetailsRecord getModuleSetReleaseDetails(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @PathVariable("moduleSetReleaseId") ModuleSetReleaseId moduleSetReleaseId) {
-
-        return moduleSetReleaseQueryService.getModuleSetReleaseDetails(
+            @PathVariable("moduleSetReleaseId")
+            @Parameter(description = "Unique identifier of the module set release.")
+            ModuleSetReleaseId moduleSetReleaseId) {
+        ModuleSetReleaseDetailsRecord moduleSetReleaseDetails =
+                moduleSetReleaseQueryService.getModuleSetReleaseDetails(
                 sessionService.asScoreUser(user), moduleSetReleaseId);
+        if (moduleSetReleaseDetails == null) {
+            throw new NotFoundException();
+        }
+        return moduleSetReleaseDetails;
     }
 
     @GetMapping()

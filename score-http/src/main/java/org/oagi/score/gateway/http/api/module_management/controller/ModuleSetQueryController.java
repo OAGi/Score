@@ -13,6 +13,7 @@ import org.oagi.score.gateway.http.api.module_management.model.*;
 import org.oagi.score.gateway.http.api.module_management.repository.criteria.ModuleSetListFilterCriteria;
 import org.oagi.score.gateway.http.api.module_management.service.ModuleSetQueryService;
 import org.oagi.score.gateway.http.common.model.DateRangeCriteria;
+import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.model.PageRequest;
 import org.oagi.score.gateway.http.common.model.PageResponse;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
@@ -136,7 +137,8 @@ public class ModuleSetQueryController {
             @ApiResponse(responseCode = "200", description = "Successful retrieval of module set details",
                     content = @Content(schema = @Schema(implementation = ModuleSetDetailsRecord.class))),
             @ApiResponse(responseCode = "400", description = "Invalid parameters"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "Record not found")
     })
     @GetMapping(value = "/{moduleSetId:[\\d]+}")
     public ModuleSetDetailsRecord getModuleSetDetails(
@@ -144,8 +146,12 @@ public class ModuleSetQueryController {
 
             @Parameter(description = "The ID of the module set.")
             @PathVariable("moduleSetId") ModuleSetId moduleSetId) {
-
-        return moduleSetQueryService.getModuleSetDetails(sessionService.asScoreUser(user), moduleSetId);
+        ModuleSetDetailsRecord moduleSetDetails =
+                moduleSetQueryService.getModuleSetDetails(sessionService.asScoreUser(user), moduleSetId);
+        if (moduleSetDetails == null) {
+            throw new NotFoundException();
+        }
+        return moduleSetDetails;
     }
 
     @Operation(summary = "Retrieve module set metadata", description = "Fetches metadata of a module set.")

@@ -32,6 +32,7 @@ import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpManifestId
 import org.oagi.score.gateway.http.api.cc_management.model.bcc.BccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.bccp.BccpManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScManifestId;
+import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -65,8 +66,15 @@ public class BieEditController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public BieEditNode getRootNode(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                    @PathVariable("id") TopLevelAsbiepId topLevelAsbiepId) {
-        BieEditAbieNode rootNode = service.getRootNode(sessionService.asScoreUser(user), topLevelAsbiepId);
-        return rootNode;
+        try {
+            BieEditAbieNode rootNode = service.getRootNode(sessionService.asScoreUser(user), topLevelAsbiepId);
+            if (rootNode == null) {
+                throw new NotFoundException();
+            }
+            return rootNode;
+        } catch (IllegalArgumentException e) {
+            throw new NotFoundException();
+        }
     }
 
     @GetMapping(value = "/profile_bie/{topLevelAsbiepId:[\\d]+}/abie/{manifestId:[\\d]+}")

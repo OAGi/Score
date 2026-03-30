@@ -17,6 +17,7 @@ import org.oagi.score.gateway.http.api.context_management.context_category.servi
 import org.oagi.score.gateway.http.api.context_management.context_scheme.model.ContextSchemeSummaryRecord;
 import org.oagi.score.gateway.http.api.context_management.context_scheme.service.ContextSchemeQueryService;
 import org.oagi.score.gateway.http.common.model.DateRangeCriteria;
+import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.model.PageRequest;
 import org.oagi.score.gateway.http.common.model.PageResponse;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
@@ -68,7 +69,8 @@ public class ContextCategoryQueryController {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ContextCategoryDetailsRecord.class))),
             @ApiResponse(responseCode = "400", description = "Invalid parameters"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "Record not found")
     })
     @GetMapping(value = "/{ctxCategoryId:[\\d]+}")
     public ContextCategoryDetailsRecord getContextCategoryDetails(
@@ -77,7 +79,12 @@ public class ContextCategoryQueryController {
             @Parameter(description = "The ID of the context category.")
             @PathVariable("ctxCategoryId") ContextCategoryId contextCategoryId) {
 
-        return contextCategoryQueryService.getContextCategoryDetails(sessionService.asScoreUser(user), contextCategoryId);
+        ContextCategoryDetailsRecord contextCategoryDetails =
+                contextCategoryQueryService.getContextCategoryDetails(sessionService.asScoreUser(user), contextCategoryId);
+        if (contextCategoryDetails == null) {
+            throw new NotFoundException();
+        }
+        return contextCategoryDetails;
     }
 
     @Operation(summary = "Retrieve context category list", description = "Fetches a paginated list of context categories based on various filter criteria.")

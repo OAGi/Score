@@ -38,9 +38,33 @@ export class AssignedBusinessTermDetailComponent implements OnInit {
     const assignedBusinessTermId = this.route.snapshot.queryParams.id;
     const bieType = this.route.snapshot.queryParams.type;
     this.service.getAssignedBusinessTerm(bieType, assignedBusinessTermId).subscribe(assignedBusinessTerm => {
+      if (!assignedBusinessTerm) {
+        this.redirectToAssignedBusinessTermList();
+        return;
+      }
+
       this.assignedBusinessTerm = assignedBusinessTerm;
       this.hashCode = hashCode(this.assignedBusinessTerm);
+    }, err => {
+      if (err.status === 404) {
+        this.redirectToAssignedBusinessTermList();
+        return;
+      }
+
+      const errorMessage = (err.status === 403) ?
+        'You do not have access permission.' : 'Something\'s wrong.';
+      this.snackBar.open(errorMessage, '', {
+        duration: 3000,
+      });
+      this.router.navigateByUrl('/business_term_management/assign_business_term');
     });
+  }
+
+  private redirectToAssignedBusinessTermList() {
+    this.snackBar.open('The requested business term assignment is unavailable.', '', {
+      duration: 3000,
+    });
+    this.router.navigateByUrl('/business_term_management/assign_business_term');
   }
 
   isChanged() {

@@ -168,6 +168,14 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     saveBooleanProperty(this.auth.getUserToken(), this.HIDE_PROHIBITED_PROPERTY_KEY, hideProhibited);
   }
 
+  private redirectToDataTypeList() {
+    this.isUpdating = false;
+    this.snackBar.open('The requested DT is unavailable.', '', {
+      duration: 3000,
+    });
+    this.router.navigateByUrl('/data_type');
+  }
+
   ngOnInit() {
     this.commentControl = new CommentControl(this.sidenav, this.service);
 
@@ -182,6 +190,10 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
           this.preferencesService.load(this.auth.getUserToken())
         ]);
       })).subscribe(([ccGraph, dtDetails, tags, preferencesInfo]) => {
+      if (!dtDetails) {
+        this.redirectToDataTypeList();
+        return;
+      }
 
       this.namespaceService.getNamespaceSummaries(dtDetails.library.libraryId).subscribe(namespaces => {
         this.namespaces = namespaces;
@@ -267,6 +279,11 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
         this.isUpdating = false;
       });
     }, err => {
+      this.isUpdating = false;
+      if (err.status === 404) {
+        this.redirectToDataTypeList();
+        return;
+      }
       this.snackBar.open('Something\'s wrong.', '', {
         duration: 3000
       });

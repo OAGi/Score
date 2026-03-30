@@ -237,6 +237,8 @@ export class CodeListDetailComponent implements OnInit {
       let errorMessage;
       if (err.status === 403) {
         errorMessage = 'You do not have access permission.';
+      } else if (err.status === 404) {
+        errorMessage = 'The requested code list is unavailable.';
       } else {
         errorMessage = 'Something\'s wrong.';
       }

@@ -128,6 +128,14 @@ export class AsccpDetailComponent implements OnInit {
     saveBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, hideCardinality);
   }
 
+  private redirectToCcList() {
+    this.isUpdating = false;
+    this.snackBar.open('The requested ASCCP is unavailable.', '', {
+      duration: 3000,
+    });
+    this.router.navigateByUrl('/core_component');
+  }
+
   ngOnInit() {
     this.commentControl = new CommentControl(this.sidenav, this.service);
 
@@ -143,6 +151,10 @@ export class AsccpDetailComponent implements OnInit {
           this.service.availableModels()
         ]);
       })).subscribe(([ccGraph, asccpDetails, tags, preferencesInfo, models]) => {
+      if (!asccpDetails) {
+        this.redirectToCcList();
+        return;
+      }
 
       this.namespaceService.getNamespaceSummaries(asccpDetails.library.libraryId).subscribe(namespaces => {
         this.namespaces = namespaces;
@@ -219,6 +231,11 @@ export class AsccpDetailComponent implements OnInit {
 
       this.isUpdating = false;
     }, err => {
+      this.isUpdating = false;
+      if (err.status === 404) {
+        this.redirectToCcList();
+        return;
+      }
       this.snackBar.open('Something\'s wrong.', '', {
         duration: 3000
       });
