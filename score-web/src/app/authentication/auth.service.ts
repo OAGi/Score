@@ -31,6 +31,7 @@ import {Clipboard} from '@angular/cdk/clipboard';
 export class AuthService implements OnInit, CanActivate {
   private http = inject(HttpClient);
   private router = inject(Router);
+  private logoutInProgress = false;
 
 
   RESTRICTED_NEXT_PARAMS = ['login', 'pending', 'reject'];
@@ -142,6 +143,10 @@ export class AuthService implements OnInit, CanActivate {
     return userToken.roles.includes(this.ROLE_DEVELOPER) || userToken.roles.includes(this.ROLE_END_USER);
   }
 
+  isLogoutInProgress(): boolean {
+    return this.logoutInProgress;
+  }
+
   isAdmin() {
     const userToken = this.getUserToken();
     if (!userToken.enabled) {
@@ -185,6 +190,7 @@ export class AuthService implements OnInit, CanActivate {
   }
 
   logout(url?) {
+    this.logoutInProgress = true;
     localStorage.removeItem(this.USER_INFO_KEY);
 
     this.http.get('/api/' + environment.logoutPath)
@@ -209,9 +215,13 @@ export class AuthService implements OnInit, CanActivate {
         queryParams: {
           next
         }
+      }).finally(() => {
+        this.logoutInProgress = false;
       });
     } else {
-      return this.router.navigate(commands);
+      return this.router.navigate(commands).finally(() => {
+        this.logoutInProgress = false;
+      });
     }
   }
 
