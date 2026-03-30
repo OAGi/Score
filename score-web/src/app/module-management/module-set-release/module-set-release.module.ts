@@ -25,20 +25,24 @@ const routes: Routes = [
         path: '',
         component: ModuleSetReleaseListComponent,
         canActivate: [AuthService],
+        title: 'Module Set Release'
       },
       {
         path: 'create',
         component: ModuleSetReleaseCreateComponent,
         canActivate: [AuthService],
+        title: 'Create Module Set Release'
       },
       {
         path: ':moduleSetReleaseId',
         component: ModuleSetReleaseDetailComponent,
         canActivate: [AuthService],
+        title: 'Module Set Release'
       }, {
         path: ':moduleSetReleaseId/assign',
         component: ModuleSetReleaseAssignComponent,
         canActivate: [AuthService],
+        title: 'Assign Module Set Release'
       }
     ]
   }

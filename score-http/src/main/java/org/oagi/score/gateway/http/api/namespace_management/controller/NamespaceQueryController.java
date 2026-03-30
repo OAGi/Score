@@ -11,6 +11,7 @@ import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceSumma
 import org.oagi.score.gateway.http.api.namespace_management.repository.criteria.NamespaceListFilterCriteria;
 import org.oagi.score.gateway.http.api.namespace_management.service.NamespaceQueryService;
 import org.oagi.score.gateway.http.common.model.DateRangeCriteria;
+import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.model.PageRequest;
 import org.oagi.score.gateway.http.common.model.PageResponse;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
@@ -164,6 +165,11 @@ public class NamespaceQueryController {
             @Parameter(description = "Unique identifier of the namespace.")
             NamespaceId namespaceId) {
 
-        return namespaceQueryService.getNamespaceDetails(sessionService.asScoreUser(user), namespaceId);
+        NamespaceDetailsRecord namespaceDetails =
+                namespaceQueryService.getNamespaceDetails(sessionService.asScoreUser(user), namespaceId);
+        if (namespaceDetails == null) {
+            throw new NotFoundException();
+        }
+        return namespaceDetails;
     }
 }

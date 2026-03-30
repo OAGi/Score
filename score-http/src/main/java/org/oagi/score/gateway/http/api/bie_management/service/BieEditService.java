@@ -139,6 +139,9 @@ public class BieEditService implements InitializingBean {
         var topLevelAsbiepQuery = repositoryFactory.topLevelAsbiepQueryRepository(requester);
         TopLevelAsbiepSummaryRecord topLevelAsbiep =
                 topLevelAsbiepQuery.getTopLevelAsbiepSummary(topLevelAsbiepId);
+        if (topLevelAsbiep == null) {
+            throw new IllegalArgumentException();
+        }
         bieEditTreeController.initialize(requester, topLevelAsbiep);
         if (isDerived || isLocked) {
             // bieEditTreeController.setForceBieUpdate(false);
@@ -150,6 +153,9 @@ public class BieEditService implements InitializingBean {
     @Transactional
     public BieEditAbieNode getRootNode(ScoreUser requester, TopLevelAsbiepId topLevelAsbiepId) {
         BieEditTreeController treeController = getTreeController(requester, topLevelAsbiepId);
+        if (treeController == null) {
+            throw new IllegalArgumentException();
+        }
         return treeController.getRootNode(topLevelAsbiepId);
     }
 

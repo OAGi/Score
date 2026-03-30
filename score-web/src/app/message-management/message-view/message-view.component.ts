@@ -6,6 +6,8 @@ import {MessageService} from '../domain/message.service';
 import {MessageDetails} from '../domain/messageDetails';
 import {finalize} from 'rxjs/operators';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -20,6 +22,7 @@ export class MessageViewComponent implements OnInit {
   private auth = inject(AuthService);
   private snackBar = inject(MatSnackBar);
   private messageService = inject(MessageService);
+  private titleService = inject(Title);
 
 
   loading: boolean;
@@ -34,7 +37,10 @@ export class MessageViewComponent implements OnInit {
         finalize(() => {
           this.loading = false;
         })
-      ).subscribe(message => this.message = message);
+      ).subscribe(message => {
+        this.message = message;
+        setAppTitleIfPresent(this.titleService, this.message.subject, 'Message');
+      });
     });
   }
 

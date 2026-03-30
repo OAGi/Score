@@ -26,20 +26,25 @@ const routes: Routes = [
         path: '',
         component: ReleaseListComponent,
         canActivate: [AuthService],
+        title: 'Release'
       }, {
         path: 'create',
         component: ReleaseCreateComponent,
         canActivate: [AuthService],
+        title: 'Create Release'
       }, {
         path: ':id',
+        title: 'Release',
         children: [{
           path: '',
           component: ReleaseDetailComponent,
           canActivate: [AuthService],
+          title: 'Release'
         }, {
           path: 'assign',
           component: ReleaseAssignComponent,
           canActivate: [AuthService],
+          title: 'Assign Release'
         }]
       }
     ]

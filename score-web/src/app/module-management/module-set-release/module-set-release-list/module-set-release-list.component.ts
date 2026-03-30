@@ -262,9 +262,9 @@ export class ModuleSetReleaseListComponent implements OnInit {
     }
   }
 
-  onLibraryChange(library: LibrarySummary) {
+  onLibraryChange(library?: LibrarySummary) {
     this.request.library = library;
-    saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
+    saveLibrary(this.auth.getUserToken(), this.request.library?.libraryId);
     this.onSearch();
   }
 
@@ -274,6 +274,14 @@ export class ModuleSetReleaseListComponent implements OnInit {
   }
 
   loadModuleSetReleaseList(isInit?: boolean) {
+    if (!this.request.library?.libraryId) {
+      this.loading = false;
+      this.selection.clear();
+      this.dataSource.data = [];
+      this.paginator.length = 0;
+      return;
+    }
+
     this.loading = true;
 
     this.request.page = new PageRequest(
@@ -335,6 +343,9 @@ export class ModuleSetReleaseListComponent implements OnInit {
   }
 
   create() {
+    if (!this.request.library?.libraryId) {
+      return;
+    }
     this.router.navigateByUrl('/module_management/module_set_release/create');
   }
 

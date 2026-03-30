@@ -20,6 +20,7 @@ const routes: Routes = [
         path: '**',
         component: ExtensionDetailComponent,
         canActivate: [AuthService],
+        title: 'Core Component'
       }
     ]
   }

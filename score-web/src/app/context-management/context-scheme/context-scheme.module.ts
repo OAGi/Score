@@ -24,17 +24,20 @@ const routes: Routes = [
       {
         path: 'context_scheme',
         component: ContextSchemeListComponent,
-        canActivate: [AuthService]
+        canActivate: [AuthService],
+        title: 'Context Scheme'
       },
       {
         path: 'context_scheme/create',
         component: ContextSchemeCreateComponent,
-        canActivate: [AuthService]
+        canActivate: [AuthService],
+        title: 'Create Context Scheme'
       },
       {
         path: 'context_scheme/:id',
         component: ContextSchemeDetailComponent,
-        canActivate: [AuthService]
+        canActivate: [AuthService],
+        title: 'Context Scheme'
       },
     ]
   }

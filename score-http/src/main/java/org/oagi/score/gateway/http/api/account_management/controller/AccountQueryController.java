@@ -1,6 +1,11 @@
 package org.oagi.score.gateway.http.api.account_management.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oagi.score.gateway.http.api.account_management.model.AccountDetailsRecord;
 import org.oagi.score.gateway.http.api.account_management.model.AccountListEntryRecord;
@@ -9,6 +14,7 @@ import org.oagi.score.gateway.http.api.account_management.service.AccountQuerySe
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationQueryService;
 import org.oagi.score.gateway.http.api.context_management.business_context.model.BusinessContextId;
 import org.oagi.score.gateway.http.api.tenant_management.model.TenantId;
+import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.model.PageRequest;
 import org.oagi.score.gateway.http.common.model.PageResponse;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
@@ -111,12 +117,24 @@ public class AccountQueryController {
         return response;
     }
 
+    @Operation(summary = "Get account details", description = "Retrieves details of a specific account by user ID or login ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful retrieval",
+                    content = @Content(schema = @Schema(implementation = AccountDetailsRecord.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid parameters"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "Record not found")
+    })
     @GetMapping(value = "/{appUserIdOrUsername}")
     public AccountDetailsRecord getAccount(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @PathVariable("appUserIdOrUsername") String appUserIdOrUsername) {
         ScoreUser requester = sessionService.asScoreUser(user);
-        return accountQueryService.getAccountDetails(requester, appUserIdOrUsername);
+        AccountDetailsRecord accountDetails = accountQueryService.getAccountDetails(requester, appUserIdOrUsername);
+        if (accountDetails == null) {
+            throw new NotFoundException();
+        }
+        return accountDetails;
     }
 
     @GetMapping(value = "/names")

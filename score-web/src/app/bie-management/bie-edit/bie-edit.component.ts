@@ -65,6 +65,8 @@ import {PreferencesInfo} from '../../settings-management/settings-preferences/do
 import {CcNodeService} from '../../cc-management/domain/core-component-node.service';
 import {BieStateTransitionFlowService} from '../domain/bie-state-transition-flow.service';
 import {StateDependencySelection} from '../domain/state-dependency-target';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 
 
 @Component({
@@ -91,6 +93,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   private renderer = inject(Renderer2);
   private el = inject(ElementRef);
   private cdr = inject(ChangeDetectorRef);
+  private titleService = inject(Title);
   webPageInfo = inject(WebPageInfoService);
   private stateTransitionFlowService = inject(BieStateTransitionFlowService);
 
@@ -278,6 +281,11 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         ]);
       })).subscribe(([ccGraph, usedBieList, refBieList, rootNode,
                        bizCtxResp, allBizCtxResp, preferencesInfo]) => {
+      if (!rootNode) {
+        this.redirectToBieList();
+        return;
+      }
+
       this.initRootNode(rootNode);
 
       if (this.state === 'WIP' && (this.access !== 'CanEdit' && !this.auth.isAdmin())) {
@@ -339,17 +347,26 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         doAfter();
       }
     }, err => {
-      let errorMessage;
-      if (err.status === 403) {
-        errorMessage = 'You do not have access permission.';
-      } else {
-        errorMessage = 'Something\'s wrong.';
+      if (err.status === 404) {
+        this.redirectToBieList();
+        return;
       }
+
+      const errorMessage = (err.status === 403) ?
+        'You do not have access permission.' : 'Something\'s wrong.';
       this.snackBar.open(errorMessage, '', {
         duration: 3000
       });
       this.router.navigateByUrl('/profile_bie');
     });
+  }
+
+  private redirectToBieList() {
+    this.loading = false;
+    this.snackBar.open('The requested BIE is unavailable.', '', {
+      duration: 3000
+    });
+    this.router.navigateByUrl('/profile_bie');
   }
 
   extractDelimiter(path: string): string {
@@ -389,6 +406,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   initRootNode(rootNode) {
     this.rootNode = new BieEditAbieNode(rootNode);
+    setAppTitleIfPresent(this.titleService, this.rootNode.name, 'BIE');
     this.rootNode.reset();
     const that = this;
 

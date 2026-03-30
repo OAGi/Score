@@ -15,6 +15,8 @@ import {ModuleAddDialogComponent} from './module-add-dialog/module-add-dialog.co
 import {ModuleEditDialogComponent} from './module-edit-dialog/module-edit-dialog.component';
 import {UserToken} from '../../../authentication/domain/auth';
 import {forkJoin} from 'rxjs';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -31,6 +33,7 @@ export class ModuleSetEditComponent implements OnInit {
   private dialog = inject(MatDialog);
   private auth = inject(AuthService);
   private confirmDialogService = inject(ConfirmDialogService);
+  private titleService = inject(Title);
 
 
   title;
@@ -65,6 +68,11 @@ export class ModuleSetEditComponent implements OnInit {
         ]);
       }))
       .subscribe(([moduleSet, moduleSetMetadata]) => {
+        if (!moduleSet) {
+          this.redirectToModuleSetList();
+          return;
+        }
+
         this.init(moduleSet);
         this.service.getModules(this.moduleSet.moduleSetId).subscribe(resp => {
           this.rootElement = resp as ModuleElement;
@@ -77,6 +85,15 @@ export class ModuleSetEditComponent implements OnInit {
         this.isUpdating = false;
       }, error => {
         this.isUpdating = false;
+
+        if (error.status === 404) {
+          this.redirectToModuleSetList();
+          return;
+        }
+
+        this.snackBar.open('Something\'s wrong.', '', {
+          duration: 3000,
+        });
       });
   }
 
@@ -91,7 +108,16 @@ export class ModuleSetEditComponent implements OnInit {
 
   init(moduleSet: ModuleSet) {
     this.moduleSet = moduleSet;
+    setAppTitleIfPresent(this.titleService, this.moduleSet.name, 'Module Set');
     this.$hashCode = hashCode(this.moduleSet);
+  }
+
+  private redirectToModuleSetList() {
+    this.isUpdating = false;
+    this.snackBar.open('The requested module set is unavailable.', '', {
+      duration: 3000,
+    });
+    this.router.navigateByUrl('/module_management/module_set');
   }
 
   @HostListener('document:keydown', ['$event'])

@@ -9,6 +9,8 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {hashCode} from '../../../common/utility';
 import {ContextScheme} from '../../context-scheme/domain/context-scheme';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -24,6 +26,7 @@ export class ContextCategoryDetailComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
   private dialog = inject(MatDialog);
   private confirmDialogService = inject(ConfirmDialogService);
+  private titleService = inject(Title);
 
 
   title = 'Edit Context Category';
@@ -40,16 +43,33 @@ export class ContextCategoryDetailComponent implements OnInit {
     ).subscribe(contextCategory => {
 
       if (!contextCategory) {
-        this.snackBar.open('Access denied.', '', {
-          duration: 3000
-        });
-        this.router.navigateByUrl('/context_management/context_category');
+        this.redirectToContextCategoryList();
         return;
       }
 
       this.hashCode = hashCode(contextCategory);
       this.contextCategory = contextCategory;
+      setAppTitleIfPresent(this.titleService, this.contextCategory.name, 'Context Category');
+    }, err => {
+      if (err.status === 404) {
+        this.redirectToContextCategoryList();
+        return;
+      }
+
+      const errorMessage = (err.status === 403) ?
+        'You do not have access permission.' : 'Something\'s wrong.';
+      this.snackBar.open(errorMessage, '', {
+        duration: 3000
+      });
+      this.router.navigateByUrl('/context_management/context_category');
     });
+  }
+
+  private redirectToContextCategoryList() {
+    this.snackBar.open('The requested context category is unavailable.', '', {
+      duration: 3000
+    });
+    this.router.navigateByUrl('/context_management/context_category');
   }
 
   isChanged() {
@@ -89,6 +109,7 @@ export class ContextCategoryDetailComponent implements OnInit {
 
     this.service.update(this.contextCategory).subscribe(_ => {
       this.hashCode = hashCode(this.contextCategory);
+      setAppTitleIfPresent(this.titleService, this.contextCategory.name, 'Context Category');
       this.snackBar.open('Updated', '', {
         duration: 3000,
       });

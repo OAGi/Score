@@ -15,6 +15,7 @@ import org.oagi.score.gateway.http.api.context_management.business_context.repos
 import org.oagi.score.gateway.http.api.context_management.business_context.service.BusinessContextQueryService;
 import org.oagi.score.gateway.http.api.tenant_management.model.TenantId;
 import org.oagi.score.gateway.http.common.model.DateRangeCriteria;
+import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.model.PageRequest;
 import org.oagi.score.gateway.http.common.model.PageResponse;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
@@ -85,14 +86,20 @@ public class BusinessContextQueryController {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = BusinessContextDetailsRecord.class))),
             @ApiResponse(responseCode = "400", description = "Invalid parameters"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "Record not found")
     })
     @GetMapping(value = "/{bizCtxId:[\\d]+}")
     public BusinessContextDetailsRecord getBusinessContextDetails(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @PathVariable("bizCtxId") BusinessContextId businessContextId) {
 
-        return businessContextQueryService.getBusinessContextDetails(sessionService.asScoreUser(user), businessContextId);
+        BusinessContextDetailsRecord businessContextDetails =
+                businessContextQueryService.getBusinessContextDetails(sessionService.asScoreUser(user), businessContextId);
+        if (businessContextDetails == null) {
+            throw new NotFoundException();
+        }
+        return businessContextDetails;
     }
 
     @Operation(summary = "Retrieve business context value list", description = "Fetches a list of business context values for a given business context ID.")

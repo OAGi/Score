@@ -31,6 +31,8 @@ import {ContextCategoryService} from '../../context-category/domain/context-cate
 import {ContextCategorySummary} from '../../context-category/domain/context-category';
 import {CodeListService} from '../../../code-list-management/domain/code-list.service';
 import {finalize} from 'rxjs/operators';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -51,6 +53,7 @@ export class ContextSchemeDetailComponent implements OnInit {
   private auth = inject(AuthService);
   private confirmDialogService = inject(ConfirmDialogService);
   private preferencesService = inject(SettingsPreferencesService);
+  private titleService = inject(Title);
 
 
   title = 'Edit Context Scheme';
@@ -178,10 +181,7 @@ export class ContextSchemeDetailComponent implements OnInit {
                     contextScheme, contextSchemeValues, preferencesInfo]) => {
 
       if (!contextScheme) {
-        this.snackBar.open('Access denied.', '', {
-          duration: 3000
-        });
-        this.router.navigateByUrl('/context_management/context_scheme');
+        this.redirectToContextSchemeList();
         return;
       }
 
@@ -203,6 +203,7 @@ export class ContextSchemeDetailComponent implements OnInit {
 
       this.contextSchemeUpdateRequest.contextSchemeValueList = contextSchemeValues;
       this.contextSchemeUpdateRequest.used = contextScheme.used;
+      setAppTitleIfPresent(this.titleService, this.contextSchemeUpdateRequest.schemeName, 'Context Scheme');
 
       this.hashCode = hashCode(this.contextSchemeUpdateRequest);
       this.dataSource.data = this.contextSchemeUpdateRequest.contextSchemeValueList;
@@ -212,7 +213,10 @@ export class ContextSchemeDetailComponent implements OnInit {
     }, err => {
       this.isUpdating = false;
       let errorMessage;
-      if (err.status === 403) {
+      if (err.status === 404) {
+        this.redirectToContextSchemeList();
+        return;
+      } else if (err.status === 403) {
         errorMessage = 'You do not have access permission.';
       } else {
         errorMessage = 'Something\'s wrong.';
@@ -244,6 +248,14 @@ export class ContextSchemeDetailComponent implements OnInit {
       return (data.value && data.value.toLowerCase().indexOf(filter) > -1)
           || (data.meaning && data.meaning.toLowerCase().indexOf(filter) > -1);
     };
+  }
+
+  private redirectToContextSchemeList() {
+    this.isUpdating = false;
+    this.snackBar.open('The requested context scheme is unavailable.', '', {
+      duration: 3000
+    });
+    this.router.navigateByUrl('/context_management/context_scheme');
   }
 
   filterCtxCategories() {
@@ -454,6 +466,7 @@ export class ContextSchemeDetailComponent implements OnInit {
       this.isUpdating = false;
     })).subscribe(_ => {
       this.hashCode = hashCode(this.contextSchemeUpdateRequest);
+      setAppTitleIfPresent(this.titleService, this.contextSchemeUpdateRequest.schemeName, 'Context Scheme');
       this.snackBar.open('Updated', '', {
         duration: 3000,
       });

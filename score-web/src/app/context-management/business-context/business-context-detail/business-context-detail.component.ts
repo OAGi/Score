@@ -24,6 +24,8 @@ import {ScoreTableColumnResizeDirective} from '../../../common/score-table-colum
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {AuthService} from '../../../authentication/auth.service';
 import {forkJoin} from 'rxjs';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -42,6 +44,7 @@ export class BusinessContextDetailComponent implements OnInit {
   private auth = inject(AuthService);
   private confirmDialogService = inject(ConfirmDialogService);
   private preferencesService = inject(SettingsPreferencesService);
+  private titleService = inject(Title);
 
 
   title = 'Edit Business Context';
@@ -159,10 +162,7 @@ export class BusinessContextDetailComponent implements OnInit {
       this.preferencesInfo = preferencesInfo;
 
       if (!businessContextDetails) {
-        this.snackBar.open('Access denied.', '', {
-          duration: 3000
-        });
-        this.router.navigateByUrl('/context_management/business_context');
+        this.redirectToBusinessContextList();
         return;
       }
 
@@ -172,8 +172,23 @@ export class BusinessContextDetailComponent implements OnInit {
       });
       this.hashCode = hashCode(businessContextDetails);
       this.businessContext = businessContextDetails;
+      setAppTitleIfPresent(this.titleService, this.businessContext.name, 'Business Context');
 
       this._updateDataSource(this.businessContext.businessContextValues);
+    }, err => {
+      let errorMessage;
+      if (err.status === 404) {
+        this.redirectToBusinessContextList();
+        return;
+      } else if (err.status === 403) {
+        errorMessage = 'You do not have access permission.';
+      } else {
+        errorMessage = 'Something\'s wrong.';
+      }
+      this.snackBar.open(errorMessage, '', {
+        duration: 3000
+      });
+      this.router.navigateByUrl('/context_management/business_context');
     });
 
     // Prevent the sorting event from being triggered if any columns are currently resizing.
@@ -187,6 +202,13 @@ export class BusinessContextDetailComponent implements OnInit {
     };
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
+  }
+
+  private redirectToBusinessContextList() {
+    this.snackBar.open('The requested business context is unavailable.', '', {
+      duration: 3000
+    });
+    this.router.navigateByUrl('/context_management/business_context');
   }
 
   isChanged() {
@@ -333,8 +355,9 @@ export class BusinessContextDetailComponent implements OnInit {
     }
 
     this.service.update(this.businessContext.businessContextId, this.businessContext.name,
-        this.businessContext.businessContextValues).subscribe(_ => {
+      this.businessContext.businessContextValues).subscribe(_ => {
       this.hashCode = hashCode(this.businessContext);
+      setAppTitleIfPresent(this.titleService, this.businessContext.name, 'Business Context');
       this.snackBar.open('Updated', '', {
         duration: 3000,
       });

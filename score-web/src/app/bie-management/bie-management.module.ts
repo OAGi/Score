@@ -56,6 +56,7 @@ const routes: Routes = [
         path: '',
         component: BieListComponent,
         canActivate: [AuthService],
+        title: 'BIE'
       },
       {
         path: 'create',
@@ -63,12 +64,14 @@ const routes: Routes = [
           {
             path: '',
             component: BieCreateBizCtxComponent,
-            canActivate: [AuthService]
+            canActivate: [AuthService],
+            title: 'Create BIE'
           },
           {
             path: 'asccp',
             component: BieCreateAsccpComponent,
-            canActivate: [AuthService]
+            canActivate: [AuthService],
+            title: 'Create BIE'
           }
         ]
       },
@@ -78,12 +81,14 @@ const routes: Routes = [
           {
             path: '',
             component: BieCopyBizCtxComponent,
-            canActivate: [AuthService]
+            canActivate: [AuthService],
+            title: 'Copy BIE'
           },
           {
             path: 'bie',
             component: BieCopyProfileBieComponent,
-            canActivate: [AuthService]
+            canActivate: [AuthService],
+            title: 'Copy BIE'
           }
         ]
       },
@@ -93,12 +98,14 @@ const routes: Routes = [
           {
             path: '',
             component: BieUpliftProfileBieComponent,
-            canActivate: [AuthService]
+            canActivate: [AuthService],
+            title: 'Uplift BIE'
           },
           {
             path: ':topLevelAsbiepId',
             component: BieUpliftComponent,
-            canActivate: [AuthService]
+            canActivate: [AuthService],
+            title: 'Uplift BIE'
           }
         ]
       },
@@ -108,22 +115,26 @@ const routes: Routes = [
           {
             path: '',
             component: BieReportComponent,
-            canActivate: [AuthService]
+            canActivate: [AuthService],
+            title: 'BIE Reuse Report'
           }
         ]
       },
       {
         path: ':id',
+        title: 'BIE',
         children: [
           {
             path: 'accept-ownership-transfer-request',
             component: BieAcceptOwnershipTransferRequestComponent,
             canActivate: [AuthService],
+            title: 'BIE'
           },
           {
             path: '**',
             component: BieEditComponent,
-            canActivate: [AuthService]
+            canActivate: [AuthService],
+            title: 'BIE'
           }
         ]
       }

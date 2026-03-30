@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -90,6 +91,9 @@ public class SystemAccountQueryController implements InitializingBean {
         if (principal instanceof UserDetails) {
             UserDetails userDetails = (UserDetails) principal;
             accountDetails = accountQueryService.getAccountDetails(requester, userDetails.getUsername());
+            if (accountDetails == null) {
+                throw new AuthenticationCredentialsNotFoundException("An authentication information was not found.");
+            }
             resp.put("username", userDetails.getUsername());
             resp.put("authentication", "basic");
             resp.put("roles", userDetails.getAuthorities().stream().map(e -> e.toString()).collect(Collectors.toList()));
@@ -102,6 +106,9 @@ public class SystemAccountQueryController implements InitializingBean {
 
             if (oAuth2UserRecord != null && oAuth2UserRecord.userId() != null) {
                 accountDetails = accountQueryService.getAccountDetails(requester, oAuth2UserRecord.userId());
+                if (accountDetails == null) {
+                    throw new AuthenticationCredentialsNotFoundException("An authentication information was not found.");
+                }
                 resp.put("username", accountDetails.loginId());
                 resp.put("authentication", "oauth2");
                 List<String> roles = new ArrayList();

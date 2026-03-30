@@ -713,6 +713,9 @@ public class OpenAPIDocController {
         request.setOasDocId(oasDocId);
 
         GetOasDocResponse response = oasDocService.getOasDoc(sessionService.asScoreUser(user), request);
+        if (response.getOasDoc() == null) {
+            throw new NotFoundException();
+        }
         return response.getOasDoc();
     }
 
@@ -807,4 +810,3 @@ public class OpenAPIDocController {
         }
     }
 }
-

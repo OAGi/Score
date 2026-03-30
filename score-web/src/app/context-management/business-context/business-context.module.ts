@@ -23,17 +23,20 @@ const routes: Routes = [
       {
         path: 'business_context',
         component: BusinessContextListComponent,
-        canActivate: [AuthService]
+        canActivate: [AuthService],
+        title: 'Business Context'
       },
       {
         path: 'business_context/create',
         component: BusinessContextCreateComponent,
-        canActivate: [AuthService]
+        canActivate: [AuthService],
+        title: 'Create Business Context'
       },
       {
         path: 'business_context/:id',
         component: BusinessContextDetailComponent,
-        canActivate: [AuthService]
+        canActivate: [AuthService],
+        title: 'Business Context'
       }
     ]
   }

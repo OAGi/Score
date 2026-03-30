@@ -27,14 +27,41 @@ export class PendingDetailComponent implements OnInit {
 
   title = 'Review Pending Account';
   pending: PendingAccount;
+  loading = false;
 
   ngOnInit() {
+    this.loading = true;
     this.route.paramMap.pipe(
       switchMap((params: ParamMap) =>
         this.service.getPending(Number(params.get('id'))))
     ).subscribe(resp => {
+      if (!resp) {
+        this.redirectToPendingList();
+        return;
+      }
+
       this.pending = resp;
+      this.loading = false;
+    }, err => {
+      this.loading = false;
+
+      if (err.status === 404) {
+        this.redirectToPendingList();
+        return;
+      }
+
+      this.snackBar.open('Something\'s wrong.', '', {
+        duration: 3000,
+      });
     });
+  }
+
+  private redirectToPendingList() {
+    this.loading = false;
+    this.snackBar.open('The requested pending account is unavailable.', '', {
+      duration: 3000,
+    });
+    this.router.navigateByUrl('/account/pending');
   }
 
   linkToAccount() {

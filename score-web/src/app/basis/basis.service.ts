@@ -17,7 +17,17 @@ export class WebPageInfoService {
   get webPageInfo(): WebPageInfo {
     let item = localStorage.getItem(this.WEB_PAGE_INFO_KEY);
     if (!item) {
-      this.load();
+      if (!this.fetching) {
+        this.fetching = true;
+        this.load().subscribe({
+          next: () => {
+            this.fetching = false;
+          },
+          error: () => {
+            this.fetching = false;
+          }
+        });
+      }
 
       this.set(new WebPageInfo());
       item = localStorage.getItem(this.WEB_PAGE_INFO_KEY);
@@ -36,6 +46,7 @@ export class WebPageInfoService {
   load(): Observable<WebPageInfo> {
     return this.http.get<WebPageInfo>('api/info/webpages').pipe(tap(val => {
       this.set(val);
+      this.fetching = false;
     }));
   }
 

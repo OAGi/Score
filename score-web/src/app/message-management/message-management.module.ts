@@ -21,11 +21,13 @@ const routes: Routes = [
         path: '',
         component: MessageListComponent,
         canActivate: [AuthService],
+        title: 'Message'
       },
       {
         path: ':messageId',
         component: MessageViewComponent,
         canActivate: [AuthService],
+        title: 'Message'
       }
     ]
   }

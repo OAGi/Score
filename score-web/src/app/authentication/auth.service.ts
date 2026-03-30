@@ -31,6 +31,7 @@ import {Clipboard} from '@angular/cdk/clipboard';
 export class AuthService implements OnInit, CanActivate {
   private http = inject(HttpClient);
   private router = inject(Router);
+  private logoutInProgress = false;
 
 
   RESTRICTED_NEXT_PARAMS = ['login', 'pending', 'reject'];
@@ -40,6 +41,23 @@ export class AuthService implements OnInit, CanActivate {
   ROLE_ADMIN = 'admin';
 
   ngOnInit() {
+  }
+
+  isServiceUnavailableFailure(error: any, url?: string): boolean {
+    if (!(error instanceof HttpErrorResponse)) {
+      return false;
+    }
+
+    if ([0, 503, 504].includes(error.status)) {
+      return true;
+    }
+
+    if (error.status === 500 && !!url) {
+      return url.indexOf('/api/' + environment.statePath) !== -1 ||
+        url.indexOf('/api/' + environment.logoutPath) !== -1;
+    }
+
+    return false;
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot):
@@ -63,6 +81,9 @@ export class AuthService implements OnInit, CanActivate {
         return false;
       }
     }), catchError(err => {
+      if (this.isServiceUnavailableFailure(err, '/api/' + environment.statePath)) {
+        return of(this.router.parseUrl('/service-unavailable'));
+      }
       this.logout(getResolvedUrl(route));
       return of(false);
     }));
@@ -142,6 +163,10 @@ export class AuthService implements OnInit, CanActivate {
     return userToken.roles.includes(this.ROLE_DEVELOPER) || userToken.roles.includes(this.ROLE_END_USER);
   }
 
+  isLogoutInProgress(): boolean {
+    return this.logoutInProgress;
+  }
+
   isAdmin() {
     const userToken = this.getUserToken();
     if (!userToken.enabled) {
@@ -185,10 +210,20 @@ export class AuthService implements OnInit, CanActivate {
   }
 
   logout(url?) {
+    this.logoutInProgress = true;
     localStorage.removeItem(this.USER_INFO_KEY);
 
     this.http.get('/api/' + environment.logoutPath)
       .subscribe(resp => {
+        this.redirectToLogin(url);
+      }, err => {
+        if (this.isServiceUnavailableFailure(err, '/api/' + environment.logoutPath)) {
+          this.logoutInProgress = false;
+          this.router.navigate(['/service-unavailable'], {
+            queryParams: {reason: 'gateway'}
+          });
+          return;
+        }
         this.redirectToLogin(url);
       });
   }
@@ -209,9 +244,13 @@ export class AuthService implements OnInit, CanActivate {
         queryParams: {
           next
         }
+      }).finally(() => {
+        this.logoutInProgress = false;
       });
     } else {
-      return this.router.navigate(commands);
+      return this.router.navigate(commands).finally(() => {
+        this.logoutInProgress = false;
+      });
     }
   }
 
@@ -261,22 +300,16 @@ export class ErrorAlertInterceptor implements HttpInterceptor {
         }
 
         if (error instanceof HttpErrorResponse || error.name === 'HttpErrorResponse') {
+          if (this.auth.isServiceUnavailableFailure(error, req.url)) {
+            this.router.navigate(['/service-unavailable'], {
+              queryParams: {
+                reason: error.status === 503 ? 'service' : 'gateway'
+              }
+            });
+            return throwError(error);
+          }
+
           switch (error.status) {
-            case 0:
-            case 504:
-              this.snackBar.open('Gateway Connection Failure', '', {
-                duration: 3000,
-              });
-
-              break;
-
-            case 503:
-              this.snackBar.open('Gateway Service Unavailable', '', {
-                duration: 3000,
-              });
-
-              break;
-
             case 400:
             case 403:
             case 500:

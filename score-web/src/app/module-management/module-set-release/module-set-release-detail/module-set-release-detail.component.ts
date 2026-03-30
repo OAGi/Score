@@ -18,6 +18,8 @@ import {
   ModuleSetReleaseValidationDialogComponent
 } from './module-set-release-validation-dialog/module-set-release-validation-dialog.component';
 import {ReleaseSummary} from '../../../release-management/domain/release';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -35,6 +37,7 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
   private dialog = inject(MatDialog);
   private auth = inject(AuthService);
   private confirmDialogService = inject(ConfirmDialogService);
+  private titleService = inject(Title);
 
 
   title: string;
@@ -59,6 +62,7 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.isUpdating = true;
     this.moduleSetList = [];
     this.releaseList = [];
 
@@ -68,7 +72,13 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
         return this.moduleService.getModuleSetReleaseDetails(moduleSetReleaseId);
       }))
       .subscribe(moduleSetRelease => {
+        if (!moduleSetRelease) {
+          this.redirectToModuleSetReleaseList();
+          return;
+        }
+
         this.init(moduleSetRelease);
+        this.isUpdating = false;
 
         this.moduleService.getModuleSetSummaries(moduleSetRelease.library.libraryId).subscribe(resp => {
           this.initModuleSetList(resp);
@@ -76,6 +86,17 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
 
         this.releaseService.getReleaseSummaryList(moduleSetRelease.library.libraryId).subscribe(list => {
           this.initReleaseList(list);
+        });
+      }, err => {
+        this.isUpdating = false;
+
+        if (err.status === 404) {
+          this.redirectToModuleSetReleaseList();
+          return;
+        }
+
+        this.snackBar.open('Something\'s wrong.', '', {
+          duration: 3000,
         });
       });
   }
@@ -91,7 +112,16 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
 
   init(moduleSetRelease: ModuleSetReleaseDetails) {
     this.moduleSetRelease = moduleSetRelease;
+    setAppTitleIfPresent(this.titleService, this.moduleSetRelease.name, 'Module Set Release');
     this.$hashCode = hashCode(this.moduleSetRelease);
+  }
+
+  private redirectToModuleSetReleaseList() {
+    this.isUpdating = false;
+    this.snackBar.open('The requested module set release is unavailable.', '', {
+      duration: 3000,
+    });
+    this.router.navigateByUrl('/module_management/module_set_release');
   }
 
   initModuleSetList(list: ModuleSetSummary[]) {
@@ -261,8 +291,7 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
           });
 
           this.moduleService.getModuleSetReleaseDetails(this.moduleSetRelease.moduleSetReleaseId).subscribe(moduleSetRelease => {
-            this.moduleSetRelease = moduleSetRelease;
-            this.$hashCode = hashCode(this.moduleSetRelease);
+            this.init(moduleSetRelease);
           });
         });
   }

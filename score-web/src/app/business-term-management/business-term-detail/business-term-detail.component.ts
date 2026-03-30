@@ -10,6 +10,8 @@ import {MatSort} from '@angular/material/sort';
 import {hashCode} from '../../common/utility';
 import {forkJoin} from 'rxjs';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -25,6 +27,7 @@ export class BusinessTermDetailComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
   private dialog = inject(MatDialog);
   private confirmDialogService = inject(ConfirmDialogService);
+  private titleService = inject(Title);
 
 
   title = 'Edit Business Term';
@@ -44,10 +47,35 @@ export class BusinessTermDetailComponent implements OnInit {
       this.service.getBusinessTermDetails(businessTermId)
     )
       .subscribe(([businessTerm]) => {
+        if (!businessTerm) {
+          this.redirectToBusinessTermList();
+          return;
+        }
+
         this.businessTerm = businessTerm;
+        setAppTitleIfPresent(this.titleService, this.businessTerm.businessTerm, 'Business Term');
         this.hashCode = hashCode(this.businessTerm);
+      }, err => {
+        if (err.status === 404) {
+          this.redirectToBusinessTermList();
+          return;
+        }
+
+        const errorMessage = (err.status === 403) ?
+          'You do not have access permission.' : 'Something\'s wrong.';
+        this.snackBar.open(errorMessage, '', {
+          duration: 3000,
+        });
+        this.router.navigateByUrl('/business_term_management/business_term');
       });
 
+  }
+
+  private redirectToBusinessTermList() {
+    this.snackBar.open('The requested business term is unavailable.', '', {
+      duration: 3000,
+    });
+    this.router.navigateByUrl('/business_term_management/business_term');
   }
 
   isChanged() {
@@ -99,6 +127,7 @@ export class BusinessTermDetailComponent implements OnInit {
   doUpdate() {
     this.service.update(this.businessTerm).subscribe(_ => {
       this.hashCode = hashCode(this.businessTerm);
+      setAppTitleIfPresent(this.titleService, this.businessTerm.businessTerm, 'Business Term');
       this.snackBar.open('Updated', '', {
         duration: 3000,
       });

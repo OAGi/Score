@@ -13,6 +13,7 @@ import org.oagi.score.gateway.http.api.graph.model.FindUsagesResponse;
 import org.oagi.score.gateway.http.api.graph.model.Graph;
 import org.oagi.score.gateway.http.api.graph.service.GraphService;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
+import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.util.StringUtils;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,40 +71,48 @@ public class GraphController {
                                         @PathVariable("id") BigInteger id,
                                         @RequestParam(value = "q", required = false) String query) {
         Graph graph;
-        switch (type.toLowerCase()) {
-            case "acc":
-            case "extension":
-                graph = graphService.getAccGraph(
-                        sessionService.asScoreUser(user), new AccManifestId(id));
-                break;
+        try {
+            switch (type.toLowerCase()) {
+                case "acc":
+                case "extension":
+                    graph = graphService.getAccGraph(
+                            sessionService.asScoreUser(user), new AccManifestId(id));
+                    break;
 
-            case "asccp":
-                graph = graphService.getAsccpGraph(
-                        sessionService.asScoreUser(user), new AsccpManifestId(id), false);
-                break;
+                case "asccp":
+                    graph = graphService.getAsccpGraph(
+                            sessionService.asScoreUser(user), new AsccpManifestId(id), false);
+                    break;
 
-            case "bccp":
-                graph = graphService.getBccpGraph(
-                        sessionService.asScoreUser(user), new BccpManifestId(id));
-                break;
+                case "bccp":
+                    graph = graphService.getBccpGraph(
+                            sessionService.asScoreUser(user), new BccpManifestId(id));
+                    break;
 
-            case "dt":
-                graph = graphService.getDtGraph(
-                        sessionService.asScoreUser(user), new DtManifestId(id));
-                break;
+                case "dt":
+                    graph = graphService.getDtGraph(
+                            sessionService.asScoreUser(user), new DtManifestId(id));
+                    break;
 
-            case "top_level_asbiep":
-                graph = graphService.getBieGraph(
-                        sessionService.asScoreUser(user), new TopLevelAsbiepId(id));
-                break;
+                case "top_level_asbiep":
+                    graph = graphService.getBieGraph(
+                            sessionService.asScoreUser(user), new TopLevelAsbiepId(id));
+                    break;
 
-            case "code_list":
-                graph = graphService.getCodeListGraph(
-                        sessionService.asScoreUser(user), new CodeListManifestId(id));
-                break;
+                case "code_list":
+                    graph = graphService.getCodeListGraph(
+                            sessionService.asScoreUser(user), new CodeListManifestId(id));
+                    break;
 
-            default:
-                throw new UnsupportedOperationException();
+                default:
+                    throw new UnsupportedOperationException();
+            }
+        } catch (IllegalArgumentException e) {
+            throw new NotFoundException();
+        }
+
+        if (graph == null) {
+            throw new NotFoundException();
         }
 
         Map<String, Object> response = new HashMap();
@@ -131,11 +140,19 @@ public class GraphController {
                                               @PathVariable("topLevelAsbiepId") TopLevelAsbiepId topLevelAsbiepId,
                                               @PathVariable("targetReleaseId") ReleaseId targetReleaseId) {
 
-        AsccpSummaryRecord asccpSummary = graphService.getUpliftBie(
-                sessionService.asScoreUser(user), topLevelAsbiepId, targetReleaseId);
+        AsccpSummaryRecord asccpSummary;
         Graph graph;
-        graph = graphService.getAsccpGraph(
-                sessionService.asScoreUser(user), asccpSummary.asccpManifestId(), false);
+        try {
+            asccpSummary = graphService.getUpliftBie(
+                    sessionService.asScoreUser(user), topLevelAsbiepId, targetReleaseId);
+            graph = graphService.getAsccpGraph(
+                    sessionService.asScoreUser(user), asccpSummary.asccpManifestId(), false);
+        } catch (IllegalArgumentException e) {
+            throw new NotFoundException();
+        }
+        if (graph == null) {
+            throw new NotFoundException();
+        }
 
         Map<String, Object> response = new HashMap();
         response.put("graph", graph);

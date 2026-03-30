@@ -25,6 +25,7 @@ const routes: Routes = [
         path: '',
         component: CodeListListComponent,
         canActivate: [AuthService],
+        title: 'Code List'
       },
       {
         path: 'create',
@@ -33,6 +34,7 @@ const routes: Routes = [
             path: 'from_another',
             component: CodeListForDerivingComponent,
             canActivate: [AuthService],
+            title: 'Create Code List'
           }
         ],
       },
@@ -40,11 +42,13 @@ const routes: Routes = [
         path: 'uplift',
         component: CodeListUpliftComponent,
         canActivate: [AuthService],
+        title: 'Uplift Code List'
       },
       {
         path: ':manifestId',
         component: CodeListDetailComponent,
         canActivate: [AuthService],
+        title: 'Code List'
       }
     ]
   }

@@ -3,7 +3,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import {AuthService} from '../../authentication/auth.service';
 import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import {UserToken} from '../../authentication/domain/auth';
-import {base64Encode} from '../../common/utility';
+import {base64Encode, loadLibrary, saveLibrary} from '../../common/utility';
 import {MessageService} from '../../message-management/domain/message.service';
 import {tap} from 'rxjs/operators';
 import {Router} from '@angular/router';
@@ -15,6 +15,7 @@ import {
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {AboutService} from '../about/domain/about.service';
 import {WebPageInfoService} from '../basis.service';
+import {LibraryService} from '../../library-management/domain/library.service';
 
 @Component({
   standalone: false,
@@ -25,6 +26,7 @@ import {WebPageInfoService} from '../basis.service';
 export class NavbarComponent implements OnInit {
   private auth = inject(AuthService);
   private aboutService = inject(AboutService);
+  private libraryService = inject(LibraryService);
   private configService = inject(SettingsApplicationSettingsService);
   private sanitizer = inject(DomSanitizer);
   private router = inject(Router);
@@ -50,12 +52,7 @@ export class NavbarComponent implements OnInit {
     translate.onLangChange.subscribe((event: LangChangeEvent) => {
     });
 
-    if (!!webPageInfo.brand) {
-      this.brand = sanitizer.bypassSecurityTrustHtml(webPageInfo.brand);
-    }
-    if (!!webPageInfo.favicon) {
-      (document.querySelector('#appIcon') as HTMLLinkElement).href = webPageInfo.favicon;
-    }
+    this.refreshBranding();
   }
 
   get isTenantEnabled(): boolean {
@@ -88,6 +85,10 @@ export class NavbarComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.ensureDefaultLibrarySelection();
+    this.webPageInfo.load().subscribe(_ => {
+      this.refreshBranding();
+    });
     this.reloadNotiCount();
 
     // subscribe an event
@@ -102,8 +103,20 @@ export class NavbarComponent implements OnInit {
     }
 
     this.stompService.watch('/topic/webpage/info').subscribe((message: Message) => {
-      this.webPageInfo.load().subscribe(_ => {});
+      this.webPageInfo.load().subscribe(_ => {
+        this.refreshBranding();
+      });
     });
+  }
+
+  refreshBranding() {
+    const webPageInfo = this.webPageInfo;
+    this.brand = webPageInfo.brand
+      ? this.sanitizer.bypassSecurityTrustHtml(webPageInfo.brand)
+      : undefined;
+    if (webPageInfo.favicon) {
+      (document.querySelector('#appIcon') as HTMLLinkElement).href = webPageInfo.favicon;
+    }
   }
 
   reloadNotiCount() {
@@ -141,6 +154,24 @@ export class NavbarComponent implements OnInit {
 
   get isDeveloper(): boolean {
     return this.roles.includes('developer');
+  }
+
+  get hasSelectedLibrary(): boolean {
+    return !!loadLibrary(this.auth.getUserToken());
+  }
+
+  ensureDefaultLibrarySelection() {
+    const userToken = this.auth.getUserToken();
+    if (!userToken || loadLibrary(userToken)) {
+      return;
+    }
+
+    this.libraryService.getLibrarySummaryList().subscribe(libraries => {
+      const defaultLibrary = libraries.find(library => library.isDefault) || libraries[0];
+      if (defaultLibrary?.libraryId) {
+        saveLibrary(userToken, defaultLibrary.libraryId);
+      }
+    });
   }
 
   showContextButton() {

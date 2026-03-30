@@ -5,8 +5,8 @@
         [libraries]="mappedLibraries"
         (libraryChange)="onLibraryChange($event)"/>
       <span class="flex-11-auto"></span>
-      @if (userToken.roles.includes('developer')) {
-        <button mat-raised-button class="ms-2" color="primary" routerLink="create">
+      @if (userToken.roles.includes('developer') && request.library?.libraryId) {
+        <button mat-raised-button class="ms-2" color="primary" (click)="create()">
           New Release
         </button>
       }

@@ -44,6 +44,8 @@ import {FormControl} from '@angular/forms';
 import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ModelBrowserNode} from '../model-browser/domain/model-browser-node';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -61,6 +63,7 @@ export class AsccpDetailComponent implements OnInit {
   private confirmDialogService = inject(ConfirmDialogService);
   private preferencesService = inject(SettingsPreferencesService);
   private tagService = inject(TagService);
+  private titleService = inject(Title);
   private location = inject(Location);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -128,6 +131,14 @@ export class AsccpDetailComponent implements OnInit {
     saveBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, hideCardinality);
   }
 
+  private redirectToCcList() {
+    this.isUpdating = false;
+    this.snackBar.open('The requested ASCCP is unavailable.', '', {
+      duration: 3000,
+    });
+    this.router.navigateByUrl('/core_component');
+  }
+
   ngOnInit() {
     this.commentControl = new CommentControl(this.sidenav, this.service);
 
@@ -143,6 +154,10 @@ export class AsccpDetailComponent implements OnInit {
           this.service.availableModels()
         ]);
       })).subscribe(([ccGraph, asccpDetails, tags, preferencesInfo, models]) => {
+      if (!asccpDetails) {
+        this.redirectToCcList();
+        return;
+      }
 
       this.namespaceService.getNamespaceSummaries(asccpDetails.library.libraryId).subscribe(namespaces => {
         this.namespaces = namespaces;
@@ -166,6 +181,7 @@ export class AsccpDetailComponent implements OnInit {
       this.preferencesInfo = preferencesInfo;
       this.availableModels = models;
       this.selectedModel = (!!this.availableModels && this.availableModels.length > 0) ? this.availableModels[0] : undefined;
+      setAppTitleIfPresent(this.titleService, asccpDetails.den, 'ASCCP');
       this.isGenerating = false;
 
       // subscribe an event
@@ -219,6 +235,11 @@ export class AsccpDetailComponent implements OnInit {
 
       this.isUpdating = false;
     }, err => {
+      this.isUpdating = false;
+      if (err.status === 404) {
+        this.redirectToCcList();
+        return;
+      }
       this.snackBar.open('Something\'s wrong.', '', {
         duration: 3000
       });

@@ -16,6 +16,9 @@ import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../set
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -29,9 +32,11 @@ export class TenantUserDetailComponent implements OnInit {
   private service = inject(TenantListService);
   private accountService = inject(AccountListService);
   private preferencesService = inject(SettingsPreferencesService);
+  private snackBar = inject(MatSnackBar);
   private location = inject(Location);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private titleService = inject(Title);
 
 
   title = 'Users Management';
@@ -210,11 +215,28 @@ export class TenantUserDetailComponent implements OnInit {
         this.loading = false;
       })
     ).subscribe(resp => {
+      if (!resp) {
+        this.redirectToTenantList();
+        return;
+      }
+
       this.tenantInfo = resp;
+      setAppTitleIfPresent(this.titleService, this.tenantInfo.name, 'Tenant Users');
       this.loadAccounts(true);
     }, error => {
       this.dataSource.data = [];
+      if (error.status === 404) {
+        this.redirectToTenantList();
+      }
     });
+  }
+
+  private redirectToTenantList() {
+    this.loading = false;
+    this.snackBar.open('The requested tenant is unavailable.', '', {
+      duration: 3000,
+    });
+    this.router.navigateByUrl('/tenant');
   }
 
   loadAccounts(isInit?: boolean) {

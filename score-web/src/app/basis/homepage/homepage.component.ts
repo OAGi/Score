@@ -133,7 +133,9 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     this.libraryService.getLibrarySummaryList().subscribe(libraries => {
       this.initLibraries(libraries);
 
-      this.loadData();
+      if (this.library?.libraryId) {
+        this.loadData();
+      }
     });
   }
 
@@ -169,6 +171,12 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   }
 
   loadData() {
+    if (!this.library?.libraryId) {
+      this.selectedRelease = undefined;
+      this.releaseFilteredList.next([]);
+      return;
+    }
+
     const userToken = this.userToken;
     forkJoin([
       this.releaseService.getReleaseSummaryList(this.library.libraryId)

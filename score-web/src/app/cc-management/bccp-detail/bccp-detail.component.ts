@@ -43,6 +43,8 @@ import {EditTagsDialogComponent} from '../../tag-management/edit-tags-dialog/edi
 import {FormControl} from '@angular/forms';
 import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -60,6 +62,7 @@ export class BccpDetailComponent implements OnInit {
   private confirmDialogService = inject(ConfirmDialogService);
   private preferencesService = inject(SettingsPreferencesService);
   private tagService = inject(TagService);
+  private titleService = inject(Title);
   private location = inject(Location);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -123,6 +126,14 @@ export class BccpDetailComponent implements OnInit {
     saveBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, hideCardinality);
   }
 
+  private redirectToCcList() {
+    this.isUpdating = false;
+    this.snackBar.open('The requested BCCP is unavailable.', '', {
+      duration: 3000,
+    });
+    this.router.navigateByUrl('/core_component');
+  }
+
   ngOnInit() {
     this.commentControl = new CommentControl(this.sidenav, this.service);
 
@@ -137,6 +148,10 @@ export class BccpDetailComponent implements OnInit {
           this.preferencesService.load(this.auth.getUserToken())
         ]);
       })).subscribe(([ccGraph, bccpDetails, tags, preferencesInfo]) => {
+      if (!bccpDetails) {
+        this.redirectToCcList();
+        return;
+      }
 
       this.namespaceService.getNamespaceSummaries(bccpDetails.library.libraryId).subscribe(namespaces => {
         this.namespaces = namespaces;
@@ -159,6 +174,7 @@ export class BccpDetailComponent implements OnInit {
 
       this.tags = tags;
       this.preferencesInfo = preferencesInfo;
+      setAppTitleIfPresent(this.titleService, bccpDetails.den, 'BCCP');
 
       // subscribe an event
       this.stompService.watch('/topic/bccp/' + this.manifestId).subscribe((message: Message) => {
@@ -211,6 +227,11 @@ export class BccpDetailComponent implements OnInit {
 
       this.isUpdating = false;
     }, err => {
+      this.isUpdating = false;
+      if (err.status === 404) {
+        this.redirectToCcList();
+        return;
+      }
       this.snackBar.open('Something\'s wrong.', '', {
         duration: 3000
       });

@@ -25,11 +25,13 @@ const routes: Routes = [
         path: 'plantuml',
         component: CcPlantumlDiagramComponent,
         canActivate: [AuthService],
+        title: 'Model Browser Diagram'
       },
       {
         path: '**',
         component: ModelBrowserComponent,
         canActivate: [AuthService],
+        title: 'Model Browser'
       }
     ]
   }

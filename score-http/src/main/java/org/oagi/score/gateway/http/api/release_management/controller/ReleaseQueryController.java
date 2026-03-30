@@ -16,6 +16,7 @@ import org.oagi.score.gateway.http.api.release_management.model.*;
 import org.oagi.score.gateway.http.api.release_management.repository.criteria.ReleaseListFilterCriteria;
 import org.oagi.score.gateway.http.api.release_management.service.ReleaseQueryService;
 import org.oagi.score.gateway.http.common.model.DateRangeCriteria;
+import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.model.PageRequest;
 import org.oagi.score.gateway.http.common.model.PageResponse;
 import org.oagi.score.gateway.http.common.util.DeleteOnCloseFileSystemResource;
@@ -218,7 +219,8 @@ public class ReleaseQueryController {
             @ApiResponse(responseCode = "200", description = "Successful retrieval",
                     content = @Content(schema = @Schema(implementation = ReleaseDetailsRecord.class))),
             @ApiResponse(responseCode = "400", description = "Invalid parameters"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "Record not found")
     })
     @GetMapping(value = "/{releaseId:[\\d]+}")
     public ReleaseDetailsRecord getReleaseDetails(
@@ -228,8 +230,12 @@ public class ReleaseQueryController {
             @PathVariable("releaseId")
             @Parameter(description = "Unique identifier of the release.")
             ReleaseId releaseId) {
-
-        return releaseQueryService.getReleaseDetails(sessionService.asScoreUser(user), releaseId);
+        ReleaseDetailsRecord releaseDetails =
+                releaseQueryService.getReleaseDetails(sessionService.asScoreUser(user), releaseId);
+        if (releaseDetails == null) {
+            throw new NotFoundException();
+        }
+        return releaseDetails;
     }
 
     @GetMapping(value = "/{releaseId:[\\d]+}/assignable")

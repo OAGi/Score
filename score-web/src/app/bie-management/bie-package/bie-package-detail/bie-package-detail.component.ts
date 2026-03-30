@@ -25,6 +25,8 @@ import {ScoreTableColumnResizeDirective} from '../../../common/score-table-colum
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {forkJoin, of} from 'rxjs';
 import {BieExpressOption} from '../../bie-express/domain/generate-expression';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -42,6 +44,7 @@ export class BiePackageDetailComponent implements OnInit {
   private confirmDialogService = inject(ConfirmDialogService);
   private preferencesService = inject(SettingsPreferencesService);
   private dialog = inject(MatDialog);
+  private titleService = inject(Title);
   webPageInfo = inject(WebPageInfoService);
 
 
@@ -261,6 +264,11 @@ export class BiePackageDetailComponent implements OnInit {
       this.biePackageService.get(this.request.biePackageId),
       this.preferencesService.load(this.auth.getUserToken())
     ]).subscribe(([biePackage, preferencesInfo]) => {
+      if (!biePackage) {
+        this.redirectToBiePackageList();
+        return;
+      }
+
       this.preferencesInfo = preferencesInfo;
       this.onColumnsChange(this.preferencesInfo.tableColumnsInfo.columnsOfBiePage);
 
@@ -268,17 +276,26 @@ export class BiePackageDetailComponent implements OnInit {
       this.loadBieListInBiePackage(true);
     }, err => {
       this.loading = false;
-      let errorMessage;
-      if (err.status === 403) {
-        errorMessage = 'You do not have access permission.';
-      } else {
-        errorMessage = 'Something\'s wrong.';
+      if (err.status === 404) {
+        this.redirectToBiePackageList();
+        return;
       }
+
+      const errorMessage = (err.status === 403) ?
+        'You do not have access permission.' : 'Something\'s wrong.';
       this.snackBar.open(errorMessage, '', {
         duration: 3000
       });
       this.router.navigateByUrl('/bie_package');
     });
+  }
+
+  private redirectToBiePackageList() {
+    this.loading = false;
+    this.snackBar.open('The requested BIE package is unavailable.', '', {
+      duration: 3000
+    });
+    this.router.navigateByUrl('/bie_package');
   }
 
   get isAdmin(): boolean {
@@ -288,6 +305,7 @@ export class BiePackageDetailComponent implements OnInit {
   init(biePackage: BiePackageDetails) {
     this.hashCode = hashCode(biePackage);
     this.biePackage = biePackage;
+    setAppTitleIfPresent(this.titleService, this.biePackage.name, 'BIE Package');
     this.loading = false;
   }
 

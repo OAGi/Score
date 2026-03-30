@@ -5,9 +5,11 @@
         [libraries]="mappedLibraries"
         (libraryChange)="onLibraryChange($event)"/>
       <span class="flex-11-auto"></span>
-      <button mat-raised-button class="ms-2" color="primary" routerLink="create">
-        New Namespace
-      </button>
+      @if (request.library?.libraryId) {
+        <button mat-raised-button class="ms-2" color="primary" (click)="create()">
+          New Namespace
+        </button>
+      }
     </mat-toolbar>
   </div>
 

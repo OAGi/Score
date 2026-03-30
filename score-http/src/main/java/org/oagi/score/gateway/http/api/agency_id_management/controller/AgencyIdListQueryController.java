@@ -11,6 +11,7 @@ import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.common.model.AccessPrivilege;
 import org.oagi.score.gateway.http.common.model.DateRangeCriteria;
+import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.model.PageRequest;
 import org.oagi.score.gateway.http.common.model.PageResponse;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
@@ -54,9 +55,12 @@ public class AgencyIdListQueryController {
 
             @PathVariable("agencyIdListManifestId")
             AgencyIdListManifestId agencyIdListManifestId) {
-
-        return agencyIdListQueryService.getAgencyIdListDetails(
+        AgencyIdListDetailsRecord agencyIdListDetails = agencyIdListQueryService.getAgencyIdListDetails(
                 sessionService.asScoreUser(user), agencyIdListManifestId);
+        if (agencyIdListDetails == null) {
+            throw new NotFoundException();
+        }
+        return agencyIdListDetails;
     }
 
     @GetMapping(value = "/{agencyIdListManifestId:[\\d]+}/prev")

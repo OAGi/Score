@@ -9,6 +9,8 @@ import {MatSort} from '@angular/material/sort';
 import {hashCode} from '../../common/utility';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {AssignedBusinessTermDetails} from '../domain/business-term';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -24,6 +26,7 @@ export class AssignedBusinessTermDetailComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
   private dialog = inject(MatDialog);
   private confirmDialogService = inject(ConfirmDialogService);
+  private titleService = inject(Title);
 
 
   title = 'Edit Business Term Assignment';
@@ -38,9 +41,34 @@ export class AssignedBusinessTermDetailComponent implements OnInit {
     const assignedBusinessTermId = this.route.snapshot.queryParams.id;
     const bieType = this.route.snapshot.queryParams.type;
     this.service.getAssignedBusinessTerm(bieType, assignedBusinessTermId).subscribe(assignedBusinessTerm => {
+      if (!assignedBusinessTerm) {
+        this.redirectToAssignedBusinessTermList();
+        return;
+      }
+
       this.assignedBusinessTerm = assignedBusinessTerm;
+      setAppTitleIfPresent(this.titleService, this.assignedBusinessTerm.businessTerm, 'Business Term Assignment');
       this.hashCode = hashCode(this.assignedBusinessTerm);
+    }, err => {
+      if (err.status === 404) {
+        this.redirectToAssignedBusinessTermList();
+        return;
+      }
+
+      const errorMessage = (err.status === 403) ?
+        'You do not have access permission.' : 'Something\'s wrong.';
+      this.snackBar.open(errorMessage, '', {
+        duration: 3000,
+      });
+      this.router.navigateByUrl('/business_term_management/assign_business_term');
     });
+  }
+
+  private redirectToAssignedBusinessTermList() {
+    this.snackBar.open('The requested business term assignment is unavailable.', '', {
+      duration: 3000,
+    });
+    this.router.navigateByUrl('/business_term_management/assign_business_term');
   }
 
   isChanged() {
@@ -110,6 +138,7 @@ export class AssignedBusinessTermDetailComponent implements OnInit {
   doUpdate(assignedBusinessTerm: AssignedBusinessTermDetails) {
     this.service.updateAssignment(assignedBusinessTerm).subscribe(_ => {
       this.hashCode = hashCode(assignedBusinessTerm);
+      setAppTitleIfPresent(this.titleService, assignedBusinessTerm.businessTerm, 'Business Term Assignment');
       this.snackBar.open('Updated', '', {
         duration: 3000,
       });

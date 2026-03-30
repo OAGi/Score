@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import org.oagi.score.gateway.http.api.account_management.controller.payload.PendingListRequest;
 import org.oagi.score.gateway.http.api.account_management.model.AppOauth2User;
 import org.oagi.score.gateway.http.api.account_management.service.PendingListService;
+import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.model.PageRequest;
 import org.oagi.score.gateway.http.common.model.PageResponse;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
@@ -95,7 +96,11 @@ public class PendingListController {
     @RequestMapping(value = "/pending/{appOauth2UserId:[\\d]+}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public AppOauth2User getPending(@PathVariable("appOauth2UserId") long appOauth2UserId) {
-        return service.getPending(appOauth2UserId);
+        AppOauth2User pending = service.getPending(appOauth2UserId);
+        if (pending == null) {
+            throw new NotFoundException();
+        }
+        return pending;
     }
 
     @RequestMapping(value = "/pending/{appOauth2UserId:[\\d]+}", method = RequestMethod.POST,

@@ -22,11 +22,13 @@ const routes: Routes = [
         path: 'plantuml',
         component: CcPlantumlDiagramComponent,
         canActivate: [AuthService],
+        title: 'Core Component Diagram'
       },
       {
         path: '**',
         component: AsccpDetailComponent,
         canActivate: [AuthService],
+        title: 'Core Component'
       }
     ]
   }

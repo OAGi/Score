@@ -70,6 +70,8 @@ import {EditTagsDialogComponent} from '../../tag-management/edit-tags-dialog/edi
 import {WebPageInfoService} from '../../basis/basis.service';
 import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -87,6 +89,7 @@ export class AccDetailComponent implements OnInit {
   private confirmDialogService = inject(ConfirmDialogService);
   private preferencesService = inject(SettingsPreferencesService);
   private tagService = inject(TagService);
+  private titleService = inject(Title);
   private location = inject(Location);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -167,6 +170,14 @@ export class AccDetailComponent implements OnInit {
     saveBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, hideCardinality);
   }
 
+  private redirectToCcList() {
+    this.isUpdating = false;
+    this.snackBar.open('The requested ACC is unavailable.', '', {
+      duration: 3000,
+    });
+    this.router.navigateByUrl('/core_component');
+  }
+
   ngOnInit() {
     this.commentControl = new CommentControl(this.sidenav, this.service);
     this.hasBasedAcc = false;
@@ -183,6 +194,10 @@ export class AccDetailComponent implements OnInit {
           this.service.availableModels()
         ]);
       })).subscribe(([ccGraph, accDetails, tags, preferencesInfo, models]) => {
+      if (!accDetails) {
+        this.redirectToCcList();
+        return;
+      }
 
       this.namespaceService.getNamespaceSummaries(accDetails.library.libraryId).subscribe(namespaces => {
         this.namespaces = namespaces;
@@ -207,6 +222,7 @@ export class AccDetailComponent implements OnInit {
       this.preferencesInfo = preferencesInfo;
       this.availableModels = models;
       this.selectedModel = (!!this.availableModels && this.availableModels.length > 0) ? this.availableModels[0] : undefined;
+      setAppTitleIfPresent(this.titleService, accDetails.den, 'ACC');
       this.isDefinitionGenerating = false;
       this.isNameGenerating = false;
 
@@ -266,6 +282,11 @@ export class AccDetailComponent implements OnInit {
 
       this.isUpdating = false;
     }, err => {
+      this.isUpdating = false;
+      if (err.status === 404) {
+        this.redirectToCcList();
+        return;
+      }
       this.snackBar.open('Something\'s wrong.', '', {
         duration: 3000
       });

@@ -2,6 +2,7 @@ package org.oagi.score.gateway.http.configuration.handler;
 
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.common.model.AccessControlException;
+import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.model.base.ScoreDataAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,16 @@ public class ScoreResponseEntityExceptionHandler extends ResponseEntityException
     @ExceptionHandler(EmptyResultDataAccessException.class)
     public ResponseEntity handleEmptyResultDataAccessException(
             EmptyResultDataAccessException ex, WebRequest webRequest) {
+        logger.debug(ex.getMessage(), ex);
+        return new ResponseEntity(HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Handles controller-level not-found signals
+     */
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity handleNotFoundException(
+            NotFoundException ex, WebRequest webRequest) {
         logger.debug(ex.getMessage(), ex);
         return new ResponseEntity(HttpStatus.NOT_FOUND);
     }

@@ -34,6 +34,8 @@ import {
 } from '../../../settings-management/settings-preferences/domain/preferences';
 import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -53,6 +55,7 @@ export class OasDocDetailComponent implements OnInit {
   private confirmDialogService = inject(ConfirmDialogService);
   private preferencesService = inject(SettingsPreferencesService);
   private dialog = inject(MatDialog);
+  private titleService = inject(Title);
   webPageInfo = inject(WebPageInfoService);
 
 
@@ -275,20 +278,46 @@ export class OasDocDetailComponent implements OnInit {
       this.openAPIService.getBieListForOasDoc(this.request, oasDocId),
       this.preferencesService.load(this.auth.getUserToken())
     ]).subscribe(([simpleOasDoc, bieForOasDoc, preferencesInfo]) => {
+      if (!simpleOasDoc) {
+        this.redirectToOasDocList();
+        return;
+      }
+
       this.preferencesInfo = preferencesInfo;
       this.onColumnsChange(this.preferencesInfo.tableColumnsInfo.columnsOfBieForOasDocPage);
 
       this.oasDoc = simpleOasDoc;
       this.init(this.oasDoc);
       this.loadBieListForOasDoc(true);
-    }, _ => {
+    }, err => {
       this.isUpdating = false;
+      if (err.status === 404) {
+        this.redirectToOasDocList();
+        return;
+      }
+
+      const errorMessage = (err.status === 403) ?
+        'You do not have access permission.' : 'Something\'s wrong.';
+      this.snackBar.open(errorMessage, '', {
+        duration: 3000,
+      });
+      this.router.navigateByUrl('/profile_bie/express/oas_doc');
     });
+  }
+
+  private redirectToOasDocList() {
+    this.loading = false;
+    this.isUpdating = false;
+    this.snackBar.open('The requested OpenAPI document is unavailable.', '', {
+      duration: 3000,
+    });
+    this.router.navigateByUrl('/profile_bie/express/oas_doc');
   }
 
   init(oasDoc: OasDoc) {
     this.hashCodeForOasDoc = hashCode(oasDoc);
     this.oasDoc = oasDoc;
+    setAppTitleIfPresent(this.titleService, this.oasDoc.title, 'OpenAPI Document');
     this.isUpdating = false;
   }
 

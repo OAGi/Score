@@ -5,9 +5,11 @@
         [libraries]="mappedLibraries"
         (libraryChange)="onLibraryChange($event)"/>
       <span class="flex-11-auto"></span>
-      <button mat-icon-button class="ms-2" routerLink="create" matTooltip="New BIE">
-        <mat-icon>add</mat-icon>
-      </button>
+      @if (request.library?.libraryId) {
+        <button mat-icon-button class="ms-2" matTooltip="New BIE" (click)="create()">
+          <mat-icon>add</mat-icon>
+        </button>
+      }
 
       <button mat-icon-button class="ms-2" matTooltip="Move to WIP"
         [hidden]="!canToolbarAction('WIP')"

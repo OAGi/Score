@@ -1,5 +1,5 @@
 import {NgModule} from '@angular/core';
-import {ActivatedRouteSnapshot, BaseRouteReuseStrategy, RouteReuseStrategy, RouterModule} from '@angular/router';
+import {ActivatedRouteSnapshot, BaseRouteReuseStrategy, RouteReuseStrategy, RouterModule, TitleStrategy} from '@angular/router';
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatIconRegistry} from '@angular/material/icon';
@@ -34,6 +34,7 @@ import {SettingsManagementModule} from './settings-management/settings-managemen
 import {SCORE_WEBAPP_ROUTES} from './basis/routes';
 import {WebPageInfoService} from './basis/basis.service';
 import {MailService} from './common/score-mail.service';
+import {AppTitleStrategy} from './common/app-title.strategy';
 
 const httpInterceptorsProviders = [
   {provide: HTTP_INTERCEPTORS, useClass: XhrInterceptor, multi: true},
@@ -102,6 +103,10 @@ class ShouldReuseRouteFalseRouteReuseStrategy extends BaseRouteReuseStrategy {
     {
       provide: RouteReuseStrategy,
       useClass: ShouldReuseRouteFalseRouteReuseStrategy
+    },
+    {
+      provide: TitleStrategy,
+      useClass: AppTitleStrategy
     },
     AuthService,
     WebPageInfoService,

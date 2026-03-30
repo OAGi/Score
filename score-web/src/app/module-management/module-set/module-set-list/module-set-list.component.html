@@ -5,7 +5,7 @@
         [libraries]="mappedLibraries"
         (libraryChange)="onLibraryChange($event)"/>
       <span class="flex-11-auto"></span>
-      @if (roles.includes('developer')) {
+      @if (roles.includes('developer') && request.library?.libraryId) {
         <button
           (click)="create()" class="ms-2" color="primary" mat-raised-button>
           New Module Set

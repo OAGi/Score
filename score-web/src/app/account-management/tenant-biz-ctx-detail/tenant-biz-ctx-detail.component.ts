@@ -23,6 +23,8 @@ import {AuthService} from '../../authentication/auth.service';
 import {TenantList} from '../domain/tenants';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -40,6 +42,7 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private titleService = inject(Title);
 
   title = 'Business Context Management';
 
@@ -213,11 +216,28 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
         this.loading = false;
       })
     ).subscribe(resp => {
+      if (!resp) {
+        this.redirectToTenantList();
+        return;
+      }
+
       this.tenantInfo = resp;
+      setAppTitleIfPresent(this.titleService, this.tenantInfo.name, 'Tenant Business Context');
       this.loadBusinessContextList(true);
     }, error => {
       this.dataSource.data = [];
+      if (error.status === 404) {
+        this.redirectToTenantList();
+      }
     });
+  }
+
+  private redirectToTenantList() {
+    this.loading = false;
+    this.snackBar.open('The requested tenant is unavailable.', '', {
+      duration: 3000,
+    });
+    this.router.navigateByUrl('/tenant');
   }
 
   loadBusinessContextList(isInit?: boolean) {

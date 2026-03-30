@@ -62,6 +62,8 @@ import {FormControl} from '@angular/forms';
 import {FindUsagesDialogComponent} from '../find-usages-dialog/find-usages-dialog.component';
 import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 
 
 @Component({
@@ -83,6 +85,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   private confirmDialogService = inject(ConfirmDialogService);
   private preferencesService = inject(SettingsPreferencesService);
   private tagService = inject(TagService);
+  private titleService = inject(Title);
   private location = inject(Location);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -168,6 +171,14 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     saveBooleanProperty(this.auth.getUserToken(), this.HIDE_PROHIBITED_PROPERTY_KEY, hideProhibited);
   }
 
+  private redirectToDataTypeList() {
+    this.isUpdating = false;
+    this.snackBar.open('The requested DT is unavailable.', '', {
+      duration: 3000,
+    });
+    this.router.navigateByUrl('/data_type');
+  }
+
   ngOnInit() {
     this.commentControl = new CommentControl(this.sidenav, this.service);
 
@@ -182,6 +193,10 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
           this.preferencesService.load(this.auth.getUserToken())
         ]);
       })).subscribe(([ccGraph, dtDetails, tags, preferencesInfo]) => {
+      if (!dtDetails) {
+        this.redirectToDataTypeList();
+        return;
+      }
 
       this.namespaceService.getNamespaceSummaries(dtDetails.library.libraryId).subscribe(namespaces => {
         this.namespaces = namespaces;
@@ -204,6 +219,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
 
       this.tags = tags;
       this.preferencesInfo = preferencesInfo;
+      setAppTitleIfPresent(this.titleService, dtDetails.den, 'Data Type');
 
       // subscribe an event
       this.stompService.watch('/topic/dt/' + this.manifestId).subscribe((message: Message) => {
@@ -267,6 +283,11 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
         this.isUpdating = false;
       });
     }, err => {
+      this.isUpdating = false;
+      if (err.status === 404) {
+        this.redirectToDataTypeList();
+        return;
+      }
       this.snackBar.open('Something\'s wrong.', '', {
         duration: 3000
       });

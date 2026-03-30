@@ -9,9 +9,12 @@
     <mat-menu #bieMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>
         <button mat-menu-item routerLink="profile_bie" title="{{'BIE_NAV.VIEW'| translate}}"> View/Edit BIE</button>
-        <button mat-menu-item routerLink="profile_bie/create" title="{{ 'BIE_NAV.CREATE' | translate}}" [disabled]="isTenantEnabled && !hasTenantRole">
-          Create BIE
-        </button>
+        @if (hasSelectedLibrary) {
+          <button mat-menu-item routerLink="profile_bie/create" title="{{ 'BIE_NAV.CREATE' | translate}}"
+            [disabled]="isTenantEnabled && !hasTenantRole">
+            Create BIE
+          </button>
+        }
         <button mat-menu-item routerLink="profile_bie/copy" title="{{'BIE_NAV.COPY' | translate}}">
           Copy BIE
         </button>

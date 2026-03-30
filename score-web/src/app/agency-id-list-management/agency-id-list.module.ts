@@ -22,11 +22,13 @@ const routes: Routes = [
         path: '',
         component: AgencyIdListListComponent,
         canActivate: [AuthService],
+        title: 'Agency ID List'
       },
       {
         path: ':manifestId',
         component: AgencyIdListDetailComponent,
         canActivate: [AuthService],
+        title: 'Agency ID List'
       }
     ]
   }

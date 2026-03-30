@@ -21,16 +21,19 @@ const routes: Routes = [
         path: '',
         component: NamespaceListComponent,
         canActivate: [AuthService],
+        title: 'Namespace'
       },
       {
         path: 'create',
         component: NamespaceCreateComponent,
         canActivate: [AuthService],
+        title: 'Create Namespace'
       },
       {
         path: ':id',
         component: NamespaceDetailComponent,
         canActivate: [AuthService],
+        title: 'Namespace'
       }
     ]
   }

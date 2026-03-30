@@ -21,6 +21,7 @@ const routes: Routes = [
     path: 'data_type',
     component: DtListComponent,
     canActivate: [AuthService],
+    title: 'Data Type'
   }
 ];
 

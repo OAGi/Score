@@ -7,6 +7,8 @@ import {AccountListService} from '../domain/account-list.service';
 import {finalize, switchMap} from 'rxjs/operators';
 import {AuthService} from '../../authentication/auth.service';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -21,6 +23,7 @@ export class AccountDetailComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private titleService = inject(Title);
 
   title = 'Edit Account';
   accountId;
@@ -37,13 +40,36 @@ export class AccountDetailComponent implements OnInit {
       this.service.getAccount(accountId).pipe(finalize(() => {
         this.loading = false;
       })).subscribe(resp => {
+        if (!resp) {
+          this.redirectToAccountList();
+          return;
+        }
+
         this.account = resp;
+        setAppTitleIfPresent(this.titleService, this.account.loginId, 'Account');
+      }, err => {
+        if (err.status === 404) {
+          this.redirectToAccountList();
+          return;
+        }
+
+        this.snackBar.open('Something\'s wrong.', '', {
+          duration: 3000,
+        });
       });
     });
 
 
     this.newPassword = '';
     this.confirmPassword = '';
+  }
+
+  private redirectToAccountList() {
+    this.loading = false;
+    this.snackBar.open('The requested account is unavailable.', '', {
+      duration: 3000,
+    });
+    this.router.navigateByUrl('/account');
   }
 
   get isOAuth2User(): boolean {

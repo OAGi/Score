@@ -9,6 +9,8 @@ import {NamespaceDetails} from '../domain/namespace';
 import {NamespaceService} from '../domain/namespace.service';
 import {finalize, switchMap} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -24,6 +26,7 @@ export class NamespaceDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private auth = inject(AuthService);
+  private titleService = inject(Title);
 
 
   title = 'Namespace Detail';
@@ -41,11 +44,36 @@ export class NamespaceDetailComponent implements OnInit {
       switchMap((params: ParamMap) =>
         this.service.getNamespaceDetails(params.get('id')))
     ).subscribe(resp => {
+      if (!resp) {
+        this.redirectToNamespaceList();
+        return;
+      }
+
       this.namespace = resp;
+      setAppTitleIfPresent(this.titleService, this.namespace.uri, 'Namespace');
       this.uriForm = new FormControl({value: this.namespace.uri, disabled: !this.namespace.canEdit},
         Validators.pattern('\\w+:(\\/?\\/?)[^\\s]+'));
       this.hashCode = hashCode(resp);
+    }, err => {
+      if (err.status === 404) {
+        this.redirectToNamespaceList();
+        return;
+      }
+
+      const errorMessage = (err.status === 403) ?
+        'You do not have access permission.' : 'Something\'s wrong.';
+      this.snackBar.open(errorMessage, '', {
+        duration: 3000,
+      });
+      this.router.navigateByUrl('/namespace');
     });
+  }
+
+  private redirectToNamespaceList() {
+    this.snackBar.open('The requested namespace is unavailable.', '', {
+      duration: 3000,
+    });
+    this.router.navigateByUrl('/namespace');
   }
 
   isChanged() {
@@ -90,6 +118,7 @@ export class NamespaceDetailComponent implements OnInit {
     this.namespace.uri = this.uriForm.value;
     this.service.update(this.namespace).subscribe(_ => {
       this.hashCode = hashCode(this.namespace);
+      setAppTitleIfPresent(this.titleService, this.namespace.uri, 'Namespace');
       this.snackBar.open('Updated', '', {
         duration: 3000,
       });

@@ -14,6 +14,8 @@ import {hashCode, saveAsBlobResponse} from '../../common/utility';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {ReleaseWhatsChangedDialogComponent} from './release-whats-changed-dialog/release-whats-changed-dialog.component';
+import {Title} from '@angular/platform-browser';
+import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 
 @Component({
   standalone: false,
@@ -31,6 +33,7 @@ export class ReleaseDetailComponent implements OnInit {
   private router = inject(Router);
   private auth = inject(AuthService);
   private confirmDialogService = inject(ConfirmDialogService);
+  private titleService = inject(Title);
 
 
   title = 'Releases Detail';
@@ -52,7 +55,17 @@ export class ReleaseDetailComponent implements OnInit {
       switchMap((params: ParamMap) =>
         this.service.getReleaseDetail(params.get('id')))
     ).subscribe(resp => {
+      if (!resp) {
+        this.isLoading = false;
+        this.snackBar.open('The requested release is unavailable.', '', {
+          duration: 3000,
+        });
+        this.router.navigateByUrl('/release');
+        return;
+      }
+
       this.releaseDetail = resp;
+      setAppTitleIfPresent(this.titleService, this.releaseDetail.releaseNum, 'Release');
       this.$hashCode = hashCode(this.releaseDetail);
 
       this.namespaceService.getNamespaceSummaries(this.releaseDetail.libraryId).subscribe(resp => {
@@ -70,6 +83,20 @@ export class ReleaseDetailComponent implements OnInit {
         });
 
       this.isLoading = false;
+    }, err => {
+      this.isLoading = false;
+
+      if (err.status === 404) {
+        this.snackBar.open('The requested release is unavailable.', '', {
+          duration: 3000,
+        });
+        this.router.navigateByUrl('/release');
+        return;
+      }
+
+      this.snackBar.open('Something\'s wrong.', '', {
+        duration: 3000,
+      });
     });
   }
 
@@ -132,6 +159,7 @@ export class ReleaseDetailComponent implements OnInit {
       }))
       .subscribe(_ => {
         this.$hashCode = hashCode(this.releaseDetail);
+        setAppTitleIfPresent(this.titleService, this.releaseDetail.releaseNum, 'Release');
         this.snackBar.open('Updated', '', {
           duration: 3000,
         });
