@@ -43,6 +43,26 @@ export class LibraryListEntry {
   lastUpdated: WhoAndWhen;
 }
 
+export interface DiscardLibraryCheck {
+  discardable: boolean;
+  message: string;
+}
+
+export interface LibraryReleaseDependency {
+  releaseDepId?: number | null;
+  releaseId: number;
+  libraryId: number;
+  libraryName: string;
+  releaseNum: string;
+  state: string;
+  workingRelease: boolean;
+}
+
+export interface LibraryReleaseDependenciesResponse {
+  currentDependencies: LibraryReleaseDependency[];
+  availableDependencies: LibraryReleaseDependency[];
+}
+
 export class LibraryListRequest {
   filters: {
     name: string;

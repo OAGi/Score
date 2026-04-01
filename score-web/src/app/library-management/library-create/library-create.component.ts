@@ -30,6 +30,11 @@ export class LibraryCreateComponent {
   uriForm = new FormControl('');
 
   ngOnInit() {
+    if (!this.isAdmin) {
+      this.router.navigateByUrl('/');
+      return;
+    }
+
     this.library = new LibraryDetails();
 
     this.uriForm = new FormControl({value: this.library.link, disabled: !this.isAdmin},

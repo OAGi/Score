@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.oagi.score.gateway.http.api.library_management.controller.payload.LibraryReleaseDependenciesResponse;
 import org.oagi.score.gateway.http.api.library_management.model.LibraryDetailsRecord;
 import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
 import org.oagi.score.gateway.http.api.library_management.model.LibraryListEntry;
@@ -77,6 +78,14 @@ public class LibraryQueryController {
             throw new NotFoundException();
         }
         return libraryDetails;
+    }
+
+    @GetMapping(value = "/{libraryId:[\\d]+}/release-dependencies")
+    public LibraryReleaseDependenciesResponse getLibraryReleaseDependencies(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("libraryId") LibraryId libraryId) {
+
+        return libraryQueryService.getLibraryReleaseDependencies(sessionService.asScoreUser(user), libraryId);
     }
 
     @Operation(

@@ -15,28 +15,32 @@
   <div class="p-3">
     <mat-card>
       <mat-card-content class="mat-card-container">
-        <mat-form-field>
+        <mat-form-field floatLabel="always">
           <mat-label>Name</mat-label>
           <input matInput required [(ngModel)]="library.name" maxlength="100"
+            placeholder="Library name, e.g. OAGIS"
             [disabled]="!isAdmin"/>
         </mat-form-field>
 
-        <mat-form-field>
+        <mat-form-field floatLabel="always">
           <mat-label>Type</mat-label>
           <input matInput required [(ngModel)]="library.type" maxlength="100"
+            placeholder="Library type, e.g. Standard"
             [disabled]="!isAdmin"/>
         </mat-form-field>
 
-        <mat-form-field>
+        <mat-form-field floatLabel="always">
           <mat-label>Organization</mat-label>
           <input matInput required [(ngModel)]="library.organization" maxlength="100"
+            placeholder="Maintaining organization, e.g. Open Applications Group"
             [disabled]="!isAdmin"/>
         </mat-form-field>
 
-        <mat-form-field>
+        <mat-form-field floatLabel="always">
           <mat-label>Link</mat-label>
           <input matInput required
             [formControl]="uriForm"
+            placeholder="Reference URL, e.g. https://oagi.org"
             [value]="uriForm.value">
           @if (uriForm.hasError('pattern')) {
             <mat-error>
@@ -45,9 +49,10 @@
           }
         </mat-form-field>
 
-        <mat-form-field>
+        <mat-form-field floatLabel="always">
           <mat-label>Domain</mat-label>
           <input matInput required [(ngModel)]="library.domain" maxlength="100"
+            placeholder="Subject area, e.g. Interoperability Standards"
             [disabled]="!isAdmin"/>
         </mat-form-field>
 

@@ -120,6 +120,44 @@ public class JooqReleaseQueryRepository extends JooqBaseRepository implements Re
     }
 
     @Override
+    public List<ReleaseDependencySummaryRecord> getReleaseDependencySummaryList(ReleaseId releaseId) {
+        if (releaseId == null) {
+            return Collections.emptyList();
+        }
+
+        return dslContext().select(
+                        RELEASE_DEP.RELEASE_DEP_ID,
+                        RELEASE.RELEASE_ID,
+                        RELEASE.LIBRARY_ID,
+                        RELEASE.RELEASE_NUM,
+                        RELEASE.STATE)
+                .from(RELEASE)
+                .join(RELEASE_DEP).on(RELEASE_DEP.DEPEND_ON_RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
+                .where(RELEASE_DEP.RELEASE_ID.eq(valueOf(releaseId)))
+                .fetch(record -> new ReleaseDependencySummaryRecord(
+                        new ReleaseDepId(record.get(RELEASE_DEP.RELEASE_DEP_ID).toBigInteger()),
+                        new ReleaseId(record.get(RELEASE.RELEASE_ID).toBigInteger()),
+                        new LibraryId(record.get(RELEASE.LIBRARY_ID).toBigInteger()),
+                        record.get(RELEASE.RELEASE_NUM),
+                        ReleaseState.valueOf(record.get(RELEASE.STATE))));
+    }
+
+    @Override
+    public List<ReleaseSummaryRecord> getReleaseSummaryListDependingOn(ReleaseId releaseId) {
+        if (releaseId == null) {
+            return Collections.emptyList();
+        }
+
+        var queryBuilder = new GetReleaseSummaryListQueryBuilder();
+        return queryBuilder.select()
+                .join(RELEASE_DEP).on(RELEASE_DEP.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
+                .where(RELEASE_DEP.DEPEND_ON_RELEASE_ID.eq(valueOf(releaseId)))
+                .fetch(queryBuilder.mapper());
+    }
+
+    @Override
     public Set<ReleaseSummaryRecord> getIncludedReleaseSummaryList(ReleaseId releaseId) {
         if (releaseId == null) {
             return Collections.emptySet();

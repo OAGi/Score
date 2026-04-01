@@ -3,11 +3,11 @@
     <mat-toolbar class="bg-white">
       <span class="title">{{ title }}</span>
       <span class="flex-11-auto"></span>
-      <!--
-      <button mat-raised-button class="ms-2" color="primary" routerLink="create" *ngIf="isAdmin">
-        New Library
-      </button>
-      -->
+      @if (isAdmin) {
+        <button mat-raised-button class="ms-2" color="primary" routerLink="create">
+          Create Library
+        </button>
+      }
     </mat-toolbar>
   </div>
 

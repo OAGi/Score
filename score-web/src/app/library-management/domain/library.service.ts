@@ -1,7 +1,14 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import {Observable} from 'rxjs';
-import {LibraryDetails, LibraryListEntry, LibraryListRequest, LibrarySummary} from './library';
+import {
+  DiscardLibraryCheck,
+  LibraryDetails,
+  LibraryListEntry,
+  LibraryListRequest,
+  LibraryReleaseDependenciesResponse,
+  LibrarySummary
+} from './library';
 import {PageResponse} from '../../basis/basis';
 import {map} from 'rxjs/operators';
 
@@ -44,6 +51,20 @@ export class LibraryService {
 
   discard(libraryId: number): Observable<any> {
     return this.http.delete<any>('/api/libraries/' + libraryId);
+  }
+
+  checkDiscard(libraryId: number): Observable<DiscardLibraryCheck> {
+    return this.http.get<DiscardLibraryCheck>('/api/libraries/' + libraryId + '/discard-check');
+  }
+
+  getReleaseDependencies(libraryId: number): Observable<LibraryReleaseDependenciesResponse> {
+    return this.http.get<LibraryReleaseDependenciesResponse>('/api/libraries/' + libraryId + '/release-dependencies');
+  }
+
+  updateReleaseDependencies(libraryId: number, releaseIds: number[]): Observable<any> {
+    return this.http.put('/api/libraries/' + libraryId + '/release-dependencies', {
+      releaseIds
+    });
   }
 
   getLibraryList(request: LibraryListRequest): Observable<PageResponse<LibraryListEntry>> {
