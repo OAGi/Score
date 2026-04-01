@@ -30,6 +30,31 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
     }
 
     @Override
+    public void createXbtManifestRecords(ReleaseId releaseId) {
+        // A new library starts with only a Working release, so there is no existing release
+        // from which XBT manifests can be copied. Initialize one manifest row per built-in XML
+        // Schema XBT here so later draft creation can use the normal "copy from Working" flow.
+        //
+        // Current limitation: this bootstraps from the shared XBT catalog rather than a
+        // release-specific predecessor. For revision-1 built-in XBTs, we reuse an existing
+        // log_id for the same xbt_id when available so the initial manifest rows still
+        // participate in the expected log lineage.
+        dslContext().insertInto(XBT_MANIFEST,
+                        XBT_MANIFEST.RELEASE_ID,
+                        XBT_MANIFEST.XBT_ID,
+                        XBT_MANIFEST.LOG_ID)
+                .select(dslContext().select(
+                                inline(valueOf(releaseId)),
+                                XBT.XBT_ID,
+                                field(select(min(XBT_MANIFEST.LOG_ID))
+                                        .from(XBT_MANIFEST)
+                                        .where(XBT_MANIFEST.XBT_ID.eq(XBT.XBT_ID))))
+                        .from(XBT)
+                        .where(XBT.BUILTIN_TYPE.like("xsd:%")))
+                .execute();
+    }
+
+    @Override
     public void clearReplacement(ReleaseId releaseId) {
 
         dslContext().update(ACC_MANIFEST)

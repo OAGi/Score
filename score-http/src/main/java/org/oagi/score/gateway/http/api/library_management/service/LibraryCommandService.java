@@ -61,7 +61,8 @@ public class LibraryCommandService {
                 request.type(), request.name(), request.organization(), request.description(),
                 request.link(), request.domain(), null);
 
-        releaseCommand(requester).create(libraryId);
+        ReleaseId workingReleaseId = releaseCommand(requester).create(libraryId);
+        repositoryFactory.ccCommandRepository(requester).createXbtManifestRecords(workingReleaseId);
 
         return libraryId;
     }
