@@ -37,6 +37,11 @@ public abstract class ACC implements Component {
             case 5: //Embedded
             case 6: //OAGIS10Nouns
             case 7: //OAGIS10BODs
+            case 8: //BOD
+            case 9: //Verb
+            case 10: //Noun
+            case 11: //Choice
+            case 12: //AttributeGroup
                 ACC basedACC = null;
                 if (acc.basedAccManifestId() != null) {
                     AccSummaryRecord basedAcc = ccDocument.getAcc(acc.basedAccManifestId());

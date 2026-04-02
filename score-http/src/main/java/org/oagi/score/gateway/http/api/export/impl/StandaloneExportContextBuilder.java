@@ -88,7 +88,8 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
         AccSummaryRecord roleOfAcc = ccDocument.getAcc(asccp.roleOfAccManifestId());
 
         String term;
-        if (asccp.propertyTerm().equals(roleOfAcc.objectClassTerm())) {
+        if (roleOfAcc == null || !StringUtils.hasLength(roleOfAcc.objectClassTerm())
+                || asccp.propertyTerm().equals(roleOfAcc.objectClassTerm())) {
             term = asccp.propertyTerm();
         } else {
             term = asccp.propertyTerm() + roleOfAcc.objectClassTerm();
@@ -109,7 +110,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
         if (asccp.den().equals(ANY_ASCCP_DEN)) {
             return;
         }
-;
+
         SchemaModule schemaModule = null;
         if (ignoreReusableIndicator || asccp.reusable()) {
             NamespaceSummaryRecord namespace = ccDocument.getNamespace(asccp.namespaceId());
