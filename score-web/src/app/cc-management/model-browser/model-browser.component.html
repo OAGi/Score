@@ -483,7 +483,7 @@
                                     <mat-label>Value Domain</mat-label>
                                     <mat-select placeholder="Value Domain" required
                                       [value]="asBccpDetail().dt.defaultDtAwdPri?.dtAwdPriId">
-                                      @for (dtAwdPri of asBccpDetail().dt.dtAwdPriList; track dtAwdPri) {
+                                      @for (dtAwdPri of asBccpDetail().dt.primitiveDtAwdPriList; track dtAwdPri) {
                                         <mat-option
                                           [value]="dtAwdPri.dtAwdPriId" [disabled]="true">
                                           {{ dtAwdPri.xbt?.name }}
@@ -618,7 +618,7 @@
                                     <mat-label>Value Domain</mat-label>
                                     <mat-select placeholder="Value Domain" required
                                       [value]="asDtScDetail().dtSc.defaultDtScAwdPri?.dtScAwdPriId">
-                                      @for (dtScAwdPri of asDtScDetail().dtSc.dtScAwdPriList; track dtScAwdPri) {
+                                      @for (dtScAwdPri of asDtScDetail().dtSc.primitiveDtScAwdPriList; track dtScAwdPri) {
                                         <mat-option
                                           [value]="dtScAwdPri.dtScAwdPriId" [disabled]="true">
                                           {{ dtScAwdPri.xbt?.name }}

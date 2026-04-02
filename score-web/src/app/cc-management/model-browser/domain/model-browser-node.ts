@@ -938,11 +938,15 @@ export class DtDetail {
     return 'Primitive';
   }
 
+  get primitiveDtAwdPriList(): DtAwdPriDetails[] {
+    return (this.dtAwdPriList || []).filter(e => !!e.xbt && !e.codeList && !e.agencyIdList);
+  }
+
   get defaultDtAwdPri(): any {
-    if (!this.dtAwdPriList) {
+    if (!this.primitiveDtAwdPriList.length) {
       return {};
     }
-    return this.dtAwdPriList.filter(e => e.isDefault)[0];
+    return this.primitiveDtAwdPriList.filter(e => e.isDefault)[0];
   }
 
 }
@@ -985,11 +989,15 @@ export class BdtScDetail {
     return 'Primitive';
   }
 
+  get primitiveDtScAwdPriList(): DtScAwdPriDetails[] {
+    return (this.dtScAwdPriList || []).filter(e => !!e.xbt && !e.codeList && !e.agencyIdList);
+  }
+
   get defaultDtScAwdPri(): any {
-    if (!this.dtScAwdPriList) {
+    if (!this.primitiveDtScAwdPriList.length) {
       return {};
     }
-    return this.dtScAwdPriList.filter(e => e.isDefault)[0];
+    return this.primitiveDtScAwdPriList.filter(e => e.isDefault)[0];
   }
 
   get path(): string {
