@@ -8,6 +8,8 @@ import org.oagi.score.gateway.http.api.cc_management.model.dt.DtManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScManifestId;
 import org.oagi.score.gateway.http.api.cc_management.service.CcQueryService;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
+import org.oagi.score.gateway.http.api.release_management.model.ReleaseSummaryRecord;
+import org.oagi.score.gateway.http.api.release_management.repository.ReleaseQueryRepository;
 import org.oagi.score.gateway.http.common.model.PageRequest;
 import org.oagi.score.gateway.http.common.model.ResultAndCount;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
@@ -18,9 +20,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import static org.oagi.score.gateway.http.api.cc_management.model.CcState.Deleted;
 import static org.oagi.score.gateway.http.api.cc_management.model.CcState.Production;
 import static org.oagi.score.gateway.http.api.cc_management.model.CcState.Published;
 
@@ -33,6 +41,10 @@ public class AgencyIdListQueryService {
 
     private AgencyIdListQueryRepository query(ScoreUser requester) {
         return repositoryFactory.agencyIdListQueryRepository(requester);
+    }
+
+    private ReleaseQueryRepository releaseQuery(ScoreUser requester) {
+        return repositoryFactory.releaseQueryRepository(requester);
     }
 
     @Autowired
@@ -48,9 +60,36 @@ public class AgencyIdListQueryService {
             throw new IllegalArgumentException("`releaseId` must not be null");
         }
 
-        List<AgencyIdListSummaryRecord> agencyIdListSummaryList =
-                query(requester).getAgencyIdListSummaryListInStates(releaseId, Arrays.asList(Published, Production));
-        return agencyIdListSummaryList;
+        ReleaseSummaryRecord release = releaseQuery(requester).getReleaseSummary(releaseId);
+        if (release == null) {
+            return Collections.emptyList();
+        }
+        if (!release.isWorkingRelease()) {
+            return query(requester).getAgencyIdListSummaryListInStates(releaseId, Arrays.asList(Published, Production));
+        }
+
+        var agencyIdListQuery = query(requester);
+        Map<AgencyIdListManifestId, AgencyIdListSummaryRecord> visibleAgencyIdLists = new LinkedHashMap<>();
+
+        agencyIdListQuery.getAgencyIdListSummaryList(releaseId).stream()
+                .filter(agencyIdList -> agencyIdList.state() != Deleted)
+                .forEach(agencyIdList -> visibleAgencyIdLists.put(agencyIdList.agencyIdListManifestId(), agencyIdList));
+
+        Set<ReleaseId> dependencyReleaseIds = releaseQuery(requester).getIncludedReleaseSummaryList(releaseId).stream()
+                .map(ReleaseSummaryRecord::releaseId)
+                .filter(includedReleaseId -> !releaseId.equals(includedReleaseId))
+                .collect(Collectors.toSet());
+        if (!dependencyReleaseIds.isEmpty()) {
+            agencyIdListQuery.getAgencyIdListSummaryList(dependencyReleaseIds).stream()
+                    .filter(agencyIdList -> agencyIdList.state() == Published || agencyIdList.state() == Production)
+                    .forEach(agencyIdList -> visibleAgencyIdLists.putIfAbsent(agencyIdList.agencyIdListManifestId(), agencyIdList));
+        }
+
+        return visibleAgencyIdLists.values().stream()
+                .sorted(Comparator.comparing(AgencyIdListSummaryRecord::name, String.CASE_INSENSITIVE_ORDER)
+                        .thenComparing(AgencyIdListSummaryRecord::listId, String.CASE_INSENSITIVE_ORDER)
+                        .thenComparing(AgencyIdListSummaryRecord::versionId, String.CASE_INSENSITIVE_ORDER))
+                .collect(Collectors.toList());
     }
 
     public List<AgencyIdListSummaryRecord> availableAgencyIdListListByDtManifestId(

@@ -62,7 +62,6 @@ public class LibraryQueryService {
         List<LibraryReleaseDependencyRecord> currentDependencies = (workingRelease != null) ?
                 releaseQuery(requester).getReleaseDependencySummaryList(workingRelease.releaseId()).stream()
                         .map(release -> toDependencyRecord(release, libraryNameMap))
-                        .sorted(dependencyComparator())
                         .collect(Collectors.toList()) :
                 List.of();
 

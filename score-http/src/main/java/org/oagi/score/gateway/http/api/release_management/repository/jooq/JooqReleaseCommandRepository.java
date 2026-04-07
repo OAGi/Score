@@ -180,6 +180,18 @@ public class JooqReleaseCommandRepository extends JooqBaseRepository implements 
     }
 
     @Override
+    public void deleteDeps(ReleaseId releaseId, Collection<ReleaseId> dependOnReleaseIds) {
+        if (releaseId == null || dependOnReleaseIds == null || dependOnReleaseIds.isEmpty()) {
+            return;
+        }
+
+        dslContext().deleteFrom(RELEASE_DEP)
+                .where(RELEASE_DEP.RELEASE_ID.eq(valueOf(releaseId))
+                        .and(RELEASE_DEP.DEPEND_ON_RELEASE_ID.in(valueOf(dependOnReleaseIds))))
+                .execute();
+    }
+
+    @Override
     public void deleteDeps(ReleaseId releaseId) {
         dslContext().deleteFrom(RELEASE_DEP)
                 .where(RELEASE_DEP.RELEASE_ID.eq(valueOf(releaseId)))

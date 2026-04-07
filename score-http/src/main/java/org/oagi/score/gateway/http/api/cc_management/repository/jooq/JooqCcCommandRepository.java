@@ -14,11 +14,14 @@ import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.JooqBaseRepository;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.*;
 
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.jooq.impl.DSL.*;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.*;
@@ -248,6 +251,908 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
 
         copyDtAwdPriFromWorking(releaseId, workingReleaseId, dtManifestIds);
         copyDtScAwdPriFromWorking(releaseId, workingReleaseId, dtManifestIds);
+    }
+
+    @Override
+    public Map<String, Integer> getCrossReleaseReferenceCounts(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        Map<String, Integer> counts = new LinkedHashMap<>();
+        counts.put("ACC based references", countAccBasedReferences(workingReleaseId, dependencyReleaseId));
+        counts.put("ACC replacement references", countAccReplacementReferences(workingReleaseId, dependencyReleaseId));
+        counts.put("ASCCP role references", countAsccpRoleReferences(workingReleaseId, dependencyReleaseId));
+        counts.put("ASCCP replacement references", countAsccpReplacementReferences(workingReleaseId, dependencyReleaseId));
+        counts.put("BCCP BDT references", countBccpBdtReferences(workingReleaseId, dependencyReleaseId));
+        counts.put("BCCP replacement references", countBccpReplacementReferences(workingReleaseId, dependencyReleaseId));
+        counts.put("ASCC target references", countAsccTargetReferences(workingReleaseId, dependencyReleaseId));
+        counts.put("ASCC replacement references", countAsccReplacementReferences(workingReleaseId, dependencyReleaseId));
+        counts.put("BCC target references", countBccTargetReferences(workingReleaseId, dependencyReleaseId));
+        counts.put("BCC replacement references", countBccReplacementReferences(workingReleaseId, dependencyReleaseId));
+        counts.put("DT based references", countDtBasedReferences(workingReleaseId, dependencyReleaseId));
+        counts.put("DT replacement references", countDtReplacementReferences(workingReleaseId, dependencyReleaseId));
+        counts.put("DT_SC based references", countDtScBasedReferences(workingReleaseId, dependencyReleaseId));
+        counts.put("DT_SC replacement references", countDtScReplacementReferences(workingReleaseId, dependencyReleaseId));
+        counts.put("Code list based references", countCodeListBasedReferences(workingReleaseId, dependencyReleaseId));
+        counts.put("Code list replacement references", countCodeListReplacementReferences(workingReleaseId, dependencyReleaseId));
+        counts.put("Agency ID list based references", countAgencyIdListBasedReferences(workingReleaseId, dependencyReleaseId));
+        counts.put("Agency ID list replacement references", countAgencyIdListReplacementReferences(workingReleaseId, dependencyReleaseId));
+        counts.put("Code list value owner references", countCodeListValueOwnerReferences(workingReleaseId, dependencyReleaseId));
+        counts.put("Code list value replacement references", countCodeListValueReplacementReferences(workingReleaseId, dependencyReleaseId));
+        counts.put("Agency ID list value owner references", countAgencyIdListValueOwnerReferences(workingReleaseId, dependencyReleaseId));
+        counts.put("Agency ID list value replacement references", countAgencyIdListValueReplacementReferences(workingReleaseId, dependencyReleaseId));
+        counts.put("DT allowed code list references", countDtAwdPriCodeListReferences(workingReleaseId, dependencyReleaseId));
+        counts.put("DT allowed agency ID list references", countDtAwdPriAgencyIdListReferences(workingReleaseId, dependencyReleaseId));
+        counts.put("DT_SC allowed code list references", countDtScAwdPriCodeListReferences(workingReleaseId, dependencyReleaseId));
+        counts.put("DT_SC allowed agency ID list references", countDtScAwdPriAgencyIdListReferences(workingReleaseId, dependencyReleaseId));
+        return counts;
+    }
+
+    @Override
+    public Map<String, List<String>> getCrossReleaseReferenceDetails(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        Map<String, List<String>> details = new LinkedHashMap<>();
+        List<String> asccTargetDens = findAsccTargetReferenceDens(workingReleaseId, dependencyReleaseId);
+        if (!asccTargetDens.isEmpty()) {
+            details.put("ASCC target references", asccTargetDens);
+        }
+        List<String> asccReplacementDens = findAsccReplacementReferenceDens(workingReleaseId, dependencyReleaseId);
+        if (!asccReplacementDens.isEmpty()) {
+            details.put("ASCC replacement references", asccReplacementDens);
+        }
+        return details;
+    }
+
+    @Override
+    public void remapCrossReleaseReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId) {
+        remapAccBasedReferences(workingReleaseId, sourceReleaseId, targetReleaseId);
+        remapAccReplacementReferences(workingReleaseId, sourceReleaseId, targetReleaseId);
+        remapAsccpRoleReferences(workingReleaseId, sourceReleaseId, targetReleaseId);
+        remapAsccpReplacementReferences(workingReleaseId, sourceReleaseId, targetReleaseId);
+        remapBccpBdtReferences(workingReleaseId, sourceReleaseId, targetReleaseId);
+        remapBccpReplacementReferences(workingReleaseId, sourceReleaseId, targetReleaseId);
+        remapAsccTargetReferences(workingReleaseId, sourceReleaseId, targetReleaseId);
+        remapAsccReplacementReferences(workingReleaseId, sourceReleaseId, targetReleaseId);
+        remapBccTargetReferences(workingReleaseId, sourceReleaseId, targetReleaseId);
+        remapBccReplacementReferences(workingReleaseId, sourceReleaseId, targetReleaseId);
+        remapDtBasedReferences(workingReleaseId, sourceReleaseId, targetReleaseId);
+        remapDtReplacementReferences(workingReleaseId, sourceReleaseId, targetReleaseId);
+        remapDtScBasedReferences(workingReleaseId, sourceReleaseId, targetReleaseId);
+        remapDtScReplacementReferences(workingReleaseId, sourceReleaseId, targetReleaseId);
+        remapCodeListBasedReferences(workingReleaseId, sourceReleaseId, targetReleaseId);
+        remapCodeListReplacementReferences(workingReleaseId, sourceReleaseId, targetReleaseId);
+        remapAgencyIdListBasedReferences(workingReleaseId, sourceReleaseId, targetReleaseId);
+        remapAgencyIdListReplacementReferences(workingReleaseId, sourceReleaseId, targetReleaseId);
+        remapCodeListValueOwnerReferences(workingReleaseId, sourceReleaseId, targetReleaseId);
+        remapCodeListValueReplacementReferences(workingReleaseId, sourceReleaseId, targetReleaseId);
+        remapAgencyIdListValueOwnerReferences(workingReleaseId, sourceReleaseId, targetReleaseId);
+        remapAgencyIdListValueReplacementReferences(workingReleaseId, sourceReleaseId, targetReleaseId);
+        remapDtAwdPriCodeListReferences(workingReleaseId, sourceReleaseId, targetReleaseId);
+        remapDtAwdPriAgencyIdListReferences(workingReleaseId, sourceReleaseId, targetReleaseId);
+        remapDtScAwdPriCodeListReferences(workingReleaseId, sourceReleaseId, targetReleaseId);
+        remapDtScAwdPriAgencyIdListReferences(workingReleaseId, sourceReleaseId, targetReleaseId);
+    }
+
+    private int countAccBasedReferences(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        AccManifest dependency = ACC_MANIFEST.as("dependency");
+        return dslContext().selectCount()
+                .from(ACC_MANIFEST.join(dependency)
+                        .on(ACC_MANIFEST.BASED_ACC_MANIFEST_ID.eq(dependency.ACC_MANIFEST_ID)))
+                .where(and(
+                        ACC_MANIFEST.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .fetchOne(0, int.class);
+    }
+
+    private int countAccReplacementReferences(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        AccManifest dependency = ACC_MANIFEST.as("dependency");
+        return dslContext().selectCount()
+                .from(ACC_MANIFEST.join(dependency)
+                        .on(ACC_MANIFEST.REPLACEMENT_ACC_MANIFEST_ID.eq(dependency.ACC_MANIFEST_ID)))
+                .where(and(
+                        ACC_MANIFEST.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .fetchOne(0, int.class);
+    }
+
+    private int countAsccpRoleReferences(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        AccManifest dependency = ACC_MANIFEST.as("dependency");
+        return dslContext().selectCount()
+                .from(ASCCP_MANIFEST.join(dependency)
+                        .on(ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID.eq(dependency.ACC_MANIFEST_ID)))
+                .where(and(
+                        ASCCP_MANIFEST.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .fetchOne(0, int.class);
+    }
+
+    private int countAsccpReplacementReferences(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        AsccpManifest dependency = ASCCP_MANIFEST.as("dependency");
+        return dslContext().selectCount()
+                .from(ASCCP_MANIFEST.join(dependency)
+                        .on(ASCCP_MANIFEST.REPLACEMENT_ASCCP_MANIFEST_ID.eq(dependency.ASCCP_MANIFEST_ID)))
+                .where(and(
+                        ASCCP_MANIFEST.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .fetchOne(0, int.class);
+    }
+
+    private int countBccpBdtReferences(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        DtManifest dependency = DT_MANIFEST.as("dependency");
+        return dslContext().selectCount()
+                .from(BCCP_MANIFEST.join(dependency)
+                        .on(BCCP_MANIFEST.BDT_MANIFEST_ID.eq(dependency.DT_MANIFEST_ID)))
+                .where(and(
+                        BCCP_MANIFEST.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .fetchOne(0, int.class);
+    }
+
+    private int countBccpReplacementReferences(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        BccpManifest dependency = BCCP_MANIFEST.as("dependency");
+        return dslContext().selectCount()
+                .from(BCCP_MANIFEST.join(dependency)
+                        .on(BCCP_MANIFEST.REPLACEMENT_BCCP_MANIFEST_ID.eq(dependency.BCCP_MANIFEST_ID)))
+                .where(and(
+                        BCCP_MANIFEST.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .fetchOne(0, int.class);
+    }
+
+    private int countAsccTargetReferences(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        AsccpManifest dependency = ASCCP_MANIFEST.as("dependency");
+        return dslContext().selectCount()
+                .from(ASCC_MANIFEST.join(dependency)
+                        .on(ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID.eq(dependency.ASCCP_MANIFEST_ID)))
+                .where(and(
+                        ASCC_MANIFEST.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .fetchOne(0, int.class);
+    }
+
+    private List<String> findAsccTargetReferenceDens(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        AsccpManifest dependency = ASCCP_MANIFEST.as("dependency");
+        return dslContext().selectDistinct(ASCC_MANIFEST.DEN)
+                .from(ASCC_MANIFEST.join(dependency)
+                        .on(ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID.eq(dependency.ASCCP_MANIFEST_ID)))
+                .where(and(
+                        ASCC_MANIFEST.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .orderBy(ASCC_MANIFEST.DEN.asc())
+                .fetch(ASCC_MANIFEST.DEN);
+    }
+
+    private int countAsccReplacementReferences(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        AsccManifest dependency = ASCC_MANIFEST.as("dependency");
+        return dslContext().selectCount()
+                .from(ASCC_MANIFEST.join(dependency)
+                        .on(ASCC_MANIFEST.REPLACEMENT_ASCC_MANIFEST_ID.eq(dependency.ASCC_MANIFEST_ID)))
+                .where(and(
+                        ASCC_MANIFEST.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .fetchOne(0, int.class);
+    }
+
+    private List<String> findAsccReplacementReferenceDens(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        AsccManifest dependency = ASCC_MANIFEST.as("dependency");
+        return dslContext().selectDistinct(ASCC_MANIFEST.DEN)
+                .from(ASCC_MANIFEST.join(dependency)
+                        .on(ASCC_MANIFEST.REPLACEMENT_ASCC_MANIFEST_ID.eq(dependency.ASCC_MANIFEST_ID)))
+                .where(and(
+                        ASCC_MANIFEST.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .orderBy(ASCC_MANIFEST.DEN.asc())
+                .fetch(ASCC_MANIFEST.DEN);
+    }
+
+    private int countBccTargetReferences(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        BccpManifest dependency = BCCP_MANIFEST.as("dependency");
+        return dslContext().selectCount()
+                .from(BCC_MANIFEST.join(dependency)
+                        .on(BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(dependency.BCCP_MANIFEST_ID)))
+                .where(and(
+                        BCC_MANIFEST.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .fetchOne(0, int.class);
+    }
+
+    private int countBccReplacementReferences(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        BccManifest dependency = BCC_MANIFEST.as("dependency");
+        return dslContext().selectCount()
+                .from(BCC_MANIFEST.join(dependency)
+                        .on(BCC_MANIFEST.REPLACEMENT_BCC_MANIFEST_ID.eq(dependency.BCC_MANIFEST_ID)))
+                .where(and(
+                        BCC_MANIFEST.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .fetchOne(0, int.class);
+    }
+
+    private int countDtBasedReferences(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        DtManifest dependency = DT_MANIFEST.as("dependency");
+        return dslContext().selectCount()
+                .from(DT_MANIFEST.join(dependency)
+                        .on(DT_MANIFEST.BASED_DT_MANIFEST_ID.eq(dependency.DT_MANIFEST_ID)))
+                .where(and(
+                        DT_MANIFEST.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .fetchOne(0, int.class);
+    }
+
+    private int countDtReplacementReferences(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        DtManifest dependency = DT_MANIFEST.as("dependency");
+        return dslContext().selectCount()
+                .from(DT_MANIFEST.join(dependency)
+                        .on(DT_MANIFEST.REPLACEMENT_DT_MANIFEST_ID.eq(dependency.DT_MANIFEST_ID)))
+                .where(and(
+                        DT_MANIFEST.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .fetchOne(0, int.class);
+    }
+
+    private int countDtScBasedReferences(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        DtScManifest dependency = DT_SC_MANIFEST.as("dependency");
+        return dslContext().selectCount()
+                .from(DT_SC_MANIFEST.join(dependency)
+                        .on(DT_SC_MANIFEST.BASED_DT_SC_MANIFEST_ID.eq(dependency.DT_SC_MANIFEST_ID)))
+                .where(and(
+                        DT_SC_MANIFEST.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .fetchOne(0, int.class);
+    }
+
+    private int countDtScReplacementReferences(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        DtScManifest dependency = DT_SC_MANIFEST.as("dependency");
+        return dslContext().selectCount()
+                .from(DT_SC_MANIFEST.join(dependency)
+                        .on(DT_SC_MANIFEST.REPLACEMENT_DT_SC_MANIFEST_ID.eq(dependency.DT_SC_MANIFEST_ID)))
+                .where(and(
+                        DT_SC_MANIFEST.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .fetchOne(0, int.class);
+    }
+
+    private int countCodeListBasedReferences(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        CodeListManifest dependency = CODE_LIST_MANIFEST.as("dependency");
+        return dslContext().selectCount()
+                .from(CODE_LIST_MANIFEST.join(dependency)
+                        .on(CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID.eq(dependency.CODE_LIST_MANIFEST_ID)))
+                .where(and(
+                        CODE_LIST_MANIFEST.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .fetchOne(0, int.class);
+    }
+
+    private int countCodeListReplacementReferences(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        CodeListManifest dependency = CODE_LIST_MANIFEST.as("dependency");
+        return dslContext().selectCount()
+                .from(CODE_LIST_MANIFEST.join(dependency)
+                        .on(CODE_LIST_MANIFEST.REPLACEMENT_CODE_LIST_MANIFEST_ID.eq(dependency.CODE_LIST_MANIFEST_ID)))
+                .where(and(
+                        CODE_LIST_MANIFEST.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .fetchOne(0, int.class);
+    }
+
+    private int countAgencyIdListBasedReferences(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        AgencyIdListManifest dependency = AGENCY_ID_LIST_MANIFEST.as("dependency");
+        return dslContext().selectCount()
+                .from(AGENCY_ID_LIST_MANIFEST.join(dependency)
+                        .on(AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID.eq(dependency.AGENCY_ID_LIST_MANIFEST_ID)))
+                .where(and(
+                        AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .fetchOne(0, int.class);
+    }
+
+    private int countAgencyIdListReplacementReferences(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        AgencyIdListManifest dependency = AGENCY_ID_LIST_MANIFEST.as("dependency");
+        return dslContext().selectCount()
+                .from(AGENCY_ID_LIST_MANIFEST.join(dependency)
+                        .on(AGENCY_ID_LIST_MANIFEST.REPLACEMENT_AGENCY_ID_LIST_MANIFEST_ID.eq(dependency.AGENCY_ID_LIST_MANIFEST_ID)))
+                .where(and(
+                        AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .fetchOne(0, int.class);
+    }
+
+    private int countCodeListValueOwnerReferences(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        CodeListManifest dependency = CODE_LIST_MANIFEST.as("dependency");
+        return dslContext().selectCount()
+                .from(CODE_LIST_VALUE_MANIFEST.join(dependency)
+                        .on(CODE_LIST_VALUE_MANIFEST.CODE_LIST_MANIFEST_ID.eq(dependency.CODE_LIST_MANIFEST_ID)))
+                .where(and(
+                        CODE_LIST_VALUE_MANIFEST.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .fetchOne(0, int.class);
+    }
+
+    private int countCodeListValueReplacementReferences(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        CodeListValueManifest dependency = CODE_LIST_VALUE_MANIFEST.as("dependency");
+        return dslContext().selectCount()
+                .from(CODE_LIST_VALUE_MANIFEST.join(dependency)
+                        .on(CODE_LIST_VALUE_MANIFEST.REPLACEMENT_CODE_LIST_VALUE_MANIFEST_ID.eq(dependency.CODE_LIST_VALUE_MANIFEST_ID)))
+                .where(and(
+                        CODE_LIST_VALUE_MANIFEST.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .fetchOne(0, int.class);
+    }
+
+    private int countAgencyIdListValueOwnerReferences(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        AgencyIdListManifest dependency = AGENCY_ID_LIST_MANIFEST.as("dependency");
+        return dslContext().selectCount()
+                .from(AGENCY_ID_LIST_VALUE_MANIFEST.join(dependency)
+                        .on(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(dependency.AGENCY_ID_LIST_MANIFEST_ID)))
+                .where(and(
+                        AGENCY_ID_LIST_VALUE_MANIFEST.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .fetchOne(0, int.class);
+    }
+
+    private int countAgencyIdListValueReplacementReferences(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        AgencyIdListValueManifest dependency = AGENCY_ID_LIST_VALUE_MANIFEST.as("dependency");
+        return dslContext().selectCount()
+                .from(AGENCY_ID_LIST_VALUE_MANIFEST.join(dependency)
+                        .on(AGENCY_ID_LIST_VALUE_MANIFEST.REPLACEMENT_AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(dependency.AGENCY_ID_LIST_VALUE_MANIFEST_ID)))
+                .where(and(
+                        AGENCY_ID_LIST_VALUE_MANIFEST.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .fetchOne(0, int.class);
+    }
+
+    private int countDtAwdPriCodeListReferences(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        CodeListManifest dependency = CODE_LIST_MANIFEST.as("dependency");
+        return dslContext().selectCount()
+                .from(DT_AWD_PRI.join(dependency)
+                        .on(DT_AWD_PRI.CODE_LIST_MANIFEST_ID.eq(dependency.CODE_LIST_MANIFEST_ID)))
+                .where(and(
+                        DT_AWD_PRI.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .fetchOne(0, int.class);
+    }
+
+    private int countDtAwdPriAgencyIdListReferences(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        AgencyIdListManifest dependency = AGENCY_ID_LIST_MANIFEST.as("dependency");
+        return dslContext().selectCount()
+                .from(DT_AWD_PRI.join(dependency)
+                        .on(DT_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID.eq(dependency.AGENCY_ID_LIST_MANIFEST_ID)))
+                .where(and(
+                        DT_AWD_PRI.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .fetchOne(0, int.class);
+    }
+
+    private int countDtScAwdPriCodeListReferences(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        CodeListManifest dependency = CODE_LIST_MANIFEST.as("dependency");
+        return dslContext().selectCount()
+                .from(DT_SC_AWD_PRI.join(dependency)
+                        .on(DT_SC_AWD_PRI.CODE_LIST_MANIFEST_ID.eq(dependency.CODE_LIST_MANIFEST_ID)))
+                .where(and(
+                        DT_SC_AWD_PRI.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .fetchOne(0, int.class);
+    }
+
+    private int countDtScAwdPriAgencyIdListReferences(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId) {
+        AgencyIdListManifest dependency = AGENCY_ID_LIST_MANIFEST.as("dependency");
+        return dslContext().selectCount()
+                .from(DT_SC_AWD_PRI.join(dependency)
+                        .on(DT_SC_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID.eq(dependency.AGENCY_ID_LIST_MANIFEST_ID)))
+                .where(and(
+                        DT_SC_AWD_PRI.RELEASE_ID.eq(valueOf(workingReleaseId)),
+                        dependency.RELEASE_ID.eq(valueOf(dependencyReleaseId))))
+                .fetchOne(0, int.class);
+    }
+
+    private void remapAccBasedReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId) {
+        AccManifest working = ACC_MANIFEST.as("working");
+        AccManifest sourceManifest = ACC_MANIFEST.as("source_manifest");
+        Acc sourceAcc = ACC.as("source_acc");
+        Acc targetAcc = ACC.as("target_acc");
+        AccManifest targetManifest = ACC_MANIFEST.as("target_manifest");
+        dslContext().update(working
+                        .join(sourceManifest).on(and(
+                                working.BASED_ACC_MANIFEST_ID.eq(sourceManifest.ACC_MANIFEST_ID),
+                                sourceManifest.RELEASE_ID.eq(valueOf(sourceReleaseId))))
+                        .join(sourceAcc).on(sourceManifest.ACC_ID.eq(sourceAcc.ACC_ID))
+                        .join(targetAcc).on(sourceAcc.GUID.eq(targetAcc.GUID))
+                        .join(targetManifest).on(and(
+                                targetAcc.ACC_ID.eq(targetManifest.ACC_ID),
+                                targetManifest.RELEASE_ID.eq(valueOf(targetReleaseId)))))
+                .set(working.BASED_ACC_MANIFEST_ID, targetManifest.ACC_MANIFEST_ID)
+                .where(working.RELEASE_ID.eq(valueOf(workingReleaseId)))
+                .execute();
+    }
+
+    private void remapAccReplacementReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId) {
+        AccManifest working = ACC_MANIFEST.as("working");
+        AccManifest sourceManifest = ACC_MANIFEST.as("source_manifest");
+        Acc sourceAcc = ACC.as("source_acc");
+        Acc targetAcc = ACC.as("target_acc");
+        AccManifest targetManifest = ACC_MANIFEST.as("target_manifest");
+        dslContext().update(working
+                        .join(sourceManifest).on(and(
+                                working.REPLACEMENT_ACC_MANIFEST_ID.eq(sourceManifest.ACC_MANIFEST_ID),
+                                sourceManifest.RELEASE_ID.eq(valueOf(sourceReleaseId))))
+                        .join(sourceAcc).on(sourceManifest.ACC_ID.eq(sourceAcc.ACC_ID))
+                        .join(targetAcc).on(sourceAcc.GUID.eq(targetAcc.GUID))
+                        .join(targetManifest).on(and(
+                                targetAcc.ACC_ID.eq(targetManifest.ACC_ID),
+                                targetManifest.RELEASE_ID.eq(valueOf(targetReleaseId)))))
+                .set(working.REPLACEMENT_ACC_MANIFEST_ID, targetManifest.ACC_MANIFEST_ID)
+                .where(working.RELEASE_ID.eq(valueOf(workingReleaseId)))
+                .execute();
+    }
+
+    private void remapAsccpRoleReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId) {
+        AsccpManifest working = ASCCP_MANIFEST.as("working");
+        AccManifest sourceManifest = ACC_MANIFEST.as("source_manifest");
+        Acc sourceAcc = ACC.as("source_acc");
+        Acc targetAcc = ACC.as("target_acc");
+        AccManifest targetManifest = ACC_MANIFEST.as("target_manifest");
+        dslContext().update(working
+                        .join(sourceManifest).on(and(
+                                working.ROLE_OF_ACC_MANIFEST_ID.eq(sourceManifest.ACC_MANIFEST_ID),
+                                sourceManifest.RELEASE_ID.eq(valueOf(sourceReleaseId))))
+                        .join(sourceAcc).on(sourceManifest.ACC_ID.eq(sourceAcc.ACC_ID))
+                        .join(targetAcc).on(sourceAcc.GUID.eq(targetAcc.GUID))
+                        .join(targetManifest).on(and(
+                                targetAcc.ACC_ID.eq(targetManifest.ACC_ID),
+                                targetManifest.RELEASE_ID.eq(valueOf(targetReleaseId)))))
+                .set(working.ROLE_OF_ACC_MANIFEST_ID, targetManifest.ACC_MANIFEST_ID)
+                .where(working.RELEASE_ID.eq(valueOf(workingReleaseId)))
+                .execute();
+    }
+
+    private void remapAsccpReplacementReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId) {
+        AsccpManifest working = ASCCP_MANIFEST.as("working");
+        AsccpManifest sourceManifest = ASCCP_MANIFEST.as("source_manifest");
+        Asccp sourceComponent = ASCCP.as("source_component");
+        Asccp targetComponent = ASCCP.as("target_component");
+        AsccpManifest targetManifest = ASCCP_MANIFEST.as("target_manifest");
+        dslContext().update(working
+                        .join(sourceManifest).on(and(
+                                working.REPLACEMENT_ASCCP_MANIFEST_ID.eq(sourceManifest.ASCCP_MANIFEST_ID),
+                                sourceManifest.RELEASE_ID.eq(valueOf(sourceReleaseId))))
+                        .join(sourceComponent).on(sourceManifest.ASCCP_ID.eq(sourceComponent.ASCCP_ID))
+                        .join(targetComponent).on(sourceComponent.GUID.eq(targetComponent.GUID))
+                        .join(targetManifest).on(and(
+                                targetComponent.ASCCP_ID.eq(targetManifest.ASCCP_ID),
+                                targetManifest.RELEASE_ID.eq(valueOf(targetReleaseId)))))
+                .set(working.REPLACEMENT_ASCCP_MANIFEST_ID, targetManifest.ASCCP_MANIFEST_ID)
+                .where(working.RELEASE_ID.eq(valueOf(workingReleaseId)))
+                .execute();
+    }
+
+    private void remapBccpBdtReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId) {
+        BccpManifest working = BCCP_MANIFEST.as("working");
+        DtManifest sourceManifest = DT_MANIFEST.as("source_manifest");
+        Dt sourceComponent = DT.as("source_component");
+        Dt targetComponent = DT.as("target_component");
+        DtManifest targetManifest = DT_MANIFEST.as("target_manifest");
+        dslContext().update(working
+                        .join(sourceManifest).on(and(
+                                working.BDT_MANIFEST_ID.eq(sourceManifest.DT_MANIFEST_ID),
+                                sourceManifest.RELEASE_ID.eq(valueOf(sourceReleaseId))))
+                        .join(sourceComponent).on(sourceManifest.DT_ID.eq(sourceComponent.DT_ID))
+                        .join(targetComponent).on(sourceComponent.GUID.eq(targetComponent.GUID))
+                        .join(targetManifest).on(and(
+                                targetComponent.DT_ID.eq(targetManifest.DT_ID),
+                                targetManifest.RELEASE_ID.eq(valueOf(targetReleaseId)))))
+                .set(working.BDT_MANIFEST_ID, targetManifest.DT_MANIFEST_ID)
+                .where(working.RELEASE_ID.eq(valueOf(workingReleaseId)))
+                .execute();
+    }
+
+    private void remapBccpReplacementReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId) {
+        BccpManifest working = BCCP_MANIFEST.as("working");
+        BccpManifest sourceManifest = BCCP_MANIFEST.as("source_manifest");
+        Bccp sourceComponent = BCCP.as("source_component");
+        Bccp targetComponent = BCCP.as("target_component");
+        BccpManifest targetManifest = BCCP_MANIFEST.as("target_manifest");
+        dslContext().update(working
+                        .join(sourceManifest).on(and(
+                                working.REPLACEMENT_BCCP_MANIFEST_ID.eq(sourceManifest.BCCP_MANIFEST_ID),
+                                sourceManifest.RELEASE_ID.eq(valueOf(sourceReleaseId))))
+                        .join(sourceComponent).on(sourceManifest.BCCP_ID.eq(sourceComponent.BCCP_ID))
+                        .join(targetComponent).on(sourceComponent.GUID.eq(targetComponent.GUID))
+                        .join(targetManifest).on(and(
+                                targetComponent.BCCP_ID.eq(targetManifest.BCCP_ID),
+                                targetManifest.RELEASE_ID.eq(valueOf(targetReleaseId)))))
+                .set(working.REPLACEMENT_BCCP_MANIFEST_ID, targetManifest.BCCP_MANIFEST_ID)
+                .where(working.RELEASE_ID.eq(valueOf(workingReleaseId)))
+                .execute();
+    }
+
+    private void remapAsccTargetReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId) {
+        AsccManifest working = ASCC_MANIFEST.as("working");
+        AsccpManifest sourceManifest = ASCCP_MANIFEST.as("source_manifest");
+        Asccp sourceComponent = ASCCP.as("source_component");
+        Asccp targetComponent = ASCCP.as("target_component");
+        AsccpManifest targetManifest = ASCCP_MANIFEST.as("target_manifest");
+        dslContext().update(working
+                        .join(sourceManifest).on(and(
+                                working.TO_ASCCP_MANIFEST_ID.eq(sourceManifest.ASCCP_MANIFEST_ID),
+                                sourceManifest.RELEASE_ID.eq(valueOf(sourceReleaseId))))
+                        .join(sourceComponent).on(sourceManifest.ASCCP_ID.eq(sourceComponent.ASCCP_ID))
+                        .join(targetComponent).on(sourceComponent.GUID.eq(targetComponent.GUID))
+                        .join(targetManifest).on(and(
+                                targetComponent.ASCCP_ID.eq(targetManifest.ASCCP_ID),
+                                targetManifest.RELEASE_ID.eq(valueOf(targetReleaseId)))))
+                .set(working.TO_ASCCP_MANIFEST_ID, targetManifest.ASCCP_MANIFEST_ID)
+                .where(working.RELEASE_ID.eq(valueOf(workingReleaseId)))
+                .execute();
+    }
+
+    private void remapAsccReplacementReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId) {
+        AsccManifest working = ASCC_MANIFEST.as("working");
+        AsccManifest sourceManifest = ASCC_MANIFEST.as("source_manifest");
+        Ascc sourceComponent = ASCC.as("source_component");
+        Ascc targetComponent = ASCC.as("target_component");
+        AsccManifest targetManifest = ASCC_MANIFEST.as("target_manifest");
+        dslContext().update(working
+                        .join(sourceManifest).on(and(
+                                working.REPLACEMENT_ASCC_MANIFEST_ID.eq(sourceManifest.ASCC_MANIFEST_ID),
+                                sourceManifest.RELEASE_ID.eq(valueOf(sourceReleaseId))))
+                        .join(sourceComponent).on(sourceManifest.ASCC_ID.eq(sourceComponent.ASCC_ID))
+                        .join(targetComponent).on(sourceComponent.GUID.eq(targetComponent.GUID))
+                        .join(targetManifest).on(and(
+                                targetComponent.ASCC_ID.eq(targetManifest.ASCC_ID),
+                                targetManifest.RELEASE_ID.eq(valueOf(targetReleaseId)))))
+                .set(working.REPLACEMENT_ASCC_MANIFEST_ID, targetManifest.ASCC_MANIFEST_ID)
+                .where(working.RELEASE_ID.eq(valueOf(workingReleaseId)))
+                .execute();
+    }
+
+    private void remapBccTargetReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId) {
+        BccManifest working = BCC_MANIFEST.as("working");
+        BccpManifest sourceManifest = BCCP_MANIFEST.as("source_manifest");
+        Bccp sourceComponent = BCCP.as("source_component");
+        Bccp targetComponent = BCCP.as("target_component");
+        BccpManifest targetManifest = BCCP_MANIFEST.as("target_manifest");
+        dslContext().update(working
+                        .join(sourceManifest).on(and(
+                                working.TO_BCCP_MANIFEST_ID.eq(sourceManifest.BCCP_MANIFEST_ID),
+                                sourceManifest.RELEASE_ID.eq(valueOf(sourceReleaseId))))
+                        .join(sourceComponent).on(sourceManifest.BCCP_ID.eq(sourceComponent.BCCP_ID))
+                        .join(targetComponent).on(sourceComponent.GUID.eq(targetComponent.GUID))
+                        .join(targetManifest).on(and(
+                                targetComponent.BCCP_ID.eq(targetManifest.BCCP_ID),
+                                targetManifest.RELEASE_ID.eq(valueOf(targetReleaseId)))))
+                .set(working.TO_BCCP_MANIFEST_ID, targetManifest.BCCP_MANIFEST_ID)
+                .where(working.RELEASE_ID.eq(valueOf(workingReleaseId)))
+                .execute();
+    }
+
+    private void remapBccReplacementReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId) {
+        BccManifest working = BCC_MANIFEST.as("working");
+        BccManifest sourceManifest = BCC_MANIFEST.as("source_manifest");
+        Bcc sourceComponent = BCC.as("source_component");
+        Bcc targetComponent = BCC.as("target_component");
+        BccManifest targetManifest = BCC_MANIFEST.as("target_manifest");
+        dslContext().update(working
+                        .join(sourceManifest).on(and(
+                                working.REPLACEMENT_BCC_MANIFEST_ID.eq(sourceManifest.BCC_MANIFEST_ID),
+                                sourceManifest.RELEASE_ID.eq(valueOf(sourceReleaseId))))
+                        .join(sourceComponent).on(sourceManifest.BCC_ID.eq(sourceComponent.BCC_ID))
+                        .join(targetComponent).on(sourceComponent.GUID.eq(targetComponent.GUID))
+                        .join(targetManifest).on(and(
+                                targetComponent.BCC_ID.eq(targetManifest.BCC_ID),
+                                targetManifest.RELEASE_ID.eq(valueOf(targetReleaseId)))))
+                .set(working.REPLACEMENT_BCC_MANIFEST_ID, targetManifest.BCC_MANIFEST_ID)
+                .where(working.RELEASE_ID.eq(valueOf(workingReleaseId)))
+                .execute();
+    }
+
+    private void remapDtBasedReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId) {
+        DtManifest working = DT_MANIFEST.as("working");
+        DtManifest sourceManifest = DT_MANIFEST.as("source_manifest");
+        Dt sourceComponent = DT.as("source_component");
+        Dt targetComponent = DT.as("target_component");
+        DtManifest targetManifest = DT_MANIFEST.as("target_manifest");
+        dslContext().update(working
+                        .join(sourceManifest).on(and(
+                                working.BASED_DT_MANIFEST_ID.eq(sourceManifest.DT_MANIFEST_ID),
+                                sourceManifest.RELEASE_ID.eq(valueOf(sourceReleaseId))))
+                        .join(sourceComponent).on(sourceManifest.DT_ID.eq(sourceComponent.DT_ID))
+                        .join(targetComponent).on(sourceComponent.GUID.eq(targetComponent.GUID))
+                        .join(targetManifest).on(and(
+                                targetComponent.DT_ID.eq(targetManifest.DT_ID),
+                                targetManifest.RELEASE_ID.eq(valueOf(targetReleaseId)))))
+                .set(working.BASED_DT_MANIFEST_ID, targetManifest.DT_MANIFEST_ID)
+                .where(working.RELEASE_ID.eq(valueOf(workingReleaseId)))
+                .execute();
+    }
+
+    private void remapDtReplacementReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId) {
+        DtManifest working = DT_MANIFEST.as("working");
+        DtManifest sourceManifest = DT_MANIFEST.as("source_manifest");
+        Dt sourceComponent = DT.as("source_component");
+        Dt targetComponent = DT.as("target_component");
+        DtManifest targetManifest = DT_MANIFEST.as("target_manifest");
+        dslContext().update(working
+                        .join(sourceManifest).on(and(
+                                working.REPLACEMENT_DT_MANIFEST_ID.eq(sourceManifest.DT_MANIFEST_ID),
+                                sourceManifest.RELEASE_ID.eq(valueOf(sourceReleaseId))))
+                        .join(sourceComponent).on(sourceManifest.DT_ID.eq(sourceComponent.DT_ID))
+                        .join(targetComponent).on(sourceComponent.GUID.eq(targetComponent.GUID))
+                        .join(targetManifest).on(and(
+                                targetComponent.DT_ID.eq(targetManifest.DT_ID),
+                                targetManifest.RELEASE_ID.eq(valueOf(targetReleaseId)))))
+                .set(working.REPLACEMENT_DT_MANIFEST_ID, targetManifest.DT_MANIFEST_ID)
+                .where(working.RELEASE_ID.eq(valueOf(workingReleaseId)))
+                .execute();
+    }
+
+    private void remapDtScBasedReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId) {
+        DtScManifest working = DT_SC_MANIFEST.as("working");
+        DtScManifest sourceManifest = DT_SC_MANIFEST.as("source_manifest");
+        DtSc sourceComponent = DT_SC.as("source_component");
+        DtSc targetComponent = DT_SC.as("target_component");
+        DtScManifest targetManifest = DT_SC_MANIFEST.as("target_manifest");
+        dslContext().update(working
+                        .join(sourceManifest).on(and(
+                                working.BASED_DT_SC_MANIFEST_ID.eq(sourceManifest.DT_SC_MANIFEST_ID),
+                                sourceManifest.RELEASE_ID.eq(valueOf(sourceReleaseId))))
+                        .join(sourceComponent).on(sourceManifest.DT_SC_ID.eq(sourceComponent.DT_SC_ID))
+                        .join(targetComponent).on(sourceComponent.GUID.eq(targetComponent.GUID))
+                        .join(targetManifest).on(and(
+                                targetComponent.DT_SC_ID.eq(targetManifest.DT_SC_ID),
+                                targetManifest.RELEASE_ID.eq(valueOf(targetReleaseId)))))
+                .set(working.BASED_DT_SC_MANIFEST_ID, targetManifest.DT_SC_MANIFEST_ID)
+                .where(working.RELEASE_ID.eq(valueOf(workingReleaseId)))
+                .execute();
+    }
+
+    private void remapDtScReplacementReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId) {
+        DtScManifest working = DT_SC_MANIFEST.as("working");
+        DtScManifest sourceManifest = DT_SC_MANIFEST.as("source_manifest");
+        DtSc sourceComponent = DT_SC.as("source_component");
+        DtSc targetComponent = DT_SC.as("target_component");
+        DtScManifest targetManifest = DT_SC_MANIFEST.as("target_manifest");
+        dslContext().update(working
+                        .join(sourceManifest).on(and(
+                                working.REPLACEMENT_DT_SC_MANIFEST_ID.eq(sourceManifest.DT_SC_MANIFEST_ID),
+                                sourceManifest.RELEASE_ID.eq(valueOf(sourceReleaseId))))
+                        .join(sourceComponent).on(sourceManifest.DT_SC_ID.eq(sourceComponent.DT_SC_ID))
+                        .join(targetComponent).on(sourceComponent.GUID.eq(targetComponent.GUID))
+                        .join(targetManifest).on(and(
+                                targetComponent.DT_SC_ID.eq(targetManifest.DT_SC_ID),
+                                targetManifest.RELEASE_ID.eq(valueOf(targetReleaseId)))))
+                .set(working.REPLACEMENT_DT_SC_MANIFEST_ID, targetManifest.DT_SC_MANIFEST_ID)
+                .where(working.RELEASE_ID.eq(valueOf(workingReleaseId)))
+                .execute();
+    }
+
+    private void remapCodeListBasedReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId) {
+        CodeListManifest working = CODE_LIST_MANIFEST.as("working");
+        CodeListManifest sourceManifest = CODE_LIST_MANIFEST.as("source_manifest");
+        CodeList sourceComponent = CODE_LIST.as("source_component");
+        CodeList targetComponent = CODE_LIST.as("target_component");
+        CodeListManifest targetManifest = CODE_LIST_MANIFEST.as("target_manifest");
+        dslContext().update(working
+                        .join(sourceManifest).on(and(
+                                working.BASED_CODE_LIST_MANIFEST_ID.eq(sourceManifest.CODE_LIST_MANIFEST_ID),
+                                sourceManifest.RELEASE_ID.eq(valueOf(sourceReleaseId))))
+                        .join(sourceComponent).on(sourceManifest.CODE_LIST_ID.eq(sourceComponent.CODE_LIST_ID))
+                        .join(targetComponent).on(sourceComponent.GUID.eq(targetComponent.GUID))
+                        .join(targetManifest).on(and(
+                                targetComponent.CODE_LIST_ID.eq(targetManifest.CODE_LIST_ID),
+                                targetManifest.RELEASE_ID.eq(valueOf(targetReleaseId)))))
+                .set(working.BASED_CODE_LIST_MANIFEST_ID, targetManifest.CODE_LIST_MANIFEST_ID)
+                .where(working.RELEASE_ID.eq(valueOf(workingReleaseId)))
+                .execute();
+    }
+
+    private void remapCodeListReplacementReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId) {
+        CodeListManifest working = CODE_LIST_MANIFEST.as("working");
+        CodeListManifest sourceManifest = CODE_LIST_MANIFEST.as("source_manifest");
+        CodeList sourceComponent = CODE_LIST.as("source_component");
+        CodeList targetComponent = CODE_LIST.as("target_component");
+        CodeListManifest targetManifest = CODE_LIST_MANIFEST.as("target_manifest");
+        dslContext().update(working
+                        .join(sourceManifest).on(and(
+                                working.REPLACEMENT_CODE_LIST_MANIFEST_ID.eq(sourceManifest.CODE_LIST_MANIFEST_ID),
+                                sourceManifest.RELEASE_ID.eq(valueOf(sourceReleaseId))))
+                        .join(sourceComponent).on(sourceManifest.CODE_LIST_ID.eq(sourceComponent.CODE_LIST_ID))
+                        .join(targetComponent).on(sourceComponent.GUID.eq(targetComponent.GUID))
+                        .join(targetManifest).on(and(
+                                targetComponent.CODE_LIST_ID.eq(targetManifest.CODE_LIST_ID),
+                                targetManifest.RELEASE_ID.eq(valueOf(targetReleaseId)))))
+                .set(working.REPLACEMENT_CODE_LIST_MANIFEST_ID, targetManifest.CODE_LIST_MANIFEST_ID)
+                .where(working.RELEASE_ID.eq(valueOf(workingReleaseId)))
+                .execute();
+    }
+
+    private void remapAgencyIdListBasedReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId) {
+        AgencyIdListManifest working = AGENCY_ID_LIST_MANIFEST.as("working");
+        AgencyIdListManifest sourceManifest = AGENCY_ID_LIST_MANIFEST.as("source_manifest");
+        AgencyIdList sourceComponent = AGENCY_ID_LIST.as("source_component");
+        AgencyIdList targetComponent = AGENCY_ID_LIST.as("target_component");
+        AgencyIdListManifest targetManifest = AGENCY_ID_LIST_MANIFEST.as("target_manifest");
+        dslContext().update(working
+                        .join(sourceManifest).on(and(
+                                working.BASED_AGENCY_ID_LIST_MANIFEST_ID.eq(sourceManifest.AGENCY_ID_LIST_MANIFEST_ID),
+                                sourceManifest.RELEASE_ID.eq(valueOf(sourceReleaseId))))
+                        .join(sourceComponent).on(sourceManifest.AGENCY_ID_LIST_ID.eq(sourceComponent.AGENCY_ID_LIST_ID))
+                        .join(targetComponent).on(sourceComponent.GUID.eq(targetComponent.GUID))
+                        .join(targetManifest).on(and(
+                                targetComponent.AGENCY_ID_LIST_ID.eq(targetManifest.AGENCY_ID_LIST_ID),
+                                targetManifest.RELEASE_ID.eq(valueOf(targetReleaseId)))))
+                .set(working.BASED_AGENCY_ID_LIST_MANIFEST_ID, targetManifest.AGENCY_ID_LIST_MANIFEST_ID)
+                .where(working.RELEASE_ID.eq(valueOf(workingReleaseId)))
+                .execute();
+    }
+
+    private void remapAgencyIdListReplacementReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId) {
+        AgencyIdListManifest working = AGENCY_ID_LIST_MANIFEST.as("working");
+        AgencyIdListManifest sourceManifest = AGENCY_ID_LIST_MANIFEST.as("source_manifest");
+        AgencyIdList sourceComponent = AGENCY_ID_LIST.as("source_component");
+        AgencyIdList targetComponent = AGENCY_ID_LIST.as("target_component");
+        AgencyIdListManifest targetManifest = AGENCY_ID_LIST_MANIFEST.as("target_manifest");
+        dslContext().update(working
+                        .join(sourceManifest).on(and(
+                                working.REPLACEMENT_AGENCY_ID_LIST_MANIFEST_ID.eq(sourceManifest.AGENCY_ID_LIST_MANIFEST_ID),
+                                sourceManifest.RELEASE_ID.eq(valueOf(sourceReleaseId))))
+                        .join(sourceComponent).on(sourceManifest.AGENCY_ID_LIST_ID.eq(sourceComponent.AGENCY_ID_LIST_ID))
+                        .join(targetComponent).on(sourceComponent.GUID.eq(targetComponent.GUID))
+                        .join(targetManifest).on(and(
+                                targetComponent.AGENCY_ID_LIST_ID.eq(targetManifest.AGENCY_ID_LIST_ID),
+                                targetManifest.RELEASE_ID.eq(valueOf(targetReleaseId)))))
+                .set(working.REPLACEMENT_AGENCY_ID_LIST_MANIFEST_ID, targetManifest.AGENCY_ID_LIST_MANIFEST_ID)
+                .where(working.RELEASE_ID.eq(valueOf(workingReleaseId)))
+                .execute();
+    }
+
+    private void remapCodeListValueOwnerReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId) {
+        CodeListValueManifest working = CODE_LIST_VALUE_MANIFEST.as("working");
+        CodeListManifest sourceManifest = CODE_LIST_MANIFEST.as("source_manifest");
+        CodeList sourceComponent = CODE_LIST.as("source_component");
+        CodeList targetComponent = CODE_LIST.as("target_component");
+        CodeListManifest targetManifest = CODE_LIST_MANIFEST.as("target_manifest");
+        dslContext().update(working
+                        .join(sourceManifest).on(and(
+                                working.CODE_LIST_MANIFEST_ID.eq(sourceManifest.CODE_LIST_MANIFEST_ID),
+                                sourceManifest.RELEASE_ID.eq(valueOf(sourceReleaseId))))
+                        .join(sourceComponent).on(sourceManifest.CODE_LIST_ID.eq(sourceComponent.CODE_LIST_ID))
+                        .join(targetComponent).on(sourceComponent.GUID.eq(targetComponent.GUID))
+                        .join(targetManifest).on(and(
+                                targetComponent.CODE_LIST_ID.eq(targetManifest.CODE_LIST_ID),
+                                targetManifest.RELEASE_ID.eq(valueOf(targetReleaseId)))))
+                .set(working.CODE_LIST_MANIFEST_ID, targetManifest.CODE_LIST_MANIFEST_ID)
+                .where(working.RELEASE_ID.eq(valueOf(workingReleaseId)))
+                .execute();
+    }
+
+    private void remapCodeListValueReplacementReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId) {
+        CodeListValueManifest working = CODE_LIST_VALUE_MANIFEST.as("working");
+        CodeListValueManifest sourceManifest = CODE_LIST_VALUE_MANIFEST.as("source_manifest");
+        CodeListValue sourceComponent = CODE_LIST_VALUE.as("source_component");
+        CodeListValue targetComponent = CODE_LIST_VALUE.as("target_component");
+        CodeListValueManifest targetManifest = CODE_LIST_VALUE_MANIFEST.as("target_manifest");
+        dslContext().update(working
+                        .join(sourceManifest).on(and(
+                                working.REPLACEMENT_CODE_LIST_VALUE_MANIFEST_ID.eq(sourceManifest.CODE_LIST_VALUE_MANIFEST_ID),
+                                sourceManifest.RELEASE_ID.eq(valueOf(sourceReleaseId))))
+                        .join(sourceComponent).on(sourceManifest.CODE_LIST_VALUE_ID.eq(sourceComponent.CODE_LIST_VALUE_ID))
+                        .join(targetComponent).on(sourceComponent.GUID.eq(targetComponent.GUID))
+                        .join(targetManifest).on(and(
+                                targetComponent.CODE_LIST_VALUE_ID.eq(targetManifest.CODE_LIST_VALUE_ID),
+                                targetManifest.RELEASE_ID.eq(valueOf(targetReleaseId)))))
+                .set(working.REPLACEMENT_CODE_LIST_VALUE_MANIFEST_ID, targetManifest.CODE_LIST_VALUE_MANIFEST_ID)
+                .where(working.RELEASE_ID.eq(valueOf(workingReleaseId)))
+                .execute();
+    }
+
+    private void remapAgencyIdListValueOwnerReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId) {
+        AgencyIdListValueManifest working = AGENCY_ID_LIST_VALUE_MANIFEST.as("working");
+        AgencyIdListManifest sourceManifest = AGENCY_ID_LIST_MANIFEST.as("source_manifest");
+        AgencyIdList sourceComponent = AGENCY_ID_LIST.as("source_component");
+        AgencyIdList targetComponent = AGENCY_ID_LIST.as("target_component");
+        AgencyIdListManifest targetManifest = AGENCY_ID_LIST_MANIFEST.as("target_manifest");
+        dslContext().update(working
+                        .join(sourceManifest).on(and(
+                                working.AGENCY_ID_LIST_MANIFEST_ID.eq(sourceManifest.AGENCY_ID_LIST_MANIFEST_ID),
+                                sourceManifest.RELEASE_ID.eq(valueOf(sourceReleaseId))))
+                        .join(sourceComponent).on(sourceManifest.AGENCY_ID_LIST_ID.eq(sourceComponent.AGENCY_ID_LIST_ID))
+                        .join(targetComponent).on(sourceComponent.GUID.eq(targetComponent.GUID))
+                        .join(targetManifest).on(and(
+                                targetComponent.AGENCY_ID_LIST_ID.eq(targetManifest.AGENCY_ID_LIST_ID),
+                                targetManifest.RELEASE_ID.eq(valueOf(targetReleaseId)))))
+                .set(working.AGENCY_ID_LIST_MANIFEST_ID, targetManifest.AGENCY_ID_LIST_MANIFEST_ID)
+                .where(working.RELEASE_ID.eq(valueOf(workingReleaseId)))
+                .execute();
+    }
+
+    private void remapAgencyIdListValueReplacementReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId) {
+        AgencyIdListValueManifest working = AGENCY_ID_LIST_VALUE_MANIFEST.as("working");
+        AgencyIdListValueManifest sourceManifest = AGENCY_ID_LIST_VALUE_MANIFEST.as("source_manifest");
+        AgencyIdListValue sourceComponent = AGENCY_ID_LIST_VALUE.as("source_component");
+        AgencyIdListValue targetComponent = AGENCY_ID_LIST_VALUE.as("target_component");
+        AgencyIdListValueManifest targetManifest = AGENCY_ID_LIST_VALUE_MANIFEST.as("target_manifest");
+        dslContext().update(working
+                        .join(sourceManifest).on(and(
+                                working.REPLACEMENT_AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(sourceManifest.AGENCY_ID_LIST_VALUE_MANIFEST_ID),
+                                sourceManifest.RELEASE_ID.eq(valueOf(sourceReleaseId))))
+                        .join(sourceComponent).on(sourceManifest.AGENCY_ID_LIST_VALUE_ID.eq(sourceComponent.AGENCY_ID_LIST_VALUE_ID))
+                        .join(targetComponent).on(sourceComponent.GUID.eq(targetComponent.GUID))
+                        .join(targetManifest).on(and(
+                                targetComponent.AGENCY_ID_LIST_VALUE_ID.eq(targetManifest.AGENCY_ID_LIST_VALUE_ID),
+                                targetManifest.RELEASE_ID.eq(valueOf(targetReleaseId)))))
+                .set(working.REPLACEMENT_AGENCY_ID_LIST_VALUE_MANIFEST_ID, targetManifest.AGENCY_ID_LIST_VALUE_MANIFEST_ID)
+                .where(working.RELEASE_ID.eq(valueOf(workingReleaseId)))
+                .execute();
+    }
+
+    private void remapDtAwdPriCodeListReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId) {
+        CodeListManifest sourceManifest = CODE_LIST_MANIFEST.as("source_manifest");
+        CodeList sourceComponent = CODE_LIST.as("source_component");
+        CodeList targetComponent = CODE_LIST.as("target_component");
+        CodeListManifest targetManifest = CODE_LIST_MANIFEST.as("target_manifest");
+        dslContext().update(DT_AWD_PRI
+                        .join(sourceManifest).on(and(
+                                DT_AWD_PRI.CODE_LIST_MANIFEST_ID.eq(sourceManifest.CODE_LIST_MANIFEST_ID),
+                                sourceManifest.RELEASE_ID.eq(valueOf(sourceReleaseId))))
+                        .join(sourceComponent).on(sourceManifest.CODE_LIST_ID.eq(sourceComponent.CODE_LIST_ID))
+                        .join(targetComponent).on(sourceComponent.GUID.eq(targetComponent.GUID))
+                        .join(targetManifest).on(and(
+                                targetComponent.CODE_LIST_ID.eq(targetManifest.CODE_LIST_ID),
+                                targetManifest.RELEASE_ID.eq(valueOf(targetReleaseId)))))
+                .set(DT_AWD_PRI.CODE_LIST_MANIFEST_ID, targetManifest.CODE_LIST_MANIFEST_ID)
+                .where(DT_AWD_PRI.RELEASE_ID.eq(valueOf(workingReleaseId)))
+                .execute();
+    }
+
+    private void remapDtAwdPriAgencyIdListReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId) {
+        AgencyIdListManifest sourceManifest = AGENCY_ID_LIST_MANIFEST.as("source_manifest");
+        AgencyIdList sourceComponent = AGENCY_ID_LIST.as("source_component");
+        AgencyIdList targetComponent = AGENCY_ID_LIST.as("target_component");
+        AgencyIdListManifest targetManifest = AGENCY_ID_LIST_MANIFEST.as("target_manifest");
+        dslContext().update(DT_AWD_PRI
+                        .join(sourceManifest).on(and(
+                                DT_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID.eq(sourceManifest.AGENCY_ID_LIST_MANIFEST_ID),
+                                sourceManifest.RELEASE_ID.eq(valueOf(sourceReleaseId))))
+                        .join(sourceComponent).on(sourceManifest.AGENCY_ID_LIST_ID.eq(sourceComponent.AGENCY_ID_LIST_ID))
+                        .join(targetComponent).on(sourceComponent.GUID.eq(targetComponent.GUID))
+                        .join(targetManifest).on(and(
+                                targetComponent.AGENCY_ID_LIST_ID.eq(targetManifest.AGENCY_ID_LIST_ID),
+                                targetManifest.RELEASE_ID.eq(valueOf(targetReleaseId)))))
+                .set(DT_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID, targetManifest.AGENCY_ID_LIST_MANIFEST_ID)
+                .where(DT_AWD_PRI.RELEASE_ID.eq(valueOf(workingReleaseId)))
+                .execute();
+    }
+
+    private void remapDtScAwdPriCodeListReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId) {
+        CodeListManifest sourceManifest = CODE_LIST_MANIFEST.as("source_manifest");
+        CodeList sourceComponent = CODE_LIST.as("source_component");
+        CodeList targetComponent = CODE_LIST.as("target_component");
+        CodeListManifest targetManifest = CODE_LIST_MANIFEST.as("target_manifest");
+        dslContext().update(DT_SC_AWD_PRI
+                        .join(sourceManifest).on(and(
+                                DT_SC_AWD_PRI.CODE_LIST_MANIFEST_ID.eq(sourceManifest.CODE_LIST_MANIFEST_ID),
+                                sourceManifest.RELEASE_ID.eq(valueOf(sourceReleaseId))))
+                        .join(sourceComponent).on(sourceManifest.CODE_LIST_ID.eq(sourceComponent.CODE_LIST_ID))
+                        .join(targetComponent).on(sourceComponent.GUID.eq(targetComponent.GUID))
+                        .join(targetManifest).on(and(
+                                targetComponent.CODE_LIST_ID.eq(targetManifest.CODE_LIST_ID),
+                                targetManifest.RELEASE_ID.eq(valueOf(targetReleaseId)))))
+                .set(DT_SC_AWD_PRI.CODE_LIST_MANIFEST_ID, targetManifest.CODE_LIST_MANIFEST_ID)
+                .where(DT_SC_AWD_PRI.RELEASE_ID.eq(valueOf(workingReleaseId)))
+                .execute();
+    }
+
+    private void remapDtScAwdPriAgencyIdListReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId) {
+        AgencyIdListManifest sourceManifest = AGENCY_ID_LIST_MANIFEST.as("source_manifest");
+        AgencyIdList sourceComponent = AGENCY_ID_LIST.as("source_component");
+        AgencyIdList targetComponent = AGENCY_ID_LIST.as("target_component");
+        AgencyIdListManifest targetManifest = AGENCY_ID_LIST_MANIFEST.as("target_manifest");
+        dslContext().update(DT_SC_AWD_PRI
+                        .join(sourceManifest).on(and(
+                                DT_SC_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID.eq(sourceManifest.AGENCY_ID_LIST_MANIFEST_ID),
+                                sourceManifest.RELEASE_ID.eq(valueOf(sourceReleaseId))))
+                        .join(sourceComponent).on(sourceManifest.AGENCY_ID_LIST_ID.eq(sourceComponent.AGENCY_ID_LIST_ID))
+                        .join(targetComponent).on(sourceComponent.GUID.eq(targetComponent.GUID))
+                        .join(targetManifest).on(and(
+                                targetComponent.AGENCY_ID_LIST_ID.eq(targetManifest.AGENCY_ID_LIST_ID),
+                                targetManifest.RELEASE_ID.eq(valueOf(targetReleaseId)))))
+                .set(DT_SC_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID, targetManifest.AGENCY_ID_LIST_MANIFEST_ID)
+                .where(DT_SC_AWD_PRI.RELEASE_ID.eq(valueOf(workingReleaseId)))
+                .execute();
     }
 
     @Override

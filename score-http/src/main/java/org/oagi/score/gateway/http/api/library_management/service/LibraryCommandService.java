@@ -6,8 +6,11 @@ import org.oagi.score.gateway.http.api.library_management.controller.payload.Dis
 import org.oagi.score.gateway.http.api.library_management.controller.payload.UpdateLibraryReleaseDependenciesRequest;
 import org.oagi.score.gateway.http.api.library_management.controller.payload.UpdateLibraryRequest;
 import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
+import org.oagi.score.gateway.http.api.library_management.model.LibrarySummaryRecord;
 import org.oagi.score.gateway.http.api.library_management.repository.LibraryCommandRepository;
 import org.oagi.score.gateway.http.api.library_management.repository.LibraryQueryRepository;
+import org.oagi.score.gateway.http.api.release_management.model.ReleaseDependencySummaryRecord;
+import org.oagi.score.gateway.http.api.release_management.model.ReleaseDetailsRecord;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseState;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseSummaryRecord;
@@ -19,7 +22,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -109,7 +117,7 @@ public class LibraryCommandService {
         }
 
         Set<ReleaseId> dependencyReleaseIds = request.releaseIds() == null ? Set.of() :
-                request.releaseIds().stream().collect(Collectors.toSet());
+                request.releaseIds().stream().collect(Collectors.toCollection(LinkedHashSet::new));
         List<ReleaseSummaryRecord> dependencyReleases = releaseQuery(requester).getReleaseSummaryList(dependencyReleaseIds);
         if (dependencyReleases.size() != dependencyReleaseIds.size()) {
             throw new IllegalArgumentException("One or more selected release dependencies do not exist.");
@@ -133,8 +141,277 @@ public class LibraryCommandService {
             }
         }
 
-        releaseCommand(requester).deleteDeps(workingRelease.releaseId());
-        releaseCommand(requester).createDeps(workingRelease.releaseId(), dependencyReleaseIds);
+        Map<LibraryId, String> libraryNameMap = query(requester).getLibrarySummaryList().stream()
+                .collect(Collectors.toMap(LibrarySummaryRecord::libraryId, LibrarySummaryRecord::name));
+        List<ReleaseDependencySummaryRecord> currentDependencies =
+                releaseQuery(requester).getReleaseDependencySummaryList(workingRelease.releaseId());
+        validateAndRemapDependencyChanges(
+                requester, workingRelease, currentDependencies, dependencyReleases, libraryNameMap);
+
+        Set<ReleaseId> currentDependencyReleaseIds = currentDependencies.stream()
+                .map(ReleaseDependencySummaryRecord::releaseId)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        List<ReleaseId> dependencyReleaseIdsToCreate = dependencyReleaseIds.stream()
+                .filter(releaseId -> !currentDependencyReleaseIds.contains(releaseId))
+                .collect(Collectors.toList());
+        Set<ReleaseId> dependencyReleaseIdsToDelete = currentDependencyReleaseIds.stream()
+                .filter(releaseId -> !dependencyReleaseIds.contains(releaseId))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        releaseCommand(requester).deleteDeps(workingRelease.releaseId(), dependencyReleaseIdsToDelete);
+        releaseCommand(requester).createDeps(workingRelease.releaseId(), dependencyReleaseIdsToCreate);
+    }
+
+    private void validateAndRemapDependencyChanges(
+            ScoreUser requester,
+            ReleaseSummaryRecord workingRelease,
+            List<ReleaseDependencySummaryRecord> currentDependencies,
+            List<ReleaseSummaryRecord> selectedDependencies,
+            Map<LibraryId, String> libraryNameMap) {
+
+        Map<LibraryId, ReleaseDependencySummaryRecord> currentByLibrary = currentDependencies.stream()
+                .collect(Collectors.toMap(ReleaseDependencySummaryRecord::libraryId, dependency -> dependency,
+                        (left, right) -> left, LinkedHashMap::new));
+        Map<LibraryId, ReleaseSummaryRecord> selectedByLibrary = selectedDependencies.stream()
+                .collect(Collectors.toMap(ReleaseSummaryRecord::libraryId, dependency -> dependency,
+                        (left, right) -> left, LinkedHashMap::new));
+
+        var ccCommand = repositoryFactory.ccCommandRepository(requester);
+        Map<ReleaseId, ReleaseDetailsRecord> releaseDetailsCache = new LinkedHashMap<>();
+        List<String> errors = new ArrayList<>();
+
+        for (Map.Entry<LibraryId, ReleaseDependencySummaryRecord> entry : currentByLibrary.entrySet()) {
+            LibraryId dependencyLibraryId = entry.getKey();
+            ReleaseDependencySummaryRecord currentDependency = entry.getValue();
+            ReleaseSummaryRecord selectedDependency = selectedByLibrary.get(dependencyLibraryId);
+
+            if (selectedDependency == null) {
+                Map<String, Integer> referenceCounts =
+                        ccCommand.getCrossReleaseReferenceCounts(workingRelease.releaseId(), currentDependency.releaseId());
+                if (sumCounts(referenceCounts) > 0) {
+                    Map<String, List<String>> referenceDetails =
+                            ccCommand.getCrossReleaseReferenceDetails(workingRelease.releaseId(), currentDependency.releaseId());
+                    errors.add(buildRemovalErrorMessage(currentDependency, libraryNameMap, referenceCounts, referenceDetails));
+                }
+                continue;
+            }
+
+            if (currentDependency.releaseId().equals(selectedDependency.releaseId())) {
+                continue;
+            }
+
+            Map<String, Integer> referenceCounts =
+                    ccCommand.getCrossReleaseReferenceCounts(workingRelease.releaseId(), currentDependency.releaseId());
+            if (sumCounts(referenceCounts) == 0) {
+                continue;
+            }
+            Map<String, List<String>> referenceDetails =
+                    ccCommand.getCrossReleaseReferenceDetails(workingRelease.releaseId(), currentDependency.releaseId());
+
+            if (currentDependency.isWorkingRelease() || selectedDependency.isWorkingRelease()) {
+                errors.add(buildWorkingDependencyErrorMessage(
+                        currentDependency, selectedDependency, libraryNameMap, referenceCounts, referenceDetails));
+                continue;
+            }
+
+            ReleaseChangeRelation releaseChangeRelation = classifyReleaseChangeRelation(
+                    requester, currentDependency.releaseId(), selectedDependency.releaseId(), releaseDetailsCache);
+            if (releaseChangeRelation == ReleaseChangeRelation.UNRELATED) {
+                errors.add(buildUnknownReleaseChainErrorMessage(
+                        currentDependency, selectedDependency, libraryNameMap, referenceCounts, referenceDetails));
+                continue;
+            }
+
+            if (releaseChangeRelation == ReleaseChangeRelation.DOWNGRADE) {
+                errors.add(buildDowngradeErrorMessage(
+                        currentDependency, selectedDependency, libraryNameMap, referenceCounts, referenceDetails));
+                continue;
+            }
+
+            ccCommand.remapCrossReleaseReferences(
+                    workingRelease.releaseId(), currentDependency.releaseId(), selectedDependency.releaseId());
+
+            Map<String, Integer> remainingReferenceCounts =
+                    ccCommand.getCrossReleaseReferenceCounts(workingRelease.releaseId(), currentDependency.releaseId());
+            if (sumCounts(remainingReferenceCounts) > 0) {
+                Map<String, List<String>> remainingReferenceDetails =
+                        ccCommand.getCrossReleaseReferenceDetails(workingRelease.releaseId(), currentDependency.releaseId());
+                errors.add(buildUpgradeGapErrorMessage(
+                        currentDependency, selectedDependency, libraryNameMap,
+                        referenceCounts, remainingReferenceCounts, remainingReferenceDetails));
+            }
+        }
+
+        if (!errors.isEmpty()) {
+            throw new IllegalArgumentException("Release dependency update is blocked.\n\n"
+                    + String.join("\n\n", errors));
+        }
+    }
+
+    private ReleaseChangeRelation classifyReleaseChangeRelation(
+            ScoreUser requester,
+            ReleaseId currentReleaseId,
+            ReleaseId selectedReleaseId,
+            Map<ReleaseId, ReleaseDetailsRecord> releaseDetailsCache) {
+        if (currentReleaseId.equals(selectedReleaseId)) {
+            return ReleaseChangeRelation.UNCHANGED;
+        }
+        if (isReachableByNextRelease(requester, currentReleaseId, selectedReleaseId, releaseDetailsCache)) {
+            return ReleaseChangeRelation.UPGRADE;
+        }
+        if (isReachableByPrevRelease(requester, currentReleaseId, selectedReleaseId, releaseDetailsCache)) {
+            return ReleaseChangeRelation.DOWNGRADE;
+        }
+        return ReleaseChangeRelation.UNRELATED;
+    }
+
+    private boolean isReachableByNextRelease(
+            ScoreUser requester,
+            ReleaseId startReleaseId,
+            ReleaseId targetReleaseId,
+            Map<ReleaseId, ReleaseDetailsRecord> releaseDetailsCache) {
+        return isReachableInReleaseChain(
+                requester, startReleaseId, targetReleaseId, releaseDetailsCache, true);
+    }
+
+    private boolean isReachableByPrevRelease(
+            ScoreUser requester,
+            ReleaseId startReleaseId,
+            ReleaseId targetReleaseId,
+            Map<ReleaseId, ReleaseDetailsRecord> releaseDetailsCache) {
+        return isReachableInReleaseChain(
+                requester, startReleaseId, targetReleaseId, releaseDetailsCache, false);
+    }
+
+    private boolean isReachableInReleaseChain(
+            ScoreUser requester,
+            ReleaseId startReleaseId,
+            ReleaseId targetReleaseId,
+            Map<ReleaseId, ReleaseDetailsRecord> releaseDetailsCache,
+            boolean followNextRelease) {
+        Set<ReleaseId> visitedReleaseIds = new HashSet<>();
+        ReleaseId currentReleaseId = startReleaseId;
+        while (currentReleaseId != null && visitedReleaseIds.add(currentReleaseId)) {
+            ReleaseDetailsRecord releaseDetails = releaseDetailsCache.computeIfAbsent(
+                    currentReleaseId, releaseId -> releaseQuery(requester).getReleaseDetails(releaseId));
+            ReleaseSummaryRecord adjacentRelease = followNextRelease ? releaseDetails.next() : releaseDetails.prev();
+            if (adjacentRelease == null) {
+                return false;
+            }
+            if (targetReleaseId.equals(adjacentRelease.releaseId())) {
+                return true;
+            }
+            currentReleaseId = adjacentRelease.releaseId();
+        }
+        return false;
+    }
+
+    private int sumCounts(Map<String, Integer> counts) {
+        return counts.values().stream().mapToInt(Integer::intValue).sum();
+    }
+
+    private String buildRemovalErrorMessage(
+            ReleaseDependencySummaryRecord currentDependency,
+            Map<LibraryId, String> libraryNameMap,
+            Map<String, Integer> referenceCounts,
+            Map<String, List<String>> referenceDetails) {
+        return "Removing dependency " + dependencyLabel(currentDependency, libraryNameMap)
+                + " would leave Working release references in place.\n"
+                + formatReferenceBreakdown(referenceCounts, referenceDetails);
+    }
+
+    private String buildWorkingDependencyErrorMessage(
+            ReleaseDependencySummaryRecord currentDependency,
+            ReleaseSummaryRecord selectedDependency,
+            Map<LibraryId, String> libraryNameMap,
+            Map<String, Integer> referenceCounts,
+            Map<String, List<String>> referenceDetails) {
+        return "Changing dependency " + dependencyLabel(currentDependency, libraryNameMap)
+                + " to " + dependencyLabel(selectedDependency, libraryNameMap)
+                + " is blocked because Working dependencies are not remapped automatically.\n"
+                + formatReferenceBreakdown(referenceCounts, referenceDetails);
+    }
+
+    private String buildUnknownReleaseChainErrorMessage(
+            ReleaseDependencySummaryRecord currentDependency,
+            ReleaseSummaryRecord selectedDependency,
+            Map<LibraryId, String> libraryNameMap,
+            Map<String, Integer> referenceCounts,
+            Map<String, List<String>> referenceDetails) {
+        return "Changing dependency " + dependencyLabel(currentDependency, libraryNameMap)
+                + " to " + dependencyLabel(selectedDependency, libraryNameMap)
+                + " is blocked because the selected release is not on the same upgrade path.\n"
+                + formatReferenceBreakdown(referenceCounts, referenceDetails);
+    }
+
+    private String buildDowngradeErrorMessage(
+            ReleaseDependencySummaryRecord currentDependency,
+            ReleaseSummaryRecord selectedDependency,
+            Map<LibraryId, String> libraryNameMap,
+            Map<String, Integer> referenceCounts,
+            Map<String, List<String>> referenceDetails) {
+        return "Downgrading dependency from " + dependencyLabel(currentDependency, libraryNameMap)
+                + " to " + dependencyLabel(selectedDependency, libraryNameMap)
+                + " is blocked while Working release references still exist.\n"
+                + formatReferenceBreakdown(referenceCounts, referenceDetails);
+    }
+
+    private String buildUpgradeGapErrorMessage(
+            ReleaseDependencySummaryRecord currentDependency,
+            ReleaseSummaryRecord selectedDependency,
+            Map<LibraryId, String> libraryNameMap,
+            Map<String, Integer> originalReferenceCounts,
+            Map<String, Integer> remainingReferenceCounts,
+            Map<String, List<String>> remainingReferenceDetails) {
+        int originalCount = sumCounts(originalReferenceCounts);
+        int remainingCount = sumCounts(remainingReferenceCounts);
+        int remappedCount = originalCount - remainingCount;
+        return "Upgrading dependency from " + dependencyLabel(currentDependency, libraryNameMap)
+                + " to " + dependencyLabel(selectedDependency, libraryNameMap)
+                + " could not remap every Working release reference.\n"
+                + "Remapped references: " + remappedCount + "\n"
+                + "Unresolved references: " + remainingCount + "\n"
+                + formatReferenceBreakdown(remainingReferenceCounts, remainingReferenceDetails);
+    }
+
+    private String dependencyLabel(ReleaseSummaryRecord dependency, Map<LibraryId, String> libraryNameMap) {
+        return libraryNameMap.getOrDefault(dependency.libraryId(), "Library") + " " + dependency.releaseNum();
+    }
+
+    private String dependencyLabel(ReleaseDependencySummaryRecord dependency, Map<LibraryId, String> libraryNameMap) {
+        return libraryNameMap.getOrDefault(dependency.libraryId(), "Library") + " " + dependency.releaseNum();
+    }
+
+    private String formatReferenceBreakdown(
+            Map<String, Integer> referenceCounts,
+            Map<String, List<String>> referenceDetails) {
+        return referenceCounts.entrySet().stream()
+                .filter(entry -> entry.getValue() > 0)
+                .map(entry -> formatReferenceBreakdownLine(entry.getKey(), entry.getValue(), referenceDetails))
+                .collect(Collectors.joining("\n"));
+    }
+
+    private String formatReferenceBreakdownLine(
+            String referenceType,
+            Integer count,
+            Map<String, List<String>> referenceDetails) {
+        String line = "- " + referenceType + ": " + count;
+        List<String> details = referenceDetails.get(referenceType);
+        if (details == null || details.isEmpty()) {
+            return line;
+        }
+        if (details.size() <= 2) {
+            return line + " (DENs: " + String.join(", ", details) + ")";
+        }
+        return line + " (DENs: " + String.join(", ", details.subList(0, 2))
+                + ", and " + (details.size() - 2) + " more)";
+    }
+
+    private enum ReleaseChangeRelation {
+        UNCHANGED,
+        UPGRADE,
+        DOWNGRADE,
+        UNRELATED
     }
 
     public boolean discard(ScoreUser requester, LibraryId libraryId) {

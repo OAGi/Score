@@ -12,3 +12,8 @@ docker-compose.yml
 misc
 ql-test
 *.sql
+hr_open
+hr_open_standards
+b2mml
+agxml*
+Chem*

@@ -64,6 +64,10 @@ public class SchemaModule {
         return module.getVersionNum();
     }
 
+    public String getName() {
+        return module.getName();
+    }
+
     public ModuleId getModuleId() {
         return module.getModuleId();
     }
@@ -108,10 +112,7 @@ public class SchemaModule {
 
             for (SchemaModule include : this.includeModules) {
                 if (references.contains(include)) {
-                    references.add(include);
-
-                    throw new IllegalArgumentException("Circular reference found: " +
-                            references.stream().map(m -> m.module.getModulePath()).collect(Collectors.joining(" -> ")));
+                    return true;
                 }
 
                 nextReferences = new ArrayList(references);

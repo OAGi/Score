@@ -70,6 +70,8 @@ public interface ReleaseCommandRepository {
 
     void createDeps(ReleaseId releaseId, Collection<ReleaseId> dependOnReleaseIds);
 
+    void deleteDeps(ReleaseId releaseId, Collection<ReleaseId> dependOnReleaseIds);
+
     void deleteDeps(ReleaseId releaseId);
 
 }

@@ -4,24 +4,29 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper;
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocument;
 import org.oagi.score.gateway.http.api.cc_management.model.ValueConstraint;
+import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.OagisComponentType;
 import org.oagi.score.gateway.http.api.cc_management.model.ascc.AsccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.bcc.BccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.bccp.BccpSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.DtAwdPriSummaryRecord;
+import org.oagi.score.gateway.http.api.cc_management.model.dt.DtManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.DtSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScAwdPriSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.seq_key.SeqKeySupportable;
+import org.oagi.score.gateway.http.api.code_list_management.model.CodeListManifestId;
 import org.oagi.score.gateway.http.api.code_list_management.model.CodeListSummaryRecord;
 import org.oagi.score.gateway.http.api.export.model.*;
 import org.oagi.score.gateway.http.api.module_management.model.ModuleCcDocument;
 import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
 import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceSummaryRecord;
+import org.oagi.score.gateway.http.api.xbt_management.model.XbtManifestId;
 import org.oagi.score.gateway.http.api.xbt_management.model.XbtSummaryRecord;
 import org.oagi.score.gateway.http.common.util.Utility;
 import org.springframework.data.util.Pair;
@@ -37,6 +42,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import static org.oagi.score.gateway.http.common.ScoreConstants.ANY_ASCCP_DEN;
 
 public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
@@ -619,7 +625,6 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
         if (!StringUtils.hasLength(relativeModulePath)) {
             return localRef(definitionName);
         }
-
         return relativeModulePath + "#/$defs/" + escapeJsonPointerToken(definitionName);
     }
 
@@ -638,7 +643,7 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
     private String getRelativeSchemaLocation(SchemaModule targetSchemaModule) throws IOException {
         File targetModuleFile = new File(baseDir, targetSchemaModule.getPath());
         Path pathAbsolute = Paths.get(targetModuleFile.getCanonicalPath());
-        Path pathBase = Paths.get(this.moduleFile.getParentFile().getCanonicalPath());
+        Path pathBase = Paths.get(getJsonIdResolutionBaseDirectory().getCanonicalPath());
         Path pathRelative = pathBase.relativize(pathAbsolute);
         return FilenameUtils.separatorsToUnix(pathRelative.toString()) + ".json";
     }
@@ -647,12 +652,22 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
         try {
             File targetModuleFile = new File(baseDir, normalizeModulePath(targetModulePath));
             Path pathAbsolute = Paths.get(targetModuleFile.getCanonicalPath());
-            Path pathBase = Paths.get(this.moduleFile.getParentFile().getCanonicalPath());
+            Path pathBase = Paths.get(getJsonIdResolutionBaseDirectory().getCanonicalPath());
             Path pathRelative = pathBase.relativize(pathAbsolute);
             return FilenameUtils.separatorsToUnix(pathRelative.toString()) + ".json";
         } catch (IOException e) {
             throw new IllegalStateException("Failed to resolve relative JSON schema location.", e);
         }
+    }
+
+    private File getJsonIdResolutionBaseDirectory() throws IOException {
+        String currentModuleParentPath = FilenameUtils.getPathNoEndSeparator(
+                FilenameUtils.separatorsToUnix(schemaModule.getPath()));
+        if (!StringUtils.hasLength(currentModuleParentPath)) {
+            return this.moduleFile.getParentFile().getCanonicalFile();
+        }
+        return new File(this.moduleFile.getParentFile(),
+                FilenameUtils.separatorsToSystem(currentModuleParentPath)).getCanonicalFile();
     }
 
     private String normalizeModulePath(String modulePath) {
@@ -662,52 +677,119 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
         return FilenameUtils.separatorsToSystem(modulePath).replaceFirst("^[\\\\/]+", "");
     }
 
-    private String referencedModulePathForAcc(org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId accManifestId) {
-        if (moduleCcDocument == null || accManifestId == null) {
+    private String referencedModulePathForAcc(AccManifestId accManifestId) {
+        if (accManifestId == null) {
             return null;
         }
-        ModuleCCID<?> moduleCCID = moduleCcDocument.getModuleAcc(accManifestId);
-        return (moduleCCID != null) ? moduleCCID.path() : null;
+        if (moduleCcDocument != null) {
+            ModuleCCID<?> moduleCCID = moduleCcDocument.getModuleAcc(accManifestId);
+            if (moduleCCID != null) {
+                return moduleCCID.path();
+            }
+        }
+        SchemaModule ownerSchemaModule = findOwningSchemaModule(
+                schemaModule,
+                new LinkedHashSet<>(),
+                candidate -> candidate.getACCMap().values().stream()
+                        .anyMatch(acc -> accManifestId.equals(acc.accManifestId())));
+        return (ownerSchemaModule != null) ? ownerSchemaModule.getPath() : null;
     }
 
-    private String referencedModulePathForAsccp(org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpManifestId asccpManifestId) {
-        if (moduleCcDocument == null || asccpManifestId == null) {
+    private String referencedModulePathForDt(DtManifestId dtManifestId) {
+        if (dtManifestId == null) {
             return null;
         }
-        ModuleCCID<?> moduleCCID = moduleCcDocument.getModuleAsccp(asccpManifestId);
-        return (moduleCCID != null) ? moduleCCID.path() : null;
+        if (moduleCcDocument != null) {
+            ModuleCCID<?> moduleCCID = moduleCcDocument.getModuleDt(dtManifestId);
+            if (moduleCCID != null) {
+                return moduleCCID.path();
+            }
+        }
+        SchemaModule ownerSchemaModule = findOwningSchemaModule(
+                schemaModule,
+                new LinkedHashSet<>(),
+                candidate -> candidate.getBDTSimpleMap().values().stream()
+                        .anyMatch(bdtSimple -> dtManifestId.equals(bdtSimple.getBdtManifestId())));
+        return (ownerSchemaModule != null) ? ownerSchemaModule.getPath() : null;
     }
 
-    private String referencedModulePathForDt(org.oagi.score.gateway.http.api.cc_management.model.dt.DtManifestId dtManifestId) {
-        if (moduleCcDocument == null || dtManifestId == null) {
+    private String referencedModulePathForCodeList(CodeListManifestId codeListManifestId) {
+        if (codeListManifestId == null) {
             return null;
         }
-        ModuleCCID<?> moduleCCID = moduleCcDocument.getModuleDt(dtManifestId);
-        return (moduleCCID != null) ? moduleCCID.path() : null;
+        if (moduleCcDocument != null) {
+            ModuleCCID<?> moduleCCID = moduleCcDocument.getModuleCodeList(codeListManifestId);
+            if (moduleCCID != null) {
+                return moduleCCID.path();
+            }
+        }
+        SchemaModule ownerSchemaModule = findOwningSchemaModule(
+                schemaModule,
+                new LinkedHashSet<>(),
+                candidate -> candidate.getCodeListMap().values().stream()
+                        .anyMatch(codeList -> codeListManifestId.equals(codeList.getCodeListManifestId())));
+        return (ownerSchemaModule != null) ? ownerSchemaModule.getPath() : null;
     }
 
-    private String referencedModulePathForCodeList(org.oagi.score.gateway.http.api.code_list_management.model.CodeListManifestId codeListManifestId) {
-        if (moduleCcDocument == null || codeListManifestId == null) {
+    private String referencedModulePathForAgencyIdList(AgencyIdListManifestId agencyIdListManifestId) {
+        if (agencyIdListManifestId == null) {
             return null;
         }
-        ModuleCCID<?> moduleCCID = moduleCcDocument.getModuleCodeList(codeListManifestId);
-        return (moduleCCID != null) ? moduleCCID.path() : null;
+        if (moduleCcDocument != null) {
+            ModuleCCID<?> moduleCCID = moduleCcDocument.getModuleAgencyIdList(agencyIdListManifestId);
+            if (moduleCCID != null) {
+                return moduleCCID.path();
+            }
+        }
+        SchemaModule ownerSchemaModule = findOwningSchemaModule(
+                schemaModule,
+                new LinkedHashSet<>(),
+                candidate -> candidate.getAgencyIdMap().values().stream()
+                        .anyMatch(agencyId -> agencyIdListManifestId.equals(agencyId.agencyIdListManifestId())));
+        return (ownerSchemaModule != null) ? ownerSchemaModule.getPath() : null;
     }
 
-    private String referencedModulePathForAgencyIdList(org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId agencyIdListManifestId) {
-        if (moduleCcDocument == null || agencyIdListManifestId == null) {
+    private String referencedModulePathForXbt(XbtManifestId xbtManifestId) {
+        if (xbtManifestId == null) {
             return null;
         }
-        ModuleCCID<?> moduleCCID = moduleCcDocument.getModuleAgencyIdList(agencyIdListManifestId);
-        return (moduleCCID != null) ? moduleCCID.path() : null;
+        if (moduleCcDocument != null) {
+            ModuleCCID<?> moduleCCID = moduleCcDocument.getModuleXbt(xbtManifestId);
+            if (moduleCCID != null) {
+                return moduleCCID.path();
+            }
+        }
+        SchemaModule ownerSchemaModule = findOwningSchemaModule(
+                schemaModule,
+                new LinkedHashSet<>(),
+                candidate -> candidate.getXBTSimpleTypeMap().values().stream()
+                        .anyMatch(xbtSimpleType -> xbtManifestId.equals(xbtSimpleType.xbtManifestId())));
+        return (ownerSchemaModule != null) ? ownerSchemaModule.getPath() : null;
     }
 
-    private String referencedModulePathForXbt(org.oagi.score.gateway.http.api.xbt_management.model.XbtManifestId xbtManifestId) {
-        if (moduleCcDocument == null || xbtManifestId == null) {
+    private SchemaModule findOwningSchemaModule(SchemaModule candidate,
+                                                Set<String> visitedPaths,
+                                                java.util.function.Predicate<SchemaModule> matcher) {
+        if (candidate == null) {
             return null;
         }
-        ModuleCCID<?> moduleCCID = moduleCcDocument.getModuleXbt(xbtManifestId);
-        return (moduleCCID != null) ? moduleCCID.path() : null;
+
+        String candidatePath = candidate.getPath();
+        if (StringUtils.hasLength(candidatePath) && !visitedPaths.add(candidatePath)) {
+            return null;
+        }
+
+        if (matcher.test(candidate)) {
+            return candidate;
+        }
+
+        for (SchemaModule dependedModule : candidate.getDependedModules()) {
+            SchemaModule owner = findOwningSchemaModule(dependedModule, visitedPaths, matcher);
+            if (owner != null) {
+                return owner;
+            }
+        }
+        return null;
     }
 
     private String selectRootRef(SchemaModule schemaModule) {

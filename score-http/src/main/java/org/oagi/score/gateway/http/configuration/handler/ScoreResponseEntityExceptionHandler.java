@@ -43,6 +43,21 @@ public class ScoreResponseEntityExceptionHandler extends ResponseEntityException
                 .trim();
     }
 
+    private ResponseEntity<String> errorResponse(HttpStatus status, String message) {
+        MultiValueMap<String, String> headers = new HttpHeaders();
+        headers.set("X-Error-Message", toHeaderValue(message));
+        return new ResponseEntity<>(message, headers, status);
+    }
+
+    private ResponseEntity<String> errorResponse(HttpStatus status, String message, String errorMessageId) {
+        MultiValueMap<String, String> headers = new HttpHeaders();
+        headers.set("X-Error-Message", toHeaderValue(message));
+        if (errorMessageId != null) {
+            headers.set("X-Error-Message-Id", errorMessageId);
+        }
+        return new ResponseEntity<>(message, headers, status);
+    }
+
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity handleAuthenticationException(
             AuthenticationException ex, WebRequest webRequest) {
@@ -71,84 +86,59 @@ public class ScoreResponseEntityExceptionHandler extends ResponseEntityException
     public ResponseEntity handleAccessControlException(
             AccessControlException ex, WebRequest webRequest) {
         logger.debug(ex.getMessage(), ex);
-
-        MultiValueMap<String, String> headers = new HttpHeaders();
-        headers.set("X-Error-Message", toHeaderValue(ex.getMessage()));
-        return new ResponseEntity(headers, HttpStatus.BAD_REQUEST);
+        return errorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity handleIllegalArgumentException(
             IllegalArgumentException ex, WebRequest webRequest) {
         logger.debug(ex.getMessage(), ex);
-
-        MultiValueMap<String, String> headers = new HttpHeaders();
-        headers.set("X-Error-Message", toHeaderValue(ex.getMessage()));
-        return new ResponseEntity(headers, HttpStatus.BAD_REQUEST);
+        return errorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity handleIllegalStateException(
             IllegalStateException ex, WebRequest webRequest) {
         logger.debug(ex.getMessage(), ex);
-
-        MultiValueMap<String, String> headers = new HttpHeaders();
-        headers.set("X-Error-Message", toHeaderValue(ex.getMessage()));
-        return new ResponseEntity(headers, HttpStatus.INTERNAL_SERVER_ERROR);
+        return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
     }
 
     @ExceptionHandler(DataAccessForbiddenException.class)
     public ResponseEntity handleDataAccessForbiddenException(
             DataAccessForbiddenException ex, WebRequest webRequest) {
         logger.debug(ex.getMessage(), ex);
-
-        MultiValueMap<String, String> headers = new HttpHeaders();
-        headers.set("X-Error-Message", toHeaderValue(ex.getMessage()));
-        if (ex.getErrorMessageId() != null) {
-            headers.set("X-Error-Message-Id", ex.getErrorMessageId().toString());
-        }
-        return new ResponseEntity(headers, HttpStatus.FORBIDDEN);
+        return errorResponse(HttpStatus.FORBIDDEN, ex.getMessage(),
+                ex.getErrorMessageId() != null ? ex.getErrorMessageId().toString() : null);
     }
 
     @ExceptionHandler(BadSqlGrammarException.class)
     public ResponseEntity handleBadSqlGrammarException(
             BadSqlGrammarException ex, WebRequest webRequest) {
         logger.debug(ex.getMessage(), ex);
-
-        MultiValueMap<String, String> headers = new HttpHeaders();
-        headers.set("X-Error-Message", toHeaderValue(ex.getMessage()));
-        return new ResponseEntity(headers, HttpStatus.SERVICE_UNAVAILABLE);
+        return errorResponse(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
     }
 
     @ExceptionHandler(SQLSyntaxErrorException.class)
     public ResponseEntity handleSQLSyntaxErrorException(
             SQLSyntaxErrorException ex, WebRequest webRequest) {
         logger.debug(ex.getMessage(), ex);
-
-        MultiValueMap<String, String> headers = new HttpHeaders();
-        headers.set("X-Error-Message", toHeaderValue(ex.getMessage()));
-        return new ResponseEntity(headers, HttpStatus.SERVICE_UNAVAILABLE);
+        return errorResponse(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
     }
 
     @ExceptionHandler(ScoreDataAccessException.class)
     public ResponseEntity handleScoreDataAccessException(
             ScoreDataAccessException ex, WebRequest webRequest) {
         logger.debug(ex.getMessage(), ex);
-
-        MultiValueMap<String, String> headers = new HttpHeaders();
-        headers.set("X-Error-Message", toHeaderValue(ex.getMessage()));
-        return new ResponseEntity(headers, HttpStatus.BAD_REQUEST);
+        return errorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(OutOfMemoryError.class)
     public ResponseEntity handleOutOfMemoryError(
             OutOfMemoryError ex, WebRequest webRequest) {
         logger.debug(ex.getMessage(), ex);
-
-        MultiValueMap<String, String> headers = new HttpHeaders();
-        headers.set("X-Error-Message", toHeaderValue("Not enough memory to perform the request: " + ex.getMessage() + ". " +
-                "Please consider either increasing available heap space or cleaning data to reduce the size of the request."));
-        return new ResponseEntity(headers, HttpStatus.INTERNAL_SERVER_ERROR);
+        return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR,
+                "Not enough memory to perform the request: " + ex.getMessage() + ". " +
+                        "Please consider either increasing available heap space or cleaning data to reduce the size of the request.");
     }
 
 }

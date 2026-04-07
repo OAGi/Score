@@ -1,4 +1,4 @@
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpContext, HttpParams} from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import {Observable} from 'rxjs';
 import {
@@ -11,6 +11,7 @@ import {
 } from './library';
 import {PageResponse} from '../../basis/basis';
 import {map} from 'rxjs/operators';
+import {SUPPRESS_ERROR_ALERT} from '../../authentication/auth.service';
 
 @Injectable()
 export class LibraryService {
@@ -64,6 +65,8 @@ export class LibraryService {
   updateReleaseDependencies(libraryId: number, releaseIds: number[]): Observable<any> {
     return this.http.put('/api/libraries/' + libraryId + '/release-dependencies', {
       releaseIds
+    }, {
+      context: new HttpContext().set(SUPPRESS_ERROR_ALERT, true)
     });
   }
 

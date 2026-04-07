@@ -1,4 +1,5 @@
 import { Component, ElementRef, HostListener, ViewChild, inject } from '@angular/core';
+import {HttpErrorResponse} from '@angular/common/http';
 import {FormControl, Validators} from '@angular/forms';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
@@ -186,6 +187,7 @@ export class LibraryDetailComponent {
     const requests: Observable<any>[] = [];
     const libraryChanged = this.isChanged();
     const dependencyChanged = this.isDependencyChanged();
+    const submittedDependencyReleaseIds = [...this.selectedDependencyReleaseIds];
 
     if (libraryChanged) {
       requests.push(this.service.update(this.library));
@@ -201,18 +203,14 @@ export class LibraryDetailComponent {
       }
       if (dependencyChanged) {
         this.service.getReleaseDependencies(this.library.libraryId).subscribe(dependencies => {
-          this.resetDependencyState(dependencies);
+          this.resetDependencyState(dependencies, submittedDependencyReleaseIds);
           this.clearDependencyInput();
           this.snackBar.open('Updated', '', {
             duration: 3000,
           });
           this.loading = false;
         }, error => {
-          const errorMessage = typeof error?.error === 'string' ? error.error :
-              error?.error?.message || 'Something\'s wrong.';
-          this.snackBar.open(errorMessage, '', {
-            duration: 5000,
-          });
+          this.openLibraryUpdateError(error);
           this.loading = false;
         });
         return;
@@ -224,11 +222,7 @@ export class LibraryDetailComponent {
       });
       this.loading = false;
     }, error => {
-      const errorMessage = typeof error?.error === 'string' ? error.error :
-          error?.error?.message || 'Something\'s wrong.';
-      this.snackBar.open(errorMessage, '', {
-        duration: 5000,
-      });
+      this.openLibraryUpdateError(error);
       this.loading = false;
     });
   }
@@ -285,15 +279,32 @@ export class LibraryDetailComponent {
   }
 
   private filterDependencyOptions(value: string | LibraryReleaseDependency): LibraryReleaseDependency[] {
-    const filterValue = typeof value === 'string' ? value.trim().toLowerCase() : '';
+    const filterValue = typeof value === 'string'
+        ? this.normalizeDependencySearchValue(value)
+        : '';
     const selectedLibraryIds = new Set(this.selectedDependencies.map(selectedDependency => selectedDependency.libraryId));
     const removedReleaseIds = new Set(this.removedDependencies.map(dependency => dependency.releaseId));
     return this.availableReleaseDependencies
         .filter(dependency => !this.selectedDependencyReleaseIds.includes(dependency.releaseId))
         .filter(dependency => !removedReleaseIds.has(dependency.releaseId))
         .filter(dependency => !selectedLibraryIds.has(dependency.libraryId))
-        .filter(dependency => !filterValue || this.releaseDependencyLabel(dependency).toLowerCase().includes(filterValue))
+        .filter(dependency => !filterValue || this.matchesDependencySearch(dependency, filterValue))
         .sort((a, b) => this.releaseDependencyLabel(a).localeCompare(this.releaseDependencyLabel(b)));
+  }
+
+  private matchesDependencySearch(dependency: LibraryReleaseDependency, filterValue: string): boolean {
+    const normalizedLabel = this.normalizeDependencySearchValue(this.releaseDependencyLabel(dependency));
+    return filterValue
+        .split(' ')
+        .every(token => normalizedLabel.includes(token));
+  }
+
+  private normalizeDependencySearchValue(value: string): string {
+    return value
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim()
+        .replace(/\s+/g, ' ');
   }
 
   private clearDependencyInput() {
@@ -303,17 +314,80 @@ export class LibraryDetailComponent {
     this.dependencyCtrl.setValue('');
   }
 
+  private openLibraryUpdateError(error: HttpErrorResponse): void {
+    const errorMessage = typeof error?.error === 'string' ? error.error :
+        error?.error?.message ||
+        error?.headers?.get('x-error-message') ||
+        'Something\'s wrong.';
+    if (this.openDependencyUpdateErrorDialog(errorMessage)) {
+      return;
+    }
+    this.snackBar.open(errorMessage, '', {
+      duration: 5000,
+    });
+  }
+
+  private openDependencyUpdateErrorDialog(errorMessage: string): boolean {
+    const lines = (errorMessage || '')
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0);
+    if (lines.length <= 1) {
+      return false;
+    }
+
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = lines[0];
+    dialogConfig.data.content = lines.slice(1).filter(line => !line.startsWith('- '));
+    dialogConfig.data.list = lines
+        .slice(1)
+        .filter(line => line.startsWith('- '))
+        .map(line => line.substring(2));
+    dialogConfig.data.action = undefined;
+    this.confirmDialogService.open(dialogConfig);
+    return true;
+  }
+
   private refreshDependencyOptions() {
     this.dependencyCtrl.setValue(this.dependencyCtrl.value ?? '');
   }
 
-  private resetDependencyState(response: LibraryReleaseDependenciesResponse) {
-    this.persistedReleaseDependencies = response.currentDependencies;
+  private resetDependencyState(
+      response: LibraryReleaseDependenciesResponse,
+      preferredOrder?: number[]) {
+    this.persistedReleaseDependencies = this.sortCurrentDependencies(response.currentDependencies, preferredOrder);
     this.availableReleaseDependencies = response.availableDependencies;
     this.removedDependencies = [];
-    this.selectedDependencyReleaseIds = response.currentDependencies.map(dependency => dependency.releaseId);
+    this.selectedDependencyReleaseIds = this.persistedReleaseDependencies.map(dependency => dependency.releaseId);
     this.dependencyHash = this.getDependencyHash();
     this.refreshDependencyOptions();
+  }
+
+  private sortCurrentDependencies(
+      currentDependencies: LibraryReleaseDependency[],
+      preferredOrder?: number[]): LibraryReleaseDependency[] {
+    const sortedDependencies = [...currentDependencies];
+    if (preferredOrder && preferredOrder.length > 0) {
+      const preferredOrderIndex = new Map(preferredOrder.map((releaseId, index) => [releaseId, index]));
+      sortedDependencies.sort((a, b) => {
+        const leftIndex = preferredOrderIndex.get(a.releaseId);
+        const rightIndex = preferredOrderIndex.get(b.releaseId);
+        if (leftIndex != null && rightIndex != null) {
+          return leftIndex - rightIndex;
+        }
+        if (leftIndex != null) {
+          return -1;
+        }
+        if (rightIndex != null) {
+          return 1;
+        }
+        return (a.releaseDepId ?? Number.MAX_SAFE_INTEGER) - (b.releaseDepId ?? Number.MAX_SAFE_INTEGER);
+      });
+      return sortedDependencies;
+    }
+
+    return sortedDependencies
+        .sort((a, b) => (a.releaseDepId ?? Number.MAX_SAFE_INTEGER) - (b.releaseDepId ?? Number.MAX_SAFE_INTEGER));
   }
 
   private getDependencyHash(): string {

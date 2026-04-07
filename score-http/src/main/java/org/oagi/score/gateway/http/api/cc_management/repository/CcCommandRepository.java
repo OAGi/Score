@@ -9,6 +9,7 @@ import org.oagi.score.gateway.http.api.code_list_management.model.CodeListManife
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CcCommandRepository {
 
@@ -40,6 +41,12 @@ public interface CcCommandRepository {
                               List<DtManifestId> dtManifestIds,
                               List<CodeListManifestId> codeListManifestIds,
                               List<AgencyIdListManifestId> agencyIdListManifestIds);
+
+    Map<String, Integer> getCrossReleaseReferenceCounts(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId);
+
+    Map<String, List<String>> getCrossReleaseReferenceDetails(ReleaseId workingReleaseId, ReleaseId dependencyReleaseId);
+
+    void remapCrossReleaseReferences(ReleaseId workingReleaseId, ReleaseId sourceReleaseId, ReleaseId targetReleaseId);
 
     void cleanUp(ReleaseId releaseId);
 

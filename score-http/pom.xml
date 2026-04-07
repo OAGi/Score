@@ -141,6 +141,12 @@
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>${springdoc.version}</version>
@@ -342,6 +348,11 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <profiles>
+                        <profile>dev</profile>
+                    </profiles>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
@@ -423,4 +434,16 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <spring-boot.run.profiles>dev</spring-boot.run.profiles>
+                <spring-boot.run.fork>true</spring-boot.run.fork>
+                <spring-boot.run.addResources>true</spring-boot.run.addResources>
+                <spring-boot.run.jvmArguments>-Dspring.devtools.restart.enabled=true -Dspring.devtools.livereload.enabled=true</spring-boot.run.jvmArguments>
+            </properties>
+        </profile>
+    </profiles>
 </project>
