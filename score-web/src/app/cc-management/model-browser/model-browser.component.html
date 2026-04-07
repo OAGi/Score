@@ -141,6 +141,16 @@
                         (click)="onClick(node, $event)"
                         (keydown)="keyNavigation(node, $event)"
                         [style.padding-left]="node.level * paddingPixel + 'px'">
+                        @for (guide of choiceGuides(node); track $index) {
+                          <span class="choice-branch-guide"
+                            [class.choice-branch-guide-continue]="guide.continuation"
+                            [class.choice-branch-guide-first]="guide.first && !guide.continuation"
+                            [class.choice-branch-guide-last]="guide.last && !guide.continuation"
+                            [class.choice-branch-guide-only]="guide.only && !guide.continuation"
+                            [style.--choice-guide-extra-offset.px]="guide.offset"
+                            [matTooltip]="guide.tooltip"></span>
+                        }
+
                         @if (dataSource.isExpandable(node)) {
                           <button
                             (click)="toggle(node, $event)"

@@ -31,6 +31,62 @@
   outline: none;
 }
 
+.choice-branch-guide {
+  display: inline-block;
+  position: relative;
+  width: 16px;
+  min-width: 16px;
+  height: 33px;
+  left: calc(-1 * var(--choice-guide-extra-offset, 0px));
+  margin-left: -16px;
+  margin-right: 0;
+  padding-right: 0 !important;
+  overflow: visible;
+}
+
+.mat-tree-node > span.choice-branch-guide {
+  cursor: default;
+  margin-right: 0;
+}
+
+.choice-branch-guide::before,
+.choice-branch-guide::after {
+  content: '';
+  position: absolute;
+  background-color: #c62828;
+}
+
+.choice-branch-guide::before {
+  left: 7px;
+  top: 0;
+  bottom: 0;
+  width: 0.5px;
+}
+
+.choice-branch-guide::after {
+  left: 7px;
+  top: 16px;
+  width: 10px;
+  height: 0.5px;
+}
+
+.choice-branch-guide.choice-branch-guide-first::before {
+  top: 16px;
+}
+
+.choice-branch-guide.choice-branch-guide-only::before,
+.choice-branch-guide.choice-branch-guide-last::before {
+  bottom: 15px;
+}
+
+.choice-branch-guide.choice-branch-guide-only::before {
+  display: none;
+}
+
+.choice-branch-guide-continue::after {
+  display: none;
+}
+
 .mat-tree-node div {
   height: 16px;
 }

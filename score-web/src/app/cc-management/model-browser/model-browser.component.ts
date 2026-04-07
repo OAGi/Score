@@ -13,6 +13,7 @@ import {WebPageInfoService} from '../../basis/basis.service';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
 import {
+  ModelBrowserAsccpNode,
   ModelBrowserAccNodeDetail,
   ModelBrowserAsccpNodeDetail,
   ModelBrowserBccpNodeDetail,
@@ -163,6 +164,104 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
     const index = this.searcher.getNodeIndex(node);
     this.scrollTree(index, delay);
     this.cursorNode = node;
+  }
+
+  private visibleChoiceChildrenOf(choiceNode: ModelBrowserNode): ModelBrowserNode[] {
+    return (((choiceNode.children || []) as ModelBrowserNode[]))
+      .filter(child => !child.isGroup && !child.isChoice);
+  }
+
+  isChoiceChild(node: ModelBrowserNode): boolean {
+    return !!node?.parent && (node.parent as ModelBrowserNode).isChoice;
+  }
+
+  private visibleChoiceChildren(node: ModelBrowserNode): ModelBrowserNode[] {
+    if (!node?.parent || !(node.parent as ModelBrowserNode).isChoice) {
+      return [];
+    }
+    return this.visibleChoiceChildrenOf(node.parent as ModelBrowserNode);
+  }
+
+  isFirstChoiceChild(node: ModelBrowserNode): boolean {
+    const siblings = this.visibleChoiceChildren(node);
+    return siblings.length > 0 && siblings[0] === node;
+  }
+
+  isLastChoiceChild(node: ModelBrowserNode): boolean {
+    const siblings = this.visibleChoiceChildren(node);
+    return siblings.length > 0 && siblings[siblings.length - 1] === node;
+  }
+
+  isOnlyChoiceChild(node: ModelBrowserNode): boolean {
+    return this.visibleChoiceChildren(node).length === 1;
+  }
+
+  private choiceBranchRoot(node: ModelBrowserNode): ModelBrowserNode | null {
+    let current = node;
+    while (!!current?.parent) {
+      const parent = current.parent as ModelBrowserNode;
+      if (parent.isChoice) {
+        return current;
+      }
+      current = parent;
+    }
+    return null;
+  }
+
+  choiceTooltip(node: ModelBrowserNode): string | null {
+    let current = node;
+    while (!!current?.parent) {
+      const parent = current.parent as ModelBrowserNode;
+      if (parent.isChoice) {
+        return (parent as ModelBrowserAsccpNode).accNode?.objectClassTerm || parent.name;
+      }
+      current = parent;
+    }
+    return null;
+  }
+
+  hasChoiceBranchContinuation(node: ModelBrowserNode): boolean {
+    const branchRoot = this.choiceBranchRoot(node);
+    return !!branchRoot && branchRoot !== node && !this.isLastChoiceChild(branchRoot);
+  }
+
+  choiceGuideExtraOffset(node: ModelBrowserNode): number {
+    const branchRoot = this.choiceBranchRoot(node);
+    if (!branchRoot) {
+      return 0;
+    }
+    return Math.max(0, node.level - branchRoot.level) * this.paddingPixel;
+  }
+
+  choiceGuides(node: ModelBrowserNode): {offset: number, continuation: boolean, first: boolean, last: boolean, only: boolean, tooltip: string | null}[] {
+    const guides: {offset: number, continuation: boolean, first: boolean, last: boolean, only: boolean, tooltip: string | null}[] = [];
+    let current: ModelBrowserNode = node;
+
+    while (!!current?.parent) {
+      const parent = current.parent as ModelBrowserNode;
+      if (parent.isChoice) {
+        const siblings = this.visibleChoiceChildrenOf(parent);
+        const branchRoot = current;
+        const branchIndex = siblings.indexOf(branchRoot);
+        if (branchIndex !== -1) {
+          const continuation = branchRoot !== node;
+          const last = branchIndex === siblings.length - 1;
+          if (!continuation || !last) {
+            guides.push({
+              offset: Math.max(0, node.level - branchRoot.level) * this.paddingPixel,
+              continuation,
+              first: branchIndex === 0,
+              last,
+              only: siblings.length === 1,
+              tooltip: (parent as ModelBrowserAsccpNode).accNode?.objectClassTerm || parent.name
+            });
+          }
+        }
+      }
+      current = parent;
+    }
+
+    return guides.sort((a, b) => b.offset - a.offset);
   }
 
   @HostListener('document:keydown', ['$event'])
