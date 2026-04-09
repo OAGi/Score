@@ -85,19 +85,6 @@ public class BieListController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping(value = "/bie_list/state/dependencies",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    /**
-     * Builds a merged dependency preview graph for the currently selected BIE list rows.
-     */
-    public List<BieStateDependencyTarget> getStateDependencies(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                                            @RequestBody BieStateDependenciesRequest request) {
-        return bieStateTransitionService.getStateDependencies(sessionService.asScoreUser(user),
-                request.getTopLevelAsbiepIds(),
-                request.getRequestedCodeListManifestIds(),
-                request.getState());
-    }
-
     @PostMapping(value = "/bie_list/state/dependencies/validate",
             produces = MediaType.APPLICATION_JSON_VALUE)
     /**

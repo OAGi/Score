@@ -485,7 +485,6 @@ export class BieListComponent implements OnInit {
     this.stateTransitionFlowService.requestDependencySelection({
       state: 'Discard',
       rootTopLevelAsbiepIds: bieLists.map(e => e.topLevelAsbiepId),
-      loadDependencies: () => this.service.getStateDependencies(bieLists.map(e => e.topLevelAsbiepId), 'Discard'),
       validateSelection: (selection: StateDependencySelection) =>
         this.service.validateStateDependencies(
           bieLists.map(e => e.topLevelAsbiepId),
@@ -691,7 +690,6 @@ export class BieListComponent implements OnInit {
     this.stateTransitionFlowService.requestDependencySelection({
       state: action,
       rootTopLevelAsbiepIds: this.selection.selected.map(e => e.topLevelAsbiepId),
-      loadDependencies: () => this.service.getStateDependencies(this.selection.selected.map(e => e.topLevelAsbiepId), action),
       validateSelection: (selection: StateDependencySelection) =>
         this.service.validateStateDependencies(
           this.selection.selected.map(e => e.topLevelAsbiepId),

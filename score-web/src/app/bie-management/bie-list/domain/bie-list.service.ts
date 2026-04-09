@@ -191,18 +191,6 @@ export class BieListService {
   }
 
   /**
-   * Loads the merged dependency preview graph for the selected list rows.
-   */
-  getStateDependencies(topLevelAsbiepIds: number[], state: string): Observable<StateDependencyTarget[]> {
-    return this.http.post<StateDependencyTarget[]>('/api/bie_list/state/dependencies', {
-      topLevelAsbiepIds,
-      state
-    }, {
-      context: this.suppressErrorAlert()
-    });
-  }
-
-  /**
    * Revalidates the current bulk dependency selection on the server.
    */
   validateStateDependencies(topLevelAsbiepIds: number[], state: string,

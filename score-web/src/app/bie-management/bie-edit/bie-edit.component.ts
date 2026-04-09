@@ -2438,7 +2438,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     this.stateTransitionFlowService.requestDependencySelection({
       state,
       rootTopLevelAsbiepIds: [this.rootNode.topLevelAsbiepId],
-      loadDependencies: () => this.service.getStateDependencies(this.rootNode.topLevelAsbiepId, state),
       validateSelection: (selection: StateDependencySelection) =>
         this.service.validateStateDependencies(this.rootNode.topLevelAsbiepId, state, selection),
       normalizeTargets: (dependencyTargets) => {
@@ -2495,7 +2494,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     this.stateTransitionFlowService.requestDependencySelection({
       state: 'Discard',
       rootTopLevelAsbiepIds: [this.rootNode.topLevelAsbiepId],
-      loadDependencies: () => this.service.getStateDependencies(this.rootNode.topLevelAsbiepId, 'Discard'),
       validateSelection: (selection: StateDependencySelection) =>
         this.service.validateStateDependencies(this.rootNode.topLevelAsbiepId, 'Discard', selection),
       normalizeTargets: (dependencyTargets) => {

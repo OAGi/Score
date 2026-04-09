@@ -324,16 +324,6 @@ export class BieEditService {
   }
 
   /**
-   * Loads the dependency preview graph for the requested single-BIE state transition.
-   */
-  getStateDependencies(topLevelAsbiepId: number, state: string): Observable<StateDependencyTarget[]> {
-    return this.http.get<StateDependencyTarget[]>('/api/profile_bie/node/root/' + topLevelAsbiepId + '/state/dependencies', {
-      params: new HttpParams().set('state', state),
-      context: this.suppressErrorAlert()
-    });
-  }
-
-  /**
    * Revalidates the dependency selection after the dialog checkbox state changes.
    */
   validateStateDependencies(topLevelAsbiepId: number, state: string, selection: StateDependencySelection): Observable<StateDependencyTarget[]> {
