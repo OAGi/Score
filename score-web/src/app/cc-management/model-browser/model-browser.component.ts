@@ -341,7 +341,7 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
 
     const delimiter = this.preferencesInfo.viewSettingsInfo.treeSettings.delimiter;
     let queryPath = node.queryPath;
-    queryPath = queryPath.replaceAll('/', delimiter);
+    queryPath = queryPath.split('/').join(delimiter);
 
     this.clipboard.copy(queryPath);
     this.snackBar.open('Copied to clipboard', '', {
