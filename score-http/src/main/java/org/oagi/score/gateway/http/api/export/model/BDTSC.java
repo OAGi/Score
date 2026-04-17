@@ -35,7 +35,7 @@ public class BDTSC implements Component {
     }
 
     public String getName() {
-        return namingStrategy.bdtScName(dtSc);
+        return namingStrategy.bdtScName(dtSc, ownerDt, ccDocument);
     }
 
     public String getGuid() {

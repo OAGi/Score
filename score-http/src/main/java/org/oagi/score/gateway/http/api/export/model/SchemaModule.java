@@ -64,6 +64,14 @@ public class SchemaModule {
         return module.getVersionNum();
     }
 
+    public void setRootDefinitionName(String rootDefinitionName) {
+        this.module.setRootDefinitionName(rootDefinitionName);
+    }
+
+    public String getRootDefinitionName() {
+        return this.module.getRootDefinitionName();
+    }
+
     public String getName() {
         return module.getName();
     }
@@ -83,6 +91,14 @@ public class SchemaModule {
         return module.getReleaseNamespace();
     }
 
+    public Namespace getModuleNamespace() {
+        return module.getModuleNamespace();
+    }
+
+    public Namespace getReleaseNamespace() {
+        return module.getReleaseNamespace();
+    }
+
     public void addNamespace(Namespace namespace) {
         if (namespace == null) {
             return;
@@ -95,50 +111,17 @@ public class SchemaModule {
     }
 
     public boolean hasInclude(SchemaModule schemaModule) {
-        List<SchemaModule> references = new ArrayList();
-        references.add(schemaModule);
-        return hasInclude(schemaModule, references);
-    }
-
-    public boolean hasInclude(SchemaModule schemaModule, List<SchemaModule> references) {
-        List<SchemaModule> nextReferences = null;
-        try {
-            if (this.equals(schemaModule)) {
-                return true;
-            }
-            if (this.includeModules.indexOf(schemaModule) > -1) {
-                return true;
-            }
-
-            for (SchemaModule include : this.includeModules) {
-                if (references.contains(include)) {
-                    return true;
-                }
-
-                nextReferences = new ArrayList(references);
-                nextReferences.add(include);
-
-                if (include.hasInclude(schemaModule, nextReferences)) {
-                    return true;
-                }
-            }
-            return false;
-
-        } catch (StackOverflowError e) {
-            throw new IllegalArgumentException("Circular reference found: " +
-                    nextReferences.stream().map(m -> m.module.getModulePath()).collect(Collectors.joining(" -> "))
-                    , e);
+        if (this.equals(schemaModule)) {
+            return true;
         }
+        return this.includeModules.contains(schemaModule);
     }
 
     private boolean hasImport(SchemaModule schemaModule) {
         if (this.equals(schemaModule)) {
             return true;
         }
-        if (this.importModules.indexOf(schemaModule) > -1) {
-            return true;
-        }
-        return false;
+        return this.importModules.contains(schemaModule);
     }
 
     public void addInclude(SchemaModule schemaModule) {
@@ -274,17 +257,6 @@ public class SchemaModule {
     }
 
     public void minimizeDependency() {
-        for (SchemaModule cur : new ArrayList<>(includeModules)) {
-            for (SchemaModule next : new ArrayList<>(includeModules)) {
-                if (cur.equals(next)) {
-                    continue;
-                }
-                if (cur.hasInclude(next)) {
-                    includeModules.remove(next);
-                }
-            }
-        }
-
         for (SchemaModule cur : new ArrayList<>(importModules)) {
             for (SchemaModule next : new ArrayList<>(importModules)) {
                 if (cur.equals(next)) {

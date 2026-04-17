@@ -4,6 +4,7 @@ import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListSu
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.bccp.BccpSummaryRecord;
+import org.oagi.score.gateway.http.api.cc_management.model.CcDocument;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.DtSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScSummaryRecord;
 import org.oagi.score.gateway.http.api.code_list_management.model.CodeListSummaryRecord;
@@ -41,27 +42,8 @@ public class JsonSchemaNamingStrategy implements SchemaNamingStrategy {
     }
 
     @Override
-    public String bdtScName(DtScSummaryRecord dtSc) {
-        String propertyTerm = dtSc.propertyTerm();
-        if ("MIME".equals(propertyTerm) || "URI".equals(propertyTerm)) {
-            propertyTerm = propertyTerm.toLowerCase();
-        }
-        String representationTerm = dtSc.representationTerm();
-        if (propertyTerm.equals(representationTerm) || "Text".equals(representationTerm)) {
-            representationTerm = "";
-        }
-        if ("9bb9add40b5b415c8489b08bd4484907".equals(dtSc.getId().value())) {
-            representationTerm = "";
-        }
-
-        if (propertyTerm.contains(representationTerm)) {
-            String attrName = Character.toLowerCase(propertyTerm.charAt(0)) + propertyTerm.substring(1);
-            return convertIdentifierToId(attrName.replaceAll(" ", ""));
-        }
-
-        String attrName = Character.toLowerCase(propertyTerm.charAt(0)) + propertyTerm.substring(1) +
-                convertIdentifierToId(representationTerm);
-        return convertIdentifierToId(attrName.replaceAll(" ", ""));
+    public String bdtScName(DtScSummaryRecord dtSc, DtSummaryRecord ownerDt, CcDocument ccDocument) {
+        return convertIdentifierToId(new XmlSchemaNamingStrategy().bdtScName(dtSc, ownerDt, ccDocument));
     }
 
     @Override

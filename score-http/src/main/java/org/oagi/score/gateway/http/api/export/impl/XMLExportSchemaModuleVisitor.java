@@ -28,6 +28,7 @@ import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScSummaryReco
 import org.oagi.score.gateway.http.api.cc_management.model.seq_key.SeqKeySupportable;
 import org.oagi.score.gateway.http.api.code_list_management.model.CodeListSummaryRecord;
 import org.oagi.score.gateway.http.api.export.model.*;
+import org.oagi.score.gateway.http.api.module_management.model.ModuleCcDocument;
 import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
 import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceSummaryRecord;
 import org.oagi.score.gateway.http.common.ScoreConstants;
@@ -45,7 +46,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -65,6 +68,7 @@ public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
     private Document document;
     private Element rootElement;
     private org.jdom2.Namespace targetNamespace;
+    private final Map<String, org.jdom2.Namespace> declaredNamespacesByUri = new HashMap<>();
     private File moduleFile;
     private final org.jdom2.Namespace OAGI_NS = org.jdom2.Namespace.getNamespace("", ScoreConstants.OAGI_NS);
     private final org.jdom2.Namespace XSD_NS = org.jdom2.Namespace.getNamespace("xsd", "http://www.w3.org/2001/XMLSchema");
@@ -89,15 +93,24 @@ public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
         return schemaModule.getNamespace().asJdom2Namespace();
     }
 
+    private boolean shouldEmitCctsAnnotationElements() {
+        return targetNamespace != null && ScoreConstants.OAGI_NS.equals(targetNamespace.getURI());
+    }
+
     public void startSchemaModule(SchemaModule schemaModule) throws Exception {
         this.schemaModule = schemaModule;
         this.document = createDocument();
 
         Element schemaElement = new Element("schema", XSD_NS);
         this.targetNamespace = getNamespace(schemaModule);
+        declaredNamespacesByUri.clear();
+        declaredNamespacesByUri.put(targetNamespace.getURI(), targetNamespace);
         schemaElement.addNamespaceDeclaration(targetNamespace);
         schemaModule.getAdditionalNamespaces().stream().forEach(e -> {
-            schemaElement.addNamespaceDeclaration(e.asJdom2Namespace());
+            org.jdom2.Namespace namespace = resolveNamespace(e);
+            if (!targetNamespace.getURI().equals(namespace.getURI())) {
+                schemaElement.addNamespaceDeclaration(namespace);
+            }
         });
         schemaElement.setAttribute("targetNamespace", targetNamespace.getURI());
         schemaElement.setAttribute("elementFormDefault", "qualified");
@@ -151,8 +164,10 @@ public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
         includeElement.setAttribute("schemaLocation", schemaLocation);
         rootElement.addContent(includeElement);
 
-        org.jdom2.Namespace namespace = getNamespace(includeSchemaModule);
-        this.rootElement.addNamespaceDeclaration(namespace);
+        org.jdom2.Namespace namespace = resolveNamespace(includeSchemaModule.getNamespace());
+        if (!targetNamespace.getURI().equals(namespace.getURI())) {
+            this.rootElement.addNamespaceDeclaration(namespace);
+        }
     }
 
     public void visitImportModule(SchemaModule importSchemaModule) throws Exception {
@@ -162,8 +177,10 @@ public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
         importElement.setAttribute("namespace", importSchemaModule.getNamespace().getNamespaceUri());
         rootElement.addContent(importElement);
 
-        org.jdom2.Namespace namespace = getNamespace(importSchemaModule);
-        this.rootElement.addNamespaceDeclaration(namespace);
+        org.jdom2.Namespace namespace = resolveNamespace(importSchemaModule.getNamespace());
+        if (!targetNamespace.getURI().equals(namespace.getURI())) {
+            this.rootElement.addNamespaceDeclaration(namespace);
+        }
     }
 
     public void visitAgencyId(AgencyId agencyId) throws Exception {
@@ -198,6 +215,10 @@ public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
             restrictionElement.addContent(enumerationElement);
 
             enumerationElement.setAttribute("value", value.value());
+
+            if (!shouldEmitCctsAnnotationElements()) {
+                continue;
+            }
 
             Element annotationElement = new Element("annotation", XSD_NS);
             enumerationElement.addContent(annotationElement);
@@ -301,6 +322,10 @@ public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
     }
 
     private void setDocumentation(Element typeElement, BDTSimple bdtSimple) {
+        if (!shouldEmitCctsAnnotationElements()) {
+            return;
+        }
+
         DtSummaryRecord dataType = bdtSimple.getDataType();
 
         Element annotationElement = new Element("annotation", XSD_NS);
@@ -429,6 +454,10 @@ public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
     }
 
     private void setDocumentationForRestrictionOrUnionOrExtension(Element extensionElement, BDTSimple bdtSimple, boolean union) {
+        if (!shouldEmitCctsAnnotationElements()) {
+            return;
+        }
+
         DtSummaryRecord dataType = bdtSimple.getDataType();
 
         Element annotationElement = new Element("annotation", XSD_NS);
@@ -644,6 +673,10 @@ public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
     }
 
     private void setDocumentationForBdtSc(Element attributeElement, BDTSimple bdtSimple, BDTSC dtSc) {
+        if (!shouldEmitCctsAnnotationElements()) {
+            return;
+        }
+
         Element annotationElement = new Element("annotation", XSD_NS);
         attributeElement.addContent(annotationElement);
 
@@ -956,6 +989,22 @@ public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
         return element;
     }
 
+    private boolean isGloballyAssignedAsccp(AsccpSummaryRecord asccp) {
+        if (!(ccDocument instanceof ModuleCcDocument moduleCcDocument)) {
+            return true;
+        }
+        ModuleCCID<?> moduleCCID = moduleCcDocument.getModuleAsccp(asccp.asccpManifestId());
+        return moduleCCID != null && moduleCCID.moduleId().equals(schemaModule.getModuleId());
+    }
+
+    private boolean isGloballyAssignedBccp(BccpSummaryRecord bccp) {
+        if (!(ccDocument instanceof ModuleCcDocument moduleCcDocument)) {
+            return true;
+        }
+        ModuleCCID<?> moduleCCID = moduleCcDocument.getModuleBccp(bccp.bccpManifestId());
+        return moduleCCID != null && moduleCCID.moduleId().equals(schemaModule.getModuleId());
+    }
+
     public void visitACCComplexType(ACCComplexType accComplexType) throws Exception {
         switch (accComplexType.getOagisComponentType()) {
             case OAGIS10Nouns:
@@ -1046,7 +1095,7 @@ public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
                         Element groupElement = new Element("group", XSD_NS);
 
                         String ref = Utility.toCamelCase(asccp.propertyTerm());
-                        groupElement.setAttribute("ref", attachNamespacePrefixIfExists(ref, asccp.namespaceId()));
+                        groupElement.setAttribute("ref", attachNamespacePrefixIfExists(ref, acc.namespaceId()));
                         groupElement.setAttribute("id", ID_ATTIBUTE_PREFIX + ascc.guid());
                         setCardinalities(groupElement, ascc.cardinality().min(), ascc.cardinality().max());
 
@@ -1057,13 +1106,13 @@ public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
                     } else {
                         Element element = new Element("element", XSD_NS);
 
-                        if (asccp.reusable()) {
+                        if (asccp.reusable() && isGloballyAssignedAsccp(asccp)) {
                             String ref = Utility.toCamelCase(asccp.propertyTerm());
                             element.setAttribute("ref", attachNamespacePrefixIfExists(ref, asccp.namespaceId()));
                         } else {
                             element.setAttribute("name", Utility.toCamelCase(asccp.propertyTerm()));
                             String typeName = Utility.toCamelCase(asccp.den().substring((asccp.propertyTerm() + ". ").length())) + "Type";
-                            element.setAttribute("type", attachNamespacePrefixIfExists(typeName, asccp.namespaceId()));
+                            element.setAttribute("type", attachNamespacePrefixIfExists(typeName, acc.namespaceId()));
                         }
 
                         element.setAttribute("id", ID_ATTIBUTE_PREFIX + ascc.guid());
@@ -1082,8 +1131,15 @@ public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
                     BccpSummaryRecord bccp = ccDocument.getBccp(bcc.toBccpManifestId());
                     Element element = new Element("element", XSD_NS);
 
-                    String ref = namingStrategy.bccpName(bccp);
-                    element.setAttribute("ref", attachNamespacePrefixIfExists(ref, bccp.namespaceId()));
+                    if (isGloballyAssignedBccp(bccp)) {
+                        String ref = namingStrategy.bccpName(bccp);
+                        element.setAttribute("ref", attachNamespacePrefixIfExists(ref, bccp.namespaceId()));
+                    } else {
+                        DtSummaryRecord dt = ccDocument.getDt(bccp.dtManifestId());
+                        element.setAttribute("name", namingStrategy.bccpName(bccp));
+                        element.setAttribute("type", attachNamespacePrefixIfExists(
+                                namingStrategy.dtName(dt), dt.namespaceId()));
+                    }
                     element.setAttribute("id", ID_ATTIBUTE_PREFIX + bcc.guid());
                     setCardinalities(element, bcc.cardinality().min(), bcc.cardinality().max());
 
@@ -1110,6 +1166,10 @@ public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
             }
         } else {
             if (!sequenceElement.getContent().isEmpty()) {
+                complexTypeElement.addContent(sequenceElement);
+            } else if (accComplexType.isGroup()) {
+                // B2MML extension schemas intentionally declare empty global groups with
+                // an empty sequence placeholder for downstream customization.
                 complexTypeElement.addContent(sequenceElement);
             }
         }
@@ -1258,13 +1318,43 @@ public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
     }
 
     private String attachNamespacePrefixIfExists(String str, NamespaceId namespaceId) {
-        if (namespaceId == null) {
+        if (str == null || namespaceId == null) {
+            return str;
+        }
+        // Built-in/simple QNames such as xsd:string and already qualified names
+        // must remain untouched.
+        if (str.contains(":")) {
             return str;
         }
         NamespaceSummaryRecord namespace = ccDocument.getNamespace(namespaceId);
-        if (StringUtils.hasLength(namespace.prefix())) {
-            return namespace.prefix() + ":" + str;
+        org.jdom2.Namespace resolvedNamespace = resolveNamespace(Namespace.newNamespace(namespace));
+        if (StringUtils.hasLength(resolvedNamespace.getPrefix())) {
+            return resolvedNamespace.getPrefix() + ":" + str;
         }
         return str;
+    }
+
+    private org.jdom2.Namespace resolveNamespace(Namespace namespace) {
+        if (namespace == null || !StringUtils.hasLength(namespace.getNamespaceUri())) {
+            return org.jdom2.Namespace.NO_NAMESPACE;
+        }
+        if (declaredNamespacesByUri.containsKey(namespace.getNamespaceUri())) {
+            return declaredNamespacesByUri.get(namespace.getNamespaceUri());
+        }
+
+        String prefix = namespace.getNamespacePrefix();
+        if (!StringUtils.hasLength(prefix)) {
+            prefix = guessNamespacePrefix(namespace.getNamespaceUri());
+        }
+        org.jdom2.Namespace resolvedNamespace = org.jdom2.Namespace.getNamespace(prefix, namespace.getNamespaceUri());
+        declaredNamespacesByUri.put(namespace.getNamespaceUri(), resolvedNamespace);
+        return resolvedNamespace;
+    }
+
+    private String guessNamespacePrefix(String namespaceUri) {
+        if (targetNamespace != null && namespaceUri.equals(targetNamespace.getURI())) {
+            return targetNamespace.getPrefix();
+        }
+        return "ns" + declaredNamespacesByUri.size();
     }
 }

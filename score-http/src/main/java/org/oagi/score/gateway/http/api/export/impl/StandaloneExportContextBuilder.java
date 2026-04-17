@@ -72,6 +72,16 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
     public ExportContext build(AsccpManifestId asccpManifestId) {
         addASCCP(null, asccpManifestId, true);
 
+        AsccpSummaryRecord asccp = ccDocument.getAsccp(asccpManifestId);
+        if (asccp != null) {
+            NamespaceSummaryRecord namespace = ccDocument.getNamespace(asccp.namespaceId());
+            SchemaModule rootModule = getModuleByNamespace(namespace);
+            AccSummaryRecord roleOfAcc = ccDocument.getAcc(asccp.roleOfAccManifestId());
+            if (rootModule != null && roleOfAcc != null) {
+                rootModule.setRootDefinitionName(namingStrategy.accTypeName(roleOfAcc));
+            }
+        }
+
         String path = getPath(asccpManifestId);
         DefaultExportContext context = new DefaultExportContext();
         this.schemaModuleMap.values().forEach(module -> {

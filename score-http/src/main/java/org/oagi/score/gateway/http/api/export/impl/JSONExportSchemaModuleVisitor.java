@@ -9,6 +9,7 @@ import org.oagi.score.gateway.http.api.bie_management.service.generate_expressio
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocument;
 import org.oagi.score.gateway.http.api.cc_management.model.ValueConstraint;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
+import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.OagisComponentType;
 import org.oagi.score.gateway.http.api.cc_management.model.ascc.AsccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpSummaryRecord;
@@ -221,13 +222,25 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
             return this.moduleFile;
         }
 
-        if (!globalElementProperties.isEmpty()) {
+        if (tryApplyRootDefinition(schemaModule)) {
+            // Root schema hoisted from $defs for standalone entry exports.
+        } else if (!globalElementProperties.isEmpty()) {
             applyGlobalElementRoot();
         } else {
             String rootRef = selectRootRef(schemaModule);
             if (StringUtils.hasLength(rootRef)) {
                 document.put("$ref", rootRef);
             }
+        }
+        if (!document.containsKey("properties")) {
+            if (document.containsKey("allOf")) {
+                document.putIfAbsent("type", "object");
+            }
+            document.remove("additionalProperties");
+            document.remove("unevaluatedProperties");
+        }
+        if (definitions.isEmpty()) {
+            document.remove("$defs");
         }
         mapper.writeValue(this.moduleFile, orderedDocument());
         return this.moduleFile;
@@ -238,7 +251,10 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
         copyIfPresent(ordered, "$schema");
         copyIfPresent(ordered, "$id");
         copyIfPresent(ordered, "type");
+        copyIfPresent(ordered, "description");
+        copyIfPresent(ordered, "allOf");
         copyIfPresent(ordered, "additionalProperties");
+        copyIfPresent(ordered, "unevaluatedProperties");
         copyIfPresent(ordered, "minProperties");
         copyIfPresent(ordered, "maxProperties");
         copyIfPresent(ordered, "properties");
@@ -282,20 +298,23 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
 
         boolean extendable = !ccDocument.getAccListByBasedAccManifestId(acc.accManifestId()).isEmpty();
         LinkedHashMap<String, Object> schema = new LinkedHashMap<>();
+        List<Object> allOf = new ArrayList<>();
         if (acc.getBasedACC() != null) {
-            List<Object> allOf = new ArrayList<>();
             allOf.add(withRefFirst(definitionRef(
                     acc.getBasedACC().getTypeName(),
                     referencedModulePathForAcc(acc.getBasedACC().accManifestId()),
                     acc.getBasedACC().getTypeNamespaceId()), new LinkedHashMap<>()));
+        }
+        allOf.addAll(builder.getCompositions());
 
-            LinkedHashMap<String, Object> localSchema = builder.toSchema();
+        if (!allOf.isEmpty()) {
+            LinkedHashMap<String, Object> localSchema = builder.toLocalSchema();
             if (!localSchema.isEmpty()) {
                 allOf.add(localSchema);
             }
             schema.put("allOf", allOf);
         } else {
-            schema.putAll(builder.toSchema());
+            schema.putAll(builder.toRootSchema());
         }
 
         if (!builder.additionalProperties && !extendable) {
@@ -320,6 +339,11 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
             }
             if (ANY_ASCCP_DEN.equals(asccp.den()) || ascc.den().endsWith("Any Structured Content")) {
                 builder.additionalProperties = true;
+                return;
+            }
+            AccSummaryRecord acc = ccDocument.getAcc(asccp.roleOfAccManifestId());
+            if (acc != null && acc.isGroup()) {
+                builder.addComposition(buildAsccGroupCompositionSchema(asccp));
                 return;
             }
 
@@ -370,6 +394,19 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
                 applyNillableTypeUnion(schema, asccp.nillable()),
                 ascc.cardinality().min(),
                 ascc.cardinality().max());
+    }
+
+    private Map<String, Object> buildAsccGroupCompositionSchema(AsccpSummaryRecord asccp) {
+        AccSummaryRecord acc = ccDocument.getAcc(asccp.roleOfAccManifestId());
+        if (acc == null) {
+            return new LinkedHashMap<>();
+        }
+        return withRefFirst(
+                definitionRef(
+                        namingStrategy.accTypeName(acc),
+                        referencedModulePathForAcc(asccp.roleOfAccManifestId()),
+                        acc.namespaceId()),
+                new LinkedHashMap<>());
     }
 
     private Map<String, Object> buildBccPropertySchema(BccSummaryRecord bcc, BccpSummaryRecord bccp) {
@@ -606,6 +643,12 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
         String normalizedTargetModulePath = normalizeModulePath(targetModulePath);
         if (StringUtils.hasLength(normalizedTargetModulePath) &&
                 !normalizedTargetModulePath.equals(normalizeModulePath(schemaModule.getPath()))) {
+            SchemaModule targetSchemaModule = findSchemaModuleByPath(
+                    schemaModule, new LinkedHashSet<>(), normalizedTargetModulePath);
+            if (targetSchemaModule != null
+                    && definitionName.equals(targetSchemaModule.getRootDefinitionName())) {
+                return getRelativeSchemaLocation(normalizedTargetModulePath) + "#";
+            }
             return relativeModuleRef(normalizedTargetModulePath, definitionName);
         }
         return definitionRef(definitionName, namespaceId);
@@ -792,6 +835,99 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
         return null;
     }
 
+    private SchemaModule findSchemaModuleByPath(SchemaModule candidate,
+                                                Set<String> visitedPaths,
+                                                String normalizedTargetPath) {
+        if (candidate == null) {
+            return null;
+        }
+
+        String candidatePath = normalizeModulePath(candidate.getPath());
+        if (StringUtils.hasLength(candidatePath) && !visitedPaths.add(candidatePath)) {
+            return null;
+        }
+
+        if (normalizedTargetPath.equals(candidatePath)) {
+            return candidate;
+        }
+
+        for (SchemaModule dependedModule : candidate.getDependedModules()) {
+            SchemaModule target = findSchemaModuleByPath(dependedModule, visitedPaths, normalizedTargetPath);
+            if (target != null) {
+                return target;
+            }
+        }
+        return null;
+    }
+
+    private boolean tryApplyRootDefinition(SchemaModule schemaModule) {
+        String rootDefinitionName = schemaModule.getRootDefinitionName();
+        if (!StringUtils.hasLength(rootDefinitionName)) {
+            return false;
+        }
+        Object rootDefinition = definitions.remove(rootDefinitionName);
+        if (!(rootDefinition instanceof Map<?, ?> rootSchema)) {
+            return false;
+        }
+        Map<String, Object> flattenedRootSchema = flattenRootDefinition(rootSchema);
+        for (Map.Entry<String, Object> entry : flattenedRootSchema.entrySet()) {
+            document.put(entry.getKey(), entry.getValue());
+        }
+        return true;
+    }
+
+    private Map<String, Object> flattenRootDefinition(Map<?, ?> rootSchema) {
+        LinkedHashMap<String, Object> flattened = new LinkedHashMap<>();
+        Object allOfObject = rootSchema.get("allOf");
+        List<Object> flattenedAllOf = new ArrayList<>();
+        if (allOfObject instanceof List<?> allOfList) {
+            for (Object item : allOfList) {
+                if (item instanceof Map<?, ?> itemMap && isInlineLocalObjectSchema(itemMap)) {
+                    copyObjectSchemaFields(flattened, itemMap);
+                } else {
+                    flattenedAllOf.add(item);
+                }
+            }
+        }
+
+        for (Map.Entry<?, ?> entry : rootSchema.entrySet()) {
+            if (entry.getKey() instanceof String key) {
+                if ("allOf".equals(key)) {
+                    continue;
+                }
+                flattened.put(key, entry.getValue());
+            }
+        }
+        if (!flattenedAllOf.isEmpty()) {
+            flattened.put("allOf", flattenedAllOf);
+        }
+        return flattened;
+    }
+
+    private boolean isInlineLocalObjectSchema(Map<?, ?> schema) {
+        return schema.containsKey("type")
+                || schema.containsKey("properties")
+                || schema.containsKey("required")
+                || schema.containsKey("additionalProperties")
+                || schema.containsKey("unevaluatedProperties");
+    }
+
+    private void copyObjectSchemaFields(Map<String, Object> target, Map<?, ?> source) {
+        copyObjectSchemaField(target, source, "type");
+        copyObjectSchemaField(target, source, "properties");
+        copyObjectSchemaField(target, source, "required");
+        copyObjectSchemaField(target, source, "additionalProperties");
+        copyObjectSchemaField(target, source, "unevaluatedProperties");
+        copyObjectSchemaField(target, source, "minProperties");
+        copyObjectSchemaField(target, source, "maxProperties");
+    }
+
+    private void copyObjectSchemaField(Map<String, Object> target, Map<?, ?> source, String key) {
+        if (source.containsKey(key)) {
+            target.put(key, source.get(key));
+        }
+    }
+
     private String selectRootRef(SchemaModule schemaModule) {
         for (Pair<SchemaModule.OrderType, String> order : schemaModule.getOrders()) {
             SchemaModule.OrderType type = order.getFirst();
@@ -865,9 +1001,38 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
     }
 
     private void applyGlobalElementRoot() {
+        if (globalElementProperties.size() == 1) {
+            Object onlyPropertySchema = globalElementProperties.values().iterator().next();
+            if (onlyPropertySchema instanceof Map<?, ?> propertySchema) {
+                String definitionName = localDefinitionName(propertySchema.get("$ref"));
+                if (StringUtils.hasLength(definitionName)) {
+                    Object rootDefinition = definitions.remove(definitionName);
+                    if (rootDefinition instanceof Map<?, ?> rootSchema) {
+                        Map<String, Object> flattenedRootSchema = flattenRootDefinition(rootSchema);
+                        flattenedRootSchema.remove("unevaluatedProperties");
+                        flattenedRootSchema.remove("additionalProperties");
+                        document.put("type", "object");
+                        document.put("additionalProperties", false);
+                        for (Map.Entry<String, Object> entry : flattenedRootSchema.entrySet()) {
+                            document.put(entry.getKey(), entry.getValue());
+                        }
+                        return;
+                    }
+                }
+            }
+        }
+
         document.put("type", "object");
         document.put("additionalProperties", false);
         document.put("properties", new LinkedHashMap<>(globalElementProperties));
+    }
+
+    private String localDefinitionName(Object refObject) {
+        if (!(refObject instanceof String ref) || !ref.startsWith("#/$defs/")) {
+            return null;
+        }
+        String token = ref.substring("#/$defs/".length());
+        return token.replace("~1", "/").replace("~0", "~");
     }
 
     private String jsonPropertyName(String term) {
@@ -912,9 +1077,20 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
     }
 
     private static final class ObjectSchemaBuilder {
+        private final List<Map<String, Object>> compositions = new ArrayList<>();
         private final LinkedHashMap<String, Object> properties = new LinkedHashMap<>();
         private final LinkedHashSet<String> required = new LinkedHashSet<>();
         private boolean additionalProperties;
+
+        void addComposition(Map<String, Object> schema) {
+            if (schema != null && !schema.isEmpty()) {
+                compositions.add(schema);
+            }
+        }
+
+        List<Map<String, Object>> getCompositions() {
+            return new ArrayList<>(compositions);
+        }
 
         void addProperty(String propertyName, Map<String, Object> schema, boolean requiredIndicator) {
             properties.put(propertyName, schema);
@@ -923,7 +1099,18 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
             }
         }
 
-        LinkedHashMap<String, Object> toSchema() {
+        LinkedHashMap<String, Object> toLocalSchema() {
+            if (!additionalProperties && properties.isEmpty()) {
+                return new LinkedHashMap<>();
+            }
+            return buildObjectSchema();
+        }
+
+        LinkedHashMap<String, Object> toRootSchema() {
+            return buildObjectSchema();
+        }
+
+        private LinkedHashMap<String, Object> buildObjectSchema() {
             LinkedHashMap<String, Object> schema = new LinkedHashMap<>();
             schema.put("type", "object");
             if (!properties.isEmpty()) {
