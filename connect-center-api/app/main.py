@@ -28,7 +28,7 @@ from fastapi.responses import JSONResponse
 
 # FastMCP
 from fastmcp import FastMCP
-from fastmcp.server.auth.oidc_proxy import OIDCProxy
+from mcp.types import Icon
 from fastmcp.utilities.lifespan import combine_lifespans
 
 # Application
@@ -50,6 +50,7 @@ from app.routes.namespace import router as namespace_router
 from app.routes.release import router as release_router
 from app.routes.tag import router as tag_router
 from app.routes.xbt import router as xbt_router
+from app.security import ConnectCenterOIDCProxy
 from app.settings import settings
 
 _API_ROUTE_PREFIX = "/api"
@@ -320,7 +321,7 @@ for router in (
 ):
     app.include_router(router, prefix=_API_ROUTE_PREFIX)
 
-def _create_mcp_server(api_app: FastAPI) -> tuple[FastMCP, OIDCProxy | None]:
+def _create_mcp_server(api_app: FastAPI) -> tuple[FastMCP, ConnectCenterOIDCProxy | None]:
     """Build the FastMCP server exposed by the API process."""
     from app.tools.agency_id_list import mcp as agency_id_list_mcp
     from app.tools.app_user import mcp as app_user_mcp
@@ -338,7 +339,18 @@ def _create_mcp_server(api_app: FastAPI) -> tuple[FastMCP, OIDCProxy | None]:
     from app.tools.xbt import mcp as xbt_mcp
 
     mcp_auth = _create_mcp_auth()
-    mcp = FastMCP("connectCenter MCP", auth=mcp_auth)
+
+    docs_base_url = settings.public_docs_base_url.rstrip("/")
+    website_url = docs_base_url or None
+    icon_src = f"{docs_base_url}/connectcenter-developers.svg" if docs_base_url else None
+    icons = [Icon(src=icon_src, mimeType="image/svg+xml")] if icon_src else None
+
+    mcp = FastMCP(
+        "connectCenter MCP",
+        auth=mcp_auth,
+        website_url=website_url,
+        icons=icons,
+    )
 
     mcp.mount(agency_id_list_mcp)
     mcp.mount(app_user_mcp)
@@ -362,7 +374,7 @@ def _create_mcp_server(api_app: FastAPI) -> tuple[FastMCP, OIDCProxy | None]:
 # ---------------------------------------------------------------------------
 
 
-def _create_mcp_auth() -> OIDCProxy | None:
+def _create_mcp_auth() -> ConnectCenterOIDCProxy | None:
     """Build the FastMCP OIDC proxy from the existing API env configuration."""
     config_url = (settings.oauth2_configuration_url or "").strip()
     issuer_uri = (settings.oauth2_issuer_uri or "").strip().rstrip("/")
@@ -379,7 +391,7 @@ def _create_mcp_auth() -> OIDCProxy | None:
 
     base_url = f"{settings.public_api_base_url.rstrip('/')}{_MCP_ROUTE_PREFIX}"
 
-    return OIDCProxy(
+    return ConnectCenterOIDCProxy(
         config_url=config_url,
         client_id=client_id,
         client_secret=client_secret,

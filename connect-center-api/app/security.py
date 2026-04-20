@@ -15,14 +15,23 @@ from __future__ import annotations
 
 import json
 import logging
+import html
+import secrets
 import time
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Literal
+from urllib.parse import urlencode, urlparse
 
 from fastapi import Depends, HTTPException, status
 from fastapi import Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBasic, HTTPBasicCredentials, HTTPBearer
+from fastmcp.server.auth.oauth_proxy.models import ProxyDCRClient
+from fastmcp.server.auth.oidc_proxy import OIDCProxy
+from fastmcp.server.server import FastMCP
+from fastmcp.utilities.ui import create_page, create_secure_html_response
 from pydantic import BaseModel, Field, ConfigDict
+from starlette.responses import HTMLResponse, RedirectResponse
 
 try:
     import bcrypt
@@ -509,3 +518,480 @@ async def _authenticate_oauth2(bearer: HTTPAuthorizationCredentials, *, session:
         sub=sub,
         session=session,
     )
+
+
+# ---------------------------------------------------------------------------
+# FastMCP Consent UI
+# ---------------------------------------------------------------------------
+
+
+_WORKSPACE_ROOT = Path(__file__).resolve().parents[2]
+_CONNECTCENTER_LOGO_PATH = (
+    _WORKSPACE_ROOT
+    / "score-chrome-extensions"
+    / "connectCenterNavigator"
+    / "images"
+    / "connectcenter-logo.svg"
+)
+CONNECTCENTER_CONSENT_LOGO_SVG = (
+    _CONNECTCENTER_LOGO_PATH.read_text(encoding="utf-8")
+    if _CONNECTCENTER_LOGO_PATH.exists()
+    else ""
+)
+
+
+def _build_default_consent_csp(*, redirect_uri: str, csp_policy: str | None) -> str:
+    """Return the consent-page CSP, matching FastMCP's default behavior."""
+    if csp_policy is not None:
+        return csp_policy
+
+    parsed_redirect = urlparse(redirect_uri)
+    redirect_scheme = parsed_redirect.scheme.lower()
+
+    form_action_schemes = ["https:", "http:"]
+    if redirect_scheme and redirect_scheme not in ("http", "https"):
+        form_action_schemes.append(f"{redirect_scheme}:")
+
+    form_action_directive = " ".join(form_action_schemes)
+    return (
+        "default-src 'none'; "
+        "style-src 'unsafe-inline'; "
+        "img-src https: data:; "
+        "base-uri 'none'; "
+        f"form-action {form_action_directive}"
+    )
+
+
+def create_connectcenter_consent_html(
+    *,
+    client_id: str,
+    redirect_uri: str,
+    scopes: list[str],
+    txn_id: str,
+    csrf_token: str,
+    client_name: str | None = None,
+    client_website_url: str | None = None,
+    server_name: str | None = None,
+    server_icon_url: str | None = None,
+    server_website_url: str | None = None,
+    csp_policy: str | None = None,
+    is_cimd_client: bool = False,
+    cimd_domain: str | None = None,
+) -> str:
+    """Create a connectCenter-styled consent page."""
+    client_display = html.escape(client_name or client_id)
+    client_id_display = html.escape(client_id)
+    redirect_uri_display = html.escape(redirect_uri)
+    scopes_display = ", ".join(html.escape(scope) for scope in scopes) if scopes else "None"
+    client_website_display = html.escape(client_website_url or "N/A")
+
+    server_label = html.escape(server_name or "NIST/OAGi connectCenter")
+    if server_website_url:
+        server_display = (
+            f'<a href="{html.escape(server_website_url, quote=True)}" '
+            'target="_blank" rel="noopener noreferrer" class="brand-link">'
+            f"{server_label}</a>"
+        )
+    else:
+        server_display = server_label
+
+    request_heading = f"{client_display} is requesting access to {server_display}."
+    logo_markup = ""
+    if CONNECTCENTER_CONSENT_LOGO_SVG:
+        logo_markup = f'<div class="brand-logo" aria-label="{server_label}">{CONNECTCENTER_CONSENT_LOGO_SVG}</div>'
+
+    cimd_badge = ""
+    if is_cimd_client and cimd_domain:
+        cimd_badge = (
+            '<div class="consent-badge">'
+            f"Verified domain: <strong>{html.escape(cimd_domain)}</strong>"
+            "</div>"
+        )
+
+    content = f"""
+        <div class="auth-box">
+          <div class="auth-form">
+            <div class="auth-form-header">
+              {logo_markup}
+              <h1>{request_heading}</h1>
+              <h4>Authorize a client to use your MCP session.</h4>
+            </div>
+
+            <div class="auth-form-body">
+              <p class="helper-copy">
+                This approval helps prevent confused deputy attacks by making the requesting
+                client explicit before credentials are returned.
+              </p>
+              {cimd_badge}
+
+              <div class="redirect-target">
+                <div class="redirect-target-label">Credentials will be sent to</div>
+                <div class="redirect-target-value">{redirect_uri_display}</div>
+              </div>
+
+              <details class="consent-details">
+                <summary>Advanced Details</summary>
+                <div class="consent-detail-box">
+                  <div class="consent-detail-row">
+                    <div class="consent-detail-label">Application Name</div>
+                    <div class="consent-detail-value">{client_display}</div>
+                  </div>
+                  <div class="consent-detail-row">
+                    <div class="consent-detail-label">Application Website</div>
+                    <div class="consent-detail-value">{client_website_display}</div>
+                  </div>
+                  <div class="consent-detail-row">
+                    <div class="consent-detail-label">Application ID</div>
+                    <div class="consent-detail-value monospace">{client_id_display}</div>
+                  </div>
+                  <div class="consent-detail-row">
+                    <div class="consent-detail-label">Redirect URI</div>
+                    <div class="consent-detail-value monospace">{redirect_uri_display}</div>
+                  </div>
+                  <div class="consent-detail-row">
+                    <div class="consent-detail-label">Requested Scopes</div>
+                    <div class="consent-detail-value">{scopes_display}</div>
+                  </div>
+                </div>
+              </details>
+
+              <form role="form" autocomplete="off" method="POST" action="">
+                <input type="hidden" name="txn_id" value="{html.escape(txn_id, quote=True)}" />
+                <input type="hidden" name="csrf_token" value="{html.escape(csrf_token, quote=True)}" />
+                <input type="hidden" name="submit" value="true" />
+                <button type="submit" name="action" value="approve" class="btn btn-primary consent-submit-button">
+                  Allow access
+                </button>
+                <button type="submit" name="action" value="deny" class="btn btn-secondary consent-secondary-button">
+                  Deny
+                </button>
+              </form>
+            </div>
+
+            <div class="statement-container">
+              <p>
+                You will only need to approve this client once per browser session unless cookies are cleared
+                or the client redirect target changes.
+              </p>
+            </div>
+          </div>
+        </div>
+    """
+
+    additional_styles = """
+        body {
+            margin: 0;
+            background: #f6f8fa;
+            color: #24292f;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        }
+        .auth-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: min(100vw - 32px, 420px);
+            transform: translate(-50%, -50%);
+        }
+        .auth-form {
+            width: 100%;
+            margin: 0 auto;
+        }
+        .auth-form-header {
+            margin: 0;
+            padding: 0 0 12px 0;
+            text-align: center;
+            color: #333;
+        }
+        .auth-form-header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 300;
+            line-height: 1.25;
+            letter-spacing: -0.5px;
+        }
+        .auth-form-header h4 {
+            margin: 8px 0 0 0;
+            color: #57606a;
+            font-size: 14px;
+            font-weight: 400;
+        }
+        .brand-logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 24px auto;
+            min-height: 26px;
+        }
+        .brand-logo svg {
+            display: block;
+            width: 255px;
+            max-width: 100%;
+            height: auto;
+        }
+        .auth-form-body {
+            margin-top: 16px;
+            padding: 20px;
+            font-size: 14px;
+            background-color: #fff;
+            border: 1px solid #d8dee2;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .helper-copy {
+            margin: 0 0 16px 0;
+            color: #57606a;
+            line-height: 1.5;
+        }
+        .brand-link {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .brand-link:hover {
+            text-decoration: underline;
+        }
+        .consent-badge {
+            margin: 0 0 16px 0;
+            padding: 8px 12px;
+            border: 1px solid #b7ebc6;
+            border-radius: 5px;
+            background: #edfdf3;
+            color: #1a7f37;
+            text-align: center;
+        }
+        .redirect-target {
+            margin: 0 0 16px 0;
+            padding: 14px 16px;
+            border: 1px solid #d8dee2;
+            border-radius: 5px;
+            background: #fff8c5;
+        }
+        .redirect-target-label {
+            margin-bottom: 6px;
+            color: #57606a;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .redirect-target-value {
+            color: #24292f;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.45;
+            overflow-wrap: anywhere;
+        }
+        .consent-details {
+            margin: 0 0 20px 0;
+        }
+        .consent-details summary {
+            cursor: pointer;
+            color: #24292f;
+            font-weight: 600;
+        }
+        .consent-detail-box {
+            margin-top: 12px;
+            border: 1px solid #d8dee2;
+            border-radius: 5px;
+            background: #f6f8fa;
+            overflow: hidden;
+        }
+        .consent-detail-row {
+            display: grid;
+            grid-template-columns: 132px 1fr;
+            gap: 12px;
+            padding: 10px 12px;
+            border-top: 1px solid #d8dee2;
+        }
+        .consent-detail-row:first-child {
+            border-top: 0;
+        }
+        .consent-detail-label {
+            color: #57606a;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .consent-detail-value {
+            color: #24292f;
+            overflow-wrap: anywhere;
+        }
+        .monospace {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 12px;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            margin-top: 16px;
+            padding: 10px 16px;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: #2da44e;
+            border-color: rgba(31, 35, 40, 0.15);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #2c974b;
+        }
+        .btn-secondary {
+            background: #f6f8fa;
+            border-color: #d0d7de;
+            color: #24292f;
+        }
+        .btn-secondary:hover {
+            background: #eef2f6;
+        }
+        .consent-secondary-button {
+            margin-top: 12px;
+        }
+        .statement-container {
+            margin-top: 16px;
+            padding: 16px 18px;
+            border: 1px solid #d8dee2;
+            border-radius: 5px;
+            background: #fff;
+            color: #57606a;
+            font-size: 13px;
+            line-height: 1.5;
+            text-align: center;
+        }
+        .statement-container p {
+            margin: 0;
+        }
+        @media (max-width: 560px) {
+            .auth-box {
+                position: static;
+                width: auto;
+                transform: none;
+                margin: 24px 16px;
+            }
+            .consent-detail-row {
+                grid-template-columns: 1fr;
+                gap: 6px;
+            }
+        }
+    """
+
+    return create_page(
+        content=content,
+        title="ConnectCenter Access Approval",
+        additional_styles=additional_styles,
+        csp_policy=_build_default_consent_csp(redirect_uri=redirect_uri, csp_policy=csp_policy),
+    )
+
+
+class ConnectCenterConsentMixin:
+    """Override FastMCP consent rendering with connectCenter branding."""
+
+    async def _show_consent_page(
+        self,
+        request: Request,
+    ) -> HTMLResponse | RedirectResponse:
+        """Display the connectCenter-branded consent page."""
+        txn_id = request.query_params.get("txn_id")
+        if not txn_id:
+            return create_secure_html_response(
+                "<h1>Error</h1><p>Invalid or expired transaction</p>",
+                status_code=400,
+            )
+
+        txn_model = await self._transaction_store.get(key=txn_id)
+        if not txn_model:
+            return create_secure_html_response(
+                "<h1>Error</h1><p>Invalid or expired transaction</p>",
+                status_code=400,
+            )
+
+        txn = txn_model.model_dump()
+        client_key = self._make_client_key(txn["client_id"], txn["client_redirect_uri"])
+
+        approved = set(self._decode_list_cookie(request, "MCP_APPROVED_CLIENTS"))
+        denied = set(self._decode_list_cookie(request, "MCP_DENIED_CLIENTS"))
+
+        if client_key in approved:
+            consent_token = secrets.token_urlsafe(32)
+            txn_model.consent_token = consent_token
+            await self._transaction_store.put(key=txn_id, value=txn_model, ttl=15 * 60)
+            upstream_url = self._build_upstream_authorize_url(txn_id, txn)
+            response = RedirectResponse(url=upstream_url, status_code=302)
+            self._set_consent_binding_cookie(request, response, txn_id, consent_token)
+            return response
+
+        if client_key in denied:
+            callback_params = {
+                "error": "access_denied",
+                "state": txn.get("client_state") or "",
+            }
+            sep = "&" if "?" in txn["client_redirect_uri"] else "?"
+            return RedirectResponse(
+                url=f"{txn['client_redirect_uri']}{sep}{urlencode(callback_params)}",
+                status_code=302,
+            )
+
+        csrf_token = secrets.token_urlsafe(32)
+        csrf_expires_at = time.time() + 15 * 60
+
+        txn_model.csrf_token = csrf_token
+        txn_model.csrf_expires_at = csrf_expires_at
+        await self._transaction_store.put(key=txn_id, value=txn_model, ttl=15 * 60)
+
+        client = await self.get_client(txn["client_id"])
+        client_name = getattr(client, "client_name", None) if client else None
+        client_website_url = (
+            getattr(client, "client_uri", None)
+            or getattr(client, "website_uri", None)
+            or getattr(client, "homepage_uri", None)
+        )
+
+        is_cimd_client = False
+        cimd_domain: str | None = None
+        if isinstance(client, ProxyDCRClient) and client.cimd_document is not None:
+            is_cimd_client = True
+            cimd_domain = urlparse(txn["client_id"]).hostname
+
+        fastmcp = getattr(request.app.state, "fastmcp_server", None)
+        if isinstance(fastmcp, FastMCP):
+            server_name = fastmcp.name
+            icons = fastmcp.icons
+            server_icon_url = icons[0].src if icons else None
+            server_website_url = fastmcp.website_url
+        else:
+            server_name = None
+            server_icon_url = None
+            server_website_url = None
+
+        html_content = create_connectcenter_consent_html(
+            client_id=txn["client_id"],
+            redirect_uri=txn["client_redirect_uri"],
+            scopes=txn.get("scopes") or [],
+            txn_id=txn_id,
+            csrf_token=csrf_token,
+            client_name=client_name,
+            client_website_url=client_website_url,
+            server_name=server_name,
+            server_icon_url=server_icon_url,
+            server_website_url=server_website_url,
+            csp_policy=self._consent_csp_policy,
+            is_cimd_client=is_cimd_client,
+            cimd_domain=cimd_domain,
+        )
+        response = create_secure_html_response(html_content)
+        self._set_list_cookie(
+            response,
+            "MCP_CONSENT_STATE",
+            self._encode_list_cookie([csrf_token]),
+            max_age=15 * 60,
+        )
+        return response
+
+
+class ConnectCenterOIDCProxy(ConnectCenterConsentMixin, OIDCProxy):
+    """OIDC proxy with connectCenter-branded consent UI."""
+
+    pass
