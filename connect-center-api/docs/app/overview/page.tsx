@@ -38,6 +38,7 @@ export default function ReferenceOverviewPage() {
             methods: [
               { key: 'list', method: 'GET', title: 'List releases', endpoint: '/releases' },
               { key: 'retrieve', method: 'GET', title: 'Retrieve a release', endpoint: '/releases/{release_id}' },
+              { key: 'retrieve_working', method: 'GET', title: 'Retrieve the Working release', endpoint: '/releases/working' },
             ],
           },
           {

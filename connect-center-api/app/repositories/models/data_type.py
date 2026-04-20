@@ -11,6 +11,7 @@ from app.repositories.models.library import LibrarySummaryRow
 from app.repositories.models.log import LogSummaryRow
 from app.repositories.models.namespace import NamespaceSummaryRow
 from app.repositories.models.release import ReleaseSummaryRow
+from app.repositories.models.tag import TagSummaryRow
 
 
 class DataTypeRow(BaseModel):
@@ -31,6 +32,7 @@ class DataTypeRow(BaseModel):
     is_deprecated: bool
     state: str | None = None
     supplementary_components: list[DataTypeSupplementaryComponentRow] = Field(default_factory=list)
+    tags: list[TagSummaryRow] = Field(default_factory=list)
     namespace: NamespaceSummaryRow | None = None
     library: LibrarySummaryRow
     release: ReleaseSummaryRow

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Any, get_args, get_origin
+from functools import lru_cache
+from typing import Any, get_args, get_origin, get_type_hints
 
 from dataclasses import fields, is_dataclass
 
@@ -31,12 +32,21 @@ def to_dataclass(cls: type, value: Any) -> Any:
     if not isinstance(data, dict):
         return data
 
+    resolved_types = _resolved_field_types(cls)
     kwargs: dict[str, Any] = {}
     for f in fields(cls):
         if f.name not in data:
             continue
-        kwargs[f.name] = _coerce_type(f.type, data[f.name])
+        kwargs[f.name] = _coerce_type(resolved_types.get(f.name, f.type), data[f.name])
     return cls(**kwargs)
+
+
+@lru_cache(maxsize=None)
+def _resolved_field_types(cls: type) -> dict[str, Any]:
+    try:
+        return get_type_hints(cls, include_extras=True)
+    except Exception:
+        return {}
 
 
 def _coerce_type(tp: Any, value: Any) -> Any:

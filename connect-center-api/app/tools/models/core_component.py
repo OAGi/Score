@@ -10,6 +10,7 @@ from app.tools.models.shared import LibrarySummaryRecord
 from app.tools.models.shared import LogSummaryRecord
 from app.tools.models.shared import NamespaceSummaryRecord
 from app.tools.models.shared import ReleaseSummaryRecord
+from app.tools.models.shared import TagSummaryRecord
 from app.tools.models.shared import UserSummary
 from app.tools.models.shared import ValueConstraintRecord
 from app.tools.models.shared import WhoAndWhen
@@ -30,6 +31,7 @@ class CoreComponentListEntryResponse(BaseModel):
     namespace: NamespaceSummaryRecord | None = None
     library: LibrarySummaryRecord
     release: ReleaseSummaryRecord
+    tags: list[TagSummaryRecord] = Field(default_factory=list)
     log: LogSummaryRecord | None = None
     owner: UserSummary
     created: WhoAndWhen
@@ -221,6 +223,127 @@ class GetCoreComponentPaginationResponse(BaseModel):
     model_config = ConfigDict(frozen=True)
 
 
+class CreateAccResponse(BaseModel):
+    """Response for create_acc tool."""
+
+    acc_manifest_id: int
+
+    model_config = ConfigDict(frozen=True)
+
+
+class CreateAsccpResponse(BaseModel):
+    """Response for create_asccp tool."""
+
+    asccp_manifest_id: int
+
+    model_config = ConfigDict(frozen=True)
+
+
+class CreateBccpResponse(BaseModel):
+    """Response for create_bccp tool."""
+
+    bccp_manifest_id: int
+
+    model_config = ConfigDict(frozen=True)
+
+
+class AddAsccToAccResponse(BaseModel):
+    """Response for add_ascc_to_acc tool."""
+
+    ascc_manifest_id: int
+
+    model_config = ConfigDict(frozen=True)
+
+
+class AddBccToAccResponse(BaseModel):
+    """Response for add_bcc_to_acc tool."""
+
+    bcc_manifest_id: int
+
+    model_config = ConfigDict(frozen=True)
+
+
+class ReorderAsccInAccResponse(BaseModel):
+    """Response for reorder_ascc_in_acc tool."""
+
+    ascc_manifest_id: int
+    updates: list[str]
+
+    model_config = ConfigDict(frozen=True)
+
+
+class ReorderBccInAccResponse(BaseModel):
+    """Response for reorder_bcc_in_acc tool."""
+
+    bcc_manifest_id: int
+    updates: list[str]
+
+    model_config = ConfigDict(frozen=True)
+
+
+class UpdateAccResponse(BaseModel):
+    """Response for update_acc tool."""
+
+    acc_manifest_id: int
+    updates: list[str]
+
+    model_config = ConfigDict(frozen=True)
+
+
+class UpdateAsccpResponse(BaseModel):
+    """Response for update_asccp tool."""
+
+    asccp_manifest_id: int
+    updates: list[str]
+
+    model_config = ConfigDict(frozen=True)
+
+
+class UpdateBccpResponse(BaseModel):
+    """Response for update_bccp tool."""
+
+    bccp_manifest_id: int
+    updates: list[str]
+
+    model_config = ConfigDict(frozen=True)
+
+
+class UpdateAccBaseResponse(BaseModel):
+    """Response for base-ACC update tools."""
+
+    acc_manifest_id: int
+    updates: list[str]
+
+    model_config = ConfigDict(frozen=True)
+
+
+class UpdateAccTagsResponse(BaseModel):
+    """Response for ACC tag update tools."""
+
+    acc_manifest_id: int
+    updates: list[str]
+
+    model_config = ConfigDict(frozen=True)
+
+
+class ChangeAccStateResponse(BaseModel):
+    """Response for change_acc_state tool."""
+
+    acc_manifest_id: int
+    updates: list[str]
+
+    model_config = ConfigDict(frozen=True)
+
+
+class DiscardAccResponse(BaseModel):
+    """Response for discard_acc tool."""
+
+    acc_manifest_id: int
+    discarded: bool
+
+    model_config = ConfigDict(frozen=True)
+
+
 class GetAccResponse(BaseModel):
     """Response for get_acc tool."""
 
@@ -241,6 +364,7 @@ class GetAccResponse(BaseModel):
     namespace: NamespaceSummaryRecord | None = None
     library: LibrarySummaryRecord
     release: ReleaseSummaryRecord
+    tags: list[TagSummaryRecord] = Field(default_factory=list)
     log: LogSummaryRecord | None = None
     owner: UserSummary
     created: WhoAndWhen
@@ -267,6 +391,7 @@ class GetAsccpResponse(BaseModel):
     namespace: NamespaceSummaryRecord | None = None
     library: LibrarySummaryRecord
     release: ReleaseSummaryRecord
+    tags: list[TagSummaryRecord] = Field(default_factory=list)
     log: LogSummaryRecord | None = None
     owner: UserSummary
     created: WhoAndWhen

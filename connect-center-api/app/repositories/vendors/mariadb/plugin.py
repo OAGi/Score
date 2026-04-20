@@ -19,6 +19,7 @@ from app.repositories.contracts.ctx_category import ContextCategoryRepositoryCon
 from app.repositories.contracts.ctx_scheme import CtxSchemeRepositoryContract
 from app.repositories.contracts.data_type import DataTypeRepositoryContract
 from app.repositories.contracts.library import LibraryRepositoryContract
+from app.repositories.contracts.log import LogRepositoryContract
 from app.repositories.contracts.namespace import NamespaceRepositoryContract
 from app.repositories.contracts.release import ReleaseRepositoryContract
 from app.repositories.contracts.tag import TagRepositoryContract
@@ -34,6 +35,7 @@ from app.repositories.vendors.mariadb.ctx_category_repository import MariaDbCont
 from app.repositories.vendors.mariadb.ctx_scheme_repository import MariaDbCtxSchemeRepository
 from app.repositories.vendors.mariadb.data_type_repository import MariaDbDataTypeRepository
 from app.repositories.vendors.mariadb.library_repository import MariaDbLibraryRepository
+from app.repositories.vendors.mariadb.log_repository import MariaDbLogRepository
 from app.repositories.vendors.mariadb.models import agency_id_list as _agency_id_list_model  # noqa: F401
 # Ensure models are imported so `Base.metadata.create_all()` sees every table.
 from app.repositories.vendors.mariadb.models import app_user as _app_user_model  # noqa: F401
@@ -171,6 +173,17 @@ class MariadbVendorPlugin:
         """
         return MariaDbNamespaceRepository(session)
 
+    def create_log_repository(self, session: AsyncSession) -> LogRepositoryContract:
+        """Create repository instance for create log repository.
+
+        Args:
+            session: Database session bound to the current request.
+
+        Returns:
+            Result of the operation.
+        """
+        return MariaDbLogRepository(session)
+
     def create_release_repository(self, session: AsyncSession) -> ReleaseRepositoryContract:
         """Create repository instance for create release repository.
 
@@ -191,7 +204,7 @@ class MariadbVendorPlugin:
         Returns:
             Result of the operation.
         """
-        return MariaDbDataTypeRepository(session)
+        return MariaDbDataTypeRepository(session, self.create_log_repository(session))
 
     def create_tag_repository(self, session: AsyncSession) -> TagRepositoryContract:
         """Create repository instance for create tag repository.
@@ -246,7 +259,10 @@ class MariadbVendorPlugin:
         Returns:
             Result of the operation.
         """
-        return MariaDbCoreComponentRepository(session)
+        return MariaDbCoreComponentRepository(
+            session,
+            self.create_log_repository(session),
+        )
 
 
 PLUGIN = MariadbVendorPlugin()

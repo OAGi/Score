@@ -45,6 +45,7 @@ function MethodBadge({ method }: { method: MethodDoc['method'] }) {
     GET: 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-400/60 dark:bg-blue-500/15 dark:text-blue-200',
     POST: 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-400/60 dark:bg-emerald-500/15 dark:text-emerald-200',
     PUT: 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-400/70 dark:bg-amber-500/15 dark:text-amber-200',
+    PATCH: 'border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-400/70 dark:bg-violet-500/15 dark:text-violet-200',
     DELETE: 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-400/70 dark:bg-rose-500/15 dark:text-rose-200',
   };
 
@@ -145,9 +146,9 @@ function PropertyList({ fields, requiredFilter }: { fields: MethodDoc['body_para
         }
 
         return (
-          <details key={field.name} className="group overflow-visible px-4 py-3">
-            <summary className="relative cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-              <ChevronRight className="absolute -left-3 top-0.5 h-4 w-4 text-[#94a3b8] transition-transform group-open:rotate-90" />
+          <details key={field.name} className="group overflow-visible">
+            <summary className="relative cursor-pointer list-none px-4 py-3 [&::-webkit-details-marker]:hidden">
+              <ChevronRight className="absolute -left-3 top-3.5 h-4 w-4 text-[#94a3b8] transition-transform group-open:rotate-90" />
               <div className="flex items-center gap-2">
                 <span className="font-mono text-[12px] text-[#0f172a]">{field.name}</span>
                 <span className="rounded border border-border bg-[#f8fafc] px-2 py-0.5 text-[11px] text-[#6b7280]">

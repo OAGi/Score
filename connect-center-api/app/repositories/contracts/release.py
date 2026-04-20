@@ -58,6 +58,22 @@ class ReleaseRepositoryContract(Protocol):
         """
         pass
 
+    async def get_by_library_id_and_release_num(
+        self,
+        library_id: LibraryId,
+        release_num: str,
+    ) -> ReleaseRow | None:
+        """Repository contract for exact library/release-number lookup.
+
+        Args:
+            library_id: Library identifier used to scope the query.
+            release_num: Exact release number to locate.
+
+        Returns:
+            Result of the operation.
+        """
+        pass
+
     async def get_dependent_releases(self, release_id: ReleaseId) -> list[ReleaseId]:
         """Repository contract for get dependent releases.
 

@@ -24,6 +24,7 @@ from app.repositories.contracts.ctx_category import ContextCategoryRepositoryCon
 from app.repositories.contracts.ctx_scheme import CtxSchemeRepositoryContract
 from app.repositories.contracts.data_type import DataTypeRepositoryContract
 from app.repositories.contracts.library import LibraryRepositoryContract
+from app.repositories.contracts.log import LogRepositoryContract
 from app.repositories.contracts.namespace import NamespaceRepositoryContract
 from app.repositories.contracts.release import ReleaseRepositoryContract
 from app.repositories.contracts.tag import TagRepositoryContract
@@ -106,6 +107,16 @@ class VendorPlugin(Protocol):
         pass
     def create_namespace_repository(self, session: AsyncSession) -> NamespaceRepositoryContract:
         """Create repository instance for create namespace repository.
+
+        Args:
+            session: Database session bound to the current request.
+
+        Returns:
+            Result of the operation.
+        """
+        pass
+    def create_log_repository(self, session: AsyncSession) -> LogRepositoryContract:
+        """Create repository instance for create log repository.
 
         Args:
             session: Database session bound to the current request.

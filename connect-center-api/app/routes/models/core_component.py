@@ -1,15 +1,16 @@
-"""Pydantic response models for Core Component endpoints."""
+"""Pydantic request and response models for Core Component endpoints."""
 
 from __future__ import annotations
 
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.routes.models.shared import LibrarySummaryRecord
 from app.routes.models.shared import LogSummaryRecord
 from app.routes.models.shared import NamespaceSummaryRecord
 from app.routes.models.shared import ReleaseSummaryRecord
+from app.routes.models.shared import TagSummaryRecord
 from app.routes.models.shared import UserSummary
 from app.routes.models.shared import ValueConstraintRecord
 from app.routes.models.shared import WhoAndWhen
@@ -56,6 +57,462 @@ class GetCoreComponentListResponse(BaseModel):
     items: list[CoreComponentListEntry] = Field(..., description="Core components.")
 
     model_config = ConfigDict(frozen=True)
+
+
+class CreateAccRequest(BaseModel):
+    """Request payload for creating an ACC."""
+
+    release_id: int = Field(
+        ...,
+        ge=1,
+        description=(
+            "Target release identifier. Developers can target only the `Working` release, "
+            "while end-users can target only non-`Working` releases."
+        ),
+    )
+    based_acc_manifest_id: int | None = Field(
+        default=None,
+        ge=1,
+        description="Base ACC manifest identifier. If provided, it must belong to the same release as `release_id`.",
+    )
+    initial_object_class_term: str | None = Field(
+        default="Object Class Term",
+        description="Initial object class term. Defaults to 'Object Class Term'.",
+    )
+    initial_component_type: Literal[
+        "Base",
+        "Semantics",
+        "Extension",
+        "SemanticGroup",
+        "UserExtensionGroup",
+        "Embedded",
+        "OAGIS10Nouns",
+        "OAGIS10BODs",
+        "BOD",
+        "Verb",
+        "Noun",
+        "Choice",
+        "AttributeGroup",
+    ] = Field(
+        default="Semantics",
+        description=(
+            "Initial OAGIS component type. Use `Base` only when this ACC is intended to be the base ACC for other "
+            "ACCs. Use `Extension` for a developer extension ACC that end-users may extend later in BIEs. Use "
+            "`SemanticGroup` for a grouping ACC whose associations are flattened in BIEs. Otherwise use "
+            "`Semantics`. Defaults to `Semantics`."
+        ),
+    )
+    initial_definition: str | None = Field(default=None, description="Initial definition text.")
+    namespace_id: int | None = Field(
+        default=None,
+        ge=1,
+        description="Namespace identifier. If provided, it must belong to the same library as the target release.",
+    )
+    tag_id: list[int] | None = Field(
+        default=None,
+        description="Optional tag identifier list to attach. Use `List tags` to discover valid tag IDs.",
+        examples=[[1, 2, 3]],
+    )
+
+
+class CreateAccResponse(BaseModel):
+    """Response payload for creating an ACC."""
+
+    acc_manifest_id: int = Field(..., ge=1, description="Created ACC manifest identifier.")
+
+    model_config = ConfigDict(frozen=True)
+
+
+class CreateAsccpRequest(BaseModel):
+    """Request payload for creating an ASCCP."""
+
+    release_id: int = Field(..., ge=1, description="Target release identifier.")
+    role_of_acc_manifest_id: int = Field(..., ge=1, description="Role ACC manifest identifier.")
+    initial_property_term: str | None = Field(default="Property Term", description="Initial property term.")
+    asccp_type: Literal["Default", "DataArea", "Extension", "Verb", "BOD"] = Field(
+        default="Default",
+        description="Initial ASCCP type.",
+    )
+    reusable_indicator: bool = Field(default=True, description="Initial reusable indicator.")
+    namespace_id: int | None = Field(default=None, ge=1, description="Optional namespace identifier.")
+    definition: str | None = Field(default=None, description="Initial definition text.")
+    definition_source: str | None = Field(default=None, description="Initial definition source.")
+    tag_id: list[int] | None = Field(default=None, description="Optional tag identifier list to attach.")
+
+
+class CreateAsccpResponse(BaseModel):
+    """Response payload for creating an ASCCP."""
+
+    asccp_manifest_id: int = Field(..., ge=1, description="Created ASCCP manifest identifier.")
+
+    model_config = ConfigDict(frozen=True)
+
+
+class CreateBccpRequest(BaseModel):
+    """Request payload for creating a BCCP."""
+
+    release_id: int = Field(..., ge=1, description="Target release identifier.")
+    bdt_manifest_id: int = Field(
+        ...,
+        ge=1,
+        description=(
+            "Target BDT manifest identifier. The selected data type must already be a BDT, "
+            "which means its base DT link is set."
+        ),
+    )
+    initial_property_term: str | None = Field(default="Property Term", description="Initial property term.")
+    tag_id: list[int] | None = Field(default=None, description="Optional tag identifier list to attach.")
+
+
+class CreateBccpResponse(BaseModel):
+    """Response payload for creating a BCCP."""
+
+    bccp_manifest_id: int = Field(..., ge=1, description="Created BCCP manifest identifier.")
+
+    model_config = ConfigDict(frozen=True)
+
+
+class AddAsccToAccResponse(BaseModel):
+    """Response payload for adding an ASCC to an ACC."""
+
+    ascc_manifest_id: int = Field(..., ge=1, description="ASCC manifest identifier.")
+
+    model_config = ConfigDict(frozen=True)
+
+
+class AddBccToAccResponse(BaseModel):
+    """Response payload for adding a BCC to an ACC."""
+
+    bcc_manifest_id: int = Field(..., ge=1, description="BCC manifest identifier.")
+
+    model_config = ConfigDict(frozen=True)
+
+
+class _MoveAccAssociationRequestBase(BaseModel):
+    """Shared request payload for reordering an ACC child within the sequence."""
+
+    index: int | None = Field(
+        default=None,
+        description=(
+            "Optional zero-based insertion index. Use `0` to place the association first, `-1` to place it last, "
+            "or another non-negative index to place the association at that position in the sequence. "
+            "Mutually exclusive with all `after_*` and `before_*` options."
+        ),
+    )
+    after_ascc_manifest_id: int | None = Field(
+        default=None,
+        ge=1,
+        description="Place the association after this ASCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options.",
+    )
+    after_bcc_manifest_id: int | None = Field(
+        default=None,
+        ge=1,
+        description="Place the association after this BCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options.",
+    )
+    before_ascc_manifest_id: int | None = Field(
+        default=None,
+        ge=1,
+        description="Place the association before this ASCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options.",
+    )
+    before_bcc_manifest_id: int | None = Field(
+        default=None,
+        ge=1,
+        description="Place the association before this BCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options.",
+    )
+
+    model_config = ConfigDict(frozen=True)
+
+    @model_validator(mode="after")
+    def validate_target_selector(self) -> "_MoveAccAssociationRequestBase":
+        """Ensure the caller chooses at most one sequence target selector."""
+        provided = sum(
+            value is not None
+            for value in (
+                self.index,
+                self.after_ascc_manifest_id,
+                self.after_bcc_manifest_id,
+                self.before_ascc_manifest_id,
+                self.before_bcc_manifest_id,
+            )
+        )
+        if provided > 1:
+            raise ValueError("Provide only one of `index`, `after_*`, or `before_*`.")
+        return self
+
+
+class MoveAsccRequest(_MoveAccAssociationRequestBase):
+    """Request payload for reordering an ASCC within an ACC sequence."""
+
+
+class MoveBccRequest(_MoveAccAssociationRequestBase):
+    """Request payload for reordering a BCC within an ACC sequence."""
+
+
+class ReorderAsccInAccResponse(BaseModel):
+    """Response payload for reordering an ASCC in an ACC."""
+
+    ascc_manifest_id: int = Field(..., ge=1, description="Reordered ASCC manifest identifier.")
+    updates: list[str] = Field(default_factory=list, description="Updated field names.", examples=[["sequence"]])
+
+    model_config = ConfigDict(frozen=True)
+
+
+class ReorderBccInAccResponse(BaseModel):
+    """Response payload for reordering a BCC in an ACC."""
+
+    bcc_manifest_id: int = Field(..., ge=1, description="Reordered BCC manifest identifier.")
+    updates: list[str] = Field(default_factory=list, description="Updated field names.", examples=[["sequence"]])
+
+    model_config = ConfigDict(frozen=True)
+
+
+class UpdateAccRequest(BaseModel):
+    """Request payload for updating mutable ACC fields."""
+
+    object_class_term: str | None = Field(default=None, description="Updated object class term.")
+    component_type: Literal[
+        "Base",
+        "Semantics",
+        "Extension",
+        "SemanticGroup",
+        "UserExtensionGroup",
+        "Embedded",
+        "OAGIS10Nouns",
+        "OAGIS10BODs",
+        "BOD",
+        "Verb",
+        "Noun",
+        "Choice",
+        "AttributeGroup",
+    ] | None = Field(default=None, description="Updated OAGIS component type.")
+    definition: str | None = Field(
+        default=None,
+        description="Updated definition text. Use null to clear the definition.",
+    )
+    definition_source: str | None = Field(
+        default=None,
+        description="Updated definition source. Use null to clear the definition source.",
+    )
+    is_abstract: bool | None = Field(default=None, description="Updated abstract flag.")
+    deprecated: bool | None = Field(default=None, description="Updated deprecation flag.")
+    namespace_id: int | None = Field(
+        default=None,
+        ge=1,
+        description="Updated namespace identifier. Use null to clear the namespace. If provided, it must belong to the same library as the ACC release.",
+    )
+
+    model_config = ConfigDict(
+        frozen=True,
+        json_schema_extra={
+            "example": {
+                "object_class_term": "Order",
+                "component_type": "Semantics",
+                "definition": "A document used to request goods or services.",
+                "definition_source": "https://www.oagis.org",
+                "is_abstract": False,
+                "deprecated": False,
+                "namespace_id": 1,
+            }
+        },
+    )
+
+
+class UpdateAsccpRequest(BaseModel):
+    """Request payload for updating mutable ASCCP fields."""
+
+    property_term: str | None = Field(default=None, description="Updated property term.")
+    definition: str | None = Field(default=None, description="Updated definition text. Use null to clear the definition.")
+    definition_source: str | None = Field(default=None, description="Updated definition source. Use null to clear the definition source.")
+    reusable_indicator: bool | None = Field(default=None, description="Updated reusable indicator.")
+    deprecated: bool | None = Field(default=None, description="Updated deprecation flag.")
+    is_nillable: bool | None = Field(default=None, description="Updated nillable flag.")
+    namespace_id: int | None = Field(default=None, ge=1, description="Updated namespace identifier. Use null to clear the namespace.")
+
+    model_config = ConfigDict(frozen=True)
+
+
+class UpdateBccpRequest(BaseModel):
+    """Request payload for updating mutable BCCP fields."""
+
+    property_term: str | None = Field(default=None, description="Updated property term.")
+    definition: str | None = Field(default=None, description="Updated definition text. Use null to clear the definition.")
+    definition_source: str | None = Field(default=None, description="Updated definition source. Use null to clear the definition source.")
+    deprecated: bool | None = Field(default=None, description="Updated deprecation flag.")
+    is_nillable: bool | None = Field(default=None, description="Updated nillable flag.")
+    namespace_id: int | None = Field(default=None, ge=1, description="Updated namespace identifier. Use null to clear the namespace.")
+    default_value: str | None = Field(default=None, description="Updated default value. Use null to clear it.")
+    fixed_value: str | None = Field(default=None, description="Updated fixed value. Use null to clear it.")
+
+    model_config = ConfigDict(frozen=True)
+
+
+class UpdateAccBaseRequest(BaseModel):
+    """Request payload for setting or unsetting an ACC base manifest."""
+
+    based_acc_manifest_id: int | None = Field(
+        ...,
+        ge=1,
+        description=(
+            "Base ACC manifest identifier. Provide a manifest ID to set the base ACC, "
+            "or null to remove the current base ACC."
+        ),
+    )
+
+    model_config = ConfigDict(
+        frozen=True,
+        json_schema_extra={"example": {"based_acc_manifest_id": 12}},
+    )
+
+
+class UpdateAccStateRequest(BaseModel):
+    """Request payload for ACC state transitions."""
+
+    state: Literal[
+        "Deleted",
+        "WIP",
+        "Draft",
+        "QA",
+        "Candidate",
+        "Production",
+    ] = Field(..., description="Target ACC lifecycle state.")
+
+    model_config = ConfigDict(
+        frozen=True,
+        json_schema_extra={"example": {"state": "Draft"}},
+    )
+
+
+class UpdateAsccpStateRequest(BaseModel):
+    """Request payload for ASCCP state transitions."""
+
+    state: Literal["Deleted", "WIP", "Draft", "QA", "Candidate", "Production"] = Field(
+        ...,
+        description="Target ASCCP lifecycle state.",
+    )
+
+    model_config = ConfigDict(frozen=True)
+
+
+class UpdateBccpStateRequest(BaseModel):
+    """Request payload for BCCP state transitions."""
+
+    state: Literal["Deleted", "WIP", "Draft", "QA", "Candidate", "Production"] = Field(
+        ...,
+        description="Target BCCP lifecycle state.",
+    )
+
+    model_config = ConfigDict(frozen=True)
+
+
+class UpdateAccResponse(BaseModel):
+    """Response payload for ACC update operations."""
+
+    acc_manifest_id: int = Field(..., ge=1, description="Target ACC manifest identifier.", examples=[1])
+    updates: list[str] = Field(default_factory=list, description="Updated field names.", examples=[["definition"]])
+
+    model_config = ConfigDict(
+        frozen=True,
+        json_schema_extra={
+            "example": {
+                "acc_manifest_id": 1,
+                "updates": ["definition", "definition_source"],
+            }
+        },
+    )
+
+
+class UpdateAsccpResponse(BaseModel):
+    """Response payload for ASCCP update operations."""
+
+    asccp_manifest_id: int = Field(..., ge=1, description="Target ASCCP manifest identifier.")
+    updates: list[str] = Field(default_factory=list, description="Updated field names.")
+
+    model_config = ConfigDict(frozen=True)
+
+
+class UpdateBccpResponse(BaseModel):
+    """Response payload for BCCP update operations."""
+
+    bccp_manifest_id: int = Field(..., ge=1, description="Target BCCP manifest identifier.")
+    updates: list[str] = Field(default_factory=list, description="Updated field names.")
+
+    model_config = ConfigDict(frozen=True)
+
+
+class UpdateAccBaseResponse(BaseModel):
+    """Response payload for ACC base update operations."""
+
+    acc_manifest_id: int = Field(..., ge=1, description="Target ACC manifest identifier.", examples=[1])
+    updates: list[str] = Field(
+        default_factory=list,
+        description="Updated field names.",
+        examples=[["based_acc_manifest_id"]],
+    )
+
+    model_config = ConfigDict(
+        frozen=True,
+        json_schema_extra={
+            "example": {
+                "acc_manifest_id": 1,
+                "updates": ["based_acc_manifest_id"],
+            }
+        },
+    )
+
+
+class UpdateAccTagsResponse(BaseModel):
+    """Response payload for ACC tag update operations."""
+
+    acc_manifest_id: int = Field(..., ge=1, description="Target ACC manifest identifier.", examples=[1])
+    updates: list[str] = Field(
+        default_factory=list,
+        description="Updated field names.",
+        examples=[["tags"]],
+    )
+
+    model_config = ConfigDict(
+        frozen=True,
+        json_schema_extra={
+            "example": {
+                "acc_manifest_id": 1,
+                "updates": ["tags"],
+            }
+        },
+    )
+
+
+class ChangeAccStateResponse(BaseModel):
+    """Response payload for ACC state change operations."""
+
+    acc_manifest_id: int = Field(..., ge=1, description="Target ACC manifest identifier.", examples=[1])
+    updates: list[str] = Field(default_factory=list, description="Updated field names.", examples=[["state:Draft"]])
+
+    model_config = ConfigDict(
+        frozen=True,
+        json_schema_extra={
+            "example": {
+                "acc_manifest_id": 1,
+                "updates": ["state:Draft"],
+            }
+        },
+    )
+
+
+class DiscardAccResponse(BaseModel):
+    """Response payload for ACC discard operations."""
+
+    acc_manifest_id: int = Field(..., ge=1, description="Target ACC manifest identifier.", examples=[1])
+    discarded: bool = Field(..., description="Whether the ACC was permanently discarded.", examples=[True])
+
+    model_config = ConfigDict(
+        frozen=True,
+        json_schema_extra={
+            "example": {
+                "acc_manifest_id": 1,
+                "discarded": True,
+            }
+        },
+    )
 
 
 class DataTypeSummaryRecord(BaseModel):
@@ -270,6 +727,7 @@ class GetAccByAccManifestIdResponse(BaseModel):
     namespace: NamespaceSummaryRecord | None = Field(default=None, description="ACC namespace.")
     library: LibrarySummaryRecord = Field(..., description="ACC library.")
     release: ReleaseSummaryRecord = Field(..., description="ACC release.")
+    tags: list[TagSummaryRecord] = Field(default_factory=list, description="ACC tags.")
     log: LogSummaryRecord | None = Field(default=None, description="Revision log.")
     owner: UserSummary = Field(..., description="Owner information.")
     created: WhoAndWhen = Field(..., description="Creation metadata.")
@@ -296,6 +754,7 @@ class GetAsccpByAsccpManifestIdResponse(BaseModel):
     namespace: NamespaceSummaryRecord | None = Field(default=None, description="ASCCP namespace.")
     library: LibrarySummaryRecord = Field(..., description="ASCCP library.")
     release: ReleaseSummaryRecord = Field(..., description="ASCCP release.")
+    tags: list[TagSummaryRecord] = Field(default_factory=list, description="ASCCP tags.")
     log: LogSummaryRecord | None = Field(default=None, description="Revision log.")
     owner: UserSummary = Field(..., description="Owner information.")
     created: WhoAndWhen = Field(..., description="Creation metadata.")
@@ -323,6 +782,7 @@ class GetBccpByBccpManifestIdResponse(BaseModel):
     namespace: NamespaceSummaryRecord | None = Field(default=None, description="BCCP namespace.")
     library: LibrarySummaryRecord = Field(..., description="BCCP library.")
     release: ReleaseSummaryRecord = Field(..., description="BCCP release.")
+    tags: list[TagSummaryRecord] = Field(default_factory=list, description="BCCP tags.")
     log: LogSummaryRecord | None = Field(default=None, description="Revision log.")
     owner: UserSummary = Field(..., description="Owner information.")
     created: WhoAndWhen = Field(..., description="Creation metadata.")

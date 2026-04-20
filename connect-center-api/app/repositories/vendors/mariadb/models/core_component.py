@@ -20,6 +20,7 @@ class Acc(Base):
     object_class_qualifier: Mapped[str | None] = mapped_column(String(100), nullable=True)
     definition: Mapped[str | None] = mapped_column(Text, nullable=True)
     definition_source: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    based_acc_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("acc.acc_id"), nullable=True)
     namespace_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("namespace.namespace_id"), nullable=True)
     owner_user_id: Mapped[int] = mapped_column(Integer, ForeignKey("app_user.app_user_id"), nullable=False)
     created_by: Mapped[int] = mapped_column(Integer, ForeignKey("app_user.app_user_id"), nullable=False)
@@ -28,8 +29,11 @@ class Acc(Base):
     last_update_timestamp: Mapped[object] = mapped_column(DateTime, nullable=False, server_default=func.now())
     state: Mapped[str | None] = mapped_column(String(20), nullable=True)
     is_deprecated: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    replacement_acc_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("acc.acc_id"), nullable=True)
     oagis_component_type: Mapped[int | None] = mapped_column(Integer, nullable=True)
     is_abstract: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    prev_acc_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("acc.acc_id"), nullable=True)
+    next_acc_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("acc.acc_id"), nullable=True)
 
 
 class AccManifest(Base):
@@ -41,7 +45,23 @@ class AccManifest(Base):
     acc_id: Mapped[int] = mapped_column(Integer, ForeignKey("acc.acc_id"), nullable=False)
     based_acc_manifest_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("acc_manifest.acc_manifest_id"), nullable=True)
     den: Mapped[str] = mapped_column(String(351), nullable=False)
+    conflict: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     log_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("log.log_id"), nullable=True)
+    replacement_acc_manifest_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("acc_manifest.acc_manifest_id"),
+        nullable=True,
+    )
+    prev_acc_manifest_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("acc_manifest.acc_manifest_id"),
+        nullable=True,
+    )
+    next_acc_manifest_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("acc_manifest.acc_manifest_id"),
+        nullable=True,
+    )
 
 
 class Asccp(Base):
@@ -56,6 +76,7 @@ class Asccp(Base):
     is_nillable: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     definition: Mapped[str | None] = mapped_column(Text, nullable=True)
     definition_source: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    role_of_acc_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("acc.acc_id"), nullable=True)
     namespace_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("namespace.namespace_id"), nullable=True)
     owner_user_id: Mapped[int] = mapped_column(Integer, ForeignKey("app_user.app_user_id"), nullable=False)
     created_by: Mapped[int] = mapped_column(Integer, ForeignKey("app_user.app_user_id"), nullable=False)
@@ -64,6 +85,9 @@ class Asccp(Base):
     last_update_timestamp: Mapped[object] = mapped_column(DateTime, nullable=False, server_default=func.now())
     state: Mapped[str | None] = mapped_column(String(20), nullable=True)
     is_deprecated: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    replacement_asccp_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("asccp.asccp_id"), nullable=True)
+    prev_asccp_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("asccp.asccp_id"), nullable=True)
+    next_asccp_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("asccp.asccp_id"), nullable=True)
 
 
 class AsccpManifest(Base):
@@ -75,7 +99,23 @@ class AsccpManifest(Base):
     asccp_id: Mapped[int] = mapped_column(Integer, ForeignKey("asccp.asccp_id"), nullable=False)
     role_of_acc_manifest_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("acc_manifest.acc_manifest_id"), nullable=True)
     den: Mapped[str] = mapped_column(String(304), nullable=False)
+    conflict: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     log_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("log.log_id"), nullable=True)
+    replacement_asccp_manifest_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("asccp_manifest.asccp_manifest_id"),
+        nullable=True,
+    )
+    prev_asccp_manifest_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("asccp_manifest.asccp_manifest_id"),
+        nullable=True,
+    )
+    next_asccp_manifest_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("asccp_manifest.asccp_manifest_id"),
+        nullable=True,
+    )
 
 
 class Bccp(Base):
@@ -100,6 +140,9 @@ class Bccp(Base):
     default_value: Mapped[str | None] = mapped_column(Text, nullable=True)
     fixed_value: Mapped[str | None] = mapped_column(Text, nullable=True)
     is_nillable: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    replacement_bccp_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("bccp.bccp_id"), nullable=True)
+    prev_bccp_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("bccp.bccp_id"), nullable=True)
+    next_bccp_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("bccp.bccp_id"), nullable=True)
 
 
 class BccpManifest(Base):
@@ -112,6 +155,21 @@ class BccpManifest(Base):
     bdt_manifest_id: Mapped[int] = mapped_column(Integer, ForeignKey("dt_manifest.dt_manifest_id"), nullable=False)
     den: Mapped[str] = mapped_column(String(351), nullable=False)
     log_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("log.log_id"), nullable=True)
+    replacement_bccp_manifest_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("bccp_manifest.bccp_manifest_id"),
+        nullable=True,
+    )
+    prev_bccp_manifest_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("bccp_manifest.bccp_manifest_id"),
+        nullable=True,
+    )
+    next_bccp_manifest_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("bccp_manifest.bccp_manifest_id"),
+        nullable=True,
+    )
 
 
 class Ascc(Base):
@@ -122,9 +180,21 @@ class Ascc(Base):
     guid: Mapped[str] = mapped_column(String(32), nullable=False)
     cardinality_min: Mapped[int] = mapped_column(Integer, nullable=False)
     cardinality_max: Mapped[int] = mapped_column(Integer, nullable=False)
+    seq_key: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    from_acc_id: Mapped[int] = mapped_column(Integer, ForeignKey("acc.acc_id"), nullable=False)
+    to_asccp_id: Mapped[int] = mapped_column(Integer, ForeignKey("asccp.asccp_id"), nullable=False)
     definition: Mapped[str | None] = mapped_column(Text, nullable=True)
     definition_source: Mapped[str | None] = mapped_column(String(100), nullable=True)
     is_deprecated: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    replacement_ascc_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("ascc.ascc_id"), nullable=True)
+    created_by: Mapped[int] = mapped_column(Integer, ForeignKey("app_user.app_user_id"), nullable=False)
+    owner_user_id: Mapped[int] = mapped_column(Integer, ForeignKey("app_user.app_user_id"), nullable=False)
+    last_updated_by: Mapped[int] = mapped_column(Integer, ForeignKey("app_user.app_user_id"), nullable=False)
+    creation_timestamp: Mapped[object] = mapped_column(DateTime, nullable=False, server_default=func.now())
+    last_update_timestamp: Mapped[object] = mapped_column(DateTime, nullable=False, server_default=func.now())
+    state: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    prev_ascc_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("ascc.ascc_id"), nullable=True)
+    next_ascc_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("ascc.ascc_id"), nullable=True)
 
 
 class AsccManifest(Base):
@@ -132,10 +202,28 @@ class AsccManifest(Base):
     __tablename__ = "ascc_manifest"
 
     ascc_manifest_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    release_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("release.release_id"), nullable=True)
     ascc_id: Mapped[int] = mapped_column(Integer, ForeignKey("ascc.ascc_id"), nullable=False)
+    seq_key_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("seq_key.seq_key_id"), nullable=True)
     from_acc_manifest_id: Mapped[int] = mapped_column(Integer, ForeignKey("acc_manifest.acc_manifest_id"), nullable=False)
     to_asccp_manifest_id: Mapped[int] = mapped_column(Integer, ForeignKey("asccp_manifest.asccp_manifest_id"), nullable=False)
     den: Mapped[str] = mapped_column(String(304), nullable=False)
+    conflict: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    replacement_ascc_manifest_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("ascc_manifest.ascc_manifest_id"),
+        nullable=True,
+    )
+    prev_ascc_manifest_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("ascc_manifest.ascc_manifest_id"),
+        nullable=True,
+    )
+    next_ascc_manifest_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("ascc_manifest.ascc_manifest_id"),
+        nullable=True,
+    )
 
 
 class Bcc(Base):
@@ -146,13 +234,25 @@ class Bcc(Base):
     guid: Mapped[str] = mapped_column(String(32), nullable=False)
     cardinality_min: Mapped[int] = mapped_column(Integer, nullable=False)
     cardinality_max: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    to_bccp_id: Mapped[int] = mapped_column(Integer, ForeignKey("bccp.bccp_id"), nullable=False)
+    from_acc_id: Mapped[int] = mapped_column(Integer, ForeignKey("acc.acc_id"), nullable=False)
+    seq_key: Mapped[int | None] = mapped_column(Integer, nullable=True)
     entity_type: Mapped[int | None] = mapped_column(Integer, nullable=True)
     definition: Mapped[str | None] = mapped_column(Text, nullable=True)
     definition_source: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    created_by: Mapped[int] = mapped_column(Integer, ForeignKey("app_user.app_user_id"), nullable=False)
+    owner_user_id: Mapped[int] = mapped_column(Integer, ForeignKey("app_user.app_user_id"), nullable=False)
+    last_updated_by: Mapped[int] = mapped_column(Integer, ForeignKey("app_user.app_user_id"), nullable=False)
+    creation_timestamp: Mapped[object] = mapped_column(DateTime, nullable=False, server_default=func.now())
+    last_update_timestamp: Mapped[object] = mapped_column(DateTime, nullable=False, server_default=func.now())
+    state: Mapped[str | None] = mapped_column(String(20), nullable=True)
     is_deprecated: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    replacement_bcc_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("bcc.bcc_id"), nullable=True)
     is_nillable: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     default_value: Mapped[str | None] = mapped_column(Text, nullable=True)
     fixed_value: Mapped[str | None] = mapped_column(Text, nullable=True)
+    prev_bcc_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("bcc.bcc_id"), nullable=True)
+    next_bcc_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("bcc.bcc_id"), nullable=True)
 
 
 class BccManifest(Base):
@@ -160,10 +260,28 @@ class BccManifest(Base):
     __tablename__ = "bcc_manifest"
 
     bcc_manifest_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    release_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("release.release_id"), nullable=True)
     bcc_id: Mapped[int] = mapped_column(Integer, ForeignKey("bcc.bcc_id"), nullable=False)
+    seq_key_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("seq_key.seq_key_id"), nullable=True)
     from_acc_manifest_id: Mapped[int] = mapped_column(Integer, ForeignKey("acc_manifest.acc_manifest_id"), nullable=False)
     to_bccp_manifest_id: Mapped[int] = mapped_column(Integer, ForeignKey("bccp_manifest.bccp_manifest_id"), nullable=False)
     den: Mapped[str] = mapped_column(String(351), nullable=False)
+    conflict: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    replacement_bcc_manifest_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("bcc_manifest.bcc_manifest_id"),
+        nullable=True,
+    )
+    prev_bcc_manifest_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("bcc_manifest.bcc_manifest_id"),
+        nullable=True,
+    )
+    next_bcc_manifest_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("bcc_manifest.bcc_manifest_id"),
+        nullable=True,
+    )
 
 
 class SeqKey(Base):

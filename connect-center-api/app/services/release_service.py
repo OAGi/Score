@@ -20,7 +20,7 @@ from app.services.models import WhoAndWhen
 from app.services.models.release import ReleaseServiceResult
 from app.services.utils.date import DateRange
 from app.services.utils.pagination import PaginationParams, PaginationResponse
-from app.types.identifiers import ReleaseId
+from app.types.identifiers import LibraryId, ReleaseId
 
 logger = logging.getLogger("connectcenter.service.release")
 
@@ -173,6 +173,31 @@ class ReleaseService:
         users_by_id = await load_users_by_ids(self._account_service_repo, [row.created_by, row.last_updated_by])
         result = self._to_release_result(row, users_by_id=users_by_id)
         logger.info("get release id=%d → found", int(release_id))
+        return result
+
+    async def get_by_library_id_and_release_num(
+        self,
+        *,
+        library_id: LibraryId,
+        release_num: str,
+    ) -> ReleaseServiceResult | None:
+        """Get a release by exact library and release number."""
+        row = await self._repo.get_by_library_id_and_release_num(library_id, release_num)
+        if row is None:
+            logger.info(
+                "get release library_id=%d release_num=%s → not found",
+                int(library_id),
+                release_num,
+            )
+            return None
+        users_by_id = await load_users_by_ids(self._account_service_repo, [row.created_by, row.last_updated_by])
+        result = self._to_release_result(row, users_by_id=users_by_id)
+        logger.info(
+            "get release library_id=%d release_num=%s → found id=%d",
+            int(library_id),
+            release_num,
+            int(result.release_id),
+        )
         return result
 
     async def get_dependent_releases(self, release_id: ReleaseId) -> list[ReleaseId]:

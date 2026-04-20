@@ -47,7 +47,7 @@ export type OpenApiSpec = {
   >;
 };
 
-export type HttpMethod = 'get' | 'post' | 'put' | 'delete';
+export type HttpMethod = 'get' | 'post' | 'put' | 'patch' | 'delete';
 
 let openApiSpecCache: OpenApiSpec | null = null;
 let openApiSpecPromise: Promise<OpenApiSpec> | null = null;
@@ -211,6 +211,7 @@ export function getReleaseOperation(spec: OpenApiSpec, key: string): OperationLo
   const mapping: Record<string, { path: string; method: HttpMethod }> = {
     list: { path: '/releases', method: 'get' },
     retrieve: { path: '/releases/{release_id}', method: 'get' },
+    retrieve_working: { path: '/releases/working', method: 'get' },
   };
 
   const target = mapping[key];
@@ -223,7 +224,18 @@ export function getReleaseOperation(spec: OpenApiSpec, key: string): OperationLo
 export function getDataTypeOperation(spec: OpenApiSpec, key: string): OperationLookup | null {
   const mapping: Record<string, { path: string; method: HttpMethod }> = {
     list: { path: '/data-types', method: 'get' },
+    create_dt: { path: '/data-types', method: 'post' },
     retrieve: { path: '/data-types/{dt_manifest_id}', method: 'get' },
+    update_dt: { path: '/data-types/{dt_manifest_id}', method: 'post' },
+    create_dt_sc: { path: '/data-types/{dt_manifest_id}/supplementary-components', method: 'post' },
+    update_dt_sc: { path: '/data-types/supplementary-components/{dt_sc_manifest_id}', method: 'post' },
+    delete_dt_sc: { path: '/data-types/supplementary-components/{dt_sc_manifest_id}', method: 'delete' },
+    add_dt_tags: { path: '/data-types/{dt_manifest_id}/tags', method: 'post' },
+    remove_dt_tags: { path: '/data-types/{dt_manifest_id}/tags', method: 'delete' },
+    change_dt_state: { path: '/data-types/{dt_manifest_id}/state', method: 'post' },
+    revise_dt: { path: '/data-types/{dt_manifest_id}/revise', method: 'post' },
+    cancel_dt: { path: '/data-types/{dt_manifest_id}/cancel', method: 'post' },
+    discard_dt: { path: '/data-types/{dt_manifest_id}', method: 'delete' },
   };
 
   const target = mapping[key];
@@ -286,9 +298,41 @@ export function getAgencyIdListOperation(spec: OpenApiSpec, key: string): Operat
 export function getCoreComponentOperation(spec: OpenApiSpec, key: string): OperationLookup | null {
   const mapping: Record<string, { path: string; method: HttpMethod }> = {
     list: { path: '/core-components', method: 'get' },
+    create_acc: { path: '/core-components/acc', method: 'post' },
     get_acc: { path: '/core-components/acc/{acc_manifest_id}', method: 'get' },
+    update_acc: { path: '/core-components/acc/{acc_manifest_id}', method: 'post' },
+    set_acc_base: { path: '/core-components/acc/{acc_manifest_id}/base', method: 'post' },
+    unset_acc_base: { path: '/core-components/acc/{acc_manifest_id}/base', method: 'delete' },
+    add_acc_tags: { path: '/core-components/acc/{acc_manifest_id}/tags', method: 'post' },
+    remove_acc_tags: { path: '/core-components/acc/{acc_manifest_id}/tags', method: 'delete' },
+    change_acc_state: { path: '/core-components/acc/{acc_manifest_id}/state', method: 'post' },
+    revise_acc: { path: '/core-components/acc/{acc_manifest_id}/revise', method: 'post' },
+    cancel_acc: { path: '/core-components/acc/{acc_manifest_id}/cancel', method: 'post' },
+    discard_acc: { path: '/core-components/acc/{acc_manifest_id}', method: 'delete' },
+    add_ascc_to_acc: { path: '/core-components/acc/{acc_manifest_id}/ascc/{asccp_manifest_id}', method: 'post' },
+    reorder_ascc_in_acc: { path: '/core-components/ascc/{ascc_manifest_id}/move', method: 'post' },
+    add_bcc_to_acc: { path: '/core-components/acc/{acc_manifest_id}/bcc/{bccp_manifest_id}', method: 'post' },
+    reorder_bcc_in_acc: { path: '/core-components/bcc/{bcc_manifest_id}/move', method: 'post' },
     get_asccp: { path: '/core-components/asccp/{asccp_manifest_id}', method: 'get' },
+    create_asccp: { path: '/core-components/asccp', method: 'post' },
+    update_asccp: { path: '/core-components/asccp/{asccp_manifest_id}', method: 'post' },
+    change_asccp_state: { path: '/core-components/asccp/{asccp_manifest_id}/state', method: 'post' },
+    change_asccp_role_of_acc: { path: '/core-components/asccp/{asccp_manifest_id}/acc', method: 'post' },
+    add_asccp_tags: { path: '/core-components/asccp/{asccp_manifest_id}/tags', method: 'post' },
+    remove_asccp_tags: { path: '/core-components/asccp/{asccp_manifest_id}/tags', method: 'delete' },
+    revise_asccp: { path: '/core-components/asccp/{asccp_manifest_id}/revise', method: 'post' },
+    cancel_asccp: { path: '/core-components/asccp/{asccp_manifest_id}/cancel', method: 'post' },
+    discard_asccp: { path: '/core-components/asccp/{asccp_manifest_id}', method: 'delete' },
     get_bccp: { path: '/core-components/bccp/{bccp_manifest_id}', method: 'get' },
+    create_bccp: { path: '/core-components/bccp', method: 'post' },
+    update_bccp: { path: '/core-components/bccp/{bccp_manifest_id}', method: 'post' },
+    change_bccp_state: { path: '/core-components/bccp/{bccp_manifest_id}/state', method: 'post' },
+    change_bccp_bdt: { path: '/core-components/bccp/{bccp_manifest_id}/bdt', method: 'post' },
+    add_bccp_tags: { path: '/core-components/bccp/{bccp_manifest_id}/tags', method: 'post' },
+    remove_bccp_tags: { path: '/core-components/bccp/{bccp_manifest_id}/tags', method: 'delete' },
+    revise_bccp: { path: '/core-components/bccp/{bccp_manifest_id}/revise', method: 'post' },
+    cancel_bccp: { path: '/core-components/bccp/{bccp_manifest_id}/cancel', method: 'post' },
+    discard_bccp: { path: '/core-components/bccp/{bccp_manifest_id}', method: 'delete' },
   };
 
   const target = mapping[key];

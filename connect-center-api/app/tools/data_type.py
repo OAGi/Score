@@ -42,7 +42,7 @@ All operations require proper authentication and authorization.
 from __future__ import annotations
 
 import logging
-from typing import Annotated, Any
+from typing import Annotated, Any, Literal
 
 from fastmcp import FastMCP
 from fastmcp.dependencies import Depends
@@ -55,11 +55,29 @@ from app.security import AuthenticatedUser
 from app.services.data_type_service import DataTypeService
 from app.services.release_service import ReleaseService
 from app.tools import _to_tool_error, get_tool_authenticated_user, tool_session
-from app.tools.models.data_type import DataTypeResponseEntry, GetDataTypePaginationResponse, GetDataTypeResponse
+from app.tools.models.data_type import (
+    CreateDataTypeResponse,
+    CreateDataTypeSupplementaryComponentResponse,
+    DataTypeResponseEntry,
+    DefaultPrimitiveSelectionInput,
+    GetDataTypePaginationResponse,
+    GetDataTypeResponse,
+    UpdateDataTypeResponse,
+    UpdateDataTypeSupplementaryComponentResponse,
+    ValueConstraintInput,
+)
+from app.types.unset import UNSET
 
 logger = logging.getLogger("connectcenter.mcp.data_type")
 
 mcp = FastMCP("connectCenter MCP - Data Type Tools")
+
+EMPTY_OUTPUT_SCHEMA = {
+    "type": "object",
+    "description": "Empty response body.",
+    "properties": {},
+    "additionalProperties": False,
+}
 
 
 async def get_data_type_service(
@@ -242,12 +260,10 @@ async def get_data_type_service(
                                     "definition_source": {"type": ["string", "null"],
                                                           "description": "URL indicating the source of the definition",
                                                           "example": "https://unece.org/trade/uncefact/core-components-data-type-catalogue"},
-                                    "cardinality_min": {"type": "integer",
-                                                        "description": "Minimum cardinality for the supplementary component",
-                                                        "example": 0},
-                                    "cardinality_max": {"type": "integer",
-                                                        "description": "Maximum cardinality for the supplementary component",
-                                                        "example": 1},
+                                    "cardinality": {"type": "string",
+                                                    "description": "SCORE-style supplementary-component cardinality label",
+                                                    "enum": ["Prohibited", "Optional", "Required"],
+                                                    "example": "Optional"},
                                     "value_constraint": {
                                         "type": ["object", "null"],
                                         "description": "Value constraint (default_value or fixed_value) for the supplementary component. Exactly one of default_value or fixed_value must be set.",
@@ -264,7 +280,7 @@ async def get_data_type_service(
                                                       "description": "Whether the supplementary component is deprecated",
                                                       "example": False}
                                 },
-                                "required": ["dt_sc_manifest_id", "dt_sc_id", "guid", "cardinality_min",
+                                "required": ["dt_sc_manifest_id", "dt_sc_id", "guid", "cardinality",
                                              "is_deprecated"]
                             }
                         },
@@ -655,12 +671,10 @@ async def get_data_types(
                         "definition_source": {"type": ["string", "null"],
                                               "description": "URL indicating the source of the definition",
                                               "example": "https://unece.org/trade/uncefact/core-components-data-type-catalogue"},
-                        "cardinality_min": {"type": "integer",
-                                            "description": "Minimum cardinality for the supplementary component",
-                                            "example": 0},
-                        "cardinality_max": {"type": "integer",
-                                            "description": "Maximum cardinality for the supplementary component",
-                                            "example": 1},
+                        "cardinality": {"type": "string",
+                                        "description": "SCORE-style supplementary-component cardinality label",
+                                        "enum": ["Prohibited", "Optional", "Required"],
+                                        "example": "Optional"},
                         "value_constraint": {
                             "type": ["object", "null"],
                             "description": "Value constraint (default_value or fixed_value) for the supplementary component. Exactly one of default_value or fixed_value must be set.",
@@ -677,7 +691,7 @@ async def get_data_types(
                                           "description": "Whether the supplementary component is deprecated",
                                           "example": False}
                     },
-                    "required": ["dt_sc_manifest_id", "dt_sc_id", "guid", "cardinality_min", "is_deprecated"]
+                    "required": ["dt_sc_manifest_id", "dt_sc_id", "guid", "cardinality", "is_deprecated"]
                 }
             },
             "namespace": {
@@ -861,6 +875,424 @@ async def get_data_type(
         return GetDataTypeResponse.model_validate(row, from_attributes=True)
     except Exception as exc:
         raise _to_tool_error(exc, fallback=f"Unable to retrieve data type {dt_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="create_dt",
+    description="Create a new DT (Data Type) from an existing base DT.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the created DT manifest identifier.",
+        "properties": {
+            "dt_manifest_id": {"type": "integer", "description": "Created DT manifest identifier.", "example": 12345}
+        },
+        "required": ["dt_manifest_id"],
+    },
+)
+async def create_dt(
+    release_id: Annotated[
+        int,
+        Field(
+            gt=0,
+            description=(
+                "Target release identifier. Developers must use the `Working` release, "
+                "and end-users must use a non-`Working` release."
+            ),
+        ),
+    ],
+    based_dt_manifest_id: Annotated[
+        int,
+        Field(gt=0, description="Base DT manifest identifier used to derive the new DT."),
+    ],
+    tag_id: Annotated[
+        list[int] | None,
+        Field(
+            default=None,
+            description="Optional tag identifier list to attach. Use get_tags() to discover valid tag IDs.",
+        ),
+    ],
+    data_type_service: DataTypeService = Depends(get_data_type_service),
+) -> CreateDataTypeResponse:
+    """
+    Create a DT in a role-appropriate release branch.
+
+    Rules:
+    - developers can target only the `Working` release
+    - end-users can target only non-`Working` releases
+    - the target release must already be `Published`
+    - the new DT is derived from `based_dt_manifest_id` and starts in `WIP`
+    """
+    try:
+        result = await data_type_service.create_dt(
+            release_id=release_id,
+            based_dt_manifest_id=based_dt_manifest_id,
+            tag_id=tag_id,
+        )
+        return CreateDataTypeResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback="Unable to create the DT.") from exc
+
+
+@mcp.tool(
+    name="update_dt",
+    description="Update mutable DT (Data Type) fields while the DT is in WIP.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the updated DT manifest identifier and changed fields.",
+        "properties": {
+            "dt_manifest_id": {"type": "integer", "description": "Target DT manifest identifier.", "example": 12345},
+            "updates": {
+                "type": "array",
+                "description": "Updated field names.",
+                "items": {"type": "string"},
+                "example": ["definition", "definition_source"],
+            },
+        },
+        "required": ["dt_manifest_id", "updates"],
+    },
+)
+async def update_dt(
+    dt_manifest_id: Annotated[int, Field(gt=0, description="Target DT manifest identifier.")],
+    qualifier: Annotated[
+        str | None,
+        Field(default=None, description="Updated qualifier. Omit to leave unchanged. Pass an empty string to clear it."),
+    ],
+    six_digit_id: Annotated[
+        str | None,
+        Field(default=None, description="Updated six-digit identifier. Omit to leave unchanged. Pass an empty string to clear it."),
+    ],
+    deprecated: Annotated[
+        bool | None,
+        Field(default=None, description="Updated deprecation flag. Omit to leave unchanged."),
+    ],
+    namespace_id: Annotated[
+        int | None,
+        Field(
+            default=None,
+            ge=0,
+            description="Updated namespace identifier. Omit to leave unchanged. Use 0 to clear the namespace.",
+        ),
+    ],
+    content_component_definition: Annotated[
+        str | None,
+        Field(default=None, description="Updated content component definition. Omit to leave unchanged. Pass an empty string to clear it."),
+    ],
+    definition: Annotated[
+        str | None,
+        Field(default=None, description="Updated definition text. Omit to leave unchanged. Pass an empty string to clear it."),
+    ],
+    definition_source: Annotated[
+        str | None,
+        Field(default=None, description="Updated definition source. Omit to leave unchanged. Pass an empty string to clear it."),
+    ],
+    default_primitive: Annotated[
+        DefaultPrimitiveSelectionInput | None,
+        Field(
+            default=None,
+            description=(
+                "Default primitive target. Provide exactly one of xbt_manifest_id, "
+                "code_list_manifest_id, or agency_id_list_manifest_id."
+            ),
+        ),
+    ],
+    data_type_service: DataTypeService = Depends(get_data_type_service),
+) -> UpdateDataTypeResponse:
+    """
+    Update mutable DT fields.
+
+    Rules:
+    - the DT must currently be in `WIP`
+    - only the owner or an administrator can update it
+    - omit a parameter to leave it unchanged
+    - pass `""` to clear string fields
+    - pass `0` for `namespace_id` to clear the namespace
+    """
+    try:
+        result = await data_type_service.update_dt(
+            dt_manifest_id=dt_manifest_id,
+            qualifier=UNSET if qualifier is None else qualifier,
+            six_digit_id=UNSET if six_digit_id is None else six_digit_id,
+            deprecated=UNSET if deprecated is None else deprecated,
+            namespace_id=UNSET if namespace_id is None else (None if namespace_id == 0 else namespace_id),
+            content_component_definition=UNSET if content_component_definition is None else content_component_definition,
+            definition=UNSET if definition is None else definition,
+            definition_source=UNSET if definition_source is None else definition_source,
+            xbt_manifest_id=UNSET if default_primitive is None else default_primitive.xbt_manifest_id,
+            code_list_manifest_id=UNSET if default_primitive is None else default_primitive.code_list_manifest_id,
+            agency_id_list_manifest_id=(
+                UNSET if default_primitive is None else default_primitive.agency_id_list_manifest_id
+            ),
+        )
+        return UpdateDataTypeResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to update DT {dt_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="create_dt_sc",
+    description="Create a new DT supplementary component under a DT.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the created DT_SC manifest identifier.",
+        "properties": {
+            "dt_sc_manifest_id": {"type": "integer", "description": "Created DT_SC manifest identifier.", "example": 12345}
+        },
+        "required": ["dt_sc_manifest_id"],
+    },
+)
+async def create_dt_sc(
+    dt_manifest_id: Annotated[int, Field(gt=0, description="Owning DT manifest identifier.")],
+    data_type_service: DataTypeService = Depends(get_data_type_service),
+) -> CreateDataTypeSupplementaryComponentResponse:
+    """Create a blank DT_SC under a WIP DT."""
+    try:
+        result = await data_type_service.create_dt_sc(owner_dt_manifest_id=dt_manifest_id)
+        return CreateDataTypeSupplementaryComponentResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to create a DT supplementary component for DT {dt_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="update_dt_sc",
+    description="Update mutable DT supplementary-component fields while the owner DT is in WIP.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the updated DT_SC manifest identifier and changed fields.",
+        "properties": {
+            "dt_sc_manifest_id": {"type": "integer", "description": "Target DT_SC manifest identifier.", "example": 12345},
+            "updates": {"type": "array", "items": {"type": "string"}, "example": ["property_term", "definition"]},
+        },
+        "required": ["dt_sc_manifest_id", "updates"],
+    },
+)
+async def update_dt_sc(
+    dt_sc_manifest_id: Annotated[int, Field(gt=0, description="Target DT_SC manifest identifier.")],
+    property_term: Annotated[str | None, Field(default=None, description="Updated property term. Omit to leave unchanged. Pass an empty string to clear it.")],
+    representation_term: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description=(
+                "Updated representation term. Use a CDT data type term such as `Amount`, `Code`, or `Text`. "
+                "When this changes, the DT_SC primitive rows are reset to the default primitive set for that term."
+            ),
+        ),
+    ],
+    cardinality: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description=(
+                "Updated DT_SC cardinality. Use `Prohibited` for `0..0`, `Optional` for `0..1`, "
+                "or `Required` for `1..1`."
+            ),
+        ),
+    ],
+    deprecated: Annotated[bool | None, Field(default=None, description="Updated deprecation flag. Omit to leave unchanged.")],
+    definition: Annotated[str | None, Field(default=None, description="Updated definition text. Omit to leave unchanged. Pass an empty string to clear it.")],
+    definition_source: Annotated[str | None, Field(default=None, description="Updated definition source. Omit to leave unchanged. Pass an empty string to clear it.")],
+    value_constraint: Annotated[
+        ValueConstraintInput | None,
+        Field(
+            default=None,
+            description=(
+                "Updated value constraint. Provide default_value to set a default when the element is omitted, "
+                "or fixed_value to require one exact value."
+            ),
+        ),
+    ],
+    default_primitive: Annotated[
+        DefaultPrimitiveSelectionInput | None,
+        Field(
+            default=None,
+            description=(
+                "Default primitive target. Provide exactly one of xbt_manifest_id, "
+                "code_list_manifest_id, or agency_id_list_manifest_id."
+            ),
+        ),
+    ],
+    data_type_service: DataTypeService = Depends(get_data_type_service),
+) -> UpdateDataTypeSupplementaryComponentResponse:
+    """Update mutable DT_SC fields."""
+    try:
+        result = await data_type_service.update_dt_sc(
+            dt_sc_manifest_id=dt_sc_manifest_id,
+            property_term=UNSET if property_term is None else property_term,
+            representation_term=UNSET if representation_term is None else representation_term,
+            cardinality=UNSET if cardinality is None else cardinality,
+            deprecated=UNSET if deprecated is None else deprecated,
+            default_value=UNSET if value_constraint is None else value_constraint.default_value,
+            fixed_value=UNSET if value_constraint is None else value_constraint.fixed_value,
+            definition=UNSET if definition is None else definition,
+            definition_source=UNSET if definition_source is None else definition_source,
+            xbt_manifest_id=UNSET if default_primitive is None else default_primitive.xbt_manifest_id,
+            code_list_manifest_id=UNSET if default_primitive is None else default_primitive.code_list_manifest_id,
+            agency_id_list_manifest_id=(
+                UNSET if default_primitive is None else default_primitive.agency_id_list_manifest_id
+            ),
+        )
+        return UpdateDataTypeSupplementaryComponentResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to update DT_SC {dt_sc_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="delete_dt_sc",
+    description="Delete a DT supplementary component while the owner DT is in WIP.",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def delete_dt_sc(
+    dt_sc_manifest_id: Annotated[int, Field(gt=0, description="Target DT_SC manifest identifier.")],
+    data_type_service: DataTypeService = Depends(get_data_type_service),
+) -> dict[str, object]:
+    """Delete a DT_SC."""
+    try:
+        await data_type_service.delete_dt_sc(dt_sc_manifest_id=dt_sc_manifest_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to delete DT_SC {dt_sc_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="add_dt_tags",
+    description="Attach one or more tags to a DT (Data Type).",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def add_dt_tags(
+    dt_manifest_id: Annotated[int, Field(gt=0, description="Target DT manifest identifier.")],
+    tag_id: Annotated[
+        list[int],
+        Field(description="Tag identifier list to attach. Use get_tags() to discover valid tag IDs."),
+    ],
+    data_type_service: DataTypeService = Depends(get_data_type_service),
+) -> dict[str, object]:
+    """Add tags to a DT while it is in `WIP`."""
+    try:
+        await data_type_service.add_dt_tags(dt_manifest_id=dt_manifest_id, tag_id=tag_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to add tags to DT {dt_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="remove_dt_tags",
+    description="Detach one or more tags from a DT (Data Type).",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def remove_dt_tags(
+    dt_manifest_id: Annotated[int, Field(gt=0, description="Target DT manifest identifier.")],
+    tag_id: Annotated[
+        list[int],
+        Field(description="Tag identifier list to remove. Use get_tags() to discover valid tag IDs."),
+    ],
+    data_type_service: DataTypeService = Depends(get_data_type_service),
+) -> dict[str, object]:
+    """Remove tags from a DT while it is in `WIP`."""
+    try:
+        await data_type_service.remove_dt_tags(dt_manifest_id=dt_manifest_id, tag_id=tag_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to remove tags from DT {dt_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="change_dt_state",
+    description="Change the lifecycle state of a DT (Data Type).",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def change_dt_state(
+    dt_manifest_id: Annotated[int, Field(gt=0, description="Target DT manifest identifier.")],
+    state: Annotated[
+        Literal["Deleted", "WIP", "Draft", "QA", "Candidate", "Production"],
+        Field(description="Target lifecycle state."),
+    ],
+    data_type_service: DataTypeService = Depends(get_data_type_service),
+) -> dict[str, object]:
+    """
+    Change a DT lifecycle state according to connectCenter rules.
+
+    Valid transitions depend on the DT release branch:
+    - `Working` release DTs: `Deleted <-> WIP <-> Draft <-> Candidate`
+    - non-`Working` release DTs: `Deleted <-> WIP <-> QA <-> Production`
+    """
+    try:
+        await data_type_service.change_dt_state(dt_manifest_id=dt_manifest_id, state=state)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to change the DT state for {dt_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="revise_dt",
+    description="Create a new editable DT (Data Type) revision from a stable DT revision.",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def revise_dt(
+    dt_manifest_id: Annotated[int, Field(gt=0, description="Target DT manifest identifier.")],
+    data_type_service: DataTypeService = Depends(get_data_type_service),
+) -> dict[str, object]:
+    """
+    Revise a DT according to connectCenter rules.
+
+    Rules:
+    - developer-side DTs can be revised only from the `Published` state in the `Working` release
+    - end-user DTs can be revised only from the `Production` state in a non-`Working` release
+    - the requester and the DT owner must belong to the same role family
+    """
+    try:
+        await data_type_service.revise_dt(dt_manifest_id=dt_manifest_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to revise DT {dt_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="cancel_dt",
+    description="Cancel the current DT (Data Type) revision and restore the previous stable revision.",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def cancel_dt(
+    dt_manifest_id: Annotated[int, Field(gt=0, description="Target DT manifest identifier.")],
+    data_type_service: DataTypeService = Depends(get_data_type_service),
+) -> dict[str, object]:
+    """
+    Cancel the current DT revision according to connectCenter rules.
+
+    Rules:
+    - only DTs in the `WIP` state can be cancelled
+    - the requester and the DT owner must belong to the same role family
+    - the DT must be on the requester's allowed branch (`Working` for developers, non-`Working` for end-users)
+    """
+    try:
+        await data_type_service.cancel_dt(dt_manifest_id=dt_manifest_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to cancel DT {dt_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="discard_dt",
+    description="Discard a Deleted DT (Data Type) and its direct DT-owned records permanently.",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def discard_dt(
+    dt_manifest_id: Annotated[int, Field(gt=0, description="Target DT manifest identifier.")],
+    data_type_service: DataTypeService = Depends(get_data_type_service),
+) -> dict[str, object]:
+    """
+    Discard a Deleted DT from the database.
+
+    Rules:
+    - the DT must already be in the `Deleted` state
+    - related BCCPs that still use the DT must be discarded first
+    - derived DTs must be discarded first
+    - this operation is irreversible
+    """
+    try:
+        await data_type_service.discard_dt(dt_manifest_id=dt_manifest_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to discard DT {dt_manifest_id}.") from exc
 
 
 def _build_data_type_service(

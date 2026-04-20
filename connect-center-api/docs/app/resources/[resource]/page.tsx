@@ -1,10 +1,19 @@
 import { notFound } from 'next/navigation';
 
+type SectionGroup = {
+  title: string;
+  items: string[];
+};
+
 type ResourceConcept = {
   title: string;
   overview: string[];
-  endpointUsage: string[];
+  endpointUsage: string[] | SectionGroup[];
 };
+
+function isGroupedSectionItems(items: string[] | SectionGroup[]): items is SectionGroup[] {
+  return items.length > 0 && typeof items[0] !== 'string';
+}
 
 const RESOURCE_CONCEPTS: Record<string, ResourceConcept> = {
   accounts: {
@@ -40,6 +49,7 @@ const RESOURCE_CONCEPTS: Record<string, ResourceConcept> = {
     endpointUsage: [
       'Use `get_releases` with a `library_id` to find the release number and state you want to inspect or build against.',
       'Use `get_release` when you already know the `release_id` and need its precise metadata.',
+      'Use `get_working_release` with a `library_id` when you need the library\'s `Working` release directly, especially for Developer authoring flows.',
       'Reuse the selected `release_id` across downstream endpoints such as `get_core_components`, `get_data_types`, `get_code_lists`, and `get_agency_id_lists`.',
     ],
   },
@@ -62,9 +72,55 @@ const RESOURCE_CONCEPTS: Record<string, ResourceConcept> = {
       'BIEs are profiles of these canonical components. In practice, CC endpoints are used both directly for model inspection and indirectly when a BIE response gives you manifest IDs that you need to resolve.',
     ],
     endpointUsage: [
-      'Use `get_core_components` to search the release for ACC, ASCCP, or BCCP records by DEN, tag, or component type.',
-      'Use `get_acc`, `get_asccp`, and `get_bccp` when you already have a manifest ID and need full component details.',
-      'When traversing a BIE, follow manifest IDs returned from ASBIEP, ABIE, ASBIE, or BBIE structures into these CC endpoints for the canonical definition behind the profile.',
+      {
+        title: 'General',
+        items: [
+          'Use `get_core_components` to search the release for ACC, ASCCP, or BCCP records by DEN, tag, or component type.',
+          'Use `get_acc`, `get_asccp`, and `get_bccp` when you already have a manifest ID and need full component details.',
+          'When traversing a BIE, follow manifest IDs returned from ASBIEP, ABIE, ASBIE, or BBIE structures into these CC endpoints for the canonical definition behind the profile.',
+        ],
+      },
+      {
+        title: 'ACC',
+        items: [
+          'Use `create_acc` to create a new ACC in the release branch allowed for your role: `Working` for developers, non-`Working` for end-users, with admins following the matching effective-role path.',
+          'Use `update_acc` to change mutable ACC fields such as object class term, definition, namespace, component type, abstract flag, or deprecation while the ACC is in `WIP`.',
+          'Use `set_base_acc` to assign a base ACC while the ACC is in `WIP`, and `clear_base_acc` to remove that inheritance target. Base ACC updates must stay within the same release and cannot introduce inherited ASCCP or BCCP conflicts.',
+          'Use `add_tags_to_acc` and `remove_tags_from_acc` to attach or detach ACC tags while the ACC is in `WIP`. These tag updates follow the same owner or admin rules as other mutable ACC edits.',
+          'Use `change_acc_state` to move an ACC through its lifecycle state transitions, including `WIP` to `Deleted` when you want to mark it for deletion.',
+          'Use `revise_acc` to create a new editable ACC revision from a stable ACC: `Published` in `Working` for developers, or `Production` in a non-`Working` release for end-users.',
+          'Use `cancel_acc` to abandon the current `WIP` ACC revision and restore the previous stable revision on the same allowed branch and role family.',
+          'Use `discard_acc` only after the ACC is already in `Deleted`. Discard permanently removes the ACC from the database and cannot be undone.',
+          'Use `add_ascc_to_acc` and `add_bcc_to_acc` to add a reusable ASCCP or BCCP into an ACC sequence, or reposition the existing relationship if that property is already present.',
+          'Use `reorder_ascc_in_acc` and `reorder_bcc_in_acc` when you need a position-only change for an existing ACC relationship without changing which ASCCP or BCCP it targets.',
+        ],
+      },
+      {
+        title: 'ASCCP',
+        items: [
+          'Use `create_asccp` to create a new ASCCP in the release branch allowed for your role: `Working` for developers, non-`Working` for end-users, with admins following the matching effective-role path.',
+          'Use `update_asccp` to change mutable ASCCP fields while the ASCCP is in `WIP`.',
+          'Use `change_asccp_role_of_acc` to update the ACC that supplies the ASCCP role while the ASCCP is in `WIP`.',
+          'Use `add_asccp_tags` and `remove_asccp_tags` to attach or detach ASCCP tags while the ASCCP is in `WIP`. These tag updates follow the same owner or admin rules as other mutable ASCCP edits.',
+          'Use `change_asccp_state` to move an ASCCP through its lifecycle state transitions, including `WIP` to `Deleted` when you want to mark it for deletion.',
+          'Use `revise_asccp` to create a new editable ASCCP revision from a stable ASCCP: `Published` in `Working` for developers, or `Production` in a non-`Working` release for end-users.',
+          'Use `cancel_asccp` to abandon the current `WIP` ASCCP revision and restore the previous stable revision on the same allowed branch and role family.',
+          'Use `discard_asccp` only after the ASCCP is already in `Deleted`. Discard permanently removes the ASCCP from the database and cannot be undone.',
+        ],
+      },
+      {
+        title: 'BCCP',
+        items: [
+          'Use `create_bccp` to create a new BCCP in the release branch allowed for your role: `Working` for developers, non-`Working` for end-users, with admins following the matching effective-role path.',
+          'Use `update_bccp` to change mutable BCCP fields while the BCCP is in `WIP`.',
+          'Use `change_bccp_bdt` to assign or change the BDT used by a BCCP while the BCCP is in `WIP`.',
+          'Use `add_bccp_tags` and `remove_bccp_tags` to attach or detach BCCP tags while the BCCP is in `WIP`. These tag updates follow the same owner or admin rules as other mutable BCCP edits.',
+          'Use `change_bccp_state` to move a BCCP through its lifecycle state transitions, including `WIP` to `Deleted` when you want to mark it for deletion.',
+          'Use `revise_bccp` to create a new editable BCCP revision from a stable BCCP: `Published` in `Working` for developers, or `Production` in a non-`Working` release for end-users.',
+          'Use `cancel_bccp` to abandon the current `WIP` BCCP revision and restore the previous stable revision on the same allowed branch and role family.',
+          'Use `discard_bccp` only after the BCCP is already in `Deleted`. Discard permanently removes the BCCP from the database and cannot be undone.',
+        ],
+      },
     ],
   },
   business_information_entities: {
@@ -88,6 +144,16 @@ const RESOURCE_CONCEPTS: Record<string, ResourceConcept> = {
     ],
     endpointUsage: [
       'Use `get_data_types` with a `release_id` to browse available types by DEN, representation term, or qualifier.',
+      'Use `create_dt` to create a new DT from an existing base DT in the release branch allowed for your role: `Working` for developers, non-`Working` for end-users, with admins following the matching effective-role path.',
+      'Use `update_dt` to change mutable DT fields such as qualifier, six-digit ID, definition, definition source, content component definition, namespace, deprecation, or the default primitive restriction while the DT is in `WIP`.',
+      'Use `create_dt_sc` to append a new DT supplementary component under a `WIP` DT. New DT_SCs start with a default `Text` representation-term primitive set and are propagated to inherited DTs.',
+      'Use `update_dt_sc` to change mutable DT supplementary-component fields such as property term, representation term, cardinality, definition, value constraint, deprecation, or the default primitive restriction while the owner DT is in `WIP`. If you change `representation_term`, use a CDT data type term such as `Amount`, `Code`, or `Text`; that change resets the DT_SC primitive rows to the default primitive set for the selected term. For cardinality, use `Prohibited` for `0..0`, `Optional` for `0..1`, and `Required` for `1..1`.',
+      'Use `delete_dt_sc` to remove a DT supplementary component while the owner DT is in `WIP`. DT_SC deletion also removes inherited copies and is blocked when BIE supplementary components still reference it.',
+      'Use `add_dt_tags` and `remove_dt_tags` to attach or detach DT tags while the DT is in `WIP`. These tag updates follow the same owner or admin rules as other mutable DT edits.',
+      'Use `change_dt_state` to move a DT through its lifecycle state transitions, including `WIP` to `Deleted` when you want to mark it for deletion.',
+      'Use `revise_dt` to create a new editable DT revision from a stable DT: `Published` in `Working` for developers, or `Production` in a non-`Working` release for end-users.',
+      'Use `cancel_dt` to abandon the current `WIP` DT revision and restore the previous stable revision on the same allowed branch and role family.',
+      'Use `discard_dt` only after the DT is already in `Deleted`. Discard permanently removes the DT from the database and cannot be undone.',
       'Use `get_data_type` when you already have a `dt_manifest_id` and need the full type definition.',
       'Follow data-type references from BCCPs, BBIEs, or BBIE supplementary components when you need to understand the default value domain or supplementary-component structure.',
     ],
@@ -187,16 +253,35 @@ function Section({
   items,
 }: {
   title: string;
-  items: string[];
+  items: string[] | SectionGroup[];
 }) {
+  const groupedItems = isGroupedSectionItems(items) ? items : null;
+
   return (
     <section className="mt-6">
       <h2 className="text-base font-semibold text-[#111827] dark:text-white">{title}</h2>
-      <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-[#334155] dark:text-[#cbd5e1]">
-        {items.map((item) => (
-          <li key={item}>{item}</li>
-        ))}
-      </ul>
+      {groupedItems ? (
+        <div className="mt-4 space-y-5">
+          {groupedItems.map((group) => (
+            <div key={group.title}>
+              <h3 className="text-sm font-semibold uppercase tracking-[0.12em] text-[#475569] dark:text-[#94a3b8]">
+                {group.title}
+              </h3>
+              <ul className="mt-2 list-disc space-y-2 pl-5 text-sm leading-6 text-[#334155] dark:text-[#cbd5e1]">
+                {group.items.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-[#334155] dark:text-[#cbd5e1]">
+          {(items as string[]).map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 }

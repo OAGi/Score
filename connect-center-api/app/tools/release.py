@@ -26,6 +26,8 @@ Available Tools:
 - get_release: Retrieve a single release by its ID, including library, namespace,
   creator, last_updater, and linked releases (prev_release, next_release).
 
+- get_working_release: Retrieve the `Working` release for a library by `library_id`.
+
 Key Features:
 - Full relationship loading (library, namespace, creator, last_updater, prev_release, next_release)
 - Support for filtering, pagination, and sorting
@@ -57,6 +59,77 @@ from app.tools.models.release import GetReleasePaginationResponse, GetReleaseRes
 logger = logging.getLogger("connectcenter.mcp.release")
 
 mcp = FastMCP("connectCenter MCP - Release Tools")
+
+_RELEASE_OUTPUT_SCHEMA = {
+    "type": "object",
+    "description": "Response containing release information",
+    "properties": {
+        "release_id": {"type": "integer", "description": "Unique identifier for the release", "example": 1},
+        "library": {
+            "type": "object",
+            "description": "Library information",
+            "properties": {
+                "library_id": {"type": "integer", "description": "Unique identifier for the library", "example": 1},
+                "name": {"type": "string", "description": "Library name", "example": "connectSpec"}
+            },
+            "required": ["library_id", "name"]
+        },
+        "guid": {"type": "string", "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)", "example": "a1b2c3d4e5f6789012345678901234ab"},
+        "release_num": {"type": "string", "description": "Release number", "example": "10.6"},
+        "release_note": {"type": ["string", "null"], "description": "Release notes", "example": "Major update with new features"},
+        "release_license": {"type": ["string", "null"], "description": "Release license information", "example": "MIT License"},
+        "namespace": {
+            "type": ["object", "null"],
+            "description": "Namespace information",
+            "properties": {
+                "namespace_id": {"type": "integer", "description": "Unique identifier for the namespace", "example": 1},
+                "uri": {"type": "string", "description": "Namespace URI (Uniform Resource Identifier)", "example": "http://www.openapplications.org/oagis/10"},
+                "prefix": {"type": ["string", "null"], "description": "Namespace prefix", "example": "oagis"}
+            },
+            "required": ["namespace_id", "uri"]
+        },
+        "state": {"type": "string", "enum": ["Processing", "Initialized", "Draft", "Published"], "description": "Release state", "example": "Published"},
+        "created": {
+            "type": "object",
+            "description": "Information about the creation of the release",
+            "properties": {
+                "who": {
+                    "type": "object",
+                    "description": "User who created the release",
+                    "properties": {
+                        "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
+                        "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
+                        "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
+                        "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                    },
+                    "required": ["user_id", "login_id", "username", "roles"]
+                },
+                "when": {"type": "string", "format": "date-time", "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-15T10:30:00Z"}
+            },
+            "required": ["who", "when"]
+        },
+        "last_updated": {
+            "type": "object",
+            "description": "Information about the last update of the release",
+            "properties": {
+                "who": {
+                    "type": "object",
+                    "description": "User who last updated the release",
+                    "properties": {
+                        "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
+                        "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
+                        "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
+                        "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                    },
+                    "required": ["user_id", "login_id", "username", "roles"]
+                },
+                "when": {"type": "string", "format": "date-time", "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-20T14:45:00Z"}
+            },
+            "required": ["who", "when"]
+        }
+    },
+    "required": ["release_id", "library", "guid", "release_num", "state", "created", "last_updated"]
+}
 
 
 async def get_release_service(
@@ -251,76 +324,7 @@ async def get_releases(
 @mcp.tool(
     name="get_release",
     description="Get a specific release by ID",
-    output_schema={
-        "type": "object",
-        "description": "Response containing release information",
-        "properties": {
-            "release_id": {"type": "integer", "description": "Unique identifier for the release", "example": 1},
-            "library": {
-                "type": "object",
-                "description": "Library information",
-                "properties": {
-                    "library_id": {"type": "integer", "description": "Unique identifier for the library", "example": 1},
-                    "name": {"type": "string", "description": "Library name", "example": "connectSpec"}
-                },
-                "required": ["library_id", "name"]
-            },
-            "guid": {"type": "string", "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)", "example": "a1b2c3d4e5f6789012345678901234ab"},
-            "release_num": {"type": "string", "description": "Release number", "example": "10.6"},
-            "release_note": {"type": ["string", "null"], "description": "Release notes", "example": "Major update with new features"},
-            "release_license": {"type": ["string", "null"], "description": "Release license information", "example": "MIT License"},
-            "namespace": {
-                "type": ["object", "null"],
-                "description": "Namespace information",
-                "properties": {
-                    "namespace_id": {"type": "integer", "description": "Unique identifier for the namespace", "example": 1},
-                    "uri": {"type": "string", "description": "Namespace URI (Uniform Resource Identifier)", "example": "http://www.openapplications.org/oagis/10"},
-                    "prefix": {"type": ["string", "null"], "description": "Namespace prefix", "example": "oagis"}
-                },
-                "required": ["namespace_id", "uri"]
-            },
-            "state": {"type": "string", "enum": ["Processing", "Initialized", "Draft", "Published"], "description": "Release state", "example": "Published"},
-            "created": {
-                "type": "object",
-                "description": "Information about the creation of the release",
-                "properties": {
-                    "who": {
-                        "type": "object",
-                        "description": "User who created the release",
-                        "properties": {
-                            "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                            "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                            "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                            "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
-                        },
-                        "required": ["user_id", "login_id", "username", "roles"]
-                    },
-                    "when": {"type": "string", "format": "date-time", "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-15T10:30:00Z"}
-                },
-                "required": ["who", "when"]
-            },
-            "last_updated": {
-                "type": "object",
-                "description": "Information about the last update of the release",
-                "properties": {
-                    "who": {
-                        "type": "object",
-                        "description": "User who last updated the release",
-                        "properties": {
-                            "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                            "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                            "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                            "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
-                        },
-                        "required": ["user_id", "login_id", "username", "roles"]
-                    },
-                    "when": {"type": "string", "format": "date-time", "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-20T14:45:00Z"}
-                },
-                "required": ["who", "when"]
-            }
-        },
-        "required": ["release_id", "library", "guid", "release_num", "state", "created", "last_updated"]
-    }
+    output_schema=_RELEASE_OUTPUT_SCHEMA
 )
 async def get_release(
     release_id: Annotated[int, Field(gt=0, description="Unique numeric identifier of the release to retrieve.")],
@@ -376,6 +380,46 @@ async def get_release(
         return GetReleaseResponse.model_validate(row, from_attributes=True)
     except Exception as exc:
         raise _to_tool_error(exc, fallback=f"Unable to retrieve release {release_id}.") from exc
+
+
+@mcp.tool(
+    name="get_working_release",
+    description="Get the `Working` release for a specific library",
+    output_schema=_RELEASE_OUTPUT_SCHEMA,
+)
+async def get_working_release(
+    library_id: Annotated[int, Field(gt=0, description="Unique numeric identifier of the library whose `Working` release should be retrieved.")],
+    release_service: ReleaseService = Depends(get_release_service),
+) -> GetReleaseResponse:
+    """
+    Get the `Working` release for a specific library.
+
+    This function retrieves the library's exact `Working` release, which is
+    especially useful for Developer flows that need a valid editable release_id
+    before calling other tools such as `create_acc`.
+
+    Args:
+        library_id (int): The unique identifier of the library to inspect
+
+    Returns:
+        GetReleaseResponse: Response object containing the library's `Working` release details.
+
+    Raises:
+        ToolError: If the library has no `Working` release, the library ID is invalid,
+            or other retrieval errors occur.
+    """
+    try:
+        row = await release_service.get_by_library_id_and_release_num(
+            library_id=library_id,
+            release_num="Working",
+        )
+        if row is None:
+            raise ValueError(
+                f"The `Working` release for library ID {library_id} was not found. Please check the library ID and try again."
+            )
+        return GetReleaseResponse.model_validate(row, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to retrieve the Working release for library {library_id}.") from exc
 
 
 def _build_release_service(

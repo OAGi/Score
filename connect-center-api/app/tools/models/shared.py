@@ -72,6 +72,15 @@ class LogSummaryRecord(BaseModel):
     model_config = ConfigDict(frozen=True, from_attributes=True)
 
 
+class TagSummaryRecord(BaseModel):
+    """Compact tag summary."""
+
+    tag_id: int = Field(..., ge=1, description="Tag identifier.")
+    name: str = Field(..., description="Tag name.")
+
+    model_config = ConfigDict(frozen=True, from_attributes=True)
+
+
 class ValueConstraintRecord(BaseModel):
     """Value constraint information."""
 

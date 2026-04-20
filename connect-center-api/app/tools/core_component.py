@@ -21,6 +21,39 @@ Available Tools:
 - get_core_components: Retrieve paginated lists of Core Components (ACCs, ASCCPs, or BCCPs)
   filtered by release with optional filters. Supports custom sorting and pagination.
 
+- create_acc: Create a new ACC (Aggregate Core Component) by targeting an explicit
+  `release_id` with optional base ACC, namespace, definition, and tag attachments.
+
+- add_ascc_to_acc: Add an ASCC (Association Core Component) relationship to an ACC
+  by referencing an existing ASCCP manifest.
+
+- add_bcc_to_acc: Add a BCC (Basic Core Component) relationship to an ACC
+  by referencing an existing BCCP manifest.
+
+- reorder_ascc_in_acc: Reorder an existing ASCC relationship within an ACC sequence.
+
+- reorder_bcc_in_acc: Reorder an existing BCC relationship within an ACC sequence.
+
+- update_acc: Update mutable ACC fields such as object class term, component type,
+  definition text, abstract flag, deprecation flag, or namespace.
+
+- set_base_acc: Set the base ACC inheritance target for an ACC.
+
+- clear_base_acc: Clear the base ACC inheritance target for an ACC.
+
+- add_tags_to_acc: Attach one or more tags to an ACC.
+
+- remove_tags_from_acc: Detach one or more tags from an ACC.
+
+- change_acc_state: Change an ACC to another lifecycle state following connectCenter's
+  ACC state-transition rules.
+
+- revise_acc: Create a new editable ACC revision from a stable ACC revision.
+
+- cancel_acc: Cancel the current ACC revision and restore the previous stable ACC revision.
+
+- discard_acc: Discard a Deleted ACC and its direct ACC-owned records permanently.
+
 - get_acc: Retrieve a single ACC (Aggregate Core Component) by its manifest ID, including
   all related entities (namespace, creator, owner, release, log, based_acc_manifest) and
   all associated ASCCs and BCCs with their relationships.
@@ -55,9 +88,15 @@ from __future__ import annotations
 import logging
 from typing import Annotated, Any, Literal
 
-from fastmcp import FastMCP
+from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
-from pydantic import Field
+from fastmcp.exceptions import ToolError
+from fastmcp.server.elicitation import (
+    AcceptedElicitation,
+    CancelledElicitation,
+    DeclinedElicitation,
+)
+from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.vendor_plugins import get_vendor_plugin
@@ -67,16 +106,70 @@ from app.services.core_component_service import CoreComponentService
 from app.services.release_service import ReleaseService
 from app.tools import _to_tool_error, get_tool_authenticated_user, tool_session
 from app.tools.models.core_component import (
+    AddAsccToAccResponse,
+    AddBccToAccResponse,
     CoreComponentListEntryResponse,
+    CreateAccResponse,
+    CreateAsccpResponse,
+    CreateBccpResponse,
     GetAccResponse,
     GetAsccpResponse,
     GetBccpResponse,
     GetCoreComponentPaginationResponse,
+    ReorderAsccInAccResponse,
+    ReorderBccInAccResponse,
+    UpdateAccResponse,
+    UpdateAsccpResponse,
+    UpdateBccpResponse,
 )
+from app.types.unset import UNSET
+from app.types.identifiers import DataTypeManifestId
 
 logger = logging.getLogger("connectcenter.mcp.core_component")
 
 mcp = FastMCP("connectCenter MCP - Core Component Tools")
+
+EMPTY_OUTPUT_SCHEMA = {
+    "type": "object",
+    "description": "Empty response body.",
+    "properties": {},
+    "additionalProperties": False,
+}
+
+
+class MissingAccDefinitionResponse(BaseModel):
+    """Structured elicitation response for a missing ACC definition."""
+
+    definition: str = Field(min_length=1, description="Definition to save before changing the ACC state.")
+
+
+async def _elicit_on_acc_structure_warnings(
+    *,
+    ctx: Context,
+    warnings: list[str],
+    prompt: str,
+    declined_message: str,
+    cancelled_message: str,
+) -> None:
+    """Ask for confirmation when an ACC change may create repeated fields later."""
+    if not warnings:
+        return
+    elicit_result = await ctx.elicit(
+        message=(
+            f"{prompt}\n\n"
+            "Things to double-check:\n"
+            + "\n".join(f"- {warning}" for warning in warnings)
+            + "\n\nDo you still want to continue?"
+        ),
+        response_type=None,
+    )
+    match elicit_result:
+        case AcceptedElicitation():
+            return
+        case DeclinedElicitation():
+            raise ToolError(declined_message)
+        case CancelledElicitation():
+            raise ToolError(cancelled_message)
 
 
 async def get_core_component_service(
@@ -318,6 +411,1253 @@ async def get_core_components(
 
 
 @mcp.tool(
+    name="create_acc",
+    description="Create a new ACC (Aggregate Core Component).",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the created ACC manifest identifier.",
+        "properties": {
+            "acc_manifest_id": {
+                "type": "integer",
+                "description": "Created ACC manifest identifier.",
+                "example": 12345,
+            }
+        },
+        "required": ["acc_manifest_id"],
+    },
+)
+async def create_acc(
+    release_id: Annotated[
+        int,
+        Field(
+            gt=0,
+            description=(
+                "Target release identifier. Developers must use the `Working` release, "
+                "and end-users must use a non-`Working` release."
+            ),
+        ),
+    ],
+    based_acc_manifest_id: Annotated[
+        int | None,
+        Field(
+            default=None,
+            gt=0,
+            description="Base ACC manifest identifier. If provided, it must belong to the same release as `release_id`.",
+        ),
+    ],
+    initial_object_class_term: Annotated[
+        str | None,
+        Field(default="Object Class Term", description="Initial object class term."),
+    ],
+    initial_component_type: Annotated[
+        Literal[
+            "Base",
+            "Semantics",
+            "Extension",
+            "SemanticGroup",
+            "UserExtensionGroup",
+            "Embedded",
+            "OAGIS10Nouns",
+            "OAGIS10BODs",
+            "BOD",
+            "Verb",
+            "Noun",
+            "Choice",
+            "AttributeGroup",
+        ],
+        Field(
+            default="Semantics",
+            description=(
+                "Initial OAGIS component type. Use `Base` only when this ACC is intended to be the base ACC "
+                "for other ACCs. Use `Extension` for a developer extension ACC that end-users may extend later "
+                "in BIEs. Use `SemanticGroup` for a grouping ACC whose associations are flattened in BIEs. "
+                "Otherwise use `Semantics`. If the user does not indicate a specific intent, keep the default "
+                "value `Semantics`."
+            ),
+        ),
+    ],
+    initial_definition: Annotated[str | None, Field(default=None, description="Initial definition text.")],
+    namespace_id: Annotated[
+        int | None,
+        Field(
+            default=None,
+            gt=0,
+            description="Namespace identifier. If provided, it must belong to the same library as the target release.",
+        ),
+    ],
+    tag_id: Annotated[
+        list[int] | None,
+        Field(
+            default=None,
+            description="Optional tag identifier list to attach. Use get_tags() to discover valid tag IDs.",
+        ),
+    ],
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> CreateAccResponse:
+    """
+    Create an ACC in a role-appropriate release branch.
+
+    This tool mirrors connectCenter's ACC creation defaults:
+    - `initial_object_class_term` defaults to `Object Class Term`
+    - `initial_component_type` defaults to `Semantics`
+    - persisted ACC `type` is derived from `initial_component_type`
+    - developers can target only the `Working` release, while end-users can target only non-`Working` releases
+    - use `get_working_release` when you need help finding the developer-valid `Working` `release_id`
+    - choose `Base` only when the ACC is meant to be reused as a base ACC for other ACCs
+    - choose `Extension` only for a developer extension ACC that end-users may extend later in BIEs
+    - choose `SemanticGroup` only for a grouping ACC whose associations are flattened in BIEs
+    - if the user does not clearly ask for one of those cases, leave `initial_component_type` as `Semantics`
+
+    If `tag_id` is provided, connectCenter will attach each referenced tag to the ACC.
+    """
+    return await _create_acc_response(
+        core_component_service=core_component_service,
+        release_id=release_id,
+        based_acc_manifest_id=based_acc_manifest_id,
+        initial_object_class_term=initial_object_class_term,
+        initial_component_type=initial_component_type,
+        initial_definition=initial_definition,
+        namespace_id=namespace_id,
+        tag_id=tag_id,
+        fallback="Unable to create the ACC.",
+    )
+
+
+@mcp.tool(
+    name="create_asccp",
+    description="Create a new ASCCP (Association Core Component Property).",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the created ASCCP manifest identifier.",
+        "properties": {
+            "asccp_manifest_id": {"type": "integer", "description": "Created ASCCP manifest identifier.", "example": 12345}
+        },
+        "required": ["asccp_manifest_id"],
+    },
+)
+async def create_asccp(
+    release_id: Annotated[int, Field(gt=0, description="Target release identifier.")],
+    role_of_acc_manifest_id: Annotated[int, Field(gt=0, description="Role ACC manifest identifier.")],
+    initial_property_term: Annotated[str | None, Field(default="Property Term", description="Initial property term.")],
+    asccp_type: Annotated[Literal["Default", "DataArea", "Extension", "Verb", "BOD"], Field(default="Default", description="Initial ASCCP type.")],
+    reusable_indicator: Annotated[bool, Field(default=True, description="Initial reusable indicator.")],
+    namespace_id: Annotated[int | None, Field(default=None, gt=0, description="Optional namespace identifier.")],
+    definition: Annotated[str | None, Field(default=None, description="Initial definition text.")],
+    definition_source: Annotated[str | None, Field(default=None, description="Initial definition source.")],
+    tag_id: Annotated[list[int] | None, Field(default=None, description="Optional tag identifier list to attach.")],
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> CreateAsccpResponse:
+    """Create an ASCCP in a role-appropriate release branch."""
+    try:
+        result = await core_component_service.create_asccp(
+            release_id=release_id,
+            role_of_acc_manifest_id=role_of_acc_manifest_id,
+            initial_property_term=initial_property_term,
+            asccp_type=asccp_type,
+            reusable_indicator=reusable_indicator,
+            namespace_id=namespace_id,
+            definition=definition,
+            definition_source=definition_source,
+            tag_id=tag_id,
+        )
+        return CreateAsccpResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback="Unable to create the ASCCP.") from exc
+
+
+@mcp.tool(
+    name="create_bccp",
+    description="Create a new BCCP (Basic Core Component Property).",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the created BCCP manifest identifier.",
+        "properties": {
+            "bccp_manifest_id": {"type": "integer", "description": "Created BCCP manifest identifier.", "example": 12345}
+        },
+        "required": ["bccp_manifest_id"],
+    },
+)
+async def create_bccp(
+    release_id: Annotated[int, Field(gt=0, description="Target release identifier.")],
+    bdt_manifest_id: Annotated[
+        int,
+        Field(
+            gt=0,
+            description=(
+                "Target BDT manifest identifier. The selected data type must already be a BDT, "
+                "which means its base DT link is set."
+            ),
+        ),
+    ],
+    initial_property_term: Annotated[str | None, Field(default="Property Term", description="Initial property term.")],
+    tag_id: Annotated[list[int] | None, Field(default=None, description="Optional tag identifier list to attach.")],
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> CreateBccpResponse:
+    """Create a BCCP in a role-appropriate release branch."""
+    try:
+        result = await core_component_service.create_bccp(
+            release_id=release_id,
+            bdt_manifest_id=DataTypeManifestId(int(bdt_manifest_id)),
+            initial_property_term=initial_property_term,
+            tag_id=tag_id,
+        )
+        return CreateBccpResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback="Unable to create the BCCP.") from exc
+
+
+@mcp.tool(
+    name="add_ascc_to_acc",
+    description="Add an ASCC (Association Core Component) relationship to an ACC sequence.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the ASCC manifest identifier.",
+        "properties": {
+            "ascc_manifest_id": {
+                "type": "integer",
+                "description": "ASCC manifest identifier.",
+                "example": 12345,
+            },
+        },
+        "required": ["ascc_manifest_id"],
+    },
+)
+async def add_ascc_to_acc(
+    acc_manifest_id: Annotated[int, Field(gt=0, description="Source ACC manifest identifier.")],
+    asccp_manifest_id: Annotated[int, Field(gt=0, description="Target ASCCP manifest identifier.")],
+    ctx: Context,
+    index: Annotated[
+        int,
+        Field(default=-1, description="Zero-based insertion index. Defaults to -1, which places the ASCC at the end of the ACC sequence."),
+    ],
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> AddAsccToAccResponse:
+    """
+    Add an ASCC to an ACC using an existing ASCCP manifest.
+
+    connectCenter applies these rules:
+    - the ACC and ASCCP must be in the same release
+    - only the ACC owner or an administrator can modify relationships
+    - the target ASCCP must be reusable
+    - an ACC can have at most one `Extension` ASCCP
+    - if the ASCCP is already associated to the ACC, use `reorder_ascc_in_acc` instead
+    - `index=-1` is the default and places the relationship at the end of the ACC's `seq_key` order
+    - if the change could create repeated field names or sequence issues later, the tool asks for confirmation before continuing
+    """
+    try:
+        warnings = await core_component_service.get_add_ascc_to_acc_warnings(
+            acc_manifest_id=acc_manifest_id,
+            asccp_manifest_id=asccp_manifest_id,
+            index=index,
+        )
+        await _elicit_on_acc_structure_warnings(
+            ctx=ctx,
+            warnings=warnings,
+            prompt="Adding this ASCC may create repeated field names or sequence issues later.",
+            declined_message="Adding the ASCC to the ACC was not confirmed.",
+            cancelled_message="Adding the ASCC to the ACC was cancelled.",
+        )
+        result = await core_component_service.add_ascc_to_acc(
+            acc_manifest_id=acc_manifest_id,
+            asccp_manifest_id=asccp_manifest_id,
+            index=index,
+        )
+        return AddAsccToAccResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to add the ASCC to ACC {acc_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="add_bcc_to_acc",
+    description="Add a BCC (Basic Core Component) relationship to an ACC sequence.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the BCC manifest identifier.",
+        "properties": {
+            "bcc_manifest_id": {
+                "type": "integer",
+                "description": "BCC manifest identifier.",
+                "example": 12345,
+            },
+        },
+        "required": ["bcc_manifest_id"],
+    },
+)
+async def add_bcc_to_acc(
+    acc_manifest_id: Annotated[int, Field(gt=0, description="Source ACC manifest identifier.")],
+    bccp_manifest_id: Annotated[int, Field(gt=0, description="Target BCCP manifest identifier.")],
+    ctx: Context,
+    index: Annotated[
+        int,
+        Field(default=-1, description="Zero-based insertion index. Defaults to -1, which places the BCC at the end of the ACC sequence."),
+    ],
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> AddBccToAccResponse:
+    """
+    Add a BCC to an ACC using an existing BCCP manifest.
+
+    connectCenter applies these rules:
+    - the ACC and BCCP must be in the same release
+    - only the ACC owner or an administrator can modify relationships
+    - if the BCCP is already associated to the ACC, use `reorder_bcc_in_acc` instead
+    - `index=-1` is the default and places the relationship at the end of the ACC's `seq_key` order
+    - if the change could create repeated field names or sequence issues later, the tool asks for confirmation before continuing
+    """
+    try:
+        warnings = await core_component_service.get_add_bcc_to_acc_warnings(
+            acc_manifest_id=acc_manifest_id,
+            bccp_manifest_id=bccp_manifest_id,
+            index=index,
+        )
+        await _elicit_on_acc_structure_warnings(
+            ctx=ctx,
+            warnings=warnings,
+            prompt="Adding this BCC may create repeated field names or sequence issues later.",
+            declined_message="Adding the BCC to the ACC was not confirmed.",
+            cancelled_message="Adding the BCC to the ACC was cancelled.",
+        )
+        result = await core_component_service.add_bcc_to_acc(
+            acc_manifest_id=acc_manifest_id,
+            bccp_manifest_id=bccp_manifest_id,
+            index=index,
+        )
+        return AddBccToAccResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to add the BCC to ACC {acc_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="reorder_ascc_in_acc",
+    description="Reorder an existing ASCC (Association Core Component) within an ACC sequence. Exactly one positioning option may be provided.",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def reorder_ascc_in_acc(
+    ascc_manifest_id: Annotated[int, Field(gt=0, description="ASCC manifest identifier to move.")],
+    ctx: Context,
+    index: Annotated[
+        int | None,
+        Field(
+            default=None,
+            description=(
+                "Optional zero-based insertion index. Use `0` to move to the beginning, `-1` to move to the end, "
+                "or another non-negative index to place the association at that position in the sequence. "
+                "Mutually exclusive with all `after_*` and `before_*` options."
+            ),
+        ),
+    ],
+    after_ascc_manifest_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="Reorder the ASCC after this ASCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
+    ],
+    after_bcc_manifest_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="Reorder the ASCC after this BCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
+    ],
+    before_ascc_manifest_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="Reorder the ASCC before this ASCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
+    ],
+    before_bcc_manifest_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="Reorder the ASCC before this BCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
+    ],
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> dict[str, object]:
+    """
+    Reorder an existing ASCC within an ACC sequence.
+
+    Notes:
+    - provide only one of `index`, `after_*`, or `before_*`
+    - omit all positioning inputs to place the ASCC first
+    - the ACC must be in `WIP`
+    - if the change could create repeated field names or sequence issues later, the tool asks for confirmation before continuing
+    """
+    try:
+        warnings = await core_component_service.get_reorder_ascc_in_acc_warnings(
+            ascc_manifest_id=ascc_manifest_id,
+            index=index,
+            after_ascc_manifest_id=None if after_ascc_manifest_id is None else after_ascc_manifest_id,
+            after_bcc_manifest_id=None if after_bcc_manifest_id is None else after_bcc_manifest_id,
+            before_ascc_manifest_id=None if before_ascc_manifest_id is None else before_ascc_manifest_id,
+            before_bcc_manifest_id=None if before_bcc_manifest_id is None else before_bcc_manifest_id,
+        )
+        await _elicit_on_acc_structure_warnings(
+            ctx=ctx,
+            warnings=warnings,
+            prompt="Reordering this ASCC may create repeated field names or sequence issues later.",
+            declined_message="Reordering the ASCC in the ACC was not confirmed.",
+            cancelled_message="Reordering the ASCC in the ACC was cancelled.",
+        )
+        await core_component_service.reorder_ascc_in_acc(
+            ascc_manifest_id=ascc_manifest_id,
+            index=index,
+            after_ascc_manifest_id=None if after_ascc_manifest_id is None else after_ascc_manifest_id,
+            after_bcc_manifest_id=None if after_bcc_manifest_id is None else after_bcc_manifest_id,
+            before_ascc_manifest_id=None if before_ascc_manifest_id is None else before_ascc_manifest_id,
+            before_bcc_manifest_id=None if before_bcc_manifest_id is None else before_bcc_manifest_id,
+        )
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to reorder ASCC {ascc_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="reorder_bcc_in_acc",
+    description="Reorder an existing BCC (Basic Core Component) within an ACC sequence. Exactly one positioning option may be provided.",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def reorder_bcc_in_acc(
+    bcc_manifest_id: Annotated[int, Field(gt=0, description="BCC manifest identifier to move.")],
+    ctx: Context,
+    index: Annotated[
+        int | None,
+        Field(
+            default=None,
+            description=(
+                "Optional zero-based insertion index. Use `0` to move to the beginning, `-1` to move to the end, "
+                "or another non-negative index to place the association at that position in the sequence. "
+                "Mutually exclusive with all `after_*` and `before_*` options."
+            ),
+        ),
+    ],
+    after_ascc_manifest_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="Reorder the BCC after this ASCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
+    ],
+    after_bcc_manifest_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="Reorder the BCC after this BCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
+    ],
+    before_ascc_manifest_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="Reorder the BCC before this ASCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
+    ],
+    before_bcc_manifest_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="Reorder the BCC before this BCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
+    ],
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> dict[str, object]:
+    """
+    Reorder an existing BCC within an ACC sequence.
+
+    Notes:
+    - provide only one of `index`, `after_*`, or `before_*`
+    - omit all positioning inputs to place the BCC first
+    - the ACC must be in `WIP`
+    - if the change could create repeated field names or sequence issues later, the tool asks for confirmation before continuing
+    """
+    try:
+        warnings = await core_component_service.get_reorder_bcc_in_acc_warnings(
+            bcc_manifest_id=bcc_manifest_id,
+            index=index,
+            after_ascc_manifest_id=None if after_ascc_manifest_id is None else after_ascc_manifest_id,
+            after_bcc_manifest_id=None if after_bcc_manifest_id is None else after_bcc_manifest_id,
+            before_ascc_manifest_id=None if before_ascc_manifest_id is None else before_ascc_manifest_id,
+            before_bcc_manifest_id=None if before_bcc_manifest_id is None else before_bcc_manifest_id,
+        )
+        await _elicit_on_acc_structure_warnings(
+            ctx=ctx,
+            warnings=warnings,
+            prompt="Reordering this BCC may create repeated field names or sequence issues later.",
+            declined_message="Reordering the BCC in the ACC was not confirmed.",
+            cancelled_message="Reordering the BCC in the ACC was cancelled.",
+        )
+        await core_component_service.reorder_bcc_in_acc(
+            bcc_manifest_id=bcc_manifest_id,
+            index=index,
+            after_ascc_manifest_id=None if after_ascc_manifest_id is None else after_ascc_manifest_id,
+            after_bcc_manifest_id=None if after_bcc_manifest_id is None else after_bcc_manifest_id,
+            before_ascc_manifest_id=None if before_ascc_manifest_id is None else before_ascc_manifest_id,
+            before_bcc_manifest_id=None if before_bcc_manifest_id is None else before_bcc_manifest_id,
+        )
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to reorder BCC {bcc_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="update_acc",
+    description="Update mutable ACC (Aggregate Core Component) fields.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the updated ACC manifest identifier and changed fields.",
+        "properties": {
+            "acc_manifest_id": {
+                "type": "integer",
+                "description": "Target ACC manifest identifier.",
+                "example": 12345,
+            },
+            "updates": {
+                "type": "array",
+                "description": "List of updated field names.",
+                "items": {"type": "string"},
+                "example": ["definition", "namespace_id"],
+            },
+        },
+        "required": ["acc_manifest_id", "updates"],
+    },
+)
+async def update_acc(
+    acc_manifest_id: Annotated[int, Field(gt=0, description="Target ACC manifest identifier.")],
+    object_class_term: Annotated[
+        str | None,
+        Field(default=None, description="Updated object class term. Omit to leave unchanged."),
+    ],
+    component_type: Annotated[
+        Literal[
+            "Base",
+            "Semantics",
+            "Extension",
+            "SemanticGroup",
+            "UserExtensionGroup",
+            "Embedded",
+            "OAGIS10Nouns",
+            "OAGIS10BODs",
+            "BOD",
+            "Verb",
+            "Noun",
+            "Choice",
+            "AttributeGroup",
+        ] | None,
+        Field(default=None, description="Updated OAGIS component type. Omit to leave unchanged."),
+    ],
+    definition: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description="Updated definition text. Omit to leave unchanged. Pass an empty string to clear it.",
+        ),
+    ],
+    definition_source: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description="Updated definition source. Omit to leave unchanged. Pass an empty string to clear it.",
+        ),
+    ],
+    is_abstract: Annotated[
+        bool | None,
+        Field(default=None, description="Updated abstract flag. Omit to leave unchanged."),
+    ],
+    deprecated: Annotated[
+        bool | None,
+        Field(default=None, description="Updated deprecation flag. Omit to leave unchanged."),
+    ],
+    namespace_id: Annotated[
+        int | None,
+        Field(
+            default=None,
+            ge=0,
+            description=(
+                "Updated namespace identifier. Omit to leave unchanged. "
+                "Use 0 to clear the namespace. When set to a positive value, it must belong to the same library as the ACC release."
+            ),
+        ),
+    ],
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> UpdateAccResponse:
+    """
+    Update mutable ACC fields.
+
+    ACC updates follow connectCenter's owner-edit rules:
+    - the ACC must currently be in `WIP`
+    - only the owner or an administrator can update it
+    - changing the object class term also updates the ACC manifest DEN and dependent relationship DENs
+
+    Notes:
+    - Omit a parameter to leave it unchanged
+    - pass `""` for `definition` or `definition_source` to clear those values
+    - pass `0` for `namespace_id` to clear the namespace
+    """
+    try:
+        result = await core_component_service.update_acc(
+            acc_manifest_id=acc_manifest_id,
+            object_class_term=UNSET if object_class_term is None else object_class_term,
+            component_type=UNSET if component_type is None else component_type,
+            definition=UNSET if definition is None else definition,
+            definition_source=UNSET if definition_source is None else definition_source,
+            is_abstract=UNSET if is_abstract is None else is_abstract,
+            deprecated=UNSET if deprecated is None else deprecated,
+            namespace_id=UNSET if namespace_id is None else (None if namespace_id == 0 else namespace_id),
+        )
+        return UpdateAccResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to update ACC {acc_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="set_base_acc",
+    description="Set the base ACC (Aggregate Core Component) for an ACC.",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def set_base_acc(
+    acc_manifest_id: Annotated[int, Field(gt=0, description="Target ACC manifest identifier.")],
+    based_acc_manifest_id: Annotated[
+        int,
+        Field(
+            gt=0,
+            description=(
+                "Base ACC manifest identifier to set. It must be in the same release as `acc_manifest_id`, "
+                "and it must be different from `acc_manifest_id`."
+            ),
+        ),
+    ],
+    ctx: Context,
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> dict[str, object]:
+    """
+    Set the base ACC for an ACC.
+
+    ACC base updates follow connectCenter's inheritance-edit rules:
+    - the ACC must currently be in `WIP`
+    - only the owner or an administrator can update it
+    - the base ACC must be in the same release as the target ACC
+    - the base ACC must be different from the target ACC
+    - the selected base chain must not introduce duplicate ASCCP or BCCP relationships
+    - setting a base ACC that would create an inheritance cycle is rejected
+    - if the change could create repeated field names or sequence issues later, the tool asks for confirmation before continuing
+    """
+    try:
+        warnings = await core_component_service.get_set_base_acc_warnings(
+            acc_manifest_id=acc_manifest_id,
+            based_acc_manifest_id=based_acc_manifest_id,
+        )
+        await _elicit_on_acc_structure_warnings(
+            ctx=ctx,
+            warnings=warnings,
+            prompt="Setting this base ACC may create repeated field names or sequence issues later.",
+            declined_message="Setting the base ACC was not confirmed.",
+            cancelled_message="Setting the base ACC was cancelled.",
+        )
+        await core_component_service.update_acc_base(
+            acc_manifest_id=acc_manifest_id,
+            based_acc_manifest_id=based_acc_manifest_id,
+        )
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to set base ACC for {acc_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="clear_base_acc",
+    description="Clear the base ACC (Aggregate Core Component) for an ACC.",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def clear_base_acc(
+    acc_manifest_id: Annotated[int, Field(gt=0, description="Target ACC manifest identifier.")],
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> dict[str, object]:
+    """
+    Clear the base ACC for an ACC.
+
+    ACC base updates follow connectCenter's inheritance-edit rules:
+    - the ACC must currently be in `WIP`
+    - only the owner or an administrator can update it
+    """
+    try:
+        await core_component_service.update_acc_base(
+            acc_manifest_id=acc_manifest_id,
+            based_acc_manifest_id=None,
+        )
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to clear base ACC for {acc_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="add_tags_to_acc",
+    description="Attach one or more tags to an ACC (Aggregate Core Component).",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def add_tags_to_acc(
+    acc_manifest_id: Annotated[int, Field(gt=0, description="Target ACC manifest identifier.")],
+    tag_id: Annotated[
+        list[int],
+        Field(description="Tag identifier list to attach. Use `List tags` to discover valid tag IDs."),
+    ],
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> dict[str, object]:
+    """
+    Add tags to an ACC.
+
+    ACC tag updates follow connectCenter's owner-edit rules:
+    - the ACC must currently be in `WIP`
+    - only the owner or an administrator can update it
+    - duplicate requested tags are ignored after normalization
+    """
+    try:
+        await core_component_service.add_acc_tags(
+            acc_manifest_id=acc_manifest_id,
+            tag_id=tag_id,
+        )
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to add tags to ACC {acc_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="remove_tags_from_acc",
+    description="Detach one or more tags from an ACC (Aggregate Core Component).",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def remove_tags_from_acc(
+    acc_manifest_id: Annotated[int, Field(gt=0, description="Target ACC manifest identifier.")],
+    tag_id: Annotated[
+        list[int],
+        Field(description="Tag identifier list to remove. Use `List tags` to discover valid tag IDs."),
+    ],
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> dict[str, object]:
+    """
+    Remove tags from an ACC.
+
+    ACC tag updates follow connectCenter's owner-edit rules:
+    - the ACC must currently be in `WIP`
+    - only the owner or an administrator can update it
+    - tags not currently attached are ignored after normalization
+    """
+    try:
+        await core_component_service.remove_acc_tags(
+            acc_manifest_id=acc_manifest_id,
+            tag_id=tag_id,
+        )
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to remove tags from ACC {acc_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="change_acc_state",
+    description="Change the lifecycle state of an ACC (Aggregate Core Component).",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def change_acc_state(
+    acc_manifest_id: Annotated[int, Field(gt=0, description="Target ACC manifest identifier.")],
+    state: Annotated[
+        Literal["Deleted", "WIP", "Draft", "QA", "Candidate", "Production"],
+        Field(description="Target lifecycle state."),
+    ],
+    ctx: Context,
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> dict[str, object]:
+    """
+    Change an ACC lifecycle state according to connectCenter rules.
+
+    Valid transitions depend on the ACC release branch:
+    - `Working` release ACCs: `Deleted <-> WIP <-> Draft <-> Candidate`
+    - non-`Working` release ACCs: `Deleted <-> WIP <-> QA <-> Production`
+
+    Additional rules:
+    - moving from `WIP` to `Deleted` marks the ACC to be deleted later
+    - only the owner or an administrator can change the ACC state, except when restoring `Deleted -> WIP`
+    - the ACC must have a namespace before it can move to `QA`
+    - if the ACC is missing a definition when moving to `QA`, the tool asks for one first
+    - moving a non-`Working` ACC to `Production` requires explicit end-user confirmation
+    - states such as `ReleaseDraft` and `Published` are not handled by this service
+    """
+    try:
+        row = await core_component_service.get_acc(acc_manifest_id)
+        if row is None:
+            raise ToolError(
+                f"The ACC with manifest ID {acc_manifest_id} was not found. Please check the ID and try again."
+            )
+
+        if state == "QA":
+            if row.namespace is None:
+                raise ToolError(
+                    f"'{row.den}' needs a namespace before it can move to the 'QA' state."
+                )
+            if not str(row.definition or "").strip():
+                elicit_result = await ctx.elicit(
+                    message=(
+                        f"'{row.den}' needs a definition before it can move to the 'QA' state.\n\n"
+                        "Please enter a short definition for this ACC."
+                    ),
+                    response_type=MissingAccDefinitionResponse,
+                )
+                match elicit_result:
+                    case AcceptedElicitation(data=data):
+                        definition = str(data.definition).strip()
+                        if not definition:
+                            raise ToolError(
+                                f"'{row.den}' still needs a definition before it can move to the 'QA' state."
+                            )
+                        await core_component_service.update_acc(
+                            acc_manifest_id=acc_manifest_id,
+                            definition=definition,
+                        )
+                    case DeclinedElicitation():
+                        raise ToolError("Changing the ACC state was not confirmed.")
+                    case CancelledElicitation():
+                        raise ToolError("Changing the ACC state was cancelled.")
+
+        if row.release.release_num != "Working" and row.state == "QA" and state == "Production":
+            elicit_result = await ctx.elicit(
+                message=(
+                    f"Are you sure you want to change '{row.den}' to the 'Production' state?\n\n"
+                    "This is the end-user production transition for a non-'Working' release ACC."
+                ),
+                response_type=None,
+            )
+            match elicit_result:
+                case AcceptedElicitation():
+                    pass
+                case DeclinedElicitation():
+                    raise ToolError("ACC state change was not confirmed.")
+                case CancelledElicitation():
+                    raise ToolError("ACC state change was cancelled.")
+
+        await core_component_service.change_acc_state(
+            acc_manifest_id=acc_manifest_id,
+            state=state,
+        )
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to change the ACC state for {acc_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="revise_acc",
+    description="Create a new editable ACC (Aggregate Core Component) revision from a stable ACC revision.",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def revise_acc(
+    acc_manifest_id: Annotated[int, Field(gt=0, description="Target ACC manifest identifier.")],
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> dict[str, object]:
+    """
+    Revise an ACC according to connectCenter rules.
+
+    Rules:
+    - developer-side ACCs can be revised only from the `Published` state in the `Working` release
+    - end-user ACCs can be revised only from the `Production` state in a non-`Working` release
+    - the requester and the ACC owner must belong to the same role family
+    - revising creates a new editable `WIP` revision for the ACC
+    """
+    try:
+        await core_component_service.revise_acc(acc_manifest_id=acc_manifest_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to revise ACC {acc_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="cancel_acc",
+    description="Cancel the current ACC (Aggregate Core Component) revision and restore the previous stable revision.",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def cancel_acc(
+    acc_manifest_id: Annotated[int, Field(gt=0, description="Target ACC manifest identifier.")],
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> dict[str, object]:
+    """
+    Cancel the current ACC revision according to connectCenter rules.
+
+    Rules:
+    - only ACCs in the `WIP` state can be cancelled
+    - the requester and the ACC owner must belong to the same role family
+    - the ACC must be on the requester's allowed branch (`Working` for developers, non-`Working` for end-users)
+    - cancelling restores the previous stable ACC revision
+    """
+    try:
+        await core_component_service.cancel_acc(acc_manifest_id=acc_manifest_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to cancel ACC {acc_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="discard_acc",
+    description="Discard a Deleted ACC (Aggregate Core Component) and its direct ACC-owned records permanently.",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def discard_acc(
+    acc_manifest_id: Annotated[int, Field(gt=0, description="Target ACC manifest identifier.")],
+    ctx: Context,
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> dict[str, object]:
+    """
+    Discard a Deleted ACC from the database.
+
+    Rules:
+    - the ACC must already be in the `Deleted` state
+    - related ASCCPs that still use the ACC as their role-of ACC must be discarded first
+    - derived ACCs must be discarded first
+    - this operation is irreversible
+    """
+    row = await core_component_service.get_acc(acc_manifest_id)
+    if row is None:
+        raise ToolError(
+            f"The ACC with manifest ID {acc_manifest_id} was not found. Please check the ID and try again."
+        )
+    if row.state != "Deleted":
+        raise ToolError(
+            f"The ACC '{row.den}' is currently in the '{row.state}' state. "
+            "Only ACCs in the 'Deleted' state can be discarded."
+        )
+
+    elicit_result = await ctx.elicit(
+        message=(
+            f"Are you sure you want to discard '{row.den}' permanently?\n\n"
+            "This removes the ACC and its direct ACC-owned records from the database and cannot be undone."
+        ),
+        response_type=None,
+    )
+    match elicit_result:
+        case AcceptedElicitation():
+            pass
+        case DeclinedElicitation():
+            raise ToolError("ACC discard was not confirmed.")
+        case CancelledElicitation():
+            raise ToolError("ACC discard was cancelled.")
+
+    try:
+        await core_component_service.discard_acc(acc_manifest_id=acc_manifest_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to discard ACC {acc_manifest_id}.") from exc
+
+
+@mcp.tool(name="update_asccp", description="Update selected mutable fields of an ASCCP (Association Core Component Property).", output_schema={"type": "object", "description": "Response containing the updated ASCCP manifest identifier and changed fields.", "properties": {"asccp_manifest_id": {"type": "integer"}, "updates": {"type": "array", "items": {"type": "string"}}}, "required": ["asccp_manifest_id", "updates"]})
+async def update_asccp(
+    asccp_manifest_id: Annotated[int, Field(gt=0, description="Target ASCCP manifest identifier.")],
+    ctx: Context,
+    property_term: Annotated[str | None, Field(default=None, description="Updated property term.")] = None,
+    definition: Annotated[str | None, Field(default=None, description="Updated definition text.")] = None,
+    definition_source: Annotated[str | None, Field(default=None, description="Updated definition source.")] = None,
+    reusable_indicator: Annotated[bool | None, Field(default=None, description="Updated reusable indicator.")] = None,
+    deprecated: Annotated[bool | None, Field(default=None, description="Updated deprecation flag.")] = None,
+    is_nillable: Annotated[bool | None, Field(default=None, description="Updated nillable flag.")] = None,
+    namespace_id: Annotated[int | None, Field(default=None, gt=0, description="Updated namespace identifier.")] = None,
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> UpdateAsccpResponse:
+    """Update mutable ASCCP fields."""
+    try:
+        warnings = await core_component_service.get_update_asccp_warnings(
+            asccp_manifest_id=asccp_manifest_id,
+            property_term=property_term if property_term is not None else UNSET,
+        )
+        await _elicit_on_acc_structure_warnings(
+            ctx=ctx,
+            warnings=warnings,
+            prompt="Updating this ASCCP may affect ACCs that already use it.",
+            declined_message="Updating the ASCCP was not confirmed.",
+            cancelled_message="Updating the ASCCP was cancelled.",
+        )
+        result = await core_component_service.update_asccp(
+            asccp_manifest_id=asccp_manifest_id,
+            property_term=property_term,
+            definition=definition,
+            definition_source=definition_source,
+            reusable_indicator=reusable_indicator,
+            deprecated=deprecated,
+            is_nillable=is_nillable,
+            namespace_id=namespace_id,
+            allow_warnings=True,
+        )
+        return UpdateAsccpResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to update ASCCP {asccp_manifest_id}.") from exc
+
+
+@mcp.tool(name="update_bccp", description="Update selected mutable fields of a BCCP (Basic Core Component Property).", output_schema={"type": "object", "description": "Response containing the updated BCCP manifest identifier and changed fields.", "properties": {"bccp_manifest_id": {"type": "integer"}, "updates": {"type": "array", "items": {"type": "string"}}}, "required": ["bccp_manifest_id", "updates"]})
+async def update_bccp(
+    bccp_manifest_id: Annotated[int, Field(gt=0, description="Target BCCP manifest identifier.")],
+    ctx: Context,
+    property_term: Annotated[str | None, Field(default=None, description="Updated property term.")] = None,
+    definition: Annotated[str | None, Field(default=None, description="Updated definition text.")] = None,
+    definition_source: Annotated[str | None, Field(default=None, description="Updated definition source.")] = None,
+    deprecated: Annotated[bool | None, Field(default=None, description="Updated deprecation flag.")] = None,
+    is_nillable: Annotated[bool | None, Field(default=None, description="Updated nillable flag.")] = None,
+    namespace_id: Annotated[int | None, Field(default=None, gt=0, description="Updated namespace identifier.")] = None,
+    default_value: Annotated[str | None, Field(default=None, description="Updated default value.")] = None,
+    fixed_value: Annotated[str | None, Field(default=None, description="Updated fixed value.")] = None,
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> UpdateBccpResponse:
+    """Update mutable BCCP fields."""
+    try:
+        warnings = await core_component_service.get_update_bccp_warnings(
+            bccp_manifest_id=bccp_manifest_id,
+            property_term=property_term if property_term is not None else UNSET,
+        )
+        await _elicit_on_acc_structure_warnings(
+            ctx=ctx,
+            warnings=warnings,
+            prompt="Updating this BCCP may affect ACCs that already use it.",
+            declined_message="Updating the BCCP was not confirmed.",
+            cancelled_message="Updating the BCCP was cancelled.",
+        )
+        result = await core_component_service.update_bccp(
+            bccp_manifest_id=bccp_manifest_id,
+            property_term=property_term,
+            definition=definition,
+            definition_source=definition_source,
+            deprecated=deprecated,
+            is_nillable=is_nillable,
+            namespace_id=namespace_id,
+            default_value=default_value,
+            fixed_value=fixed_value,
+            allow_warnings=True,
+        )
+        return UpdateBccpResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to update BCCP {bccp_manifest_id}.") from exc
+
+
+@mcp.tool(name="change_asccp_state", description="Change the lifecycle state of an ASCCP (Association Core Component Property).", output_schema=EMPTY_OUTPUT_SCHEMA)
+async def change_asccp_state(
+    asccp_manifest_id: Annotated[int, Field(gt=0, description="Target ASCCP manifest identifier.")],
+    state: Annotated[Literal["Deleted", "WIP", "Draft", "QA", "Candidate", "Production"], Field(description="Target lifecycle state.")],
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> dict[str, object]:
+    """Change ASCCP lifecycle state."""
+    try:
+        await core_component_service.change_asccp_state(asccp_manifest_id=asccp_manifest_id, state=state)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to change the ASCCP state for {asccp_manifest_id}.") from exc
+
+
+@mcp.tool(name="change_bccp_state", description="Change the lifecycle state of a BCCP (Basic Core Component Property).", output_schema=EMPTY_OUTPUT_SCHEMA)
+async def change_bccp_state(
+    bccp_manifest_id: Annotated[int, Field(gt=0, description="Target BCCP manifest identifier.")],
+    state: Annotated[Literal["Deleted", "WIP", "Draft", "QA", "Candidate", "Production"], Field(description="Target lifecycle state.")],
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> dict[str, object]:
+    """Change BCCP lifecycle state."""
+    try:
+        await core_component_service.change_bccp_state(bccp_manifest_id=bccp_manifest_id, state=state)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to change the BCCP state for {bccp_manifest_id}.") from exc
+
+
+@mcp.tool(name="change_asccp_role_acc", description="Change the role ACC of an ASCCP (Association Core Component Property).", output_schema=EMPTY_OUTPUT_SCHEMA)
+async def change_asccp_role_acc(
+    asccp_manifest_id: Annotated[int, Field(gt=0, description="Target ASCCP manifest identifier.")],
+    acc_manifest_id: Annotated[int, Field(gt=0, description="Target role ACC manifest identifier.")],
+    ctx: Context,
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> dict[str, object]:
+    """Change the role ACC of an ASCCP."""
+    try:
+        warnings = await core_component_service.get_change_asccp_role_of_acc_warnings(
+            asccp_manifest_id=asccp_manifest_id,
+            role_of_acc_manifest_id=acc_manifest_id,
+        )
+        await _elicit_on_acc_structure_warnings(
+            ctx=ctx,
+            warnings=warnings,
+            prompt="Changing the role ACC of this ASCCP may affect ACCs that already use it.",
+            declined_message="Changing the role ACC of the ASCCP was not confirmed.",
+            cancelled_message="Changing the role ACC of the ASCCP was cancelled.",
+        )
+        await core_component_service.change_asccp_role_of_acc(
+            asccp_manifest_id=asccp_manifest_id,
+            role_of_acc_manifest_id=acc_manifest_id,
+            allow_warnings=True,
+        )
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to change the role ACC of ASCCP {asccp_manifest_id}.") from exc
+
+
+@mcp.tool(name="change_bccp_bdt", description="Change the BDT of a BCCP (Basic Core Component Property).", output_schema=EMPTY_OUTPUT_SCHEMA)
+async def change_bccp_bdt(
+    bccp_manifest_id: Annotated[int, Field(gt=0, description="Target BCCP manifest identifier.")],
+    bdt_manifest_id: Annotated[
+        int,
+        Field(
+            gt=0,
+            description=(
+                "Target BDT manifest identifier. The selected data type must already be a BDT, "
+                "which means its base DT link is set."
+            ),
+        ),
+    ],
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> dict[str, object]:
+    """Change the BDT of a BCCP."""
+    try:
+        await core_component_service.change_bccp_bdt(
+            bccp_manifest_id=bccp_manifest_id,
+            bdt_manifest_id=DataTypeManifestId(int(bdt_manifest_id)),
+        )
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to change the BDT of BCCP {bccp_manifest_id}.") from exc
+
+
+@mcp.tool(name="add_tags_to_asccp", description="Attach one or more tags to an ASCCP (Association Core Component Property).", output_schema=EMPTY_OUTPUT_SCHEMA)
+async def add_tags_to_asccp(
+    asccp_manifest_id: Annotated[int, Field(gt=0, description="Target ASCCP manifest identifier.")],
+    tag_id: Annotated[list[int], Field(description="Tag identifier list to attach.")],
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> dict[str, object]:
+    """Attach tags to a WIP ASCCP."""
+    try:
+        await core_component_service.add_asccp_tags(asccp_manifest_id=asccp_manifest_id, tag_id=tag_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to add tags to ASCCP {asccp_manifest_id}.") from exc
+
+
+@mcp.tool(name="remove_tags_from_asccp", description="Detach one or more tags from an ASCCP (Association Core Component Property).", output_schema=EMPTY_OUTPUT_SCHEMA)
+async def remove_tags_from_asccp(
+    asccp_manifest_id: Annotated[int, Field(gt=0, description="Target ASCCP manifest identifier.")],
+    tag_id: Annotated[list[int], Field(description="Tag identifier list to remove.")],
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> dict[str, object]:
+    """Remove tags from a WIP ASCCP."""
+    try:
+        await core_component_service.remove_asccp_tags(asccp_manifest_id=asccp_manifest_id, tag_id=tag_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to remove tags from ASCCP {asccp_manifest_id}.") from exc
+
+
+@mcp.tool(name="add_tags_to_bccp", description="Attach one or more tags to a BCCP (Basic Core Component Property).", output_schema=EMPTY_OUTPUT_SCHEMA)
+async def add_tags_to_bccp(
+    bccp_manifest_id: Annotated[int, Field(gt=0, description="Target BCCP manifest identifier.")],
+    tag_id: Annotated[list[int], Field(description="Tag identifier list to attach.")],
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> dict[str, object]:
+    """Attach tags to a WIP BCCP."""
+    try:
+        await core_component_service.add_bccp_tags(bccp_manifest_id=bccp_manifest_id, tag_id=tag_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to add tags to BCCP {bccp_manifest_id}.") from exc
+
+
+@mcp.tool(name="remove_tags_from_bccp", description="Detach one or more tags from a BCCP (Basic Core Component Property).", output_schema=EMPTY_OUTPUT_SCHEMA)
+async def remove_tags_from_bccp(
+    bccp_manifest_id: Annotated[int, Field(gt=0, description="Target BCCP manifest identifier.")],
+    tag_id: Annotated[list[int], Field(description="Tag identifier list to remove.")],
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> dict[str, object]:
+    """Remove tags from a WIP BCCP."""
+    try:
+        await core_component_service.remove_bccp_tags(bccp_manifest_id=bccp_manifest_id, tag_id=tag_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to remove tags from BCCP {bccp_manifest_id}.") from exc
+
+
+@mcp.tool(name="revise_asccp", description="Create a new editable ASCCP revision from a stable ASCCP revision.", output_schema=EMPTY_OUTPUT_SCHEMA)
+async def revise_asccp(
+    asccp_manifest_id: Annotated[int, Field(gt=0, description="Target ASCCP manifest identifier.")],
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> dict[str, object]:
+    """Revise an ASCCP."""
+    try:
+        await core_component_service.revise_asccp(asccp_manifest_id=asccp_manifest_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to revise ASCCP {asccp_manifest_id}.") from exc
+
+
+@mcp.tool(name="cancel_asccp", description="Cancel the current ASCCP revision and restore the previous stable revision.", output_schema=EMPTY_OUTPUT_SCHEMA)
+async def cancel_asccp(
+    asccp_manifest_id: Annotated[int, Field(gt=0, description="Target ASCCP manifest identifier.")],
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> dict[str, object]:
+    """Cancel the current ASCCP revision."""
+    try:
+        await core_component_service.cancel_asccp(asccp_manifest_id=asccp_manifest_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to cancel ASCCP {asccp_manifest_id}.") from exc
+
+
+@mcp.tool(name="discard_asccp", description="Discard a Deleted ASCCP (Association Core Component Property) permanently.", output_schema=EMPTY_OUTPUT_SCHEMA)
+async def discard_asccp(
+    asccp_manifest_id: Annotated[int, Field(gt=0, description="Target ASCCP manifest identifier.")],
+    ctx: Context,
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> dict[str, object]:
+    """Discard a Deleted ASCCP permanently."""
+    row = await core_component_service.get_asccp(asccp_manifest_id)
+    if row is None:
+        raise ToolError(f"The ASCCP with manifest ID {asccp_manifest_id} was not found. Please check the ID and try again.")
+    if row.state != "Deleted":
+        raise ToolError(f"The ASCCP '{row.den}' is currently in the '{row.state}' state. Only ASCCPs in the 'Deleted' state can be discarded.")
+    elicit_result = await ctx.elicit(
+        message=(f"Are you sure you want to discard '{row.den}' permanently?\n\nThis removes the ASCCP from the database and cannot be undone."),
+        response_type=None,
+    )
+    match elicit_result:
+        case AcceptedElicitation():
+            pass
+        case DeclinedElicitation():
+            raise ToolError("ASCCP discard was not confirmed.")
+        case CancelledElicitation():
+            raise ToolError("ASCCP discard was cancelled.")
+    try:
+        await core_component_service.discard_asccp(asccp_manifest_id=asccp_manifest_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to discard ASCCP {asccp_manifest_id}.") from exc
+
+
+@mcp.tool(name="revise_bccp", description="Create a new editable BCCP revision from a stable BCCP revision.", output_schema=EMPTY_OUTPUT_SCHEMA)
+async def revise_bccp(
+    bccp_manifest_id: Annotated[int, Field(gt=0, description="Target BCCP manifest identifier.")],
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> dict[str, object]:
+    """Revise a BCCP."""
+    try:
+        await core_component_service.revise_bccp(bccp_manifest_id=bccp_manifest_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to revise BCCP {bccp_manifest_id}.") from exc
+
+
+@mcp.tool(name="cancel_bccp", description="Cancel the current BCCP revision and restore the previous stable revision.", output_schema=EMPTY_OUTPUT_SCHEMA)
+async def cancel_bccp(
+    bccp_manifest_id: Annotated[int, Field(gt=0, description="Target BCCP manifest identifier.")],
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> dict[str, object]:
+    """Cancel the current BCCP revision."""
+    try:
+        await core_component_service.cancel_bccp(bccp_manifest_id=bccp_manifest_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to cancel BCCP {bccp_manifest_id}.") from exc
+
+
+@mcp.tool(name="discard_bccp", description="Discard a Deleted BCCP (Basic Core Component Property) permanently.", output_schema=EMPTY_OUTPUT_SCHEMA)
+async def discard_bccp(
+    bccp_manifest_id: Annotated[int, Field(gt=0, description="Target BCCP manifest identifier.")],
+    ctx: Context,
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> dict[str, object]:
+    """Discard a Deleted BCCP permanently."""
+    row = await core_component_service.get_bccp(bccp_manifest_id)
+    if row is None:
+        raise ToolError(f"The BCCP with manifest ID {bccp_manifest_id} was not found. Please check the ID and try again.")
+    if row.state != "Deleted":
+        raise ToolError(f"The BCCP '{row.den}' is currently in the '{row.state}' state. Only BCCPs in the 'Deleted' state can be discarded.")
+    elicit_result = await ctx.elicit(
+        message=(f"Are you sure you want to discard '{row.den}' permanently?\n\nThis removes the BCCP from the database and cannot be undone."),
+        response_type=None,
+    )
+    match elicit_result:
+        case AcceptedElicitation():
+            pass
+        case DeclinedElicitation():
+            raise ToolError("BCCP discard was not confirmed.")
+        case CancelledElicitation():
+            raise ToolError("BCCP discard was cancelled.")
+    try:
+        await core_component_service.discard_bccp(bccp_manifest_id=bccp_manifest_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to discard BCCP {bccp_manifest_id}.") from exc
+
+
+@mcp.tool(
     name="get_acc",
     description="Get a specific ACC by its manifest ID.",
     output_schema={
@@ -545,6 +1885,18 @@ async def get_core_components(
                     "state": {"type": "string", "description": "Release state", "example": "Published"}
                 },
                 "required": ["release_id", "release_num", "state"]
+            },
+            "tags": {
+                "type": "array",
+                "description": "Tags attached to the ACC.",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "tag_id": {"type": "integer", "description": "Unique identifier for the tag", "example": 1},
+                        "name": {"type": "string", "description": "Tag name", "example": "Noun"}
+                    },
+                    "required": ["tag_id", "name"]
+                }
             },
             "log": {
                 "type": ["object", "null"],
@@ -779,6 +2131,18 @@ async def get_acc(
                 },
                 "required": ["release_id", "release_num", "state"]
             },
+            "tags": {
+                "type": "array",
+                "description": "Tags attached to the ASCCP.",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "tag_id": {"type": "integer", "description": "Unique identifier for the tag", "example": 1},
+                        "name": {"type": "string", "description": "Tag name", "example": "Verb"}
+                    },
+                    "required": ["tag_id", "name"]
+                }
+            },
             "log": {
                 "type": ["object", "null"],
                 "description": "Log information",
@@ -1008,6 +2372,18 @@ async def get_asccp(
                 },
                 "required": ["release_id", "release_num", "state"]
             },
+            "tags": {
+                "type": "array",
+                "description": "Tags attached to the BCCP.",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "tag_id": {"type": "integer", "description": "Unique identifier for the tag", "example": 1},
+                        "name": {"type": "string", "description": "Tag name", "example": "BOD"}
+                    },
+                    "required": ["tag_id", "name"]
+                }
+            },
             "log": {
                 "type": ["object", "null"],
                 "description": "Log information",
@@ -1154,6 +2530,48 @@ def _build_core_component_service(
         plugin.create_app_user_repository(session),
         requester=requester,
     )
+
+
+async def _create_acc_response(
+    *,
+    core_component_service: CoreComponentService,
+    release_id: int,
+    based_acc_manifest_id: int | None = None,
+    initial_object_class_term: str | None = None,
+    initial_component_type: Literal[
+        "Base",
+        "Semantics",
+        "Extension",
+        "SemanticGroup",
+        "UserExtensionGroup",
+        "Embedded",
+        "OAGIS10Nouns",
+        "OAGIS10BODs",
+        "BOD",
+        "Verb",
+        "Noun",
+        "Choice",
+        "AttributeGroup",
+    ] = "Semantics",
+    initial_definition: str | None = None,
+    namespace_id: int | None = None,
+    tag_id: list[int] | None = None,
+    fallback: str,
+) -> CreateAccResponse:
+    """Create an ACC through the shared service and convert to MCP response."""
+    try:
+        result = await core_component_service.create_acc(
+            release_id=release_id,
+            based_acc_manifest_id=based_acc_manifest_id,
+            initial_object_class_term=initial_object_class_term,
+            initial_component_type=initial_component_type,
+            initial_definition=initial_definition,
+            namespace_id=namespace_id,
+            tag_id=tag_id,
+        )
+        return CreateAccResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=fallback) from exc
 
 
 def _to_list_response(*, items: list[Any], total: int, offset: int, limit: int) -> GetCoreComponentPaginationResponse:

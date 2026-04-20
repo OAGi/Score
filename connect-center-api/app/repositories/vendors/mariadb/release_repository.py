@@ -114,6 +114,20 @@ class MariaDbReleaseRepository(ReleaseRepositoryContract):
         row = res.first()
         return _to_release_row(row) if row else None
 
+    async def get_by_library_id_and_release_num(
+        self,
+        library_id: LibraryId,
+        release_num: str,
+    ) -> ReleaseRow | None:
+        """Return a release by exact library and release number, including `Working`."""
+        stmt = _select().where(
+            Release.library_id == int(library_id),
+            Release.release_num == release_num,
+        )
+        res = await self._session.execute(stmt)
+        row = res.first()
+        return _to_release_row(row) if row else None
+
     async def get_dependent_releases(self, release_id: ReleaseId) -> list[ReleaseId]:
         """Handle get dependent releases.
 

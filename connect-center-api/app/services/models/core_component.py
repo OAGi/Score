@@ -13,6 +13,7 @@ from app.services.models.library import LibrarySummaryServiceRecord
 from app.services.models.log import LogSummaryServiceRecord
 from app.services.models.namespace import NamespaceSummaryServiceRecord
 from app.services.models.release import ReleaseSummaryServiceRecord
+from app.services.models.tag import TagSummaryServiceRecord
 from app.services.utils.date import DateRange
 from app.services.utils.pagination import PaginationParams
 from app.services.utils.string import Guid
@@ -45,6 +46,31 @@ class CoreComponentServiceParams:
 
 
 CoreComponentType = Literal["ACC", "ASCCP", "BCCP"]
+CoreComponentState = Literal[
+    "Deleted",
+    "WIP",
+    "Draft",
+    "QA",
+    "Candidate",
+    "Production",
+    "ReleaseDraft",
+    "Published",
+]
+OagisComponentType = Literal[
+    "Base",
+    "Semantics",
+    "Extension",
+    "SemanticGroup",
+    "UserExtensionGroup",
+    "Embedded",
+    "OAGIS10Nouns",
+    "OAGIS10BODs",
+    "BOD",
+    "Verb",
+    "Noun",
+    "Choice",
+    "AttributeGroup",
+]
 
 
 @dataclass(kw_only=True)
@@ -246,6 +272,7 @@ class GetAccServiceResult:
     namespace: NamespaceSummaryServiceRecord | None = None
     library: LibrarySummaryServiceRecord
     release: ReleaseSummaryServiceRecord
+    tags: list[TagSummaryServiceRecord] = field(default_factory=list)
     log: LogSummaryServiceRecord | None = None
     owner: UserSummary
     created: WhoAndWhen
@@ -271,6 +298,7 @@ class GetAsccpServiceResult:
     namespace: NamespaceSummaryServiceRecord | None = None
     library: LibrarySummaryServiceRecord
     release: ReleaseSummaryServiceRecord
+    tags: list[TagSummaryServiceRecord] = field(default_factory=list)
     log: LogSummaryServiceRecord | None = None
     owner: UserSummary
     created: WhoAndWhen
@@ -297,10 +325,174 @@ class GetBccpServiceResult:
     namespace: NamespaceSummaryServiceRecord | None = None
     library: LibrarySummaryServiceRecord
     release: ReleaseSummaryServiceRecord
+    tags: list[TagSummaryServiceRecord] = field(default_factory=list)
     log: LogSummaryServiceRecord | None = None
     owner: UserSummary
     created: WhoAndWhen
     last_updated: WhoAndWhen
+
+
+@dataclass(kw_only=True)
+class CreateAccServiceResult:
+    """ACC create response model."""
+
+    acc_manifest_id: int
+
+
+@dataclass(kw_only=True)
+class CreateAsccpServiceResult:
+    """ASCCP create response model."""
+
+    asccp_manifest_id: int
+
+
+@dataclass(kw_only=True)
+class CreateBccpServiceResult:
+    """BCCP create response model."""
+
+    bccp_manifest_id: int
+
+
+@dataclass(kw_only=True)
+class CreateAsccServiceResult:
+    """ASCC place response model."""
+
+    ascc_manifest_id: int
+
+
+@dataclass(kw_only=True)
+class CreateBccServiceResult:
+    """BCC place response model."""
+
+    bcc_manifest_id: int
+
+
+@dataclass(kw_only=True)
+class MoveAsccServiceResult:
+    """ASCC move response model."""
+
+    ascc_manifest_id: int
+    updates: list[str] = field(default_factory=list)
+
+
+@dataclass(kw_only=True)
+class MoveBccServiceResult:
+    """BCC move response model."""
+
+    bcc_manifest_id: int
+    updates: list[str] = field(default_factory=list)
+
+
+@dataclass(kw_only=True)
+class UpdateAccServiceResult:
+    """ACC update/state-update response model."""
+
+    acc_manifest_id: int
+    updates: list[str] = field(default_factory=list)
+
+
+@dataclass(kw_only=True)
+class UpdateAsccpServiceResult:
+    """ASCCP update response model."""
+
+    asccp_manifest_id: int
+    updates: list[str] = field(default_factory=list)
+
+
+@dataclass(kw_only=True)
+class UpdateBccpServiceResult:
+    """BCCP update response model."""
+
+    bccp_manifest_id: int
+    updates: list[str] = field(default_factory=list)
+
+
+@dataclass(kw_only=True)
+class UpdateAccBaseServiceResult:
+    """ACC base update response model."""
+
+    acc_manifest_id: int
+    updates: list[str] = field(default_factory=list)
+
+
+@dataclass(kw_only=True)
+class UpdateAccTagsServiceResult:
+    """ACC tag update response model."""
+
+    acc_manifest_id: int
+    updates: list[str] = field(default_factory=list)
+
+
+@dataclass(kw_only=True)
+class DiscardAccServiceResult:
+    """ACC discard response model."""
+
+    acc_manifest_id: int
+    discarded: bool
+
+
+@dataclass(kw_only=True)
+class DiscardAsccpServiceResult:
+    """ASCCP discard response model."""
+
+    asccp_manifest_id: int
+    discarded: bool
+
+
+@dataclass(kw_only=True)
+class DiscardBccpServiceResult:
+    """BCCP discard response model."""
+
+    bccp_manifest_id: int
+    discarded: bool
+
+
+@dataclass(kw_only=True)
+class ReviseAccServiceResult:
+    """ACC revise response model."""
+
+    acc_manifest_id: int
+    revised: bool
+
+
+@dataclass(kw_only=True)
+class ReviseAsccpServiceResult:
+    """ASCCP revise response model."""
+
+    asccp_manifest_id: int
+    revised: bool
+
+
+@dataclass(kw_only=True)
+class ReviseBccpServiceResult:
+    """BCCP revise response model."""
+
+    bccp_manifest_id: int
+    revised: bool
+
+
+@dataclass(kw_only=True)
+class CancelAccServiceResult:
+    """ACC cancel response model."""
+
+    acc_manifest_id: int
+    cancelled: bool
+
+
+@dataclass(kw_only=True)
+class CancelAsccpServiceResult:
+    """ASCCP cancel response model."""
+
+    asccp_manifest_id: int
+    cancelled: bool
+
+
+@dataclass(kw_only=True)
+class CancelBccpServiceResult:
+    """BCCP cancel response model."""
+
+    bccp_manifest_id: int
+    cancelled: bool
 
 
 @dataclass(kw_only=True)
