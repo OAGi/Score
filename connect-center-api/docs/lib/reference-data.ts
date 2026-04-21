@@ -43,6 +43,8 @@ export type MethodKey =
   | 'create'
   | 'update'
   | 'delete'
+  | 'update_release_dependencies'
+  | 'transfer_namespace_ownership'
   | 'list'
   | 'retrieve'
   | 'retrieve_working'
@@ -55,8 +57,7 @@ export type MethodKey =
   | 'delete_value'
   | 'create_acc'
   | 'update_acc'
-  | 'set_acc_base'
-  | 'unset_acc_base'
+  | 'transfer_acc_ownership'
   | 'add_acc_tags'
   | 'remove_acc_tags'
   | 'change_acc_state'
@@ -65,12 +66,17 @@ export type MethodKey =
   | 'discard_acc'
   | 'add_ascc_to_acc'
   | 'reorder_ascc_in_acc'
+  | 'remove_ascc'
+  | 'update_ascc'
   | 'add_bcc_to_acc'
   | 'reorder_bcc_in_acc'
+  | 'remove_bcc'
+  | 'update_bcc'
   | 'get_acc'
   | 'get_asccp'
   | 'create_asccp'
   | 'update_asccp'
+  | 'transfer_asccp_ownership'
   | 'change_asccp_state'
   | 'change_asccp_role_of_acc'
   | 'add_asccp_tags'
@@ -81,6 +87,7 @@ export type MethodKey =
   | 'get_bccp'
   | 'create_bccp'
   | 'update_bccp'
+  | 'transfer_bccp_ownership'
   | 'change_bccp_state'
   | 'change_bccp_bdt'
   | 'add_bccp_tags'
@@ -111,6 +118,7 @@ export type MethodKey =
   | 'remove_reused_top_level_asbiep'
   | 'create_dt'
   | 'update_dt'
+  | 'transfer_dt_ownership'
   | 'create_dt_sc'
   | 'update_dt_sc'
   | 'delete_dt_sc'
@@ -119,7 +127,18 @@ export type MethodKey =
   | 'change_dt_state'
   | 'revise_dt'
   | 'cancel_dt'
-  | 'discard_dt';
+  | 'discard_dt'
+  | 'create_code_list'
+  | 'update_code_list'
+  | 'transfer_code_list_ownership'
+  | 'change_code_list_state'
+  | 'revise_code_list'
+  | 'cancel_code_list'
+  | 'discard_code_list'
+  | 'retrieve_code_list_value'
+  | 'create_code_list_value'
+  | 'update_code_list_value'
+  | 'delete_code_list_value';
 
 export type MethodType = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
@@ -649,7 +668,9 @@ export async function fetchBusinessContextMethod(method: string): Promise<Method
 
 export async function fetchLibraryResource(): Promise<ResourceDoc> {
   const spec = await fetchOpenApi();
-  const methodOrder: Array<Extract<MethodKey, 'list' | 'retrieve'>> = ['list', 'retrieve'];
+  const methodOrder: Array<
+    Extract<MethodKey, 'list' | 'retrieve' | 'create' | 'update' | 'update_release_dependencies' | 'delete'>
+  > = ['list', 'retrieve', 'create', 'update', 'update_release_dependencies', 'delete'];
 
   const methods: MethodSummary[] = [];
   for (const key of methodOrder) {
@@ -721,7 +742,14 @@ export async function fetchAccountMethod(method: string): Promise<MethodDoc | nu
 
 export async function fetchNamespaceResource(): Promise<ResourceDoc> {
   const spec = await fetchOpenApi();
-  const methodOrder: Array<Extract<MethodKey, 'list' | 'retrieve'>> = ['list', 'retrieve'];
+  const methodOrder: Array<Extract<MethodKey, 'list' | 'retrieve' | 'create' | 'update' | 'transfer_namespace_ownership' | 'delete'>> = [
+    'list',
+    'retrieve',
+    'create',
+    'update',
+    'transfer_namespace_ownership',
+    'delete',
+  ];
 
   const methods: MethodSummary[] = [];
   for (const key of methodOrder) {
@@ -804,30 +832,32 @@ export async function fetchDataTypeResource(): Promise<ResourceDoc> {
       | 'create_dt'
       | 'retrieve'
       | 'update_dt'
-      | 'create_dt_sc'
-      | 'update_dt_sc'
-      | 'delete_dt_sc'
       | 'add_dt_tags'
       | 'remove_dt_tags'
       | 'change_dt_state'
+      | 'transfer_dt_ownership'
       | 'revise_dt'
       | 'cancel_dt'
       | 'discard_dt'
+      | 'create_dt_sc'
+      | 'update_dt_sc'
+      | 'delete_dt_sc'
     >
   > = [
     'list',
     'retrieve',
     'create_dt',
     'update_dt',
-    'create_dt_sc',
-    'update_dt_sc',
-    'delete_dt_sc',
     'add_dt_tags',
     'remove_dt_tags',
     'change_dt_state',
+    'transfer_dt_ownership',
     'revise_dt',
     'cancel_dt',
     'discard_dt',
+    'create_dt_sc',
+    'update_dt_sc',
+    'delete_dt_sc',
   ];
 
   const methods: MethodSummary[] = [];
@@ -921,7 +951,38 @@ export async function fetchXbtMethod(method: string): Promise<MethodDoc | null> 
 
 export async function fetchCodeListResource(): Promise<ResourceDoc> {
   const spec = await fetchOpenApi();
-  const methodOrder: Array<Extract<MethodKey, 'list' | 'retrieve'>> = ['list', 'retrieve'];
+  const methodOrder: Array<
+    Extract<
+      MethodKey,
+      | 'list'
+      | 'retrieve'
+      | 'create_code_list'
+      | 'update_code_list'
+      | 'transfer_code_list_ownership'
+      | 'change_code_list_state'
+      | 'revise_code_list'
+      | 'cancel_code_list'
+      | 'discard_code_list'
+      | 'retrieve_code_list_value'
+      | 'create_code_list_value'
+      | 'update_code_list_value'
+      | 'delete_code_list_value'
+    >
+  > = [
+    'list',
+    'retrieve',
+    'create_code_list',
+    'update_code_list',
+    'transfer_code_list_ownership',
+    'change_code_list_state',
+    'revise_code_list',
+    'cancel_code_list',
+    'discard_code_list',
+    'retrieve_code_list_value',
+    'create_code_list_value',
+    'update_code_list_value',
+    'delete_code_list_value',
+  ];
 
   const methods: MethodSummary[] = [];
   for (const key of methodOrder) {
@@ -947,7 +1008,7 @@ export async function fetchCodeListMethod(method: string): Promise<MethodDoc | n
   const key = method as MethodKey;
   const lookup = getCodeListOperation(spec, key);
   if (!lookup) return null;
-  return buildMethodDocFromOperation(spec, key, lookup);
+  return buildReferenceMethodDoc(spec, key, lookup);
 }
 
 export async function fetchAgencyIdListResource(): Promise<ResourceDoc> {
@@ -990,22 +1051,26 @@ export async function fetchCoreComponentResource(): Promise<ResourceDoc> {
       | 'get_acc'
       | 'create_acc'
       | 'update_acc'
-      | 'set_acc_base'
-      | 'unset_acc_base'
       | 'add_acc_tags'
       | 'remove_acc_tags'
       | 'change_acc_state'
+      | 'transfer_acc_ownership'
       | 'revise_acc'
       | 'cancel_acc'
       | 'discard_acc'
       | 'add_ascc_to_acc'
       | 'reorder_ascc_in_acc'
+      | 'remove_ascc'
+      | 'update_ascc'
       | 'add_bcc_to_acc'
       | 'reorder_bcc_in_acc'
+      | 'remove_bcc'
+      | 'update_bcc'
       | 'get_asccp'
       | 'create_asccp'
       | 'update_asccp'
       | 'change_asccp_state'
+      | 'transfer_asccp_ownership'
       | 'change_asccp_role_of_acc'
       | 'add_asccp_tags'
       | 'remove_asccp_tags'
@@ -1016,6 +1081,7 @@ export async function fetchCoreComponentResource(): Promise<ResourceDoc> {
       | 'create_bccp'
       | 'update_bccp'
       | 'change_bccp_state'
+      | 'transfer_bccp_ownership'
       | 'change_bccp_bdt'
       | 'add_bccp_tags'
       | 'remove_bccp_tags'
@@ -1028,22 +1094,26 @@ export async function fetchCoreComponentResource(): Promise<ResourceDoc> {
     'get_acc',
     'create_acc',
     'update_acc',
-    'set_acc_base',
-    'unset_acc_base',
     'add_acc_tags',
     'remove_acc_tags',
     'change_acc_state',
+    'transfer_acc_ownership',
     'revise_acc',
     'cancel_acc',
+    'discard_acc',
     'add_ascc_to_acc',
     'reorder_ascc_in_acc',
+    'update_ascc',
+    'remove_ascc',
     'add_bcc_to_acc',
     'reorder_bcc_in_acc',
-    'discard_acc',
+    'update_bcc',
+    'remove_bcc',
     'get_asccp',
     'create_asccp',
     'update_asccp',
     'change_asccp_state',
+    'transfer_asccp_ownership',
     'change_asccp_role_of_acc',
     'add_asccp_tags',
     'remove_asccp_tags',
@@ -1054,6 +1124,7 @@ export async function fetchCoreComponentResource(): Promise<ResourceDoc> {
     'create_bccp',
     'update_bccp',
     'change_bccp_state',
+    'transfer_bccp_ownership',
     'change_bccp_bdt',
     'add_bccp_tags',
     'remove_bccp_tags',

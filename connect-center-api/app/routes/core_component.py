@@ -18,7 +18,9 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Respon
 
 from app.deps import get_core_component_service
 from app.routes.models.core_component import (
+    AddAsccToAccRequest,
     AddAsccToAccResponse,
+    AddBccToAccRequest,
     AddBccToAccResponse,
     CoreComponentListEntry,
     CreateAccRequest,
@@ -33,9 +35,17 @@ from app.routes.models.core_component import (
     GetCoreComponentListResponse,
     MoveAsccRequest,
     MoveBccRequest,
+    UpdateAsccRequest,
+    UpdateAsccResponse,
     UpdateAccRequest,
     UpdateAccResponse,
     UpdateAccStateRequest,
+    TransferOwnershipRequest,
+    TransferAccOwnershipResponse,
+    TransferAsccpOwnershipResponse,
+    TransferBccpOwnershipResponse,
+    UpdateBccRequest,
+    UpdateBccResponse,
     UpdateAsccpRequest,
     UpdateAsccpResponse,
     UpdateAsccpStateRequest,
@@ -57,6 +67,11 @@ from app.types.identifiers import (
 from app.types.identifiers import ReleaseId
 
 router = APIRouter(prefix="/core-components", tags=["core-component"])
+
+
+def _map_bcc_entity_type_update(entity_type: str | int) -> str:
+    """Translate API-facing BCC entity-type labels to stored service labels."""
+    return "Attribute" if entity_type in {"Attribute", 0} else "Element"
 
 
 @router.get(
@@ -219,12 +234,20 @@ async def add_ascc_to_acc(
     asccp_manifest_id: AsccpManifestId = Path(
         ...,
         ge=1,
-        description="ASCCP (Association Core Component Property) manifest ID to add.",
+        description=(
+            "ASCCP (Association Core Component Property) manifest ID to add. If the ASCCP is in the same library "
+            "as the ACC, it must be from the ACC release. If it is in a different library, its release must be "
+            "one of the ACC release dependencies."
+        ),
     ),
     *,
     index: int = Query(
         default=-1,
         description="Zero-based insertion index. Defaults to -1, which places the ASCC at the end of the ACC sequence.",
+    ),
+    payload: AddAsccToAccRequest | None = Body(
+        default=None,
+        description="Optional relationship fields to set as part of the initial add operation.",
     ),
     core_component_service: CoreComponentService = Depends(get_core_component_service),
 ) -> AddAsccToAccResponse:
@@ -234,6 +257,10 @@ async def add_ascc_to_acc(
             acc_manifest_id=acc_manifest_id,
             asccp_manifest_id=asccp_manifest_id,
             index=index,
+            cardinality_min=None if payload is None else payload.cardinality_min,
+            cardinality_max=None if payload is None else payload.cardinality_max,
+            definition=None if payload is None else payload.definition,
+            definition_source=None if payload is None else payload.definition_source,
         )
         return AddAsccToAccResponse.model_validate(result, from_attributes=True)
     except LookupError as e:
@@ -270,12 +297,20 @@ async def add_bcc_to_acc(
     bccp_manifest_id: BccpManifestId = Path(
         ...,
         ge=1,
-        description="BCCP (Basic Core Component Property) manifest ID to add.",
+        description=(
+            "BCCP (Basic Core Component Property) manifest ID to add. If the BCCP is in the same library as the "
+            "ACC, it must be from the ACC release. If it is in a different library, its release must be one of "
+            "the ACC release dependencies."
+        ),
     ),
     *,
     index: int = Query(
         default=-1,
         description="Zero-based insertion index. Defaults to -1, which places the BCC at the end of the ACC sequence.",
+    ),
+    payload: AddBccToAccRequest | None = Body(
+        default=None,
+        description="Optional relationship fields to set as part of the initial add operation.",
     ),
     core_component_service: CoreComponentService = Depends(get_core_component_service),
 ) -> AddBccToAccResponse:
@@ -285,6 +320,14 @@ async def add_bcc_to_acc(
             acc_manifest_id=acc_manifest_id,
             bccp_manifest_id=bccp_manifest_id,
             index=index,
+            cardinality_min=None if payload is None else payload.cardinality_min,
+            cardinality_max=None if payload is None else payload.cardinality_max,
+            entity_type=None if payload is None or payload.entity_type is None else _map_bcc_entity_type_update(payload.entity_type),
+            is_nillable=None if payload is None else payload.is_nillable,
+            default_value=None if payload is None or payload.value_constraint is None else payload.value_constraint.default_value,
+            fixed_value=None if payload is None or payload.value_constraint is None else payload.value_constraint.fixed_value,
+            definition=None if payload is None else payload.definition,
+            definition_source=None if payload is None else payload.definition_source,
         )
         return AddBccToAccResponse.model_validate(result, from_attributes=True)
     except LookupError as e:
@@ -397,6 +440,192 @@ async def reorder_bcc_in_acc(
         )
 
 
+@router.delete(
+    "/ascc/{ascc_manifest_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Remove ASCC",
+    description="Remove an existing ASCC (Association Core Component) relationship from its owning ACC.",
+)
+async def remove_ascc(
+    ascc_manifest_id: AsccManifestId = Path(..., ge=1, description="ASCC manifest ID to remove."),
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> Response:
+    """Remove an existing ASCC relationship."""
+    try:
+        await core_component_service.remove_ascc(ascc_manifest_id=ascc_manifest_id)
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+    except LookupError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": "The ASCC was not found.", "cause": str(e)},
+        )
+    except PermissionError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"message": "You do not have permission to modify this ACC.", "cause": str(e)},
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "The request is invalid. Check the ASCC and try again.", "cause": str(e)},
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"message": "We couldn't remove the ASCC.", "cause": str(e)},
+        )
+
+
+@router.delete(
+    "/bcc/{bcc_manifest_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Remove BCC",
+    description="Remove an existing BCC (Basic Core Component) relationship from its owning ACC.",
+)
+async def remove_bcc(
+    bcc_manifest_id: BccManifestId = Path(..., ge=1, description="BCC manifest ID to remove."),
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> Response:
+    """Remove an existing BCC relationship."""
+    try:
+        await core_component_service.remove_bcc(bcc_manifest_id=bcc_manifest_id)
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+    except LookupError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": "The BCC was not found.", "cause": str(e)},
+        )
+    except PermissionError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"message": "You do not have permission to modify this ACC.", "cause": str(e)},
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "The request is invalid. Check the BCC and try again.", "cause": str(e)},
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"message": "We couldn't remove the BCC.", "cause": str(e)},
+        )
+
+
+@router.post(
+    "/ascc/{ascc_manifest_id}",
+    summary="Update ASCC",
+    description="Update selected mutable fields of an ASCC (Association Core Component).",
+    response_model=UpdateAsccResponse,
+)
+async def update_ascc(
+    payload: UpdateAsccRequest = Body(...),
+    ascc_manifest_id: AsccManifestId = Path(..., ge=1, description="ASCC manifest ID."),
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> UpdateAsccResponse:
+    """Update mutable ASCC fields and return the changed field names."""
+    updates_payload = payload.model_dump(exclude_unset=True)
+    try:
+        result = await core_component_service.update_ascc(
+            ascc_manifest_id=ascc_manifest_id,
+            cardinality_min=updates_payload.get("cardinality_min", UNSET),
+            cardinality_max=updates_payload.get("cardinality_max", UNSET),
+            definition=updates_payload.get("definition", UNSET),
+            definition_source=updates_payload.get("definition_source", UNSET),
+            deprecated=updates_payload.get("deprecated", UNSET),
+        )
+        return UpdateAsccResponse.model_validate(result, from_attributes=True)
+    except LookupError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": "The ASCC was not found.", "cause": str(e)},
+        )
+    except PermissionError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"message": "You do not have permission to update this ASCC.", "cause": str(e)},
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "The request is invalid. Check the body and try again.", "cause": str(e)},
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"message": "We couldn't update the ASCC.", "cause": str(e)},
+        )
+
+
+@router.post(
+    "/bcc/{bcc_manifest_id}",
+    summary="Update BCC",
+    description="Update selected mutable fields of a BCC (Basic Core Component).",
+    response_model=UpdateBccResponse,
+)
+async def update_bcc(
+    payload: UpdateBccRequest = Body(...),
+    bcc_manifest_id: BccManifestId = Path(..., ge=1, description="BCC manifest ID."),
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> UpdateBccResponse:
+    """Update mutable BCC fields and return the changed field names."""
+    updates_payload = payload.model_dump(exclude_unset=True)
+    try:
+        result = await core_component_service.update_bcc(
+            bcc_manifest_id=bcc_manifest_id,
+            entity_type=(
+                _map_bcc_entity_type_update(payload.entity_type)
+                if "entity_type" in payload.model_fields_set and payload.entity_type is not None
+                else UNSET
+            ),
+            cardinality_min=updates_payload.get("cardinality_min", UNSET),
+            cardinality_max=updates_payload.get("cardinality_max", UNSET),
+            definition=updates_payload.get("definition", UNSET),
+            definition_source=updates_payload.get("definition_source", UNSET),
+            deprecated=updates_payload.get("deprecated", UNSET),
+            is_nillable=updates_payload.get("is_nillable", UNSET),
+            default_value=(
+                None
+                if "value_constraint" in payload.model_fields_set and payload.value_constraint is None
+                else (
+                    payload.value_constraint.default_value
+                    if "value_constraint" in payload.model_fields_set and payload.value_constraint is not None
+                    else UNSET
+                )
+            ),
+            fixed_value=(
+                None
+                if "value_constraint" in payload.model_fields_set and payload.value_constraint is None
+                else (
+                    payload.value_constraint.fixed_value
+                    if "value_constraint" in payload.model_fields_set and payload.value_constraint is not None
+                    else UNSET
+                )
+            ),
+        )
+        return UpdateBccResponse.model_validate(result, from_attributes=True)
+    except LookupError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": "The BCC was not found.", "cause": str(e)},
+        )
+    except PermissionError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"message": "You do not have permission to update this BCC.", "cause": str(e)},
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "The request is invalid. Check the body and try again.", "cause": str(e)},
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"message": "We couldn't update the BCC.", "cause": str(e)},
+        )
+
+
 @router.post(
     "/acc/{acc_manifest_id}",
     summary="Update ACC",
@@ -419,6 +648,7 @@ async def update_acc(
             definition_source=updates_payload.get("definition_source", UNSET),
             is_abstract=updates_payload.get("is_abstract", UNSET),
             deprecated=updates_payload.get("deprecated", UNSET),
+            based_acc_manifest_id=updates_payload.get("based_acc_manifest_id", UNSET),
             namespace_id=updates_payload.get("namespace_id", UNSET),
         )
         return UpdateAccResponse.model_validate(result, from_attributes=True)
@@ -445,32 +675,32 @@ async def update_acc(
 
 
 @router.post(
-    "/acc/{acc_manifest_id}/base",
-    status_code=status.HTTP_204_NO_CONTENT,
-    summary="Set base ACC",
-    description="Set the base ACC (Aggregate Core Component) for an ACC.",
+    "/acc/{acc_manifest_id}/ownership",
+    summary="Transfer ACC ownership",
+    description="Transfer ownership of an ACC (Aggregate Core Component) to another user while the ACC is in `WIP`.",
+    response_model=TransferAccOwnershipResponse,
 )
-async def set_acc_base(
+async def transfer_acc_ownership(
+    payload: TransferOwnershipRequest = Body(...),
     acc_manifest_id: AccManifestId = Path(..., ge=1, description="ACC (Aggregate Core Component) manifest ID."),
-    based_acc_manifest_id: AccManifestId = Query(..., ge=1, description="Base ACC manifest identifier to set."),
     core_component_service: CoreComponentService = Depends(get_core_component_service),
-) -> Response:
-    """Set the base ACC of a WIP ACC."""
+) -> TransferAccOwnershipResponse:
+    """Transfer ACC ownership and return the changed field names."""
     try:
-        await core_component_service.update_acc_base(
+        result = await core_component_service.transfer_acc_ownership(
             acc_manifest_id=acc_manifest_id,
-            based_acc_manifest_id=based_acc_manifest_id,
+            target_user_id=payload.target_user_id,
         )
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
+        return TransferAccOwnershipResponse.model_validate(result, from_attributes=True)
     except LookupError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={"message": "The ACC was not found.", "cause": str(e)},
+            detail={"message": "The ACC or target user was not found.", "cause": str(e)},
         )
     except PermissionError as e:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"message": "You do not have permission to update this ACC.", "cause": str(e)},
+            detail={"message": "You do not have permission to transfer this ACC.", "cause": str(e)},
         )
     except ValueError as e:
         raise HTTPException(
@@ -480,46 +710,7 @@ async def set_acc_base(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"message": "We couldn't set the ACC base.", "cause": str(e)},
-        )
-
-
-@router.delete(
-    "/acc/{acc_manifest_id}/base",
-    status_code=status.HTTP_204_NO_CONTENT,
-    summary="Clear base ACC",
-    description="Unset the base ACC (Aggregate Core Component) for an ACC.",
-)
-async def unset_acc_base(
-    acc_manifest_id: AccManifestId = Path(..., ge=1, description="ACC (Aggregate Core Component) manifest ID."),
-    core_component_service: CoreComponentService = Depends(get_core_component_service),
-) -> Response:
-    """Unset the base ACC of a WIP ACC."""
-    try:
-        await core_component_service.update_acc_base(
-            acc_manifest_id=acc_manifest_id,
-            based_acc_manifest_id=None,
-        )
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
-    except LookupError as e:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail={"message": "The ACC was not found.", "cause": str(e)},
-        )
-    except PermissionError as e:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail={"message": "You do not have permission to update this ACC.", "cause": str(e)},
-        )
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"message": "The request is invalid. Check the query and try again.", "cause": str(e)},
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"message": "We couldn't unset the ACC base.", "cause": str(e)},
+            detail={"message": "We couldn't transfer ACC ownership.", "cause": str(e)},
         )
 
 
@@ -850,6 +1041,46 @@ async def update_asccp(
 
 
 @router.post(
+    "/asccp/{asccp_manifest_id}/ownership",
+    summary="Transfer ASCCP ownership",
+    description="Transfer ownership of an ASCCP (Association Core Component Property) to another user while the ASCCP is in `WIP`.",
+    response_model=TransferAsccpOwnershipResponse,
+)
+async def transfer_asccp_ownership(
+    payload: TransferOwnershipRequest = Body(...),
+    asccp_manifest_id: AsccpManifestId = Path(..., ge=1, description="ASCCP manifest ID."),
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> TransferAsccpOwnershipResponse:
+    """Transfer ASCCP ownership and return the changed field names."""
+    try:
+        result = await core_component_service.transfer_asccp_ownership(
+            asccp_manifest_id=asccp_manifest_id,
+            target_user_id=payload.target_user_id,
+        )
+        return TransferAsccpOwnershipResponse.model_validate(result, from_attributes=True)
+    except LookupError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": "The ASCCP or target user was not found.", "cause": str(e)},
+        )
+    except PermissionError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"message": "You do not have permission to transfer this ASCCP.", "cause": str(e)},
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "The request is invalid. Check the body and try again.", "cause": str(e)},
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"message": "We couldn't transfer ASCCP ownership.", "cause": str(e)},
+        )
+
+
+@router.post(
     "/asccp/{asccp_manifest_id}/state",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Change ASCCP state",
@@ -873,7 +1104,15 @@ async def change_asccp_state(
 )
 async def change_asccp_role_of_acc(
     asccp_manifest_id: AsccpManifestId = Path(..., ge=1, description="ASCCP manifest ID."),
-    acc_manifest_id: AccManifestId = Query(..., ge=1, description="Role ACC manifest identifier."),
+    acc_manifest_id: AccManifestId = Query(
+        ...,
+        ge=1,
+        description=(
+            "Role ACC manifest identifier. If the ACC is in the same library as the ASCCP, it must be from the "
+            "ASCCP release. If it is in a different library, its release must be one of the ASCCP release "
+            "dependencies."
+        ),
+    ),
     core_component_service: CoreComponentService = Depends(get_core_component_service),
 ) -> Response:
     """Change the role ACC of an ASCCP."""
@@ -1017,6 +1256,46 @@ async def update_bccp(
 
 
 @router.post(
+    "/bccp/{bccp_manifest_id}/ownership",
+    summary="Transfer BCCP ownership",
+    description="Transfer ownership of a BCCP (Basic Core Component Property) to another user while the BCCP is in `WIP`.",
+    response_model=TransferBccpOwnershipResponse,
+)
+async def transfer_bccp_ownership(
+    payload: TransferOwnershipRequest = Body(...),
+    bccp_manifest_id: BccpManifestId = Path(..., ge=1, description="BCCP manifest ID."),
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> TransferBccpOwnershipResponse:
+    """Transfer BCCP ownership and return the changed field names."""
+    try:
+        result = await core_component_service.transfer_bccp_ownership(
+            bccp_manifest_id=bccp_manifest_id,
+            target_user_id=payload.target_user_id,
+        )
+        return TransferBccpOwnershipResponse.model_validate(result, from_attributes=True)
+    except LookupError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": "The BCCP or target user was not found.", "cause": str(e)},
+        )
+    except PermissionError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"message": "You do not have permission to transfer this BCCP.", "cause": str(e)},
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "The request is invalid. Check the body and try again.", "cause": str(e)},
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"message": "We couldn't transfer BCCP ownership.", "cause": str(e)},
+        )
+
+
+@router.post(
     "/bccp/{bccp_manifest_id}/state",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Change BCCP state",
@@ -1045,7 +1324,9 @@ async def change_bccp_bdt(
         ge=1,
         description=(
             "Target BDT manifest identifier. The selected data type must already be a BDT, "
-            "which means its base DT link is set."
+            "which means its base DT link is set. If the BDT is in the same library as the BCCP, it must be from "
+            "the BCCP release. If it is in a different library, its release must be one of the BCCP release "
+            "dependencies."
         ),
     ),
     core_component_service: CoreComponentService = Depends(get_core_component_service),

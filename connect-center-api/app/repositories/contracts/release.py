@@ -84,3 +84,14 @@ class ReleaseRepositoryContract(Protocol):
             Result of the operation.
         """
         pass
+
+    async def get_release_dependency_ids(self, release_id: ReleaseId) -> list[ReleaseId]:
+        """Repository contract for direct release dependencies.
+
+        Args:
+            release_id: Release identifier used to scope the query.
+
+        Returns:
+            Direct dependency release identifiers from `release_dep`.
+        """
+        pass

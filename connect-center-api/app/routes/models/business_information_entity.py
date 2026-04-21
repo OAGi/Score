@@ -662,7 +662,7 @@ class UpdateBBIERequest(BaseModel):
     facet_max_length: int | None = Field(default=None, ge=0, description="Facet max length.")
     facet_pattern: str | None = Field(default=None, description="Facet pattern (regular expression).")
     xbt_manifest_id: int | None = Field(default=None, ge=1, description="XBT manifest identifier to use as the primitive restriction for this BBIE.")
-    code_list_manifest_id: int | None = Field(default=None, ge=1, description="Code-list manifest identifier to use as the primitive restriction for this BBIE.")
+    code_list_manifest_id: int | None = Field(default=None, ge=1, description="Code list manifest identifier to use as the primitive restriction for this BBIE.")
     agency_id_list_manifest_id: int | None = Field(default=None, ge=1, description="Agency-ID-list manifest identifier to use as the primitive restriction for this BBIE.")
 
     model_config = ConfigDict(
@@ -728,7 +728,7 @@ class UpdateBBIESCRequest(BaseModel):
     facet_max_length: int | None = Field(default=None, ge=0, description="Facet max length.")
     facet_pattern: str | None = Field(default=None, description="Facet pattern (regular expression).")
     xbt_manifest_id: int | None = Field(default=None, ge=1, description="XBT manifest identifier to use as the primitive restriction for this BBIE supplementary component.")
-    code_list_manifest_id: int | None = Field(default=None, ge=1, description="Code-list manifest identifier to use as the primitive restriction for this BBIE supplementary component.")
+    code_list_manifest_id: int | None = Field(default=None, ge=1, description="Code list manifest identifier to use as the primitive restriction for this BBIE supplementary component.")
     agency_id_list_manifest_id: int | None = Field(default=None, ge=1, description="Agency-ID-list manifest identifier to use as the primitive restriction for this BBIE supplementary component.")
 
     model_config = ConfigDict(

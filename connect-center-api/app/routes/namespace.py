@@ -1,26 +1,21 @@
-"""Namespace API routes.
-
-Provides read-only endpoints for listing namespaces and retrieving a single
-namespace by ID. Supports filtering, sorting, and date-range queries.
-
-Key features:
-- Pagination via `limit`/`offset`.
-- Multi-column sorting via `order_by` with allowlisted columns.
-- Filtering on namespace attributes (library_id, uri, prefix, is_std_nmsp).
-- Date range filters for creation and last update timestamps.
-- Standardized error responses for invalid query parameters and missing records.
-"""
+"""Namespace API routes."""
 
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Response, status
 
 from app.deps import get_namespace_service
 from app.routes.models.namespace import (
+    CreateNamespaceRequest,
+    CreateNamespaceResponse,
     GetNamespaceByNamespaceIdResponse,
     GetNamespaceListResponse,
     NamespaceEntry,
+    TransferNamespaceOwnershipRequest,
+    TransferNamespaceOwnershipResponse,
+    UpdateNamespaceRequest,
+    UpdateNamespaceResponse,
 )
 from app.utils.date import parse_date_range
 from app.services.namespace_service import NamespaceService
@@ -134,3 +129,163 @@ async def get_namespace_by_namespace_id(
             },
         )
     return GetNamespaceByNamespaceIdResponse.model_validate(row, from_attributes=True)
+
+
+@router.post(
+    "",
+    status_code=status.HTTP_201_CREATED,
+    summary="Create namespace",
+    description="Create a new namespace in a library.",
+    response_model=CreateNamespaceResponse,
+)
+async def create_namespace(
+    payload: CreateNamespaceRequest = Body(...),
+    namespace_service: NamespaceService = Depends(get_namespace_service),
+) -> CreateNamespaceResponse:
+    """Create a namespace and return its identifier."""
+    try:
+        result = await namespace_service.create_namespace(
+            library_id=payload.library_id,
+            uri=payload.uri,
+            prefix=payload.prefix,
+            description=payload.description,
+        )
+        return CreateNamespaceResponse.model_validate(result, from_attributes=True)
+    except LookupError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": "A referenced resource was not found.", "cause": str(e)},
+        )
+    except PermissionError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"message": "You do not have permission to create namespaces.", "cause": str(e)},
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "The request is invalid. Check the body and try again.", "cause": str(e)},
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"message": "We couldn't create the namespace.", "cause": str(e)},
+        )
+
+
+@router.post(
+    "/{namespace_id}",
+    summary="Update namespace",
+    description="Update an existing namespace owned by the requester.",
+    response_model=UpdateNamespaceResponse,
+)
+async def update_namespace(
+    namespace_id: NamespaceId = Path(..., ge=1, description="Namespace identifier."),
+    payload: UpdateNamespaceRequest = Body(...),
+    namespace_service: NamespaceService = Depends(get_namespace_service),
+) -> UpdateNamespaceResponse:
+    """Update a namespace and return the changed fields."""
+    try:
+        result = await namespace_service.update_namespace(
+            namespace_id=namespace_id,
+            uri=payload.uri,
+            prefix=payload.prefix,
+            description=payload.description,
+        )
+        return UpdateNamespaceResponse.model_validate(result, from_attributes=True)
+    except LookupError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": "The namespace was not found.", "cause": str(e)},
+        )
+    except PermissionError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"message": "You do not have permission to update this namespace.", "cause": str(e)},
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "The request is invalid. Check the body and try again.", "cause": str(e)},
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"message": "We couldn't update the namespace.", "cause": str(e)},
+        )
+
+
+@router.post(
+    "/{namespace_id}/ownership",
+    summary="Transfer namespace ownership",
+    description="Transfer ownership of a namespace to another user by login ID.",
+    response_model=TransferNamespaceOwnershipResponse,
+)
+async def transfer_namespace_ownership(
+    namespace_id: NamespaceId = Path(..., ge=1, description="Namespace identifier."),
+    payload: TransferNamespaceOwnershipRequest = Body(...),
+    namespace_service: NamespaceService = Depends(get_namespace_service),
+) -> TransferNamespaceOwnershipResponse:
+    """Transfer namespace ownership."""
+    try:
+        result = await namespace_service.transfer_namespace_ownership(
+            namespace_id=namespace_id,
+            target_login_id=payload.target_login_id,
+        )
+        return TransferNamespaceOwnershipResponse.model_validate(result, from_attributes=True)
+    except LookupError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": "A referenced resource was not found.", "cause": str(e)},
+        )
+    except PermissionError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"message": "You do not have permission to transfer this namespace.", "cause": str(e)},
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "The request is invalid. Check the body and try again.", "cause": str(e)},
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"message": "We couldn't transfer namespace ownership.", "cause": str(e)},
+        )
+
+
+@router.delete(
+    "/{namespace_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Discard namespace",
+    description="Discard a namespace when it is not in use.",
+)
+async def discard_namespace(
+    namespace_id: NamespaceId = Path(..., ge=1, description="Namespace identifier."),
+    namespace_service: NamespaceService = Depends(get_namespace_service),
+) -> Response:
+    """Discard a namespace."""
+    try:
+        await namespace_service.discard_namespace(namespace_id=namespace_id)
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+    except LookupError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": "The namespace was not found.", "cause": str(e)},
+        )
+    except PermissionError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"message": "You do not have permission to discard this namespace.", "cause": str(e)},
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "The request is invalid. Check the namespace and try again.", "cause": str(e)},
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"message": "We couldn't discard the namespace.", "cause": str(e)},
+        )

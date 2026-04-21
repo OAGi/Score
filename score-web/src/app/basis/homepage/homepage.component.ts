@@ -14,7 +14,7 @@ import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {base64Encode, initFilter, loadBranch, loadLibrary, saveBranch, saveLibrary} from '../../common/utility';
 import {CcListEntry, SummaryCcExt} from '../../cc-management/cc-list/domain/cc-list';
-import {ReleaseSummary, WorkingRelease} from '../../release-management/domain/release';
+import {ReleaseSummary} from '../../release-management/domain/release';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {WebPageInfoService} from '../basis.service';
 import {LibrarySummary} from '../../library-management/domain/library';
@@ -99,6 +99,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   releaseListFilterCtrl: FormControl = new FormControl();
   releaseFilteredList: ReplaySubject<ReleaseSummary[]> = new ReplaySubject<ReleaseSummary[]>(1);
   selectedRelease: ReleaseSummary;
+  workingRelease: ReleaseSummary;
 
   myRecentBIEs = new MatTableDataSource<BieListEntry>();
   @ViewChild('myRecentBIEsSort', {static: false})
@@ -172,15 +173,19 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
   loadData() {
     if (!this.library?.libraryId) {
+      this.workingRelease = undefined;
       this.selectedRelease = undefined;
       this.releaseFilteredList.next([]);
       return;
     }
 
     const userToken = this.userToken;
+    this.workingRelease = undefined;
     forkJoin([
-      this.releaseService.getReleaseSummaryList(this.library.libraryId)
-    ]).subscribe(([resp]) => {
+      this.releaseService.getReleaseSummaryList(this.library.libraryId),
+      this.releaseService.getWorkingRelease(this.library.libraryId)
+    ]).subscribe(([resp, workingRelease]) => {
+      this.workingRelease = workingRelease;
       resp = [{state: '', releaseId: -1, releaseNum : 'All', workingRelease: false}].concat(resp.filter(e => !e.workingRelease));
       initFilter(this.releaseListFilterCtrl, this.releaseFilteredList, resp, (e) => e.releaseNum);
 
@@ -212,7 +217,9 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   }
 
   initSummaryCCs(userToken) {
-    const releaseParam = {key: 'releaseId', value: WorkingRelease.releaseId};
+    const releaseParams = this.workingRelease ?
+      [{key: 'releaseId', value: this.workingRelease.releaseId}] :
+      [];
     this.ccService.getSummaryCcList(this.library.libraryId).subscribe(summaryCcInfo => {
       this.numberOfTotalCCByStates = [];
       this.numberOfMyCCByStates = [];
@@ -220,7 +227,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
         this.numberOfTotalCCByStates.push({
           name: item.state,
           value: summaryCcInfo.numberOfTotalCcByStates[item.state] || 0,
-          href: ['/core_component', [{key: 'states', value: item.state}, releaseParam]],
+          href: ['/core_component', [{key: 'states', value: item.state}, ...releaseParams]],
           disabled: false,
           style: {
             bg_color: this.webPageInfo.getComponentStateColorSet(item.state).background || item.color,
@@ -230,7 +237,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
         this.numberOfMyCCByStates.push({
           name: item.state,
           value: summaryCcInfo.numberOfMyCcByStates[item.state] || 0,
-          href: ['/core_component', [{key: 'states', value: item.state}, releaseParam, {key: 'ownerLoginIdList', value: userToken.username}]],
+          href: ['/core_component', [{key: 'states', value: item.state}, ...releaseParams, {key: 'ownerLoginIdList', value: userToken.username}]],
           disabled: false,
           style: {
             bg_color: this.webPageInfo.getComponentStateColorSet(item.state).background || item.color,

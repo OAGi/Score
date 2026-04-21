@@ -213,6 +213,12 @@ class ReleaseService:
         logger.info("get_dependent_releases release_id=%d → %d dependencies", int(release_id), len(deps))
         return deps
 
+    async def get_release_dependency_ids(self, release_id: ReleaseId) -> list[ReleaseId]:
+        """Get direct release dependency IDs from `release_dep`."""
+        deps = await self._repo.get_release_dependency_ids(release_id)
+        logger.info("get_release_dependency_ids release_id=%d → %d dependencies", int(release_id), len(deps))
+        return deps
+
     def _to_release_result(
         self,
         row: Any,

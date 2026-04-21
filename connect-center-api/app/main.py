@@ -39,6 +39,7 @@ from app.routes.biz_ctx import router as biz_ctx_router
 from app.routes.biz_ctx import value_router as biz_ctx_value_router
 from app.routes.business_information_entity import router as business_information_entity_router
 from app.routes.code_list import router as code_list_router
+from app.routes.code_list import value_router as code_list_value_router
 from app.routes.core_component import router as core_component_router
 from app.routes.ctx_category import router as ctx_category_router
 from app.routes.ctx_scheme import router as ctx_scheme_router
@@ -315,6 +316,7 @@ for router in (
     tag_router,
     xbt_router,
     code_list_router,
+    code_list_value_router,
     agency_id_list_router,
     core_component_router,
     business_information_entity_router,

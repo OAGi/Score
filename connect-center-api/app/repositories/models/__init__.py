@@ -16,7 +16,7 @@ from app.repositories.models.core_component import (
 )
 from app.repositories.models.ctx_category import ContextCategorySummaryRow
 from app.repositories.models.ctx_scheme import CtxSchemeValueRow, CtxSchemeValueSummaryRow
-from app.repositories.models.data_type import DataTypeBaseSummaryRow, DataTypeSupplementaryComponentRow
+from app.repositories.models.data_type import DataTypeBaseSummaryRow, DataTypePrimitiveRow, DataTypeSupplementaryComponentRow
 from app.repositories.models.library import LibrarySummaryRow
 from app.repositories.models.log import LogSummaryRow
 from app.repositories.models.namespace import NamespaceSummaryRow
@@ -39,6 +39,7 @@ __all__ = [
     "CtxSchemeValueRow",
     "CtxSchemeValueSummaryRow",
     "DataTypeBaseSummaryRow",
+    "DataTypePrimitiveRow",
     "DataTypeSupplementaryComponentRow",
     "DtSummaryRow",
     "LibrarySummaryRow",

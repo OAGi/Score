@@ -1,4 +1,4 @@
-"""Service models for code-list operations."""
+"""Service models for code list operations."""
 
 from __future__ import annotations
 
@@ -17,6 +17,18 @@ from app.services.utils.pagination import PaginationParams
 from app.services.utils.string import Guid
 from app.types.identifiers import CodeListId, CodeListManifestId, CodeListValueId, CodeListValueManifestId
 from app.types.identifiers import ReleaseId
+
+
+CodeListState = Literal[
+    "Deleted",
+    "WIP",
+    "Draft",
+    "QA",
+    "Candidate",
+    "Production",
+    "ReleaseDraft",
+    "Published",
+]
 
 
 class CodeListServiceParams:
@@ -58,16 +70,7 @@ class CodeListServiceResult:
     definition_source: str | None = None
     extensible_indicator: bool
     is_deprecated: bool
-    state: Literal[
-        "Deleted",
-        "WIP",
-        "Draft",
-        "QA",
-        "Candidate",
-        "Production",
-        "ReleaseDraft",
-        "Published",
-    ]
+    state: CodeListState
     values: list[CodeListValueServiceRecord] = field(default_factory=list)
     namespace: NamespaceSummaryServiceRecord | None = None
     library: LibrarySummaryServiceRecord
@@ -88,4 +91,43 @@ class CodeListValueServiceRecord:
     value: str
     meaning: str | None = None
     definition: str | None = None
+    definition_source: str | None = None
     is_deprecated: bool
+
+
+@dataclass(kw_only=True)
+class CreateCodeListServiceResult:
+    """Code list create response model."""
+
+    code_list_manifest_id: CodeListManifestId
+
+
+@dataclass(kw_only=True)
+class CreateCodeListValueServiceResult:
+    """Code list value create response model."""
+
+    code_list_value_manifest_id: CodeListValueManifestId
+
+
+@dataclass(kw_only=True)
+class UpdateCodeListServiceResult:
+    """Code list update response model."""
+
+    code_list_manifest_id: CodeListManifestId
+    updates: list[str] = field(default_factory=list)
+
+
+@dataclass(kw_only=True)
+class UpdateCodeListValueServiceResult:
+    """Code list value update response model."""
+
+    code_list_value_manifest_id: CodeListValueManifestId
+    updates: list[str] = field(default_factory=list)
+
+
+@dataclass(kw_only=True)
+class TransferCodeListOwnershipServiceResult:
+    """Code list ownership-transfer response model."""
+
+    code_list_manifest_id: CodeListManifestId
+    updates: list[str] = field(default_factory=list)

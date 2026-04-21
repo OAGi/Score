@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from app.services.models import WhoAndWhen
 from app.services.models.app_user import UserSummary
@@ -49,6 +49,29 @@ class NamespaceServiceResult:
     owner: UserSummary
     created: WhoAndWhen
     last_updated: WhoAndWhen
+
+
+@dataclass(kw_only=True)
+class CreateNamespaceServiceResult:
+    """Namespace create response model."""
+
+    namespace_id: NamespaceId
+
+
+@dataclass(kw_only=True)
+class UpdateNamespaceServiceResult:
+    """Namespace update response model."""
+
+    namespace_id: NamespaceId
+    updates: list[str] = field(default_factory=list)
+
+
+@dataclass(kw_only=True)
+class TransferNamespaceOwnershipServiceResult:
+    """Namespace ownership-transfer response model."""
+
+    namespace_id: NamespaceId
+    updates: list[str] = field(default_factory=list)
 
 
 @dataclass(kw_only=True)

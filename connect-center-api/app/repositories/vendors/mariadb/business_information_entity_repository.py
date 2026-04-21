@@ -1625,6 +1625,33 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
         top_level.asbiep_id = asbiep.asbiep_id
         return top_level.top_level_asbiep_id
 
+    async def get_release_summary_by_asccp_manifest_id(
+        self,
+        *,
+        asccp_manifest_id: AsccpManifestId,
+    ) -> ReleaseSummaryRow | None:
+        """Resolve the release summary for an ASCCP manifest."""
+        row = (
+            await self._session.execute(
+                select(
+                    Release.release_id,
+                    Release.release_num,
+                    Release.state,
+                )
+                .join(AsccpManifest, AsccpManifest.release_id == Release.release_id)
+                .where(AsccpManifest.asccp_manifest_id == asccp_manifest_id)
+            )
+        ).first()
+        if row is None:
+            return None
+
+        release_id, release_num, state = row
+        return ReleaseSummaryRow(
+            release_id=int(release_id),
+            release_num=str(release_num) if release_num is not None else None,
+            state=str(state) if state is not None else None,
+        )
+
     async def update_top_level_asbiep(
         self,
         top_level_asbiep_id: int,
@@ -1816,7 +1843,7 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
         return [int(value) for value in (await self._session.execute(stmt)).scalars().all() if value is not None]
 
     async def list_assigned_code_list_manifest_ids(self, *, top_level_asbiep_id: int) -> list[int]:
-        """Return code-list manifest ids assigned by BBIE and BBIE_SC rows under the target top-level ASBIEP."""
+        """Return code list manifest ids assigned by BBIE and BBIE_SC rows under the target top-level ASBIEP."""
         stmt = union(
             select(Bbie.code_list_manifest_id.label("code_list_manifest_id")).where(
                 Bbie.owner_top_level_asbiep_id == top_level_asbiep_id,
@@ -2848,7 +2875,7 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
             facet_max_length: Facet maximum length.
             facet_pattern: Facet regular expression pattern.
             xbt_manifest_id: XBT manifest identifier to use as the primitive restriction for this BBIE.
-            code_list_manifest_id: Code-list manifest identifier to use as the primitive restriction for this BBIE.
+            code_list_manifest_id: Code list manifest identifier to use as the primitive restriction for this BBIE.
             agency_id_list_manifest_id: Agency-ID-list manifest identifier to use as the primitive restriction for this BBIE.
 
         Returns:
@@ -3133,7 +3160,7 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
             facet_max_length: Facet maximum length.
             facet_pattern: Facet regular expression pattern.
             xbt_manifest_id: XBT manifest identifier to use as the primitive restriction for this BBIE supplementary component.
-            code_list_manifest_id: Code-list manifest identifier to use as the primitive restriction for this BBIE supplementary component.
+            code_list_manifest_id: Code list manifest identifier to use as the primitive restriction for this BBIE supplementary component.
             agency_id_list_manifest_id: Agency-ID-list manifest identifier to use as the primitive restriction for this BBIE supplementary component.
 
         Returns:

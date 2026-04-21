@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.services.utils.string import Guid
 from app.tools.models.shared import LibrarySummaryRecord
@@ -52,8 +52,36 @@ class DataTypeSupplementaryComponentResponse(BaseModel):
     cardinality: str
     value_constraint: ValueConstraintRecord | None = None
     is_deprecated: bool
+    primitives: list[DataTypePrimitiveResponse] = Field(default_factory=list)
 
     model_config = ConfigDict(frozen=True, from_attributes=True)
+
+
+class DataTypePrimitiveResponse(BaseModel):
+    """Primitive selection payload for MCP tools."""
+
+    cdt_pri_name: str | None = None
+    xbt_manifest_id: int | None = None
+    code_list_manifest_id: int | None = None
+    agency_id_list_manifest_id: int | None = None
+    is_default: bool
+
+    model_config = ConfigDict(frozen=True, from_attributes=True)
+
+
+_CDT_PRI_NAMES = (
+    "Binary",
+    "Boolean",
+    "Decimal",
+    "Double",
+    "Float",
+    "Integer",
+    "NormalizedString",
+    "String",
+    "TimeDuration",
+    "TimePoint",
+    "Token",
+)
 
 
 class DefaultPrimitiveSelectionInput(BaseModel):
@@ -75,6 +103,51 @@ class DefaultPrimitiveSelectionInput(BaseModel):
             raise ValueError(
                 "Exactly one of xbt_manifest_id, code_list_manifest_id, or agency_id_list_manifest_id must be provided."
             )
+        return self
+
+    model_config = ConfigDict(frozen=True)
+
+
+class PrimitiveMutationInput(BaseModel):
+    """Primitive add/remove payload for DT update tools."""
+
+    cdt_pri_name: str | None = Field(
+        default=None,
+        description=(
+            "CDT primitive name. Required when xbt_manifest_id is provided. When provided, it must "
+            "be one of: Binary, Boolean, Decimal, Double, Float, Integer, NormalizedString, String, "
+            "TimeDuration, TimePoint, Token."
+        ),
+    )
+    xbt_manifest_id: int | None = Field(default=None, gt=0)
+    code_list_manifest_id: int | None = Field(default=None, gt=0)
+    agency_id_list_manifest_id: int | None = Field(default=None, gt=0)
+
+    @field_validator("cdt_pri_name")
+    @classmethod
+    def validate_cdt_pri_name(cls, value: str | None) -> str | None:
+        """Require a supported CDT primitive name when populated."""
+        if value is None:
+            return None
+        if value not in _CDT_PRI_NAMES:
+            allowed = ", ".join(_CDT_PRI_NAMES)
+            raise ValueError(f"cdt_pri_name must be one of: {allowed}.")
+        return value
+
+    @model_validator(mode="after")
+    def validate_exactly_one_selection(self) -> "PrimitiveMutationInput":
+        """Require exactly one primitive target and an XBT primitive name when needed."""
+        provided = [
+            self.xbt_manifest_id,
+            self.code_list_manifest_id,
+            self.agency_id_list_manifest_id,
+        ]
+        if sum(value is not None for value in provided) != 1:
+            raise ValueError(
+                "Exactly one of xbt_manifest_id, code_list_manifest_id, or agency_id_list_manifest_id must be provided."
+            )
+        if self.xbt_manifest_id is not None and self.cdt_pri_name is None:
+            raise ValueError("cdt_pri_name must be provided when xbt_manifest_id is provided.")
         return self
 
     model_config = ConfigDict(frozen=True)
@@ -121,6 +194,7 @@ class DataTypeResponseEntry(BaseModel):
     commonly_used: bool
     is_deprecated: bool
     state: str | None = None
+    primitives: list[DataTypePrimitiveResponse] = Field(default_factory=list)
     supplementary_components: list[DataTypeSupplementaryComponentResponse]
     tags: list[TagSummaryRecord] = Field(default_factory=list)
     namespace: NamespaceSummaryRecord | None = None
@@ -159,6 +233,15 @@ class CreateDataTypeResponse(BaseModel):
 
 class UpdateDataTypeResponse(BaseModel):
     """Response for update_dt tool."""
+
+    dt_manifest_id: int
+    updates: list[str] = Field(default_factory=list)
+
+    model_config = ConfigDict(frozen=True)
+
+
+class TransferDataTypeOwnershipResponse(BaseModel):
+    """Response for transfer_dt_ownership tool."""
 
     dt_manifest_id: int
     updates: list[str] = Field(default_factory=list)

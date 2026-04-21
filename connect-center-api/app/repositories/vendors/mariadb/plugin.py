@@ -237,7 +237,7 @@ class MariadbVendorPlugin:
         Returns:
             Result of the operation.
         """
-        return MariaDbCodeListRepository(session)
+        return MariaDbCodeListRepository(session, self.create_log_repository(session))
 
     def create_agency_id_list_repository(self, session: AsyncSession) -> AgencyIdListRepositoryContract:
         """Create repository instance for create agency id list repository.

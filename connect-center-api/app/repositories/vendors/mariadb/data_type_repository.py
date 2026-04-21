@@ -15,7 +15,7 @@ from datetime import datetime
 import secrets
 from typing import Any, Literal
 
-from sqlalchemy import bindparam, func, select, text
+from sqlalchemy import bindparam, func, select, table, column, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 
@@ -23,6 +23,7 @@ from app.repositories.contracts.data_type import DataTypeRepositoryContract
 from app.repositories.contracts.log import LogRepositoryContract
 from app.repositories.models import (
     DataTypeBaseSummaryRow,
+    DataTypePrimitiveRow,
     DataTypeSupplementaryComponentRow,
     LibrarySummaryRow,
     LogSummaryRow,
@@ -31,6 +32,7 @@ from app.repositories.models import (
 )
 from app.repositories.models.data_type import DataTypeRow
 from app.repositories.models.tag import TagSummaryRow
+from app.repositories.vendors.mariadb.models.app_user import AppUser
 from app.repositories.vendors.mariadb.models.data_type import Dt, DtAwdPri, DtManifest, DtSc, DtScAwdPri, DtScManifest
 from app.repositories.vendors.mariadb.models.business_information_entity import BbieSc
 from app.repositories.vendors.mariadb.models.core_component import Acc, AccManifest, BccManifest, Bccp, BccpManifest
@@ -45,6 +47,8 @@ from app.types.identifiers import (
     DataTypeSupplementaryComponentManifestId,
     ReleaseId,
 )
+
+CDT_PRI = table("cdt_pri", column("cdt_pri_id"), column("name"))
 
 
 class MariaDbDataTypeRepository(DataTypeRepositoryContract):
@@ -125,11 +129,13 @@ class MariaDbDataTypeRepository(DataTypeRepositoryContract):
             return total, []
 
         dt_manifest_ids = [int(row["dt_manifest_id"]) for row in rows]
+        primitives_by_manifest = await _primitives_by_dt_manifest_ids(self._session, dt_manifest_ids)
         sc_by_owner = await _scs_by_owner_manifest_ids(self._session, dt_manifest_ids)
         tags_by_manifest = await _tags_by_manifest_ids(self._session, dt_manifest_ids)
         return total, [
             _to_data_type_row(
                 row,
+                primitives_by_manifest.get(row["dt_manifest_id"], []),
                 sc_by_owner.get(row["dt_manifest_id"], []),
                 tags_by_manifest.get(row["dt_manifest_id"], []),
             )
@@ -154,10 +160,12 @@ class MariaDbDataTypeRepository(DataTypeRepositoryContract):
             return None
 
         dt_manifest_id_int = int(dt_manifest_id)
+        primitives_by_manifest = await _primitives_by_dt_manifest_ids(self._session, [dt_manifest_id_int])
         sc_by_owner = await _scs_by_owner_manifest_ids(self._session, [dt_manifest_id_int])
         tags_by_manifest = await _tags_by_manifest_ids(self._session, [dt_manifest_id_int])
         return _to_data_type_row(
             dict(row._mapping),
+            primitives_by_manifest.get(dt_manifest_id_int, []),
             sc_by_owner.get(dt_manifest_id_int, []),
             tags_by_manifest.get(dt_manifest_id_int, []),
         )
@@ -375,6 +383,59 @@ class MariaDbDataTypeRepository(DataTypeRepositoryContract):
                 for bcc_manifest, owner_acc in bcc_rows:
                     bcc_manifest.den = f"{owner_acc.object_class_term}. {bccp_manifest.den}"
             await self._session.flush()
+        await self._append_dt_log(
+            dt_manifest_id=dt_manifest_id,
+            requester_user_id=requester_user_id,
+            action="Modified",
+            timestamp=now,
+        )
+        await self._session.flush()
+        return True
+
+    async def transfer_dt_ownership(
+        self,
+        *,
+        dt_manifest_id: DataTypeManifestId,
+        requester_user_id: AppUserId,
+        target_user_id: AppUserId,
+    ) -> bool:
+        """Transfer DT ownership, cascade to DT_SC rows, and append a log entry."""
+        dt_manifest = await self._session.get(DtManifest, int(dt_manifest_id))
+        if dt_manifest is None:
+            return False
+        dt = await self._session.get(Dt, int(dt_manifest.dt_id))
+        if dt is None:
+            return False
+
+        target_owner = await self._session.get(AppUser, int(target_user_id))
+        if target_owner is None:
+            raise LookupError(f"No user exists with ID {int(target_user_id)}. Please verify the identifier and try again.")
+        if target_owner.is_enabled is not None and not bool(target_owner.is_enabled):
+            raise ValueError(
+                "Cannot transfer ownership to a disabled user. "
+                "Please choose an enabled user account and try again."
+            )
+
+        now = datetime.utcnow()
+        dt.owner_user_id = int(target_user_id)
+        dt.last_updated_by = int(requester_user_id)
+        dt.last_update_timestamp = now
+        await self._session.execute(
+            text(
+                "UPDATE dt_sc "
+                "SET owner_user_id = :target_user_id, "
+                "last_updated_by = :requester_user_id, "
+                "last_update_timestamp = :timestamp "
+                "WHERE dt_sc_id IN (SELECT dt_sc_id FROM dt_sc_manifest WHERE owner_dt_manifest_id = :dt_manifest_id)"
+            ),
+            {
+                "target_user_id": int(target_user_id),
+                "requester_user_id": int(requester_user_id),
+                "timestamp": now,
+                "dt_manifest_id": int(dt_manifest_id),
+            },
+        )
+        await self._session.flush()
         await self._append_dt_log(
             dt_manifest_id=dt_manifest_id,
             requester_user_id=requester_user_id,
@@ -643,6 +704,55 @@ class MariaDbDataTypeRepository(DataTypeRepositoryContract):
         await self._session.flush()
         return True
 
+    async def update_dt_base(
+        self,
+        *,
+        dt_manifest_id: DataTypeManifestId,
+        based_dt_manifest_id: DataTypeManifestId | None,
+        requester_user_id: AppUserId,
+    ) -> bool:
+        """Update the base DT link and append a log entry."""
+        dt_manifest = await self._session.get(DtManifest, int(dt_manifest_id))
+        if dt_manifest is None:
+            return False
+        dt = await self._session.get(Dt, int(dt_manifest.dt_id))
+        if dt is None:
+            return False
+
+        current_base_manifest_id = int(dt_manifest.based_dt_manifest_id) if dt_manifest.based_dt_manifest_id is not None else None
+        requested_base_manifest_id = int(based_dt_manifest_id) if based_dt_manifest_id is not None else None
+        if current_base_manifest_id == requested_base_manifest_id:
+            return False
+
+        based_dt_id: int | None = None
+        if based_dt_manifest_id is not None:
+            based_dt_manifest = await self._session.get(DtManifest, int(based_dt_manifest_id))
+            if based_dt_manifest is None:
+                raise LookupError(
+                    f"No DT exists with manifest ID {int(based_dt_manifest_id)}. Please verify the identifier and try again."
+                )
+            based_dt = await self._session.get(Dt, int(based_dt_manifest.dt_id))
+            if based_dt is None:
+                raise LookupError(
+                    f"No DT exists with manifest ID {int(based_dt_manifest_id)}. Please verify the identifier and try again."
+                )
+            based_dt_id = int(based_dt.dt_id)
+
+        now = datetime.utcnow()
+        dt.based_dt_id = based_dt_id
+        dt_manifest.based_dt_manifest_id = requested_base_manifest_id
+        dt.last_updated_by = int(requester_user_id)
+        dt.last_update_timestamp = now
+        await self._session.flush()
+        await self._append_dt_log(
+            dt_manifest_id=dt_manifest_id,
+            requester_user_id=requester_user_id,
+            action="Modified",
+            timestamp=now,
+        )
+        await self._session.flush()
+        return True
+
     async def delete_dt_sc(
         self,
         *,
@@ -763,6 +873,71 @@ class MariaDbDataTypeRepository(DataTypeRepositoryContract):
         await self._session.flush()
         return True
 
+    async def replace_dt_primitives(
+        self,
+        *,
+        dt_manifest_id: DataTypeManifestId,
+        primitives: list[DataTypePrimitiveRow],
+        requester_user_id: AppUserId,
+    ) -> bool:
+        """Replace DT primitive rows with the desired manifest set."""
+        dt_manifest = await self._session.get(DtManifest, int(dt_manifest_id))
+        if dt_manifest is None:
+            return False
+        primitive_rows = (
+            await self._session.execute(
+                select(DtAwdPri)
+                .where(
+                    DtAwdPri.release_id == int(dt_manifest.release_id),
+                    DtAwdPri.dt_id == int(dt_manifest.dt_id),
+                )
+                .order_by(DtAwdPri.dt_awd_pri_id.asc())
+            )
+        ).scalars().all()
+
+        desired_by_key = {_primitive_key(primitive): primitive for primitive in primitives}
+        current_by_key = {_primitive_key(row): row for row in primitive_rows}
+        updates_applied = False
+
+        for key, row in current_by_key.items():
+            if key not in desired_by_key:
+                await self._session.delete(row)
+                updates_applied = True
+
+        for key, primitive in desired_by_key.items():
+            current = current_by_key.get(key)
+            if current is None:
+                await self._create_dt_primitive_row(
+                    dt_manifest=dt_manifest,
+                    cdt_pri_name=primitive.cdt_pri_name,
+                    xbt_manifest_id=primitive.xbt_manifest_id,
+                    code_list_manifest_id=primitive.code_list_manifest_id,
+                    agency_id_list_manifest_id=primitive.agency_id_list_manifest_id,
+                    is_default=bool(primitive.is_default),
+                )
+                updates_applied = True
+                continue
+            if bool(current.is_default) != bool(primitive.is_default):
+                current.is_default = bool(primitive.is_default)
+                updates_applied = True
+
+        if not updates_applied:
+            return False
+
+        dt = await self._session.get(Dt, int(dt_manifest.dt_id))
+        now = datetime.utcnow()
+        if dt is not None:
+            dt.last_updated_by = int(requester_user_id)
+            dt.last_update_timestamp = now
+        await self._append_dt_log(
+            dt_manifest_id=dt_manifest_id,
+            requester_user_id=requester_user_id,
+            action="Modified",
+            timestamp=now,
+        )
+        await self._session.flush()
+        return True
+
     async def change_dt_sc_default_primitive(
         self,
         *,
@@ -792,9 +967,13 @@ class MariaDbDataTypeRepository(DataTypeRepositoryContract):
             code_list_manifest_id=code_list_manifest_id,
             agency_id_list_manifest_id=agency_id_list_manifest_id,
         )
-        if target is None and (code_list_manifest_id is not None or agency_id_list_manifest_id is not None):
-            target = await self._create_dt_sc_value_domain_primitive_row(
+        if target is None and (
+            xbt_manifest_id is not None or code_list_manifest_id is not None or agency_id_list_manifest_id is not None
+        ):
+            target = await self._create_dt_sc_primitive_row(
                 dt_sc_manifest=dt_sc_manifest,
+                cdt_pri_name=None,
+                xbt_manifest_id=xbt_manifest_id,
                 code_list_manifest_id=code_list_manifest_id,
                 agency_id_list_manifest_id=agency_id_list_manifest_id,
             )
@@ -808,6 +987,73 @@ class MariaDbDataTypeRepository(DataTypeRepositoryContract):
             if bool(row.is_default) != should_be_default:
                 row.is_default = should_be_default
                 updates_applied = True
+        if not updates_applied:
+            return False
+
+        owner_dt_manifest_id = DataTypeManifestId(int(dt_sc_manifest.owner_dt_manifest_id))
+        owner_dt_manifest = await self._session.get(DtManifest, int(owner_dt_manifest_id))
+        owner_dt = await self._session.get(Dt, int(owner_dt_manifest.dt_id)) if owner_dt_manifest is not None else None
+        now = datetime.utcnow()
+        if owner_dt is not None:
+            owner_dt.last_updated_by = int(requester_user_id)
+            owner_dt.last_update_timestamp = now
+        await self._append_dt_log(
+            dt_manifest_id=owner_dt_manifest_id,
+            requester_user_id=requester_user_id,
+            action="Modified",
+            timestamp=now,
+        )
+        await self._session.flush()
+        return True
+
+    async def replace_dt_sc_primitives(
+        self,
+        *,
+        dt_sc_manifest_id: DataTypeSupplementaryComponentManifestId,
+        primitives: list[DataTypePrimitiveRow],
+        requester_user_id: AppUserId,
+    ) -> bool:
+        """Replace DT_SC primitive rows with the desired manifest set."""
+        dt_sc_manifest = await self._session.get(DtScManifest, int(dt_sc_manifest_id))
+        if dt_sc_manifest is None:
+            return False
+        primitive_rows = (
+            await self._session.execute(
+                select(DtScAwdPri)
+                .where(
+                    DtScAwdPri.release_id == int(dt_sc_manifest.release_id),
+                    DtScAwdPri.dt_sc_id == int(dt_sc_manifest.dt_sc_id),
+                )
+                .order_by(DtScAwdPri.dt_sc_awd_pri_id.asc())
+            )
+        ).scalars().all()
+
+        desired_by_key = {_primitive_key(primitive): primitive for primitive in primitives}
+        current_by_key = {_primitive_key(row): row for row in primitive_rows}
+        updates_applied = False
+
+        for key, row in current_by_key.items():
+            if key not in desired_by_key:
+                await self._session.delete(row)
+                updates_applied = True
+
+        for key, primitive in desired_by_key.items():
+            current = current_by_key.get(key)
+            if current is None:
+                await self._create_dt_sc_primitive_row(
+                    dt_sc_manifest=dt_sc_manifest,
+                    cdt_pri_name=primitive.cdt_pri_name,
+                    xbt_manifest_id=primitive.xbt_manifest_id,
+                    code_list_manifest_id=primitive.code_list_manifest_id,
+                    agency_id_list_manifest_id=primitive.agency_id_list_manifest_id,
+                    is_default=bool(primitive.is_default),
+                )
+                updates_applied = True
+                continue
+            if bool(current.is_default) != bool(primitive.is_default):
+                current.is_default = bool(primitive.is_default)
+                updates_applied = True
+
         if not updates_applied:
             return False
 
@@ -1371,36 +1617,123 @@ class MariaDbDataTypeRepository(DataTypeRepositoryContract):
             target_dt_sc_id=target_dt_sc_id,
         )
 
-    async def _create_dt_sc_value_domain_primitive_row(
+    async def _create_dt_sc_primitive_row(
         self,
         *,
         dt_sc_manifest: DtScManifest,
+        cdt_pri_name: str | None,
+        xbt_manifest_id: int | None,
         code_list_manifest_id: int | None,
         agency_id_list_manifest_id: int | None,
+        is_default: bool = False,
     ) -> DtScAwdPri:
-        """Create a Token-based DT_SC primitive row for a code or agency restriction."""
-        cdt_pri_id = await self._session.scalar(
-            text("SELECT cdt_pri_id FROM cdt_pri WHERE name = :name LIMIT 1"),
-            {"name": "Token"},
+        """Create a DT_SC primitive row for an XBT, code-list, or agency restriction."""
+        cdt_pri_id = await self._resolve_cdt_pri_id_for_primitive(
+            cdt_pri_name=cdt_pri_name,
+            xbt_manifest_id=xbt_manifest_id,
+            code_list_manifest_id=code_list_manifest_id,
+            agency_id_list_manifest_id=agency_id_list_manifest_id,
         )
-        if cdt_pri_id is None:
-            raise ValueError("Could not find the 'Token' CDT primitive.")
 
         row = DtScAwdPri(
             release_id=int(dt_sc_manifest.release_id),
             dt_sc_id=int(dt_sc_manifest.dt_sc_id),
             cdt_pri_id=int(cdt_pri_id),
-            xbt_manifest_id=None,
+            xbt_manifest_id=None if xbt_manifest_id is None else int(xbt_manifest_id),
             code_list_manifest_id=None if code_list_manifest_id is None else int(code_list_manifest_id),
             agency_id_list_manifest_id=(
                 None if agency_id_list_manifest_id is None else int(agency_id_list_manifest_id)
             ),
-            is_default=False,
+            is_default=bool(is_default),
         )
         self._session.add(row)
         await self._session.flush()
         await self._session.refresh(row)
         return row
+
+    async def _create_dt_primitive_row(
+        self,
+        *,
+        dt_manifest: DtManifest,
+        cdt_pri_name: str | None,
+        xbt_manifest_id: int | None,
+        code_list_manifest_id: int | None,
+        agency_id_list_manifest_id: int | None,
+        is_default: bool = False,
+    ) -> DtAwdPri:
+        """Create a DT primitive row for an XBT, code-list, or agency restriction."""
+        cdt_pri_id = await self._resolve_cdt_pri_id_for_primitive(
+            cdt_pri_name=cdt_pri_name,
+            xbt_manifest_id=xbt_manifest_id,
+            code_list_manifest_id=code_list_manifest_id,
+            agency_id_list_manifest_id=agency_id_list_manifest_id,
+        )
+
+        row = DtAwdPri(
+            release_id=int(dt_manifest.release_id),
+            dt_id=int(dt_manifest.dt_id),
+            cdt_pri_id=int(cdt_pri_id),
+            xbt_manifest_id=None if xbt_manifest_id is None else int(xbt_manifest_id),
+            code_list_manifest_id=None if code_list_manifest_id is None else int(code_list_manifest_id),
+            agency_id_list_manifest_id=None if agency_id_list_manifest_id is None else int(agency_id_list_manifest_id),
+            is_default=bool(is_default),
+        )
+        self._session.add(row)
+        await self._session.flush()
+        await self._session.refresh(row)
+        return row
+
+    async def _resolve_cdt_pri_id_for_primitive(
+        self,
+        *,
+        cdt_pri_name: str | None,
+        xbt_manifest_id: int | None,
+        code_list_manifest_id: int | None,
+        agency_id_list_manifest_id: int | None,
+    ) -> int:
+        """Resolve the CDT primitive ID for a new primitive row."""
+        if cdt_pri_name is not None:
+            cdt_pri_id = await self._session.scalar(
+                text("SELECT cdt_pri_id FROM cdt_pri WHERE name = :name LIMIT 1"),
+                {"name": cdt_pri_name},
+            )
+            if cdt_pri_id is None:
+                raise ValueError(f"Could not find the '{cdt_pri_name}' CDT primitive.")
+            return int(cdt_pri_id)
+        if code_list_manifest_id is not None or agency_id_list_manifest_id is not None:
+            cdt_pri_id = await self._session.scalar(
+                text("SELECT cdt_pri_id FROM cdt_pri WHERE name = :name LIMIT 1"),
+                {"name": "Token"},
+            )
+            if cdt_pri_id is None:
+                raise ValueError("Could not find the 'Token' CDT primitive.")
+            return int(cdt_pri_id)
+        if xbt_manifest_id is None:
+            raise ValueError("One primitive manifest identifier is required.")
+
+        cdt_pri_id = await self._session.scalar(
+            text(
+                """
+                SELECT cdt_pri_id
+                FROM (
+                    SELECT p.cdt_pri_id AS cdt_pri_id
+                    FROM dt_awd_pri p
+                    WHERE p.xbt_manifest_id = :xbt_manifest_id
+                    UNION ALL
+                    SELECT p.cdt_pri_id AS cdt_pri_id
+                    FROM dt_sc_awd_pri p
+                    WHERE p.xbt_manifest_id = :xbt_manifest_id
+                ) candidates
+                LIMIT 1
+                """
+            ),
+            {"xbt_manifest_id": int(xbt_manifest_id)},
+        )
+        if cdt_pri_id is None:
+            raise ValueError(
+                f"Could not infer the CDT primitive for xbt_manifest_id {int(xbt_manifest_id)}."
+            )
+        return int(cdt_pri_id)
 
     async def _next_default_property_term(self, *, release_id: ReleaseId) -> str:
         """Return the next available `Property Term N` label for a release."""
@@ -1761,6 +2094,8 @@ async def _scs_by_owner_manifest_ids(
     if not dt_manifest_ids:
         return {}
 
+    primitives_by_sc_manifest = await _primitives_by_dt_sc_manifest_ids(session, dt_manifest_ids)
+
     sc_rows = [
         dict(row._mapping)
         for row in (
@@ -1808,9 +2143,100 @@ async def _scs_by_owner_manifest_ids(
                 default_value=str(sc_row["default_value"]) if sc_row.get("default_value") is not None else None,
                 fixed_value=str(sc_row["fixed_value"]) if sc_row.get("fixed_value") is not None else None,
                 is_deprecated=bool(sc_row["is_deprecated"]),
+                primitives=primitives_by_sc_manifest.get(int(sc_row["dt_sc_manifest_id"]), []),
             )
         )
     return sc_by_owner
+
+
+async def _primitives_by_dt_manifest_ids(
+    session: AsyncSession,
+    dt_manifest_ids: list[int],
+) -> dict[int, list[DataTypePrimitiveRow]]:
+    if not dt_manifest_ids:
+        return {}
+
+    rows = (
+        await session.execute(
+            select(
+                DtManifest.dt_manifest_id,
+                CDT_PRI.c.name.label("cdt_pri_name"),
+                DtAwdPri.xbt_manifest_id,
+                DtAwdPri.code_list_manifest_id,
+                DtAwdPri.agency_id_list_manifest_id,
+                DtAwdPri.is_default,
+            )
+            .select_from(DtManifest)
+            .join(DtAwdPri, (DtAwdPri.release_id == DtManifest.release_id) & (DtAwdPri.dt_id == DtManifest.dt_id))
+            .join(CDT_PRI, CDT_PRI.c.cdt_pri_id == DtAwdPri.cdt_pri_id)
+            .where(DtManifest.dt_manifest_id.in_(dt_manifest_ids))
+            .order_by(DtManifest.dt_manifest_id.asc(), DtAwdPri.dt_awd_pri_id.asc())
+        )
+    ).all()
+
+    primitives_by_manifest: dict[int, list[DataTypePrimitiveRow]] = defaultdict(list)
+    for row in rows:
+        primitives_by_manifest[int(row.dt_manifest_id)].append(
+            DataTypePrimitiveRow(
+                cdt_pri_name=(
+                    str(row.cdt_pri_name)
+                    if row.cdt_pri_name is not None and row.xbt_manifest_id is not None
+                    else None
+                ),
+                xbt_manifest_id=int(row.xbt_manifest_id) if row.xbt_manifest_id is not None else None,
+                code_list_manifest_id=int(row.code_list_manifest_id) if row.code_list_manifest_id is not None else None,
+                agency_id_list_manifest_id=(
+                    int(row.agency_id_list_manifest_id) if row.agency_id_list_manifest_id is not None else None
+                ),
+                is_default=bool(row.is_default),
+            )
+        )
+    return primitives_by_manifest
+
+
+async def _primitives_by_dt_sc_manifest_ids(
+    session: AsyncSession,
+    dt_manifest_ids: list[int],
+) -> dict[int, list[DataTypePrimitiveRow]]:
+    if not dt_manifest_ids:
+        return {}
+
+    rows = (
+        await session.execute(
+            select(
+                DtScManifest.dt_sc_manifest_id,
+                CDT_PRI.c.name.label("cdt_pri_name"),
+                DtScAwdPri.xbt_manifest_id,
+                DtScAwdPri.code_list_manifest_id,
+                DtScAwdPri.agency_id_list_manifest_id,
+                DtScAwdPri.is_default,
+            )
+            .select_from(DtScManifest)
+            .join(DtScAwdPri, (DtScAwdPri.release_id == DtScManifest.release_id) & (DtScAwdPri.dt_sc_id == DtScManifest.dt_sc_id))
+            .join(CDT_PRI, CDT_PRI.c.cdt_pri_id == DtScAwdPri.cdt_pri_id)
+            .where(DtScManifest.owner_dt_manifest_id.in_(dt_manifest_ids))
+            .order_by(DtScManifest.dt_sc_manifest_id.asc(), DtScAwdPri.dt_sc_awd_pri_id.asc())
+        )
+    ).all()
+
+    primitives_by_manifest: dict[int, list[DataTypePrimitiveRow]] = defaultdict(list)
+    for row in rows:
+        primitives_by_manifest[int(row.dt_sc_manifest_id)].append(
+            DataTypePrimitiveRow(
+                cdt_pri_name=(
+                    str(row.cdt_pri_name)
+                    if row.cdt_pri_name is not None and row.xbt_manifest_id is not None
+                    else None
+                ),
+                xbt_manifest_id=int(row.xbt_manifest_id) if row.xbt_manifest_id is not None else None,
+                code_list_manifest_id=int(row.code_list_manifest_id) if row.code_list_manifest_id is not None else None,
+                agency_id_list_manifest_id=(
+                    int(row.agency_id_list_manifest_id) if row.agency_id_list_manifest_id is not None else None
+                ),
+                is_default=bool(row.is_default),
+            )
+        )
+    return primitives_by_manifest
 
 
 async def _tags_by_manifest_ids(
@@ -1844,6 +2270,7 @@ async def _tags_by_manifest_ids(
 
 def _to_data_type_row(
     row: dict[str, Any],
+    primitives: list[DataTypePrimitiveRow],
     scs: list[DataTypeSupplementaryComponentRow],
     tags: list[TagSummaryRow],
 ) -> DataTypeRow:
@@ -1896,6 +2323,7 @@ def _to_data_type_row(
         commonly_used=bool(row["commonly_used"]),
         is_deprecated=bool(row["is_deprecated"]),
         state=str(row["state"]) if row.get("state") is not None else None,
+        primitives=primitives,
         supplementary_components=scs,
         tags=tags,
         namespace=_namespace_summary(row),
@@ -1933,6 +2361,15 @@ def _build_dt_den(*, qualifier: str | None, data_type_term: str | None) -> str:
     if normalized_qualifier:
         return f"{normalized_qualifier}_ {normalized_data_type_term}. Type"
     return f"{normalized_data_type_term}. Type"
+
+
+def _primitive_key(row: DataTypePrimitiveRow | DtAwdPri | DtScAwdPri) -> tuple[int | None, int | None, int | None]:
+    """Build a stable primitive identity key."""
+    return (
+        int(row.xbt_manifest_id) if row.xbt_manifest_id is not None else None,
+        int(row.code_list_manifest_id) if row.code_list_manifest_id is not None else None,
+        int(row.agency_id_list_manifest_id) if row.agency_id_list_manifest_id is not None else None,
+    )
 
 
 def _library_summary(row: dict[str, Any], prefix: str = "") -> LibrarySummaryRow:

@@ -384,6 +384,22 @@ class MoveBccServiceResult:
 
 
 @dataclass(kw_only=True)
+class UpdateAsccServiceResult:
+    """ASCC update response model."""
+
+    ascc_manifest_id: int
+    updates: list[str] = field(default_factory=list)
+
+
+@dataclass(kw_only=True)
+class UpdateBccServiceResult:
+    """BCC update response model."""
+
+    bcc_manifest_id: int
+    updates: list[str] = field(default_factory=list)
+
+
+@dataclass(kw_only=True)
 class UpdateAccServiceResult:
     """ACC update/state-update response model."""
 
@@ -402,6 +418,30 @@ class UpdateAsccpServiceResult:
 @dataclass(kw_only=True)
 class UpdateBccpServiceResult:
     """BCCP update response model."""
+
+    bccp_manifest_id: int
+    updates: list[str] = field(default_factory=list)
+
+
+@dataclass(kw_only=True)
+class TransferAccOwnershipServiceResult:
+    """ACC ownership-transfer response model."""
+
+    acc_manifest_id: int
+    updates: list[str] = field(default_factory=list)
+
+
+@dataclass(kw_only=True)
+class TransferAsccpOwnershipServiceResult:
+    """ASCCP ownership-transfer response model."""
+
+    asccp_manifest_id: int
+    updates: list[str] = field(default_factory=list)
+
+
+@dataclass(kw_only=True)
+class TransferBccpOwnershipServiceResult:
+    """BCCP ownership-transfer response model."""
 
     bccp_manifest_id: int
     updates: list[str] = field(default_factory=list)

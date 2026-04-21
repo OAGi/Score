@@ -158,6 +158,13 @@ class MariaDbReleaseRepository(ReleaseRepositoryContract):
 
         return [x for x in all_dependent_releases]
 
+    async def get_release_dependency_ids(self, release_id: ReleaseId) -> list[ReleaseId]:
+        """Get direct release dependency IDs from `release_dep`."""
+        res = await self._session.execute(
+            select(ReleaseDep.depend_on_release_id).where(ReleaseDep.release_id == int(release_id))
+        )
+        return [ReleaseId(int(dep_release_id)) for dep_release_id in res.scalars().all()]
+
 
 def _as_dt(value: object) -> datetime:
     """Internal helper for as dt.

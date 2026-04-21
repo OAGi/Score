@@ -145,10 +145,8 @@ export class ReleaseResponse {
 
 export const WorkingRelease = {
   releaseNum: 'Working',
-  // @TODO: this must be retrieved from server.
-  releaseId: 2,
   state: '',
-  working: true
+  workingRelease: true
 };
 
 export class AssignableMap {

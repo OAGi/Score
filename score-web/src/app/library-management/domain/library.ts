@@ -19,6 +19,8 @@ export class LibraryDetails {
   link: string;
   domain: string;
   description: string;
+  namespaceUri: string;
+  namespacePrefix: string;
   state: string;
   readOnly: boolean;
   isDefault: boolean;

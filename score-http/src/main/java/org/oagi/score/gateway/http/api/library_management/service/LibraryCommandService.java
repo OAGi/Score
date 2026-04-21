@@ -9,6 +9,7 @@ import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
 import org.oagi.score.gateway.http.api.library_management.model.LibrarySummaryRecord;
 import org.oagi.score.gateway.http.api.library_management.repository.LibraryCommandRepository;
 import org.oagi.score.gateway.http.api.library_management.repository.LibraryQueryRepository;
+import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseDependencySummaryRecord;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseDetailsRecord;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
@@ -32,10 +33,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.oagi.score.gateway.http.common.model.ScoreRole.ADMINISTRATOR;
+import static org.oagi.score.gateway.http.common.util.StringUtils.hasLength;
 
 @Service
 @Transactional
 public class LibraryCommandService {
+
+    private static final String DEFAULT_LIBRARY_DEPENDENCY_NAME = "CCTS Data Type Catalogue v3";
+    private static final String DEFAULT_LIBRARY_DEPENDENCY_RELEASE_NUM = "3.1";
 
     @Autowired
     private RepositoryFactory repositoryFactory;
@@ -64,13 +69,32 @@ public class LibraryCommandService {
         if (query(requester).hasDuplicateName(request.name())) {
             throw new IllegalArgumentException("The library name '" + request.name() + "' already exists.");
         }
+        if (!hasLength(request.namespaceUri())) {
+            throw new IllegalArgumentException("'namespaceUri' is required.");
+        }
 
         LibraryId libraryId = command(requester).create(
                 request.type(), request.name(), request.organization(), request.description(),
                 request.link(), request.domain(), null);
 
-        ReleaseId workingReleaseId = releaseCommand(requester).create(libraryId);
+        NamespaceId namespaceId = repositoryFactory.namespaceCommandRepository(requester).create(
+                libraryId,
+                request.namespaceUri(),
+                request.namespacePrefix(),
+                null,
+                true);
+
+        ReleaseId workingReleaseId = releaseCommand(requester).create(
+                libraryId,
+                namespaceId,
+                "Working",
+                null,
+                null);
         repositoryFactory.ccCommandRepository(requester).createXbtManifestRecords(workingReleaseId);
+        ReleaseId defaultDependencyReleaseId = getDefaultLibraryDependencyReleaseId(requester);
+        if (defaultDependencyReleaseId != null) {
+            releaseCommand(requester).createDeps(workingReleaseId, List.of(defaultDependencyReleaseId));
+        }
 
         return libraryId;
     }
@@ -372,6 +396,19 @@ public class LibraryCommandService {
                 + "Remapped references: " + remappedCount + "\n"
                 + "Unresolved references: " + remainingCount + "\n"
                 + formatReferenceBreakdown(remainingReferenceCounts, remainingReferenceDetails);
+    }
+
+    private ReleaseId getDefaultLibraryDependencyReleaseId(ScoreUser requester) {
+        LibrarySummaryRecord cctsLibrary = query(requester).getLibrarySummaryByName(DEFAULT_LIBRARY_DEPENDENCY_NAME);
+        if (cctsLibrary == null) {
+            return null;
+        }
+        ReleaseSummaryRecord cctsRelease = releaseQuery(requester)
+                .getReleaseSummary(cctsLibrary.libraryId(), DEFAULT_LIBRARY_DEPENDENCY_RELEASE_NUM);
+        if (cctsRelease == null) {
+            return null;
+        }
+        return cctsRelease.releaseId();
     }
 
     private String dependencyLabel(ReleaseSummaryRecord dependency, Map<LibraryId, String> libraryNameMap) {

@@ -17,6 +17,7 @@ from app.repositories.models.business_information_entity import (
     TopLevelAsbiepInfoRow,
     TopLevelAsbiepListRow,
 )
+from app.repositories.models.release import ReleaseSummaryRow
 from app.types.identifiers import (
     AccManifestId,
     AgencyIdListManifestId,
@@ -170,6 +171,21 @@ class BusinessInformationEntityRepositoryContract(Protocol):
         """
         pass
 
+    async def get_release_summary_by_asccp_manifest_id(
+        self,
+        *,
+        asccp_manifest_id: AsccpManifestId,
+    ) -> ReleaseSummaryRow | None:
+        """Resolve the release summary for an ASCCP manifest.
+
+        Args:
+            asccp_manifest_id: ASCCP manifest identifier.
+
+        Returns:
+            Release summary for the manifest, if found.
+        """
+        pass
+
     async def update_top_level_asbiep(
         self,
         top_level_asbiep_id: int,
@@ -266,13 +282,13 @@ class BusinessInformationEntityRepositoryContract(Protocol):
         pass
 
     async def list_assigned_code_list_manifest_ids(self, *, top_level_asbiep_id: int) -> list[int]:
-        """List code-list manifest identifiers assigned anywhere under the target top-level ASBIEP.
+        """List code list manifest identifiers assigned anywhere under the target top-level ASBIEP.
 
         Args:
             top_level_asbiep_id: Top-level ASBIEP identifier being inspected.
 
         Returns:
-            Distinct code-list manifest identifiers assigned by BBIE or BBIE_SC
+            Distinct code list manifest identifiers assigned by BBIE or BBIE_SC
             rows owned by the target top-level ASBIEP.
         """
         pass

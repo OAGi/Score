@@ -38,3 +38,29 @@ class GetNamespacePaginationResponse(BaseModel):
     items: list[NamespaceResponseEntry]
 
     model_config = ConfigDict(frozen=True)
+
+
+class CreateNamespaceResponse(BaseModel):
+    """Response for create_namespace tool."""
+
+    namespace_id: int
+
+    model_config = ConfigDict(frozen=True)
+
+
+class UpdateNamespaceResponse(BaseModel):
+    """Response for update_namespace tool."""
+
+    namespace_id: int
+    updates: list[str]
+
+    model_config = ConfigDict(frozen=True)
+
+
+class TransferNamespaceOwnershipResponse(BaseModel):
+    """Response for transfer_namespace_ownership tool."""
+
+    namespace_id: int
+    updates: list[str]
+
+    model_config = ConfigDict(frozen=True)

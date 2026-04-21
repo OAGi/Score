@@ -39,3 +39,29 @@ class GetLibraryPaginationResponse(BaseModel):
     items: list[LibraryResponseEntry]
 
     model_config = ConfigDict(frozen=True)
+
+
+class CreateLibraryResponse(BaseModel):
+    """Response for create_library tool."""
+
+    library_id: int
+
+    model_config = ConfigDict(frozen=True)
+
+
+class UpdateLibraryResponse(BaseModel):
+    """Response for update_library tool."""
+
+    library_id: int
+    updates: list[str]
+
+    model_config = ConfigDict(frozen=True)
+
+
+class UpdateLibraryReleaseDependenciesResponse(BaseModel):
+    """Response for update_library_release_dependencies tool."""
+
+    library_id: int
+    release_ids: list[int]
+
+    model_config = ConfigDict(frozen=True)

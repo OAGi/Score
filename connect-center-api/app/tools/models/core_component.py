@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.tools.models.shared import LibrarySummaryRecord
 from app.tools.models.shared import LogSummaryRecord
@@ -212,6 +212,32 @@ class BccRelationshipResponse(BaseModel):
     model_config = ConfigDict(frozen=True, from_attributes=True)
 
 
+BccEntityTypeUpdate = Literal["Element", "Attribute", 1, 0]
+
+
+class BccValueConstraintInput(BaseModel):
+    """Mutually exclusive value-constraint input for BCC updates."""
+
+    default_value: str | None = Field(
+        default=None,
+        description="Default value to apply when the element is omitted.",
+    )
+    fixed_value: str | None = Field(
+        default=None,
+        description="Fixed value to require for the element.",
+    )
+
+    @model_validator(mode="after")
+    def validate_exactly_one_selection(self) -> "BccValueConstraintInput":
+        """Require exactly one value-constraint option."""
+        provided = [self.default_value, self.fixed_value]
+        if sum(value is not None for value in provided) != 1:
+            raise ValueError("Exactly one of default_value or fixed_value must be provided.")
+        return self
+
+    model_config = ConfigDict(frozen=True)
+
+
 class GetCoreComponentPaginationResponse(BaseModel):
     """Response for get_core_components tool."""
 
@@ -290,6 +316,24 @@ class UpdateAccResponse(BaseModel):
     model_config = ConfigDict(frozen=True)
 
 
+class UpdateAsccResponse(BaseModel):
+    """Response for update_ascc tool."""
+
+    ascc_manifest_id: int
+    updates: list[str]
+
+    model_config = ConfigDict(frozen=True)
+
+
+class UpdateBccResponse(BaseModel):
+    """Response for update_bcc tool."""
+
+    bcc_manifest_id: int
+    updates: list[str]
+
+    model_config = ConfigDict(frozen=True)
+
+
 class UpdateAsccpResponse(BaseModel):
     """Response for update_asccp tool."""
 
@@ -308,10 +352,28 @@ class UpdateBccpResponse(BaseModel):
     model_config = ConfigDict(frozen=True)
 
 
-class UpdateAccBaseResponse(BaseModel):
-    """Response for base-ACC update tools."""
+class TransferAccOwnershipResponse(BaseModel):
+    """Response for transfer_acc_ownership tool."""
 
     acc_manifest_id: int
+    updates: list[str]
+
+    model_config = ConfigDict(frozen=True)
+
+
+class TransferAsccpOwnershipResponse(BaseModel):
+    """Response for transfer_asccp_ownership tool."""
+
+    asccp_manifest_id: int
+    updates: list[str]
+
+    model_config = ConfigDict(frozen=True)
+
+
+class TransferBccpOwnershipResponse(BaseModel):
+    """Response for transfer_bccp_ownership tool."""
+
+    bccp_manifest_id: int
     updates: list[str]
 
     model_config = ConfigDict(frozen=True)

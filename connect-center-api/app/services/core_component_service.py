@@ -24,6 +24,7 @@ from __future__ import annotations
 import logging
 from dataclasses import replace
 from dataclasses import dataclass
+from typing import Literal
 
 from app.repositories.contracts.app_user import AppUserRepositoryContract
 from app.repositories.contracts.core_component import CoreComponentRepositoryContract
@@ -57,9 +58,14 @@ from app.services.models.core_component import (
     ReviseAccServiceResult,
     ReviseAsccpServiceResult,
     ReviseBccpServiceResult,
+    TransferAccOwnershipServiceResult,
+    TransferAsccpOwnershipServiceResult,
+    TransferBccpOwnershipServiceResult,
+    UpdateAsccServiceResult,
     UpdateAccServiceResult,
     UpdateAccBaseServiceResult,
     UpdateAccTagsServiceResult,
+    UpdateBccServiceResult,
     UpdateAsccpServiceResult,
     UpdateBccpServiceResult,
     ValueConstraintServiceRecord,
@@ -71,6 +77,7 @@ from app.services.models.namespace import NamespaceSummaryServiceRecord
 from app.services.models.release import ReleaseSummaryServiceRecord
 from app.services.models.release import ReleaseServiceResult
 from app.services.models.tag import TagSummaryServiceRecord
+from app.services.data_type_service import DataTypeService
 from app.services.release_service import ReleaseService
 from app.services.utils.date import DateRange
 from app.services.utils.pagination import PaginationParams, PaginationResponse
@@ -140,6 +147,7 @@ class CoreComponentService:
         self,
         core_component_repository: CoreComponentRepositoryContract,
         release_service: ReleaseService,
+        data_type_service: DataTypeService,
         account_service_repo: AppUserRepositoryContract,
         requester: AuthenticatedUser,
     ):
@@ -153,6 +161,7 @@ class CoreComponentService:
         """
         self._repo = core_component_repository
         self._release_service = release_service
+        self._data_type_service = data_type_service
         self._account_service_repo = account_service_repo
         self._requester = requester
 
@@ -190,6 +199,22 @@ class CoreComponentService:
 
         normalized_definition = initial_definition.strip() if isinstance(initial_definition, str) else None
         normalized_tag_ids = self._normalize_tag_ids(tag_id)
+
+        if based_acc_manifest_id is not None:
+            based_acc = await self.get_acc(based_acc_manifest_id)
+            if based_acc is None:
+                raise LookupError(
+                    f"No ACC exists with manifest ID {int(based_acc_manifest_id)}. Please verify the identifier and try again."
+                )
+            await self._assert_reference_release_allowed(
+                target_release_id=effective_release_id,
+                target_library_id=release.library.library_id,
+                referenced_release_id=based_acc.release.release_id,
+                referenced_library_id=based_acc.library.library_id,
+                referenced_label="The base ACC",
+                target_label="the target release",
+                selection_phrase="a base ACC",
+            )
 
         acc_manifest_id = await self._repo.create_acc(
             release_id=effective_release_id,
@@ -230,6 +255,15 @@ class CoreComponentService:
             raise LookupError(
                 f"No ACC exists with manifest ID {int(role_of_acc_manifest_id)}. Please verify the identifier and try again."
             )
+        await self._assert_reference_release_allowed(
+            target_release_id=release_id,
+            target_library_id=release.library.library_id,
+            referenced_release_id=role_of_acc.release.release_id,
+            referenced_library_id=role_of_acc.library.library_id,
+            referenced_label="The role ACC",
+            target_label="the target release",
+            selection_phrase="a role ACC",
+        )
         if role_of_acc.is_abstract:
             raise ValueError("An abstract ACC cannot be used to create a new ASCCP.")
 
@@ -272,6 +306,21 @@ class CoreComponentService:
         self._assert_release_is_published(release)
         self._assert_can_create_core_components(release_num=release.release_num)
 
+        bdt = await self._data_type_service.get(bdt_manifest_id)
+        if bdt is None:
+            raise LookupError(
+                f"No data type exists with manifest ID {int(bdt_manifest_id)}. Please verify the identifier and try again."
+            )
+        await self._assert_reference_release_allowed(
+            target_release_id=release_id,
+            target_library_id=release.library.library_id,
+            referenced_release_id=bdt.release.release_id,
+            referenced_library_id=bdt.library.library_id,
+            referenced_label="The target BDT",
+            target_label="the target release",
+            selection_phrase="a BDT",
+        )
+
         property_term = (initial_property_term or "").strip() or "Property Term"
         normalized_tag_ids = self._normalize_tag_ids(tag_id)
         bccp_manifest_id = await self._repo.create_bccp(
@@ -288,6 +337,40 @@ class CoreComponentService:
             )
         return CreateBccpServiceResult(bccp_manifest_id=int(bccp_manifest_id))
 
+    async def _assert_reference_release_allowed(
+        self,
+        *,
+        target_release_id: ReleaseId | int,
+        target_library_id: int,
+        referenced_release_id: ReleaseId | int,
+        referenced_library_id: int,
+        referenced_label: str,
+        target_label: str,
+        selection_phrase: str,
+    ) -> None:
+        normalized_target_release_id = int(target_release_id)
+        normalized_referenced_release_id = int(referenced_release_id)
+
+        if int(referenced_library_id) == int(target_library_id):
+            if normalized_referenced_release_id != normalized_target_release_id:
+                raise ValueError(
+                    f"{referenced_label} must belong to the same release as {target_label} when both components are in the same library. "
+                    f"Please choose {selection_phrase} from the target release and try again."
+                )
+            return
+
+        direct_dependency_release_ids = {
+            int(dependent_release_id)
+            for dependent_release_id in await self._release_service.get_release_dependency_ids(
+                ReleaseId(normalized_target_release_id)
+            )
+        }
+        if normalized_referenced_release_id not in direct_dependency_release_ids:
+            raise ValueError(
+                f"{referenced_label} must come from a release dependency of {target_label} when the components are in different libraries. "
+                f"Please choose {selection_phrase} from one of the target release dependencies and try again."
+            )
+
     async def update_acc(
         self,
         *,
@@ -298,6 +381,7 @@ class CoreComponentService:
         definition_source: str | None | UnsetType = UNSET,
         is_abstract: bool | UnsetType = UNSET,
         deprecated: bool | UnsetType = UNSET,
+        based_acc_manifest_id: AccManifestId | None | UnsetType = UNSET,
         namespace_id: NamespaceId | None | UnsetType = UNSET,
     ) -> UpdateAccServiceResult:
         """Update mutable ACC fields when the requester owns a WIP ACC."""
@@ -307,7 +391,7 @@ class CoreComponentService:
             raise LookupError(
                 f"No ACC exists with manifest ID {int(acc_manifest_id)}. Please verify the identifier and try again."
             )
-        self._assert_can_update_acc(acc)
+        self._assert_can_update_wip_core_component(acc, label="ACC")
 
         normalized_object_class_term = object_class_term
         if object_class_term is not UNSET:
@@ -367,35 +451,45 @@ class CoreComponentService:
             None if namespace_id is None else int(namespace_id)
         ) != current_namespace_id:
             updates.append("namespace_id")
+        base_changed = based_acc_manifest_id is not UNSET and based_acc_manifest_id != self._acc_base_manifest_id(acc)
+        if base_changed:
+            updates.append("based_acc_manifest_id")
 
         if not updates:
             logger.info("update acc id=%d → no changes", int(acc_manifest_id))
             return UpdateAccServiceResult(acc_manifest_id=int(acc_manifest_id), updates=[])
 
-        await self._repo.update_acc(
-            acc_manifest_id=acc_manifest_id,
-            object_class_term=None if normalized_object_class_term is UNSET else normalized_object_class_term,
-            object_class_term_set=normalized_object_class_term is not UNSET,
-            oagis_component_type=None
-            if component_type is UNSET
-            else OAGIS_COMPONENT_TYPE_VALUES[component_type],
-            oagis_component_type_set=component_type is not UNSET,
-            acc_type=None if component_type is UNSET else self._derive_acc_type(component_type),
-            acc_type_set=component_type is not UNSET,
-            definition=None if normalized_definition is UNSET else normalized_definition,
-            definition_set=normalized_definition is not UNSET,
-            definition_source=None
-            if normalized_definition_source is UNSET
-            else normalized_definition_source,
-            definition_source_set=normalized_definition_source is not UNSET,
-            is_abstract=None if is_abstract is UNSET else bool(is_abstract),
-            is_abstract_set=is_abstract is not UNSET,
-            deprecated=None if deprecated is UNSET else bool(deprecated),
-            deprecated_set=deprecated is not UNSET,
-            namespace_id=None if namespace_id in {UNSET, None} else namespace_id,
-            namespace_id_set=namespace_id is not UNSET,
-            requester_user_id=self._requester.user.user_id,
-        )
+        scalar_updates = [update for update in updates if update != "based_acc_manifest_id"]
+        if scalar_updates:
+            await self._repo.update_acc(
+                acc_manifest_id=acc_manifest_id,
+                object_class_term=None if normalized_object_class_term is UNSET else normalized_object_class_term,
+                object_class_term_set=normalized_object_class_term is not UNSET,
+                oagis_component_type=None
+                if component_type is UNSET
+                else OAGIS_COMPONENT_TYPE_VALUES[component_type],
+                oagis_component_type_set=component_type is not UNSET,
+                acc_type=None if component_type is UNSET else self._derive_acc_type(component_type),
+                acc_type_set=component_type is not UNSET,
+                definition=None if normalized_definition is UNSET else normalized_definition,
+                definition_set=normalized_definition is not UNSET,
+                definition_source=None
+                if normalized_definition_source is UNSET
+                else normalized_definition_source,
+                definition_source_set=normalized_definition_source is not UNSET,
+                is_abstract=None if is_abstract is UNSET else bool(is_abstract),
+                is_abstract_set=is_abstract is not UNSET,
+                deprecated=None if deprecated is UNSET else bool(deprecated),
+                deprecated_set=deprecated is not UNSET,
+                namespace_id=None if namespace_id in {UNSET, None} else namespace_id,
+                namespace_id_set=namespace_id is not UNSET,
+                requester_user_id=self._requester.user.user_id,
+            )
+        if base_changed:
+            await self.update_acc_base(
+                acc_manifest_id=acc_manifest_id,
+                based_acc_manifest_id=based_acc_manifest_id,
+            )
         logger.info("update acc id=%d → %s", int(acc_manifest_id), sorted(updates))
         return UpdateAccServiceResult(acc_manifest_id=int(acc_manifest_id), updates=sorted(updates))
 
@@ -418,7 +512,7 @@ class CoreComponentService:
             raise LookupError(
                 f"No ASCCP exists with manifest ID {int(asccp_manifest_id)}. Please verify the identifier and try again."
             )
-        self._assert_can_update_component(asccp, label="ASCCP")
+        self._assert_can_update_wip_core_component(asccp, label="ASCCP")
 
         normalized_property_term = property_term
         if property_term is not UNSET:
@@ -498,7 +592,7 @@ class CoreComponentService:
             raise LookupError(
                 f"No BCCP exists with manifest ID {int(bccp_manifest_id)}. Please verify the identifier and try again."
             )
-        self._assert_can_update_component(bccp, label="BCCP")
+        self._assert_can_update_wip_core_component(bccp, label="BCCP")
 
         normalized_property_term = property_term
         if property_term is not UNSET:
@@ -572,6 +666,325 @@ class CoreComponentService:
         )
         return UpdateBccpServiceResult(bccp_manifest_id=int(bccp_manifest_id), updates=sorted(updates))
 
+    async def transfer_acc_ownership(
+        self,
+        *,
+        acc_manifest_id: AccManifestId,
+        target_user_id: int,
+    ) -> TransferAccOwnershipServiceResult:
+        """Transfer ACC ownership to another user while the ACC is in `WIP`."""
+        logger.info("transfer acc ownership id=%d → user_id=%d", int(acc_manifest_id), int(target_user_id))
+        acc = await self.get_acc(acc_manifest_id)
+        if acc is None:
+            raise LookupError(
+                f"No ACC exists with manifest ID {int(acc_manifest_id)}. Please verify the identifier and try again."
+            )
+        self._assert_can_transfer_wip_component(acc, label="ACC")
+        if int(target_user_id) == int(acc.owner.user_id):
+            logger.info("transfer acc ownership id=%d → no-op (same owner)", int(acc_manifest_id))
+            return TransferAccOwnershipServiceResult(acc_manifest_id=int(acc_manifest_id), updates=[])
+        transferred = await self._repo.transfer_acc_ownership(
+            acc_manifest_id=acc_manifest_id,
+            requester_user_id=self._requester_user_id,
+            target_user_id=int(target_user_id),
+        )
+        if not transferred:
+            raise LookupError(
+                f"No ACC exists with manifest ID {int(acc_manifest_id)}. Please verify the identifier and try again."
+            )
+        logger.info("transfer acc ownership id=%d → transferred to user_id=%d", int(acc_manifest_id), int(target_user_id))
+        return TransferAccOwnershipServiceResult(acc_manifest_id=int(acc_manifest_id), updates=["owner_user_id"])
+
+    async def transfer_asccp_ownership(
+        self,
+        *,
+        asccp_manifest_id: AsccpManifestId,
+        target_user_id: int,
+    ) -> TransferAsccpOwnershipServiceResult:
+        """Transfer ASCCP ownership to another user while the ASCCP is in `WIP`."""
+        logger.info("transfer asccp ownership id=%d → user_id=%d", int(asccp_manifest_id), int(target_user_id))
+        asccp = await self.get_asccp(asccp_manifest_id)
+        if asccp is None:
+            raise LookupError(
+                f"No ASCCP exists with manifest ID {int(asccp_manifest_id)}. Please verify the identifier and try again."
+            )
+        self._assert_can_transfer_wip_component(asccp, label="ASCCP")
+        if int(target_user_id) == int(asccp.owner.user_id):
+            logger.info("transfer asccp ownership id=%d → no-op (same owner)", int(asccp_manifest_id))
+            return TransferAsccpOwnershipServiceResult(asccp_manifest_id=int(asccp_manifest_id), updates=[])
+        transferred = await self._repo.transfer_asccp_ownership(
+            asccp_manifest_id=asccp_manifest_id,
+            requester_user_id=self._requester_user_id,
+            target_user_id=int(target_user_id),
+        )
+        if not transferred:
+            raise LookupError(
+                f"No ASCCP exists with manifest ID {int(asccp_manifest_id)}. Please verify the identifier and try again."
+            )
+        logger.info("transfer asccp ownership id=%d → transferred to user_id=%d", int(asccp_manifest_id), int(target_user_id))
+        return TransferAsccpOwnershipServiceResult(asccp_manifest_id=int(asccp_manifest_id), updates=["owner_user_id"])
+
+    async def transfer_bccp_ownership(
+        self,
+        *,
+        bccp_manifest_id: BccpManifestId,
+        target_user_id: int,
+    ) -> TransferBccpOwnershipServiceResult:
+        """Transfer BCCP ownership to another user while the BCCP is in `WIP`."""
+        logger.info("transfer bccp ownership id=%d → user_id=%d", int(bccp_manifest_id), int(target_user_id))
+        bccp = await self.get_bccp(bccp_manifest_id)
+        if bccp is None:
+            raise LookupError(
+                f"No BCCP exists with manifest ID {int(bccp_manifest_id)}. Please verify the identifier and try again."
+            )
+        self._assert_can_transfer_wip_component(bccp, label="BCCP")
+        if int(target_user_id) == int(bccp.owner.user_id):
+            logger.info("transfer bccp ownership id=%d → no-op (same owner)", int(bccp_manifest_id))
+            return TransferBccpOwnershipServiceResult(bccp_manifest_id=int(bccp_manifest_id), updates=[])
+        transferred = await self._repo.transfer_bccp_ownership(
+            bccp_manifest_id=bccp_manifest_id,
+            requester_user_id=self._requester_user_id,
+            target_user_id=int(target_user_id),
+        )
+        if not transferred:
+            raise LookupError(
+                f"No BCCP exists with manifest ID {int(bccp_manifest_id)}. Please verify the identifier and try again."
+            )
+        logger.info("transfer bccp ownership id=%d → transferred to user_id=%d", int(bccp_manifest_id), int(target_user_id))
+        return TransferBccpOwnershipServiceResult(bccp_manifest_id=int(bccp_manifest_id), updates=["owner_user_id"])
+
+    async def update_ascc(
+        self,
+        *,
+        ascc_manifest_id: AsccManifestId,
+        cardinality_min: int | UnsetType = UNSET,
+        cardinality_max: int | UnsetType = UNSET,
+        definition: str | None | UnsetType = UNSET,
+        definition_source: str | None | UnsetType = UNSET,
+        deprecated: bool | UnsetType = UNSET,
+    ) -> UpdateAsccServiceResult:
+        """Update mutable ASCC fields when the requester owns the parent WIP ACC."""
+        owner_acc_manifest_id = await self._repo.get_owner_acc_manifest_id_by_ascc_manifest(ascc_manifest_id)
+        if owner_acc_manifest_id is None:
+            raise LookupError(
+                f"No ASCC exists with manifest ID {int(ascc_manifest_id)}. Please verify the identifier and try again."
+            )
+        acc = await self.get_acc(owner_acc_manifest_id)
+        if acc is None:
+            raise LookupError(
+                f"No ACC exists with manifest ID {int(owner_acc_manifest_id)}. Please verify the identifier and try again."
+            )
+        self._assert_can_update_wip_core_component(acc, label="ACC")
+
+        relationship = next(
+            (
+                relationship
+                for relationship in acc.relationships
+                if getattr(relationship, "component_type", None) == "ASCC"
+                and int(relationship.ascc_manifest_id) == int(ascc_manifest_id)
+            ),
+            None,
+        )
+        if relationship is None:
+            raise LookupError(
+                f"No ASCC exists with manifest ID {int(ascc_manifest_id)} in the target ACC. Please verify the identifier and try again."
+            )
+
+        normalized_definition = definition
+        if definition is not UNSET and isinstance(definition, str):
+            normalized_definition = definition.strip() or None
+        normalized_definition_source = definition_source
+        if definition_source is not UNSET and isinstance(definition_source, str):
+            normalized_definition_source = definition_source.strip() or None
+
+        normalized_cardinality_min = cardinality_min
+        if cardinality_min is not UNSET:
+            normalized_cardinality_min = int(cardinality_min)
+            if normalized_cardinality_min < 0:
+                raise ValueError("`cardinality_min` cannot be less than 0.")
+
+        normalized_cardinality_max = cardinality_max
+        if cardinality_max is not UNSET:
+            normalized_cardinality_max = int(cardinality_max)
+            if normalized_cardinality_max < -1:
+                raise ValueError("`cardinality_max` cannot be less than -1.")
+
+        final_cardinality_min = int(relationship.cardinality_min) if normalized_cardinality_min is UNSET else int(normalized_cardinality_min)
+        final_cardinality_max = int(relationship.cardinality_max) if normalized_cardinality_max is UNSET else int(normalized_cardinality_max)
+        if final_cardinality_max != -1 and final_cardinality_min > final_cardinality_max:
+            raise ValueError("`cardinality_min` cannot be greater than `cardinality_max`.")
+
+        updates: list[str] = []
+        if normalized_cardinality_min is not UNSET and final_cardinality_min != int(relationship.cardinality_min):
+            updates.append("cardinality_min")
+        if normalized_cardinality_max is not UNSET and final_cardinality_max != int(relationship.cardinality_max):
+            updates.append("cardinality_max")
+        if normalized_definition is not UNSET and normalized_definition != relationship.definition:
+            updates.append("definition")
+        if normalized_definition_source is not UNSET and normalized_definition_source != relationship.definition_source:
+            updates.append("definition_source")
+        if deprecated is not UNSET and bool(deprecated) != bool(relationship.is_deprecated):
+            updates.append("deprecated")
+        if not updates:
+            return UpdateAsccServiceResult(ascc_manifest_id=int(ascc_manifest_id), updates=[])
+
+        await self._repo.update_ascc(
+            ascc_manifest_id=ascc_manifest_id,
+            cardinality_min=None if normalized_cardinality_min is UNSET else final_cardinality_min,
+            cardinality_min_set=normalized_cardinality_min is not UNSET,
+            cardinality_max=None if normalized_cardinality_max is UNSET else final_cardinality_max,
+            cardinality_max_set=normalized_cardinality_max is not UNSET,
+            deprecated=None if deprecated is UNSET else bool(deprecated),
+            deprecated_set=deprecated is not UNSET,
+            definition=None if normalized_definition is UNSET else normalized_definition,
+            definition_set=normalized_definition is not UNSET,
+            definition_source=None if normalized_definition_source is UNSET else normalized_definition_source,
+            definition_source_set=normalized_definition_source is not UNSET,
+            requester_user_id=self._requester.user.user_id,
+        )
+        return UpdateAsccServiceResult(ascc_manifest_id=int(ascc_manifest_id), updates=sorted(updates))
+
+    async def update_bcc(
+        self,
+        *,
+        bcc_manifest_id: BccManifestId,
+        entity_type: Literal["Attribute", "Element"] | UnsetType = UNSET,
+        cardinality_min: int | UnsetType = UNSET,
+        cardinality_max: int | UnsetType = UNSET,
+        definition: str | None | UnsetType = UNSET,
+        definition_source: str | None | UnsetType = UNSET,
+        deprecated: bool | UnsetType = UNSET,
+        is_nillable: bool | UnsetType = UNSET,
+        default_value: str | None | UnsetType = UNSET,
+        fixed_value: str | None | UnsetType = UNSET,
+    ) -> UpdateBccServiceResult:
+        """Update mutable BCC fields when the requester owns the parent WIP ACC."""
+        owner_acc_manifest_id = await self._repo.get_owner_acc_manifest_id_by_bcc_manifest(bcc_manifest_id)
+        if owner_acc_manifest_id is None:
+            raise LookupError(
+                f"No BCC exists with manifest ID {int(bcc_manifest_id)}. Please verify the identifier and try again."
+            )
+        acc = await self.get_acc(owner_acc_manifest_id)
+        if acc is None:
+            raise LookupError(
+                f"No ACC exists with manifest ID {int(owner_acc_manifest_id)}. Please verify the identifier and try again."
+            )
+        self._assert_can_update_wip_core_component(acc, label="ACC")
+
+        relationship = next(
+            (
+                relationship
+                for relationship in acc.relationships
+                if getattr(relationship, "component_type", None) == "BCC"
+                and int(relationship.bcc_manifest_id) == int(bcc_manifest_id)
+            ),
+            None,
+        )
+        if relationship is None:
+            raise LookupError(
+                f"No BCC exists with manifest ID {int(bcc_manifest_id)} in the target ACC. Please verify the identifier and try again."
+            )
+
+        normalized_definition = definition
+        if definition is not UNSET and isinstance(definition, str):
+            normalized_definition = definition.strip() or None
+        normalized_definition_source = definition_source
+        if definition_source is not UNSET and isinstance(definition_source, str):
+            normalized_definition_source = definition_source.strip() or None
+        normalized_default_value = default_value
+        if default_value is not UNSET and isinstance(default_value, str):
+            normalized_default_value = default_value.strip() or None
+        normalized_fixed_value = fixed_value
+        if fixed_value is not UNSET and isinstance(fixed_value, str):
+            normalized_fixed_value = fixed_value.strip() or None
+        if normalized_default_value not in {UNSET, None} and normalized_fixed_value not in {UNSET, None}:
+            raise ValueError("Provide only one of `default_value` or `fixed_value`.")
+
+        current_entity_type = relationship.entity_type or "Element"
+        normalized_entity_type = entity_type
+        if entity_type is not UNSET:
+            normalized_entity_type = str(entity_type)
+
+        normalized_cardinality_min = cardinality_min
+        if cardinality_min is not UNSET:
+            normalized_cardinality_min = int(cardinality_min)
+            if normalized_cardinality_min < 0:
+                raise ValueError("`cardinality_min` cannot be less than 0.")
+
+        normalized_cardinality_max = cardinality_max
+        if cardinality_max is not UNSET:
+            normalized_cardinality_max = int(cardinality_max)
+            if normalized_cardinality_max < -1:
+                raise ValueError("`cardinality_max` cannot be less than -1.")
+
+        if normalized_entity_type is not UNSET and normalized_entity_type == "Attribute" and current_entity_type != "Attribute":
+            final_cardinality_min = 0
+            final_cardinality_max = 1
+        else:
+            final_cardinality_min = int(relationship.cardinality_min) if normalized_cardinality_min is UNSET else int(normalized_cardinality_min)
+            final_cardinality_max = int(relationship.cardinality_max) if normalized_cardinality_max is UNSET else int(normalized_cardinality_max)
+
+        if final_cardinality_max != -1 and final_cardinality_min > final_cardinality_max:
+            raise ValueError("`cardinality_min` cannot be greater than `cardinality_max`.")
+
+        current_default_value = relationship.value_constraint.default_value if relationship.value_constraint is not None else None
+        current_fixed_value = relationship.value_constraint.fixed_value if relationship.value_constraint is not None else None
+
+        updates: list[str] = []
+        if normalized_entity_type is not UNSET and normalized_entity_type != current_entity_type:
+            updates.append("entity_type")
+        if final_cardinality_min != int(relationship.cardinality_min):
+            updates.append("cardinality_min")
+        if final_cardinality_max != int(relationship.cardinality_max):
+            updates.append("cardinality_max")
+        if normalized_definition is not UNSET and normalized_definition != relationship.definition:
+            updates.append("definition")
+        if normalized_definition_source is not UNSET and normalized_definition_source != relationship.definition_source:
+            updates.append("definition_source")
+        if deprecated is not UNSET and bool(deprecated) != bool(relationship.is_deprecated):
+            updates.append("deprecated")
+        if is_nillable is not UNSET and bool(is_nillable) != bool(relationship.is_nillable):
+            updates.append("is_nillable")
+        value_constraint_changed = False
+        if normalized_default_value is not UNSET and normalized_default_value != current_default_value:
+            value_constraint_changed = True
+        if normalized_fixed_value is not UNSET and normalized_fixed_value != current_fixed_value:
+            value_constraint_changed = True
+        if value_constraint_changed:
+            updates.append("value_constraint")
+        if not updates:
+            return UpdateBccServiceResult(bcc_manifest_id=int(bcc_manifest_id), updates=[])
+
+        await self._repo.update_bcc(
+            bcc_manifest_id=bcc_manifest_id,
+            entity_type=None if normalized_entity_type is UNSET else normalized_entity_type,
+            entity_type_set=normalized_entity_type is not UNSET,
+            cardinality_min=final_cardinality_min,
+            cardinality_min_set=(
+                normalized_cardinality_min is not UNSET
+                or (normalized_entity_type is not UNSET and normalized_entity_type == "Attribute" and current_entity_type != "Attribute")
+            ),
+            cardinality_max=final_cardinality_max,
+            cardinality_max_set=(
+                normalized_cardinality_max is not UNSET
+                or (normalized_entity_type is not UNSET and normalized_entity_type == "Attribute" and current_entity_type != "Attribute")
+            ),
+            deprecated=None if deprecated is UNSET else bool(deprecated),
+            deprecated_set=deprecated is not UNSET,
+            is_nillable=None if is_nillable is UNSET else bool(is_nillable),
+            is_nillable_set=is_nillable is not UNSET,
+            default_value=None if normalized_default_value is UNSET else normalized_default_value,
+            default_value_set=normalized_default_value is not UNSET,
+            fixed_value=None if normalized_fixed_value is UNSET else normalized_fixed_value,
+            fixed_value_set=normalized_fixed_value is not UNSET,
+            definition=None if normalized_definition is UNSET else normalized_definition,
+            definition_set=normalized_definition is not UNSET,
+            definition_source=None if normalized_definition_source is UNSET else normalized_definition_source,
+            definition_source_set=normalized_definition_source is not UNSET,
+            requester_user_id=self._requester.user.user_id,
+        )
+        return UpdateBccServiceResult(bcc_manifest_id=int(bcc_manifest_id), updates=sorted(set(updates)))
+
     async def update_acc_base(
         self,
         *,
@@ -589,7 +1002,7 @@ class CoreComponentService:
             raise LookupError(
                 f"No ACC exists with manifest ID {int(acc_manifest_id)}. Please verify the identifier and try again."
             )
-        self._assert_can_update_acc(acc)
+        self._assert_can_update_wip_core_component(acc, label="ACC")
 
         current_base_manifest_id = self._acc_base_manifest_id(acc)
         requested_base_manifest_id = None if based_acc_manifest_id is None else int(based_acc_manifest_id)
@@ -610,11 +1023,15 @@ class CoreComponentService:
                     f"No ACC exists with manifest ID {requested_base_manifest_id}. "
                     "Please verify the identifier and try again."
                 )
-            if int(based_acc.release.release_id) != int(acc.release.release_id):
-                raise ValueError(
-                    "The base ACC manifest must belong to the same release as the target ACC. "
-                    "Please choose a base ACC from the ACC release and try again."
-                )
+            await self._assert_reference_release_allowed(
+                target_release_id=acc.release.release_id,
+                target_library_id=acc.library.library_id,
+                referenced_release_id=based_acc.release.release_id,
+                referenced_library_id=based_acc.library.library_id,
+                referenced_label="The base ACC",
+                target_label="the target ACC",
+                selection_phrase="a base ACC",
+            )
             await self._assert_no_acc_base_cycle(
                 acc_manifest_id=acc_manifest_id,
                 based_acc=based_acc,
@@ -664,11 +1081,15 @@ class CoreComponentService:
             raise LookupError(
                 f"No ACC exists with manifest ID {int(based_acc_manifest_id)}. Please verify the identifier and try again."
             )
-        if int(based_acc.release.release_id) != int(acc.release.release_id):
-            raise ValueError(
-                "The base ACC manifest must belong to the same release as the target ACC. "
-                "Please choose a base ACC from the ACC release and try again."
-            )
+        await self._assert_reference_release_allowed(
+            target_release_id=acc.release.release_id,
+            target_library_id=acc.library.library_id,
+            referenced_release_id=based_acc.release.release_id,
+            referenced_library_id=based_acc.library.library_id,
+            referenced_label="The base ACC",
+            target_label="the target ACC",
+            selection_phrase="a base ACC",
+        )
 
         current_terms = await self._collect_flattened_property_terms(acc)
         incoming_terms = await self._collect_flattened_property_terms(based_acc)
@@ -700,7 +1121,7 @@ class CoreComponentService:
             raise LookupError(
                 f"No ACC exists with manifest ID {int(acc_manifest_id)}. Please verify the identifier and try again."
             )
-        self._assert_can_update_acc(acc)
+        self._assert_can_update_wip_core_component(acc, label="ACC")
 
         normalized_tag_ids = self._normalize_tag_ids(tag_id) or []
         current_tag_ids = {int(tag.tag_id) for tag in acc.tags}
@@ -734,7 +1155,7 @@ class CoreComponentService:
             raise LookupError(
                 f"No ACC exists with manifest ID {int(acc_manifest_id)}. Please verify the identifier and try again."
             )
-        self._assert_can_update_acc(acc)
+        self._assert_can_update_wip_core_component(acc, label="ACC")
 
         normalized_tag_ids = self._normalize_tag_ids(tag_id) or []
         current_tag_ids = {int(tag.tag_id) for tag in acc.tags}
@@ -768,7 +1189,7 @@ class CoreComponentService:
             raise LookupError(
                 f"No ASCCP exists with manifest ID {int(asccp_manifest_id)}. Please verify the identifier and try again."
             )
-        self._assert_can_update_component(asccp, label="ASCCP")
+        self._assert_can_update_wip_core_component(asccp, label="ASCCP")
         warnings = await self.get_change_asccp_role_of_acc_warnings(
             asccp_manifest_id=asccp_manifest_id,
             role_of_acc_manifest_id=role_of_acc_manifest_id,
@@ -792,7 +1213,21 @@ class CoreComponentService:
             raise LookupError(
                 f"No BCCP exists with manifest ID {int(bccp_manifest_id)}. Please verify the identifier and try again."
             )
-        self._assert_can_update_component(bccp, label="BCCP")
+        self._assert_can_update_wip_core_component(bccp, label="BCCP")
+        bdt = await self._data_type_service.get(bdt_manifest_id)
+        if bdt is None:
+            raise LookupError(
+                f"No data type exists with manifest ID {int(bdt_manifest_id)}. Please verify the identifier and try again."
+            )
+        await self._assert_reference_release_allowed(
+            target_release_id=bccp.release.release_id,
+            target_library_id=bccp.library.library_id,
+            referenced_release_id=bdt.release.release_id,
+            referenced_library_id=bdt.library.library_id,
+            referenced_label="The target BDT",
+            target_label="the target BCCP",
+            selection_phrase="a BDT",
+        )
         await self._repo.change_bccp_bdt(
             bccp_manifest_id=bccp_manifest_id,
             bdt_manifest_id=bdt_manifest_id,
@@ -838,6 +1273,15 @@ class CoreComponentService:
             raise LookupError(
                 f"No ACC exists with manifest ID {int(role_of_acc_manifest_id)}. Please verify the identifier and try again."
             )
+        await self._assert_reference_release_allowed(
+            target_release_id=asccp.release.release_id,
+            target_library_id=asccp.library.library_id,
+            referenced_release_id=role_of_acc.release.release_id,
+            referenced_library_id=role_of_acc.library.library_id,
+            referenced_label="The role ACC",
+            target_label="the target ASCCP",
+            selection_phrase="a role ACC",
+        )
         preview_asccp = replace(
             asccp,
             role_of_acc=BaseAccSummaryServiceRecord(
@@ -918,7 +1362,7 @@ class CoreComponentService:
             raise LookupError(
                 f"No ASCCP exists with manifest ID {int(asccp_manifest_id)}. Please verify the identifier and try again."
             )
-        self._assert_can_update_component(asccp, label="ASCCP")
+        self._assert_can_update_wip_core_component(asccp, label="ASCCP")
         normalized_tag_ids = self._normalize_tag_ids(tag_id) or []
         current_tag_ids = {int(tag.tag_id) for tag in asccp.tags}
         tag_ids_to_add = [single_tag_id for single_tag_id in normalized_tag_ids if single_tag_id not in current_tag_ids]
@@ -942,7 +1386,7 @@ class CoreComponentService:
             raise LookupError(
                 f"No ASCCP exists with manifest ID {int(asccp_manifest_id)}. Please verify the identifier and try again."
             )
-        self._assert_can_update_component(asccp, label="ASCCP")
+        self._assert_can_update_wip_core_component(asccp, label="ASCCP")
         normalized_tag_ids = self._normalize_tag_ids(tag_id) or []
         current_tag_ids = {int(tag.tag_id) for tag in asccp.tags}
         tag_ids_to_remove = [single_tag_id for single_tag_id in normalized_tag_ids if single_tag_id in current_tag_ids]
@@ -966,7 +1410,7 @@ class CoreComponentService:
             raise LookupError(
                 f"No BCCP exists with manifest ID {int(bccp_manifest_id)}. Please verify the identifier and try again."
             )
-        self._assert_can_update_component(bccp, label="BCCP")
+        self._assert_can_update_wip_core_component(bccp, label="BCCP")
         normalized_tag_ids = self._normalize_tag_ids(tag_id) or []
         current_tag_ids = {int(tag.tag_id) for tag in bccp.tags}
         tag_ids_to_add = [single_tag_id for single_tag_id in normalized_tag_ids if single_tag_id not in current_tag_ids]
@@ -990,7 +1434,7 @@ class CoreComponentService:
             raise LookupError(
                 f"No BCCP exists with manifest ID {int(bccp_manifest_id)}. Please verify the identifier and try again."
             )
-        self._assert_can_update_component(bccp, label="BCCP")
+        self._assert_can_update_wip_core_component(bccp, label="BCCP")
         normalized_tag_ids = self._normalize_tag_ids(tag_id) or []
         current_tag_ids = {int(tag.tag_id) for tag in bccp.tags}
         tag_ids_to_remove = [single_tag_id for single_tag_id in normalized_tag_ids if single_tag_id in current_tag_ids]
@@ -1008,6 +1452,10 @@ class CoreComponentService:
         acc_manifest_id: AccManifestId,
         asccp_manifest_id: AsccpManifestId,
         index: int = -1,
+        cardinality_min: int | None = None,
+        cardinality_max: int | None = None,
+        definition: str | None = None,
+        definition_source: str | None = None,
     ) -> CreateAsccServiceResult:
         """Add an ASCC relationship to an ACC, creating it if needed."""
         logger.info(
@@ -1021,18 +1469,22 @@ class CoreComponentService:
             raise LookupError(
                 f"No ACC exists with manifest ID {int(acc_manifest_id)}. Please verify the identifier and try again."
             )
-        self._assert_can_reorder_acc_structure(acc)
+        self._assert_can_update_wip_core_component(acc, label="ACC")
 
         asccp = await self.get_asccp(asccp_manifest_id)
         if asccp is None:
             raise LookupError(
                 f"No ASCCP exists with manifest ID {int(asccp_manifest_id)}. Please verify the identifier and try again."
             )
-        if int(asccp.release.release_id) != int(acc.release.release_id):
-            raise ValueError(
-                "The target ASCCP must belong to the same release as the source ACC. "
-                "Please choose an ASCCP from the ACC release and try again."
-            )
+        await self._assert_reference_release_allowed(
+            target_release_id=acc.release.release_id,
+            target_library_id=acc.library.library_id,
+            referenced_release_id=asccp.release.release_id,
+            referenced_library_id=asccp.library.library_id,
+            referenced_label="The target ASCCP",
+            target_label="the source ACC",
+            selection_phrase="an ASCCP",
+        )
         if not asccp.reusable_indicator:
             raise ValueError("Target ASCCP is not reusable.")
 
@@ -1051,10 +1503,27 @@ class CoreComponentService:
             )
 
         self._assert_valid_sequence_index(index=index, sequence_length=len(acc.relationships))
+        normalized_definition = definition.strip() or None if isinstance(definition, str) else None
+        normalized_definition_source = definition_source.strip() or None if isinstance(definition_source, str) else None
+
+        final_cardinality_min = 0 if cardinality_min is None else int(cardinality_min)
+        if final_cardinality_min < 0:
+            raise ValueError("`cardinality_min` cannot be less than 0.")
+
+        final_cardinality_max = -1 if cardinality_max is None else int(cardinality_max)
+        if final_cardinality_max < -1:
+            raise ValueError("`cardinality_max` cannot be less than -1.")
+        if final_cardinality_max != -1 and final_cardinality_min > final_cardinality_max:
+            raise ValueError("`cardinality_min` cannot be greater than `cardinality_max`.")
+
         ascc_manifest_id = await self._repo.create_ascc(
             acc_manifest_id=acc_manifest_id,
             asccp_manifest_id=asccp_manifest_id,
             index=index,
+            cardinality_min=final_cardinality_min,
+            cardinality_max=final_cardinality_max,
+            definition=normalized_definition,
+            definition_source=normalized_definition_source,
             requester_user_id=self._requester.user.user_id,
         )
         logger.info(
@@ -1083,11 +1552,15 @@ class CoreComponentService:
             raise LookupError(
                 f"No ASCCP exists with manifest ID {int(asccp_manifest_id)}. Please verify the identifier and try again."
             )
-        if int(asccp.release.release_id) != int(acc.release.release_id):
-            raise ValueError(
-                "The target ASCCP must belong to the same release as the source ACC. "
-                "Please choose an ASCCP from the ACC release and try again."
-            )
+        await self._assert_reference_release_allowed(
+            target_release_id=acc.release.release_id,
+            target_library_id=acc.library.library_id,
+            referenced_release_id=asccp.release.release_id,
+            referenced_library_id=asccp.library.library_id,
+            referenced_label="The target ASCCP",
+            target_label="the source ACC",
+            selection_phrase="an ASCCP",
+        )
 
         current_terms = await self._collect_flattened_property_terms(acc)
         incoming_terms = await self._collect_flattened_property_terms_from_asccp(asccp)
@@ -1134,6 +1607,14 @@ class CoreComponentService:
         acc_manifest_id: AccManifestId,
         bccp_manifest_id: BccpManifestId,
         index: int = -1,
+        entity_type: Literal["Attribute", "Element"] | None = None,
+        cardinality_min: int | None = None,
+        cardinality_max: int | None = None,
+        definition: str | None = None,
+        definition_source: str | None = None,
+        is_nillable: bool | None = None,
+        default_value: str | None = None,
+        fixed_value: str | None = None,
     ) -> CreateBccServiceResult:
         """Add a BCC relationship to an ACC, creating it if needed."""
         logger.info(
@@ -1147,18 +1628,22 @@ class CoreComponentService:
             raise LookupError(
                 f"No ACC exists with manifest ID {int(acc_manifest_id)}. Please verify the identifier and try again."
             )
-        self._assert_can_reorder_acc_structure(acc)
+        self._assert_can_update_wip_core_component(acc, label="ACC")
 
         bccp = await self.get_bccp(bccp_manifest_id)
         if bccp is None:
             raise LookupError(
                 f"No BCCP exists with manifest ID {int(bccp_manifest_id)}. Please verify the identifier and try again."
             )
-        if int(bccp.release.release_id) != int(acc.release.release_id):
-            raise ValueError(
-                "The target BCCP must belong to the same release as the source ACC. "
-                "Please choose a BCCP from the ACC release and try again."
-            )
+        await self._assert_reference_release_allowed(
+            target_release_id=acc.release.release_id,
+            target_library_id=acc.library.library_id,
+            referenced_release_id=bccp.release.release_id,
+            referenced_library_id=bccp.library.library_id,
+            referenced_label="The target BCCP",
+            target_label="the source ACC",
+            selection_phrase="a BCCP",
+        )
 
         existing_relationship = next(
             (
@@ -1174,11 +1659,46 @@ class CoreComponentService:
                 "This BCC is already in the ACC sequence. Please use `reorder_bcc_in_acc` instead."
             )
 
-        self._assert_valid_sequence_index(index=index, sequence_length=len(acc.relationships))
+        normalized_definition = definition.strip() or None if isinstance(definition, str) else None
+        normalized_definition_source = definition_source.strip() or None if isinstance(definition_source, str) else None
+        normalized_default_value = default_value.strip() or None if isinstance(default_value, str) else default_value
+        normalized_fixed_value = fixed_value.strip() or None if isinstance(fixed_value, str) else fixed_value
+        if normalized_default_value is not None and normalized_fixed_value is not None:
+            raise ValueError("Provide only one of `default_value` or `fixed_value`.")
+
+        final_entity_type = "Element" if entity_type is None else str(entity_type)
+        if final_entity_type not in {"Attribute", "Element"}:
+            raise ValueError("`entity_type` must be either `Attribute` or `Element`.")
+
+        effective_index = index
+        if final_entity_type == "Attribute":
+            effective_index = self._resolve_attribute_bcc_add_index(acc.relationships)
+            final_cardinality_min = 0
+            final_cardinality_max = 1
+        else:
+            final_cardinality_min = 0 if cardinality_min is None else int(cardinality_min)
+            final_cardinality_max = -1 if cardinality_max is None else int(cardinality_max)
+
+        self._assert_valid_sequence_index(index=effective_index, sequence_length=len(acc.relationships))
+        if final_cardinality_min < 0:
+            raise ValueError("`cardinality_min` cannot be less than 0.")
+        if final_cardinality_max < -1:
+            raise ValueError("`cardinality_max` cannot be less than -1.")
+        if final_cardinality_max != -1 and final_cardinality_min > final_cardinality_max:
+            raise ValueError("`cardinality_min` cannot be greater than `cardinality_max`.")
+
         bcc_manifest_id = await self._repo.create_bcc(
             acc_manifest_id=acc_manifest_id,
             bccp_manifest_id=bccp_manifest_id,
-            index=index,
+            index=effective_index,
+            entity_type=final_entity_type,
+            cardinality_min=final_cardinality_min,
+            cardinality_max=final_cardinality_max,
+            definition=normalized_definition,
+            definition_source=normalized_definition_source,
+            is_nillable=bool(is_nillable) if is_nillable is not None else False,
+            default_value=normalized_default_value,
+            fixed_value=normalized_fixed_value,
             requester_user_id=self._requester.user.user_id,
         )
         logger.info(
@@ -1207,11 +1727,15 @@ class CoreComponentService:
             raise LookupError(
                 f"No BCCP exists with manifest ID {int(bccp_manifest_id)}. Please verify the identifier and try again."
             )
-        if int(bccp.release.release_id) != int(acc.release.release_id):
-            raise ValueError(
-                "The target BCCP must belong to the same release as the source ACC. "
-                "Please choose a BCCP from the ACC release and try again."
-            )
+        await self._assert_reference_release_allowed(
+            target_release_id=acc.release.release_id,
+            target_library_id=acc.library.library_id,
+            referenced_release_id=bccp.release.release_id,
+            referenced_library_id=bccp.library.library_id,
+            referenced_label="The target BCCP",
+            target_label="the source ACC",
+            selection_phrase="a BCCP",
+        )
 
         current_terms = await self._collect_flattened_property_terms(acc)
         incoming_terms = [
@@ -1255,6 +1779,84 @@ class CoreComponentService:
             )
         )
         return warnings
+
+    async def remove_ascc(
+        self,
+        *,
+        ascc_manifest_id: AsccManifestId,
+    ) -> None:
+        """Remove an existing ASCC relationship from an ACC."""
+        acc_manifest_id = await self._repo.get_owner_acc_manifest_id_by_ascc_manifest(ascc_manifest_id)
+        if acc_manifest_id is None:
+            raise LookupError(
+                f"No ASCC exists with manifest ID {int(ascc_manifest_id)}. Please verify the identifier and try again."
+            )
+        logger.info("remove ascc acc_manifest_id=%d ascc_manifest_id=%d", int(acc_manifest_id), int(ascc_manifest_id))
+        acc = await self.get_acc(acc_manifest_id)
+        if acc is None:
+            raise LookupError(
+                f"No ACC exists with manifest ID {int(acc_manifest_id)}. Please verify the identifier and try again."
+            )
+        self._assert_can_update_wip_core_component(acc, label="ACC")
+        self._ensure_relationship_exists(
+            relationships=acc.relationships,
+            component_type="ASCC",
+            manifest_id=int(ascc_manifest_id),
+            label="ASCC",
+        )
+        bie_usage_count = await self._repo.count_bie_references_by_ascc_manifest(ascc_manifest_id)
+        if bie_usage_count > 0:
+            raise ValueError(
+                f"This association is referenced in {bie_usage_count} BIE(s) and cannot be deleted."
+            )
+        removed = await self._repo.remove_ascc(
+            ascc_manifest_id=ascc_manifest_id,
+            requester_user_id=self._requester.user.user_id,
+        )
+        if not removed:
+            raise LookupError(
+                f"No ASCC exists with manifest ID {int(ascc_manifest_id)}. Please verify the identifier and try again."
+            )
+        logger.info("remove ascc acc_manifest_id=%d ascc_manifest_id=%d → removed", int(acc_manifest_id), int(ascc_manifest_id))
+
+    async def remove_bcc(
+        self,
+        *,
+        bcc_manifest_id: BccManifestId,
+    ) -> None:
+        """Remove an existing BCC relationship from an ACC."""
+        acc_manifest_id = await self._repo.get_owner_acc_manifest_id_by_bcc_manifest(bcc_manifest_id)
+        if acc_manifest_id is None:
+            raise LookupError(
+                f"No BCC exists with manifest ID {int(bcc_manifest_id)}. Please verify the identifier and try again."
+            )
+        logger.info("remove bcc acc_manifest_id=%d bcc_manifest_id=%d", int(acc_manifest_id), int(bcc_manifest_id))
+        acc = await self.get_acc(acc_manifest_id)
+        if acc is None:
+            raise LookupError(
+                f"No ACC exists with manifest ID {int(acc_manifest_id)}. Please verify the identifier and try again."
+            )
+        self._assert_can_update_wip_core_component(acc, label="ACC")
+        self._ensure_relationship_exists(
+            relationships=acc.relationships,
+            component_type="BCC",
+            manifest_id=int(bcc_manifest_id),
+            label="BCC",
+        )
+        bie_usage_count = await self._repo.count_bie_references_by_bcc_manifest(bcc_manifest_id)
+        if bie_usage_count > 0:
+            raise ValueError(
+                f"This association is referenced in {bie_usage_count} BIE(s) and cannot be deleted."
+            )
+        removed = await self._repo.remove_bcc(
+            bcc_manifest_id=bcc_manifest_id,
+            requester_user_id=self._requester.user.user_id,
+        )
+        if not removed:
+            raise LookupError(
+                f"No BCC exists with manifest ID {int(bcc_manifest_id)}. Please verify the identifier and try again."
+            )
+        logger.info("remove bcc acc_manifest_id=%d bcc_manifest_id=%d → removed", int(acc_manifest_id), int(bcc_manifest_id))
 
     async def get_reorder_ascc_in_acc_warnings(
         self,
@@ -1374,7 +1976,7 @@ class CoreComponentService:
             raise LookupError(
                 f"No ACC exists with manifest ID {int(acc_manifest_id)}. Please verify the identifier and try again."
             )
-        self._assert_can_reorder_acc_structure(acc)
+        self._assert_can_update_wip_core_component(acc, label="ACC")
 
         self._ensure_relationship_exists(
             relationships=acc.relationships,
@@ -1425,7 +2027,7 @@ class CoreComponentService:
             raise LookupError(
                 f"No ACC exists with manifest ID {int(acc_manifest_id)}. Please verify the identifier and try again."
             )
-        self._assert_can_reorder_acc_structure(acc)
+        self._assert_can_update_wip_core_component(acc, label="ACC")
 
         self._ensure_relationship_exists(
             relationships=acc.relationships,
@@ -1469,35 +2071,14 @@ class CoreComponentService:
             )
 
         current_state = str(acc.state or "")
-        release_num = str(acc.release.release_num or "")
-        allowed_transitions = self._acc_state_transitions_for_release(release_num=release_num)
-
-        if current_state not in allowed_transitions:
-            branch_label = "'Working'" if release_num == "Working" else "non-'Working'"
-            raise ValueError(
-                f"The ACC is in '{current_state}' state, which cannot be changed by this service for {branch_label} releases."
-            )
-        if state not in allowed_transitions[current_state]:  # type: ignore[index]
-            raise ValueError(
-                f"The core component in '{current_state}' state cannot move to '{state}' state."
-            )
-
+        self._assert_component_state_transition_allowed(acc, state=state, label="ACC")
         restore = current_state == "Deleted" and state == "WIP"
         if restore:
-            self._assert_can_restore_deleted_acc(acc)
+            self._assert_can_restore_deleted_component(acc)
         else:
-            if not self._is_admin() and int(acc.owner.user_id) != int(self._requester.user.user_id):
-                raise PermissionError(
-                    "It only allows to modify the core component by the owner."
-                )
+            self._assert_owner_or_admin(acc)
             if state == "Deleted":
-                revision_num = int(acc.log.revision_num) if acc.log is not None else 1
-                if revision_num != 1:
-                    raise ValueError(
-                        f"'{acc.den}' can't be marked as deleted because it is a later revision. "
-                        "Only the first revision can be deleted. If you want to undo this revised version, "
-                        "please cancel it instead."
-                    )
+                self._assert_revision_one_only(acc, label="ACC")
             if state == "QA":
                 if acc.namespace is None:
                     raise ValueError(
@@ -1562,15 +2143,7 @@ class CoreComponentService:
                 f"No ACC exists with manifest ID {int(acc_manifest_id)}. Please verify the identifier and try again."
             )
 
-        if self._requester_is_developer():
-            if acc.state != "Published":
-                raise ValueError("Only the core component in 'Published' state can be revised.")
-        else:
-            if acc.state != "Production":
-                raise ValueError("Only the core component in 'Production' state can be revised.")
-
-        self._assert_can_access_revision_branch(acc)
-        self._assert_same_role_family_as_owner(acc)
+        self._assert_can_revise_component(acc)
 
         revised = await self._repo.revise_acc(
             acc_manifest_id=acc_manifest_id,
@@ -1595,14 +2168,7 @@ class CoreComponentService:
             raise LookupError(
                 f"No ACC exists with manifest ID {int(acc_manifest_id)}. Please verify the identifier and try again."
             )
-        if acc.state != "WIP":
-            raise ValueError(
-                f"The ACC '{acc.den}' cannot be cancelled because it is in the '{acc.state}' state. "
-                "Only ACCs in the 'WIP' state can be cancelled."
-            )
-
-        self._assert_can_access_revision_branch(acc)
-        self._assert_same_role_family_as_owner(acc)
+        self._assert_can_cancel_component(acc, label="ACC")
 
         cancelled = await self._repo.cancel_acc(acc_manifest_id=acc_manifest_id)
         if not cancelled:
@@ -2085,23 +2651,13 @@ class CoreComponentService:
             return
         raise PermissionError("A recognized application role is required to create ACCs.")
 
-    def _assert_can_update_acc(self, acc: GetAccServiceResult) -> None:
-        """Validate owner/admin permissions for mutable ACC edits."""
-        if acc.state != "WIP":
-            raise ValueError(
-                f"The ACC '{acc.den}' cannot be updated because it is in the '{acc.state}' state. "
-                "Only ACCs in the 'WIP' state can be updated."
-            )
-        if not self._is_admin() and int(acc.owner.user_id) != int(self._requester.user.user_id):
-            raise PermissionError("It only allows to modify the core component by the owner.")
-
-    def _assert_can_update_component(
+    def _assert_can_update_wip_core_component(
         self,
-        component: GetAsccpServiceResult | GetBccpServiceResult,
+        component: GetAccServiceResult | GetAsccpServiceResult | GetBccpServiceResult,
         *,
         label: str,
     ) -> None:
-        """Validate owner/admin permissions for mutable ASCCP/BCCP edits."""
+        """Validate owner/admin permissions for mutable WIP core-component edits."""
         if component.state != "WIP":
             raise ValueError(
                 f"The {label} '{component.den}' cannot be updated because it is in the '{component.state}' state. "
@@ -2109,34 +2665,19 @@ class CoreComponentService:
             )
         self._assert_owner_or_admin(component)
 
-    def _assert_can_modify_acc_structure(self, acc: GetAccServiceResult) -> None:
-        """Validate owner/admin permissions for ACC relationship edits."""
-        if not self._is_admin() and int(acc.owner.user_id) != int(self._requester.user.user_id):
-            raise PermissionError("It only allows to modify the core component by the owner.")
-
-    def _assert_can_reorder_acc_structure(self, acc: GetAccServiceResult) -> None:
-        """Validate WIP/owner rules for ACC sequence changes."""
-        if acc.state != "WIP":
+    def _assert_can_transfer_wip_component(
+        self,
+        component: GetAccServiceResult | GetAsccpServiceResult | GetBccpServiceResult,
+        *,
+        label: str,
+    ) -> None:
+        """Validate owner/admin permissions for WIP ownership transfer."""
+        if component.state != "WIP":
             raise ValueError(
-                f"The ACC '{acc.den}' cannot be updated because it is in the '{acc.state}' state. "
-                "Only ACCs in the 'WIP' state can be updated."
+                f"The {label} '{component.den}' cannot be transferred because it is in the '{component.state}' state. "
+                f"Only {label}s in the 'WIP' state can be transferred."
             )
-        self._assert_can_modify_acc_structure(acc)
-
-    def _assert_can_restore_deleted_acc(self, acc: GetAccServiceResult) -> None:
-        """Validate role-based restore permissions for Deleted ACCs."""
-        roles = set(self._requester.user.roles)
-        release_num = str(acc.release.release_num or "")
-        if release_num == "Working":
-            if "Developer" not in roles:
-                raise PermissionError(
-                    "It only allows to restore the component in 'Working' branch for developers."
-                )
-            return
-        if "End-User" not in roles:
-            raise PermissionError(
-                "It only allows to restore the component in non-'Working' branch for end-users."
-            )
+        self._assert_owner_or_admin(component)
 
     def _assert_can_restore_deleted_component(
         self,
@@ -2155,23 +2696,6 @@ class CoreComponentService:
             raise PermissionError(
                 "It only allows to restore the component in non-'Working' branch for end-users."
             )
-
-    def _assert_can_access_revision_branch(self, acc: GetAccServiceResult) -> None:
-        """Validate revise/cancel branch rules for the requester's role family."""
-        release_num = str(acc.release.release_num or "")
-        if self._requester_is_developer():
-            if release_num != "Working":
-                raise ValueError("It only allows to revise the component in 'Working' branch for developers.")
-            return
-        if release_num == "Working":
-            raise ValueError("It only allows to revise the component in non-'Working' branch for end-users.")
-
-    def _assert_same_role_family_as_owner(self, acc: GetAccServiceResult) -> None:
-        """Require the requester and owner to both be developer-side or both end-user-side."""
-        owner_roles = set(acc.owner.roles)
-        owner_is_developer = "Developer" in owner_roles
-        if self._requester_is_developer() != owner_is_developer:
-            raise ValueError("It only allows to revise the component for users in the same roles.")
 
     def _assert_same_role_family_as_component_owner(
         self,
@@ -2246,9 +2770,9 @@ class CoreComponentService:
 
     def _assert_can_revise_component(
         self,
-        component: GetAsccpServiceResult | GetBccpServiceResult,
+        component: GetAccServiceResult | GetAsccpServiceResult | GetBccpServiceResult,
     ) -> None:
-        """Validate revise rules for ASCCP/BCCP revisions."""
+        """Validate revise rules for ACC/ASCCP/BCCP revisions."""
         if self._requester_is_developer():
             if component.state != "Published":
                 raise ValueError("Only the core component in 'Published' state can be revised.")
@@ -2260,11 +2784,11 @@ class CoreComponentService:
 
     def _assert_can_cancel_component(
         self,
-        component: GetAsccpServiceResult | GetBccpServiceResult,
+        component: GetAccServiceResult | GetAsccpServiceResult | GetBccpServiceResult,
         *,
         label: str,
     ) -> None:
-        """Validate cancel rules for ASCCP/BCCP revisions."""
+        """Validate cancel rules for ACC/ASCCP/BCCP revisions."""
         if component.state != "WIP":
             raise ValueError(
                 f"The {label} '{component.den}' cannot be cancelled because it is in the '{component.state}' state. "
@@ -2275,9 +2799,9 @@ class CoreComponentService:
 
     def _assert_can_access_component_revision_branch(
         self,
-        component: GetAsccpServiceResult | GetBccpServiceResult,
+        component: GetAccServiceResult | GetAsccpServiceResult | GetBccpServiceResult,
     ) -> None:
-        """Validate revise/cancel branch rules for ASCCP/BCCP."""
+        """Validate revise/cancel branch rules for ACC/ASCCP/BCCP."""
         release_num = str(component.release.release_num or "")
         if self._requester_is_developer():
             if release_num != "Working":
@@ -2673,6 +3197,20 @@ class CoreComponentService:
         CoreComponentService._assert_valid_sequence_index(index=index, sequence_length=len(ordered))
         final_index = len(ordered) if index < 0 else int(index)
         return ordered[:final_index] + [new_item] + ordered[final_index:]
+
+    @staticmethod
+    def _resolve_attribute_bcc_add_index(
+        relationships: list[AsccRelationshipServiceRecord | BccRelationshipServiceRecord],
+    ) -> int:
+        """Return the insertion index for a BCC attribute block at the head of an ACC sequence."""
+        attribute_count = 0
+        for relationship in relationships:
+            if getattr(relationship, "component_type", None) != "BCC":
+                break
+            if getattr(relationship, "entity_type", None) != "Attribute":
+                break
+            attribute_count += 1
+        return attribute_count
 
     @staticmethod
     def _preview_sequence_for_move(

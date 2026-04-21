@@ -73,7 +73,11 @@ class CreateAccRequest(BaseModel):
     based_acc_manifest_id: int | None = Field(
         default=None,
         ge=1,
-        description="Base ACC manifest identifier. If provided, it must belong to the same release as `release_id`.",
+        description=(
+            "Base ACC manifest identifier. If provided and the base ACC is in the same library as `release_id`, "
+            "it must be from that release. If it is in a different library, its release must be one of the "
+            "target release dependencies."
+        ),
     )
     initial_object_class_term: str | None = Field(
         default="Object Class Term",
@@ -127,7 +131,15 @@ class CreateAsccpRequest(BaseModel):
     """Request payload for creating an ASCCP."""
 
     release_id: int = Field(..., ge=1, description="Target release identifier.")
-    role_of_acc_manifest_id: int = Field(..., ge=1, description="Role ACC manifest identifier.")
+    role_of_acc_manifest_id: int = Field(
+        ...,
+        ge=1,
+        description=(
+            "Role ACC manifest identifier. If the role ACC is in the same library as `release_id`, it must be "
+            "from that release. If it is in a different library, its release must be one of the target release "
+            "dependencies."
+        ),
+    )
     initial_property_term: str | None = Field(default="Property Term", description="Initial property term.")
     asccp_type: Literal["Default", "DataArea", "Extension", "Verb", "BOD"] = Field(
         default="Default",
@@ -157,7 +169,9 @@ class CreateBccpRequest(BaseModel):
         ge=1,
         description=(
             "Target BDT manifest identifier. The selected data type must already be a BDT, "
-            "which means its base DT link is set."
+            "which means its base DT link is set. If the BDT is in the same library as `release_id`, it must be "
+            "from that release. If it is in a different library, its release must be one of the target release "
+            "dependencies."
         ),
     )
     initial_property_term: str | None = Field(default="Property Term", description="Initial property term.")
@@ -269,6 +283,15 @@ class ReorderBccInAccResponse(BaseModel):
 class UpdateAccRequest(BaseModel):
     """Request payload for updating mutable ACC fields."""
 
+    based_acc_manifest_id: int | None = Field(
+        default=None,
+        ge=1,
+        description=(
+            "Updated base ACC manifest identifier. Use null to clear the current base ACC. If the base ACC is in "
+            "the same library as the target ACC, it must be from the target ACC release. If it is in a different "
+            "library, its release must be one of the target ACC release dependencies."
+        ),
+    )
     object_class_term: str | None = Field(default=None, description="Updated object class term.")
     component_type: Literal[
         "Base",
@@ -311,7 +334,142 @@ class UpdateAccRequest(BaseModel):
                 "definition_source": "https://www.oagis.org",
                 "is_abstract": False,
                 "deprecated": False,
+                "based_acc_manifest_id": 12,
                 "namespace_id": 1,
+            }
+        },
+    )
+
+
+class UpdateAsccRequest(BaseModel):
+    """Request payload for updating mutable ASCC fields."""
+
+    cardinality_min: int | None = Field(default=None, ge=0, description="Updated minimum cardinality.")
+    cardinality_max: int | None = Field(
+        default=None,
+        ge=-1,
+        description="Updated maximum cardinality. Use `-1` for unbounded.",
+    )
+    definition: str | None = Field(default=None, description="Updated definition text. Use null to clear the definition.")
+    definition_source: str | None = Field(
+        default=None,
+        description="Updated definition source. Use null to clear the definition source.",
+    )
+    deprecated: bool | None = Field(default=None, description="Updated deprecation flag.")
+
+    model_config = ConfigDict(frozen=True)
+
+
+class AddAsccToAccRequest(BaseModel):
+    """Optional request payload for setting ASCC fields at create time."""
+
+    cardinality_min: int | None = Field(default=None, ge=0, description="Initial minimum cardinality.")
+    cardinality_max: int | None = Field(
+        default=None,
+        ge=-1,
+        description="Initial maximum cardinality. Use `-1` for unbounded.",
+    )
+    definition: str | None = Field(default=None, description="Initial definition text. Use null to leave it empty.")
+    definition_source: str | None = Field(
+        default=None,
+        description="Initial definition source. Use null to leave it empty.",
+    )
+
+    model_config = ConfigDict(frozen=True)
+
+
+BccEntityTypeUpdate = Literal["Element", "Attribute", 1, 0]
+
+
+class BccValueConstraintRequest(BaseModel):
+    """Mutually exclusive value-constraint selection for BCC updates."""
+
+    default_value: str | None = Field(
+        default=None,
+        description="Default value to apply when the element is omitted.",
+    )
+    fixed_value: str | None = Field(
+        default=None,
+        description="Fixed value to require for the element.",
+    )
+
+    @model_validator(mode="after")
+    def validate_exactly_one_selection(self) -> "BccValueConstraintRequest":
+        """Require exactly one value-constraint option."""
+        provided = [self.default_value, self.fixed_value]
+        if sum(value is not None for value in provided) != 1:
+            raise ValueError("Exactly one of default_value or fixed_value must be provided.")
+        return self
+
+    model_config = ConfigDict(frozen=True)
+
+
+class AddBccToAccRequest(BaseModel):
+    """Optional request payload for setting BCC fields at create time."""
+
+    cardinality_min: int | None = Field(default=None, ge=0, description="Initial minimum cardinality.")
+    cardinality_max: int | None = Field(
+        default=None,
+        ge=-1,
+        description="Initial maximum cardinality. Use `-1` for unbounded.",
+    )
+    entity_type: BccEntityTypeUpdate | None = Field(
+        default=None,
+        description="Initial entity type. Use `Element` or `Attribute`. Integer aliases `1` and `0` are also accepted.",
+    )
+    is_nillable: bool | None = Field(default=None, description="Initial nillable flag.")
+    definition: str | None = Field(default=None, description="Initial definition text. Use null to leave it empty.")
+    definition_source: str | None = Field(
+        default=None,
+        description="Initial definition source. Use null to leave it empty.",
+    )
+    value_constraint: BccValueConstraintRequest | None = Field(
+        default=None,
+        description="Initial value constraint. Provide exactly one of default_value or fixed_value.",
+    )
+
+    model_config = ConfigDict(frozen=True)
+
+
+class UpdateBccRequest(BaseModel):
+    """Request payload for updating mutable BCC fields."""
+
+    entity_type: BccEntityTypeUpdate | None = Field(
+        default=None,
+        description="Updated entity type. Use `Element` or `Attribute`. Integer aliases `1` and `0` are also accepted.",
+    )
+    cardinality_min: int | None = Field(default=None, ge=0, description="Updated minimum cardinality.")
+    cardinality_max: int | None = Field(
+        default=None,
+        ge=-1,
+        description="Updated maximum cardinality. Use `-1` for unbounded.",
+    )
+    definition: str | None = Field(default=None, description="Updated definition text. Use null to clear the definition.")
+    definition_source: str | None = Field(
+        default=None,
+        description="Updated definition source. Use null to clear the definition source.",
+    )
+    deprecated: bool | None = Field(default=None, description="Updated deprecation flag.")
+    is_nillable: bool | None = Field(default=None, description="Updated nillable flag.")
+    value_constraint: BccValueConstraintRequest | None = Field(
+        default=None,
+        description="Updated value constraint. Provide one of `default_value` or `fixed_value`. Use null to clear the current value constraint.",
+    )
+
+    model_config = ConfigDict(
+        frozen=True,
+        json_schema_extra={
+            "example": {
+                "entity_type": "Element",
+                "cardinality_min": 0,
+                "cardinality_max": 1,
+                "definition": "The monetary amount of the purchase order.",
+                "definition_source": "https://www.oagis.org",
+                "deprecated": False,
+                "is_nillable": False,
+                "value_constraint": {
+                    "default_value": "0.00",
+                },
             }
         },
     )
@@ -344,24 +502,6 @@ class UpdateBccpRequest(BaseModel):
     fixed_value: str | None = Field(default=None, description="Updated fixed value. Use null to clear it.")
 
     model_config = ConfigDict(frozen=True)
-
-
-class UpdateAccBaseRequest(BaseModel):
-    """Request payload for setting or unsetting an ACC base manifest."""
-
-    based_acc_manifest_id: int | None = Field(
-        ...,
-        ge=1,
-        description=(
-            "Base ACC manifest identifier. Provide a manifest ID to set the base ACC, "
-            "or null to remove the current base ACC."
-        ),
-    )
-
-    model_config = ConfigDict(
-        frozen=True,
-        json_schema_extra={"example": {"based_acc_manifest_id": 12}},
-    )
 
 
 class UpdateAccStateRequest(BaseModel):
@@ -404,6 +544,14 @@ class UpdateBccpStateRequest(BaseModel):
     model_config = ConfigDict(frozen=True)
 
 
+class TransferOwnershipRequest(BaseModel):
+    """Request payload for core-component ownership transfer."""
+
+    target_user_id: int = Field(..., ge=1, description="Target owner user ID.")
+
+    model_config = ConfigDict(frozen=True)
+
+
 class UpdateAccResponse(BaseModel):
     """Response payload for ACC update operations."""
 
@@ -419,6 +567,24 @@ class UpdateAccResponse(BaseModel):
             }
         },
     )
+
+
+class UpdateAsccResponse(BaseModel):
+    """Response payload for ASCC update operations."""
+
+    ascc_manifest_id: int = Field(..., ge=1, description="Target ASCC manifest identifier.")
+    updates: list[str] = Field(default_factory=list, description="Updated field names.")
+
+    model_config = ConfigDict(frozen=True)
+
+
+class UpdateBccResponse(BaseModel):
+    """Response payload for BCC update operations."""
+
+    bcc_manifest_id: int = Field(..., ge=1, description="Target BCC manifest identifier.")
+    updates: list[str] = Field(default_factory=list, description="Updated field names.")
+
+    model_config = ConfigDict(frozen=True)
 
 
 class UpdateAsccpResponse(BaseModel):
@@ -439,25 +605,31 @@ class UpdateBccpResponse(BaseModel):
     model_config = ConfigDict(frozen=True)
 
 
-class UpdateAccBaseResponse(BaseModel):
-    """Response payload for ACC base update operations."""
+class TransferAccOwnershipResponse(BaseModel):
+    """Response payload for ACC ownership transfer."""
 
-    acc_manifest_id: int = Field(..., ge=1, description="Target ACC manifest identifier.", examples=[1])
-    updates: list[str] = Field(
-        default_factory=list,
-        description="Updated field names.",
-        examples=[["based_acc_manifest_id"]],
-    )
+    acc_manifest_id: int = Field(..., ge=1, description="Target ACC manifest identifier.")
+    updates: list[str] = Field(default_factory=list, description="Updated field names.")
 
-    model_config = ConfigDict(
-        frozen=True,
-        json_schema_extra={
-            "example": {
-                "acc_manifest_id": 1,
-                "updates": ["based_acc_manifest_id"],
-            }
-        },
-    )
+    model_config = ConfigDict(frozen=True)
+
+
+class TransferAsccpOwnershipResponse(BaseModel):
+    """Response payload for ASCCP ownership transfer."""
+
+    asccp_manifest_id: int = Field(..., ge=1, description="Target ASCCP manifest identifier.")
+    updates: list[str] = Field(default_factory=list, description="Updated field names.")
+
+    model_config = ConfigDict(frozen=True)
+
+
+class TransferBccpOwnershipResponse(BaseModel):
+    """Response payload for BCCP ownership transfer."""
+
+    bccp_manifest_id: int = Field(..., ge=1, description="Target BCCP manifest identifier.")
+    updates: list[str] = Field(default_factory=list, description="Updated field names.")
+
+    model_config = ConfigDict(frozen=True)
 
 
 class UpdateAccTagsResponse(BaseModel):

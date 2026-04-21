@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from app.services.models import WhoAndWhen
 from app.services.utils.date import DateRange
 from app.services.utils.pagination import PaginationParams
-from app.types.identifiers import LibraryId
+from app.types.identifiers import LibraryId, ReleaseId
 
 
 class LibraryServiceParams:
@@ -63,3 +63,34 @@ class LibrarySummaryServiceRecord:
 
     library_id: LibraryId
     name: str
+
+
+@dataclass(kw_only=True)
+class CreateLibraryServiceResult:
+    """Result returned after creating a library."""
+
+    library_id: LibraryId
+
+
+@dataclass(kw_only=True)
+class UpdateLibraryServiceResult:
+    """Result returned after updating a library."""
+
+    library_id: LibraryId
+    updates: list[str]
+
+
+@dataclass(kw_only=True)
+class DiscardLibraryCheckServiceResult:
+    """Result returned by the discard-check operation."""
+
+    discardable: bool
+    message: str
+
+
+@dataclass(kw_only=True)
+class UpdateLibraryReleaseDependenciesServiceResult:
+    """Result returned after replacing working-release dependencies."""
+
+    library_id: LibraryId
+    release_ids: list[ReleaseId]

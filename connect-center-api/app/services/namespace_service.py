@@ -1,9 +1,4 @@
-"""Service layer for Namespace operations in connectCenter.
-
-Namespaces provide unique identification and scoping for components and entities.
-This service delegates query and retrieval operations to the repository while
-documenting supported filters, pagination, and sorting.
-"""
+"""Service layer for Namespace operations in connectCenter."""
 
 
 from __future__ import annotations
@@ -17,67 +12,21 @@ from app.repositories.models.app_user import AppUserRow
 from app.security import AuthenticatedUser
 from app.services import load_users_by_ids, to_user_summary
 from app.services.models import WhoAndWhen
-from app.services.models.namespace import NamespaceServiceResult
+from app.services.models.namespace import (
+    CreateNamespaceServiceResult,
+    NamespaceServiceResult,
+    TransferNamespaceOwnershipServiceResult,
+    UpdateNamespaceServiceResult,
+)
 from app.services.utils.date import DateRange
 from app.services.utils.pagination import PaginationParams, PaginationResponse
-from app.types.identifiers import NamespaceId
+from app.types.identifiers import LibraryId, NamespaceId
 
 logger = logging.getLogger("connectcenter.service.namespace")
 
 
 class NamespaceService:
-    """Service class for managing Namespace operations.
-
-    This service provides a comprehensive interface for working with Namespaces,
-    which provide unique identification and scoping for components and entities
-    in connectCenter. Namespaces help organize and distinguish components
-    from different sources or standards.
-
-    Key Features:
-    - Query namespaces with advanced filtering capabilities
-    - Retrieve individual namespaces by ID
-    - Support for pagination, sorting, and date range filtering
-    - Repository-managed loading of related entities (library, owner, creator, last_updater)
-    - SQL injection protection through column whitelisting
-
-    Main Operations:
-    - get(): Retrieve a single namespace by its ID, including library, owner,
-      creator, and last_updater information (as provided by the repository).
-    - list(): Retrieve paginated lists of namespaces with optional filters for
-      library_id, uri, prefix, and is_std_nmsp flag. Supports date range filtering
-      and custom sorting.
-
-    Filtering Capabilities:
-    - Text fields (uri, prefix): case-insensitive partial matching
-    - Boolean field (is_std_nmsp): exact matching for standard namespace flag
-    - Library ID: exact matching
-    - Date range filtering for creation and last update timestamps
-    - All filters can be combined for complex queries
-
-    Sorting:
-    - Supports sorting by multiple columns (uri, prefix, is_std_nmsp, timestamps)
-    - Multi-column sorting with ascending/descending order
-    - Default sorting by creation timestamp (newest first)
-    - Column whitelist prevents SQL injection attacks
-
-    Relationship Loading:
-    - The repository implementation loads library, owner, creator, and last_updater summaries.
-
-    Example Usage:
-        service = NamespaceService(repo)
-
-        # Get a specific namespace
-        namespace = await service.get(namespace_id=NamespaceId(1))
-
-        # Get paginated namespaces with filters
-        page = await service.list(
-            limit=10,
-            offset=0,
-            sorts=[],
-            uri="http://www.example.org",
-            is_std_nmsp=True,
-        )
-    """
+    """Service class for namespace read and command operations."""
 
     # Allowed columns for ordering (defense-in-depth against SQL injection).
     _ORDER_BY_ALLOWED: set[str] = {
@@ -179,6 +128,152 @@ class NamespaceService:
         logger.info("get namespace id=%d → found", int(namespace_id))
         return result
 
+    async def create_namespace(
+        self,
+        *,
+        library_id: LibraryId,
+        uri: str,
+        prefix: str | None = None,
+        description: str | None = None,
+    ) -> CreateNamespaceServiceResult:
+        """Create a namespace following score-http namespace rules."""
+        normalized_uri = self._normalize_uri(uri)
+        normalized_prefix = self._normalize_prefix(prefix)
+
+        if not await self._repo.library_exists(library_id):
+            raise LookupError(f"No library exists with ID {int(library_id)}. Please verify the identifier and try again.")
+        if await self._repo.has_duplicate_uri(library_id=library_id, uri=normalized_uri):
+            raise ValueError(f"Namespace URI '{normalized_uri}' already exists.")
+        if await self._repo.has_duplicate_prefix(library_id=library_id, prefix=normalized_prefix):
+            raise ValueError(f"Namespace Prefix '{normalized_prefix}' already exists.")
+
+        namespace_id = await self._repo.create_namespace(
+            library_id=library_id,
+            uri=normalized_uri,
+            prefix=normalized_prefix,
+            description=description,
+            requester_user_id=self._requester_user_id,
+            requester_is_developer=self._requester_is_developer(),
+        )
+        return CreateNamespaceServiceResult(namespace_id=int(namespace_id))
+
+    async def update_namespace(
+        self,
+        *,
+        namespace_id: NamespaceId,
+        uri: str,
+        prefix: str | None = None,
+        description: str | None = None,
+    ) -> UpdateNamespaceServiceResult:
+        """Update a namespace owned by the requester."""
+        namespace = await self.get(namespace_id)
+        if namespace is None:
+            raise LookupError(f"No namespace exists with ID {int(namespace_id)}. Please verify the identifier and try again.")
+        self._assert_owner_only(namespace)
+
+        normalized_uri = self._normalize_uri(uri)
+        normalized_prefix = self._normalize_prefix(prefix)
+        library_id = LibraryId(int(namespace.library.library_id))
+
+        if await self._repo.has_duplicate_uri(
+            library_id=library_id,
+            uri=normalized_uri,
+            exclude_namespace_id=namespace_id,
+        ):
+            raise ValueError(f"Namespace URI '{normalized_uri}' already exists.")
+        if await self._repo.has_duplicate_prefix(
+            library_id=library_id,
+            prefix=normalized_prefix,
+            exclude_namespace_id=namespace_id,
+        ):
+            raise ValueError(f"Namespace Prefix '{normalized_prefix}' already exists.")
+
+        updates: list[str] = []
+        if namespace.uri != normalized_uri:
+            updates.append("uri")
+        if (namespace.prefix or "") != normalized_prefix:
+            updates.append("prefix")
+        if namespace.description != description:
+            updates.append("description")
+
+        if not updates:
+            return UpdateNamespaceServiceResult(namespace_id=int(namespace_id), updates=[])
+
+        updated = await self._repo.update_namespace(
+            namespace_id=namespace_id,
+            uri=normalized_uri,
+            prefix=normalized_prefix,
+            description=description,
+            requester_user_id=self._requester_user_id,
+        )
+        if not updated:
+            raise PermissionError("Only the namespace owner can update the namespace.")
+        return UpdateNamespaceServiceResult(namespace_id=int(namespace_id), updates=updates)
+
+    async def discard_namespace(
+        self,
+        *,
+        namespace_id: NamespaceId,
+    ) -> None:
+        """Discard a namespace when it is not in use."""
+        namespace = await self.get(namespace_id)
+        if namespace is None:
+            raise LookupError(f"No namespace exists with ID {int(namespace_id)}. Please verify the identifier and try again.")
+        self._assert_owner_only(namespace)
+
+        if await self._repo.namespace_is_used(namespace_id=namespace_id):
+            raise ValueError("The namespace in use cannot be discarded.")
+
+        deleted = await self._repo.discard_namespace(namespace_id=namespace_id)
+        if not deleted:
+            raise LookupError(f"No namespace exists with ID {int(namespace_id)}. Please verify the identifier and try again.")
+
+    async def transfer_namespace_ownership(
+        self,
+        *,
+        namespace_id: NamespaceId,
+        target_login_id: str,
+    ) -> TransferNamespaceOwnershipServiceResult:
+        """Transfer namespace ownership to another user by login ID."""
+        namespace = await self.get(namespace_id)
+        if namespace is None:
+            raise LookupError(f"No namespace exists with ID {int(namespace_id)}. Please verify the identifier and try again.")
+        self._assert_can_transfer(namespace)
+
+        normalized_login_id = target_login_id.strip()
+        if not normalized_login_id:
+            raise ValueError("`target_login_id` is required.")
+
+        target_user = await self._account_service_repo.get_auth_by_login_id(normalized_login_id)
+        if target_user is None:
+            raise LookupError(
+                f"No user exists with login ID '{normalized_login_id}'. Please verify the identifier and try again."
+            )
+
+        target_is_developer = bool(target_user.is_developer)
+        if bool(namespace.is_std_nmsp) != target_is_developer:
+            raise ValueError(
+                "Standard namespaces cannot be transferred to End Users."
+                if namespace.is_std_nmsp
+                else "Non-standard namespaces cannot be transferred to Developers."
+            )
+
+        if int(namespace.owner.user_id) == int(target_user.app_user_id):
+            return TransferNamespaceOwnershipServiceResult(namespace_id=int(namespace_id), updates=[])
+
+        transferred = await self._repo.transfer_namespace_ownership(
+            namespace_id=namespace_id,
+            requester_user_id=self._requester_user_id,
+            target_user_id=int(target_user.app_user_id),
+        )
+        if not transferred:
+            raise PermissionError("Ownership transfer failed due to insufficient permissions.")
+
+        return TransferNamespaceOwnershipServiceResult(
+            namespace_id=int(namespace_id),
+            updates=["owner_user_id"],
+        )
+
     def _to_namespace_result(
         self,
         row: Any,
@@ -208,3 +303,34 @@ class NamespaceService:
             created=WhoAndWhen(who=created, when=row.creation_timestamp),
             last_updated=WhoAndWhen(who=updated, when=row.last_update_timestamp),
         )
+
+    @property
+    def _requester_user_id(self) -> int:
+        return int(self._requester.user.user_id)
+
+    def _is_admin(self) -> bool:
+        return "Admin" in self._requester.user.roles
+
+    def _requester_is_developer(self) -> bool:
+        return "Developer" in self._requester.user.roles
+
+    @staticmethod
+    def _normalize_uri(uri: str) -> str:
+        normalized = uri.strip()
+        if not normalized:
+            raise ValueError("`uri` is required.")
+        return normalized
+
+    @staticmethod
+    def _normalize_prefix(prefix: str | None) -> str:
+        if prefix is None:
+            return ""
+        return prefix.strip()
+
+    def _assert_owner_only(self, namespace: NamespaceServiceResult) -> None:
+        if int(namespace.owner.user_id) != self._requester_user_id:
+            raise PermissionError("Only the namespace owner can modify the namespace.")
+
+    def _assert_can_transfer(self, namespace: NamespaceServiceResult) -> None:
+        if not self._is_admin() and int(namespace.owner.user_id) != self._requester_user_id:
+            raise PermissionError("Only the namespace owner can transfer ownership.")

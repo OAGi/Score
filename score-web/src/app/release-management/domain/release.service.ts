@@ -27,6 +27,11 @@ export class ReleaseService {
     return this.http.get<ReleaseSummary[]>('/api/releases/summaries', {params});
   }
 
+  getWorkingRelease(libraryId: number): Observable<ReleaseSummary> {
+    const params = new HttpParams().set('libraryId', libraryId);
+    return this.http.get<ReleaseSummary>('/api/releases/working', {params});
+  }
+
   getReleaseList(request: ReleaseListRequest): Observable<PageResponse<ReleaseListEntry>> {
     let params = new HttpParams()
         .set('libraryId', '' + request.library.libraryId)

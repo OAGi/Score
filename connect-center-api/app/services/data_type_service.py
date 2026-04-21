@@ -16,11 +16,13 @@ from app.services.models.data_type import (
     CancelDataTypeServiceResult,
     CreateDataTypeSupplementaryComponentServiceResult,
     CreateDataTypeServiceResult,
+    DataTypePrimitiveServiceRecord,
     DataTypeServiceResult,
     DataTypeSupplementaryComponentServiceRecord,
     DataTypeValueConstraintServiceRecord,
     DiscardDataTypeServiceResult,
     ReviseDataTypeServiceResult,
+    TransferDataTypeOwnershipServiceResult,
     UpdateDataTypeServiceResult,
     UpdateDataTypeSupplementaryComponentServiceResult,
 )
@@ -52,6 +54,20 @@ DataTypeState = Literal[
 ]
 
 DataTypeSupplementaryComponentCardinality = Literal["Prohibited", "Optional", "Required"]
+
+CDT_PRIMITIVE_NAMES = {
+    "Binary",
+    "Boolean",
+    "Decimal",
+    "Double",
+    "Float",
+    "Integer",
+    "NormalizedString",
+    "String",
+    "TimeDuration",
+    "TimePoint",
+    "Token",
+}
 
 
 class DataTypeService:
@@ -169,6 +185,16 @@ class DataTypeService:
         release_id: ReleaseId,
         based_dt_manifest_id: DataTypeManifestId,
         tag_id: list[int] | None = None,
+        qualifier: str | None | UnsetType = UNSET,
+        six_digit_id: str | None | UnsetType = UNSET,
+        deprecated: bool | UnsetType = UNSET,
+        namespace_id: int | None | UnsetType = UNSET,
+        content_component_definition: str | None | UnsetType = UNSET,
+        definition: str | None | UnsetType = UNSET,
+        definition_source: str | None | UnsetType = UNSET,
+        xbt_manifest_id: int | None | UnsetType = UNSET,
+        code_list_manifest_id: int | None | UnsetType = UNSET,
+        agency_id_list_manifest_id: int | None | UnsetType = UNSET,
     ) -> CreateDataTypeServiceResult:
         """Create a DT in a release allowed for the requester's role."""
         release = await self._release_service.get(release_id)
@@ -182,6 +208,11 @@ class DataTypeService:
             raise LookupError(
                 f"No DT exists with manifest ID {int(based_dt_manifest_id)}. Please verify the identifier and try again."
             )
+        await self._assert_base_dt_allowed_for_release(
+            target_release_id=release.release_id,
+            target_library_id=release.library.library_id,
+            based_dt=based_dt,
+        )
 
         normalized_tag_ids = self._normalize_tag_ids(tag_id)
         dt_manifest_id = await self._repo.create_dt(
@@ -190,12 +221,41 @@ class DataTypeService:
             requester_user_id=self._requester_user_id,
             tag_id=normalized_tag_ids,
         )
+        if any(
+            value is not UNSET
+            for value in (
+                qualifier,
+                six_digit_id,
+                deprecated,
+                namespace_id,
+                content_component_definition,
+                definition,
+                definition_source,
+                xbt_manifest_id,
+                code_list_manifest_id,
+                agency_id_list_manifest_id,
+            )
+        ):
+            await self.update_dt(
+                dt_manifest_id=dt_manifest_id,
+                qualifier=qualifier,
+                six_digit_id=six_digit_id,
+                deprecated=deprecated,
+                namespace_id=namespace_id,
+                content_component_definition=content_component_definition,
+                definition=definition,
+                definition_source=definition_source,
+                xbt_manifest_id=xbt_manifest_id,
+                code_list_manifest_id=code_list_manifest_id,
+                agency_id_list_manifest_id=agency_id_list_manifest_id,
+            )
         return CreateDataTypeServiceResult(dt_manifest_id=int(dt_manifest_id))
 
     async def update_dt(
         self,
         *,
         dt_manifest_id: DataTypeManifestId,
+        based_dt_manifest_id: DataTypeManifestId | None | UnsetType = UNSET,
         qualifier: str | None | UnsetType = UNSET,
         six_digit_id: str | None | UnsetType = UNSET,
         deprecated: bool | UnsetType = UNSET,
@@ -206,6 +266,8 @@ class DataTypeService:
         xbt_manifest_id: int | None | UnsetType = UNSET,
         code_list_manifest_id: int | None | UnsetType = UNSET,
         agency_id_list_manifest_id: int | None | UnsetType = UNSET,
+        add_primitives: list[DataTypePrimitiveServiceRecord] | UnsetType = UNSET,
+        remove_primitives: list[DataTypePrimitiveServiceRecord] | UnsetType = UNSET,
     ) -> UpdateDataTypeServiceResult:
         """Update mutable DT fields when the requester owns a WIP DT."""
         dt = await self.get(dt_manifest_id)
@@ -236,8 +298,31 @@ class DataTypeService:
             normalized_definition_source = definition_source.strip() or None
 
         current_namespace_id = int(dt.namespace.namespace_id) if dt.namespace is not None else None
+        current_based_dt_manifest_id = int(dt.base_dt.dt_manifest_id) if dt.base_dt is not None else None
+        based_dt_changed = False
+        replacement_base_dt: DataTypeServiceResult | None = None
+        if based_dt_manifest_id is not UNSET:
+            requested_based_dt_manifest_id = None if based_dt_manifest_id is None else int(based_dt_manifest_id)
+            based_dt_changed = requested_based_dt_manifest_id != current_based_dt_manifest_id
+            if based_dt_changed and requested_based_dt_manifest_id is not None:
+                replacement_base_dt = await self._resolve_replacement_base_dt(
+                    target_dt=dt,
+                    based_dt_manifest_id=DataTypeManifestId(requested_based_dt_manifest_id),
+                )
+                blocking_derived_dts = await self._find_non_wip_inherited_dts(dt_manifest_id)
+                if blocking_derived_dts:
+                    blocked = ", ".join(f"'{item.den}' ({item.state})" for item in blocking_derived_dts)
+                    subject = "the following derived DT is" if len(blocking_derived_dts) == 1 else "the following derived DTs are"
+                    raise ValueError(
+                        f"The base DT cannot be changed for DT '{dt.den}' because {subject} "
+                        f"not in the 'WIP' state: {blocked}. Base DT changes that resync inherited "
+                        "primitives and supplementary components require the target DT and all derived DTs "
+                        "to be in the 'WIP' state."
+                    )
 
         updates: list[str] = []
+        if based_dt_changed:
+            updates.append("based_dt_manifest_id")
         if normalized_qualifier is not UNSET and normalized_qualifier != dt.qualifier:
             updates.append("qualifier")
         if normalized_six_digit_id is not UNSET and normalized_six_digit_id != dt.six_digit_id:
@@ -255,13 +340,15 @@ class DataTypeService:
             updates.append("definition")
         if normalized_definition_source is not UNSET and normalized_definition_source != dt.definition_source:
             updates.append("definition_source")
-        primitive_change_requested = any(
+        primitive_selection_requested = any(
             value is not UNSET for value in (xbt_manifest_id, code_list_manifest_id, agency_id_list_manifest_id)
         )
+        primitive_mutation_requested = add_primitives is not UNSET or remove_primitives is not UNSET
+        primitive_change_requested = primitive_selection_requested or primitive_mutation_requested
         normalized_xbt_manifest_id: int | None = None
         normalized_code_list_manifest_id: int | None = None
         normalized_agency_id_list_manifest_id: int | None = None
-        if primitive_change_requested:
+        if primitive_selection_requested:
             (
                 normalized_xbt_manifest_id,
                 normalized_code_list_manifest_id,
@@ -274,7 +361,40 @@ class DataTypeService:
         if not updates and not primitive_change_requested:
             return UpdateDataTypeServiceResult(dt_manifest_id=int(dt_manifest_id), updates=[])
 
-        if updates:
+        scalar_updates = [
+            update
+            for update in updates
+            if update not in {"based_dt_manifest_id", "primitives", "supplementary_components", "default_primitive"}
+        ]
+
+        if based_dt_changed:
+            await self._repo.update_dt_base(
+                dt_manifest_id=dt_manifest_id,
+                based_dt_manifest_id=(
+                    None if based_dt_manifest_id is None else DataTypeManifestId(int(based_dt_manifest_id))
+                ),
+                requester_user_id=self._requester_user_id,
+            )
+            if replacement_base_dt is not None:
+                primitives_replaced = await self._replace_dt_primitives_recursive(
+                    dt_manifest_id=dt_manifest_id,
+                    primitives=replacement_base_dt.primitives,
+                    skip_ownership_check=False,
+                )
+                if primitives_replaced:
+                    updates.append("primitives")
+                inherited_dt_sc_manifest_ids = await self._list_inherited_dt_sc_manifest_ids(dt_manifest_id)
+                for inherited_dt_sc_manifest_id in inherited_dt_sc_manifest_ids:
+                    await self._delete_dt_sc_branch_recursive(inherited_dt_sc_manifest_id)
+                for supplementary_component in replacement_base_dt.supplementary_components:
+                    await self._create_dt_sc_from_base_recursive(
+                        owner_dt_manifest_id=dt_manifest_id,
+                        based_dt_sc_manifest_id=supplementary_component.dt_sc_manifest_id,
+                    )
+                if inherited_dt_sc_manifest_ids or replacement_base_dt.supplementary_components:
+                    updates.append("supplementary_components")
+
+        if scalar_updates:
             await self._repo.update_dt(
                 dt_manifest_id=dt_manifest_id,
                 qualifier=None if normalized_qualifier is UNSET else normalized_qualifier,
@@ -297,16 +417,71 @@ class DataTypeService:
             )
         primitive_updated = False
         if primitive_change_requested:
-            primitive_updated = await self._change_dt_default_primitive_recursive(
-                dt_manifest_id=dt_manifest_id,
-                xbt_manifest_id=normalized_xbt_manifest_id,
-                code_list_manifest_id=normalized_code_list_manifest_id,
-                agency_id_list_manifest_id=normalized_agency_id_list_manifest_id,
-                skip_ownership_check=False,
-            )
-            if primitive_updated:
-                updates.append("default_primitive")
+            if primitive_mutation_requested:
+                desired_primitives, membership_changed, default_changed = self._resolve_primitive_update(
+                    current_primitives=dt.primitives,
+                    add_primitives=[] if add_primitives is UNSET else add_primitives,
+                    remove_primitives=[] if remove_primitives is UNSET else remove_primitives,
+                    default_primitive=(
+                        None
+                        if not primitive_selection_requested
+                        else DataTypePrimitiveServiceRecord(
+                            xbt_manifest_id=normalized_xbt_manifest_id,
+                            code_list_manifest_id=normalized_code_list_manifest_id,
+                            agency_id_list_manifest_id=normalized_agency_id_list_manifest_id,
+                            is_default=True,
+                        )
+                    ),
+                )
+                primitive_updated = await self._replace_dt_primitives_recursive(
+                    dt_manifest_id=dt_manifest_id,
+                    primitives=desired_primitives,
+                    skip_ownership_check=False,
+                )
+                if primitive_updated and membership_changed:
+                    updates.append("primitives")
+                if primitive_updated and default_changed:
+                    updates.append("default_primitive")
+            else:
+                primitive_updated = await self._change_dt_default_primitive_recursive(
+                    dt_manifest_id=dt_manifest_id,
+                    xbt_manifest_id=normalized_xbt_manifest_id,
+                    code_list_manifest_id=normalized_code_list_manifest_id,
+                    agency_id_list_manifest_id=normalized_agency_id_list_manifest_id,
+                    skip_ownership_check=False,
+                )
+                if primitive_updated:
+                    updates.append("default_primitive")
         return UpdateDataTypeServiceResult(dt_manifest_id=int(dt_manifest_id), updates=sorted(set(updates)))
+
+    async def transfer_dt_ownership(
+        self,
+        *,
+        dt_manifest_id: DataTypeManifestId,
+        target_user_id: int,
+    ) -> TransferDataTypeOwnershipServiceResult:
+        """Transfer DT ownership to another user while the DT is in `WIP`."""
+        logger.info("transfer dt ownership id=%d → user_id=%d", int(dt_manifest_id), int(target_user_id))
+        dt = await self.get(dt_manifest_id)
+        if dt is None:
+            raise LookupError(
+                f"No DT exists with manifest ID {int(dt_manifest_id)}. Please verify the identifier and try again."
+            )
+        self._assert_can_transfer_dt(dt)
+        if int(target_user_id) == int(dt.owner.user_id):
+            logger.info("transfer dt ownership id=%d → no-op (same owner)", int(dt_manifest_id))
+            return TransferDataTypeOwnershipServiceResult(dt_manifest_id=int(dt_manifest_id), updates=[])
+        transferred = await self._repo.transfer_dt_ownership(
+            dt_manifest_id=dt_manifest_id,
+            requester_user_id=self._requester_user_id,
+            target_user_id=int(target_user_id),
+        )
+        if not transferred:
+            raise LookupError(
+                f"No DT exists with manifest ID {int(dt_manifest_id)}. Please verify the identifier and try again."
+            )
+        logger.info("transfer dt ownership id=%d → transferred to user_id=%d", int(dt_manifest_id), int(target_user_id))
+        return TransferDataTypeOwnershipServiceResult(dt_manifest_id=int(dt_manifest_id), updates=["owner_user_id"])
 
     async def add_dt_tags(
         self,
@@ -383,6 +558,8 @@ class DataTypeService:
         xbt_manifest_id: int | None | UnsetType = UNSET,
         code_list_manifest_id: int | None | UnsetType = UNSET,
         agency_id_list_manifest_id: int | None | UnsetType = UNSET,
+        add_primitives: list[DataTypePrimitiveServiceRecord] | UnsetType = UNSET,
+        remove_primitives: list[DataTypePrimitiveServiceRecord] | UnsetType = UNSET,
         skip_ownership_check: bool = False,
     ) -> UpdateDataTypeSupplementaryComponentServiceResult:
         """Update mutable DT_SC fields and propagate the same change to inherited DT_SCs."""
@@ -422,13 +599,15 @@ class DataTypeService:
         if cardinality is not UNSET:
             normalized_cardinality_min, normalized_cardinality_max = self._normalize_dt_sc_cardinality(cardinality)
 
-        primitive_change_requested = any(
+        primitive_selection_requested = any(
             value is not UNSET for value in (xbt_manifest_id, code_list_manifest_id, agency_id_list_manifest_id)
         )
+        primitive_mutation_requested = add_primitives is not UNSET or remove_primitives is not UNSET
+        primitive_change_requested = primitive_selection_requested or primitive_mutation_requested
         normalized_xbt_manifest_id: int | None = None
         normalized_code_list_manifest_id: int | None = None
         normalized_agency_id_list_manifest_id: int | None = None
-        if primitive_change_requested:
+        if primitive_selection_requested:
             (
                 normalized_xbt_manifest_id,
                 normalized_code_list_manifest_id,
@@ -502,17 +681,44 @@ class DataTypeService:
                 definition_source_set=normalized_definition_source is not UNSET,
                 requester_user_id=self._requester_user_id,
             )
+            if primitive_mutation_requested and normalized_representation_term is not UNSET:
+                dt, dt_sc = await self._get_owner_dt_and_sc(dt_sc_manifest_id)
         primitive_updated = False
         if primitive_change_requested:
-            primitive_updated = await self._repo.change_dt_sc_default_primitive(
-                dt_sc_manifest_id=dt_sc_manifest_id,
-                xbt_manifest_id=normalized_xbt_manifest_id,
-                code_list_manifest_id=normalized_code_list_manifest_id,
-                agency_id_list_manifest_id=normalized_agency_id_list_manifest_id,
-                requester_user_id=self._requester_user_id,
-            )
-            if primitive_updated:
-                updates.append("default_primitive")
+            if primitive_mutation_requested:
+                desired_primitives, membership_changed, default_changed = self._resolve_primitive_update(
+                    current_primitives=dt_sc.primitives,
+                    add_primitives=[] if add_primitives is UNSET else add_primitives,
+                    remove_primitives=[] if remove_primitives is UNSET else remove_primitives,
+                    default_primitive=(
+                        None
+                        if not primitive_selection_requested
+                        else DataTypePrimitiveServiceRecord(
+                            xbt_manifest_id=normalized_xbt_manifest_id,
+                            code_list_manifest_id=normalized_code_list_manifest_id,
+                            agency_id_list_manifest_id=normalized_agency_id_list_manifest_id,
+                            is_default=True,
+                        )
+                    ),
+                )
+                primitive_updated = await self._replace_dt_sc_primitives(
+                    dt_sc_manifest_id=dt_sc_manifest_id,
+                    primitives=desired_primitives,
+                )
+                if primitive_updated and membership_changed:
+                    updates.append("primitives")
+                if primitive_updated and default_changed:
+                    updates.append("default_primitive")
+            else:
+                primitive_updated = await self._repo.change_dt_sc_default_primitive(
+                    dt_sc_manifest_id=dt_sc_manifest_id,
+                    xbt_manifest_id=normalized_xbt_manifest_id,
+                    code_list_manifest_id=normalized_code_list_manifest_id,
+                    agency_id_list_manifest_id=normalized_agency_id_list_manifest_id,
+                    requester_user_id=self._requester_user_id,
+                )
+                if primitive_updated:
+                    updates.append("default_primitive")
         for inherited_dt_sc_manifest_id in await self._repo.list_direct_inherited_dt_sc_manifest_ids(dt_sc_manifest_id):
             await self.update_dt_sc(
                 dt_sc_manifest_id=inherited_dt_sc_manifest_id,
@@ -524,9 +730,11 @@ class DataTypeService:
                 fixed_value=normalized_fixed_value,
                 definition=normalized_definition,
                 definition_source=normalized_definition_source,
-                xbt_manifest_id=normalized_xbt_manifest_id if primitive_change_requested else UNSET,
-                code_list_manifest_id=normalized_code_list_manifest_id if primitive_change_requested else UNSET,
-                agency_id_list_manifest_id=normalized_agency_id_list_manifest_id if primitive_change_requested else UNSET,
+                xbt_manifest_id=normalized_xbt_manifest_id if primitive_selection_requested else UNSET,
+                code_list_manifest_id=normalized_code_list_manifest_id if primitive_selection_requested else UNSET,
+                agency_id_list_manifest_id=normalized_agency_id_list_manifest_id if primitive_selection_requested else UNSET,
+                add_primitives=add_primitives,
+                remove_primitives=remove_primitives,
                 skip_ownership_check=True,
             )
         return UpdateDataTypeSupplementaryComponentServiceResult(
@@ -794,6 +1002,7 @@ class DataTypeService:
             commonly_used=row.commonly_used,
             is_deprecated=row.is_deprecated,
             state=row.state,
+            primitives=[self._to_primitive_result(primitive) for primitive in row.primitives],
             supplementary_components=[
                 self._to_supplementary_component_result(component)
                 for component in row.supplementary_components
@@ -835,6 +1044,17 @@ class DataTypeService:
             cardinality_max=component.cardinality_max,
             value_constraint=value_constraint,
             is_deprecated=component.is_deprecated,
+            primitives=[DataTypeService._to_primitive_result(primitive) for primitive in component.primitives],
+        )
+
+    @staticmethod
+    def _to_primitive_result(component: Any) -> DataTypePrimitiveServiceRecord:
+        return DataTypePrimitiveServiceRecord(
+            cdt_pri_name=component.cdt_pri_name,
+            xbt_manifest_id=component.xbt_manifest_id,
+            code_list_manifest_id=component.code_list_manifest_id,
+            agency_id_list_manifest_id=component.agency_id_list_manifest_id,
+            is_default=bool(component.is_default),
         )
 
     @property
@@ -870,12 +1090,33 @@ class DataTypeService:
         if not self._is_admin() and int(dt.owner.user_id) != self._requester_user_id:
             raise PermissionError("It only allows to modify the core component by the owner.")
 
-    def _assert_can_update_dt(self, dt: DataTypeServiceResult) -> None:
-        """Validate owner/admin and WIP requirements for DT updates."""
+    def _assert_dt_is_wip(self, dt: DataTypeServiceResult) -> None:
+        """Require the DT to be in the mutable WIP state."""
         if dt.state != "WIP":
             raise ValueError(
                 f"The DT '{dt.den}' cannot be updated because it is in the '{dt.state}' state. "
                 "Only DTs in the 'WIP' state can be updated."
+            )
+
+    def _assert_dt_allows_new_supplementary_component(self, dt: DataTypeServiceResult) -> None:
+        """Require the owner DT to be WIP before adding a supplementary component."""
+        if dt.state != "WIP":
+            raise ValueError(
+                f"The supplementary component cannot be added to DT '{dt.den}' because it is in the '{dt.state}' state. "
+                "Supplementary components can only be added to DTs in the 'WIP' state."
+            )
+
+    def _assert_can_update_dt(self, dt: DataTypeServiceResult) -> None:
+        """Validate owner/admin and WIP requirements for DT updates."""
+        self._assert_dt_is_wip(dt)
+        self._assert_owner_or_admin(dt)
+
+    def _assert_can_transfer_dt(self, dt: DataTypeServiceResult) -> None:
+        """Validate owner/admin and WIP requirements for DT ownership transfer."""
+        if dt.state != "WIP":
+            raise ValueError(
+                f"The DT '{dt.den}' cannot be transferred because it is in the '{dt.state}' state. "
+                "Only DTs in the 'WIP' state can be transferred."
             )
         self._assert_owner_or_admin(dt)
 
@@ -1004,11 +1245,7 @@ class DataTypeService:
             raise LookupError(
                 f"No DT exists with manifest ID {int(owner_dt_manifest_id)}. Please verify the identifier and try again."
             )
-        if dt.state != "WIP":
-            raise ValueError(
-                f"The supplementary component cannot be added to DT '{dt.den}' because it is in the '{dt.state}' state. "
-                "Supplementary components can only be added to DTs in the 'WIP' state."
-            )
+        self._assert_dt_allows_new_supplementary_component(dt)
         dt_sc_manifest_id = await self._repo.create_dt_sc_from_base(
             owner_dt_manifest_id=owner_dt_manifest_id,
             based_dt_sc_manifest_id=based_dt_sc_manifest_id,
@@ -1035,11 +1272,7 @@ class DataTypeService:
             raise LookupError(
                 f"No DT exists with manifest ID {int(dt_manifest_id)}. Please verify the identifier and try again."
             )
-        if dt.state != "WIP":
-            raise ValueError(
-                f"The DT '{dt.den}' cannot be updated because it is in the '{dt.state}' state. "
-                "Only DTs in the 'WIP' state can be updated."
-            )
+        self._assert_dt_is_wip(dt)
         if not skip_ownership_check:
             self._assert_owner_or_admin(dt)
 
@@ -1064,6 +1297,69 @@ class DataTypeService:
             )
         return updated or inherited_updated
 
+    async def _replace_dt_primitives_recursive(
+        self,
+        *,
+        dt_manifest_id: DataTypeManifestId,
+        primitives: list[DataTypePrimitiveServiceRecord],
+        skip_ownership_check: bool,
+    ) -> bool:
+        dt = await self.get(dt_manifest_id)
+        if dt is None:
+            raise LookupError(
+                f"No DT exists with manifest ID {int(dt_manifest_id)}. Please verify the identifier and try again."
+            )
+        self._assert_dt_is_wip(dt)
+        if not skip_ownership_check:
+            self._assert_owner_or_admin(dt)
+
+        updated = await self._repo.replace_dt_primitives(
+            dt_manifest_id=dt_manifest_id,
+            primitives=[
+                DataTypePrimitiveServiceRecord(
+                    cdt_pri_name=primitive.cdt_pri_name,
+                    xbt_manifest_id=primitive.xbt_manifest_id,
+                    code_list_manifest_id=primitive.code_list_manifest_id,
+                    agency_id_list_manifest_id=primitive.agency_id_list_manifest_id,
+                    is_default=primitive.is_default,
+                )
+                for primitive in primitives
+            ],
+            requester_user_id=self._requester_user_id,
+        )
+        inherited_updated = False
+        for inherited_dt_manifest_id in await self._repo.list_direct_inherited_dt_manifest_ids(dt_manifest_id):
+            inherited_updated = (
+                await self._replace_dt_primitives_recursive(
+                    dt_manifest_id=inherited_dt_manifest_id,
+                    primitives=primitives,
+                    skip_ownership_check=True,
+                )
+                or inherited_updated
+            )
+        return updated or inherited_updated
+
+    async def _replace_dt_sc_primitives(
+        self,
+        *,
+        dt_sc_manifest_id: DataTypeSupplementaryComponentManifestId,
+        primitives: list[DataTypePrimitiveServiceRecord],
+    ) -> bool:
+        return await self._repo.replace_dt_sc_primitives(
+            dt_sc_manifest_id=dt_sc_manifest_id,
+            primitives=[
+                DataTypePrimitiveServiceRecord(
+                    cdt_pri_name=primitive.cdt_pri_name,
+                    xbt_manifest_id=primitive.xbt_manifest_id,
+                    code_list_manifest_id=primitive.code_list_manifest_id,
+                    agency_id_list_manifest_id=primitive.agency_id_list_manifest_id,
+                    is_default=primitive.is_default,
+                )
+                for primitive in primitives
+            ],
+            requester_user_id=self._requester_user_id,
+        )
+
     async def _find_non_wip_inherited_dts(
         self,
         dt_manifest_id: DataTypeManifestId,
@@ -1077,6 +1373,103 @@ class DataTypeService:
                 results.append(inherited_dt)
             results.extend(await self._find_non_wip_inherited_dts(inherited_dt_manifest_id))
         return results
+
+    async def _resolve_replacement_base_dt(
+        self,
+        *,
+        target_dt: DataTypeServiceResult,
+        based_dt_manifest_id: DataTypeManifestId,
+    ) -> DataTypeServiceResult:
+        if int(based_dt_manifest_id) == int(target_dt.dt_manifest_id):
+            raise ValueError("A DT cannot be based on itself.")
+        based_dt = await self.get(based_dt_manifest_id)
+        if based_dt is None:
+            raise LookupError(
+                f"No DT exists with manifest ID {int(based_dt_manifest_id)}. Please verify the identifier and try again."
+            )
+        await self._assert_base_dt_allowed_for_release(
+            target_release_id=target_dt.release.release_id,
+            target_library_id=target_dt.library.library_id,
+            based_dt=based_dt,
+        )
+
+        current_base = based_dt
+        visited: set[int] = set()
+        while current_base.base_dt is not None:
+            current_base_manifest_id = int(current_base.dt_manifest_id)
+            if current_base_manifest_id in visited:
+                break
+            visited.add(current_base_manifest_id)
+            next_base_manifest_id = current_base.base_dt.dt_manifest_id
+            if int(next_base_manifest_id) == int(target_dt.dt_manifest_id):
+                raise ValueError("Changing the base DT would create a cycle.")
+            next_base = await self.get(next_base_manifest_id)
+            if next_base is None:
+                break
+            current_base = next_base
+
+        return based_dt
+
+    async def _assert_base_dt_allowed_for_release(
+        self,
+        *,
+        target_release_id: ReleaseId | int,
+        target_library_id: int,
+        based_dt: DataTypeServiceResult,
+    ) -> None:
+        base_library_id = int(based_dt.library.library_id)
+        base_release_id = int(based_dt.release.release_id)
+        normalized_target_release_id = int(target_release_id)
+        if base_library_id == int(target_library_id):
+            if base_release_id != normalized_target_release_id:
+                raise ValueError(
+                    "The base DT must belong to the same release as the target release when both DTs are in the same library. "
+                    "Please choose a base DT from the target release and try again."
+                )
+            return
+
+        dependent_release_ids = {
+            int(dependent_release_id)
+            for dependent_release_id in await self._release_service.get_dependent_releases(
+                ReleaseId(normalized_target_release_id)
+            )
+        }
+        if base_release_id not in dependent_release_ids:
+            raise ValueError(
+                "The base DT must come from a dependent release when the base DT belongs to a different library. "
+                "Please choose a base DT from one of the target release dependencies and try again."
+            )
+
+    async def _list_inherited_dt_sc_manifest_ids(
+        self,
+        dt_manifest_id: DataTypeManifestId,
+    ) -> list[DataTypeSupplementaryComponentManifestId]:
+        dt = await self.get(dt_manifest_id)
+        if dt is None:
+            raise LookupError(
+                f"No DT exists with manifest ID {int(dt_manifest_id)}. Please verify the identifier and try again."
+            )
+        inherited_manifest_ids: list[DataTypeSupplementaryComponentManifestId] = []
+        for supplementary_component in dt.supplementary_components:
+            if (
+                await self._repo.get_based_dt_sc_manifest_id(supplementary_component.dt_sc_manifest_id)
+                is not None
+            ):
+                inherited_manifest_ids.append(supplementary_component.dt_sc_manifest_id)
+        return inherited_manifest_ids
+
+    async def _delete_dt_sc_branch_recursive(
+        self,
+        dt_sc_manifest_id: DataTypeSupplementaryComponentManifestId,
+    ) -> bool:
+        deleted = False
+        for inherited_dt_sc_manifest_id in await self._repo.list_direct_inherited_dt_sc_manifest_ids(dt_sc_manifest_id):
+            deleted = await self._delete_dt_sc_branch_recursive(inherited_dt_sc_manifest_id) or deleted
+        deleted_here = await self._repo.delete_dt_sc(
+            dt_sc_manifest_id=dt_sc_manifest_id,
+            requester_user_id=self._requester_user_id,
+        )
+        return deleted_here or deleted
 
     @staticmethod
     def _normalize_default_primitive_target(
@@ -1096,6 +1489,104 @@ class DataTypeService:
                 "Exactly one of xbt_manifest_id, code_list_manifest_id, or agency_id_list_manifest_id must be provided."
             )
         return xbt_manifest_id, code_list_manifest_id, agency_id_list_manifest_id
+
+    @classmethod
+    def _resolve_primitive_update(
+        cls,
+        *,
+        current_primitives: list[DataTypePrimitiveServiceRecord],
+        add_primitives: list[DataTypePrimitiveServiceRecord],
+        remove_primitives: list[DataTypePrimitiveServiceRecord],
+        default_primitive: DataTypePrimitiveServiceRecord | None,
+    ) -> tuple[list[DataTypePrimitiveServiceRecord], bool, bool]:
+        desired_by_key = {cls._primitive_key(primitive): primitive for primitive in current_primitives}
+        current_keys = set(desired_by_key)
+        current_default_key = next(
+            (cls._primitive_key(primitive) for primitive in current_primitives if primitive.is_default),
+            None,
+        )
+
+        for primitive in remove_primitives:
+            cls._assert_primitive_mutation_supported(primitive, action="remove")
+            desired_by_key.pop(cls._primitive_key(primitive), None)
+
+        for primitive in add_primitives:
+            cls._assert_primitive_mutation_supported(primitive, action="add")
+            key = cls._primitive_key(primitive)
+            desired_by_key[key] = DataTypePrimitiveServiceRecord(
+                cdt_pri_name=primitive.cdt_pri_name,
+                xbt_manifest_id=primitive.xbt_manifest_id,
+                code_list_manifest_id=primitive.code_list_manifest_id,
+                agency_id_list_manifest_id=primitive.agency_id_list_manifest_id,
+                is_default=False,
+            )
+        explicit_default_key = None
+        if default_primitive is not None:
+            explicit_default_key = cls._primitive_key(default_primitive)
+
+        desired_keys = list(desired_by_key)
+        if not desired_keys:
+            raise ValueError("At least one primitive must remain after applying the requested changes.")
+
+        if explicit_default_key is not None:
+            if explicit_default_key not in desired_by_key:
+                raise ValueError("The requested default primitive must exist after applying primitive additions/removals.")
+            target_default_key = explicit_default_key
+        elif current_default_key in desired_by_key:
+            target_default_key = current_default_key
+        elif len(desired_keys) == 1:
+            target_default_key = desired_keys[0]
+        else:
+            raise ValueError("Removing the default primitive requires selecting a replacement default primitive.")
+
+        desired = [
+            DataTypePrimitiveServiceRecord(
+                cdt_pri_name=primitive.cdt_pri_name,
+                xbt_manifest_id=primitive.xbt_manifest_id,
+                code_list_manifest_id=primitive.code_list_manifest_id,
+                agency_id_list_manifest_id=primitive.agency_id_list_manifest_id,
+                is_default=cls._primitive_key(primitive) == target_default_key,
+            )
+            for primitive in desired_by_key.values()
+        ]
+        desired_keys_set = {cls._primitive_key(primitive) for primitive in desired}
+        membership_changed = desired_keys_set != current_keys
+        default_changed = target_default_key != current_default_key
+        return desired, membership_changed, default_changed
+
+    @staticmethod
+    def _assert_primitive_mutation_supported(
+        primitive: DataTypePrimitiveServiceRecord,
+        *,
+        action: str,
+    ) -> None:
+        populated = [
+            primitive.xbt_manifest_id,
+            primitive.code_list_manifest_id,
+            primitive.agency_id_list_manifest_id,
+        ]
+        if sum(value is not None for value in populated) != 1:
+            raise ValueError(
+                f"Primitive {action} operations require exactly one of xbt_manifest_id, "
+                "code_list_manifest_id, or agency_id_list_manifest_id."
+            )
+        if primitive.xbt_manifest_id is not None and primitive.cdt_pri_name is None:
+            raise ValueError(
+                f"Primitive {action} operations require cdt_pri_name when xbt_manifest_id is provided."
+            )
+        if primitive.cdt_pri_name is not None and primitive.cdt_pri_name not in CDT_PRIMITIVE_NAMES:
+            allowed = ", ".join(sorted(CDT_PRIMITIVE_NAMES))
+            raise ValueError(f"Primitive {action} operations require cdt_pri_name to be one of: {allowed}.")
+
+    @staticmethod
+    def _primitive_key(
+        primitive: DataTypePrimitiveServiceRecord,
+    ) -> tuple[int | None, int | None, int | None]:
+        return (
+            int(primitive.xbt_manifest_id) if primitive.xbt_manifest_id is not None else None,
+            int(primitive.code_list_manifest_id) if primitive.code_list_manifest_id is not None else None,
+            int(primitive.agency_id_list_manifest_id) if primitive.agency_id_list_manifest_id is not None else None,
+        )
 
     @staticmethod
     def _normalize_dt_sc_cardinality(

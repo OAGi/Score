@@ -41,22 +41,37 @@ from __future__ import annotations
 import logging
 from typing import Annotated, Any
 
-from fastmcp import FastMCP
+from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from fastmcp.exceptions import ToolError
+from fastmcp.server.elicitation import AcceptedElicitation, CancelledElicitation, DeclinedElicitation
 from pydantic import Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.vendor_plugins import get_vendor_plugin
-from app.utils.date import parse_date_range
 from app.security import AuthenticatedUser
 from app.services.library_service import LibraryService
 from app.tools import _to_tool_error, get_tool_authenticated_user, str_to_bool, tool_session
-from app.tools.models.library import GetLibraryPaginationResponse, GetLibraryResponse, LibraryResponseEntry
+from app.tools.models.library import (
+    CreateLibraryResponse,
+    GetLibraryPaginationResponse,
+    GetLibraryResponse,
+    LibraryResponseEntry,
+    UpdateLibraryReleaseDependenciesResponse,
+    UpdateLibraryResponse,
+)
+from app.utils.date import parse_date_range
 
 logger = logging.getLogger("connectcenter.mcp.library")
 
 mcp = FastMCP("connectCenter MCP - Library Tools")
+
+EMPTY_OUTPUT_SCHEMA = {
+    "type": "object",
+    "description": "Empty response body.",
+    "properties": {},
+    "additionalProperties": False,
+}
 
 
 async def get_library_service(
@@ -367,6 +382,179 @@ async def get_library(
         return GetLibraryResponse.model_validate(row, from_attributes=True)
     except Exception as exc:
         raise _to_tool_error(exc, fallback=f"Unable to retrieve library {library_id}.") from exc
+
+
+@mcp.tool(
+    name="create_library",
+    description="Create a library and seed its working release.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the created library identifier.",
+        "properties": {
+            "library_id": {"type": "integer", "description": "Created library identifier.", "example": 12},
+        },
+        "required": ["library_id"],
+    },
+)
+async def create_library(
+    name: Annotated[str, Field(min_length=1, description="Library name.")],
+    namespace_uri: Annotated[
+        str,
+        Field(min_length=1, description="URI for the default standard namespace."),
+    ],
+    namespace_prefix: Annotated[
+        str | None,
+        Field(default=None, description="Prefix for the default standard namespace."),
+    ] = None,
+    type: Annotated[str | None, Field(default=None, description="Type of the library.")] = None,
+    organization: Annotated[str | None, Field(default=None, description="Owning organization.")] = None,
+    link: Annotated[str | None, Field(default=None, description="Library URL.")] = None,
+    domain: Annotated[str | None, Field(default=None, description="Library domain.")] = None,
+    description: Annotated[str | None, Field(default=None, description="Library description.")] = None,
+    library_service: LibraryService = Depends(get_library_service),
+) -> CreateLibraryResponse:
+    """Create a library."""
+    try:
+        result = await library_service.create_library(
+            type=type,
+            name=name,
+            organization=organization,
+            description=description,
+            link=link,
+            domain=domain,
+            namespace_uri=namespace_uri,
+            namespace_prefix=namespace_prefix,
+        )
+        return CreateLibraryResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback="Unable to create the library.") from exc
+
+
+@mcp.tool(
+    name="update_library",
+    description="Update an existing library.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the target library identifier and changed fields.",
+        "properties": {
+            "library_id": {"type": "integer", "description": "Target library identifier.", "example": 12},
+            "updates": {
+                "type": "array",
+                "description": "Updated field names.",
+                "items": {"type": "string"},
+                "example": ["name", "domain"],
+            },
+        },
+        "required": ["library_id", "updates"],
+    },
+)
+async def update_library(
+    library_id: Annotated[int, Field(gt=0, description="Target library identifier.")],
+    name: Annotated[str, Field(min_length=1, description="Library name.")],
+    type: Annotated[str | None, Field(default=None, description="Type of the library.")] = None,
+    organization: Annotated[str | None, Field(default=None, description="Owning organization.")] = None,
+    link: Annotated[str | None, Field(default=None, description="Library URL.")] = None,
+    domain: Annotated[str | None, Field(default=None, description="Library domain.")] = None,
+    description: Annotated[str | None, Field(default=None, description="Library description.")] = None,
+    state: Annotated[str | None, Field(default=None, description="Library state.")] = None,
+    is_default: Annotated[
+        bool | str | None,
+        Field(default=None, description="Whether this library should become the default."),
+    ] = None,
+    library_service: LibraryService = Depends(get_library_service),
+) -> UpdateLibraryResponse:
+    """Update a library."""
+    try:
+        result = await library_service.update_library(
+            library_id=library_id,
+            type=type,
+            name=name,
+            organization=organization,
+            description=description,
+            link=link,
+            domain=domain,
+            state=state,
+            is_default=str_to_bool(is_default),
+        )
+        return UpdateLibraryResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to update library {library_id}.") from exc
+
+
+@mcp.tool(
+    name="update_library_release_dependencies",
+    description="Replace the working-release dependency list for a library.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the target library identifier and the dependency release IDs now assigned.",
+        "properties": {
+            "library_id": {"type": "integer", "description": "Target library identifier.", "example": 12},
+            "release_ids": {
+                "type": "array",
+                "description": "Release identifiers now assigned as dependencies.",
+                "items": {"type": "integer"},
+                "example": [101, 205],
+            },
+        },
+        "required": ["library_id", "release_ids"],
+    },
+)
+async def update_library_release_dependencies(
+    library_id: Annotated[int, Field(gt=0, description="Target library identifier.")],
+    release_ids: Annotated[
+        list[int] | None,
+        Field(default=None, description="Release identifiers that should remain assigned as dependencies."),
+    ] = None,
+    library_service: LibraryService = Depends(get_library_service),
+) -> UpdateLibraryReleaseDependenciesResponse:
+    """Replace working-release dependencies for a library."""
+    try:
+        result = await library_service.update_library_release_dependencies(
+            library_id=library_id,
+            release_ids=release_ids,
+        )
+        return UpdateLibraryReleaseDependenciesResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to update release dependencies for library {library_id}.") from exc
+
+
+@mcp.tool(
+    name="discard_library",
+    description="Discard a library permanently when it passes the discard checks.",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def discard_library(
+    library_id: Annotated[int, Field(gt=0, description="Target library identifier.")],
+    ctx: Context,
+    library_service: LibraryService = Depends(get_library_service),
+) -> dict[str, object]:
+    """Discard a library after confirmation."""
+    row = await library_service.get(library_id)
+    if row is None:
+        raise ToolError(
+            f"The library with ID {library_id} was not found. Please check the ID and try again."
+        )
+
+    elicit_result = await ctx.elicit(
+        message=(
+            f"Are you sure you want to discard library '{row.name}' permanently?\n\n"
+            "This removes the library record and its working release seed data and cannot be undone."
+        ),
+        response_type=None,
+    )
+    match elicit_result:
+        case AcceptedElicitation():
+            pass
+        case DeclinedElicitation():
+            raise ToolError("Library discard was not confirmed.")
+        case CancelledElicitation():
+            raise ToolError("Library discard was cancelled.")
+
+    try:
+        await library_service.discard_library(library_id=library_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to discard library {library_id}.") from exc
 
 
 def _build_library_service(

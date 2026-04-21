@@ -26,6 +26,12 @@ Available Tools:
   related information such as namespace, release, library, log, and associated
   value manifests.
 
+- create_code_list_value: Create a new code list value under a WIP Code List.
+
+- update_code_list_value: Update one existing code list value under a WIP Code List.
+
+- delete_code_list_value: Delete one existing code list value under a WIP Code List.
+
 Key Features:
 - Full relationship loading (namespace, creator, owner, release, library, log)
 - Support for filtering, pagination, and sorting
@@ -41,22 +47,47 @@ from __future__ import annotations
 import logging
 from typing import Annotated, Any
 
-from fastmcp import FastMCP
+from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
+from fastmcp.exceptions import ToolError
+from fastmcp.server.elicitation import (
+    AcceptedElicitation,
+    CancelledElicitation,
+    DeclinedElicitation,
+)
 from pydantic import Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.vendor_plugins import get_vendor_plugin
 from app.utils.date import parse_date_range
 from app.security import AuthenticatedUser
+from app.services.app_user_service import AppUserService
 from app.services.code_list_service import CodeListService
 from app.services.release_service import ReleaseService
 from app.tools import _to_tool_error, get_tool_authenticated_user, tool_session
-from app.tools.models.code_list import CodeListResponseEntry, GetCodeListPaginationResponse, GetCodeListResponse
+from app.tools.models.code_list import (
+    CodeListLifecycleState,
+    CodeListResponseEntry,
+    CreateCodeListResponse,
+    CreateCodeListValueResponse,
+    GetCodeListPaginationResponse,
+    GetCodeListResponse,
+    TransferCodeListOwnershipResponse,
+    UpdateCodeListResponse,
+    UpdateCodeListValueResponse,
+)
+from app.types.unset import UNSET
 
 logger = logging.getLogger("connectcenter.mcp.code_list")
 
 mcp = FastMCP("connectCenter MCP - Code List Tools")
+
+EMPTY_OUTPUT_SCHEMA = {
+    "type": "object",
+    "description": "Empty response body.",
+    "properties": {},
+    "additionalProperties": False,
+}
 
 
 async def get_code_list_service(
@@ -65,6 +96,16 @@ async def get_code_list_service(
     """Provide a requester-scoped code list service for MCP tools."""
     requester = await get_tool_authenticated_user(session)
     return _build_code_list_service(session, requester)
+
+
+async def get_app_user_service(
+    session: AsyncSession = Depends(tool_session),
+) -> AppUserService:
+    """Provide a requester-scoped app-user service for MCP tools."""
+    requester = await get_tool_authenticated_user(session)
+    vendor_plugin = get_vendor_plugin()
+    app_user_repository = vendor_plugin.create_app_user_repository(session)
+    return AppUserService(app_user_repository=app_user_repository, requester=requester)
 
 
 @mcp.tool(
@@ -513,6 +554,409 @@ async def get_code_list(
         return GetCodeListResponse.model_validate(row, from_attributes=True)
     except Exception as exc:
         raise _to_tool_error(exc, fallback=f"Unable to retrieve code list {code_list_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="create_code_list",
+    description="Create a new code list in a role-appropriate release branch.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the created code list manifest identifier.",
+        "properties": {
+            "code_list_manifest_id": {
+                "type": "integer",
+                "description": "Created code list manifest identifier.",
+                "example": 12345,
+            }
+        },
+        "required": ["code_list_manifest_id"],
+    },
+)
+async def create_code_list(
+    release_id: Annotated[
+        int,
+        Field(
+            gt=0,
+            description=(
+                "Target release identifier. Developers must use the `Working` release, "
+                "and end-users must use a non-`Working` release."
+            ),
+        ),
+    ],
+    based_code_list_manifest_id: Annotated[
+        int | None,
+        Field(
+            default=None,
+            gt=0,
+            description="Optional base code list manifest identifier used to derive the new code list.",
+        ),
+    ],
+    code_list_service: CodeListService = Depends(get_code_list_service),
+) -> CreateCodeListResponse:
+    """Create a code list, optionally derived from a base code list."""
+    try:
+        result = await code_list_service.create_code_list(
+            release_id=release_id,
+            based_code_list_manifest_id=based_code_list_manifest_id,
+        )
+        return CreateCodeListResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback="Unable to create the code list.") from exc
+
+
+@mcp.tool(
+    name="update_code_list",
+    description="Update mutable code list fields while the code list is in WIP.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the updated code list manifest identifier and changed fields.",
+        "properties": {
+            "code_list_manifest_id": {
+                "type": "integer",
+                "description": "Target code list manifest identifier.",
+                "example": 12345,
+            },
+            "updates": {
+                "type": "array",
+                "description": "Updated field names.",
+                "items": {"type": "string"},
+                "example": ["definition", "remark"],
+            },
+        },
+        "required": ["code_list_manifest_id", "updates"],
+    },
+)
+async def update_code_list(
+    code_list_manifest_id: Annotated[int, Field(gt=0, description="Target code list manifest identifier.")],
+    name: Annotated[str | None, Field(default=None, description="Updated name. Omit to leave unchanged.")],
+    version_id: Annotated[str | None, Field(default=None, description="Updated version identifier. Omit to leave unchanged.")],
+    list_id: Annotated[str | None, Field(default=None, description="Updated external list identifier. Omit to leave unchanged.")],
+    agency_id_list_value_manifest_id: Annotated[
+        int | None,
+        Field(
+            default=None,
+            ge=0,
+            description=(
+                "Updated agency ID list value manifest identifier. Omit to leave unchanged. "
+                "Use `0` to clear it."
+            ),
+        ),
+    ],
+    definition: Annotated[str | None, Field(default=None, description="Updated definition text. Omit to leave unchanged.")],
+    definition_source: Annotated[str | None, Field(default=None, description="Updated definition source URL. Omit to leave unchanged.")],
+    remark: Annotated[str | None, Field(default=None, description="Updated remark. Omit to leave unchanged.")],
+    namespace_id: Annotated[
+        int | None,
+        Field(
+            default=None,
+            ge=0,
+            description="Updated namespace identifier. Omit to leave unchanged. Use `0` to clear the namespace.",
+        ),
+    ],
+    deprecated: Annotated[bool | None, Field(default=None, description="Updated deprecation flag. Omit to leave unchanged.")],
+    extensible_indicator: Annotated[
+        bool | None,
+        Field(default=None, description="Updated extensibility flag. Omit to leave unchanged."),
+    ],
+    code_list_service: CodeListService = Depends(get_code_list_service),
+) -> UpdateCodeListResponse:
+    """Update mutable code list fields."""
+    try:
+        result = await code_list_service.update_code_list(
+            code_list_manifest_id=code_list_manifest_id,
+            name=UNSET if name is None else name,
+            version_id=UNSET if version_id is None else version_id,
+            list_id=UNSET if list_id is None else list_id,
+            agency_id_list_value_manifest_id=(
+                UNSET
+                if agency_id_list_value_manifest_id is None
+                else (None if agency_id_list_value_manifest_id == 0 else agency_id_list_value_manifest_id)
+            ),
+            definition=UNSET if definition is None else definition,
+            definition_source=UNSET if definition_source is None else definition_source,
+            remark=UNSET if remark is None else remark,
+            namespace_id=UNSET if namespace_id is None else (None if namespace_id == 0 else namespace_id),
+            deprecated=UNSET if deprecated is None else deprecated,
+            extensible_indicator=UNSET if extensible_indicator is None else extensible_indicator,
+        )
+        return UpdateCodeListResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to update code list {code_list_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="create_code_list_value",
+    description="Create a new code list value while the owner code list is in WIP.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the created code list value manifest identifier.",
+        "properties": {
+            "code_list_value_manifest_id": {
+                "type": "integer",
+                "description": "Created code list value manifest identifier.",
+                "example": 12345,
+            }
+        },
+        "required": ["code_list_value_manifest_id"],
+    },
+)
+async def create_code_list_value(
+    code_list_manifest_id: Annotated[int, Field(gt=0, description="Owner code list manifest identifier.")],
+    value: Annotated[str, Field(min_length=1, description="Value for the new code list entry.")],
+    meaning: Annotated[str | None, Field(default=None, description="Meaning of the new code list value.")],
+    definition: Annotated[str | None, Field(default=None, description="Definition of the new code list value.")],
+    definition_source: Annotated[
+        str | None,
+        Field(default=None, description="Definition source URL for the new code list value."),
+    ],
+    deprecated: Annotated[bool, Field(default=False, description="Whether the new code list value is deprecated.")],
+    code_list_service: CodeListService = Depends(get_code_list_service),
+) -> CreateCodeListValueResponse:
+    """Create one code list value under the target code list."""
+    try:
+        result = await code_list_service.create_code_list_value(
+            code_list_manifest_id=code_list_manifest_id,
+            value=value,
+            meaning=meaning,
+            definition=definition,
+            definition_source=definition_source,
+            deprecated=deprecated,
+        )
+        return CreateCodeListValueResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(
+            exc,
+            fallback=f"Unable to create a code list value for code list {code_list_manifest_id}.",
+        ) from exc
+
+
+@mcp.tool(
+    name="update_code_list_value",
+    description="Update selected fields of an existing code list value while the owner code list is in WIP.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the updated code list value manifest identifier and changed fields.",
+        "properties": {
+            "code_list_value_manifest_id": {
+                "type": "integer",
+                "description": "Target code list value manifest identifier.",
+                "example": 12345,
+            },
+            "updates": {
+                "type": "array",
+                "description": "Updated field names.",
+                "items": {"type": "string"},
+                "example": ["meaning", "definition"],
+            },
+        },
+        "required": ["code_list_value_manifest_id", "updates"],
+    },
+)
+async def update_code_list_value(
+    code_list_manifest_id: Annotated[int, Field(gt=0, description="Owner code list manifest identifier.")],
+    code_list_value_manifest_id: Annotated[int, Field(gt=0, description="Target code list value manifest identifier.")],
+    value: Annotated[str | None, Field(default=None, description="Updated value. Omit to leave unchanged.")],
+    meaning: Annotated[str | None, Field(default=None, description="Updated meaning. Omit to leave unchanged.")],
+    definition: Annotated[str | None, Field(default=None, description="Updated definition. Omit to leave unchanged.")],
+    definition_source: Annotated[
+        str | None,
+        Field(default=None, description="Updated definition source URL. Omit to leave unchanged."),
+    ],
+    deprecated: Annotated[bool | None, Field(default=None, description="Updated deprecation flag. Omit to leave unchanged.")],
+    code_list_service: CodeListService = Depends(get_code_list_service),
+) -> UpdateCodeListValueResponse:
+    """Update one code list value under the target code list."""
+    try:
+        result = await code_list_service.update_code_list_value(
+            code_list_manifest_id=code_list_manifest_id,
+            code_list_value_manifest_id=code_list_value_manifest_id,
+            value=UNSET if value is None else value,
+            meaning=UNSET if meaning is None else meaning,
+            definition=UNSET if definition is None else definition,
+            definition_source=UNSET if definition_source is None else definition_source,
+            deprecated=UNSET if deprecated is None else deprecated,
+        )
+        return UpdateCodeListValueResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(
+            exc,
+            fallback=f"Unable to update code list value {code_list_value_manifest_id}.",
+        ) from exc
+
+
+@mcp.tool(
+    name="delete_code_list_value",
+    description="Delete an existing code list value while the owner code list is in WIP.",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def delete_code_list_value(
+    code_list_manifest_id: Annotated[int, Field(gt=0, description="Owner code list manifest identifier.")],
+    code_list_value_manifest_id: Annotated[int, Field(gt=0, description="Target code list value manifest identifier.")],
+    code_list_service: CodeListService = Depends(get_code_list_service),
+) -> dict[str, object]:
+    """Delete one code list value under the target code list."""
+    try:
+        await code_list_service.delete_code_list_value(
+            code_list_manifest_id=code_list_manifest_id,
+            code_list_value_manifest_id=code_list_value_manifest_id,
+        )
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(
+            exc,
+            fallback=f"Unable to delete code list value {code_list_value_manifest_id}.",
+        ) from exc
+
+
+@mcp.tool(
+    name="transfer_code_list_ownership",
+    description="Transfer ownership of a code list to another user.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the code list manifest identifier and changed fields.",
+        "properties": {
+            "code_list_manifest_id": {
+                "type": "integer",
+                "description": "Target code list manifest identifier.",
+                "example": 12345,
+            },
+            "updates": {
+                "type": "array",
+                "description": "Updated field names.",
+                "items": {"type": "string"},
+                "example": ["owner_user_id"],
+            },
+        },
+        "required": ["code_list_manifest_id", "updates"],
+    },
+)
+async def transfer_code_list_ownership(
+    code_list_manifest_id: Annotated[int, Field(gt=0, description="Target code list manifest identifier.")],
+    new_owner_user_id: Annotated[int, Field(gt=0, description="User ID of the new owner.")],
+    ctx: Context,
+    code_list_service: CodeListService = Depends(get_code_list_service),
+    app_user_service: AppUserService = Depends(get_app_user_service),
+) -> TransferCodeListOwnershipResponse:
+    """Transfer code list ownership to another user after confirmation."""
+    try:
+        row = await code_list_service.get(code_list_manifest_id)
+        if row is None:
+            raise ToolError(
+                f"The code list with manifest ID {code_list_manifest_id} was not found. Please check the ID and try again."
+            )
+        target_user = await app_user_service.get(new_owner_user_id)
+        if target_user is None:
+            raise ToolError(
+                f"The target user with ID {new_owner_user_id} was not found. Please check the ID and try again."
+            )
+
+        target_user_label = target_user.login_id
+        if target_user.username and target_user.username != target_user.login_id:
+            target_user_label = f"{target_user.login_id} ({target_user.username})"
+        code_list_label = row.name or row.list_id or f"Code list {code_list_manifest_id}"
+
+        elicit_result = await ctx.elicit(
+            message=(
+                f"Are you sure you want to transfer ownership of '{code_list_label}' "
+                f"to {target_user_label}?"
+            ),
+            response_type=None,
+        )
+        match elicit_result:
+            case AcceptedElicitation():
+                payload = await code_list_service.transfer_code_list_ownership(
+                    code_list_manifest_id=code_list_manifest_id,
+                    target_user_id=new_owner_user_id,
+                )
+                updates = [] if int(new_owner_user_id) == int(row.owner.user_id) else ["owner_user_id"]
+                return TransferCodeListOwnershipResponse(
+                    code_list_manifest_id=payload.code_list_manifest_id,
+                    updates=updates,
+                )
+            case DeclinedElicitation():
+                raise ToolError("Code list ownership transfer declined by user.")
+            case CancelledElicitation():
+                raise ToolError("Code list ownership transfer cancelled by user.")
+    except Exception as exc:
+        raise _to_tool_error(
+            exc,
+            fallback=f"Unable to transfer ownership of code list {code_list_manifest_id}.",
+        ) from exc
+
+
+@mcp.tool(
+    name="change_code_list_state",
+    description="Change the lifecycle state of a code list.",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def change_code_list_state(
+    code_list_manifest_id: Annotated[int, Field(gt=0, description="Target code list manifest identifier.")],
+    state: Annotated[CodeListLifecycleState, Field(description="Target lifecycle state.")],
+    code_list_service: CodeListService = Depends(get_code_list_service),
+) -> dict[str, object]:
+    """Change a code list lifecycle state according to connectCenter rules."""
+    try:
+        await code_list_service.change_code_list_state(
+            code_list_manifest_id=code_list_manifest_id,
+            state=state,
+        )
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(
+            exc,
+            fallback=f"Unable to change the code list state for {code_list_manifest_id}.",
+        ) from exc
+
+
+@mcp.tool(
+    name="revise_code_list",
+    description="Create a new editable code list revision from a stable code list revision.",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def revise_code_list(
+    code_list_manifest_id: Annotated[int, Field(gt=0, description="Target code list manifest identifier.")],
+    code_list_service: CodeListService = Depends(get_code_list_service),
+) -> dict[str, object]:
+    """Revise a code list according to connectCenter rules."""
+    try:
+        await code_list_service.revise_code_list(code_list_manifest_id=code_list_manifest_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to revise code list {code_list_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="cancel_code_list",
+    description="Cancel the current code list revision and restore the previous stable revision.",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def cancel_code_list(
+    code_list_manifest_id: Annotated[int, Field(gt=0, description="Target code list manifest identifier.")],
+    code_list_service: CodeListService = Depends(get_code_list_service),
+) -> dict[str, object]:
+    """Cancel the current code list revision according to connectCenter rules."""
+    try:
+        await code_list_service.cancel_code_list(code_list_manifest_id=code_list_manifest_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to cancel code list {code_list_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="discard_code_list",
+    description="Discard a Deleted code list and its direct records permanently.",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def discard_code_list(
+    code_list_manifest_id: Annotated[int, Field(gt=0, description="Target code list manifest identifier.")],
+    code_list_service: CodeListService = Depends(get_code_list_service),
+) -> dict[str, object]:
+    """Discard a Deleted code list from the database."""
+    try:
+        await code_list_service.discard_code_list(code_list_manifest_id=code_list_manifest_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to discard code list {code_list_manifest_id}.") from exc
 
 
 def _build_code_list_service(

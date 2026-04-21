@@ -71,6 +71,10 @@ class CoreComponentRepositoryContract(Protocol):
         acc_manifest_id: AccManifestId,
         asccp_manifest_id: AsccpManifestId,
         index: int,
+        cardinality_min: int,
+        cardinality_max: int,
+        definition: str | None,
+        definition_source: str | None,
         requester_user_id: AppUserId,
     ) -> AsccManifestId:
         """Repository contract for appending an ASCC to an ACC."""
@@ -82,9 +86,49 @@ class CoreComponentRepositoryContract(Protocol):
         acc_manifest_id: AccManifestId,
         bccp_manifest_id: BccpManifestId,
         index: int,
+        entity_type: Literal["Attribute", "Element"],
+        cardinality_min: int,
+        cardinality_max: int,
+        definition: str | None,
+        definition_source: str | None,
+        is_nillable: bool,
+        default_value: str | None,
+        fixed_value: str | None,
         requester_user_id: AppUserId,
     ) -> BccManifestId:
         """Repository contract for appending a BCC to an ACC."""
+        pass
+
+    async def remove_ascc(
+        self,
+        *,
+        ascc_manifest_id: AsccManifestId,
+        requester_user_id: AppUserId,
+    ) -> bool:
+        """Repository contract for removing an ASCC relationship from its ACC."""
+        pass
+
+    async def remove_bcc(
+        self,
+        *,
+        bcc_manifest_id: BccManifestId,
+        requester_user_id: AppUserId,
+    ) -> bool:
+        """Repository contract for removing a BCC relationship from its ACC."""
+        pass
+
+    async def count_bie_references_by_ascc_manifest(
+        self,
+        ascc_manifest_id: AsccManifestId,
+    ) -> int:
+        """Count BIE references to the given ASCC manifest."""
+        pass
+
+    async def count_bie_references_by_bcc_manifest(
+        self,
+        bcc_manifest_id: BccManifestId,
+    ) -> int:
+        """Count BIE references to the given BCC manifest."""
         pass
 
     async def create_asccp(
@@ -178,6 +222,82 @@ class CoreComponentRepositoryContract(Protocol):
         requester_user_id: AppUserId,
     ) -> bool:
         """Repository contract for updating mutable ACC fields."""
+        pass
+
+    async def transfer_acc_ownership(
+        self,
+        *,
+        acc_manifest_id: AccManifestId,
+        requester_user_id: AppUserId,
+        target_user_id: AppUserId,
+    ) -> bool:
+        """Repository contract for transferring ACC ownership."""
+        pass
+
+    async def update_ascc(
+        self,
+        *,
+        ascc_manifest_id: AsccManifestId,
+        cardinality_min: int | None,
+        cardinality_min_set: bool,
+        cardinality_max: int | None,
+        cardinality_max_set: bool,
+        deprecated: bool | None,
+        deprecated_set: bool,
+        definition: str | None,
+        definition_set: bool,
+        definition_source: str | None,
+        definition_source_set: bool,
+        requester_user_id: AppUserId,
+    ) -> bool:
+        """Repository contract for updating mutable ASCC fields."""
+        pass
+
+    async def update_bcc(
+        self,
+        *,
+        bcc_manifest_id: BccManifestId,
+        entity_type: Literal["Attribute", "Element"] | None,
+        entity_type_set: bool,
+        cardinality_min: int | None,
+        cardinality_min_set: bool,
+        cardinality_max: int | None,
+        cardinality_max_set: bool,
+        deprecated: bool | None,
+        deprecated_set: bool,
+        is_nillable: bool | None,
+        is_nillable_set: bool,
+        default_value: str | None,
+        default_value_set: bool,
+        fixed_value: str | None,
+        fixed_value_set: bool,
+        definition: str | None,
+        definition_set: bool,
+        definition_source: str | None,
+        definition_source_set: bool,
+        requester_user_id: AppUserId,
+    ) -> bool:
+        """Repository contract for updating mutable BCC fields."""
+        pass
+
+    async def transfer_asccp_ownership(
+        self,
+        *,
+        asccp_manifest_id: AsccpManifestId,
+        requester_user_id: AppUserId,
+        target_user_id: AppUserId,
+    ) -> bool:
+        """Repository contract for transferring ASCCP ownership."""
+        pass
+
+    async def transfer_bccp_ownership(
+        self,
+        *,
+        bccp_manifest_id: BccpManifestId,
+        requester_user_id: AppUserId,
+        target_user_id: AppUserId,
+    ) -> bool:
+        """Repository contract for transferring BCCP ownership."""
         pass
 
     async def update_acc_base(

@@ -44,15 +44,23 @@ from __future__ import annotations
 import logging
 from typing import Annotated, Any, Literal
 
-from fastmcp import FastMCP
+from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
+from fastmcp.exceptions import ToolError
+from fastmcp.server.elicitation import (
+    AcceptedElicitation,
+    CancelledElicitation,
+    DeclinedElicitation,
+)
 from pydantic import Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.vendor_plugins import get_vendor_plugin
 from app.utils.date import parse_date_range
 from app.security import AuthenticatedUser
+from app.services.app_user_service import AppUserService
 from app.services.data_type_service import DataTypeService
+from app.services.models.data_type import DataTypePrimitiveServiceRecord
 from app.services.release_service import ReleaseService
 from app.tools import _to_tool_error, get_tool_authenticated_user, tool_session
 from app.tools.models.data_type import (
@@ -62,6 +70,8 @@ from app.tools.models.data_type import (
     DefaultPrimitiveSelectionInput,
     GetDataTypePaginationResponse,
     GetDataTypeResponse,
+    PrimitiveMutationInput,
+    TransferDataTypeOwnershipResponse,
     UpdateDataTypeResponse,
     UpdateDataTypeSupplementaryComponentResponse,
     ValueConstraintInput,
@@ -86,6 +96,16 @@ async def get_data_type_service(
     """Provide a requester-scoped data-type service for MCP tools."""
     requester = await get_tool_authenticated_user(session)
     return _build_data_type_service(session, requester)
+
+
+async def get_app_user_service(
+    session: AsyncSession = Depends(tool_session),
+) -> AppUserService:
+    """Provide a requester-scoped app-user service for MCP tools."""
+    requester = await get_tool_authenticated_user(session)
+    vendor_plugin = get_vendor_plugin()
+    app_user_repository = vendor_plugin.create_app_user_repository(session)
+    return AppUserService(app_user_repository=app_user_repository, requester=requester)
 
 
 @mcp.tool(
@@ -141,7 +161,7 @@ async def get_data_type_service(
                                                         "description": "Representation term for the data type (DT)",
                                                         "example": "Amount"},
                                 "six_digit_id": {"type": ["string", "null"],
-                                                 "description": "Six-digit identifier for the data type (DT)",
+                                                 "description": "Six-character suffix for the BDT Type name from the UN/CEFACT XML Schema NDR. It must be unique within the namespace and use only letters and digits.",
                                                  "example": "123456"},
                                 "definition": {"type": ["string", "null"],
                                                "description": "Definition of the data type (DT)",
@@ -213,7 +233,7 @@ async def get_data_type_service(
                                                 "description": "Representation term for the data type (DT)",
                                                 "example": "Amount"},
                         "six_digit_id": {"type": ["string", "null"],
-                                         "description": "Six-digit identifier for the data type (DT)",
+                                         "description": "Six-character suffix for the BDT Type name from the UN/CEFACT XML Schema NDR. It must be unique within the namespace and use only letters and digits.",
                                          "example": "123456"},
                         "definition": {"type": ["string", "null"], "description": "Definition of the data type (DT)",
                                        "example": "A number of monetary units specified in a currency where the unit of currency is explicit or implied"},
@@ -627,7 +647,7 @@ async def get_data_types(
                           "example": "Price"},
             "representation_term": {"type": ["string", "null"],
                                     "description": "Representation term for the data type (DT)", "example": "Amount"},
-            "six_digit_id": {"type": ["string", "null"], "description": "Six-digit identifier for the data type (DT)",
+            "six_digit_id": {"type": ["string", "null"], "description": "Six-character suffix for the BDT Type name from the UN/CEFACT XML Schema NDR. It must be unique within the namespace and use only letters and digits.",
                              "example": "123456"},
             "definition": {"type": ["string", "null"], "description": "Definition of the data type (DT)",
                            "example": "A number of monetary units specified in a currency where the unit of currency is explicit or implied"},
@@ -879,7 +899,7 @@ async def get_data_type(
 
 @mcp.tool(
     name="create_dt",
-    description="Create a new DT (Data Type) from an existing base DT.",
+    description="Create a new DT (Data Type) from an existing base DT, with optional initial mutable-field overrides.",
     output_schema={
         "type": "object",
         "description": "Response containing the created DT manifest identifier.",
@@ -902,13 +922,84 @@ async def create_dt(
     ],
     based_dt_manifest_id: Annotated[
         int,
-        Field(gt=0, description="Base DT manifest identifier used to derive the new DT."),
+        Field(
+            gt=0,
+            description=(
+                "Base DT manifest identifier used to derive the new DT. "
+                "If the base DT is in the same library, it must be from the target release. "
+                "If it is in a different library, its release must be one of the target release dependencies."
+            ),
+        ),
+    ],
+    qualifier: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description="Initial qualifier override. Omit to keep the base DT value. Pass an empty string to clear it.",
+        ),
+    ],
+    six_digit_id: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description=(
+                "Initial six-character suffix for the BDT Type name from the UN/CEFACT XML Schema NDR. "
+                "It must be unique within the namespace and use only letters and digits. "
+                "Omit to keep the base DT value. Pass an empty string to clear it."
+            ),
+        ),
+    ],
+    deprecated: Annotated[
+        bool | None,
+        Field(default=None, description="Initial deprecation flag override. Omit to keep the base DT value."),
+    ],
+    namespace_id: Annotated[
+        int | None,
+        Field(
+            default=None,
+            ge=0,
+            description="Initial namespace identifier. Omit to keep the base DT value. Use 0 to clear the namespace.",
+        ),
+    ],
+    content_component_definition: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description=(
+                "Initial content component definition. Omit to keep the base DT value. "
+                "Pass an empty string to clear it."
+            ),
+        ),
+    ],
+    definition: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description="Initial definition text. Omit to keep the base DT value. Pass an empty string to clear it.",
+        ),
+    ],
+    definition_source: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description="Initial definition source. Omit to keep the base DT value. Pass an empty string to clear it.",
+        ),
     ],
     tag_id: Annotated[
         list[int] | None,
         Field(
             default=None,
             description="Optional tag identifier list to attach. Use get_tags() to discover valid tag IDs.",
+        ),
+    ],
+    default_primitive: Annotated[
+        DefaultPrimitiveSelectionInput | None,
+        Field(
+            default=None,
+            description=(
+                "Initial default primitive target. Provide exactly one of xbt_manifest_id, "
+                "code_list_manifest_id, or agency_id_list_manifest_id."
+            ),
         ),
     ],
     data_type_service: DataTypeService = Depends(get_data_type_service),
@@ -921,12 +1012,26 @@ async def create_dt(
     - end-users can target only non-`Working` releases
     - the target release must already be `Published`
     - the new DT is derived from `based_dt_manifest_id` and starts in `WIP`
+    - the new DT copies `dt_awd_pri` and DT supplementary components (with their `dt_sc_awd_pri`) from the selected base DT
+    - optional mutable fields can be applied during creation
     """
     try:
         result = await data_type_service.create_dt(
             release_id=release_id,
             based_dt_manifest_id=based_dt_manifest_id,
             tag_id=tag_id,
+            qualifier=UNSET if qualifier is None else qualifier,
+            six_digit_id=UNSET if six_digit_id is None else six_digit_id,
+            deprecated=UNSET if deprecated is None else deprecated,
+            namespace_id=UNSET if namespace_id is None else (None if namespace_id == 0 else namespace_id),
+            content_component_definition=UNSET if content_component_definition is None else content_component_definition,
+            definition=UNSET if definition is None else definition,
+            definition_source=UNSET if definition_source is None else definition_source,
+            xbt_manifest_id=UNSET if default_primitive is None else default_primitive.xbt_manifest_id,
+            code_list_manifest_id=UNSET if default_primitive is None else default_primitive.code_list_manifest_id,
+            agency_id_list_manifest_id=(
+                UNSET if default_primitive is None else default_primitive.agency_id_list_manifest_id
+            ),
         )
         return CreateDataTypeResponse.model_validate(result, from_attributes=True)
     except Exception as exc:
@@ -953,13 +1058,32 @@ async def create_dt(
 )
 async def update_dt(
     dt_manifest_id: Annotated[int, Field(gt=0, description="Target DT manifest identifier.")],
+    based_dt_manifest_id: Annotated[
+        int | None,
+        Field(
+            default=None,
+            ge=0,
+            description=(
+                "Updated base DT manifest identifier. Omit to leave unchanged. Use 0 to clear the base DT link. "
+                "If the base DT is in the same library, it must be from the target release. "
+                "If it is in a different library, its release must be one of the target release dependencies."
+            ),
+        ),
+    ],
     qualifier: Annotated[
         str | None,
         Field(default=None, description="Updated qualifier. Omit to leave unchanged. Pass an empty string to clear it."),
     ],
     six_digit_id: Annotated[
         str | None,
-        Field(default=None, description="Updated six-digit identifier. Omit to leave unchanged. Pass an empty string to clear it."),
+        Field(
+            default=None,
+            description=(
+                "Updated six-character suffix for the BDT Type name from the UN/CEFACT XML Schema NDR. "
+                "It must be unique within the namespace and use only letters and digits. "
+                "Omit to leave unchanged. Pass an empty string to clear it."
+            ),
+        ),
     ],
     deprecated: Annotated[
         bool | None,
@@ -995,6 +1119,27 @@ async def update_dt(
             ),
         ),
     ],
+    add_primitives: Annotated[
+        list[PrimitiveMutationInput] | None,
+        Field(
+            default=None,
+            description=(
+                "Primitive rows to add. Each row uses the form {cdt_pri_name, xbt_manifest_id, "
+                "code_list_manifest_id, agency_id_list_manifest_id}. Use default_primitive to choose "
+                "which remaining primitive is the default."
+            ),
+        ),
+    ],
+    remove_primitives: Annotated[
+        list[PrimitiveMutationInput] | None,
+        Field(
+            default=None,
+            description=(
+                "Primitive rows to remove. Each row uses the form {cdt_pri_name, xbt_manifest_id, "
+                "code_list_manifest_id, agency_id_list_manifest_id}."
+            ),
+        ),
+    ],
     data_type_service: DataTypeService = Depends(get_data_type_service),
 ) -> UpdateDataTypeResponse:
     """
@@ -1004,12 +1149,14 @@ async def update_dt(
     - the DT must currently be in `WIP`
     - only the owner or an administrator can update it
     - omit a parameter to leave it unchanged
+    - pass `0` for `based_dt_manifest_id` to clear the base DT link
     - pass `""` to clear string fields
     - pass `0` for `namespace_id` to clear the namespace
     """
     try:
         result = await data_type_service.update_dt(
             dt_manifest_id=dt_manifest_id,
+            based_dt_manifest_id=UNSET if based_dt_manifest_id is None else (None if based_dt_manifest_id == 0 else based_dt_manifest_id),
             qualifier=UNSET if qualifier is None else qualifier,
             six_digit_id=UNSET if six_digit_id is None else six_digit_id,
             deprecated=UNSET if deprecated is None else deprecated,
@@ -1022,10 +1169,87 @@ async def update_dt(
             agency_id_list_manifest_id=(
                 UNSET if default_primitive is None else default_primitive.agency_id_list_manifest_id
             ),
+            add_primitives=(
+                [DataTypePrimitiveServiceRecord(**primitive.model_dump(), is_default=False) for primitive in add_primitives]
+                if add_primitives is not None
+                else UNSET
+            ),
+            remove_primitives=(
+                [DataTypePrimitiveServiceRecord(**primitive.model_dump(), is_default=False) for primitive in remove_primitives]
+                if remove_primitives is not None
+                else UNSET
+            ),
         )
         return UpdateDataTypeResponse.model_validate(result, from_attributes=True)
     except Exception as exc:
         raise _to_tool_error(exc, fallback=f"Unable to update DT {dt_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="transfer_dt_ownership",
+    description="Transfer ownership of a DT (Data Type) to another user.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the DT manifest identifier and changed fields.",
+        "properties": {
+            "dt_manifest_id": {"type": "integer", "description": "Target DT manifest identifier.", "example": 12345},
+            "updates": {
+                "type": "array",
+                "description": "Updated field names.",
+                "items": {"type": "string"},
+                "example": ["owner_user_id"],
+            },
+        },
+        "required": ["dt_manifest_id", "updates"],
+    },
+)
+async def transfer_dt_ownership(
+    dt_manifest_id: Annotated[int, Field(gt=0, description="Target DT manifest identifier.")],
+    new_owner_user_id: Annotated[int, Field(gt=0, description="User ID of the new owner.")],
+    ctx: Context,
+    data_type_service: DataTypeService = Depends(get_data_type_service),
+    app_user_service: AppUserService = Depends(get_app_user_service),
+) -> TransferDataTypeOwnershipResponse:
+    """Transfer DT ownership to another user after confirmation."""
+    try:
+        row = await data_type_service.get(dt_manifest_id)
+        if row is None:
+            raise ToolError(
+                f"The data type with manifest ID {dt_manifest_id} was not found. Please check the ID and try again."
+            )
+        target_user = await app_user_service.get(new_owner_user_id)
+        if target_user is None:
+            raise ToolError(
+                f"The target user with ID {new_owner_user_id} was not found. Please check the ID and try again."
+            )
+        target_user_label = target_user.login_id
+        if target_user.username and target_user.username != target_user.login_id:
+            target_user_label = f"{target_user.login_id} ({target_user.username})"
+
+        elicit_result = await ctx.elicit(
+            message=(
+                f"Are you sure you want to transfer ownership of '{row.den}' "
+                f"to {target_user_label}?"
+            ),
+            response_type=None,
+        )
+        match elicit_result:
+            case AcceptedElicitation():
+                payload = await data_type_service.transfer_dt_ownership(
+                    dt_manifest_id=dt_manifest_id,
+                    target_user_id=new_owner_user_id,
+                )
+                updates = [] if int(new_owner_user_id) == int(row.owner.user_id) else ["owner_user_id"]
+                return TransferDataTypeOwnershipResponse(
+                    dt_manifest_id=payload.dt_manifest_id,
+                    updates=updates,
+                )
+            case DeclinedElicitation():
+                raise ToolError("DT ownership transfer declined by user.")
+            case CancelledElicitation():
+                raise ToolError("DT ownership transfer cancelled by user.")
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to transfer ownership of DT {dt_manifest_id}.") from exc
 
 
 @mcp.tool(
@@ -1111,6 +1335,27 @@ async def update_dt_sc(
             ),
         ),
     ],
+    add_primitives: Annotated[
+        list[PrimitiveMutationInput] | None,
+        Field(
+            default=None,
+            description=(
+                "Primitive rows to add. Each row uses the form {cdt_pri_name, xbt_manifest_id, "
+                "code_list_manifest_id, agency_id_list_manifest_id}. Use default_primitive to choose "
+                "which remaining primitive is the default."
+            ),
+        ),
+    ],
+    remove_primitives: Annotated[
+        list[PrimitiveMutationInput] | None,
+        Field(
+            default=None,
+            description=(
+                "Primitive rows to remove. Each row uses the form {cdt_pri_name, xbt_manifest_id, "
+                "code_list_manifest_id, agency_id_list_manifest_id}."
+            ),
+        ),
+    ],
     data_type_service: DataTypeService = Depends(get_data_type_service),
 ) -> UpdateDataTypeSupplementaryComponentResponse:
     """Update mutable DT_SC fields."""
@@ -1129,6 +1374,16 @@ async def update_dt_sc(
             code_list_manifest_id=UNSET if default_primitive is None else default_primitive.code_list_manifest_id,
             agency_id_list_manifest_id=(
                 UNSET if default_primitive is None else default_primitive.agency_id_list_manifest_id
+            ),
+            add_primitives=(
+                [DataTypePrimitiveServiceRecord(**primitive.model_dump(), is_default=False) for primitive in add_primitives]
+                if add_primitives is not None
+                else UNSET
+            ),
+            remove_primitives=(
+                [DataTypePrimitiveServiceRecord(**primitive.model_dump(), is_default=False) for primitive in remove_primitives]
+                if remove_primitives is not None
+                else UNSET
             ),
         )
         return UpdateDataTypeSupplementaryComponentResponse.model_validate(result, from_attributes=True)

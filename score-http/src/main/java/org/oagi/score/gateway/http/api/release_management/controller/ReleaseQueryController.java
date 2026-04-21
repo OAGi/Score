@@ -76,6 +76,30 @@ public class ReleaseQueryController {
                 libraryId, separate(releaseStates).map(e -> ReleaseState.valueOf(e)).collect(toSet()));
     }
 
+    @Operation(summary = "Get Working Release Summary", description = "Fetches the working release summary for a given library.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful retrieval",
+                    content = @Content(schema = @Schema(implementation = ReleaseSummaryRecord.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid parameters"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "Record not found")
+    })
+    @GetMapping(value = "/working")
+    public ReleaseSummaryRecord getWorkingReleaseSummary(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+
+            @RequestParam(name = "libraryId")
+            @Parameter(description = "ID of the library")
+            LibraryId libraryId) {
+
+        ReleaseSummaryRecord workingRelease =
+                releaseQueryService.getWorkingReleaseSummary(sessionService.asScoreUser(user), libraryId);
+        if (workingRelease == null) {
+            throw new NotFoundException();
+        }
+        return workingRelease;
+    }
+
     @Operation(summary = "Get Release List", description = "Retrieves a paginated list of releases.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful retrieval",

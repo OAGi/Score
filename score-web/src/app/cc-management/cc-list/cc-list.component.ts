@@ -764,6 +764,14 @@ export class CcListComponent implements OnInit {
         return false;
     }
 
+    if (actionType === 'Update' && toState !== 'WIP' &&
+      this.selection.selected.some(item => !item.namespaceId)) {
+      this.snackBar.open('Namespace is required for all selected components before moving to Draft/QA.', '', {
+        duration: 3000
+      });
+      return;
+    }
+
     this.confirmDialogService.open(dialogConfig).afterClosed()
         .subscribe(result => {
           if (!result) {

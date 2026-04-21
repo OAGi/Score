@@ -5063,7 +5063,7 @@ async def update_bbie(
     facet_max_length: Annotated[int | None, Field(default=None, ge=0, description="Facet max-length restriction.")],
     facet_pattern: Annotated[str | None, Field(default=None, description="Facet pattern restriction.")],
     xbt_manifest_id: Annotated[int | None, Field(default=None, gt=0, description="XBT manifest identifier to use as the primitive restriction for this BBIE.")],
-    code_list_manifest_id: Annotated[int | None, Field(default=None, gt=0, description="Code-list manifest identifier to use as the primitive restriction for this BBIE.")],
+    code_list_manifest_id: Annotated[int | None, Field(default=None, gt=0, description="Code list manifest identifier to use as the primitive restriction for this BBIE.")],
     agency_id_list_manifest_id: Annotated[int | None, Field(default=None, gt=0, description="Agency-ID-list manifest identifier to use as the primitive restriction for this BBIE.")],
     business_information_entity_service: BusinessInformationEntityService = Depends(get_business_information_entity_service),
 ) -> UpdateBbieToolResponse:
@@ -5128,7 +5128,7 @@ async def update_bbie(
             Accepts int, str (converted to int), or None. If not provided, will not be updated.
         facet_pattern (str | None, optional): Pattern facet (regex) for string types
         xbt_manifest_id (int | None, optional): XBT manifest identifier to use as the primitive restriction for this BBIE. Mutually exclusive with code_list_manifest_id and agency_id_list_manifest_id.
-        code_list_manifest_id (int | None, optional): Code-list manifest identifier to use as the primitive restriction for this BBIE. Mutually exclusive with xbt_manifest_id and agency_id_list_manifest_id.
+        code_list_manifest_id (int | None, optional): Code list manifest identifier to use as the primitive restriction for this BBIE. Mutually exclusive with xbt_manifest_id and agency_id_list_manifest_id.
         agency_id_list_manifest_id (int | None, optional): Agency-ID-list manifest identifier to use as the primitive restriction for this BBIE. Mutually exclusive with xbt_manifest_id and code_list_manifest_id.
 
     Returns:
@@ -5316,7 +5316,7 @@ async def update_bbie_sc(
     facet_max_length: Annotated[int | None, Field(default=None, ge=0, description="Facet max-length restriction.")],
     facet_pattern: Annotated[str | None, Field(default=None, description="Facet pattern restriction.")],
     xbt_manifest_id: Annotated[int | None, Field(default=None, gt=0, description="XBT manifest identifier to use as the primitive restriction for this BBIE supplementary component.")],
-    code_list_manifest_id: Annotated[int | None, Field(default=None, gt=0, description="Code-list manifest identifier to use as the primitive restriction for this BBIE supplementary component.")],
+    code_list_manifest_id: Annotated[int | None, Field(default=None, gt=0, description="Code list manifest identifier to use as the primitive restriction for this BBIE supplementary component.")],
     agency_id_list_manifest_id: Annotated[int | None, Field(default=None, gt=0, description="Agency-ID-list manifest identifier to use as the primitive restriction for this BBIE supplementary component.")],
     business_information_entity_service: BusinessInformationEntityService = Depends(get_business_information_entity_service),
 ) -> UpdateBbieScToolResponse:
@@ -5370,7 +5370,7 @@ async def update_bbie_sc(
             Accepts int, str (converted to int), or None. If not provided, will not be updated.
         facet_pattern (str | None, optional): Pattern facet (regex) for string types
         xbt_manifest_id (int | None, optional): XBT manifest identifier to use as the primitive restriction for this BBIE supplementary component. Mutually exclusive with code_list_manifest_id and agency_id_list_manifest_id.
-        code_list_manifest_id (int | None, optional): Code-list manifest identifier to use as the primitive restriction for this BBIE supplementary component. Mutually exclusive with xbt_manifest_id and agency_id_list_manifest_id.
+        code_list_manifest_id (int | None, optional): Code list manifest identifier to use as the primitive restriction for this BBIE supplementary component. Mutually exclusive with xbt_manifest_id and agency_id_list_manifest_id.
         agency_id_list_manifest_id (int | None, optional): Agency-ID-list manifest identifier to use as the primitive restriction for this BBIE supplementary component. Mutually exclusive with xbt_manifest_id and code_list_manifest_id.
 
     Returns:

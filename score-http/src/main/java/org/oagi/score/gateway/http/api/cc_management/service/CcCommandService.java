@@ -87,6 +87,25 @@ public class CcCommandService {
         }
 
         assertReleaseIsPublished(requester, request.releaseId());
+        ReleaseSummaryRecord targetRelease = repositoryFactory.releaseQueryRepository(requester)
+                .getReleaseSummary(request.releaseId());
+        if (targetRelease == null) {
+            throw new IllegalArgumentException("Target release does not exist.");
+        }
+        if (request.basedAccManifestId() != null) {
+            AccSummaryRecord basedAcc = repositoryFactory.accQueryRepository(requester)
+                    .getAccSummary(request.basedAccManifestId());
+            if (basedAcc == null) {
+                throw new IllegalArgumentException("Base ACC does not exist.");
+            }
+            assertReferencedReleaseAllowed(
+                    requester,
+                    targetRelease,
+                    basedAcc.release(),
+                    "The base ACC",
+                    "the target release",
+                    "a base ACC");
+        }
 
         var command = repositoryFactory.accCommandRepository(requester);
 
@@ -110,6 +129,40 @@ public class CcCommandService {
         }
 
         return accManifestId;
+    }
+
+    private void assertReferencedReleaseAllowed(
+            ScoreUser requester,
+            ReleaseSummaryRecord targetRelease,
+            ReleaseSummaryRecord referencedRelease,
+            String referencedLabel,
+            String targetLabel,
+            String selectionPhrase) {
+
+        if (targetRelease == null || referencedRelease == null) {
+            throw new IllegalArgumentException("Referenced release information is missing.");
+        }
+
+        if (targetRelease.libraryId().equals(referencedRelease.libraryId())) {
+            if (!targetRelease.releaseId().equals(referencedRelease.releaseId())) {
+                throw new IllegalArgumentException(
+                        referencedLabel + " must belong to the same release as " + targetLabel
+                                + " when both components are in the same library. "
+                                + "Please choose " + selectionPhrase + " from the target release and try again.");
+            }
+            return;
+        }
+
+        boolean allowed = repositoryFactory.releaseQueryRepository(requester)
+                .getReleaseDependencySummaryList(targetRelease.releaseId()).stream()
+                .anyMatch(dependency -> dependency.releaseId().equals(referencedRelease.releaseId()));
+        if (!allowed) {
+            throw new IllegalArgumentException(
+                    referencedLabel + " must come from a release dependency of " + targetLabel
+                            + " when the components are in different libraries. "
+                            + "Please choose " + selectionPhrase
+                            + " from one of the target release dependencies and try again.");
+        }
     }
 
     private void makeLog(ScoreUser requester, AccManifestId accManifestId, LogAction action) {
@@ -158,6 +211,13 @@ public class CcCommandService {
         if (toAsccp == null) {
             throw new IllegalArgumentException("Target ASCCP does not exist.");
         }
+        assertReferencedReleaseAllowed(
+                requester,
+                fromAcc.release(),
+                toAsccp.release(),
+                "The target ASCCP",
+                "the source ACC",
+                "an ASCCP");
 
         if (!request.skipReusableCheck() && !toAsccp.reusable()) {
             throw new IllegalArgumentException("Target ASCCP is not reusable.");
@@ -214,6 +274,13 @@ public class CcCommandService {
         if (toBccp == null) {
             throw new IllegalArgumentException("Target BCCP does not exist.");
         }
+        assertReferencedReleaseAllowed(
+                requester,
+                fromAcc.release(),
+                toBccp.release(),
+                "The target BCCP",
+                "the source ACC",
+                "a BCCP");
 
         BccManifestId bccManifestId = repositoryFactory.accCommandRepository(requester)
                 .createBcc(request.accManifestId(), request.bccpManifestId(),
@@ -236,9 +303,24 @@ public class CcCommandService {
         }
 
         assertReleaseIsPublished(requester, request.releaseId());
+        ReleaseSummaryRecord targetRelease = repositoryFactory.releaseQueryRepository(requester)
+                .getReleaseSummary(request.releaseId());
+        if (targetRelease == null) {
+            throw new IllegalArgumentException("Target release does not exist.");
+        }
 
         AccSummaryRecord roleOfAcc = repositoryFactory.accQueryRepository(requester)
                 .getAccSummary(request.roleOfAccManifestId());
+        if (roleOfAcc == null) {
+            throw new IllegalArgumentException("Role ACC does not exist.");
+        }
+        assertReferencedReleaseAllowed(
+                requester,
+                targetRelease,
+                roleOfAcc.release(),
+                "The role ACC",
+                "the target release",
+                "a role ACC");
         if (roleOfAcc.isAbstract()) {
             throw new IllegalArgumentException("An abstract ACC cannot be used to create a new ASCCP.");
         }
@@ -398,6 +480,22 @@ public class CcCommandService {
 
     public BccpManifestId createBccp(ScoreUser requester, BccpCreateRequest request) {
         assertReleaseIsPublished(requester, request.releaseId());
+        ReleaseSummaryRecord targetRelease = repositoryFactory.releaseQueryRepository(requester)
+                .getReleaseSummary(request.releaseId());
+        if (targetRelease == null) {
+            throw new IllegalArgumentException("Target release does not exist.");
+        }
+        DtSummaryRecord bdt = repositoryFactory.dtQueryRepository(requester).getDtSummary(request.basedDtManifestId());
+        if (bdt == null) {
+            throw new IllegalArgumentException("Target BDT does not exist.");
+        }
+        assertReferencedReleaseAllowed(
+                requester,
+                targetRelease,
+                bdt.release(),
+                "The target BDT",
+                "the target release",
+                "a BDT");
 
         var command = repositoryFactory.bccpCommandRepository(requester);
 
@@ -438,6 +536,23 @@ public class CcCommandService {
         }
 
         assertReleaseIsPublished(requester, request.releaseId());
+        ReleaseSummaryRecord targetRelease = repositoryFactory.releaseQueryRepository(requester)
+                .getReleaseSummary(request.releaseId());
+        if (targetRelease == null) {
+            throw new IllegalArgumentException("Target release does not exist.");
+        }
+        DtSummaryRecord basedDt = repositoryFactory.dtQueryRepository(requester)
+                .getDtSummary(request.basedDtManifestId());
+        if (basedDt == null) {
+            throw new IllegalArgumentException("Base DT does not exist.");
+        }
+        assertReferencedReleaseAllowed(
+                requester,
+                targetRelease,
+                basedDt.release(),
+                "The base DT",
+                "the target release",
+                "a base DT");
 
         var command = repositoryFactory.dtCommandRepository(requester);
         DtManifestId dtManifestId = command.create(request.releaseId(), request.basedDtManifestId());
@@ -1182,6 +1297,19 @@ public class CcCommandService {
         if (!requester.isAdministrator() && !acc.owner().userId().equals(requester.userId())) {
             throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
         }
+        if (basedAccManifestId != null) {
+            AccSummaryRecord basedAcc = query.getAccSummary(basedAccManifestId);
+            if (basedAcc == null) {
+                throw new IllegalArgumentException("Base ACC does not exist.");
+            }
+            assertReferencedReleaseAllowed(
+                    requester,
+                    acc.release(),
+                    basedAcc.release(),
+                    "The base ACC",
+                    "the target ACC",
+                    "a base ACC");
+        }
 
         var command = repositoryFactory.accCommandRepository(requester);
         return command.updateBasedAccManifestId(accManifestId, basedAccManifestId);
@@ -1259,6 +1387,17 @@ public class CcCommandService {
         if (!requester.isAdministrator() && !asccp.owner().userId().equals(requester.userId())) {
             throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
         }
+        AccSummaryRecord roleOfAcc = repositoryFactory.accQueryRepository(requester).getAccSummary(roleOfAccManifestId);
+        if (roleOfAcc == null) {
+            throw new IllegalArgumentException("Role ACC does not exist.");
+        }
+        assertReferencedReleaseAllowed(
+                requester,
+                asccp.release(),
+                roleOfAcc.release(),
+                "The role ACC",
+                "the target ASCCP",
+                "a role ACC");
 
         boolean updated = repositoryFactory.asccpCommandRepository(requester).updateRoleOfAcc(asccpManifestId, roleOfAccManifestId);
         if (updated) {
@@ -1342,6 +1481,17 @@ public class CcCommandService {
         if (!requester.isAdministrator() && !bccp.owner().userId().equals(requester.userId())) {
             throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
         }
+        DtSummaryRecord bdt = repositoryFactory.dtQueryRepository(requester).getDtSummary(dtManifestId);
+        if (bdt == null) {
+            throw new IllegalArgumentException("Target BDT does not exist.");
+        }
+        assertReferencedReleaseAllowed(
+                requester,
+                bccp.release(),
+                bdt.release(),
+                "The target BDT",
+                "the target BCCP",
+                "a BDT");
 
         boolean updated = repositoryFactory.bccpCommandRepository(requester).updateDt(bccpManifestId, dtManifestId);
         if (updated) {

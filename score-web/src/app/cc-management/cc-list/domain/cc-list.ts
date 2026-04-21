@@ -201,6 +201,7 @@ export class CcListEntry {
   definition: Definition;
   module: string;
   oagisComponentType: string;
+  namespaceId: number;
 
   state: string;
   deprecated: boolean;

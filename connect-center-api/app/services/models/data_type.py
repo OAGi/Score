@@ -70,6 +70,7 @@ class DataTypeServiceResult:
         "ReleaseDraft",
         "Published",
     ]
+    primitives: list[DataTypePrimitiveServiceRecord] = field(default_factory=list)
     supplementary_components: list[DataTypeSupplementaryComponentServiceRecord] = field(default_factory=list)
     tags: list[TagSummaryServiceRecord] = field(default_factory=list)
     namespace: NamespaceSummaryServiceRecord | None = None
@@ -112,6 +113,17 @@ class DataTypeValueConstraintServiceRecord:
 
 
 @dataclass(kw_only=True)
+class DataTypePrimitiveServiceRecord:
+    """Primitive selection for a DT or DT_SC."""
+
+    cdt_pri_name: str | None = None
+    xbt_manifest_id: int | None = None
+    code_list_manifest_id: int | None = None
+    agency_id_list_manifest_id: int | None = None
+    is_default: bool
+
+
+@dataclass(kw_only=True)
 class DataTypeSupplementaryComponentServiceRecord:
     """Data type supplementary component information."""
 
@@ -127,6 +139,7 @@ class DataTypeSupplementaryComponentServiceRecord:
     cardinality_max: int
     value_constraint: DataTypeValueConstraintServiceRecord | None = None
     is_deprecated: bool
+    primitives: list[DataTypePrimitiveServiceRecord] = field(default_factory=list)
 
     @property
     def cardinality(self) -> Literal["Prohibited", "Optional", "Required"]:
@@ -170,6 +183,14 @@ class CreateDataTypeServiceResult:
 @dataclass(kw_only=True)
 class UpdateDataTypeServiceResult:
     """Data-type update response model."""
+
+    dt_manifest_id: DataTypeManifestId
+    updates: list[str] = field(default_factory=list)
+
+
+@dataclass(kw_only=True)
+class TransferDataTypeOwnershipServiceResult:
+    """Data-type ownership-transfer response model."""
 
     dt_manifest_id: DataTypeManifestId
     updates: list[str] = field(default_factory=list)

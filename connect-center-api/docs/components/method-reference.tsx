@@ -125,8 +125,9 @@ function PropertyList({ fields, requiredFilter }: { fields: MethodDoc['body_para
   return (
     <div className="divide-y divide-border rounded-lg bg-white dark:bg-[#050505]">
       {rootFields.map((field) => {
-        const children = fields.filter((candidate) => candidate.name.startsWith(`${field.name}.`) && matchesRequiredFilter(candidate.required));
-        const expandable = /\bobject\b/i.test(field.type) && children.length > 0;
+        const prefix = childFieldPrefix(field.name, field.type);
+        const children = fields.filter((candidate) => candidate.name.startsWith(prefix) && matchesRequiredFilter(candidate.required));
+        const expandable = (isObjectLikeType(field.type) || isArrayType(field.type)) && children.length > 0;
 
         if (!expandable) {
           return (
@@ -164,7 +165,7 @@ function PropertyList({ fields, requiredFilter }: { fields: MethodDoc['body_para
               {children.map((child, index) => (
                 <div key={child.name} className={index === 0 ? 'px-4 py-3' : 'border-t border-border px-4 py-3'}>
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-[12px] text-[#0f172a]">{child.name.slice(field.name.length + 1)}</span>
+                    <span className="font-mono text-[12px] text-[#0f172a]">{childFieldLabel(field.name, field.type, child.name)}</span>
                     <span className="rounded border border-border bg-[#f8fafc] px-2 py-0.5 text-[11px] text-[#6b7280]">
                       {child.type}
                     </span>
@@ -599,10 +600,19 @@ function isArrayType(type: string): boolean {
   return /\barray\b/i.test(type);
 }
 
+function childFieldPrefix(fieldName: string, fieldType: string): string {
+  return isArrayType(fieldType) ? `${fieldName}[].` : `${fieldName}.`;
+}
+
+function childFieldLabel(parentName: string, parentType: string, childName: string): string {
+  return childName.slice(childFieldPrefix(parentName, parentType).length);
+}
+
 function getStructuredBodyFields(fields: MethodDoc['body_params']): MethodDoc['body_params'] {
   return fields.filter((field) => {
-    const hasChildren = fields.some((candidate) => candidate.name.startsWith(`${field.name}.`));
-    if (isObjectLikeType(field.type) && hasChildren) {
+    const prefix = childFieldPrefix(field.name, field.type);
+    const hasChildren = fields.some((candidate) => candidate.name.startsWith(prefix));
+    if ((isObjectLikeType(field.type) || isArrayType(field.type)) && hasChildren) {
       return false;
     }
     return true;

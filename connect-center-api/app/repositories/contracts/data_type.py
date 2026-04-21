@@ -10,7 +10,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Protocol, Literal
 
-from app.repositories.models.data_type import DataTypeRow
+from app.repositories.models.data_type import DataTypePrimitiveRow, DataTypeRow
 from app.types.identifiers import AppUserId, DataTypeManifestId, DataTypeSupplementaryComponentManifestId, ReleaseId
 
 
@@ -93,6 +93,26 @@ class DataTypeRepositoryContract(Protocol):
         requester_user_id: AppUserId,
     ) -> bool:
         """Update mutable DT fields."""
+        pass
+
+    async def update_dt_base(
+        self,
+        *,
+        dt_manifest_id: DataTypeManifestId,
+        based_dt_manifest_id: DataTypeManifestId | None,
+        requester_user_id: AppUserId,
+    ) -> bool:
+        """Update the base DT manifest link for a DT."""
+        pass
+
+    async def transfer_dt_ownership(
+        self,
+        *,
+        dt_manifest_id: DataTypeManifestId,
+        requester_user_id: AppUserId,
+        target_user_id: AppUserId,
+    ) -> bool:
+        """Transfer DT ownership."""
         pass
 
     async def create_dt_sc(
@@ -182,6 +202,16 @@ class DataTypeRepositoryContract(Protocol):
         """Update the default primitive selection for a DT."""
         pass
 
+    async def replace_dt_primitives(
+        self,
+        *,
+        dt_manifest_id: DataTypeManifestId,
+        primitives: list[DataTypePrimitiveRow],
+        requester_user_id: AppUserId,
+    ) -> bool:
+        """Replace the DT primitive rows with the provided desired set."""
+        pass
+
     async def change_dt_sc_default_primitive(
         self,
         *,
@@ -192,6 +222,16 @@ class DataTypeRepositoryContract(Protocol):
         requester_user_id: AppUserId,
     ) -> bool:
         """Update the default primitive selection for a DT_SC."""
+        pass
+
+    async def replace_dt_sc_primitives(
+        self,
+        *,
+        dt_sc_manifest_id: DataTypeSupplementaryComponentManifestId,
+        primitives: list[DataTypePrimitiveRow],
+        requester_user_id: AppUserId,
+    ) -> bool:
+        """Replace the DT_SC primitive rows with the provided desired set."""
         pass
 
     async def change_dt_state(

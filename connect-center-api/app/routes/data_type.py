@@ -17,6 +17,8 @@ from app.routes.models.data_type import (
     DataTypeEntry,
     GetDataTypeByDataTypeManifestIdResponse,
     GetDataTypeListResponse,
+    TransferDataTypeOwnershipRequest,
+    TransferDataTypeOwnershipResponse,
     UpdateDataTypeRequest,
     UpdateDataTypeResponse,
     UpdateDataTypeSupplementaryComponentRequest,
@@ -25,6 +27,7 @@ from app.routes.models.data_type import (
 )
 from app.utils.date import parse_date_range
 from app.services.data_type_service import DataTypeService
+from app.services.models.data_type import DataTypePrimitiveServiceRecord
 from app.types.unset import UNSET
 from app.types.identifiers import DataTypeManifestId, DataTypeSupplementaryComponentManifestId
 from app.types.identifiers import ReleaseId
@@ -103,7 +106,10 @@ async def get_data_type_list(
     "",
     status_code=status.HTTP_201_CREATED,
     summary="Create DT",
-    description="Create a DT (Data Type) from an existing base DT in a release allowed for your role.",
+    description=(
+        "Create a DT (Data Type) from an existing base DT in a release allowed for your role. "
+        "Optional mutable DT fields can be supplied and applied during creation."
+    ),
     response_model=CreateDataTypeResponse,
 )
 async def create_data_type(
@@ -116,6 +122,32 @@ async def create_data_type(
             release_id=payload.release_id,
             based_dt_manifest_id=payload.based_dt_manifest_id,
             tag_id=payload.tag_id,
+            qualifier=payload.qualifier if "qualifier" in payload.model_fields_set else UNSET,
+            six_digit_id=payload.six_digit_id if "six_digit_id" in payload.model_fields_set else UNSET,
+            deprecated=payload.deprecated if "deprecated" in payload.model_fields_set else UNSET,
+            namespace_id=payload.namespace_id if "namespace_id" in payload.model_fields_set else UNSET,
+            content_component_definition=(
+                payload.content_component_definition
+                if "content_component_definition" in payload.model_fields_set
+                else UNSET
+            ),
+            definition=payload.definition if "definition" in payload.model_fields_set else UNSET,
+            definition_source=payload.definition_source if "definition_source" in payload.model_fields_set else UNSET,
+            xbt_manifest_id=(
+                payload.default_primitive.xbt_manifest_id
+                if "default_primitive" in payload.model_fields_set and payload.default_primitive is not None
+                else UNSET
+            ),
+            code_list_manifest_id=(
+                payload.default_primitive.code_list_manifest_id
+                if "default_primitive" in payload.model_fields_set and payload.default_primitive is not None
+                else UNSET
+            ),
+            agency_id_list_manifest_id=(
+                payload.default_primitive.agency_id_list_manifest_id
+                if "default_primitive" in payload.model_fields_set and payload.default_primitive is not None
+                else UNSET
+            ),
         )
         return CreateDataTypeResponse.model_validate(result, from_attributes=True)
     except LookupError as e:
@@ -186,6 +218,7 @@ async def update_data_type(
     try:
         result = await data_type_service.update_dt(
             dt_manifest_id=dt_manifest_id,
+            based_dt_manifest_id=payload.based_dt_manifest_id if "based_dt_manifest_id" in payload.model_fields_set else UNSET,
             qualifier=payload.qualifier if "qualifier" in payload.model_fields_set else UNSET,
             six_digit_id=payload.six_digit_id if "six_digit_id" in payload.model_fields_set else UNSET,
             deprecated=payload.deprecated if "deprecated" in payload.model_fields_set else UNSET,
@@ -212,6 +245,22 @@ async def update_data_type(
                 if "default_primitive" in payload.model_fields_set and payload.default_primitive is not None
                 else UNSET
             ),
+            add_primitives=(
+                [
+                    DataTypePrimitiveServiceRecord(**primitive.model_dump(), is_default=False)
+                    for primitive in payload.add_primitives
+                ]
+                if "add_primitives" in payload.model_fields_set and payload.add_primitives is not None
+                else UNSET
+            ),
+            remove_primitives=(
+                [
+                    DataTypePrimitiveServiceRecord(**primitive.model_dump(), is_default=False)
+                    for primitive in payload.remove_primitives
+                ]
+                if "remove_primitives" in payload.model_fields_set and payload.remove_primitives is not None
+                else UNSET
+            ),
         )
         return UpdateDataTypeResponse.model_validate(result, from_attributes=True)
     except LookupError as e:
@@ -233,6 +282,46 @@ async def update_data_type(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={"message": "We couldn't update the DT.", "cause": str(e)},
+        )
+
+
+@router.post(
+    "/{dt_manifest_id}/ownership",
+    summary="Transfer DT ownership",
+    description="Transfer ownership of a DT (Data Type) to another user while the DT is in `WIP`.",
+    response_model=TransferDataTypeOwnershipResponse,
+)
+async def transfer_data_type_ownership(
+    payload: TransferDataTypeOwnershipRequest = Body(...),
+    dt_manifest_id: DataTypeManifestId = Path(..., ge=1, description="Data type manifest ID."),
+    data_type_service: DataTypeService = Depends(get_data_type_service),
+) -> TransferDataTypeOwnershipResponse:
+    """Transfer DT ownership and return the changed field names."""
+    try:
+        result = await data_type_service.transfer_dt_ownership(
+            dt_manifest_id=dt_manifest_id,
+            target_user_id=payload.target_user_id,
+        )
+        return TransferDataTypeOwnershipResponse.model_validate(result, from_attributes=True)
+    except LookupError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": "The data type or target user was not found.", "cause": str(e)},
+        )
+    except PermissionError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"message": "You do not have permission to transfer this DT.", "cause": str(e)},
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "The request is invalid. Check the body and try again.", "cause": str(e)},
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"message": "We couldn't transfer DT ownership.", "cause": str(e)},
         )
 
 
@@ -331,6 +420,22 @@ async def update_dt_sc(
             agency_id_list_manifest_id=(
                 payload.default_primitive.agency_id_list_manifest_id
                 if "default_primitive" in payload.model_fields_set and payload.default_primitive is not None
+                else UNSET
+            ),
+            add_primitives=(
+                [
+                    DataTypePrimitiveServiceRecord(**primitive.model_dump(), is_default=False)
+                    for primitive in payload.add_primitives
+                ]
+                if "add_primitives" in payload.model_fields_set and payload.add_primitives is not None
+                else UNSET
+            ),
+            remove_primitives=(
+                [
+                    DataTypePrimitiveServiceRecord(**primitive.model_dump(), is_default=False)
+                    for primitive in payload.remove_primitives
+                ]
+                if "remove_primitives" in payload.model_fields_set and payload.remove_primitives is not None
                 else UNSET
             ),
         )

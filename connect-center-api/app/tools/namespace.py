@@ -27,6 +27,14 @@ Available Tools:
 - get_namespace: Retrieve a single namespace by its ID, including library, owner,
   creator, and last_updater information.
 
+- create_namespace: Create a namespace in a target library.
+
+- update_namespace: Update a namespace owned by the requester.
+
+- transfer_namespace_ownership: Transfer a namespace to another user by login ID.
+
+- discard_namespace: Permanently delete a namespace that is not in use.
+
 Key Features:
 - Full relationship loading (library, owner, creator, last_updater)
 - Support for filtering, pagination, and sorting
@@ -44,9 +52,14 @@ from __future__ import annotations
 import logging
 from typing import Annotated, Any
 
-from fastmcp import FastMCP
+from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from fastmcp.exceptions import ToolError
+from fastmcp.server.elicitation import (
+    AcceptedElicitation,
+    CancelledElicitation,
+    DeclinedElicitation,
+)
 from pydantic import Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -55,11 +68,25 @@ from app.utils.date import parse_date_range
 from app.security import AuthenticatedUser
 from app.services.namespace_service import NamespaceService
 from app.tools import _to_tool_error, get_tool_authenticated_user, str_to_bool, tool_session
-from app.tools.models.namespace import GetNamespacePaginationResponse, GetNamespaceResponse, NamespaceResponseEntry
+from app.tools.models.namespace import (
+    CreateNamespaceResponse,
+    GetNamespacePaginationResponse,
+    GetNamespaceResponse,
+    NamespaceResponseEntry,
+    TransferNamespaceOwnershipResponse,
+    UpdateNamespaceResponse,
+)
 
 logger = logging.getLogger("connectcenter.mcp.namespace")
 
 mcp = FastMCP("connectCenter MCP - Namespace Tools")
+
+EMPTY_OUTPUT_SCHEMA = {
+    "type": "object",
+    "description": "Empty response body.",
+    "properties": {},
+    "additionalProperties": False,
+}
 
 
 async def get_namespace_service(
@@ -460,6 +487,177 @@ async def get_namespace(
         return GetNamespaceResponse.model_validate(row, from_attributes=True)
     except Exception as exc:
         raise _to_tool_error(exc, fallback=f"Unable to retrieve namespace {namespace_id}.") from exc
+
+
+@mcp.tool(
+    name="create_namespace",
+    description="Create a namespace in a target library.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the created namespace identifier.",
+        "properties": {
+            "namespace_id": {"type": "integer", "description": "Created namespace identifier.", "example": 101}
+        },
+        "required": ["namespace_id"],
+    },
+)
+async def create_namespace(
+    library_id: Annotated[int, Field(gt=0, description="Owning library identifier.")],
+    uri: Annotated[str, Field(min_length=1, description="Namespace URI.")],
+    prefix: Annotated[
+        str | None,
+        Field(default=None, description="Namespace prefix. Pass an empty string to store a blank prefix."),
+    ] = None,
+    description: Annotated[str | None, Field(default=None, description="Namespace description.")] = None,
+    namespace_service: NamespaceService = Depends(get_namespace_service),
+) -> CreateNamespaceResponse:
+    """Create a namespace."""
+    try:
+        result = await namespace_service.create_namespace(
+            library_id=library_id,
+            uri=uri,
+            prefix=prefix,
+            description=description,
+        )
+        return CreateNamespaceResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback="Unable to create the namespace.") from exc
+
+
+@mcp.tool(
+    name="update_namespace",
+    description="Update a namespace owned by the requester.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the target namespace identifier and changed fields.",
+        "properties": {
+            "namespace_id": {"type": "integer", "description": "Target namespace identifier.", "example": 101},
+            "updates": {
+                "type": "array",
+                "description": "Updated field names.",
+                "items": {"type": "string"},
+                "example": ["uri", "prefix"],
+            },
+        },
+        "required": ["namespace_id", "updates"],
+    },
+)
+async def update_namespace(
+    namespace_id: Annotated[int, Field(gt=0, description="Target namespace identifier.")],
+    uri: Annotated[str, Field(min_length=1, description="Updated namespace URI.")],
+    prefix: Annotated[
+        str | None,
+        Field(default=None, description="Updated namespace prefix. Pass an empty string to store a blank prefix."),
+    ] = None,
+    description: Annotated[str | None, Field(default=None, description="Updated namespace description.")] = None,
+    namespace_service: NamespaceService = Depends(get_namespace_service),
+) -> UpdateNamespaceResponse:
+    """Update a namespace."""
+    try:
+        result = await namespace_service.update_namespace(
+            namespace_id=namespace_id,
+            uri=uri,
+            prefix=prefix,
+            description=description,
+        )
+        return UpdateNamespaceResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to update namespace {namespace_id}.") from exc
+
+
+@mcp.tool(
+    name="transfer_namespace_ownership",
+    description="Transfer namespace ownership to another user by login ID.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the target namespace identifier and changed fields.",
+        "properties": {
+            "namespace_id": {"type": "integer", "description": "Target namespace identifier.", "example": 101},
+            "updates": {
+                "type": "array",
+                "description": "Updated field names.",
+                "items": {"type": "string"},
+                "example": ["owner_user_id"],
+            },
+        },
+        "required": ["namespace_id", "updates"],
+    },
+)
+async def transfer_namespace_ownership(
+    namespace_id: Annotated[int, Field(gt=0, description="Target namespace identifier.")],
+    target_login_id: Annotated[str, Field(min_length=1, description="Login ID of the new owner.")],
+    ctx: Context,
+    namespace_service: NamespaceService = Depends(get_namespace_service),
+) -> TransferNamespaceOwnershipResponse:
+    """Transfer namespace ownership after confirmation."""
+    row = await namespace_service.get(namespace_id)
+    if row is None:
+        raise ToolError(
+            f"The namespace with ID {namespace_id} was not found. Please check the ID and try again."
+        )
+
+    elicit_result = await ctx.elicit(
+        message=(
+            f"Are you sure you want to transfer ownership of namespace '{row.uri}' "
+            f"to {target_login_id.strip()}?"
+        ),
+        response_type=None,
+    )
+    match elicit_result:
+        case AcceptedElicitation():
+            pass
+        case DeclinedElicitation():
+            raise ToolError("Namespace ownership transfer declined by user.")
+        case CancelledElicitation():
+            raise ToolError("Namespace ownership transfer cancelled by user.")
+
+    try:
+        payload = await namespace_service.transfer_namespace_ownership(
+            namespace_id=namespace_id,
+            target_login_id=target_login_id,
+        )
+        return TransferNamespaceOwnershipResponse.model_validate(payload, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to transfer ownership of namespace {namespace_id}.") from exc
+
+
+@mcp.tool(
+    name="discard_namespace",
+    description="Discard a namespace permanently when it is not in use.",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def discard_namespace(
+    namespace_id: Annotated[int, Field(gt=0, description="Target namespace identifier.")],
+    ctx: Context,
+    namespace_service: NamespaceService = Depends(get_namespace_service),
+) -> dict[str, object]:
+    """Discard a namespace after confirmation."""
+    row = await namespace_service.get(namespace_id)
+    if row is None:
+        raise ToolError(
+            f"The namespace with ID {namespace_id} was not found. Please check the ID and try again."
+        )
+
+    elicit_result = await ctx.elicit(
+        message=(
+            f"Are you sure you want to discard namespace '{row.uri}' permanently?\n\n"
+            "This removes the namespace record and cannot be undone."
+        ),
+        response_type=None,
+    )
+    match elicit_result:
+        case AcceptedElicitation():
+            pass
+        case DeclinedElicitation():
+            raise ToolError("Namespace discard was not confirmed.")
+        case CancelledElicitation():
+            raise ToolError("Namespace discard was cancelled.")
+
+    try:
+        await namespace_service.discard_namespace(namespace_id=namespace_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to discard namespace {namespace_id}.") from exc
 
 
 def _build_namespace_service(

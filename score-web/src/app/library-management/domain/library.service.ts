@@ -33,7 +33,9 @@ export class LibraryService {
       organization: library.organization,
       link: library.link,
       domain: library.domain,
-      description: library.description
+      description: library.description,
+      namespaceUri: library.namespaceUri,
+      namespacePrefix: library.namespacePrefix
     });
   }
 
