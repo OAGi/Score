@@ -21,6 +21,7 @@ import org.oagi.score.gateway.http.api.code_list_management.model.CodeListSummar
 import org.oagi.score.gateway.http.api.code_list_management.model.CodeListValueSummaryRecord;
 import org.oagi.score.gateway.http.api.export.ExportContext;
 import org.oagi.score.gateway.http.api.export.model.*;
+import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
 import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceSummaryRecord;
 import org.oagi.score.gateway.http.api.xbt_management.model.XbtSummaryRecord;
 import org.oagi.score.gateway.http.common.util.StringUtils;
@@ -69,12 +70,51 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
         return schemaModule;
     }
 
+    private NamespaceSummaryRecord requireNamespace(
+            String componentType, String componentName, Object manifestId, NamespaceId namespaceId) {
+        if (namespaceId == null) {
+            throw new IllegalStateException(
+                    "Namespace is required for " + componentType + " '" + componentName + "' [" + manifestId + "].");
+        }
+
+        NamespaceSummaryRecord namespace = ccDocument.getNamespace(namespaceId);
+        if (namespace == null) {
+            throw new IllegalStateException(
+                    "Namespace [" + namespaceId + "] for " + componentType + " '" + componentName + "' [" + manifestId + "] could not be resolved.");
+        }
+        return namespace;
+    }
+
+    private NamespaceSummaryRecord requireNamespace(AsccpSummaryRecord asccp) {
+        return requireNamespace("ASCCP", asccp.den(), asccp.asccpManifestId(), asccp.namespaceId());
+    }
+
+    private NamespaceSummaryRecord requireNamespace(AccSummaryRecord acc) {
+        return requireNamespace("ACC", acc.den(), acc.accManifestId(), acc.namespaceId());
+    }
+
+    private NamespaceSummaryRecord requireNamespace(BccpSummaryRecord bccp) {
+        return requireNamespace("BCCP", bccp.den(), bccp.bccpManifestId(), bccp.namespaceId());
+    }
+
+    private NamespaceSummaryRecord requireNamespace(DtSummaryRecord dt) {
+        return requireNamespace("DT", dt.den(), dt.dtManifestId(), dt.namespaceId());
+    }
+
+    private NamespaceSummaryRecord requireNamespace(CodeListSummaryRecord codeList) {
+        return requireNamespace("Code List", codeList.name(), codeList.codeListManifestId(), codeList.namespaceId());
+    }
+
+    private NamespaceSummaryRecord requireNamespace(AgencyIdListSummaryRecord agencyIdList) {
+        return requireNamespace("Agency ID List", agencyIdList.name(), agencyIdList.agencyIdListManifestId(), agencyIdList.namespaceId());
+    }
+
     public ExportContext build(AsccpManifestId asccpManifestId) {
         addASCCP(null, asccpManifestId, true);
 
         AsccpSummaryRecord asccp = ccDocument.getAsccp(asccpManifestId);
         if (asccp != null) {
-            NamespaceSummaryRecord namespace = ccDocument.getNamespace(asccp.namespaceId());
+            NamespaceSummaryRecord namespace = requireNamespace(asccp);
             SchemaModule rootModule = getModuleByNamespace(namespace);
             AccSummaryRecord roleOfAcc = ccDocument.getAcc(asccp.roleOfAccManifestId());
             if (rootModule != null && roleOfAcc != null) {
@@ -123,7 +163,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
 
         SchemaModule schemaModule = null;
         if (ignoreReusableIndicator || asccp.reusable()) {
-            NamespaceSummaryRecord namespace = ccDocument.getNamespace(asccp.namespaceId());
+            NamespaceSummaryRecord namespace = requireNamespace(asccp);
             schemaModule = getModuleByNamespace(namespace);
             if (parentSchemaModule != null && !parentSchemaModule.getNamespace().equals(schemaModule.getNamespace())) {
                 parentSchemaModule.addImport(schemaModule);
@@ -143,7 +183,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
 
         SchemaModule bccpSchemaModule = null;
         if (EntityType.Element == bcc.entityType()) {
-            NamespaceSummaryRecord namespace = ccDocument.getNamespace(bccp.namespaceId());
+            NamespaceSummaryRecord namespace = requireNamespace(bccp);
             bccpSchemaModule = getModuleByNamespace(namespace);
             if (parentSchemaModule != null && !parentSchemaModule.getNamespace().equals(bccpSchemaModule.getNamespace())) {
                 parentSchemaModule.addImport(bccpSchemaModule);
@@ -168,7 +208,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
                 return;
             }
 
-            NamespaceSummaryRecord namespace = ccDocument.getNamespace(acc.namespaceId());
+            NamespaceSummaryRecord namespace = requireNamespace(acc);
             schemaModule = getModuleByNamespace(namespace);
             if (parentSchemaModule != null && !parentSchemaModule.getNamespace().equals(schemaModule.getNamespace())) {
                 parentSchemaModule.addImport(schemaModule);
@@ -207,7 +247,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
             return;
         }
 
-        NamespaceSummaryRecord namespace = ccDocument.getNamespace(dt.namespaceId());
+        NamespaceSummaryRecord namespace = requireNamespace(dt);
         SchemaModule schemaModule = getModuleByNamespace(namespace);
         if (parentSchemaModule != null && !parentSchemaModule.getNamespace().equals(schemaModule.getNamespace())) {
             parentSchemaModule.addImport(schemaModule);
@@ -215,7 +255,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
         }
 
         if (baseDataType.basedDtManifestId() != null) { // if baseDataType is not CDT
-            NamespaceSummaryRecord baseNamespace = ccDocument.getNamespace(baseDataType.namespaceId());
+            NamespaceSummaryRecord baseNamespace = requireNamespace(baseDataType);
             SchemaModule baseSchemaModule = getModuleByNamespace(baseNamespace);
             if (baseSchemaModule != null && !baseSchemaModule.getNamespace().equals(schemaModule.getNamespace())) {
                 schemaModule.addImport(baseSchemaModule);
@@ -260,7 +300,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
                         .filter(e -> e.codeListManifestId() != null)
                         .forEach(dtScAwdPri -> {
                             CodeListSummaryRecord codeList = ccDocument.getCodeList(dtScAwdPri.codeListManifestId());
-                            NamespaceSummaryRecord codeListNamespace = ccDocument.getNamespace(codeList.namespaceId());
+                            NamespaceSummaryRecord codeListNamespace = requireNamespace(codeList);
                             SchemaModule codeListSchemaModule = getModuleByNamespace(codeListNamespace);
                             if (codeListSchemaModule != null && !codeListSchemaModule.getNamespace().equals(schemaModule.getNamespace())) {
                                 schemaModule.addImport(codeListSchemaModule);
@@ -273,7 +313,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
                         .filter(e -> e.agencyIdListManifestId() != null)
                         .forEach(dtScAwdPri -> {
                             AgencyIdListSummaryRecord agencyIdList = ccDocument.getAgencyIdList(dtScAwdPri.agencyIdListManifestId());
-                            NamespaceSummaryRecord agencyIdListNamespace = ccDocument.getNamespace(agencyIdList.namespaceId());
+                            NamespaceSummaryRecord agencyIdListNamespace = requireNamespace(agencyIdList);
                             SchemaModule agencyIdListSchemaModule = getModuleByNamespace(agencyIdListNamespace);
                             if (agencyIdListSchemaModule != null && !agencyIdListSchemaModule.getNamespace().equals(schemaModule.getNamespace())) {
                                 schemaModule.addImport(agencyIdListSchemaModule);
@@ -300,7 +340,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
                 .filter(e -> e.codeListManifestId() != null)
                 .forEach(dtAwdPri -> {
                     CodeListSummaryRecord codeList = ccDocument.getCodeList(dtAwdPri.codeListManifestId());
-                    NamespaceSummaryRecord codeListNamespace = ccDocument.getNamespace(codeList.namespaceId());
+                    NamespaceSummaryRecord codeListNamespace = requireNamespace(codeList);
                     SchemaModule codeListSchemaModule = getModuleByNamespace(codeListNamespace);
                     if (codeListSchemaModule != null && !codeListSchemaModule.getNamespace().equals(schemaModule.getNamespace())) {
                         schemaModule.addImport(codeListSchemaModule);
@@ -313,7 +353,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
                 .filter(e -> e.agencyIdListManifestId() != null)
                 .forEach(dtAwdPri -> {
                     AgencyIdListSummaryRecord agencyIdList = ccDocument.getAgencyIdList(dtAwdPri.agencyIdListManifestId());
-                    NamespaceSummaryRecord agencyIdListNamespace = ccDocument.getNamespace(agencyIdList.namespaceId());
+                    NamespaceSummaryRecord agencyIdListNamespace = requireNamespace(agencyIdList);
                     SchemaModule agencyIdListSchemaModule = getModuleByNamespace(agencyIdListNamespace);
                     if (agencyIdListSchemaModule != null && !agencyIdListSchemaModule.getNamespace().equals(schemaModule.getNamespace())) {
                         schemaModule.addImport(agencyIdListSchemaModule);
@@ -350,7 +390,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
             schemaCodeList.addValue(codeListValue.value());
         }
 
-        NamespaceSummaryRecord namespace = ccDocument.getNamespace(codeList.namespaceId());
+        NamespaceSummaryRecord namespace = requireNamespace(codeList);
         SchemaModule schemaModule = getModuleByNamespace(namespace);
         if (parentSchemaModule != null && !parentSchemaModule.getNamespace().equals(schemaModule.getNamespace())) {
             parentSchemaModule.addImport(schemaModule);
