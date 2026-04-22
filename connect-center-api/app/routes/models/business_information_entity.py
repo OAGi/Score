@@ -446,15 +446,15 @@ class CreateTopLevelASBIEPResponse(BaseModel):
 class UpdateTopLevelASBIEPRequest(BaseModel):
     """Request payload for updating top-level ASBIEP fields."""
 
-    version: str | None = Field(default=None, description="Version value.")
-    status: str | None = Field(default=None, description="Status value.")
-    display_name: str | None = Field(default=None, description="Display name override.")
-    biz_term: str | None = Field(default=None, description="Business term override.")
-    definition: str | None = Field(default=None, description="ASBIEP definition override.")
-    remark: str | None = Field(default=None, description="ASBIEP remark override.")
-    is_deprecated: bool | None = Field(default=None, description="Deprecation flag.")
-    deprecated_reason: str | None = Field(default=None, description="Deprecation reason.")
-    deprecated_remark: str | None = Field(default=None, description="Deprecation remark.")
+    version: str | None = Field(default=None, description="Version value. Omit to leave unchanged.")
+    status: str | None = Field(default=None, description="Status value. Omit to leave unchanged.")
+    display_name: str | None = Field(default=None, description="Display name override. Omit to leave unchanged.")
+    biz_term: str | None = Field(default=None, description="Business term override. Omit to leave unchanged.")
+    definition: str | None = Field(default=None, description="ASBIEP definition override. Omit to leave unchanged.")
+    remark: str | None = Field(default=None, description="ASBIEP remark override. Omit to leave unchanged.")
+    is_deprecated: bool | None = Field(default=None, description="Deprecation flag. Omit to leave unchanged.")
+    deprecated_reason: str | None = Field(default=None, description="Deprecation reason. Omit to leave unchanged.")
+    deprecated_remark: str | None = Field(default=None, description="Deprecation remark. Omit to leave unchanged.")
 
     model_config = ConfigDict(
         frozen=True,
@@ -593,12 +593,12 @@ class CreateASBIEResponse(BaseModel):
 class UpdateASBIERequest(BaseModel):
     """Request payload for updating an ASBIE."""
 
-    is_used: bool | None = Field(default=None, description="Whether this ASBIE is profiled.")
-    is_nillable: bool | None = Field(default=None, description="Nillable indicator.")
-    definition: str | None = Field(default=None, description="Definition text for this ASBIE.")
-    cardinality_min: int | None = Field(default=None, ge=0, description="Minimum cardinality.")
-    cardinality_max: int | None = Field(default=None, description="Maximum cardinality (`-1` for unbounded).")
-    remark: str | None = Field(default=None, description="Remark text for the ASBIE property.")
+    is_used: bool | None = Field(default=None, description="Whether this ASBIE is profiled. Omit to leave unchanged.")
+    is_nillable: bool | None = Field(default=None, description="Nillable indicator. Omit to leave unchanged.")
+    definition: str | None = Field(default=None, description="Definition text for this ASBIE. Omit to leave unchanged.")
+    cardinality_min: int | None = Field(default=None, ge=0, description="Minimum cardinality. Omit to leave unchanged.")
+    cardinality_max: int | None = Field(default=None, description="Maximum cardinality (`-1` for unbounded). Omit to leave unchanged.")
+    remark: str | None = Field(default=None, description="Remark text for the ASBIE property. Omit to leave unchanged.")
 
     model_config = ConfigDict(
         frozen=True,
@@ -649,21 +649,21 @@ class CreateBBIEResponse(BaseModel):
 class UpdateBBIERequest(BaseModel):
     """Request payload for updating a BBIE."""
 
-    is_used: bool | None = Field(default=None, description="Whether this BBIE is profiled.")
-    is_nillable: bool | None = Field(default=None, description="Nillable indicator.")
-    cardinality_min: int | None = Field(default=None, ge=0, description="Minimum cardinality.")
-    cardinality_max: int | None = Field(default=None, description="Maximum cardinality (`-1` for unbounded).")
-    definition: str | None = Field(default=None, description="Definition text for this BBIE.")
-    example: str | None = Field(default=None, description="Illustrative example value or content for this BBIE.")
-    remark: str | None = Field(default=None, description="Remark text for the BBIE property.")
-    default_value: str | None = Field(default=None, description="Default value.")
-    fixed_value: str | None = Field(default=None, description="Fixed value.")
-    facet_min_length: int | None = Field(default=None, ge=0, description="Facet min length.")
-    facet_max_length: int | None = Field(default=None, ge=0, description="Facet max length.")
-    facet_pattern: str | None = Field(default=None, description="Facet pattern (regular expression).")
-    xbt_manifest_id: int | None = Field(default=None, ge=1, description="XBT manifest identifier to use as the primitive restriction for this BBIE.")
-    code_list_manifest_id: int | None = Field(default=None, ge=1, description="Code list manifest identifier to use as the primitive restriction for this BBIE.")
-    agency_id_list_manifest_id: int | None = Field(default=None, ge=1, description="Agency-ID-list manifest identifier to use as the primitive restriction for this BBIE.")
+    is_used: bool | None = Field(default=None, description="Whether this BBIE is profiled. Omit to leave unchanged.")
+    is_nillable: bool | None = Field(default=None, description="Nillable indicator. Omit to leave unchanged.")
+    cardinality_min: int | None = Field(default=None, ge=0, description="Minimum cardinality. Omit to leave unchanged.")
+    cardinality_max: int | None = Field(default=None, description="Maximum cardinality (`-1` for unbounded). Omit to leave unchanged.")
+    definition: str | None = Field(default=None, description="Definition text for this BBIE. Omit to leave unchanged.")
+    example: str | None = Field(default=None, description="Illustrative example value or content for this BBIE. Omit to leave unchanged.")
+    remark: str | None = Field(default=None, description="Remark text for the BBIE property. Omit to leave unchanged.")
+    default_value: str | None = Field(default=None, description="Default value. Omit to leave unchanged.")
+    fixed_value: str | None = Field(default=None, description="Fixed value. Omit to leave unchanged.")
+    facet_min_length: int | None = Field(default=None, ge=0, description="Facet min length. Omit to leave unchanged.")
+    facet_max_length: int | None = Field(default=None, ge=0, description="Facet max length. Omit to leave unchanged.")
+    facet_pattern: str | None = Field(default=None, description="Facet pattern (regular expression). Omit to leave unchanged.")
+    xbt_manifest_id: int | None = Field(default=None, ge=1, description="XBT manifest identifier to use as the primitive restriction for this BBIE. Omit to leave unchanged.")
+    code_list_manifest_id: int | None = Field(default=None, ge=1, description="Code list manifest identifier to use as the primitive restriction for this BBIE. Omit to leave unchanged.")
+    agency_id_list_manifest_id: int | None = Field(default=None, ge=1, description="Agency-ID-list manifest identifier to use as the primitive restriction for this BBIE. Omit to leave unchanged.")
 
     model_config = ConfigDict(
         frozen=True,
@@ -714,22 +714,22 @@ class CreateBBIESCResponse(BaseModel):
 class UpdateBBIESCRequest(BaseModel):
     """Request payload for updating a BBIE_SC."""
 
-    is_used: bool | None = Field(default=None, description="Whether this BBIE_SC is profiled.")
-    cardinality_min: int | None = Field(default=None, ge=0, description="Minimum cardinality.")
-    cardinality_max: int | None = Field(default=None, description="Maximum cardinality (`-1` for unbounded).")
-    definition: str | None = Field(default=None, description="Definition text for this BBIE supplementary component.")
-    example: str | None = Field(default=None, description="Illustrative example value or content for this BBIE supplementary component.")
-    remark: str | None = Field(default=None, description="Remark text for this BBIE supplementary component.")
-    biz_term: str | None = Field(default=None, description="Business term override.")
-    display_name: str | None = Field(default=None, description="Display name override.")
-    default_value: str | None = Field(default=None, description="Default value.")
-    fixed_value: str | None = Field(default=None, description="Fixed value.")
-    facet_min_length: int | None = Field(default=None, ge=0, description="Facet min length.")
-    facet_max_length: int | None = Field(default=None, ge=0, description="Facet max length.")
-    facet_pattern: str | None = Field(default=None, description="Facet pattern (regular expression).")
-    xbt_manifest_id: int | None = Field(default=None, ge=1, description="XBT manifest identifier to use as the primitive restriction for this BBIE supplementary component.")
-    code_list_manifest_id: int | None = Field(default=None, ge=1, description="Code list manifest identifier to use as the primitive restriction for this BBIE supplementary component.")
-    agency_id_list_manifest_id: int | None = Field(default=None, ge=1, description="Agency-ID-list manifest identifier to use as the primitive restriction for this BBIE supplementary component.")
+    is_used: bool | None = Field(default=None, description="Whether this BBIE_SC is profiled. Omit to leave unchanged.")
+    cardinality_min: int | None = Field(default=None, ge=0, description="Minimum cardinality. Omit to leave unchanged.")
+    cardinality_max: int | None = Field(default=None, description="Maximum cardinality (`-1` for unbounded). Omit to leave unchanged.")
+    definition: str | None = Field(default=None, description="Definition text for this BBIE supplementary component. Omit to leave unchanged.")
+    example: str | None = Field(default=None, description="Illustrative example value or content for this BBIE supplementary component. Omit to leave unchanged.")
+    remark: str | None = Field(default=None, description="Remark text for this BBIE supplementary component. Omit to leave unchanged.")
+    biz_term: str | None = Field(default=None, description="Business term override. Omit to leave unchanged.")
+    display_name: str | None = Field(default=None, description="Display name override. Omit to leave unchanged.")
+    default_value: str | None = Field(default=None, description="Default value. Omit to leave unchanged.")
+    fixed_value: str | None = Field(default=None, description="Fixed value. Omit to leave unchanged.")
+    facet_min_length: int | None = Field(default=None, ge=0, description="Facet min length. Omit to leave unchanged.")
+    facet_max_length: int | None = Field(default=None, ge=0, description="Facet max length. Omit to leave unchanged.")
+    facet_pattern: str | None = Field(default=None, description="Facet pattern (regular expression). Omit to leave unchanged.")
+    xbt_manifest_id: int | None = Field(default=None, ge=1, description="XBT manifest identifier to use as the primitive restriction for this BBIE supplementary component. Omit to leave unchanged.")
+    code_list_manifest_id: int | None = Field(default=None, ge=1, description="Code list manifest identifier to use as the primitive restriction for this BBIE supplementary component. Omit to leave unchanged.")
+    agency_id_list_manifest_id: int | None = Field(default=None, ge=1, description="Agency-ID-list manifest identifier to use as the primitive restriction for this BBIE supplementary component. Omit to leave unchanged.")
 
     model_config = ConfigDict(
         frozen=True,

@@ -174,7 +174,8 @@ export function getLibraryOperation(spec: OpenApiSpec, key: string): OperationLo
     retrieve: { path: '/libraries/{library_id}', method: 'get' },
     update: { path: '/libraries/{library_id}', method: 'post' },
     delete: { path: '/libraries/{library_id}', method: 'delete' },
-    update_release_dependencies: { path: '/libraries/{library_id}/release-dependencies', method: 'post' },
+    add_release_dependency: { path: '/libraries/{library_id}/release-dependencies/{release_id}', method: 'post' },
+    remove_release_dependency: { path: '/libraries/{library_id}/release-dependencies/{release_id}', method: 'delete' },
   };
 
   const target = mapping[key];
@@ -334,7 +335,7 @@ export function getCoreComponentOperation(spec: OpenApiSpec, key: string): Opera
     add_acc_tags: { path: '/core-components/acc/{acc_manifest_id}/tags', method: 'post' },
     remove_acc_tags: { path: '/core-components/acc/{acc_manifest_id}/tags', method: 'delete' },
     change_acc_state: { path: '/core-components/acc/{acc_manifest_id}/state', method: 'post' },
-    revise_acc: { path: '/core-components/acc/{acc_manifest_id}/revise', method: 'post' },
+    revise_amend_acc: { path: '/core-components/acc/{acc_manifest_id}/revise', method: 'post' },
     cancel_acc: { path: '/core-components/acc/{acc_manifest_id}/cancel', method: 'post' },
     discard_acc: { path: '/core-components/acc/{acc_manifest_id}', method: 'delete' },
     add_ascc_to_acc: { path: '/core-components/acc/{acc_manifest_id}/ascc/{asccp_manifest_id}', method: 'post' },

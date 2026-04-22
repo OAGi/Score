@@ -15,13 +15,15 @@ from app.services.models import WhoAndWhen
 from app.services.models.library import (
     CreateLibraryServiceResult,
     DiscardLibraryCheckServiceResult,
+    LibraryReleaseDependencyServiceResult,
     LibraryServiceResult,
-    UpdateLibraryReleaseDependenciesServiceResult,
+    ManageLibraryReleaseDependenciesServiceResult,
     UpdateLibraryServiceResult,
 )
 from app.services.utils.date import DateRange
 from app.services.utils.pagination import PaginationParams, PaginationResponse
 from app.types.identifiers import LibraryId, ReleaseId
+from app.types.unset import UNSET, UnsetType
 
 logger = logging.getLogger("connectcenter.service.library")
 
@@ -99,7 +101,7 @@ class LibraryService:
             key=int,
         )
         users_by_id = await load_users_by_ids(self._account_service_repo, user_ids)
-        items = [self._to_library_result(row, users_by_id=users_by_id) for row in rows]
+        items = [self._to_library_result(row, users_by_id=users_by_id, release_dependencies=[]) for row in rows]
         logger.info("list libraries → %d/%d", len(items), total)
         return PaginationResponse(items=items, total=total, limit=pagination.limit, offset=pagination.offset)
 
@@ -110,7 +112,8 @@ class LibraryService:
             logger.info("get library id=%d → not found", int(library_id))
             return None
         users_by_id = await load_users_by_ids(self._account_service_repo, [row.created_by, row.last_updated_by])
-        result = self._to_library_result(row, users_by_id=users_by_id)
+        release_dependencies = await self._get_library_release_dependencies(library_id)
+        result = self._to_library_result(row, users_by_id=users_by_id, release_dependencies=release_dependencies)
         logger.info("get library id=%d → found", int(library_id))
         return result
 
@@ -180,51 +183,56 @@ class LibraryService:
         self,
         *,
         library_id: LibraryId,
-        type: str | None,
-        name: str,
-        organization: str | None,
-        description: str | None,
-        link: str | None,
-        domain: str | None,
-        state: str | None,
-        is_default: bool | None,
+        type: str | None | UnsetType = UNSET,
+        name: str | UnsetType = UNSET,
+        organization: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        link: str | None | UnsetType = UNSET,
+        domain: str | None | UnsetType = UNSET,
+        state: str | None | UnsetType = UNSET,
+        is_default: bool | None | UnsetType = UNSET,
     ) -> UpdateLibraryServiceResult:
         """Update a library."""
         self._assert_admin("Only administrators can update the library.")
         if not await self._repo.exists(library_id):
             raise LookupError(f"Library with ID '{int(library_id)}' does not exist.")
 
-        normalized_name = self._normalize_required_name(name)
-        if await self._repo.has_duplicate_name(name=normalized_name, exclude_library_id=library_id):
-            raise ValueError(f"The library name '{normalized_name}' already exists.")
-
         current = await self.get(library_id)
         if current is None:
             raise LookupError(f"Library with ID '{int(library_id)}' does not exist.")
 
-        normalized_type = self._normalize_optional_text(type)
-        normalized_organization = self._normalize_optional_text(organization)
-        normalized_description = self._normalize_optional_text(description)
-        normalized_link = self._normalize_optional_text(link)
-        normalized_domain = self._normalize_optional_text(domain)
-        normalized_state = self._normalize_optional_text(state)
+        normalized_name = current.name if name is UNSET else self._normalize_required_name(name)
+        if name is not UNSET and normalized_name != current.name:
+            if await self._repo.has_duplicate_name(name=normalized_name, exclude_library_id=library_id):
+                raise ValueError(f"The library name '{normalized_name}' already exists.")
+
+        normalized_type = current.type if type is UNSET else self._normalize_optional_text(type)
+        normalized_organization = (
+            current.organization if organization is UNSET else self._normalize_optional_text(organization)
+        )
+        normalized_description = (
+            current.description if description is UNSET else self._normalize_optional_text(description)
+        )
+        normalized_link = current.link if link is UNSET else self._normalize_optional_text(link)
+        normalized_domain = current.domain if domain is UNSET else self._normalize_optional_text(domain)
+        normalized_state = current.state if state is UNSET else self._normalize_optional_text(state)
 
         updates: list[str] = []
-        if current.type != normalized_type:
+        if type is not UNSET and current.type != normalized_type:
             updates.append("type")
-        if current.name != normalized_name:
+        if name is not UNSET and current.name != normalized_name:
             updates.append("name")
-        if current.organization != normalized_organization:
+        if organization is not UNSET and current.organization != normalized_organization:
             updates.append("organization")
-        if current.description != normalized_description:
+        if description is not UNSET and current.description != normalized_description:
             updates.append("description")
-        if current.link != normalized_link:
+        if link is not UNSET and current.link != normalized_link:
             updates.append("link")
-        if current.domain != normalized_domain:
+        if domain is not UNSET and current.domain != normalized_domain:
             updates.append("domain")
-        if current.state != normalized_state:
+        if state is not UNSET and current.state != normalized_state:
             updates.append("state")
-        if is_default is not None and current.is_default != is_default:
+        if is_default is not UNSET and current.is_default != bool(is_default):
             updates.append("is_default")
 
         if not updates:
@@ -239,7 +247,7 @@ class LibraryService:
             link=normalized_link,
             domain=normalized_domain,
             state=normalized_state,
-            is_default=is_default,
+            is_default=None if is_default is UNSET else bool(is_default),
             requester_user_id=self._requester_user_id,
         )
         return UpdateLibraryServiceResult(library_id=library_id, updates=updates)
@@ -256,46 +264,63 @@ class LibraryService:
             message="" if block_message is None else block_message,
         )
 
-    async def update_library_release_dependencies(
+    async def add_library_release_dependency(
         self,
         *,
         library_id: LibraryId,
-        release_ids: list[int] | None,
-    ) -> UpdateLibraryReleaseDependenciesServiceResult:
-        """Replace direct dependencies for the library's working release."""
-        self._assert_admin("Only administrators can update library release dependencies.")
-        if not await self._repo.exists(library_id):
-            raise LookupError(f"Library with ID '{int(library_id)}' does not exist.")
-
-        working_release = await self._repo.get_working_release(library_id=library_id)
-        if working_release is None:
-            raise ValueError("The library does not have an editable release.")
-
-        unique_release_ids = self._dedupe_release_ids(release_ids or [])
-        selected_releases = await self._repo.get_releases_by_ids(release_ids=unique_release_ids)
-        if len(selected_releases) != len(unique_release_ids):
-            raise ValueError("One or more selected release dependencies do not exist.")
-        if len({release.library_id for release in selected_releases}) != len(selected_releases):
-            raise ValueError("Only one release dependency can be selected from each library.")
-
-        for release in selected_releases:
-            if int(release.library_id) == int(library_id):
-                raise ValueError("A library cannot depend on one of its own releases.")
-            if release.state != "Published":
-                raise ValueError("Only published releases can be assigned as dependencies.")
-            transitive_dependencies = await self._repo.get_transitive_dependency_ids(
-                release_id=ReleaseId(int(release.release_id))
+        release_id: ReleaseId,
+    ) -> ManageLibraryReleaseDependenciesServiceResult:
+        """Add a direct dependency to the library's working release."""
+        working_release = await self._get_required_working_release(library_id)
+        current_dependency_ids = {
+            int(existing_release_id)
+            for existing_release_id in await self._repo.get_release_dependency_ids(
+                release_id=ReleaseId(int(working_release.release_id))
             )
-            if int(working_release.release_id) in {int(dep_release_id) for dep_release_id in transitive_dependencies}:
-                raise ValueError("The selected dependencies would create a circular release dependency.")
-
+        }
+        await self._validate_selected_release_dependencies(
+            library_id=library_id,
+            working_release_id=ReleaseId(int(working_release.release_id)),
+            selected_release_ids=[release_id],
+        )
+        target_dependency_ids = sorted(current_dependency_ids | {int(release_id)})
         await self._repo.replace_release_dependencies(
             release_id=ReleaseId(int(working_release.release_id)),
-            dependency_release_ids=unique_release_ids,
+            dependency_release_ids=[ReleaseId(value) for value in target_dependency_ids],
         )
-        return UpdateLibraryReleaseDependenciesServiceResult(
+        return ManageLibraryReleaseDependenciesServiceResult(
             library_id=library_id,
-            release_ids=unique_release_ids,
+            release_dependencies=await self._get_library_release_dependencies(library_id),
+        )
+
+    async def remove_library_release_dependency(
+        self,
+        *,
+        library_id: LibraryId,
+        release_id: ReleaseId,
+    ) -> ManageLibraryReleaseDependenciesServiceResult:
+        """Remove a direct dependency from the library's working release."""
+        working_release = await self._get_required_working_release(library_id)
+        current_dependency_ids = {
+            int(existing_release_id)
+            for existing_release_id in await self._repo.get_release_dependency_ids(
+                release_id=ReleaseId(int(working_release.release_id))
+            )
+        }
+        if int(release_id) not in current_dependency_ids:
+            selected_releases = await self._repo.get_releases_by_ids(release_ids=[release_id])
+            if len(selected_releases) != 1:
+                raise LookupError(f"Release with ID '{int(release_id)}' does not exist.")
+            raise ValueError("The selected release dependency is not currently assigned to the library.")
+
+        target_dependency_ids = sorted(current_dependency_ids - {int(release_id)})
+        await self._repo.replace_release_dependencies(
+            release_id=ReleaseId(int(working_release.release_id)),
+            dependency_release_ids=[ReleaseId(value) for value in target_dependency_ids],
+        )
+        return ManageLibraryReleaseDependenciesServiceResult(
+            library_id=library_id,
+            release_dependencies=await self._get_library_release_dependencies(library_id),
         )
 
     async def discard_library(
@@ -321,6 +346,7 @@ class LibraryService:
         row: Any,
         *,
         users_by_id: dict[int, AppUserRow],
+        release_dependencies: list[LibraryReleaseDependencyServiceResult],
     ) -> LibraryServiceResult:
         """Map a repository row to a service DTO."""
         created = to_user_summary(int(row.created_by), users_by_id=users_by_id)
@@ -336,6 +362,7 @@ class LibraryService:
             state=row.state,
             is_read_only=row.is_read_only,
             is_default=row.is_default,
+            release_dependencies=release_dependencies,
             created=WhoAndWhen(who=created, when=row.creation_timestamp),
             last_updated=WhoAndWhen(who=updated, when=row.last_update_timestamp),
         )
@@ -347,6 +374,67 @@ class LibraryService:
     def _assert_admin(self, message: str) -> None:
         if "Admin" not in self._requester.user.roles:
             raise PermissionError(message)
+
+    async def _get_library_release_dependencies(
+        self,
+        library_id: LibraryId,
+    ) -> list[LibraryReleaseDependencyServiceResult]:
+        working_release = await self._repo.get_working_release(library_id=library_id)
+        if working_release is None:
+            return []
+
+        dependency_release_ids = await self._repo.get_release_dependency_ids(
+            release_id=ReleaseId(int(working_release.release_id))
+        )
+        if not dependency_release_ids:
+            return []
+
+        releases = await self._repo.get_releases_by_ids(release_ids=dependency_release_ids)
+        return [
+            LibraryReleaseDependencyServiceResult(
+                release_id=ReleaseId(int(release.release_id)),
+                library_id=LibraryId(int(release.library_id)),
+                library_name=release.library_name,
+                release_num=release.release_num,
+                state=release.state,
+            )
+            for release in releases
+        ]
+
+    async def _get_required_working_release(self, library_id: LibraryId) -> Any:
+        self._assert_admin("Only administrators can update library release dependencies.")
+        if not await self._repo.exists(library_id):
+            raise LookupError(f"Library with ID '{int(library_id)}' does not exist.")
+
+        working_release = await self._repo.get_working_release(library_id=library_id)
+        if working_release is None:
+            raise ValueError("The library does not have an editable release.")
+        return working_release
+
+    async def _validate_selected_release_dependencies(
+        self,
+        *,
+        library_id: LibraryId,
+        working_release_id: ReleaseId,
+        selected_release_ids: list[ReleaseId],
+    ) -> None:
+        unique_release_ids = self._dedupe_release_ids(selected_release_ids)
+        selected_releases = await self._repo.get_releases_by_ids(release_ids=unique_release_ids)
+        if len(selected_releases) != len(unique_release_ids):
+            raise ValueError("One or more selected release dependencies do not exist.")
+        if len({release.library_id for release in selected_releases}) != len(selected_releases):
+            raise ValueError("Only one release dependency can be selected from each library.")
+
+        for release in selected_releases:
+            if int(release.library_id) == int(library_id):
+                raise ValueError("A library cannot depend on one of its own releases.")
+            if release.state != "Published":
+                raise ValueError("Only published releases can be assigned as dependencies.")
+            transitive_dependencies = await self._repo.get_transitive_dependency_ids(
+                release_id=ReleaseId(int(release.release_id))
+            )
+            if int(working_release_id) in {int(dep_release_id) for dep_release_id in transitive_dependencies}:
+                raise ValueError("The selected dependencies would create a circular release dependency.")
 
     @staticmethod
     def _normalize_required_name(name: str) -> str:

@@ -21,6 +21,7 @@ from app.utils.date import parse_date_range
 from app.services.namespace_service import NamespaceService
 from app.types.identifiers import LibraryId
 from app.types.identifiers import NamespaceId
+from app.types.unset import UNSET
 
 router = APIRouter(prefix="/namespaces", tags=["namespace"])
 
@@ -185,12 +186,13 @@ async def update_namespace(
     namespace_service: NamespaceService = Depends(get_namespace_service),
 ) -> UpdateNamespaceResponse:
     """Update a namespace and return the changed fields."""
+    updates_payload = payload.model_dump(exclude_unset=True)
     try:
         result = await namespace_service.update_namespace(
             namespace_id=namespace_id,
-            uri=payload.uri,
-            prefix=payload.prefix,
-            description=payload.description,
+            uri=updates_payload.get("uri", UNSET),
+            prefix=updates_payload.get("prefix", UNSET),
+            description=updates_payload.get("description", UNSET),
         )
         return UpdateNamespaceResponse.model_validate(result, from_attributes=True)
     except LookupError as e:

@@ -119,12 +119,12 @@ class CreateCtxSchemeResponse(BaseModel):
 
 class UpdateCtxSchemeRequest(BaseModel):
     """Request body for partially updating a context scheme."""
-    scheme_id: str | None = Field(default=None, max_length=45, description="External identification of the scheme.")
-    scheme_name: str | None = Field(default=None, max_length=255, description="Pretty print name of the context scheme.")
-    description: str | None = Field(default=None, description="Description of the context scheme.")
-    scheme_agency_id: str | None = Field(default=None, max_length=45, description="Identification of the agency maintaining the scheme.")
-    scheme_version_id: str | None = Field(default=None, max_length=45, description="Version number of the context scheme.")
-    ctx_category_id: int | None = Field(default=None, ge=1, description="Associated context category ID.")
+    scheme_id: str | None = Field(default=None, max_length=45, description="External identification of the scheme. Omit to leave unchanged.")
+    scheme_name: str | None = Field(default=None, max_length=255, description="Pretty print name of the context scheme. Omit to leave unchanged.")
+    description: str | None = Field(default=None, description="Description of the context scheme. Omit to leave unchanged.")
+    scheme_agency_id: str | None = Field(default=None, max_length=45, description="Identification of the agency maintaining the scheme. Omit to leave unchanged.")
+    scheme_version_id: str | None = Field(default=None, max_length=45, description="Version number of the context scheme. Omit to leave unchanged.")
+    ctx_category_id: int | None = Field(default=None, ge=1, description="Associated context category ID. Omit to leave unchanged.")
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -172,8 +172,8 @@ class CreateCtxSchemeValueResponse(BaseModel):
 
 class UpdateCtxSchemeValueRequest(BaseModel):
     """Request body for updating a context scheme value."""
-    value: str | None = Field(default=None, max_length=100, description="Value of the context scheme.")
-    meaning: str | None = Field(default=None, description="Meaning of the context scheme value.")
+    value: str | None = Field(default=None, max_length=100, description="Value of the context scheme. Omit to leave unchanged.")
+    meaning: str | None = Field(default=None, description="Meaning of the context scheme value. Omit to leave unchanged.")
 
     model_config = ConfigDict(
         json_schema_extra={

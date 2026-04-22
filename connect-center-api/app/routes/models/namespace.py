@@ -77,12 +77,12 @@ class CreateNamespaceRequest(BaseModel):
 class UpdateNamespaceRequest(BaseModel):
     """Request payload for updating a namespace."""
 
-    uri: str = Field(..., min_length=1, description="Updated namespace URI.")
+    uri: str | None = Field(default=None, min_length=1, description="Namespace URI to save. Omit this field to leave it unchanged.")
     prefix: str | None = Field(
         default=None,
-        description="Updated namespace prefix. Use an empty string to store a blank prefix.",
+        description="Namespace prefix to save. Omit this field to leave it unchanged. Use an empty string to store a blank prefix.",
     )
-    description: str | None = Field(default=None, description="Updated namespace description.")
+    description: str | None = Field(default=None, description="Namespace description to save. Omit this field to leave it unchanged.")
 
     model_config = ConfigDict(
         frozen=True,

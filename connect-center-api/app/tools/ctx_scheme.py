@@ -600,8 +600,8 @@ async def create_context_scheme_value(
 )
 async def update_context_scheme_value(
     ctx_scheme_value_id: Annotated[int, Field(gt=0, description="Unique identifier of the context scheme value to update.")],
-    value: Annotated[str | None, Field(default=None, description="Optional updated value string for this context scheme entry.")],
-    meaning: Annotated[str | None, Field(default=None, description="Optional updated human-readable meaning for the value.")],
+    value: Annotated[str | None, Field(default=None, description="Updated value string for this context scheme entry. Omit to leave unchanged.")],
+    meaning: Annotated[str | None, Field(default=None, description="Updated human-readable meaning for the value. Omit to leave unchanged.")],
     ctx_scheme_service: CtxSchemeService = Depends(get_ctx_scheme_service),
 ) -> UpdateCtxSchemeValueResponse:
     """
@@ -764,12 +764,12 @@ async def delete_context_scheme_value(
 )
 async def update_context_scheme(
     ctx_scheme_id: Annotated[int, Field(gt=0, description="Unique identifier of the context scheme to update.")],
-    scheme_id: Annotated[str | None, Field(default=None, description="Updated external identification of the scheme.")],
-    scheme_name: Annotated[str | None, Field(default=None, description="Updated pretty print name of the context scheme.")],
-    description: Annotated[str | None, Field(default=None, description="Updated description of the context scheme.")],
-    scheme_agency_id: Annotated[str | None, Field(default=None, description="Updated agency identifier maintaining the scheme.")],
-    scheme_version_id: Annotated[str | None, Field(default=None, description="Updated version identifier of the scheme.")],
-    ctx_category_id: Annotated[int | None, Field(default=None, ge=1, description="Updated associated context category ID.")],
+    scheme_id: Annotated[str | None, Field(default=None, description="Updated external identification of the scheme. Omit to leave unchanged.")],
+    scheme_name: Annotated[str | None, Field(default=None, description="Updated pretty print name of the context scheme. Omit to leave unchanged.")],
+    description: Annotated[str | None, Field(default=None, description="Updated description of the context scheme. Omit to leave unchanged.")],
+    scheme_agency_id: Annotated[str | None, Field(default=None, description="Updated agency identifier maintaining the scheme. Omit to leave unchanged.")],
+    scheme_version_id: Annotated[str | None, Field(default=None, description="Updated version identifier of the scheme. Omit to leave unchanged.")],
+    ctx_category_id: Annotated[int | None, Field(default=None, ge=1, description="Updated associated context category ID. Omit to leave unchanged.")],
     ctx_scheme_service: CtxSchemeService = Depends(get_ctx_scheme_service),
 ) -> UpdateCtxSchemeResponse:
     """

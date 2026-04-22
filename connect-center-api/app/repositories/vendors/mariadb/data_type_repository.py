@@ -591,7 +591,8 @@ class MariaDbDataTypeRepository(DataTypeRepositoryContract):
         await self._session.refresh(dt_sc_manifest)
 
         await self._copy_dt_sc_awd_pri_by_dt_sc_id(
-            release_id=ReleaseId(int(owner_dt_manifest.release_id)),
+            source_release_id=ReleaseId(int(based_dt_sc_manifest.release_id)),
+            target_release_id=ReleaseId(int(owner_dt_manifest.release_id)),
             source_dt_sc_id=int(based_dt_sc.dt_sc_id),
             target_dt_sc_id=int(dt_sc.dt_sc_id),
         )
@@ -1212,7 +1213,8 @@ class MariaDbDataTypeRepository(DataTypeRepositoryContract):
             await self._session.refresh(next_dt_sc)
             prev_dt_sc.next_dt_sc_id = int(next_dt_sc.dt_sc_id)
             await self._copy_dt_sc_awd_pri_by_dt_sc_id(
-                release_id=ReleaseId(int(dt_manifest.release_id)),
+                source_release_id=ReleaseId(int(dt_manifest.release_id)),
+                target_release_id=ReleaseId(int(dt_manifest.release_id)),
                 source_dt_sc_id=int(prev_dt_sc.dt_sc_id),
                 target_dt_sc_id=int(next_dt_sc.dt_sc_id),
             )
@@ -1524,7 +1526,8 @@ class MariaDbDataTypeRepository(DataTypeRepositoryContract):
     async def _copy_dt_sc_awd_pri_by_dt_sc_id(
         self,
         *,
-        release_id: ReleaseId,
+        source_release_id: ReleaseId,
+        target_release_id: ReleaseId,
         source_dt_sc_id: int,
         target_dt_sc_id: int,
     ) -> None:
@@ -1533,11 +1536,12 @@ class MariaDbDataTypeRepository(DataTypeRepositoryContract):
             text(
                 "INSERT INTO dt_sc_awd_pri "
                 "(release_id, dt_sc_id, cdt_pri_id, xbt_manifest_id, code_list_manifest_id, agency_id_list_manifest_id, is_default) "
-                "SELECT :release_id, :target_dt_sc_id, cdt_pri_id, xbt_manifest_id, code_list_manifest_id, agency_id_list_manifest_id, is_default "
-                "FROM dt_sc_awd_pri WHERE release_id = :release_id AND dt_sc_id = :source_dt_sc_id"
+                "SELECT :target_release_id, :target_dt_sc_id, cdt_pri_id, xbt_manifest_id, code_list_manifest_id, agency_id_list_manifest_id, is_default "
+                "FROM dt_sc_awd_pri WHERE release_id = :source_release_id AND dt_sc_id = :source_dt_sc_id"
             ),
             {
-                "release_id": int(release_id),
+                "source_release_id": int(source_release_id),
+                "target_release_id": int(target_release_id),
                 "source_dt_sc_id": int(source_dt_sc_id),
                 "target_dt_sc_id": int(target_dt_sc_id),
             },
@@ -1847,7 +1851,8 @@ class MariaDbDataTypeRepository(DataTypeRepositoryContract):
             await self._session.flush()
 
             await self._copy_dt_sc_awd_pri_by_dt_sc_id(
-                release_id=release_id,
+                source_release_id=ReleaseId(int(source_sc_manifest.release_id)),
+                target_release_id=release_id,
                 source_dt_sc_id=int(source_sc.dt_sc_id),
                 target_dt_sc_id=int(next_sc.dt_sc_id),
             )

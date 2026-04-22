@@ -473,8 +473,8 @@ async def create_context_category(
 )
 async def update_context_category(
     ctx_category_id: Annotated[int, Field(description="Unique identifier of the context category to update.", gt=0)],
-    name: Annotated[str | None, Field(default=None, description="The new name for the context category.")],
-    description: Annotated[str | None, Field(default=None, description="The new description or purpose for the context category.")],
+    name: Annotated[str | None, Field(default=None, description="The new name for the context category. Omit to leave unchanged.")],
+    description: Annotated[str | None, Field(default=None, description="The new description or purpose for the context category. Omit to leave unchanged.")],
     context_category_service: ContextCategoryService = Depends(get_ctx_category_service),
 ) -> UpdateCtxCategoryResponse:
     """

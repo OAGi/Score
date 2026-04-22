@@ -70,6 +70,7 @@ from app.services.models.core_component import (
     UpdateBccpServiceResult,
     ValueConstraintServiceRecord,
 )
+from app.services.models.data_type import DataTypeServiceResult
 from app.services.models.library import LibrarySummaryServiceRecord
 from app.services.models.log import LogSummaryServiceRecord
 from app.services.models.mapper import to_dataclass
@@ -170,9 +171,11 @@ class CoreComponentService:
         *,
         release_id: ReleaseId,
         based_acc_manifest_id: AccManifestId | None = None,
-        initial_object_class_term: str | None = "Object Class Term",
-        initial_component_type: OagisComponentType = "Semantics",
-        initial_definition: str | None = None,
+        object_class_term: str,
+        component_type: OagisComponentType = "Semantics",
+        definition: str | None = None,
+        definition_source: str | None = None,
+        is_abstract: bool | None = None,
         namespace_id: NamespaceId | None = None,
         tag_id: list[int] | None = None,
     ) -> CreateAccServiceResult:
@@ -180,24 +183,31 @@ class CoreComponentService:
         logger.info(
             "create acc release_id=%d object_class_term=%r",
             int(release_id),
-            initial_object_class_term,
+            object_class_term,
         )
         effective_release_id, release = await self._resolve_create_acc_release_id(release_id=release_id)
         self._assert_can_create_core_components(release_num=release.release_num)
 
-        object_class_term = (initial_object_class_term or "").strip() or "Object Class Term"
+        object_class_term = str(object_class_term).strip()
+        if not object_class_term:
+            raise ValueError("Object class term is required. Please provide a non-empty value.")
         if len(object_class_term) > 100:
             raise ValueError(
                 "Object class term cannot exceed 100 characters. Please shorten it and try again."
             )
 
-        if initial_component_type not in OAGIS_COMPONENT_TYPE_VALUES:
+        if component_type not in OAGIS_COMPONENT_TYPE_VALUES:
             allowed = ", ".join(OAGIS_COMPONENT_TYPE_VALUES)
             raise ValueError(
-                f"Invalid initial_component_type: {initial_component_type}. Allowed values are: {allowed}."
+                f"Invalid component_type: {component_type}. Allowed values are: {allowed}."
             )
 
-        normalized_definition = initial_definition.strip() if isinstance(initial_definition, str) else None
+        normalized_definition = definition.strip() if isinstance(definition, str) else None
+        normalized_definition_source = definition_source.strip() if isinstance(definition_source, str) else None
+        if normalized_definition_source is not None and len(normalized_definition_source) > 100:
+            raise ValueError(
+                "Definition source cannot exceed 100 characters. Please shorten it and try again."
+            )
         normalized_tag_ids = self._normalize_tag_ids(tag_id)
 
         if based_acc_manifest_id is not None:
@@ -220,9 +230,11 @@ class CoreComponentService:
             release_id=effective_release_id,
             based_acc_manifest_id=based_acc_manifest_id,
             object_class_term=object_class_term,
-            oagis_component_type=OAGIS_COMPONENT_TYPE_VALUES[initial_component_type],
-            acc_type=self._derive_acc_type(initial_component_type),
+            oagis_component_type=OAGIS_COMPONENT_TYPE_VALUES[component_type],
+            acc_type=self._derive_acc_type(component_type),
             definition=normalized_definition,
+            definition_source=normalized_definition_source,
+            is_abstract=bool(is_abstract) if is_abstract is not None else False,
             namespace_id=namespace_id,
             tag_id=normalized_tag_ids,
             requester_user_id=self._requester.user.user_id,
@@ -235,8 +247,7 @@ class CoreComponentService:
         *,
         release_id: ReleaseId,
         role_of_acc_manifest_id: AccManifestId,
-        initial_property_term: str | None = "Property Term",
-        asccp_type: str = "Default",
+        property_term: str,
         reusable_indicator: bool = True,
         namespace_id: NamespaceId | None = None,
         definition: str | None = None,
@@ -267,16 +278,19 @@ class CoreComponentService:
         if role_of_acc.is_abstract:
             raise ValueError("An abstract ACC cannot be used to create a new ASCCP.")
 
-        property_term = (initial_property_term or "").strip() or "Property Term"
+        normalized_property_term = property_term.strip()
+        if not normalized_property_term:
+            raise ValueError("Property term cannot be empty. Please provide a non-empty value and try again.")
         normalized_definition = definition.strip() if isinstance(definition, str) else None
         normalized_definition_source = definition_source.strip() if isinstance(definition_source, str) else None
         normalized_tag_ids = self._normalize_tag_ids(tag_id)
+        derived_asccp_type = self._derive_asccp_type_for_role_acc(role_of_acc.component_type)
 
         asccp_manifest_id = await self._repo.create_asccp(
             release_id=release_id,
             role_of_acc_manifest_id=role_of_acc_manifest_id,
-            property_term=property_term,
-            asccp_type=asccp_type,
+            property_term=normalized_property_term,
+            asccp_type=derived_asccp_type,
             reusable_indicator=bool(reusable_indicator),
             namespace_id=namespace_id,
             definition=normalized_definition,
@@ -296,7 +310,14 @@ class CoreComponentService:
         *,
         release_id: ReleaseId,
         bdt_manifest_id: DataTypeManifestId,
-        initial_property_term: str | None = "Property Term",
+        property_term: str,
+        definition: str | None = None,
+        definition_source: str | None = None,
+        deprecated: bool | None = None,
+        is_nillable: bool | None = None,
+        namespace_id: NamespaceId | None = None,
+        default_value: str | None = None,
+        fixed_value: str | None = None,
         tag_id: list[int] | None = None,
     ) -> CreateBccpServiceResult:
         """Create a BCCP in a release allowed for the requester's role."""
@@ -321,12 +342,27 @@ class CoreComponentService:
             selection_phrase="a BDT",
         )
 
-        property_term = (initial_property_term or "").strip() or "Property Term"
+        normalized_property_term = property_term.strip()
+        if not normalized_property_term:
+            raise ValueError("Property term cannot be empty. Please provide a non-empty value and try again.")
+        normalized_definition = definition.strip() if isinstance(definition, str) else None
+        normalized_definition_source = definition_source.strip() if isinstance(definition_source, str) else None
+        normalized_default_value = default_value.strip() if isinstance(default_value, str) else None
+        normalized_fixed_value = fixed_value.strip() if isinstance(fixed_value, str) else None
+        if normalized_default_value is not None and normalized_fixed_value is not None:
+            raise ValueError("Provide only one of `default_value` or `fixed_value`.")
         normalized_tag_ids = self._normalize_tag_ids(tag_id)
         bccp_manifest_id = await self._repo.create_bccp(
             release_id=release_id,
             bdt_manifest_id=bdt_manifest_id,
-            property_term=property_term,
+            property_term=normalized_property_term,
+            definition=normalized_definition,
+            definition_source=normalized_definition_source,
+            deprecated=bool(deprecated) if deprecated is not None else False,
+            is_nillable=bool(is_nillable) if is_nillable is not None else False,
+            namespace_id=namespace_id,
+            default_value=normalized_default_value,
+            fixed_value=normalized_fixed_value,
             requester_user_id=self._requester.user.user_id,
         )
         if normalized_tag_ids:
@@ -497,6 +533,7 @@ class CoreComponentService:
         self,
         *,
         asccp_manifest_id: AsccpManifestId,
+        role_of_acc_manifest_id: AccManifestId | UnsetType = UNSET,
         property_term: str | None | UnsetType = UNSET,
         definition: str | None | UnsetType = UNSET,
         definition_source: str | None | UnsetType = UNSET,
@@ -514,6 +551,25 @@ class CoreComponentService:
             )
         self._assert_can_update_wip_core_component(asccp, label="ASCCP")
 
+        normalized_role_of_acc_manifest_id = role_of_acc_manifest_id
+        if role_of_acc_manifest_id is not UNSET:
+            role_of_acc = await self.get_acc(role_of_acc_manifest_id)
+            if role_of_acc is None:
+                raise LookupError(
+                    f"No ACC exists with manifest ID {int(role_of_acc_manifest_id)}. Please verify the identifier and try again."
+                )
+            await self._assert_reference_release_allowed(
+                target_release_id=asccp.release.release_id,
+                target_library_id=asccp.library.library_id,
+                referenced_release_id=role_of_acc.release.release_id,
+                referenced_library_id=role_of_acc.library.library_id,
+                referenced_label="The role ACC",
+                target_label="the target ASCCP",
+                selection_phrase="a role ACC",
+            )
+            if role_of_acc.is_abstract:
+                raise ValueError("An abstract ACC cannot be used as the role ACC of an ASCCP.")
+
         normalized_property_term = property_term
         if property_term is not UNSET:
             if property_term is None or not str(property_term).strip():
@@ -529,6 +585,14 @@ class CoreComponentService:
 
         current_namespace_id = int(asccp.namespace.namespace_id) if asccp.namespace is not None else None
         updates: list[str] = []
+        current_role_of_acc_manifest_id = (
+            int(asccp.role_of_acc.acc_manifest_id) if asccp.role_of_acc is not None else None
+        )
+        if (
+            normalized_role_of_acc_manifest_id is not UNSET
+            and int(normalized_role_of_acc_manifest_id) != current_role_of_acc_manifest_id
+        ):
+            updates.append("role_of_acc_manifest_id")
         if normalized_property_term is not UNSET and normalized_property_term != asccp.property_term:
             updates.append("property_term")
         if normalized_definition is not UNSET and normalized_definition != asccp.definition:
@@ -548,12 +612,15 @@ class CoreComponentService:
 
         warnings = await self.get_update_asccp_warnings(
             asccp_manifest_id=asccp_manifest_id,
+            role_of_acc_manifest_id=normalized_role_of_acc_manifest_id,
             property_term=normalized_property_term,
         )
         self._raise_for_structural_warnings(warnings=warnings, allow_warnings=allow_warnings)
 
         await self._repo.update_asccp(
             asccp_manifest_id=asccp_manifest_id,
+            role_of_acc_manifest_id=None if normalized_role_of_acc_manifest_id is UNSET else normalized_role_of_acc_manifest_id,
+            role_of_acc_manifest_id_set=normalized_role_of_acc_manifest_id is not UNSET,
             property_term=None if normalized_property_term is UNSET else normalized_property_term,
             property_term_set=normalized_property_term is not UNSET,
             reusable_indicator=None if reusable_indicator is UNSET else bool(reusable_indicator),
@@ -576,6 +643,7 @@ class CoreComponentService:
         self,
         *,
         bccp_manifest_id: BccpManifestId,
+        bdt_manifest_id: DataTypeManifestId | UnsetType = UNSET,
         property_term: str | None | UnsetType = UNSET,
         definition: str | None | UnsetType = UNSET,
         definition_source: str | None | UnsetType = UNSET,
@@ -593,6 +661,23 @@ class CoreComponentService:
                 f"No BCCP exists with manifest ID {int(bccp_manifest_id)}. Please verify the identifier and try again."
             )
         self._assert_can_update_wip_core_component(bccp, label="BCCP")
+
+        normalized_bdt_manifest_id = bdt_manifest_id
+        if bdt_manifest_id is not UNSET:
+            bdt = await self._data_type_service.get(bdt_manifest_id)
+            if bdt is None:
+                raise LookupError(
+                    f"No data type exists with manifest ID {int(bdt_manifest_id)}. Please verify the identifier and try again."
+                )
+            await self._assert_reference_release_allowed(
+                target_release_id=bccp.release.release_id,
+                target_library_id=bccp.library.library_id,
+                referenced_release_id=bdt.release.release_id,
+                referenced_library_id=bdt.library.library_id,
+                referenced_label="The target BDT",
+                target_label="the target BCCP",
+                selection_phrase="a BDT",
+            )
 
         normalized_property_term = property_term
         if property_term is not UNSET:
@@ -619,6 +704,8 @@ class CoreComponentService:
         current_fixed_value = bccp.value_constraint.fixed_value if bccp.value_constraint is not None else None
 
         updates: list[str] = []
+        if normalized_bdt_manifest_id is not UNSET and int(normalized_bdt_manifest_id) != int(bccp.bdt.dt_manifest_id):
+            updates.append("bdt_manifest_id")
         if normalized_property_term is not UNSET and normalized_property_term != bccp.property_term:
             updates.append("property_term")
         if normalized_definition is not UNSET and normalized_definition != bccp.definition:
@@ -646,6 +733,8 @@ class CoreComponentService:
 
         await self._repo.update_bccp(
             bccp_manifest_id=bccp_manifest_id,
+            bdt_manifest_id=None if normalized_bdt_manifest_id is UNSET else normalized_bdt_manifest_id,
+            bdt_manifest_id_set=normalized_bdt_manifest_id is not UNSET,
             property_term=None if normalized_property_term is UNSET else normalized_property_term,
             property_term_set=normalized_property_term is not UNSET,
             deprecated=None if deprecated is UNSET else bool(deprecated),
@@ -762,6 +851,11 @@ class CoreComponentService:
         definition: str | None | UnsetType = UNSET,
         definition_source: str | None | UnsetType = UNSET,
         deprecated: bool | UnsetType = UNSET,
+        index: int | UnsetType = UNSET,
+        after_ascc_manifest_id: AsccManifestId | UnsetType = UNSET,
+        after_bcc_manifest_id: BccManifestId | UnsetType = UNSET,
+        before_ascc_manifest_id: AsccManifestId | UnsetType = UNSET,
+        before_bcc_manifest_id: BccManifestId | UnsetType = UNSET,
     ) -> UpdateAsccServiceResult:
         """Update mutable ASCC fields when the requester owns the parent WIP ACC."""
         owner_acc_manifest_id = await self._repo.get_owner_acc_manifest_id_by_ascc_manifest(ascc_manifest_id)
@@ -797,22 +891,15 @@ class CoreComponentService:
         if definition_source is not UNSET and isinstance(definition_source, str):
             normalized_definition_source = definition_source.strip() or None
 
-        normalized_cardinality_min = cardinality_min
-        if cardinality_min is not UNSET:
-            normalized_cardinality_min = int(cardinality_min)
-            if normalized_cardinality_min < 0:
-                raise ValueError("`cardinality_min` cannot be less than 0.")
-
-        normalized_cardinality_max = cardinality_max
-        if cardinality_max is not UNSET:
-            normalized_cardinality_max = int(cardinality_max)
-            if normalized_cardinality_max < -1:
-                raise ValueError("`cardinality_max` cannot be less than -1.")
+        normalized_cardinality_min = self._normalize_optional_cardinality_min(cardinality_min)
+        normalized_cardinality_max = self._normalize_optional_cardinality_max(cardinality_max)
 
         final_cardinality_min = int(relationship.cardinality_min) if normalized_cardinality_min is UNSET else int(normalized_cardinality_min)
         final_cardinality_max = int(relationship.cardinality_max) if normalized_cardinality_max is UNSET else int(normalized_cardinality_max)
-        if final_cardinality_max != -1 and final_cardinality_min > final_cardinality_max:
-            raise ValueError("`cardinality_min` cannot be greater than `cardinality_max`.")
+        self._assert_valid_cardinality_range(
+            cardinality_min=final_cardinality_min,
+            cardinality_max=final_cardinality_max,
+        )
 
         updates: list[str] = []
         if normalized_cardinality_min is not UNSET and final_cardinality_min != int(relationship.cardinality_min):
@@ -825,24 +912,66 @@ class CoreComponentService:
             updates.append("definition_source")
         if deprecated is not UNSET and bool(deprecated) != bool(relationship.is_deprecated):
             updates.append("deprecated")
+        sequence_requested = any(
+            value is not UNSET and value is not None
+            for value in (
+                index,
+                after_ascc_manifest_id,
+                after_bcc_manifest_id,
+                before_ascc_manifest_id,
+                before_bcc_manifest_id,
+            )
+        )
+        if sequence_requested:
+            updates.append("sequence")
         if not updates:
             return UpdateAsccServiceResult(ascc_manifest_id=int(ascc_manifest_id), updates=[])
 
-        await self._repo.update_ascc(
-            ascc_manifest_id=ascc_manifest_id,
-            cardinality_min=None if normalized_cardinality_min is UNSET else final_cardinality_min,
-            cardinality_min_set=normalized_cardinality_min is not UNSET,
-            cardinality_max=None if normalized_cardinality_max is UNSET else final_cardinality_max,
-            cardinality_max_set=normalized_cardinality_max is not UNSET,
-            deprecated=None if deprecated is UNSET else bool(deprecated),
-            deprecated_set=deprecated is not UNSET,
-            definition=None if normalized_definition is UNSET else normalized_definition,
-            definition_set=normalized_definition is not UNSET,
-            definition_source=None if normalized_definition_source is UNSET else normalized_definition_source,
-            definition_source_set=normalized_definition_source is not UNSET,
-            requester_user_id=self._requester.user.user_id,
+        scalar_updates_requested = any(
+            value is not UNSET
+            for value in (
+                normalized_cardinality_min,
+                normalized_cardinality_max,
+                normalized_definition,
+                normalized_definition_source,
+                deprecated,
+            )
         )
-        return UpdateAsccServiceResult(ascc_manifest_id=int(ascc_manifest_id), updates=sorted(updates))
+        if scalar_updates_requested:
+            await self._repo.update_ascc(
+                ascc_manifest_id=ascc_manifest_id,
+                cardinality_min=None if normalized_cardinality_min is UNSET else final_cardinality_min,
+                cardinality_min_set=normalized_cardinality_min is not UNSET,
+                cardinality_max=None if normalized_cardinality_max is UNSET else final_cardinality_max,
+                cardinality_max_set=normalized_cardinality_max is not UNSET,
+                deprecated=None if deprecated is UNSET else bool(deprecated),
+                deprecated_set=deprecated is not UNSET,
+                definition=None if normalized_definition is UNSET else normalized_definition,
+                definition_set=normalized_definition is not UNSET,
+                definition_source=None if normalized_definition_source is UNSET else normalized_definition_source,
+                definition_source_set=normalized_definition_source is not UNSET,
+                requester_user_id=self._requester.user.user_id,
+            )
+        if sequence_requested:
+            resolved_after_ascc_manifest_id, resolved_after_bcc_manifest_id = self._resolve_move_after_reference(
+                relationships=acc.relationships,
+                item_component_type="ASCC",
+                item_manifest_id=int(ascc_manifest_id),
+                index=None if index in {UNSET, None} else int(index),
+                after_ascc_manifest_id=None if after_ascc_manifest_id in {UNSET, None} else after_ascc_manifest_id,
+                after_bcc_manifest_id=None if after_bcc_manifest_id in {UNSET, None} else after_bcc_manifest_id,
+                before_ascc_manifest_id=None if before_ascc_manifest_id in {UNSET, None} else before_ascc_manifest_id,
+                before_bcc_manifest_id=None if before_bcc_manifest_id in {UNSET, None} else before_bcc_manifest_id,
+            )
+            await self._repo.move_acc_sequence(
+                acc_manifest_id=owner_acc_manifest_id,
+                item_ascc_manifest_id=ascc_manifest_id,
+                item_bcc_manifest_id=None,
+                after_ascc_manifest_id=resolved_after_ascc_manifest_id,
+                after_bcc_manifest_id=resolved_after_bcc_manifest_id,
+                requester_user_id=self._requester.user.user_id,
+            )
+        return UpdateAsccServiceResult(ascc_manifest_id=int(ascc_manifest_id), updates=sorted(set(updates)))
 
     async def update_bcc(
         self,
@@ -855,6 +984,11 @@ class CoreComponentService:
         definition_source: str | None | UnsetType = UNSET,
         deprecated: bool | UnsetType = UNSET,
         is_nillable: bool | UnsetType = UNSET,
+        index: int | UnsetType = UNSET,
+        after_ascc_manifest_id: AsccManifestId | UnsetType = UNSET,
+        after_bcc_manifest_id: BccManifestId | UnsetType = UNSET,
+        before_ascc_manifest_id: AsccManifestId | UnsetType = UNSET,
+        before_bcc_manifest_id: BccManifestId | UnsetType = UNSET,
         default_value: str | None | UnsetType = UNSET,
         fixed_value: str | None | UnsetType = UNSET,
     ) -> UpdateBccServiceResult:
@@ -900,32 +1034,42 @@ class CoreComponentService:
         if normalized_default_value not in {UNSET, None} and normalized_fixed_value not in {UNSET, None}:
             raise ValueError("Provide only one of `default_value` or `fixed_value`.")
 
-        current_entity_type = relationship.entity_type or "Element"
-        normalized_entity_type = entity_type
-        if entity_type is not UNSET:
-            normalized_entity_type = str(entity_type)
+        current_entity_type = self._normalize_bcc_entity_type(relationship.entity_type or "Element")
+        normalized_entity_type = self._normalize_bcc_entity_type(entity_type)
 
-        normalized_cardinality_min = cardinality_min
-        if cardinality_min is not UNSET:
-            normalized_cardinality_min = int(cardinality_min)
-            if normalized_cardinality_min < 0:
-                raise ValueError("`cardinality_min` cannot be less than 0.")
+        normalized_cardinality_min = self._normalize_optional_cardinality_min(cardinality_min)
+        normalized_cardinality_max = self._normalize_optional_cardinality_max(cardinality_max)
 
-        normalized_cardinality_max = cardinality_max
-        if cardinality_max is not UNSET:
-            normalized_cardinality_max = int(cardinality_max)
-            if normalized_cardinality_max < -1:
-                raise ValueError("`cardinality_max` cannot be less than -1.")
+        final_entity_type = current_entity_type if normalized_entity_type is UNSET else normalized_entity_type
 
-        if normalized_entity_type is not UNSET and normalized_entity_type == "Attribute" and current_entity_type != "Attribute":
-            final_cardinality_min = 0
-            final_cardinality_max = 1
+        if final_entity_type == "Attribute":
+            await self._assert_attribute_bcc_allowed_for_bdt(
+                bdt_manifest_id=int(relationship.to_bccp.bdt_manifest.dt_manifest_id),
+            )
+            transitioning_to_attribute = current_entity_type != "Attribute"
+            default_cardinality_min = 0 if transitioning_to_attribute else int(relationship.cardinality_min)
+            default_cardinality_max = 1 if transitioning_to_attribute else int(relationship.cardinality_max)
+            final_cardinality_min = default_cardinality_min if normalized_cardinality_min is UNSET else int(normalized_cardinality_min)
+            if transitioning_to_attribute and (
+                normalized_cardinality_max is UNSET
+                or int(normalized_cardinality_max) == -1
+                or int(normalized_cardinality_max) > 1
+            ):
+                final_cardinality_max = 1
+            else:
+                final_cardinality_max = default_cardinality_max if normalized_cardinality_max is UNSET else int(normalized_cardinality_max)
+            self._assert_valid_attribute_bcc_cardinality(
+                cardinality_min=final_cardinality_min,
+                cardinality_max=final_cardinality_max,
+            )
         else:
             final_cardinality_min = int(relationship.cardinality_min) if normalized_cardinality_min is UNSET else int(normalized_cardinality_min)
             final_cardinality_max = int(relationship.cardinality_max) if normalized_cardinality_max is UNSET else int(normalized_cardinality_max)
 
-        if final_cardinality_max != -1 and final_cardinality_min > final_cardinality_max:
-            raise ValueError("`cardinality_min` cannot be greater than `cardinality_max`.")
+        self._assert_valid_cardinality_range(
+            cardinality_min=final_cardinality_min,
+            cardinality_max=final_cardinality_max,
+        )
 
         current_default_value = relationship.value_constraint.default_value if relationship.value_constraint is not None else None
         current_fixed_value = relationship.value_constraint.fixed_value if relationship.value_constraint is not None else None
@@ -952,37 +1096,83 @@ class CoreComponentService:
             value_constraint_changed = True
         if value_constraint_changed:
             updates.append("value_constraint")
+        sequence_requested = any(
+            value is not UNSET and value is not None
+            for value in (
+                index,
+                after_ascc_manifest_id,
+                after_bcc_manifest_id,
+                before_ascc_manifest_id,
+                before_bcc_manifest_id,
+            )
+        )
+        if sequence_requested:
+            updates.append("sequence")
         if not updates:
             return UpdateBccServiceResult(bcc_manifest_id=int(bcc_manifest_id), updates=[])
 
-        await self._repo.update_bcc(
-            bcc_manifest_id=bcc_manifest_id,
-            entity_type=None if normalized_entity_type is UNSET else normalized_entity_type,
-            entity_type_set=normalized_entity_type is not UNSET,
-            cardinality_min=final_cardinality_min,
-            cardinality_min_set=(
-                normalized_cardinality_min is not UNSET
-                or (normalized_entity_type is not UNSET and normalized_entity_type == "Attribute" and current_entity_type != "Attribute")
-            ),
-            cardinality_max=final_cardinality_max,
-            cardinality_max_set=(
-                normalized_cardinality_max is not UNSET
-                or (normalized_entity_type is not UNSET and normalized_entity_type == "Attribute" and current_entity_type != "Attribute")
-            ),
-            deprecated=None if deprecated is UNSET else bool(deprecated),
-            deprecated_set=deprecated is not UNSET,
-            is_nillable=None if is_nillable is UNSET else bool(is_nillable),
-            is_nillable_set=is_nillable is not UNSET,
-            default_value=None if normalized_default_value is UNSET else normalized_default_value,
-            default_value_set=normalized_default_value is not UNSET,
-            fixed_value=None if normalized_fixed_value is UNSET else normalized_fixed_value,
-            fixed_value_set=normalized_fixed_value is not UNSET,
-            definition=None if normalized_definition is UNSET else normalized_definition,
-            definition_set=normalized_definition is not UNSET,
-            definition_source=None if normalized_definition_source is UNSET else normalized_definition_source,
-            definition_source_set=normalized_definition_source is not UNSET,
-            requester_user_id=self._requester.user.user_id,
+        scalar_updates_requested = any(
+            value is not UNSET
+            for value in (
+                normalized_entity_type,
+                normalized_cardinality_min,
+                normalized_cardinality_max,
+                normalized_definition,
+                normalized_definition_source,
+                deprecated,
+                is_nillable,
+                normalized_default_value,
+                normalized_fixed_value,
+            )
         )
+        if scalar_updates_requested:
+            await self._repo.update_bcc(
+                bcc_manifest_id=bcc_manifest_id,
+                entity_type=None if normalized_entity_type is UNSET else normalized_entity_type,
+                entity_type_set=normalized_entity_type is not UNSET,
+                cardinality_min=final_cardinality_min,
+                cardinality_min_set=(
+                    normalized_cardinality_min is not UNSET
+                    or (normalized_entity_type is not UNSET and normalized_entity_type == "Attribute" and current_entity_type != "Attribute")
+                ),
+                cardinality_max=final_cardinality_max,
+                cardinality_max_set=(
+                    normalized_cardinality_max is not UNSET
+                    or (normalized_entity_type is not UNSET and normalized_entity_type == "Attribute" and current_entity_type != "Attribute")
+                ),
+                deprecated=None if deprecated is UNSET else bool(deprecated),
+                deprecated_set=deprecated is not UNSET,
+                is_nillable=None if is_nillable is UNSET else bool(is_nillable),
+                is_nillable_set=is_nillable is not UNSET,
+                default_value=None if normalized_default_value is UNSET else normalized_default_value,
+                default_value_set=normalized_default_value is not UNSET,
+                fixed_value=None if normalized_fixed_value is UNSET else normalized_fixed_value,
+                fixed_value_set=normalized_fixed_value is not UNSET,
+                definition=None if normalized_definition is UNSET else normalized_definition,
+                definition_set=normalized_definition is not UNSET,
+                definition_source=None if normalized_definition_source is UNSET else normalized_definition_source,
+                definition_source_set=normalized_definition_source is not UNSET,
+                requester_user_id=self._requester.user.user_id,
+            )
+        if sequence_requested:
+            resolved_after_ascc_manifest_id, resolved_after_bcc_manifest_id = self._resolve_move_after_reference(
+                relationships=acc.relationships,
+                item_component_type="BCC",
+                item_manifest_id=int(bcc_manifest_id),
+                index=None if index in {UNSET, None} else int(index),
+                after_ascc_manifest_id=None if after_ascc_manifest_id in {UNSET, None} else after_ascc_manifest_id,
+                after_bcc_manifest_id=None if after_bcc_manifest_id in {UNSET, None} else after_bcc_manifest_id,
+                before_ascc_manifest_id=None if before_ascc_manifest_id in {UNSET, None} else before_ascc_manifest_id,
+                before_bcc_manifest_id=None if before_bcc_manifest_id in {UNSET, None} else before_bcc_manifest_id,
+            )
+            await self._repo.move_acc_sequence(
+                acc_manifest_id=owner_acc_manifest_id,
+                item_ascc_manifest_id=None,
+                item_bcc_manifest_id=bcc_manifest_id,
+                after_ascc_manifest_id=resolved_after_ascc_manifest_id,
+                after_bcc_manifest_id=resolved_after_bcc_manifest_id,
+                requester_user_id=self._requester.user.user_id,
+            )
         return UpdateBccServiceResult(bcc_manifest_id=int(bcc_manifest_id), updates=sorted(set(updates)))
 
     async def update_acc_base(
@@ -1238,17 +1428,54 @@ class CoreComponentService:
         self,
         *,
         asccp_manifest_id: AsccpManifestId,
+        role_of_acc_manifest_id: AccManifestId | UnsetType = UNSET,
         property_term: str | None | UnsetType = UNSET,
     ) -> list[str]:
         """Preview structural warnings for ASCCP field updates."""
-        if property_term is UNSET:
+        if property_term is UNSET and role_of_acc_manifest_id is UNSET:
             return []
         asccp = await self.get_asccp(asccp_manifest_id)
         if asccp is None:
             raise LookupError(
                 f"No ASCCP exists with manifest ID {int(asccp_manifest_id)}. Please verify the identifier and try again."
             )
-        preview_asccp = replace(asccp, property_term=property_term)
+
+        preview_asccp = asccp
+        if property_term is not UNSET:
+            preview_asccp = replace(preview_asccp, property_term=property_term)
+        if role_of_acc_manifest_id is not UNSET:
+            role_of_acc = await self.get_acc(role_of_acc_manifest_id)
+            if role_of_acc is None:
+                raise LookupError(
+                    f"No ACC exists with manifest ID {int(role_of_acc_manifest_id)}. Please verify the identifier and try again."
+                )
+            await self._assert_reference_release_allowed(
+                target_release_id=asccp.release.release_id,
+                target_library_id=asccp.library.library_id,
+                referenced_release_id=role_of_acc.release.release_id,
+                referenced_library_id=role_of_acc.library.library_id,
+                referenced_label="The role ACC",
+                target_label="the target ASCCP",
+                selection_phrase="a role ACC",
+            )
+            preview_asccp = replace(
+                preview_asccp,
+                role_of_acc=BaseAccSummaryServiceRecord(
+                    acc_manifest_id=int(role_of_acc.acc_manifest_id),
+                    acc_id=int(role_of_acc.acc_id),
+                    guid=str(role_of_acc.guid),
+                    den=str(role_of_acc.den),
+                    object_class_term=str(role_of_acc.object_class_term),
+                    type=OAGIS_COMPONENT_TYPE_NAMES.get(int(role_of_acc.component_type))
+                    if role_of_acc.component_type is not None
+                    else None,
+                    definition=role_of_acc.definition,
+                    definition_source=role_of_acc.definition_source,
+                    namespace=role_of_acc.namespace,
+                    library=role_of_acc.library,
+                    release=role_of_acc.release,
+                ),
+            )
         return await self._collect_acc_warnings_for_asccp_preview(
             asccp_manifest_id=asccp_manifest_id,
             current_asccp=asccp,
@@ -1451,7 +1678,11 @@ class CoreComponentService:
         *,
         acc_manifest_id: AccManifestId,
         asccp_manifest_id: AsccpManifestId,
-        index: int = -1,
+        index: int | None = None,
+        after_ascc_manifest_id: AsccManifestId | None = None,
+        after_bcc_manifest_id: BccManifestId | None = None,
+        before_ascc_manifest_id: AsccManifestId | None = None,
+        before_bcc_manifest_id: BccManifestId | None = None,
         cardinality_min: int | None = None,
         cardinality_max: int | None = None,
         definition: str | None = None,
@@ -1459,7 +1690,7 @@ class CoreComponentService:
     ) -> CreateAsccServiceResult:
         """Add an ASCC relationship to an ACC, creating it if needed."""
         logger.info(
-            "place ascc acc_manifest_id=%d asccp_manifest_id=%d index=%d",
+            "place ascc acc_manifest_id=%d asccp_manifest_id=%d index=%s",
             int(acc_manifest_id),
             int(asccp_manifest_id),
             index,
@@ -1502,24 +1733,29 @@ class CoreComponentService:
                 "This ASCC is already in the ACC sequence. Please use `reorder_ascc_in_acc` instead."
             )
 
-        self._assert_valid_sequence_index(index=index, sequence_length=len(acc.relationships))
+        resolved_index = self._resolve_add_sequence_index(
+            relationships=acc.relationships,
+            index=index,
+            after_ascc_manifest_id=after_ascc_manifest_id,
+            after_bcc_manifest_id=after_bcc_manifest_id,
+            before_ascc_manifest_id=before_ascc_manifest_id,
+            before_bcc_manifest_id=before_bcc_manifest_id,
+            default_to_end=True,
+        )
         normalized_definition = definition.strip() or None if isinstance(definition, str) else None
         normalized_definition_source = definition_source.strip() or None if isinstance(definition_source, str) else None
 
-        final_cardinality_min = 0 if cardinality_min is None else int(cardinality_min)
-        if final_cardinality_min < 0:
-            raise ValueError("`cardinality_min` cannot be less than 0.")
-
-        final_cardinality_max = -1 if cardinality_max is None else int(cardinality_max)
-        if final_cardinality_max < -1:
-            raise ValueError("`cardinality_max` cannot be less than -1.")
-        if final_cardinality_max != -1 and final_cardinality_min > final_cardinality_max:
-            raise ValueError("`cardinality_min` cannot be greater than `cardinality_max`.")
+        final_cardinality_min = self._normalize_required_cardinality_min(cardinality_min, default=0)
+        final_cardinality_max = self._normalize_required_cardinality_max(cardinality_max, default=-1)
+        self._assert_valid_cardinality_range(
+            cardinality_min=final_cardinality_min,
+            cardinality_max=final_cardinality_max,
+        )
 
         ascc_manifest_id = await self._repo.create_ascc(
             acc_manifest_id=acc_manifest_id,
             asccp_manifest_id=asccp_manifest_id,
-            index=index,
+            index=resolved_index,
             cardinality_min=final_cardinality_min,
             cardinality_max=final_cardinality_max,
             definition=normalized_definition,
@@ -1539,7 +1775,11 @@ class CoreComponentService:
         *,
         acc_manifest_id: AccManifestId,
         asccp_manifest_id: AsccpManifestId,
-        index: int = -1,
+        index: int | None = None,
+        after_ascc_manifest_id: AsccManifestId | None = None,
+        after_bcc_manifest_id: BccManifestId | None = None,
+        before_ascc_manifest_id: AsccManifestId | None = None,
+        before_bcc_manifest_id: BccManifestId | None = None,
     ) -> list[str]:
         """Preview flattened BIE warnings for adding an ASCC to an ACC."""
         acc = await self.get_acc(acc_manifest_id)
@@ -1583,6 +1823,15 @@ class CoreComponentService:
             raise ValueError(
                 "This ASCC is already in the ACC sequence. Please use `reorder_ascc_in_acc` instead."
             )
+        resolved_index = self._resolve_add_sequence_index(
+            relationships=acc.relationships,
+            index=index,
+            after_ascc_manifest_id=after_ascc_manifest_id,
+            after_bcc_manifest_id=after_bcc_manifest_id,
+            before_ascc_manifest_id=before_ascc_manifest_id,
+            before_bcc_manifest_id=before_bcc_manifest_id,
+            default_to_end=True,
+        )
         final_sequence = self._preview_sequence_for_add(
             relationships=acc.relationships,
             new_item=_SequencePreviewItem(
@@ -1591,7 +1840,7 @@ class CoreComponentService:
                 relationship_label=label,
                 cardinality_max=-1,
             ),
-            index=index,
+            index=resolved_index,
         )
         warnings.extend(
             self._build_sequence_ambiguity_warnings_for_sequence(
@@ -1606,7 +1855,11 @@ class CoreComponentService:
         *,
         acc_manifest_id: AccManifestId,
         bccp_manifest_id: BccpManifestId,
-        index: int = -1,
+        index: int | None = None,
+        after_ascc_manifest_id: AsccManifestId | None = None,
+        after_bcc_manifest_id: BccManifestId | None = None,
+        before_ascc_manifest_id: AsccManifestId | None = None,
+        before_bcc_manifest_id: BccManifestId | None = None,
         entity_type: Literal["Attribute", "Element"] | None = None,
         cardinality_min: int | None = None,
         cardinality_max: int | None = None,
@@ -1618,7 +1871,7 @@ class CoreComponentService:
     ) -> CreateBccServiceResult:
         """Add a BCC relationship to an ACC, creating it if needed."""
         logger.info(
-            "place bcc acc_manifest_id=%d bccp_manifest_id=%d index=%d",
+            "place bcc acc_manifest_id=%d bccp_manifest_id=%d index=%s",
             int(acc_manifest_id),
             int(bccp_manifest_id),
             index,
@@ -1666,26 +1919,41 @@ class CoreComponentService:
         if normalized_default_value is not None and normalized_fixed_value is not None:
             raise ValueError("Provide only one of `default_value` or `fixed_value`.")
 
-        final_entity_type = "Element" if entity_type is None else str(entity_type)
-        if final_entity_type not in {"Attribute", "Element"}:
-            raise ValueError("`entity_type` must be either `Attribute` or `Element`.")
+        final_entity_type = "Element" if entity_type is None else self._normalize_bcc_entity_type(entity_type)
 
-        effective_index = index
+        resolved_index = self._resolve_add_sequence_index(
+            relationships=acc.relationships,
+            index=index,
+            after_ascc_manifest_id=after_ascc_manifest_id,
+            after_bcc_manifest_id=after_bcc_manifest_id,
+            before_ascc_manifest_id=before_ascc_manifest_id,
+            before_bcc_manifest_id=before_bcc_manifest_id,
+            default_to_end=True,
+        )
+        effective_index = resolved_index
         if final_entity_type == "Attribute":
-            effective_index = self._resolve_attribute_bcc_add_index(acc.relationships)
-            final_cardinality_min = 0
-            final_cardinality_max = 1
+            await self._assert_attribute_bcc_allowed_for_bdt(
+                bdt_manifest_id=int(bccp.bdt.dt_manifest_id),
+            )
+            effective_index = self._resolve_attribute_bcc_add_index(
+                relationships=acc.relationships,
+                index=resolved_index,
+            )
+            final_cardinality_min = self._normalize_required_cardinality_min(cardinality_min, default=0)
+            final_cardinality_max = self._normalize_required_cardinality_max(cardinality_max, default=1)
+            self._assert_valid_attribute_bcc_cardinality(
+                cardinality_min=final_cardinality_min,
+                cardinality_max=final_cardinality_max,
+            )
         else:
-            final_cardinality_min = 0 if cardinality_min is None else int(cardinality_min)
-            final_cardinality_max = -1 if cardinality_max is None else int(cardinality_max)
+            final_cardinality_min = self._normalize_required_cardinality_min(cardinality_min, default=0)
+            final_cardinality_max = self._normalize_required_cardinality_max(cardinality_max, default=-1)
 
         self._assert_valid_sequence_index(index=effective_index, sequence_length=len(acc.relationships))
-        if final_cardinality_min < 0:
-            raise ValueError("`cardinality_min` cannot be less than 0.")
-        if final_cardinality_max < -1:
-            raise ValueError("`cardinality_max` cannot be less than -1.")
-        if final_cardinality_max != -1 and final_cardinality_min > final_cardinality_max:
-            raise ValueError("`cardinality_min` cannot be greater than `cardinality_max`.")
+        self._assert_valid_cardinality_range(
+            cardinality_min=final_cardinality_min,
+            cardinality_max=final_cardinality_max,
+        )
 
         bcc_manifest_id = await self._repo.create_bcc(
             acc_manifest_id=acc_manifest_id,
@@ -1714,7 +1982,12 @@ class CoreComponentService:
         *,
         acc_manifest_id: AccManifestId,
         bccp_manifest_id: BccpManifestId,
-        index: int = -1,
+        index: int | None = None,
+        after_ascc_manifest_id: AsccManifestId | None = None,
+        after_bcc_manifest_id: BccManifestId | None = None,
+        before_ascc_manifest_id: AsccManifestId | None = None,
+        before_bcc_manifest_id: BccManifestId | None = None,
+        entity_type: Literal["Attribute", "Element"] | None = None,
     ) -> list[str]:
         """Preview flattened BIE warnings for adding a BCC to an ACC."""
         acc = await self.get_acc(acc_manifest_id)
@@ -1762,6 +2035,26 @@ class CoreComponentService:
             raise ValueError(
                 "This BCC is already in the ACC sequence. Please use `reorder_bcc_in_acc` instead."
             )
+        final_entity_type = "Element" if entity_type is None else str(entity_type)
+        if final_entity_type not in {"Attribute", "Element"}:
+            raise ValueError("`entity_type` must be either `Attribute` or `Element`.")
+        resolved_index = self._resolve_add_sequence_index(
+            relationships=acc.relationships,
+            index=index,
+            after_ascc_manifest_id=after_ascc_manifest_id,
+            after_bcc_manifest_id=after_bcc_manifest_id,
+            before_ascc_manifest_id=before_ascc_manifest_id,
+            before_bcc_manifest_id=before_bcc_manifest_id,
+            default_to_end=True,
+        )
+        effective_index = (
+            self._resolve_attribute_bcc_add_index(
+                relationships=acc.relationships,
+                index=resolved_index,
+            )
+            if final_entity_type == "Attribute"
+            else resolved_index
+        )
         final_sequence = self._preview_sequence_for_add(
             relationships=acc.relationships,
             new_item=_SequencePreviewItem(
@@ -1770,7 +2063,7 @@ class CoreComponentService:
                 relationship_label=bccp.den,
                 cardinality_max=-1,
             ),
-            index=index,
+            index=effective_index,
         )
         warnings.extend(
             self._build_sequence_ambiguity_warnings_for_sequence(
@@ -2134,6 +2427,7 @@ class CoreComponentService:
         self,
         *,
         acc_manifest_id: AccManifestId,
+        requested_action: Literal["revise", "amend"] | None = None,
     ) -> ReviseAccServiceResult:
         """Create a new ACC working revision from a stable ACC revision."""
         logger.info("revise acc id=%d", int(acc_manifest_id))
@@ -2143,7 +2437,7 @@ class CoreComponentService:
                 f"No ACC exists with manifest ID {int(acc_manifest_id)}. Please verify the identifier and try again."
             )
 
-        self._assert_can_revise_component(acc)
+        self._assert_can_revise_component(acc, requested_action=requested_action)
 
         revised = await self._repo.revise_acc(
             acc_manifest_id=acc_manifest_id,
@@ -2296,6 +2590,7 @@ class CoreComponentService:
         self,
         *,
         asccp_manifest_id: AsccpManifestId,
+        requested_action: Literal["revise", "amend"] | None = None,
     ) -> ReviseAsccpServiceResult:
         """Create a new ASCCP working revision from a stable ASCCP revision."""
         asccp = await self.get_asccp(asccp_manifest_id)
@@ -2303,7 +2598,7 @@ class CoreComponentService:
             raise LookupError(
                 f"No ASCCP exists with manifest ID {int(asccp_manifest_id)}. Please verify the identifier and try again."
             )
-        self._assert_can_revise_component(asccp)
+        self._assert_can_revise_component(asccp, requested_action=requested_action, label_plural="ASCCPs")
         revised = await self._repo.revise_asccp(
             asccp_manifest_id=asccp_manifest_id,
             requester_user_id=self._requester.user.user_id,
@@ -2337,6 +2632,7 @@ class CoreComponentService:
         self,
         *,
         bccp_manifest_id: BccpManifestId,
+        requested_action: Literal["revise", "amend"] | None = None,
     ) -> ReviseBccpServiceResult:
         """Create a new BCCP working revision from a stable BCCP revision."""
         bccp = await self.get_bccp(bccp_manifest_id)
@@ -2344,7 +2640,7 @@ class CoreComponentService:
             raise LookupError(
                 f"No BCCP exists with manifest ID {int(bccp_manifest_id)}. Please verify the identifier and try again."
             )
-        self._assert_can_revise_component(bccp)
+        self._assert_can_revise_component(bccp, requested_action=requested_action, label_plural="BCCPs")
         revised = await self._repo.revise_bccp(
             bccp_manifest_id=bccp_manifest_id,
             requester_user_id=self._requester.user.user_id,
@@ -2771,14 +3067,22 @@ class CoreComponentService:
     def _assert_can_revise_component(
         self,
         component: GetAccServiceResult | GetAsccpServiceResult | GetBccpServiceResult,
+        *,
+        requested_action: Literal["revise", "amend"] | None = None,
+        label_plural: str = "ACCs",
     ) -> None:
         """Validate revise rules for ACC/ASCCP/BCCP revisions."""
+        expected_action: Literal["revise", "amend"] = "revise" if self._requester_is_developer() else "amend"
+        if requested_action is not None and requested_action != expected_action:
+            if expected_action == "revise":
+                raise PermissionError(f"Developer-side {label_plural} must use revise.")
+            raise PermissionError(f"End-user {label_plural} must use amend.")
         if self._requester_is_developer():
             if component.state != "Published":
                 raise ValueError("Only the core component in 'Published' state can be revised.")
         else:
             if component.state != "Production":
-                raise ValueError("Only the core component in 'Production' state can be revised.")
+                raise ValueError("Only the core component in 'Production' state can be amended.")
         self._assert_can_access_component_revision_branch(component)
         self._assert_same_role_family_as_component_owner(component)
 
@@ -2808,17 +3112,27 @@ class CoreComponentService:
                 raise ValueError("It only allows to revise the component in 'Working' branch for developers.")
             return
         if release_num == "Working":
-            raise ValueError("It only allows to revise the component in non-'Working' branch for end-users.")
+            raise ValueError("It only allows to amend the component in non-'Working' branches for end-users.")
 
 
     @staticmethod
-    def _derive_acc_type(initial_component_type: OagisComponentType) -> str:
+    def _derive_acc_type(component_type: OagisComponentType) -> str:
         """Derive persisted ACC type from the selected OAGIS component type.
 
         connectCenter's extension-specific flows persist `Extension` for extension-like
         component types and `Default` for the regular authoring path.
         """
-        if initial_component_type in {"Extension", "UserExtensionGroup"}:
+        if component_type in {"Extension", "UserExtensionGroup"}:
+            return "Extension"
+        return "Default"
+
+    @staticmethod
+    def _derive_asccp_type_for_role_acc(component_type: int | None) -> str:
+        """Derive persisted ASCCP type from the role ACC's OAGIS component type."""
+        if component_type in {
+            OAGIS_COMPONENT_TYPE_VALUES["Extension"],
+            OAGIS_COMPONENT_TYPE_VALUES["UserExtensionGroup"],
+        }:
             return "Extension"
         return "Default"
 
@@ -3199,10 +3513,78 @@ class CoreComponentService:
         return ordered[:final_index] + [new_item] + ordered[final_index:]
 
     @staticmethod
+    def _resolve_add_sequence_index(
+        *,
+        relationships: list[AsccRelationshipServiceRecord | BccRelationshipServiceRecord],
+        index: int | None,
+        after_ascc_manifest_id: AsccManifestId | None,
+        after_bcc_manifest_id: BccManifestId | None,
+        before_ascc_manifest_id: AsccManifestId | None,
+        before_bcc_manifest_id: BccManifestId | None,
+        default_to_end: bool,
+    ) -> int:
+        """Resolve add-placement inputs into a concrete zero-based insertion index."""
+        provided = sum(
+            value is not None
+            for value in (
+                index,
+                after_ascc_manifest_id,
+                after_bcc_manifest_id,
+                before_ascc_manifest_id,
+                before_bcc_manifest_id,
+            )
+        )
+        if provided > 1:
+            raise ValueError("Provide only one of `index`, `after_*`, or `before_*`.")
+
+        ordered = list(relationships)
+        if index is not None:
+            CoreComponentService._assert_valid_sequence_index(index=index, sequence_length=len(ordered))
+            return len(ordered) if index < 0 else int(index)
+
+        if after_ascc_manifest_id is not None:
+            position = CoreComponentService._find_sequence_reference_index(
+                ordered=ordered,
+                target_component_type="ASCC",
+                target_manifest_id=int(after_ascc_manifest_id),
+            )
+            return position + 1
+
+        if after_bcc_manifest_id is not None:
+            position = CoreComponentService._find_sequence_reference_index(
+                ordered=ordered,
+                target_component_type="BCC",
+                target_manifest_id=int(after_bcc_manifest_id),
+            )
+            return position + 1
+
+        if before_ascc_manifest_id is not None:
+            return CoreComponentService._find_sequence_reference_index(
+                ordered=ordered,
+                target_component_type="ASCC",
+                target_manifest_id=int(before_ascc_manifest_id),
+            )
+
+        if before_bcc_manifest_id is not None:
+            return CoreComponentService._find_sequence_reference_index(
+                ordered=ordered,
+                target_component_type="BCC",
+                target_manifest_id=int(before_bcc_manifest_id),
+            )
+
+        return len(ordered) if default_to_end else 0
+
+    @staticmethod
     def _resolve_attribute_bcc_add_index(
         relationships: list[AsccRelationshipServiceRecord | BccRelationshipServiceRecord],
+        index: int,
     ) -> int:
-        """Return the insertion index for a BCC attribute block at the head of an ACC sequence."""
+        """Resolve an attribute BCC add index within the leading attribute block.
+
+        Attribute BCCs live in the leading block of the ACC sequence.
+        - indexes inside that block are honored directly
+        - `-1` or any index beyond that block append to the end of the attribute block
+        """
         attribute_count = 0
         for relationship in relationships:
             if getattr(relationship, "component_type", None) != "BCC":
@@ -3210,7 +3592,10 @@ class CoreComponentService:
             if getattr(relationship, "entity_type", None) != "Attribute":
                 break
             attribute_count += 1
-        return attribute_count
+        CoreComponentService._assert_valid_sequence_index(index=index, sequence_length=len(relationships))
+        if index < 0 or index > attribute_count:
+            return attribute_count
+        return int(index)
 
     @staticmethod
     def _preview_sequence_for_move(
@@ -3540,6 +3925,84 @@ class CoreComponentService:
         if index > sequence_length:
             raise ValueError(
                 f"`index` is out of range for the ACC sequence. Allowed values are 0 to {sequence_length}, or -1 for the end."
+            )
+
+    @staticmethod
+    def _normalize_optional_cardinality_min(value: int | UnsetType) -> int | UnsetType:
+        """Normalize an optional minimum cardinality for update-style operations."""
+        if value is UNSET:
+            return UNSET
+        normalized = int(value)
+        if normalized < 0:
+            raise ValueError("`cardinality_min` cannot be less than 0.")
+        return normalized
+
+    @staticmethod
+    def _normalize_optional_cardinality_max(value: int | UnsetType) -> int | UnsetType:
+        """Normalize an optional maximum cardinality for update-style operations."""
+        if value is UNSET:
+            return UNSET
+        normalized = int(value)
+        if normalized < -1:
+            raise ValueError("`cardinality_max` cannot be less than -1.")
+        return normalized
+
+    @staticmethod
+    def _normalize_required_cardinality_min(value: int | None, *, default: int) -> int:
+        """Normalize a minimum cardinality for create-style operations."""
+        normalized = default if value is None else int(value)
+        if normalized < 0:
+            raise ValueError("`cardinality_min` cannot be less than 0.")
+        return normalized
+
+    @staticmethod
+    def _normalize_required_cardinality_max(value: int | None, *, default: int) -> int:
+        """Normalize a maximum cardinality for create-style operations."""
+        normalized = default if value is None else int(value)
+        if normalized < -1:
+            raise ValueError("`cardinality_max` cannot be less than -1.")
+        return normalized
+
+    @staticmethod
+    def _assert_valid_cardinality_range(*, cardinality_min: int, cardinality_max: int) -> None:
+        """Ensure the final cardinality range is internally consistent."""
+        if cardinality_max != -1 and cardinality_min > cardinality_max:
+            raise ValueError("`cardinality_min` cannot be greater than `cardinality_max`.")
+
+    @staticmethod
+    def _normalize_bcc_entity_type(value: Literal["Attribute", "Element"] | int | UnsetType) -> Literal["Attribute", "Element"] | UnsetType:
+        """Normalize BCC entity-type aliases into canonical string values."""
+        if value is UNSET:
+            return UNSET
+        if value in {"Attribute", 0}:
+            return "Attribute"
+        if value in {"Element", 1}:
+            return "Element"
+        raise ValueError("`entity_type` must be either `Attribute` or `Element`.")
+
+    @staticmethod
+    def _assert_valid_attribute_bcc_cardinality(*, cardinality_min: int, cardinality_max: int) -> None:
+        """Ensure `Attribute` BCC cardinality stays within the allowed bounded range."""
+        if cardinality_min > 1:
+            raise ValueError("`cardinality_min` cannot be greater than 1 for `Attribute` BCCs.")
+        if cardinality_max == -1 or cardinality_max > 1:
+            raise ValueError("`cardinality_max` cannot be greater than 1 for `Attribute` BCCs.")
+
+    async def _assert_attribute_bcc_allowed_for_bdt(self, *, bdt_manifest_id: int) -> None:
+        """Reject `Attribute` BCCs when the linked BDT has active supplementary components."""
+        dt = await self._data_type_service.get(bdt_manifest_id)
+        if dt is None:
+            raise LookupError(
+                f"No data type exists with manifest ID {int(bdt_manifest_id)}. Please verify the identifier and try again."
+            )
+        self._assert_no_active_dt_scs_for_attribute_bcc(dt=dt)
+
+    @staticmethod
+    def _assert_no_active_dt_scs_for_attribute_bcc(*, dt: DataTypeServiceResult) -> None:
+        """Ensure the target BDT has no active DT_SC entries before allowing an `Attribute` BCC."""
+        if any(sc.cardinality != "Prohibited" for sc in dt.supplementary_components):
+            raise ValueError(
+                "A BCC cannot be `Attribute` when its BCCP's BDT has active DT supplementary components."
             )
 
     @staticmethod

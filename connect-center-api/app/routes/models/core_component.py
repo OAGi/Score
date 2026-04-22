@@ -79,11 +79,16 @@ class CreateAccRequest(BaseModel):
             "target release dependencies."
         ),
     )
-    initial_object_class_term: str | None = Field(
-        default="Object Class Term",
-        description="Initial object class term. Defaults to 'Object Class Term'.",
+    object_class_term: str = Field(
+        ...,
+        min_length=1,
+        description=(
+            "Object class term to start with. In CCTS, this is the term that represents the activity or object "
+            "the ACC stands for. It serves as the basis for the ACC DEN and for the DENs of the ASCC and BCC "
+            "properties under that ACC."
+        ),
     )
-    initial_component_type: Literal[
+    component_type: Literal[
         "Base",
         "Semantics",
         "Extension",
@@ -100,13 +105,32 @@ class CreateAccRequest(BaseModel):
     ] = Field(
         default="Semantics",
         description=(
-            "Initial OAGIS component type. Use `Base` only when this ACC is intended to be the base ACC for other "
-            "ACCs. Use `Extension` for a developer extension ACC that end-users may extend later in BIEs. Use "
-            "`SemanticGroup` for a grouping ACC whose associations are flattened in BIEs. Otherwise use "
-            "`Semantics`. Defaults to `Semantics`."
+            "OAGIS component type to start with. Use `Base` only when this ACC is meant to be the base ACC for "
+            "other ACCs. Use `Extension` for a developer extension ACC that end-users may extend later in BIEs. "
+            "Use `SemanticGroup` for a grouping ACC whose associations are flattened in BIEs. In most other "
+            "cases, use `Semantics`. Defaults to `Semantics`."
         ),
     )
-    initial_definition: str | None = Field(default=None, description="Initial definition text.")
+    definition: str | None = Field(
+        default=None,
+        description=(
+            "Definition text to start with. This is the explanatory text that describes what the ACC means."
+        ),
+    )
+    definition_source: str | None = Field(
+        default=None,
+        description=(
+            "Definition source to start with. Use this to record where the definition came from, such as a "
+            "specification, standard, or reference URL."
+        ),
+    )
+    is_abstract: bool | None = Field(
+        default=None,
+        description=(
+            "Whether this ACC should be abstract. If `component_type` is `Base`, this is usually `true`, because "
+            "the ACC is meant to serve as a base ACC for other ACCs."
+        ),
+    )
     namespace_id: int | None = Field(
         default=None,
         ge=1,
@@ -135,21 +159,34 @@ class CreateAsccpRequest(BaseModel):
         ...,
         ge=1,
         description=(
-            "Role ACC manifest identifier. If the role ACC is in the same library as `release_id`, it must be "
+            "Role ACC manifest identifier. This identifies the ACC that this ASCCP points to as the associated ACC in the relationship. "
+            "If the role ACC is in the same library as `release_id`, it must be "
             "from that release. If it is in a different library, its release must be one of the target release "
             "dependencies."
         ),
     )
-    initial_property_term: str | None = Field(default="Property Term", description="Initial property term.")
-    asccp_type: Literal["Default", "DataArea", "Extension", "Verb", "BOD"] = Field(
-        default="Default",
-        description="Initial ASCCP type.",
+    property_term: str = Field(
+        ...,
+        min_length=1,
+        description=(
+            "Property term to use for this ASCCP. In CCTS, this is a semantically meaningful name for the "
+            "characteristic that represents the nature of the association to the associated ACC."
+        ),
     )
-    reusable_indicator: bool = Field(default=True, description="Initial reusable indicator.")
-    namespace_id: int | None = Field(default=None, ge=1, description="Optional namespace identifier.")
-    definition: str | None = Field(default=None, description="Initial definition text.")
-    definition_source: str | None = Field(default=None, description="Initial definition source.")
-    tag_id: list[int] | None = Field(default=None, description="Optional tag identifier list to attach.")
+    reusable_indicator: bool = Field(default=True, description="Whether this ASCCP should start as reusable.")
+    namespace_id: int | None = Field(default=None, ge=1, description="Namespace to use for this ASCCP.")
+    definition: str | None = Field(
+        default=None,
+        description="Definition text to start with. This is the explanatory text that describes what the ASCCP means.",
+    )
+    definition_source: str | None = Field(
+        default=None,
+        description=(
+            "Definition source to start with. Use this to record where the definition came from, such as a "
+            "specification, standard, or reference URL."
+        ),
+    )
+    tag_id: list[int] | None = Field(default=None, description="Tag IDs to attach when the ASCCP is created.")
 
 
 class CreateAsccpResponse(BaseModel):
@@ -174,8 +211,37 @@ class CreateBccpRequest(BaseModel):
             "dependencies."
         ),
     )
-    initial_property_term: str | None = Field(default="Property Term", description="Initial property term.")
-    tag_id: list[int] | None = Field(default=None, description="Optional tag identifier list to attach.")
+    property_term: str = Field(
+        ...,
+        min_length=1,
+        description=(
+            "Property term to use for this BCCP. In CCTS, this is a semantically meaningful name for a unique "
+            "characteristic that can be used in an ACC object class."
+        ),
+    )
+    definition: str | None = Field(
+        default=None,
+        description="Definition text to start with. This is the explanatory text that describes what the BCCP means. Set `null` to leave it empty.",
+    )
+    definition_source: str | None = Field(
+        default=None,
+        description=(
+            "Definition source to start with. Use this to record where the definition came from, such as a "
+            "specification, standard, or reference URL. Set `null` to leave it empty."
+        ),
+    )
+    deprecated: bool | None = Field(default=None, description="Whether this BCCP should start as deprecated.")
+    is_nillable: bool | None = Field(default=None, description="Whether this BCCP should allow nil values when created.")
+    namespace_id: int | None = Field(
+        default=None,
+        ge=1,
+        description="Namespace to use for this BCCP. Set `null` to leave it empty.",
+    )
+    value_constraint: BccValueConstraintRequest | None = Field(
+        default=None,
+        description="Value constraint to start with. Provide one of `default_value` or `fixed_value`. Set `null` to leave it empty.",
+    )
+    tag_id: list[int] | None = Field(default=None, description="Tag IDs to attach when the BCCP is created.")
 
 
 class CreateBccpResponse(BaseModel):
@@ -287,12 +353,19 @@ class UpdateAccRequest(BaseModel):
         default=None,
         ge=1,
         description=(
-            "Updated base ACC manifest identifier. Use null to clear the current base ACC. If the base ACC is in "
-            "the same library as the target ACC, it must be from the target ACC release. If it is in a different "
-            "library, its release must be one of the target ACC release dependencies."
+            "Base ACC. If the base ACC is in the same library as the target ACC, it must come from the same release. "
+            "If it is in a different library, its release must be one of the target ACC release dependencies. "
+            "Omit to leave unchanged. Set `null` to remove the current base ACC."
         ),
     )
-    object_class_term: str | None = Field(default=None, description="Updated object class term.")
+    object_class_term: str | None = Field(
+        default=None,
+        description=(
+            "Object class term. In CCTS, this is the term that represents the activity or "
+            "object the ACC stands for. It serves as the basis for the ACC DEN and for the DENs of the ASCC and "
+            "BCC properties under that ACC. Omit to leave unchanged."
+        ),
+    )
     component_type: Literal[
         "Base",
         "Semantics",
@@ -307,21 +380,38 @@ class UpdateAccRequest(BaseModel):
         "Noun",
         "Choice",
         "AttributeGroup",
-    ] | None = Field(default=None, description="Updated OAGIS component type.")
+    ] | None = Field(
+        default=None,
+        description=(
+            "OAGIS component type. Use `Base` only when this ACC is meant to be the base ACC "
+            "for other ACCs. Use `Extension` for a developer extension ACC that end-users may extend later in BIEs. "
+            "Use `SemanticGroup` for a grouping ACC whose associations are flattened in BIEs. In most other "
+            "cases, use `Semantics`. Omit to leave unchanged."
+        ),
+    )
     definition: str | None = Field(
         default=None,
-        description="Updated definition text. Use null to clear the definition.",
+        description="Definition text. This is the explanatory text that describes what the ACC means. Omit to leave unchanged. Set `null` to clear it.",
     )
     definition_source: str | None = Field(
         default=None,
-        description="Updated definition source. Use null to clear the definition source.",
+        description=(
+            "Definition source. Use this to record where the definition came from, such as a "
+            "specification, standard, or reference URL. Omit to leave unchanged. Set `null` to clear it."
+        ),
     )
-    is_abstract: bool | None = Field(default=None, description="Updated abstract flag.")
-    deprecated: bool | None = Field(default=None, description="Updated deprecation flag.")
+    is_abstract: bool | None = Field(
+        default=None,
+        description=(
+            "Whether this ACC should be abstract. If `component_type` is `Base`, this is usually `true`, because "
+            "the ACC is meant to serve as a base ACC for other ACCs. Omit to leave unchanged."
+        ),
+    )
+    deprecated: bool | None = Field(default=None, description="Whether this ACC should be deprecated. Omit to leave unchanged.")
     namespace_id: int | None = Field(
         default=None,
         ge=1,
-        description="Updated namespace identifier. Use null to clear the namespace. If provided, it must belong to the same library as the ACC release.",
+        description="Namespace. If provided, it must belong to the same library as the ACC release. Omit to leave unchanged. Set `null` to clear it.",
     )
 
     model_config = ConfigDict(
@@ -341,44 +431,99 @@ class UpdateAccRequest(BaseModel):
     )
 
 
-class UpdateAsccRequest(BaseModel):
+class UpdateAsccRequest(_MoveAccAssociationRequestBase):
     """Request payload for updating mutable ASCC fields."""
 
-    cardinality_min: int | None = Field(default=None, ge=0, description="Updated minimum cardinality.")
+    cardinality_min: int | None = Field(
+        default=None,
+        ge=0,
+        description=(
+            "Minimum cardinality to use. Use `0` or a positive integer. If `cardinality_max` is also provided "
+            "and is not `-1`, `cardinality_min` must be less than or equal to `cardinality_max`. Omit to leave unchanged."
+        ),
+    )
     cardinality_max: int | None = Field(
         default=None,
         ge=-1,
-        description="Updated maximum cardinality. Use `-1` for unbounded.",
+        description=(
+            "Maximum cardinality to use. Use `-1` for unbounded, or `0` or a positive integer for a bounded "
+            "maximum. If it is not `-1`, it must be greater than or equal to `cardinality_min`. Omit to leave unchanged."
+        ),
     )
-    definition: str | None = Field(default=None, description="Updated definition text. Use null to clear the definition.")
+    definition: str | None = Field(
+        default=None,
+        description="Definition text. This is the explanatory text that describes what the ASCCP means. Omit to leave unchanged. Set `null` to clear it.",
+    )
     definition_source: str | None = Field(
         default=None,
-        description="Updated definition source. Use null to clear the definition source.",
+        description=(
+            "Definition source. Use this to record where the definition came from, such as a "
+            "specification, standard, or reference URL. Omit to leave unchanged. Set `null` to clear it."
+        ),
     )
-    deprecated: bool | None = Field(default=None, description="Updated deprecation flag.")
+    deprecated: bool | None = Field(default=None, description="Whether this ASCC should be deprecated. Omit to leave unchanged.")
 
-    model_config = ConfigDict(frozen=True)
+    @model_validator(mode="after")
+    def validate_cardinality_range(self) -> "UpdateAsccRequest":
+        """Ensure the optional ASCC cardinality range is internally consistent."""
+        if (
+            self.cardinality_min is not None
+            and self.cardinality_max is not None
+            and self.cardinality_max != -1
+            and self.cardinality_min > self.cardinality_max
+        ):
+            raise ValueError("`cardinality_min` cannot be greater than `cardinality_max`.")
+        return self
 
-
-class AddAsccToAccRequest(BaseModel):
+class AddAsccToAccRequest(_MoveAccAssociationRequestBase):
     """Optional request payload for setting ASCC fields at create time."""
 
-    cardinality_min: int | None = Field(default=None, ge=0, description="Initial minimum cardinality.")
+    cardinality_min: int | None = Field(
+        default=None,
+        ge=0,
+        description=(
+            "Minimum cardinality to start with. Use `0` or a positive integer. If `cardinality_max` is also "
+            "provided and is not `-1`, `cardinality_min` must be less than or equal to `cardinality_max`."
+        ),
+    )
     cardinality_max: int | None = Field(
         default=None,
         ge=-1,
-        description="Initial maximum cardinality. Use `-1` for unbounded.",
+        description=(
+            "Maximum cardinality to start with. Use `-1` for unbounded, or `0` or a positive integer for a "
+            "bounded maximum. If it is not `-1`, it must be greater than or equal to `cardinality_min`."
+        ),
     )
-    definition: str | None = Field(default=None, description="Initial definition text. Use null to leave it empty.")
+    definition: str | None = Field(
+        default=None,
+        description="Definition text to start with. This is the explanatory text that describes what the BCC means. Set `null` to leave it empty.",
+    )
     definition_source: str | None = Field(
         default=None,
-        description="Initial definition source. Use null to leave it empty.",
+        description=(
+            "Definition source to start with. Use this to record where the definition came from, such as a "
+            "specification, standard, or reference URL. Set `null` to leave it empty."
+        ),
     )
 
-    model_config = ConfigDict(frozen=True)
-
+    @model_validator(mode="after")
+    def validate_cardinality_range(self) -> "AddAsccToAccRequest":
+        """Ensure the optional ASCC cardinality range is internally consistent."""
+        if (
+            self.cardinality_min is not None
+            and self.cardinality_max is not None
+            and self.cardinality_max != -1
+            and self.cardinality_min > self.cardinality_max
+        ):
+            raise ValueError("`cardinality_min` cannot be greater than `cardinality_max`.")
+        return self
 
 BccEntityTypeUpdate = Literal["Element", "Attribute", 1, 0]
+
+
+def _is_attribute_bcc_entity_type(value: BccEntityTypeUpdate | None) -> bool:
+    """Return whether a BCC entity-type input refers to `Attribute`."""
+    return value in {"Attribute", 0}
 
 
 class BccValueConstraintRequest(BaseModel):
@@ -404,57 +549,111 @@ class BccValueConstraintRequest(BaseModel):
     model_config = ConfigDict(frozen=True)
 
 
-class AddBccToAccRequest(BaseModel):
+class AddBccToAccRequest(_MoveAccAssociationRequestBase):
     """Optional request payload for setting BCC fields at create time."""
 
-    cardinality_min: int | None = Field(default=None, ge=0, description="Initial minimum cardinality.")
+    cardinality_min: int | None = Field(
+        default=None,
+        ge=0,
+        description=(
+            "Minimum cardinality to start with. Use `0` or a positive integer. If `cardinality_max` is also "
+            "provided and is not `-1`, `cardinality_min` must be less than or equal to `cardinality_max`."
+        ),
+    )
     cardinality_max: int | None = Field(
         default=None,
         ge=-1,
-        description="Initial maximum cardinality. Use `-1` for unbounded.",
+        description=(
+            "Maximum cardinality to start with. Use `-1` for unbounded, or `0` or a positive integer for a "
+            "bounded maximum. If it is not `-1`, it must be greater than or equal to `cardinality_min`. "
+            "If `entity_type` is `Attribute`, this value must be `0` or `1`; `-1` is not allowed."
+        ),
     )
     entity_type: BccEntityTypeUpdate | None = Field(
         default=None,
-        description="Initial entity type. Use `Element` or `Attribute`. Integer aliases `1` and `0` are also accepted.",
+        description="Entity type to start with. Use `Element` or `Attribute`. Integer aliases `1` and `0` are also accepted.",
     )
-    is_nillable: bool | None = Field(default=None, description="Initial nillable flag.")
-    definition: str | None = Field(default=None, description="Initial definition text. Use null to leave it empty.")
+    is_nillable: bool | None = Field(default=None, description="Whether this BCC should allow nil values when created.")
+    definition: str | None = Field(default=None, description="Definition text to start with. Set `null` to leave it empty.")
     definition_source: str | None = Field(
         default=None,
-        description="Initial definition source. Use null to leave it empty.",
+        description="Definition source to start with. Set `null` to leave it empty.",
     )
     value_constraint: BccValueConstraintRequest | None = Field(
         default=None,
-        description="Initial value constraint. Provide exactly one of default_value or fixed_value.",
+        description="Value constraint to start with. Provide exactly one of `default_value` or `fixed_value`.",
     )
 
-    model_config = ConfigDict(frozen=True)
+    @model_validator(mode="after")
+    def validate_cardinality_range(self) -> "AddBccToAccRequest":
+        """Ensure the optional BCC cardinality range is internally consistent."""
+        if (
+            self.cardinality_min is not None
+            and self.cardinality_max is not None
+            and self.cardinality_max != -1
+            and self.cardinality_min > self.cardinality_max
+        ):
+            raise ValueError("`cardinality_min` cannot be greater than `cardinality_max`.")
+        if _is_attribute_bcc_entity_type(self.entity_type):
+            if self.cardinality_min is not None and self.cardinality_min > 1:
+                raise ValueError("`cardinality_min` cannot be greater than 1 for `Attribute` BCCs.")
+            if self.cardinality_max is not None and (self.cardinality_max == -1 or self.cardinality_max > 1):
+                raise ValueError("`cardinality_max` cannot be greater than 1 for `Attribute` BCCs.")
+        return self
 
-
-class UpdateBccRequest(BaseModel):
+class UpdateBccRequest(_MoveAccAssociationRequestBase):
     """Request payload for updating mutable BCC fields."""
 
     entity_type: BccEntityTypeUpdate | None = Field(
         default=None,
-        description="Updated entity type. Use `Element` or `Attribute`. Integer aliases `1` and `0` are also accepted.",
+        description="Entity type to use. Choose `Element` or `Attribute`. Integer aliases `1` and `0` are also accepted. Omit to leave unchanged.",
     )
-    cardinality_min: int | None = Field(default=None, ge=0, description="Updated minimum cardinality.")
+    cardinality_min: int | None = Field(
+        default=None,
+        ge=0,
+        description=(
+            "Minimum cardinality to use. Use `0` or a positive integer. If `cardinality_max` is also provided "
+            "and is not `-1`, `cardinality_min` must be less than or equal to `cardinality_max`. Omit to leave unchanged."
+        ),
+    )
     cardinality_max: int | None = Field(
         default=None,
         ge=-1,
-        description="Updated maximum cardinality. Use `-1` for unbounded.",
+        description=(
+            "Maximum cardinality to use. Use `-1` for unbounded, or `0` or a positive integer for a bounded "
+            "maximum. If it is not `-1`, it must be greater than or equal to `cardinality_min`. If `entity_type` "
+            "changes from `Element` to `Attribute`, `-1` or a value greater than `1` is normalized to `1`. Omit to leave unchanged."
+        ),
     )
-    definition: str | None = Field(default=None, description="Updated definition text. Use null to clear the definition.")
+    definition: str | None = Field(
+        default=None,
+        description="Definition text. This is the explanatory text that describes what the BCC means. Omit to leave unchanged. Set `null` to clear it.",
+    )
     definition_source: str | None = Field(
         default=None,
-        description="Updated definition source. Use null to clear the definition source.",
+        description=(
+            "Definition source. Use this to record where the definition came from, such as a "
+            "specification, standard, or reference URL. Omit to leave unchanged. Set `null` to clear it."
+        ),
     )
-    deprecated: bool | None = Field(default=None, description="Updated deprecation flag.")
-    is_nillable: bool | None = Field(default=None, description="Updated nillable flag.")
+    deprecated: bool | None = Field(default=None, description="Whether this BCC should be deprecated. Omit to leave unchanged.")
+    is_nillable: bool | None = Field(default=None, description="Whether this BCC should allow nil values. Omit to leave unchanged.")
     value_constraint: BccValueConstraintRequest | None = Field(
         default=None,
-        description="Updated value constraint. Provide one of `default_value` or `fixed_value`. Use null to clear the current value constraint.",
+        description="Value constraint. Provide one of `default_value` or `fixed_value`. Omit to leave unchanged. Set `null` to clear the current value constraint.",
     )
+
+    @model_validator(mode="after")
+    def validate_cardinality_range(self) -> "UpdateBccRequest":
+        """Ensure the optional BCC cardinality range is internally consistent."""
+        if (
+            self.cardinality_min is not None
+            and self.cardinality_max is not None
+            and self.cardinality_max != -1
+            and self.cardinality_min > self.cardinality_max
+        ):
+            raise ValueError("`cardinality_min` cannot be greater than `cardinality_max`.")
+        return self
 
     model_config = ConfigDict(
         frozen=True,
@@ -478,13 +677,35 @@ class UpdateBccRequest(BaseModel):
 class UpdateAsccpRequest(BaseModel):
     """Request payload for updating mutable ASCCP fields."""
 
-    property_term: str | None = Field(default=None, description="Updated property term.")
-    definition: str | None = Field(default=None, description="Updated definition text. Use null to clear the definition.")
-    definition_source: str | None = Field(default=None, description="Updated definition source. Use null to clear the definition source.")
-    reusable_indicator: bool | None = Field(default=None, description="Updated reusable indicator.")
-    deprecated: bool | None = Field(default=None, description="Updated deprecation flag.")
-    is_nillable: bool | None = Field(default=None, description="Updated nillable flag.")
-    namespace_id: int | None = Field(default=None, ge=1, description="Updated namespace identifier. Use null to clear the namespace.")
+    role_of_acc_manifest_id: int | None = Field(
+        default=None,
+        ge=1,
+        description="Role ACC. This identifies the ACC that this ASCCP points to as the associated ACC in the relationship. "
+                    "If the role ACC is in the same library as `release_id`, it must be from that release. If it is in a different library, "
+                    "its release must be one of the target release dependencies. Omit to leave unchanged.",
+    )
+    property_term: str | None = Field(
+        default=None,
+        description=(
+            "Property term. In CCTS, this is a semantically meaningful name for the "
+            "characteristic that expresses the nature of the association to the associated ACC. Omit to leave unchanged."
+        ),
+    )
+    definition: str | None = Field(
+        default=None,
+        description="Definition text. This is the explanatory text that describes what the ASCCP means. Omit to leave unchanged. Set `null` to clear it.",
+    )
+    definition_source: str | None = Field(
+        default=None,
+        description=(
+            "Definition source. Use this to record where the definition came from, such as a "
+            "specification, standard, or reference URL. Omit to leave unchanged. Set `null` to clear it."
+        ),
+    )
+    reusable_indicator: bool | None = Field(default=None, description="Whether this ASCCP should be reusable. Omit to leave unchanged.")
+    deprecated: bool | None = Field(default=None, description="Whether this ASCCP should be deprecated. Omit to leave unchanged.")
+    is_nillable: bool | None = Field(default=None, description="Whether this ASCCP should allow nil values. Omit to leave unchanged.")
+    namespace_id: int | None = Field(default=None, ge=1, description="Namespace. Omit to leave unchanged. Set `null` to clear it.")
 
     model_config = ConfigDict(frozen=True)
 
@@ -492,16 +713,49 @@ class UpdateAsccpRequest(BaseModel):
 class UpdateBccpRequest(BaseModel):
     """Request payload for updating mutable BCCP fields."""
 
-    property_term: str | None = Field(default=None, description="Updated property term.")
-    definition: str | None = Field(default=None, description="Updated definition text. Use null to clear the definition.")
-    definition_source: str | None = Field(default=None, description="Updated definition source. Use null to clear the definition source.")
-    deprecated: bool | None = Field(default=None, description="Updated deprecation flag.")
-    is_nillable: bool | None = Field(default=None, description="Updated nillable flag.")
-    namespace_id: int | None = Field(default=None, ge=1, description="Updated namespace identifier. Use null to clear the namespace.")
-    default_value: str | None = Field(default=None, description="Updated default value. Use null to clear it.")
-    fixed_value: str | None = Field(default=None, description="Updated fixed value. Use null to clear it.")
+    bdt_manifest_id: int | None = Field(default=None, ge=1, description="BDT. Omit to leave unchanged. The selected data type must already be a BDT, which means its base DT link is set. If the BDT is in the same library as the BCCP, it must come from the BCCP release. If it is in a different library, its release must be one of the BCCP release dependencies.")
+    property_term: str | None = Field(
+        default=None,
+        description=(
+            "Property term. In CCTS, this is a semantically meaningful name for a unique "
+            "characteristic that can be used in an ACC object class. Omit to leave unchanged."
+        ),
+    )
+    definition: str | None = Field(
+        default=None,
+        description="Definition text. This is the explanatory text that describes what the BCCP means. Omit to leave unchanged. Set `null` to clear it.",
+    )
+    definition_source: str | None = Field(
+        default=None,
+        description=(
+            "Definition source. Use this to record where the definition came from, such as a "
+            "specification, standard, or reference URL. Omit to leave unchanged. Set `null` to clear it."
+        ),
+    )
+    deprecated: bool | None = Field(default=None, description="Whether this BCCP should be deprecated. Omit to leave unchanged.")
+    is_nillable: bool | None = Field(default=None, description="Whether this BCCP should allow nil values. Omit to leave unchanged.")
+    namespace_id: int | None = Field(default=None, ge=1, description="Namespace. Omit to leave unchanged. Set `null` to clear it.")
+    value_constraint: BccValueConstraintRequest | None = Field(
+        default=None,
+        description="Value constraint. Provide one of `default_value` or `fixed_value`. Omit to leave unchanged. Set `null` to clear the current value constraint.",
+    )
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(
+        frozen=True,
+        json_schema_extra={
+            "example": {
+                "bdt_manifest_id": 18,
+                "property_term": "Amount",
+                "definition": "The amount for this basic core component property.",
+                "definition_source": "https://www.oagis.org",
+                "deprecated": False,
+                "is_nillable": False,
+                "value_constraint": {
+                    "fixed_value": "X",
+                },
+            }
+        },
+    )
 
 
 class UpdateAccStateRequest(BaseModel):
@@ -769,7 +1023,13 @@ class AsccpInfoRecord(BaseModel):
     role_of_acc_manifest_id: int = Field(..., ge=1, description="Role-of ACC manifest identifier.")
     guid: str = Field(..., description="ASCCP GUID.")
     den: str | None = Field(default=None, description="ASCCP DEN.")
-    property_term: str | None = Field(default=None, description="ASCCP property term.")
+    property_term: str | None = Field(
+        default=None,
+        description=(
+            "ASCCP property term. In CCTS, this is the semantically meaningful name for the characteristic that "
+            "represents the nature of the association to the associated ACC."
+        ),
+    )
     definition: str | None = Field(default=None, description="ASCCP definition.")
     definition_source: str | None = Field(default=None, description="ASCCP definition source.")
     is_deprecated: bool = Field(..., description="Whether ASCCP is deprecated.")
@@ -916,7 +1176,13 @@ class GetAsccpByAsccpManifestIdResponse(BaseModel):
     role_of_acc: BaseAccInfoRecord | None = Field(default=None, description="Role-of ACC information.")
     guid: str = Field(..., description="ASCCP GUID.")
     den: str | None = Field(default=None, description="ASCCP DEN.")
-    property_term: str | None = Field(default=None, description="ASCCP property term.")
+    property_term: str | None = Field(
+        default=None,
+        description=(
+            "ASCCP property term. In CCTS, this is the semantically meaningful name for the characteristic that "
+            "represents the nature of the association to the associated ACC."
+        ),
+    )
     definition: str | None = Field(default=None, description="ASCCP definition.")
     definition_source: str | None = Field(default=None, description="ASCCP definition source.")
     reusable_indicator: bool = Field(..., description="Reusable indicator.")

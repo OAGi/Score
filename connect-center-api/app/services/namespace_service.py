@@ -21,6 +21,7 @@ from app.services.models.namespace import (
 from app.services.utils.date import DateRange
 from app.services.utils.pagination import PaginationParams, PaginationResponse
 from app.types.identifiers import LibraryId, NamespaceId
+from app.types.unset import UNSET, UnsetType
 
 logger = logging.getLogger("connectcenter.service.namespace")
 
@@ -161,9 +162,9 @@ class NamespaceService:
         self,
         *,
         namespace_id: NamespaceId,
-        uri: str,
-        prefix: str | None = None,
-        description: str | None = None,
+        uri: str | UnsetType = UNSET,
+        prefix: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
     ) -> UpdateNamespaceServiceResult:
         """Update a namespace owned by the requester."""
         namespace = await self.get(namespace_id)
@@ -171,29 +172,32 @@ class NamespaceService:
             raise LookupError(f"No namespace exists with ID {int(namespace_id)}. Please verify the identifier and try again.")
         self._assert_owner_only(namespace)
 
-        normalized_uri = self._normalize_uri(uri)
-        normalized_prefix = self._normalize_prefix(prefix)
+        normalized_uri = namespace.uri if uri is UNSET else self._normalize_uri(uri)
+        normalized_prefix = (namespace.prefix or "") if prefix is UNSET else self._normalize_prefix(prefix)
+        next_description = namespace.description if description is UNSET else description
         library_id = LibraryId(int(namespace.library.library_id))
 
-        if await self._repo.has_duplicate_uri(
-            library_id=library_id,
-            uri=normalized_uri,
-            exclude_namespace_id=namespace_id,
-        ):
-            raise ValueError(f"Namespace URI '{normalized_uri}' already exists.")
-        if await self._repo.has_duplicate_prefix(
-            library_id=library_id,
-            prefix=normalized_prefix,
-            exclude_namespace_id=namespace_id,
-        ):
-            raise ValueError(f"Namespace Prefix '{normalized_prefix}' already exists.")
+        if uri is not UNSET and namespace.uri != normalized_uri:
+            if await self._repo.has_duplicate_uri(
+                library_id=library_id,
+                uri=normalized_uri,
+                exclude_namespace_id=namespace_id,
+            ):
+                raise ValueError(f"Namespace URI '{normalized_uri}' already exists.")
+        if prefix is not UNSET and (namespace.prefix or "") != normalized_prefix:
+            if await self._repo.has_duplicate_prefix(
+                library_id=library_id,
+                prefix=normalized_prefix,
+                exclude_namespace_id=namespace_id,
+            ):
+                raise ValueError(f"Namespace Prefix '{normalized_prefix}' already exists.")
 
         updates: list[str] = []
-        if namespace.uri != normalized_uri:
+        if uri is not UNSET and namespace.uri != normalized_uri:
             updates.append("uri")
-        if (namespace.prefix or "") != normalized_prefix:
+        if prefix is not UNSET and (namespace.prefix or "") != normalized_prefix:
             updates.append("prefix")
-        if namespace.description != description:
+        if description is not UNSET and namespace.description != next_description:
             updates.append("description")
 
         if not updates:
@@ -203,7 +207,7 @@ class NamespaceService:
             namespace_id=namespace_id,
             uri=normalized_uri,
             prefix=normalized_prefix,
-            description=description,
+            description=next_description,
             requester_user_id=self._requester_user_id,
         )
         if not updated:

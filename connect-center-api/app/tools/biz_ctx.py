@@ -548,7 +548,7 @@ async def create_business_context_value(
 )
 async def update_business_context(
     biz_ctx_id: Annotated[int, Field(gt=0, description="Unique identifier of the business context to update.")],
-    name: Annotated[str | None, Field(default=None, description="New name to assign to the business context.")],
+    name: Annotated[str | None, Field(default=None, description="New name to assign to the business context. Omit to leave unchanged.")],
     biz_ctx_service: BizCtxService = Depends(get_biz_ctx_service),
 ) -> UpdateBizCtxResponse:
     """

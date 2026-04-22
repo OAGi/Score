@@ -14,6 +14,8 @@ published as ISO 15000-5):
 
 from __future__ import annotations
 
+from typing import Literal
+
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Response, status
 
 from app.deps import get_core_component_service
@@ -33,8 +35,6 @@ from app.routes.models.core_component import (
     GetAsccpByAsccpManifestIdResponse,
     GetBccpByBccpManifestIdResponse,
     GetCoreComponentListResponse,
-    MoveAsccRequest,
-    MoveBccRequest,
     UpdateAsccRequest,
     UpdateAsccResponse,
     UpdateAccRequest,
@@ -193,9 +193,11 @@ async def create_acc(
         result = await core_component_service.create_acc(
             release_id=payload.release_id,
             based_acc_manifest_id=payload.based_acc_manifest_id,
-            initial_object_class_term=payload.initial_object_class_term,
-            initial_component_type=payload.initial_component_type,
-            initial_definition=payload.initial_definition,
+            object_class_term=payload.object_class_term,
+            component_type=payload.component_type,
+            definition=payload.definition,
+            definition_source=payload.definition_source,
+            is_abstract=payload.is_abstract,
             namespace_id=payload.namespace_id,
             tag_id=payload.tag_id,
         )
@@ -226,7 +228,7 @@ async def create_acc(
     "/acc/{acc_manifest_id}/ascc/{asccp_manifest_id}",
     status_code=status.HTTP_201_CREATED,
     summary="Add ASCC to ACC",
-    description="Add an ASCC (Association Core Component) to an ACC sequence. If the ASCCP is already present, use `Reorder ASCC in ACC` instead.",
+    description="Add an ASCC (Association Core Component) to an ACC sequence. If the ASCCP is already present, use `Update ASCC` with a sequence selector instead.",
     response_model=AddAsccToAccResponse,
 )
 async def add_ascc_to_acc(
@@ -240,14 +242,9 @@ async def add_ascc_to_acc(
             "one of the ACC release dependencies."
         ),
     ),
-    *,
-    index: int = Query(
-        default=-1,
-        description="Zero-based insertion index. Defaults to -1, which places the ASCC at the end of the ACC sequence.",
-    ),
     payload: AddAsccToAccRequest | None = Body(
         default=None,
-        description="Optional relationship fields to set as part of the initial add operation.",
+        description="Optional placement and relationship fields to set as part of the initial add operation.",
     ),
     core_component_service: CoreComponentService = Depends(get_core_component_service),
 ) -> AddAsccToAccResponse:
@@ -256,7 +253,11 @@ async def add_ascc_to_acc(
         result = await core_component_service.add_ascc_to_acc(
             acc_manifest_id=acc_manifest_id,
             asccp_manifest_id=asccp_manifest_id,
-            index=index,
+            index=None if payload is None else payload.index,
+            after_ascc_manifest_id=None if payload is None else payload.after_ascc_manifest_id,
+            after_bcc_manifest_id=None if payload is None else payload.after_bcc_manifest_id,
+            before_ascc_manifest_id=None if payload is None else payload.before_ascc_manifest_id,
+            before_bcc_manifest_id=None if payload is None else payload.before_bcc_manifest_id,
             cardinality_min=None if payload is None else payload.cardinality_min,
             cardinality_max=None if payload is None else payload.cardinality_max,
             definition=None if payload is None else payload.definition,
@@ -289,7 +290,7 @@ async def add_ascc_to_acc(
     "/acc/{acc_manifest_id}/bcc/{bccp_manifest_id}",
     status_code=status.HTTP_201_CREATED,
     summary="Add BCC to ACC",
-    description="Add a BCC (Basic Core Component) to an ACC sequence. If the BCCP is already present, use `Reorder BCC in ACC` instead.",
+    description="Add a BCC (Basic Core Component) to an ACC sequence. If the BCCP is already present, use `Update BCC` with a sequence selector instead.",
     response_model=AddBccToAccResponse,
 )
 async def add_bcc_to_acc(
@@ -303,14 +304,9 @@ async def add_bcc_to_acc(
             "the ACC release dependencies."
         ),
     ),
-    *,
-    index: int = Query(
-        default=-1,
-        description="Zero-based insertion index. Defaults to -1, which places the BCC at the end of the ACC sequence.",
-    ),
     payload: AddBccToAccRequest | None = Body(
         default=None,
-        description="Optional relationship fields to set as part of the initial add operation.",
+        description="Optional placement and relationship fields to set as part of the initial add operation.",
     ),
     core_component_service: CoreComponentService = Depends(get_core_component_service),
 ) -> AddBccToAccResponse:
@@ -319,7 +315,11 @@ async def add_bcc_to_acc(
         result = await core_component_service.add_bcc_to_acc(
             acc_manifest_id=acc_manifest_id,
             bccp_manifest_id=bccp_manifest_id,
-            index=index,
+            index=None if payload is None else payload.index,
+            after_ascc_manifest_id=None if payload is None else payload.after_ascc_manifest_id,
+            after_bcc_manifest_id=None if payload is None else payload.after_bcc_manifest_id,
+            before_ascc_manifest_id=None if payload is None else payload.before_ascc_manifest_id,
+            before_bcc_manifest_id=None if payload is None else payload.before_bcc_manifest_id,
             cardinality_min=None if payload is None else payload.cardinality_min,
             cardinality_max=None if payload is None else payload.cardinality_max,
             entity_type=None if payload is None or payload.entity_type is None else _map_bcc_entity_type_update(payload.entity_type),
@@ -349,94 +349,6 @@ async def add_bcc_to_acc(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={"message": "We couldn't add the BCC to the ACC.", "cause": str(e)},
-        )
-
-
-@router.post(
-    "/ascc/{ascc_manifest_id}/move",
-    status_code=status.HTTP_204_NO_CONTENT,
-    summary="Reorder ASCC in ACC",
-    description="Reorder an existing ASCC (Association Core Component) within an ACC sequence. Exactly one positioning option may be provided: `index`, `after_ascc_manifest_id`, `after_bcc_manifest_id`, `before_ascc_manifest_id`, or `before_bcc_manifest_id`.",
-)
-async def reorder_ascc_in_acc(
-    payload: MoveAsccRequest = Body(...),
-    ascc_manifest_id: AsccManifestId = Path(..., ge=1, description="ASCC manifest ID to reorder."),
-    core_component_service: CoreComponentService = Depends(get_core_component_service),
-) -> Response:
-    """Reorder an existing ASCC relationship."""
-    try:
-        await core_component_service.reorder_ascc_in_acc(
-            ascc_manifest_id=ascc_manifest_id,
-            index=payload.index,
-            after_ascc_manifest_id=payload.after_ascc_manifest_id,
-            after_bcc_manifest_id=payload.after_bcc_manifest_id,
-            before_ascc_manifest_id=payload.before_ascc_manifest_id,
-            before_bcc_manifest_id=payload.before_bcc_manifest_id,
-        )
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
-    except LookupError as e:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail={"message": "A referenced resource was not found.", "cause": str(e)},
-        )
-    except PermissionError as e:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail={"message": "You do not have permission to modify this ACC.", "cause": str(e)},
-        )
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"message": "The request is invalid. Check the body and try again.", "cause": str(e)},
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"message": "We couldn't reorder the ASCC.", "cause": str(e)},
-        )
-
-
-@router.post(
-    "/bcc/{bcc_manifest_id}/move",
-    status_code=status.HTTP_204_NO_CONTENT,
-    summary="Reorder BCC in ACC",
-    description="Reorder an existing BCC (Basic Core Component) within an ACC sequence. Exactly one positioning option may be provided: `index`, `after_ascc_manifest_id`, `after_bcc_manifest_id`, `before_ascc_manifest_id`, or `before_bcc_manifest_id`.",
-)
-async def reorder_bcc_in_acc(
-    payload: MoveBccRequest = Body(...),
-    bcc_manifest_id: BccManifestId = Path(..., ge=1, description="BCC manifest ID to reorder."),
-    core_component_service: CoreComponentService = Depends(get_core_component_service),
-) -> Response:
-    """Reorder an existing BCC relationship."""
-    try:
-        await core_component_service.reorder_bcc_in_acc(
-            bcc_manifest_id=bcc_manifest_id,
-            index=payload.index,
-            after_ascc_manifest_id=payload.after_ascc_manifest_id,
-            after_bcc_manifest_id=payload.after_bcc_manifest_id,
-            before_ascc_manifest_id=payload.before_ascc_manifest_id,
-            before_bcc_manifest_id=payload.before_bcc_manifest_id,
-        )
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
-    except LookupError as e:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail={"message": "A referenced resource was not found.", "cause": str(e)},
-        )
-    except PermissionError as e:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail={"message": "You do not have permission to modify this ACC.", "cause": str(e)},
-        )
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"message": "The request is invalid. Check the body and try again.", "cause": str(e)},
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"message": "We couldn't reorder the BCC.", "cause": str(e)},
         )
 
 
@@ -533,6 +445,11 @@ async def update_ascc(
             definition=updates_payload.get("definition", UNSET),
             definition_source=updates_payload.get("definition_source", UNSET),
             deprecated=updates_payload.get("deprecated", UNSET),
+            index=updates_payload.get("index", UNSET),
+            after_ascc_manifest_id=updates_payload.get("after_ascc_manifest_id", UNSET),
+            after_bcc_manifest_id=updates_payload.get("after_bcc_manifest_id", UNSET),
+            before_ascc_manifest_id=updates_payload.get("before_ascc_manifest_id", UNSET),
+            before_bcc_manifest_id=updates_payload.get("before_bcc_manifest_id", UNSET),
         )
         return UpdateAsccResponse.model_validate(result, from_attributes=True)
     except LookupError as e:
@@ -584,6 +501,11 @@ async def update_bcc(
             definition_source=updates_payload.get("definition_source", UNSET),
             deprecated=updates_payload.get("deprecated", UNSET),
             is_nillable=updates_payload.get("is_nillable", UNSET),
+            index=updates_payload.get("index", UNSET),
+            after_ascc_manifest_id=updates_payload.get("after_ascc_manifest_id", UNSET),
+            after_bcc_manifest_id=updates_payload.get("after_bcc_manifest_id", UNSET),
+            before_ascc_manifest_id=updates_payload.get("before_ascc_manifest_id", UNSET),
+            before_bcc_manifest_id=updates_payload.get("before_bcc_manifest_id", UNSET),
             default_value=(
                 None
                 if "value_constraint" in payload.model_fields_set and payload.value_constraint is None
@@ -824,8 +746,10 @@ async def remove_acc_tags(
     summary="Change ACC state",
     description=(
         "Change the lifecycle state of an ACC (Aggregate Core Component). "
-        "For `Working` releases, the allowed path is `Deleted <-> WIP <-> Draft <-> Candidate`. "
-        "For non-`Working` releases, the allowed path is `Deleted <-> WIP <-> QA <-> Production`."
+        "For `Working` releases, the allowed moves are `Deleted -> WIP`, `WIP -> Deleted|Draft`, "
+        "`Draft -> WIP|Candidate`, and `Candidate -> WIP`. "
+        "For non-`Working` releases, the allowed moves are `Deleted -> WIP`, `WIP -> Deleted|QA`, "
+        "`QA -> WIP|Production`, and `Production` is terminal."
     ),
 )
 async def change_acc_state(
@@ -862,22 +786,19 @@ async def change_acc_state(
         )
 
 
-@router.post(
-    "/acc/{acc_manifest_id}/revise",
-    status_code=status.HTTP_204_NO_CONTENT,
-    summary="Revise ACC",
-    description=(
-        "Create a new editable ACC revision from a stable ACC. "
-        "Developer-side ACCs can be revised only from `Published`, and end-user ACCs only from `Production`."
-    ),
-)
-async def revise_acc(
-    acc_manifest_id: AccManifestId = Path(..., ge=1, description="ACC (Aggregate Core Component) manifest ID."),
-    core_component_service: CoreComponentService = Depends(get_core_component_service),
+async def _revise_or_amend_acc(
+    *,
+    acc_manifest_id: AccManifestId,
+    requested_action: Literal["revise", "amend"],
+    core_component_service: CoreComponentService,
 ) -> Response:
-    """Create a revised ACC working copy."""
+    """Create a revised or amended ACC working copy."""
+    action_phrase = requested_action if requested_action in {"revise", "amend"} else "revise or amend"
     try:
-        await core_component_service.revise_acc(acc_manifest_id=acc_manifest_id)
+        await core_component_service.revise_acc(
+            acc_manifest_id=acc_manifest_id,
+            requested_action=requested_action,
+        )
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except LookupError as e:
         raise HTTPException(
@@ -887,7 +808,7 @@ async def revise_acc(
     except PermissionError as e:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"message": "You do not have permission to revise this ACC.", "cause": str(e)},
+            detail={"message": f"You do not have permission to {action_phrase} this ACC.", "cause": str(e)},
         )
     except ValueError as e:
         raise HTTPException(
@@ -897,8 +818,67 @@ async def revise_acc(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"message": "We couldn't revise the ACC.", "cause": str(e)},
+            detail={"message": f"We couldn't {action_phrase} the ACC.", "cause": str(e)},
         )
+
+
+@router.post(
+    "/acc/{acc_manifest_id}/revise",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Revise/Amend ACC",
+    description=(
+        "Create a new editable ACC revision from a stable ACC. "
+        "Use `/revise` for developer-side ACCs in `Working` releases when the stable ACC is in `Published`. "
+        "End-user ACCs should use `/amend` instead."
+    ),
+)
+async def revise_acc(
+    acc_manifest_id: AccManifestId = Path(..., ge=1, description="ACC (Aggregate Core Component) manifest ID."),
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> Response:
+    """Create a revised ACC working copy for developer-side ACCs."""
+    return await _revise_or_amend_acc(
+        acc_manifest_id=acc_manifest_id,
+        requested_action="revise",
+        core_component_service=core_component_service,
+    )
+
+
+@router.post(
+    "/acc/{acc_manifest_id}/amend",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Revise/Amend ACC",
+    description=(
+        "Create a new editable ACC revision from a stable ACC. "
+        "Use `/amend` for end-user ACCs in non-`Working` releases when the stable ACC is in `Production`. "
+        "Developer-side ACCs should use `/revise` instead."
+    ),
+    openapi_extra={"x-alternative-endpoint-for": "/core-components/acc/{acc_manifest_id}/revise"},
+)
+async def amend_acc(
+    acc_manifest_id: AccManifestId = Path(..., ge=1, description="ACC (Aggregate Core Component) manifest ID."),
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> Response:
+    """Create an amended ACC working copy for end-user ACCs."""
+    return await _revise_or_amend_acc(
+        acc_manifest_id=acc_manifest_id,
+        requested_action="amend",
+        core_component_service=core_component_service,
+    )
+
+
+async def _revise_or_amend_asccp(
+    *,
+    asccp_manifest_id: AsccpManifestId,
+    requested_action: Literal["revise", "amend"],
+    core_component_service: CoreComponentService,
+) -> Response:
+    """Create a revised or amended ASCCP working copy."""
+    await core_component_service.revise_asccp(
+        asccp_manifest_id=asccp_manifest_id,
+        requested_action=requested_action,
+    )
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.post(
@@ -1027,15 +1007,17 @@ async def update_asccp(
     core_component_service: CoreComponentService = Depends(get_core_component_service),
 ) -> UpdateAsccpResponse:
     """Update mutable ASCCP fields and return the changed field names."""
+    updates_payload = payload.model_dump(exclude_unset=True)
     result = await core_component_service.update_asccp(
         asccp_manifest_id=asccp_manifest_id,
-        property_term=payload.model_dump(exclude_unset=True).get("property_term", UNSET),
-        definition=payload.model_dump(exclude_unset=True).get("definition", UNSET),
-        definition_source=payload.model_dump(exclude_unset=True).get("definition_source", UNSET),
-        reusable_indicator=payload.model_dump(exclude_unset=True).get("reusable_indicator", UNSET),
-        deprecated=payload.model_dump(exclude_unset=True).get("deprecated", UNSET),
-        is_nillable=payload.model_dump(exclude_unset=True).get("is_nillable", UNSET),
-        namespace_id=payload.model_dump(exclude_unset=True).get("namespace_id", UNSET),
+        role_of_acc_manifest_id=updates_payload.get("role_of_acc_manifest_id", UNSET),
+        property_term=updates_payload.get("property_term", UNSET),
+        definition=updates_payload.get("definition", UNSET),
+        definition_source=updates_payload.get("definition_source", UNSET),
+        reusable_indicator=updates_payload.get("reusable_indicator", UNSET),
+        deprecated=updates_payload.get("deprecated", UNSET),
+        is_nillable=updates_payload.get("is_nillable", UNSET),
+        namespace_id=updates_payload.get("namespace_id", UNSET),
     )
     return UpdateAsccpResponse.model_validate(result, from_attributes=True)
 
@@ -1084,7 +1066,13 @@ async def transfer_asccp_ownership(
     "/asccp/{asccp_manifest_id}/state",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Change ASCCP state",
-    description="Change the lifecycle state of an ASCCP (Association Core Component Property).",
+    description=(
+        "Change the lifecycle state of an ASCCP (Association Core Component Property). "
+        "For `Working` releases, the allowed moves are `Deleted -> WIP`, `WIP -> Deleted|Draft`, "
+        "`Draft -> WIP|Candidate`, and `Candidate -> WIP`. "
+        "For non-`Working` releases, the allowed moves are `Deleted -> WIP`, `WIP -> Deleted|QA`, "
+        "`QA -> WIP|Production`, and `Production` is terminal."
+    ),
 )
 async def change_asccp_state(
     payload: UpdateAsccpStateRequest = Body(...),
@@ -1093,33 +1081,6 @@ async def change_asccp_state(
 ) -> Response:
     """Change ASCCP lifecycle state."""
     await core_component_service.change_asccp_state(asccp_manifest_id=asccp_manifest_id, state=payload.state)
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-
-@router.post(
-    "/asccp/{asccp_manifest_id}/acc",
-    status_code=status.HTTP_204_NO_CONTENT,
-    summary="Change role ACC of ASCCP",
-    description="Change the role ACC (Aggregate Core Component) of an ASCCP.",
-)
-async def change_asccp_role_of_acc(
-    asccp_manifest_id: AsccpManifestId = Path(..., ge=1, description="ASCCP manifest ID."),
-    acc_manifest_id: AccManifestId = Query(
-        ...,
-        ge=1,
-        description=(
-            "Role ACC manifest identifier. If the ACC is in the same library as the ASCCP, it must be from the "
-            "ASCCP release. If it is in a different library, its release must be one of the ASCCP release "
-            "dependencies."
-        ),
-    ),
-    core_component_service: CoreComponentService = Depends(get_core_component_service),
-) -> Response:
-    """Change the role ACC of an ASCCP."""
-    await core_component_service.change_asccp_role_of_acc(
-        asccp_manifest_id=asccp_manifest_id,
-        role_of_acc_manifest_id=acc_manifest_id,
-    )
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
@@ -1170,15 +1131,59 @@ async def remove_asccp_tags(
 @router.post(
     "/asccp/{asccp_manifest_id}/revise",
     status_code=status.HTTP_204_NO_CONTENT,
-    summary="Revise ASCCP",
-    description="Create a new editable ASCCP revision from a stable ASCCP.",
+    summary="Revise/Amend ASCCP",
+    description=(
+        "Create a new editable ASCCP revision from a stable ASCCP. "
+        "Use `/revise` for developer-side ASCCPs in `Working` releases when the stable ASCCP is in `Published`. "
+        "End-user ASCCPs should use `/amend` instead."
+    ),
 )
 async def revise_asccp(
     asccp_manifest_id: AsccpManifestId = Path(..., ge=1, description="ASCCP manifest ID."),
     core_component_service: CoreComponentService = Depends(get_core_component_service),
 ) -> Response:
-    """Create a revised ASCCP working copy."""
-    await core_component_service.revise_asccp(asccp_manifest_id=asccp_manifest_id)
+    """Create a revised ASCCP working copy for developer-side ASCCPs."""
+    return await _revise_or_amend_asccp(
+        asccp_manifest_id=asccp_manifest_id,
+        requested_action="revise",
+        core_component_service=core_component_service,
+    )
+
+
+@router.post(
+    "/asccp/{asccp_manifest_id}/amend",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Revise/Amend ASCCP",
+    description=(
+        "Create a new editable ASCCP revision from a stable ASCCP. "
+        "Use `/amend` for end-user ASCCPs in non-`Working` releases when the stable ASCCP is in `Production`. "
+        "Developer-side ASCCPs should use `/revise` instead."
+    ),
+    openapi_extra={"x-alternative-endpoint-for": "/core-components/asccp/{asccp_manifest_id}/revise"},
+)
+async def amend_asccp(
+    asccp_manifest_id: AsccpManifestId = Path(..., ge=1, description="ASCCP manifest ID."),
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> Response:
+    """Create an amended ASCCP working copy for end-user ASCCPs."""
+    return await _revise_or_amend_asccp(
+        asccp_manifest_id=asccp_manifest_id,
+        requested_action="amend",
+        core_component_service=core_component_service,
+    )
+
+
+async def _revise_or_amend_bccp(
+    *,
+    bccp_manifest_id: BccpManifestId,
+    requested_action: Literal["revise", "amend"],
+    core_component_service: CoreComponentService,
+) -> Response:
+    """Create a revised or amended BCCP working copy."""
+    await core_component_service.revise_bccp(
+        bccp_manifest_id=bccp_manifest_id,
+        requested_action=requested_action,
+    )
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
@@ -1224,7 +1229,19 @@ async def create_bccp(
     core_component_service: CoreComponentService = Depends(get_core_component_service),
 ) -> CreateBccpResponse:
     """Create a BCCP and return its manifest ID."""
-    result = await core_component_service.create_bccp(**payload.model_dump())
+    result = await core_component_service.create_bccp(
+        release_id=payload.release_id,
+        bdt_manifest_id=payload.bdt_manifest_id,
+        property_term=payload.property_term,
+        definition=payload.definition,
+        definition_source=payload.definition_source,
+        deprecated=payload.deprecated,
+        is_nillable=payload.is_nillable,
+        namespace_id=payload.namespace_id,
+        default_value=None if payload.value_constraint is None else payload.value_constraint.default_value,
+        fixed_value=None if payload.value_constraint is None else payload.value_constraint.fixed_value,
+        tag_id=payload.tag_id,
+    )
     return CreateBccpResponse.model_validate(result, from_attributes=True)
 
 
@@ -1243,14 +1260,31 @@ async def update_bccp(
     updates_payload = payload.model_dump(exclude_unset=True)
     result = await core_component_service.update_bccp(
         bccp_manifest_id=bccp_manifest_id,
+        bdt_manifest_id=updates_payload.get("bdt_manifest_id", UNSET),
         property_term=updates_payload.get("property_term", UNSET),
         definition=updates_payload.get("definition", UNSET),
         definition_source=updates_payload.get("definition_source", UNSET),
         deprecated=updates_payload.get("deprecated", UNSET),
         is_nillable=updates_payload.get("is_nillable", UNSET),
         namespace_id=updates_payload.get("namespace_id", UNSET),
-        default_value=updates_payload.get("default_value", UNSET),
-        fixed_value=updates_payload.get("fixed_value", UNSET),
+        default_value=(
+            None
+            if "value_constraint" in payload.model_fields_set and payload.value_constraint is None
+            else (
+                payload.value_constraint.default_value
+                if "value_constraint" in payload.model_fields_set and payload.value_constraint is not None
+                else UNSET
+            )
+        ),
+        fixed_value=(
+            None
+            if "value_constraint" in payload.model_fields_set and payload.value_constraint is None
+            else (
+                payload.value_constraint.fixed_value
+                if "value_constraint" in payload.model_fields_set and payload.value_constraint is not None
+                else UNSET
+            )
+        ),
     )
     return UpdateBccpResponse.model_validate(result, from_attributes=True)
 
@@ -1299,7 +1333,13 @@ async def transfer_bccp_ownership(
     "/bccp/{bccp_manifest_id}/state",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Change BCCP state",
-    description="Change the lifecycle state of a BCCP (Basic Core Component Property).",
+    description=(
+        "Change the lifecycle state of a BCCP (Basic Core Component Property). "
+        "For `Working` releases, the allowed moves are `Deleted -> WIP`, `WIP -> Deleted|Draft`, "
+        "`Draft -> WIP|Candidate`, and `Candidate -> WIP`. "
+        "For non-`Working` releases, the allowed moves are `Deleted -> WIP`, `WIP -> Deleted|QA`, "
+        "`QA -> WIP|Production`, and `Production` is terminal."
+    ),
 )
 async def change_bccp_state(
     payload: UpdateBccpStateRequest = Body(...),
@@ -1308,34 +1348,6 @@ async def change_bccp_state(
 ) -> Response:
     """Change BCCP lifecycle state."""
     await core_component_service.change_bccp_state(bccp_manifest_id=bccp_manifest_id, state=payload.state)
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-
-@router.post(
-    "/bccp/{bccp_manifest_id}/bdt",
-    status_code=status.HTTP_204_NO_CONTENT,
-    summary="Change BDT of BCCP",
-    description="Change the BDT (Business Data Type) of a BCCP.",
-)
-async def change_bccp_bdt(
-    bccp_manifest_id: BccpManifestId = Path(..., ge=1, description="BCCP manifest ID."),
-    dt_manifest_id: DataTypeManifestId = Query(
-        ...,
-        ge=1,
-        description=(
-            "Target BDT manifest identifier. The selected data type must already be a BDT, "
-            "which means its base DT link is set. If the BDT is in the same library as the BCCP, it must be from "
-            "the BCCP release. If it is in a different library, its release must be one of the BCCP release "
-            "dependencies."
-        ),
-    ),
-    core_component_service: CoreComponentService = Depends(get_core_component_service),
-) -> Response:
-    """Change the BDT of a BCCP."""
-    await core_component_service.change_bccp_bdt(
-        bccp_manifest_id=bccp_manifest_id,
-        bdt_manifest_id=dt_manifest_id,
-    )
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
@@ -1386,16 +1398,46 @@ async def remove_bccp_tags(
 @router.post(
     "/bccp/{bccp_manifest_id}/revise",
     status_code=status.HTTP_204_NO_CONTENT,
-    summary="Revise BCCP",
-    description="Create a new editable BCCP revision from a stable BCCP.",
+    summary="Revise/Amend BCCP",
+    description=(
+        "Create a new editable BCCP revision from a stable BCCP. "
+        "Use `/revise` for developer-side BCCPs in `Working` releases when the stable BCCP is in `Published`. "
+        "End-user BCCPs should use `/amend` instead."
+    ),
 )
 async def revise_bccp(
     bccp_manifest_id: BccpManifestId = Path(..., ge=1, description="BCCP manifest ID."),
     core_component_service: CoreComponentService = Depends(get_core_component_service),
 ) -> Response:
-    """Create a revised BCCP working copy."""
-    await core_component_service.revise_bccp(bccp_manifest_id=bccp_manifest_id)
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    """Create a revised BCCP working copy for developer-side BCCPs."""
+    return await _revise_or_amend_bccp(
+        bccp_manifest_id=bccp_manifest_id,
+        requested_action="revise",
+        core_component_service=core_component_service,
+    )
+
+
+@router.post(
+    "/bccp/{bccp_manifest_id}/amend",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Revise/Amend BCCP",
+    description=(
+        "Create a new editable BCCP revision from a stable BCCP. "
+        "Use `/amend` for end-user BCCPs in non-`Working` releases when the stable BCCP is in `Production`. "
+        "Developer-side BCCPs should use `/revise` instead."
+    ),
+    openapi_extra={"x-alternative-endpoint-for": "/core-components/bccp/{bccp_manifest_id}/revise"},
+)
+async def amend_bccp(
+    bccp_manifest_id: BccpManifestId = Path(..., ge=1, description="BCCP manifest ID."),
+    core_component_service: CoreComponentService = Depends(get_core_component_service),
+) -> Response:
+    """Create an amended BCCP working copy for end-user BCCPs."""
+    return await _revise_or_amend_bccp(
+        bccp_manifest_id=bccp_manifest_id,
+        requested_action="amend",
+        core_component_service=core_component_service,
+    )
 
 
 @router.post(

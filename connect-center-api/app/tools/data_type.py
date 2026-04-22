@@ -935,7 +935,10 @@ async def create_dt(
         str | None,
         Field(
             default=None,
-            description="Initial qualifier override. Omit to keep the base DT value. Pass an empty string to clear it.",
+            description=(
+                "Qualifier to start with. In CCTS, a BDT qualifier term is a word or words that help define and "
+                "differentiate a qualified BDT from its higher-level BDT. Omit to use the value derived from the base DT."
+            ),
         ),
     ],
     six_digit_id: Annotated[
@@ -945,7 +948,7 @@ async def create_dt(
             description=(
                 "Initial six-character suffix for the BDT Type name from the UN/CEFACT XML Schema NDR. "
                 "It must be unique within the namespace and use only letters and digits. "
-                "Omit to keep the base DT value. Pass an empty string to clear it."
+                "Omit to start without a six-character suffix."
             ),
         ),
     ],
@@ -958,7 +961,11 @@ async def create_dt(
         Field(
             default=None,
             ge=0,
-            description="Initial namespace identifier. Omit to keep the base DT value. Use 0 to clear the namespace.",
+            description=(
+                "Namespace to use when creating this DT. In the original score-http create logic, omitting this "
+                "uses the base DT namespace only when it is compatible with the requester's role. Use 0 to clear "
+                "the namespace in this API."
+            ),
         ),
     ],
     content_component_definition: Annotated[
@@ -966,8 +973,7 @@ async def create_dt(
         Field(
             default=None,
             description=(
-                "Initial content component definition. Omit to keep the base DT value. "
-                "Pass an empty string to clear it."
+                "Content component definition to start with. Omit to use the value derived from the base DT."
             ),
         ),
     ],
@@ -975,14 +981,20 @@ async def create_dt(
         str | None,
         Field(
             default=None,
-            description="Initial definition text. Omit to keep the base DT value. Pass an empty string to clear it.",
+            description=(
+                "Definition text to start with. This is the explanatory text that describes what the DT means. "
+                "Omit to use the value derived from the base DT."
+            ),
         ),
     ],
     definition_source: Annotated[
         str | None,
         Field(
             default=None,
-            description="Initial definition source. Omit to keep the base DT value. Pass an empty string to clear it.",
+            description=(
+                "Definition source to start with. Use this to record where the definition came from, such as a "
+                "specification, standard, or reference URL. Omit to use the value derived from the base DT."
+            ),
         ),
     ],
     tag_id: Annotated[
@@ -1002,6 +1014,27 @@ async def create_dt(
             ),
         ),
     ],
+    add_primitives: Annotated[
+        list[PrimitiveMutationInput] | None,
+        Field(
+            default=None,
+            description=(
+                "Primitive rows to add during creation. Each row uses the form {cdt_pri_name, xbt_manifest_id, "
+                "code_list_manifest_id, agency_id_list_manifest_id}. Use default_primitive to choose which remaining "
+                "primitive is the default."
+            ),
+        ),
+    ] = None,
+    remove_primitives: Annotated[
+        list[PrimitiveMutationInput] | None,
+        Field(
+            default=None,
+            description=(
+                "Primitive rows to remove during creation. Each row uses the form {cdt_pri_name, xbt_manifest_id, "
+                "code_list_manifest_id, agency_id_list_manifest_id}."
+            ),
+        ),
+    ] = None,
     data_type_service: DataTypeService = Depends(get_data_type_service),
 ) -> CreateDataTypeResponse:
     """
@@ -1031,6 +1064,16 @@ async def create_dt(
             code_list_manifest_id=UNSET if default_primitive is None else default_primitive.code_list_manifest_id,
             agency_id_list_manifest_id=(
                 UNSET if default_primitive is None else default_primitive.agency_id_list_manifest_id
+            ),
+            add_primitives=(
+                [DataTypePrimitiveServiceRecord(**primitive.model_dump(), is_default=False) for primitive in add_primitives]
+                if add_primitives is not None
+                else UNSET
+            ),
+            remove_primitives=(
+                [DataTypePrimitiveServiceRecord(**primitive.model_dump(), is_default=False) for primitive in remove_primitives]
+                if remove_primitives is not None
+                else UNSET
             ),
         )
         return CreateDataTypeResponse.model_validate(result, from_attributes=True)
@@ -1072,7 +1115,13 @@ async def update_dt(
     ],
     qualifier: Annotated[
         str | None,
-        Field(default=None, description="Updated qualifier. Omit to leave unchanged. Pass an empty string to clear it."),
+        Field(
+            default=None,
+            description=(
+                "Qualifier. In CCTS, a BDT qualifier term is a word or words that help define and differentiate a "
+                "qualified BDT from its higher-level BDT. Omit to leave unchanged. Pass an empty string to clear it."
+            ),
+        ),
     ],
     six_digit_id: Annotated[
         str | None,
@@ -1103,11 +1152,11 @@ async def update_dt(
     ],
     definition: Annotated[
         str | None,
-        Field(default=None, description="Updated definition text. Omit to leave unchanged. Pass an empty string to clear it."),
+        Field(default=None, description="Definition text. Omit to leave unchanged. Pass an empty string to clear it."),
     ],
     definition_source: Annotated[
         str | None,
-        Field(default=None, description="Updated definition source. Omit to leave unchanged. Pass an empty string to clear it."),
+        Field(default=None, description="Definition source. Omit to leave unchanged. Pass an empty string to clear it."),
     ],
     default_primitive: Annotated[
         DefaultPrimitiveSelectionInput | None,
@@ -1254,7 +1303,7 @@ async def transfer_dt_ownership(
 
 @mcp.tool(
     name="create_dt_sc",
-    description="Create a new DT supplementary component under a DT.",
+    description="Create a new DT supplementary component under a DT and optionally apply the same mutable fields available in update_dt_sc.",
     output_schema={
         "type": "object",
         "description": "Response containing the created DT_SC manifest identifier.",
@@ -1266,11 +1315,131 @@ async def transfer_dt_ownership(
 )
 async def create_dt_sc(
     dt_manifest_id: Annotated[int, Field(gt=0, description="Owning DT manifest identifier.")],
+    property_term: Annotated[
+        str,
+        Field(
+            ...,
+            min_length=1,
+            description=(
+                "Property term to start with. In CCTS, a BDT supplementary component property term is a "
+                "semantically meaningful name for a unique characteristic that can be used in a BDT."
+            ),
+        ),
+    ],
+    representation_term: Annotated[
+        str,
+        Field(
+            ...,
+            min_length=1,
+            description=(
+                "Representation term to start with. In CCTS, this is a semantically meaningful name that "
+                "represents the value domain of the supplementary component. Choose an approved CDT data type "
+                "term such as `Amount`, `Code`, or `Text`. When this changes, the DT_SC primitive rows are reset "
+                "to the default primitive set for that term."
+            ),
+        ),
+    ],
+    cardinality: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description=(
+                "Cardinality to start with. Use `Prohibited` for `0..0`, `Optional` for `0..1`, or `Required` "
+                "for `1..1`. Omit to keep the generated initial cardinality."
+            ),
+        ),
+    ] = None,
+    deprecated: Annotated[
+        bool | None,
+        Field(default=None, description="Whether this supplementary component should start as deprecated. Omit to keep the generated initial value."),
+    ] = None,
+    definition: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description=(
+                "Definition text to start with. This is the explanatory text that describes what the "
+                "supplementary component means. Omit to keep the generated initial value. Pass an empty string to clear it."
+            ),
+        ),
+    ] = None,
+    definition_source: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description=(
+                "Definition source to start with. Use this to record where the definition came from, such as a "
+                "specification, standard, or reference URL. Omit to keep the generated initial value. Pass an empty string to clear it."
+            ),
+        ),
+    ] = None,
+    value_constraint: Annotated[
+        ValueConstraintInput | None,
+        Field(
+            default=None,
+            description=(
+                "Value constraint to start with. Provide default_value to set a default when the element is "
+                "omitted, or fixed_value to require one exact value. Omit to keep the generated initial value."
+            ),
+        ),
+    ] = None,
+    default_primitive: Annotated[
+        DefaultPrimitiveSelectionInput | None,
+        Field(
+            default=None,
+            description=(
+                "Default primitive to start with. Provide exactly one of xbt_manifest_id, code_list_manifest_id, "
+                "or agency_id_list_manifest_id. Omit to keep the generated initial value."
+            ),
+        ),
+    ] = None,
+    add_primitives: Annotated[
+        list[PrimitiveMutationInput] | None,
+        Field(
+            default=None,
+            description=(
+                "Primitive rows to add during creation. Each row uses the form {cdt_pri_name, xbt_manifest_id, "
+                "code_list_manifest_id, agency_id_list_manifest_id}. Use default_primitive to choose which "
+                "remaining primitive is the default. Omit to keep only the generated initial primitive rows."
+            ),
+        ),
+    ] = None,
+    remove_primitives: Annotated[
+        list[PrimitiveMutationInput] | None,
+        Field(
+            default=None,
+            description=(
+                "Primitive rows to remove during creation. Each row uses the form {cdt_pri_name, xbt_manifest_id, "
+                "code_list_manifest_id, agency_id_list_manifest_id}. Omit to keep the generated initial primitive rows."
+            ),
+        ),
+    ] = None,
     data_type_service: DataTypeService = Depends(get_data_type_service),
 ) -> CreateDataTypeSupplementaryComponentResponse:
-    """Create a blank DT_SC under a WIP DT."""
+    """Create a DT_SC under a WIP DT."""
     try:
-        result = await data_type_service.create_dt_sc(owner_dt_manifest_id=dt_manifest_id)
+        result = await data_type_service.create_dt_sc(
+            owner_dt_manifest_id=dt_manifest_id,
+            property_term=property_term,
+            representation_term=representation_term,
+            cardinality=UNSET if cardinality is None else cardinality,
+            deprecated=UNSET if deprecated is None else deprecated,
+            default_value=UNSET if value_constraint is None else value_constraint.default_value,
+            fixed_value=UNSET if value_constraint is None else value_constraint.fixed_value,
+            definition=UNSET if definition is None else definition,
+            definition_source=UNSET if definition_source is None else definition_source,
+            xbt_manifest_id=UNSET if default_primitive is None else default_primitive.xbt_manifest_id,
+            code_list_manifest_id=UNSET if default_primitive is None else default_primitive.code_list_manifest_id,
+            agency_id_list_manifest_id=(
+                UNSET if default_primitive is None else default_primitive.agency_id_list_manifest_id
+            ),
+            add_primitives=UNSET if add_primitives is None else [
+                DataTypePrimitiveServiceRecord(**item.model_dump(), is_default=False) for item in add_primitives
+            ],
+            remove_primitives=UNSET if remove_primitives is None else [
+                DataTypePrimitiveServiceRecord(**item.model_dump(), is_default=False) for item in remove_primitives
+            ],
+        )
         return CreateDataTypeSupplementaryComponentResponse.model_validate(result, from_attributes=True)
     except Exception as exc:
         raise _to_tool_error(exc, fallback=f"Unable to create a DT supplementary component for DT {dt_manifest_id}.") from exc
@@ -1291,14 +1460,26 @@ async def create_dt_sc(
 )
 async def update_dt_sc(
     dt_sc_manifest_id: Annotated[int, Field(gt=0, description="Target DT_SC manifest identifier.")],
-    property_term: Annotated[str | None, Field(default=None, description="Updated property term. Omit to leave unchanged. Pass an empty string to clear it.")],
+    property_term: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description=(
+                "Property term. In CCTS, a BDT supplementary component property term is a semantically meaningful "
+                "name for a unique characteristic that can be used in a BDT. Omit to leave unchanged. Pass an "
+                "empty string to clear it."
+            ),
+        ),
+    ],
     representation_term: Annotated[
         str | None,
         Field(
             default=None,
             description=(
-                "Updated representation term. Use a CDT data type term such as `Amount`, `Code`, or `Text`. "
-                "When this changes, the DT_SC primitive rows are reset to the default primitive set for that term."
+                "Representation term. In CCTS, this is a semantically meaningful name that represents the value "
+                "domain of the supplementary component. Use an approved CDT data type term such as `Amount`, "
+                "`Code`, or `Text`. When this changes, the DT_SC primitive rows are reset to the default primitive "
+                "set for that term. Omit to leave unchanged."
             ),
         ),
     ],
@@ -1308,20 +1489,38 @@ async def update_dt_sc(
             default=None,
             description=(
                 "Updated DT_SC cardinality. Use `Prohibited` for `0..0`, `Optional` for `0..1`, "
-                "or `Required` for `1..1`."
+                "or `Required` for `1..1`. Omit to leave unchanged."
             ),
         ),
     ],
     deprecated: Annotated[bool | None, Field(default=None, description="Updated deprecation flag. Omit to leave unchanged.")],
-    definition: Annotated[str | None, Field(default=None, description="Updated definition text. Omit to leave unchanged. Pass an empty string to clear it.")],
-    definition_source: Annotated[str | None, Field(default=None, description="Updated definition source. Omit to leave unchanged. Pass an empty string to clear it.")],
+    definition: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description=(
+                "Definition text. This is the explanatory text that describes what the supplementary component means. "
+                "Omit to leave unchanged. Pass an empty string to clear it."
+            ),
+        ),
+    ],
+    definition_source: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description=(
+                "Definition source. Use this to record where the definition came from, such as a "
+                "specification, standard, or reference URL. Omit to leave unchanged. Pass an empty string to clear it."
+            ),
+        ),
+    ],
     value_constraint: Annotated[
         ValueConstraintInput | None,
         Field(
             default=None,
             description=(
                 "Updated value constraint. Provide default_value to set a default when the element is omitted, "
-                "or fixed_value to require one exact value."
+                "or fixed_value to require one exact value. Omit to leave unchanged."
             ),
         ),
     ],
@@ -1331,7 +1530,7 @@ async def update_dt_sc(
             default=None,
             description=(
                 "Default primitive target. Provide exactly one of xbt_manifest_id, "
-                "code_list_manifest_id, or agency_id_list_manifest_id."
+                "code_list_manifest_id, or agency_id_list_manifest_id. Omit to leave unchanged."
             ),
         ),
     ],
@@ -1342,7 +1541,7 @@ async def update_dt_sc(
             description=(
                 "Primitive rows to add. Each row uses the form {cdt_pri_name, xbt_manifest_id, "
                 "code_list_manifest_id, agency_id_list_manifest_id}. Use default_primitive to choose "
-                "which remaining primitive is the default."
+                "which remaining primitive is the default. Omit to leave unchanged."
             ),
         ),
     ],
@@ -1352,7 +1551,7 @@ async def update_dt_sc(
             default=None,
             description=(
                 "Primitive rows to remove. Each row uses the form {cdt_pri_name, xbt_manifest_id, "
-                "code_list_manifest_id, agency_id_list_manifest_id}."
+                "code_list_manifest_id, agency_id_list_manifest_id}. Omit to leave unchanged."
             ),
         ),
     ],
@@ -1467,8 +1666,8 @@ async def change_dt_state(
     Change a DT lifecycle state according to connectCenter rules.
 
     Valid transitions depend on the DT release branch:
-    - `Working` release DTs: `Deleted <-> WIP <-> Draft <-> Candidate`
-    - non-`Working` release DTs: `Deleted <-> WIP <-> QA <-> Production`
+    - `Working` release DTs: `Deleted -> WIP`, `WIP -> Deleted|Draft`, `Draft -> WIP|Candidate`, `Candidate -> WIP`
+    - non-`Working` release DTs: `Deleted -> WIP`, `WIP -> Deleted|QA`, `QA -> WIP|Production`, `Production` is terminal
     """
     try:
         await data_type_service.change_dt_state(dt_manifest_id=dt_manifest_id, state=state)
@@ -1478,27 +1677,30 @@ async def change_dt_state(
 
 
 @mcp.tool(
-    name="revise_dt",
-    description="Create a new editable DT (Data Type) revision from a stable DT revision.",
+    name="revise_or_amend_dt",
+    description=(
+        "Create a new editable DT (Data Type) revision from a stable DT revision. "
+        "For end-user DTs, this is called an amendment."
+    ),
     output_schema=EMPTY_OUTPUT_SCHEMA,
 )
-async def revise_dt(
+async def revise_or_amend_dt(
     dt_manifest_id: Annotated[int, Field(gt=0, description="Target DT manifest identifier.")],
     data_type_service: DataTypeService = Depends(get_data_type_service),
 ) -> dict[str, object]:
     """
-    Revise a DT according to connectCenter rules.
+    Revise or amend a DT according to connectCenter rules.
 
     Rules:
     - developer-side DTs can be revised only from the `Published` state in the `Working` release
-    - end-user DTs can be revised only from the `Production` state in a non-`Working` release
+    - end-user DTs can be amended only from the `Production` state in a non-`Working` release
     - the requester and the DT owner must belong to the same role family
     """
     try:
         await data_type_service.revise_dt(dt_manifest_id=dt_manifest_id)
         return {}
     except Exception as exc:
-        raise _to_tool_error(exc, fallback=f"Unable to revise DT {dt_manifest_id}.") from exc
+        raise _to_tool_error(exc, fallback=f"Unable to revise or amend DT {dt_manifest_id}.") from exc
 
 
 @mcp.tool(

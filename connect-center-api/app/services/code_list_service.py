@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Literal
 
 from app.repositories.contracts.app_user import AppUserRepositoryContract
 from app.repositories.contracts.code_list import CodeListRepositoryContract
@@ -125,7 +126,17 @@ class CodeListService:
         self,
         *,
         release_id: ReleaseId,
+        name: str,
         based_code_list_manifest_id: CodeListManifestId | None = None,
+        version_id: str | None = None,
+        list_id: str | None = None,
+        agency_id_list_value_manifest_id: int | None = None,
+        definition: str | None = None,
+        definition_source: str | None = None,
+        remark: str | None = None,
+        namespace_id: int | None = None,
+        deprecated: bool | None = None,
+        extensible_indicator: bool | None = None,
     ) -> CreateCodeListServiceResult:
         """Create a code list in a release allowed for the requester's role."""
         release = await self._release_service.get(release_id)
@@ -133,6 +144,9 @@ class CodeListService:
             raise LookupError(f"No release exists with ID {int(release_id)}. Please verify the identifier and try again.")
         self._assert_release_is_published(release.state)
         self._assert_can_create_code_lists(release_num=release.release_num)
+
+        if str(name).strip() == "":
+            raise ValueError("New code lists require a non-empty `name`.")
 
         if based_code_list_manifest_id is not None:
             based = await self.get(based_code_list_manifest_id)
@@ -145,6 +159,16 @@ class CodeListService:
         code_list_manifest_id = await self._repo.create_code_list(
             release_id=release_id,
             based_code_list_manifest_id=based_code_list_manifest_id,
+            name=str(name),
+            version_id=version_id,
+            list_id=list_id,
+            agency_id_list_value_manifest_id=agency_id_list_value_manifest_id,
+            definition=definition,
+            definition_source=definition_source,
+            remark=remark,
+            namespace_id=namespace_id,
+            deprecated=deprecated,
+            extensible_indicator=extensible_indicator,
             requester_user_id=self._requester_user_id,
             requester_is_developer=self._requester_is_developer(),
         )
@@ -555,6 +579,7 @@ class CodeListService:
         self,
         *,
         code_list_manifest_id: CodeListManifestId,
+        requested_action: Literal["revise", "amend"] | None = None,
     ) -> None:
         """Create a revised code list working copy."""
         code_list = await self.get(code_list_manifest_id)
@@ -562,7 +587,7 @@ class CodeListService:
             raise LookupError(
                 f"No code list exists with manifest ID {int(code_list_manifest_id)}. Please verify the identifier and try again."
             )
-        self._assert_can_revise_code_list(code_list)
+        self._assert_can_revise_code_list(code_list, requested_action=requested_action)
 
         revised = await self._repo.revise_code_list(
             code_list_manifest_id=code_list_manifest_id,
@@ -575,7 +600,7 @@ class CodeListService:
         await self._repo.append_code_list_log(
             code_list_manifest_id=code_list_manifest_id,
             requester_user_id=self._requester_user_id,
-            action="Revised",
+            action="Revised" if self._requester_is_developer() else "Amended",
         )
 
     async def cancel_code_list(
@@ -733,7 +758,7 @@ class CodeListService:
                 raise ValueError("It only allows to revise the component in 'Working' branch for developers.")
             return
         if release_num == "Working":
-            raise ValueError("It only allows to revise the component in non-'Working' branch for end-users.")
+            raise ValueError("It only allows to amend the component in non-'Working' branches for end-users.")
 
     def _assert_same_role_family_as_owner(self, code_list: CodeListServiceResult) -> None:
         owner_roles = set(code_list.owner.roles)
@@ -741,13 +766,23 @@ class CodeListService:
         if self._requester_is_developer() != owner_is_developer:
             raise ValueError("It only allows to revise the component for users in the same roles.")
 
-    def _assert_can_revise_code_list(self, code_list: CodeListServiceResult) -> None:
+    def _assert_can_revise_code_list(
+        self,
+        code_list: CodeListServiceResult,
+        *,
+        requested_action: Literal["revise", "amend"] | None = None,
+    ) -> None:
+        expected_action: Literal["revise", "amend"] = "revise" if self._requester_is_developer() else "amend"
+        if requested_action is not None and requested_action != expected_action:
+            if expected_action == "revise":
+                raise PermissionError("Developer-side code lists must use revise.")
+            raise PermissionError("End-user code lists must use amend.")
         if self._requester_is_developer():
             if code_list.state != "Published":
                 raise ValueError("Only the core component in 'Published' state can be revised.")
         else:
             if code_list.state != "Production":
-                raise ValueError("Only the core component in 'Production' state can be revised.")
+                raise ValueError("Only the core component in 'Production' state can be amended.")
         self._assert_can_access_revision_branch(code_list)
         self._assert_same_role_family_as_owner(code_list)
 

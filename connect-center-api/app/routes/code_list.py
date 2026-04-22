@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+from typing import Literal
+
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Response, status
 
 from app.deps import get_code_list_service
@@ -238,6 +240,16 @@ async def create_code_list(
         result = await code_list_service.create_code_list(
             release_id=payload.release_id,
             based_code_list_manifest_id=payload.based_code_list_manifest_id,
+            name=payload.name,
+            version_id=payload.version_id,
+            list_id=payload.list_id,
+            agency_id_list_value_manifest_id=payload.agency_id_list_value_manifest_id,
+            definition=payload.definition,
+            definition_source=payload.definition_source,
+            remark=payload.remark,
+            namespace_id=payload.namespace_id,
+            deprecated=payload.deprecated,
+            extensible_indicator=payload.extensible_indicator,
         )
         return CreateCodeListResponse.model_validate(result, from_attributes=True)
     except LookupError as e:
@@ -560,8 +572,10 @@ async def transfer_code_list_ownership(
     summary="Change code list state",
     description=(
         "Change the lifecycle state of a code list. "
-        "For `Working` releases, the allowed path is `Deleted <-> WIP <-> Draft <-> Candidate`. "
-        "For non-`Working` releases, the allowed path is `Deleted <-> WIP <-> QA <-> Production`."
+        "For `Working` releases, the allowed moves are `Deleted -> WIP`, `WIP -> Deleted|Draft`, "
+        "`Draft -> WIP|Candidate`, and `Candidate -> WIP`. "
+        "For non-`Working` releases, the allowed moves are `Deleted -> WIP`, `WIP -> Deleted|QA`, "
+        "`QA -> WIP|Production`, and `Production` is terminal."
     ),
 )
 async def change_code_list_state(
@@ -598,23 +612,18 @@ async def change_code_list_state(
         )
 
 
-@router.post(
-    "/{code_list_manifest_id}/revise",
-    status_code=status.HTTP_204_NO_CONTENT,
-    summary="Revise code list",
-    description=(
-        "Create a new editable code list revision from a stable code list. "
-        "Developer-side code lists can be revised only from `Published`, "
-        "and end-user code lists only from `Production`."
-    ),
-)
-async def revise_code_list(
-    code_list_manifest_id: CodeListManifestId = Path(..., ge=1, description="Code list manifest ID."),
-    code_list_service: CodeListService = Depends(get_code_list_service),
+async def _revise_or_amend_code_list(
+    *,
+    code_list_manifest_id: CodeListManifestId,
+    requested_action: Literal["revise", "amend"],
+    code_list_service: CodeListService,
 ) -> Response:
-    """Create a revised code list working copy."""
+    """Create a revised or amended code list working copy."""
     try:
-        await code_list_service.revise_code_list(code_list_manifest_id=code_list_manifest_id)
+        await code_list_service.revise_code_list(
+            code_list_manifest_id=code_list_manifest_id,
+            requested_action=requested_action,
+        )
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except LookupError as e:
         raise HTTPException(
@@ -624,7 +633,7 @@ async def revise_code_list(
     except PermissionError as e:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"message": "You do not have permission to revise this code list.", "cause": str(e)},
+            detail={"message": "You do not have permission to revise or amend this code list.", "cause": str(e)},
         )
     except ValueError as e:
         raise HTTPException(
@@ -634,8 +643,53 @@ async def revise_code_list(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"message": "We couldn't revise the code list.", "cause": str(e)},
+            detail={"message": "We couldn't revise or amend the code list.", "cause": str(e)},
         )
+
+
+@router.post(
+    "/{code_list_manifest_id}/revise",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Revise/Amend code list",
+    description=(
+        "Create a new editable code list revision from a stable code list. "
+        "Use `/revise` for developer-side code lists in `Working` releases when the stable code list is in `Published`. "
+        "End-user code lists should use `/amend` instead."
+    ),
+)
+async def revise_code_list(
+    code_list_manifest_id: CodeListManifestId = Path(..., ge=1, description="Code list manifest ID."),
+    code_list_service: CodeListService = Depends(get_code_list_service),
+) -> Response:
+    """Create a revised code list working copy for developer-side code lists."""
+    return await _revise_or_amend_code_list(
+        code_list_manifest_id=code_list_manifest_id,
+        requested_action="revise",
+        code_list_service=code_list_service,
+    )
+
+
+@router.post(
+    "/{code_list_manifest_id}/amend",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Revise/Amend code list",
+    description=(
+        "Create a new editable code list revision from a stable code list. "
+        "Use `/amend` for end-user code lists in non-`Working` releases when the stable code list is in `Production`. "
+        "Developer-side code lists should use `/revise` instead."
+    ),
+    openapi_extra={"x-alternative-endpoint-for": "/code-lists/{code_list_manifest_id}/revise"},
+)
+async def amend_code_list(
+    code_list_manifest_id: CodeListManifestId = Path(..., ge=1, description="Code list manifest ID."),
+    code_list_service: CodeListService = Depends(get_code_list_service),
+) -> Response:
+    """Create an amended code list working copy for end-user code lists."""
+    return await _revise_or_amend_code_list(
+        code_list_manifest_id=code_list_manifest_id,
+        requested_action="amend",
+        code_list_service=code_list_service,
+    )
 
 
 @router.post(

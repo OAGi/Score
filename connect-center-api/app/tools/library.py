@@ -57,9 +57,10 @@ from app.tools.models.library import (
     GetLibraryPaginationResponse,
     GetLibraryResponse,
     LibraryResponseEntry,
-    UpdateLibraryReleaseDependenciesResponse,
+    ManageLibraryReleaseDependenciesResponse,
     UpdateLibraryResponse,
 )
+from app.types.unset import UNSET
 from app.utils.date import parse_date_range
 
 logger = logging.getLogger("connectcenter.mcp.library")
@@ -321,9 +322,24 @@ async def get_libraries(
                     "when": {"type": "string", "format": "date-time", "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-20T14:45:00Z"}
                 },
                 "required": ["who", "when"]
+            },
+            "release_dependencies": {
+                "type": "array",
+                "description": "Direct dependencies of the library's working release.",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "release_id": {"type": "integer", "description": "Release identifier", "example": 101},
+                        "library_id": {"type": "integer", "description": "Owning library identifier", "example": 3},
+                        "library_name": {"type": "string", "description": "Owning library name", "example": "CCTS Data Type Catalogue v3"},
+                        "release_num": {"type": "string", "description": "Release number", "example": "3.1"},
+                        "state": {"type": "string", "description": "Release lifecycle state", "example": "Published"}
+                    },
+                    "required": ["release_id", "library_id", "library_name", "release_num", "state"]
+                }
             }
         },
-        "required": ["library_id", "name", "is_read_only", "is_default", "created", "last_updated"]
+        "required": ["library_id", "name", "is_read_only", "is_default", "created", "last_updated", "release_dependencies"]
     }
 )
 async def get_library(
@@ -354,6 +370,7 @@ async def get_library(
             - is_default: Whether the library is the default
             - created: Information about the creation of the library
             - last_updated: Information about the last update of the library
+            - release_dependencies: Direct dependencies of the library's working release
 
     Raises:
         ToolError: If validation fails, the library is not found, or other errors occur.
@@ -450,16 +467,16 @@ async def create_library(
 )
 async def update_library(
     library_id: Annotated[int, Field(gt=0, description="Target library identifier.")],
-    name: Annotated[str, Field(min_length=1, description="Library name.")],
-    type: Annotated[str | None, Field(default=None, description="Type of the library.")] = None,
-    organization: Annotated[str | None, Field(default=None, description="Owning organization.")] = None,
-    link: Annotated[str | None, Field(default=None, description="Library URL.")] = None,
-    domain: Annotated[str | None, Field(default=None, description="Library domain.")] = None,
-    description: Annotated[str | None, Field(default=None, description="Library description.")] = None,
-    state: Annotated[str | None, Field(default=None, description="Library state.")] = None,
+    name: Annotated[str | None, Field(default=None, min_length=1, description="Library name to save. Omit to leave it unchanged.")] = None,
+    type: Annotated[str | None, Field(default=None, description="Library type to save. Omit to leave it unchanged.")] = None,
+    organization: Annotated[str | None, Field(default=None, description="Owning organization to save. Omit to leave it unchanged.")] = None,
+    link: Annotated[str | None, Field(default=None, description="Library URL to save. Omit to leave it unchanged.")] = None,
+    domain: Annotated[str | None, Field(default=None, description="Library domain to save. Omit to leave it unchanged.")] = None,
+    description: Annotated[str | None, Field(default=None, description="Library description to save. Omit to leave it unchanged.")] = None,
+    state: Annotated[str | None, Field(default=None, description="Library state to save. Omit to leave it unchanged.")] = None,
     is_default: Annotated[
         bool | str | None,
-        Field(default=None, description="Whether this library should become the default."),
+        Field(default=None, description="Whether this library should be the default. Omit to leave it unchanged."),
     ] = None,
     library_service: LibraryService = Depends(get_library_service),
 ) -> UpdateLibraryResponse:
@@ -467,14 +484,14 @@ async def update_library(
     try:
         result = await library_service.update_library(
             library_id=library_id,
-            type=type,
-            name=name,
-            organization=organization,
-            description=description,
-            link=link,
-            domain=domain,
-            state=state,
-            is_default=str_to_bool(is_default),
+            type=UNSET if type is None else type,
+            name=UNSET if name is None else name,
+            organization=UNSET if organization is None else organization,
+            description=UNSET if description is None else description,
+            link=UNSET if link is None else link,
+            domain=UNSET if domain is None else domain,
+            state=UNSET if state is None else state,
+            is_default=UNSET if is_default is None else str_to_bool(is_default),
         )
         return UpdateLibraryResponse.model_validate(result, from_attributes=True)
     except Exception as exc:
@@ -482,45 +499,94 @@ async def update_library(
 
 
 @mcp.tool(
-    name="update_library_release_dependencies",
-    description="Replace the working-release dependency list for a library.",
+    name="add_library_release_dependency",
+    description="Add a direct dependency to a library's working release.",
     output_schema={
         "type": "object",
-        "description": "Response containing the target library identifier and the dependency release IDs now assigned.",
+        "description": "Response containing the target library identifier and the direct dependencies now assigned.",
         "properties": {
             "library_id": {"type": "integer", "description": "Target library identifier.", "example": 12},
-            "release_ids": {
+            "release_dependencies": {
                 "type": "array",
-                "description": "Release identifiers now assigned as dependencies.",
-                "items": {"type": "integer"},
-                "example": [101, 205],
+                "description": "Direct dependencies now assigned to the library's working release.",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "release_id": {"type": "integer", "description": "Release identifier.", "example": 101},
+                        "library_id": {"type": "integer", "description": "Owning library identifier.", "example": 3},
+                        "library_name": {"type": "string", "description": "Owning library name.", "example": "CCTS Data Type Catalogue v3"},
+                        "release_num": {"type": "string", "description": "Release number.", "example": "3.1"},
+                        "state": {"type": "string", "description": "Release lifecycle state.", "example": "Published"},
+                    },
+                    "required": ["release_id", "library_id", "library_name", "release_num", "state"],
+                },
             },
         },
-        "required": ["library_id", "release_ids"],
+        "required": ["library_id", "release_dependencies"],
     },
 )
-async def update_library_release_dependencies(
+async def add_library_release_dependency(
     library_id: Annotated[int, Field(gt=0, description="Target library identifier.")],
-    release_ids: Annotated[
-        list[int] | None,
-        Field(default=None, description="Release identifiers that should remain assigned as dependencies."),
-    ] = None,
+    release_id: Annotated[int, Field(gt=0, description="Release identifier to add as a dependency.")],
     library_service: LibraryService = Depends(get_library_service),
-) -> UpdateLibraryReleaseDependenciesResponse:
-    """Replace working-release dependencies for a library."""
+) -> ManageLibraryReleaseDependenciesResponse:
+    """Add a direct dependency to a library's working release."""
     try:
-        result = await library_service.update_library_release_dependencies(
+        result = await library_service.add_library_release_dependency(
             library_id=library_id,
-            release_ids=release_ids,
+            release_id=release_id,
         )
-        return UpdateLibraryReleaseDependenciesResponse.model_validate(result, from_attributes=True)
+        return ManageLibraryReleaseDependenciesResponse.model_validate(result, from_attributes=True)
     except Exception as exc:
-        raise _to_tool_error(exc, fallback=f"Unable to update release dependencies for library {library_id}.") from exc
+        raise _to_tool_error(exc, fallback=f"Unable to add release dependency {release_id} to library {library_id}.") from exc
+
+
+@mcp.tool(
+    name="remove_library_release_dependency",
+    description="Remove a direct dependency from a library's working release.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the target library identifier and the direct dependencies now assigned.",
+        "properties": {
+            "library_id": {"type": "integer", "description": "Target library identifier.", "example": 12},
+            "release_dependencies": {
+                "type": "array",
+                "description": "Direct dependencies now assigned to the library's working release.",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "release_id": {"type": "integer", "description": "Release identifier.", "example": 101},
+                        "library_id": {"type": "integer", "description": "Owning library identifier.", "example": 3},
+                        "library_name": {"type": "string", "description": "Owning library name.", "example": "CCTS Data Type Catalogue v3"},
+                        "release_num": {"type": "string", "description": "Release number.", "example": "3.1"},
+                        "state": {"type": "string", "description": "Release lifecycle state.", "example": "Published"},
+                    },
+                    "required": ["release_id", "library_id", "library_name", "release_num", "state"],
+                },
+            },
+        },
+        "required": ["library_id", "release_dependencies"],
+    },
+)
+async def remove_library_release_dependency(
+    library_id: Annotated[int, Field(gt=0, description="Target library identifier.")],
+    release_id: Annotated[int, Field(gt=0, description="Release identifier to remove from dependencies.")],
+    library_service: LibraryService = Depends(get_library_service),
+) -> ManageLibraryReleaseDependenciesResponse:
+    """Remove a direct dependency from a library's working release."""
+    try:
+        result = await library_service.remove_library_release_dependency(
+            library_id=library_id,
+            release_id=release_id,
+        )
+        return ManageLibraryReleaseDependenciesResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to remove release dependency {release_id} from library {library_id}.") from exc
 
 
 @mcp.tool(
     name="discard_library",
-    description="Discard a library permanently when it passes the discard checks.",
+    description="Discard a library permanently after explicit confirmation when it passes the discard checks.",
     output_schema=EMPTY_OUTPUT_SCHEMA,
 )
 async def discard_library(
@@ -538,7 +604,9 @@ async def discard_library(
     elicit_result = await ctx.elicit(
         message=(
             f"Are you sure you want to discard library '{row.name}' permanently?\n\n"
-            "This removes the library record and its working release seed data and cannot be undone."
+            "This permanently deletes the library record, its current working release, "
+            "its namespaces, and the current working-release authored data tied to that library. "
+            "This cannot be undone."
         ),
         response_type=None,
     )

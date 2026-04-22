@@ -30,10 +30,6 @@ Available Tools:
 - add_bcc_to_acc: Add a BCC (Basic Core Component) relationship to an ACC
   by referencing an existing BCCP manifest.
 
-- reorder_ascc_in_acc: Reorder an existing ASCC relationship within an ACC sequence.
-
-- reorder_bcc_in_acc: Reorder an existing BCC relationship within an ACC sequence.
-
 - remove_ascc: Remove an existing ASCC relationship from its owning ACC.
 
 - remove_bcc: Remove an existing BCC relationship from its owning ACC.
@@ -54,7 +50,9 @@ Available Tools:
 - change_acc_state: Change an ACC to another lifecycle state following connectCenter's
   ACC state-transition rules.
 
-- revise_acc: Create a new editable ACC revision from a stable ACC revision.
+- revise_or_amend_acc: Create a new editable ACC revision from a stable ACC revision.
+- revise_or_amend_asccp: Create a new editable ASCCP revision from a stable ASCCP revision.
+- revise_or_amend_bccp: Create a new editable BCCP revision from a stable BCCP revision.
 
 - cancel_acc: Cancel the current ACC revision and restore the previous stable ACC revision.
 
@@ -138,7 +136,7 @@ from app.tools.models.core_component import (
     UpdateBccpResponse,
 )
 from app.types.unset import UNSET
-from app.types.identifiers import DataTypeManifestId
+from app.types.identifiers import AccManifestId, DataTypeManifestId
 
 logger = logging.getLogger("connectcenter.mcp.core_component")
 
@@ -467,6 +465,16 @@ async def create_acc(
             ),
         ),
     ],
+    object_class_term: Annotated[
+        str,
+        Field(
+            description=(
+                "Object class term to start with. In CCTS, this is the term that represents the activity or "
+                "object the ACC stands for. It serves as the basis for the ACC DEN and for the DENs of the ASCC "
+                "and BCC properties under that ACC."
+            ),
+        ),
+    ],
     based_acc_manifest_id: Annotated[
         int | None,
         Field(
@@ -479,11 +487,7 @@ async def create_acc(
             ),
         ),
     ],
-    initial_object_class_term: Annotated[
-        str | None,
-        Field(default="Object Class Term", description="Initial object class term."),
-    ],
-    initial_component_type: Annotated[
+    component_type: Annotated[
         Literal[
             "Base",
             "Semantics",
@@ -502,7 +506,7 @@ async def create_acc(
         Field(
             default="Semantics",
             description=(
-                "Initial OAGIS component type. Use `Base` only when this ACC is intended to be the base ACC "
+                "OAGIS component type to start with. Use `Base` only when this ACC is intended to be the base ACC "
                 "for other ACCs. Use `Extension` for a developer extension ACC that end-users may extend later "
                 "in BIEs. Use `SemanticGroup` for a grouping ACC whose associations are flattened in BIEs. "
                 "Otherwise use `Semantics`. If the user does not indicate a specific intent, keep the default "
@@ -510,7 +514,35 @@ async def create_acc(
             ),
         ),
     ],
-    initial_definition: Annotated[str | None, Field(default=None, description="Initial definition text.")],
+    definition: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description=(
+                "Definition text to start with. This is the explanatory text that describes what the ACC means."
+            ),
+        ),
+    ],
+    definition_source: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description=(
+                "Definition source to start with. Use this to record where the definition came from, such as a "
+                "specification, standard, or reference URL."
+            ),
+        ),
+    ],
+    is_abstract: Annotated[
+        bool | None,
+        Field(
+            default=None,
+            description=(
+                "Whether this ACC should be abstract. If `component_type` is `Base`, this is usually `true`, "
+                "because the ACC is meant to serve as a base ACC for other ACCs."
+            ),
+        ),
+    ],
     namespace_id: Annotated[
         int | None,
         Field(
@@ -532,15 +564,14 @@ async def create_acc(
     Create an ACC in a role-appropriate release branch.
 
     This tool mirrors connectCenter's ACC creation defaults:
-    - `initial_object_class_term` defaults to `Object Class Term`
-    - `initial_component_type` defaults to `Semantics`
-    - persisted ACC `type` is derived from `initial_component_type`
+    - `component_type` defaults to `Semantics`
+    - persisted ACC `type` is derived from `component_type`
     - developers can target only the `Working` release, while end-users can target only non-`Working` releases
     - use `get_working_release` when you need help finding the developer-valid `Working` `release_id`
     - choose `Base` only when the ACC is meant to be reused as a base ACC for other ACCs
     - choose `Extension` only for a developer extension ACC that end-users may extend later in BIEs
     - choose `SemanticGroup` only for a grouping ACC whose associations are flattened in BIEs
-    - if the user does not clearly ask for one of those cases, leave `initial_component_type` as `Semantics`
+    - if the user does not clearly ask for one of those cases, leave `component_type` as `Semantics`
 
     If `tag_id` is provided, connectCenter will attach each referenced tag to the ACC.
     """
@@ -548,9 +579,11 @@ async def create_acc(
         core_component_service=core_component_service,
         release_id=release_id,
         based_acc_manifest_id=based_acc_manifest_id,
-        initial_object_class_term=initial_object_class_term,
-        initial_component_type=initial_component_type,
-        initial_definition=initial_definition,
+        object_class_term=object_class_term,
+        component_type=component_type,
+        definition=definition,
+        definition_source=definition_source,
+        is_abstract=is_abstract,
         namespace_id=namespace_id,
         tag_id=tag_id,
         fallback="Unable to create the ACC.",
@@ -576,19 +609,44 @@ async def create_asccp(
         Field(
             gt=0,
             description=(
-                "Role ACC manifest identifier. If the role ACC is in the same library as `release_id`, it must be "
+                "Role ACC manifest identifier. This identifies the ACC that this ASCCP points to as the associated ACC in the relationship. "
+                "If the role ACC is in the same library as `release_id`, it must be "
                 "from that release. If it is in a different library, its release must be one of the target release "
                 "dependencies."
             ),
         ),
     ],
-    initial_property_term: Annotated[str | None, Field(default="Property Term", description="Initial property term.")],
-    asccp_type: Annotated[Literal["Default", "DataArea", "Extension", "Verb", "BOD"], Field(default="Default", description="Initial ASCCP type.")],
+    property_term: Annotated[
+        str,
+        Field(
+            ...,
+            min_length=1,
+            description=(
+                "Property term to use for this ASCCP. In CCTS, this is a semantically meaningful name for the "
+                "characteristic that represents the nature of the association to the associated ACC."
+            ),
+        ),
+    ],
     reusable_indicator: Annotated[bool, Field(default=True, description="Initial reusable indicator.")],
     namespace_id: Annotated[int | None, Field(default=None, gt=0, description="Optional namespace identifier.")],
-    definition: Annotated[str | None, Field(default=None, description="Initial definition text.")],
-    definition_source: Annotated[str | None, Field(default=None, description="Initial definition source.")],
-    tag_id: Annotated[list[int] | None, Field(default=None, description="Optional tag identifier list to attach.")],
+    definition: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description="Definition text to start with. This is the explanatory text that describes what the ASCCP means.",
+        ),
+    ],
+    definition_source: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description=(
+                "Definition source to start with. Use this to record where the definition came from, such as a "
+                "specification, standard, or reference URL."
+            ),
+        ),
+    ],
+    tag_id: Annotated[list[int] | None, Field(default=None, description="Optional tag identifier list to attach.")] = None,
     core_component_service: CoreComponentService = Depends(get_core_component_service),
 ) -> CreateAsccpResponse:
     """Create an ASCCP in a role-appropriate release branch."""
@@ -596,8 +654,7 @@ async def create_asccp(
         result = await core_component_service.create_asccp(
             release_id=release_id,
             role_of_acc_manifest_id=role_of_acc_manifest_id,
-            initial_property_term=initial_property_term,
-            asccp_type=asccp_type,
+            property_term=property_term,
             reusable_indicator=reusable_indicator,
             namespace_id=namespace_id,
             definition=definition,
@@ -635,16 +692,60 @@ async def create_bccp(
             ),
         ),
     ],
-    initial_property_term: Annotated[str | None, Field(default="Property Term", description="Initial property term.")],
-    tag_id: Annotated[list[int] | None, Field(default=None, description="Optional tag identifier list to attach.")],
+    property_term: Annotated[
+        str,
+        Field(
+            description=(
+                "Property term for this BCCP. In CCTS, this is a semantically meaningful name for a unique "
+                "characteristic that can be used in an ACC object class."
+            ),
+        ),
+    ],
+    definition: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description="Definition text to start with. This is the explanatory text that describes what the BCCP means.",
+        ),
+    ] = None,
+    definition_source: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description=(
+                "Definition source to start with. Use this to record where the definition came from, such as a "
+                "specification, standard, or reference URL."
+            ),
+        ),
+    ] = None,
+    deprecated: Annotated[bool | None, Field(default=None, description="Initial deprecation flag.")] = None,
+    is_nillable: Annotated[bool | None, Field(default=None, description="Initial nillable flag.")] = None,
+    namespace_id: Annotated[int | None, Field(default=None, gt=0, description="Optional namespace identifier.")] = None,
+    value_constraint: Annotated[
+        dict[str, str | None] | None,
+        Field(
+            default=None,
+            description="Optional value constraint. Provide exactly one of `default_value` or `fixed_value`.",
+        ),
+    ] = None,
+    tag_id: Annotated[list[int] | None, Field(default=None, description="Optional tag identifier list to attach.")] = None,
     core_component_service: CoreComponentService = Depends(get_core_component_service),
 ) -> CreateBccpResponse:
     """Create a BCCP in a role-appropriate release branch."""
     try:
+        default_value = None if value_constraint is None else value_constraint.get("default_value")
+        fixed_value = None if value_constraint is None else value_constraint.get("fixed_value")
         result = await core_component_service.create_bccp(
             release_id=release_id,
             bdt_manifest_id=DataTypeManifestId(int(bdt_manifest_id)),
-            initial_property_term=initial_property_term,
+            property_term=property_term,
+            definition=definition,
+            definition_source=definition_source,
+            deprecated=deprecated,
+            is_nillable=is_nillable,
+            namespace_id=namespace_id,
+            default_value=default_value,
+            fixed_value=fixed_value,
             tag_id=tag_id,
         )
         return CreateBccpResponse.model_validate(result, from_attributes=True)
@@ -673,24 +774,77 @@ async def add_ascc_to_acc(
     asccp_manifest_id: Annotated[int, Field(gt=0, description="Target ASCCP manifest identifier.")],
     ctx: Context,
     index: Annotated[
-        int,
-        Field(default=-1, description="Zero-based insertion index. Defaults to -1, which places the ASCC at the end of the ACC sequence."),
-    ],
+        int | None,
+        Field(
+            default=None,
+            description=(
+                "Optional zero-based insertion index. Use `0` to place the association first, `-1` to place it last, "
+                "or another non-negative index to place the association at that position in the sequence. "
+                "Mutually exclusive with all `after_*` and `before_*` options. If omitted together with all other "
+                "placement options, the ASCC is added at the end."
+            ),
+        ),
+    ] = None,
+    after_ascc_manifest_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="Place the ASCC after this ASCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
+    ] = None,
+    after_bcc_manifest_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="Place the ASCC after this BCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
+    ] = None,
+    before_ascc_manifest_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="Place the ASCC before this ASCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
+    ] = None,
+    before_bcc_manifest_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="Place the ASCC before this BCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
+    ] = None,
     cardinality_min: Annotated[
         int | None,
-        Field(default=None, ge=0, description="Optional minimum cardinality to apply immediately after creation."),
+        Field(
+            default=None,
+            ge=0,
+            description=(
+                "Optional minimum cardinality to apply immediately after creation. Use `0` or a positive integer. "
+                "If `cardinality_max` is also provided and is not `-1`, this value must be less than or equal to it."
+            ),
+        ),
     ] = None,
     cardinality_max: Annotated[
         int | None,
-        Field(default=None, ge=-1, description="Optional maximum cardinality to apply immediately after creation. Use `-1` for unbounded."),
+        Field(
+            default=None,
+            ge=-1,
+            description=(
+                "Optional maximum cardinality to apply immediately after creation. Use `-1` for unbounded, or "
+                "`0` or a positive integer for a bounded maximum. If it is not `-1`, it must be greater than or "
+                "equal to `cardinality_min`. If `entity_type` is `Attribute`, this value must be `0` or `1`; "
+                "`-1` is not allowed."
+            ),
+        ),
     ] = None,
     definition: Annotated[
         str | None,
-        Field(default=None, description="Optional relationship definition to apply immediately after creation. Pass an empty string to clear it."),
+        Field(
+            default=None,
+            description=(
+                "Optional definition text to apply immediately after creation. This is the explanatory text "
+                "that describes what the BCC means. Pass an empty string to clear it."
+            ),
+        ),
     ] = None,
     definition_source: Annotated[
         str | None,
-        Field(default=None, description="Optional relationship definition source to apply immediately after creation. Pass an empty string to clear it."),
+        Field(
+            default=None,
+            description=(
+                "Optional definition source to apply immediately after creation. Use this to record where the "
+                "definition came from, such as a specification, standard, or reference URL. Pass an empty "
+                "string to clear it."
+            ),
+        ),
     ] = None,
     core_component_service: CoreComponentService = Depends(get_core_component_service),
 ) -> AddAsccToAccResponse:
@@ -703,8 +857,9 @@ async def add_ascc_to_acc(
     - only the ACC owner or an administrator can modify relationships
     - the target ASCCP must be reusable
     - an ACC can have at most one `Extension` ASCCP
-    - if the ASCCP is already associated to the ACC, use `reorder_ascc_in_acc` instead
-    - `index=-1` is the default and places the relationship at the end of the ACC's `seq_key` order
+    - if the ASCCP is already associated to the ACC, use `update_ascc` with a sequence selector instead
+    - if all placement inputs are omitted, the relationship is added at the end of the ACC's `seq_key` order
+    - provide only one of `index`, `after_*`, or `before_*`
     - if the change could create repeated field names or sequence issues later, the tool asks for confirmation before continuing
     """
     try:
@@ -712,6 +867,10 @@ async def add_ascc_to_acc(
             acc_manifest_id=acc_manifest_id,
             asccp_manifest_id=asccp_manifest_id,
             index=index,
+            after_ascc_manifest_id=None if after_ascc_manifest_id is None else after_ascc_manifest_id,
+            after_bcc_manifest_id=None if after_bcc_manifest_id is None else after_bcc_manifest_id,
+            before_ascc_manifest_id=None if before_ascc_manifest_id is None else before_ascc_manifest_id,
+            before_bcc_manifest_id=None if before_bcc_manifest_id is None else before_bcc_manifest_id,
         )
         await _elicit_on_acc_structure_warnings(
             ctx=ctx,
@@ -724,6 +883,10 @@ async def add_ascc_to_acc(
             acc_manifest_id=acc_manifest_id,
             asccp_manifest_id=asccp_manifest_id,
             index=index,
+            after_ascc_manifest_id=None if after_ascc_manifest_id is None else after_ascc_manifest_id,
+            after_bcc_manifest_id=None if after_bcc_manifest_id is None else after_bcc_manifest_id,
+            before_ascc_manifest_id=None if before_ascc_manifest_id is None else before_ascc_manifest_id,
+            before_bcc_manifest_id=None if before_bcc_manifest_id is None else before_bcc_manifest_id,
             cardinality_min=cardinality_min,
             cardinality_max=cardinality_max,
             definition=definition,
@@ -755,16 +918,56 @@ async def add_bcc_to_acc(
     bccp_manifest_id: Annotated[int, Field(gt=0, description="Target BCCP manifest identifier.")],
     ctx: Context,
     index: Annotated[
-        int,
-        Field(default=-1, description="Zero-based insertion index. Defaults to -1, which places the BCC at the end of the ACC sequence."),
-    ],
+        int | None,
+        Field(
+            default=None,
+            description=(
+                "Optional zero-based insertion index. Use `0` to place the association first, `-1` to place it last, "
+                "or another non-negative index to place the association at that position in the sequence. "
+                "Mutually exclusive with all `after_*` and `before_*` options. If omitted together with all other "
+                "placement options, the BCC is added at the end. For `Attribute` BCCs, positions outside the leading "
+                "attribute block are adjusted to the end of that block."
+            ),
+        ),
+    ] = None,
+    after_ascc_manifest_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="Place the BCC after this ASCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
+    ] = None,
+    after_bcc_manifest_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="Place the BCC after this BCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
+    ] = None,
+    before_ascc_manifest_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="Place the BCC before this ASCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
+    ] = None,
+    before_bcc_manifest_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="Place the BCC before this BCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
+    ] = None,
     cardinality_min: Annotated[
         int | None,
-        Field(default=None, ge=0, description="Optional minimum cardinality to apply immediately after creation."),
+        Field(
+            default=None,
+            ge=0,
+            description=(
+                "Optional minimum cardinality to apply immediately after creation. Use `0` or a positive integer. "
+                "If `cardinality_max` is also provided and is not `-1`, this value must be less than or equal to it."
+            ),
+        ),
     ] = None,
     cardinality_max: Annotated[
         int | None,
-        Field(default=None, ge=-1, description="Optional maximum cardinality to apply immediately after creation. Use `-1` for unbounded."),
+        Field(
+            default=None,
+            ge=-1,
+            description=(
+                "Optional maximum cardinality to apply immediately after creation. Use `-1` for unbounded, or "
+                "`0` or a positive integer for a bounded maximum. If it is not `-1`, it must be greater than or "
+                "equal to `cardinality_min`."
+            ),
+        ),
     ] = None,
     entity_type: Annotated[
         BccEntityTypeUpdate | None,
@@ -804,8 +1007,10 @@ async def add_bcc_to_acc(
     - if the BCCP is in the same library as the ACC, it must be from the ACC release
     - if the BCCP is in a different library, its release must be one of the ACC release dependencies
     - only the ACC owner or an administrator can modify relationships
-    - if the BCCP is already associated to the ACC, use `reorder_bcc_in_acc` instead
-    - `index=-1` is the default and places the relationship at the end of the ACC's `seq_key` order
+    - if the BCCP is already associated to the ACC, use `update_bcc` with a sequence selector instead
+    - if all placement inputs are omitted, the relationship is added at the end of the ACC's `seq_key` order
+    - provide only one of `index`, `after_*`, or `before_*`
+    - when adding an `Attribute` BCC, positions outside the leading attribute block are adjusted to the end of that block
     - if the change could create repeated field names or sequence issues later, the tool asks for confirmation before continuing
     """
     try:
@@ -813,18 +1018,27 @@ async def add_bcc_to_acc(
             acc_manifest_id=acc_manifest_id,
             bccp_manifest_id=bccp_manifest_id,
             index=index,
+            after_ascc_manifest_id=None if after_ascc_manifest_id is None else after_ascc_manifest_id,
+            after_bcc_manifest_id=None if after_bcc_manifest_id is None else after_bcc_manifest_id,
+            before_ascc_manifest_id=None if before_ascc_manifest_id is None else before_ascc_manifest_id,
+            before_bcc_manifest_id=None if before_bcc_manifest_id is None else before_bcc_manifest_id,
+            entity_type=None if entity_type is None else _map_bcc_entity_type_update(entity_type),
         )
-        if warnings:
-            logger.warning(
-                "add_bcc_to_acc acc_manifest_id=%d bccp_manifest_id=%d proceeding with warnings: %s",
-                acc_manifest_id,
-                bccp_manifest_id,
-                warnings,
-            )
+        await _elicit_on_acc_structure_warnings(
+            ctx=ctx,
+            warnings=warnings,
+            prompt="Adding this BCC may create repeated field names or sequence issues later.",
+            declined_message="Adding the BCC to the ACC was not confirmed.",
+            cancelled_message="Adding the BCC to the ACC was cancelled.",
+        )
         result = await core_component_service.add_bcc_to_acc(
             acc_manifest_id=acc_manifest_id,
             bccp_manifest_id=bccp_manifest_id,
             index=index,
+            after_ascc_manifest_id=None if after_ascc_manifest_id is None else after_ascc_manifest_id,
+            after_bcc_manifest_id=None if after_bcc_manifest_id is None else after_bcc_manifest_id,
+            before_ascc_manifest_id=None if before_ascc_manifest_id is None else before_ascc_manifest_id,
+            before_bcc_manifest_id=None if before_bcc_manifest_id is None else before_bcc_manifest_id,
             entity_type=None if entity_type is None else _map_bcc_entity_type_update(entity_type),
             cardinality_min=cardinality_min,
             cardinality_max=cardinality_max,
@@ -837,156 +1051,6 @@ async def add_bcc_to_acc(
         return AddBccToAccResponse.model_validate(result, from_attributes=True)
     except Exception as exc:
         raise _to_tool_error(exc, fallback=f"Unable to add the BCC to ACC {acc_manifest_id}.") from exc
-
-
-@mcp.tool(
-    name="reorder_ascc_in_acc",
-    description="Reorder an existing ASCC (Association Core Component) within an ACC sequence. Exactly one positioning option may be provided.",
-    output_schema=EMPTY_OUTPUT_SCHEMA,
-)
-async def reorder_ascc_in_acc(
-    ascc_manifest_id: Annotated[int, Field(gt=0, description="ASCC manifest identifier to move.")],
-    ctx: Context,
-    index: Annotated[
-        int | None,
-        Field(
-            default=None,
-            description=(
-                "Optional zero-based insertion index. Use `0` to move to the beginning, `-1` to move to the end, "
-                "or another non-negative index to place the association at that position in the sequence. "
-                "Mutually exclusive with all `after_*` and `before_*` options."
-            ),
-        ),
-    ],
-    after_ascc_manifest_id: Annotated[
-        int | None,
-        Field(default=None, gt=0, description="Reorder the ASCC after this ASCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
-    ],
-    after_bcc_manifest_id: Annotated[
-        int | None,
-        Field(default=None, gt=0, description="Reorder the ASCC after this BCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
-    ],
-    before_ascc_manifest_id: Annotated[
-        int | None,
-        Field(default=None, gt=0, description="Reorder the ASCC before this ASCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
-    ],
-    before_bcc_manifest_id: Annotated[
-        int | None,
-        Field(default=None, gt=0, description="Reorder the ASCC before this BCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
-    ],
-    core_component_service: CoreComponentService = Depends(get_core_component_service),
-) -> dict[str, object]:
-    """
-    Reorder an existing ASCC within an ACC sequence.
-
-    Notes:
-    - provide only one of `index`, `after_*`, or `before_*`
-    - omit all positioning inputs to place the ASCC first
-    - the ACC must be in `WIP`
-    - if the change could create repeated field names or sequence issues later, the tool asks for confirmation before continuing
-    """
-    try:
-        warnings = await core_component_service.get_reorder_ascc_in_acc_warnings(
-            ascc_manifest_id=ascc_manifest_id,
-            index=index,
-            after_ascc_manifest_id=None if after_ascc_manifest_id is None else after_ascc_manifest_id,
-            after_bcc_manifest_id=None if after_bcc_manifest_id is None else after_bcc_manifest_id,
-            before_ascc_manifest_id=None if before_ascc_manifest_id is None else before_ascc_manifest_id,
-            before_bcc_manifest_id=None if before_bcc_manifest_id is None else before_bcc_manifest_id,
-        )
-        await _elicit_on_acc_structure_warnings(
-            ctx=ctx,
-            warnings=warnings,
-            prompt="Reordering this ASCC may create repeated field names or sequence issues later.",
-            declined_message="Reordering the ASCC in the ACC was not confirmed.",
-            cancelled_message="Reordering the ASCC in the ACC was cancelled.",
-        )
-        await core_component_service.reorder_ascc_in_acc(
-            ascc_manifest_id=ascc_manifest_id,
-            index=index,
-            after_ascc_manifest_id=None if after_ascc_manifest_id is None else after_ascc_manifest_id,
-            after_bcc_manifest_id=None if after_bcc_manifest_id is None else after_bcc_manifest_id,
-            before_ascc_manifest_id=None if before_ascc_manifest_id is None else before_ascc_manifest_id,
-            before_bcc_manifest_id=None if before_bcc_manifest_id is None else before_bcc_manifest_id,
-        )
-        return {}
-    except Exception as exc:
-        raise _to_tool_error(exc, fallback=f"Unable to reorder ASCC {ascc_manifest_id}.") from exc
-
-
-@mcp.tool(
-    name="reorder_bcc_in_acc",
-    description="Reorder an existing BCC (Basic Core Component) within an ACC sequence. Exactly one positioning option may be provided.",
-    output_schema=EMPTY_OUTPUT_SCHEMA,
-)
-async def reorder_bcc_in_acc(
-    bcc_manifest_id: Annotated[int, Field(gt=0, description="BCC manifest identifier to move.")],
-    ctx: Context,
-    index: Annotated[
-        int | None,
-        Field(
-            default=None,
-            description=(
-                "Optional zero-based insertion index. Use `0` to move to the beginning, `-1` to move to the end, "
-                "or another non-negative index to place the association at that position in the sequence. "
-                "Mutually exclusive with all `after_*` and `before_*` options."
-            ),
-        ),
-    ],
-    after_ascc_manifest_id: Annotated[
-        int | None,
-        Field(default=None, gt=0, description="Reorder the BCC after this ASCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
-    ],
-    after_bcc_manifest_id: Annotated[
-        int | None,
-        Field(default=None, gt=0, description="Reorder the BCC after this BCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
-    ],
-    before_ascc_manifest_id: Annotated[
-        int | None,
-        Field(default=None, gt=0, description="Reorder the BCC before this ASCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
-    ],
-    before_bcc_manifest_id: Annotated[
-        int | None,
-        Field(default=None, gt=0, description="Reorder the BCC before this BCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
-    ],
-    core_component_service: CoreComponentService = Depends(get_core_component_service),
-) -> dict[str, object]:
-    """
-    Reorder an existing BCC within an ACC sequence.
-
-    Notes:
-    - provide only one of `index`, `after_*`, or `before_*`
-    - omit all positioning inputs to place the BCC first
-    - the ACC must be in `WIP`
-    - if the change could create repeated field names or sequence issues later, the tool asks for confirmation before continuing
-    """
-    try:
-        warnings = await core_component_service.get_reorder_bcc_in_acc_warnings(
-            bcc_manifest_id=bcc_manifest_id,
-            index=index,
-            after_ascc_manifest_id=None if after_ascc_manifest_id is None else after_ascc_manifest_id,
-            after_bcc_manifest_id=None if after_bcc_manifest_id is None else after_bcc_manifest_id,
-            before_ascc_manifest_id=None if before_ascc_manifest_id is None else before_ascc_manifest_id,
-            before_bcc_manifest_id=None if before_bcc_manifest_id is None else before_bcc_manifest_id,
-        )
-        await _elicit_on_acc_structure_warnings(
-            ctx=ctx,
-            warnings=warnings,
-            prompt="Reordering this BCC may create repeated field names or sequence issues later.",
-            declined_message="Reordering the BCC in the ACC was not confirmed.",
-            cancelled_message="Reordering the BCC in the ACC was cancelled.",
-        )
-        await core_component_service.reorder_bcc_in_acc(
-            bcc_manifest_id=bcc_manifest_id,
-            index=index,
-            after_ascc_manifest_id=None if after_ascc_manifest_id is None else after_ascc_manifest_id,
-            after_bcc_manifest_id=None if after_bcc_manifest_id is None else after_bcc_manifest_id,
-            before_ascc_manifest_id=None if before_ascc_manifest_id is None else before_ascc_manifest_id,
-            before_bcc_manifest_id=None if before_bcc_manifest_id is None else before_bcc_manifest_id,
-        )
-        return {}
-    except Exception as exc:
-        raise _to_tool_error(exc, fallback=f"Unable to reorder BCC {bcc_manifest_id}.") from exc
 
 
 @mcp.tool(
@@ -1053,16 +1117,22 @@ async def update_acc(
             default=None,
             ge=0,
             description=(
-                "Updated base ACC manifest identifier. Omit to leave unchanged. "
-                "Use 0 to clear the current base ACC. When set to a positive value, if the base ACC is in the same "
+                "Updated base ACC manifest identifier. When set to a positive value, if the base ACC is in the same "
                 "library as the target ACC it must be from the target ACC release; otherwise its release must be one "
-                "of the target ACC release dependencies."
+                "of the target ACC release dependencies. Omit to leave unchanged. Use 0 to clear the current base ACC."
             ),
         ),
     ],
     object_class_term: Annotated[
         str | None,
-        Field(default=None, description="Updated object class term. Omit to leave unchanged."),
+        Field(
+            default=None,
+            description=(
+                "Updated object class term. In CCTS, this is the term that represents the activity or object the "
+                "ACC stands for. It serves as the basis for the ACC DEN and for the DENs of the ASCC and BCC "
+                "properties under that ACC. Omit to leave unchanged."
+            ),
+        ),
     ],
     component_type: Annotated[
         Literal[
@@ -1080,25 +1150,45 @@ async def update_acc(
             "Choice",
             "AttributeGroup",
         ] | None,
-        Field(default=None, description="Updated OAGIS component type. Omit to leave unchanged."),
+        Field(
+            default=None,
+            description=(
+                "OAGIS component type. Use `Base` only when this ACC is intended to be the "
+                "base ACC for other ACCs. Use `Extension` for a developer extension ACC that end-users may extend "
+                "later in BIEs. Use `SemanticGroup` for a grouping ACC whose associations are flattened in BIEs. "
+                "Otherwise use `Semantics`. Omit to leave unchanged."
+            ),
+        ),
     ],
     definition: Annotated[
         str | None,
         Field(
             default=None,
-            description="Updated definition text. Omit to leave unchanged. Pass an empty string to clear it.",
+            description=(
+                "Definition text. This is the explanatory text that describes what the ACC means. "
+                "Omit to leave unchanged. Pass an empty string to clear it."
+            ),
         ),
     ],
     definition_source: Annotated[
         str | None,
         Field(
             default=None,
-            description="Updated definition source. Omit to leave unchanged. Pass an empty string to clear it.",
+            description=(
+                "Definition source. Use this to record where the definition came from, such as a "
+                "specification, standard, or reference URL. Omit to leave unchanged. Pass an empty string to clear it."
+            ),
         ),
     ],
     is_abstract: Annotated[
         bool | None,
-        Field(default=None, description="Updated abstract flag. Omit to leave unchanged."),
+        Field(
+            default=None,
+            description=(
+                "Whether this ACC should be abstract. If `component_type` is `Base`, this is usually `true`, "
+                "because the ACC is meant to serve as a base ACC for other ACCs. Omit to leave unchanged."
+            ),
+        ),
     ],
     deprecated: Annotated[
         bool | None,
@@ -1110,8 +1200,8 @@ async def update_acc(
             default=None,
             ge=0,
             description=(
-                "Updated namespace identifier. Omit to leave unchanged. "
-                "Use 0 to clear the namespace. When set to a positive value, it must belong to the same library as the ACC release."
+                "Updated namespace identifier. When set to a positive value, it must belong to the same library as the ACC release. "
+                "Omit to leave unchanged. Use 0 to clear the namespace."
             ),
         ),
     ],
@@ -1241,21 +1331,76 @@ async def transfer_acc_ownership(
 )
 async def update_ascc(
     ascc_manifest_id: Annotated[int, Field(gt=0, description="Target ASCC manifest identifier.")],
+    index: Annotated[
+        int | None,
+        Field(
+            default=None,
+            description=(
+                "Optional zero-based insertion index. Use `0` to place the association first, `-1` to place it last, "
+                "or another non-negative index to place it at that position in the sequence. "
+                "Mutually exclusive with all `after_*` and `before_*` options."
+            ),
+        ),
+    ] = None,
+    after_ascc_manifest_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="Place the association after this ASCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
+    ] = None,
+    after_bcc_manifest_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="Place the association after this BCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
+    ] = None,
+    before_ascc_manifest_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="Place the association before this ASCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
+    ] = None,
+    before_bcc_manifest_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="Place the association before this BCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
+    ] = None,
     cardinality_min: Annotated[
         int | None,
-        Field(default=None, ge=0, description="Updated minimum cardinality. Omit to leave unchanged."),
+        Field(
+            default=None,
+            ge=0,
+            description=(
+                "Minimum cardinality. Use `0` or a positive integer. If `cardinality_max` is also "
+                "provided and is not `-1`, this value must be less than or equal to it. Omit to leave unchanged."
+            ),
+        ),
     ] = None,
     cardinality_max: Annotated[
         int | None,
-        Field(default=None, ge=-1, description="Updated maximum cardinality. Use `-1` for unbounded. Omit to leave unchanged."),
+        Field(
+            default=None,
+            ge=-1,
+            description=(
+                "Maximum cardinality. Use `-1` for unbounded, or `0` or a positive integer for a bounded "
+                "maximum. If it is not `-1`, it must be greater than or equal to `cardinality_min`. If the BCC is "
+                "`Attribute`, this value must be `0` or `1`; `-1` is not allowed. Omit to leave unchanged."
+            ),
+        ),
     ] = None,
     definition: Annotated[
         str | None,
-        Field(default=None, description="Updated definition text. Omit to leave unchanged. Pass an empty string to clear it."),
+        Field(
+            default=None,
+            description=(
+                "Definition text. This is the explanatory text that describes what the BCC means. "
+                "Omit to leave unchanged. Pass an empty string to clear it."
+            ),
+        ),
     ] = None,
     definition_source: Annotated[
         str | None,
-        Field(default=None, description="Updated definition source. Omit to leave unchanged. Pass an empty string to clear it."),
+        Field(
+            default=None,
+            description=(
+                "Definition source. Use this to record where the definition came from, such as a "
+                "specification, standard, or reference URL. Omit to leave unchanged. Pass an empty string to "
+                "clear it."
+            ),
+        ),
     ] = None,
     deprecated: Annotated[
         bool | None,
@@ -1267,6 +1412,11 @@ async def update_ascc(
     try:
         result = await core_component_service.update_ascc(
             ascc_manifest_id=ascc_manifest_id,
+            index=UNSET if index is None else index,
+            after_ascc_manifest_id=UNSET if after_ascc_manifest_id is None else after_ascc_manifest_id,
+            after_bcc_manifest_id=UNSET if after_bcc_manifest_id is None else after_bcc_manifest_id,
+            before_ascc_manifest_id=UNSET if before_ascc_manifest_id is None else before_ascc_manifest_id,
+            before_bcc_manifest_id=UNSET if before_bcc_manifest_id is None else before_bcc_manifest_id,
             cardinality_min=UNSET if cardinality_min is None else cardinality_min,
             cardinality_max=UNSET if cardinality_max is None else cardinality_max,
             definition=UNSET if definition is None else definition,
@@ -1293,28 +1443,71 @@ async def update_ascc(
 )
 async def update_bcc(
     bcc_manifest_id: Annotated[int, Field(gt=0, description="Target BCC manifest identifier.")],
+    index: Annotated[
+        int | None,
+        Field(
+            default=None,
+            description=(
+                "Optional zero-based insertion index. Use `0` to place the association first, `-1` to place it last, "
+                "or another non-negative index to place it at that position in the sequence. "
+                "Mutually exclusive with all `after_*` and `before_*` options."
+            ),
+        ),
+    ] = None,
+    after_ascc_manifest_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="Place the association after this ASCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
+    ] = None,
+    after_bcc_manifest_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="Place the association after this BCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
+    ] = None,
+    before_ascc_manifest_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="Place the association before this ASCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
+    ] = None,
+    before_bcc_manifest_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="Place the association before this BCC manifest identifier. Mutually exclusive with `index` and all other `after_*`/`before_*` options."),
+    ] = None,
     entity_type: Annotated[
         BccEntityTypeUpdate | None,
         Field(
             default=None,
-            description="Updated entity type. Use `Element` or `Attribute`. Integer aliases `1` and `0` are also accepted.",
+            description="Updated entity type. Use `Element` or `Attribute`. Integer aliases `1` and `0` are also accepted. Omit to leave unchanged.",
         ),
     ] = None,
     cardinality_min: Annotated[
         int | None,
-        Field(default=None, ge=0, description="Updated minimum cardinality. Omit to leave unchanged."),
+        Field(
+            default=None,
+            ge=0,
+            description=(
+                "Minimum cardinality. Use `0` or a positive integer. If `cardinality_max` is also "
+                "provided and is not `-1`, this value must be less than or equal to it. Omit to leave unchanged."
+            ),
+        ),
     ] = None,
     cardinality_max: Annotated[
         int | None,
-        Field(default=None, ge=-1, description="Updated maximum cardinality. Use `-1` for unbounded. Omit to leave unchanged."),
+        Field(
+            default=None,
+            ge=-1,
+            description=(
+                "Maximum cardinality. Use `-1` for unbounded, or `0` or a positive integer for a bounded "
+                "maximum. If it is not `-1`, it must be greater than or equal to `cardinality_min`. If `entity_type` "
+                "changes from `Element` to `Attribute`, `-1` or a value greater than `1` is normalized to `1`. "
+                "Omit to leave unchanged."
+            ),
+        ),
     ] = None,
     definition: Annotated[
         str | None,
-        Field(default=None, description="Updated definition text. Omit to leave unchanged. Pass an empty string to clear it."),
+        Field(default=None, description="Definition text. Omit to leave unchanged. Pass an empty string to clear it."),
     ] = None,
     definition_source: Annotated[
         str | None,
-        Field(default=None, description="Updated definition source. Omit to leave unchanged. Pass an empty string to clear it."),
+        Field(default=None, description="Definition source. Omit to leave unchanged. Pass an empty string to clear it."),
     ] = None,
     deprecated: Annotated[
         bool | None,
@@ -1330,7 +1523,7 @@ async def update_bcc(
             default=None,
             description=(
                 "Updated value constraint. Provide `default_value` to set a default when the element is omitted, "
-                "or `fixed_value` to require one exact value."
+                "or `fixed_value` to require one exact value. Omit to leave unchanged."
             ),
         ),
     ] = None,
@@ -1340,6 +1533,11 @@ async def update_bcc(
     try:
         result = await core_component_service.update_bcc(
             bcc_manifest_id=bcc_manifest_id,
+            index=UNSET if index is None else index,
+            after_ascc_manifest_id=UNSET if after_ascc_manifest_id is None else after_ascc_manifest_id,
+            after_bcc_manifest_id=UNSET if after_bcc_manifest_id is None else after_bcc_manifest_id,
+            before_ascc_manifest_id=UNSET if before_ascc_manifest_id is None else before_ascc_manifest_id,
+            before_bcc_manifest_id=UNSET if before_bcc_manifest_id is None else before_bcc_manifest_id,
             entity_type=UNSET if entity_type is None else _map_bcc_entity_type_update(entity_type),
             cardinality_min=UNSET if cardinality_min is None else cardinality_min,
             cardinality_max=UNSET if cardinality_max is None else cardinality_max,
@@ -1435,8 +1633,8 @@ async def change_acc_state(
     Change an ACC lifecycle state according to connectCenter rules.
 
     Valid transitions depend on the ACC release branch:
-    - `Working` release ACCs: `Deleted <-> WIP <-> Draft <-> Candidate`
-    - non-`Working` release ACCs: `Deleted <-> WIP <-> QA <-> Production`
+    - `Working` release ACCs: `Deleted -> WIP`, `WIP -> Deleted|Draft`, `Draft -> WIP|Candidate`, `Candidate -> WIP`
+    - non-`Working` release ACCs: `Deleted -> WIP`, `WIP -> Deleted|QA`, `QA -> WIP|Production`, `Production` is terminal
 
     Additional rules:
     - moving from `WIP` to `Deleted` marks the ACC to be deleted later
@@ -1508,28 +1706,31 @@ async def change_acc_state(
 
 
 @mcp.tool(
-    name="revise_acc",
-    description="Create a new editable ACC (Aggregate Core Component) revision from a stable ACC revision.",
+    name="revise_or_amend_acc",
+    description=(
+        "Create a new editable ACC (Aggregate Core Component) revision from a stable ACC revision. "
+        "This tool revises developer-side ACCs and amends end-user ACCs using the same operation."
+    ),
     output_schema=EMPTY_OUTPUT_SCHEMA,
 )
-async def revise_acc(
+async def revise_or_amend_acc(
     acc_manifest_id: Annotated[int, Field(gt=0, description="Target ACC manifest identifier.")],
     core_component_service: CoreComponentService = Depends(get_core_component_service),
 ) -> dict[str, object]:
     """
-    Revise an ACC according to connectCenter rules.
+    Revise or amend an ACC according to connectCenter rules.
 
     Rules:
     - developer-side ACCs can be revised only from the `Published` state in the `Working` release
-    - end-user ACCs can be revised only from the `Production` state in a non-`Working` release
+    - end-user ACCs can be amended only from the `Production` state in a non-`Working` release
     - the requester and the ACC owner must belong to the same role family
-    - revising creates a new editable `WIP` revision for the ACC
+    - the operation creates a new editable `WIP` revision for the ACC
     """
     try:
         await core_component_service.revise_acc(acc_manifest_id=acc_manifest_id)
         return {}
     except Exception as exc:
-        raise _to_tool_error(exc, fallback=f"Unable to revise ACC {acc_manifest_id}.") from exc
+        raise _to_tool_error(exc, fallback=f"Unable to revise or amend ACC {acc_manifest_id}.") from exc
 
 
 @mcp.tool(
@@ -1613,19 +1814,54 @@ async def discard_acc(
 async def update_asccp(
     asccp_manifest_id: Annotated[int, Field(gt=0, description="Target ASCCP manifest identifier.")],
     ctx: Context,
-    property_term: Annotated[str | None, Field(default=None, description="Updated property term.")] = None,
-    definition: Annotated[str | None, Field(default=None, description="Updated definition text.")] = None,
-    definition_source: Annotated[str | None, Field(default=None, description="Updated definition source.")] = None,
-    reusable_indicator: Annotated[bool | None, Field(default=None, description="Updated reusable indicator.")] = None,
-    deprecated: Annotated[bool | None, Field(default=None, description="Updated deprecation flag.")] = None,
-    is_nillable: Annotated[bool | None, Field(default=None, description="Updated nillable flag.")] = None,
-    namespace_id: Annotated[int | None, Field(default=None, gt=0, description="Updated namespace identifier.")] = None,
+    role_of_acc_manifest_id: Annotated[
+        int | None,
+        Field(
+            default=None,
+            gt=0,
+            description="Updated role ACC manifest identifier. This identifies the ACC that this ASCCP points to as the associated ACC in the relationship. "
+                        "If the role ACC is in the same library as `release_id`, it must be from that release. If it is in a different library, "
+                        "its release must be one of the target release dependencies. Omit to leave unchanged.",
+        ),
+    ] = None,
+    property_term: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description=(
+                "Updated property term. In CCTS, this is a semantically meaningful name for the characteristic "
+                "that expresses the nature of the association to the associated ACC. Omit to leave unchanged."
+            ),
+        ),
+    ] = None,
+    definition: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description="Definition text. This is the explanatory text that describes what the ASCCP means. Omit to leave unchanged.",
+        ),
+    ] = None,
+    definition_source: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description=(
+                "Definition source. Use this to record where the definition came from, such as a "
+                "specification, standard, or reference URL. Omit to leave unchanged."
+            ),
+        ),
+    ] = None,
+    reusable_indicator: Annotated[bool | None, Field(default=None, description="Updated reusable indicator. Omit to leave unchanged.")] = None,
+    deprecated: Annotated[bool | None, Field(default=None, description="Updated deprecation flag. Omit to leave unchanged.")] = None,
+    is_nillable: Annotated[bool | None, Field(default=None, description="Updated nillable flag. Omit to leave unchanged.")] = None,
+    namespace_id: Annotated[int | None, Field(default=None, gt=0, description="Updated namespace identifier. Omit to leave unchanged.")] = None,
     core_component_service: CoreComponentService = Depends(get_core_component_service),
 ) -> UpdateAsccpResponse:
     """Update mutable ASCCP fields."""
     try:
         warnings = await core_component_service.get_update_asccp_warnings(
             asccp_manifest_id=asccp_manifest_id,
+            role_of_acc_manifest_id=AccManifestId(int(role_of_acc_manifest_id)) if role_of_acc_manifest_id is not None else UNSET,
             property_term=property_term if property_term is not None else UNSET,
         )
         await _elicit_on_acc_structure_warnings(
@@ -1637,13 +1873,14 @@ async def update_asccp(
         )
         result = await core_component_service.update_asccp(
             asccp_manifest_id=asccp_manifest_id,
-            property_term=property_term,
-            definition=definition,
-            definition_source=definition_source,
-            reusable_indicator=reusable_indicator,
-            deprecated=deprecated,
-            is_nillable=is_nillable,
-            namespace_id=namespace_id,
+            role_of_acc_manifest_id=AccManifestId(int(role_of_acc_manifest_id)) if role_of_acc_manifest_id is not None else UNSET,
+            property_term=property_term if property_term is not None else UNSET,
+            definition=definition if definition is not None else UNSET,
+            definition_source=definition_source if definition_source is not None else UNSET,
+            reusable_indicator=reusable_indicator if reusable_indicator is not None else UNSET,
+            deprecated=deprecated if deprecated is not None else UNSET,
+            is_nillable=is_nillable if is_nillable is not None else UNSET,
+            namespace_id=namespace_id if namespace_id is not None else UNSET,
             allow_warnings=True,
         )
         return UpdateAsccpResponse.model_validate(result, from_attributes=True)
@@ -1717,14 +1954,39 @@ async def transfer_asccp_ownership(
 async def update_bccp(
     bccp_manifest_id: Annotated[int, Field(gt=0, description="Target BCCP manifest identifier.")],
     ctx: Context,
-    property_term: Annotated[str | None, Field(default=None, description="Updated property term.")] = None,
-    definition: Annotated[str | None, Field(default=None, description="Updated definition text.")] = None,
-    definition_source: Annotated[str | None, Field(default=None, description="Updated definition source.")] = None,
-    deprecated: Annotated[bool | None, Field(default=None, description="Updated deprecation flag.")] = None,
-    is_nillable: Annotated[bool | None, Field(default=None, description="Updated nillable flag.")] = None,
-    namespace_id: Annotated[int | None, Field(default=None, gt=0, description="Updated namespace identifier.")] = None,
-    default_value: Annotated[str | None, Field(default=None, description="Updated default value.")] = None,
-    fixed_value: Annotated[str | None, Field(default=None, description="Updated fixed value.")] = None,
+    bdt_manifest_id: Annotated[int | None, Field(default=None, gt=0, description="Target BDT manifest identifier. Omit to leave unchanged. The selected data type must already be a BDT, which means its base DT link is set. If the BDT is in the same library as the BCCP, it must be from the BCCP release. If it is in a different library, its release must be one of the BCCP release dependencies.")] = None,
+    property_term: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description=(
+                "Updated property term. In CCTS, this is a semantically meaningful name for a unique "
+                "characteristic that can be used in an ACC object class. Omit to leave unchanged."
+            ),
+        ),
+    ] = None,
+    definition: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description="Definition text. This is the explanatory text that describes what the BCCP means. Omit to leave unchanged.",
+        ),
+    ] = None,
+    definition_source: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description=(
+                "Definition source. Use this to record where the definition came from, such as a "
+                "specification, standard, or reference URL. Omit to leave unchanged."
+            ),
+        ),
+    ] = None,
+    deprecated: Annotated[bool | None, Field(default=None, description="Updated deprecation flag. Omit to leave unchanged.")] = None,
+    is_nillable: Annotated[bool | None, Field(default=None, description="Updated nillable flag. Omit to leave unchanged.")] = None,
+    namespace_id: Annotated[int | None, Field(default=None, gt=0, description="Updated namespace identifier. Omit to leave unchanged.")] = None,
+    default_value: Annotated[str | None, Field(default=None, description="Updated default value. Omit to leave unchanged.")] = None,
+    fixed_value: Annotated[str | None, Field(default=None, description="Updated fixed value. Omit to leave unchanged.")] = None,
     core_component_service: CoreComponentService = Depends(get_core_component_service),
 ) -> UpdateBccpResponse:
     """Update mutable BCCP fields."""
@@ -1742,14 +2004,15 @@ async def update_bccp(
         )
         result = await core_component_service.update_bccp(
             bccp_manifest_id=bccp_manifest_id,
-            property_term=property_term,
-            definition=definition,
-            definition_source=definition_source,
-            deprecated=deprecated,
-            is_nillable=is_nillable,
-            namespace_id=namespace_id,
-            default_value=default_value,
-            fixed_value=fixed_value,
+            bdt_manifest_id=DataTypeManifestId(int(bdt_manifest_id)) if bdt_manifest_id is not None else UNSET,
+            property_term=property_term if property_term is not None else UNSET,
+            definition=definition if definition is not None else UNSET,
+            definition_source=definition_source if definition_source is not None else UNSET,
+            deprecated=deprecated if deprecated is not None else UNSET,
+            is_nillable=is_nillable if is_nillable is not None else UNSET,
+            namespace_id=namespace_id if namespace_id is not None else UNSET,
+            default_value=default_value if default_value is not None else UNSET,
+            fixed_value=fixed_value if fixed_value is not None else UNSET,
             allow_warnings=True,
         )
         return UpdateBccpResponse.model_validate(result, from_attributes=True)
@@ -1825,7 +2088,13 @@ async def change_asccp_state(
     state: Annotated[Literal["Deleted", "WIP", "Draft", "QA", "Candidate", "Production"], Field(description="Target lifecycle state.")],
     core_component_service: CoreComponentService = Depends(get_core_component_service),
 ) -> dict[str, object]:
-    """Change ASCCP lifecycle state."""
+    """
+    Change an ASCCP lifecycle state according to connectCenter rules.
+
+    Valid transitions depend on the ASCCP release branch:
+    - `Working` release ASCCPs: `Deleted -> WIP`, `WIP -> Deleted|Draft`, `Draft -> WIP|Candidate`, `Candidate -> WIP`
+    - non-`Working` release ASCCPs: `Deleted -> WIP`, `WIP -> Deleted|QA`, `QA -> WIP|Production`, `Production` is terminal
+    """
     try:
         await core_component_service.change_asccp_state(asccp_manifest_id=asccp_manifest_id, state=state)
         return {}
@@ -1839,80 +2108,18 @@ async def change_bccp_state(
     state: Annotated[Literal["Deleted", "WIP", "Draft", "QA", "Candidate", "Production"], Field(description="Target lifecycle state.")],
     core_component_service: CoreComponentService = Depends(get_core_component_service),
 ) -> dict[str, object]:
-    """Change BCCP lifecycle state."""
+    """
+    Change a BCCP lifecycle state according to connectCenter rules.
+
+    Valid transitions depend on the BCCP release branch:
+    - `Working` release BCCPs: `Deleted -> WIP`, `WIP -> Deleted|Draft`, `Draft -> WIP|Candidate`, `Candidate -> WIP`
+    - non-`Working` release BCCPs: `Deleted -> WIP`, `WIP -> Deleted|QA`, `QA -> WIP|Production`, `Production` is terminal
+    """
     try:
         await core_component_service.change_bccp_state(bccp_manifest_id=bccp_manifest_id, state=state)
         return {}
     except Exception as exc:
         raise _to_tool_error(exc, fallback=f"Unable to change the BCCP state for {bccp_manifest_id}.") from exc
-
-
-@mcp.tool(name="change_asccp_role_acc", description="Change the role ACC of an ASCCP (Association Core Component Property).", output_schema=EMPTY_OUTPUT_SCHEMA)
-async def change_asccp_role_acc(
-    asccp_manifest_id: Annotated[int, Field(gt=0, description="Target ASCCP manifest identifier.")],
-    acc_manifest_id: Annotated[
-        int,
-        Field(
-            gt=0,
-            description=(
-                "Target role ACC manifest identifier. If the ACC is in the same library as the ASCCP, it must be "
-                "from the ASCCP release. If it is in a different library, its release must be one of the ASCCP "
-                "release dependencies."
-            ),
-        ),
-    ],
-    ctx: Context,
-    core_component_service: CoreComponentService = Depends(get_core_component_service),
-) -> dict[str, object]:
-    """Change the role ACC of an ASCCP."""
-    try:
-        warnings = await core_component_service.get_change_asccp_role_of_acc_warnings(
-            asccp_manifest_id=asccp_manifest_id,
-            role_of_acc_manifest_id=acc_manifest_id,
-        )
-        await _elicit_on_acc_structure_warnings(
-            ctx=ctx,
-            warnings=warnings,
-            prompt="Changing the role ACC of this ASCCP may affect ACCs that already use it.",
-            declined_message="Changing the role ACC of the ASCCP was not confirmed.",
-            cancelled_message="Changing the role ACC of the ASCCP was cancelled.",
-        )
-        await core_component_service.change_asccp_role_of_acc(
-            asccp_manifest_id=asccp_manifest_id,
-            role_of_acc_manifest_id=acc_manifest_id,
-            allow_warnings=True,
-        )
-        return {}
-    except Exception as exc:
-        raise _to_tool_error(exc, fallback=f"Unable to change the role ACC of ASCCP {asccp_manifest_id}.") from exc
-
-
-@mcp.tool(name="change_bccp_bdt", description="Change the BDT of a BCCP (Basic Core Component Property).", output_schema=EMPTY_OUTPUT_SCHEMA)
-async def change_bccp_bdt(
-    bccp_manifest_id: Annotated[int, Field(gt=0, description="Target BCCP manifest identifier.")],
-    bdt_manifest_id: Annotated[
-        int,
-        Field(
-            gt=0,
-            description=(
-                "Target BDT manifest identifier. The selected data type must already be a BDT, "
-                "which means its base DT link is set. If the BDT is in the same library as the BCCP, it must be "
-                "from the BCCP release. If it is in a different library, its release must be one of the BCCP "
-                "release dependencies."
-            ),
-        ),
-    ],
-    core_component_service: CoreComponentService = Depends(get_core_component_service),
-) -> dict[str, object]:
-    """Change the BDT of a BCCP."""
-    try:
-        await core_component_service.change_bccp_bdt(
-            bccp_manifest_id=bccp_manifest_id,
-            bdt_manifest_id=DataTypeManifestId(int(bdt_manifest_id)),
-        )
-        return {}
-    except Exception as exc:
-        raise _to_tool_error(exc, fallback=f"Unable to change the BDT of BCCP {bccp_manifest_id}.") from exc
 
 
 @mcp.tool(name="add_tags_to_asccp", description="Attach one or more tags to an ASCCP (Association Core Component Property).", output_schema=EMPTY_OUTPUT_SCHEMA)
@@ -1971,17 +2178,24 @@ async def remove_tags_from_bccp(
         raise _to_tool_error(exc, fallback=f"Unable to remove tags from BCCP {bccp_manifest_id}.") from exc
 
 
-@mcp.tool(name="revise_asccp", description="Create a new editable ASCCP revision from a stable ASCCP revision.", output_schema=EMPTY_OUTPUT_SCHEMA)
-async def revise_asccp(
+@mcp.tool(
+    name="revise_or_amend_asccp",
+    description=(
+        "Create a new editable ASCCP revision from a stable ASCCP revision. "
+        "For end-user ASCCPs, this is called an amendment."
+    ),
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def revise_or_amend_asccp(
     asccp_manifest_id: Annotated[int, Field(gt=0, description="Target ASCCP manifest identifier.")],
     core_component_service: CoreComponentService = Depends(get_core_component_service),
 ) -> dict[str, object]:
-    """Revise an ASCCP."""
+    """Revise or amend an ASCCP."""
     try:
         await core_component_service.revise_asccp(asccp_manifest_id=asccp_manifest_id)
         return {}
     except Exception as exc:
-        raise _to_tool_error(exc, fallback=f"Unable to revise ASCCP {asccp_manifest_id}.") from exc
+        raise _to_tool_error(exc, fallback=f"Unable to revise or amend ASCCP {asccp_manifest_id}.") from exc
 
 
 @mcp.tool(name="cancel_asccp", description="Cancel the current ASCCP revision and restore the previous stable revision.", output_schema=EMPTY_OUTPUT_SCHEMA)
@@ -2027,17 +2241,24 @@ async def discard_asccp(
         raise _to_tool_error(exc, fallback=f"Unable to discard ASCCP {asccp_manifest_id}.") from exc
 
 
-@mcp.tool(name="revise_bccp", description="Create a new editable BCCP revision from a stable BCCP revision.", output_schema=EMPTY_OUTPUT_SCHEMA)
-async def revise_bccp(
+@mcp.tool(
+    name="revise_or_amend_bccp",
+    description=(
+        "Create a new editable BCCP revision from a stable BCCP revision. "
+        "For end-user BCCPs, this is called an amendment."
+    ),
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def revise_or_amend_bccp(
     bccp_manifest_id: Annotated[int, Field(gt=0, description="Target BCCP manifest identifier.")],
     core_component_service: CoreComponentService = Depends(get_core_component_service),
 ) -> dict[str, object]:
-    """Revise a BCCP."""
+    """Revise or amend a BCCP."""
     try:
         await core_component_service.revise_bccp(bccp_manifest_id=bccp_manifest_id)
         return {}
     except Exception as exc:
-        raise _to_tool_error(exc, fallback=f"Unable to revise BCCP {bccp_manifest_id}.") from exc
+        raise _to_tool_error(exc, fallback=f"Unable to revise or amend BCCP {bccp_manifest_id}.") from exc
 
 
 @mcp.tool(name="cancel_bccp", description="Cancel the current BCCP revision and restore the previous stable revision.", output_schema=EMPTY_OUTPUT_SCHEMA)
@@ -2961,8 +3182,8 @@ async def _create_acc_response(
     core_component_service: CoreComponentService,
     release_id: int,
     based_acc_manifest_id: int | None = None,
-    initial_object_class_term: str | None = None,
-    initial_component_type: Literal[
+    object_class_term: str,
+    component_type: Literal[
         "Base",
         "Semantics",
         "Extension",
@@ -2977,7 +3198,9 @@ async def _create_acc_response(
         "Choice",
         "AttributeGroup",
     ] = "Semantics",
-    initial_definition: str | None = None,
+    definition: str | None = None,
+    definition_source: str | None = None,
+    is_abstract: bool | None = None,
     namespace_id: int | None = None,
     tag_id: list[int] | None = None,
     fallback: str,
@@ -2987,9 +3210,11 @@ async def _create_acc_response(
         result = await core_component_service.create_acc(
             release_id=release_id,
             based_acc_manifest_id=based_acc_manifest_id,
-            initial_object_class_term=initial_object_class_term,
-            initial_component_type=initial_component_type,
-            initial_definition=initial_definition,
+            object_class_term=object_class_term,
+            component_type=component_type,
+            definition=definition,
+            definition_source=definition_source,
+            is_abstract=is_abstract,
             namespace_id=namespace_id,
             tag_id=tag_id,
         )

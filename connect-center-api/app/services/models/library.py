@@ -53,8 +53,20 @@ class LibraryServiceResult:
     state: str | None = None
     is_read_only: bool
     is_default: bool
+    release_dependencies: list["LibraryReleaseDependencyServiceResult"]
     created: WhoAndWhen
     last_updated: WhoAndWhen
+
+
+@dataclass(kw_only=True)
+class LibraryReleaseDependencyServiceResult:
+    """Release dependency information for a library's working release."""
+
+    release_id: ReleaseId
+    library_id: LibraryId
+    library_name: str
+    release_num: str
+    state: str
 
 
 @dataclass(kw_only=True)
@@ -89,8 +101,8 @@ class DiscardLibraryCheckServiceResult:
 
 
 @dataclass(kw_only=True)
-class UpdateLibraryReleaseDependenciesServiceResult:
-    """Result returned after replacing working-release dependencies."""
+class ManageLibraryReleaseDependenciesServiceResult:
+    """Result returned after adding or removing working-release dependencies."""
 
     library_id: LibraryId
-    release_ids: list[ReleaseId]
+    release_dependencies: list[LibraryReleaseDependencyServiceResult]

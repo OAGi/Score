@@ -105,6 +105,42 @@ class CreateCodeListRequest(BaseModel):
         ge=1,
         description="Optional base code list manifest identifier used to derive the new code list.",
     )
+    name: str = Field(..., min_length=1, description="Name to save for this code list.")
+    version_id: str | None = Field(
+        default=None,
+        description=(
+            "Version identifier to save. If omitted, the base code list's version identifier is used "
+            "when creating from a base code list; otherwise `1` is used."
+        ),
+    )
+    list_id: str | None = Field(
+        default=None,
+        description="External list identifier to save. If omitted, a generated list identifier is used.",
+    )
+    agency_id_list_value_manifest_id: int | None = Field(
+        default=None,
+        ge=1,
+        description="Agency ID list value to use for this code list.",
+    )
+    definition: str | None = Field(
+        default=None,
+        description="Definition text to save. This is the explanatory text that describes what the code list means.",
+    )
+    definition_source: str | None = Field(
+        default=None,
+        description=(
+            "Definition source to save. Use this to record where the definition came from, such as a "
+            "specification, standard, or reference URL."
+        ),
+    )
+    remark: str | None = Field(default=None, description="Remark to save.")
+    namespace_id: int | None = Field(
+        default=None,
+        ge=1,
+        description="Namespace to use for this code list.",
+    )
+    deprecated: bool | None = Field(default=None, description="Whether this code list should be deprecated.")
+    extensible_indicator: bool | None = Field(default=None, description="Whether this code list should be extensible.")
 
     model_config = ConfigDict(frozen=True)
 
@@ -127,14 +163,14 @@ class CreateCodeListValueRequest(BaseModel):
 class UpdateCodeListValueRequest(BaseModel):
     """Request payload for updating one existing code list value by manifest ID."""
 
-    value: str | None = Field(default=None, description="Updated code list value.")
-    meaning: str | None = Field(default=None, description="Updated meaning. Use null to clear it.")
-    definition: str | None = Field(default=None, description="Updated definition. Use null to clear it.")
+    value: str | None = Field(default=None, description="Value. Omit to leave unchanged.")
+    meaning: str | None = Field(default=None, description="Meaning. Omit to leave unchanged. Set `null` to clear it.")
+    definition: str | None = Field(default=None, description="Definition. Omit to leave unchanged. Set `null` to clear it.")
     definition_source: str | None = Field(
         default=None,
-        description="Updated definition source URL. Use null to clear it.",
+        description="Definition source URL. Omit to leave unchanged. Set `null` to clear it.",
     )
-    deprecated: bool | None = Field(default=None, description="Updated deprecation flag.")
+    deprecated: bool | None = Field(default=None, description="Whether this code list entry should be deprecated. Omit to leave unchanged.")
 
     model_config = ConfigDict(frozen=True)
 
@@ -142,27 +178,33 @@ class UpdateCodeListValueRequest(BaseModel):
 class UpdateCodeListRequest(BaseModel):
     """Request payload for updating mutable code list fields."""
 
-    name: str | None = Field(default=None, description="Updated name. Use null to clear it.")
-    version_id: str | None = Field(default=None, description="Updated version identifier. Use null to clear it.")
-    list_id: str | None = Field(default=None, description="Updated external list identifier. Use null to clear it.")
+    name: str | None = Field(default=None, description="Name. Omit to leave unchanged.")
+    version_id: str | None = Field(default=None, description="Version identifier. Omit to leave unchanged.")
+    list_id: str | None = Field(default=None, description="External list identifier. Omit to leave unchanged.")
     agency_id_list_value_manifest_id: int | None = Field(
         default=None,
         ge=1,
-        description="Updated agency-ID-list value manifest identifier. Use null to clear it.",
+        description="Agency ID list value. Omit to leave unchanged. Set `null` to clear it.",
     )
-    definition: str | None = Field(default=None, description="Updated definition text. Use null to clear it.")
+    definition: str | None = Field(
+        default=None,
+        description="Definition text. This is the explanatory text that describes what the code list means. Omit to leave unchanged. Set `null` to clear it.",
+    )
     definition_source: str | None = Field(
         default=None,
-        description="Updated definition source URL. Use null to clear it.",
+        description=(
+            "Definition source. Use this to record where the definition came from, such as a "
+            "specification, standard, or reference URL. Omit to leave unchanged. Set `null` to clear it."
+        ),
     )
-    remark: str | None = Field(default=None, description="Updated remark. Use null to clear it.")
+    remark: str | None = Field(default=None, description="Remark. Omit to leave unchanged. Set `null` to clear it.")
     namespace_id: int | None = Field(
         default=None,
         ge=1,
-        description="Updated namespace identifier. Use null to clear the namespace.",
+        description="Namespace. Omit to leave unchanged. Set `null` to clear it.",
     )
-    deprecated: bool | None = Field(default=None, description="Updated deprecation flag.")
-    extensible_indicator: bool | None = Field(default=None, description="Updated extensibility flag.")
+    deprecated: bool | None = Field(default=None, description="Whether this code list should be deprecated. Omit to leave unchanged.")
+    extensible_indicator: bool | None = Field(default=None, description="Whether this code list should be extensible. Omit to leave unchanged.")
 
     model_config = ConfigDict(frozen=True)
 

@@ -129,7 +129,17 @@ class MariaDbCodeListRepository(CodeListRepositoryContract):
         self,
         *,
         release_id: ReleaseId,
+        name: str,
         based_code_list_manifest_id: CodeListManifestId | None,
+        version_id: str | None,
+        list_id: str | None,
+        agency_id_list_value_manifest_id: int | None,
+        definition: str | None,
+        definition_source: str | None,
+        remark: str | None,
+        namespace_id: int | None,
+        deprecated: bool | None,
+        extensible_indicator: bool | None,
         requester_user_id: AppUserId,
         requester_is_developer: bool,
     ) -> CodeListManifestId:
@@ -155,20 +165,28 @@ class MariaDbCodeListRepository(CodeListRepositoryContract):
         code_list = CodeList(
             guid=_random_guid(),
             enum_type_guid=None,
-            name=str(based_code_list.name) if based_code_list is not None and based_code_list.name is not None else "Code List",
-            list_id=_random_guid(),
-            version_id=str(based_code_list.version_id) if based_code_list is not None else "1",
-            definition=None,
-            remark=None,
-            definition_source=None,
-            namespace_id=None,
+            name=str(name),
+            list_id=list_id if list_id is not None else _random_guid(),
+            version_id=(
+                str(version_id)
+                if version_id is not None
+                else (str(based_code_list.version_id) if based_code_list is not None else "1")
+            ),
+            definition=definition,
+            remark=remark,
+            definition_source=definition_source,
+            namespace_id=namespace_id,
             based_code_list_id=int(based_code_list.code_list_id) if based_code_list is not None else None,
             extensible_indicator=(
-                bool(based_code_list.extensible_indicator)
-                if based_code_list is not None and requester_is_developer
-                else bool(requester_is_developer)
+                bool(extensible_indicator)
+                if extensible_indicator is not None
+                else (
+                    bool(based_code_list.extensible_indicator)
+                    if based_code_list is not None and requester_is_developer
+                    else bool(requester_is_developer)
+                )
             ),
-            is_deprecated=False,
+            is_deprecated=bool(deprecated) if deprecated is not None else False,
             replacement_code_list_id=None,
             owner_user_id=int(requester_user_id),
             created_by=int(requester_user_id),
@@ -188,9 +206,13 @@ class MariaDbCodeListRepository(CodeListRepositoryContract):
             code_list_id=int(code_list.code_list_id),
             based_code_list_manifest_id=int(based_manifest.code_list_manifest_id) if based_manifest is not None else None,
             agency_id_list_value_manifest_id=(
-                int(based_manifest.agency_id_list_value_manifest_id)
-                if based_manifest is not None and based_manifest.agency_id_list_value_manifest_id is not None
-                else None
+                agency_id_list_value_manifest_id
+                if agency_id_list_value_manifest_id is not None
+                else (
+                    int(based_manifest.agency_id_list_value_manifest_id)
+                    if based_manifest is not None and based_manifest.agency_id_list_value_manifest_id is not None
+                    else None
+                )
             ),
             conflict=False,
             log_id=None,

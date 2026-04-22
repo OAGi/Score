@@ -7,12 +7,15 @@ commands for manifest-scoped DT authoring.
 
 from __future__ import annotations
 
+from typing import Literal
+
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Response, status
 
 from app.deps import get_data_type_service
 from app.routes.models.data_type import (
     CreateDataTypeRequest,
     CreateDataTypeResponse,
+    CreateDataTypeSupplementaryComponentRequest,
     CreateDataTypeSupplementaryComponentResponse,
     DataTypeEntry,
     GetDataTypeByDataTypeManifestIdResponse,
@@ -146,6 +149,22 @@ async def create_data_type(
             agency_id_list_manifest_id=(
                 payload.default_primitive.agency_id_list_manifest_id
                 if "default_primitive" in payload.model_fields_set and payload.default_primitive is not None
+                else UNSET
+            ),
+            add_primitives=(
+                [
+                    DataTypePrimitiveServiceRecord(**primitive.model_dump(), is_default=False)
+                    for primitive in payload.add_primitives
+                ]
+                if "add_primitives" in payload.model_fields_set and payload.add_primitives is not None
+                else UNSET
+            ),
+            remove_primitives=(
+                [
+                    DataTypePrimitiveServiceRecord(**primitive.model_dump(), is_default=False)
+                    for primitive in payload.remove_primitives
+                ]
+                if "remove_primitives" in payload.model_fields_set and payload.remove_primitives is not None
                 else UNSET
             ),
         )
@@ -329,16 +348,60 @@ async def transfer_data_type_ownership(
     "/{dt_manifest_id}/supplementary-components",
     status_code=status.HTTP_201_CREATED,
     summary="Create DT_SC",
-    description="Create a new DT supplementary component under a `WIP` DT and propagate it to inherited DTs.",
+    description="Create a new DT supplementary component under a `WIP` DT, optionally apply mutable fields, and propagate it to inherited DTs.",
     response_model=CreateDataTypeSupplementaryComponentResponse,
 )
 async def create_dt_sc(
     dt_manifest_id: DataTypeManifestId = Path(..., ge=1, description="Owning data type manifest ID."),
+    payload: CreateDataTypeSupplementaryComponentRequest = Body(...),
     data_type_service: DataTypeService = Depends(get_data_type_service),
 ) -> CreateDataTypeSupplementaryComponentResponse:
-    """Create a blank DT_SC under a DT."""
+    """Create a DT_SC under a DT."""
     try:
-        result = await data_type_service.create_dt_sc(owner_dt_manifest_id=dt_manifest_id)
+        result = await data_type_service.create_dt_sc(
+            owner_dt_manifest_id=dt_manifest_id,
+            property_term=payload.property_term,
+            representation_term=payload.representation_term,
+            cardinality=payload.cardinality if "cardinality" in payload.model_fields_set else UNSET,
+            deprecated=payload.deprecated if "deprecated" in payload.model_fields_set else UNSET,
+            default_value=(
+                None
+                if "value_constraint" in payload.model_fields_set and payload.value_constraint is None
+                else (
+                    payload.value_constraint.default_value
+                    if "value_constraint" in payload.model_fields_set and payload.value_constraint is not None
+                    else UNSET
+                )
+            ),
+            fixed_value=(
+                None
+                if "value_constraint" in payload.model_fields_set and payload.value_constraint is None
+                else (
+                    payload.value_constraint.fixed_value
+                    if "value_constraint" in payload.model_fields_set and payload.value_constraint is not None
+                    else UNSET
+                )
+            ),
+            definition=payload.definition if "definition" in payload.model_fields_set else UNSET,
+            definition_source=payload.definition_source if "definition_source" in payload.model_fields_set else UNSET,
+            xbt_manifest_id=(
+                payload.default_primitive.xbt_manifest_id
+                if "default_primitive" in payload.model_fields_set and payload.default_primitive is not None
+                else UNSET
+            ),
+            code_list_manifest_id=(
+                payload.default_primitive.code_list_manifest_id
+                if "default_primitive" in payload.model_fields_set and payload.default_primitive is not None
+                else UNSET
+            ),
+            agency_id_list_manifest_id=(
+                payload.default_primitive.agency_id_list_manifest_id
+                if "default_primitive" in payload.model_fields_set and payload.default_primitive is not None
+                else UNSET
+            ),
+            add_primitives=payload.add_primitives if "add_primitives" in payload.model_fields_set else UNSET,
+            remove_primitives=payload.remove_primitives if "remove_primitives" in payload.model_fields_set else UNSET,
+        )
         return CreateDataTypeSupplementaryComponentResponse.model_validate(result, from_attributes=True)
     except LookupError as e:
         raise HTTPException(
@@ -606,8 +669,10 @@ async def remove_dt_tags(
     summary="Change DT state",
     description=(
         "Change the lifecycle state of a DT. "
-        "For `Working` releases, the allowed path is `Deleted <-> WIP <-> Draft <-> Candidate`. "
-        "For non-`Working` releases, the allowed path is `Deleted <-> WIP <-> QA <-> Production`."
+        "For `Working` releases, the allowed moves are `Deleted -> WIP`, `WIP -> Deleted|Draft`, "
+        "`Draft -> WIP|Candidate`, and `Candidate -> WIP`. "
+        "For non-`Working` releases, the allowed moves are `Deleted -> WIP`, `WIP -> Deleted|QA`, "
+        "`QA -> WIP|Production`, and `Production` is terminal."
     ),
 )
 async def change_dt_state(
@@ -641,22 +706,18 @@ async def change_dt_state(
         )
 
 
-@router.post(
-    "/{dt_manifest_id}/revise",
-    status_code=status.HTTP_204_NO_CONTENT,
-    summary="Revise DT",
-    description=(
-        "Create a new editable DT revision from a stable DT. "
-        "Developer-side DTs can be revised only from `Published`, and end-user DTs only from `Production`."
-    ),
-)
-async def revise_dt(
-    dt_manifest_id: DataTypeManifestId = Path(..., ge=1, description="Data type manifest ID."),
-    data_type_service: DataTypeService = Depends(get_data_type_service),
+async def _revise_or_amend_dt(
+    *,
+    dt_manifest_id: DataTypeManifestId,
+    requested_action: Literal["revise", "amend"],
+    data_type_service: DataTypeService,
 ) -> Response:
-    """Create a revised DT working copy."""
+    """Create a revised or amended DT working copy."""
     try:
-        await data_type_service.revise_dt(dt_manifest_id=dt_manifest_id)
+        await data_type_service.revise_dt(
+            dt_manifest_id=dt_manifest_id,
+            requested_action=requested_action,
+        )
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except LookupError as e:
         raise HTTPException(
@@ -666,7 +727,7 @@ async def revise_dt(
     except PermissionError as e:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"message": "You do not have permission to revise this DT.", "cause": str(e)},
+            detail={"message": "You do not have permission to revise or amend this DT.", "cause": str(e)},
         )
     except ValueError as e:
         raise HTTPException(
@@ -676,8 +737,53 @@ async def revise_dt(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"message": "We couldn't revise the DT.", "cause": str(e)},
+            detail={"message": "We couldn't revise or amend the DT.", "cause": str(e)},
         )
+
+
+@router.post(
+    "/{dt_manifest_id}/revise",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Revise/Amend DT",
+    description=(
+        "Create a new editable DT revision from a stable DT. "
+        "Use `/revise` for developer-side DTs in `Working` releases when the stable DT is in `Published`. "
+        "End-user DTs should use `/amend` instead."
+    ),
+)
+async def revise_dt(
+    dt_manifest_id: DataTypeManifestId = Path(..., ge=1, description="Data type manifest ID."),
+    data_type_service: DataTypeService = Depends(get_data_type_service),
+) -> Response:
+    """Create a revised DT working copy for developer-side DTs."""
+    return await _revise_or_amend_dt(
+        dt_manifest_id=dt_manifest_id,
+        requested_action="revise",
+        data_type_service=data_type_service,
+    )
+
+
+@router.post(
+    "/{dt_manifest_id}/amend",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Revise/Amend DT",
+    description=(
+        "Create a new editable DT revision from a stable DT. "
+        "Use `/amend` for end-user DTs in non-`Working` releases when the stable DT is in `Production`. "
+        "Developer-side DTs should use `/revise` instead."
+    ),
+    openapi_extra={"x-alternative-endpoint-for": "/data-types/{dt_manifest_id}/revise"},
+)
+async def amend_dt(
+    dt_manifest_id: DataTypeManifestId = Path(..., ge=1, description="Data type manifest ID."),
+    data_type_service: DataTypeService = Depends(get_data_type_service),
+) -> Response:
+    """Create an amended DT working copy for end-user DTs."""
+    return await _revise_or_amend_dt(
+        dt_manifest_id=dt_manifest_id,
+        requested_action="amend",
+        data_type_service=data_type_service,
+    )
 
 
 @router.post(

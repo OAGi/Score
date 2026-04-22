@@ -79,7 +79,13 @@ class AsccpInfoRecord(BaseModel):
     role_of_acc_manifest_id: int = Field(..., ge=1, description="Role-of ACC manifest identifier.")
     guid: str = Field(..., description="ASCCP GUID.")
     den: str | None = Field(default=None, description="ASCCP DEN.")
-    property_term: str | None = Field(default=None, description="ASCCP property term.")
+    property_term: str | None = Field(
+        default=None,
+        description=(
+            "ASCCP property term. In CCTS, this is the semantically meaningful name for the characteristic that "
+            "represents the nature of the association to the associated ACC."
+        ),
+    )
     definition: str | None = Field(default=None, description="ASCCP definition.")
     definition_source: str | None = Field(default=None, description="ASCCP definition source.")
     is_deprecated: bool = Field(..., description="Whether ASCCP is deprecated.")

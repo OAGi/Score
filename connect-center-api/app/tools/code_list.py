@@ -583,6 +583,7 @@ async def create_code_list(
             ),
         ),
     ],
+    name: Annotated[str, Field(min_length=1, description="Name to save for this code list.")],
     based_code_list_manifest_id: Annotated[
         int | None,
         Field(
@@ -591,6 +592,60 @@ async def create_code_list(
             description="Optional base code list manifest identifier used to derive the new code list.",
         ),
     ],
+    version_id: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description=(
+                "Version identifier to save for this code list. If omitted, the base code list's "
+                "version identifier is used when creating from a base code list; otherwise `1` is used."
+            ),
+        ),
+    ],
+    list_id: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description="External list identifier to save for this code list. If omitted, a generated list identifier is used.",
+        ),
+    ],
+    agency_id_list_value_manifest_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="Agency ID list value to use for this code list."),
+    ],
+    definition: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description="Definition text to save for this code list. This is the explanatory text that describes what the code list means.",
+        ),
+    ],
+    definition_source: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description=(
+                "Definition source to save for this code list. Use this to record where the definition came from, "
+                "such as a specification, standard, or reference URL."
+            ),
+        ),
+    ],
+    remark: Annotated[
+        str | None,
+        Field(default=None, description="Remark to save for this code list."),
+    ],
+    namespace_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="Namespace identifier to use for this code list."),
+    ],
+    deprecated: Annotated[
+        bool | None,
+        Field(default=None, description="Whether this code list should start as deprecated."),
+    ],
+    extensible_indicator: Annotated[
+        bool | None,
+        Field(default=None, description="Whether this code list should be extensible."),
+    ],
     code_list_service: CodeListService = Depends(get_code_list_service),
 ) -> CreateCodeListResponse:
     """Create a code list, optionally derived from a base code list."""
@@ -598,6 +653,16 @@ async def create_code_list(
         result = await code_list_service.create_code_list(
             release_id=release_id,
             based_code_list_manifest_id=based_code_list_manifest_id,
+            name=name,
+            version_id=version_id,
+            list_id=list_id,
+            agency_id_list_value_manifest_id=agency_id_list_value_manifest_id,
+            definition=definition,
+            definition_source=definition_source,
+            remark=remark,
+            namespace_id=namespace_id,
+            deprecated=deprecated,
+            extensible_indicator=extensible_indicator,
         )
         return CreateCodeListResponse.model_validate(result, from_attributes=True)
     except Exception as exc:
@@ -642,8 +707,23 @@ async def update_code_list(
             ),
         ),
     ],
-    definition: Annotated[str | None, Field(default=None, description="Updated definition text. Omit to leave unchanged.")],
-    definition_source: Annotated[str | None, Field(default=None, description="Updated definition source URL. Omit to leave unchanged.")],
+    definition: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description="Definition text. This is the explanatory text that describes what the code list means. Omit to leave unchanged.",
+        ),
+    ],
+    definition_source: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description=(
+                "Definition source. Use this to record where the definition came from, such as a "
+                "specification, standard, or reference URL. Omit to leave unchanged."
+            ),
+        ),
+    ],
     remark: Annotated[str | None, Field(default=None, description="Updated remark. Omit to leave unchanged.")],
     namespace_id: Annotated[
         int | None,
@@ -894,7 +974,13 @@ async def change_code_list_state(
     state: Annotated[CodeListLifecycleState, Field(description="Target lifecycle state.")],
     code_list_service: CodeListService = Depends(get_code_list_service),
 ) -> dict[str, object]:
-    """Change a code list lifecycle state according to connectCenter rules."""
+    """
+    Change a code list lifecycle state according to connectCenter rules.
+
+    Valid transitions depend on the release branch:
+    - `Working` release code lists: `Deleted -> WIP`, `WIP -> Deleted|Draft`, `Draft -> WIP|Candidate`, `Candidate -> WIP`
+    - non-`Working` release code lists: `Deleted -> WIP`, `WIP -> Deleted|QA`, `QA -> WIP|Production`, `Production` is terminal
+    """
     try:
         await code_list_service.change_code_list_state(
             code_list_manifest_id=code_list_manifest_id,
@@ -909,20 +995,23 @@ async def change_code_list_state(
 
 
 @mcp.tool(
-    name="revise_code_list",
-    description="Create a new editable code list revision from a stable code list revision.",
+    name="revise_or_amend_code_list",
+    description=(
+        "Create a new editable code list revision from a stable code list revision. "
+        "For end-user code lists, this is called an amendment."
+    ),
     output_schema=EMPTY_OUTPUT_SCHEMA,
 )
-async def revise_code_list(
+async def revise_or_amend_code_list(
     code_list_manifest_id: Annotated[int, Field(gt=0, description="Target code list manifest identifier.")],
     code_list_service: CodeListService = Depends(get_code_list_service),
 ) -> dict[str, object]:
-    """Revise a code list according to connectCenter rules."""
+    """Revise or amend a code list according to connectCenter rules."""
     try:
         await code_list_service.revise_code_list(code_list_manifest_id=code_list_manifest_id)
         return {}
     except Exception as exc:
-        raise _to_tool_error(exc, fallback=f"Unable to revise code list {code_list_manifest_id}.") from exc
+        raise _to_tool_error(exc, fallback=f"Unable to revise or amend code list {code_list_manifest_id}.") from exc
 
 
 @mcp.tool(

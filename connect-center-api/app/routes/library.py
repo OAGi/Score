@@ -12,13 +12,13 @@ from app.routes.models.library import (
     GetLibraryByLibraryIdResponse,
     GetLibraryListResponse,
     LibraryEntry,
-    UpdateLibraryReleaseDependenciesRequest,
-    UpdateLibraryReleaseDependenciesResponse,
+    ManageLibraryReleaseDependenciesResponse,
     UpdateLibraryRequest,
     UpdateLibraryResponse,
 )
 from app.services.library_service import LibraryService
-from app.types.identifiers import LibraryId
+from app.types.identifiers import LibraryId, ReleaseId
+from app.types.unset import UNSET
 from app.utils.date import parse_date_range
 
 router = APIRouter(prefix="/libraries", tags=["library"])
@@ -165,17 +165,18 @@ async def update_library(
     library_service: LibraryService = Depends(get_library_service),
 ) -> UpdateLibraryResponse:
     """Update a library and return the changed fields."""
+    updates_payload = payload.model_dump(exclude_unset=True)
     try:
         result = await library_service.update_library(
             library_id=library_id,
-            type=payload.type,
-            name=payload.name,
-            organization=payload.organization,
-            description=payload.description,
-            link=payload.link,
-            domain=payload.domain,
-            state=payload.state,
-            is_default=payload.is_default,
+            type=updates_payload.get("type", UNSET),
+            name=updates_payload.get("name", UNSET),
+            organization=updates_payload.get("organization", UNSET),
+            description=updates_payload.get("description", UNSET),
+            link=updates_payload.get("link", UNSET),
+            domain=updates_payload.get("domain", UNSET),
+            state=updates_payload.get("state", UNSET),
+            is_default=updates_payload.get("is_default", UNSET),
         )
         return UpdateLibraryResponse.model_validate(result, from_attributes=True)
     except LookupError as e:
@@ -201,23 +202,23 @@ async def update_library(
 
 
 @router.post(
-    "/{library_id}/release-dependencies",
-    summary="Update library release dependencies",
-    description="Replace the dependency list for the library's working release.",
-    response_model=UpdateLibraryReleaseDependenciesResponse,
+    "/{library_id}/release-dependencies/{release_id}",
+    summary="Add library release dependency",
+    description="Add a direct dependency to the library's working release.",
+    response_model=ManageLibraryReleaseDependenciesResponse,
 )
-async def update_library_release_dependencies(
+async def add_library_release_dependency(
     library_id: LibraryId = Path(..., description="Target library identifier."),
-    payload: UpdateLibraryReleaseDependenciesRequest = Body(...),
+    release_id: ReleaseId = Path(..., description="Release identifier to add as a dependency."),
     library_service: LibraryService = Depends(get_library_service),
-) -> UpdateLibraryReleaseDependenciesResponse:
-    """Replace working-release dependencies for a library."""
+) -> ManageLibraryReleaseDependenciesResponse:
+    """Add a direct dependency to the library's working release."""
     try:
-        result = await library_service.update_library_release_dependencies(
+        result = await library_service.add_library_release_dependency(
             library_id=library_id,
-            release_ids=payload.release_ids,
+            release_id=release_id,
         )
-        return UpdateLibraryReleaseDependenciesResponse.model_validate(result, from_attributes=True)
+        return ManageLibraryReleaseDependenciesResponse.model_validate(result, from_attributes=True)
     except LookupError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -226,7 +227,7 @@ async def update_library_release_dependencies(
     except PermissionError as e:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"message": "You do not have permission to update library release dependencies.", "cause": str(e)},
+            detail={"message": "You do not have permission to add library release dependencies.", "cause": str(e)},
         )
     except ValueError as e:
         raise HTTPException(
@@ -236,7 +237,47 @@ async def update_library_release_dependencies(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"message": "We couldn't update the library release dependencies.", "cause": str(e)},
+            detail={"message": "We couldn't add the library release dependency.", "cause": str(e)},
+        )
+
+
+@router.delete(
+    "/{library_id}/release-dependencies/{release_id}",
+    summary="Remove library release dependency",
+    description="Remove a direct dependency from the library's working release.",
+    response_model=ManageLibraryReleaseDependenciesResponse,
+)
+async def remove_library_release_dependency(
+    library_id: LibraryId = Path(..., description="Target library identifier."),
+    release_id: ReleaseId = Path(..., description="Release identifier to remove from dependencies."),
+    library_service: LibraryService = Depends(get_library_service),
+) -> ManageLibraryReleaseDependenciesResponse:
+    """Remove a direct dependency from the library's working release."""
+    try:
+        result = await library_service.remove_library_release_dependency(
+            library_id=library_id,
+            release_id=release_id,
+        )
+        return ManageLibraryReleaseDependenciesResponse.model_validate(result, from_attributes=True)
+    except LookupError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": "A referenced resource was not found.", "cause": str(e)},
+        )
+    except PermissionError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"message": "You do not have permission to remove library release dependencies.", "cause": str(e)},
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "The request is invalid. Check the parameters and try again.", "cause": str(e)},
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"message": "We couldn't remove the library release dependency.", "cause": str(e)},
         )
 
 

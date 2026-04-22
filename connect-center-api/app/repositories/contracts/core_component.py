@@ -43,6 +43,8 @@ class CoreComponentRepositoryContract(Protocol):
         oagis_component_type: int,
         acc_type: str,
         definition: str | None,
+        definition_source: str | None,
+        is_abstract: bool,
         namespace_id: NamespaceId | None,
         tag_id: list[int] | None,
         requester_user_id: AppUserId,
@@ -56,6 +58,8 @@ class CoreComponentRepositoryContract(Protocol):
             oagis_component_type: Initial OAGIS component type numeric value.
             acc_type: Initial ACC type string.
             definition: Optional definition text.
+            definition_source: Optional definition source text.
+            is_abstract: Whether the new ACC should be abstract.
             namespace_id: Optional namespace identifier from the target release library.
             tag_id: Optional tag identifier list to attach after create.
             requester_user_id: Requesting user identifier for audit fields.
@@ -153,6 +157,13 @@ class CoreComponentRepositoryContract(Protocol):
         release_id: ReleaseId,
         bdt_manifest_id: DataTypeManifestId,
         property_term: str,
+        definition: str | None,
+        definition_source: str | None,
+        deprecated: bool,
+        is_nillable: bool,
+        namespace_id: NamespaceId | None,
+        default_value: str | None,
+        fixed_value: str | None,
         requester_user_id: AppUserId,
     ) -> BccpManifestId:
         """Repository contract for creating a BCCP."""
@@ -314,6 +325,8 @@ class CoreComponentRepositoryContract(Protocol):
         self,
         *,
         asccp_manifest_id: AsccpManifestId,
+        role_of_acc_manifest_id: AccManifestId | None,
+        role_of_acc_manifest_id_set: bool,
         property_term: str | None,
         property_term_set: bool,
         reusable_indicator: bool | None,
@@ -337,6 +350,8 @@ class CoreComponentRepositoryContract(Protocol):
         self,
         *,
         bccp_manifest_id: BccpManifestId,
+        bdt_manifest_id: DataTypeManifestId | None,
+        bdt_manifest_id_set: bool,
         property_term: str | None,
         property_term_set: bool,
         deprecated: bool | None,

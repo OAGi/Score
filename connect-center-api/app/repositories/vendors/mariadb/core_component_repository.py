@@ -62,6 +62,7 @@ from app.repositories.vendors.mariadb.models.tag import (
     BccpManifestTag,
     Tag,
 )
+from app.repositories.vendors.mariadb.sequence_key_handler import SequenceKeyHandler
 from app.types.identifiers import (
     AccManifestId,
     AppUserId,
@@ -87,6 +88,7 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
         """
         self._session = session
         self._log_repo = log_repository
+        self._sequence_key_handler = SequenceKeyHandler(session)
 
     async def create_acc(
         self,
@@ -97,6 +99,8 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
         oagis_component_type: int,
         acc_type: str,
         definition: str | None,
+        definition_source: str | None,
+        is_abstract: bool,
         namespace_id: NamespaceId | None,
         tag_id: list[int] | None,
         requester_user_id: AppUserId,
@@ -143,6 +147,7 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
             type=acc_type,
             object_class_term=object_class_term,
             definition=definition,
+            definition_source=definition_source,
             based_acc_id=int(based_acc_manifest.acc_id) if based_acc_manifest is not None else None,
             namespace_id=int(namespace_id) if namespace_id is not None else None,
             owner_user_id=int(requester_user_id),
@@ -153,7 +158,7 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
             state="WIP",
             is_deprecated=False,
             oagis_component_type=int(oagis_component_type),
-            is_abstract=False,
+            is_abstract=bool(is_abstract),
         )
         self._session.add(acc)
         await self._session.flush()
@@ -309,7 +314,7 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
         await self._session.flush()
 
         ascc_manifest.seq_key_id = int(seq_key.seq_key_id)
-        await self._move_seq_key(
+        await self._sequence_key_handler.move_seq_key(
             from_acc_manifest_id=acc_manifest_id,
             new_seq_key_id=int(seq_key.seq_key_id),
             index=index,
@@ -431,7 +436,7 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
         await self._session.flush()
 
         bcc_manifest.seq_key_id = int(seq_key.seq_key_id)
-        await self._move_seq_key(
+        await self._sequence_key_handler.move_seq_key(
             from_acc_manifest_id=acc_manifest_id,
             new_seq_key_id=int(seq_key.seq_key_id),
             index=index,
@@ -473,7 +478,7 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
         if ascc_manifest.seq_key_id is not None:
             current_seq_key_id = int(ascc_manifest.seq_key_id)
             ascc_manifest.seq_key_id = None
-            await self._remove_seq_key(
+            await self._sequence_key_handler.remove_seq_key(
                 from_acc_manifest_id=AccManifestId(int(acc_manifest.acc_manifest_id)),
                 current_seq_key_id=current_seq_key_id,
             )
@@ -541,7 +546,7 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
         if bcc_manifest.seq_key_id is not None:
             current_seq_key_id = int(bcc_manifest.seq_key_id)
             bcc_manifest.seq_key_id = None
-            await self._remove_seq_key(
+            await self._sequence_key_handler.remove_seq_key(
                 from_acc_manifest_id=AccManifestId(int(acc_manifest.acc_manifest_id)),
                 current_seq_key_id=current_seq_key_id,
             )
@@ -700,6 +705,13 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
         release_id: ReleaseId,
         bdt_manifest_id: DataTypeManifestId,
         property_term: str,
+        definition: str | None,
+        definition_source: str | None,
+        deprecated: bool,
+        is_nillable: bool,
+        namespace_id: NamespaceId | None,
+        default_value: str | None,
+        fixed_value: str | None,
         requester_user_id: AppUserId,
     ) -> BccpManifestId:
         """Create a BCCP, its manifest row, and initial log row."""
@@ -712,6 +724,22 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
             raise LookupError(
                 f"No data type exists with manifest ID {int(bdt_manifest_id)}. Please verify the identifier and try again."
             )
+        release = await self._session.get(Release, int(release_id))
+        if release is None:
+            raise LookupError(
+                f"No release exists with ID {int(release_id)}. Please verify the identifier and try again."
+            )
+        if namespace_id is not None:
+            namespace = await self._session.get(Namespace, int(namespace_id))
+            if namespace is None:
+                raise LookupError(
+                    f"No namespace exists with ID {int(namespace_id)}. Please verify the identifier and try again."
+                )
+            if int(namespace.library_id) != int(release.library_id):
+                raise ValueError(
+                    "The namespace must belong to the same library as the target release. "
+                    "Please choose a namespace from the release library and try again."
+                )
 
         now = datetime.utcnow()
         bccp = Bccp(
@@ -719,19 +747,19 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
             property_term=property_term,
             representation_term=str(dt.data_type_term),
             bdt_id=int(dt.dt_id),
-            definition=None,
-            definition_source=None,
-            namespace_id=None,
+            definition=definition,
+            definition_source=definition_source,
+            namespace_id=int(namespace_id) if namespace_id is not None else None,
             owner_user_id=int(requester_user_id),
             created_by=int(requester_user_id),
             last_updated_by=int(requester_user_id),
             creation_timestamp=now,
             last_update_timestamp=now,
             state="WIP",
-            is_deprecated=False,
-            default_value=None,
-            fixed_value=None,
-            is_nillable=False,
+            is_deprecated=bool(deprecated),
+            default_value=default_value if fixed_value is None else None,
+            fixed_value=fixed_value,
+            is_nillable=bool(is_nillable),
             replacement_bccp_id=None,
             prev_bccp_id=None,
             next_bccp_id=None,
@@ -806,7 +834,7 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
         now = datetime.utcnow()
         acc.last_updated_by = int(requester_user_id)
         acc.last_update_timestamp = now
-        await self._place_seq_key_after(
+        await self._sequence_key_handler.place_seq_key_after(
             from_acc_manifest_id=acc_manifest_id,
             current_seq_key_id=int(item_seq_key_id),
             after_seq_key_id=None if after_seq_key_id is None else int(after_seq_key_id),
@@ -986,35 +1014,20 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
         acc.owner_user_id = int(target_user_id)
         acc.last_updated_by = int(requester_user_id)
         acc.last_update_timestamp = now
+        child_owner_values = {
+            "owner_user_id": int(target_user_id),
+            "last_updated_by": int(requester_user_id),
+            "last_update_timestamp": now,
+        }
         await self._session.execute(
-            text(
-                "UPDATE ascc "
-                "SET owner_user_id = :target_user_id, "
-                "last_updated_by = :requester_user_id, "
-                "last_update_timestamp = :timestamp "
-                "WHERE ascc_id IN (SELECT ascc_id FROM ascc_manifest WHERE from_acc_manifest_id = :acc_manifest_id)"
-            ),
-            {
-                "target_user_id": int(target_user_id),
-                "requester_user_id": int(requester_user_id),
-                "timestamp": now,
-                "acc_manifest_id": int(acc_manifest_id),
-            },
+            update(Ascc)
+            .where(Ascc.from_acc_id == int(acc.acc_id))
+            .values(**child_owner_values),
         )
         await self._session.execute(
-            text(
-                "UPDATE bcc "
-                "SET owner_user_id = :target_user_id, "
-                "last_updated_by = :requester_user_id, "
-                "last_update_timestamp = :timestamp "
-                "WHERE bcc_id IN (SELECT bcc_id FROM bcc_manifest WHERE from_acc_manifest_id = :acc_manifest_id)"
-            ),
-            {
-                "target_user_id": int(target_user_id),
-                "requester_user_id": int(requester_user_id),
-                "timestamp": now,
-                "acc_manifest_id": int(acc_manifest_id),
-            },
+            update(Bcc)
+            .where(Bcc.from_acc_id == int(acc.acc_id))
+            .values(**child_owner_values),
         )
         await self._session.flush()
         await self._log_repo.append_acc_log(
@@ -1195,13 +1208,13 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
         bcc.last_update_timestamp = now
 
         if resulting_entity_type == "Attribute" and bcc_manifest.seq_key_id is not None:
-            await self._move_seq_key_to_last_of_attr(
+            await self._sequence_key_handler.move_seq_key_to_last_of_attr(
                 from_acc_manifest_id=AccManifestId(int(acc_manifest.acc_manifest_id)),
                 current_seq_key_id=int(bcc_manifest.seq_key_id),
                 current_bcc_manifest_id=BccManifestId(int(bcc_manifest_id)),
             )
         elif move_to_entity_type == "Element" and bcc_manifest.seq_key_id is not None:
-            await self._move_seq_key_to_last(
+            await self._sequence_key_handler.move_seq_key_to_last(
                 from_acc_manifest_id=AccManifestId(int(acc_manifest.acc_manifest_id)),
                 current_seq_key_id=int(bcc_manifest.seq_key_id),
             )
@@ -1492,6 +1505,23 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
             acc.last_updated_by = int(requester_user_id)
             acc.last_update_timestamp = now
 
+        child_state_values: dict[str, object] = {"state": state}
+        if restore_owner:
+            child_state_values["owner_user_id"] = int(requester_user_id)
+        if not implicit_move:
+            child_state_values["last_updated_by"] = int(requester_user_id)
+            child_state_values["last_update_timestamp"] = now
+
+        await self._session.execute(
+            update(Ascc)
+            .where(Ascc.from_acc_id == int(acc.acc_id))
+            .values(**child_state_values)
+        )
+        await self._session.execute(
+            update(Bcc)
+            .where(Bcc.from_acc_id == int(acc.acc_id))
+            .values(**child_state_values)
+        )
         await self._session.flush()
 
         action = "Modified"
@@ -1814,6 +1844,8 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
         self,
         *,
         asccp_manifest_id: AsccpManifestId,
+        role_of_acc_manifest_id: AccManifestId | None,
+        role_of_acc_manifest_id_set: bool,
         property_term: str | None,
         property_term_set: bool,
         reusable_indicator: bool | None,
@@ -1842,6 +1874,22 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
             raise LookupError(
                 f"No release exists with ID {int(asccp_manifest.release_id)}. Please verify the identifier and try again."
             )
+        role_of_acc = None
+        if role_of_acc_manifest_id_set:
+            if role_of_acc_manifest_id is None:
+                raise ValueError("`role_of_acc_manifest_id` cannot be null.")
+            role_of_acc_manifest = await self._session.get(AccManifest, int(role_of_acc_manifest_id))
+            if role_of_acc_manifest is None:
+                raise LookupError(
+                    f"No ACC exists with manifest ID {int(role_of_acc_manifest_id)}. Please verify the identifier and try again."
+                )
+            role_of_acc = await self._session.get(Acc, int(role_of_acc_manifest.acc_id))
+            if role_of_acc is None:
+                raise LookupError(
+                    f"No ACC exists with manifest ID {int(role_of_acc_manifest_id)}. Please verify the identifier and try again."
+                )
+            if bool(role_of_acc.is_abstract):
+                raise ValueError("An abstract ACC cannot be used as the role ACC of an ASCCP.")
 
         if namespace_id_set and namespace_id is not None:
             namespace = await self._session.get(Namespace, int(namespace_id))
@@ -1856,7 +1904,17 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
                 )
 
         now = datetime.utcnow()
-        den_needs_update = property_term_set and property_term is not None and property_term != asccp.property_term
+        den_needs_update = (
+            (property_term_set and property_term is not None and property_term != asccp.property_term)
+            or role_of_acc_manifest_id_set
+        )
+        if role_of_acc_manifest_id_set and role_of_acc is not None and role_of_acc_manifest_id is not None:
+            asccp.role_of_acc_id = int(role_of_acc.acc_id)
+            asccp_manifest.role_of_acc_manifest_id = int(role_of_acc_manifest_id)
+            asccp_manifest.den = self._build_asccp_den(
+                property_term=property_term if property_term_set and property_term is not None else str(asccp.property_term or "Property Term"),
+                object_class_term=str(role_of_acc.object_class_term),
+            )
         if property_term_set:
             asccp.property_term = property_term
         if reusable_indicator_set and reusable_indicator is not None:
@@ -1875,10 +1933,10 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
         asccp.last_update_timestamp = now
         await self._session.flush()
 
-        if den_needs_update and property_term is not None:
+        if den_needs_update:
             await self._sync_asccp_related_den(
                 asccp_manifest_id=asccp_manifest_id,
-                property_term=property_term,
+                property_term=str(asccp.property_term or "Property Term"),
             )
 
         await self._append_asccp_log(
@@ -1894,6 +1952,8 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
         self,
         *,
         bccp_manifest_id: BccpManifestId,
+        bdt_manifest_id: DataTypeManifestId | None,
+        bdt_manifest_id_set: bool,
         property_term: str | None,
         property_term_set: bool,
         deprecated: bool | None,
@@ -1924,6 +1984,19 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
             raise LookupError(
                 f"No release exists with ID {int(bccp_manifest.release_id)}. Please verify the identifier and try again."
             )
+        dt = None
+        if bdt_manifest_id_set:
+            if bdt_manifest_id is None:
+                raise ValueError("`bdt_manifest_id` cannot be null.")
+            dt_manifest = await self._get_required_bdt_manifest(
+                bdt_manifest_id=bdt_manifest_id,
+                context_label="BCCP release",
+            )
+            dt = await self._session.get(Dt, int(dt_manifest.dt_id))
+            if dt is None:
+                raise LookupError(
+                    f"No data type exists with manifest ID {int(bdt_manifest_id)}. Please verify the identifier and try again."
+                )
         if namespace_id_set and namespace_id is not None:
             namespace = await self._session.get(Namespace, int(namespace_id))
             if namespace is None:
@@ -1937,7 +2010,19 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
                 )
 
         now = datetime.utcnow()
-        den_needs_update = property_term_set and property_term is not None and property_term != bccp.property_term
+        den_needs_update = (
+            (property_term_set and property_term is not None and property_term != bccp.property_term)
+            or bdt_manifest_id_set
+        )
+        if bdt_manifest_id_set and dt is not None and bdt_manifest_id is not None:
+            bccp.bdt_id = int(dt.dt_id)
+            bccp.representation_term = str(dt.data_type_term)
+            bccp_manifest.bdt_manifest_id = int(bdt_manifest_id)
+            bccp_manifest.den = self._build_bccp_den(
+                property_term=property_term if property_term_set and property_term is not None else str(bccp.property_term),
+                qualifier=str(dt.qualifier) if dt.qualifier is not None else None,
+                data_type_term=str(dt.data_type_term),
+            )
         if property_term_set:
             bccp.property_term = property_term
         if deprecated_set and deprecated is not None:
@@ -1966,10 +2051,10 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
         bccp.last_update_timestamp = now
         await self._session.flush()
 
-        if den_needs_update and property_term is not None:
+        if den_needs_update:
             await self._sync_bccp_related_den(
                 bccp_manifest_id=bccp_manifest_id,
-                property_term=property_term,
+                property_term=str(bccp.property_term),
             )
 
         await self._append_bccp_log(
@@ -3089,179 +3174,6 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
                 if source_object_class_term is not None:
                     inbound_ascc.den = f"{source_object_class_term}. {asccp_manifest.den}"
 
-    async def _move_seq_key(
-        self,
-        *,
-        from_acc_manifest_id: AccManifestId,
-        new_seq_key_id: int,
-        index: int,
-    ) -> None:
-        """Insert a `seq_key` node into the ACC relationship chain at the requested index."""
-        seq_keys = (
-            await self._session.execute(
-                select(SeqKey).where(SeqKey.from_acc_manifest_id == int(from_acc_manifest_id))
-            )
-        ).scalars().all()
-        if not seq_keys:
-            return
-
-        seq_key_by_id = {int(seq_key.seq_key_id): seq_key for seq_key in seq_keys}
-        existing_seq_keys = [seq_key for seq_key in seq_keys if int(seq_key.seq_key_id) != int(new_seq_key_id)]
-        ordered_existing = self._order_seq_keys(existing_seq_keys)
-        if index < -1:
-            raise ValueError("`index` must be -1 or a zero-based index.")
-        if index > len(ordered_existing):
-            raise ValueError(
-                f"`index` is out of range for the ACC sequence. Allowed values are 0 to {len(ordered_existing)}, or -1 for the end."
-            )
-        insert_at = len(ordered_existing) if index < 0 else int(index)
-        ordered_all = ordered_existing[:insert_at] + [seq_key_by_id[int(new_seq_key_id)]] + ordered_existing[insert_at:]
-
-        for index, seq_key in enumerate(ordered_all):
-            seq_key.prev_seq_key_id = int(ordered_all[index - 1].seq_key_id) if index > 0 else None
-            seq_key.next_seq_key_id = int(ordered_all[index + 1].seq_key_id) if index + 1 < len(ordered_all) else None
-
-    async def _remove_seq_key(
-        self,
-        *,
-        from_acc_manifest_id: AccManifestId,
-        current_seq_key_id: int,
-    ) -> None:
-        """Remove an existing `seq_key` node from the ACC relationship chain."""
-        seq_keys = (
-            await self._session.execute(
-                select(SeqKey).where(SeqKey.from_acc_manifest_id == int(from_acc_manifest_id))
-            )
-        ).scalars().all()
-        if not seq_keys:
-            return
-
-        seq_key_by_id = {int(seq_key.seq_key_id): seq_key for seq_key in seq_keys}
-        current = seq_key_by_id.get(int(current_seq_key_id))
-        if current is None:
-            return
-
-        ordered = [
-            seq_key for seq_key in self._order_seq_keys(seq_keys)
-            if int(seq_key.seq_key_id) != int(current_seq_key_id)
-        ]
-        for index, seq_key in enumerate(ordered):
-            seq_key.prev_seq_key_id = int(ordered[index - 1].seq_key_id) if index > 0 else None
-            seq_key.next_seq_key_id = int(ordered[index + 1].seq_key_id) if index + 1 < len(ordered) else None
-
-        current.prev_seq_key_id = None
-        current.next_seq_key_id = None
-        await self._session.delete(current)
-        await self._session.flush()
-
-    async def _place_seq_key_after(
-        self,
-        *,
-        from_acc_manifest_id: AccManifestId,
-        current_seq_key_id: int,
-        after_seq_key_id: int | None,
-    ) -> None:
-        """Move an existing `seq_key` node after another node, or to the first position."""
-        seq_keys = (
-            await self._session.execute(
-                select(SeqKey).where(SeqKey.from_acc_manifest_id == int(from_acc_manifest_id))
-            )
-        ).scalars().all()
-        if not seq_keys:
-            return
-
-        seq_key_by_id = {int(seq_key.seq_key_id): seq_key for seq_key in seq_keys}
-        current = seq_key_by_id.get(int(current_seq_key_id))
-        if current is None:
-            raise LookupError("The association to move is missing its sequence key.")
-
-        ordered = [seq_key for seq_key in self._order_seq_keys(seq_keys) if int(seq_key.seq_key_id) != int(current_seq_key_id)]
-        if after_seq_key_id is None:
-            insert_at = 0
-        else:
-            after_index = next(
-                (
-                    index
-                    for index, seq_key in enumerate(ordered)
-                    if int(seq_key.seq_key_id) == int(after_seq_key_id)
-                ),
-                None,
-            )
-            if after_index is None:
-                raise LookupError("The target `after` association is missing its sequence key.")
-            insert_at = after_index + 1
-
-        ordered_all = ordered[:insert_at] + [current] + ordered[insert_at:]
-        for index, seq_key in enumerate(ordered_all):
-            seq_key.prev_seq_key_id = int(ordered_all[index - 1].seq_key_id) if index > 0 else None
-            seq_key.next_seq_key_id = int(ordered_all[index + 1].seq_key_id) if index + 1 < len(ordered_all) else None
-
-    async def _move_seq_key_to_last(
-        self,
-        *,
-        from_acc_manifest_id: AccManifestId,
-        current_seq_key_id: int,
-    ) -> None:
-        """Move an existing sequence key to the end of the ACC relationship chain."""
-        seq_keys = (
-            await self._session.execute(
-                select(SeqKey).where(SeqKey.from_acc_manifest_id == int(from_acc_manifest_id))
-            )
-        ).scalars().all()
-        ordered = [seq_key for seq_key in self._order_seq_keys(seq_keys) if int(seq_key.seq_key_id) != int(current_seq_key_id)]
-        after_seq_key_id = int(ordered[-1].seq_key_id) if ordered else None
-        await self._place_seq_key_after(
-            from_acc_manifest_id=from_acc_manifest_id,
-            current_seq_key_id=current_seq_key_id,
-            after_seq_key_id=after_seq_key_id,
-        )
-
-    async def _move_seq_key_to_last_of_attr(
-        self,
-        *,
-        from_acc_manifest_id: AccManifestId,
-        current_seq_key_id: int,
-        current_bcc_manifest_id: BccManifestId,
-    ) -> None:
-        """Move a BCC sequence key after the leading attribute block."""
-        seq_keys = (
-            await self._session.execute(
-                select(SeqKey).where(SeqKey.from_acc_manifest_id == int(from_acc_manifest_id))
-            )
-        ).scalars().all()
-        ordered = [seq_key for seq_key in self._order_seq_keys(seq_keys) if int(seq_key.seq_key_id) != int(current_seq_key_id)]
-        bcc_manifest_ids = [int(seq_key.bcc_manifest_id) for seq_key in ordered if seq_key.bcc_manifest_id is not None]
-        attribute_manifest_ids: set[int] = set()
-        if bcc_manifest_ids:
-            rows = (
-                await self._session.execute(
-                    select(BccManifest.bcc_manifest_id, Bcc.entity_type)
-                    .join(Bcc, Bcc.bcc_id == BccManifest.bcc_id)
-                    .where(BccManifest.bcc_manifest_id.in_(bcc_manifest_ids))
-                )
-            ).all()
-            attribute_manifest_ids = {
-                int(bcc_manifest_id)
-                for bcc_manifest_id, raw_entity_type in rows
-                if raw_entity_type is not None and int(raw_entity_type) == 0
-            }
-
-        after_seq_key_id: int | None = None
-        for seq_key in ordered:
-            if seq_key.bcc_manifest_id is None:
-                break
-            if int(seq_key.bcc_manifest_id) == int(current_bcc_manifest_id):
-                continue
-            if int(seq_key.bcc_manifest_id) not in attribute_manifest_ids:
-                break
-            after_seq_key_id = int(seq_key.seq_key_id)
-
-        await self._place_seq_key_after(
-            from_acc_manifest_id=from_acc_manifest_id,
-            current_seq_key_id=current_seq_key_id,
-            after_seq_key_id=after_seq_key_id,
-        )
-
     async def _resolve_seq_key_id(
         self,
         *,
@@ -3531,40 +3443,6 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
                     prev_seq_key.next_seq_key_id = int(seq_key.seq_key_id)
             prev_seq_key_id = int(seq_key.seq_key_id)
 
-    @staticmethod
-    def _order_seq_keys(seq_keys: list[SeqKey]) -> list[SeqKey]:
-        """Return `seq_key` rows in linked-list order, appending any orphan nodes last."""
-        if not seq_keys:
-            return []
-
-        seq_key_by_id = {int(seq_key.seq_key_id): seq_key for seq_key in seq_keys}
-        head_candidates = [
-            seq_key
-            for seq_key in seq_keys
-            if seq_key.prev_seq_key_id is None or int(seq_key.prev_seq_key_id) not in seq_key_by_id
-        ]
-        current = min(head_candidates or seq_keys, key=lambda seq_key: int(seq_key.seq_key_id))
-
-        ordered: list[SeqKey] = []
-        visited: set[int] = set()
-        while current is not None:
-            seq_key_id = int(current.seq_key_id)
-            if seq_key_id in visited:
-                break
-            visited.add(seq_key_id)
-            ordered.append(current)
-            next_seq_key_id = current.next_seq_key_id
-            if next_seq_key_id is None:
-                break
-            current = seq_key_by_id.get(int(next_seq_key_id))
-
-        remaining = sorted(
-            (seq_key for seq_key in seq_keys if int(seq_key.seq_key_id) not in visited),
-            key=lambda seq_key: int(seq_key.seq_key_id),
-        )
-        ordered.extend(remaining)
-        return ordered
-
     async def get_acc(self, acc_manifest_id: AccManifestId) -> GetAccRow | None:
         """Get ACC details using score-mcp-server compatible response shape.
 
@@ -3698,7 +3576,7 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
         )
 
         # `seq_key` defines canonical ACC relationship order as a linked list.
-        ordered_seq_rows = await self._load_ordered_seq_rows(acc_manifest_id)
+        ordered_seq_rows = await self._sequence_key_handler.load_ordered_seq_rows(acc_manifest_id)
         ascc_rows_by_manifest_id, bcc_rows_by_manifest_id = await self._load_acc_relationship_rows(ordered_seq_rows)
         return self._build_acc_relationships(
             ordered_seq_rows=ordered_seq_rows,
@@ -3706,48 +3584,6 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
             bcc_rows_by_manifest_id=bcc_rows_by_manifest_id,
             from_acc=from_acc,
         )
-
-    async def _load_ordered_seq_rows(self, from_acc_manifest_id: AccManifestId) -> list[dict[str, Any]]:
-        """Load `seq_key` rows for an ACC and return them in linked-list order."""
-        seq_rows = [
-            dict(row._mapping)
-            for row in (
-                await self._session.execute(
-                    select(
-                        SeqKey.seq_key_id,
-                        SeqKey.ascc_manifest_id,
-                        SeqKey.bcc_manifest_id,
-                        SeqKey.prev_seq_key_id,
-                        SeqKey.next_seq_key_id,
-                    ).where(SeqKey.from_acc_manifest_id == from_acc_manifest_id)
-                )
-            ).all()
-        ]
-        if not seq_rows:
-            return []
-
-        # Traverse the explicit prev/next chain and guard against cyclic data.
-        seq_by_id = {int(row["seq_key_id"]): row for row in seq_rows}
-        head_candidates = [row for row in seq_rows if row.get("prev_seq_key_id") is None]
-        current = (
-            min(head_candidates, key=lambda row: int(row["seq_key_id"]))
-            if head_candidates
-            else min(seq_rows, key=lambda row: int(row["seq_key_id"]))
-        )
-
-        ordered_seq_rows: list[dict[str, Any]] = []
-        visited_seq_ids: set[int] = set()
-        while current is not None:
-            seq_key_id = int(current["seq_key_id"])
-            if seq_key_id in visited_seq_ids:
-                break
-            visited_seq_ids.add(seq_key_id)
-            ordered_seq_rows.append(current)
-            next_seq_key_id = current.get("next_seq_key_id")
-            if next_seq_key_id is None:
-                break
-            current = seq_by_id.get(int(next_seq_key_id))
-        return ordered_seq_rows
 
     async def _load_acc_relationship_rows(
         self,

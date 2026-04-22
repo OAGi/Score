@@ -38,5 +38,5 @@ NON_WORKING_BRANCH_CORE_COMPONENT_STATE_TRANSITIONS: dict[
     "Deleted": {"WIP"},
     "WIP": {"Deleted", "QA"},
     "QA": {"WIP", "Production"},
-    "Production": {"QA"},
+    "Production": set(),
 }

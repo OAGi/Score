@@ -43,7 +43,8 @@ export type MethodKey =
   | 'create'
   | 'update'
   | 'delete'
-  | 'update_release_dependencies'
+  | 'add_release_dependency'
+  | 'remove_release_dependency'
   | 'transfer_namespace_ownership'
   | 'list'
   | 'retrieve'
@@ -61,7 +62,7 @@ export type MethodKey =
   | 'add_acc_tags'
   | 'remove_acc_tags'
   | 'change_acc_state'
-  | 'revise_acc'
+  | 'revise_amend_acc'
   | 'cancel_acc'
   | 'discard_acc'
   | 'add_ascc_to_acc'
@@ -669,8 +670,8 @@ export async function fetchBusinessContextMethod(method: string): Promise<Method
 export async function fetchLibraryResource(): Promise<ResourceDoc> {
   const spec = await fetchOpenApi();
   const methodOrder: Array<
-    Extract<MethodKey, 'list' | 'retrieve' | 'create' | 'update' | 'update_release_dependencies' | 'delete'>
-  > = ['list', 'retrieve', 'create', 'update', 'update_release_dependencies', 'delete'];
+    Extract<MethodKey, 'list' | 'retrieve' | 'create' | 'update' | 'add_release_dependency' | 'remove_release_dependency' | 'delete'>
+  > = ['list', 'retrieve', 'create', 'update', 'add_release_dependency', 'remove_release_dependency', 'delete'];
 
   const methods: MethodSummary[] = [];
   for (const key of methodOrder) {
@@ -884,7 +885,7 @@ export async function fetchDataTypeMethod(method: string): Promise<MethodDoc | n
   const key = method as MethodKey;
   const lookup = getDataTypeOperation(spec, key);
   if (!lookup) return null;
-  return buildMethodDocFromOperation(spec, key, lookup);
+  return buildReferenceMethodDoc(spec, key, lookup);
 }
 
 export async function fetchTagResource(): Promise<ResourceDoc> {
@@ -1055,7 +1056,7 @@ export async function fetchCoreComponentResource(): Promise<ResourceDoc> {
       | 'remove_acc_tags'
       | 'change_acc_state'
       | 'transfer_acc_ownership'
-      | 'revise_acc'
+      | 'revise_amend_acc'
       | 'cancel_acc'
       | 'discard_acc'
       | 'add_ascc_to_acc'
@@ -1098,7 +1099,7 @@ export async function fetchCoreComponentResource(): Promise<ResourceDoc> {
     'remove_acc_tags',
     'change_acc_state',
     'transfer_acc_ownership',
-    'revise_acc',
+    'revise_amend_acc',
     'cancel_acc',
     'discard_acc',
     'add_ascc_to_acc',
@@ -1157,7 +1158,7 @@ export async function fetchCoreComponentMethod(method: string): Promise<MethodDo
   const key = method as MethodKey;
   const lookup = getCoreComponentOperation(spec, key);
   if (!lookup) return null;
-  return buildMethodDocFromOperation(spec, key, lookup);
+  return buildReferenceMethodDoc(spec, key, lookup);
 }
 
 export async function fetchBusinessInformationEntityResource(): Promise<ResourceDoc> {

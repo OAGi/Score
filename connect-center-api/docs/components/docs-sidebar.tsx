@@ -86,7 +86,7 @@ const resourceSubgroups: Record<string, SidebarSubgroup[]> = {
         'remove_acc_tags',
         'change_acc_state',
         'transfer_acc_ownership',
-        'revise_acc',
+        'revise_amend_acc',
         'cancel_acc',
         'discard_acc',
       ],

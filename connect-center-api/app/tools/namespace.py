@@ -76,6 +76,7 @@ from app.tools.models.namespace import (
     TransferNamespaceOwnershipResponse,
     UpdateNamespaceResponse,
 )
+from app.types.unset import UNSET
 
 logger = logging.getLogger("connectcenter.mcp.namespace")
 
@@ -544,21 +545,21 @@ async def create_namespace(
 )
 async def update_namespace(
     namespace_id: Annotated[int, Field(gt=0, description="Target namespace identifier.")],
-    uri: Annotated[str, Field(min_length=1, description="Updated namespace URI.")],
+    uri: Annotated[str | None, Field(default=None, min_length=1, description="Namespace URI to save. Omit to leave it unchanged.")] = None,
     prefix: Annotated[
         str | None,
-        Field(default=None, description="Updated namespace prefix. Pass an empty string to store a blank prefix."),
+        Field(default=None, description="Namespace prefix to save. Omit to leave it unchanged. Pass an empty string to store a blank prefix."),
     ] = None,
-    description: Annotated[str | None, Field(default=None, description="Updated namespace description.")] = None,
+    description: Annotated[str | None, Field(default=None, description="Namespace description to save. Omit to leave it unchanged.")] = None,
     namespace_service: NamespaceService = Depends(get_namespace_service),
 ) -> UpdateNamespaceResponse:
     """Update a namespace."""
     try:
         result = await namespace_service.update_namespace(
             namespace_id=namespace_id,
-            uri=uri,
-            prefix=prefix,
-            description=description,
+            uri=UNSET if uri is None else uri,
+            prefix=UNSET if prefix is None else prefix,
+            description=UNSET if description is None else description,
         )
         return UpdateNamespaceResponse.model_validate(result, from_attributes=True)
     except Exception as exc:

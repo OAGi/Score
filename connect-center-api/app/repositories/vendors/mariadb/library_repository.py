@@ -7,12 +7,37 @@ from datetime import datetime
 from uuid import uuid4
 from typing import Any, Literal
 
-from sqlalchemy import delete, func, insert, literal, select, update
+from sqlalchemy import delete, func, insert, literal, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import Select
 
 from app.repositories.contracts.library import LibraryRepositoryContract
 from app.repositories.models.library import LibraryReleaseRow, LibraryRow
+from app.repositories.vendors.mariadb.models.agency_id_list import (
+    AgencyIdList,
+    AgencyIdListManifest,
+    AgencyIdListValue,
+    AgencyIdListValueManifest,
+)
+from app.repositories.vendors.mariadb.models.code_list import (
+    CodeList,
+    CodeListManifest,
+    CodeListValue,
+    CodeListValueManifest,
+)
+from app.repositories.vendors.mariadb.models.core_component import (
+    Acc,
+    AccManifest,
+    Ascc,
+    AsccManifest,
+    Asccp,
+    AsccpManifest,
+    Bcc,
+    BccManifest,
+    Bccp,
+    BccpManifest,
+)
+from app.repositories.vendors.mariadb.models.data_type import Dt, DtManifest, DtSc, DtScManifest
 from app.repositories.vendors.mariadb.models.library import Library
 from app.repositories.vendors.mariadb.models.namespace import Namespace
 from app.repositories.vendors.mariadb.models.release import Release, ReleaseDep
@@ -373,14 +398,325 @@ class MariaDbLibraryRepository(LibraryRepositoryContract):
             )
 
     async def discard_working_release(self, *, release_id: ReleaseId) -> None:
-        """Delete a working release and its seed dependency rows."""
-        await self._session.execute(delete(XbtManifest).where(XbtManifest.release_id == int(release_id)))
-        await self._session.execute(delete(ReleaseDep).where(ReleaseDep.release_id == int(release_id)))
-        await self._session.execute(delete(Release).where(Release.release_id == int(release_id)))
+        """Delete a working release and the authored rows that still depend on it."""
+        release_id_int = int(release_id)
+        if await self._session.scalar(select(Release.release_id).where(Release.release_id == release_id_int)) is None:
+            return
+
+        params = {"release_id": release_id_int}
+        acc_ids = await _collect_scalar_ints(
+            self._session,
+            select(AccManifest.acc_id).where(AccManifest.release_id == release_id_int),
+        )
+        ascc_ids = await _collect_scalar_ints(
+            self._session,
+            select(AsccManifest.ascc_id).where(AsccManifest.release_id == release_id_int),
+        )
+        bcc_ids = await _collect_scalar_ints(
+            self._session,
+            select(BccManifest.bcc_id).where(BccManifest.release_id == release_id_int),
+        )
+        asccp_ids = await _collect_scalar_ints(
+            self._session,
+            select(AsccpManifest.asccp_id).where(AsccpManifest.release_id == release_id_int),
+        )
+        bccp_ids = await _collect_scalar_ints(
+            self._session,
+            select(BccpManifest.bccp_id).where(BccpManifest.release_id == release_id_int),
+        )
+        dt_ids = await _collect_scalar_ints(
+            self._session,
+            select(DtManifest.dt_id).where(DtManifest.release_id == release_id_int),
+        )
+        dt_sc_ids = await _collect_scalar_ints(
+            self._session,
+            select(DtScManifest.dt_sc_id).where(DtScManifest.release_id == release_id_int),
+        )
+        code_list_ids = await _collect_scalar_ints(
+            self._session,
+            select(CodeListManifest.code_list_id).where(CodeListManifest.release_id == release_id_int),
+        )
+        code_list_value_ids = await _collect_scalar_ints(
+            self._session,
+            select(CodeListValueManifest.code_list_value_id).where(CodeListValueManifest.release_id == release_id_int),
+        )
+        agency_id_list_ids = await _collect_scalar_ints(
+            self._session,
+            select(AgencyIdListManifest.agency_id_list_id).where(AgencyIdListManifest.release_id == release_id_int),
+        )
+        agency_id_list_value_ids = await _collect_scalar_ints(
+            self._session,
+            select(AgencyIdListValueManifest.agency_id_list_value_id)
+            .join(
+                AgencyIdListManifest,
+                AgencyIdListManifest.agency_id_list_manifest_id == AgencyIdListValueManifest.agency_id_list_manifest_id,
+            )
+            .where(AgencyIdListManifest.release_id == release_id_int),
+        )
+
+        # Remove release-scoped assignments first so release-owned manifests can be deleted safely.
+        await self._session.execute(text("DELETE FROM dt_sc_awd_pri WHERE release_id = :release_id"), params)
+        await self._session.execute(text("DELETE FROM dt_awd_pri WHERE release_id = :release_id"), params)
+
+        await self._session.execute(
+            text(
+                "DELETE FROM module_blob_content_manifest "
+                "WHERE blob_content_manifest_id IN ("
+                "SELECT blob_content_manifest_id FROM blob_content_manifest WHERE release_id = :release_id)"
+            ),
+            params,
+        )
+        await self._session.execute(
+            text(
+                "DELETE FROM module_agency_id_list_manifest "
+                "WHERE agency_id_list_manifest_id IN ("
+                "SELECT agency_id_list_manifest_id FROM agency_id_list_manifest WHERE release_id = :release_id)"
+            ),
+            params,
+        )
+        await self._session.execute(
+            text(
+                "DELETE FROM module_code_list_manifest "
+                "WHERE code_list_manifest_id IN ("
+                "SELECT code_list_manifest_id FROM code_list_manifest WHERE release_id = :release_id)"
+            ),
+            params,
+        )
+        await self._session.execute(
+            text(
+                "DELETE FROM module_dt_manifest "
+                "WHERE dt_manifest_id IN (SELECT dt_manifest_id FROM dt_manifest WHERE release_id = :release_id)"
+            ),
+            params,
+        )
+        await self._session.execute(
+            text(
+                "DELETE FROM module_bccp_manifest "
+                "WHERE bccp_manifest_id IN ("
+                "SELECT bccp_manifest_id FROM bccp_manifest WHERE release_id = :release_id)"
+            ),
+            params,
+        )
+        await self._session.execute(
+            text(
+                "DELETE FROM module_asccp_manifest "
+                "WHERE asccp_manifest_id IN ("
+                "SELECT asccp_manifest_id FROM asccp_manifest WHERE release_id = :release_id)"
+            ),
+            params,
+        )
+        await self._session.execute(
+            text(
+                "DELETE FROM module_acc_manifest "
+                "WHERE acc_manifest_id IN (SELECT acc_manifest_id FROM acc_manifest WHERE release_id = :release_id)"
+            ),
+            params,
+        )
+        await self._session.execute(
+            text(
+                "DELETE FROM module_xbt_manifest "
+                "WHERE xbt_manifest_id IN (SELECT xbt_manifest_id FROM xbt_manifest WHERE release_id = :release_id)"
+            ),
+            params,
+        )
+
+        await self._session.execute(
+            text(
+                "DELETE FROM code_list_value_manifest WHERE release_id = :release_id"
+            ),
+            params,
+        )
+        await self._session.execute(
+            text(
+                "DELETE FROM agency_id_list_value_manifest WHERE release_id = :release_id"
+            ),
+            params,
+        )
+
+        # Break the seq_key cycle before deleting ASCC/BCC manifests.
+        await self._session.execute(text("UPDATE ascc_manifest SET seq_key_id = NULL WHERE release_id = :release_id"), params)
+        await self._session.execute(text("UPDATE bcc_manifest SET seq_key_id = NULL WHERE release_id = :release_id"), params)
+        await self._session.execute(
+            text(
+                "UPDATE seq_key "
+                "SET prev_seq_key_id = NULL, next_seq_key_id = NULL "
+                "WHERE from_acc_manifest_id IN ("
+                "SELECT acc_manifest_id FROM acc_manifest WHERE release_id = :release_id)"
+            ),
+            params,
+        )
+        await self._session.execute(
+            text(
+                "DELETE FROM seq_key WHERE from_acc_manifest_id IN ("
+                "SELECT acc_manifest_id FROM acc_manifest WHERE release_id = :release_id)"
+            ),
+            params,
+        )
+
+        await self._session.execute(text("DELETE FROM acc_manifest_tag WHERE acc_manifest_id IN (SELECT acc_manifest_id FROM acc_manifest WHERE release_id = :release_id)"), params)
+        await self._session.execute(text("DELETE FROM asccp_manifest_tag WHERE asccp_manifest_id IN (SELECT asccp_manifest_id FROM asccp_manifest WHERE release_id = :release_id)"), params)
+        await self._session.execute(text("DELETE FROM bccp_manifest_tag WHERE bccp_manifest_id IN (SELECT bccp_manifest_id FROM bccp_manifest WHERE release_id = :release_id)"), params)
+        await self._session.execute(text("DELETE FROM dt_manifest_tag WHERE dt_manifest_id IN (SELECT dt_manifest_id FROM dt_manifest WHERE release_id = :release_id)"), params)
+
+        await self._session.execute(text("DELETE FROM ascc_manifest WHERE release_id = :release_id"), params)
+        await self._session.execute(text("DELETE FROM bcc_manifest WHERE release_id = :release_id"), params)
+        await self._session.execute(text("DELETE FROM blob_content_manifest WHERE release_id = :release_id"), params)
+        await self._session.execute(text("DELETE FROM code_list_manifest WHERE release_id = :release_id"), params)
+        await self._session.execute(text("DELETE FROM agency_id_list_manifest WHERE release_id = :release_id"), params)
+        await self._session.execute(text("DELETE FROM dt_sc_manifest WHERE release_id = :release_id"), params)
+        await self._session.execute(text("DELETE FROM bccp_manifest WHERE release_id = :release_id"), params)
+        await self._session.execute(text("DELETE FROM asccp_manifest WHERE release_id = :release_id"), params)
+        await self._session.execute(text("DELETE FROM acc_manifest WHERE release_id = :release_id"), params)
+        await self._session.execute(text("DELETE FROM dt_manifest WHERE release_id = :release_id"), params)
+        await self._session.execute(text("DELETE FROM xbt_manifest WHERE release_id = :release_id"), params)
+        await self._session.execute(text("DELETE FROM top_level_asbiep WHERE release_id = :release_id"), params)
+
+        # Remove the authored rows that were represented in the deleted manifests.
+        if code_list_value_ids:
+            await self._session.execute(delete(CodeListValue).where(CodeListValue.code_list_value_id.in_(code_list_value_ids)))
+        if code_list_ids:
+            await self._session.execute(delete(CodeList).where(CodeList.code_list_id.in_(code_list_ids)))
+
+        if dt_sc_ids:
+            await self._session.execute(delete(DtSc).where(DtSc.dt_sc_id.in_(dt_sc_ids)))
+        if ascc_ids:
+            await self._session.execute(delete(Ascc).where(Ascc.ascc_id.in_(ascc_ids)))
+        if bcc_ids:
+            await self._session.execute(delete(Bcc).where(Bcc.bcc_id.in_(bcc_ids)))
+        if bccp_ids:
+            await self._session.execute(delete(Bccp).where(Bccp.bccp_id.in_(bccp_ids)))
+        if asccp_ids:
+            await self._session.execute(delete(Asccp).where(Asccp.asccp_id.in_(asccp_ids)))
+        if acc_ids:
+            await self._session.execute(delete(Acc).where(Acc.acc_id.in_(acc_ids)))
+        if dt_ids:
+            await self._session.execute(delete(Dt).where(Dt.dt_id.in_(dt_ids)))
+        if agency_id_list_value_ids:
+            await self._session.execute(
+                text(
+                    "UPDATE agency_id_list SET agency_id_list_value_id = NULL "
+                    "WHERE agency_id_list_id IN ("
+                    "SELECT agency_id_list_id FROM agency_id_list_manifest WHERE release_id = :release_id)"
+                ),
+                params,
+            )
+            await self._session.execute(
+                delete(AgencyIdListValue).where(AgencyIdListValue.agency_id_list_value_id.in_(agency_id_list_value_ids))
+            )
+        if agency_id_list_ids:
+            await self._session.execute(
+                delete(AgencyIdList).where(AgencyIdList.agency_id_list_id.in_(agency_id_list_ids))
+            )
+
+        await self._session.execute(
+            delete(ReleaseDep).where(
+                (ReleaseDep.release_id == release_id_int) | (ReleaseDep.depend_on_release_id == release_id_int)
+            )
+        )
+        await self._session.execute(delete(Release).where(Release.release_id == release_id_int))
 
     async def discard_library(self, *, library_id: LibraryId) -> bool:
-        """Delete a library row."""
-        res = await self._session.execute(delete(Library).where(Library.library_id == int(library_id)))
+        """Delete a library row and any remaining library-owned rows."""
+        library_id_int = int(library_id)
+        params = {"library_id": library_id_int}
+
+        await self._session.execute(
+            text(
+                "DELETE FROM module_blob_content_manifest "
+                "WHERE module_set_release_id IN ("
+                "SELECT module_set_release_id FROM module_set_release "
+                "WHERE module_set_id IN (SELECT module_set_id FROM module_set WHERE library_id = :library_id))"
+            ),
+            params,
+        )
+        await self._session.execute(
+            text(
+                "DELETE FROM module_agency_id_list_manifest "
+                "WHERE module_set_release_id IN ("
+                "SELECT module_set_release_id FROM module_set_release "
+                "WHERE module_set_id IN (SELECT module_set_id FROM module_set WHERE library_id = :library_id))"
+            ),
+            params,
+        )
+        await self._session.execute(
+            text(
+                "DELETE FROM module_code_list_manifest "
+                "WHERE module_set_release_id IN ("
+                "SELECT module_set_release_id FROM module_set_release "
+                "WHERE module_set_id IN (SELECT module_set_id FROM module_set WHERE library_id = :library_id))"
+            ),
+            params,
+        )
+        await self._session.execute(
+            text(
+                "DELETE FROM module_dt_manifest "
+                "WHERE module_set_release_id IN ("
+                "SELECT module_set_release_id FROM module_set_release "
+                "WHERE module_set_id IN (SELECT module_set_id FROM module_set WHERE library_id = :library_id))"
+            ),
+            params,
+        )
+        await self._session.execute(
+            text(
+                "DELETE FROM module_bccp_manifest "
+                "WHERE module_set_release_id IN ("
+                "SELECT module_set_release_id FROM module_set_release "
+                "WHERE module_set_id IN (SELECT module_set_id FROM module_set WHERE library_id = :library_id))"
+            ),
+            params,
+        )
+        await self._session.execute(
+            text(
+                "DELETE FROM module_asccp_manifest "
+                "WHERE module_set_release_id IN ("
+                "SELECT module_set_release_id FROM module_set_release "
+                "WHERE module_set_id IN (SELECT module_set_id FROM module_set WHERE library_id = :library_id))"
+            ),
+            params,
+        )
+        await self._session.execute(
+            text(
+                "DELETE FROM module_acc_manifest "
+                "WHERE module_set_release_id IN ("
+                "SELECT module_set_release_id FROM module_set_release "
+                "WHERE module_set_id IN (SELECT module_set_id FROM module_set WHERE library_id = :library_id))"
+            ),
+            params,
+        )
+        await self._session.execute(
+            text(
+                "DELETE FROM module_xbt_manifest "
+                "WHERE module_set_release_id IN ("
+                "SELECT module_set_release_id FROM module_set_release "
+                "WHERE module_set_id IN (SELECT module_set_id FROM module_set WHERE library_id = :library_id))"
+            ),
+            params,
+        )
+        await self._session.execute(
+            text(
+                "DELETE FROM module_set_release "
+                "WHERE module_set_id IN (SELECT module_set_id FROM module_set WHERE library_id = :library_id)"
+            ),
+            params,
+        )
+        await self._session.execute(
+            text(
+                "DELETE FROM module "
+                "WHERE module_set_id IN (SELECT module_set_id FROM module_set WHERE library_id = :library_id)"
+            ),
+            params,
+        )
+        await self._session.execute(text("DELETE FROM module_set WHERE library_id = :library_id"), params)
+        await self._session.execute(
+            text(
+                "DELETE FROM bie_package_top_level_asbiep "
+                "WHERE bie_package_id IN (SELECT bie_package_id FROM bie_package WHERE library_id = :library_id)"
+            ),
+            params,
+        )
+        await self._session.execute(text("DELETE FROM bie_package WHERE library_id = :library_id"), params)
+        await self._session.execute(text("DELETE FROM namespace WHERE library_id = :library_id"), params)
+        res = await self._session.execute(delete(Library).where(Library.library_id == library_id_int))
         return int(res.rowcount or 0) == 1
 
 
@@ -423,6 +759,12 @@ def _select_release_summary() -> Select[Any]:
         )
         .join(Library, Library.library_id == Release.library_id)
     )
+
+
+async def _collect_scalar_ints(session: AsyncSession, stmt: Select[Any]) -> list[int]:
+    """Load a sorted list of unique integer scalars for later delete steps."""
+    res = await session.execute(stmt)
+    return sorted({int(value) for value in res.scalars().all() if value is not None})
 
 
 def _to_library_row(row: Any) -> LibraryRow:

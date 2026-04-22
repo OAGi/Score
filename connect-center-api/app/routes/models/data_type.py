@@ -463,33 +463,46 @@ class CreateDataTypeRequest(BaseModel):
     )
     qualifier: str | None = Field(
         default=None,
-        description="Optional initial qualifier override. Use null to clear the inherited qualifier.",
+        description=(
+            "Qualifier to start with. In CCTS, a BDT qualifier term is a word or words that help define and "
+            "differentiate a qualified BDT from its higher-level BDT. If not provided, the value derived from the "
+            "base DT is used."
+        ),
     )
     six_digit_id: str | None = Field(
         default=None,
         description=(
-            "Optional initial six-character suffix for the BDT Type name from the UN/CEFACT XML Schema NDR. "
+            "Six-character suffix to start with for the BDT Type name from the UN/CEFACT XML Schema NDR. "
             "It must be unique within the namespace and use only letters and digits. "
-            "Use null to clear the inherited value."
+            "If not provided, it starts empty."
         ),
     )
-    deprecated: bool | None = Field(default=None, description="Optional initial deprecation flag override.")
+    deprecated: bool | None = Field(default=None, description="Whether this DT should start as deprecated.")
     namespace_id: int | None = Field(
         default=None,
         ge=1,
-        description="Optional initial namespace identifier. Use null to clear the inherited namespace.",
+        description=(
+            "Namespace to use when creating this DT. In the original score-http create logic, if this is not "
+            "provided, the base DT namespace is used only when it is compatible with the requester's role."
+        ),
     )
     content_component_definition: str | None = Field(
         default=None,
-        description="Optional initial content component definition override. Use null to clear the inherited value.",
+        description="Content component definition to start with. If not provided, the value derived from the base DT is used.",
     )
     definition: str | None = Field(
         default=None,
-        description="Optional initial definition override. Use null to clear the inherited value.",
+        description=(
+            "Definition text to start with. This is the explanatory text that describes what the DT means. "
+            "If not provided, the value derived from the base DT is used."
+        ),
     )
     definition_source: str | None = Field(
         default=None,
-        description="Optional initial definition source override. Use null to clear the inherited value.",
+        description=(
+            "Definition source to start with. Use this to record where the definition came from, such as a "
+            "specification, standard, or reference URL. If not provided, the value derived from the base DT is used."
+        ),
     )
     tag_id: list[int] | None = Field(
         default=None,
@@ -499,8 +512,23 @@ class CreateDataTypeRequest(BaseModel):
     default_primitive: DefaultPrimitiveSelectionRequest | None = Field(
         default=None,
         description=(
-            "Optional initial default primitive target. Provide exactly one of xbt_manifest_id, "
+            "Default primitive to start with. Provide exactly one of xbt_manifest_id, "
             "code_list_manifest_id, or agency_id_list_manifest_id."
+        ),
+    )
+    add_primitives: list[PrimitiveMutationRequest] | None = Field(
+        default=None,
+        description=(
+            "Primitive rows to add during creation. Each row uses the form {cdt_pri_name, xbt_manifest_id, "
+            "code_list_manifest_id, agency_id_list_manifest_id}. Use default_primitive to choose which remaining "
+            "primitive is the default."
+        ),
+    )
+    remove_primitives: list[PrimitiveMutationRequest] | None = Field(
+        default=None,
+        description=(
+            "Primitive rows to remove during creation. Each row uses the form {cdt_pri_name, xbt_manifest_id, "
+            "code_list_manifest_id, agency_id_list_manifest_id}."
         ),
     )
 
@@ -520,40 +548,52 @@ class UpdateDataTypeRequest(BaseModel):
         default=None,
         ge=1,
         description=(
-            "Updated base DT manifest identifier. Use null to clear the base DT link. "
-            "If the base DT is in the same library, it must be from the target release. "
+            "Base DT. Omit to leave unchanged. Set `null` to clear the base DT link. "
+            "If the base DT is in the same library, it must come from the target release. "
             "If it is in a different library, its release must be one of the target release dependencies."
         ),
     )
-    qualifier: str | None = Field(default=None, description="Updated qualifier. Use null to clear it.")
+    qualifier: str | None = Field(
+        default=None,
+        description=(
+            "Qualifier. In CCTS, a BDT qualifier term is a word or words that help define and differentiate a "
+            "qualified BDT from its higher-level BDT. Omit to leave unchanged. Set `null` to clear it."
+        ),
+    )
     six_digit_id: str | None = Field(
         default=None,
         description=(
-            "Updated six-character suffix for the BDT Type name from the UN/CEFACT XML Schema NDR. "
+            "Six-character suffix for the BDT Type name from the UN/CEFACT XML Schema NDR. "
             "It must be unique within the namespace and use only letters and digits. "
-            "Use null to clear it."
+            "Omit to leave unchanged. Set `null` to clear it."
         ),
     )
-    deprecated: bool | None = Field(default=None, description="Updated deprecation flag.")
+    deprecated: bool | None = Field(default=None, description="Whether this data type should be deprecated. Omit to leave unchanged.")
     namespace_id: int | None = Field(
         default=None,
         ge=1,
-        description="Updated namespace identifier. Use null to clear the namespace.",
+        description="Namespace. Omit to leave unchanged. Set `null` to clear it.",
     )
     content_component_definition: str | None = Field(
         default=None,
-        description="Updated content component definition. Use null to clear it.",
+        description="Content component definition. Omit to leave unchanged. Set `null` to clear it.",
     )
-    definition: str | None = Field(default=None, description="Updated definition text. Use null to clear it.")
+    definition: str | None = Field(
+        default=None,
+        description="Definition text. This is the explanatory text that describes what the DT means. Omit to leave unchanged. Set `null` to clear it.",
+    )
     definition_source: str | None = Field(
         default=None,
-        description="Updated definition source. Use null to clear it.",
+        description=(
+            "Definition source. Use this to record where the definition came from, such as a "
+            "specification, standard, or reference URL. Omit to leave unchanged. Set `null` to clear it."
+        ),
     )
     default_primitive: DefaultPrimitiveSelectionRequest | None = Field(
         default=None,
         description=(
-            "Default primitive target. Provide exactly one of xbt_manifest_id, "
-            "code_list_manifest_id, or agency_id_list_manifest_id."
+            "Default primitive. Provide exactly one of xbt_manifest_id, "
+            "code_list_manifest_id, or agency_id_list_manifest_id. Omit to leave unchanged."
         ),
     )
     add_primitives: list[PrimitiveMutationRequest] | None = Field(
@@ -561,14 +601,14 @@ class UpdateDataTypeRequest(BaseModel):
         description=(
             "Primitive rows to add. Each row uses the form {cdt_pri_name, xbt_manifest_id, "
             "code_list_manifest_id, agency_id_list_manifest_id}. Use default_primitive to choose "
-            "which remaining primitive is the default."
+            "which remaining primitive is the default. Omit to leave unchanged."
         ),
     )
     remove_primitives: list[PrimitiveMutationRequest] | None = Field(
         default=None,
         description=(
             "Primitive rows to remove. Each row uses the form {cdt_pri_name, xbt_manifest_id, "
-            "code_list_manifest_id, agency_id_list_manifest_id}."
+            "code_list_manifest_id, agency_id_list_manifest_id}. Omit to leave unchanged."
         ),
     )
 
@@ -582,34 +622,130 @@ class CreateDataTypeSupplementaryComponentResponse(BaseModel):
     model_config = ConfigDict(frozen=True)
 
 
-class UpdateDataTypeSupplementaryComponentRequest(BaseModel):
-    """Request payload for updating mutable DT_SC fields."""
+class CreateDataTypeSupplementaryComponentRequest(BaseModel):
+    """Request payload for creating a DT_SC with optional initial values."""
 
-    property_term: str | None = Field(default=None, description="Updated property term. Use null to clear it.")
-    representation_term: str | None = Field(
-        default=None,
+    property_term: str = Field(
+        ...,
+        min_length=1,
         description=(
-            "Updated representation term. Use a CDT data type term such as `Amount`, `Code`, or `Text`. "
-            "When this changes, the DT_SC primitive rows are reset to the default primitive set for that term."
+            "Property term to start with. In CCTS, a BDT supplementary component property term is a "
+            "semantically meaningful name for a unique characteristic that can be used in a BDT."
+        ),
+    )
+    representation_term: str = Field(
+        ...,
+        min_length=1,
+        description=(
+            "Representation term to start with. In CCTS, this is a semantically meaningful name that "
+            "represents the value domain of the supplementary component. Choose an approved CDT data type "
+            "term such as `Amount`, `Code`, or `Text`. When this changes, the DT_SC primitive rows are reset "
+            "to the default primitive set for that term."
         ),
     )
     cardinality: Literal["Prohibited", "Optional", "Required"] | None = Field(
         default=None,
         description=(
-            "Updated DT_SC cardinality. Use `Prohibited` for `0..0`, `Optional` for `0..1`, "
-            "or `Required` for `1..1`."
+            "Cardinality to start with. Choose `Prohibited` for `0..0`, `Optional` for `0..1`, "
+            "or `Required` for `1..1`. Omit to keep the generated initial cardinality."
         ),
     )
-    deprecated: bool | None = Field(default=None, description="Updated deprecation flag.")
-    definition: str | None = Field(default=None, description="Updated definition text. Use null to clear it.")
+    deprecated: bool | None = Field(
+        default=None,
+        description="Whether this supplementary component should start as deprecated. Omit to keep the generated initial value.",
+    )
+    definition: str | None = Field(
+        default=None,
+        description=(
+            "Definition text to start with. This is the explanatory text that describes what the supplementary "
+            "component means. Omit to keep the generated initial value. Set `null` to clear it."
+        ),
+    )
     definition_source: str | None = Field(
         default=None,
-        description="Updated definition source. Use null to clear it.",
+        description=(
+            "Definition source to start with. Use this to record where the definition came from, such as a "
+            "specification, standard, or reference URL. Omit to keep the generated initial value. Set `null` to clear it."
+        ),
     )
     value_constraint: ValueConstraintRequest | None = Field(
         default=None,
         description=(
-            "Updated value constraint. Use null to clear it. "
+            "Value constraint to start with. Provide default_value to set a default when the element is omitted, "
+            "or fixed_value to require one exact value. Omit to keep the generated initial value. Set `null` to clear it."
+        ),
+    )
+    default_primitive: DefaultPrimitiveSelectionRequest | None = Field(
+        default=None,
+        description=(
+            "Default primitive to start with. Provide exactly one of xbt_manifest_id, "
+            "code_list_manifest_id, or agency_id_list_manifest_id. Omit to keep the generated initial value."
+        ),
+    )
+    add_primitives: list[PrimitiveMutationRequest] | None = Field(
+        default=None,
+        description=(
+            "Primitive rows to add during creation. Each row uses the form {cdt_pri_name, xbt_manifest_id, "
+            "code_list_manifest_id, agency_id_list_manifest_id}. Use default_primitive to choose which remaining "
+            "primitive is the default. Omit to keep only the generated initial primitive rows."
+        ),
+    )
+    remove_primitives: list[PrimitiveMutationRequest] | None = Field(
+        default=None,
+        description=(
+            "Primitive rows to remove during creation. Each row uses the form {cdt_pri_name, xbt_manifest_id, "
+            "code_list_manifest_id, agency_id_list_manifest_id}. Omit to keep the generated initial primitive rows."
+        ),
+    )
+
+    model_config = ConfigDict(frozen=True)
+
+
+class UpdateDataTypeSupplementaryComponentRequest(BaseModel):
+    """Request payload for updating mutable DT_SC fields."""
+
+    property_term: str | None = Field(
+        default=None,
+        description=(
+            "Property term. In CCTS, a BDT supplementary component property term is a semantically meaningful "
+            "name for a unique characteristic that can be used in a BDT. Omit to leave unchanged. Set `null` to clear it."
+        ),
+    )
+    representation_term: str | None = Field(
+        default=None,
+        description=(
+            "Representation term. In CCTS, this is a semantically meaningful name that represents the value "
+            "domain of the supplementary component. Choose an approved CDT data type term such as `Amount`, "
+            "`Code`, or `Text`. When this changes, the DT_SC primitive rows are reset to the default primitive "
+            "set for that term. Omit to leave unchanged."
+        ),
+    )
+    cardinality: Literal["Prohibited", "Optional", "Required"] | None = Field(
+        default=None,
+        description=(
+            "Cardinality. Choose `Prohibited` for `0..0`, `Optional` for `0..1`, "
+            "or `Required` for `1..1`. Omit to leave unchanged."
+        ),
+    )
+    deprecated: bool | None = Field(default=None, description="Whether this supplementary component should be deprecated. Omit to leave unchanged.")
+    definition: str | None = Field(
+        default=None,
+        description=(
+            "Definition text. This is the explanatory text that describes what the supplementary component means. "
+            "Omit to leave unchanged. Set `null` to clear it."
+        ),
+    )
+    definition_source: str | None = Field(
+        default=None,
+        description=(
+            "Definition source. Use this to record where the definition came from, such as a specification, "
+            "standard, or reference URL. Omit to leave unchanged. Set `null` to clear it."
+        ),
+    )
+    value_constraint: ValueConstraintRequest | None = Field(
+        default=None,
+        description=(
+            "Value constraint. Omit to leave unchanged. Set `null` to clear it. "
             "Provide default_value to set a default when the element is omitted, "
             "or fixed_value to require one exact value."
         ),
@@ -617,8 +753,8 @@ class UpdateDataTypeSupplementaryComponentRequest(BaseModel):
     default_primitive: DefaultPrimitiveSelectionRequest | None = Field(
         default=None,
         description=(
-            "Default primitive target. Provide exactly one of xbt_manifest_id, "
-            "code_list_manifest_id, or agency_id_list_manifest_id."
+            "Default primitive. Provide exactly one of xbt_manifest_id, "
+            "code_list_manifest_id, or agency_id_list_manifest_id. Omit to leave unchanged."
         ),
     )
     add_primitives: list[PrimitiveMutationRequest] | None = Field(
@@ -626,14 +762,14 @@ class UpdateDataTypeSupplementaryComponentRequest(BaseModel):
         description=(
             "Primitive rows to add. Each row uses the form {cdt_pri_name, xbt_manifest_id, "
             "code_list_manifest_id, agency_id_list_manifest_id}. Use default_primitive to choose "
-            "which remaining primitive is the default."
+            "which remaining primitive is the default. Omit to leave unchanged."
         ),
     )
     remove_primitives: list[PrimitiveMutationRequest] | None = Field(
         default=None,
         description=(
             "Primitive rows to remove. Each row uses the form {cdt_pri_name, xbt_manifest_id, "
-            "code_list_manifest_id, agency_id_list_manifest_id}."
+            "code_list_manifest_id, agency_id_list_manifest_id}. Omit to leave unchanged."
         ),
     )
 

@@ -85,7 +85,7 @@ class CreateBizCtxResponse(BaseModel):
 
 class UpdateBizCtxRequest(BaseModel):
     """Request body for partially updating a business context."""
-    name: str | None = Field(default=None, max_length=100, description="Short, descriptive name of the business context.")
+    name: str | None = Field(default=None, max_length=100, description="Short, descriptive name of the business context. Omit to leave unchanged.")
 
     model_config = ConfigDict(
         json_schema_extra={

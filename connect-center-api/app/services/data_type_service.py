@@ -195,6 +195,8 @@ class DataTypeService:
         xbt_manifest_id: int | None | UnsetType = UNSET,
         code_list_manifest_id: int | None | UnsetType = UNSET,
         agency_id_list_manifest_id: int | None | UnsetType = UNSET,
+        add_primitives: list[DataTypePrimitiveServiceRecord] | UnsetType = UNSET,
+        remove_primitives: list[DataTypePrimitiveServiceRecord] | UnsetType = UNSET,
     ) -> CreateDataTypeServiceResult:
         """Create a DT in a release allowed for the requester's role."""
         release = await self._release_service.get(release_id)
@@ -234,6 +236,8 @@ class DataTypeService:
                 xbt_manifest_id,
                 code_list_manifest_id,
                 agency_id_list_manifest_id,
+                add_primitives,
+                remove_primitives,
             )
         ):
             await self.update_dt(
@@ -248,6 +252,8 @@ class DataTypeService:
                 xbt_manifest_id=xbt_manifest_id,
                 code_list_manifest_id=code_list_manifest_id,
                 agency_id_list_manifest_id=agency_id_list_manifest_id,
+                add_primitives=add_primitives,
+                remove_primitives=remove_primitives,
             )
         return CreateDataTypeServiceResult(dt_manifest_id=int(dt_manifest_id))
 
@@ -514,8 +520,21 @@ class DataTypeService:
         self,
         *,
         owner_dt_manifest_id: DataTypeManifestId,
+        property_term: str,
+        representation_term: str,
+        cardinality: DataTypeSupplementaryComponentCardinality | UnsetType = UNSET,
+        deprecated: bool | UnsetType = UNSET,
+        default_value: str | None | UnsetType = UNSET,
+        fixed_value: str | None | UnsetType = UNSET,
+        definition: str | None | UnsetType = UNSET,
+        definition_source: str | None | UnsetType = UNSET,
+        xbt_manifest_id: int | None | UnsetType = UNSET,
+        code_list_manifest_id: int | None | UnsetType = UNSET,
+        agency_id_list_manifest_id: int | None | UnsetType = UNSET,
+        add_primitives: list[DataTypePrimitiveServiceRecord] | UnsetType = UNSET,
+        remove_primitives: list[DataTypePrimitiveServiceRecord] | UnsetType = UNSET,
     ) -> CreateDataTypeSupplementaryComponentServiceResult:
-        """Create a blank DT_SC on a WIP DT and propagate it to inherited DTs."""
+        """Create a DT_SC on a WIP DT, optionally apply mutable fields, and propagate it to inherited DTs."""
         dt = await self.get(owner_dt_manifest_id)
         if dt is None:
             raise LookupError(
@@ -531,6 +550,10 @@ class DataTypeService:
                 f"not in the 'WIP' state: {blocked}. Supplementary components can only be added when "
                 "the target DT and all derived DTs are in the 'WIP' state."
             )
+        if not property_term.strip():
+            raise ValueError("property_term must not be empty.")
+        if not representation_term.strip():
+            raise ValueError("representation_term must not be empty.")
 
         dt_sc_manifest_id = await self._repo.create_dt_sc(
             owner_dt_manifest_id=owner_dt_manifest_id,
@@ -540,6 +563,38 @@ class DataTypeService:
             await self._create_dt_sc_from_base_recursive(
                 owner_dt_manifest_id=inherited_dt_manifest_id,
                 based_dt_sc_manifest_id=dt_sc_manifest_id,
+            )
+        if any(
+            value is not UNSET
+            for value in (
+                cardinality,
+                deprecated,
+                default_value,
+                fixed_value,
+                definition,
+                definition_source,
+                xbt_manifest_id,
+                code_list_manifest_id,
+                agency_id_list_manifest_id,
+                add_primitives,
+                remove_primitives,
+            )
+        ):
+            await self.update_dt_sc(
+                dt_sc_manifest_id=dt_sc_manifest_id,
+                property_term=property_term,
+                representation_term=representation_term,
+                cardinality=cardinality,
+                deprecated=deprecated,
+                default_value=default_value,
+                fixed_value=fixed_value,
+                definition=definition,
+                definition_source=definition_source,
+                xbt_manifest_id=xbt_manifest_id,
+                code_list_manifest_id=code_list_manifest_id,
+                agency_id_list_manifest_id=agency_id_list_manifest_id,
+                add_primitives=add_primitives,
+                remove_primitives=remove_primitives,
             )
         return CreateDataTypeSupplementaryComponentServiceResult(dt_sc_manifest_id=int(dt_sc_manifest_id))
 
@@ -905,6 +960,7 @@ class DataTypeService:
         self,
         *,
         dt_manifest_id: DataTypeManifestId,
+        requested_action: Literal["revise", "amend"] | None = None,
     ) -> ReviseDataTypeServiceResult:
         """Create a new DT working revision from a stable DT revision."""
         dt = await self.get(dt_manifest_id)
@@ -912,7 +968,7 @@ class DataTypeService:
             raise LookupError(
                 f"No DT exists with manifest ID {int(dt_manifest_id)}. Please verify the identifier and try again."
             )
-        self._assert_can_revise_dt(dt)
+        self._assert_can_revise_dt(dt, requested_action=requested_action)
 
         revised = await self._repo.revise_dt(
             dt_manifest_id=dt_manifest_id,
@@ -1183,7 +1239,7 @@ class DataTypeService:
                 raise ValueError("It only allows to revise the component in 'Working' branch for developers.")
             return
         if release_num == "Working":
-            raise ValueError("It only allows to revise the component in non-'Working' branch for end-users.")
+            raise ValueError("It only allows to amend the component in non-'Working' branches for end-users.")
 
     def _assert_same_role_family_as_owner(self, dt: DataTypeServiceResult) -> None:
         """Require the requester and owner to both be developer-side or both end-user-side."""
@@ -1192,14 +1248,24 @@ class DataTypeService:
         if self._requester_is_developer() != owner_is_developer:
             raise ValueError("It only allows to revise the component for users in the same roles.")
 
-    def _assert_can_revise_dt(self, dt: DataTypeServiceResult) -> None:
+    def _assert_can_revise_dt(
+        self,
+        dt: DataTypeServiceResult,
+        *,
+        requested_action: Literal["revise", "amend"] | None = None,
+    ) -> None:
         """Validate revise rules for DT revisions."""
+        expected_action: Literal["revise", "amend"] = "revise" if self._requester_is_developer() else "amend"
+        if requested_action is not None and requested_action != expected_action:
+            if expected_action == "revise":
+                raise PermissionError("Developer-side DTs must use revise.")
+            raise PermissionError("End-user DTs must use amend.")
         if self._requester_is_developer():
             if dt.state != "Published":
                 raise ValueError("Only the core component in 'Published' state can be revised.")
         else:
             if dt.state != "Production":
-                raise ValueError("Only the core component in 'Production' state can be revised.")
+                raise ValueError("Only the core component in 'Production' state can be amended.")
         self._assert_can_access_revision_branch(dt)
         self._assert_same_role_family_as_owner(dt)
 

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.tools.models.shared import WhoAndWhen
 
@@ -26,8 +26,22 @@ class LibraryResponseEntry(BaseModel):
     model_config = ConfigDict(frozen=True, from_attributes=True)
 
 
+class LibraryReleaseDependencyRecord(BaseModel):
+    """Release dependency summary for a library's working release."""
+
+    release_id: int
+    library_id: int
+    library_name: str
+    release_num: str
+    state: str
+
+    model_config = ConfigDict(frozen=True, from_attributes=True)
+
+
 class GetLibraryResponse(LibraryResponseEntry):
     """Response for get_library tool."""
+
+    release_dependencies: list[LibraryReleaseDependencyRecord] = Field(default_factory=list)
 
 
 class GetLibraryPaginationResponse(BaseModel):
@@ -58,10 +72,10 @@ class UpdateLibraryResponse(BaseModel):
     model_config = ConfigDict(frozen=True)
 
 
-class UpdateLibraryReleaseDependenciesResponse(BaseModel):
-    """Response for update_library_release_dependencies tool."""
+class ManageLibraryReleaseDependenciesResponse(BaseModel):
+    """Response for add/remove library release dependency tools."""
 
     library_id: int
-    release_ids: list[int]
+    release_dependencies: list[LibraryReleaseDependencyRecord]
 
     model_config = ConfigDict(frozen=True)
