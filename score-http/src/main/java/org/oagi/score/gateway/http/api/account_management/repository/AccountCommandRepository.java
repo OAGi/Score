@@ -7,7 +7,7 @@ public interface AccountCommandRepository {
 
     UserId create(String loginId, String password, String name, String organization, boolean developer, boolean admin);
 
-    boolean update(UserId userId, String loginId, String username, String organization, boolean admin, String newPassword);
+    boolean update(UserId userId, String loginId, String username, String organization, Boolean admin, String newPassword);
 
     boolean updatePassword(String password);
 

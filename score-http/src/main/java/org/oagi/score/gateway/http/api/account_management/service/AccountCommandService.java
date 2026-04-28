@@ -97,11 +97,12 @@ public class AccountCommandService {
         }
 
         var command = repositoryFactory.accountCommandRepository(requester, passwordEncoder);
+        Boolean admin = requester.isAdministrator() ? request.admin() : null;
         boolean updated = command.update(request.userId(),
                 request.loginId(),
                 request.username(),
                 request.organization(),
-                request.admin(),
+                admin,
                 hasLength(request.newPassword()) ? validate(request.newPassword()) : null);
 
         return updated;
