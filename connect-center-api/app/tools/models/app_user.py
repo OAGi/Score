@@ -39,6 +39,21 @@ class GetUserResponse(BaseModel):
     model_config = ConfigDict(frozen=True)
 
 
+class GetCurrentUserResponse(BaseModel):
+    """Response for the MCP current-user tool."""
+
+    login_id: str
+    username: str | None
+    organization: str | None
+    email: str | None
+    roles: list[Role]
+    email_verified: bool
+    email_verified_timestamp: datetime | None = None
+    is_enabled: bool
+
+    model_config = ConfigDict(frozen=True)
+
+
 class GetUserPaginationResponse(BaseModel):
     """Response for get_users tool."""
 

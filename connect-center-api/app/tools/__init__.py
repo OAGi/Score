@@ -72,8 +72,18 @@ async def get_tool_authenticated_user(session: AsyncSession) -> AuthenticatedUse
         raise _tool_auth_error(cause="The request is missing valid authentication credentials.")
 
     claims = access_token.claims or {}
+    if _claims_match_mcp_jwt_issuer(claims):
+        direct_user = await _get_tool_authenticated_user_from_login_claim(session, claims)
+        if direct_user is not None:
+            return direct_user
+
     sub = claims.get("sub")
-    issuer_uri = (settings.oauth2_issuer_uri or "").strip()
+    if not isinstance(sub, str) or not sub:
+        raise _tool_auth_error(cause="Token is missing the 'sub' claim.")
+
+    issuer_uri = _issuer_uri_from_claims(claims)
+    if not issuer_uri:
+        raise _tool_auth_error(cause="Token is missing the 'iss' claim and OAUTH2_ISSUER_URI is not configured.")
 
     app_user_repo = get_vendor_plugin().create_app_user_repository(session)
     oauth2_app = await app_user_repo.get_oauth2_app_by_issuer_uri(
@@ -106,6 +116,62 @@ async def get_tool_authenticated_user(session: AsyncSession) -> AuthenticatedUse
             sub=sub,
         ),
     )
+
+
+async def _get_tool_authenticated_user_from_login_claim(
+    session: AsyncSession,
+    claims: dict[str, Any],
+) -> AuthenticatedUser | None:
+    login_id = _login_id_from_claims(claims)
+    if login_id is None:
+        return None
+
+    app_user_repo = get_vendor_plugin().create_app_user_repository(session)
+    user_row = await app_user_repo.get_auth_by_login_id(login_id)
+
+    if user_row is None:
+        raise _tool_auth_error(cause="The token login claim does not match a connectCenter account.")
+
+    is_enabled = getattr(user_row, "is_enabled", None)
+    if is_enabled is False:
+        raise _tool_auth_error(cause="The linked connectCenter account is disabled.")
+
+    user = _build_user_summary(
+        user_id=int(getattr(user_row, "app_user_id")),
+        login_id=str(getattr(user_row, "login_id")),
+        name=getattr(user_row, "name", None),
+        is_admin=bool(getattr(user_row, "is_admin", False)),
+        is_developer=getattr(user_row, "is_developer", None),
+    )
+    return AuthenticatedUser(user=user, auth_type="oauth2", oauth2=None)
+
+
+def _login_id_from_claims(claims: dict[str, Any]) -> str | None:
+    login_id_claim = (settings.mcp_jwt_login_id_claim or "").strip()
+    if not login_id_claim:
+        return None
+
+    login_id = claims.get(login_id_claim)
+    if isinstance(login_id, str) and login_id.strip():
+        return login_id.strip()
+
+    return None
+
+
+def _claims_match_mcp_jwt_issuer(claims: dict[str, Any]) -> bool:
+    configured_issuer = (settings.mcp_jwt_issuer_uri or "").strip().rstrip("/")
+    if not configured_issuer:
+        return False
+
+    token_issuer = claims.get("iss")
+    return isinstance(token_issuer, str) and token_issuer.strip().rstrip("/") == configured_issuer
+
+
+def _issuer_uri_from_claims(claims: dict[str, Any]) -> str:
+    issuer_uri = claims.get("iss")
+    if isinstance(issuer_uri, str) and issuer_uri.strip():
+        return issuer_uri.strip().rstrip("/")
+    return (settings.oauth2_issuer_uri or "").strip().rstrip("/")
 
 
 @asynccontextmanager

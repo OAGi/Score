@@ -520,6 +520,84 @@ class MariaDbLibraryRepository(LibraryRepositoryContract):
             params,
         )
 
+        # Break self-referential manifest links before deleting release-owned rows.
+        await self._session.execute(
+            text(
+                "UPDATE acc_manifest "
+                "SET based_acc_manifest_id = NULL, replacement_acc_manifest_id = NULL, "
+                "prev_acc_manifest_id = NULL, next_acc_manifest_id = NULL "
+                "WHERE release_id = :release_id"
+            ),
+            params,
+        )
+        await self._session.execute(
+            text(
+                "UPDATE ascc_manifest "
+                "SET replacement_ascc_manifest_id = NULL, prev_ascc_manifest_id = NULL, next_ascc_manifest_id = NULL "
+                "WHERE release_id = :release_id"
+            ),
+            params,
+        )
+        await self._session.execute(
+            text(
+                "UPDATE bcc_manifest "
+                "SET replacement_bcc_manifest_id = NULL, prev_bcc_manifest_id = NULL, next_bcc_manifest_id = NULL "
+                "WHERE release_id = :release_id"
+            ),
+            params,
+        )
+        await self._session.execute(
+            text(
+                "UPDATE asccp_manifest "
+                "SET replacement_asccp_manifest_id = NULL, prev_asccp_manifest_id = NULL, next_asccp_manifest_id = NULL "
+                "WHERE release_id = :release_id"
+            ),
+            params,
+        )
+        await self._session.execute(
+            text(
+                "UPDATE bccp_manifest "
+                "SET replacement_bccp_manifest_id = NULL, prev_bccp_manifest_id = NULL, next_bccp_manifest_id = NULL "
+                "WHERE release_id = :release_id"
+            ),
+            params,
+        )
+        await self._session.execute(
+            text(
+                "UPDATE dt_manifest "
+                "SET based_dt_manifest_id = NULL "
+                "WHERE release_id = :release_id"
+            ),
+            params,
+        )
+        await self._session.execute(
+            text(
+                "UPDATE dt_sc_manifest "
+                "SET based_dt_sc_manifest_id = NULL, replacement_dt_sc_manifest_id = NULL, "
+                "prev_dt_sc_manifest_id = NULL, next_dt_sc_manifest_id = NULL "
+                "WHERE release_id = :release_id"
+            ),
+            params,
+        )
+        await self._session.execute(
+            text(
+                "UPDATE code_list_manifest "
+                "SET based_code_list_manifest_id = NULL, replacement_code_list_manifest_id = NULL, "
+                "prev_code_list_manifest_id = NULL, next_code_list_manifest_id = NULL "
+                "WHERE release_id = :release_id"
+            ),
+            params,
+        )
+        await self._session.execute(
+            text(
+                "UPDATE code_list_value_manifest "
+                "SET based_code_list_value_manifest_id = NULL, replacement_code_list_value_manifest_id = NULL, "
+                "prev_code_list_value_manifest_id = NULL, next_code_list_value_manifest_id = NULL "
+                "WHERE release_id = :release_id"
+            ),
+            params,
+        )
+
         await self._session.execute(
             text(
                 "DELETE FROM code_list_value_manifest WHERE release_id = :release_id"
@@ -573,23 +651,109 @@ class MariaDbLibraryRepository(LibraryRepositoryContract):
 
         # Remove the authored rows that were represented in the deleted manifests.
         if code_list_value_ids:
+            await self._session.execute(
+                update(CodeListValue)
+                .where(CodeListValue.code_list_value_id.in_(code_list_value_ids))
+                .values(
+                    based_code_list_value_id=None,
+                    replacement_code_list_value_id=None,
+                    prev_code_list_value_id=None,
+                    next_code_list_value_id=None,
+                )
+            )
             await self._session.execute(delete(CodeListValue).where(CodeListValue.code_list_value_id.in_(code_list_value_ids)))
         if code_list_ids:
+            await self._session.execute(
+                update(CodeList)
+                .where(CodeList.code_list_id.in_(code_list_ids))
+                .values(
+                    based_code_list_id=None,
+                    replacement_code_list_id=None,
+                    prev_code_list_id=None,
+                    next_code_list_id=None,
+                )
+            )
             await self._session.execute(delete(CodeList).where(CodeList.code_list_id.in_(code_list_ids)))
 
         if dt_sc_ids:
+            await self._session.execute(
+                update(DtSc)
+                .where(DtSc.dt_sc_id.in_(dt_sc_ids))
+                .values(
+                    based_dt_sc_id=None,
+                    replacement_dt_sc_id=None,
+                    prev_dt_sc_id=None,
+                    next_dt_sc_id=None,
+                )
+            )
             await self._session.execute(delete(DtSc).where(DtSc.dt_sc_id.in_(dt_sc_ids)))
         if ascc_ids:
+            await self._session.execute(
+                update(Ascc)
+                .where(Ascc.ascc_id.in_(ascc_ids))
+                .values(
+                    replacement_ascc_id=None,
+                    prev_ascc_id=None,
+                    next_ascc_id=None,
+                )
+            )
             await self._session.execute(delete(Ascc).where(Ascc.ascc_id.in_(ascc_ids)))
         if bcc_ids:
+            await self._session.execute(
+                update(Bcc)
+                .where(Bcc.bcc_id.in_(bcc_ids))
+                .values(
+                    replacement_bcc_id=None,
+                    prev_bcc_id=None,
+                    next_bcc_id=None,
+                )
+            )
             await self._session.execute(delete(Bcc).where(Bcc.bcc_id.in_(bcc_ids)))
         if bccp_ids:
+            await self._session.execute(
+                update(Bccp)
+                .where(Bccp.bccp_id.in_(bccp_ids))
+                .values(
+                    replacement_bccp_id=None,
+                    prev_bccp_id=None,
+                    next_bccp_id=None,
+                )
+            )
             await self._session.execute(delete(Bccp).where(Bccp.bccp_id.in_(bccp_ids)))
         if asccp_ids:
+            await self._session.execute(
+                update(Asccp)
+                .where(Asccp.asccp_id.in_(asccp_ids))
+                .values(
+                    replacement_asccp_id=None,
+                    prev_asccp_id=None,
+                    next_asccp_id=None,
+                )
+            )
             await self._session.execute(delete(Asccp).where(Asccp.asccp_id.in_(asccp_ids)))
         if acc_ids:
+            await self._session.execute(
+                update(Acc)
+                .where(Acc.acc_id.in_(acc_ids))
+                .values(
+                    based_acc_id=None,
+                    replacement_acc_id=None,
+                    prev_acc_id=None,
+                    next_acc_id=None,
+                )
+            )
             await self._session.execute(delete(Acc).where(Acc.acc_id.in_(acc_ids)))
         if dt_ids:
+            await self._session.execute(
+                update(Dt)
+                .where(Dt.dt_id.in_(dt_ids))
+                .values(
+                    based_dt_id=None,
+                    replacement_dt_id=None,
+                    prev_dt_id=None,
+                    next_dt_id=None,
+                )
+            )
             await self._session.execute(delete(Dt).where(Dt.dt_id.in_(dt_ids)))
         if agency_id_list_value_ids:
             await self._session.execute(

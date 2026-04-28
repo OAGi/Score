@@ -48,7 +48,7 @@ from app.security import AuthenticatedUser
 from app.services.app_user_service import AppUserService
 from app.services.models.app_user import AppUserServiceResult, Role
 from app.tools import _to_tool_error, get_tool_authenticated_user, str_to_bool, tool_session
-from app.tools.models.app_user import GetUserListEntryResponse, GetUserPaginationResponse, GetUserResponse
+from app.tools.models.app_user import GetCurrentUserResponse, GetUserListEntryResponse, GetUserPaginationResponse, GetUserResponse
 
 logger = logging.getLogger("connectcenter.mcp.app_user")
 
@@ -231,7 +231,6 @@ async def get_users(
         "type": "object",
         "description": "Response containing information about the current user",
         "properties": {
-            "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
             "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
             "username": {"type": ["string", "null"], "description": "Display name of the user",
                          "example": "Administrator"},
@@ -243,12 +242,12 @@ async def get_users(
                       "description": "List of roles assigned to the user", "example": ["Admin"]},
             "is_enabled": {"type": "boolean", "description": "Whether the user account is enabled", "example": True}
         },
-        "required": ["user_id", "login_id", "username", "organization", "email", "roles", "is_enabled"]
+        "required": ["login_id", "username", "organization", "email", "roles", "is_enabled"]
     }
 )
 async def who_am_i(
     app_user_service: AppUserService = Depends(get_app_user_service),
-) -> GetUserResponse:
+) -> GetCurrentUserResponse:
     """
     Get information about the currently authenticated user.
 
@@ -257,8 +256,7 @@ async def who_am_i(
     and account status information.
 
     Returns:
-        GetUserResponse: Response object containing:
-            - user_id: Unique identifier for the user
+        GetCurrentUserResponse: Response object containing:
             - login_id: User's login identifier
             - username: Display name of the user
             - organization: The company the user represents
@@ -298,7 +296,7 @@ async def who_am_i(
         user = await app_user_service.get_current_user()
         if user is None:
             raise ValueError("The current authenticated app user does not exist.")
-        return _to_user_response(user)
+        return _to_current_user_response(user)
     except Exception as exc:
         raise _to_tool_error(exc, fallback="Unable to retrieve the current user.") from exc
 
@@ -319,6 +317,20 @@ def _to_user_response(user: AppUserServiceResult) -> GetUserResponse:
     """Convert a service-layer app-user record into the MCP response model."""
     return GetUserResponse(
         user_id=int(user.app_user_id),
+        login_id=user.login_id,
+        username=user.username,
+        roles=_build_roles(is_admin=user.is_admin, is_developer=user.is_developer),
+        organization=user.organization,
+        email=user.email,
+        email_verified=user.email_verified,
+        email_verified_timestamp=user.email_verified_timestamp,
+        is_enabled=user.is_enabled,
+    )
+
+
+def _to_current_user_response(user: AppUserServiceResult) -> GetCurrentUserResponse:
+    """Convert a service-layer app-user record into the MCP current-user response model."""
+    return GetCurrentUserResponse(
         login_id=user.login_id,
         username=user.username,
         roles=_build_roles(is_admin=user.is_admin, is_developer=user.is_developer),

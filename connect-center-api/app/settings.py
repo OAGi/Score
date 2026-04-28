@@ -94,6 +94,14 @@ class Settings(BaseSettings):
     oauth2_configuration_url: str | None = None
     oauth2_audience: str | None = None
 
+    # Generic MCP bearer JWT verification for trusted external issuers.
+    mcp_jwt_issuer_uri: str | None = None
+    mcp_jwt_jwks_uri: str | None = None
+    mcp_jwt_audience: str | None = None
+    mcp_jwt_algorithm: str | None = None
+    mcp_jwt_algorithms: str | None = None
+    mcp_jwt_login_id_claim: str | None = "login_id"
+
     # DB vendor selection: mariadb
     db_vendor: str = "mariadb"
 
