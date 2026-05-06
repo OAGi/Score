@@ -207,7 +207,7 @@ public class SecurityConfiguration {
                 })
                 .authorizeHttpRequests(requestMatcherRegistry -> {
                     requestMatcherRegistry
-                            .requestMatchers("/info/**", "/ws/**", "/oauth2/**", "/ai/**").permitAll()
+                            .requestMatchers("/health", "/info/**", "/ws/**", "/oauth2/**", "/ai/**").permitAll()
                             .anyRequest().authenticated();
                 })
                 .exceptionHandling(exceptionHandlingConfigurer -> {

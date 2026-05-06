@@ -60,6 +60,13 @@ export class AuthService implements OnInit, CanActivate {
     return false;
   }
 
+  serviceUnavailableQueryParams(error: HttpErrorResponse): { reason: string; status?: number } {
+    return {
+      reason: error.status === 503 ? 'service' : 'gateway',
+      status: error.status > 0 ? error.status : undefined
+    };
+  }
+
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot):
     Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     return this.http.get<UserToken>('/api/' + environment.statePath).pipe(map(res => {
@@ -82,7 +89,9 @@ export class AuthService implements OnInit, CanActivate {
       }
     }), catchError(err => {
       if (this.isServiceUnavailableFailure(err, '/api/' + environment.statePath)) {
-        return of(this.router.parseUrl('/service-unavailable'));
+        return of(this.router.createUrlTree(['/service-unavailable'], {
+          queryParams: this.serviceUnavailableQueryParams(err)
+        }));
       }
       this.logout(getResolvedUrl(route));
       return of(false);
@@ -220,7 +229,7 @@ export class AuthService implements OnInit, CanActivate {
         if (this.isServiceUnavailableFailure(err, '/api/' + environment.logoutPath)) {
           this.logoutInProgress = false;
           this.router.navigate(['/service-unavailable'], {
-            queryParams: {reason: 'gateway'}
+            queryParams: this.serviceUnavailableQueryParams(err)
           });
           return;
         }
@@ -302,9 +311,7 @@ export class ErrorAlertInterceptor implements HttpInterceptor {
         if (error instanceof HttpErrorResponse || error.name === 'HttpErrorResponse') {
           if (this.auth.isServiceUnavailableFailure(error, req.url)) {
             this.router.navigate(['/service-unavailable'], {
-              queryParams: {
-                reason: error.status === 503 ? 'service' : 'gateway'
-              }
+              queryParams: this.auth.serviceUnavailableQueryParams(error)
             });
             return throwError(error);
           }

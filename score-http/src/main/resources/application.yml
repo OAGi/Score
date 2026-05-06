@@ -58,6 +58,15 @@ logging:
     org.jooq: DEBUG
     org.oagi.score: DEBUG
 
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      group:
+        readiness:
+          additional-path: server:/health
+
 resource-server:
   jwk-set-uri: ${RS_JWK_SET_URI:}
   allowed-types: ${RS_ALLOWED_TYPES:JWT,at+jwt}
