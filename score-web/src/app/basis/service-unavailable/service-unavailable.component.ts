@@ -8,6 +8,10 @@ import {SUPPRESS_ERROR_ALERT} from '../../authentication/auth.service';
 
 type GatewayHealthState = 'ready' | 'warming' | 'unavailable';
 
+interface GatewayHealthResponse {
+  ready?: boolean;
+}
+
 @Component({
   standalone: false,
   selector: 'score-service-unavailable',
@@ -77,10 +81,10 @@ export class ServiceUnavailableComponent implements OnInit, OnDestroy {
   }
 
   private checkGatewayHealth() {
-    return this.http.get('/api/health', {
+    return this.http.get<GatewayHealthResponse | null>('/api/health', {
       context: new HttpContext().set(SUPPRESS_ERROR_ALERT, true)
     }).pipe(
-      map((): GatewayHealthState => 'ready'),
+      map((response: GatewayHealthResponse | null): GatewayHealthState => response?.ready === false ? 'unavailable' : 'ready'),
       catchError(error => of(this.healthErrorState(error)))
     );
   }
