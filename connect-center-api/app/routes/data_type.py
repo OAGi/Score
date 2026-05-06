@@ -48,6 +48,10 @@ async def get_data_type_list(
     release_id: ReleaseId = Query(..., ge=1, description="Filter by release ID."),
     den: str | None = Query(default=None, description="Filter by DEN (partial match)."),
     representation_term: str | None = Query(default=None, description="Filter by representation term (partial match)."),
+    owner: str | None = Query(
+        default=None,
+        description="Comma-separated owner login IDs to filter by exact match. Prefix a login ID with '!' to exclude it.",
+    ),
     created_on: str | None = Query(default=None, description="Filter by creation date range '[before~after]'."),
     last_updated_on: str | None = Query(default=None, description="Filter by last update date range '[before~after]'."),
     order_by: str | None = Query(
@@ -88,6 +92,7 @@ async def get_data_type_list(
             order_by=order_by,
             den=den,
             representation_term=representation_term,
+            owner=owner,
             created_on=created_range,
             last_updated_on=updated_range,
         )

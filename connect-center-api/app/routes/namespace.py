@@ -37,6 +37,10 @@ async def get_namespace_list(
     uri: str | None = Query(default=None, description="Filter by namespace URI (partial match)."),
     prefix: str | None = Query(default=None, description="Filter by namespace prefix (partial match)."),
     is_std_nmsp: bool | None = Query(default=None, description="Filter by standard namespace flag."),
+    owner: str | None = Query(
+        default=None,
+        description="Comma-separated owner login IDs to filter by exact match. Prefix a login ID with '!' to exclude it.",
+    ),
     created_on: str | None = Query(
         default=None,
         description="Filter by creation date using an inclusive range: '[before~after]'.",
@@ -84,6 +88,7 @@ async def get_namespace_list(
             uri=uri,
             prefix=prefix,
             is_std_nmsp=is_std_nmsp,
+            owner=owner,
             created_on=created_range,
             last_updated_on=updated_range,
         )

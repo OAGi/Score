@@ -19,7 +19,7 @@ clients to interact with Core Component data programmatically.
 
 Available Tools:
 - get_core_components: Retrieve paginated lists of Core Components (ACCs, ASCCPs, or BCCPs)
-  filtered by release with optional filters. Supports custom sorting and pagination.
+  filtered by release with optional filters including owner. Supports custom sorting and pagination.
 
 - create_acc: Create a new ACC (Aggregate Core Component) by targeting an explicit
   `release_id` with optional base ACC, namespace, definition, and tag attachments.
@@ -335,7 +335,8 @@ async def get_core_components(
     release_id: Annotated[int, Field(gt=0, description="Filter by release ID using exact match.")],
     types: Annotated[list[Literal["ACC", "ASCCP", "BCCP"]], Field(description="Core component types to include.")],
     den: Annotated[str | None, Field(default=None, description="Filter by DEN using partial match (case-insensitive).")],
-    tag: Annotated[str | None, Field(default=None, description="Filter by tag name using partial match (case-insensitive).")],
+    tag: Annotated[str | None, Field(default=None, description="Comma-separated tag names to filter by exact match.")],
+    owner: Annotated[str | None, Field(default=None, description="Comma-separated owner login IDs to filter by exact match. Prefix a login ID with '!' to exclude it.")],
     created_on: Annotated[str | None, Field(default=None, description="Filter by creation date using an inclusive range: '[before~after]'.")],
     last_updated_on: Annotated[str | None, Field(default=None, description="Filter by last update date using an inclusive range: '[before~after]'.")],
     order_by: Annotated[str | None, Field(default=None, description="Comma-separated list of properties to order results by. Allowed columns: den, name, definition, creation_timestamp, last_update_timestamp.")],
@@ -351,8 +352,10 @@ async def get_core_components(
         types (str | None, optional): Filter by core component types. Comma-separated list of allowed values: 'ACC', 'ASCCP', 'BCCP'.
             Examples: 'ASCCP', 'ACC,BCCP', 'ASCCP,ACC,BCCP'. Defaults to 'ASCCP' if not specified.
         den (str | None, optional): Filter by Dictionary Entry Name (DEN) using partial match (case-insensitive). Defaults to None.
-        tag (str | None, optional): Filter by tag name using partial match (case-insensitive).
+        tag (str | None, optional): Comma-separated tag names using exact match.
             To discover available tag names, use the get_tags() tool first. Defaults to None.
+        owner (str | None, optional): Comma-separated owner login IDs using exact match.
+            Prefix a login ID with '!' to exclude it. Login IDs cannot contain '!' or ','. Defaults to None.
         created_on (str | None, optional): Filter by creation date using an inclusive range: '[before~after]'.
             'before' and 'after' are date-time strings. Default date format: YYYY-MM-DD.
             Examples: '[2025-01-01~2025-02-01]'. Either 'before' or 'after' can be omitted,
@@ -430,6 +433,7 @@ async def get_core_components(
             order_by=order_by,
             den=den,
             tag=tag,
+            owner=owner,
             created_on=parse_date_range(created_on),
             last_updated_on=parse_date_range(last_updated_on),
         )

@@ -601,11 +601,13 @@ class CoreComponentRepositoryContract(Protocol):
         offset: int,
         sorts: list[tuple[str, Literal["ASC", "DESC"]]],
         den: str | None = None,
-        tag: str | None = None,
+        tag_names: list[str] | None = None,
         creation_timestamp_before: datetime | None = None,
         creation_timestamp_after: datetime | None = None,
         last_update_timestamp_before: datetime | None = None,
         last_update_timestamp_after: datetime | None = None,
+        included_owner_login_ids: list[str] | None = None,
+        excluded_owner_login_ids: list[str] | None = None,
     ) -> tuple[int, list[CoreComponentListRow]]:
         """Repository contract for list.
 
@@ -616,11 +618,13 @@ class CoreComponentRepositoryContract(Protocol):
             limit: Maximum number of records to return.
             offset: Number of records to skip before collecting results.
             den: Optional Dictionary Entry Name (DEN) filter.
-            tag: Optional tag filter.
+            tag_names: Optional tag names to include by exact match.
             creation_timestamp_before: Optional upper bound for creation timestamp.
             creation_timestamp_after: Optional lower bound for creation timestamp.
             last_update_timestamp_before: Optional upper bound for last update timestamp.
             last_update_timestamp_after: Optional lower bound for last update timestamp.
+            included_owner_login_ids: Optional owner login IDs to include by exact match.
+            excluded_owner_login_ids: Optional owner login IDs to exclude by exact match.
 
         Returns:
             Result of the operation.

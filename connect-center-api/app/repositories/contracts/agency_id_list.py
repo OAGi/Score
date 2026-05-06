@@ -31,6 +31,8 @@ class AgencyIdListRepositoryContract(Protocol):
         creation_timestamp_after: datetime | None = None,
         last_update_timestamp_before: datetime | None = None,
         last_update_timestamp_after: datetime | None = None,
+        included_owner_login_ids: list[str] | None = None,
+        excluded_owner_login_ids: list[str] | None = None,
     ) -> tuple[int, list[AgencyIdListRow]]:
         """Repository contract for list.
 
@@ -46,6 +48,8 @@ class AgencyIdListRepositoryContract(Protocol):
             creation_timestamp_after: Optional lower bound for creation timestamp.
             last_update_timestamp_before: Optional upper bound for last update timestamp.
             last_update_timestamp_after: Optional lower bound for last update timestamp.
+            included_owner_login_ids: Optional owner login IDs to include by exact match.
+            excluded_owner_login_ids: Optional owner login IDs to exclude by exact match.
 
         Returns:
             Result of the operation.

@@ -258,6 +258,8 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
         creation_timestamp_after: datetime | None = None,
         last_update_timestamp_before: datetime | None = None,
         last_update_timestamp_after: datetime | None = None,
+        included_owner_login_ids: list[str] | None = None,
+        excluded_owner_login_ids: list[str] | None = None,
     ) -> tuple[int, list[TopLevelAsbiepListRow]]:
         """Handle list top level asbieps.
 
@@ -275,6 +277,8 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
             creation_timestamp_after: Optional lower bound for creation timestamp.
             last_update_timestamp_before: Optional upper bound for last update timestamp.
             last_update_timestamp_after: Optional lower bound for last update timestamp.
+            included_owner_login_ids: Optional owner login IDs to include by exact match.
+            excluded_owner_login_ids: Optional owner login IDs to exclude by exact match.
 
         Returns:
             Result of the operation.
@@ -310,6 +314,10 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
             conditions.append(TopLevelAsbiep.last_update_timestamp >= last_update_timestamp_after)
         if last_update_timestamp_before is not None:
             conditions.append(TopLevelAsbiep.last_update_timestamp <= last_update_timestamp_before)
+        if included_owner_login_ids:
+            conditions.append(AppUser.login_id.in_(included_owner_login_ids))
+        if excluded_owner_login_ids:
+            conditions.append(AppUser.login_id.not_in(excluded_owner_login_ids))
 
         from_stmt = (
             TopLevelAsbiep.__table__
@@ -318,6 +326,7 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
             .join(Asccp, AsccpManifest.asccp_id == Asccp.asccp_id)
             .join(Release, TopLevelAsbiep.release_id == Release.release_id)
             .join(Library, Release.library_id == Library.library_id)
+            .join(AppUser, TopLevelAsbiep.owner_user_id == AppUser.app_user_id)
             .join(BizCtxAssignment, TopLevelAsbiep.top_level_asbiep_id == BizCtxAssignment.top_level_asbiep_id)
         )
 

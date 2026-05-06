@@ -81,6 +81,7 @@ from app.services.models.tag import TagSummaryServiceRecord
 from app.services.data_type_service import DataTypeService
 from app.services.release_service import ReleaseService
 from app.services.utils.date import DateRange
+from app.services.utils.owner import parse_owner_filter
 from app.services.utils.pagination import PaginationParams, PaginationResponse
 from app.types.unset import UNSET, UnsetType
 from app.types.identifiers import (
@@ -101,6 +102,21 @@ from app.utils.core_component_constants import (
 )
 
 logger = logging.getLogger("connectcenter.service.core_component")
+
+
+def _parse_tag_filter(tag: str | None) -> list[str] | None:
+    """Parse comma-separated tag names for exact-match filtering."""
+    if tag is None or not tag.strip():
+        return None
+
+    tag_names: list[str] = []
+    for raw_token in tag.split(","):
+        tag_name = raw_token.strip()
+        if not tag_name:
+            raise ValueError("The tag filter contains an empty tag name.")
+        if tag_name not in tag_names:
+            tag_names.append(tag_name)
+    return tag_names
 
 
 @dataclass(frozen=True)
@@ -2682,6 +2698,7 @@ class CoreComponentService:
         tag: str | None = None,
         created_on: DateRange | None = None,
         last_updated_on: DateRange | None = None,
+        owner: str | None = None,
     ) -> PaginationResponse[CoreComponentServiceResult]:
         """Get a unified list of core components for the target release scope.
 
@@ -2715,6 +2732,8 @@ class CoreComponentService:
             )
 
         dependent_release_ids = await self._release_service.get_dependent_releases(release_id)
+        tag_names = _parse_tag_filter(tag)
+        included_owner_login_ids, excluded_owner_login_ids = parse_owner_filter(owner)
         total, rows = await self._repo.list(
             release_id=release_id,
             dependent_release_ids=dependent_release_ids,
@@ -2723,11 +2742,13 @@ class CoreComponentService:
             offset=pagination.offset,
             sorts=[(s.column, s.direction.upper()) for s in pagination.sorts],
             den=den,
-            tag=tag,
+            tag_names=tag_names,
             creation_timestamp_before=created_on.before if created_on else None,
             creation_timestamp_after=created_on.after if created_on else None,
             last_update_timestamp_before=last_updated_on.before if last_updated_on else None,
             last_update_timestamp_after=last_updated_on.after if last_updated_on else None,
+            included_owner_login_ids=included_owner_login_ids,
+            excluded_owner_login_ids=excluded_owner_login_ids,
         )
         # Repository intentionally returns only AppUser IDs. We "join" AppUser at
         # service layer via one batched lookup so account data can be cached.

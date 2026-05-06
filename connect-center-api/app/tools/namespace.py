@@ -21,7 +21,7 @@ standardized MCP interface, enabling clients to interact with Namespace data pro
 
 Available Tools:
 - get_namespaces: Retrieve paginated lists of namespaces with optional filters for
-  library_id, uri, prefix, and is_std_nmsp flag. Supports date range filtering and
+  library_id, uri, prefix, is_std_nmsp flag, and owner. Supports date range filtering and
   custom sorting.
 
 - get_namespace: Retrieve a single namespace by its ID, including library, owner,
@@ -229,6 +229,7 @@ async def get_namespaces(
     uri: Annotated[str | None, Field(default=None, description="Filter by URI using partial match (case-insensitive).")],
     prefix: Annotated[str | None, Field(default=None, description="Filter by prefix using partial match (case-insensitive).")],
     is_std_nmsp: Annotated[bool | str | None, Field(default=None, description="Filter by standard namespace flag.")],
+    owner: Annotated[str | None, Field(default=None, description="Comma-separated owner login IDs to filter by exact match. Prefix a login ID with '!' to exclude it.")],
     created_on: Annotated[str | None, Field(default=None, description="Filter by creation date using an inclusive range: '[before~after]'.")],
     last_updated_on: Annotated[str | None, Field(default=None, description="Filter by last update date using an inclusive range: '[before~after]'.")],
     order_by: Annotated[str | None, Field(default=None, description="Comma-separated list of properties to order results by. Allowed columns: uri, prefix, is_std_nmsp, creation_timestamp, last_update_timestamp.")],
@@ -253,6 +254,8 @@ async def get_namespaces(
         uri (str | None, optional): Filter by URI using partial match (case-insensitive). Defaults to None.
         prefix (str | None, optional): Filter by prefix using partial match (case-insensitive). Defaults to None.
         is_std_nmsp (bool | str | None, optional): Filter by standard namespace flag. Standard namespaces are reserved for standard use (e.g., OAGIS namespace) and end users cannot use them for their end user Core Components. Accepts bool, str ('True'/'true'/'1' for True, 'False'/'false'/'0' for False), or None. Defaults to None.
+        owner (str | None, optional): Comma-separated owner login IDs using exact match.
+            Prefix a login ID with '!' to exclude it. Login IDs cannot contain '!' or ','. Defaults to None.
         created_on (str | None, optional): Filter by creation date using an inclusive range: '[before~after]'.
             'before' and 'after' are date-time strings. Default date format: YYYY-MM-DD.
             Examples: '[2025-01-01~2025-02-01]'. Either 'before' or 'after' can be omitted,
@@ -325,6 +328,7 @@ async def get_namespaces(
             uri=uri,
             prefix=prefix,
             is_std_nmsp=is_std_nmsp,
+            owner=owner,
             created_on=parse_date_range(created_on),
             last_updated_on=parse_date_range(last_updated_on),
         )

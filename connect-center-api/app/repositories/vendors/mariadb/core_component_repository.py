@@ -2943,11 +2943,13 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
         offset: int,
         sorts: list[tuple[str, Literal["ASC", "DESC"]]],
         den: str | None = None,
-        tag: str | None = None,
+        tag_names: list[str] | None = None,
         creation_timestamp_before: datetime | None = None,
         creation_timestamp_after: datetime | None = None,
         last_update_timestamp_before: datetime | None = None,
         last_update_timestamp_after: datetime | None = None,
+        included_owner_login_ids: list[str] | None = None,
+        excluded_owner_login_ids: list[str] | None = None,
     ) -> tuple[int, list[CoreComponentListRow]]:
         """Return a unified paginated list for requested core component types.
 
@@ -2958,11 +2960,13 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
             limit: Maximum number of records to return.
             offset: Number of records to skip before collecting results.
             den: Optional Dictionary Entry Name (DEN) filter.
-            tag: Optional tag filter.
+            tag_names: Optional tag names to include by exact match.
             creation_timestamp_before: Optional upper bound for creation timestamp.
             creation_timestamp_after: Optional lower bound for creation timestamp.
             last_update_timestamp_before: Optional upper bound for last update timestamp.
             last_update_timestamp_after: Optional lower bound for last update timestamp.
+            included_owner_login_ids: Optional owner login IDs to include by exact match.
+            excluded_owner_login_ids: Optional owner login IDs to exclude by exact match.
 
         Returns:
             Result of the operation.
@@ -2998,11 +3002,13 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
                     tag_link_manifest_col=AccManifestTag.acc_manifest_id,
                     release_ids=release_ids,
                     den=den,
-                    tag=tag,
+                    tag_names=tag_names,
                     creation_timestamp_before=creation_timestamp_before,
-            creation_timestamp_after=creation_timestamp_after,
+                    creation_timestamp_after=creation_timestamp_after,
                     last_update_timestamp_before=last_update_timestamp_before,
-            last_update_timestamp_after=last_update_timestamp_after,
+                    last_update_timestamp_after=last_update_timestamp_after,
+                    included_owner_login_ids=included_owner_login_ids,
+                    excluded_owner_login_ids=excluded_owner_login_ids,
                 )
             )
 
@@ -3034,11 +3040,13 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
                     tag_link_manifest_col=AsccpManifestTag.asccp_manifest_id,
                     release_ids=release_ids,
                     den=den,
-                    tag=tag,
+                    tag_names=tag_names,
                     creation_timestamp_before=creation_timestamp_before,
-            creation_timestamp_after=creation_timestamp_after,
+                    creation_timestamp_after=creation_timestamp_after,
                     last_update_timestamp_before=last_update_timestamp_before,
-            last_update_timestamp_after=last_update_timestamp_after,
+                    last_update_timestamp_after=last_update_timestamp_after,
+                    included_owner_login_ids=included_owner_login_ids,
+                    excluded_owner_login_ids=excluded_owner_login_ids,
                 )
             )
 
@@ -3070,11 +3078,13 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
                     tag_link_manifest_col=BccpManifestTag.bccp_manifest_id,
                     release_ids=release_ids,
                     den=den,
-                    tag=tag,
+                    tag_names=tag_names,
                     creation_timestamp_before=creation_timestamp_before,
-            creation_timestamp_after=creation_timestamp_after,
+                    creation_timestamp_after=creation_timestamp_after,
                     last_update_timestamp_before=last_update_timestamp_before,
-            last_update_timestamp_after=last_update_timestamp_after,
+                    last_update_timestamp_after=last_update_timestamp_after,
+                    included_owner_login_ids=included_owner_login_ids,
+                    excluded_owner_login_ids=excluded_owner_login_ids,
                 )
             )
 
@@ -4208,11 +4218,13 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
         tag_link_manifest_col: Any,
         release_ids: list[int] | None,
         den: str | None,
-        tag: str | None,
+        tag_names: list[str] | None,
         creation_timestamp_before: datetime | None,
-    creation_timestamp_after: datetime | None,
+        creation_timestamp_after: datetime | None,
         last_update_timestamp_before: datetime | None,
-    last_update_timestamp_after: datetime | None,
+        last_update_timestamp_after: datetime | None,
+        included_owner_login_ids: list[str] | None = None,
+        excluded_owner_login_ids: list[str] | None = None,
     ) -> Select[Any]:
         # Intentionally exclude AppUser joins here.
         # User resolution is handled in the service layer via batched `gets(...)`
@@ -4245,11 +4257,13 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
             tag_link_manifest_col: Value for `tag_link_manifest_col`.
             release_ids: Release identifiers used to scope the query.
             den: Optional Dictionary Entry Name (DEN) filter.
-            tag: Optional tag filter.
+            tag_names: Optional tag names to include by exact match.
             creation_timestamp_before: Optional upper bound for creation timestamp.
             creation_timestamp_after: Optional lower bound for creation timestamp.
             last_update_timestamp_before: Optional upper bound for last update timestamp.
             last_update_timestamp_after: Optional lower bound for last update timestamp.
+            included_owner_login_ids: Optional owner login IDs to include by exact match.
+            excluded_owner_login_ids: Optional owner login IDs to exclude by exact match.
 
         Returns:
             Result of the operation.
@@ -4260,8 +4274,8 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
         if den:
             for word in [w.strip() for w in den.split() if w.strip()]:
                 where_clauses.append(func.lower(den_col).like(func.lower(f"%{word}%")))
-        if tag:
-            where_clauses.append(func.lower(Tag.name).like(func.lower(f"%{tag}%")))
+        if tag_names:
+            where_clauses.append(Tag.name.in_(tag_names))
         if creation_timestamp_after is not None:
             where_clauses.append(creation_ts_col >= creation_timestamp_after)
         if creation_timestamp_before is not None:
@@ -4270,6 +4284,18 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
             where_clauses.append(update_ts_col >= last_update_timestamp_after)
         if last_update_timestamp_before is not None:
             where_clauses.append(update_ts_col <= last_update_timestamp_before)
+        if included_owner_login_ids:
+            where_clauses.append(
+                component_owner_col.in_(
+                    select(AppUser.app_user_id).where(AppUser.login_id.in_(included_owner_login_ids))
+                )
+            )
+        if excluded_owner_login_ids:
+            where_clauses.append(
+                component_owner_col.not_in(
+                    select(AppUser.app_user_id).where(AppUser.login_id.in_(excluded_owner_login_ids))
+                )
+            )
 
         return (
             select(

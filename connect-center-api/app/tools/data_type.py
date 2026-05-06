@@ -436,6 +436,7 @@ async def get_data_types(
     release_id: Annotated[int, Field(gt=0, description="Filter by release ID using exact match.")],
     den: Annotated[str | None, Field(default=None, description="Filter by data type DEN using partial match (case-insensitive).")],
     representation_term: Annotated[str | None, Field(default=None, description="Filter by representation term using partial match (case-insensitive).")],
+    owner: Annotated[str | None, Field(default=None, description="Comma-separated owner login IDs to filter by exact match. Prefix a login ID with '!' to exclude it.")],
     created_on: Annotated[str | None, Field(default=None, description="Filter by creation date using an inclusive range: '[before~after]'.")],
     last_updated_on: Annotated[str | None, Field(default=None, description="Filter by last update date using an inclusive range: '[before~after]'.")],
     order_by: Annotated[str | None, Field(default=None, description="Comma-separated list of properties to order results by. Allowed columns: den, data_type_term, qualifier, representation_term, six_digit_id, definition, creation_timestamp, last_update_timestamp.")],
@@ -458,6 +459,8 @@ async def get_data_types(
         den (str | None, optional): Filter by Dictionary Entry Name (DEN) using partial match (case-insensitive).
             DEN format: '((qualifier) ? qualifier + "_ " : "") + data_type_term + ". Type"'. Defaults to None.
         representation_term (str | None, optional): Filter by representation term using partial match (case-insensitive). Defaults to None.
+        owner (str | None, optional): Comma-separated owner login IDs using exact match.
+            Prefix a login ID with '!' to exclude it. Login IDs cannot contain '!' or ','. Defaults to None.
         created_on (str | None, optional): Filter by creation date using an inclusive range: '[before~after]'.
             'before' and 'after' are date-time strings. Default date format: YYYY-MM-DD.
             Examples: '[2025-01-01~2025-02-01]'. Either 'before' or 'after' can be omitted,
@@ -534,6 +537,7 @@ async def get_data_types(
             order_by=order_by,
             den=den,
             representation_term=representation_term,
+            owner=owner,
             created_on=parse_date_range(created_on),
             last_updated_on=parse_date_range(last_updated_on),
         )

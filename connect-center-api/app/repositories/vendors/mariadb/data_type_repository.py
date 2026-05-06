@@ -77,6 +77,8 @@ class MariaDbDataTypeRepository(DataTypeRepositoryContract):
         creation_timestamp_after: datetime | None = None,
         last_update_timestamp_before: datetime | None = None,
         last_update_timestamp_after: datetime | None = None,
+        included_owner_login_ids: list[str] | None = None,
+        excluded_owner_login_ids: list[str] | None = None,
     ) -> tuple[int, list[DataTypeRow]]:
         """Handle list.
 
@@ -91,6 +93,8 @@ class MariaDbDataTypeRepository(DataTypeRepositoryContract):
             creation_timestamp_after: Optional lower bound for creation timestamp.
             last_update_timestamp_before: Optional upper bound for last update timestamp.
             last_update_timestamp_after: Optional lower bound for last update timestamp.
+            included_owner_login_ids: Optional owner login IDs to include by exact match.
+            excluded_owner_login_ids: Optional owner login IDs to exclude by exact match.
 
         Returns:
             Result of the operation.
@@ -104,6 +108,8 @@ class MariaDbDataTypeRepository(DataTypeRepositoryContract):
             creation_timestamp_after=creation_timestamp_after,
             last_update_timestamp_before=last_update_timestamp_before,
             last_update_timestamp_after=last_update_timestamp_after,
+            included_owner_login_ids=included_owner_login_ids,
+            excluded_owner_login_ids=excluded_owner_login_ids,
         )
 
         total_stmt = (
@@ -2053,6 +2059,8 @@ def _build_where_clauses(
     creation_timestamp_after: datetime | None,
     last_update_timestamp_before: datetime | None,
     last_update_timestamp_after: datetime | None,
+    included_owner_login_ids: list[str] | None = None,
+    excluded_owner_login_ids: list[str] | None = None,
 ) -> list[object]:
     clauses: list[object] = [DtManifest.release_id.in_([release_id, *[x for x in dependent_release_ids]])]
     if den:
@@ -2067,6 +2075,18 @@ def _build_where_clauses(
         clauses.append(Dt.last_update_timestamp >= last_update_timestamp_after)
     if last_update_timestamp_before is not None:
         clauses.append(Dt.last_update_timestamp <= last_update_timestamp_before)
+    if included_owner_login_ids:
+        clauses.append(
+            Dt.owner_user_id.in_(
+                select(AppUser.app_user_id).where(AppUser.login_id.in_(included_owner_login_ids))
+            )
+        )
+    if excluded_owner_login_ids:
+        clauses.append(
+            Dt.owner_user_id.not_in(
+                select(AppUser.app_user_id).where(AppUser.login_id.in_(excluded_owner_login_ids))
+            )
+        )
     return clauses
 
 

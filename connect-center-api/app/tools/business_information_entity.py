@@ -22,8 +22,8 @@ interact with BIE data programmatically.
 Available Tools:
 Top-Level BIE Management:
 - get_top_level_asbiep_list: Retrieve paginated lists of Top-Level ASBIEPs filtered by release
-  with optional filters for library_id, release_id_list, den, version, status, state, is_deprecated,
-  and date ranges. Supports custom sorting. Note: Only returns BIEs that have at least one
+  with optional filters for library_id, release_id_list, den, version, status, state, owner,
+  is_deprecated, and date ranges. Supports custom sorting. Note: Only returns BIEs that have at least one
   business context assigned (business rule requirement).
 
 - get_top_level_asbiep: Retrieve a single Top-Level ASBIEP by ID with full relationship loading,
@@ -314,6 +314,7 @@ async def get_top_level_asbiep_list(
     version: Annotated[str | None, Field(default=None, description="Filter by version using partial match.")],
     status: Annotated[str | None, Field(default=None, description="Filter by status using partial match.")],
     state: Annotated[str | None, Field(default=None, description="Filter by lifecycle state using partial match.")],
+    owner: Annotated[str | None, Field(default=None, description="Comma-separated owner login IDs to filter by exact match. Prefix a login ID with '!' to exclude it.")],
     is_deprecated: Annotated[bool | str | None, Field(default=None, description="Filter by deprecation flag. Accepts bool values or 'true'/'false' strings.")],
     created_on: Annotated[str | None, Field(default=None, description="Filter by creation date range using '[before~after]'.")],
     last_updated_on: Annotated[str | None, Field(default=None, description="Filter by last update date range using '[before~after]'.")],
@@ -339,6 +340,9 @@ async def get_top_level_asbiep_list(
         version (str | None, optional): Filter by version using partial match (case-insensitive). Defaults to None.
         status (str | None, optional): Filter by status using partial match (case-insensitive). Defaults to None.
         state (str | None, optional): Filter by state using partial match (case-insensitive). Defaults to None.
+        owner (str | None, optional): Comma-separated owner login IDs using exact match.
+            Prefix a login ID with '!' to exclude it. Examples: 'john.doe', 'john.doe,jane.doe',
+            '!john.doe', 'john.doe,!jane.doe'. Login IDs cannot contain '!' or ','. Defaults to None.
         is_deprecated (bool | str | None, optional): Filter by deprecation status. Accepts bool, str ('True'/'true'/'1' for True, 'False'/'false'/'0' for False), or None. Defaults to None.
         created_on (str | None, optional): Filter by creation date using an inclusive range: '[before~after]'.
             'before' and 'after' are date-time strings. Default date format: YYYY-MM-DD.
@@ -437,6 +441,7 @@ async def get_top_level_asbiep_list(
             version=version,
             status=status,
             state=state,
+            owner=owner,
             is_deprecated=is_deprecated,
             created_on=parse_date_range(created_on),
             last_updated_on=parse_date_range(last_updated_on),

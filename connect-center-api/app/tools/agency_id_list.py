@@ -221,6 +221,7 @@ async def get_agency_id_lists(
     name: Annotated[str | None, Field(default=None, description="Filter by agency ID list name using partial match (case-insensitive).")],
     list_id: Annotated[str | None, Field(default=None, description="Filter by list ID using partial match (case-insensitive).")],
     version_id: Annotated[str | None, Field(default=None, description="Filter by version ID using partial match (case-insensitive).")],
+    owner: Annotated[str | None, Field(default=None, description="Comma-separated owner login IDs to filter by exact match. Prefix a login ID with '!' to exclude it.")],
     created_on: Annotated[str | None, Field(default=None, description="Filter by creation date using an inclusive range: '[before~after]'.")],
     last_updated_on: Annotated[str | None, Field(default=None, description="Filter by last update date using an inclusive range: '[before~after]'.")],
     order_by: Annotated[str | None, Field(default=None, description="Comma-separated list of properties to order results by. Allowed columns: name, list_id, version_id, definition, creation_timestamp, last_update_timestamp.")],
@@ -241,6 +242,8 @@ async def get_agency_id_lists(
         name (str | None, optional): Filter by agency ID list name using partial match (case-insensitive). Defaults to None.
         list_id (str | None, optional): Filter by list ID using partial match (case-insensitive). Defaults to None.
         version_id (str | None, optional): Filter by version ID using partial match (case-insensitive). Defaults to None.
+        owner (str | None, optional): Comma-separated owner login IDs using exact match.
+            Prefix a login ID with '!' to exclude it. Login IDs cannot contain '!' or ','. Defaults to None.
         created_on (str | None, optional): Filter by creation date using an inclusive range: '[before~after]'.
             'before' and 'after' are date-time strings. Default date format: YYYY-MM-DD.
             Examples: '[2025-01-01~2025-02-01]'. Either 'before' or 'after' can be omitted,
@@ -316,6 +319,7 @@ async def get_agency_id_lists(
             name=name,
             list_id=list_id,
             version_id=version_id,
+            owner=owner,
             created_on=parse_date_range(created_on),
             last_updated_on=parse_date_range(last_updated_on),
         )
