@@ -1181,6 +1181,7 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
                 bbie_sc_map[item.based_dt_sc_manifest_id] = item
 
         owner_top = await self._build_top_level_info(owner_top_level_asbiep_id)
+        owner_release_id = int(owner_top.release.release_id)
         result: list[BbieScInfoRow] = []
         for manifest, dt_sc in dt_sc_manifest_rows:
             path = self._build_bbie_sc_path(
@@ -1192,6 +1193,7 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
             bbie_sc = bbie_sc_map.get(manifest.dt_sc_manifest_id)
             primitive = await self._get_default_primitive_for_dt_sc(
                 dt_sc_id=DataTypeSupplementaryComponentId(dt_sc.dt_sc_id),
+                release_id=owner_release_id,
                 owner_dt_manifest_id=DataTypeManifestId(manifest.owner_dt_manifest_id),
             )
             if bbie_sc is not None:
@@ -3097,6 +3099,7 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
             raise LookupError(self._not_found_message("DT_SC", dt_sc_manifest.dt_sc_id))
         primitive = await self._get_default_primitive_for_dt_sc(
             dt_sc_id=DataTypeSupplementaryComponentId(dt_sc_manifest.dt_sc_id),
+            release_id=int(top_level.release_id),
             owner_dt_manifest_id=DataTypeManifestId(dt_sc_manifest.owner_dt_manifest_id),
         )
         primitive_xbt_manifest_id, primitive_code_list_manifest_id, primitive_agency_id_list_manifest_id = (
@@ -3474,12 +3477,16 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
         self,
         *,
         dt_sc_id: DataTypeSupplementaryComponentId,
+        release_id: ReleaseId | int,
         owner_dt_manifest_id: DataTypeManifestId | None = None,
     ) -> PrimitiveRestrictionRow | None:
         """Resolve default primitive restriction for a DT supplementary component.
 
         Args:
             dt_sc_id: DT supplementary component identifier.
+            release_id: Release identifier used to scope the lookup so the
+                returned primitive belongs to the same release as the owning
+                top-level ASBIEP.
             owner_dt_manifest_id: Owning DT manifest identifier used as a fallback.
 
         Returns:
@@ -3490,9 +3497,10 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
                 select(DtScAwdPri)
                 .where(
                     DtScAwdPri.dt_sc_id == dt_sc_id,
+                    DtScAwdPri.release_id == int(release_id),
                     DtScAwdPri.is_default == True,
                 )
-                .order_by(DtScAwdPri.release_id.desc(), DtScAwdPri.dt_sc_awd_pri_id.desc())
+                .order_by(DtScAwdPri.dt_sc_awd_pri_id.desc())
             )
         ).scalars().first()
         if row is not None:
