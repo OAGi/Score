@@ -12,11 +12,6 @@
         </button>
       }
 
-      <button mat-icon-button class="ms-2" matTooltip="Move to WIP"
-        [hidden]="!canToolbarAction('WIP')"
-        (click)="multipleUpdate('WIP')">
-        <mat-icon>arrow_forward</mat-icon>
-      </button>
       <button mat-icon-button class="ms-2" matTooltip="Move to Draft"
         [hidden]="!canToolbarAction('Draft')"
         (click)="multipleUpdate('Draft')">
