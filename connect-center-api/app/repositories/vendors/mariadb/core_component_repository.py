@@ -233,21 +233,6 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
             raise LookupError(
                 f"No ASCCP exists with manifest ID {int(asccp_manifest_id)}. Please verify the identifier and try again."
             )
-        if not bool(asccp.reusable_indicator):
-            # reusable_indicator means "this ASCCP may be referenced by more
-            # than one ASCC". The first reference is still allowed; only
-            # subsequent references must be rejected.
-            existing_reference_count = await self._session.scalar(
-                select(func.count())
-                .select_from(AsccManifest)
-                .where(AsccManifest.to_asccp_manifest_id == int(asccp_manifest_id))
-            )
-            if int(existing_reference_count or 0) > 0:
-                raise ValueError(
-                    "Target ASCCP is not reusable and already has "
-                    f"{int(existing_reference_count)} ASCC reference(s)."
-                )
-
         existing_extension_count = await self._session.scalar(
             select(func.count())
             .select_from(AsccManifest)
@@ -598,6 +583,18 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
         )
         await self._session.flush()
         return True
+
+    async def count_ascc_references_by_asccp_manifest(
+        self,
+        asccp_manifest_id: AsccpManifestId,
+    ) -> int:
+        """Count ASCC references to the given ASCCP manifest."""
+        count = await self._session.scalar(
+            select(func.count())
+            .select_from(AsccManifest)
+            .where(AsccManifest.to_asccp_manifest_id == int(asccp_manifest_id))
+        )
+        return int(count or 0)
 
     async def count_bie_references_by_ascc_manifest(
         self,

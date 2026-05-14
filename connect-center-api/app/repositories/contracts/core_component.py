@@ -121,6 +121,13 @@ class CoreComponentRepositoryContract(Protocol):
         """Repository contract for removing a BCC relationship from its ACC."""
         pass
 
+    async def count_ascc_references_by_asccp_manifest(
+        self,
+        asccp_manifest_id: AsccpManifestId,
+    ) -> int:
+        """Count ASCC references to the given ASCCP manifest."""
+        pass
+
     async def count_bie_references_by_ascc_manifest(
         self,
         ascc_manifest_id: AsccManifestId,

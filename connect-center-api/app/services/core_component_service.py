@@ -1732,6 +1732,19 @@ class CoreComponentService:
             target_label="the source ACC",
             selection_phrase="an ASCCP",
         )
+        if not asccp.reusable_indicator:
+            # reusable_indicator means "this ASCCP may be referenced by more
+            # than one ASCC". The first reference is still allowed; only
+            # subsequent references must be rejected.
+            existing_reference_count = await self._repo.count_ascc_references_by_asccp_manifest(
+                asccp_manifest_id
+            )
+            if existing_reference_count > 0:
+                raise ValueError(
+                    "Target ASCCP is not reusable and already has "
+                    f"{existing_reference_count} ASCC reference(s)."
+                )
+
         existing_relationship = next(
             (
                 relationship
