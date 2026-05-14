@@ -219,8 +219,17 @@ public class CcCommandService {
                 "the source ACC",
                 "an ASCCP");
 
-        if (!request.skipReusableCheck() && !toAsccp.reusable()) {
-            throw new IllegalArgumentException("Target ASCCP is not reusable.");
+        // ASCCP.reusable_indicator means "this ASCCP may be referenced by more
+        // than one ASCC". When the indicator is false, the first ASCC reference
+        // is still allowed; only subsequent references must be rejected.
+        if (!toAsccp.reusable()) {
+            List<AsccSummaryRecord> existingReferences =
+                    accQuery.getAsccSummaryList(request.asccpManifestId());
+            if (!existingReferences.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Target ASCCP is not reusable and already has "
+                                + existingReferences.size() + " ASCC reference(s).");
+            }
         }
 
         if (toAsccp.type() == AsccpType.Extension) {
@@ -623,7 +632,6 @@ public class CcCommandService {
 
         // create ASCC between extension ACC and extension ASCCP
         createAscc(requester, AsccCreateRequest.builder(accManifestId, extensionAsccpManifestId)
-                .skipReusableCheck(true)
                 .build());
 
         return accManifestId;
@@ -2592,7 +2600,6 @@ public class CcCommandService {
         createAscc(requester, AsccCreateRequest.builder(eAcc.accManifestId(), ueAsccpManifestId)
                 .cardinalityMin(1)
                 .cardinalityMax(1)
-                .skipReusableCheck(true)
                 .build());
 
         return ueAccManifestId;
@@ -2615,8 +2622,7 @@ public class CcCommandService {
                 accManifestId,
                 targetAscc.toAsccpManifestId(),
                 -1,
-                targetAscc.cardinality(),
-                false), LogAction.Refactored, hash, false);
+                targetAscc.cardinality()), LogAction.Refactored, hash, false);
     }
 
     public BccManifestId refactorBcc(ScoreUser requester, BccManifestId bccManifestId, AccManifestId accManifestId) {
