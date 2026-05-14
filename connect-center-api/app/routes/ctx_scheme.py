@@ -178,6 +178,10 @@ async def get_ctx_scheme_list(
         default=None,
         description="Filter by last update date using an inclusive range: '[before~after]'.",
     ),
+    updater: str | None = Query(
+        default=None,
+        description="Comma-separated updater login IDs to filter by exact match. Prefix a login ID with '!' to exclude it.",
+    ),
     order_by: str | None = Query(
         default=None,
         description=(
@@ -225,6 +229,7 @@ async def get_ctx_scheme_list(
             ctx_category_name=ctx_category_name,
             created_on=created_range,
             last_updated_on=updated_range,
+            updater=updater,
         )
     except ValueError as e:
         raise HTTPException(

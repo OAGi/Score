@@ -13,6 +13,7 @@ from sqlalchemy.sql import Select
 
 from app.repositories.contracts.library import LibraryRepositoryContract
 from app.repositories.models.library import LibraryReleaseRow, LibraryRow
+from app.repositories.vendors.mariadb.models.app_user import AppUser
 from app.repositories.vendors.mariadb.models.agency_id_list import (
     AgencyIdList,
     AgencyIdListManifest,
@@ -67,6 +68,8 @@ class MariaDbLibraryRepository(LibraryRepositoryContract):
         creation_timestamp_after: datetime | None = None,
         last_update_timestamp_before: datetime | None = None,
         last_update_timestamp_after: datetime | None = None,
+        included_updater_login_ids: list[str] | None = None,
+        excluded_updater_login_ids: list[str] | None = None,
     ) -> tuple[int, list[LibraryRow]]:
         """Handle list."""
         where_clauses = _build_where_clauses(
@@ -81,6 +84,8 @@ class MariaDbLibraryRepository(LibraryRepositoryContract):
             creation_timestamp_after=creation_timestamp_after,
             last_update_timestamp_before=last_update_timestamp_before,
             last_update_timestamp_after=last_update_timestamp_after,
+            included_updater_login_ids=included_updater_login_ids,
+            excluded_updater_login_ids=excluded_updater_login_ids,
         )
 
         total_stmt = select(func.count()).select_from(Library)
@@ -994,6 +999,8 @@ def _build_where_clauses(
     creation_timestamp_after: datetime | None,
     last_update_timestamp_before: datetime | None,
     last_update_timestamp_after: datetime | None,
+    included_updater_login_ids: list[str] | None,
+    excluded_updater_login_ids: list[str] | None,
 ) -> list[object]:
     """Build shared library filters."""
     clauses: list[object] = []
@@ -1019,6 +1026,18 @@ def _build_where_clauses(
         clauses.append(Library.last_update_timestamp >= last_update_timestamp_after)
     if last_update_timestamp_before is not None:
         clauses.append(Library.last_update_timestamp <= last_update_timestamp_before)
+    if included_updater_login_ids:
+        clauses.append(
+            Library.last_updated_by.in_(
+                select(AppUser.app_user_id).where(AppUser.login_id.in_(included_updater_login_ids))
+            )
+        )
+    if excluded_updater_login_ids:
+        clauses.append(
+            Library.last_updated_by.not_in(
+                select(AppUser.app_user_id).where(AppUser.login_id.in_(excluded_updater_login_ids))
+            )
+        )
     return clauses
 
 

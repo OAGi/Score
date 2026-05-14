@@ -2950,6 +2950,8 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
         last_update_timestamp_after: datetime | None = None,
         included_owner_login_ids: list[str] | None = None,
         excluded_owner_login_ids: list[str] | None = None,
+        included_updater_login_ids: list[str] | None = None,
+        excluded_updater_login_ids: list[str] | None = None,
     ) -> tuple[int, list[CoreComponentListRow]]:
         """Return a unified paginated list for requested core component types.
 
@@ -2967,6 +2969,8 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
             last_update_timestamp_after: Optional lower bound for last update timestamp.
             included_owner_login_ids: Optional owner login IDs to include by exact match.
             excluded_owner_login_ids: Optional owner login IDs to exclude by exact match.
+            included_updater_login_ids: Optional updater login IDs to include by exact match.
+            excluded_updater_login_ids: Optional updater login IDs to exclude by exact match.
 
         Returns:
             Result of the operation.
@@ -3009,6 +3013,8 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
                     last_update_timestamp_after=last_update_timestamp_after,
                     included_owner_login_ids=included_owner_login_ids,
                     excluded_owner_login_ids=excluded_owner_login_ids,
+                    included_updater_login_ids=included_updater_login_ids,
+                    excluded_updater_login_ids=excluded_updater_login_ids,
                 )
             )
 
@@ -3047,6 +3053,8 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
                     last_update_timestamp_after=last_update_timestamp_after,
                     included_owner_login_ids=included_owner_login_ids,
                     excluded_owner_login_ids=excluded_owner_login_ids,
+                    included_updater_login_ids=included_updater_login_ids,
+                    excluded_updater_login_ids=excluded_updater_login_ids,
                 )
             )
 
@@ -3085,6 +3093,8 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
                     last_update_timestamp_after=last_update_timestamp_after,
                     included_owner_login_ids=included_owner_login_ids,
                     excluded_owner_login_ids=excluded_owner_login_ids,
+                    included_updater_login_ids=included_updater_login_ids,
+                    excluded_updater_login_ids=excluded_updater_login_ids,
                 )
             )
 
@@ -4108,7 +4118,7 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
                 tag_link_manifest_col=AccManifestTag.acc_manifest_id,
                 release_ids=None,
                 den=None,
-                tag=None,
+                tag_names=None,
                 creation_timestamp_before=None,
                 creation_timestamp_after=None,
                 last_update_timestamp_before=None,
@@ -4141,7 +4151,7 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
                 tag_link_manifest_col=AsccpManifestTag.asccp_manifest_id,
                 release_ids=None,
                 den=None,
-                tag=None,
+                tag_names=None,
                 creation_timestamp_before=None,
                 creation_timestamp_after=None,
                 last_update_timestamp_before=None,
@@ -4174,7 +4184,7 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
                 tag_link_manifest_col=BccpManifestTag.bccp_manifest_id,
                 release_ids=None,
                 den=None,
-                tag=None,
+                tag_names=None,
                 creation_timestamp_before=None,
                 creation_timestamp_after=None,
                 last_update_timestamp_before=None,
@@ -4225,6 +4235,8 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
         last_update_timestamp_after: datetime | None,
         included_owner_login_ids: list[str] | None = None,
         excluded_owner_login_ids: list[str] | None = None,
+        included_updater_login_ids: list[str] | None = None,
+        excluded_updater_login_ids: list[str] | None = None,
     ) -> Select[Any]:
         # Intentionally exclude AppUser joins here.
         # User resolution is handled in the service layer via batched `gets(...)`
@@ -4264,6 +4276,8 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
             last_update_timestamp_after: Optional lower bound for last update timestamp.
             included_owner_login_ids: Optional owner login IDs to include by exact match.
             excluded_owner_login_ids: Optional owner login IDs to exclude by exact match.
+            included_updater_login_ids: Optional updater login IDs to include by exact match.
+            excluded_updater_login_ids: Optional updater login IDs to exclude by exact match.
 
         Returns:
             Result of the operation.
@@ -4294,6 +4308,18 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
             where_clauses.append(
                 component_owner_col.not_in(
                     select(AppUser.app_user_id).where(AppUser.login_id.in_(excluded_owner_login_ids))
+                )
+            )
+        if included_updater_login_ids:
+            where_clauses.append(
+                component_updated_by_col.in_(
+                    select(AppUser.app_user_id).where(AppUser.login_id.in_(included_updater_login_ids))
+                )
+            )
+        if excluded_updater_login_ids:
+            where_clauses.append(
+                component_updated_by_col.not_in(
+                    select(AppUser.app_user_id).where(AppUser.login_id.in_(excluded_updater_login_ids))
                 )
             )
 

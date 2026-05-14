@@ -27,6 +27,8 @@ class ContextCategoryRepositoryContract(Protocol):
         creation_timestamp_after: datetime | None = None,
         last_update_timestamp_before: datetime | None = None,
         last_update_timestamp_after: datetime | None = None,
+        included_updater_login_ids: list[str] | None = None,
+        excluded_updater_login_ids: list[str] | None = None,
     ) -> tuple[int, list[ContextCategoryRow]]:
         """Repository contract for list.
 
@@ -40,6 +42,8 @@ class ContextCategoryRepositoryContract(Protocol):
             creation_timestamp_after: Include rows created on/after this timestamp.
             last_update_timestamp_before: Include rows updated on/before this timestamp.
             last_update_timestamp_after: Include rows updated on/after this timestamp.
+            included_updater_login_ids: Optional updater login IDs to include by exact match.
+            excluded_updater_login_ids: Optional updater login IDs to exclude by exact match.
 
         Returns:
             Result of the operation.

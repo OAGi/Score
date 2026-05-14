@@ -12,10 +12,13 @@ from typing import Any, Literal
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased
 
 from app.repositories.contracts.release import ReleaseRepositoryContract
 from app.repositories.models import LibrarySummaryRow, NamespaceSummaryRow
 from app.repositories.models.release import ReleaseRow
+from app.repositories.models.release import ReleaseSummaryRow
+from app.repositories.vendors.mariadb.models.app_user import AppUser
 from app.repositories.vendors.mariadb.models.library import Library
 from app.repositories.vendors.mariadb.models.namespace import Namespace
 from app.repositories.vendors.mariadb.models.release import Release, ReleaseDep
@@ -57,6 +60,10 @@ class MariaDbReleaseRepository(ReleaseRepositoryContract):
         creation_timestamp_after: datetime | None = None,
         last_update_timestamp_before: datetime | None = None,
         last_update_timestamp_after: datetime | None = None,
+        included_creator_login_ids: list[str] | None = None,
+        excluded_creator_login_ids: list[str] | None = None,
+        included_updater_login_ids: list[str] | None = None,
+        excluded_updater_login_ids: list[str] | None = None,
     ) -> tuple[int, list[ReleaseRow]]:
         """Handle list.
 
@@ -70,6 +77,10 @@ class MariaDbReleaseRepository(ReleaseRepositoryContract):
             creation_timestamp_after: Optional lower bound for creation timestamp.
             last_update_timestamp_before: Optional upper bound for last update timestamp.
             last_update_timestamp_after: Optional lower bound for last update timestamp.
+            included_creator_login_ids: Optional creator login IDs to include by exact match.
+            excluded_creator_login_ids: Optional creator login IDs to exclude by exact match.
+            included_updater_login_ids: Optional updater login IDs to include by exact match.
+            excluded_updater_login_ids: Optional updater login IDs to exclude by exact match.
 
         Returns:
             Result of the operation.
@@ -82,6 +93,10 @@ class MariaDbReleaseRepository(ReleaseRepositoryContract):
             creation_timestamp_after=creation_timestamp_after,
             last_update_timestamp_before=last_update_timestamp_before,
             last_update_timestamp_after=last_update_timestamp_after,
+            included_creator_login_ids=included_creator_login_ids,
+            excluded_creator_login_ids=excluded_creator_login_ids,
+            included_updater_login_ids=included_updater_login_ids,
+            excluded_updater_login_ids=excluded_updater_login_ids,
         )
 
         total_stmt = select(func.count()).select_from(Release)
@@ -182,6 +197,8 @@ def _as_dt(value: object) -> datetime:
 
 def _select():
     """Internal helper for select."""
+    prev_release = aliased(Release)
+    next_release = aliased(Release)
     return (
         select(
             Release.release_id,
@@ -199,9 +216,17 @@ def _select():
             Release.last_update_timestamp,
             Release.created_by,
             Release.last_updated_by,
+            prev_release.release_id.label("prev_release_id"),
+            prev_release.release_num.label("prev_release_num"),
+            prev_release.state.label("prev_release_state"),
+            next_release.release_id.label("next_release_id"),
+            next_release.release_num.label("next_release_num"),
+            next_release.state.label("next_release_state"),
         )
         .join(Library, Library.library_id == Release.library_id)
         .outerjoin(Namespace, Namespace.namespace_id == Release.namespace_id)
+        .outerjoin(prev_release, prev_release.release_id == Release.prev_release_id)
+        .outerjoin(next_release, next_release.release_id == Release.next_release_id)
     )
 
 
@@ -230,6 +255,12 @@ def _to_release_row(row: Any) -> ReleaseRow:
         last_update_timestamp,
         created_by,
         last_updated_by,
+        prev_release_id,
+        prev_release_num,
+        prev_release_state,
+        next_release_id,
+        next_release_num,
+        next_release_state,
     ) = row
 
     namespace_summary = None
@@ -239,6 +270,9 @@ def _to_release_row(row: Any) -> ReleaseRow:
             prefix=str(namespace_prefix) if namespace_prefix is not None else None,
             uri=str(namespace_uri),
         )
+
+    prev_release = _to_release_summary(prev_release_id, prev_release_num, prev_release_state)
+    next_release = _to_release_summary(next_release_id, next_release_num, next_release_state)
 
     return ReleaseRow(
         release_id=release_id,
@@ -253,6 +287,24 @@ def _to_release_row(row: Any) -> ReleaseRow:
         creation_timestamp=_as_dt(creation_timestamp),
         last_updated_by=last_updated_by,
         last_update_timestamp=_as_dt(last_update_timestamp),
+        is_latest=next_release is not None and next_release.release_num == "Working",
+        prev_release=prev_release,
+        next_release=next_release,
+    )
+
+
+def _to_release_summary(
+    release_id: int | None,
+    release_num: str | None,
+    state: str | None,
+) -> ReleaseSummaryRow | None:
+    """Internal helper for adjacent release summary conversion."""
+    if release_id is None:
+        return None
+    return ReleaseSummaryRow(
+        release_id=release_id,
+        release_num=str(release_num or ""),
+        state=str(state) if state is not None else None,
     )
 
 
@@ -264,6 +316,10 @@ def _build_where_clauses(
     creation_timestamp_after: datetime | None,
     last_update_timestamp_before: datetime | None,
     last_update_timestamp_after: datetime | None,
+    included_creator_login_ids: list[str] | None,
+    excluded_creator_login_ids: list[str] | None,
+    included_updater_login_ids: list[str] | None,
+    excluded_updater_login_ids: list[str] | None,
 ) -> list[object]:
     """Internal helper for build where clauses.
 
@@ -295,6 +351,30 @@ def _build_where_clauses(
         clauses.append(Release.last_update_timestamp >= last_update_timestamp_after)
     if last_update_timestamp_before is not None:
         clauses.append(Release.last_update_timestamp <= last_update_timestamp_before)
+    if included_creator_login_ids:
+        clauses.append(
+            Release.created_by.in_(
+                select(AppUser.app_user_id).where(AppUser.login_id.in_(included_creator_login_ids))
+            )
+        )
+    if excluded_creator_login_ids:
+        clauses.append(
+            Release.created_by.not_in(
+                select(AppUser.app_user_id).where(AppUser.login_id.in_(excluded_creator_login_ids))
+            )
+        )
+    if included_updater_login_ids:
+        clauses.append(
+            Release.last_updated_by.in_(
+                select(AppUser.app_user_id).where(AppUser.login_id.in_(included_updater_login_ids))
+            )
+        )
+    if excluded_updater_login_ids:
+        clauses.append(
+            Release.last_updated_by.not_in(
+                select(AppUser.app_user_id).where(AppUser.login_id.in_(excluded_updater_login_ids))
+            )
+        )
     return clauses
 
 

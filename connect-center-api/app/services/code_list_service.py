@@ -24,7 +24,7 @@ from app.services.models.code_list import (
 )
 from app.services.release_service import ReleaseService
 from app.services.utils.date import DateRange
-from app.services.utils.owner import parse_owner_filter
+from app.services.utils.owner import parse_login_id_filter, parse_owner_filter
 from app.services.utils.pagination import PaginationParams, PaginationResponse
 from app.types.identifiers import CodeListManifestId, CodeListValueManifestId, ReleaseId
 from app.types.unset import UNSET, UnsetType
@@ -73,6 +73,7 @@ class CodeListService:
         created_on: DateRange | None = None,
         last_updated_on: DateRange | None = None,
         owner: str | None = None,
+        updater: str | None = None,
     ) -> PaginationResponse[CodeListServiceResult]:
         """List code lists for a release scope."""
         logger.info("list code_lists release_id=%d limit=%d offset=%d", int(release_id), limit, offset)
@@ -84,6 +85,10 @@ class CodeListService:
         )
         dependent_release_ids = await self._release_service.get_dependent_releases(release_id)
         included_owner_login_ids, excluded_owner_login_ids = parse_owner_filter(owner)
+        included_updater_login_ids, excluded_updater_login_ids = parse_login_id_filter(
+            updater,
+            filter_name="updater",
+        )
         total, rows = await self._repo.list(
             release_id=release_id,
             dependent_release_ids=dependent_release_ids,
@@ -99,6 +104,8 @@ class CodeListService:
             last_update_timestamp_after=last_updated_on.after if last_updated_on else None,
             included_owner_login_ids=included_owner_login_ids,
             excluded_owner_login_ids=excluded_owner_login_ids,
+            included_updater_login_ids=included_updater_login_ids,
+            excluded_updater_login_ids=excluded_updater_login_ids,
         )
         user_ids = sorted(
             {

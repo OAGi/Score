@@ -64,6 +64,8 @@ class MariaDbCodeListRepository(CodeListRepositoryContract):
         last_update_timestamp_after: datetime | None = None,
         included_owner_login_ids: list[str] | None = None,
         excluded_owner_login_ids: list[str] | None = None,
+        included_updater_login_ids: list[str] | None = None,
+        excluded_updater_login_ids: list[str] | None = None,
     ) -> tuple[int, list[CodeListRow]]:
         """List code lists."""
         where_clauses = _build_where_clauses(
@@ -78,6 +80,8 @@ class MariaDbCodeListRepository(CodeListRepositoryContract):
             last_update_timestamp_after=last_update_timestamp_after,
             included_owner_login_ids=included_owner_login_ids,
             excluded_owner_login_ids=excluded_owner_login_ids,
+            included_updater_login_ids=included_updater_login_ids,
+            excluded_updater_login_ids=excluded_updater_login_ids,
         )
 
         total_stmt = (
@@ -864,6 +868,8 @@ def _build_where_clauses(
     last_update_timestamp_after: datetime | None,
     included_owner_login_ids: list[str] | None = None,
     excluded_owner_login_ids: list[str] | None = None,
+    included_updater_login_ids: list[str] | None = None,
+    excluded_updater_login_ids: list[str] | None = None,
 ) -> list[object]:
     clauses: list[object] = [CodeListManifest.release_id.in_([int(release_id), *[int(x) for x in dependent_release_ids]])]
     if name:
@@ -890,6 +896,18 @@ def _build_where_clauses(
         clauses.append(
             CodeList.owner_user_id.not_in(
                 select(AppUser.app_user_id).where(AppUser.login_id.in_(excluded_owner_login_ids))
+            )
+        )
+    if included_updater_login_ids:
+        clauses.append(
+            CodeList.last_updated_by.in_(
+                select(AppUser.app_user_id).where(AppUser.login_id.in_(included_updater_login_ids))
+            )
+        )
+    if excluded_updater_login_ids:
+        clauses.append(
+            CodeList.last_updated_by.not_in(
+                select(AppUser.app_user_id).where(AppUser.login_id.in_(excluded_updater_login_ids))
             )
         )
     return clauses

@@ -60,6 +60,8 @@ class MariaDbNamespaceRepository(NamespaceRepositoryContract):
         last_update_timestamp_after: datetime | None = None,
         included_owner_login_ids: list[str] | None = None,
         excluded_owner_login_ids: list[str] | None = None,
+        included_updater_login_ids: list[str] | None = None,
+        excluded_updater_login_ids: list[str] | None = None,
     ) -> tuple[int, list[NamespaceRow]]:
         """Handle list.
 
@@ -76,6 +78,8 @@ class MariaDbNamespaceRepository(NamespaceRepositoryContract):
             last_update_timestamp_after: Optional lower bound for last update timestamp.
             included_owner_login_ids: Optional owner login IDs to include by exact match.
             excluded_owner_login_ids: Optional owner login IDs to exclude by exact match.
+            included_updater_login_ids: Optional updater login IDs to include by exact match.
+            excluded_updater_login_ids: Optional updater login IDs to exclude by exact match.
 
         Returns:
             Result of the operation.
@@ -91,6 +95,8 @@ class MariaDbNamespaceRepository(NamespaceRepositoryContract):
             last_update_timestamp_after=last_update_timestamp_after,
             included_owner_login_ids=included_owner_login_ids,
             excluded_owner_login_ids=excluded_owner_login_ids,
+            included_updater_login_ids=included_updater_login_ids,
+            excluded_updater_login_ids=excluded_updater_login_ids,
         )
 
         total_stmt = select(func.count()).select_from(Namespace)
@@ -357,6 +363,8 @@ def _build_where_clauses(
     last_update_timestamp_after: datetime | None,
     included_owner_login_ids: list[str] | None = None,
     excluded_owner_login_ids: list[str] | None = None,
+    included_updater_login_ids: list[str] | None = None,
+    excluded_updater_login_ids: list[str] | None = None,
 ) -> list[object]:
     """Internal helper for build where clauses.
 
@@ -400,6 +408,18 @@ def _build_where_clauses(
         clauses.append(
             Namespace.owner_user_id.not_in(
                 select(AppUser.app_user_id).where(AppUser.login_id.in_(excluded_owner_login_ids))
+            )
+        )
+    if included_updater_login_ids:
+        clauses.append(
+            Namespace.last_updated_by.in_(
+                select(AppUser.app_user_id).where(AppUser.login_id.in_(included_updater_login_ids))
+            )
+        )
+    if excluded_updater_login_ids:
+        clauses.append(
+            Namespace.last_updated_by.not_in(
+                select(AppUser.app_user_id).where(AppUser.login_id.in_(excluded_updater_login_ids))
             )
         )
     return clauses

@@ -127,37 +127,73 @@ async def get_ctx_scheme_service(
         "type": "object",
         "description": "Response containing paginated list of business contexts",
         "properties": {
-            "total_items": {"type": "integer", "description": "Total number of business contexts available. Allowed values: non-negative integers (≥0).", "example": 25},
-            "offset": {"type": "integer", "description": "Offset of the first item in this page. Allowed values: non-negative integers (≥0). Default value: 0.", "example": 0},
-            "limit": {"type": "integer", "description": "Number of items returned in this page. Allowed values: integers between 1 and 100 (inclusive). Default value: 10.", "example": 10},
+            "total_items": {
+                "type": "integer",
+                "description": "Total number of business contexts available. Allowed values: non-negative integers (≥0).",
+                "example": 25,
+            },
+            "offset": {
+                "type": "integer",
+                "description": "Offset of the first item in this page. Allowed values: non-negative integers (≥0). Default value: 0.",
+                "example": 0,
+            },
+            "limit": {
+                "type": "integer",
+                "description": "Number of items returned in this page. Allowed values: integers between 1 and 100 (inclusive). Default value: 10.",
+                "example": 10,
+            },
             "items": {
                 "type": "array",
                 "description": "List of business contexts on this page",
                 "items": {
                     "type": "object",
                     "properties": {
-                        "biz_ctx_id": {"type": "integer", "description": "Unique identifier for the business context", "example": 123},
-                        "guid": {"type": "string", "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)", "example": "a1b2c3d4e5f6789012345678901234ab"},
-                        "name": {"type": "string", "description": "Short, descriptive name of the business context", "example": "Production Environment"},
+                        "biz_ctx_id": {
+                            "type": "integer",
+                            "description": "Unique identifier for the business context",
+                            "example": 123,
+                        },
+                        "guid": {
+                            "type": "string",
+                            "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)",
+                            "example": "a1b2c3d4e5f6789012345678901234ab",
+                        },
+                        "name": {
+                            "type": "string",
+                            "description": "Short, descriptive name of the business context",
+                            "example": "Production Environment",
+                        },
                         "values": {
                             "type": "array",
                             "description": "List of business context values",
                             "items": {
                                 "type": "object",
                                 "properties": {
-                                    "biz_ctx_value_id": {"type": "integer", "description": "Unique identifier for the business context value", "example": 1},
+                                    "biz_ctx_value_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the business context value",
+                                        "example": 1,
+                                    },
                                     "ctx_scheme_value": {
                                         "type": "object",
                                         "description": "Context scheme value information",
                                         "properties": {
-                                            "ctx_scheme_value_id": {"type": "integer", "description": "Unique identifier for the context scheme value", "example": 1},
-                                            "value": {"type": "string", "description": "Value of the context scheme", "example": "US"}
+                                            "ctx_scheme_value_id": {
+                                                "type": "integer",
+                                                "description": "Unique identifier for the context scheme value",
+                                                "example": 1,
+                                            },
+                                            "value": {
+                                                "type": "string",
+                                                "description": "Value of the context scheme",
+                                                "example": "US",
+                                            },
                                         },
-                                        "required": ["ctx_scheme_value_id", "value"]
-                                    }
+                                        "required": ["ctx_scheme_value_id", "value"],
+                                    },
                                 },
-                                "required": ["biz_ctx_value_id", "ctx_scheme_value"]
-                            }
+                                "required": ["biz_ctx_value_id", "ctx_scheme_value"],
+                            },
                         },
                         "created": {
                             "type": "object",
@@ -167,16 +203,38 @@ async def get_ctx_scheme_service(
                                     "type": "object",
                                     "description": "User who created the business context",
                                     "properties": {
-                                        "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                                        "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                                        "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                                        "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                                        "user_id": {
+                                            "type": "integer",
+                                            "description": "Unique identifier for the user",
+                                            "example": 1,
+                                        },
+                                        "login_id": {
+                                            "type": "string",
+                                            "description": "User's login identifier",
+                                            "example": "admin",
+                                        },
+                                        "username": {
+                                            "type": "string",
+                                            "description": "Display name of the user",
+                                            "example": "Administrator",
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                            "description": "List of roles assigned to the user",
+                                            "example": ["Admin"],
+                                        },
                                     },
-                                    "required": ["user_id", "login_id", "username", "roles"]
+                                    "required": ["user_id", "login_id", "username", "roles"],
                                 },
-                                "when": {"type": "string", "format": "date-time", "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-15T10:30:00Z"}
+                                "when": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                                    "example": "2024-01-15T10:30:00Z",
+                                },
                             },
-                            "required": ["who", "when"]
+                            "required": ["who", "when"],
                         },
                         "last_updated": {
                             "type": "object",
@@ -186,50 +244,82 @@ async def get_ctx_scheme_service(
                                     "type": "object",
                                     "description": "User who last updated the business context",
                                     "properties": {
-                                        "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                                        "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                                        "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                                        "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                                        "user_id": {
+                                            "type": "integer",
+                                            "description": "Unique identifier for the user",
+                                            "example": 1,
+                                        },
+                                        "login_id": {
+                                            "type": "string",
+                                            "description": "User's login identifier",
+                                            "example": "admin",
+                                        },
+                                        "username": {
+                                            "type": "string",
+                                            "description": "Display name of the user",
+                                            "example": "Administrator",
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                            "description": "List of roles assigned to the user",
+                                            "example": ["Admin"],
+                                        },
                                     },
-                                    "required": ["user_id", "login_id", "username", "roles"]
+                                    "required": ["user_id", "login_id", "username", "roles"],
                                 },
-                                "when": {"type": "string", "format": "date-time", "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-15T10:30:00Z"}
+                                "when": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                                    "example": "2024-01-15T10:30:00Z",
+                                },
                             },
-                            "required": ["who", "when"]
-                        }
+                            "required": ["who", "when"],
+                        },
                     },
-                    "required": ["biz_ctx_id", "guid", "name", "created", "last_updated"]
-                }
-            }
+                    "required": ["biz_ctx_id", "guid", "name", "created", "last_updated"],
+                },
+            },
         },
-        "required": ["total_items", "offset", "limit", "items"]
-    }
+        "required": ["total_items", "offset", "limit", "items"],
+    },
 )
 async def get_business_contexts(
-    name: Annotated[str | None, Field(default=None, description="Filter by the name of the business context.")],
+    name: Annotated[str | None, Field(description="Filter by the name of the business context.")] = None,
     created_on: Annotated[
         str | None,
         Field(
-            default=None,
             description="Filter by creation date using an inclusive range: '[before~after]'. 'before' and 'after' are date-time strings. Default date format: YYYY-MM-DD. Examples: '[2025-01-01~2025-02-01]'. Either 'before' or 'after' can be omitted, e.g., '[~2025-02-01]' or '[2025-01-01~]'.",
         ),
-    ],
+    ] = None,
     last_updated_on: Annotated[
         str | None,
         Field(
-            default=None,
             description="Filter by last update date using an inclusive range: '[before~after]'. 'before' and 'after' are date-time strings. Default date format: YYYY-MM-DD. Examples: '[2025-01-01~2025-02-01]'. Either 'before' or 'after' can be omitted, e.g., '[~2025-02-01]' or '[2025-01-01~]'.",
         ),
-    ],
+    ] = None,
+    updater: Annotated[
+        str | None,
+        Field(
+            description="Comma-separated updater login IDs to filter by exact match. Prefix a login ID with '!' to exclude it."
+        ),
+    ] = None,
     order_by: Annotated[
         str | None,
         Field(
-            default=None,
             description="Comma-separated list of properties to order results by. Prefix with '-' for descending, '+' for ascending (default ascending). Allowed columns: name, creation_timestamp, last_update_timestamp. Example: '-last_update_timestamp,+name' translates to 'last_update_timestamp DESC, name ASC'.",
         ),
-    ],
-    offset: Annotated[int, Field(default=0, ge=0, description="The offset from the beginning of the list. Must be a non-negative number.")],
-    limit: Annotated[int, Field(default=10, ge=1, le=100, description="The maximum number of items to return. Must be between 1 and 100 (inclusive).")],
+    ] = None,
+    offset: Annotated[
+        int, Field(ge=0, description="The offset from the beginning of the list. Must be a non-negative number.")
+    ] = 0,
+    limit: Annotated[
+        int,
+        Field(
+            ge=1, le=100, description="The maximum number of items to return. Must be between 1 and 100 (inclusive)."
+        ),
+    ] = 10,
     biz_ctx_service: BizCtxService = Depends(get_biz_ctx_service),
 ) -> GetBizCtxPaginationResponse:
     """
@@ -296,6 +386,7 @@ async def get_business_contexts(
             name=name,
             created_on=parse_date_range(created_on),
             last_updated_on=parse_date_range(last_updated_on),
+            updater=updater,
         )
         return _to_list_response(items=page.items, total=page.total, offset=page.offset, limit=page.limit)
     except Exception as exc:
@@ -309,28 +400,52 @@ async def get_business_contexts(
         "type": "object",
         "description": "Response containing business context information",
         "properties": {
-            "biz_ctx_id": {"type": "integer", "description": "Unique identifier for the business context", "example": 123},
-            "guid": {"type": "string", "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)", "example": "a1b2c3d4e5f6789012345678901234ab"},
-            "name": {"type": "string", "description": "Short, descriptive name of the business context", "example": "Production Environment"},
+            "biz_ctx_id": {
+                "type": "integer",
+                "description": "Unique identifier for the business context",
+                "example": 123,
+            },
+            "guid": {
+                "type": "string",
+                "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)",
+                "example": "a1b2c3d4e5f6789012345678901234ab",
+            },
+            "name": {
+                "type": "string",
+                "description": "Short, descriptive name of the business context",
+                "example": "Production Environment",
+            },
             "values": {
                 "type": "array",
                 "description": "List of business context values",
                 "items": {
                     "type": "object",
                     "properties": {
-                        "biz_ctx_value_id": {"type": "integer", "description": "Unique identifier for the business context value", "example": 1},
+                        "biz_ctx_value_id": {
+                            "type": "integer",
+                            "description": "Unique identifier for the business context value",
+                            "example": 1,
+                        },
                         "ctx_scheme_value": {
                             "type": "object",
                             "description": "Context scheme value information",
                             "properties": {
-                                "ctx_scheme_value_id": {"type": "integer", "description": "Unique identifier for the context scheme value", "example": 1},
-                                "value": {"type": "string", "description": "Value of the context scheme", "example": "US"}
+                                "ctx_scheme_value_id": {
+                                    "type": "integer",
+                                    "description": "Unique identifier for the context scheme value",
+                                    "example": 1,
+                                },
+                                "value": {
+                                    "type": "string",
+                                    "description": "Value of the context scheme",
+                                    "example": "US",
+                                },
                             },
-                            "required": ["ctx_scheme_value_id", "value"]
-                        }
+                            "required": ["ctx_scheme_value_id", "value"],
+                        },
                     },
-                    "required": ["biz_ctx_value_id", "ctx_scheme_value"]
-                }
+                    "required": ["biz_ctx_value_id", "ctx_scheme_value"],
+                },
             },
             "created": {
                 "type": "object",
@@ -340,16 +455,38 @@ async def get_business_contexts(
                         "type": "object",
                         "description": "User who created the business context",
                         "properties": {
-                            "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                            "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                            "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                            "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                            "user_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the user",
+                                "example": 1,
+                            },
+                            "login_id": {
+                                "type": "string",
+                                "description": "User's login identifier",
+                                "example": "admin",
+                            },
+                            "username": {
+                                "type": "string",
+                                "description": "Display name of the user",
+                                "example": "Administrator",
+                            },
+                            "roles": {
+                                "type": "array",
+                                "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                "description": "List of roles assigned to the user",
+                                "example": ["Admin"],
+                            },
                         },
-                        "required": ["user_id", "login_id", "username", "roles"]
+                        "required": ["user_id", "login_id", "username", "roles"],
                     },
-                    "when": {"type": "string", "format": "date-time", "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-15T10:30:00Z"}
+                    "when": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                        "example": "2024-01-15T10:30:00Z",
+                    },
                 },
-                "required": ["who", "when"]
+                "required": ["who", "when"],
             },
             "last_updated": {
                 "type": "object",
@@ -359,23 +496,47 @@ async def get_business_contexts(
                         "type": "object",
                         "description": "User who last updated the business context",
                         "properties": {
-                            "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                            "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                            "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                            "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                            "user_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the user",
+                                "example": 1,
+                            },
+                            "login_id": {
+                                "type": "string",
+                                "description": "User's login identifier",
+                                "example": "admin",
+                            },
+                            "username": {
+                                "type": "string",
+                                "description": "Display name of the user",
+                                "example": "Administrator",
+                            },
+                            "roles": {
+                                "type": "array",
+                                "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                "description": "List of roles assigned to the user",
+                                "example": ["Admin"],
+                            },
                         },
-                        "required": ["user_id", "login_id", "username", "roles"]
+                        "required": ["user_id", "login_id", "username", "roles"],
                     },
-                    "when": {"type": "string", "format": "date-time", "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-15T10:30:00Z"}
+                    "when": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                        "example": "2024-01-15T10:30:00Z",
+                    },
                 },
-                "required": ["who", "when"]
-            }
+                "required": ["who", "when"],
+            },
         },
-        "required": ["biz_ctx_id", "guid", "name", "created", "last_updated"]
-    }
+        "required": ["biz_ctx_id", "guid", "name", "created", "last_updated"],
+    },
 )
 async def get_business_context(
-    biz_ctx_id: Annotated[int, Field(gt=0, description="Unique numeric identifier of the business context to retrieve.")],
+    biz_ctx_id: Annotated[
+        int, Field(gt=0, description="Unique numeric identifier of the business context to retrieve.")
+    ],
     biz_ctx_service: BizCtxService = Depends(get_biz_ctx_service),
 ) -> GetBizCtxResponse:
     """
@@ -417,7 +578,9 @@ async def get_business_context(
     try:
         row = await biz_ctx_service.get(biz_ctx_id)
         if row is None:
-            raise ToolError(f"The business context with ID {biz_ctx_id} was not found. Please check the ID and try again.")
+            raise ToolError(
+                f"The business context with ID {biz_ctx_id} was not found. Please check the ID and try again."
+            )
         return GetBizCtxResponse.model_validate(row, from_attributes=True)
     except Exception as exc:
         raise _to_tool_error(exc, fallback=f"Unable to retrieve business context {biz_ctx_id}.") from exc
@@ -430,13 +593,19 @@ async def get_business_context(
         "type": "object",
         "description": "Response containing the created business context ID",
         "properties": {
-            "biz_ctx_id": {"type": "integer", "description": "Unique identifier for the created business context", "example": 123}
+            "biz_ctx_id": {
+                "type": "integer",
+                "description": "Unique identifier for the created business context",
+                "example": 123,
+            }
         },
-        "required": ["biz_ctx_id"]
-    }
+        "required": ["biz_ctx_id"],
+    },
 )
 async def create_business_context(
-    name: Annotated[str, Field(min_length=1, max_length=100, description="Short, descriptive name of the business context.")],
+    name: Annotated[
+        str, Field(min_length=1, max_length=100, description="Short, descriptive name of the business context.")
+    ],
     biz_ctx_service: BizCtxService = Depends(get_biz_ctx_service),
 ) -> CreateBizCtxResponse:
     """
@@ -479,14 +648,22 @@ async def create_business_context(
         "type": "object",
         "description": "Response containing the created business context value ID",
         "properties": {
-            "biz_ctx_value_id": {"type": "integer", "description": "Unique identifier for the created business context value", "example": 123}
+            "biz_ctx_value_id": {
+                "type": "integer",
+                "description": "Unique identifier for the created business context value",
+                "example": 123,
+            }
         },
-        "required": ["biz_ctx_value_id"]
-    }
+        "required": ["biz_ctx_value_id"],
+    },
 )
 async def create_business_context_value(
-    biz_ctx_id: Annotated[int, Field(gt=0, description="Identifier of the business context to which this value will be added.")],
-    ctx_scheme_value_id: Annotated[int, Field(gt=0, description="Identifier of the context scheme value to associate with this business context.")],
+    biz_ctx_id: Annotated[
+        int, Field(gt=0, description="Identifier of the business context to which this value will be added.")
+    ],
+    ctx_scheme_value_id: Annotated[
+        int, Field(gt=0, description="Identifier of the context scheme value to associate with this business context.")
+    ],
     biz_ctx_service: BizCtxService = Depends(get_biz_ctx_service),
 ) -> CreateBizCtxValueResponse:
     """
@@ -540,15 +717,26 @@ async def create_business_context_value(
         "type": "object",
         "description": "Response containing the updated business context ID and list of updated fields",
         "properties": {
-            "biz_ctx_id": {"type": "integer", "description": "Unique identifier of the updated business context", "example": 123},
-            "updates": {"type": "array", "items": {"type": "string"}, "description": "A list of updated fields, each represented by its name", "example": ["name"]}
+            "biz_ctx_id": {
+                "type": "integer",
+                "description": "Unique identifier of the updated business context",
+                "example": 123,
+            },
+            "updates": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "A list of updated fields, each represented by its name",
+                "example": ["name"],
+            },
         },
-        "required": ["biz_ctx_id", "updates"]
-    }
+        "required": ["biz_ctx_id", "updates"],
+    },
 )
 async def update_business_context(
     biz_ctx_id: Annotated[int, Field(gt=0, description="Unique identifier of the business context to update.")],
-    name: Annotated[str | None, Field(default=None, description="New name to assign to the business context. Omit to leave unchanged.")],
+    name: Annotated[
+        str | None, Field(description="New name to assign to the business context. Omit to leave unchanged.")
+    ] = None,
     biz_ctx_service: BizCtxService = Depends(get_biz_ctx_service),
 ) -> UpdateBizCtxResponse:
     """
@@ -588,7 +776,9 @@ async def update_business_context(
             name=UNSET if name is None else name,
         )
         if result is None:
-            raise ToolError(f"The business context with ID {biz_ctx_id} was not found. Please check the ID and try again.")
+            raise ToolError(
+                f"The business context with ID {biz_ctx_id} was not found. Please check the ID and try again."
+            )
         updated_id, updates = result
         return UpdateBizCtxResponse(biz_ctx_id=updated_id, updates=updates)
     except Exception as exc:
@@ -602,15 +792,32 @@ async def update_business_context(
         "type": "object",
         "description": "Response containing the updated business context value ID and list of updated fields",
         "properties": {
-            "biz_ctx_value_id": {"type": "integer", "description": "Unique identifier of the updated business context value", "example": 123},
-            "updates": {"type": "array", "items": {"type": "string"}, "description": "A list of updated fields, each represented by its name", "example": ["ctx_scheme_value_id"]}
+            "biz_ctx_value_id": {
+                "type": "integer",
+                "description": "Unique identifier of the updated business context value",
+                "example": 123,
+            },
+            "updates": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "A list of updated fields, each represented by its name",
+                "example": ["ctx_scheme_value_id"],
+            },
         },
-        "required": ["biz_ctx_value_id", "updates"]
-    }
+        "required": ["biz_ctx_value_id", "updates"],
+    },
 )
 async def update_business_context_value(
-    biz_ctx_value_id: Annotated[int, Field(gt=0, description="Unique identifier of the business context value to update.")],
-    ctx_scheme_value_id: Annotated[int, Field(gt=0, description="Identifier of the new context scheme value to associate with this business context value.")],
+    biz_ctx_value_id: Annotated[
+        int, Field(gt=0, description="Unique identifier of the business context value to update.")
+    ],
+    ctx_scheme_value_id: Annotated[
+        int,
+        Field(
+            gt=0,
+            description="Identifier of the new context scheme value to associate with this business context value.",
+        ),
+    ],
     biz_ctx_service: BizCtxService = Depends(get_biz_ctx_service),
 ) -> UpdateBizCtxValueResponse:
     """
@@ -669,11 +876,19 @@ async def update_business_context_value(
         "type": "object",
         "description": "Response containing the deleted business context ID or cancellation message",
         "properties": {
-            "biz_ctx_id": {"type": ["integer", "null"], "description": "Unique identifier of the deleted business context (null if deletion was cancelled)", "example": 123},
-            "message": {"type": ["string", "null"], "description": "Optional message indicating the status of the deletion operation", "example": "Deletion cancelled by user"}
+            "biz_ctx_id": {
+                "type": ["integer", "null"],
+                "description": "Unique identifier of the deleted business context (null if deletion was cancelled)",
+                "example": 123,
+            },
+            "message": {
+                "type": ["string", "null"],
+                "description": "Optional message indicating the status of the deletion operation",
+                "example": "Deletion cancelled by user",
+            },
         },
-        "required": []
-    }
+        "required": [],
+    },
 )
 async def delete_business_context(
     biz_ctx_id: Annotated[int, Field(gt=0, description="Unique identifier of the business context to delete.")],
@@ -721,7 +936,9 @@ async def delete_business_context(
     try:
         row = await biz_ctx_service.get(biz_ctx_id)
         if row is None:
-            raise ToolError(f"The business context with ID {biz_ctx_id} was not found. Please check the ID and try again.")
+            raise ToolError(
+                f"The business context with ID {biz_ctx_id} was not found. Please check the ID and try again."
+            )
 
         biz_ctx_name = row.name or f"business context {biz_ctx_id}"
 
@@ -760,14 +977,24 @@ async def delete_business_context(
         "type": "object",
         "description": "Response containing the deleted business context value ID or cancellation message",
         "properties": {
-            "biz_ctx_value_id": {"type": ["integer", "null"], "description": "Unique identifier of the deleted business context value (null if deletion was cancelled)", "example": 123},
-            "message": {"type": ["string", "null"], "description": "Optional message indicating the status of the deletion operation", "example": "Deletion cancelled by user"}
+            "biz_ctx_value_id": {
+                "type": ["integer", "null"],
+                "description": "Unique identifier of the deleted business context value (null if deletion was cancelled)",
+                "example": 123,
+            },
+            "message": {
+                "type": ["string", "null"],
+                "description": "Optional message indicating the status of the deletion operation",
+                "example": "Deletion cancelled by user",
+            },
         },
-        "required": []
-    }
+        "required": [],
+    },
 )
 async def delete_business_context_value(
-    biz_ctx_value_id: Annotated[int, Field(gt=0, description="Unique identifier of the business context value to delete.")],
+    biz_ctx_value_id: Annotated[
+        int, Field(gt=0, description="Unique identifier of the business context value to delete.")
+    ],
     ctx: Context,
     biz_ctx_service: BizCtxService = Depends(get_biz_ctx_service),
     ctx_scheme_service: CtxSchemeService = Depends(get_ctx_scheme_service),

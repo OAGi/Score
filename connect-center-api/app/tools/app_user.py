@@ -48,7 +48,12 @@ from app.security import AuthenticatedUser
 from app.services.app_user_service import AppUserService
 from app.services.models.app_user import AppUserServiceResult, Role
 from app.tools import _to_tool_error, get_tool_authenticated_user, str_to_bool, tool_session
-from app.tools.models.app_user import GetCurrentUserResponse, GetUserListEntryResponse, GetUserPaginationResponse, GetUserResponse
+from app.tools.models.app_user import (
+    GetCurrentUserResponse,
+    GetUserListEntryResponse,
+    GetUserPaginationResponse,
+    GetUserResponse,
+)
 
 logger = logging.getLogger("connectcenter.mcp.app_user")
 
@@ -70,15 +75,21 @@ async def get_app_user_service(
         "type": "object",
         "description": "Response containing paginated list of users.",
         "properties": {
-            "total_items": {"type": "integer",
-                            "description": "Total number of users available. Allowed values: non-negative integers (≥0).",
-                            "example": 25},
-            "offset": {"type": "integer",
-                       "description": "Offset of the first item in this page. Allowed values: non-negative integers (≥0). Default value: 0.",
-                       "example": 0},
-            "limit": {"type": "integer",
-                      "description": "Number of items returned in this page. Allowed values: integers between 1 and 100 (inclusive). Default value: 10.",
-                      "example": 10},
+            "total_items": {
+                "type": "integer",
+                "description": "Total number of users available. Allowed values: non-negative integers (≥0).",
+                "example": 25,
+            },
+            "offset": {
+                "type": "integer",
+                "description": "Offset of the first item in this page. Allowed values: non-negative integers (≥0). Default value: 0.",
+                "example": 0,
+            },
+            "limit": {
+                "type": "integer",
+                "description": "Number of items returned in this page. Allowed values: integers between 1 and 100 (inclusive). Default value: 10.",
+                "example": 10,
+            },
             "items": {
                 "type": "array",
                 "description": "List of users on this page",
@@ -87,36 +98,64 @@ async def get_app_user_service(
                     "properties": {
                         "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
                         "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                        "username": {"type": ["string", "null"], "description": "Display name of the user",
-                                     "example": "Administrator"},
-                        "organization": {"type": ["string", "null"], "description": "The company the user represents",
-                                         "example": "ACME Corp"},
-                        "email": {"type": ["string", "null"], "description": "Email address of the user",
-                                  "example": "admin@example.com"},
-                        "roles": {"type": "array",
-                                  "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
-                                  "description": "List of roles assigned to the user", "example": ["Admin"]},
-                        "is_enabled": {"type": "boolean", "description": "Whether the user account is enabled",
-                                       "example": True}
+                        "username": {
+                            "type": ["string", "null"],
+                            "description": "Display name of the user",
+                            "example": "Administrator",
+                        },
+                        "organization": {
+                            "type": ["string", "null"],
+                            "description": "The company the user represents",
+                            "example": "ACME Corp",
+                        },
+                        "email": {
+                            "type": ["string", "null"],
+                            "description": "Email address of the user",
+                            "example": "admin@example.com",
+                        },
+                        "roles": {
+                            "type": "array",
+                            "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                            "description": "List of roles assigned to the user",
+                            "example": ["Admin"],
+                        },
+                        "is_enabled": {
+                            "type": "boolean",
+                            "description": "Whether the user account is enabled",
+                            "example": True,
+                        },
                     },
-                    "required": ["user_id", "login_id", "username", "roles", "is_enabled"]
-                }
-            }
+                    "required": ["user_id", "login_id", "username", "roles", "is_enabled"],
+                },
+            },
         },
-        "required": ["total_items", "offset", "limit", "items"]
-    }
+        "required": ["total_items", "offset", "limit", "items"],
+    },
 )
 async def get_users(
-    login_id: Annotated[str | None, Field(default=None, description="Filter by login ID using partial match (case-insensitive).")],
-    username: Annotated[str | None, Field(default=None, description="Filter by username using partial match (case-insensitive).")],
-    organization: Annotated[str | None, Field(default=None, description="Filter by organization using partial match (case-insensitive).")],
-    email: Annotated[str | None, Field(default=None, description="Filter by email address using partial match (case-insensitive).")],
-    is_admin: Annotated[bool | str | None, Field(default=None, description="Filter by admin status.")],
-    is_developer: Annotated[bool | str | None, Field(default=None, description="Filter by developer status.")],
-    is_enabled: Annotated[bool | str | None, Field(default=None, description="Filter by enabled status.")],
-    order_by: Annotated[str | None, Field(default=None, description="Comma-separated list of properties to order results by. Allowed columns: login_id, username, organization, email, is_admin, is_developer, is_enabled.")],
-    offset: Annotated[int, Field(default=0, ge=0, description="The offset from the beginning of the list.")],
-    limit: Annotated[int, Field(default=10, ge=1, le=100, description="The maximum number of items to return.")],
+    login_id: Annotated[
+        str | None, Field(description="Filter by login ID using partial match (case-insensitive).")
+    ] = None,
+    username: Annotated[
+        str | None, Field(description="Filter by username using partial match (case-insensitive).")
+    ] = None,
+    organization: Annotated[
+        str | None, Field(description="Filter by organization using partial match (case-insensitive).")
+    ] = None,
+    email: Annotated[
+        str | None, Field(description="Filter by email address using partial match (case-insensitive).")
+    ] = None,
+    is_admin: Annotated[bool | str | None, Field(description="Filter by admin status.")] = None,
+    is_developer: Annotated[bool | str | None, Field(description="Filter by developer status.")] = None,
+    is_enabled: Annotated[bool | str | None, Field(description="Filter by enabled status.")] = None,
+    order_by: Annotated[
+        str | None,
+        Field(
+            description="Comma-separated list of properties to order results by. Allowed columns: login_id, username, organization, email, is_admin, is_developer, is_enabled."
+        ),
+    ] = None,
+    offset: Annotated[int, Field(ge=0, description="The offset from the beginning of the list.")] = 0,
+    limit: Annotated[int, Field(ge=1, le=100, description="The maximum number of items to return.")] = 10,
     app_user_service: AppUserService = Depends(get_app_user_service),
 ) -> GetUserPaginationResponse:
     """
@@ -197,9 +236,7 @@ async def get_users(
     except ToolError:
         raise
     except Exception as e:
-        raise ToolError(
-            f"Type conversion error: {str(e)}. Please check your parameter types and try again."
-        ) from e
+        raise ToolError(f"Type conversion error: {str(e)}. Please check your parameter types and try again.") from e
 
     try:
         page = await app_user_service.list(
@@ -232,18 +269,31 @@ async def get_users(
         "description": "Response containing information about the current user",
         "properties": {
             "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-            "username": {"type": ["string", "null"], "description": "Display name of the user",
-                         "example": "Administrator"},
-            "organization": {"type": ["string", "null"], "description": "The company the user represents",
-                             "example": "ACME Corp"},
-            "email": {"type": ["string", "null"], "description": "Email address of the user",
-                      "example": "admin@example.com"},
-            "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
-                      "description": "List of roles assigned to the user", "example": ["Admin"]},
-            "is_enabled": {"type": "boolean", "description": "Whether the user account is enabled", "example": True}
+            "username": {
+                "type": ["string", "null"],
+                "description": "Display name of the user",
+                "example": "Administrator",
+            },
+            "organization": {
+                "type": ["string", "null"],
+                "description": "The company the user represents",
+                "example": "ACME Corp",
+            },
+            "email": {
+                "type": ["string", "null"],
+                "description": "Email address of the user",
+                "example": "admin@example.com",
+            },
+            "roles": {
+                "type": "array",
+                "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                "description": "List of roles assigned to the user",
+                "example": ["Admin"],
+            },
+            "is_enabled": {"type": "boolean", "description": "Whether the user account is enabled", "example": True},
         },
-        "required": ["login_id", "username", "organization", "email", "roles", "is_enabled"]
-    }
+        "required": ["login_id", "username", "organization", "email", "roles", "is_enabled"],
+    },
 )
 async def who_am_i(
     app_user_service: AppUserService = Depends(get_app_user_service),

@@ -32,6 +32,15 @@ class NamespaceSummary(BaseModel):
     model_config = ConfigDict(frozen=True)
 
 
+class ReleaseReference(BaseModel):
+    """Adjacent release reference used to identify release-chain position."""
+
+    release_id: int = Field(..., ge=1, description="Adjacent release identifier.")
+    release_num: str = Field(..., description="Adjacent release number.")
+
+    model_config = ConfigDict(frozen=True, from_attributes=True)
+
+
 class ReleaseEntry(BaseModel):
     """API representation of a release record."""
     release_id: int = Field(..., ge=1, description="Unique identifier for the release.")
@@ -44,6 +53,21 @@ class ReleaseEntry(BaseModel):
     state: Literal["Processing", "Initialized", "Draft", "Published"] = Field(..., description="Current state of the release.")
     created: WhoAndWhen = Field(..., description="Information about who created the release and when.")
     last_updated: WhoAndWhen = Field(..., description="Information about who last updated the release and when.")
+    is_latest: bool = Field(
+        ...,
+        description=(
+            "True when this release's next_release points to the library's Working release; "
+            "use this flag to identify the latest published release."
+        ),
+    )
+    prev_release: ReleaseReference | None = Field(
+        default=None,
+        description="Previous release in the library release chain, with release_id and release_num.",
+    )
+    next_release: ReleaseReference | None = Field(
+        default=None,
+        description="Next release in the library release chain, with release_id and release_num. If this is Working, is_latest is true.",
+    )
 
     model_config = ConfigDict(frozen=True)
 

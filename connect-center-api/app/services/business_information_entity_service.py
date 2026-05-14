@@ -68,7 +68,7 @@ from app.services.models.library import LibrarySummaryServiceRecord
 from app.services.models.mapper import to_dataclass
 from app.services.models.release import ReleaseSummaryServiceRecord
 from app.services.utils.date import DateRange
-from app.services.utils.owner import parse_owner_filter
+from app.services.utils.owner import parse_login_id_filter, parse_owner_filter
 from app.services.utils.pagination import PaginationParams, PaginationResponse
 
 logger = logging.getLogger("connectcenter.service.business_information_entity")
@@ -126,6 +126,7 @@ class BusinessInformationEntityService:
         created_on: DateRange | None = None,
         last_updated_on: DateRange | None = None,
         owner: str | None = None,
+        updater: str | None = None,
     ) -> PaginationResponse[TopLevelAsbiepListServiceResult]:
         """List top-level ASBIEPs with filters, sorting, and pagination.
 
@@ -143,6 +144,7 @@ class BusinessInformationEntityService:
             created_on: Optional creation-time filter in ISO-8601 range form.
             last_updated_on: Optional last-update-time filter in ISO-8601 range form.
             owner: Optional comma-separated owner login ID filter. Prefix a login ID with '!' to exclude it.
+            updater: Optional comma-separated updater login ID filter. Prefix a login ID with '!' to exclude it.
 
         Returns:
             Result of the operation.
@@ -155,6 +157,10 @@ class BusinessInformationEntityService:
             allowed_sort_columns=self._ORDER_BY_ALLOWED,
         )
         included_owner_login_ids, excluded_owner_login_ids = parse_owner_filter(owner)
+        included_updater_login_ids, excluded_updater_login_ids = parse_login_id_filter(
+            updater,
+            filter_name="updater",
+        )
         total, rows = await self._repo.list_top_level_asbieps(
             limit=pagination.limit,
             offset=pagination.offset,
@@ -172,6 +178,8 @@ class BusinessInformationEntityService:
             last_update_timestamp_after=last_updated_on.after if last_updated_on else None,
             included_owner_login_ids=included_owner_login_ids,
             excluded_owner_login_ids=excluded_owner_login_ids,
+            included_updater_login_ids=included_updater_login_ids,
+            excluded_updater_login_ids=excluded_updater_login_ids,
         )
         user_ids = sorted(
             {

@@ -289,6 +289,10 @@ async def get_top_level_asbiep_list(
         default=None,
         description="Comma-separated owner login IDs to filter by exact match. Prefix a login ID with '!' to exclude it.",
     ),
+    updater: str | None = Query(
+        default=None,
+        description="Comma-separated updater login IDs to filter by exact match. Prefix a login ID with '!' to exclude it.",
+    ),
     is_deprecated: bool | None = Query(default=None, description="Filter by deprecation flag."),
     created_on: str | None = Query(default=None, description="Filter by creation date range '[before~after]'."),
     last_updated_on: str | None = Query(default=None, description="Filter by last update date range '[before~after]'."),
@@ -313,6 +317,7 @@ async def get_top_level_asbiep_list(
         status_param: Optional status filter value from query parameters.
         state: Optional lifecycle state filter.
         owner: Optional comma-separated owner login ID filter.
+        updater: Optional comma-separated updater login ID filter.
         is_deprecated: Optional deprecation flag filter.
         created_on: Optional creation-time filter in ISO-8601 range form.
         last_updated_on: Optional last-update-time filter in ISO-8601 range form.
@@ -338,6 +343,7 @@ async def get_top_level_asbiep_list(
             status=status_param,
             state=state,
             owner=owner,
+            updater=updater,
             is_deprecated=is_deprecated,
             created_on=created_range,
             last_updated_on=updated_range,

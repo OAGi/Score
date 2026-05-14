@@ -19,7 +19,7 @@ from app.services.models.namespace import (
     UpdateNamespaceServiceResult,
 )
 from app.services.utils.date import DateRange
-from app.services.utils.owner import parse_owner_filter
+from app.services.utils.owner import parse_login_id_filter, parse_owner_filter
 from app.services.utils.pagination import PaginationParams, PaginationResponse
 from app.types.identifiers import LibraryId, NamespaceId
 from app.types.unset import UNSET, UnsetType
@@ -69,6 +69,7 @@ class NamespaceService:
         created_on: DateRange | None = None,
         last_updated_on: DateRange | None = None,
         owner: str | None = None,
+        updater: str | None = None,
     ) -> PaginationResponse[NamespaceServiceResult]:
         """Get namespaces with optional filtering and pagination.
 
@@ -88,6 +89,10 @@ class NamespaceService:
             allowed_sort_columns=self._ORDER_BY_ALLOWED,
         )
         included_owner_login_ids, excluded_owner_login_ids = parse_owner_filter(owner)
+        included_updater_login_ids, excluded_updater_login_ids = parse_login_id_filter(
+            updater,
+            filter_name="updater",
+        )
         total, rows = await self._repo.list(
             limit=pagination.limit,
             offset=pagination.offset,
@@ -102,6 +107,8 @@ class NamespaceService:
             last_update_timestamp_after=last_updated_on.after if last_updated_on else None,
             included_owner_login_ids=included_owner_login_ids,
             excluded_owner_login_ids=excluded_owner_login_ids,
+            included_updater_login_ids=included_updater_login_ids,
+            excluded_updater_login_ids=excluded_updater_login_ids,
         )
         user_ids = sorted(
             {

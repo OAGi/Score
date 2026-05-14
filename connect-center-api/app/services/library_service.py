@@ -21,6 +21,7 @@ from app.services.models.library import (
     UpdateLibraryServiceResult,
 )
 from app.services.utils.date import DateRange
+from app.services.utils.owner import parse_login_id_filter
 from app.services.utils.pagination import PaginationParams, PaginationResponse
 from app.types.identifiers import LibraryId, ReleaseId
 from app.types.unset import UNSET, UnsetType
@@ -71,6 +72,7 @@ class LibraryService:
         is_default: bool | None = None,
         created_on: DateRange | None = None,
         last_updated_on: DateRange | None = None,
+        updater: str | None = None,
     ) -> PaginationResponse[LibraryServiceResult]:
         """Get libraries with optional filtering and pagination."""
         logger.info("list libraries limit=%d offset=%d", limit, offset)
@@ -79,6 +81,10 @@ class LibraryService:
             offset=offset,
             order_by=order_by,
             allowed_sort_columns=self._ORDER_BY_ALLOWED,
+        )
+        included_updater_login_ids, excluded_updater_login_ids = parse_login_id_filter(
+            updater,
+            filter_name="updater",
         )
         total, rows = await self._repo.list(
             limit=pagination.limit,
@@ -95,6 +101,8 @@ class LibraryService:
             creation_timestamp_after=created_on.after if created_on else None,
             last_update_timestamp_before=last_updated_on.before if last_updated_on else None,
             last_update_timestamp_after=last_updated_on.after if last_updated_on else None,
+            included_updater_login_ids=included_updater_login_ids,
+            excluded_updater_login_ids=excluded_updater_login_ids,
         )
         user_ids = sorted(
             {user_id for row in rows for user_id in (row.created_by, row.last_updated_by)},

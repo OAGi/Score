@@ -46,11 +46,20 @@ async def get_release_list(
         default=None,
         description="Filter by last update date using an inclusive range: '[before~after]'.",
     ),
+    creator: str | None = Query(
+        default=None,
+        description="Comma-separated creator login IDs to filter by exact match. Prefix a login ID with '!' to exclude it.",
+    ),
+    updater: str | None = Query(
+        default=None,
+        description="Comma-separated updater login IDs to filter by exact match. Prefix a login ID with '!' to exclude it.",
+    ),
     order_by: str | None = Query(
         default=None,
         description=(
             "Comma-separated list of properties to order results by. Prefix with '-' for descending, '+' for ascending. "
-            "Allowed columns: release_num, state, creation_timestamp, last_update_timestamp."
+            "Allowed columns: release_num, state, creation_timestamp, last_update_timestamp. "
+            "Use the is_latest response field to identify the latest published release."
         ),
     ),
     offset: int = Query(default=0, ge=0, description="The offset from the beginning of the list."),
@@ -65,6 +74,8 @@ async def get_release_list(
         state: Optional lifecycle state filter.
         created_on: Optional creation-time filter in ISO-8601 range form.
         last_updated_on: Optional last-update-time filter in ISO-8601 range form.
+        creator: Optional comma-separated creator login ID filter.
+        updater: Optional comma-separated updater login ID filter.
         order_by: Sort expression used for ordering the result set.
         offset: Zero-based index of the first item to include in the page.
         limit: Maximum number of items to return.
@@ -85,6 +96,8 @@ async def get_release_list(
             state=state,
             created_on=created_range,
             last_updated_on=updated_range,
+            creator=creator,
+            updater=updater,
         )
     except ValueError as e:
         raise HTTPException(

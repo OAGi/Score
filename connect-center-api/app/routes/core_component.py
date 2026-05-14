@@ -100,6 +100,10 @@ async def get_core_component_list(
         default=None,
         description="Comma-separated owner login IDs to filter by exact match. Prefix a login ID with '!' to exclude it.",
     ),
+    updater: str | None = Query(
+        default=None,
+        description="Comma-separated updater login IDs to filter by exact match. Prefix a login ID with '!' to exclude it.",
+    ),
     created_on: str | None = Query(default=None, description="Filter by creation date range '[before~after]'."),
     last_updated_on: str | None = Query(default=None, description="Filter by last update date range '[before~after]'."),
     order_by: str | None = Query(
@@ -157,6 +161,7 @@ async def get_core_component_list(
             den=den,
             tag=tag,
             owner=owner,
+            updater=updater,
             created_on=created_range,
             last_updated_on=updated_range,
         )

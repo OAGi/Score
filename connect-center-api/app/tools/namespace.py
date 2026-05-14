@@ -105,60 +105,92 @@ async def get_namespace_service(
         "type": "object",
         "description": "Response containing paginated list of namespaces. Namespaces are globally unique identifiers that work across systems, standards, and organizations.",
         "properties": {
-            "total_items": {"type": "integer",
-                            "description": "Total number of namespaces available. Allowed values: non-negative integers (≥0).",
-                            "example": 10},
-            "offset": {"type": "integer",
-                       "description": "Offset of the first item in this page. Allowed values: non-negative integers (≥0). Default value: 0.",
-                       "example": 0},
-            "limit": {"type": "integer",
-                      "description": "Number of items returned in this page. Allowed values: integers between 1 and 100 (inclusive). Default value: 10.",
-                      "example": 10},
+            "total_items": {
+                "type": "integer",
+                "description": "Total number of namespaces available. Allowed values: non-negative integers (≥0).",
+                "example": 10,
+            },
+            "offset": {
+                "type": "integer",
+                "description": "Offset of the first item in this page. Allowed values: non-negative integers (≥0). Default value: 0.",
+                "example": 0,
+            },
+            "limit": {
+                "type": "integer",
+                "description": "Number of items returned in this page. Allowed values: integers between 1 and 100 (inclusive). Default value: 10.",
+                "example": 10,
+            },
             "items": {
                 "type": "array",
                 "description": "List of namespaces on this page",
                 "items": {
                     "type": "object",
                     "properties": {
-                        "namespace_id": {"type": "integer", "description": "Unique identifier for the namespace",
-                                         "example": 1},
+                        "namespace_id": {
+                            "type": "integer",
+                            "description": "Unique identifier for the namespace",
+                            "example": 1,
+                        },
                         "library": {
                             "type": "object",
                             "description": "Library information",
                             "properties": {
-                                "library_id": {"type": "integer", "description": "Unique identifier for the library",
-                                               "example": 1},
-                                "name": {"type": "string", "description": "Library name", "example": "connectSpec"}
+                                "library_id": {
+                                    "type": "integer",
+                                    "description": "Unique identifier for the library",
+                                    "example": 1,
+                                },
+                                "name": {"type": "string", "description": "Library name", "example": "connectSpec"},
                             },
-                            "required": ["library_id", "name"]
+                            "required": ["library_id", "name"],
                         },
-                        "uri": {"type": "string",
-                                "description": "Namespace URI (Uniform Resource Identifier) - globally unique identifier that works across systems, standards, and organizations",
-                                "example": "http://www.openapplications.org/oagis/10"},
-                        "prefix": {"type": ["string", "null"],
-                                   "description": "Namespace prefix - short identifier used to reference the namespace URI",
-                                   "example": "oagis"},
-                        "description": {"type": ["string", "null"],
-                                        "description": "Description of the namespace and its purpose",
-                                        "example": "OAGIS namespace for business documents"},
-                        "is_std_nmsp": {"type": "boolean",
-                                        "description": "Whether this namespace is reserved for standard use (e.g., OAGIS namespace). If true, end users cannot use this namespace for their end user Core Components",
-                                        "example": True},
+                        "uri": {
+                            "type": "string",
+                            "description": "Namespace URI (Uniform Resource Identifier) - globally unique identifier that works across systems, standards, and organizations",
+                            "example": "http://www.openapplications.org/oagis/10",
+                        },
+                        "prefix": {
+                            "type": ["string", "null"],
+                            "description": "Namespace prefix - short identifier used to reference the namespace URI",
+                            "example": "oagis",
+                        },
+                        "description": {
+                            "type": ["string", "null"],
+                            "description": "Description of the namespace and its purpose",
+                            "example": "OAGIS namespace for business documents",
+                        },
+                        "is_std_nmsp": {
+                            "type": "boolean",
+                            "description": "Whether this namespace is reserved for standard use (e.g., OAGIS namespace). If true, end users cannot use this namespace for their end user Core Components",
+                            "example": True,
+                        },
                         "owner": {
                             "type": "object",
                             "description": "User information about the owner of the namespace",
                             "properties": {
-                                "user_id": {"type": "integer", "description": "Unique identifier for the user",
-                                            "example": 1},
-                                "login_id": {"type": "string", "description": "User's login identifier",
-                                             "example": "admin"},
-                                "username": {"type": "string", "description": "Display name of the user",
-                                             "example": "Administrator"},
-                                "roles": {"type": "array",
-                                          "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
-                                          "description": "List of roles assigned to the user", "example": ["Admin"]}
+                                "user_id": {
+                                    "type": "integer",
+                                    "description": "Unique identifier for the user",
+                                    "example": 1,
+                                },
+                                "login_id": {
+                                    "type": "string",
+                                    "description": "User's login identifier",
+                                    "example": "admin",
+                                },
+                                "username": {
+                                    "type": "string",
+                                    "description": "Display name of the user",
+                                    "example": "Administrator",
+                                },
+                                "roles": {
+                                    "type": "array",
+                                    "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                    "description": "List of roles assigned to the user",
+                                    "example": ["Admin"],
+                                },
                             },
-                            "required": ["user_id", "login_id", "username", "roles"]
+                            "required": ["user_id", "login_id", "username", "roles"],
                         },
                         "created": {
                             "type": "object",
@@ -168,25 +200,38 @@ async def get_namespace_service(
                                     "type": "object",
                                     "description": "User who created the namespace",
                                     "properties": {
-                                        "user_id": {"type": "integer", "description": "Unique identifier for the user",
-                                                    "example": 1},
-                                        "login_id": {"type": "string", "description": "User's login identifier",
-                                                     "example": "admin"},
-                                        "username": {"type": "string", "description": "Display name of the user",
-                                                     "example": "Administrator"},
-                                        "roles": {"type": "array", "items": {"type": "string",
-                                                                             "enum": ["Admin", "Developer",
-                                                                                      "End-User"]},
-                                                  "description": "List of roles assigned to the user",
-                                                  "example": ["Admin"]}
+                                        "user_id": {
+                                            "type": "integer",
+                                            "description": "Unique identifier for the user",
+                                            "example": 1,
+                                        },
+                                        "login_id": {
+                                            "type": "string",
+                                            "description": "User's login identifier",
+                                            "example": "admin",
+                                        },
+                                        "username": {
+                                            "type": "string",
+                                            "description": "Display name of the user",
+                                            "example": "Administrator",
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                            "description": "List of roles assigned to the user",
+                                            "example": ["Admin"],
+                                        },
                                     },
-                                    "required": ["user_id", "login_id", "username", "roles"]
+                                    "required": ["user_id", "login_id", "username", "roles"],
                                 },
-                                "when": {"type": "string", "format": "date-time",
-                                         "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
-                                         "example": "2024-01-15T10:30:00Z"}
+                                "when": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                                    "example": "2024-01-15T10:30:00Z",
+                                },
                             },
-                            "required": ["who", "when"]
+                            "required": ["who", "when"],
                         },
                         "last_updated": {
                             "type": "object",
@@ -196,45 +241,78 @@ async def get_namespace_service(
                                     "type": "object",
                                     "description": "User who last updated the namespace",
                                     "properties": {
-                                        "user_id": {"type": "integer", "description": "Unique identifier for the user",
-                                                    "example": 1},
-                                        "login_id": {"type": "string", "description": "User's login identifier",
-                                                     "example": "admin"},
-                                        "username": {"type": "string", "description": "Display name of the user",
-                                                     "example": "Administrator"},
-                                        "roles": {"type": "array", "items": {"type": "string",
-                                                                             "enum": ["Admin", "Developer",
-                                                                                      "End-User"]},
-                                                  "description": "List of roles assigned to the user",
-                                                  "example": ["Admin"]}
+                                        "user_id": {
+                                            "type": "integer",
+                                            "description": "Unique identifier for the user",
+                                            "example": 1,
+                                        },
+                                        "login_id": {
+                                            "type": "string",
+                                            "description": "User's login identifier",
+                                            "example": "admin",
+                                        },
+                                        "username": {
+                                            "type": "string",
+                                            "description": "Display name of the user",
+                                            "example": "Administrator",
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                            "description": "List of roles assigned to the user",
+                                            "example": ["Admin"],
+                                        },
                                     },
-                                    "required": ["user_id", "login_id", "username", "roles"]
+                                    "required": ["user_id", "login_id", "username", "roles"],
                                 },
-                                "when": {"type": "string", "format": "date-time",
-                                         "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
-                                         "example": "2024-01-20T14:45:00Z"}
+                                "when": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                                    "example": "2024-01-20T14:45:00Z",
+                                },
                             },
-                            "required": ["who", "when"]
-                        }
+                            "required": ["who", "when"],
+                        },
                     },
-                    "required": ["namespace_id", "library", "uri", "is_std_nmsp", "owner", "created", "last_updated"]
-                }
-            }
+                    "required": ["namespace_id", "library", "uri", "is_std_nmsp", "owner", "created", "last_updated"],
+                },
+            },
         },
-        "required": ["total_items", "offset", "limit", "items"]
-    }
+        "required": ["total_items", "offset", "limit", "items"],
+    },
 )
 async def get_namespaces(
     library_id: Annotated[int, Field(gt=0, description="Filter by library ID using exact match.")],
-    uri: Annotated[str | None, Field(default=None, description="Filter by URI using partial match (case-insensitive).")],
-    prefix: Annotated[str | None, Field(default=None, description="Filter by prefix using partial match (case-insensitive).")],
-    is_std_nmsp: Annotated[bool | str | None, Field(default=None, description="Filter by standard namespace flag.")],
-    owner: Annotated[str | None, Field(default=None, description="Comma-separated owner login IDs to filter by exact match. Prefix a login ID with '!' to exclude it.")],
-    created_on: Annotated[str | None, Field(default=None, description="Filter by creation date using an inclusive range: '[before~after]'.")],
-    last_updated_on: Annotated[str | None, Field(default=None, description="Filter by last update date using an inclusive range: '[before~after]'.")],
-    order_by: Annotated[str | None, Field(default=None, description="Comma-separated list of properties to order results by. Allowed columns: uri, prefix, is_std_nmsp, creation_timestamp, last_update_timestamp.")],
-    offset: Annotated[int, Field(default=0, ge=0, description="The offset from the beginning of the list.")],
-    limit: Annotated[int, Field(default=10, ge=1, le=100, description="The maximum number of items to return.")],
+    uri: Annotated[str | None, Field(description="Filter by URI using partial match (case-insensitive).")] = None,
+    prefix: Annotated[str | None, Field(description="Filter by prefix using partial match (case-insensitive).")] = None,
+    is_std_nmsp: Annotated[bool | str | None, Field(description="Filter by standard namespace flag.")] = None,
+    owner: Annotated[
+        str | None,
+        Field(
+            description="Comma-separated owner login IDs to filter by exact match. Prefix a login ID with '!' to exclude it."
+        ),
+    ] = None,
+    updater: Annotated[
+        str | None,
+        Field(
+            description="Comma-separated updater login IDs to filter by exact match. Prefix a login ID with '!' to exclude it."
+        ),
+    ] = None,
+    created_on: Annotated[
+        str | None, Field(description="Filter by creation date using an inclusive range: '[before~after]'.")
+    ] = None,
+    last_updated_on: Annotated[
+        str | None, Field(description="Filter by last update date using an inclusive range: '[before~after]'.")
+    ] = None,
+    order_by: Annotated[
+        str | None,
+        Field(
+            description="Comma-separated list of properties to order results by. Allowed columns: uri, prefix, is_std_nmsp, creation_timestamp, last_update_timestamp."
+        ),
+    ] = None,
+    offset: Annotated[int, Field(ge=0, description="The offset from the beginning of the list.")] = 0,
+    limit: Annotated[int, Field(ge=1, le=100, description="The maximum number of items to return.")] = 10,
     namespace_service: NamespaceService = Depends(get_namespace_service),
 ) -> GetNamespacePaginationResponse:
     """
@@ -315,9 +393,7 @@ async def get_namespaces(
     except ToolError:
         raise
     except Exception as e:
-        raise ToolError(
-            f"Type conversion error: {str(e)}. Please check your parameter types and try again."
-        ) from e
+        raise ToolError(f"Type conversion error: {str(e)}. Please check your parameter types and try again.") from e
 
     try:
         page = await namespace_service.list(
@@ -329,6 +405,7 @@ async def get_namespaces(
             prefix=prefix,
             is_std_nmsp=is_std_nmsp,
             owner=owner,
+            updater=updater,
             created_on=parse_date_range(created_on),
             last_updated_on=parse_date_range(last_updated_on),
         )
@@ -350,33 +427,49 @@ async def get_namespaces(
                 "description": "Library information",
                 "properties": {
                     "library_id": {"type": "integer", "description": "Unique identifier for the library", "example": 1},
-                    "name": {"type": "string", "description": "Library name", "example": "connectSpec"}
+                    "name": {"type": "string", "description": "Library name", "example": "connectSpec"},
                 },
-                "required": ["library_id", "name"]
+                "required": ["library_id", "name"],
             },
-            "uri": {"type": "string",
-                    "description": "Namespace URI (Uniform Resource Identifier) - globally unique identifier that works across systems, standards, and organizations",
-                    "example": "http://www.openapplications.org/oagis/10"},
-            "prefix": {"type": ["string", "null"],
-                       "description": "Namespace prefix - short identifier used to reference the namespace URI",
-                       "example": "oagis"},
-            "description": {"type": ["string", "null"], "description": "Description of the namespace and its purpose",
-                            "example": "OAGIS namespace for business documents"},
-            "is_std_nmsp": {"type": "boolean",
-                            "description": "Whether this namespace is reserved for standard use (e.g., OAGIS namespace). If true, end users cannot use this namespace for their end user Core Components",
-                            "example": True},
+            "uri": {
+                "type": "string",
+                "description": "Namespace URI (Uniform Resource Identifier) - globally unique identifier that works across systems, standards, and organizations",
+                "example": "http://www.openapplications.org/oagis/10",
+            },
+            "prefix": {
+                "type": ["string", "null"],
+                "description": "Namespace prefix - short identifier used to reference the namespace URI",
+                "example": "oagis",
+            },
+            "description": {
+                "type": ["string", "null"],
+                "description": "Description of the namespace and its purpose",
+                "example": "OAGIS namespace for business documents",
+            },
+            "is_std_nmsp": {
+                "type": "boolean",
+                "description": "Whether this namespace is reserved for standard use (e.g., OAGIS namespace). If true, end users cannot use this namespace for their end user Core Components",
+                "example": True,
+            },
             "owner": {
                 "type": "object",
                 "description": "User information about the owner of the namespace",
                 "properties": {
                     "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
                     "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                    "username": {"type": "string", "description": "Display name of the user",
-                                 "example": "Administrator"},
-                    "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
-                              "description": "List of roles assigned to the user", "example": ["Admin"]}
+                    "username": {
+                        "type": "string",
+                        "description": "Display name of the user",
+                        "example": "Administrator",
+                    },
+                    "roles": {
+                        "type": "array",
+                        "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                        "description": "List of roles assigned to the user",
+                        "example": ["Admin"],
+                    },
                 },
-                "required": ["user_id", "login_id", "username", "roles"]
+                "required": ["user_id", "login_id", "username", "roles"],
             },
             "created": {
                 "type": "object",
@@ -386,23 +479,38 @@ async def get_namespaces(
                         "type": "object",
                         "description": "User who created the namespace",
                         "properties": {
-                            "user_id": {"type": "integer", "description": "Unique identifier for the user",
-                                        "example": 1},
-                            "login_id": {"type": "string", "description": "User's login identifier",
-                                         "example": "admin"},
-                            "username": {"type": "string", "description": "Display name of the user",
-                                         "example": "Administrator"},
-                            "roles": {"type": "array",
-                                      "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
-                                      "description": "List of roles assigned to the user", "example": ["Admin"]}
+                            "user_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the user",
+                                "example": 1,
+                            },
+                            "login_id": {
+                                "type": "string",
+                                "description": "User's login identifier",
+                                "example": "admin",
+                            },
+                            "username": {
+                                "type": "string",
+                                "description": "Display name of the user",
+                                "example": "Administrator",
+                            },
+                            "roles": {
+                                "type": "array",
+                                "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                "description": "List of roles assigned to the user",
+                                "example": ["Admin"],
+                            },
                         },
-                        "required": ["user_id", "login_id", "username", "roles"]
+                        "required": ["user_id", "login_id", "username", "roles"],
                     },
-                    "when": {"type": "string", "format": "date-time",
-                             "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
-                             "example": "2024-01-15T10:30:00Z"}
+                    "when": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                        "example": "2024-01-15T10:30:00Z",
+                    },
                 },
-                "required": ["who", "when"]
+                "required": ["who", "when"],
             },
             "last_updated": {
                 "type": "object",
@@ -412,27 +520,42 @@ async def get_namespaces(
                         "type": "object",
                         "description": "User who last updated the namespace",
                         "properties": {
-                            "user_id": {"type": "integer", "description": "Unique identifier for the user",
-                                        "example": 1},
-                            "login_id": {"type": "string", "description": "User's login identifier",
-                                         "example": "admin"},
-                            "username": {"type": "string", "description": "Display name of the user",
-                                         "example": "Administrator"},
-                            "roles": {"type": "array",
-                                      "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
-                                      "description": "List of roles assigned to the user", "example": ["Admin"]}
+                            "user_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the user",
+                                "example": 1,
+                            },
+                            "login_id": {
+                                "type": "string",
+                                "description": "User's login identifier",
+                                "example": "admin",
+                            },
+                            "username": {
+                                "type": "string",
+                                "description": "Display name of the user",
+                                "example": "Administrator",
+                            },
+                            "roles": {
+                                "type": "array",
+                                "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                "description": "List of roles assigned to the user",
+                                "example": ["Admin"],
+                            },
                         },
-                        "required": ["user_id", "login_id", "username", "roles"]
+                        "required": ["user_id", "login_id", "username", "roles"],
                     },
-                    "when": {"type": "string", "format": "date-time",
-                             "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
-                             "example": "2024-01-20T14:45:00Z"}
+                    "when": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                        "example": "2024-01-20T14:45:00Z",
+                    },
                 },
-                "required": ["who", "when"]
-            }
+                "required": ["who", "when"],
+            },
         },
-        "required": ["namespace_id", "library", "uri", "is_std_nmsp", "owner", "created", "last_updated"]
-    }
+        "required": ["namespace_id", "library", "uri", "is_std_nmsp", "owner", "created", "last_updated"],
+    },
 )
 async def get_namespace(
     namespace_id: Annotated[int, Field(gt=0, description="Unique numeric identifier of the namespace to retrieve.")],
@@ -549,12 +672,19 @@ async def create_namespace(
 )
 async def update_namespace(
     namespace_id: Annotated[int, Field(gt=0, description="Target namespace identifier.")],
-    uri: Annotated[str | None, Field(default=None, min_length=1, description="Namespace URI to save. Omit to leave it unchanged.")] = None,
+    uri: Annotated[
+        str | None, Field(default=None, min_length=1, description="Namespace URI to save. Omit to leave it unchanged.")
+    ] = None,
     prefix: Annotated[
         str | None,
-        Field(default=None, description="Namespace prefix to save. Omit to leave it unchanged. Pass an empty string to store a blank prefix."),
+        Field(
+            default=None,
+            description="Namespace prefix to save. Omit to leave it unchanged. Pass an empty string to store a blank prefix.",
+        ),
     ] = None,
-    description: Annotated[str | None, Field(default=None, description="Namespace description to save. Omit to leave it unchanged.")] = None,
+    description: Annotated[
+        str | None, Field(default=None, description="Namespace description to save. Omit to leave it unchanged.")
+    ] = None,
     namespace_service: NamespaceService = Depends(get_namespace_service),
 ) -> UpdateNamespaceResponse:
     """Update a namespace."""
@@ -597,15 +727,10 @@ async def transfer_namespace_ownership(
     """Transfer namespace ownership after confirmation."""
     row = await namespace_service.get(namespace_id)
     if row is None:
-        raise ToolError(
-            f"The namespace with ID {namespace_id} was not found. Please check the ID and try again."
-        )
+        raise ToolError(f"The namespace with ID {namespace_id} was not found. Please check the ID and try again.")
 
     elicit_result = await ctx.elicit(
-        message=(
-            f"Are you sure you want to transfer ownership of namespace '{row.uri}' "
-            f"to {target_login_id.strip()}?"
-        ),
+        message=(f"Are you sure you want to transfer ownership of namespace '{row.uri}' to {target_login_id.strip()}?"),
         response_type=None,
     )
     match elicit_result:
@@ -639,9 +764,7 @@ async def discard_namespace(
     """Discard a namespace after confirmation."""
     row = await namespace_service.get(namespace_id)
     if row is None:
-        raise ToolError(
-            f"The namespace with ID {namespace_id} was not found. Please check the ID and try again."
-        )
+        raise ToolError(f"The namespace with ID {namespace_id} was not found. Please check the ID and try again.")
 
     elicit_result = await ctx.elicit(
         message=(

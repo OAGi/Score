@@ -9,6 +9,7 @@ from typing import Any, Sequence, Literal
 
 from sqlalchemy import and_, delete as sa_delete, func, or_, select, text, union
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased
 
 from app.repositories.contracts.business_information_entity import BusinessInformationEntityRepositoryContract
 from app.repositories.contracts.core_component import CoreComponentRepositoryContract
@@ -260,6 +261,8 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
         last_update_timestamp_after: datetime | None = None,
         included_owner_login_ids: list[str] | None = None,
         excluded_owner_login_ids: list[str] | None = None,
+        included_updater_login_ids: list[str] | None = None,
+        excluded_updater_login_ids: list[str] | None = None,
     ) -> tuple[int, list[TopLevelAsbiepListRow]]:
         """Handle list top level asbieps.
 
@@ -279,10 +282,13 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
             last_update_timestamp_after: Optional lower bound for last update timestamp.
             included_owner_login_ids: Optional owner login IDs to include by exact match.
             excluded_owner_login_ids: Optional owner login IDs to exclude by exact match.
+            included_updater_login_ids: Optional updater login IDs to include by exact match.
+            excluded_updater_login_ids: Optional updater login IDs to exclude by exact match.
 
         Returns:
             Result of the operation.
         """
+        updater_user = aliased(AppUser)
         conditions = [TopLevelAsbiep.asbiep_id.is_not(None)]
         if library_id is not None:
             conditions.append(Release.library_id == library_id)
@@ -318,6 +324,10 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
             conditions.append(AppUser.login_id.in_(included_owner_login_ids))
         if excluded_owner_login_ids:
             conditions.append(AppUser.login_id.not_in(excluded_owner_login_ids))
+        if included_updater_login_ids:
+            conditions.append(updater_user.login_id.in_(included_updater_login_ids))
+        if excluded_updater_login_ids:
+            conditions.append(updater_user.login_id.not_in(excluded_updater_login_ids))
 
         from_stmt = (
             TopLevelAsbiep.__table__
@@ -327,6 +337,7 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
             .join(Release, TopLevelAsbiep.release_id == Release.release_id)
             .join(Library, Release.library_id == Library.library_id)
             .join(AppUser, TopLevelAsbiep.owner_user_id == AppUser.app_user_id)
+            .join(updater_user, TopLevelAsbiep.last_updated_by == updater_user.app_user_id)
             .join(BizCtxAssignment, TopLevelAsbiep.top_level_asbiep_id == BizCtxAssignment.top_level_asbiep_id)
         )
 

@@ -115,30 +115,78 @@ async def get_ctx_scheme_service(
         "type": "object",
         "description": "Response containing paginated list of context schemes",
         "properties": {
-            "total_items": {"type": "integer", "description": "Total number of context schemes available. Allowed values: non-negative integers (≥0).", "example": 25},
-            "offset": {"type": "integer", "description": "Offset of the first item in this page. Allowed values: non-negative integers (≥0). Default value: 0.", "example": 0},
-            "limit": {"type": "integer", "description": "Number of items returned in this page. Allowed values: integers between 1 and 100 (inclusive). Default value: 10.", "example": 10},
+            "total_items": {
+                "type": "integer",
+                "description": "Total number of context schemes available. Allowed values: non-negative integers (≥0).",
+                "example": 25,
+            },
+            "offset": {
+                "type": "integer",
+                "description": "Offset of the first item in this page. Allowed values: non-negative integers (≥0). Default value: 0.",
+                "example": 0,
+            },
+            "limit": {
+                "type": "integer",
+                "description": "Number of items returned in this page. Allowed values: integers between 1 and 100 (inclusive). Default value: 10.",
+                "example": 10,
+            },
             "items": {
                 "type": "array",
                 "description": "List of context schemes on this page",
                 "items": {
                     "type": "object",
                     "properties": {
-                        "ctx_scheme_id": {"type": "integer", "description": "Unique identifier for the context scheme", "example": 123},
-                        "guid": {"type": "string", "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)", "example": "a1b2c3d4e5f6789012345678901234ab"},
-                        "scheme_id": {"type": "string", "description": "External identification of the scheme", "example": "Country"},
-                        "scheme_name": {"type": ["string", "null"], "description": "Pretty print name of the context scheme", "example": "Country Code"},
-                        "description": {"type": ["string", "null"], "description": "Description of the context scheme", "example": "Standard country codes"},
-                        "scheme_agency_id": {"type": "string", "description": "Agency identifier responsible for the scheme", "example": "ISO"},
-                        "scheme_version_id": {"type": "string", "description": "Version identifier of the scheme", "example": "1.0"},
+                        "ctx_scheme_id": {
+                            "type": "integer",
+                            "description": "Unique identifier for the context scheme",
+                            "example": 123,
+                        },
+                        "guid": {
+                            "type": "string",
+                            "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)",
+                            "example": "a1b2c3d4e5f6789012345678901234ab",
+                        },
+                        "scheme_id": {
+                            "type": "string",
+                            "description": "External identification of the scheme",
+                            "example": "Country",
+                        },
+                        "scheme_name": {
+                            "type": ["string", "null"],
+                            "description": "Pretty print name of the context scheme",
+                            "example": "Country Code",
+                        },
+                        "description": {
+                            "type": ["string", "null"],
+                            "description": "Description of the context scheme",
+                            "example": "Standard country codes",
+                        },
+                        "scheme_agency_id": {
+                            "type": "string",
+                            "description": "Agency identifier responsible for the scheme",
+                            "example": "ISO",
+                        },
+                        "scheme_version_id": {
+                            "type": "string",
+                            "description": "Version identifier of the scheme",
+                            "example": "1.0",
+                        },
                         "ctx_category": {
                             "type": "object",
                             "description": "Associated context category",
                             "properties": {
-                                "ctx_category_id": {"type": "integer", "description": "Unique identifier for the context category", "example": 1},
-                                "name": {"type": "string", "description": "Name of the context category", "example": "Geographic"}
+                                "ctx_category_id": {
+                                    "type": "integer",
+                                    "description": "Unique identifier for the context category",
+                                    "example": 1,
+                                },
+                                "name": {
+                                    "type": "string",
+                                    "description": "Name of the context category",
+                                    "example": "Geographic",
+                                },
                             },
-                            "required": ["ctx_category_id", "name"]
+                            "required": ["ctx_category_id", "name"],
                         },
                         "values": {
                             "type": "array",
@@ -146,13 +194,29 @@ async def get_ctx_scheme_service(
                             "items": {
                                 "type": "object",
                                 "properties": {
-                                    "ctx_scheme_value_id": {"type": "integer", "description": "Unique identifier for the context scheme value", "example": 1},
-                                    "guid": {"type": "string", "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)", "example": "a1b2c3d4e5f6789012345678901234ab"},
-                                    "value": {"type": "string", "description": "Value of the context scheme", "example": "US"},
-                                    "meaning": {"type": ["string", "null"], "description": "Meaning of the context scheme value", "example": "United States"}
+                                    "ctx_scheme_value_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the context scheme value",
+                                        "example": 1,
+                                    },
+                                    "guid": {
+                                        "type": "string",
+                                        "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)",
+                                        "example": "a1b2c3d4e5f6789012345678901234ab",
+                                    },
+                                    "value": {
+                                        "type": "string",
+                                        "description": "Value of the context scheme",
+                                        "example": "US",
+                                    },
+                                    "meaning": {
+                                        "type": ["string", "null"],
+                                        "description": "Meaning of the context scheme value",
+                                        "example": "United States",
+                                    },
                                 },
-                                "required": ["ctx_scheme_value_id", "guid", "value"]
-                            }
+                                "required": ["ctx_scheme_value_id", "guid", "value"],
+                            },
                         },
                         "created": {
                             "type": "object",
@@ -162,16 +226,38 @@ async def get_ctx_scheme_service(
                                     "type": "object",
                                     "description": "User who created the context scheme",
                                     "properties": {
-                                        "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                                        "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                                        "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                                        "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                                        "user_id": {
+                                            "type": "integer",
+                                            "description": "Unique identifier for the user",
+                                            "example": 1,
+                                        },
+                                        "login_id": {
+                                            "type": "string",
+                                            "description": "User's login identifier",
+                                            "example": "admin",
+                                        },
+                                        "username": {
+                                            "type": "string",
+                                            "description": "Display name of the user",
+                                            "example": "Administrator",
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                            "description": "List of roles assigned to the user",
+                                            "example": ["Admin"],
+                                        },
                                     },
-                                    "required": ["user_id", "login_id", "username", "roles"]
+                                    "required": ["user_id", "login_id", "username", "roles"],
                                 },
-                                "when": {"type": "string", "format": "date-time", "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-15T10:30:00Z"}
+                                "when": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                                    "example": "2024-01-15T10:30:00Z",
+                                },
                             },
-                            "required": ["who", "when"]
+                            "required": ["who", "when"],
                         },
                         "last_updated": {
                             "type": "object",
@@ -181,56 +267,105 @@ async def get_ctx_scheme_service(
                                     "type": "object",
                                     "description": "User who last updated the context scheme",
                                     "properties": {
-                                        "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                                        "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                                        "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                                        "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                                        "user_id": {
+                                            "type": "integer",
+                                            "description": "Unique identifier for the user",
+                                            "example": 1,
+                                        },
+                                        "login_id": {
+                                            "type": "string",
+                                            "description": "User's login identifier",
+                                            "example": "admin",
+                                        },
+                                        "username": {
+                                            "type": "string",
+                                            "description": "Display name of the user",
+                                            "example": "Administrator",
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                            "description": "List of roles assigned to the user",
+                                            "example": ["Admin"],
+                                        },
                                     },
-                                    "required": ["user_id", "login_id", "username", "roles"]
+                                    "required": ["user_id", "login_id", "username", "roles"],
                                 },
-                                "when": {"type": "string", "format": "date-time", "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-15T10:30:00Z"}
+                                "when": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                                    "example": "2024-01-15T10:30:00Z",
+                                },
                             },
-                            "required": ["who", "when"]
-                        }
+                            "required": ["who", "when"],
+                        },
                     },
-                    "required": ["ctx_scheme_id", "guid", "scheme_id", "scheme_agency_id", "scheme_version_id", "ctx_category", "created", "last_updated"]
-                }
-            }
+                    "required": [
+                        "ctx_scheme_id",
+                        "guid",
+                        "scheme_id",
+                        "scheme_agency_id",
+                        "scheme_version_id",
+                        "ctx_category",
+                        "created",
+                        "last_updated",
+                    ],
+                },
+            },
         },
-        "required": ["total_items", "offset", "limit", "items"]
-    }
+        "required": ["total_items", "offset", "limit", "items"],
+    },
 )
 async def get_context_schemes(
-    scheme_id: Annotated[str | None, Field(default=None, description="Filter by the unique scheme identifier.")],
-    scheme_name: Annotated[str | None, Field(default=None, description="Filter by the human-readable name of the scheme.")],
-    scheme_agency_id: Annotated[str | None, Field(default=None, description="Filter by the agency identifier responsible for the scheme.")],
-    scheme_version_id: Annotated[str | None, Field(default=None, description="Filter by the version identifier of the scheme.")],
-    ctx_category_id: Annotated[int | None, Field(default=None, ge=1, description="Filter by the associated context category ID.")],
-    ctx_category_name: Annotated[str | None, Field(default=None, description="Filter by the name of the associated context category.")],
-    description: Annotated[str | None, Field(default=None, description="Filter by text contained in the scheme description.")],
+    scheme_id: Annotated[str | None, Field(description="Filter by the unique scheme identifier.")] = None,
+    scheme_name: Annotated[str | None, Field(description="Filter by the human-readable name of the scheme.")] = None,
+    scheme_agency_id: Annotated[
+        str | None, Field(description="Filter by the agency identifier responsible for the scheme.")
+    ] = None,
+    scheme_version_id: Annotated[
+        str | None, Field(description="Filter by the version identifier of the scheme.")
+    ] = None,
+    ctx_category_id: Annotated[
+        int | None, Field(ge=1, description="Filter by the associated context category ID.")
+    ] = None,
+    ctx_category_name: Annotated[
+        str | None, Field(description="Filter by the name of the associated context category.")
+    ] = None,
+    description: Annotated[str | None, Field(description="Filter by text contained in the scheme description.")] = None,
     created_on: Annotated[
         str | None,
         Field(
-            default=None,
             description="Filter by creation date using an inclusive range: '[before~after]'. 'before' and 'after' are date-time strings. Default date format: YYYY-MM-DD. Examples: '[2025-01-01~2025-02-01]'. Either 'before' or 'after' can be omitted, e.g., '[~2025-02-01]' or '[2025-01-01~]'.",
         ),
-    ],
+    ] = None,
     last_updated_on: Annotated[
         str | None,
         Field(
-            default=None,
             description="Filter by last update date using an inclusive range: '[before~after]'. 'before' and 'after' are date-time strings. Default date format: YYYY-MM-DD. Examples: '[2025-01-01~2025-02-01]'. Either 'before' or 'after' can be omitted, e.g., '[~2025-02-01]' or '[2025-01-01~]'.",
         ),
-    ],
+    ] = None,
+    updater: Annotated[
+        str | None,
+        Field(
+            description="Comma-separated updater login IDs to filter by exact match. Prefix a login ID with '!' to exclude it."
+        ),
+    ] = None,
     order_by: Annotated[
         str | None,
         Field(
-            default=None,
             description="Comma-separated list of properties to order results by. Prefix with '-' for descending, '+' for ascending (default ascending). Allowed columns: scheme_id, scheme_name, description, scheme_agency_id, scheme_version_id, creation_timestamp, last_update_timestamp. Example: '-last_update_timestamp,+scheme_id,description' translates to 'last_update_timestamp DESC, scheme_id ASC, description ASC'.",
         ),
-    ],
-    offset: Annotated[int, Field(default=0, ge=0, description="The offset from the beginning of the list. Must be a non-negative number.")],
-    limit: Annotated[int, Field(default=10, ge=1, le=100, description="The maximum number of items to return. Must be between 1 and 100 (inclusive).")],
+    ] = None,
+    offset: Annotated[
+        int, Field(ge=0, description="The offset from the beginning of the list. Must be a non-negative number.")
+    ] = 0,
+    limit: Annotated[
+        int,
+        Field(
+            ge=1, le=100, description="The maximum number of items to return. Must be between 1 and 100 (inclusive)."
+        ),
+    ] = 10,
     ctx_scheme_service: CtxSchemeService = Depends(get_ctx_scheme_service),
 ) -> GetCtxSchemePaginationResponse:
     """
@@ -309,6 +444,7 @@ async def get_context_schemes(
             ctx_category_name=ctx_category_name,
             created_on=parse_date_range(created_on),
             last_updated_on=parse_date_range(last_updated_on),
+            updater=updater,
         )
         return _to_list_response(items=page.items, total=page.total, offset=page.offset, limit=page.limit)
     except Exception as exc:
@@ -322,21 +458,53 @@ async def get_context_schemes(
         "type": "object",
         "description": "Response containing context scheme information",
         "properties": {
-            "ctx_scheme_id": {"type": "integer", "description": "Unique identifier for the context scheme", "example": 123},
-            "guid": {"type": "string", "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)", "example": "a1b2c3d4e5f6789012345678901234ab"},
-            "scheme_id": {"type": "string", "description": "External identification of the scheme", "example": "Country"},
-            "scheme_name": {"type": ["string", "null"], "description": "Pretty print name of the context scheme", "example": "Country Code"},
-            "description": {"type": ["string", "null"], "description": "Description of the context scheme", "example": "Standard country codes"},
-            "scheme_agency_id": {"type": "string", "description": "Agency identifier responsible for the scheme", "example": "ISO"},
-            "scheme_version_id": {"type": "string", "description": "Version identifier of the scheme", "example": "1.0"},
+            "ctx_scheme_id": {
+                "type": "integer",
+                "description": "Unique identifier for the context scheme",
+                "example": 123,
+            },
+            "guid": {
+                "type": "string",
+                "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)",
+                "example": "a1b2c3d4e5f6789012345678901234ab",
+            },
+            "scheme_id": {
+                "type": "string",
+                "description": "External identification of the scheme",
+                "example": "Country",
+            },
+            "scheme_name": {
+                "type": ["string", "null"],
+                "description": "Pretty print name of the context scheme",
+                "example": "Country Code",
+            },
+            "description": {
+                "type": ["string", "null"],
+                "description": "Description of the context scheme",
+                "example": "Standard country codes",
+            },
+            "scheme_agency_id": {
+                "type": "string",
+                "description": "Agency identifier responsible for the scheme",
+                "example": "ISO",
+            },
+            "scheme_version_id": {
+                "type": "string",
+                "description": "Version identifier of the scheme",
+                "example": "1.0",
+            },
             "ctx_category": {
                 "type": ["object", "null"],
                 "description": "Associated context category",
                 "properties": {
-                    "ctx_category_id": {"type": "integer", "description": "Unique identifier for the context category", "example": 1},
-                    "name": {"type": "string", "description": "Name of the context category", "example": "Geographic"}
+                    "ctx_category_id": {
+                        "type": "integer",
+                        "description": "Unique identifier for the context category",
+                        "example": 1,
+                    },
+                    "name": {"type": "string", "description": "Name of the context category", "example": "Geographic"},
                 },
-                "required": ["ctx_category_id", "name"]
+                "required": ["ctx_category_id", "name"],
             },
             "values": {
                 "type": "array",
@@ -344,13 +512,25 @@ async def get_context_schemes(
                 "items": {
                     "type": "object",
                     "properties": {
-                        "ctx_scheme_value_id": {"type": "integer", "description": "Unique identifier for the context scheme value", "example": 1},
-                        "guid": {"type": "string", "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)", "example": "a1b2c3d4e5f6789012345678901234ab"},
+                        "ctx_scheme_value_id": {
+                            "type": "integer",
+                            "description": "Unique identifier for the context scheme value",
+                            "example": 1,
+                        },
+                        "guid": {
+                            "type": "string",
+                            "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)",
+                            "example": "a1b2c3d4e5f6789012345678901234ab",
+                        },
                         "value": {"type": "string", "description": "Value of the context scheme", "example": "US"},
-                        "meaning": {"type": ["string", "null"], "description": "Meaning of the context scheme value", "example": "United States"}
+                        "meaning": {
+                            "type": ["string", "null"],
+                            "description": "Meaning of the context scheme value",
+                            "example": "United States",
+                        },
                     },
-                    "required": ["ctx_scheme_value_id", "guid", "value"]
-                }
+                    "required": ["ctx_scheme_value_id", "guid", "value"],
+                },
             },
             "created": {
                 "type": "object",
@@ -360,16 +540,38 @@ async def get_context_schemes(
                         "type": "object",
                         "description": "User who created the context scheme",
                         "properties": {
-                            "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                            "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                            "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                            "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                            "user_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the user",
+                                "example": 1,
+                            },
+                            "login_id": {
+                                "type": "string",
+                                "description": "User's login identifier",
+                                "example": "admin",
+                            },
+                            "username": {
+                                "type": "string",
+                                "description": "Display name of the user",
+                                "example": "Administrator",
+                            },
+                            "roles": {
+                                "type": "array",
+                                "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                "description": "List of roles assigned to the user",
+                                "example": ["Admin"],
+                            },
                         },
-                        "required": ["user_id", "login_id", "username", "roles"]
+                        "required": ["user_id", "login_id", "username", "roles"],
                     },
-                    "when": {"type": "string", "format": "date-time", "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-15T10:30:00Z"}
+                    "when": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                        "example": "2024-01-15T10:30:00Z",
+                    },
                 },
-                "required": ["who", "when"]
+                "required": ["who", "when"],
             },
             "last_updated": {
                 "type": "object",
@@ -379,23 +581,57 @@ async def get_context_schemes(
                         "type": "object",
                         "description": "User who last updated the context scheme",
                         "properties": {
-                            "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                            "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                            "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                            "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                            "user_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the user",
+                                "example": 1,
+                            },
+                            "login_id": {
+                                "type": "string",
+                                "description": "User's login identifier",
+                                "example": "admin",
+                            },
+                            "username": {
+                                "type": "string",
+                                "description": "Display name of the user",
+                                "example": "Administrator",
+                            },
+                            "roles": {
+                                "type": "array",
+                                "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                "description": "List of roles assigned to the user",
+                                "example": ["Admin"],
+                            },
                         },
-                        "required": ["user_id", "login_id", "username", "roles"]
+                        "required": ["user_id", "login_id", "username", "roles"],
                     },
-                    "when": {"type": "string", "format": "date-time", "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-15T10:30:00Z"}
+                    "when": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                        "example": "2024-01-15T10:30:00Z",
+                    },
                 },
-                "required": ["who", "when"]
-            }
+                "required": ["who", "when"],
+            },
         },
-        "required": ["ctx_scheme_id", "guid", "scheme_id", "scheme_agency_id", "scheme_version_id", "ctx_category", "values", "created", "last_updated"]
-    }
+        "required": [
+            "ctx_scheme_id",
+            "guid",
+            "scheme_id",
+            "scheme_agency_id",
+            "scheme_version_id",
+            "ctx_category",
+            "values",
+            "created",
+            "last_updated",
+        ],
+    },
 )
 async def get_context_scheme(
-    ctx_scheme_id: Annotated[int, Field(gt=0, description="Unique numeric identifier of the context scheme to retrieve.")],
+    ctx_scheme_id: Annotated[
+        int, Field(gt=0, description="Unique numeric identifier of the context scheme to retrieve.")
+    ],
     ctx_scheme_service: CtxSchemeService = Depends(get_ctx_scheme_service),
 ) -> GetCtxSchemeResponse:
     """
@@ -445,7 +681,9 @@ async def get_context_scheme(
     try:
         row = await ctx_scheme_service.get(ctx_scheme_id)
         if row is None:
-            raise ToolError(f"The context scheme with ID {ctx_scheme_id} was not found. Please check the ID and try again.")
+            raise ToolError(
+                f"The context scheme with ID {ctx_scheme_id} was not found. Please check the ID and try again."
+            )
         return GetCtxSchemeResponse.model_validate(row, from_attributes=True)
     except Exception as exc:
         raise _to_tool_error(exc, fallback=f"Unable to retrieve context scheme {ctx_scheme_id}.") from exc
@@ -458,18 +696,26 @@ async def get_context_scheme(
         "type": "object",
         "description": "Response containing the created context scheme ID",
         "properties": {
-            "ctx_scheme_id": {"type": "integer", "description": "Unique identifier for the created context scheme", "example": 123}
+            "ctx_scheme_id": {
+                "type": "integer",
+                "description": "Unique identifier for the created context scheme",
+                "example": 123,
+            }
         },
-        "required": ["ctx_scheme_id"]
-    }
+        "required": ["ctx_scheme_id"],
+    },
 )
 async def create_context_scheme(
     scheme_id: Annotated[str, Field(min_length=1, max_length=45, description="External identification of the scheme.")],
-    scheme_name: Annotated[str, Field(min_length=1, max_length=255, description="Pretty print name of the context scheme.")],
-    description: Annotated[str | None, Field(default=None, description="Description of the context scheme.")],
-    scheme_agency_id: Annotated[str | None, Field(default=None, description="Identification of the agency maintaining the scheme.")],
-    scheme_version_id: Annotated[str | None, Field(default=None, description="Version number of the context scheme.")],
-    ctx_category_id: Annotated[int | None, Field(default=None, ge=1, description="Associated context category ID.")],
+    scheme_name: Annotated[
+        str, Field(min_length=1, max_length=255, description="Pretty print name of the context scheme.")
+    ],
+    description: Annotated[str | None, Field(description="Description of the context scheme.")] = None,
+    scheme_agency_id: Annotated[
+        str | None, Field(description="Identification of the agency maintaining the scheme.")
+    ] = None,
+    scheme_version_id: Annotated[str | None, Field(description="Version number of the context scheme.")] = None,
+    ctx_category_id: Annotated[int | None, Field(ge=1, description="Associated context category ID.")] = None,
     ctx_scheme_service: CtxSchemeService = Depends(get_ctx_scheme_service),
 ) -> CreateCtxSchemeResponse:
     """
@@ -531,15 +777,26 @@ async def create_context_scheme(
         "type": "object",
         "description": "Response containing the created context scheme value ID",
         "properties": {
-            "ctx_scheme_value_id": {"type": "integer", "description": "Unique identifier for the created context scheme value", "example": 123}
+            "ctx_scheme_value_id": {
+                "type": "integer",
+                "description": "Unique identifier for the created context scheme value",
+                "example": 123,
+            }
         },
-        "required": ["ctx_scheme_value_id"]
-    }
+        "required": ["ctx_scheme_value_id"],
+    },
 )
 async def create_context_scheme_value(
-    ctx_scheme_id: Annotated[int, Field(gt=0, description="Identifier of the context scheme to which this value belongs.")],
-    value: Annotated[str, Field(min_length=1, max_length=100, description="The actual value string to be added to the context scheme.")],
-    meaning: Annotated[str | None, Field(default=None, description="Optional descriptive meaning or explanation of the value.")],
+    ctx_scheme_id: Annotated[
+        int, Field(gt=0, description="Identifier of the context scheme to which this value belongs.")
+    ],
+    value: Annotated[
+        str,
+        Field(min_length=1, max_length=100, description="The actual value string to be added to the context scheme."),
+    ],
+    meaning: Annotated[
+        str | None, Field(description="Optional descriptive meaning or explanation of the value.")
+    ] = None,
     ctx_scheme_service: CtxSchemeService = Depends(get_ctx_scheme_service),
 ) -> CreateCtxSchemeValueResponse:
     """
@@ -592,16 +849,31 @@ async def create_context_scheme_value(
         "type": "object",
         "description": "Response containing the updated context scheme value ID and list of updated fields",
         "properties": {
-            "ctx_scheme_value_id": {"type": "integer", "description": "Unique identifier of the updated context scheme value", "example": 123},
-            "updates": {"type": "array", "items": {"type": "string"}, "description": "A list of updated fields, each represented by its name", "example": ["value", "meaning"]}
+            "ctx_scheme_value_id": {
+                "type": "integer",
+                "description": "Unique identifier of the updated context scheme value",
+                "example": 123,
+            },
+            "updates": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "A list of updated fields, each represented by its name",
+                "example": ["value", "meaning"],
+            },
         },
-        "required": ["ctx_scheme_value_id", "updates"]
-    }
+        "required": ["ctx_scheme_value_id", "updates"],
+    },
 )
 async def update_context_scheme_value(
-    ctx_scheme_value_id: Annotated[int, Field(gt=0, description="Unique identifier of the context scheme value to update.")],
-    value: Annotated[str | None, Field(default=None, description="Updated value string for this context scheme entry. Omit to leave unchanged.")],
-    meaning: Annotated[str | None, Field(default=None, description="Updated human-readable meaning for the value. Omit to leave unchanged.")],
+    ctx_scheme_value_id: Annotated[
+        int, Field(gt=0, description="Unique identifier of the context scheme value to update.")
+    ],
+    value: Annotated[
+        str | None, Field(description="Updated value string for this context scheme entry. Omit to leave unchanged.")
+    ] = None,
+    meaning: Annotated[
+        str | None, Field(description="Updated human-readable meaning for the value. Omit to leave unchanged.")
+    ] = None,
     ctx_scheme_service: CtxSchemeService = Depends(get_ctx_scheme_service),
 ) -> UpdateCtxSchemeValueResponse:
     """
@@ -662,14 +934,24 @@ async def update_context_scheme_value(
         "type": "object",
         "description": "Response containing the deleted context scheme value ID or cancellation message",
         "properties": {
-            "ctx_scheme_value_id": {"type": ["integer", "null"], "description": "Unique identifier of the deleted context scheme value (null if deletion was cancelled)", "example": 123},
-            "message": {"type": ["string", "null"], "description": "Optional message indicating the status of the deletion operation", "example": "Deletion cancelled by user"}
+            "ctx_scheme_value_id": {
+                "type": ["integer", "null"],
+                "description": "Unique identifier of the deleted context scheme value (null if deletion was cancelled)",
+                "example": 123,
+            },
+            "message": {
+                "type": ["string", "null"],
+                "description": "Optional message indicating the status of the deletion operation",
+                "example": "Deletion cancelled by user",
+            },
         },
-        "required": []
-    }
+        "required": [],
+    },
 )
 async def delete_context_scheme_value(
-    ctx_scheme_value_id: Annotated[int, Field(gt=0, description="Unique identifier of the context scheme value to delete.")],
+    ctx_scheme_value_id: Annotated[
+        int, Field(gt=0, description="Unique identifier of the context scheme value to delete.")
+    ],
     ctx: Context,
     ctx_scheme_service: CtxSchemeService = Depends(get_ctx_scheme_service),
 ) -> DeleteCtxSchemeValueResponse:
@@ -756,20 +1038,41 @@ async def delete_context_scheme_value(
         "type": "object",
         "description": "Response containing the updated context scheme ID and list of updated fields",
         "properties": {
-            "ctx_scheme_id": {"type": "integer", "description": "Unique identifier of the updated context scheme", "example": 123},
-            "updates": {"type": "array", "items": {"type": "string"}, "description": "A list of updated fields, each represented by its name", "example": ["scheme_id", "scheme_name", "description"]}
+            "ctx_scheme_id": {
+                "type": "integer",
+                "description": "Unique identifier of the updated context scheme",
+                "example": 123,
+            },
+            "updates": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "A list of updated fields, each represented by its name",
+                "example": ["scheme_id", "scheme_name", "description"],
+            },
         },
-        "required": ["ctx_scheme_id", "updates"]
-    }
+        "required": ["ctx_scheme_id", "updates"],
+    },
 )
 async def update_context_scheme(
     ctx_scheme_id: Annotated[int, Field(gt=0, description="Unique identifier of the context scheme to update.")],
-    scheme_id: Annotated[str | None, Field(default=None, description="Updated external identification of the scheme. Omit to leave unchanged.")],
-    scheme_name: Annotated[str | None, Field(default=None, description="Updated pretty print name of the context scheme. Omit to leave unchanged.")],
-    description: Annotated[str | None, Field(default=None, description="Updated description of the context scheme. Omit to leave unchanged.")],
-    scheme_agency_id: Annotated[str | None, Field(default=None, description="Updated agency identifier maintaining the scheme. Omit to leave unchanged.")],
-    scheme_version_id: Annotated[str | None, Field(default=None, description="Updated version identifier of the scheme. Omit to leave unchanged.")],
-    ctx_category_id: Annotated[int | None, Field(default=None, ge=1, description="Updated associated context category ID. Omit to leave unchanged.")],
+    scheme_id: Annotated[
+        str | None, Field(description="Updated external identification of the scheme. Omit to leave unchanged.")
+    ] = None,
+    scheme_name: Annotated[
+        str | None, Field(description="Updated pretty print name of the context scheme. Omit to leave unchanged.")
+    ] = None,
+    description: Annotated[
+        str | None, Field(description="Updated description of the context scheme. Omit to leave unchanged.")
+    ] = None,
+    scheme_agency_id: Annotated[
+        str | None, Field(description="Updated agency identifier maintaining the scheme. Omit to leave unchanged.")
+    ] = None,
+    scheme_version_id: Annotated[
+        str | None, Field(description="Updated version identifier of the scheme. Omit to leave unchanged.")
+    ] = None,
+    ctx_category_id: Annotated[
+        int | None, Field(ge=1, description="Updated associated context category ID. Omit to leave unchanged.")
+    ] = None,
     ctx_scheme_service: CtxSchemeService = Depends(get_ctx_scheme_service),
 ) -> UpdateCtxSchemeResponse:
     """
@@ -822,7 +1125,9 @@ async def update_context_scheme(
             ctx_category_id=UNSET if ctx_category_id is None else ctx_category_id,
         )
         if result is None:
-            raise ToolError(f"The context scheme with ID {ctx_scheme_id} was not found. Please check the ID and try again.")
+            raise ToolError(
+                f"The context scheme with ID {ctx_scheme_id} was not found. Please check the ID and try again."
+            )
         updated_id, updates = result
         return UpdateCtxSchemeResponse(ctx_scheme_id=updated_id, updates=updates)
     except Exception as exc:
@@ -836,11 +1141,19 @@ async def update_context_scheme(
         "type": "object",
         "description": "Response containing the deleted context scheme ID or cancellation message",
         "properties": {
-            "ctx_scheme_id": {"type": ["integer", "null"], "description": "Unique identifier of the deleted context scheme (null if deletion was cancelled)", "example": 123},
-            "message": {"type": ["string", "null"], "description": "Optional message indicating the status of the deletion operation", "example": "Deletion cancelled by user"}
+            "ctx_scheme_id": {
+                "type": ["integer", "null"],
+                "description": "Unique identifier of the deleted context scheme (null if deletion was cancelled)",
+                "example": 123,
+            },
+            "message": {
+                "type": ["string", "null"],
+                "description": "Optional message indicating the status of the deletion operation",
+                "example": "Deletion cancelled by user",
+            },
         },
-        "required": []
-    }
+        "required": [],
+    },
 )
 async def delete_context_scheme(
     ctx_scheme_id: Annotated[int, Field(gt=0, description="Unique identifier of the context scheme to delete.")],
@@ -883,7 +1196,9 @@ async def delete_context_scheme(
     try:
         row = await ctx_scheme_service.get(ctx_scheme_id)
         if row is None:
-            raise ToolError(f"The context scheme with ID {ctx_scheme_id} was not found. Please check the ID and try again.")
+            raise ToolError(
+                f"The context scheme with ID {ctx_scheme_id} was not found. Please check the ID and try again."
+            )
 
         scheme_name = row.scheme_name or row.scheme_id
 
@@ -901,7 +1216,9 @@ async def delete_context_scheme(
             case AcceptedElicitation():
                 deleted = await ctx_scheme_service.delete(ctx_scheme_id)
                 if not deleted:
-                    raise ToolError(f"The context scheme with ID {ctx_scheme_id} was not found. Please check the ID and try again.")
+                    raise ToolError(
+                        f"The context scheme with ID {ctx_scheme_id} was not found. Please check the ID and try again."
+                    )
                 return DeleteCtxSchemeResponse(ctx_scheme_id=ctx_scheme_id)
             case DeclinedElicitation():
                 return DeleteCtxSchemeResponse(ctx_scheme_id=None, message="Deletion declined by user")

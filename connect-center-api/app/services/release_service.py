@@ -17,8 +17,10 @@ from app.repositories.models.app_user import AppUserRow
 from app.security import AuthenticatedUser
 from app.services import load_users_by_ids, to_user_summary
 from app.services.models import WhoAndWhen
+from app.services.models.release import ReleaseReferenceServiceRecord
 from app.services.models.release import ReleaseServiceResult
 from app.services.utils.date import DateRange
+from app.services.utils.owner import parse_login_id_filter
 from app.services.utils.pagination import PaginationParams, PaginationResponse
 from app.types.identifiers import LibraryId, ReleaseId
 
@@ -118,6 +120,8 @@ class ReleaseService:
         state: str | None = None,
         created_on: DateRange | None = None,
         last_updated_on: DateRange | None = None,
+        creator: str | None = None,
+        updater: str | None = None,
     ) -> PaginationResponse[ReleaseServiceResult]:
         """Get releases with optional filtering and pagination.
 
@@ -136,6 +140,14 @@ class ReleaseService:
             order_by=order_by,
             allowed_sort_columns=self._ORDER_BY_ALLOWED,
         )
+        included_creator_login_ids, excluded_creator_login_ids = parse_login_id_filter(
+            creator,
+            filter_name="creator",
+        )
+        included_updater_login_ids, excluded_updater_login_ids = parse_login_id_filter(
+            updater,
+            filter_name="updater",
+        )
         total, rows = await self._repo.list(
             limit=pagination.limit,
             offset=pagination.offset,
@@ -147,6 +159,10 @@ class ReleaseService:
             creation_timestamp_after=created_on.after if created_on else None,
             last_update_timestamp_before=last_updated_on.before if last_updated_on else None,
             last_update_timestamp_after=last_updated_on.after if last_updated_on else None,
+            included_creator_login_ids=included_creator_login_ids,
+            excluded_creator_login_ids=excluded_creator_login_ids,
+            included_updater_login_ids=included_updater_login_ids,
+            excluded_updater_login_ids=excluded_updater_login_ids,
         )
         user_ids = sorted(
             {user_id for row in rows for user_id in (row.created_by, row.last_updated_by)},
@@ -247,4 +263,17 @@ class ReleaseService:
             state=row.state,
             created=WhoAndWhen(who=created, when=row.creation_timestamp),
             last_updated=WhoAndWhen(who=updated, when=row.last_update_timestamp),
+            is_latest=bool(row.is_latest),
+            prev_release=self._to_release_reference(row.prev_release),
+            next_release=self._to_release_reference(row.next_release),
+        )
+
+    @staticmethod
+    def _to_release_reference(row: Any | None) -> ReleaseReferenceServiceRecord | None:
+        """Map a repository release summary to an adjacent release reference."""
+        if row is None:
+            return None
+        return ReleaseReferenceServiceRecord(
+            release_id=row.release_id,
+            release_num=str(row.release_num or ""),
         )
