@@ -232,8 +232,18 @@ public class BieDocumentImpl implements BieDocument {
 
     private void accept(BieVisitor visitor, BieAssociation bieAssociation, BieVisitContext context) {
         if (bieAssociation.isAsbie()) {
-            visitor.visitAsbie((Asbie) bieAssociation, context);
-            accept(visitor, getAsbiep((Asbie) bieAssociation), context);
+            Asbie asbie = (Asbie) bieAssociation;
+            visitor.visitAsbie(asbie, context);
+            Asbiep asbiep = getAsbiep(asbie);
+            // For reuse ASBIEs (to_asbiep owned by a different top-level), pass null
+            // so visitors handle them as the reuse case without descending into the
+            // reuse target's subtree. BieSet eagerly loads reuse target data, so the
+            // existing `asbiep == null` reuse signal alone is insufficient.
+            if (asbiep != null
+                    && !asbie.getOwnerTopLevelAsbiepId().equals(asbiep.getOwnerTopLevelAsbiepId())) {
+                asbiep = null;
+            }
+            accept(visitor, asbiep, context);
         } else if (bieAssociation.isBbie()) {
             Bbie bbie = (Bbie) bieAssociation;
             visitor.visitBbie(bbie, context);
