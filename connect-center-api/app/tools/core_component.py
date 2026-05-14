@@ -1077,7 +1077,7 @@ async def add_ascc_to_acc(
     - if the ASCCP is in the same library as the ACC, it must be from the ACC release
     - if the ASCCP is in a different library, its release must be one of the ACC release dependencies
     - only the ACC owner or an administrator can modify relationships
-    - the target ASCCP must be reusable
+    - if the target ASCCP is not reusable, it must not already be referenced by any other ASCC
     - an ACC can have at most one `Extension` ASCCP
     - if the ASCCP is already associated to the ACC, use `update_ascc` with a sequence selector instead
     - if all placement inputs are omitted, the relationship is added at the end of the ACC's `seq_key` order

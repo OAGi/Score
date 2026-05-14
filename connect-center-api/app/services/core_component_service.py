@@ -1732,9 +1732,6 @@ class CoreComponentService:
             target_label="the source ACC",
             selection_phrase="an ASCCP",
         )
-        if not asccp.reusable_indicator:
-            raise ValueError("Target ASCCP is not reusable.")
-
         existing_relationship = next(
             (
                 relationship
