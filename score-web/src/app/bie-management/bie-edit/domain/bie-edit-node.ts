@@ -320,8 +320,10 @@ export class RefBie {
   asbieId: number;
   basedAsccManifestId: number;
   hashPath: string;
+  // The owner BIE that contains the ASBIE referencing another top-level BIE.
   topLevelAsbiepId: number;
   basedTopLevelAsbiepId: number;
+  // The referenced/reused top-level BIE.
   refTopLevelAsbiepId: number;
   refBasedTopLevelAsbiepId: number;
   refInverseMode: boolean;
