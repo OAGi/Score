@@ -235,6 +235,110 @@ public class OpenAPIDocService {
                 oasResponseId != null ? oasResponseId : null);
     }
 
+    /**
+     * Issue #1730: Adds an API operation (endpoint) that does NOT reference a BIE.
+     *
+     * A BIE-less message body (top_level_asbiep_id = NULL) is created and linked to either an
+     * {@code oas_request} (Request-type message body, no schema) or an {@code oas_response}
+     * (Response-type, carrying the chosen HTTP status code such as 202/204) without any content
+     * schema, so the OpenAPI generator can emit a bodyless operation.
+     */
+    @Transactional
+    public AddBieForOasDocResponse addOperationForOasDoc(ScoreUser requester, AddOperationForOasDocRequest request) {
+        UserId userId = requester.userId();
+        if (userId == null) {
+            throw new IllegalArgumentException("`userId` parameter must not be null.");
+        }
+        if (request.getOasDocId() == null) {
+            throw new IllegalArgumentException("`oasDocId` parameter must not be null.");
+        }
+        if (request.getVerb() == null) {
+            throw new IllegalArgumentException("`verb` parameter must not be null.");
+        }
+
+        long millis = System.currentTimeMillis();
+
+        var command = repositoryFactory.oasDocCommandRepository(requester);
+
+        // Issue #1730: BIE-less endpoint -> empty message body (top_level_asbiep_id = NULL).
+        OasMessageBodyId oasMessageBodyId = new InsertOasMessageBodyArguments(command)
+                .setUserId(userId)
+                .setTopLevelAsbiepId(null)
+                .setTimestamp(millis)
+                .execute();
+
+        OasResourceId oasResourceId = new InsertOasResourceArguments(command)
+                .setUserId(userId)
+                .setOasDocId(request.getOasDocId())
+                .setPath(request.getPath())
+                .setRef(request.getRef())
+                .setTimestamp(millis)
+                .execute();
+
+        OasOperationId oasOperationId = new InsertOasOperationArguments(command)
+                .setUserId(userId)
+                .setOperationId(request.getOperationId())
+                .setOasResourceId(oasResourceId)
+                .setVerb(request.getVerb())
+                .setSummary(request.getSummary())
+                .setDescription(request.getDescription())
+                .setDeprecated(false)
+                .setTimestamp(millis)
+                .execute();
+
+        if (request.getTagName() != null) {
+            OasTagId oasTagId = new InsertOasTagArguments(command)
+                    .setUserId(userId)
+                    .setGuid(randomGuid())
+                    .setName(request.getTagName())
+                    .execute();
+            new InsertOasResourceTagArguments(command)
+                    .setUserId(userId)
+                    .setOasOperationId(oasOperationId)
+                    .setOasTagId(oasTagId)
+                    .execute();
+        }
+
+        OasRequestId oasRequestId = null;
+        OasResponseId oasResponseId = null;
+        if (request.isOasRequest()) {
+            // Request-type message body: no BIE schema and no status code; the generator omits
+            // (empties) the requestBody.
+            oasRequestId = new InsertOasRequestArguments(command)
+                    .setUserId(userId)
+                    .setOasOperationId(oasOperationId)
+                    .setOasMessageBodyId(oasMessageBodyId)
+                    .setDescription(request.getDescription())
+                    .setMakeArrayIndicator(false)
+                    // Issue #1730: Suppress Root defaults to checked for added (BIE-less) operations.
+                    .setSuppressRootIndicator(true)
+                    .setIncludePaginationIndicator(false)
+                    .setIncludeMetaHeaderIndicator(false)
+                    .setRequired(false)
+                    .setTimestamp(millis)
+                    .execute();
+        } else {
+            // Response-type message body: carries the HTTP status code (e.g. 202/204), no content schema.
+            String httpStatusCode = (request.getHttpStatusCode() != null)
+                    ? String.valueOf(request.getHttpStatusCode()) : null;
+            oasResponseId = new InsertOasResponseArguments(command)
+                    .setUserId(userId)
+                    .setOasOperationId(oasOperationId)
+                    .setOasMessageBodyId(oasMessageBodyId)
+                    .setDescription(request.getDescription())
+                    .setHttpStatusCode(httpStatusCode)
+                    .setMakeArrayIndicator(false)
+                    // Issue #1730: Suppress Root defaults to checked for added (BIE-less) operations.
+                    .setSuppressRootIndicator(true)
+                    .setIncludePaginationIndicator(false)
+                    .setIncludeMetaHeaderIndicator(false)
+                    .setTimestamp(millis)
+                    .execute();
+        }
+
+        return new AddBieForOasDocResponse(oasRequestId, oasResponseId);
+    }
+
     private void validateOasDocRequest(String openApiVersion,
                                        String termsOfService,
                                        String version,

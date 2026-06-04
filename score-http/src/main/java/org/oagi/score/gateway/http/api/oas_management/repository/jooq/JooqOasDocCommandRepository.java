@@ -387,6 +387,10 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
                 .set(OAS_RESPONSE.OAS_MESSAGE_BODY_ID, valueOf(arguments.getOasMessageBodyId()))
                 .set(OAS_RESPONSE.OAS_OPERATION_ID, valueOf(arguments.getOasOperationId()))
                 .set(OAS_RESPONSE.DESCRIPTION, arguments.getDescription())
+                // Issue #1730: Persist the HTTP status code (e.g. 202/204) so bodyless responses can be generated.
+                .set(OAS_RESPONSE.HTTP_STATUS_CODE,
+                        (arguments.getHttpStatusCode() != null && !arguments.getHttpStatusCode().isBlank())
+                                ? Integer.valueOf(arguments.getHttpStatusCode().trim()) : null)
                 .set(OAS_RESPONSE.SUPPRESS_ROOT_INDICATOR, (byte) (arguments.isSuppressRootIndicator() ? 1 : 0))
                 .set(OAS_RESPONSE.MAKE_ARRAY_INDICATOR, (byte) (arguments.isMakeArrayIndicator() ? 1 : 0))
                 .set(OAS_RESPONSE.INCLUDE_CONFIRM_INDICATOR, (byte) 0)

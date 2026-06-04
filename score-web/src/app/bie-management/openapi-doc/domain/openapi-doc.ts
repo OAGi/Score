@@ -284,6 +284,7 @@ export class BieForOasDoc {
   status: string;
   state: string;
   businessContext: string;
+  httpStatusCode: number;
   lastUpdateTimestamp: Date;
   createdBy: ScoreUser;
   lastUpdatedBy: ScoreUser;
@@ -315,6 +316,7 @@ export class BieForOasDoc {
     this.status = obj && obj.status || '';
     this.state = obj && obj.state || '';
     this.businessContext = obj && obj.businessContext || '';
+    this.httpStatusCode = obj && obj.httpStatusCode || undefined;
     this.verb = obj && obj.verb || '';
     this.arrayIndicator = obj && obj.arrayIndicator || false;
     this.suppressRootIndicator = obj && obj.suppressRootIndicator || false;
@@ -342,7 +344,8 @@ export class BieForOasDoc {
       arrayIndicator: this.arrayIndicator,
       suppressRootIndicator: this.suppressRootIndicator,
       messageBody: this.messageBody,
-      tagName: this.tagName
+      tagName: this.tagName,
+      httpStatusCode: this.httpStatusCode
     };
   }
 
@@ -430,6 +433,19 @@ export class AssignBieForOasDoc {
   suppressRootIndicator: boolean;
   messageBody: string;
   tagName: string;
+}
+
+// Issue #1730: payload to add an API operation (endpoint) that does NOT reference a BIE.
+export class AddOperationForOasDoc {
+  oasDocId: number;
+  verb: string;
+  resourceName: string;
+  operationId: string;
+  tagName: string;
+  messageBody: string;        // 'Request' | 'Response'
+  httpStatusCode: number;     // only applies when messageBody === 'Response'
+  summary: string;
+  description: string;
 }
 
 export class BieForOasDocUpdateRequest {

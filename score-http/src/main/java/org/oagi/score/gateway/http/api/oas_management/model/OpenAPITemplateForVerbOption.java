@@ -17,6 +17,7 @@ public class OpenAPITemplateForVerbOption {
     private String operationId;
     private String tagName;
     private String messageBodyType;
+    private Integer httpStatusCode;
 
     private boolean arrayForJsonExpression;
     private boolean suppressRootProperty;

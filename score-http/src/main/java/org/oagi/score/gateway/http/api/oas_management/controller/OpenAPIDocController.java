@@ -349,7 +349,7 @@ public class OpenAPIDocController {
         GetBieForOasDocResponse bieForOasDocList = oasDocService.getBieForOasDoc(sessionService.asScoreUser(user), request);
 
         return bieForOasDocList.getResults().stream()
-                .filter(c -> c.getTopLevelAsbiepId().equals(selectedTopLevelAsbiepId))
+                .filter(c -> c.getTopLevelAsbiepId() != null && c.getTopLevelAsbiepId().equals(selectedTopLevelAsbiepId))
                 .findAny().get();
     }
 
@@ -416,6 +416,33 @@ public class OpenAPIDocController {
         }
     }
 
+    // Issue #1730: Add an API operation (endpoint) that does NOT reference a BIE
+    // (e.g. DELETE/PATCH with no body, 202 Accepted / 204 No Content).
+    @RequestMapping(value = "/oas_doc/{id:[\\d]+}/operation", method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity addOperationForOasDoc(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("id") OasDocId oasDocId,
+            @RequestBody AddOperationForOasDoc addOperationForOasDoc) {
+        ScoreUser requester = sessionService.asScoreUser(user);
+        AddOperationForOasDocRequest request = new AddOperationForOasDocRequest(requester);
+        request.setOasDocId(oasDocId);
+        request.setOasRequest("Request".equals(addOperationForOasDoc.getMessageBody()));
+        request.setVerb(addOperationForOasDoc.getVerb());
+        request.setPath(addOperationForOasDoc.getResourceName());
+        request.setOperationId(addOperationForOasDoc.getOperationId());
+        request.setTagName(addOperationForOasDoc.getTagName());
+        request.setHttpStatusCode(addOperationForOasDoc.getHttpStatusCode());
+        request.setSummary(addOperationForOasDoc.getSummary());
+        request.setDescription(addOperationForOasDoc.getDescription());
+        AddBieForOasDocResponse response = oasDocService.addOperationForOasDoc(requester, request);
+        if (response.getOasResponseId() != null || response.getOasRequestId() != null) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/check_bie_reused_across_operations", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ReusedBIEViolationCheckResponse checkBIEReusedAcrossOperations(
@@ -432,6 +459,10 @@ public class OpenAPIDocController {
         if (bieForOasDocList != null && bieForOasDocList.getResults() != null) {
             for (BieForOasDoc bieForOasDoc : bieForOasDocList.getResults()) {
                 TopLevelAsbiepId selectedTopLevelAsbiepId = bieForOasDoc.getTopLevelAsbiepId();
+                // Issue #1730: Bodyless operations have no BIE; skip them in the reuse check.
+                if (selectedTopLevelAsbiepId == null) {
+                    continue;
+                }
 
                 reusedBIEViolationCheck.getReusedBIE(selectedTopLevelAsbiepId)
                         .putOperation(bieForOasDoc.getVerb(), Pair.of(bieForOasDoc.getMessageBody(), bieForOasDoc.getOperationId()));
@@ -474,6 +505,10 @@ public class OpenAPIDocController {
         if (bieForOasDocList != null && bieForOasDocList.getResults() != null) {
             for (BieForOasDoc bieForOasDoc : bieForOasDocList.getResults()) {
                 TopLevelAsbiepId selectedTopLevelAsbiepId = bieForOasDoc.getTopLevelAsbiepId();
+                // Issue #1730: Bodyless operations have no BIE; skip them in the reuse check.
+                if (selectedTopLevelAsbiepId == null) {
+                    continue;
+                }
 
                 reusedBIEViolationCheck.getReusedBIE(selectedTopLevelAsbiepId)
                         .putOperation(bieForOasDoc.getVerb(), Pair.of(bieForOasDoc.getMessageBody(), bieForOasDoc.getOperationId()));

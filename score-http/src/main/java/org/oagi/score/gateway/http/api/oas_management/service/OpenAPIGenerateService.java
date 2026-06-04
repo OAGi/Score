@@ -86,10 +86,13 @@ public class OpenAPIGenerateService {
             filename = option.getOasDoc().getTitle() + "-" + millis;
         }
 
-        GenerationContext generationContext = generateContext(requester, topLevelAsbieps);
+        // Issue #1730: a document may contain only bodyless (BIE-less) operations, so there may be no BIEs.
+        GenerationContext generationContext = topLevelAsbieps.isEmpty() ? null : generateContext(requester, topLevelAsbieps);
         BieGenerateOpenApiExpression generateExpression = createBieGenerateOpenAPIExpression(generationContext, option);
-        for (TopLevelAsbiepSummaryRecord refTopLevelAsbiep : generationContext.getRefTopLevelAsbiepSet()) {
-            generateExpression.generate(refTopLevelAsbiep);
+        if (generationContext != null) {
+            for (TopLevelAsbiepSummaryRecord refTopLevelAsbiep : generationContext.getRefTopLevelAsbiepSet()) {
+                generateExpression.generate(refTopLevelAsbiep);
+            }
         }
 
         defineSchemaName(generateExpression, option, generationContext);
@@ -121,6 +124,10 @@ public class OpenAPIGenerateService {
         // [Entry] ::= **optional** name; used for the inner schema object of an array -- seldom used.
         Map<String, List<OpenAPITemplateForVerbOption>> bieNameTemplateMap = new HashMap<>();
         for (OpenAPITemplateForVerbOption template : option.getTemplates()) {
+            // Issue #1730: bodyless operations have no BIE and therefore no component schema.
+            if (template.getTopLevelAsbiep() == null) {
+                continue;
+            }
             String bieName = getBieName(template.getTopLevelAsbiep(), generationContext);
             List<OpenAPITemplateForVerbOption> schemaNameTemplates;
             if (bieNameTemplateMap.containsKey(bieName)) {

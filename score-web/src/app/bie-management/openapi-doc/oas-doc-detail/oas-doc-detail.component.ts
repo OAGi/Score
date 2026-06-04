@@ -18,6 +18,7 @@ import {SelectionModel} from '@angular/cdk/collections';
 import {finalize} from 'rxjs/operators';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {OasDocAssignDialogComponent} from '../oas-doc-assign-dialog/oas-doc-assign-dialog.component';
+import {OasDocAddOperationDialogComponent} from '../oas-doc-add-operation-dialog/oas-doc-add-operation-dialog.component';
 import {MatMultiSort, MatMultiSortTableDataSource, TableData} from 'ngx-mat-multi-sort';
 import {BusinessContext} from '../../../context-management/business-context/domain/business-context';
 import {BieExpressOption} from '../../bie-express/domain/generate-expression';
@@ -558,6 +559,29 @@ export class OasDocDetailComponent implements OnInit {
 
     this.isUpdating = true;
     const dialogRef = this.dialog.open(OasDocAssignDialogComponent, dialogConfig);
+    dialogRef.afterClosed().pipe(finalize(() => {
+      this.isUpdating = false;
+    })).subscribe(result => {
+      if (!result) {
+        return;
+      }
+
+      this.loadBieListForOasDoc();
+    });
+  }
+
+  // Issue #1730: open the dialog to add a BIE-less operation (endpoint).
+  openAddOperationDialog($event: any) {
+    $event.preventDefault();
+    $event.stopPropagation();
+
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.data = {oasDoc: this.oasDoc};
+    dialogConfig.autoFocus = false;
+    dialogConfig.width = '600px';
+
+    this.isUpdating = true;
+    const dialogRef = this.dialog.open(OasDocAddOperationDialogComponent, dialogConfig);
     dialogRef.afterClosed().pipe(finalize(() => {
       this.isUpdating = false;
     })).subscribe(result => {

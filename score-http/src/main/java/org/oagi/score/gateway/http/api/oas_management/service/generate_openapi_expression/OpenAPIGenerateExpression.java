@@ -735,11 +735,15 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
     private void generateTemplate(OpenAPITemplateForVerbOption template) {
         TopLevelAsbiepSummaryRecord topLevelAsbiep = template.getTopLevelAsbiep();
-        AsbiepSummaryRecord asbiep = generationContext.findASBIEP(topLevelAsbiep.asbiepId(), topLevelAsbiep);
-        generationContext.referenceCounter().increase(asbiep);
+        // Issue #1730: a bodyless operation references no BIE (no ASBIEP / component schema).
+        boolean bodyless = (topLevelAsbiep == null);
+        AsbiepSummaryRecord asbiep = bodyless ? null : generationContext.findASBIEP(topLevelAsbiep.asbiepId(), topLevelAsbiep);
+        if (!bodyless) {
+            generationContext.referenceCounter().increase(asbiep);
+        }
         try {
-            AbieSummaryRecord typeAbie = generationContext.queryTargetABIE(asbiep);
-            ReleaseDetailsRecord release = generationContext.findRelease(topLevelAsbiep.release().releaseId());
+            AbieSummaryRecord typeAbie = bodyless ? null : generationContext.queryTargetABIE(asbiep);
+            ReleaseDetailsRecord release = bodyless ? null : generationContext.findRelease(topLevelAsbiep.release().releaseId());
 
             Map<String, Object> paths;
             Map<String, Object> securitySchemes;
@@ -782,7 +786,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     infoBuilder = infoBuilder.put("license", licenseBuilder.build());
                 }
                 infoBuilder = infoBuilder.put("version", option.getOasDoc().getVersion())
-                        .put("x-oagis-license", StringUtils.hasLength(release.releaseLicense()) ? release.releaseLicense() : "");
+                        .put("x-oagis-license", (release != null && StringUtils.hasLength(release.releaseLicense())) ? release.releaseLicense() : "");
                 root.put("info", infoBuilder.build());
 
                 paths = new LinkedHashMap();
@@ -793,7 +797,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                         .put("authorizationCode", ImmutableMap.<String, Object>builder()
                                                 .put("authorizationUrl", "https://example.com/oauth/authorize")
                                                 .put("tokenUrl", "https://example.com/oauth/token")
-                                                .put("scopes", getAuthorizationCodeScopes(topLevelAsbiep))
+                                                .put("scopes", bodyless ? new LinkedHashMap<String, Object>() : getAuthorizationCodeScopes(topLevelAsbiep))
                                                 .build())
                                         .build())
                                 .build())
@@ -813,7 +817,9 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 Map<String, Object> flows = (Map<String, Object>) oauth2.get("flows");
                 Map<String, Object> authorizationCode = (Map<String, Object>) flows.get("authorizationCode");
                 Map<String, Object> scopes = (Map<String, Object>) authorizationCode.get("scopes");
-                scopes.putAll(getAuthorizationCodeScopes(topLevelAsbiep));
+                if (!bodyless) {
+                    scopes.putAll(getAuthorizationCodeScopes(topLevelAsbiep));
+                }
             }
 
             Map<String, Object> pathMap = new LinkedHashMap<>();
@@ -834,13 +840,87 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 }
             }
 
-            GeneratorForOperation generatorForOperation = generatorForOperationMap.get(template.getVerbOption());
-            if (generatorForOperation == null) {
-                throw new UnsupportedOperationException("Unsupported Operation: " + template.getVerbOption());
+            if (bodyless) {
+                // Issue #1730: emit a BIE-less operation (no request/response schema; status-only response).
+                generateBodylessOperation(template, path);
+            } else {
+                GeneratorForOperation generatorForOperation = generatorForOperationMap.get(template.getVerbOption());
+                if (generatorForOperation == null) {
+                    throw new UnsupportedOperationException("Unsupported Operation: " + template.getVerbOption());
+                }
+                generatorForOperation.proceed(topLevelAsbiep, template, path, asbiep);
             }
-            generatorForOperation.proceed(topLevelAsbiep, template, path, asbiep);
         } finally {
-            generationContext.referenceCounter().decrease(asbiep);
+            if (!bodyless) {
+                generationContext.referenceCounter().decrease(asbiep);
+            }
+        }
+    }
+
+    /**
+     * Issue #1730: Generates an operation that does not reference a BIE. Emits the HTTP method,
+     * path parameters and a single status-only response (e.g. 202 Accepted, 204 No Content)
+     * without any request/response body or component schema.
+     */
+    private void generateBodylessOperation(OpenAPITemplateForVerbOption template, Map<String, Object> path) {
+        // Populate operation metadata only if this path+verb has not been built yet, so that a
+        // collision with an already-generated operation is not clobbered (and an existing,
+        // immutable operation map is never mutated).
+        if (!path.containsKey("operationId")) {
+            path.put("summary", "");
+            path.put("description", "");
+            if (template.getTagName() != null) {
+                path.put("tags", Arrays.asList(template.getTagName()));
+            }
+            path.put("operationId", template.getOperationId());
+        }
+        ensurePathParameters(path, template.getVerbOption(), template.isArrayForJsonExpression(), template);
+
+        // A bodyless operation must still declare at least one (status-only) response.
+        // The status code is taken from the message body when present (Response-type), otherwise
+        // derived from the verb (Issue #1730: DELETE -> 202 Accepted, PATCH -> 204 No Content).
+        if (!path.containsKey("responses")) {
+            Integer statusCode = (template.getHttpStatusCode() != null)
+                    ? template.getHttpStatusCode()
+                    : defaultStatusForVerb(template.getVerbOption());
+            String statusKey = String.valueOf(statusCode);
+            path.put("responses", ImmutableMap.<String, Object>builder()
+                    .put(statusKey, ImmutableMap.<String, Object>builder()
+                            .put("description", reasonPhrase(statusCode))
+                            .build())
+                    .build());
+        }
+    }
+
+    private Integer defaultStatusForVerb(Operation verb) {
+        if (verb == null) {
+            return 200;
+        }
+        switch (verb) {
+            case DELETE:
+                return 202;
+            case PATCH:
+                return 204;
+            default:
+                return 200;
+        }
+    }
+
+    private String reasonPhrase(Integer statusCode) {
+        if (statusCode == null) {
+            return "";
+        }
+        switch (statusCode) {
+            case 200:
+                return "OK";
+            case 201:
+                return "Created";
+            case 202:
+                return "Accepted";
+            case 204:
+                return "No Content";
+            default:
+                return "";
         }
     }
 

@@ -37,6 +37,7 @@ public class BieForOasDoc extends Auditable {
     private String resourceName;
     private String operationId;
     private String tagName;
+    private Integer httpStatusCode;
     private Date lastUpdateTimestamp;
     private Date creationTimestamp;
     private UserSummaryRecord createdBy;
@@ -237,6 +238,14 @@ public class BieForOasDoc extends Auditable {
         this.tagName = tagName;
     }
 
+    public Integer getHttpStatusCode() {
+        return httpStatusCode;
+    }
+
+    public void setHttpStatusCode(Integer httpStatusCode) {
+        this.httpStatusCode = httpStatusCode;
+    }
+
     @Override
     public Date getLastUpdateTimestamp() {
         return lastUpdateTimestamp;
@@ -304,6 +313,7 @@ public class BieForOasDoc extends Auditable {
                 ", resourceName='" + resourceName + '\'' +
                 ", operationId='" + operationId + '\'' +
                 ", tagName='" + tagName + '\'' +
+                ", httpStatusCode=" + httpStatusCode +
                 ", lastUpdateTimestamp=" + lastUpdateTimestamp +
                 ", creationTimestamp=" + creationTimestamp +
                 ", createdBy=" + createdBy +

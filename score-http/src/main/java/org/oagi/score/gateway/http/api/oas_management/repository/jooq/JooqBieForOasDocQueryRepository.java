@@ -2,6 +2,7 @@ package org.oagi.score.gateway.http.api.oas_management.repository.jooq;
 
 import org.jooq.*;
 import org.jooq.Record;
+import org.jooq.impl.SQLDataType;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.bie_management.model.BieState;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static org.jooq.impl.DSL.castNull;
 import static org.jooq.impl.DSL.field;
 import static org.jooq.impl.DSL.inline;
 import static org.oagi.score.gateway.http.api.oas_management.controller.payload.GetAssignedOasTagResponse.EMPTY_INSTANCE;
@@ -56,6 +58,9 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
                         RELEASE.RELEASE_NUM,
                         ASBIEP.REMARK,
                         inline("Request").as("oas_doc_message_body_type"),
+                        // Issue #1730: typed NULL placeholder so the unionAll column set stays aligned with the
+                        // response select (requests carry no HTTP status code). Renders as a NULL literal.
+                        castNull(SQLDataType.INTEGER).as("http_status_code"),
                         OAS_DOC.as("oas_doc").OAS_DOC_ID.as("oas_doc_id"),
                         OAS_OPERATION.as("oas_operation").VERB.as("verb"),
                         OAS_TAG.as("oas_tag").NAME.as("tag_name"),
@@ -75,12 +80,13 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
                 .leftJoin(OAS_DOC.as("oas_doc")).on(OAS_RESOURCE.as("oas_resource").OAS_DOC_ID.eq(OAS_DOC.as("oas_doc").OAS_DOC_ID))
                 .leftJoin(OAS_RESOURCE_TAG.as("oas_resource_tag")).on(OAS_RESOURCE_TAG.as("oas_resource_tag").OAS_OPERATION_ID.eq(OAS_OPERATION.as("oas_operation").OAS_OPERATION_ID))
                 .leftJoin(OAS_TAG.as("oas_tag")).on(OAS_RESOURCE_TAG.as("oas_resource_tag").OAS_TAG_ID.eq(OAS_TAG.as("oas_tag").OAS_TAG_ID))
-                .rightJoin(TOP_LEVEL_ASBIEP).on(OAS_MESSAGE_BODY.TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
-                .join(RELEASE).on(RELEASE.RELEASE_ID.eq(TOP_LEVEL_ASBIEP.RELEASE_ID))
+                // Issue #1730: left-join so BIE-less (bodyless) operations are still returned.
+                .leftJoin(TOP_LEVEL_ASBIEP).on(OAS_MESSAGE_BODY.TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
+                .leftJoin(RELEASE).on(RELEASE.RELEASE_ID.eq(TOP_LEVEL_ASBIEP.RELEASE_ID))
                 .leftJoin(ASBIEP).on(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
                 .leftJoin(ASCCP_MANIFEST).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
                 .leftJoin(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
-                .join(ownerTable()).on(ownerTablePk().eq(TOP_LEVEL_ASBIEP.OWNER_USER_ID))
+                .leftJoin(ownerTable()).on(ownerTablePk().eq(TOP_LEVEL_ASBIEP.OWNER_USER_ID))
                 .join(creatorTable()).on(creatorTablePk().eq(OAS_MESSAGE_BODY.CREATED_BY))
                 .join(updaterTable()).on(updaterTablePk().eq(OAS_MESSAGE_BODY.LAST_UPDATED_BY));
     }
@@ -99,6 +105,8 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
                         RELEASE.RELEASE_NUM,
                         ASBIEP.REMARK,
                         inline("Response").as("oas_doc_message_body_type"),
+                        // Issue #1730: HTTP status code drives bodyless (202/204) response generation.
+                        OAS_RESPONSE.HTTP_STATUS_CODE.as("http_status_code"),
                         OAS_DOC.as("oas_doc").OAS_DOC_ID.as("oas_doc_id"),
                         OAS_OPERATION.as("oas_operation").VERB.as("verb"),
                         OAS_TAG.as("oas_tag").NAME.as("tag_name"),
@@ -118,12 +126,13 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
                 .leftJoin(OAS_DOC.as("oas_doc")).on(OAS_RESOURCE.as("oas_resource").OAS_DOC_ID.eq(OAS_DOC.as("oas_doc").OAS_DOC_ID))
                 .leftJoin(OAS_RESOURCE_TAG.as("oas_resource_tag")).on(OAS_RESOURCE_TAG.as("oas_resource_tag").OAS_OPERATION_ID.eq(OAS_OPERATION.as("oas_operation").OAS_OPERATION_ID))
                 .leftJoin(OAS_TAG.as("oas_tag")).on(OAS_RESOURCE_TAG.as("oas_resource_tag").OAS_TAG_ID.eq(OAS_TAG.as("oas_tag").OAS_TAG_ID))
-                .rightJoin(TOP_LEVEL_ASBIEP).on(OAS_MESSAGE_BODY.TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
-                .join(RELEASE).on(RELEASE.RELEASE_ID.eq(TOP_LEVEL_ASBIEP.RELEASE_ID))
+                // Issue #1730: left-join so BIE-less (bodyless) operations are still returned.
+                .leftJoin(TOP_LEVEL_ASBIEP).on(OAS_MESSAGE_BODY.TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
+                .leftJoin(RELEASE).on(RELEASE.RELEASE_ID.eq(TOP_LEVEL_ASBIEP.RELEASE_ID))
                 .leftJoin(ASBIEP).on(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
                 .leftJoin(ASCCP_MANIFEST).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
                 .leftJoin(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
-                .join(ownerTable()).on(ownerTablePk().eq(TOP_LEVEL_ASBIEP.OWNER_USER_ID))
+                .leftJoin(ownerTable()).on(ownerTablePk().eq(TOP_LEVEL_ASBIEP.OWNER_USER_ID))
                 .join(creatorTable()).on(creatorTablePk().eq(OAS_MESSAGE_BODY.CREATED_BY))
                 .join(updaterTable()).on(updaterTablePk().eq(OAS_MESSAGE_BODY.LAST_UPDATED_BY));
     }
@@ -131,13 +140,21 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
     private RecordMapper<Record, BieForOasDoc> mapper() {
         return record -> {
             BieForOasDoc bieForOasDoc = new BieForOasDoc();
-            bieForOasDoc.setTopLevelAsbiepId(new TopLevelAsbiepId(record.get(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID).toBigInteger()));
-            bieForOasDoc.setState(BieState.valueOf(record.get(TOP_LEVEL_ASBIEP.STATE)));
-            bieForOasDoc.setVersion(record.get(TOP_LEVEL_ASBIEP.VERSION));
-            bieForOasDoc.setDen(record.get(ASCCP_MANIFEST.DEN));
-            bieForOasDoc.setReleaseNum(record.get(RELEASE.RELEASE_NUM));
-            bieForOasDoc.setRemark(record.get(ASBIEP.REMARK));
-            bieForOasDoc.setGuid(record.get(ASCCP.GUID));
+            // Issue #1730: TOP_LEVEL_ASBIEP is left-joined; bodyless operations have no BIE.
+            ULong topLevelAsbiepId = record.get(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID);
+            if (topLevelAsbiepId != null) {
+                bieForOasDoc.setTopLevelAsbiepId(new TopLevelAsbiepId(topLevelAsbiepId.toBigInteger()));
+                bieForOasDoc.setState(BieState.valueOf(record.get(TOP_LEVEL_ASBIEP.STATE)));
+                bieForOasDoc.setVersion(record.get(TOP_LEVEL_ASBIEP.VERSION));
+                bieForOasDoc.setDen(record.get(ASCCP_MANIFEST.DEN));
+                bieForOasDoc.setReleaseNum(record.get(RELEASE.RELEASE_NUM));
+                bieForOasDoc.setRemark(record.get(ASBIEP.REMARK));
+                bieForOasDoc.setGuid(record.get(ASCCP.GUID));
+            } else {
+                // Issue #1730: a bodyless operation has no BIE state; treat it as editable (WIP)
+                // so downstream access checks (which switch on state) do not NPE.
+                bieForOasDoc.setState(BieState.WIP);
+            }
             bieForOasDoc.setMessageBody(record.get(field("oas_doc_message_body_type", String.class)));
             ULong oasDocId = record.get(OAS_DOC.as("oas_doc").OAS_DOC_ID.as("oas_doc_id"));
             if (oasDocId != null) {
@@ -163,8 +180,19 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
             if (oasOperationId != null) {
                 bieForOasDoc.setOasOperationId(new OasOperationId(oasOperationId.toBigInteger()));
             }
-            bieForOasDoc.setReleaseId(new ReleaseId(record.get(TOP_LEVEL_ASBIEP.RELEASE_ID).toBigInteger()));
-            bieForOasDoc.setOwner(fetchOwnerSummary(record));
+            if (topLevelAsbiepId != null) {
+                bieForOasDoc.setReleaseId(new ReleaseId(record.get(TOP_LEVEL_ASBIEP.RELEASE_ID).toBigInteger()));
+                bieForOasDoc.setOwner(fetchOwnerSummary(record));
+            } else {
+                // Issue #1730: bodyless operation has no BIE owner; fall back to the creator so that
+                // access evaluation (getOwner().userId()) works and the creator can edit/remove it.
+                bieForOasDoc.setOwner(fetchCreatorSummary(record));
+            }
+            // Issue #1730: surface the persisted HTTP status code for bodyless responses.
+            Integer httpStatusCode = record.get(field("http_status_code", Integer.class));
+            if (httpStatusCode != null) {
+                bieForOasDoc.setHttpStatusCode(httpStatusCode);
+            }
             bieForOasDoc.setCreatedBy(fetchCreatorSummary(record));
             bieForOasDoc.setLastUpdatedBy(fetchUpdaterSummary(record));
             bieForOasDoc.setCreationTimestamp(toDate(record.get(OAS_MESSAGE_BODY.CREATION_TIMESTAMP)));
