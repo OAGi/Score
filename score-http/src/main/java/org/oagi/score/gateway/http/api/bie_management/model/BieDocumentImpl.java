@@ -28,6 +28,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.oagi.score.gateway.http.api.bie_management.service.BieVisitResult.SKIP_SUBTREE;
+
 @Data
 public class BieDocumentImpl implements BieDocument {
 
@@ -219,12 +221,16 @@ public class BieDocumentImpl implements BieDocument {
     }
 
     private void accept(BieVisitor visitor, Asbiep asbiep, BieVisitContext context) {
-        visitor.visitAsbiep(asbiep, context);
+        if (visitor.visitAsbiep(asbiep, context) == SKIP_SUBTREE) {
+            return;
+        }
         accept(visitor, getAbie(asbiep), context);
     }
 
     private void accept(BieVisitor visitor, Abie abie, BieVisitContext context) {
-        visitor.visitAbie(abie, context);
+        if (visitor.visitAbie(abie, context) == SKIP_SUBTREE) {
+            return;
+        }
         for (BieAssociation bieAssociation : getAssociations(abie)) {
             accept(visitor, bieAssociation, context);
         }
@@ -233,21 +239,22 @@ public class BieDocumentImpl implements BieDocument {
     private void accept(BieVisitor visitor, BieAssociation bieAssociation, BieVisitContext context) {
         if (bieAssociation.isAsbie()) {
             Asbie asbie = (Asbie) bieAssociation;
-            visitor.visitAsbie(asbie, context);
-            Asbiep asbiep = getAsbiep(asbie);
-            // For reuse ASBIEs (to_asbiep owned by a different top-level), pass null
-            // so visitors handle them as the reuse case without descending into the
-            // reuse target's subtree. BieSet eagerly loads reuse target data, so the
-            // existing `asbiep == null` reuse signal alone is insufficient.
-            if (asbiep != null
-                    && !asbie.getOwnerTopLevelAsbiepId().equals(asbiep.getOwnerTopLevelAsbiepId())) {
-                asbiep = null;
+            // A reuse-reference ASBIE returns SKIP_SUBTREE: it points at another top-level
+            // BIE, so re-traversing its to_asbiep subtree would both duplicate work
+            // (corrupting the source-id-keyed maps) and overwrite the reference with a
+            // private copy.
+            if (visitor.visitAsbie(asbie, context) == SKIP_SUBTREE) {
+                return;
             }
-            accept(visitor, asbiep, context);
+            accept(visitor, getAsbiep(asbie), context);
         } else if (bieAssociation.isBbie()) {
             Bbie bbie = (Bbie) bieAssociation;
-            visitor.visitBbie(bbie, context);
-            visitor.visitBbiep(getBbiep(bbie), context);
+            if (visitor.visitBbie(bbie, context) == SKIP_SUBTREE) {
+                return;
+            }
+            if (visitor.visitBbiep(getBbiep(bbie), context) == SKIP_SUBTREE) {
+                return;
+            }
             for (BbieSc bbieSc : getBbieScList(bbie)) {
                 visitor.visitBbieSc(bbieSc, context);
             }
