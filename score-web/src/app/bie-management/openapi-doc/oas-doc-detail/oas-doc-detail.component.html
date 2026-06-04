@@ -2,13 +2,13 @@
   <div class="ps-2 pe-2">
     <mat-toolbar class="bg-white">
       <span class="title">{{ title }}</span>
+      <button mat-raised-button class="ms-4" color="warn" (click)="discard()">
+        Discard
+      </button>
       <span class="flex-11-auto"></span>
       <button mat-raised-button class="ms-2" color="primary" (click)="update()"
               [disabled]="!isChanged() || isDisabled(oasDoc)">
         Update
-      </button>
-      <button mat-raised-button class="ms-2" color="warn" (click)="discard()">
-        Discard
       </button>
     </mat-toolbar>
   </div>
