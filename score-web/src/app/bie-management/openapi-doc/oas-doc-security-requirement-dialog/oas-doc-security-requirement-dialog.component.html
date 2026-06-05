@@ -1,0 +1,107 @@
+<h2 mat-dialog-title>{{ data.title }}</h2>
+
+<mat-dialog-content>
+  @if (data.allowInherit) {
+    <mat-radio-group [(ngModel)]="mode" (ngModelChange)="onModeChange($event)" class="security-mode-group">
+      <mat-radio-button value="inherit">Use root security</mat-radio-button>
+      <mat-radio-button value="none">No security for this operation</mat-radio-button>
+      <mat-radio-button value="custom">Override with selected schemes</mat-radio-button>
+    </mat-radio-group>
+  }
+
+  @if (mode === 'custom') {
+    @if (securitySchemes.length === 0) {
+      <span class="muted-text">Add a Security Scheme first.</span>
+    } @else {
+      <div class="requirement-list">
+        @for (requirement of requirements; track $index) {
+          <div class="requirement-card">
+            <div class="requirement-card-header">
+              @if ($index > 0) {
+                <span class="or-badge">OR</span>
+              }
+              <span class="requirement-label">Requirement {{ $index + 1 }}</span>
+              <span class="spacer"></span>
+              <mat-checkbox [(ngModel)]="requirement.anonymous" (ngModelChange)="toggleAnonymous(requirement)">
+                Allow anonymous (&#123;&#125;)
+              </mat-checkbox>
+              <button mat-icon-button type="button" matTooltip="Remove requirement" (click)="removeRequirement($index)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+
+            @if (isDuplicate($index)) {
+              <div class="requirement-error">
+                <mat-icon class="requirement-error-icon">warning</mat-icon>
+                Duplicate of Requirement {{ duplicateOf($index) + 1 }} — change or remove it.
+              </div>
+            }
+
+            @if (!requirement.anonymous) {
+              @for (entry of requirement.schemes; track $index) {
+                <div class="scheme-row">
+                  @if ($index > 0) {
+                    <span class="and-badge">AND</span>
+                  }
+                  <mat-form-field class="scheme-field">
+                    <mat-label>Security Scheme</mat-label>
+                    <mat-select [(ngModel)]="entry.schemeName" (selectionChange)="onSchemeChange(entry)">
+                      @for (scheme of securitySchemes; track scheme.schemeName) {
+                        <mat-option [value]="scheme.schemeName"
+                                    [disabled]="isSchemeTaken(requirement, entry, scheme.schemeName)">
+                          {{ scheme.schemeName }} ({{ scheme.type }})
+                        </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+
+                  @if (isOAuth2(entry.schemeName)) {
+                    <mat-form-field class="scopes-field">
+                      <mat-label>Scopes</mat-label>
+                      <mat-select multiple [(ngModel)]="entry.scopes">
+                        @for (scope of oauth2ScopeOptions(entry); track scope) {
+                          <mat-option [value]="scope">{{ scope }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                  } @else if (isOidc(entry.schemeName)) {
+                    <mat-form-field class="scopes-field">
+                      <mat-label>Scopes (comma-separated)</mat-label>
+                      <input matInput [ngModel]="freeTextScopes(entry)"
+                             (ngModelChange)="setFreeTextScopes(entry, $event)">
+                    </mat-form-field>
+                  } @else {
+                    <span class="muted-text scopes-field">No scopes</span>
+                  }
+
+                  <button mat-icon-button type="button" matTooltip="Remove scheme"
+                          (click)="removeSchemeEntry(requirement, $index)">
+                    <mat-icon>remove</mat-icon>
+                  </button>
+                </div>
+              }
+              @if (canAddSchemeEntry(requirement)) {
+                <button mat-button type="button" class="add-and-btn" (click)="addSchemeEntry(requirement)">
+                  <mat-icon>add</mat-icon>
+                  Add scheme (AND)
+                </button>
+              }
+            }
+          </div>
+        }
+      </div>
+
+      <div class="requirements-toolbar">
+        <button mat-stroked-button type="button" (click)="addRequirement()">
+          <mat-icon>add</mat-icon>
+          Add Alternative (OR)
+        </button>
+      </div>
+    }
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">Cancel</button>
+  <button mat-raised-button color="primary" type="button" (click)="apply()" [disabled]="!canApply()">Apply</button>
+</mat-dialog-actions>

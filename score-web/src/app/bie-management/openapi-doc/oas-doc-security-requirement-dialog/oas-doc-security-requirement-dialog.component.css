@@ -1,0 +1,96 @@
+.security-mode-group {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.requirement-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.requirement-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 8px 12px;
+  background: #fff;
+}
+
+.requirement-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.requirement-label {
+  font-weight: 500;
+}
+
+.requirement-card-header .spacer {
+  flex: 1 1 auto;
+}
+
+.or-badge,
+.and-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #1976d2;
+  border: 1px solid #1976d2;
+  border-radius: 3px;
+  padding: 0 5px;
+  line-height: 16px;
+}
+
+.and-badge {
+  color: #767676;
+  border-color: #c0c0c0;
+}
+
+.scheme-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.requirements-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.add-and-btn {
+  margin-top: 2px;
+}
+
+.scheme-field {
+  width: 240px;
+}
+
+.scopes-field {
+  flex: 1 1 auto;
+  min-width: 260px;
+}
+
+.muted-text {
+  color: #767676;
+  font-size: 12px;
+}
+
+.requirement-error {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #d32f2f;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.requirement-error-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}

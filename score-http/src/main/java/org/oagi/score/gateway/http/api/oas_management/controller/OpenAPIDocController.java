@@ -132,6 +132,9 @@ public class OpenAPIDocController {
         request.setContactUrl(oasDoc.getContactUrl());
         request.setLicenseName(oasDoc.getLicenseName());
         request.setLicenseUrl(oasDoc.getLicenseUrl());
+        // Issue #1729: carry the configured Security Schemes.
+        request.setSecuritySchemes(oasDoc.getSecuritySchemes());
+        request.setSecurityRequirements(oasDoc.getSecurityRequirements());
 
         CreateOasDocResponse response = oasDocService.createOasDoc(sessionService.asScoreUser(user), request);
 
@@ -773,6 +776,9 @@ public class OpenAPIDocController {
         request.setContactUrl(oasDoc.getContactUrl());
         request.setLicenseName(oasDoc.getLicenseName());
         request.setLicenseUrl(oasDoc.getLicenseUrl());
+        // Issue #1729: carry the configured Security Schemes.
+        request.setSecuritySchemes(oasDoc.getSecuritySchemes());
+        request.setSecurityRequirements(oasDoc.getSecurityRequirements());
 
         UpdateOasDocResponse response = oasDocService.updateOasDoc(sessionService.asScoreUser(user), request);
 

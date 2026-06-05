@@ -20,9 +20,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDoc.OAS_DOC;
+import static org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasSecurityScheme.OAS_SECURITY_SCHEME;
 import static org.oagi.score.gateway.http.common.util.ScoreGuidUtils.randomGuid;
 
 @Service
@@ -35,6 +40,11 @@ public class OpenAPIDocService {
     private static final int CONTACT_URL_MAX_LENGTH = OAS_DOC.CONTACT_URL.getDataType().length();
     private static final int LICENSE_NAME_MAX_LENGTH = OAS_DOC.LICENSE_NAME.getDataType().length();
     private static final int LICENSE_URL_MAX_LENGTH = OAS_DOC.LICENSE_URL.getDataType().length();
+    // Issue #1729
+    private static final int SCHEME_NAME_MAX_LENGTH = OAS_SECURITY_SCHEME.SCHEME_NAME.getDataType().length();
+    private static final int API_KEY_NAME_MAX_LENGTH = OAS_SECURITY_SCHEME.API_KEY_NAME.getDataType().length();
+    private static final int BEARER_FORMAT_MAX_LENGTH = OAS_SECURITY_SCHEME.BEARER_FORMAT.getDataType().length();
+    private static final int OPEN_ID_CONNECT_URL_MAX_LENGTH = OAS_SECURITY_SCHEME.OPEN_ID_CONNECT_URL.getDataType().length();
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -79,6 +89,8 @@ public class OpenAPIDocService {
                 request.getContactUrl(),
                 request.getLicenseName(),
                 request.getLicenseUrl());
+        validateSecuritySchemes(request.getSecuritySchemes());
+        validateSecurityRequirements(request.getSecuritySchemes(), request.getSecurityRequirements());
         CreateOasDocResponse response = command(requester).createOasDoc(request);
         return response;
     }
@@ -92,6 +104,8 @@ public class OpenAPIDocService {
                 request.getContactUrl(),
                 request.getLicenseName(),
                 request.getLicenseUrl());
+        validateSecuritySchemes(request.getSecuritySchemes());
+        validateSecurityRequirements(request.getSecuritySchemes(), request.getSecurityRequirements());
         UpdateOasDocResponse response = command(requester).updateOasDoc(request);
         return response;
     }
@@ -353,6 +367,214 @@ public class OpenAPIDocService {
         validateMaxLength("licenseUrl", licenseUrl, LICENSE_URL_MAX_LENGTH);
     }
 
+    /**
+     * Issue #1729: validate the list of OpenAPI 3.0.3 Security Schemes. An empty/null list keeps the
+     * legacy default OAuth2 scheme. Each scheme needs a unique, non-blank Scheme Name (the
+     * components.securitySchemes map key) and valid type-specific fields.
+     */
+    private void validateSecuritySchemes(List<OasSecurityScheme> schemes) {
+        if (schemes == null || schemes.isEmpty()) {
+            return;
+        }
+        Set<String> explicitNames = new HashSet<>();
+        for (OasSecurityScheme scheme : schemes) {
+            if (scheme == null) {
+                continue;
+            }
+            String name = scheme.getSchemeName();
+            // Scheme Name is optional; a blank falls back to a unique type-derived default at persist time.
+            if (!isBlank(name)) {
+                validateMaxLength("schemeName", name, SCHEME_NAME_MAX_LENGTH);
+                if (!explicitNames.add(name.trim())) {
+                    throw new IllegalArgumentException("Duplicate security scheme name: " + name.trim());
+                }
+            }
+            validateSecurityScheme(scheme);
+        }
+    }
+
+    /**
+     * Validate a single Security Scheme's type-specific fields per OpenAPI 3.0.3:
+     * <ul>
+     *   <li>apiKey -&gt; {@code in} (query|header|cookie) and {@code name} are required</li>
+     *   <li>http -&gt; {@code scheme} (bearer|basic) is required; bearer also requires
+     *       {@code bearerFormat}; basic suppresses {@code bearerFormat}</li>
+     *   <li>oauth2 -&gt; no extra required fields (uses the example.com authorizationCode flow)</li>
+     *   <li>openIdConnect -&gt; {@code openIdConnectUrl} is required</li>
+     * </ul>
+     */
+    private void validateSecurityScheme(OasSecurityScheme scheme) {
+        String type = scheme.getType();
+        if (isBlank(type)) {
+            throw new IllegalArgumentException("Security scheme `type` is required.");
+        }
+        switch (type) {
+            case "oauth2":
+                validateOAuthFlows(scheme.getFlows());
+                break;
+            case "apiKey":
+                if (isBlank(scheme.getApiKeyIn())) {
+                    throw new IllegalArgumentException("`in` is required for an apiKey security scheme.");
+                }
+                if (!List.of("query", "header", "cookie").contains(scheme.getApiKeyIn())) {
+                    throw new IllegalArgumentException("`in` must be one of query, header, cookie.");
+                }
+                if (isBlank(scheme.getApiKeyName())) {
+                    throw new IllegalArgumentException("`name` is required for an apiKey security scheme.");
+                }
+                validateMaxLength("name", scheme.getApiKeyName(), API_KEY_NAME_MAX_LENGTH);
+                break;
+            case "http":
+                if (isBlank(scheme.getHttpScheme())) {
+                    throw new IllegalArgumentException("`scheme` is required for an http security scheme.");
+                }
+                if ("bearer".equalsIgnoreCase(scheme.getHttpScheme())) {
+                    // bearerFormat is an optional hint for the bearer scheme.
+                    if (!isBlank(scheme.getBearerFormat())) {
+                        validateMaxLength("bearerFormat", scheme.getBearerFormat(), BEARER_FORMAT_MAX_LENGTH);
+                    }
+                } else if ("basic".equalsIgnoreCase(scheme.getHttpScheme())) {
+                    // bearerFormat is not applicable to the basic scheme.
+                    scheme.setBearerFormat(null);
+                } else {
+                    throw new IllegalArgumentException("`scheme` must be one of bearer, basic.");
+                }
+                break;
+            case "openIdConnect":
+                if (isBlank(scheme.getOpenIdConnectUrl())) {
+                    throw new IllegalArgumentException("`openIdConnectUrl` is required for an openIdConnect security scheme.");
+                }
+                validateMaxLength("openIdConnectUrl", scheme.getOpenIdConnectUrl(), OPEN_ID_CONNECT_URL_MAX_LENGTH);
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported security scheme type: " + type);
+        }
+    }
+
+    private static final List<String> OAUTH_FLOW_TYPES =
+            List.of("implicit", "password", "clientCredentials", "authorizationCode", "deviceAuthorization");
+
+    /**
+     * Issue #1729: validate an oauth2 scheme's OAuth Flows Object. At least one flow is REQUIRED (the
+     * generator no longer fabricates a default, so a flowless oauth2 scheme would emit a useless
+     * `flows: {}`). Each flow needs a valid, unique type and the URLs that its type requires per
+     * OpenAPI 3.0.3 (deviceAuthorization is 3.2 and is gated out of the generated output).
+     */
+    private void validateOAuthFlows(List<OasOAuthFlow> flows) {
+        if (flows == null || flows.isEmpty()) {
+            throw new IllegalArgumentException("An oauth2 security scheme requires at least one OAuth flow.");
+        }
+        Set<String> flowTypes = new HashSet<>();
+        for (OasOAuthFlow flow : flows) {
+            if (flow == null) {
+                continue;
+            }
+            String ft = flow.getFlowType();
+            if (isBlank(ft) || !OAUTH_FLOW_TYPES.contains(ft)) {
+                throw new IllegalArgumentException("Invalid OAuth flow type: " + ft);
+            }
+            if (!flowTypes.add(ft)) {
+                throw new IllegalArgumentException("Duplicate OAuth flow type: " + ft);
+            }
+            boolean needsAuthUrl = "implicit".equals(ft) || "authorizationCode".equals(ft);
+            boolean needsTokenUrl = "password".equals(ft) || "clientCredentials".equals(ft)
+                    || "authorizationCode".equals(ft) || "deviceAuthorization".equals(ft);
+            if (needsAuthUrl && isBlank(flow.getAuthorizationUrl())) {
+                throw new IllegalArgumentException("`authorizationUrl` is required for the " + ft + " flow.");
+            }
+            if (needsTokenUrl && isBlank(flow.getTokenUrl())) {
+                throw new IllegalArgumentException("`tokenUrl` is required for the " + ft + " flow.");
+            }
+            if ("deviceAuthorization".equals(ft) && isBlank(flow.getDeviceAuthorizationUrl())) {
+                throw new IllegalArgumentException("`deviceAuthorizationUrl` is required for the deviceAuthorization flow.");
+            }
+        }
+    }
+
+    private void validateSecurityRequirements(List<OasSecurityScheme> schemes,
+                                              List<OasSecurityRequirement> requirements) {
+        if (requirements == null || requirements.isEmpty()) {
+            return;
+        }
+        // Key by the SAME resolved name the persistence/generator emit (trimmed schemeName, else a
+        // type-derived default) so a requirement that references a derived name is not falsely rejected.
+        Map<String, OasSecurityScheme> schemeMap = (schemes == null ? List.<OasSecurityScheme>of() : schemes).stream()
+                .filter(scheme -> scheme != null && !isBlank(scheme.getType()))
+                .collect(Collectors.toMap(this::resolvedSchemeName, scheme -> scheme, (a, b) -> a));
+        for (OasSecurityRequirement requirement : requirements) {
+            if (requirement == null || requirement.isAnonymous()) {
+                continue;
+            }
+            if (requirement.getSchemes() == null || requirement.getSchemes().isEmpty()) {
+                continue;
+            }
+            for (OasSecurityRequirementScheme requirementScheme : requirement.getSchemes()) {
+                if (requirementScheme == null || isBlank(requirementScheme.getSchemeName())) {
+                    continue;
+                }
+                OasSecurityScheme scheme = schemeMap.get(requirementScheme.getSchemeName().trim());
+                if (scheme == null) {
+                    throw new IllegalArgumentException("Unknown security scheme: " + requirementScheme.getSchemeName());
+                }
+                if (!"oauth2".equals(scheme.getType()) && !"openIdConnect".equals(scheme.getType())
+                        && requirementScheme.getScopes() != null && !requirementScheme.getScopes().isEmpty()) {
+                    throw new IllegalArgumentException("Scopes are only allowed for oauth2 or openIdConnect security schemes.");
+                }
+                if ("oauth2".equals(scheme.getType())) {
+                    Set<String> declaredScopes = collectOAuthScopeNames(scheme);
+                    if (requirementScheme.getScopes() != null) {
+                        for (String scope : requirementScheme.getScopes()) {
+                            if (!isBlank(scope) && !declaredScopes.contains(scope.trim())) {
+                                throw new IllegalArgumentException("Unknown OAuth2 scope: " + scope);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Mirror resolveSchemeNameFor (generator) / typeDefaultName (persistence): the components.securitySchemes
+    // key is the trimmed schemeName when present, otherwise a type-derived default.
+    private String resolvedSchemeName(OasSecurityScheme scheme) {
+        if (!isBlank(scheme.getSchemeName())) {
+            return scheme.getSchemeName().trim();
+        }
+        String type = scheme.getType();
+        if ("apiKey".equalsIgnoreCase(type)) {
+            return "ApiKeyAuth";
+        }
+        if ("http".equalsIgnoreCase(type)) {
+            return "basic".equalsIgnoreCase(scheme.getHttpScheme()) ? "BasicAuth" : "BearerAuth";
+        }
+        if ("openIdConnect".equalsIgnoreCase(type)) {
+            return "OpenID";
+        }
+        return "OAuth2";
+    }
+
+    private Set<String> collectOAuthScopeNames(OasSecurityScheme scheme) {
+        Set<String> scopeNames = new HashSet<>();
+        if (scheme.getFlows() == null) {
+            return scopeNames;
+        }
+        for (OasOAuthFlow flow : scheme.getFlows()) {
+            if (flow == null || flow.getScopes() == null) {
+                continue;
+            }
+            for (OasOAuthScope scope : flow.getScopes()) {
+                if (scope != null && !isBlank(scope.getScopeName())) {
+                    scopeNames.add(scope.getScopeName().trim());
+                }
+            }
+        }
+        return scopeNames;
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
+    }
+
     private void validateMaxLength(String fieldName, String value, int maxLength) {
         if (value != null && value.length() > maxLength) {
             throw new IllegalArgumentException(
@@ -380,6 +602,25 @@ public class OpenAPIDocService {
 
     @Transactional
     public UpdateBieForOasDocResponse updateDetails(ScoreUser requester, UpdateBieForOasDocRequest request) {
+
+        // Issue #1729: per-operation security overrides are persisted through this path (not the OasDoc
+        // create/update path), so validate them against the document's declared schemes the same way the
+        // document-level requirements are validated (scheme must exist; scope rules per scheme type).
+        if (request.getBieForOasDocList() != null) {
+            boolean hasOverride = request.getBieForOasDocList().stream()
+                    .anyMatch(b -> b != null && b.isSecurityOverridden()
+                            && b.getSecurityRequirements() != null && !b.getSecurityRequirements().isEmpty());
+            if (hasOverride) {
+                OasDoc oasDoc = query(requester).getOasDoc(
+                        new GetOasDocRequest(requester).withOasDocId(request.getOasDocId())).getOasDoc();
+                List<OasSecurityScheme> schemes = (oasDoc == null) ? null : oasDoc.getSecuritySchemes();
+                for (BieForOasDoc bieForOasDoc : request.getBieForOasDocList()) {
+                    if (bieForOasDoc != null && bieForOasDoc.isSecurityOverridden()) {
+                        validateSecurityRequirements(schemes, bieForOasDoc.getSecurityRequirements());
+                    }
+                }
+            }
+        }
 
         UpdateBieForOasDocResponse response =
                 bieForOasDocCommand(requester).updateBieForOasDoc(request);

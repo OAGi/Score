@@ -1,7 +1,11 @@
 package org.oagi.score.gateway.http.api.oas_management.controller.payload;
 
+import org.oagi.score.gateway.http.api.oas_management.model.OasSecurityRequirement;
+import org.oagi.score.gateway.http.api.oas_management.model.OasSecurityScheme;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.model.base.Request;
+
+import java.util.List;
 
 public class CreateOasDocRequest extends Request {
     private String openAPIVersion;
@@ -15,6 +19,9 @@ public class CreateOasDocRequest extends Request {
     private String licenseName;
     private String licenseUrl;
     private String ownerUserId;
+    // Issue #1729
+    private List<OasSecurityScheme> securitySchemes;
+    private List<OasSecurityRequirement> securityRequirements;
 
     public CreateOasDocRequest(ScoreUser requester) {
         super(requester);
@@ -110,5 +117,21 @@ public class CreateOasDocRequest extends Request {
 
     public void setOwnerUserId(String ownerUserId) {
         this.ownerUserId = ownerUserId;
+    }
+
+    public List<OasSecurityScheme> getSecuritySchemes() {
+        return securitySchemes;
+    }
+
+    public void setSecuritySchemes(List<OasSecurityScheme> securitySchemes) {
+        this.securitySchemes = securitySchemes;
+    }
+
+    public List<OasSecurityRequirement> getSecurityRequirements() {
+        return securityRequirements;
+    }
+
+    public void setSecurityRequirements(List<OasSecurityRequirement> securityRequirements) {
+        this.securityRequirements = securityRequirements;
     }
 }

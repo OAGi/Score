@@ -93,7 +93,9 @@ export class OpenAPIService {
       contactName: oasDoc.contactName,
       contactUrl: oasDoc.contactUrl,
       contactEmail: oasDoc.contactEmail,
-      licenseUrl: oasDoc.licenseUrl
+      licenseUrl: oasDoc.licenseUrl,
+      securitySchemes: oasDoc.securitySchemes,
+      securityRequirements: oasDoc.securityRequirements
     });
   }
 
@@ -109,7 +111,9 @@ export class OpenAPIService {
       contactName: oasDoc.contactName,
       contactUrl: oasDoc.contactUrl,
       contactEmail: oasDoc.contactEmail,
-      licenseUrl: oasDoc.licenseUrl
+      licenseUrl: oasDoc.licenseUrl,
+      securitySchemes: oasDoc.securitySchemes,
+      securityRequirements: oasDoc.securityRequirements
     });
   }
 

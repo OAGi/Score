@@ -77,6 +77,8 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ModuleSe
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ModuleXbtManifest.ModuleXbtManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Namespace.NamespacePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDoc.OasDocPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocSecurity.OasDocSecurityPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocSecurityScope.OasDocSecurityScopePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocTag.OasDocTagPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasExample.OasExamplePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasExternalDoc.OasExternalDocPath;
@@ -84,7 +86,11 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasExter
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasHttpHeader.OasHttpHeaderPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasMediaType.OasMediaTypePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasMessageBody.OasMessageBodyPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasOauthFlow.OasOauthFlowPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasOauthScope.OasOauthScopePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasOperation.OasOperationPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasOperationSecurity.OasOperationSecurityPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasOperationSecurityScope.OasOperationSecurityScopePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasParameter.OasParameterPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasParameterLink.OasParameterLinkPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasRequest.OasRequestPath;
@@ -92,6 +98,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasReque
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasResource.OasResourcePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasResponse.OasResponsePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasResponseHeaders.OasResponseHeadersPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasSecurityScheme.OasSecuritySchemePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasServer.OasServerPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasServerVariable.OasServerVariablePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasTag.OasTagPath;
@@ -1528,6 +1535,62 @@ public class AppUser extends TableImpl<AppUserRecord> {
         return _oasDocOwnerUserIdFk;
     }
 
+    private transient OasDocSecurityPath _oasDocSecurityCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_doc_security</code> table, via the
+     * <code>oas_doc_security_created_by_fk</code> key
+     */
+    public OasDocSecurityPath oasDocSecurityCreatedByFk() {
+        if (_oasDocSecurityCreatedByFk == null)
+            _oasDocSecurityCreatedByFk = new OasDocSecurityPath(this, null, Keys.OAS_DOC_SECURITY_CREATED_BY_FK.getInverseKey());
+
+        return _oasDocSecurityCreatedByFk;
+    }
+
+    private transient OasDocSecurityPath _oasDocSecurityLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_doc_security</code> table, via the
+     * <code>oas_doc_security_last_updated_by_fk</code> key
+     */
+    public OasDocSecurityPath oasDocSecurityLastUpdatedByFk() {
+        if (_oasDocSecurityLastUpdatedByFk == null)
+            _oasDocSecurityLastUpdatedByFk = new OasDocSecurityPath(this, null, Keys.OAS_DOC_SECURITY_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasDocSecurityLastUpdatedByFk;
+    }
+
+    private transient OasDocSecurityScopePath _oasDocSecurityScopeCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_doc_security_scope</code> table, via the
+     * <code>oas_doc_security_scope_created_by_fk</code> key
+     */
+    public OasDocSecurityScopePath oasDocSecurityScopeCreatedByFk() {
+        if (_oasDocSecurityScopeCreatedByFk == null)
+            _oasDocSecurityScopeCreatedByFk = new OasDocSecurityScopePath(this, null, Keys.OAS_DOC_SECURITY_SCOPE_CREATED_BY_FK.getInverseKey());
+
+        return _oasDocSecurityScopeCreatedByFk;
+    }
+
+    private transient OasDocSecurityScopePath _oasDocSecurityScopeLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_doc_security_scope</code> table, via the
+     * <code>oas_doc_security_scope_last_updated_by_fk</code> key
+     */
+    public OasDocSecurityScopePath oasDocSecurityScopeLastUpdatedByFk() {
+        if (_oasDocSecurityScopeLastUpdatedByFk == null)
+            _oasDocSecurityScopeLastUpdatedByFk = new OasDocSecurityScopePath(this, null, Keys.OAS_DOC_SECURITY_SCOPE_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasDocSecurityScopeLastUpdatedByFk;
+    }
+
     private transient OasDocTagPath _oasDocTagCreatedByFk;
 
     /**
@@ -1748,6 +1811,62 @@ public class AppUser extends TableImpl<AppUserRecord> {
         return _oasMessageBodyLastUpdatedByFk;
     }
 
+    private transient OasOauthFlowPath _oasOauthFlowCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_oauth_flow</code> table, via the
+     * <code>oas_oauth_flow_created_by_fk</code> key
+     */
+    public OasOauthFlowPath oasOauthFlowCreatedByFk() {
+        if (_oasOauthFlowCreatedByFk == null)
+            _oasOauthFlowCreatedByFk = new OasOauthFlowPath(this, null, Keys.OAS_OAUTH_FLOW_CREATED_BY_FK.getInverseKey());
+
+        return _oasOauthFlowCreatedByFk;
+    }
+
+    private transient OasOauthFlowPath _oasOauthFlowLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_oauth_flow</code> table, via the
+     * <code>oas_oauth_flow_last_updated_by_fk</code> key
+     */
+    public OasOauthFlowPath oasOauthFlowLastUpdatedByFk() {
+        if (_oasOauthFlowLastUpdatedByFk == null)
+            _oasOauthFlowLastUpdatedByFk = new OasOauthFlowPath(this, null, Keys.OAS_OAUTH_FLOW_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasOauthFlowLastUpdatedByFk;
+    }
+
+    private transient OasOauthScopePath _oasOauthScopeCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_oauth_scope</code> table, via the
+     * <code>oas_oauth_scope_created_by_fk</code> key
+     */
+    public OasOauthScopePath oasOauthScopeCreatedByFk() {
+        if (_oasOauthScopeCreatedByFk == null)
+            _oasOauthScopeCreatedByFk = new OasOauthScopePath(this, null, Keys.OAS_OAUTH_SCOPE_CREATED_BY_FK.getInverseKey());
+
+        return _oasOauthScopeCreatedByFk;
+    }
+
+    private transient OasOauthScopePath _oasOauthScopeLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_oauth_scope</code> table, via the
+     * <code>oas_oauth_scope_last_updated_by_fk</code> key
+     */
+    public OasOauthScopePath oasOauthScopeLastUpdatedByFk() {
+        if (_oasOauthScopeLastUpdatedByFk == null)
+            _oasOauthScopeLastUpdatedByFk = new OasOauthScopePath(this, null, Keys.OAS_OAUTH_SCOPE_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasOauthScopeLastUpdatedByFk;
+    }
+
     private transient OasOperationPath _oasOperationCreatedByFk;
 
     /**
@@ -1772,6 +1891,62 @@ public class AppUser extends TableImpl<AppUserRecord> {
             _oasOperationLastUpdatedByFk = new OasOperationPath(this, null, Keys.OAS_OPERATION_LAST_UPDATED_BY_FK.getInverseKey());
 
         return _oasOperationLastUpdatedByFk;
+    }
+
+    private transient OasOperationSecurityPath _oasOperationSecurityCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_operation_security</code> table, via the
+     * <code>oas_operation_security_created_by_fk</code> key
+     */
+    public OasOperationSecurityPath oasOperationSecurityCreatedByFk() {
+        if (_oasOperationSecurityCreatedByFk == null)
+            _oasOperationSecurityCreatedByFk = new OasOperationSecurityPath(this, null, Keys.OAS_OPERATION_SECURITY_CREATED_BY_FK.getInverseKey());
+
+        return _oasOperationSecurityCreatedByFk;
+    }
+
+    private transient OasOperationSecurityPath _oasOperationSecurityLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_operation_security</code> table, via the
+     * <code>oas_operation_security_last_updated_by_fk</code> key
+     */
+    public OasOperationSecurityPath oasOperationSecurityLastUpdatedByFk() {
+        if (_oasOperationSecurityLastUpdatedByFk == null)
+            _oasOperationSecurityLastUpdatedByFk = new OasOperationSecurityPath(this, null, Keys.OAS_OPERATION_SECURITY_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasOperationSecurityLastUpdatedByFk;
+    }
+
+    private transient OasOperationSecurityScopePath _oasOperationSecurityScopeCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_operation_security_scope</code> table, via the
+     * <code>oas_operation_security_scope_created_by_fk</code> key
+     */
+    public OasOperationSecurityScopePath oasOperationSecurityScopeCreatedByFk() {
+        if (_oasOperationSecurityScopeCreatedByFk == null)
+            _oasOperationSecurityScopeCreatedByFk = new OasOperationSecurityScopePath(this, null, Keys.OAS_OPERATION_SECURITY_SCOPE_CREATED_BY_FK.getInverseKey());
+
+        return _oasOperationSecurityScopeCreatedByFk;
+    }
+
+    private transient OasOperationSecurityScopePath _oasOperationSecurityScopeLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_operation_security_scope</code> table, via the
+     * <code>oas_operation_security_scope_last_updated_by_fk</code> key
+     */
+    public OasOperationSecurityScopePath oasOperationSecurityScopeLastUpdatedByFk() {
+        if (_oasOperationSecurityScopeLastUpdatedByFk == null)
+            _oasOperationSecurityScopeLastUpdatedByFk = new OasOperationSecurityScopePath(this, null, Keys.OAS_OPERATION_SECURITY_SCOPE_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasOperationSecurityScopeLastUpdatedByFk;
     }
 
     private transient OasParameterPath _oasParameterCreatedByFk;
@@ -1960,6 +2135,34 @@ public class AppUser extends TableImpl<AppUserRecord> {
             _oasResponseLastUpdatedByFk = new OasResponsePath(this, null, Keys.OAS_RESPONSE_LAST_UPDATED_BY_FK.getInverseKey());
 
         return _oasResponseLastUpdatedByFk;
+    }
+
+    private transient OasSecuritySchemePath _oasSecuritySchemeCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_security_scheme</code> table, via the
+     * <code>oas_security_scheme_created_by_fk</code> key
+     */
+    public OasSecuritySchemePath oasSecuritySchemeCreatedByFk() {
+        if (_oasSecuritySchemeCreatedByFk == null)
+            _oasSecuritySchemeCreatedByFk = new OasSecuritySchemePath(this, null, Keys.OAS_SECURITY_SCHEME_CREATED_BY_FK.getInverseKey());
+
+        return _oasSecuritySchemeCreatedByFk;
+    }
+
+    private transient OasSecuritySchemePath _oasSecuritySchemeLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_security_scheme</code> table, via the
+     * <code>oas_security_scheme_last_updated_by_fk</code> key
+     */
+    public OasSecuritySchemePath oasSecuritySchemeLastUpdatedByFk() {
+        if (_oasSecuritySchemeLastUpdatedByFk == null)
+            _oasSecuritySchemeLastUpdatedByFk = new OasSecuritySchemePath(this, null, Keys.OAS_SECURITY_SCHEME_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasSecuritySchemeLastUpdatedByFk;
     }
 
     private transient OasServerPath _oasServerCreatedByFk;

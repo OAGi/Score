@@ -80,6 +80,8 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ModuleSe
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ModuleXbtManifest;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Namespace;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDoc;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocSecurity;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocSecurityScope;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocTag;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasExample;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasExternalDoc;
@@ -87,7 +89,11 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasExter
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasHttpHeader;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasMediaType;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasMessageBody;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasOauthFlow;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasOauthScope;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasOperation;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasOperationSecurity;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasOperationSecurityScope;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasParameter;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasParameterLink;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasRequest;
@@ -96,6 +102,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasResou
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasResourceTag;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasResponse;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasResponseHeaders;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasSecurityScheme;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasServer;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasServerVariable;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasTag;
@@ -594,6 +601,16 @@ public class Tables {
     public static final OasDoc OAS_DOC = OasDoc.OAS_DOC;
 
     /**
+     * Root-level Security Requirement entry for an OpenAPI document.
+     */
+    public static final OasDocSecurity OAS_DOC_SECURITY = OasDocSecurity.OAS_DOC_SECURITY;
+
+    /**
+     * Scope of a root-level Security Requirement entry.
+     */
+    public static final OasDocSecurityScope OAS_DOC_SECURITY_SCOPE = OasDocSecurityScope.OAS_DOC_SECURITY_SCOPE;
+
+    /**
      * The table <code>oagi.oas_doc_tag</code>.
      */
     public static final OasDocTag OAS_DOC_TAG = OasDocTag.OAS_DOC_TAG;
@@ -629,9 +646,30 @@ public class Tables {
     public static final OasMessageBody OAS_MESSAGE_BODY = OasMessageBody.OAS_MESSAGE_BODY;
 
     /**
+     * OpenAPI OAuth Flow Object for an oauth2 security scheme (one entry of
+     * components.securitySchemes.&lt;name&gt;.flows).
+     */
+    public static final OasOauthFlow OAS_OAUTH_FLOW = OasOauthFlow.OAS_OAUTH_FLOW;
+
+    /**
+     * OpenAPI OAuth Flow scope (name -&gt; description) for an oauth2 flow.
+     */
+    public static final OasOauthScope OAS_OAUTH_SCOPE = OasOauthScope.OAS_OAUTH_SCOPE;
+
+    /**
      * The table <code>oagi.oas_operation</code>.
      */
     public static final OasOperation OAS_OPERATION = OasOperation.OAS_OPERATION;
+
+    /**
+     * Operation-level Security Requirement entry (overrides document-level).
+     */
+    public static final OasOperationSecurity OAS_OPERATION_SECURITY = OasOperationSecurity.OAS_OPERATION_SECURITY;
+
+    /**
+     * Scope of an operation-level Security Requirement entry.
+     */
+    public static final OasOperationSecurityScope OAS_OPERATION_SECURITY_SCOPE = OasOperationSecurityScope.OAS_OPERATION_SECURITY_SCOPE;
 
     /**
      * The table <code>oagi.oas_parameter</code>.
@@ -672,6 +710,12 @@ public class Tables {
      * The table <code>oagi.oas_response_headers</code>.
      */
     public static final OasResponseHeaders OAS_RESPONSE_HEADERS = OasResponseHeaders.OAS_RESPONSE_HEADERS;
+
+    /**
+     * OpenAPI Security Scheme Object (OAS 3.0.3 through 3.2.0); one named entry
+     * of a document components.securitySchemes map.
+     */
+    public static final OasSecurityScheme OAS_SECURITY_SCHEME = OasSecurityScheme.OAS_SECURITY_SCHEME;
 
     /**
      * The table <code>oagi.oas_server</code>.

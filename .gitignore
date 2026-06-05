@@ -12,6 +12,8 @@ docker-compose.yml
 misc
 ql-test
 *.sql
+# but keep Flyway migration scripts under version control
+!score-http/src/main/resources/db/migration/*.sql
 hr_open
 hr_open_standards
 b2mml

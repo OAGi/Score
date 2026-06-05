@@ -100,9 +100,110 @@ public class JooqOasDocQueryRepository extends JooqBaseRepository
             oasDoc = (OasDoc) select()
                     .where(OAS_DOC.OAS_DOC_ID.eq(valueOf(oasDocId)))
                     .fetchOne(mapper());
+            // Issue #1729: attach the configured Security Schemes (empty list = default OAuth2).
+            if (oasDoc != null) {
+                oasDoc.setSecuritySchemes(loadSecuritySchemes(oasDocId));
+                oasDoc.setSecurityRequirements(loadDocSecurityRequirements(oasDocId));
+            }
         }
 
         return new GetOasDocResponse(oasDoc);
+    }
+
+    // Issue #1729: load the document's Security Schemes in insertion order; empty list = OAuth2 default.
+    private List<OasSecurityScheme> loadSecuritySchemes(OasDocId oasDocId) {
+        List<OasSecurityScheme> schemes = dslContext().selectFrom(OAS_SECURITY_SCHEME)
+                .where(OAS_SECURITY_SCHEME.OAS_DOC_ID.eq(valueOf(oasDocId)))
+                .orderBy(OAS_SECURITY_SCHEME.OAS_SECURITY_SCHEME_ID.asc())
+                .fetch()
+                .map(record -> {
+                    OasSecurityScheme scheme = new OasSecurityScheme();
+                    scheme.setOasSecuritySchemeId(record.getOasSecuritySchemeId().toBigInteger());
+                    scheme.setGuid(record.getGuid());
+                    scheme.setType(record.getType());
+                    scheme.setSchemeName(record.getSchemeName());
+                    scheme.setDescription(record.getDescription());
+                    scheme.setApiKeyName(record.getApiKeyName());
+                    scheme.setApiKeyIn(record.getApiKeyIn());
+                    scheme.setHttpScheme(record.getHttpScheme());
+                    scheme.setBearerFormat(record.getBearerFormat());
+                    scheme.setOpenIdConnectUrl(record.getOpenIdConnectUrl());
+                    return scheme;
+                });
+        // Issue #1729: attach the OAuth Flows Object (flows + scopes) for oauth2 schemes.
+        for (OasSecurityScheme scheme : schemes) {
+            if ("oauth2".equalsIgnoreCase(scheme.getType())) {
+                scheme.setFlows(loadOAuthFlows(ULong.valueOf(scheme.getOasSecuritySchemeId())));
+            }
+        }
+        return schemes;
+    }
+
+    private List<OasSecurityRequirement> loadDocSecurityRequirements(OasDocId oasDocId) {
+        Map<Integer, OasSecurityRequirement> requirements = new LinkedHashMap<>();
+        dslContext().selectFrom(OAS_DOC_SECURITY)
+                .where(OAS_DOC_SECURITY.OAS_DOC_ID.eq(valueOf(oasDocId)))
+                .orderBy(OAS_DOC_SECURITY.REQUIREMENT_GROUP.asc(), OAS_DOC_SECURITY.OAS_DOC_SECURITY_ID.asc())
+                .fetch()
+                .forEach(record -> {
+                    Integer group = record.getRequirementGroup();
+                    OasSecurityRequirement requirement = requirements.computeIfAbsent(group, k -> {
+                        OasSecurityRequirement r = new OasSecurityRequirement();
+                        r.setSchemes(new ArrayList<>());
+                        return r;
+                    });
+                    if (!StringUtils.hasLength(record.getSchemeName())) {
+                        requirement.setAnonymous(true);
+                    } else if (!requirement.isAnonymous()) {
+                        OasSecurityRequirementScheme scheme = new OasSecurityRequirementScheme();
+                        scheme.setSchemeName(record.getSchemeName());
+                        scheme.setScopes(loadDocSecurityScopes(record.getOasDocSecurityId()));
+                        requirement.getSchemes().add(scheme);
+                    }
+                });
+        return new ArrayList<>(requirements.values());
+    }
+
+    private List<String> loadDocSecurityScopes(ULong oasDocSecurityId) {
+        return dslContext().select(OAS_DOC_SECURITY_SCOPE.SCOPE_NAME)
+                .from(OAS_DOC_SECURITY_SCOPE)
+                .where(OAS_DOC_SECURITY_SCOPE.OAS_DOC_SECURITY_ID.eq(oasDocSecurityId))
+                .orderBy(OAS_DOC_SECURITY_SCOPE.OAS_DOC_SECURITY_SCOPE_ID.asc())
+                .fetchInto(String.class);
+    }
+
+    private List<OasOAuthFlow> loadOAuthFlows(ULong oasSecuritySchemeId) {
+        return dslContext().selectFrom(OAS_OAUTH_FLOW)
+                .where(OAS_OAUTH_FLOW.OAS_SECURITY_SCHEME_ID.eq(oasSecuritySchemeId))
+                .orderBy(OAS_OAUTH_FLOW.OAS_OAUTH_FLOW_ID.asc())
+                .fetch()
+                .map(record -> {
+                    OasOAuthFlow flow = new OasOAuthFlow();
+                    flow.setOasOAuthFlowId(record.getOasOauthFlowId().toBigInteger());
+                    flow.setGuid(record.getGuid());
+                    flow.setFlowType(record.getFlowType());
+                    flow.setAuthorizationUrl(record.getAuthorizationUrl());
+                    flow.setTokenUrl(record.getTokenUrl());
+                    flow.setRefreshUrl(record.getRefreshUrl());
+                    flow.setDeviceAuthorizationUrl(record.getDeviceAuthorizationUrl());
+                    flow.setScopes(loadOAuthScopes(record.getOasOauthFlowId()));
+                    return flow;
+                });
+    }
+
+    private List<OasOAuthScope> loadOAuthScopes(ULong oasOAuthFlowId) {
+        return dslContext().selectFrom(OAS_OAUTH_SCOPE)
+                .where(OAS_OAUTH_SCOPE.OAS_OAUTH_FLOW_ID.eq(oasOAuthFlowId))
+                .orderBy(OAS_OAUTH_SCOPE.OAS_OAUTH_SCOPE_ID.asc())
+                .fetch()
+                .map(record -> {
+                    OasOAuthScope scope = new OasOAuthScope();
+                    scope.setOasOAuthScopeId(record.getOasOauthScopeId().toBigInteger());
+                    scope.setGuid(record.getGuid());
+                    scope.setScopeName(record.getScopeName());
+                    scope.setDescription(record.getDescription());
+                    return scope;
+                });
     }
 
     private Collection<Condition> getConditions(GetOasDocListRequest request) {

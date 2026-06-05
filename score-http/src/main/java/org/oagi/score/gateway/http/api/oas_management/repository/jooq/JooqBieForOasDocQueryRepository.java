@@ -24,7 +24,9 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.jooq.impl.DSL.castNull;
 import static org.jooq.impl.DSL.field;
@@ -70,6 +72,7 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
                         OAS_RESOURCE.as("oas_resource").OAS_RESOURCE_ID.as("oas_resource_id"),
                         OAS_OPERATION.as("oas_operation").OPERATION_ID.as("operation_id"),
                         OAS_OPERATION.as("oas_operation").OAS_OPERATION_ID.as("oas_operation_id"),
+                        OAS_OPERATION.as("oas_operation").SECURITY_OVERRIDDEN.as("security_overridden"),
                         OAS_MESSAGE_BODY.CREATION_TIMESTAMP,
                         OAS_MESSAGE_BODY.LAST_UPDATE_TIMESTAMP
                 ), ownerFields(), creatorFields(), updaterFields()))
@@ -116,6 +119,7 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
                         OAS_RESOURCE.as("oas_resource").OAS_RESOURCE_ID.as("oas_resource_id"),
                         OAS_OPERATION.as("oas_operation").OPERATION_ID.as("operation_id"),
                         OAS_OPERATION.as("oas_operation").OAS_OPERATION_ID.as("oas_operation_id"),
+                        OAS_OPERATION.as("oas_operation").SECURITY_OVERRIDDEN.as("security_overridden"),
                         OAS_MESSAGE_BODY.CREATION_TIMESTAMP,
                         OAS_MESSAGE_BODY.LAST_UPDATE_TIMESTAMP
                 ), ownerFields(), creatorFields(), updaterFields()))
@@ -179,6 +183,10 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
             ULong oasOperationId = record.get(OAS_OPERATION.as("oas_operation").OAS_OPERATION_ID.as("oas_operation_id"));
             if (oasOperationId != null) {
                 bieForOasDoc.setOasOperationId(new OasOperationId(oasOperationId.toBigInteger()));
+                List<OasSecurityRequirement> securityRequirements = loadOperationSecurityRequirements(oasOperationId);
+                Byte securityOverridden = record.get(field("security_overridden", Byte.class));
+                bieForOasDoc.setSecurityOverridden(securityOverridden != null && securityOverridden == (byte) 1);
+                bieForOasDoc.setSecurityRequirements(securityRequirements);
             }
             if (topLevelAsbiepId != null) {
                 bieForOasDoc.setReleaseId(new ReleaseId(record.get(TOP_LEVEL_ASBIEP.RELEASE_ID).toBigInteger()));
@@ -199,6 +207,39 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
             bieForOasDoc.setLastUpdateTimestamp(toDate(record.get(OAS_MESSAGE_BODY.LAST_UPDATE_TIMESTAMP)));
             return bieForOasDoc;
         };
+    }
+
+    private List<OasSecurityRequirement> loadOperationSecurityRequirements(ULong oasOperationId) {
+        Map<Integer, OasSecurityRequirement> requirements = new LinkedHashMap<>();
+        dslContext().selectFrom(OAS_OPERATION_SECURITY)
+                .where(OAS_OPERATION_SECURITY.OAS_OPERATION_ID.eq(oasOperationId))
+                .orderBy(OAS_OPERATION_SECURITY.REQUIREMENT_GROUP.asc(), OAS_OPERATION_SECURITY.OAS_OPERATION_SECURITY_ID.asc())
+                .fetch()
+                .forEach(record -> {
+                    Integer group = record.getRequirementGroup();
+                    OasSecurityRequirement requirement = requirements.computeIfAbsent(group, k -> {
+                        OasSecurityRequirement r = new OasSecurityRequirement();
+                        r.setSchemes(new ArrayList<>());
+                        return r;
+                    });
+                    if (record.getSchemeName() == null || record.getSchemeName().isBlank()) {
+                        requirement.setAnonymous(true);
+                    } else if (!requirement.isAnonymous()) {
+                        OasSecurityRequirementScheme scheme = new OasSecurityRequirementScheme();
+                        scheme.setSchemeName(record.getSchemeName());
+                        scheme.setScopes(loadOperationSecurityScopes(record.getOasOperationSecurityId()));
+                        requirement.getSchemes().add(scheme);
+                    }
+                });
+        return new ArrayList<>(requirements.values());
+    }
+
+    private List<String> loadOperationSecurityScopes(ULong oasOperationSecurityId) {
+        return dslContext().select(OAS_OPERATION_SECURITY_SCOPE.SCOPE_NAME)
+                .from(OAS_OPERATION_SECURITY_SCOPE)
+                .where(OAS_OPERATION_SECURITY_SCOPE.OAS_OPERATION_SECURITY_ID.eq(oasOperationSecurityId))
+                .orderBy(OAS_OPERATION_SECURITY_SCOPE.OAS_OPERATION_SECURITY_SCOPE_ID.asc())
+                .fetchInto(String.class);
     }
 
     private Collection<Condition> getConditions(GetBieForOasDocRequest request) {

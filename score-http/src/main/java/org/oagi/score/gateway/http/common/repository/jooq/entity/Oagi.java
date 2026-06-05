@@ -87,6 +87,8 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ModuleSe
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ModuleXbtManifest;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Namespace;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDoc;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocSecurity;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocSecurityScope;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocTag;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasExample;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasExternalDoc;
@@ -94,7 +96,11 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasExter
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasHttpHeader;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasMediaType;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasMessageBody;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasOauthFlow;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasOauthScope;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasOperation;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasOperationSecurity;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasOperationSecurityScope;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasParameter;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasParameterLink;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasRequest;
@@ -103,6 +109,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasResou
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasResourceTag;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasResponse;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasResponseHeaders;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasSecurityScheme;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasServer;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasServerVariable;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasTag;
@@ -608,6 +615,16 @@ public class Oagi extends SchemaImpl {
     public final OasDoc OAS_DOC = OasDoc.OAS_DOC;
 
     /**
+     * Root-level Security Requirement entry for an OpenAPI document.
+     */
+    public final OasDocSecurity OAS_DOC_SECURITY = OasDocSecurity.OAS_DOC_SECURITY;
+
+    /**
+     * Scope of a root-level Security Requirement entry.
+     */
+    public final OasDocSecurityScope OAS_DOC_SECURITY_SCOPE = OasDocSecurityScope.OAS_DOC_SECURITY_SCOPE;
+
+    /**
      * The table <code>oagi.oas_doc_tag</code>.
      */
     public final OasDocTag OAS_DOC_TAG = OasDocTag.OAS_DOC_TAG;
@@ -643,9 +660,30 @@ public class Oagi extends SchemaImpl {
     public final OasMessageBody OAS_MESSAGE_BODY = OasMessageBody.OAS_MESSAGE_BODY;
 
     /**
+     * OpenAPI OAuth Flow Object for an oauth2 security scheme (one entry of
+     * components.securitySchemes.&lt;name&gt;.flows).
+     */
+    public final OasOauthFlow OAS_OAUTH_FLOW = OasOauthFlow.OAS_OAUTH_FLOW;
+
+    /**
+     * OpenAPI OAuth Flow scope (name -&gt; description) for an oauth2 flow.
+     */
+    public final OasOauthScope OAS_OAUTH_SCOPE = OasOauthScope.OAS_OAUTH_SCOPE;
+
+    /**
      * The table <code>oagi.oas_operation</code>.
      */
     public final OasOperation OAS_OPERATION = OasOperation.OAS_OPERATION;
+
+    /**
+     * Operation-level Security Requirement entry (overrides document-level).
+     */
+    public final OasOperationSecurity OAS_OPERATION_SECURITY = OasOperationSecurity.OAS_OPERATION_SECURITY;
+
+    /**
+     * Scope of an operation-level Security Requirement entry.
+     */
+    public final OasOperationSecurityScope OAS_OPERATION_SECURITY_SCOPE = OasOperationSecurityScope.OAS_OPERATION_SECURITY_SCOPE;
 
     /**
      * The table <code>oagi.oas_parameter</code>.
@@ -686,6 +724,12 @@ public class Oagi extends SchemaImpl {
      * The table <code>oagi.oas_response_headers</code>.
      */
     public final OasResponseHeaders OAS_RESPONSE_HEADERS = OasResponseHeaders.OAS_RESPONSE_HEADERS;
+
+    /**
+     * OpenAPI Security Scheme Object (OAS 3.0.3 through 3.2.0); one named entry
+     * of a document components.securitySchemes map.
+     */
+    public final OasSecurityScheme OAS_SECURITY_SCHEME = OasSecurityScheme.OAS_SECURITY_SCHEME;
 
     /**
      * The table <code>oagi.oas_server</code>.
@@ -880,6 +924,8 @@ public class Oagi extends SchemaImpl {
             ModuleXbtManifest.MODULE_XBT_MANIFEST,
             Namespace.NAMESPACE,
             OasDoc.OAS_DOC,
+            OasDocSecurity.OAS_DOC_SECURITY,
+            OasDocSecurityScope.OAS_DOC_SECURITY_SCOPE,
             OasDocTag.OAS_DOC_TAG,
             OasExample.OAS_EXAMPLE,
             OasExternalDoc.OAS_EXTERNAL_DOC,
@@ -887,7 +933,11 @@ public class Oagi extends SchemaImpl {
             OasHttpHeader.OAS_HTTP_HEADER,
             OasMediaType.OAS_MEDIA_TYPE,
             OasMessageBody.OAS_MESSAGE_BODY,
+            OasOauthFlow.OAS_OAUTH_FLOW,
+            OasOauthScope.OAS_OAUTH_SCOPE,
             OasOperation.OAS_OPERATION,
+            OasOperationSecurity.OAS_OPERATION_SECURITY,
+            OasOperationSecurityScope.OAS_OPERATION_SECURITY_SCOPE,
             OasParameter.OAS_PARAMETER,
             OasParameterLink.OAS_PARAMETER_LINK,
             OasRequest.OAS_REQUEST,
@@ -896,6 +946,7 @@ public class Oagi extends SchemaImpl {
             OasResourceTag.OAS_RESOURCE_TAG,
             OasResponse.OAS_RESPONSE,
             OasResponseHeaders.OAS_RESPONSE_HEADERS,
+            OasSecurityScheme.OAS_SECURITY_SCHEME,
             OasServer.OAS_SERVER,
             OasServerVariable.OAS_SERVER_VARIABLE,
             OasTag.OAS_TAG,

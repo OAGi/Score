@@ -92,6 +92,52 @@ export class OasDocListRequest {
   }
 }
 
+// Issue #1729: one entry of an OAuth Flow Object's scopes map (name -> description).
+export class OasOAuthScope {
+  oasOAuthScopeId?: number;
+  guid?: string;
+  scopeName: string;
+  description?: string;
+}
+
+// Issue #1729: one OAuth Flow Object for an oauth2 scheme (a scheme may declare several flows).
+export class OasOAuthFlow {
+  oasOAuthFlowId?: number;
+  guid?: string;
+  flowType: string;             // implicit | password | clientCredentials | authorizationCode | deviceAuthorization
+  authorizationUrl?: string;    // required for implicit & authorizationCode
+  tokenUrl?: string;            // required for password, clientCredentials, authorizationCode, deviceAuthorization
+  refreshUrl?: string;          // optional
+  deviceAuthorizationUrl?: string; // required for deviceAuthorization (OpenAPI 3.2+)
+  scopes?: OasOAuthScope[];
+}
+
+// Issue #1729: one named OpenAPI Security Scheme. A document can configure several (the OpenAPI
+// components.securitySchemes is a map). An empty list keeps the legacy default OAuth2 scheme.
+export class OasSecurityScheme {
+  oasSecuritySchemeId?: number;
+  guid?: string;
+  schemeName?: string;       // the components.securitySchemes map key (unique within the document)
+  type: string;              // 'apiKey' | 'http' | 'oauth2' | 'openIdConnect'
+  description?: string;
+  apiKeyName?: string;       // required when type === 'apiKey'
+  apiKeyIn?: string;         // 'header' | 'query' | 'cookie'
+  httpScheme?: string;       // 'bearer' | 'basic'
+  bearerFormat?: string;     // optional, only for httpScheme === 'bearer'
+  openIdConnectUrl?: string; // required when type === 'openIdConnect'
+  flows?: OasOAuthFlow[];    // the OAuth Flows Object, when type === 'oauth2'
+}
+
+export class OasSecurityRequirementScheme {
+  schemeName: string;
+  scopes?: string[];
+}
+
+export class OasSecurityRequirement {
+  anonymous?: boolean;
+  schemes?: OasSecurityRequirementScheme[];
+}
+
 export class OasDoc {
   oasDocId: number;
   guid: string;
@@ -108,6 +154,9 @@ export class OasDoc {
   contactEmail: string;
   licenseName: string;
   licenseUrl: string;
+  // Issue #1729: the document's Security Schemes (empty = default OAuth2).
+  securitySchemes: OasSecurityScheme[];
+  securityRequirements: OasSecurityRequirement[];
   access: string;
   ownerUserId: string;
   lastUpdateTimestamp: Date;
@@ -296,6 +345,8 @@ export class BieForOasDoc {
   private _arrayIndicator: boolean;
   private _suppressRootIndicator: boolean;
   private _messageBody: string;
+  private _securityOverridden: boolean;
+  private _securityRequirements: OasSecurityRequirement[];
   private $hashCode: number;
   listeners: ChangeListener<BieForOasDoc>[] = [];
 
@@ -321,6 +372,8 @@ export class BieForOasDoc {
     this.arrayIndicator = obj && obj.arrayIndicator || false;
     this.suppressRootIndicator = obj && obj.suppressRootIndicator || false;
     this.messageBody = obj && obj.messageBody || '';
+    this.securityOverridden = obj && obj.securityOverridden || false;
+    this.securityRequirements = obj && obj.securityRequirements || [];
     this.resourceName = obj && obj.resourceName || '';
     this.operationId = obj && obj.operationId || '';
     this.tagName = obj && obj.tagName || '';
@@ -345,7 +398,9 @@ export class BieForOasDoc {
       suppressRootIndicator: this.suppressRootIndicator,
       messageBody: this.messageBody,
       tagName: this.tagName,
-      httpStatusCode: this.httpStatusCode
+      httpStatusCode: this.httpStatusCode,
+      securityOverridden: this.securityOverridden,
+      securityRequirements: this.securityRequirements
     };
   }
 
@@ -407,10 +462,27 @@ export class BieForOasDoc {
     this._messageBody = messageBody;
   }
 
+  get securityOverridden(): boolean {
+    return this._securityOverridden;
+  }
+
+  set securityOverridden(securityOverridden: boolean) {
+    this._securityOverridden = securityOverridden;
+  }
+
+  get securityRequirements(): OasSecurityRequirement[] {
+    return this._securityRequirements;
+  }
+
+  set securityRequirements(securityRequirements: OasSecurityRequirement[]) {
+    this._securityRequirements = securityRequirements || [];
+  }
+
   get hashCode(): number {
     return hashCode4Array([this.oasDocId, this.topLevelAsbiepId, this.oasResourceId, this.oasOperationId,
       this.verb, this.messageBody, this.resourceName, this.operationId, this.tagName,
-      this.arrayIndicator, this.suppressRootIndicator]);
+      this.arrayIndicator, this.suppressRootIndicator, this.securityOverridden,
+      JSON.stringify(this.securityRequirements || [])]);
   }
 
   reset(): void {

@@ -38,6 +38,11 @@ public class BieForOasDoc extends Auditable {
     private String operationId;
     private String tagName;
     private Integer httpStatusCode;
+    // Issue #1729: per-operation security. securityOverridden=false => inherit the document-level
+    // security (no operation `security` emitted). true with empty requirements => `security: []`.
+    // true with requirements => that operation's `security` array. Keyed by the oas_operation.
+    private boolean securityOverridden;
+    private List<OasSecurityRequirement> securityRequirements;
     private Date lastUpdateTimestamp;
     private Date creationTimestamp;
     private UserSummaryRecord createdBy;
@@ -244,6 +249,22 @@ public class BieForOasDoc extends Auditable {
 
     public void setHttpStatusCode(Integer httpStatusCode) {
         this.httpStatusCode = httpStatusCode;
+    }
+
+    public boolean isSecurityOverridden() {
+        return securityOverridden;
+    }
+
+    public void setSecurityOverridden(boolean securityOverridden) {
+        this.securityOverridden = securityOverridden;
+    }
+
+    public List<OasSecurityRequirement> getSecurityRequirements() {
+        return securityRequirements;
+    }
+
+    public void setSecurityRequirements(List<OasSecurityRequirement> securityRequirements) {
+        this.securityRequirements = securityRequirements;
     }
 
     @Override

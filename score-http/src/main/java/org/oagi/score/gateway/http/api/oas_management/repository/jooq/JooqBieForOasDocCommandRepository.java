@@ -7,6 +7,8 @@ import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.oas_management.controller.payload.*;
 import org.oagi.score.gateway.http.api.oas_management.model.BieForOasDoc;
 import org.oagi.score.gateway.http.api.oas_management.model.OasDocId;
+import org.oagi.score.gateway.http.api.oas_management.model.OasSecurityRequirement;
+import org.oagi.score.gateway.http.api.oas_management.model.OasSecurityRequirementScheme;
 import org.oagi.score.gateway.http.api.oas_management.repository.BieForOasDocCommandRepository;
 import org.oagi.score.gateway.http.common.model.AccessControl;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
@@ -19,7 +21,9 @@ import org.oagi.score.gateway.http.common.util.StringUtils;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.jooq.impl.DSL.and;
 import static org.oagi.score.gateway.http.common.model.ScoreRole.DEVELOPER;
@@ -57,6 +61,10 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
         List<Field<?>> oasRequestChangedField = new ArrayList();
         List<Field<?>> oasResponseChangedField = new ArrayList();
         List<Field<?>> oasTagChangeField = new ArrayList<>();
+        boolean securityChanged = false;
+        // Issue #1729: an oas_operation appears as up to two rows (Request + Response). Persist its
+        // security exactly once to avoid the second row's delete-then-reinsert clobbering the first.
+        Set<ULong> securityProcessedOps = new HashSet<>();
         for (BieForOasDoc bieForOasDoc : request.getBieForOasDocList()) {
             if (bieForOasDoc.getMessageBody().equals("Request")) {
                 //update oasTag
@@ -225,6 +233,9 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
                         oasOperationChangedField.add(OAS_OPERATION.as("res_oas_operation").OPERATION_ID);
                         oasOperationRecord.setOperationId(bieForOasDoc.getOperationId());
                     }
+                    // Issue #1729: security_overridden + operation security rows are persisted once per
+                    // oas_operation (deduped) in saveOperationSecurityRequirements below, so the flag stays
+                    // consistent with the rows regardless of the Request/Response branch.
                     oasOperationChangedField.add(OAS_OPERATION.as("res_oas_operation").LAST_UPDATED_BY);
                     oasOperationRecord.setLastUpdatedBy(valueOf(requesterId));
                     oasOperationChangedField.add(OAS_OPERATION.as("res_oas_operation").LAST_UPDATE_TIMESTAMP);
@@ -327,9 +338,131 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
                 }
             }
 
+            if (bieForOasDoc.getOasOperationId() != null
+                    && securityProcessedOps.add(valueOf(bieForOasDoc.getOasOperationId()))) {
+                securityChanged |= saveOperationSecurityRequirements(
+                        valueOf(bieForOasDoc.getOasOperationId()),
+                        bieForOasDoc.isSecurityOverridden(),
+                        bieForOasDoc.getSecurityRequirements(),
+                        valueOf(requesterId),
+                        timestamp);
+            }
         }
         return new UpdateBieForOasDocResponse(oasDocId, !oasResourceChangedField.isEmpty() || !oasOperationChangedField.isEmpty()
-                || !oasRequestChangedField.isEmpty() || !oasResponseChangedField.isEmpty() || !oasTagChangeField.isEmpty());
+                || !oasRequestChangedField.isEmpty() || !oasResponseChangedField.isEmpty() || !oasTagChangeField.isEmpty()
+                || securityChanged);
+    }
+
+    private boolean saveOperationSecurityRequirements(ULong oasOperationId, boolean securityOverridden,
+                                                      List<OasSecurityRequirement> requirements,
+                                                      ULong requesterId, LocalDateTime timestamp) {
+        dslContext().deleteFrom(OAS_OPERATION_SECURITY_SCOPE)
+                .where(OAS_OPERATION_SECURITY_SCOPE.OAS_OPERATION_SECURITY_ID.in(
+                        dslContext().select(OAS_OPERATION_SECURITY.OAS_OPERATION_SECURITY_ID)
+                                .from(OAS_OPERATION_SECURITY)
+                                .where(OAS_OPERATION_SECURITY.OAS_OPERATION_ID.eq(oasOperationId))))
+                .execute();
+        int deletedRows = dslContext().deleteFrom(OAS_OPERATION_SECURITY)
+                .where(OAS_OPERATION_SECURITY.OAS_OPERATION_ID.eq(oasOperationId))
+                .execute();
+
+        // Issue #1729: keep oas_operation.security_overridden consistent with the rows, in one place,
+        // for both message-body branches (false => inherit/clear; true => this operation's array).
+        dslContext().update(OAS_OPERATION)
+                .set(OAS_OPERATION.SECURITY_OVERRIDDEN, BooleanToByte(securityOverridden))
+                .set(OAS_OPERATION.LAST_UPDATED_BY, requesterId)
+                .set(OAS_OPERATION.LAST_UPDATE_TIMESTAMP, timestamp)
+                .where(OAS_OPERATION.OAS_OPERATION_ID.eq(oasOperationId))
+                .execute();
+
+        if (!securityOverridden || requirements == null || requirements.isEmpty()) {
+            return true;
+        }
+
+        boolean inserted = false;
+        for (int i = 0; i < requirements.size(); i++) {
+            OasSecurityRequirement requirement = requirements.get(i);
+            if (requirement == null) {
+                continue;
+            }
+            if (requirement.isAnonymous()) {
+                insertOperationSecurityRequirementEntry(oasOperationId, i, null, Collections.emptyList(), requesterId, timestamp);
+                inserted = true;
+                continue;
+            }
+            if (requirement.getSchemes() == null) {
+                continue;
+            }
+            Set<String> usedSchemeNames = new HashSet<>();
+            for (OasSecurityRequirementScheme scheme : requirement.getSchemes()) {
+                if (scheme == null || scheme.getSchemeName() == null || scheme.getSchemeName().isBlank()) {
+                    continue;
+                }
+                String schemeName = scheme.getSchemeName().trim();
+                if (!usedSchemeNames.add(schemeName)) {
+                    continue;
+                }
+                insertOperationSecurityRequirementEntry(oasOperationId, i, schemeName, scheme.getScopes(), requesterId, timestamp);
+                inserted = true;
+            }
+        }
+        return deletedRows > 0 || inserted;
+    }
+
+    private void insertOperationSecurityRequirementEntry(ULong oasOperationId, int requirementGroup, String schemeName,
+                                                         List<String> scopes, ULong requesterId, LocalDateTime timestamp) {
+        ULong oasOperationSecurityId = dslContext().insertInto(OAS_OPERATION_SECURITY)
+                .set(OAS_OPERATION_SECURITY.GUID, randomGuid())
+                .set(OAS_OPERATION_SECURITY.OAS_OPERATION_ID, oasOperationId)
+                .set(OAS_OPERATION_SECURITY.REQUIREMENT_GROUP, requirementGroup)
+                .set(OAS_OPERATION_SECURITY.SCHEME_NAME, schemeName)
+                .set(OAS_OPERATION_SECURITY.CREATED_BY, requesterId)
+                .set(OAS_OPERATION_SECURITY.LAST_UPDATED_BY, requesterId)
+                .set(OAS_OPERATION_SECURITY.CREATION_TIMESTAMP, timestamp)
+                .set(OAS_OPERATION_SECURITY.LAST_UPDATE_TIMESTAMP, timestamp)
+                .returning(OAS_OPERATION_SECURITY.OAS_OPERATION_SECURITY_ID)
+                .fetchOne().getOasOperationSecurityId();
+        insertOperationSecurityScopes(oasOperationSecurityId, scopes, requesterId, timestamp);
+    }
+
+    private void insertOperationSecurityScopes(ULong oasOperationSecurityId, List<String> scopes,
+                                               ULong requesterId, LocalDateTime timestamp) {
+        if (scopes == null || scopes.isEmpty()) {
+            return;
+        }
+        Set<String> usedScopeNames = new HashSet<>();
+        for (String scope : scopes) {
+            if (scope == null || scope.isBlank()) {
+                continue;
+            }
+            String scopeName = scope.trim();
+            if (!usedScopeNames.add(scopeName)) {
+                continue;
+            }
+            dslContext().insertInto(OAS_OPERATION_SECURITY_SCOPE)
+                    .set(OAS_OPERATION_SECURITY_SCOPE.GUID, randomGuid())
+                    .set(OAS_OPERATION_SECURITY_SCOPE.OAS_OPERATION_SECURITY_ID, oasOperationSecurityId)
+                    .set(OAS_OPERATION_SECURITY_SCOPE.SCOPE_NAME, scopeName)
+                    .set(OAS_OPERATION_SECURITY_SCOPE.CREATED_BY, requesterId)
+                    .set(OAS_OPERATION_SECURITY_SCOPE.LAST_UPDATED_BY, requesterId)
+                    .set(OAS_OPERATION_SECURITY_SCOPE.CREATION_TIMESTAMP, timestamp)
+                    .set(OAS_OPERATION_SECURITY_SCOPE.LAST_UPDATE_TIMESTAMP, timestamp)
+                    .execute();
+        }
+    }
+
+    // Issue #1729: no ON DELETE CASCADE — clear an operation's security (scopes -> entries) before the
+    // operation row itself is deleted, to avoid an FK violation.
+    private void deleteOperationSecurity(ULong oasOperationId) {
+        dslContext().deleteFrom(OAS_OPERATION_SECURITY_SCOPE)
+                .where(OAS_OPERATION_SECURITY_SCOPE.OAS_OPERATION_SECURITY_ID.in(
+                        dslContext().select(OAS_OPERATION_SECURITY.OAS_OPERATION_SECURITY_ID)
+                                .from(OAS_OPERATION_SECURITY)
+                                .where(OAS_OPERATION_SECURITY.OAS_OPERATION_ID.eq(oasOperationId))))
+                .execute();
+        dslContext().deleteFrom(OAS_OPERATION_SECURITY)
+                .where(OAS_OPERATION_SECURITY.OAS_OPERATION_ID.eq(oasOperationId))
+                .execute();
     }
 
     @Override
@@ -362,6 +495,7 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
                             dslContext().delete(OAS_RESOURCE_TAG).where(OAS_RESOURCE_TAG.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId()))).execute();
                             dslContext().delete(OAS_TAG).where(OAS_TAG.OAS_TAG_ID.eq(oasTagId)).execute();
                         }
+                        deleteOperationSecurity(valueOf(bieForOasDoc.getOasOperationId()));
                         dslContext().delete(OAS_OPERATION).where(OAS_OPERATION.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId()))).execute();
                         dslContext().delete(OAS_RESOURCE).where(OAS_RESOURCE.OAS_RESOURCE_ID.eq(oasOperationRecord.getOasResourceId())).execute();
                     }
@@ -384,6 +518,7 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
                             dslContext().delete(OAS_RESOURCE_TAG).where(OAS_RESOURCE_TAG.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId()))).execute();
                             dslContext().delete(OAS_TAG).where(OAS_TAG.OAS_TAG_ID.eq(oasTagId)).execute();
                         }
+                        deleteOperationSecurity(valueOf(bieForOasDoc.getOasOperationId()));
                         dslContext().delete(OAS_OPERATION).where(OAS_OPERATION.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId()))).execute();
                         dslContext().delete(OAS_RESOURCE).where(OAS_RESOURCE.OAS_RESOURCE_ID.eq(oasOperationRecord.getOasResourceId())).execute();
                     }

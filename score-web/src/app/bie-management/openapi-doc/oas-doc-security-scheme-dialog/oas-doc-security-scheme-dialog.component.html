@@ -1,0 +1,178 @@
+<h2 mat-dialog-title>{{ isNew ? 'Add Security Scheme' : 'Edit Security Scheme' }}</h2>
+
+<mat-dialog-content>
+  <div class="row">
+    <div class="col-6">
+      <mat-form-field class="w-100">
+        <mat-label>Type</mat-label>
+        <mat-select [(ngModel)]="scheme.type" (ngModelChange)="onTypeChange()">
+          @for (t of securitySchemeTypes; track t.value) {
+            <mat-option [value]="t.value">{{ t.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="col-6">
+      <mat-form-field class="w-100">
+        <mat-label>Scheme Name</mat-label>
+        <input matInput [(ngModel)]="scheme.schemeName" maxlength="100">
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <mat-form-field class="w-100">
+        <mat-label>Description (optional)</mat-label>
+        <input matInput [(ngModel)]="scheme.description" maxlength="250">
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- apiKey: in + name -->
+  @if (scheme.type === 'apiKey') {
+    <div class="row">
+      <div class="col-4">
+        <mat-form-field class="w-100">
+          <mat-label>In</mat-label>
+          <mat-select [(ngModel)]="scheme.apiKeyIn">
+            <mat-option value="query">Query</mat-option>
+            <mat-option value="header">Header</mat-option>
+            <mat-option value="cookie">Cookie</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="col-8">
+        <mat-form-field class="w-100">
+          <mat-label>Name</mat-label>
+          <input matInput [(ngModel)]="scheme.apiKeyName" maxlength="200" placeholder="e.g. X-API-Key">
+        </mat-form-field>
+      </div>
+    </div>
+  }
+
+  <!-- http: scheme (+ optional bearerFormat) -->
+  @if (scheme.type === 'http') {
+    <div class="row">
+      <div class="col-4">
+        <mat-form-field class="w-100">
+          <mat-label>Scheme</mat-label>
+          <mat-select [(ngModel)]="scheme.httpScheme" (ngModelChange)="onHttpSchemeChange()">
+            <mat-option value="basic">Basic</mat-option>
+            <mat-option value="bearer">Bearer</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      @if (scheme.httpScheme === 'bearer') {
+        <div class="col-8">
+          <mat-form-field class="w-100">
+            <mat-label>Bearer Format</mat-label>
+            <input matInput [(ngModel)]="scheme.bearerFormat" maxlength="50" placeholder="e.g. JWT (optional)">
+          </mat-form-field>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- openIdConnect: openIdConnectUrl -->
+  @if (scheme.type === 'openIdConnect') {
+    <div class="row">
+      <div class="col-12">
+        <mat-form-field class="w-100">
+          <mat-label>OpenID Connect URL</mat-label>
+          <input matInput [(ngModel)]="scheme.openIdConnectUrl" maxlength="250">
+        </mat-form-field>
+      </div>
+    </div>
+  }
+
+  <!-- oauth2: OAuth Flows Object editor -->
+  @if (scheme.type === 'oauth2') {
+    <div class="d-flex align-items-center mt-1">
+      <span style="font-weight: 500;">OAuth Flows</span>
+      <button mat-icon-button type="button" matTooltip="Add Flow" (click)="addFlow()">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+
+    @for (flow of scheme.flows; track $index) {
+      <div class="oas-flow-card">
+        <div class="d-flex align-items-center" style="gap: 10px;">
+          <mat-form-field class="no-subscript" style="flex: 1;">
+            <mat-label>Flow Type</mat-label>
+            <mat-select [(ngModel)]="flow.flowType" (ngModelChange)="onFlowTypeChange(flow)">
+              @for (ft of flowTypes; track ft.value) {
+                <mat-option [value]="ft.value">{{ ft.label }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <button mat-icon-button type="button" matTooltip="Remove Flow" (click)="removeFlow($index)">
+            <mat-icon>remove</mat-icon>
+          </button>
+        </div>
+
+        <div class="row">
+          @if (needsAuthUrl(flow.flowType)) {
+            <div class="col-6">
+              <mat-form-field class="w-100 no-subscript">
+                <mat-label>Authorization URL</mat-label>
+                <input matInput [(ngModel)]="flow.authorizationUrl" maxlength="250">
+              </mat-form-field>
+            </div>
+          }
+          @if (needsTokenUrl(flow.flowType)) {
+            <div class="col-6">
+              <mat-form-field class="w-100 no-subscript">
+                <mat-label>Token URL</mat-label>
+                <input matInput [(ngModel)]="flow.tokenUrl" maxlength="250">
+              </mat-form-field>
+            </div>
+          }
+          @if (needsDeviceUrl(flow.flowType)) {
+            <div class="col-6">
+              <mat-form-field class="w-100 no-subscript">
+                <mat-label>Device Authorization URL</mat-label>
+                <input matInput [(ngModel)]="flow.deviceAuthorizationUrl" maxlength="250">
+              </mat-form-field>
+            </div>
+          }
+          <div class="col-6">
+            <mat-form-field class="w-100 no-subscript">
+              <mat-label>Refresh URL (optional)</mat-label>
+              <input matInput [(ngModel)]="flow.refreshUrl" maxlength="250">
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center">
+          <span style="font-size: 12px; color: #767676;">Scopes</span>
+          <button mat-icon-button type="button" matTooltip="Add Scope" (click)="addScope(flow)">
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+        @for (scope of flow.scopes; track $index) {
+          <div class="d-flex align-items-center" style="gap: 10px;">
+            <mat-form-field class="no-subscript" style="flex: 1;">
+              <mat-label>Scope</mat-label>
+              <input matInput [(ngModel)]="scope.scopeName" maxlength="200">
+            </mat-form-field>
+            <mat-form-field class="no-subscript" style="flex: 2;">
+              <mat-label>Description</mat-label>
+              <input matInput [(ngModel)]="scope.description">
+            </mat-form-field>
+            <button mat-icon-button type="button" matTooltip="Remove Scope" (click)="removeScope(flow, $index)">
+              <mat-icon>remove</mat-icon>
+            </button>
+          </div>
+        }
+      </div>
+    }
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Cancel</button>
+  <button mat-raised-button color="primary" [disabled]="!isValid" (click)="save()">
+    {{ isNew ? 'Add' : 'Save' }}
+  </button>
+</mat-dialog-actions>

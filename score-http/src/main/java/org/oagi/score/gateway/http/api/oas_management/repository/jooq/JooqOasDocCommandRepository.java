@@ -13,12 +13,17 @@ import org.oagi.score.gateway.http.common.model.base.ScoreDataAccessException;
 import org.oagi.score.gateway.http.common.repository.jooq.JooqBaseRepository;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.OasDocRecord;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.OasOauthFlowRecord;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.OasOauthScopeRecord;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.OasSecuritySchemeRecord;
 import org.oagi.score.gateway.http.common.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.oagi.score.gateway.http.common.model.ScoreRole.DEVELOPER;
 import static org.oagi.score.gateway.http.common.model.ScoreRole.END_USER;
@@ -65,6 +70,9 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
                 .set(record)
                 .returning(OAS_DOC.OAS_DOC_ID)
                 .fetchOne().getOasDocId();
+        // Issue #1729: persist the configured Security Schemes (if any).
+        saveSecuritySchemes(oasDocId, request.getSecuritySchemes(), requesterId, timestamp);
+        saveDocSecurityRequirements(oasDocId, request.getSecurityRequirements(), requesterId, timestamp);
         return new CreateOasDocResponse(oasDocId.toBigInteger());
     }
 
@@ -136,6 +144,9 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
                 throw new ScoreDataAccessException(new IllegalStateException());
             }
         }
+        // Issue #1729: replace the document's Security Schemes (independent of the doc-field changes above).
+        saveSecuritySchemes(record.getOasDocId(), request.getSecuritySchemes(), requesterId, timestamp);
+        saveDocSecurityRequirements(record.getOasDocId(), request.getSecurityRequirements(), requesterId, timestamp);
         return new UpdateOasDocResponse(
                 record.getOasDocId().toBigInteger(),
                 !changedField.isEmpty());
@@ -173,6 +184,17 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
                 deleteOasRequestByOperationIdList(oasOperationIds);
                 deleteOasResponseByOperationIdList(oasOperationIds);
 
+                // Issue #1729: no ON DELETE CASCADE — remove operation-level security (scopes -> entries) first.
+                dslContext().deleteFrom(OAS_OPERATION_SECURITY_SCOPE)
+                        .where(OAS_OPERATION_SECURITY_SCOPE.OAS_OPERATION_SECURITY_ID.in(
+                                dslContext().select(OAS_OPERATION_SECURITY.OAS_OPERATION_SECURITY_ID)
+                                        .from(OAS_OPERATION_SECURITY)
+                                        .where(OAS_OPERATION_SECURITY.OAS_OPERATION_ID.in(oasOperationIds))))
+                        .execute();
+                dslContext().deleteFrom(OAS_OPERATION_SECURITY)
+                        .where(OAS_OPERATION_SECURITY.OAS_OPERATION_ID.in(oasOperationIds))
+                        .execute();
+
                 dslContext().delete(OAS_OPERATION)
                         .where(
                                 oasOperationIds.size() == 1 ?
@@ -188,6 +210,34 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
                                     OAS_RESOURCE.OAS_RESOURCE_ID.in(oasResourceIds)
                     ).execute();
         }
+
+        // Issue #1729: no ON DELETE CASCADE — delete the document's security objects children-first.
+        // Root-level security: scopes -> entries.
+        dslContext().deleteFrom(OAS_DOC_SECURITY_SCOPE)
+                .where(OAS_DOC_SECURITY_SCOPE.OAS_DOC_SECURITY_ID.in(
+                        dslContext().select(OAS_DOC_SECURITY.OAS_DOC_SECURITY_ID).from(OAS_DOC_SECURITY)
+                                .where(OAS_DOC_SECURITY.OAS_DOC_ID.in(valueOf(oasDocIdList)))))
+                .execute();
+        dslContext().deleteFrom(OAS_DOC_SECURITY)
+                .where(OAS_DOC_SECURITY.OAS_DOC_ID.in(valueOf(oasDocIdList)))
+                .execute();
+        // Security schemes: oauth scopes -> flows -> schemes.
+        dslContext().deleteFrom(OAS_OAUTH_SCOPE)
+                .where(OAS_OAUTH_SCOPE.OAS_OAUTH_FLOW_ID.in(
+                        dslContext().select(OAS_OAUTH_FLOW.OAS_OAUTH_FLOW_ID).from(OAS_OAUTH_FLOW)
+                                .where(OAS_OAUTH_FLOW.OAS_SECURITY_SCHEME_ID.in(
+                                        dslContext().select(OAS_SECURITY_SCHEME.OAS_SECURITY_SCHEME_ID)
+                                                .from(OAS_SECURITY_SCHEME)
+                                                .where(OAS_SECURITY_SCHEME.OAS_DOC_ID.in(valueOf(oasDocIdList)))))))
+                .execute();
+        dslContext().deleteFrom(OAS_OAUTH_FLOW)
+                .where(OAS_OAUTH_FLOW.OAS_SECURITY_SCHEME_ID.in(
+                        dslContext().select(OAS_SECURITY_SCHEME.OAS_SECURITY_SCHEME_ID).from(OAS_SECURITY_SCHEME)
+                                .where(OAS_SECURITY_SCHEME.OAS_DOC_ID.in(valueOf(oasDocIdList)))))
+                .execute();
+        dslContext().deleteFrom(OAS_SECURITY_SCHEME)
+                .where(OAS_SECURITY_SCHEME.OAS_DOC_ID.in(valueOf(oasDocIdList)))
+                .execute();
 
         try {
             dslContext().delete(OAS_DOC)
@@ -396,6 +446,245 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
                 .set(OAS_RESPONSE.INCLUDE_CONFIRM_INDICATOR, (byte) 0)
                 .returningResult(OAS_RESPONSE.OAS_RESPONSE_ID)
                 .fetchOne().value1().toBigInteger());
+    }
+
+    /**
+     * Issue #1729: persist the document's Security Schemes. An empty/null list keeps the legacy
+     * hardcoded OAuth2 default and persists NO row. Replace strategy: delete all then re-insert one row
+     * per scheme (apiKey | http | oauth2 | openIdConnect). Scheme names are unique per doc (DB UK).
+     */
+    private void saveSecuritySchemes(ULong oasDocId, List<OasSecurityScheme> schemes,
+                                     ULong requesterId, LocalDateTime timestamp) {
+        // No ON DELETE CASCADE: delete children first (oauth scope -> flow -> scheme) for this doc.
+        dslContext().deleteFrom(OAS_OAUTH_SCOPE)
+                .where(OAS_OAUTH_SCOPE.OAS_OAUTH_FLOW_ID.in(
+                        dslContext().select(OAS_OAUTH_FLOW.OAS_OAUTH_FLOW_ID).from(OAS_OAUTH_FLOW)
+                                .where(OAS_OAUTH_FLOW.OAS_SECURITY_SCHEME_ID.in(
+                                        dslContext().select(OAS_SECURITY_SCHEME.OAS_SECURITY_SCHEME_ID)
+                                                .from(OAS_SECURITY_SCHEME)
+                                                .where(OAS_SECURITY_SCHEME.OAS_DOC_ID.eq(oasDocId))))))
+                .execute();
+        dslContext().deleteFrom(OAS_OAUTH_FLOW)
+                .where(OAS_OAUTH_FLOW.OAS_SECURITY_SCHEME_ID.in(
+                        dslContext().select(OAS_SECURITY_SCHEME.OAS_SECURITY_SCHEME_ID).from(OAS_SECURITY_SCHEME)
+                                .where(OAS_SECURITY_SCHEME.OAS_DOC_ID.eq(oasDocId))))
+                .execute();
+        dslContext().deleteFrom(OAS_SECURITY_SCHEME)
+                .where(OAS_SECURITY_SCHEME.OAS_DOC_ID.eq(oasDocId))
+                .execute();
+
+        if (schemes == null || schemes.isEmpty()) {
+            return;
+        }
+        Set<String> usedNames = new HashSet<>();
+        for (OasSecurityScheme scheme : schemes) {
+            if (scheme == null || scheme.getType() == null || scheme.getType().isBlank()) {
+                continue;
+            }
+            String type = scheme.getType();
+            OasSecuritySchemeRecord record = new OasSecuritySchemeRecord();
+            record.setGuid(randomGuid());
+            record.setOasDocId(oasDocId);
+            record.setType(type);
+            String schemeName = resolveUniqueSchemeName(scheme, usedNames);
+            usedNames.add(schemeName);
+            record.setSchemeName(schemeName);
+            record.setDescription(scheme.getDescription());
+            if ("apiKey".equalsIgnoreCase(type)) {
+                record.setApiKeyName(scheme.getApiKeyName());
+                record.setApiKeyIn(scheme.getApiKeyIn());
+            } else if ("http".equalsIgnoreCase(type)) {
+                record.setHttpScheme(scheme.getHttpScheme());
+                if ("bearer".equalsIgnoreCase(scheme.getHttpScheme())) {
+                    record.setBearerFormat(scheme.getBearerFormat());
+                }
+            } else if ("openIdConnect".equalsIgnoreCase(type)) {
+                record.setOpenIdConnectUrl(scheme.getOpenIdConnectUrl());
+            }
+            record.setDeprecated((byte) 0);
+            record.setCreatedBy(requesterId);
+            record.setLastUpdatedBy(requesterId);
+            record.setCreationTimestamp(timestamp);
+            record.setLastUpdateTimestamp(timestamp);
+            ULong oasSecuritySchemeId = dslContext().insertInto(OAS_SECURITY_SCHEME)
+                    .set(record)
+                    .returning(OAS_SECURITY_SCHEME.OAS_SECURITY_SCHEME_ID)
+                    .fetchOne().getOasSecuritySchemeId();
+
+            // Issue #1729: persist the OAuth Flows Object (flows + scopes) for oauth2 schemes.
+            if ("oauth2".equalsIgnoreCase(type) && scheme.getFlows() != null) {
+                saveOAuthFlows(oasSecuritySchemeId, scheme.getFlows(), requesterId, timestamp);
+            }
+        }
+    }
+
+    // Issue #1729: persist a scheme's OAuth flows and their scopes. There is no ON DELETE CASCADE; the
+    // replace strategy in saveSecuritySchemes deletes the existing scopes -> flows -> schemes first.
+    private void saveOAuthFlows(ULong oasSecuritySchemeId, List<OasOAuthFlow> flows,
+                                ULong requesterId, LocalDateTime timestamp) {
+        Set<String> usedFlowTypes = new HashSet<>();
+        for (OasOAuthFlow flow : flows) {
+            if (flow == null || flow.getFlowType() == null || flow.getFlowType().isBlank()) {
+                continue;
+            }
+            if (!usedFlowTypes.add(flow.getFlowType())) {
+                continue; // at most one flow per type (DB unique key)
+            }
+            OasOauthFlowRecord flowRecord = new OasOauthFlowRecord();
+            flowRecord.setGuid(randomGuid());
+            flowRecord.setOasSecuritySchemeId(oasSecuritySchemeId);
+            flowRecord.setFlowType(flow.getFlowType());
+            flowRecord.setAuthorizationUrl(flow.getAuthorizationUrl());
+            flowRecord.setTokenUrl(flow.getTokenUrl());
+            flowRecord.setRefreshUrl(flow.getRefreshUrl());
+            flowRecord.setDeviceAuthorizationUrl(flow.getDeviceAuthorizationUrl());
+            flowRecord.setCreatedBy(requesterId);
+            flowRecord.setLastUpdatedBy(requesterId);
+            flowRecord.setCreationTimestamp(timestamp);
+            flowRecord.setLastUpdateTimestamp(timestamp);
+            ULong oasOAuthFlowId = dslContext().insertInto(OAS_OAUTH_FLOW)
+                    .set(flowRecord)
+                    .returning(OAS_OAUTH_FLOW.OAS_OAUTH_FLOW_ID)
+                    .fetchOne().getOasOauthFlowId();
+
+            if (flow.getScopes() == null) {
+                continue;
+            }
+            Set<String> usedScopeNames = new HashSet<>();
+            for (OasOAuthScope scope : flow.getScopes()) {
+                if (scope == null || scope.getScopeName() == null || scope.getScopeName().isBlank()) {
+                    continue;
+                }
+                if (!usedScopeNames.add(scope.getScopeName())) {
+                    continue; // at most one scope per name (DB unique key)
+                }
+                OasOauthScopeRecord scopeRecord = new OasOauthScopeRecord();
+                scopeRecord.setGuid(randomGuid());
+                scopeRecord.setOasOauthFlowId(oasOAuthFlowId);
+                scopeRecord.setScopeName(scope.getScopeName());
+                scopeRecord.setDescription(scope.getDescription());
+                scopeRecord.setCreatedBy(requesterId);
+                scopeRecord.setLastUpdatedBy(requesterId);
+                scopeRecord.setCreationTimestamp(timestamp);
+                scopeRecord.setLastUpdateTimestamp(timestamp);
+                dslContext().insertInto(OAS_OAUTH_SCOPE).set(scopeRecord).execute();
+            }
+        }
+    }
+
+    private void saveDocSecurityRequirements(ULong oasDocId, List<OasSecurityRequirement> requirements,
+                                             ULong requesterId, LocalDateTime timestamp) {
+        dslContext().deleteFrom(OAS_DOC_SECURITY_SCOPE)
+                .where(OAS_DOC_SECURITY_SCOPE.OAS_DOC_SECURITY_ID.in(
+                        dslContext().select(OAS_DOC_SECURITY.OAS_DOC_SECURITY_ID)
+                                .from(OAS_DOC_SECURITY)
+                                .where(OAS_DOC_SECURITY.OAS_DOC_ID.eq(oasDocId))))
+                .execute();
+        dslContext().deleteFrom(OAS_DOC_SECURITY)
+                .where(OAS_DOC_SECURITY.OAS_DOC_ID.eq(oasDocId))
+                .execute();
+
+        if (requirements == null || requirements.isEmpty()) {
+            return;
+        }
+
+        for (int i = 0; i < requirements.size(); i++) {
+            OasSecurityRequirement requirement = requirements.get(i);
+            if (requirement == null) {
+                continue;
+            }
+            if (requirement.isAnonymous()) {
+                insertDocSecurityRequirementEntry(oasDocId, i, null, Collections.emptyList(), requesterId, timestamp);
+                continue;
+            }
+            if (requirement.getSchemes() == null) {
+                continue;
+            }
+            Set<String> usedSchemeNames = new HashSet<>();
+            for (OasSecurityRequirementScheme scheme : requirement.getSchemes()) {
+                if (scheme == null || scheme.getSchemeName() == null || scheme.getSchemeName().isBlank()) {
+                    continue;
+                }
+                String schemeName = scheme.getSchemeName().trim();
+                if (!usedSchemeNames.add(schemeName)) {
+                    continue;
+                }
+                insertDocSecurityRequirementEntry(oasDocId, i, schemeName, scheme.getScopes(), requesterId, timestamp);
+            }
+        }
+    }
+
+    private void insertDocSecurityRequirementEntry(ULong oasDocId, int requirementGroup, String schemeName,
+                                                   List<String> scopes, ULong requesterId, LocalDateTime timestamp) {
+        ULong oasDocSecurityId = dslContext().insertInto(OAS_DOC_SECURITY)
+                .set(OAS_DOC_SECURITY.GUID, randomGuid())
+                .set(OAS_DOC_SECURITY.OAS_DOC_ID, oasDocId)
+                .set(OAS_DOC_SECURITY.REQUIREMENT_GROUP, requirementGroup)
+                .set(OAS_DOC_SECURITY.SCHEME_NAME, schemeName)
+                .set(OAS_DOC_SECURITY.CREATED_BY, requesterId)
+                .set(OAS_DOC_SECURITY.LAST_UPDATED_BY, requesterId)
+                .set(OAS_DOC_SECURITY.CREATION_TIMESTAMP, timestamp)
+                .set(OAS_DOC_SECURITY.LAST_UPDATE_TIMESTAMP, timestamp)
+                .returning(OAS_DOC_SECURITY.OAS_DOC_SECURITY_ID)
+                .fetchOne().getOasDocSecurityId();
+        insertDocSecurityScopes(oasDocSecurityId, scopes, requesterId, timestamp);
+    }
+
+    private void insertDocSecurityScopes(ULong oasDocSecurityId, List<String> scopes,
+                                         ULong requesterId, LocalDateTime timestamp) {
+        if (scopes == null || scopes.isEmpty()) {
+            return;
+        }
+        Set<String> usedScopeNames = new HashSet<>();
+        for (String scope : scopes) {
+            if (scope == null || scope.isBlank()) {
+                continue;
+            }
+            String scopeName = scope.trim();
+            if (!usedScopeNames.add(scopeName)) {
+                continue;
+            }
+            dslContext().insertInto(OAS_DOC_SECURITY_SCOPE)
+                    .set(OAS_DOC_SECURITY_SCOPE.GUID, randomGuid())
+                    .set(OAS_DOC_SECURITY_SCOPE.OAS_DOC_SECURITY_ID, oasDocSecurityId)
+                    .set(OAS_DOC_SECURITY_SCOPE.SCOPE_NAME, scopeName)
+                    .set(OAS_DOC_SECURITY_SCOPE.CREATED_BY, requesterId)
+                    .set(OAS_DOC_SECURITY_SCOPE.LAST_UPDATED_BY, requesterId)
+                    .set(OAS_DOC_SECURITY_SCOPE.CREATION_TIMESTAMP, timestamp)
+                    .set(OAS_DOC_SECURITY_SCOPE.LAST_UPDATE_TIMESTAMP, timestamp)
+                    .execute();
+        }
+    }
+
+    // Issue #1729: resolve a unique components.securitySchemes key. A blank Scheme Name falls back to a
+    // type-derived default; collisions (blank or explicit) get a numeric suffix so the per-doc unique key
+    // never throws.
+    private String resolveUniqueSchemeName(OasSecurityScheme scheme, Set<String> usedNames) {
+        String base = (scheme.getSchemeName() != null && !scheme.getSchemeName().isBlank())
+                ? scheme.getSchemeName().trim()
+                : typeDefaultName(scheme);
+        if (!usedNames.contains(base)) {
+            return base;
+        }
+        int i = 2;
+        while (usedNames.contains(base + i)) {
+            i++;
+        }
+        return base + i;
+    }
+
+    private String typeDefaultName(OasSecurityScheme scheme) {
+        String type = scheme.getType();
+        if ("apiKey".equalsIgnoreCase(type)) {
+            return "ApiKeyAuth";
+        }
+        if ("http".equalsIgnoreCase(type)) {
+            return "basic".equalsIgnoreCase(scheme.getHttpScheme()) ? "BasicAuth" : "BearerAuth";
+        }
+        if ("openIdConnect".equalsIgnoreCase(type)) {
+            return "OpenID";
+        }
+        return "OAuth2";
     }
 
 }
