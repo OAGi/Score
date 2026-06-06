@@ -506,7 +506,7 @@ export class OasDocDetailComponent implements OnInit {
     return valid(oasDoc1.securityRequirements);
   }
 
-  globalSecuritySummary(): string {
+  documentSecuritySummary(): string {
     const summary = this.securityRequirementSummary(this.oasDoc.securityRequirements, false);
     return summary === 'No Security' ? 'None' : summary;
   }
@@ -520,10 +520,10 @@ export class OasDocDetailComponent implements OnInit {
     return summary === 'No Security' ? 'Public' : summary;
   }
 
-  openGlobalSecurityDialog() {
+  openDocumentSecurityDialog() {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.data = {
-      title: 'Global Security',
+      title: 'Document Security',
       securitySchemes: this.securitySchemes,
       securityRequirements: JSON.parse(JSON.stringify(this.oasDoc.securityRequirements || [])),
       allowInherit: false
@@ -776,12 +776,25 @@ export class OasDocDetailComponent implements OnInit {
       // oas_security_scheme_id from the database, so a renamed/added scheme must be committed before the
       // operation rows are saved — otherwise the lookup misses and the requirement is silently dropped.
       this.openAPIService.updateOasDoc(this.oasDoc).subscribe(_ => {
-        this.init(this.oasDoc);
-        if (detailsChanged) {
-          this.updateDetails();
-        }
-        this.snackBar.open('Updated', '', {
-          duration: 3000,
+        // Re-fetch the persisted document so its Security Schemes carry their freshly-assigned
+        // oas_security_scheme_id. A scheme added/edited in this session has no id yet; without it the
+        // NEXT updateOasDoc would send schemes with no id, and the backend (matching kept schemes by id)
+        // would treat every scheme as removed, delete-and-reinsert them, and wipe every operation's
+        // security override. Reloading the ids here keeps subsequent updates a stable in-place diff.
+        this.openAPIService.getOasDoc(this.oasDoc.oasDocId).subscribe(reloaded => {
+          if (reloaded) {
+            this.oasDoc.securitySchemes = reloaded.securitySchemes || [];
+            this.oasDoc.securityRequirements = reloaded.securityRequirements || [];
+          }
+          this.init(this.oasDoc);
+          if (detailsChanged) {
+            // Pass a no-op callback so updateDetails() stays silent (it still persists the rows); this
+            // method shows the single 'Updated' snackBar below. Otherwise both fire and it shows twice.
+            this.updateDetails(() => {});
+          }
+          this.snackBar.open('Updated', '', {
+            duration: 3000,
+          });
         });
       });
     } else if (detailsChanged) {

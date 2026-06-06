@@ -76,7 +76,7 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
                         .where(OAS_RESOURCE_TAG.as("req_oas_resource_tag").OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId())))
                         .fetchOptional().orElse(null);
                 if (req_oasResourceTagRecord == null) {
-                    if (bieForOasDoc.getTagName() != null) {
+                    if (StringUtils.hasLength(bieForOasDoc.getTagName())) {
                         ULong oasTagId = dslContext().insertInto(OAS_TAG)
                                 .set(OAS_TAG.GUID, randomGuid())
                                 .set(OAS_TAG.NAME, bieForOasDoc.getTagName())
@@ -97,14 +97,23 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
                     }
                 } else {
                     ULong oasTagId = req_oasResourceTagRecord.getOasTagId();
-                    OasTagRecord oasTagRecord = dslContext().selectFrom(OAS_TAG.as("req_oas_tag"))
-                            .where(OAS_TAG.as("req_oas_tag").OAS_TAG_ID.eq(oasTagId)).fetchOptional().orElse(null);
-                    if (oasTagRecord != null && !StringUtils.equals(oasTagRecord.getName(), bieForOasDoc.getTagName())) {
-                        oasTagChangeField.add(OAS_TAG.NAME);
-                        oasTagRecord.setName(bieForOasDoc.getTagName());
-                        int affectedRows = oasTagRecord.update(oasTagChangeField);
-                        if (affectedRows != 1) {
-                            throw new ScoreDataAccessException(new IllegalStateException());
+                    if (!StringUtils.hasLength(bieForOasDoc.getTagName())) {
+                        // The tag was cleared: drop the association and the now-orphan tag so generation
+                        // does not emit an empty `tags: [""]`.
+                        dslContext().deleteFrom(OAS_RESOURCE_TAG)
+                                .where(OAS_RESOURCE_TAG.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId())))
+                                .execute();
+                        dslContext().deleteFrom(OAS_TAG).where(OAS_TAG.OAS_TAG_ID.eq(oasTagId)).execute();
+                    } else {
+                        OasTagRecord oasTagRecord = dslContext().selectFrom(OAS_TAG.as("req_oas_tag"))
+                                .where(OAS_TAG.as("req_oas_tag").OAS_TAG_ID.eq(oasTagId)).fetchOptional().orElse(null);
+                        if (oasTagRecord != null && !StringUtils.equals(oasTagRecord.getName(), bieForOasDoc.getTagName())) {
+                            oasTagChangeField.add(OAS_TAG.NAME);
+                            oasTagRecord.setName(bieForOasDoc.getTagName());
+                            int affectedRows = oasTagRecord.update(oasTagChangeField);
+                            if (affectedRows != 1) {
+                                throw new ScoreDataAccessException(new IllegalStateException());
+                            }
                         }
                     }
                 }
@@ -254,7 +263,7 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
                         .where(OAS_RESOURCE_TAG.as("res_oas_resource_tag").OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId())))
                         .fetchOptional().orElse(null);
                 if (res_oasResourceTagRecord == null) {
-                    if (bieForOasDoc.getTagName() != null) {
+                    if (StringUtils.hasLength(bieForOasDoc.getTagName())) {
                         ULong oasTagId = dslContext().insertInto(OAS_TAG)
                                 .set(OAS_TAG.GUID, randomGuid())
                                 .set(OAS_TAG.NAME, bieForOasDoc.getTagName())
@@ -275,14 +284,23 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
                     }
                 } else {
                     ULong oasTagId = res_oasResourceTagRecord.getOasTagId();
-                    OasTagRecord oasTagRecord = dslContext().selectFrom(OAS_TAG.as("res_oas_tag"))
-                            .where(OAS_TAG.as("res_oas_tag").OAS_TAG_ID.eq(oasTagId)).fetchOptional().orElse(null);
-                    if (oasTagRecord != null && !StringUtils.equals(oasTagRecord.getName(), bieForOasDoc.getTagName())) {
-                        oasTagChangeField.add(OAS_TAG.NAME);
-                        oasTagRecord.setName(bieForOasDoc.getTagName());
-                        int affectedRows = oasTagRecord.update(oasTagChangeField);
-                        if (affectedRows != 1) {
-                            throw new ScoreDataAccessException(new IllegalStateException());
+                    if (!StringUtils.hasLength(bieForOasDoc.getTagName())) {
+                        // The tag was cleared: drop the association and the now-orphan tag so generation
+                        // does not emit an empty `tags: [""]`.
+                        dslContext().deleteFrom(OAS_RESOURCE_TAG)
+                                .where(OAS_RESOURCE_TAG.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId())))
+                                .execute();
+                        dslContext().deleteFrom(OAS_TAG).where(OAS_TAG.OAS_TAG_ID.eq(oasTagId)).execute();
+                    } else {
+                        OasTagRecord oasTagRecord = dslContext().selectFrom(OAS_TAG.as("res_oas_tag"))
+                                .where(OAS_TAG.as("res_oas_tag").OAS_TAG_ID.eq(oasTagId)).fetchOptional().orElse(null);
+                        if (oasTagRecord != null && !StringUtils.equals(oasTagRecord.getName(), bieForOasDoc.getTagName())) {
+                            oasTagChangeField.add(OAS_TAG.NAME);
+                            oasTagRecord.setName(bieForOasDoc.getTagName());
+                            int affectedRows = oasTagRecord.update(oasTagChangeField);
+                            if (affectedRows != 1) {
+                                throw new ScoreDataAccessException(new IllegalStateException());
+                            }
                         }
                     }
                 }

@@ -102,10 +102,11 @@
                 Add Security Scheme
               </button>
               <button mat-stroked-button class="ms-2 oas-doc-security-btn" type="button"
-                      (click)="openGlobalSecurityDialog()" [disabled]="securitySchemes.length === 0"
+                      (click)="openDocumentSecurityDialog()"
+                      [disabled]="securitySchemes.length === 0 && (oasDoc.securityRequirements?.length || 0) === 0"
                       matTooltip="Edit the document-level (global) security requirement">
                 <mat-icon>security</mat-icon>
-                <span class="oas-doc-security-label">Global Security: {{ globalSecuritySummary() }}</span>
+                <span class="oas-doc-security-label">Document Security: {{ documentSecuritySummary() }}</span>
               </button>
               @if (securitySchemes.length === 0) {
                 <span class="ms-3" style="font-size: 12px; color: #767676;">
@@ -332,7 +333,7 @@
               <th mat-header-cell *matHeaderCellDef
                   score-table-column-resize [defaultWidth]="width('Security')" (onResize)="onResizeWidth($event)"> Security</th>
               <td mat-cell *matCellDef="let element">
-                @if (securitySchemes.length === 0) {
+                @if (securitySchemes.length === 0 && !element.securityOverridden) {
                   <span class="oas-security-na" matTooltip="Add a Security Scheme to configure operation security">—</span>
                 } @else {
                   <div class="oas-security-cell"

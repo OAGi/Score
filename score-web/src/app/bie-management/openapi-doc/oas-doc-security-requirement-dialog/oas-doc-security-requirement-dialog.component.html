@@ -3,14 +3,14 @@
 <mat-dialog-content>
   @if (data.allowInherit) {
     <mat-radio-group [(ngModel)]="mode" (ngModelChange)="onModeChange($event)" class="security-mode-group">
-      <mat-radio-button value="inherit">Use root security</mat-radio-button>
+      <mat-radio-button value="inherit">Use document security</mat-radio-button>
       <mat-radio-button value="none">No security for this operation</mat-radio-button>
       <mat-radio-button value="custom">Override with selected schemes</mat-radio-button>
     </mat-radio-group>
   }
 
   @if (mode === 'custom') {
-    @if (securitySchemes.length === 0) {
+    @if (securitySchemes.length === 0 && requirements.length === 0) {
       <span class="muted-text">Add a Security Scheme first.</span>
     } @else {
       <div class="requirement-list">
@@ -92,7 +92,8 @@
       </div>
 
       <div class="requirements-toolbar">
-        <button mat-stroked-button type="button" (click)="addRequirement()">
+        <button mat-stroked-button type="button" (click)="addRequirement()"
+                [disabled]="securitySchemes.length === 0">
           <mat-icon>add</mat-icon>
           Add Alternative (OR)
         </button>

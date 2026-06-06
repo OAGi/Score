@@ -205,7 +205,7 @@ public class OpenAPIDocService {
                 .setTimestamp(millis)
                 .execute();
 
-        if (request.getTagName() != null) {
+        if (request.getTagName() != null && !request.getTagName().isBlank()) {
             OasTagId oasTagId = new InsertOasTagArguments(command)
                     .setUserId(userId)
                     .setGuid(randomGuid())
@@ -300,7 +300,7 @@ public class OpenAPIDocService {
                 .setTimestamp(millis)
                 .execute();
 
-        if (request.getTagName() != null) {
+        if (request.getTagName() != null && !request.getTagName().isBlank()) {
             OasTagId oasTagId = new InsertOasTagArguments(command)
                     .setUserId(userId)
                     .setGuid(randomGuid())

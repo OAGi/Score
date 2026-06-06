@@ -553,7 +553,10 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 path.put("summary", "");
                 path.put("description", "");
                 putOperationSecurity(path, bieName + "Read");
-                if (template.getTagName() != null) {
+                // Issue #1729: place the configured per-operation `security` right after `description`
+                // (same position as the legacy default), instead of appending it after the body/responses.
+                putConfiguredOperationSecurity(template, path);
+                if (StringUtils.hasLength(template.getTagName())) {
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
                 path.put("operationId", template.getOperationId());
@@ -599,7 +602,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 String schemaName = template.getSchemaName();
                 boolean isSuppressRoot = template.isSuppressRootProperty();
                 ensurePathParameters(path, getOperation(), isArray, template);
-                if (template.getTagName() != null && !path.containsKey("tags")) {
+                if (StringUtils.hasLength(template.getTagName()) && !path.containsKey("tags")) {
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
                 if (template.getMessageBodyType().equals("Request")) {
@@ -639,7 +642,8 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 path.put("summary", "");
                 path.put("description", "");
                 putOperationSecurity(path, bieName + "Write");
-                if (template.getTagName() != null) {
+                putConfiguredOperationSecurity(template, path);
+                if (StringUtils.hasLength(template.getTagName())) {
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
                 path.put("operationId", template.getOperationId());
@@ -707,7 +711,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 String schemaName = template.getSchemaName();
                 boolean isSuppressRoot = template.isSuppressRootProperty();
                 ensurePathParameters(path, getOperation(), isArray, template);
-                if (template.getTagName() != null && !path.containsKey("tags")) {
+                if (StringUtils.hasLength(template.getTagName()) && !path.containsKey("tags")) {
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
                 if (template.getMessageBodyType().equals("Request")) {
@@ -747,7 +751,8 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 path.put("summary", "");
                 path.put("description", "");
                 putOperationSecurity(path, bieName + "Write");
-                if (template.getTagName() != null) {
+                putConfiguredOperationSecurity(template, path);
+                if (StringUtils.hasLength(template.getTagName())) {
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
                 path.put("operationId", template.getOperationId());
@@ -814,7 +819,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 String schemaName = template.getSchemaName();
                 boolean isSuppressRoot = template.isSuppressRootProperty();
                 ensurePathParameters(path, getOperation(), isArray, template);
-                if (template.getTagName() != null && !path.containsKey("tags")) {
+                if (StringUtils.hasLength(template.getTagName()) && !path.containsKey("tags")) {
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
                 if (template.getMessageBodyType().equals("Request")) {
@@ -854,7 +859,8 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 path.put("summary", "");
                 path.put("description", "");
                 putOperationSecurity(path, bieName + "Write");
-                if (template.getTagName() != null) {
+                putConfiguredOperationSecurity(template, path);
+                if (StringUtils.hasLength(template.getTagName())) {
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
                 path.put("operationId", template.getOperationId());
@@ -927,7 +933,8 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 path.put("summary", "");
                 path.put("description", "");
                 putOperationSecurity(path, bieName + "Write");
-                if (template.getTagName() != null) {
+                putConfiguredOperationSecurity(template, path);
+                if (StringUtils.hasLength(template.getTagName())) {
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
                 path.put("operationId", template.getOperationId());
@@ -1082,7 +1089,6 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 }
                 generatorForOperation.proceed(topLevelAsbiep, template, path, asbiep);
             }
-            putConfiguredOperationSecurity(template, path);
         } finally {
             if (!bodyless) {
                 generationContext.referenceCounter().decrease(asbiep);
@@ -1102,7 +1108,9 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
         if (!path.containsKey("operationId")) {
             path.put("summary", "");
             path.put("description", "");
-            if (template.getTagName() != null) {
+            // Issue #1729: configured per-operation `security` right after `description` (before tags).
+            putConfiguredOperationSecurity(template, path);
+            if (StringUtils.hasLength(template.getTagName())) {
                 path.put("tags", Arrays.asList(template.getTagName()));
             }
             path.put("operationId", template.getOperationId());
