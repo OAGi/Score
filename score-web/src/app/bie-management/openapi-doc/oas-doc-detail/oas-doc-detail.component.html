@@ -260,6 +260,7 @@
                   score-table-column-resize [defaultWidth]="width('Verb')" (onResize)="onResizeWidth($event)"> Verb</th>
               <td mat-cell *matCellDef="let element">
                 <mat-select [(ngModel)]="element.verb"
+                            [panelWidth]="null"
                             (ngModelChange)="onChange('verb', element)">
                   <mat-option value="GET">GET</mat-option>
                   <mat-option value="PUT">PUT</mat-option>
@@ -292,7 +293,7 @@
               <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="messageBody"
                   score-table-column-resize [defaultWidth]="width('Message Body')" (onResize)="onResizeWidth($event)"> Message Body</th>
               <td mat-cell *matCellDef="let element">
-                <mat-select [(ngModel)]="element.messageBody" [disabled]="!element.topLevelAsbiepId">
+                <mat-select [(ngModel)]="element.messageBody" [panelWidth]="null" [disabled]="!element.topLevelAsbiepId">
                   <mat-option value="Request" [disabled]="element.verb === 'GET' || element.verb === 'DELETE'">Request</mat-option>
                   <mat-option value="Response">Response</mat-option>
                 </mat-select>

@@ -278,6 +278,7 @@
                     score-table-column-resize [defaultWidth]="width('Verb')"> Verb</th>
                 <td mat-cell *matCellDef="let element">
                   <mat-select [(ngModel)]="verbSelection[element.topLevelAsbiepId]" required="true"
+                              [panelWidth]="null"
                               (ngModelChange)="onChange('verbSelection', element.topLevelAsbiepId)"
                               (click)="$event.stopPropagation()">
                     <mat-option value="GET">GET</mat-option>
@@ -297,6 +298,7 @@
                     score-table-column-resize [defaultWidth]="width('Message Body')"> Message Body</th>
                 <td mat-cell *matCellDef="let element">
                   <mat-select [(ngModel)]="messageBodySelection[element.topLevelAsbiepId]" required="true"
+                              [panelWidth]="null"
                               (click)="$event.stopPropagation()">
                     <mat-option value="Request" [disabled]="verbSelection[element.topLevelAsbiepId] === 'GET' || verbSelection[element.topLevelAsbiepId] === 'DELETE'">Request</mat-option>
                     <mat-option value="Response">Response</mat-option>
