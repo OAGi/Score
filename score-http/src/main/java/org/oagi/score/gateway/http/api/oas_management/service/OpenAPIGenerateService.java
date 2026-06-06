@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -148,8 +149,26 @@ public class OpenAPIGenerateService {
             for (List<OpenAPITemplateForVerbOption> values : bieNameTemplateByTopLevelAsbiepIdMap.values()) {
                 // If any template is checked as array
                 if (values.stream().filter(e -> e.isArrayForJsonExpression()).count() > 0) {
+                    // Issue #1728
+                    // The array's inner item schema is materialized with the array operation's own
+                    // suppress-root option. A non-array sibling operation on the same BIE can therefore
+                    // reuse that single inner item -- the bare '<BIEName>' schema the array's items $ref --
+                    // only when it shares the same suppress-root option. Otherwise its object shape genuinely
+                    // differs and it must keep a distinct '<BIEName>ListEntry' name; appending 'ListEntry'
+                    // unconditionally would mint a separate, redundant schema object for the same BIE.
+                    Set<Boolean> arraySuppressRootOptions = values.stream()
+                            .filter(OpenAPITemplateForVerbOption::isArrayForJsonExpression)
+                            .map(OpenAPITemplateForVerbOption::isSuppressRootProperty)
+                            .collect(Collectors.toSet());
                     for (OpenAPITemplateForVerbOption template : values) {
-                        String key = entry.getKey() + (template.isArrayForJsonExpression() ? "List" : "ListEntry");
+                        String key;
+                        if (template.isArrayForJsonExpression()) {
+                            key = entry.getKey() + "List";
+                        } else if (arraySuppressRootOptions.contains(template.isSuppressRootProperty())) {
+                            key = entry.getKey();
+                        } else {
+                            key = entry.getKey() + "ListEntry";
+                        }
                         List<OpenAPITemplateForVerbOption> schemaNameWithArrayTemplates;
                         if (bieNameWithArrayTemplateMap.containsKey(key)) {
                             schemaNameWithArrayTemplates = bieNameWithArrayTemplateMap.get(key);
