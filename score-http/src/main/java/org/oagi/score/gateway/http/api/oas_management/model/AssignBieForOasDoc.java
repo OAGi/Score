@@ -22,6 +22,8 @@ public class AssignBieForOasDoc extends Auditable {
     private boolean suppressRootIndicator;
     private boolean required;
     private String tagName;
+    // Issue #1732: operationId is built by the frontend and sent on Add; the backend stores it as-is.
+    private String operationId;
     private Date lastUpdateTimestamp;
     private Date creationTimestamp;
     private UserSummaryRecord createdBy;
@@ -121,6 +123,14 @@ public class AssignBieForOasDoc extends Auditable {
 
     public void setTagName(String tagName) {
         this.tagName = tagName;
+    }
+
+    public String getOperationId() {
+        return operationId;
+    }
+
+    public void setOperationId(String operationId) {
+        this.operationId = operationId;
     }
 
     @Override

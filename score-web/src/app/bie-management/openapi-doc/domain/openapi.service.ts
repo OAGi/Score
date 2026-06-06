@@ -264,7 +264,8 @@ export class OpenAPIService {
         required: assignBieForOasDoc.required,
         arrayIndicator: assignBieForOasDoc.arrayIndicator,
         suppressRootIndicator: assignBieForOasDoc.suppressRootIndicator,
-        messageBody: assignBieForOasDoc.messageBody
+        messageBody: assignBieForOasDoc.messageBody,
+        operationId: assignBieForOasDoc.operationId
       });
   }
 

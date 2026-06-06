@@ -1186,12 +1186,6 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
         return properties;
     }
 
-    private String getOperationId(String operation, TopLevelAsbiepSummaryRecord topLevelAsbiep) {
-        String controllerName = getBieName(topLevelAsbiep);
-        String action = operation + Character.toUpperCase(controllerName.charAt(0)) + controllerName.substring(1);
-        return controllerName + "_" + action;
-    }
-
     private void suppressRootProperty(Map<String, Object> parent) {
         Map<String, Object> properties = (Map<String, Object>) parent.get("properties");
         // Get the first element from 'properties' property and move all children of the element to the parent.

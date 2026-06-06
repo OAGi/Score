@@ -10,7 +10,7 @@ import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatDatepicker} from '@angular/material/datepicker';
 import {finalize} from 'rxjs/operators';
-import {AssignBieForOasDoc, BieForOasDoc, BieForOasDocListRequest, OasDoc} from '../domain/openapi-doc';
+import {AssignBieForOasDoc, BieForOasDoc, BieForOasDocListRequest, buildOperationId, OasDoc} from '../domain/openapi-doc';
 import {OpenAPIService} from '../domain/openapi.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ReleaseSummary} from '../../../release-management/domain/release';
@@ -411,6 +411,10 @@ export class OasDocAssignDialogComponent implements OnInit {
       this.assignBieForOasDoc.oasDocId = this.oasDoc.oasDocId;
       this.assignBieForOasDoc.arrayIndicator = bieForOasDoc.arrayIndicator;
       this.assignBieForOasDoc.suppressRootIndicator = bieForOasDoc.suppressRootIndicator;
+      // Issue #1732: the frontend owns the initial operationId ('<verb><BIEName>[List]'); the
+      // backend stores it verbatim.
+      this.assignBieForOasDoc.operationId = buildOperationId(
+        this.assignBieForOasDoc.verb, bieForOasDoc.propertyTerm, bieForOasDoc.arrayIndicator);
       this.openAPIService.assignBieForOasDoc(this.assignBieForOasDoc).subscribe(resp => {
         this.snackBar.open('Added', '', {
           duration: 3000,

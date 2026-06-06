@@ -505,6 +505,75 @@ export class AssignBieForOasDoc {
   suppressRootIndicator: boolean;
   messageBody: string;
   tagName: string;
+  // Issue #1732: the frontend owns operationId and sends it on Add; the backend just stores it.
+  operationId: string;
+}
+
+// ---------------------------------------------------------------------------
+// operationId naming (issue #1732)
+//
+// operationId follows '<verb><BIEName>[List]' with NO business-context prefix. The frontend is the
+// single source of truth: it builds the operationId on Add and on verb change, and the backend
+// stores whatever is sent (same pattern as the issue #1730 add-operation flow).
+// ---------------------------------------------------------------------------
+
+const OPERATION_ID_VERB_WORDS: { [verb: string]: string } = {
+  GET: 'query', POST: 'create', PUT: 'replace', PATCH: 'update', DELETE: 'delete',
+  OPTIONS: 'options', HEAD: 'head', TRACE: 'trace'
+};
+// Verb words that may already lead an operationId (incl. the legacy 'get'/'update' words).
+const KNOWN_OPERATION_ID_VERB_WORDS =
+  ['query', 'create', 'replace', 'update', 'delete', 'options', 'head', 'trace', 'get'];
+
+export function operationIdVerbWord(verb: string): string {
+  return OPERATION_ID_VERB_WORDS[verb] || '';
+}
+
+// Builds the operationId from a bare BIE name (e.g. the property term).
+export function buildOperationId(verb: string, bieName: string, isArray: boolean): string {
+  const word = operationIdVerbWord(verb);
+  if (!word) {
+    return '';
+  }
+  const name = capitalizeFirst((bieName || '').replace(/\s/g, ''));
+  return word + name + (isArray ? 'List' : '');
+}
+
+// Recomputes the operationId after a verb/array change, swapping only the leading verb word so a
+// manually edited name survives. Tolerates the legacy '<businessContext>_<verb><BIEName>' format.
+export function recomputeOperationId(verb: string, oldOperationId: string, isArray: boolean): string {
+  if (!operationIdVerbWord(verb)) {
+    return oldOperationId;
+  }
+  return buildOperationId(verb, extractBieName(oldOperationId), isArray);
+}
+
+// Recovers the BIE-name segment from an existing operationId so the verb word can be replaced.
+export function extractBieName(operationId: string): string {
+  let name = (operationId || '').trim();
+  // Drop a legacy '<businessContext>_' prefix if present (the new format has no underscore).
+  const underscore = name.lastIndexOf('_');
+  if (underscore >= 0) {
+    name = name.substring(underscore + 1);
+  }
+  // Strip a leading verb word so it can be replaced.
+  for (const word of KNOWN_OPERATION_ID_VERB_WORDS) {
+    const next = name.charAt(word.length);
+    if (name.length > word.length && name.startsWith(word)
+        && next !== next.toLowerCase() && next === next.toUpperCase()) {
+      name = name.substring(word.length);
+      break;
+    }
+  }
+  // Strip a trailing 'List' marker; it gets re-applied from the array indicator.
+  if (name.endsWith('List')) {
+    name = name.substring(0, name.length - 'List'.length);
+  }
+  return name;
+}
+
+function capitalizeFirst(value: string): string {
+  return value ? value.charAt(0).toUpperCase() + value.slice(1) : value;
 }
 
 // Issue #1730: payload to add an API operation (endpoint) that does NOT reference a BIE.

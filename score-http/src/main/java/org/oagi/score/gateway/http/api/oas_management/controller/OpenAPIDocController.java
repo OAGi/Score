@@ -402,9 +402,13 @@ public class OpenAPIDocController {
         }
         request.setPath(resourceName);
         request.setVerb(verbOption);
-        SetOperationIdWithVerb setOperationIdWithVerb = new SetOperationIdWithVerb(verbOption, businessContextName, assignBieForOasDoc.getPropertyTerm(),
-                isArray);
-        String operationId = setOperationIdWithVerb.verbToOperationId();
+        // Issue #1732: the frontend builds the operationId ('<verb><BIEName>[List]', no
+        // business-context prefix) and sends it; the backend just stores it. businessContextName
+        // above is still used to build the resource path. Guard: operationId is required (NOT NULL).
+        String operationId = assignBieForOasDoc.getOperationId();
+        if (operationId == null || operationId.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
         request.setOperationId(operationId);
         request.setMakeArrayIndicator(assignBieForOasDoc.isArrayIndicator());
         //issue#1492 Comments by Scott without displaying, default Suppress Root = true when Adding BIE
@@ -645,89 +649,12 @@ public class OpenAPIDocController {
         ScoreUser requester = sessionService.asScoreUser(user);
 
         for (BieForOasDoc bieForOasDoc : updateBieForOasDocRequest.getBieForOasDocList()) {
-            if (bieForOasDoc.getOasResourceId() != null) {
-                GetOasOperationRequest getOasOperationRequest = new GetOasOperationRequest(requester)
-                        .withOasResourceId(bieForOasDoc.getOasResourceId());
-                GetOasOperationResponse oasOperationResponse = oasDocService.getOasOperation(requester, getOasOperationRequest);
-                if (!bieForOasDoc.getVerb().equals(oasOperationResponse.getOasOperation().getVerb())) {
-
-                    UpdateOperationIdWhenVerbChanged updateOperationIdWhenVerbChanged = new UpdateOperationIdWhenVerbChanged(
-                            bieForOasDoc.getVerb(), bieForOasDoc.getOperationId(), bieForOasDoc.isArrayIndicator());
-                    String updatedOperationId = updateOperationIdWhenVerbChanged.verbToOperationId();
-                    bieForOasDoc.setOperationId(updatedOperationId);
-                }
-            }
-
-            if (bieForOasDoc.getOasOperationId() != null) {
-                if (bieForOasDoc.getMessageBody().equals("Request")) {
-                    GetOasRequestTableRequest getOasRequestTableRequest = new GetOasRequestTableRequest(requester)
-                            .withOasOperationId(bieForOasDoc.getOasOperationId());
-                    GetOasRequestTableResponse oasRequestTableResponse = oasDocService.getOasRequestTable(requester, getOasRequestTableRequest);
-                    if (oasRequestTableResponse != null &&
-                            oasRequestTableResponse.getOasRequestTable() != null
-                            && bieForOasDoc.isArrayIndicator() != oasRequestTableResponse.getOasRequestTable().isMakeArrayIndicator()) {
-                        String newResourceName = null;
-                        String newOperationId = null;
-                        String oldResourceName = bieForOasDoc.getResourceName();
-                        String oldOperationId = bieForOasDoc.getOperationId();
-                        if (bieForOasDoc.isArrayIndicator()) {
-                            if (!oldResourceName.endsWith("-list")) {
-                                newResourceName = oldResourceName + "-list";
-                            }
-                            if (!oldOperationId.endsWith("List")) {
-                                newOperationId = oldOperationId + "List";
-                            }
-                        } else {
-                            if (oldResourceName.endsWith("-list")) {
-                                newResourceName = oldResourceName.substring(0, oldResourceName.length() - 5);
-                            }
-                            if (oldOperationId.endsWith("List")) {
-                                newOperationId = oldOperationId.substring(0, oldOperationId.length() - 4);
-                            }
-                        }
-                        if (newResourceName != null) {
-                            bieForOasDoc.setResourceName(newResourceName);
-                        }
-                        if (newOperationId != null) {
-                            bieForOasDoc.setOperationId(newOperationId);
-                        }
-                    }
-                }
-
-                if (bieForOasDoc.getMessageBody().equals("Response")) {
-                    GetOasResponseTableRequest getOasResponseTableRequest = new GetOasResponseTableRequest(requester)
-                            .withOasOperationId(bieForOasDoc.getOasOperationId());
-                    GetOasResponseTableResponse oasResponseTableResponse = oasDocService.getOasResponseTable(requester, getOasResponseTableRequest);
-                    if (oasResponseTableResponse != null &&
-                            oasResponseTableResponse.getOasResponseTable() != null
-                            && bieForOasDoc.isArrayIndicator() != oasResponseTableResponse.getOasResponseTable().isMakeArrayIndicator()) {
-                        String newResourceName = null;
-                        String newOperationId = null;
-                        String oldResourceName = bieForOasDoc.getResourceName();
-                        String oldOperationId = bieForOasDoc.getOperationId();
-                        if (bieForOasDoc.isArrayIndicator()) {
-                            if (!oldResourceName.endsWith("-list")) {
-                                newResourceName = oldResourceName + "-list";
-                            }
-                            if (!oldOperationId.endsWith("List")) {
-                                newOperationId = oldOperationId + "List";
-                            }
-                        } else {
-                            if (oldResourceName.endsWith("-list")) {
-                                newResourceName = oldResourceName.substring(0, oldResourceName.length() - 5);
-                            }
-                            if (oldOperationId.endsWith("List")) {
-                                newOperationId = oldOperationId.substring(0, oldOperationId.length() - 4);
-                            }
-                        }
-                        if (newResourceName != null) {
-                            bieForOasDoc.setResourceName(newResourceName);
-                        }
-                        if (newOperationId != null) {
-                            bieForOasDoc.setOperationId(newOperationId);
-                        }
-                    }
-                }
+            // Issue #1732: operationId (verb word and the array 'List' suffix included) and
+            // resourceName are computed by the frontend and sent verbatim; the backend persists them
+            // as-is — it does not recompute or adjust them here. Guard: operationId is required.
+            String operationId = bieForOasDoc.getOperationId();
+            if (operationId == null || operationId.isBlank()) {
+                return ResponseEntity.badRequest().build();
             }
         }
 

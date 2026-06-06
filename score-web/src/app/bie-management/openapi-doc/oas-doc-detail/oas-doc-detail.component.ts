@@ -7,6 +7,7 @@ import {
   OasDoc,
   OasSecurityRequirement,
   OasSecurityScheme,
+  recomputeOperationId,
   SimpleOasDoc
 } from '../domain/openapi-doc';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
@@ -14,6 +15,8 @@ import {OpenAPIService} from '../domain/openapi.service';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {ErrorStateMatcher} from '@angular/material/core';
+import {UntypedFormControl} from '@angular/forms';
 import {forkJoin} from 'rxjs';
 import {hashCode, saveAsBlobResponse, saveBranch} from 'src/app/common/utility';
 import {SelectionModel} from '@angular/cdk/collections';
@@ -254,6 +257,18 @@ export class OasDocDetailComponent implements OnInit {
   option: BieExpressOption;
   openApiFormats: string[] = ['YAML', 'JSON'];
   topLevelAsbiepIds: number[];
+
+  // Issue #1732: operationId no longer carries a business-context prefix, so the same BIE+verb
+  // under different contexts can produce identical operationIds. OpenAPI requires operationId to be
+  // unique within a document, so collisions among the loaded operations are flagged as a mat-error
+  // (application-level validation). User-entered values are never auto-corrected or blocked.
+  duplicateOperationIds = new Set<string>();
+  operationIdErrorStateMatcher: ErrorStateMatcher = {
+    isErrorState: (control: UntypedFormControl | null): boolean => {
+      const value = (control?.value || '').trim();
+      return !value || this.duplicateOperationIds.has(value);
+    }
+  };
 
   @ViewChild(MatMultiSort, {static: true}) sort: MatMultiSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -649,6 +664,7 @@ export class OasDocDetailComponent implements OnInit {
       this.table.dataSource.data.forEach((elm: BieForOasDoc) => {
         this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContext;
       });
+      this.recomputeDuplicateOperationIds();
 
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
@@ -703,6 +719,7 @@ export class OasDocDetailComponent implements OnInit {
       if (source.verb === 'GET' && source.messageBody === 'Request') {
         source.messageBody = 'Response';
       }
+      this.updateOperationIdForVerb(source);
     }
   }
 
@@ -766,6 +783,13 @@ export class OasDocDetailComponent implements OnInit {
 
   doUpdate() {
     // See #isChanged for the conditions in this method.
+
+    // Issue #1732: never persist a blank operationId (it is required and NOT NULL in the DB).
+    const blankOperationId = this.getChanged().some(e => !e.operationId || !e.operationId.trim());
+    if (blankOperationId) {
+      this.snackBar.open('Operation ID is required.', '', {duration: 3000});
+      return;
+    }
 
     const docChanged = this.hashCodeForOasDoc !== hashCode(this.oasDoc);
     const detailsChanged = this.getChanged().length > 0;
@@ -914,6 +938,47 @@ export class OasDocDetailComponent implements OnInit {
   _updateDataSource(data: BieForOasDoc[]) {
     this.table.dataSource.data = data;
     this.oasDoc.bieList = data;
+    this.recomputeDuplicateOperationIds();
+  }
+
+  // Recomputes the set of operationIds that occur more than once among the loaded operations.
+  // Note: the list is server-paginated, so this validates within the currently loaded rows.
+  recomputeDuplicateOperationIds(): void {
+    const counts = new Map<string, number>();
+    for (const row of (this.table?.dataSource?.data || [])) {
+      const id = (row.operationId || '').trim();
+      if (id) {
+        counts.set(id, (counts.get(id) || 0) + 1);
+      }
+    }
+    this.duplicateOperationIds = new Set<string>(
+      Array.from(counts.entries()).filter(([, count]) => count > 1).map(([id]) => id));
+  }
+
+  // Issue #1732: keep the Operation ID's verb word in sync when the Verb changes. Swaps only the
+  // leading verb word, preserving the BIE-name segment (so a manually edited name survives), and
+  // re-applies the 'List' suffix from the array indicator. The frontend owns the operationId; the
+  // backend stores it verbatim on save.
+  updateOperationIdForVerb(element: BieForOasDoc): void {
+    element.operationId = recomputeOperationId(element.verb, element.operationId, element.arrayIndicator);
+    this.recomputeDuplicateOperationIds();
+  }
+
+  // Issue #1732: when the Array Indicator toggles, keep the 'List' suffix on operationId and the
+  // '-list' suffix on resourceName in sync. The frontend owns these; the backend stores them as-is.
+  // Only the suffix is touched (the verb word / name are preserved).
+  updateOperationIdForArray(element: BieForOasDoc): void {
+    element.operationId = this.applySuffix(element.operationId, 'List', element.arrayIndicator);
+    element.resourceName = this.applySuffix(element.resourceName, '-list', element.arrayIndicator);
+    this.recomputeDuplicateOperationIds();
+  }
+
+  private applySuffix(value: string, suffix: string, present: boolean): string {
+    const current = value || '';
+    if (present) {
+      return current.endsWith(suffix) ? current : current + suffix;
+    }
+    return current.endsWith(suffix) ? current.substring(0, current.length - suffix.length) : current;
   }
 
   select(row: BieForOasDoc) {

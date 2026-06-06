@@ -276,6 +276,7 @@
                   score-table-column-resize [defaultWidth]="width('Array Indicator')" (onResize)="onResizeWidth($event)"> Array Indicator</th>
               <td mat-cell *matCellDef="let element">
                 <mat-checkbox [(ngModel)]="element.arrayIndicator"
+                              (ngModelChange)="updateOperationIdForArray(element)"
                               [disabled]="!element.topLevelAsbiepId"></mat-checkbox>
               </td>
             </ng-container>
@@ -315,7 +316,14 @@
                   score-table-column-resize [defaultWidth]="width('Operation ID')" (onResize)="onResizeWidth($event)"> Operation ID</th>
               <td mat-cell *matCellDef="let element">
                 <mat-form-field>
-                  <input matInput [(ngModel)]="element.operationId">
+                  <input matInput [(ngModel)]="element.operationId"
+                         (ngModelChange)="recomputeDuplicateOperationIds()"
+                         [errorStateMatcher]="operationIdErrorStateMatcher">
+                  @if (!element.operationId || !element.operationId.trim()) {
+                    <mat-error>Operation ID is required.</mat-error>
+                  } @else {
+                    <mat-error>Operation ID must be unique within the document.</mat-error>
+                  }
                 </mat-form-field>
               </td>
             </ng-container>
