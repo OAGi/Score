@@ -87,21 +87,23 @@ public class OasDocSecurityRecord extends UpdatableRecordImpl<OasDocSecurityReco
     }
 
     /**
-     * Setter for <code>oagi.oas_doc_security.scheme_name</code>. The
-     * components.securitySchemes key this entry references. NULL marks an empty
-     * requirement object {} (anonymous / optional).
+     * Setter for <code>oagi.oas_doc_security.oas_security_scheme_id</code>. FK
+     * to oas_security_scheme. The scheme this entry references (its scheme_name
+     * is the components.securitySchemes key). NULL marks an empty requirement
+     * object {} (anonymous / optional).
      */
-    public void setSchemeName(String value) {
+    public void setOasSecuritySchemeId(ULong value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_doc_security.scheme_name</code>. The
-     * components.securitySchemes key this entry references. NULL marks an empty
-     * requirement object {} (anonymous / optional).
+     * Getter for <code>oagi.oas_doc_security.oas_security_scheme_id</code>. FK
+     * to oas_security_scheme. The scheme this entry references (its scheme_name
+     * is the components.securitySchemes key). NULL marks an empty requirement
+     * object {} (anonymous / optional).
      */
-    public String getSchemeName() {
-        return (String) get(4);
+    public ULong getOasSecuritySchemeId() {
+        return (ULong) get(4);
     }
 
     /**
@@ -191,14 +193,14 @@ public class OasDocSecurityRecord extends UpdatableRecordImpl<OasDocSecurityReco
     /**
      * Create a detached, initialised OasDocSecurityRecord
      */
-    public OasDocSecurityRecord(ULong oasDocSecurityId, String guid, ULong oasDocId, Integer requirementGroup, String schemeName, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
+    public OasDocSecurityRecord(ULong oasDocSecurityId, String guid, ULong oasDocId, Integer requirementGroup, ULong oasSecuritySchemeId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
         super(OasDocSecurity.OAS_DOC_SECURITY);
 
         setOasDocSecurityId(oasDocSecurityId);
         setGuid(guid);
         setOasDocId(oasDocId);
         setRequirementGroup(requirementGroup);
-        setSchemeName(schemeName);
+        setOasSecuritySchemeId(oasSecuritySchemeId);
         setCreatedBy(createdBy);
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);

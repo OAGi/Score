@@ -211,23 +211,34 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
 
     private List<OasSecurityRequirement> loadOperationSecurityRequirements(ULong oasOperationId) {
         Map<Integer, OasSecurityRequirement> requirements = new LinkedHashMap<>();
-        dslContext().selectFrom(OAS_OPERATION_SECURITY)
+        // Issue #1729: oas_operation_security references the scheme by oas_security_scheme_id; join to
+        // resolve the components.securitySchemes key (a NULL id is an anonymous {} requirement).
+        dslContext().select(
+                        OAS_OPERATION_SECURITY.OAS_OPERATION_SECURITY_ID,
+                        OAS_OPERATION_SECURITY.REQUIREMENT_GROUP,
+                        OAS_OPERATION_SECURITY.OAS_SECURITY_SCHEME_ID,
+                        OAS_SECURITY_SCHEME.SCHEME_NAME)
+                .from(OAS_OPERATION_SECURITY)
+                .leftJoin(OAS_SECURITY_SCHEME)
+                .on(OAS_SECURITY_SCHEME.OAS_SECURITY_SCHEME_ID.eq(OAS_OPERATION_SECURITY.OAS_SECURITY_SCHEME_ID))
                 .where(OAS_OPERATION_SECURITY.OAS_OPERATION_ID.eq(oasOperationId))
                 .orderBy(OAS_OPERATION_SECURITY.REQUIREMENT_GROUP.asc(), OAS_OPERATION_SECURITY.OAS_OPERATION_SECURITY_ID.asc())
                 .fetch()
                 .forEach(record -> {
-                    Integer group = record.getRequirementGroup();
+                    Integer group = record.get(OAS_OPERATION_SECURITY.REQUIREMENT_GROUP);
                     OasSecurityRequirement requirement = requirements.computeIfAbsent(group, k -> {
                         OasSecurityRequirement r = new OasSecurityRequirement();
                         r.setSchemes(new ArrayList<>());
                         return r;
                     });
-                    if (record.getSchemeName() == null || record.getSchemeName().isBlank()) {
+                    String schemeName = record.get(OAS_SECURITY_SCHEME.SCHEME_NAME);
+                    if (record.get(OAS_OPERATION_SECURITY.OAS_SECURITY_SCHEME_ID) == null
+                            || schemeName == null || schemeName.isBlank()) {
                         requirement.setAnonymous(true);
                     } else if (!requirement.isAnonymous()) {
                         OasSecurityRequirementScheme scheme = new OasSecurityRequirementScheme();
-                        scheme.setSchemeName(record.getSchemeName());
-                        scheme.setScopes(loadOperationSecurityScopes(record.getOasOperationSecurityId()));
+                        scheme.setSchemeName(schemeName);
+                        scheme.setScopes(loadOperationSecurityScopes(record.get(OAS_OPERATION_SECURITY.OAS_OPERATION_SECURITY_ID)));
                         requirement.getSchemes().add(scheme);
                     }
                 });

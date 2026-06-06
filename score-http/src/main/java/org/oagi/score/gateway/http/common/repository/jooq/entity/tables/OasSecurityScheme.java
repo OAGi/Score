@@ -35,7 +35,9 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Oagi;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDoc.OasDocPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocSecurity.OasDocSecurityPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasOauthFlow.OasOauthFlowPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasOperationSecurity.OasOperationSecurityPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.OasSecuritySchemeRecord;
 
 
@@ -332,6 +334,19 @@ public class OasSecurityScheme extends TableImpl<OasSecuritySchemeRecord> {
         return _oasDoc;
     }
 
+    private transient OasDocSecurityPath _oasDocSecurity;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_doc_security</code> table
+     */
+    public OasDocSecurityPath oasDocSecurity() {
+        if (_oasDocSecurity == null)
+            _oasDocSecurity = new OasDocSecurityPath(this, null, Keys.OAS_DOC_SECURITY_OAS_SECURITY_SCHEME_ID_FK.getInverseKey());
+
+        return _oasDocSecurity;
+    }
+
     private transient OasOauthFlowPath _oasOauthFlow;
 
     /**
@@ -343,6 +358,19 @@ public class OasSecurityScheme extends TableImpl<OasSecuritySchemeRecord> {
             _oasOauthFlow = new OasOauthFlowPath(this, null, Keys.OAS_OAUTH_FLOW_OAS_SECURITY_SCHEME_ID_FK.getInverseKey());
 
         return _oasOauthFlow;
+    }
+
+    private transient OasOperationSecurityPath _oasOperationSecurity;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_operation_security</code> table
+     */
+    public OasOperationSecurityPath oasOperationSecurity() {
+        if (_oasOperationSecurity == null)
+            _oasOperationSecurity = new OasOperationSecurityPath(this, null, Keys.OAS_OPERATION_SECURITY_OAS_SECURITY_SCHEME_ID_FK.getInverseKey());
+
+        return _oasOperationSecurity;
     }
 
     @Override

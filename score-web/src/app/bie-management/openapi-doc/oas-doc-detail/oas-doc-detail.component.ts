@@ -430,10 +430,16 @@ export class OasDocDetailComponent implements OnInit {
           const previousSchemeName = this.securitySchemes[index]?.schemeName;
           this.securitySchemes[index] = result;
           if (previousSchemeName && previousSchemeName !== result.schemeName) {
-            this.oasDoc.securityRequirements = this.pruneSecurityRequirements(this.oasDoc.securityRequirements, previousSchemeName);
+            const newName = result.schemeName;
+            // Propagate a rename into the dependent requirements (the scheme keeps its id). A blank new
+            // name (shouldn't happen — Update is gated) falls back to pruning the now-unnamed references.
+            const apply = (reqs: OasSecurityRequirement[]) => newName
+              ? this.renameSecurityRequirements(reqs, previousSchemeName, newName)
+              : this.pruneSecurityRequirements(reqs, previousSchemeName);
+            this.oasDoc.securityRequirements = apply(this.oasDoc.securityRequirements);
             (this.table?.dataSource?.data || []).forEach(row => {
               const hadRequirements = (row.securityRequirements || []).length > 0;
-              row.securityRequirements = this.pruneSecurityRequirements(row.securityRequirements, previousSchemeName);
+              row.securityRequirements = apply(row.securityRequirements);
               // Preserve a Public override (empty by intent); only revert a custom override that lost all schemes.
               if (hadRequirements && row.securityRequirements.length === 0) {
                 row.securityOverridden = false;
@@ -600,6 +606,15 @@ export class OasDocDetailComponent implements OnInit {
       .filter(req => req.anonymous || req.schemes.length > 0);
   }
 
+  // A renamed scheme keeps its oas_security_scheme_id, so carry the new name into the dependent
+  // requirements (which reference schemes by name) instead of dropping them.
+  private renameSecurityRequirements(requirements: OasSecurityRequirement[], oldName: string, newName: string): OasSecurityRequirement[] {
+    return (requirements || []).map(req => ({
+      anonymous: req.anonymous,
+      schemes: (req.schemes || []).map(s => s.schemeName === oldName ? {...s, schemeName: newName} : s)
+    }));
+  }
+
   getPath(commands?: any[]): string {
     const urlTree = this.router.createUrlTree(commands);
     const path = this.location.prepareExternalUrl(urlTree.toString());
@@ -752,16 +767,25 @@ export class OasDocDetailComponent implements OnInit {
   doUpdate() {
     // See #isChanged for the conditions in this method.
 
-    if (this.hashCodeForOasDoc !== hashCode(this.oasDoc)) {
+    const docChanged = this.hashCodeForOasDoc !== hashCode(this.oasDoc);
+    const detailsChanged = this.getChanged().length > 0;
+
+    if (docChanged) {
+      // Persist the document (incl. its security schemes) FIRST, then the per-operation details.
+      // updateDetails() resolves each operation Security Requirement's scheme name to its
+      // oas_security_scheme_id from the database, so a renamed/added scheme must be committed before the
+      // operation rows are saved — otherwise the lookup misses and the requirement is silently dropped.
       this.openAPIService.updateOasDoc(this.oasDoc).subscribe(_ => {
         this.init(this.oasDoc);
+        if (detailsChanged) {
+          this.updateDetails();
+        }
         this.snackBar.open('Updated', '', {
           duration: 3000,
         });
       });
-    }
-
-    if (this.getChanged().length > 0) {
+    } else if (detailsChanged) {
+      // No scheme change -> existing schemes are already persisted, so resolution is safe.
       this.updateDetails();
     }
   }

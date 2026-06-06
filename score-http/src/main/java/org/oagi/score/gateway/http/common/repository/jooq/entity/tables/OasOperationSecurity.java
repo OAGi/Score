@@ -36,6 +36,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.Oagi;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasOperation.OasOperationPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasOperationSecurityScope.OasOperationSecurityScopePath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasSecurityScheme.OasSecuritySchemePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.OasOperationSecurityRecord;
 
 
@@ -88,11 +89,13 @@ public class OasOperationSecurity extends TableImpl<OasOperationSecurityRecord> 
     public final TableField<OasOperationSecurityRecord, Integer> REQUIREMENT_GROUP = createField(DSL.name("requirement_group"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.INTEGER)), this, "Index of the Security Requirement Object within the security array (OR). Rows sharing a group are ANDed into one requirement object.");
 
     /**
-     * The column <code>oagi.oas_operation_security.scheme_name</code>. The
-     * components.securitySchemes key this entry references. NULL marks an empty
-     * requirement object {} (anonymous / optional).
+     * The column
+     * <code>oagi.oas_operation_security.oas_security_scheme_id</code>. FK to
+     * oas_security_scheme. The scheme this entry references (its scheme_name is
+     * the components.securitySchemes key). NULL marks an empty requirement
+     * object {} (anonymous / optional).
      */
-    public final TableField<OasOperationSecurityRecord, String> SCHEME_NAME = createField(DSL.name("scheme_name"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The components.securitySchemes key this entry references. NULL marks an empty requirement object {} (anonymous / optional).");
+    public final TableField<OasOperationSecurityRecord, ULong> OAS_SECURITY_SCHEME_ID = createField(DSL.name("oas_security_scheme_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "FK to oas_security_scheme. The scheme this entry references (its scheme_name is the components.securitySchemes key). NULL marks an empty requirement object {} (anonymous / optional).");
 
     /**
      * The column <code>oagi.oas_operation_security.created_by</code>. The user
@@ -205,7 +208,7 @@ public class OasOperationSecurity extends TableImpl<OasOperationSecurityRecord> 
 
     @Override
     public List<ForeignKey<OasOperationSecurityRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.OAS_OPERATION_SECURITY_CREATED_BY_FK, Keys.OAS_OPERATION_SECURITY_LAST_UPDATED_BY_FK, Keys.OAS_OPERATION_SECURITY_OAS_OPERATION_ID_FK);
+        return Arrays.asList(Keys.OAS_OPERATION_SECURITY_CREATED_BY_FK, Keys.OAS_OPERATION_SECURITY_LAST_UPDATED_BY_FK, Keys.OAS_OPERATION_SECURITY_OAS_OPERATION_ID_FK, Keys.OAS_OPERATION_SECURITY_OAS_SECURITY_SCHEME_ID_FK);
     }
 
     private transient AppUserPath _oasOperationSecurityCreatedByFk;
@@ -244,6 +247,19 @@ public class OasOperationSecurity extends TableImpl<OasOperationSecurityRecord> 
             _oasOperation = new OasOperationPath(this, Keys.OAS_OPERATION_SECURITY_OAS_OPERATION_ID_FK, null);
 
         return _oasOperation;
+    }
+
+    private transient OasSecuritySchemePath _oasSecurityScheme;
+
+    /**
+     * Get the implicit join path to the <code>oagi.oas_security_scheme</code>
+     * table.
+     */
+    public OasSecuritySchemePath oasSecurityScheme() {
+        if (_oasSecurityScheme == null)
+            _oasSecurityScheme = new OasSecuritySchemePath(this, Keys.OAS_OPERATION_SECURITY_OAS_SECURITY_SCHEME_ID_FK, null);
+
+        return _oasSecurityScheme;
     }
 
     private transient OasOperationSecurityScopePath _oasOperationSecurityScope;

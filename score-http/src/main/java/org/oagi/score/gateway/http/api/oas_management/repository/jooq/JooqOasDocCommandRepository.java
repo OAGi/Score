@@ -22,7 +22,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import static org.oagi.score.gateway.http.common.model.ScoreRole.DEVELOPER;
@@ -450,177 +453,412 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
 
     /**
      * Issue #1729: persist the document's Security Schemes. An empty/null list keeps the legacy
-     * hardcoded OAuth2 default and persists NO row. Replace strategy: delete all then re-insert one row
-     * per scheme (apiKey | http | oauth2 | openIdConnect). Scheme names are unique per doc (DB UK).
+     * hardcoded OAuth2 default and persists NO row. Diff strategy (NOT delete-then-reinsert): rows the
+     * client still carries (matched by {@code oas_security_scheme_id}) are UPDATEd in place so their id
+     * stays stable for the {@code oas_doc_security}/{@code oas_operation_security} FK references; rows no
+     * longer present are DELETEd (after their requirement references are cleared); rows without a known id
+     * are INSERTed. Scheme names are unique per doc (DB UK).
      */
     private void saveSecuritySchemes(ULong oasDocId, List<OasSecurityScheme> schemes,
                                      ULong requesterId, LocalDateTime timestamp) {
-        // No ON DELETE CASCADE: delete children first (oauth scope -> flow -> scheme) for this doc.
-        dslContext().deleteFrom(OAS_OAUTH_SCOPE)
-                .where(OAS_OAUTH_SCOPE.OAS_OAUTH_FLOW_ID.in(
-                        dslContext().select(OAS_OAUTH_FLOW.OAS_OAUTH_FLOW_ID).from(OAS_OAUTH_FLOW)
-                                .where(OAS_OAUTH_FLOW.OAS_SECURITY_SCHEME_ID.in(
-                                        dslContext().select(OAS_SECURITY_SCHEME.OAS_SECURITY_SCHEME_ID)
-                                                .from(OAS_SECURITY_SCHEME)
-                                                .where(OAS_SECURITY_SCHEME.OAS_DOC_ID.eq(oasDocId))))))
-                .execute();
-        dslContext().deleteFrom(OAS_OAUTH_FLOW)
-                .where(OAS_OAUTH_FLOW.OAS_SECURITY_SCHEME_ID.in(
-                        dslContext().select(OAS_SECURITY_SCHEME.OAS_SECURITY_SCHEME_ID).from(OAS_SECURITY_SCHEME)
-                                .where(OAS_SECURITY_SCHEME.OAS_DOC_ID.eq(oasDocId))))
-                .execute();
-        dslContext().deleteFrom(OAS_SECURITY_SCHEME)
+        List<OasSecuritySchemeRecord> existing = dslContext().selectFrom(OAS_SECURITY_SCHEME)
                 .where(OAS_SECURITY_SCHEME.OAS_DOC_ID.eq(oasDocId))
-                .execute();
+                .fetch();
+        Map<ULong, OasSecuritySchemeRecord> existingById = new LinkedHashMap<>();
+        for (OasSecuritySchemeRecord record : existing) {
+            existingById.put(record.getOasSecuritySchemeId(), record);
+        }
 
-        if (schemes == null || schemes.isEmpty()) {
+        List<OasSecurityScheme> incoming = (schemes == null) ? Collections.emptyList() : schemes;
+
+        // Ids the client still carries -> these rows survive (are UPDATEd); the rest are removed.
+        Set<ULong> keptIds = new HashSet<>();
+        for (OasSecurityScheme scheme : incoming) {
+            if (scheme == null || scheme.getType() == null || scheme.getType().isBlank()
+                    || scheme.getOasSecuritySchemeId() == null) {
+                continue;
+            }
+            ULong id = ULong.valueOf(scheme.getOasSecuritySchemeId());
+            if (existingById.containsKey(id)) {
+                keptIds.add(id);
+            }
+        }
+
+        // DELETE removed schemes. No ON DELETE CASCADE: first clear the requirement references
+        // (oas_doc_security / oas_operation_security) and the scheme's own oauth flows/scopes.
+        for (ULong id : existingById.keySet()) {
+            if (!keptIds.contains(id)) {
+                deleteSecuritySchemeReferences(id);
+                deleteOAuthFlows(id);
+                dslContext().deleteFrom(OAS_SECURITY_SCHEME)
+                        .where(OAS_SECURITY_SCHEME.OAS_SECURITY_SCHEME_ID.eq(id))
+                        .execute();
+            }
+        }
+
+        if (incoming.isEmpty()) {
             return;
         }
+
+        // Park every surviving row on a unique temporary name first so reordering/swapping names across
+        // the kept schemes cannot transiently violate the (oas_doc_id, scheme_name) unique key.
+        for (ULong id : keptIds) {
+            dslContext().update(OAS_SECURITY_SCHEME)
+                    .set(OAS_SECURITY_SCHEME.SCHEME_NAME, existingById.get(id).getGuid())
+                    .where(OAS_SECURITY_SCHEME.OAS_SECURITY_SCHEME_ID.eq(id))
+                    .execute();
+        }
+
         Set<String> usedNames = new HashSet<>();
-        for (OasSecurityScheme scheme : schemes) {
+        Set<ULong> processedIds = new HashSet<>();
+        for (OasSecurityScheme scheme : incoming) {
             if (scheme == null || scheme.getType() == null || scheme.getType().isBlank()) {
                 continue;
             }
+            ULong id = (scheme.getOasSecuritySchemeId() != null)
+                    ? ULong.valueOf(scheme.getOasSecuritySchemeId()) : null;
+            // Guard against a malformed payload that repeats the same id: processing it twice would
+            // overwrite the first variant's row (and orphan requirements referencing its name). Keep the
+            // first occurrence only.
+            if (id != null && !processedIds.add(id)) {
+                continue;
+            }
             String type = scheme.getType();
-            OasSecuritySchemeRecord record = new OasSecuritySchemeRecord();
-            record.setGuid(randomGuid());
-            record.setOasDocId(oasDocId);
-            record.setType(type);
             String schemeName = resolveUniqueSchemeName(scheme, usedNames);
             usedNames.add(schemeName);
-            record.setSchemeName(schemeName);
-            record.setDescription(scheme.getDescription());
-            if ("apiKey".equalsIgnoreCase(type)) {
-                record.setApiKeyName(scheme.getApiKeyName());
-                record.setApiKeyIn(scheme.getApiKeyIn());
-            } else if ("http".equalsIgnoreCase(type)) {
-                record.setHttpScheme(scheme.getHttpScheme());
-                if ("bearer".equalsIgnoreCase(scheme.getHttpScheme())) {
-                    record.setBearerFormat(scheme.getBearerFormat());
-                }
-            } else if ("openIdConnect".equalsIgnoreCase(type)) {
-                record.setOpenIdConnectUrl(scheme.getOpenIdConnectUrl());
-            }
-            record.setDeprecated((byte) 0);
-            record.setCreatedBy(requesterId);
-            record.setLastUpdatedBy(requesterId);
-            record.setCreationTimestamp(timestamp);
-            record.setLastUpdateTimestamp(timestamp);
-            ULong oasSecuritySchemeId = dslContext().insertInto(OAS_SECURITY_SCHEME)
-                    .set(record)
-                    .returning(OAS_SECURITY_SCHEME.OAS_SECURITY_SCHEME_ID)
-                    .fetchOne().getOasSecuritySchemeId();
 
-            // Issue #1729: persist the OAuth Flows Object (flows + scopes) for oauth2 schemes.
-            if ("oauth2".equalsIgnoreCase(type) && scheme.getFlows() != null) {
+            OasSecuritySchemeRecord record = (id != null) ? existingById.get(id) : null;
+
+            ULong oasSecuritySchemeId;
+            if (record != null) {
+                // UPDATE in place: the id is preserved so dependent FK references stay valid.
+                record.setType(type);
+                record.setSchemeName(schemeName);
+                // The row was parked on a temporary name above; force the column to be written even when
+                // the final name equals the originally-loaded one (otherwise the temp name would stick).
+                record.changed(OAS_SECURITY_SCHEME.SCHEME_NAME, true);
+                record.setDescription(scheme.getDescription());
+                record.setApiKeyName("apiKey".equalsIgnoreCase(type) ? scheme.getApiKeyName() : null);
+                record.setApiKeyIn("apiKey".equalsIgnoreCase(type) ? scheme.getApiKeyIn() : null);
+                if ("http".equalsIgnoreCase(type)) {
+                    record.setHttpScheme(scheme.getHttpScheme());
+                    record.setBearerFormat("bearer".equalsIgnoreCase(scheme.getHttpScheme())
+                            ? scheme.getBearerFormat() : null);
+                } else {
+                    record.setHttpScheme(null);
+                    record.setBearerFormat(null);
+                }
+                record.setOpenIdConnectUrl("openIdConnect".equalsIgnoreCase(type)
+                        ? scheme.getOpenIdConnectUrl() : null);
+                record.setLastUpdatedBy(requesterId);
+                record.setLastUpdateTimestamp(timestamp);
+                record.update();
+                oasSecuritySchemeId = record.getOasSecuritySchemeId();
+            } else {
+                // INSERT a brand-new scheme.
+                OasSecuritySchemeRecord newRecord = new OasSecuritySchemeRecord();
+                newRecord.setGuid(randomGuid());
+                newRecord.setOasDocId(oasDocId);
+                newRecord.setType(type);
+                newRecord.setSchemeName(schemeName);
+                newRecord.setDescription(scheme.getDescription());
+                if ("apiKey".equalsIgnoreCase(type)) {
+                    newRecord.setApiKeyName(scheme.getApiKeyName());
+                    newRecord.setApiKeyIn(scheme.getApiKeyIn());
+                } else if ("http".equalsIgnoreCase(type)) {
+                    newRecord.setHttpScheme(scheme.getHttpScheme());
+                    if ("bearer".equalsIgnoreCase(scheme.getHttpScheme())) {
+                        newRecord.setBearerFormat(scheme.getBearerFormat());
+                    }
+                } else if ("openIdConnect".equalsIgnoreCase(type)) {
+                    newRecord.setOpenIdConnectUrl(scheme.getOpenIdConnectUrl());
+                }
+                newRecord.setDeprecated((byte) 0);
+                newRecord.setCreatedBy(requesterId);
+                newRecord.setLastUpdatedBy(requesterId);
+                newRecord.setCreationTimestamp(timestamp);
+                newRecord.setLastUpdateTimestamp(timestamp);
+                oasSecuritySchemeId = dslContext().insertInto(OAS_SECURITY_SCHEME)
+                        .set(newRecord)
+                        .returning(OAS_SECURITY_SCHEME.OAS_SECURITY_SCHEME_ID)
+                        .fetchOne().getOasSecuritySchemeId();
+            }
+
+            // Issue #1729: persist the OAuth Flows Object for oauth2 schemes (diffed in place); clear any
+            // leftover flows for non-oauth2 (e.g. when an existing scheme's type changed away from oauth2).
+            if ("oauth2".equalsIgnoreCase(type)) {
                 saveOAuthFlows(oasSecuritySchemeId, scheme.getFlows(), requesterId, timestamp);
+            } else {
+                deleteOAuthFlows(oasSecuritySchemeId);
             }
         }
     }
 
-    // Issue #1729: persist a scheme's OAuth flows and their scopes. There is no ON DELETE CASCADE; the
-    // replace strategy in saveSecuritySchemes deletes the existing scopes -> flows -> schemes first.
+    // Issue #1729: delete a scheme's OAuth flows and their scopes (children-first; no ON DELETE CASCADE).
+    private void deleteOAuthFlows(ULong oasSecuritySchemeId) {
+        dslContext().deleteFrom(OAS_OAUTH_SCOPE)
+                .where(OAS_OAUTH_SCOPE.OAS_OAUTH_FLOW_ID.in(
+                        dslContext().select(OAS_OAUTH_FLOW.OAS_OAUTH_FLOW_ID).from(OAS_OAUTH_FLOW)
+                                .where(OAS_OAUTH_FLOW.OAS_SECURITY_SCHEME_ID.eq(oasSecuritySchemeId))))
+                .execute();
+        dslContext().deleteFrom(OAS_OAUTH_FLOW)
+                .where(OAS_OAUTH_FLOW.OAS_SECURITY_SCHEME_ID.eq(oasSecuritySchemeId))
+                .execute();
+    }
+
+    // Issue #1729: before a scheme row is deleted, clear the Security Requirement entries that reference it
+    // (document-level and operation-level, scopes-first) because the FK is RESTRICT, not ON DELETE CASCADE.
+    private void deleteSecuritySchemeReferences(ULong oasSecuritySchemeId) {
+        dslContext().deleteFrom(OAS_DOC_SECURITY_SCOPE)
+                .where(OAS_DOC_SECURITY_SCOPE.OAS_DOC_SECURITY_ID.in(
+                        dslContext().select(OAS_DOC_SECURITY.OAS_DOC_SECURITY_ID).from(OAS_DOC_SECURITY)
+                                .where(OAS_DOC_SECURITY.OAS_SECURITY_SCHEME_ID.eq(oasSecuritySchemeId))))
+                .execute();
+        dslContext().deleteFrom(OAS_DOC_SECURITY)
+                .where(OAS_DOC_SECURITY.OAS_SECURITY_SCHEME_ID.eq(oasSecuritySchemeId))
+                .execute();
+        dslContext().deleteFrom(OAS_OPERATION_SECURITY_SCOPE)
+                .where(OAS_OPERATION_SECURITY_SCOPE.OAS_OPERATION_SECURITY_ID.in(
+                        dslContext().select(OAS_OPERATION_SECURITY.OAS_OPERATION_SECURITY_ID).from(OAS_OPERATION_SECURITY)
+                                .where(OAS_OPERATION_SECURITY.OAS_SECURITY_SCHEME_ID.eq(oasSecuritySchemeId))))
+                .execute();
+        dslContext().deleteFrom(OAS_OPERATION_SECURITY)
+                .where(OAS_OPERATION_SECURITY.OAS_SECURITY_SCHEME_ID.eq(oasSecuritySchemeId))
+                .execute();
+    }
+
+    // Issue #1729: map this doc's components.securitySchemes key -> oas_security_scheme_id, so a Security
+    // Requirement entry (carried by name on the wire) can be persisted as the FK to oas_security_scheme.
+    private Map<String, ULong> loadSchemeIdByName(ULong oasDocId) {
+        Map<String, ULong> schemeIdByName = new LinkedHashMap<>();
+        dslContext().select(OAS_SECURITY_SCHEME.SCHEME_NAME, OAS_SECURITY_SCHEME.OAS_SECURITY_SCHEME_ID)
+                .from(OAS_SECURITY_SCHEME)
+                .where(OAS_SECURITY_SCHEME.OAS_DOC_ID.eq(oasDocId))
+                .fetch()
+                .forEach(record -> schemeIdByName.put(record.value1(), record.value2()));
+        return schemeIdByName;
+    }
+
+    // Issue #1729: persist a scheme's OAuth flows and their scopes as a DIFF (not delete-then-reinsert):
+    // a flow still present (matched by flow_type, its unique key within the scheme) is UPDATEd in place so
+    // its id stays stable; flows no longer present are deleted (scopes first; no ON DELETE CASCADE); new
+    // flows are inserted. Each kept flow's scopes are reconciled the same way (matched by scope_name).
     private void saveOAuthFlows(ULong oasSecuritySchemeId, List<OasOAuthFlow> flows,
                                 ULong requesterId, LocalDateTime timestamp) {
-        Set<String> usedFlowTypes = new HashSet<>();
-        for (OasOAuthFlow flow : flows) {
+        List<OasOAuthFlow> incoming = (flows == null) ? Collections.emptyList() : flows;
+
+        // Existing flows for this scheme, keyed by flow_type.
+        Map<String, OasOauthFlowRecord> existingByType = new LinkedHashMap<>();
+        dslContext().selectFrom(OAS_OAUTH_FLOW)
+                .where(OAS_OAUTH_FLOW.OAS_SECURITY_SCHEME_ID.eq(oasSecuritySchemeId))
+                .fetch()
+                .forEach(record -> existingByType.put(record.getFlowType(), record));
+
+        // Desired flow types (a flow_type is unique within the scheme).
+        Set<String> desiredTypes = new HashSet<>();
+        for (OasOAuthFlow flow : incoming) {
+            if (flow != null && flow.getFlowType() != null && !flow.getFlowType().isBlank()) {
+                desiredTypes.add(flow.getFlowType());
+            }
+        }
+
+        // DELETE flows no longer desired (scopes first; no ON DELETE CASCADE).
+        for (Map.Entry<String, OasOauthFlowRecord> existing : existingByType.entrySet()) {
+            if (!desiredTypes.contains(existing.getKey())) {
+                ULong oasOAuthFlowId = existing.getValue().getOasOauthFlowId();
+                dslContext().deleteFrom(OAS_OAUTH_SCOPE)
+                        .where(OAS_OAUTH_SCOPE.OAS_OAUTH_FLOW_ID.eq(oasOAuthFlowId)).execute();
+                dslContext().deleteFrom(OAS_OAUTH_FLOW)
+                        .where(OAS_OAUTH_FLOW.OAS_OAUTH_FLOW_ID.eq(oasOAuthFlowId)).execute();
+            }
+        }
+
+        // INSERT new flows / UPDATE existing ones in place; reconcile each flow's scopes.
+        Set<String> processedTypes = new HashSet<>();
+        for (OasOAuthFlow flow : incoming) {
             if (flow == null || flow.getFlowType() == null || flow.getFlowType().isBlank()) {
                 continue;
             }
-            if (!usedFlowTypes.add(flow.getFlowType())) {
+            String flowType = flow.getFlowType();
+            if (!processedTypes.add(flowType)) {
                 continue; // at most one flow per type (DB unique key)
             }
-            OasOauthFlowRecord flowRecord = new OasOauthFlowRecord();
-            flowRecord.setGuid(randomGuid());
-            flowRecord.setOasSecuritySchemeId(oasSecuritySchemeId);
-            flowRecord.setFlowType(flow.getFlowType());
-            flowRecord.setAuthorizationUrl(flow.getAuthorizationUrl());
-            flowRecord.setTokenUrl(flow.getTokenUrl());
-            flowRecord.setRefreshUrl(flow.getRefreshUrl());
-            flowRecord.setDeviceAuthorizationUrl(flow.getDeviceAuthorizationUrl());
-            flowRecord.setCreatedBy(requesterId);
-            flowRecord.setLastUpdatedBy(requesterId);
-            flowRecord.setCreationTimestamp(timestamp);
-            flowRecord.setLastUpdateTimestamp(timestamp);
-            ULong oasOAuthFlowId = dslContext().insertInto(OAS_OAUTH_FLOW)
-                    .set(flowRecord)
-                    .returning(OAS_OAUTH_FLOW.OAS_OAUTH_FLOW_ID)
-                    .fetchOne().getOasOauthFlowId();
-
-            if (flow.getScopes() == null) {
-                continue;
+            OasOauthFlowRecord record = existingByType.get(flowType);
+            ULong oasOAuthFlowId;
+            if (record != null) {
+                // UPDATE in place only when a URL actually changed (the id is preserved either way).
+                if (!Objects.equals(record.getAuthorizationUrl(), flow.getAuthorizationUrl())
+                        || !Objects.equals(record.getTokenUrl(), flow.getTokenUrl())
+                        || !Objects.equals(record.getRefreshUrl(), flow.getRefreshUrl())
+                        || !Objects.equals(record.getDeviceAuthorizationUrl(), flow.getDeviceAuthorizationUrl())) {
+                    record.setAuthorizationUrl(flow.getAuthorizationUrl());
+                    record.setTokenUrl(flow.getTokenUrl());
+                    record.setRefreshUrl(flow.getRefreshUrl());
+                    record.setDeviceAuthorizationUrl(flow.getDeviceAuthorizationUrl());
+                    record.setLastUpdatedBy(requesterId);
+                    record.setLastUpdateTimestamp(timestamp);
+                    record.update();
+                }
+                oasOAuthFlowId = record.getOasOauthFlowId();
+            } else {
+                OasOauthFlowRecord flowRecord = new OasOauthFlowRecord();
+                flowRecord.setGuid(randomGuid());
+                flowRecord.setOasSecuritySchemeId(oasSecuritySchemeId);
+                flowRecord.setFlowType(flowType);
+                flowRecord.setAuthorizationUrl(flow.getAuthorizationUrl());
+                flowRecord.setTokenUrl(flow.getTokenUrl());
+                flowRecord.setRefreshUrl(flow.getRefreshUrl());
+                flowRecord.setDeviceAuthorizationUrl(flow.getDeviceAuthorizationUrl());
+                flowRecord.setCreatedBy(requesterId);
+                flowRecord.setLastUpdatedBy(requesterId);
+                flowRecord.setCreationTimestamp(timestamp);
+                flowRecord.setLastUpdateTimestamp(timestamp);
+                oasOAuthFlowId = dslContext().insertInto(OAS_OAUTH_FLOW)
+                        .set(flowRecord)
+                        .returning(OAS_OAUTH_FLOW.OAS_OAUTH_FLOW_ID)
+                        .fetchOne().getOasOauthFlowId();
             }
-            Set<String> usedScopeNames = new HashSet<>();
-            for (OasOAuthScope scope : flow.getScopes()) {
+            reconcileOAuthScopes(oasOAuthFlowId, flow.getScopes(), requesterId, timestamp);
+        }
+    }
+
+    // Issue #1729: reconcile an OAuth flow's scopes (name -> description) as a diff — insert new names,
+    // delete removed names, update a kept name's description when it changed, leave unchanged rows (ids) alone.
+    private void reconcileOAuthScopes(ULong oasOAuthFlowId, List<OasOAuthScope> scopes,
+                                      ULong requesterId, LocalDateTime timestamp) {
+        Map<String, OasOauthScopeRecord> existingByName = new LinkedHashMap<>();
+        dslContext().selectFrom(OAS_OAUTH_SCOPE)
+                .where(OAS_OAUTH_SCOPE.OAS_OAUTH_FLOW_ID.eq(oasOAuthFlowId))
+                .fetch()
+                .forEach(record -> existingByName.put(record.getScopeName(), record));
+
+        // Desired scopes (name -> description); a scope_name is unique per flow, so keep the first description.
+        LinkedHashMap<String, String> desired = new LinkedHashMap<>();
+        if (scopes != null) {
+            for (OasOAuthScope scope : scopes) {
                 if (scope == null || scope.getScopeName() == null || scope.getScopeName().isBlank()) {
                     continue;
                 }
-                if (!usedScopeNames.add(scope.getScopeName())) {
-                    continue; // at most one scope per name (DB unique key)
-                }
+                desired.putIfAbsent(scope.getScopeName(), scope.getDescription());
+            }
+        }
+
+        for (Map.Entry<String, OasOauthScopeRecord> existing : existingByName.entrySet()) {
+            if (!desired.containsKey(existing.getKey())) {
+                dslContext().deleteFrom(OAS_OAUTH_SCOPE)
+                        .where(OAS_OAUTH_SCOPE.OAS_OAUTH_SCOPE_ID.eq(existing.getValue().getOasOauthScopeId()))
+                        .execute();
+            }
+        }
+        for (Map.Entry<String, String> entry : desired.entrySet()) {
+            OasOauthScopeRecord record = existingByName.get(entry.getKey());
+            if (record == null) {
                 OasOauthScopeRecord scopeRecord = new OasOauthScopeRecord();
                 scopeRecord.setGuid(randomGuid());
                 scopeRecord.setOasOauthFlowId(oasOAuthFlowId);
-                scopeRecord.setScopeName(scope.getScopeName());
-                scopeRecord.setDescription(scope.getDescription());
+                scopeRecord.setScopeName(entry.getKey());
+                scopeRecord.setDescription(entry.getValue());
                 scopeRecord.setCreatedBy(requesterId);
                 scopeRecord.setLastUpdatedBy(requesterId);
                 scopeRecord.setCreationTimestamp(timestamp);
                 scopeRecord.setLastUpdateTimestamp(timestamp);
                 dslContext().insertInto(OAS_OAUTH_SCOPE).set(scopeRecord).execute();
+            } else if (!Objects.equals(record.getDescription(), entry.getValue())) {
+                record.setDescription(entry.getValue());
+                record.setLastUpdatedBy(requesterId);
+                record.setLastUpdateTimestamp(timestamp);
+                record.update();
             }
         }
     }
 
+    // Issue #1729: persist the document's root-level Security Requirement entries as a DIFF (not
+    // delete-then-reinsert): a (requirement_group, oas_security_scheme_id) pair still present is kept with
+    // its id and only its free-text scopes are reconciled; pairs no longer present are deleted; new pairs
+    // are inserted. These rows carry no mutable payload beyond their key, so there is nothing else to update.
     private void saveDocSecurityRequirements(ULong oasDocId, List<OasSecurityRequirement> requirements,
                                              ULong requesterId, LocalDateTime timestamp) {
-        dslContext().deleteFrom(OAS_DOC_SECURITY_SCOPE)
-                .where(OAS_DOC_SECURITY_SCOPE.OAS_DOC_SECURITY_ID.in(
-                        dslContext().select(OAS_DOC_SECURITY.OAS_DOC_SECURITY_ID)
-                                .from(OAS_DOC_SECURITY)
-                                .where(OAS_DOC_SECURITY.OAS_DOC_ID.eq(oasDocId))))
-                .execute();
-        dslContext().deleteFrom(OAS_DOC_SECURITY)
-                .where(OAS_DOC_SECURITY.OAS_DOC_ID.eq(oasDocId))
-                .execute();
+        // Schemes are saved before requirements; resolve each by-name reference to its FK id.
+        Map<String, ULong> schemeIdByName = loadSchemeIdByName(oasDocId);
 
-        if (requirements == null || requirements.isEmpty()) {
-            return;
+        // Desired state keyed by (requirement_group, scheme id) -> the entry (null scheme id = anonymous).
+        LinkedHashMap<String, OasSecurityRequirementDiff.Entry> desired =
+                OasSecurityRequirementDiff.build(requirements, schemeIdByName);
+
+        // Existing rows for this doc, keyed the same way.
+        Map<String, ULong> existingIdByKey = new LinkedHashMap<>();
+        dslContext().select(OAS_DOC_SECURITY.OAS_DOC_SECURITY_ID, OAS_DOC_SECURITY.REQUIREMENT_GROUP,
+                        OAS_DOC_SECURITY.OAS_SECURITY_SCHEME_ID)
+                .from(OAS_DOC_SECURITY)
+                .where(OAS_DOC_SECURITY.OAS_DOC_ID.eq(oasDocId))
+                .fetch()
+                .forEach(record -> existingIdByKey.put(
+                        OasSecurityRequirementDiff.key(record.get(OAS_DOC_SECURITY.REQUIREMENT_GROUP), record.get(OAS_DOC_SECURITY.OAS_SECURITY_SCHEME_ID)),
+                        record.get(OAS_DOC_SECURITY.OAS_DOC_SECURITY_ID)));
+
+        // DELETE entries no longer desired (scopes first; no ON DELETE CASCADE).
+        for (Map.Entry<String, ULong> existing : existingIdByKey.entrySet()) {
+            if (!desired.containsKey(existing.getKey())) {
+                dslContext().deleteFrom(OAS_DOC_SECURITY_SCOPE)
+                        .where(OAS_DOC_SECURITY_SCOPE.OAS_DOC_SECURITY_ID.eq(existing.getValue()))
+                        .execute();
+                dslContext().deleteFrom(OAS_DOC_SECURITY)
+                        .where(OAS_DOC_SECURITY.OAS_DOC_SECURITY_ID.eq(existing.getValue()))
+                        .execute();
+            }
         }
 
-        for (int i = 0; i < requirements.size(); i++) {
-            OasSecurityRequirement requirement = requirements.get(i);
-            if (requirement == null) {
-                continue;
-            }
-            if (requirement.isAnonymous()) {
-                insertDocSecurityRequirementEntry(oasDocId, i, null, Collections.emptyList(), requesterId, timestamp);
-                continue;
-            }
-            if (requirement.getSchemes() == null) {
-                continue;
-            }
-            Set<String> usedSchemeNames = new HashSet<>();
-            for (OasSecurityRequirementScheme scheme : requirement.getSchemes()) {
-                if (scheme == null || scheme.getSchemeName() == null || scheme.getSchemeName().isBlank()) {
-                    continue;
-                }
-                String schemeName = scheme.getSchemeName().trim();
-                if (!usedSchemeNames.add(schemeName)) {
-                    continue;
-                }
-                insertDocSecurityRequirementEntry(oasDocId, i, schemeName, scheme.getScopes(), requesterId, timestamp);
+        // INSERT new entries; reconcile the scopes of kept entries in place.
+        for (OasSecurityRequirementDiff.Entry entry : desired.values()) {
+            ULong oasDocSecurityId = existingIdByKey.get(OasSecurityRequirementDiff.key(entry.group, entry.schemeId));
+            if (oasDocSecurityId == null) {
+                insertDocSecurityRequirementEntry(oasDocId, entry.group, entry.schemeId, entry.scopes, requesterId, timestamp);
+            } else {
+                reconcileDocSecurityScopes(oasDocSecurityId, entry.scopes, requesterId, timestamp);
             }
         }
     }
 
-    private void insertDocSecurityRequirementEntry(ULong oasDocId, int requirementGroup, String schemeName,
+    // Issue #1729: reconcile a doc-level requirement entry's free-text scopes in place — insert names not
+    // yet stored, delete names no longer requested, leave unchanged names (and their ids) untouched.
+    private void reconcileDocSecurityScopes(ULong oasDocSecurityId, List<String> scopes,
+                                            ULong requesterId, LocalDateTime timestamp) {
+        Map<String, ULong> existing = new LinkedHashMap<>();
+        dslContext().select(OAS_DOC_SECURITY_SCOPE.SCOPE_NAME, OAS_DOC_SECURITY_SCOPE.OAS_DOC_SECURITY_SCOPE_ID)
+                .from(OAS_DOC_SECURITY_SCOPE)
+                .where(OAS_DOC_SECURITY_SCOPE.OAS_DOC_SECURITY_ID.eq(oasDocSecurityId))
+                .fetch()
+                .forEach(record -> existing.put(record.value1(), record.value2()));
+        Set<String> desired = new HashSet<>(scopes);
+        for (Map.Entry<String, ULong> e : existing.entrySet()) {
+            if (!desired.contains(e.getKey())) {
+                dslContext().deleteFrom(OAS_DOC_SECURITY_SCOPE)
+                        .where(OAS_DOC_SECURITY_SCOPE.OAS_DOC_SECURITY_SCOPE_ID.eq(e.getValue()))
+                        .execute();
+            }
+        }
+        for (String scopeName : scopes) {
+            if (!existing.containsKey(scopeName)) {
+                dslContext().insertInto(OAS_DOC_SECURITY_SCOPE)
+                        .set(OAS_DOC_SECURITY_SCOPE.GUID, randomGuid())
+                        .set(OAS_DOC_SECURITY_SCOPE.OAS_DOC_SECURITY_ID, oasDocSecurityId)
+                        .set(OAS_DOC_SECURITY_SCOPE.SCOPE_NAME, scopeName)
+                        .set(OAS_DOC_SECURITY_SCOPE.CREATED_BY, requesterId)
+                        .set(OAS_DOC_SECURITY_SCOPE.LAST_UPDATED_BY, requesterId)
+                        .set(OAS_DOC_SECURITY_SCOPE.CREATION_TIMESTAMP, timestamp)
+                        .set(OAS_DOC_SECURITY_SCOPE.LAST_UPDATE_TIMESTAMP, timestamp)
+                        .execute();
+            }
+        }
+    }
+
+    private void insertDocSecurityRequirementEntry(ULong oasDocId, int requirementGroup, ULong oasSecuritySchemeId,
                                                    List<String> scopes, ULong requesterId, LocalDateTime timestamp) {
         ULong oasDocSecurityId = dslContext().insertInto(OAS_DOC_SECURITY)
                 .set(OAS_DOC_SECURITY.GUID, randomGuid())
                 .set(OAS_DOC_SECURITY.OAS_DOC_ID, oasDocId)
                 .set(OAS_DOC_SECURITY.REQUIREMENT_GROUP, requirementGroup)
-                .set(OAS_DOC_SECURITY.SCHEME_NAME, schemeName)
+                .set(OAS_DOC_SECURITY.OAS_SECURITY_SCHEME_ID, oasSecuritySchemeId)
                 .set(OAS_DOC_SECURITY.CREATED_BY, requesterId)
                 .set(OAS_DOC_SECURITY.LAST_UPDATED_BY, requesterId)
                 .set(OAS_DOC_SECURITY.CREATION_TIMESTAMP, timestamp)
