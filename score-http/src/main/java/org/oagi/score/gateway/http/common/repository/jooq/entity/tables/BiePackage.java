@@ -123,6 +123,15 @@ public class BiePackage extends TableImpl<BiePackageRecord> {
     public final TableField<BiePackageRecord, ULong> PREV_BIE_PACKAGE_ID = createField(DSL.name("prev_bie_package_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A foreign key referring to the previous version of this BIE package, if any. Used to track package version history.");
 
     /**
+     * The column <code>oagi.bie_package.revision_reason</code>. Optional
+     * free-text reason describing the intent of this package revision (issue
+     * #1733). Captured at revision time and editable while the package is WIP;
+     * surfaced in the BIE package manifest. NULL for the initial (non-revised)
+     * package and for pre-existing rows.
+     */
+    public final TableField<BiePackageRecord, String> REVISION_REASON = createField(DSL.name("revision_reason"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Optional free-text reason describing the intent of this package revision (issue #1733). Captured at revision time and editable while the package is WIP; surfaced in the BIE package manifest. NULL for the initial (non-revised) package and for pre-existing rows.");
+
+    /**
      * The column <code>oagi.bie_package.owner_user_id</code>. Foreign key to
      * the BIE package. This is the user who owns the entity, is allowed to edit
      * the entity, and who can transfer the ownership to another user.

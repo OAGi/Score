@@ -210,4 +210,14 @@ ALTER TABLE `oas_operation`
           COMMENT '1 = this operation overrides the document-level security (0 rows => security: []; rows => the operation array). 0 = inherit the root security.'
           AFTER `deprecated`;
 
+-- Revision Reason Text (issue #1733): a package-level free-text reason explaining the
+-- intent of a package revision. Captured at Revise time (and editable while WIP),
+-- surfaced in the BIE package manifest. Per-revision by design: each Revise creates a
+-- new bie_package row chained by prev_bie_package_id, so the reason is a 1:1 attribute
+-- of that row. NULL for the initial (non-revised) package and for pre-existing rows.
+ALTER TABLE `bie_package`
+    ADD COLUMN `revision_reason` longtext DEFAULT NULL
+          COMMENT 'Optional free-text reason describing the intent of this package revision (issue #1733). Captured at revision time and editable while the package is WIP; surfaced in the BIE package manifest. NULL for the initial (non-revised) package and for pre-existing rows.'
+          AFTER `prev_bie_package_id`;
+
 SET FOREIGN_KEY_CHECKS = @OLD_FOREIGN_KEY_CHECKS;

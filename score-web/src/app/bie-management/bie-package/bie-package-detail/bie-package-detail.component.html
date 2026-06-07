@@ -72,6 +72,12 @@
               <textarea rows="4" cols="2000" matInput [(ngModel)]="biePackage.description"
                         [disabled]="biePackage.state !== 'WIP' || biePackage.access !== 'CanEdit'"></textarea>
             </mat-form-field>
+            <!-- Issue #1733: per-revision reason; only meaningful for a revised package (has a prior version). -->
+            <mat-form-field *ngIf="!!biePackage.prev">
+              <mat-label>Revision Reason</mat-label>
+              <textarea rows="2" cols="2000" matInput [(ngModel)]="biePackage.revisionReason"
+                        [disabled]="biePackage.state !== 'WIP' || biePackage.access !== 'CanEdit'"></textarea>
+            </mat-form-field>
           </div>
         </div>
       </mat-card-content>

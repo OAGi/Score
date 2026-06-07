@@ -87,7 +87,8 @@ public class BiePackageCommandService {
                         request.name(),
                         request.versionId(),
                         request.versionName(),
-                        request.description());
+                        request.description(),
+                        request.revisionReason());
             } catch (DuplicateKeyException e) {
                 throw new IllegalArgumentException("A BIE package with the same name, version ID, and version name already exists.", e);
             }

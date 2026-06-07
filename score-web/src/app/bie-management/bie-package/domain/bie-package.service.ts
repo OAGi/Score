@@ -185,7 +185,8 @@ export class BiePackageService {
       name: biePackage.name,
       versionId: biePackage.versionId,
       versionName: biePackage.versionName,
-      description: biePackage.description
+      description: biePackage.description,
+      revisionReason: biePackage.revisionReason
     });
   }
 

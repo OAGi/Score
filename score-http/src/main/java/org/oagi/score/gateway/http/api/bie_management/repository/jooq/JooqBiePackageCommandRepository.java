@@ -83,6 +83,8 @@ public class JooqBiePackageCommandRepository extends JooqBaseRepository implemen
         biePackageRecord.setDescription(biePackageDetails.description());
         biePackageRecord.setState(BieState.WIP.name());
         biePackageRecord.setPrevBiePackageId(valueOf(biePackageId));
+        // Issue #1733: a new revision starts with NO reason; the owner enters it afterward via the WIP edit
+        // form. It must NOT inherit the previous revision's reason (unlike name/versionName/description above).
         biePackageRecord.setOwnerUserId(valueOf(requester().userId()));
         biePackageRecord.setCreatedBy(valueOf(requester().userId()));
         biePackageRecord.setLastUpdatedBy(valueOf(requester().userId()));
@@ -105,7 +107,7 @@ public class JooqBiePackageCommandRepository extends JooqBaseRepository implemen
 
     @Override
     public boolean update(BiePackageId biePackageId,
-                          String name, String versionId, String versionName, String description) {
+                          String name, String versionId, String versionName, String description, String revisionReason) {
 
         UpdateSetFirstStep<BiePackageRecord> firstStep = dslContext().update(BIE_PACKAGE);
         UpdateSetMoreStep<BiePackageRecord> step;
@@ -128,6 +130,12 @@ public class JooqBiePackageCommandRepository extends JooqBaseRepository implemen
             step = step.set(BIE_PACKAGE.DESCRIPTION, description);
         } else {
             step = step.setNull(BIE_PACKAGE.DESCRIPTION);
+        }
+        // Issue #1733: optional per-revision reason; a blank value clears it (null).
+        if (hasLength(revisionReason)) {
+            step = step.set(BIE_PACKAGE.REVISION_REASON, revisionReason);
+        } else {
+            step = step.setNull(BIE_PACKAGE.REVISION_REASON);
         }
 
         int numOfUpdatedRecords = step.set(BIE_PACKAGE.LAST_UPDATED_BY, valueOf(requester().userId()))
@@ -183,6 +191,8 @@ public class JooqBiePackageCommandRepository extends JooqBaseRepository implemen
         copiedBiePackageRecord.setSourceBiePackageId(biePackageRecord.getBiePackageId());
         copiedBiePackageRecord.setSourceAction("Copy");
         copiedBiePackageRecord.setSourceTimestamp(now);
+        // Issue #1733: a copy is a new independent draft, not a revision; do not carry the source's reason.
+        copiedBiePackageRecord.setRevisionReason(null);
         BiePackageId copiedBiePackageId = new BiePackageId(
                 dslContext().insertInto(BIE_PACKAGE)
                         .set(copiedBiePackageRecord)

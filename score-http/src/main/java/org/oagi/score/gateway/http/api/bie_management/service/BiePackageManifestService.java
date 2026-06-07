@@ -64,7 +64,8 @@ import static org.oagi.score.gateway.http.common.util.StringUtils.hasLength;
 @Transactional(readOnly = true)
 public class BiePackageManifestService {
 
-    private static final String BIE_PACKAGE_MANIFEST_VERSION = "0.2";
+    // Bumped 0.2 -> 0.3 for the package-level revisionReason field added per issue #1733.
+    private static final String BIE_PACKAGE_MANIFEST_VERSION = "0.3";
 
     @Autowired
     private RepositoryFactory repositoryFactory;
@@ -223,6 +224,7 @@ public class BiePackageManifestService {
                 (prevPackage != null) ? prevPackage.guid(): null,
                 (prevPackage != null) ? prevPackage.versionGuid() : null,
                 (prevPackage != null) ? prevPackage.versionId() : null,
+                currentPackage.revisionReason(),
                 newBiesFromPriorPackageVersion,
                 removedBiesFromPriorPackageVersion,
                 changedBiesFromPriorPackageVersion,
