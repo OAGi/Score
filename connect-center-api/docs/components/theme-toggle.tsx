@@ -117,7 +117,11 @@ export function ThemeToggle({ size = 'compact', className }: ThemeToggleProps) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    // Read the persisted/OS theme on mount. This must run client-side after
+    // hydration (localStorage + matchMedia are unavailable during SSR), so the
+    // one-time synchronous setState below is intentional.
     const initial = detectInitialTheme();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time client hydration from a browser-only source
     setMode(initial.mode);
     setTheme(initial.theme);
     applyTheme(initial.mode);

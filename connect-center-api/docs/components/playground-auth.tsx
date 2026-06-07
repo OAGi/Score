@@ -225,7 +225,11 @@ export function PlaygroundAuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<PlaygroundAuthUser | null>(null);
 
   useEffect(() => {
+    // Hydrate auth state from storage on mount. Storage is browser-only and
+    // cannot be read during SSR, so this one-time synchronous setState is
+    // intentional.
     const stored = readStoredAuth();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time client hydration from session/local storage
     setAuthMethod(stored.authMethod ?? null);
     setLoginId(stored.loginId ?? '');
     setAccessToken(stored.accessToken ?? '');

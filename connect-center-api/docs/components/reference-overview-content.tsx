@@ -118,7 +118,11 @@ function useResolvedApiBaseUrl(raw: string | undefined): string {
     if (!usesLoopbackApiBase(raw)) {
       return;
     }
+    // Resolve the loopback API base from the live browser location at runtime;
+    // this depends on window and cannot be computed during SSR. The functional
+    // update is a no-op when unchanged, so it does not cause cascading renders.
     const runtimeApiBase = resolveBackendApiBase();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- runtime window-based resolution, guarded to a single state change
     setApiBaseUrl((current) => (current === runtimeApiBase ? current : runtimeApiBase));
   }, [raw]);
 

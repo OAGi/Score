@@ -1173,10 +1173,18 @@ export function MethodReference({
   const [selectedEndpoint, setSelectedEndpoint] = useState(doc.endpoint);
   const [endpointMenuOpen, setEndpointMenuOpen] = useState(false);
 
-  useEffect(() => {
+  // Reset the endpoint selection when the document changes. Handled during
+  // render (React's "adjust state when a prop changes" pattern) instead of an
+  // effect, so it avoids an extra commit/render pass. Keyed on the same values
+  // the previous effect depended on (endpoint + alternate_endpoints identity).
+  const [prevEndpoint, setPrevEndpoint] = useState(doc.endpoint);
+  const [prevAlternates, setPrevAlternates] = useState(doc.alternate_endpoints);
+  if (prevEndpoint !== doc.endpoint || prevAlternates !== doc.alternate_endpoints) {
+    setPrevEndpoint(doc.endpoint);
+    setPrevAlternates(doc.alternate_endpoints);
     setSelectedEndpoint(doc.endpoint);
     setEndpointMenuOpen(false);
-  }, [doc.endpoint, doc.alternate_endpoints]);
+  }
 
   const statusInExample = doc.response_example.match(/\bHTTP\/\d(?:\.\d)?\s+(\d{3})\b/);
   const inferredStatus =

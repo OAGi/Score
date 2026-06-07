@@ -33,6 +33,10 @@ export function MethodPageClient({ resource, method }: { resource: string; metho
 
   useEffect(() => {
     let cancelled = false;
+    // Data-fetching effect: reset to the loading state, then load the method
+    // doc for the current resource/method. The leading synchronous resets are
+    // intentional so the skeleton shows immediately while the async fetch runs.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset-before-async-fetch loading pattern
     setDoc(null);
     setNotFound(false);
     if (!isResourceKey(resource)) {
