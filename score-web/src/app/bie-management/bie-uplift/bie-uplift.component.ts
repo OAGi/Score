@@ -29,6 +29,7 @@ import {
 import {CcGraphNode} from '../../cc-management/domain/core-component-node';
 import {ReportDialogComponent} from './report-dialog/report-dialog.component';
 import {BieEditAbieNode} from '../bie-edit/domain/bie-edit-node';
+import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {saveBooleanProperty} from '../../common/utility';
 import {WebPageInfoService} from '../../basis/basis.service';
 import {Title} from '@angular/platform-browser';
@@ -77,6 +78,7 @@ export class BieUpliftComponent implements OnInit {
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);
   private titleService = inject(Title);
+  private confirmDialogService = inject(ConfirmDialogService);
   webPageInfo = inject(WebPageInfoService);
 
 
@@ -834,6 +836,45 @@ export class BieUpliftComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(uplift => {
       if (uplift) {
+        this.confirmUnselectedReuseThenUplift();
+      }
+    });
+  }
+
+  // Source reuse nodes that the user left without a target BIE selected for the
+  // target release. A reuse node is unselected when it has no target carrying a
+  // reusedTopLevelAsbiepId. Descendants auto-mapped under an already-selected
+  // reuse (target.reuseMapped) are excluded: their subtree is covered by the
+  // ancestor's reference, so it is not inline-copied. The level/used/locked
+  // filter matches report()'s row filter.
+  private collectUnselectedReuseNodes(): BieUpliftSourceFlatNode[] {
+    return this.sourceDataSource.data.filter(e =>
+      e.level > 0 && e.used && !e.locked && e.reused &&
+      !(e.target && (e.target.reusedTopLevelAsbiepId || e.target.reuseMapped)));
+  }
+
+  // Issue #1735: when reuse nodes are left unselected, the uplift inline-copies
+  // their fields instead of keeping a reference to the reused BIE. Make that
+  // consequence explicit before proceeding so the user can go back and select.
+  private confirmUnselectedReuseThenUplift() {
+    const unselectedReuseNodes = this.collectUnselectedReuseNodes();
+    if (unselectedReuseNodes.length === 0) {
+      this.createUpliftBIE();
+      return;
+    }
+
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Proceed without selecting reuse BIEs?';
+    dialogConfig.data.content = [
+      unselectedReuseNodes.length + ' reuse BIE node(s) below have no reuse BIE selected for the target release.',
+      'If you continue, their fields will be copied into the uplifted BIE and the reference to the reused BIE will NOT be kept.',
+      'To preserve the reference instead, go back and click the reuse icon on each node to select a target BIE.'
+    ];
+    dialogConfig.data.list = unselectedReuseNodes.map(e => '/' + e.parents.map(i => i.name).join('/'));
+    dialogConfig.data.action = 'Continue';
+
+    this.confirmDialogService.open(dialogConfig).afterClosed().subscribe(result => {
+      if (result) {
         this.createUpliftBIE();
       }
     });
