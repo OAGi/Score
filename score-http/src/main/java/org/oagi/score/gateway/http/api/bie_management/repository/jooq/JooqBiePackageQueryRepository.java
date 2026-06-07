@@ -68,6 +68,23 @@ public class JooqBiePackageQueryRepository extends JooqBaseRepository implements
                 .fetch(queryBuilder.mapper());
     }
 
+    @Override
+    public List<BiePackageSummaryRecord> getBiePackagesReferencingAsPrevious(Collection<BiePackageId> biePackageIds) {
+        if (biePackageIds == null || biePackageIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        var ids = valueOf(biePackageIds);
+        var queryBuilder = new GetBiePackageSummaryQueryBuilder();
+        return queryBuilder.select()
+                .where(and(
+                        BIE_PACKAGE.PREV_BIE_PACKAGE_ID.in(ids),
+                        BIE_PACKAGE.BIE_PACKAGE_ID.notIn(ids)
+                ))
+                .groupBy(BIE_PACKAGE.BIE_PACKAGE_ID)
+                .fetch(queryBuilder.mapper());
+    }
+
     private class GetBiePackageSummaryQueryBuilder {
 
         SelectOnConditionStep<? extends org.jooq.Record> select() {

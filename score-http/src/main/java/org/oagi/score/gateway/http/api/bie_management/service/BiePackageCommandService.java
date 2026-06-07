@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.oagi.score.gateway.http.api.bie_management.model.BieState.Production;
 import static org.oagi.score.gateway.http.api.bie_management.model.BieState.WIP;
@@ -147,6 +148,28 @@ public class BiePackageCommandService {
                 }
             }
         }
+
+        // Referential integrity (applies to every user, including administrators):
+        // A revision (prev_bie_package_id) is a real dependency — a BIE package referenced as the previous revision
+        // by another package outside this request must not be discarded on its own. The referencing package has to be
+        // discarded together (selected) or beforehand. (Copy/uplift provenance via source_bie_package_id is NOT a
+        // dependency: breaking it is harmless, so it is simply detached during the delete rather than blocked here.)
+        List<BiePackageSummaryRecord> externalReferencers =
+                query(requester).getBiePackagesReferencingAsPrevious(biePackageIdList);
+        if (!externalReferencers.isEmpty()) {
+            String referencers = externalReferencers.stream()
+                    .map(ref -> "'" + label(ref) + "'")
+                    .collect(Collectors.joining(", "));
+            throw new IllegalArgumentException(
+                    "Cannot discard the selected BIE package(s) because the following BIE package(s) are not included " +
+                            "but reference them as their previous revision: " + referencers + ". " +
+                            "Please discard these BIE package(s) as well, or include them in the selection.");
+        }
+    }
+
+    private static String label(BiePackageSummaryRecord biePackage) {
+        String name = hasLength(biePackage.name()) ? biePackage.name() : "BIE Package";
+        return hasLength(biePackage.versionId()) ? name + " " + biePackage.versionId() : name;
     }
 
     public boolean transferOwnership(ScoreUser requester, BiePackageId biePackageId, ScoreUser targetUser) {
