@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.oagi.score.gateway.http.api.cc_management.model.CcState.Production;
 import static org.oagi.score.gateway.http.api.cc_management.model.CcState.Published;
 
 @Service
@@ -64,9 +65,14 @@ public class CodeListQueryService {
             throw new IllegalArgumentException("`dtManifestId` must not be null");
         }
 
+        // Issue #1723: developers see both developer-owned (Published) and end-user-owned
+        // (Production) code lists so an already-assigned end-user code list is visible in the UI.
+        // Assigning an end-user (Production) code list is blocked separately:
+        //   - UI renders Production options read-only (disabled), and
+        //   - the BIE update path rejects a developer assigning a Production/end-user code list.
         List<CcState> states;
         if (requester.isDeveloper()) {
-            states = Arrays.asList(Published);
+            states = Arrays.asList(Published, Production);
         } else {
             states = Collections.emptyList();
         }
@@ -85,9 +91,14 @@ public class CodeListQueryService {
             throw new IllegalArgumentException("`dtScManifestId` must not be null");
         }
 
+        // Issue #1723: developers see both developer-owned (Published) and end-user-owned
+        // (Production) code lists so an already-assigned end-user code list is visible in the UI.
+        // Assigning an end-user (Production) code list is blocked separately:
+        //   - UI renders Production options read-only (disabled), and
+        //   - the BIE update path rejects a developer assigning a Production/end-user code list.
         List<CcState> states;
         if (requester.isDeveloper()) {
-            states = Arrays.asList(Published);
+            states = Arrays.asList(Published, Production);
         } else {
             states = Collections.emptyList();
         }

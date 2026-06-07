@@ -1693,7 +1693,8 @@
                                       </mat-option>
                                       @for (codeList of filteredValueDomains | async; track codeList) {
                                         <mat-option
-                                          [value]="codeList.id">
+                                          [value]="codeList.id"
+                                          [disabled]="!isValueDomainAssignable(codeList.state)">
                                           <div [class]="['d-flex']"
                                             [class.text-warning]="codeList.state !== 'Deleted' && !isValidState(codeList.state)"
                                             [class.text-danger]="codeList.state === 'Deleted'"
@@ -2442,7 +2443,8 @@
                                       </mat-option>
                                       @for (codeList of filteredValueDomains | async; track codeList) {
                                         <mat-option
-                                          [value]="codeList.id">
+                                          [value]="codeList.id"
+                                          [disabled]="!isValueDomainAssignable(codeList.state)">
                                           <div [class]="['d-flex']"
                                             [class.text-warning]="codeList.state !== 'Deleted' && !isValidState(codeList.state)"
                                             [class.text-danger]="codeList.state === 'Deleted'"
