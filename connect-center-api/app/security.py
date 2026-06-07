@@ -211,7 +211,11 @@ def _verify_password(password: str, password_hash: str) -> bool:
         # but actual auth checks do.
         raise RuntimeError("bcrypt is required for password verification but is not installed.")
 
-    return bcrypt.checkpw(password.encode("utf-8"), password_hash.encode("utf-8"))
+    # bcrypt only uses the first 72 bytes of a password; stored hashes were produced
+    # under that same truncation. bcrypt >=5.0 raises ValueError for longer inputs
+    # instead of truncating silently, so clamp explicitly to keep verifying long
+    # passwords exactly as before.
+    return bcrypt.checkpw(password.encode("utf-8")[:72], password_hash.encode("utf-8"))
 
 
 class OAuth2Identity(BaseModel):
