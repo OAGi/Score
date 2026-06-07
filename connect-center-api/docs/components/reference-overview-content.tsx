@@ -74,7 +74,7 @@ function ShellCodeBlock({ code, title = 'cURL', className = 'mt-2' }: ShellCodeB
             {lines.map((line, index) => (
               <span key={`${index}-${line}`} className="grid grid-cols-[2.5rem_minmax(0,1fr)] items-start gap-3">
                 <span className="syntax-line-number select-none text-right">{index + 1}</span>
-                <span className="min-w-0 whitespace-pre-wrap break-words">
+                <span className="min-w-0 whitespace-pre-wrap wrap-break-word">
                   {tokenizeShellLine(line).map((token, tokenIndex) => (
                     <span key={`${index}-${tokenIndex}`} className={token.className}>
                       {token.text || '\u00A0'}

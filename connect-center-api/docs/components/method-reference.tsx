@@ -28,7 +28,7 @@ function FieldFilterSelect({
 }) {
   return (
     <Select value={value} onValueChange={(next) => onChange(next as FieldFilter)}>
-      <SelectTrigger className="h-7 !w-auto min-w-[78px] !flex !justify-between px-2 text-[11px] text-[#111827] !outline-none !ring-0 !focus:outline-none !focus:ring-0 !focus:ring-offset-0 !focus-visible:outline-none !focus-visible:ring-0 !focus-visible:ring-offset-0 dark:text-[#e5e7eb]">
+      <SelectTrigger className="h-7 w-auto! min-w-[78px] flex! justify-between! px-2 text-[11px] text-[#111827] outline-hidden! ring-0! focus:outline-hidden! focus:ring-0! focus:ring-offset-0! focus-visible:outline-hidden! focus-visible:ring-0! focus-visible:ring-offset-0! dark:text-[#e5e7eb]">
         <SelectValue placeholder="Filter" />
       </SelectTrigger>
       <SelectContent>
@@ -580,7 +580,7 @@ function CodePane({ title, code, kind }: { title: string; code: string; kind: st
             {lines.map((line, index) => (
               <div key={`${index}-${line}`} className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-3">
                 <span className="syntax-line-number select-none text-right">{index + 1}</span>
-                <span className="min-w-0 whitespace-pre-wrap break-words">{renderHighlightedLine(line || ' ', syntaxKind)}</span>
+                <span className="min-w-0 whitespace-pre-wrap wrap-break-word">{renderHighlightedLine(line || ' ', syntaxKind)}</span>
               </div>
             ))}
           </code>
@@ -934,7 +934,7 @@ function ApiPlayground({
                     }))
                   }
                   placeholder={field.name}
-                  className="h-9 rounded-md border border-border px-3 text-sm outline-none focus:ring-2 focus:ring-[#cbd5e1]"
+                  className="h-9 rounded-md border border-border px-3 text-sm outline-hidden focus:ring-2 focus:ring-[#cbd5e1]"
                 />
               )
             ))}
@@ -1049,7 +1049,7 @@ function ApiPlayground({
                     }))
                   }
                   placeholder={field.name}
-                  className="h-9 rounded-md border border-border px-3 text-sm outline-none focus:ring-2 focus:ring-[#cbd5e1]"
+                  className="h-9 rounded-md border border-border px-3 text-sm outline-hidden focus:ring-2 focus:ring-[#cbd5e1]"
                 />
               )
             ))}
@@ -1093,7 +1093,7 @@ function ApiPlayground({
                             }
                             rows={4}
                             placeholder={isArrayType(field.type) ? '[]' : '{}'}
-                            className="w-full rounded-md border border-border px-3 py-2 font-mono text-xs outline-none focus:ring-2 focus:ring-[#cbd5e1]"
+                            className="w-full rounded-md border border-border px-3 py-2 font-mono text-xs outline-hidden focus:ring-2 focus:ring-[#cbd5e1]"
                           />
                         ) : (
                           <input
@@ -1107,7 +1107,7 @@ function ApiPlayground({
                               }))
                             }
                             placeholder={field.name}
-                            className="h-9 rounded-md border border-border px-3 text-sm outline-none focus:ring-2 focus:ring-[#cbd5e1]"
+                            className="h-9 rounded-md border border-border px-3 text-sm outline-hidden focus:ring-2 focus:ring-[#cbd5e1]"
                           />
                         )}
                       </div>
@@ -1258,7 +1258,7 @@ export function MethodReference({
                     onOpenChange={(open) => setEndpointMenuOpen(endpointOptions.length > 1 ? open : false)}
                   >
                     <SelectTrigger
-                      className={`h-9 max-w-full min-w-[340px] flex-1 bg-[#f8fafc] font-mono text-[12px] text-[#334155] !outline-none !ring-0 !shadow-none !focus:outline-none !focus:ring-0 !focus:ring-offset-0 !focus:shadow-none !focus-visible:outline-none !focus-visible:ring-0 !focus-visible:ring-offset-0 !focus-visible:shadow-none [--tw-ring-shadow:0_0_#0000] [--tw-ring-offset-shadow:0_0_#0000] [--tw-ring-offset-width:0px] ${
+                      className={`h-9 max-w-full min-w-[340px] flex-1 bg-[#f8fafc] font-mono text-[12px] text-[#334155] outline-hidden! ring-0! shadow-none! focus:outline-hidden! focus:ring-0! focus:ring-offset-0! focus:shadow-none! focus-visible:outline-hidden! focus-visible:ring-0! focus-visible:ring-offset-0! focus-visible:shadow-none! [--tw-ring-shadow:0_0_#0000] [--tw-ring-offset-shadow:0_0_#0000] [--tw-ring-offset-width:0px] ${
                         endpointOptions.length === 1 ? 'cursor-default' : ''
                       }`}
                       style={{ boxShadow: 'none', outline: 'none' }}

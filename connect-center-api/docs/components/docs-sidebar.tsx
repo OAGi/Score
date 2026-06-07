@@ -379,7 +379,7 @@ export function DocsSidebar({ resources, mobile = false }: Props) {
   const gettingStartedActive = onOverviewPage && activeOverviewSection === 'getting-started';
   const authenticationActive = onOverviewPage && activeOverviewSection === 'authentication';
   const navBase =
-    'block rounded-md px-2.5 py-1.5 text-[13px] leading-5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#93c5fd] focus-visible:ring-offset-1 focus-visible:ring-offset-white dark:focus-visible:ring-[#60a5fa] dark:focus-visible:ring-offset-black';
+    'block rounded-md px-2.5 py-1.5 text-[13px] leading-5 transition focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#93c5fd] focus-visible:ring-offset-1 focus-visible:ring-offset-white dark:focus-visible:ring-[#60a5fa] dark:focus-visible:ring-offset-black';
   const activeNavClass = 'bg-[#dbeafe] font-semibold text-[#0f172a] shadow-[inset_0_0_0_1px_rgba(59,130,246,0.25)] dark:bg-[#172554] dark:text-white dark:shadow-[inset_0_0_0_1px_rgba(96,165,250,0.35)]';
   const inactiveNavClass = 'bg-transparent text-[#374151] hover:bg-[#f4f4f5] hover:text-[#111827] dark:text-[#cbd5e1] dark:hover:bg-[#111111] dark:hover:text-white';
   const methodBadgeClass = {

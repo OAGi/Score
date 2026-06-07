@@ -266,7 +266,7 @@ export default function LoginPage() {
                   onChange={(event) => setLoginId(event.target.value)}
                   autoComplete="username"
                   placeholder="Login ID"
-                  className="h-10 rounded-xl border border-border bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-[#cbd5e1] dark:bg-black"
+                  className="h-10 rounded-xl border border-border bg-white px-3 text-sm outline-hidden focus:ring-2 focus:ring-[#cbd5e1] dark:bg-black"
                 />
               </div>
               <div className="grid gap-2">
@@ -281,7 +281,7 @@ export default function LoginPage() {
                   onChange={(event) => setPassword(event.target.value)}
                   autoComplete="current-password"
                   placeholder="Password"
-                  className="h-10 rounded-xl border border-border bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-[#cbd5e1] dark:bg-black"
+                  className="h-10 rounded-xl border border-border bg-white px-3 text-sm outline-hidden focus:ring-2 focus:ring-[#cbd5e1] dark:bg-black"
                 />
               </div>
             </div>
