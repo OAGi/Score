@@ -198,33 +198,46 @@ public final class BieBackwardCompatibilityRules {
     /**
      * OR-combines per-change verdicts into the final {@link BackwardCompatibility}.
      *
-     * <p>{@code syntaxIndependent} reflects the abstract STRUCTURE of the BIE (which elements / components exist):
-     * it is broken only by a change to the element set — a required element added, or an element removed / unused
-     * ({@link #recordStructuralBreak()}). A per-element constraint change ({@link #recordBreak(boolean, boolean)} —
-     * cardinality, value domain, facet, fixed value, nillable, array/wrapper flips, entity type) leaves the
-     * structure intact, so it only affects the concrete {@code xmlSchema} / {@code jsonSchema} renderings and never,
-     * by itself, flips {@code syntaxIndependent}.
+     * <p>{@code syntaxIndependent} answers whether the change is backward compatible <em>regardless of the target
+     * rendering</em>. A single change that invalidates a previously valid instance in EVERY syntax is a
+     * syntax-independent break: this covers structural element-set changes (a required element added, or an element
+     * removed / unused — {@link #recordStructuralBreak()}) AND per-element constraint tightenings that bind in both
+     * renderings (cardinality tightening, fixed value added/changed, element nillable removal, facet tightening,
+     * value-domain / enum narrowing — recorded via {@link #recordBreak(boolean, boolean)} with both flags set).
+     *
+     * <p>A change that breaks only ONE rendering (XML-only: entity-type flip, XSD primitive restriction; JSON-only:
+     * array/scalar flip, SC-wrapper flip, attribute / supplementary-component nillable removal) is syntax-DEPENDENT:
+     * it leaves {@code syntaxIndependent} intact and flips only the affected {@code xmlSchema} / {@code jsonSchema}
+     * column. Two <em>distinct</em> single-syntax breaks (one XML-only and one JSON-only) therefore do not, between
+     * them, constitute a syntax-independent break — only a single change that breaks both renderings does.
      */
     public static final class Accumulator {
         private boolean breaksXmlSchema = false;
         private boolean breaksJsonSchema = false;
-        private boolean breaksStructure = false;
+        private boolean breaksSyntaxIndependent = false;
 
-        /** A per-element constraint change: affects only the named syntax rendering(s), not the abstract structure. */
+        /**
+         * A per-element constraint change. When it breaks a SINGLE rendering it is syntax-dependent and only that
+         * column flips; when one change breaks BOTH renderings it is, by definition, rendering-independent and also
+         * flips {@code syntaxIndependent}.
+         */
         public void recordBreak(boolean xmlSchema, boolean jsonSchema) {
             this.breaksXmlSchema |= xmlSchema;
             this.breaksJsonSchema |= jsonSchema;
+            if (xmlSchema && jsonSchema) {
+                this.breaksSyntaxIndependent = true;
+            }
         }
 
         /** A change to the element set (required element added, or element removed / unused): breaks every level. */
         public void recordStructuralBreak() {
-            this.breaksStructure = true;
+            this.breaksSyntaxIndependent = true;
             this.breaksXmlSchema = true;
             this.breaksJsonSchema = true;
         }
 
         public BackwardCompatibility toBackwardCompatibility() {
-            return new BackwardCompatibility(!breaksStructure, !breaksXmlSchema, !breaksJsonSchema);
+            return new BackwardCompatibility(!breaksSyntaxIndependent, !breaksXmlSchema, !breaksJsonSchema);
         }
     }
 }

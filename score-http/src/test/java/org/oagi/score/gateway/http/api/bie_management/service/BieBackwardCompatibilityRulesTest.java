@@ -116,13 +116,15 @@ class BieBackwardCompatibilityRulesTest {
     static List<Case> cases() {
         List<Case> c = new ArrayList<>();
 
-        // syntaxIndependent (SI) is broken ONLY by a structural change (element added-required / removed); every
-        // per-element constraint change keeps SI=true and affects only the concrete xmlSchema / jsonSchema columns.
+        // syntaxIndependent (SI) is broken by any change that invalidates a previously valid instance in EVERY
+        // syntax: a structural element-set change (element added-required / removed) OR a per-element tightening
+        // that breaks both renderings at once (recordBreak(true,true)). A single-syntax break (XML-only or
+        // JSON-only) keeps SI=true and flips only the affected xmlSchema / jsonSchema column.
 
-        // ---- cardinality (min/max + JSON array flip): per-element, SI stays true ----
-        c.add(new Case("cardinality", "tighten min 0->1", bc(true, false, false), card(1, 1, 0, 1)));
-        c.add(new Case("cardinality", "tighten max 5->3", bc(true, false, false), card(0, 3, 0, 5)));
-        c.add(new Case("cardinality", "tighten max unbounded->1 (array->scalar)", bc(true, false, false), card(0, 1, 0, -1)));
+        // ---- cardinality (min/max + JSON array flip): tightening breaks both syntaxes -> SI=false ----
+        c.add(new Case("cardinality", "tighten min 0->1", bc(false, false, false), card(1, 1, 0, 1)));
+        c.add(new Case("cardinality", "tighten max 5->3", bc(false, false, false), card(0, 3, 0, 5)));
+        c.add(new Case("cardinality", "tighten max unbounded->1 (array->scalar)", bc(false, false, false), card(0, 1, 0, -1)));
         c.add(new Case("cardinality", "loosen min 1->0", bc(true, true, true), card(0, 1, 1, 1)));
         c.add(new Case("cardinality", "loosen max 1->2 (scalar->array)", bc(true, true, false), card(0, 2, 0, 1)));
         c.add(new Case("cardinality", "loosen max 1->unbounded (scalar->array)", bc(true, true, false), card(0, -1, 0, 1)));
@@ -137,7 +139,7 @@ class BieBackwardCompatibilityRulesTest {
                 () -> eval(acc -> { /* min 0 -> no break */ })));
 
         // ---- nillable (element vs attribute/SC scope): per-element ----
-        c.add(new Case("nillable", "element true->false", bc(true, false, false),
+        c.add(new Case("nillable", "element true->false", bc(false, false, false),
                 () -> eval(acc -> { if (nillableRemoved(false, true)) acc.recordBreak(true, true); })));
         c.add(new Case("nillable", "attribute / SC true->false (XSD ignores -> JSON-only)", bc(true, true, false),
                 () -> eval(acc -> { if (nillableRemoved(false, true)) acc.recordBreak(false, true); })));
@@ -145,15 +147,15 @@ class BieBackwardCompatibilityRulesTest {
                 () -> eval(acc -> { if (nillableRemoved(true, false)) acc.recordBreak(true, true); })));
 
         // ---- fixed / default value: per-element ----
-        c.add(new Case("value-constraint", "fixed added none->X", bc(true, false, false),
+        c.add(new Case("value-constraint", "fixed added none->X", bc(false, false, false),
                 () -> eval(acc -> { if (fixedValueBreaks("X", null)) acc.recordBreak(true, true); })));
-        c.add(new Case("value-constraint", "fixed changed X->Y", bc(true, false, false),
+        c.add(new Case("value-constraint", "fixed changed X->Y", bc(false, false, false),
                 () -> eval(acc -> { if (fixedValueBreaks("Y", "X")) acc.recordBreak(true, true); })));
         c.add(new Case("value-constraint", "fixed removed X->none", bc(true, true, true),
                 () -> eval(acc -> { if (fixedValueBreaks(null, "X")) acc.recordBreak(true, true); })));
         c.add(new Case("value-constraint", "fixed unchanged X->X", bc(true, true, true),
                 () -> eval(acc -> { if (fixedValueBreaks("X", "X")) acc.recordBreak(true, true); })));
-        c.add(new Case("value-constraint", "default->fixed (now forced)", bc(true, false, false),
+        c.add(new Case("value-constraint", "default->fixed (now forced)", bc(false, false, false),
                 () -> eval(acc -> { if (fixedValueBreaks("Y", null)) acc.recordBreak(true, true); })));
         c.add(new Case("value-constraint", "fixed->default (loosened)", bc(true, true, true),
                 () -> eval(acc -> { if (fixedValueBreaks(null, "X")) acc.recordBreak(true, true); })));
@@ -161,19 +163,19 @@ class BieBackwardCompatibilityRulesTest {
                 () -> eval(acc -> { if (fixedValueBreaks(null, null)) acc.recordBreak(true, true); })));
 
         // ---- facet (length/pattern): per-element ----
-        c.add(new Case("facet", "maxLength added none->10", bc(true, false, false),
+        c.add(new Case("facet", "maxLength added none->10", bc(false, false, false),
                 () -> eval(acc -> { if (facetTightened(null, TEN, null, null, null, null)) acc.recordBreak(true, true); })));
-        c.add(new Case("facet", "maxLength tightened 10->5", bc(true, false, false),
+        c.add(new Case("facet", "maxLength tightened 10->5", bc(false, false, false),
                 () -> eval(acc -> { if (facetTightened(null, FIVE, null, null, TEN, null)) acc.recordBreak(true, true); })));
         c.add(new Case("facet", "maxLength loosened 5->10", bc(true, true, true),
                 () -> eval(acc -> { if (facetTightened(null, TEN, null, null, FIVE, null)) acc.recordBreak(true, true); })));
         c.add(new Case("facet", "maxLength removed 10->none", bc(true, true, true),
                 () -> eval(acc -> { if (facetTightened(null, null, null, null, TEN, null)) acc.recordBreak(true, true); })));
-        c.add(new Case("facet", "minLength added/raised", bc(true, false, false),
+        c.add(new Case("facet", "minLength added/raised", bc(false, false, false),
                 () -> eval(acc -> { if (facetTightened(FIVE, null, null, null, null, null)) acc.recordBreak(true, true); })));
-        c.add(new Case("facet", "pattern added", bc(true, false, false),
+        c.add(new Case("facet", "pattern added", bc(false, false, false),
                 () -> eval(acc -> { if (facetTightened(null, null, "[A-Z]+", null, null, null)) acc.recordBreak(true, true); })));
-        c.add(new Case("facet", "pattern changed", bc(true, false, false),
+        c.add(new Case("facet", "pattern changed", bc(false, false, false),
                 () -> eval(acc -> { if (facetTightened(null, null, "[A-Z]+", null, null, "[a-z]+")) acc.recordBreak(true, true); })));
         c.add(new Case("facet", "pattern removed", bc(true, true, true),
                 () -> eval(acc -> { if (facetTightened(null, null, null, null, null, "[a-z]+")) acc.recordBreak(true, true); })));
@@ -184,14 +186,14 @@ class BieBackwardCompatibilityRulesTest {
         c.add(new Case("value-domain primitive", "string -> language (restriction)", bc(true, false, true), vd("xsd:string", "xsd:language")));
         c.add(new Case("value-domain primitive", "token -> NMTOKEN (restriction)", bc(true, false, true), vd("xsd:token", "xsd:NMTOKEN")));
         c.add(new Case("value-domain primitive", "token -> normalizedString (widening)", bc(true, true, true), vd("xsd:token", "xsd:normalizedString")));
-        c.add(new Case("value-domain primitive", "decimal -> integer (restriction, JSON narrows)", bc(true, false, false), vd("xsd:decimal", "xsd:integer")));
+        c.add(new Case("value-domain primitive", "decimal -> integer (restriction, JSON narrows)", bc(false, false, false), vd("xsd:decimal", "xsd:integer")));
         c.add(new Case("value-domain primitive", "integer -> decimal (widening)", bc(true, true, true), vd("xsd:integer", "xsd:decimal")));
-        c.add(new Case("value-domain primitive", "integer -> nonNegativeInteger (JSON min added)", bc(true, false, false), vd("xsd:integer", "xsd:nonNegativeInteger")));
-        c.add(new Case("value-domain primitive", "integer -> int (JSON bounds added)", bc(true, false, false), vd("xsd:integer", "xsd:int")));
-        c.add(new Case("value-domain primitive", "long -> int (JSON bounds tighter)", bc(true, false, false), vd("xsd:long", "xsd:int")));
+        c.add(new Case("value-domain primitive", "integer -> nonNegativeInteger (JSON min added)", bc(false, false, false), vd("xsd:integer", "xsd:nonNegativeInteger")));
+        c.add(new Case("value-domain primitive", "integer -> int (JSON bounds added)", bc(false, false, false), vd("xsd:integer", "xsd:int")));
+        c.add(new Case("value-domain primitive", "long -> int (JSON bounds tighter)", bc(false, false, false), vd("xsd:long", "xsd:int")));
         c.add(new Case("value-domain primitive", "int -> long (widening)", bc(true, true, true), vd("xsd:int", "xsd:long")));
         c.add(new Case("value-domain primitive", "int -> integer (widening)", bc(true, true, true), vd("xsd:int", "xsd:integer")));
-        c.add(new Case("value-domain primitive", "string -> integer (cross, JSON narrows)", bc(true, false, false), vd("xsd:string", "xsd:integer")));
+        c.add(new Case("value-domain primitive", "string -> integer (cross, JSON narrows)", bc(false, false, false), vd("xsd:string", "xsd:integer")));
         c.add(new Case("value-domain primitive", "string -> date (cross, JSON format-only)", bc(true, false, true), vd("xsd:string", "xsd:date")));
         c.add(new Case("value-domain primitive", "string -> anyURI (cross, JSON format-only)", bc(true, false, true), vd("xsd:string", "xsd:anyURI")));
         c.add(new Case("value-domain primitive", "anyURI -> string (cross -> universal)", bc(true, true, true), vd("xsd:anyURI", "xsd:string")));
@@ -203,18 +205,23 @@ class BieBackwardCompatibilityRulesTest {
         c.add(new Case("value-domain primitive", "string -> string (unchanged)", bc(true, true, true), vd("xsd:string", "xsd:string")));
 
         // ---- value domain: code list / agency (per-element; !newValues.containsAll(oldValues)) ----
-        c.add(new Case("value-domain code list", "code list value removed (subset)", bc(true, false, false),
+        c.add(new Case("value-domain code list", "code list value removed (subset)", bc(false, false, false),
                 () -> eval(acc -> { if (!Set.of("A", "B").containsAll(Set.of("A", "B", "C"))) acc.recordBreak(true, true); })));
         c.add(new Case("value-domain code list", "code list value added (superset)", bc(true, true, true),
                 () -> eval(acc -> { if (!Set.of("A", "B", "C").containsAll(Set.of("A", "B"))) acc.recordBreak(true, true); })));
-        c.add(new Case("value-domain code list", "primitive -> code list (enum added)", bc(true, false, false),
+        c.add(new Case("value-domain code list", "primitive -> code list (enum added)", bc(false, false, false),
                 () -> eval(acc -> acc.recordBreak(true, true))));
         c.add(new Case("value-domain code list", "code list -> primitive (enum removed)", bc(true, true, true),
                 () -> eval(acc -> { /* widening -> no break */ })));
 
         // ---- JSON-only representation flips: per-element ----
-        c.add(new Case("json representation", "SC-wrapper: gain first used SC (scalar->object)", bc(true, true, false),
+        c.add(new Case("json representation", "SC-wrapper: gain first used OPTIONAL SC (scalar->object)", bc(true, true, false),
                 () -> eval(acc -> { if (true != false) acc.recordBreak(false, true); })));
+        // Gaining a first used REQUIRED SC additionally fires the boundary structural-add break
+        // (BiePackageManifestService: prevBbie != null && cardinalityMin > 0 -> recordStructuralBreak()), which
+        // dominates the JSON-only wrapper flip: a new required attribute/property breaks every syntax.
+        c.add(new Case("json representation", "SC-wrapper: gain first used REQUIRED SC (structural add dominates)", bc(false, false, false),
+                () -> eval(acc -> { acc.recordBreak(false, true); acc.recordStructuralBreak(); })));
 
         // ---- entity type: per-element (XML-only) ----
         c.add(new Case("entity type", "Element <-> Attribute flip (XML-only)", bc(true, false, true),
