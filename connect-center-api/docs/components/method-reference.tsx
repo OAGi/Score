@@ -2,7 +2,7 @@
 
 import { Braces, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useState } from 'react';
 
 import { MethodMarkdownActions } from '@/components/method-markdown-actions';
 import { CopyButton } from '@/components/copy-button';
@@ -792,9 +792,14 @@ function ApiPlayground({
   const structuredBodyPreview = JSON.stringify(buildStructuredBodyPayload(bodyParams, bodyValues).payload ?? {}, null, 2);
   const showDividerBeforeSubmit = !authorizationHeader || pathParams.length > 0 || queryParams.length > 0 || methodSupportsBody;
 
-  useEffect(() => {
+  // Re-initialize the body form whenever its field structure changes. Handled
+  // during render (React's "adjust state on prop change" pattern), keyed on the
+  // field signature so unrelated re-renders don't discard the user's input.
+  const [prevBodyFieldSignature, setPrevBodyFieldSignature] = useState(bodyFieldSignature);
+  if (prevBodyFieldSignature !== bodyFieldSignature) {
+    setPrevBodyFieldSignature(bodyFieldSignature);
     setBodyValues(buildInitialBodyValues(bodyParams));
-  }, [bodyFieldSignature]);
+  }
 
   const serializeOrderBy = (columns: string[], directionMap: Record<string, 'asc' | 'desc'>): string => {
     return columns

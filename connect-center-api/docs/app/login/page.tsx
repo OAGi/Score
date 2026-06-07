@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { FormEvent, startTransition, useEffect, useMemo, useRef, useState } from 'react';
+import { FormEvent, startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowRight, KeyRound, LoaderCircle, LogOut, ShieldCheck } from 'lucide-react';
 
 import { usePlaygroundAuth } from '@/components/playground-auth';
@@ -40,6 +40,11 @@ export default function LoginPage() {
     const params = new URLSearchParams({ returnTo });
     return `${resolveDocsPath('/auth/login')}?${params.toString()}`;
   }, [returnTo]);
+  const continueToDocs = useCallback(() => {
+    startTransition(() => {
+      router.push(returnTo);
+    });
+  }, [router, returnTo]);
 
   useEffect(() => {
     setHasMounted(true);
@@ -120,13 +125,7 @@ export default function LoginPage() {
       .finally(() => {
         setSubmittingMode(null);
       });
-  }, [isReady, logInWithAccessToken, logOut]);
-
-  const continueToDocs = () => {
-    startTransition(() => {
-      router.push(returnTo);
-    });
-  };
+  }, [isReady, logInWithAccessToken, logOut, continueToDocs]);
 
   const handleBasicSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
