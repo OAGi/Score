@@ -882,13 +882,17 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals("0", getText(asbiePanel.getCardinalityMinField()));
         assertEquals("1", getText(asbiePanel.getCardinalityMaxField()));
 
-        // reopened uplifted nodes should not expose reuse links in the tree
+        // Issue #1735: a reuse node selected during uplift must keep its reference to the
+        // reused BIE (it must not be inline-copied). On reopen the uplifted nodes therefore
+        // still expose their reuse links in the tree: 'From UOM Package' references the
+        // uplifted reused parent, and the nested 'Unit Packaging' references the uplifted
+        // reused child.
         viewEditBIEPage.openPage();
         editBIEPage = viewEditBIEPage.openEditBIEPage(upliftedReusedScenarioTopLevelASBIEP);
         editBIEPage.getNodeByPath("/UOM Code Conversion Rate/From UOM Package");
-        assertEquals(0, getDriver().findElements(By.xpath("//span[.=\"From UOM Package\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"From UOM Package\"]//ancestor::div[1]/fa-icon")).size());
         editBIEPage.getNodeByPath("/UOM Code Conversion Rate/From UOM Package/Unit Packaging");
-        assertEquals(0, getDriver().findElements(By.xpath("//span[.=\"Unit Packaging\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"Unit Packaging\"]//ancestor::div[1]/fa-icon")).size());
         homePage.logout();
     }
 
