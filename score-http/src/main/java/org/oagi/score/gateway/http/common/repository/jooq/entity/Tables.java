@@ -64,6 +64,13 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtScMani
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtUsageRule;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Exception;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.FlywaySchemaHistory;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.GithubIssue;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.GithubIssueAccManifest;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.GithubIssueAgencyIdListManifest;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.GithubIssueAsccpManifest;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.GithubIssueBccpManifest;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.GithubIssueCodeListManifest;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.GithubIssueDtManifest;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Library;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Log;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Message;
@@ -517,6 +524,42 @@ public class Tables {
      * The table <code>oagi.flyway_schema_history</code>.
      */
     public static final FlywaySchemaHistory FLYWAY_SCHEMA_HISTORY = FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY;
+
+    /**
+     * Independent registry of referenced GitHub issues (one row per
+     * owner/repo/number) with cached metadata JSON. Issue #1533.
+     */
+    public static final GithubIssue GITHUB_ISSUE = GithubIssue.GITHUB_ISSUE;
+
+    /**
+     * Links an ACC manifest to a GitHub issue (many-to-many).
+     */
+    public static final GithubIssueAccManifest GITHUB_ISSUE_ACC_MANIFEST = GithubIssueAccManifest.GITHUB_ISSUE_ACC_MANIFEST;
+
+    /**
+     * Links an agency id list manifest to a GitHub issue (many-to-many).
+     */
+    public static final GithubIssueAgencyIdListManifest GITHUB_ISSUE_AGENCY_ID_LIST_MANIFEST = GithubIssueAgencyIdListManifest.GITHUB_ISSUE_AGENCY_ID_LIST_MANIFEST;
+
+    /**
+     * Links an ASCCP manifest to a GitHub issue (many-to-many).
+     */
+    public static final GithubIssueAsccpManifest GITHUB_ISSUE_ASCCP_MANIFEST = GithubIssueAsccpManifest.GITHUB_ISSUE_ASCCP_MANIFEST;
+
+    /**
+     * Links a BCCP manifest to a GitHub issue (many-to-many).
+     */
+    public static final GithubIssueBccpManifest GITHUB_ISSUE_BCCP_MANIFEST = GithubIssueBccpManifest.GITHUB_ISSUE_BCCP_MANIFEST;
+
+    /**
+     * Links a code list manifest to a GitHub issue (many-to-many).
+     */
+    public static final GithubIssueCodeListManifest GITHUB_ISSUE_CODE_LIST_MANIFEST = GithubIssueCodeListManifest.GITHUB_ISSUE_CODE_LIST_MANIFEST;
+
+    /**
+     * Links a DT manifest to a GitHub issue (many-to-many).
+     */
+    public static final GithubIssueDtManifest GITHUB_ISSUE_DT_MANIFEST = GithubIssueDtManifest.GITHUB_ISSUE_DT_MANIFEST;
 
     /**
      * The table <code>oagi.library</code>.

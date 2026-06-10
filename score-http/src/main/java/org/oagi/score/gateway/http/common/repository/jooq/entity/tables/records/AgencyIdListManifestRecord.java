@@ -176,6 +176,26 @@ public class AgencyIdListManifestRecord extends UpdatableRecordImpl<AgencyIdList
         return (ULong) get(9);
     }
 
+    /**
+     * Setter for <code>oagi.agency_id_list_manifest.github_issue_id</code>.
+     * Optional FK to github_issue: the GitHub issue this agency id list
+     * revision (in this release) is associated with. Carry forward on release
+     * publish.
+     */
+    public void setGithubIssueId(ULong value) {
+        set(10, value);
+    }
+
+    /**
+     * Getter for <code>oagi.agency_id_list_manifest.github_issue_id</code>.
+     * Optional FK to github_issue: the GitHub issue this agency id list
+     * revision (in this release) is associated with. Carry forward on release
+     * publish.
+     */
+    public ULong getGithubIssueId() {
+        return (ULong) get(10);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -199,7 +219,7 @@ public class AgencyIdListManifestRecord extends UpdatableRecordImpl<AgencyIdList
     /**
      * Create a detached, initialised AgencyIdListManifestRecord
      */
-    public AgencyIdListManifestRecord(ULong agencyIdListManifestId, ULong releaseId, ULong agencyIdListId, ULong agencyIdListValueManifestId, ULong basedAgencyIdListManifestId, Byte conflict, ULong logId, ULong replacementAgencyIdListManifestId, ULong prevAgencyIdListManifestId, ULong nextAgencyIdListManifestId) {
+    public AgencyIdListManifestRecord(ULong agencyIdListManifestId, ULong releaseId, ULong agencyIdListId, ULong agencyIdListValueManifestId, ULong basedAgencyIdListManifestId, Byte conflict, ULong logId, ULong replacementAgencyIdListManifestId, ULong prevAgencyIdListManifestId, ULong nextAgencyIdListManifestId, ULong githubIssueId) {
         super(AgencyIdListManifest.AGENCY_ID_LIST_MANIFEST);
 
         setAgencyIdListManifestId(agencyIdListManifestId);
@@ -212,6 +232,7 @@ public class AgencyIdListManifestRecord extends UpdatableRecordImpl<AgencyIdList
         setReplacementAgencyIdListManifestId(replacementAgencyIdListManifestId);
         setPrevAgencyIdListManifestId(prevAgencyIdListManifestId);
         setNextAgencyIdListManifestId(nextAgencyIdListManifestId);
+        setGithubIssueId(githubIssueId);
         resetTouchedOnNotNull();
     }
 }

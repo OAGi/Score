@@ -794,6 +794,18 @@
                             </mat-expansion-panel>
                           </div>
                         </div>
+                        <div class="row" *ngIf="githubService.enabled$() | async">
+                          <div class="col-12">
+                            <score-github-issue-box
+                                [manifestId]="asBdtDetail().manifestId"
+                                ccType="dt"
+                                [state]="asBdtDetail().state"
+                                [ownerLoginId]="asBdtDetail()?.owner?.loginId"
+                                [currentUser]="currentUser"
+                                [editable]="type === 'DT' && asBdtDetail().manifestId === manifestId">
+                            </score-github-issue-box>
+                          </div>
+                        </div>
                         <div class="row">
                           <div class="col-12">
                             <mat-form-field>

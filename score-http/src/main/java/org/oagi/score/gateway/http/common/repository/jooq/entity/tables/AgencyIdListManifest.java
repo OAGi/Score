@@ -39,6 +39,8 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Bbie.Bbi
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BbieSc.BbieScPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtAwdPri.DtAwdPriPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtScAwdPri.DtScAwdPriPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.GithubIssue.GithubIssuePath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.GithubIssueAgencyIdListManifest.GithubIssueAgencyIdListManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Log.LogPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ModuleAgencyIdListManifest.ModuleAgencyIdListManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Release.ReleasePath;
@@ -125,6 +127,14 @@ public class AgencyIdListManifest extends TableImpl<AgencyIdListManifestRecord> 
      */
     public final TableField<AgencyIdListManifestRecord, ULong> NEXT_AGENCY_ID_LIST_MANIFEST_ID = createField(DSL.name("next_agency_id_list_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
+    /**
+     * The column <code>oagi.agency_id_list_manifest.github_issue_id</code>.
+     * Optional FK to github_issue: the GitHub issue this agency id list
+     * revision (in this release) is associated with. Carry forward on release
+     * publish.
+     */
+    public final TableField<AgencyIdListManifestRecord, ULong> GITHUB_ISSUE_ID = createField(DSL.name("github_issue_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Optional FK to github_issue: the GitHub issue this agency id list revision (in this release) is associated with. Carry forward on release publish.");
+
     private AgencyIdListManifest(Name alias, Table<AgencyIdListManifestRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
     }
@@ -206,7 +216,7 @@ public class AgencyIdListManifest extends TableImpl<AgencyIdListManifestRecord> 
 
     @Override
     public List<ForeignKey<AgencyIdListManifestRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.AGENCY_ID_LIST_MANIFEST_AGENCY_ID_LIST_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_BASED_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_LOG_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_NEXT_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_PREV_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_RELEASE_ID_FK, Keys.AGENCY_ID_LIST_REPLACEMENT_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_ID_FK);
+        return Arrays.asList(Keys.AGENCY_ID_LIST_MANIFEST_AGENCY_ID_LIST_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_BASED_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_GITHUB_ISSUE_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_LOG_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_NEXT_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_PREV_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_RELEASE_ID_FK, Keys.AGENCY_ID_LIST_REPLACEMENT_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_ID_FK);
     }
 
     private transient AgencyIdListPath _agencyIdList;
@@ -234,6 +244,18 @@ public class AgencyIdListManifest extends TableImpl<AgencyIdListManifestRecord> 
             _agencyIdListManifestBasedAgencyIdListManifestIdFk = new AgencyIdListManifestPath(this, Keys.AGENCY_ID_LIST_MANIFEST_BASED_AGENCY_ID_LIST_MANIFEST_ID_FK, null);
 
         return _agencyIdListManifestBasedAgencyIdListManifestIdFk;
+    }
+
+    private transient GithubIssuePath _githubIssue;
+
+    /**
+     * Get the implicit join path to the <code>oagi.github_issue</code> table.
+     */
+    public GithubIssuePath githubIssue() {
+        if (_githubIssue == null)
+            _githubIssue = new GithubIssuePath(this, Keys.AGENCY_ID_LIST_MANIFEST_GITHUB_ISSUE_ID_FK, null);
+
+        return _githubIssue;
     }
 
     private transient LogPath _log;
@@ -366,6 +388,19 @@ public class AgencyIdListManifest extends TableImpl<AgencyIdListManifestRecord> 
             _dtScAwdPri = new DtScAwdPriPath(this, null, Keys.DT_SC_AWD_PRI_AGENCY_ID_LIST_MANIFEST_ID_FK.getInverseKey());
 
         return _dtScAwdPri;
+    }
+
+    private transient GithubIssueAgencyIdListManifestPath _githubIssueAgencyIdListManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_agency_id_list_manifest</code> table
+     */
+    public GithubIssueAgencyIdListManifestPath githubIssueAgencyIdListManifest() {
+        if (_githubIssueAgencyIdListManifest == null)
+            _githubIssueAgencyIdListManifest = new GithubIssueAgencyIdListManifestPath(this, null, Keys.GITHUB_ISSUE_AGENCY_ID_LIST_MANIFEST_MANIFEST_ID_FK.getInverseKey());
+
+        return _githubIssueAgencyIdListManifest;
     }
 
     private transient ModuleAgencyIdListManifestPath _moduleAgencyIdListManifest;

@@ -1334,6 +1334,11 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
                 .where(MODULE_ACC_MANIFEST.ACC_MANIFEST_ID.eq(valueOf(accManifestId)))
                 .execute();
 
+        // discard corresponding GitHub issue links (issue #1533)
+        dslContext().deleteFrom(GITHUB_ISSUE_ACC_MANIFEST)
+                .where(GITHUB_ISSUE_ACC_MANIFEST.ACC_MANIFEST_ID.eq(valueOf(accManifestId)))
+                .execute();
+
         // discard corresponding tags
         dslContext().deleteFrom(ACC_MANIFEST_TAG)
                 .where(ACC_MANIFEST_TAG.ACC_MANIFEST_ID.eq(valueOf(accManifestId)))

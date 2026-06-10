@@ -5,6 +5,7 @@ import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {AuthService} from '../../authentication/auth.service';
 import {Comment} from '../../cc-management/domain/core-component-node';
 import {AgencyIdListService} from '../domain/agency-id-list.service';
+import {GithubIntegrationService} from '../../cc-management/domain/github-integration.service';
 import {AgencyIdListDetails, AgencyIdListValue, AgencyIdListValueDetails} from '../domain/agency-id-list';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatPaginator} from '@angular/material/paginator';
@@ -39,6 +40,7 @@ import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 })
 export class AgencyIdListDetailComponent implements OnInit {
   private service = inject(AgencyIdListService);
+  protected githubService = inject(GithubIntegrationService);
   private namespaceService = inject(NamespaceService);
   private location = inject(Location);
   private route = inject(ActivatedRoute);

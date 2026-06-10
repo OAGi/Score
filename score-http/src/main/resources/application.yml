@@ -74,3 +74,19 @@ resource-server:
 springdoc:
   swagger-ui:
     tags-sorter: alpha
+
+score:
+  integration:
+    github:
+      enabled: ${SCORE_GITHUB_ENABLED:false}
+      client-id: ${GITHUB_CLIENT_ID:}
+      client-secret: ${GITHUB_CLIENT_SECRET:}
+      scope: ${GITHUB_OAUTH_SCOPE:repo}
+      authorization-uri: https://github.com/login/oauth/authorize
+      token-uri: https://github.com/login/oauth/access_token
+      api-base-url: https://api.github.com
+      default-repo-owner: OAGi
+      default-repo-name: oagis
+      redirect-uri: ${GITHUB_REDIRECT_URI:http://localhost:4200/api/integration/github/callback}
+      web-base-url: ${SCORE_WEB_BASE_URL:http://localhost:4200}
+      webhook-secret: ${GITHUB_WEBHOOK_SECRET:}

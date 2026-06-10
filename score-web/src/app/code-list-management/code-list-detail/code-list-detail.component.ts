@@ -6,6 +6,7 @@ import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {AuthService} from '../../authentication/auth.service';
 import {Comment} from '../../cc-management/domain/core-component-node';
 import {CodeListService} from '../domain/code-list.service';
+import {GithubIntegrationService} from '../../cc-management/domain/github-integration.service';
 import {CodeListDetails, CodeListValue, CodeListValueDetails} from '../domain/code-list';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatPaginator} from '@angular/material/paginator';
@@ -41,6 +42,7 @@ import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 })
 export class CodeListDetailComponent implements OnInit {
   private service = inject(CodeListService);
+  protected githubService = inject(GithubIntegrationService);
   private agencyIdListService = inject(AgencyIdListService);
   private namespaceService = inject(NamespaceService);
   private location = inject(Location);

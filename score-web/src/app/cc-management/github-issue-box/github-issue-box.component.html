@@ -1,0 +1,98 @@
+@if (show) {
+  <div class="github-box">
+    <div class="github-box-header">
+      <div class="github-header-left">
+        <svg class="github-mark" height="18" viewBox="0 0 16 16" width="18" aria-hidden="true">
+          <path fill-rule="evenodd"
+                d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
+                   0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01
+                   1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95
+                   0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27
+                   2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08
+                   2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48
+                   0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"></path>
+        </svg>
+        <span class="github-box-title">GitHub</span>
+        <!-- Connection status is viewer-global (not tied to this component), so show it even on
+             read-only boxes; only the issue-linking controls below are gated by editability. -->
+        @if (!loading && connected) {
+          <span class="github-sep">·</span>
+          <span class="github-box-account"><strong>{{ status?.login ? ('@' + status?.login) : 'GitHub' }}</strong></span>
+          <span class="github-sep">·</span>
+          <button type="button" class="github-text-btn" (click)="disconnect()">Disconnect</button>
+        }
+      </div>
+
+      <div class="github-header-right">
+        @if (!loading) {
+          @if (!connected) {
+            <a class="github-btn" [href]="connectHref">Connect GitHub</a>
+          } @else if (canEdit && isOwner) {
+            <input class="github-issue-input" type="text" [(ngModel)]="newIssue" [disabled]="busy"
+                   placeholder="Issue #, owner/repo#number, or URL" (keyup.enter)="addIssue()">
+            <button type="button" class="github-btn" (click)="addIssue()" [disabled]="busy || !newIssue">Link</button>
+          }
+        }
+      </div>
+    </div>
+
+    @if (!loading) {
+      @if (error) {
+        <div class="github-issue-error">{{ error }}</div>
+      }
+      <div class="github-box-body">
+        @if (issuesLoading) {
+          <div class="github-box-hint">Loading issues…</div>
+        } @else if (issues.length === 0) {
+          <div class="github-box-hint">No issues linked.</div>
+        } @else {
+          @for (issue of issues; track issue.linkId) {
+            <div class="github-issue">
+              <a class="github-issue-link" [href]="issue.htmlUrl" target="_blank" rel="noopener">{{ label(issue) }}</a>
+              <div class="github-issue-content">
+                <div class="github-issue-main">
+                  @if (issue.type) {
+                    <span class="gh-type">{{ issue.type }}</span>
+                  }
+                  <span class="github-issue-title">{{ issue.title }}</span>
+
+                  @if (issue.milestone?.title) {
+                    <span class="gh-ms" [class.is-closed]="issue.milestone?.state === 'closed'" title="Milestone">
+                      <svg class="gh-ms-icon" height="12" viewBox="0 0 16 16" width="12" aria-hidden="true">
+                        <path d="M7.75 0a.75.75 0 0 1 .75.75V3h3.634c.414 0 .814.147 1.13.414l1.42 1.195a.75.75 0 0 1 0 1.182l-1.42 1.195a1.75 1.75 0 0 1-1.13.414H8.5v6.75a.75.75 0 0 1-1.5 0V8H2.75A1.75 1.75 0 0 1 1 6.25v-3.5C1 1.784 1.784 1 2.75 1H7V.75A.75.75 0 0 1 7.75 0ZM2.5 2.75v3.5c0 .138.112.25.25.25h9.296a.25.25 0 0 0 .16-.058l.708-.594a.25.25 0 0 0 0-.396l-.708-.594a.25.25 0 0 0-.16-.058H2.75a.25.25 0 0 0-.25.25Z"></path>
+                      </svg>{{ issue.milestone?.title }}
+                    </span>
+                  }
+                  @if (issue.state) {
+                    <span class="github-issue-state" [class.is-closed]="issue.state === 'closed'">{{ issue.state }}</span>
+                  }
+                  @for (a of (issue.assignees || []).slice(0, 3); track a.login) {
+                    @if (a.avatarUrl) {
+                      <img class="gh-assignee" [src]="a.avatarUrl" [title]="'@' + a.login" [alt]="a.login">
+                    } @else {
+                      <span class="gh-assignee-login" [title]="'@' + a.login">{{ '@' + a.login }}</span>
+                    }
+                  }
+                  @if (isOwner && canEdit) {
+                    <button type="button" class="github-chip-x" (click)="remove(issue)" [disabled]="busy" aria-label="Unlink">×</button>
+                  }
+                </div>
+
+                @if ((issue.labels?.length || 0) > 0) {
+                  <div class="github-issue-labels">
+                    @for (lbl of issue.labels; track lbl.name) {
+                      <span class="gh-label"
+                            [style.background-color]="'#' + (lbl.color || 'e1e4e8')"
+                            [style.color]="labelTextColor(lbl.color)"
+                            [title]="lbl.description || lbl.name">{{ lbl.name }}</span>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        }
+      </div>
+    }
+  </div>
+}

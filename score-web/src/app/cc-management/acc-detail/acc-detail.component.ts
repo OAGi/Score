@@ -20,6 +20,7 @@ import {
   CcFlatNodeDataSourceSearcher
 } from '../domain/cc-flat-tree';
 import {CcNodeService} from '../domain/core-component-node.service';
+import {GithubIntegrationService} from '../domain/github-integration.service';
 import {
   AccDetails,
   AsccpOrBccpManifestId,
@@ -81,6 +82,7 @@ import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 })
 export class AccDetailComponent implements OnInit {
   private service = inject(CcNodeService);
+  protected githubService = inject(GithubIntegrationService);
   private searchOptionsService = inject(SearchOptionsService);
   private releaseService = inject(ReleaseService);
   private snackBar = inject(MatSnackBar);

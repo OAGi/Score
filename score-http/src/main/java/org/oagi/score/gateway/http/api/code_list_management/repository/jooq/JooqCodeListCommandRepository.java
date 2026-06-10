@@ -336,6 +336,11 @@ public class JooqCodeListCommandRepository
                     .execute();
         }
 
+        // discard corresponding GitHub issue links (issue #1533)
+        dslContext().deleteFrom(GITHUB_ISSUE_CODE_LIST_MANIFEST)
+                .where(GITHUB_ISSUE_CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(valueOf(codeListDetails.codeListManifestId())))
+                .execute();
+
         dslContext().deleteFrom(CODE_LIST_MANIFEST)
                 .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(valueOf(codeListDetails.codeListManifestId())))
                 .execute();

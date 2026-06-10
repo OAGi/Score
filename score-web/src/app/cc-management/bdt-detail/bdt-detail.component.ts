@@ -24,6 +24,7 @@ import {
   DtScFlatNode
 } from '../domain/cc-flat-tree';
 import {CcNodeService} from '../domain/core-component-node.service';
+import {GithubIntegrationService} from '../domain/github-integration.service';
 import {
   CcAccNodeInfo,
   CcAsccpNodeInfo,
@@ -74,6 +75,7 @@ import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 })
 export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   private service = inject(CcNodeService);
+  protected githubService = inject(GithubIntegrationService);
   private codeListService = inject(CodeListService);
   private agencyIdListservice = inject(AgencyIdListService);
   private ccListService = inject(CcListService);

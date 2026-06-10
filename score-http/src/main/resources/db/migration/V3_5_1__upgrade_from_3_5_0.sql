@@ -7,14 +7,9 @@
 SET @OLD_FOREIGN_KEY_CHECKS = @@FOREIGN_KEY_CHECKS;
 SET FOREIGN_KEY_CHECKS = 0;
 
-DROP TABLE IF EXISTS `oas_security_scheme`;
-DROP TABLE IF EXISTS `oas_oauth_flow`;
-DROP TABLE IF EXISTS `oas_oauth_scope`;
-DROP TABLE IF EXISTS `oas_doc_security_scope`;
-DROP TABLE IF EXISTS `oas_doc_security`;
-DROP TABLE IF EXISTS `oas_operation_security_scope`;
-DROP TABLE IF EXISTS `oas_operation_security`;
-
+-- --------------------------------------
+-- Issue #1729 - Support security schemes
+-- --------------------------------------
 CREATE TABLE `oas_security_scheme`
 (
     `oas_security_scheme_id`   bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'The primary key of the record.',
@@ -219,5 +214,169 @@ ALTER TABLE `bie_package`
     ADD COLUMN `revision_reason` longtext DEFAULT NULL
           COMMENT 'Optional free-text reason describing the intent of this package revision (issue #1733). Captured at revision time and editable while the package is WIP; surfaced in the BIE package manifest. NULL for the initial (non-revised) package and for pre-existing rows.'
           AFTER `prev_bie_package_id`;
+
+-- Issue #1533 — GitHub integration
+CREATE TABLE `github_issue`
+(
+    `github_issue_id`         bigint(20) unsigned                                       NOT NULL AUTO_INCREMENT COMMENT 'Primary key column.',
+    `repo_owner`              varchar(100) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL COMMENT 'GitHub repository owner/org, e.g. OAGi.',
+    `repo_name`               varchar(100) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL COMMENT 'GitHub repository name, e.g. Score.',
+    `issue_number`            int(11)                                                   NOT NULL COMMENT 'GitHub issue number within the repository.',
+    `cached_metadata`         json                                                      DEFAULT NULL COMMENT 'Cached GitHub issue metadata as JSON: title, state, type, milestone {title,state}, labels [{name,color,description}], assignees [{login,html_url,avatar_url}], html_url, node_id, etc. NULL until first synced. Project (Projects v2) is excluded (not available via the REST issue endpoint).',
+    `cached_synced_timestamp` datetime(6)                                               DEFAULT NULL COMMENT 'When cached_metadata was last refreshed from GitHub.',
+    `creation_timestamp`      datetime(6)                                               NOT NULL COMMENT 'Timestamp when this record was created.',
+    `last_update_timestamp`   datetime(6)                                               NOT NULL COMMENT 'Timestamp when this record was last updated.',
+    PRIMARY KEY (`github_issue_id`),
+    UNIQUE KEY `github_issue_uk1` (`repo_owner`, `repo_name`, `issue_number`) USING BTREE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_general_ci
+  ROW_FORMAT = DYNAMIC COMMENT ='Independent registry of referenced GitHub issues (one row per owner/repo/number) with cached metadata JSON. Issue #1533.';
+
+-- -------------------------------------------------------------------------------------
+-- github_<type>_manifest: link tables associating a manifest to a github_issue (many-to-many).
+--   One table per manifest type that carries the association: ACC, ASCCP, BCCP, DT,
+--   CODE_LIST, AGENCY_ID_LIST. Real FK on both sides (manifest <-> github_issue). A manifest
+--   may link to several issues and an issue to several manifests. The note is per-link.
+--   On release publish, the link rows must be carried forward to the new release's manifest.
+-- -------------------------------------------------------------------------------------
+
+CREATE TABLE `github_issue_acc_manifest`
+(
+    `github_issue_acc_manifest_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary key column.',
+    `acc_manifest_id`        bigint(20) unsigned NOT NULL COMMENT 'Foreign key to acc_manifest; the ACC (in a given release) linked to a GitHub issue.',
+    `github_issue_id`        bigint(20) unsigned NOT NULL COMMENT 'Foreign key to github_issue; the linked GitHub issue.',
+    `created_by`             bigint(20) unsigned NOT NULL COMMENT 'Foreign key to app_user; who created the link.',
+    `last_updated_by`        bigint(20) unsigned NOT NULL COMMENT 'Foreign key to app_user; who last updated the link.',
+    `creation_timestamp`     datetime(6)         NOT NULL COMMENT 'Timestamp when this record was created.',
+    `last_update_timestamp`  datetime(6)         NOT NULL COMMENT 'Timestamp when this record was last updated.',
+    PRIMARY KEY (`github_issue_acc_manifest_id`),
+    UNIQUE KEY `github_issue_acc_manifest_uk1` (`acc_manifest_id`, `github_issue_id`),
+    KEY `github_issue_acc_manifest_github_issue_id_fk` (`github_issue_id`),
+    KEY `github_issue_acc_manifest_created_by_fk` (`created_by`),
+    KEY `github_issue_acc_manifest_last_updated_by_fk` (`last_updated_by`),
+    CONSTRAINT `github_issue_acc_manifest_acc_manifest_id_fk` FOREIGN KEY (`acc_manifest_id`) REFERENCES `acc_manifest` (`acc_manifest_id`),
+    CONSTRAINT `github_issue_acc_manifest_github_issue_id_fk` FOREIGN KEY (`github_issue_id`) REFERENCES `github_issue` (`github_issue_id`),
+    CONSTRAINT `github_issue_acc_manifest_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
+    CONSTRAINT `github_issue_acc_manifest_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_general_ci
+  ROW_FORMAT = DYNAMIC COMMENT ='Links an ACC manifest to a GitHub issue (many-to-many).';
+
+CREATE TABLE `github_issue_asccp_manifest`
+(
+    `github_issue_asccp_manifest_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary key column.',
+    `asccp_manifest_id`        bigint(20) unsigned NOT NULL COMMENT 'Foreign key to asccp_manifest; the ASCCP (in a given release) linked to a GitHub issue.',
+    `github_issue_id`          bigint(20) unsigned NOT NULL COMMENT 'Foreign key to github_issue; the linked GitHub issue.',
+    `created_by`               bigint(20) unsigned NOT NULL COMMENT 'Foreign key to app_user; who created the link.',
+    `last_updated_by`          bigint(20) unsigned NOT NULL COMMENT 'Foreign key to app_user; who last updated the link.',
+    `creation_timestamp`       datetime(6)         NOT NULL COMMENT 'Timestamp when this record was created.',
+    `last_update_timestamp`    datetime(6)         NOT NULL COMMENT 'Timestamp when this record was last updated.',
+    PRIMARY KEY (`github_issue_asccp_manifest_id`),
+    UNIQUE KEY `github_issue_asccp_manifest_uk1` (`asccp_manifest_id`, `github_issue_id`),
+    KEY `github_issue_asccp_manifest_github_issue_id_fk` (`github_issue_id`),
+    KEY `github_issue_asccp_manifest_created_by_fk` (`created_by`),
+    KEY `github_issue_asccp_manifest_last_updated_by_fk` (`last_updated_by`),
+    CONSTRAINT `github_issue_asccp_manifest_asccp_manifest_id_fk` FOREIGN KEY (`asccp_manifest_id`) REFERENCES `asccp_manifest` (`asccp_manifest_id`),
+    CONSTRAINT `github_issue_asccp_manifest_github_issue_id_fk` FOREIGN KEY (`github_issue_id`) REFERENCES `github_issue` (`github_issue_id`),
+    CONSTRAINT `github_issue_asccp_manifest_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
+    CONSTRAINT `github_issue_asccp_manifest_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_general_ci
+  ROW_FORMAT = DYNAMIC COMMENT ='Links an ASCCP manifest to a GitHub issue (many-to-many).';
+
+CREATE TABLE `github_issue_bccp_manifest`
+(
+    `github_issue_bccp_manifest_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary key column.',
+    `bccp_manifest_id`        bigint(20) unsigned NOT NULL COMMENT 'Foreign key to bccp_manifest; the BCCP (in a given release) linked to a GitHub issue.',
+    `github_issue_id`         bigint(20) unsigned NOT NULL COMMENT 'Foreign key to github_issue; the linked GitHub issue.',
+    `created_by`              bigint(20) unsigned NOT NULL COMMENT 'Foreign key to app_user; who created the link.',
+    `last_updated_by`         bigint(20) unsigned NOT NULL COMMENT 'Foreign key to app_user; who last updated the link.',
+    `creation_timestamp`      datetime(6)         NOT NULL COMMENT 'Timestamp when this record was created.',
+    `last_update_timestamp`   datetime(6)         NOT NULL COMMENT 'Timestamp when this record was last updated.',
+    PRIMARY KEY (`github_issue_bccp_manifest_id`),
+    UNIQUE KEY `github_issue_bccp_manifest_uk1` (`bccp_manifest_id`, `github_issue_id`),
+    KEY `github_issue_bccp_manifest_github_issue_id_fk` (`github_issue_id`),
+    KEY `github_issue_bccp_manifest_created_by_fk` (`created_by`),
+    KEY `github_issue_bccp_manifest_last_updated_by_fk` (`last_updated_by`),
+    CONSTRAINT `github_issue_bccp_manifest_bccp_manifest_id_fk` FOREIGN KEY (`bccp_manifest_id`) REFERENCES `bccp_manifest` (`bccp_manifest_id`),
+    CONSTRAINT `github_issue_bccp_manifest_github_issue_id_fk` FOREIGN KEY (`github_issue_id`) REFERENCES `github_issue` (`github_issue_id`),
+    CONSTRAINT `github_issue_bccp_manifest_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
+    CONSTRAINT `github_issue_bccp_manifest_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_general_ci
+  ROW_FORMAT = DYNAMIC COMMENT ='Links a BCCP manifest to a GitHub issue (many-to-many).';
+
+CREATE TABLE `github_issue_dt_manifest`
+(
+    `github_issue_dt_manifest_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary key column.',
+    `dt_manifest_id`        bigint(20) unsigned NOT NULL COMMENT 'Foreign key to dt_manifest; the DT (in a given release) linked to a GitHub issue.',
+    `github_issue_id`       bigint(20) unsigned NOT NULL COMMENT 'Foreign key to github_issue; the linked GitHub issue.',
+    `created_by`            bigint(20) unsigned NOT NULL COMMENT 'Foreign key to app_user; who created the link.',
+    `last_updated_by`       bigint(20) unsigned NOT NULL COMMENT 'Foreign key to app_user; who last updated the link.',
+    `creation_timestamp`    datetime(6)         NOT NULL COMMENT 'Timestamp when this record was created.',
+    `last_update_timestamp` datetime(6)         NOT NULL COMMENT 'Timestamp when this record was last updated.',
+    PRIMARY KEY (`github_issue_dt_manifest_id`),
+    UNIQUE KEY `github_issue_dt_manifest_uk1` (`dt_manifest_id`, `github_issue_id`),
+    KEY `github_issue_dt_manifest_github_issue_id_fk` (`github_issue_id`),
+    KEY `github_issue_dt_manifest_created_by_fk` (`created_by`),
+    KEY `github_issue_dt_manifest_last_updated_by_fk` (`last_updated_by`),
+    CONSTRAINT `github_issue_dt_manifest_dt_manifest_id_fk` FOREIGN KEY (`dt_manifest_id`) REFERENCES `dt_manifest` (`dt_manifest_id`),
+    CONSTRAINT `github_issue_dt_manifest_github_issue_id_fk` FOREIGN KEY (`github_issue_id`) REFERENCES `github_issue` (`github_issue_id`),
+    CONSTRAINT `github_issue_dt_manifest_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
+    CONSTRAINT `github_issue_dt_manifest_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_general_ci
+  ROW_FORMAT = DYNAMIC COMMENT ='Links a DT manifest to a GitHub issue (many-to-many).';
+
+CREATE TABLE `github_issue_code_list_manifest`
+(
+    `github_issue_code_list_manifest_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary key column.',
+    `code_list_manifest_id`        bigint(20) unsigned NOT NULL COMMENT 'Foreign key to code_list_manifest; the code list (in a given release) linked to a GitHub issue.',
+    `github_issue_id`              bigint(20) unsigned NOT NULL COMMENT 'Foreign key to github_issue; the linked GitHub issue.',
+    `created_by`                   bigint(20) unsigned NOT NULL COMMENT 'Foreign key to app_user; who created the link.',
+    `last_updated_by`              bigint(20) unsigned NOT NULL COMMENT 'Foreign key to app_user; who last updated the link.',
+    `creation_timestamp`           datetime(6)         NOT NULL COMMENT 'Timestamp when this record was created.',
+    `last_update_timestamp`        datetime(6)         NOT NULL COMMENT 'Timestamp when this record was last updated.',
+    PRIMARY KEY (`github_issue_code_list_manifest_id`),
+    UNIQUE KEY `github_issue_code_list_manifest_uk1` (`code_list_manifest_id`, `github_issue_id`),
+    KEY `github_issue_code_list_manifest_github_issue_id_fk` (`github_issue_id`),
+    KEY `github_issue_code_list_manifest_created_by_fk` (`created_by`),
+    KEY `github_issue_code_list_manifest_last_updated_by_fk` (`last_updated_by`),
+    CONSTRAINT `github_issue_code_list_manifest_code_list_manifest_id_fk` FOREIGN KEY (`code_list_manifest_id`) REFERENCES `code_list_manifest` (`code_list_manifest_id`),
+    CONSTRAINT `github_issue_code_list_manifest_github_issue_id_fk` FOREIGN KEY (`github_issue_id`) REFERENCES `github_issue` (`github_issue_id`),
+    CONSTRAINT `github_issue_code_list_manifest_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
+    CONSTRAINT `github_issue_code_list_manifest_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_general_ci
+  ROW_FORMAT = DYNAMIC COMMENT ='Links a code list manifest to a GitHub issue (many-to-many).';
+
+CREATE TABLE `github_issue_agency_id_list_manifest`
+(
+    `github_issue_agency_id_list_manifest_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary key column.',
+    `agency_id_list_manifest_id`        bigint(20) unsigned NOT NULL COMMENT 'Foreign key to agency_id_list_manifest; the agency id list (in a given release) linked to a GitHub issue.',
+    `github_issue_id`                   bigint(20) unsigned NOT NULL COMMENT 'Foreign key to github_issue; the linked GitHub issue.',
+    `created_by`                        bigint(20) unsigned NOT NULL COMMENT 'Foreign key to app_user; who created the link.',
+    `last_updated_by`                   bigint(20) unsigned NOT NULL COMMENT 'Foreign key to app_user; who last updated the link.',
+    `creation_timestamp`                datetime(6)         NOT NULL COMMENT 'Timestamp when this record was created.',
+    `last_update_timestamp`             datetime(6)         NOT NULL COMMENT 'Timestamp when this record was last updated.',
+    PRIMARY KEY (`github_issue_agency_id_list_manifest_id`),
+    UNIQUE KEY `github_issue_agency_id_list_manifest_uk1` (`agency_id_list_manifest_id`, `github_issue_id`),
+    KEY `github_issue_agency_id_list_manifest_github_issue_id_fk` (`github_issue_id`),
+    KEY `github_issue_agency_id_list_manifest_created_by_fk` (`created_by`),
+    KEY `github_issue_agency_id_list_manifest_last_updated_by_fk` (`last_updated_by`),
+    CONSTRAINT `github_issue_agency_id_list_manifest_manifest_id_fk` FOREIGN KEY (`agency_id_list_manifest_id`) REFERENCES `agency_id_list_manifest` (`agency_id_list_manifest_id`),
+    CONSTRAINT `github_issue_agency_id_list_manifest_github_issue_id_fk` FOREIGN KEY (`github_issue_id`) REFERENCES `github_issue` (`github_issue_id`),
+    CONSTRAINT `github_issue_agency_id_list_manifest_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
+    CONSTRAINT `github_issue_agency_id_list_manifest_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_general_ci
+  ROW_FORMAT = DYNAMIC COMMENT ='Links an agency id list manifest to a GitHub issue (many-to-many).';
 
 SET FOREIGN_KEY_CHECKS = @OLD_FOREIGN_KEY_CHECKS;

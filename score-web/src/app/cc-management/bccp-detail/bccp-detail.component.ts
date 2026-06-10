@@ -10,6 +10,7 @@ import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {BccpFlatNode, CcFlatNode, CcFlatNodeDatabase, CcFlatNodeDataSource, CcFlatNodeDataSourceSearcher} from '../domain/cc-flat-tree';
 import {CcNodeService} from '../domain/core-component-node.service';
+import {GithubIntegrationService} from '../domain/github-integration.service';
 import {
   BccpDetails,
   CcAccNodeInfo,
@@ -54,6 +55,7 @@ import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 })
 export class BccpDetailComponent implements OnInit {
   private service = inject(CcNodeService);
+  protected githubService = inject(GithubIntegrationService);
   private searchOptionsService = inject(SearchOptionsService);
   private releaseService = inject(ReleaseService);
   private snackBar = inject(MatSnackBar);

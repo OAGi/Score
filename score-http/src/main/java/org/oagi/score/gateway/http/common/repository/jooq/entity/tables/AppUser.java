@@ -61,6 +61,12 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Dt.DtPat
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtManifestTag.DtManifestTagPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtSc.DtScPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Exception.ExceptionPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.GithubIssueAccManifest.GithubIssueAccManifestPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.GithubIssueAgencyIdListManifest.GithubIssueAgencyIdListManifestPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.GithubIssueAsccpManifest.GithubIssueAsccpManifestPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.GithubIssueBccpManifest.GithubIssueBccpManifestPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.GithubIssueCodeListManifest.GithubIssueCodeListManifestPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.GithubIssueDtManifest.GithubIssueDtManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Library.LibraryPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Log.LogPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Message.MessagePath;
@@ -1074,6 +1080,174 @@ public class AppUser extends TableImpl<AppUserRecord> {
             _exception = new ExceptionPath(this, null, Keys.EXCEPTION_CREATED_BY_FK.getInverseKey());
 
         return _exception;
+    }
+
+    private transient GithubIssueAccManifestPath _githubIssueAccManifestCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_acc_manifest</code> table, via the
+     * <code>github_issue_acc_manifest_created_by_fk</code> key
+     */
+    public GithubIssueAccManifestPath githubIssueAccManifestCreatedByFk() {
+        if (_githubIssueAccManifestCreatedByFk == null)
+            _githubIssueAccManifestCreatedByFk = new GithubIssueAccManifestPath(this, null, Keys.GITHUB_ISSUE_ACC_MANIFEST_CREATED_BY_FK.getInverseKey());
+
+        return _githubIssueAccManifestCreatedByFk;
+    }
+
+    private transient GithubIssueAccManifestPath _githubIssueAccManifestLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_acc_manifest</code> table, via the
+     * <code>github_issue_acc_manifest_last_updated_by_fk</code> key
+     */
+    public GithubIssueAccManifestPath githubIssueAccManifestLastUpdatedByFk() {
+        if (_githubIssueAccManifestLastUpdatedByFk == null)
+            _githubIssueAccManifestLastUpdatedByFk = new GithubIssueAccManifestPath(this, null, Keys.GITHUB_ISSUE_ACC_MANIFEST_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _githubIssueAccManifestLastUpdatedByFk;
+    }
+
+    private transient GithubIssueAgencyIdListManifestPath _githubIssueAgencyIdListManifestCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_agency_id_list_manifest</code> table, via the
+     * <code>github_issue_agency_id_list_manifest_created_by_fk</code> key
+     */
+    public GithubIssueAgencyIdListManifestPath githubIssueAgencyIdListManifestCreatedByFk() {
+        if (_githubIssueAgencyIdListManifestCreatedByFk == null)
+            _githubIssueAgencyIdListManifestCreatedByFk = new GithubIssueAgencyIdListManifestPath(this, null, Keys.GITHUB_ISSUE_AGENCY_ID_LIST_MANIFEST_CREATED_BY_FK.getInverseKey());
+
+        return _githubIssueAgencyIdListManifestCreatedByFk;
+    }
+
+    private transient GithubIssueAgencyIdListManifestPath _githubIssueAgencyIdListManifestLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_agency_id_list_manifest</code> table, via the
+     * <code>github_issue_agency_id_list_manifest_last_updated_by_fk</code> key
+     */
+    public GithubIssueAgencyIdListManifestPath githubIssueAgencyIdListManifestLastUpdatedByFk() {
+        if (_githubIssueAgencyIdListManifestLastUpdatedByFk == null)
+            _githubIssueAgencyIdListManifestLastUpdatedByFk = new GithubIssueAgencyIdListManifestPath(this, null, Keys.GITHUB_ISSUE_AGENCY_ID_LIST_MANIFEST_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _githubIssueAgencyIdListManifestLastUpdatedByFk;
+    }
+
+    private transient GithubIssueAsccpManifestPath _githubIssueAsccpManifestCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_asccp_manifest</code> table, via the
+     * <code>github_issue_asccp_manifest_created_by_fk</code> key
+     */
+    public GithubIssueAsccpManifestPath githubIssueAsccpManifestCreatedByFk() {
+        if (_githubIssueAsccpManifestCreatedByFk == null)
+            _githubIssueAsccpManifestCreatedByFk = new GithubIssueAsccpManifestPath(this, null, Keys.GITHUB_ISSUE_ASCCP_MANIFEST_CREATED_BY_FK.getInverseKey());
+
+        return _githubIssueAsccpManifestCreatedByFk;
+    }
+
+    private transient GithubIssueAsccpManifestPath _githubIssueAsccpManifestLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_asccp_manifest</code> table, via the
+     * <code>github_issue_asccp_manifest_last_updated_by_fk</code> key
+     */
+    public GithubIssueAsccpManifestPath githubIssueAsccpManifestLastUpdatedByFk() {
+        if (_githubIssueAsccpManifestLastUpdatedByFk == null)
+            _githubIssueAsccpManifestLastUpdatedByFk = new GithubIssueAsccpManifestPath(this, null, Keys.GITHUB_ISSUE_ASCCP_MANIFEST_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _githubIssueAsccpManifestLastUpdatedByFk;
+    }
+
+    private transient GithubIssueBccpManifestPath _githubIssueBccpManifestCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_bccp_manifest</code> table, via the
+     * <code>github_issue_bccp_manifest_created_by_fk</code> key
+     */
+    public GithubIssueBccpManifestPath githubIssueBccpManifestCreatedByFk() {
+        if (_githubIssueBccpManifestCreatedByFk == null)
+            _githubIssueBccpManifestCreatedByFk = new GithubIssueBccpManifestPath(this, null, Keys.GITHUB_ISSUE_BCCP_MANIFEST_CREATED_BY_FK.getInverseKey());
+
+        return _githubIssueBccpManifestCreatedByFk;
+    }
+
+    private transient GithubIssueBccpManifestPath _githubIssueBccpManifestLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_bccp_manifest</code> table, via the
+     * <code>github_issue_bccp_manifest_last_updated_by_fk</code> key
+     */
+    public GithubIssueBccpManifestPath githubIssueBccpManifestLastUpdatedByFk() {
+        if (_githubIssueBccpManifestLastUpdatedByFk == null)
+            _githubIssueBccpManifestLastUpdatedByFk = new GithubIssueBccpManifestPath(this, null, Keys.GITHUB_ISSUE_BCCP_MANIFEST_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _githubIssueBccpManifestLastUpdatedByFk;
+    }
+
+    private transient GithubIssueCodeListManifestPath _githubIssueCodeListManifestCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_code_list_manifest</code> table, via the
+     * <code>github_issue_code_list_manifest_created_by_fk</code> key
+     */
+    public GithubIssueCodeListManifestPath githubIssueCodeListManifestCreatedByFk() {
+        if (_githubIssueCodeListManifestCreatedByFk == null)
+            _githubIssueCodeListManifestCreatedByFk = new GithubIssueCodeListManifestPath(this, null, Keys.GITHUB_ISSUE_CODE_LIST_MANIFEST_CREATED_BY_FK.getInverseKey());
+
+        return _githubIssueCodeListManifestCreatedByFk;
+    }
+
+    private transient GithubIssueCodeListManifestPath _githubIssueCodeListManifestLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_code_list_manifest</code> table, via the
+     * <code>github_issue_code_list_manifest_last_updated_by_fk</code> key
+     */
+    public GithubIssueCodeListManifestPath githubIssueCodeListManifestLastUpdatedByFk() {
+        if (_githubIssueCodeListManifestLastUpdatedByFk == null)
+            _githubIssueCodeListManifestLastUpdatedByFk = new GithubIssueCodeListManifestPath(this, null, Keys.GITHUB_ISSUE_CODE_LIST_MANIFEST_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _githubIssueCodeListManifestLastUpdatedByFk;
+    }
+
+    private transient GithubIssueDtManifestPath _githubIssueDtManifestCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_dt_manifest</code> table, via the
+     * <code>github_issue_dt_manifest_created_by_fk</code> key
+     */
+    public GithubIssueDtManifestPath githubIssueDtManifestCreatedByFk() {
+        if (_githubIssueDtManifestCreatedByFk == null)
+            _githubIssueDtManifestCreatedByFk = new GithubIssueDtManifestPath(this, null, Keys.GITHUB_ISSUE_DT_MANIFEST_CREATED_BY_FK.getInverseKey());
+
+        return _githubIssueDtManifestCreatedByFk;
+    }
+
+    private transient GithubIssueDtManifestPath _githubIssueDtManifestLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_dt_manifest</code> table, via the
+     * <code>github_issue_dt_manifest_last_updated_by_fk</code> key
+     */
+    public GithubIssueDtManifestPath githubIssueDtManifestLastUpdatedByFk() {
+        if (_githubIssueDtManifestLastUpdatedByFk == null)
+            _githubIssueDtManifestLastUpdatedByFk = new GithubIssueDtManifestPath(this, null, Keys.GITHUB_ISSUE_DT_MANIFEST_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _githubIssueDtManifestLastUpdatedByFk;
     }
 
     private transient LibraryPath _libraryCreatedByFk;

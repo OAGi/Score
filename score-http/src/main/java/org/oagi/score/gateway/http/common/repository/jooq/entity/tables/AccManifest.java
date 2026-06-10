@@ -39,6 +39,8 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AccManif
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AsccManifest.AsccManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AsccpManifest.AsccpManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BccManifest.BccManifestPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.GithubIssue.GithubIssuePath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.GithubIssueAccManifest.GithubIssueAccManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Log.LogPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ModuleAccManifest.ModuleAccManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Release.ReleasePath;
@@ -357,6 +359,19 @@ public class AccManifest extends TableImpl<AccManifestRecord> {
         return _bccManifest;
     }
 
+    private transient GithubIssueAccManifestPath _githubIssueAccManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_acc_manifest</code> table
+     */
+    public GithubIssueAccManifestPath githubIssueAccManifest() {
+        if (_githubIssueAccManifest == null)
+            _githubIssueAccManifest = new GithubIssueAccManifestPath(this, null, Keys.GITHUB_ISSUE_ACC_MANIFEST_ACC_MANIFEST_ID_FK.getInverseKey());
+
+        return _githubIssueAccManifest;
+    }
+
     private transient ModuleAccManifestPath _moduleAccManifest;
 
     /**
@@ -388,6 +403,14 @@ public class AccManifest extends TableImpl<AccManifestRecord> {
      */
     public TagPath tag() {
         return accManifestTag().tag();
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the
+     * <code>oagi.github_issue</code> table
+     */
+    public GithubIssuePath githubIssue() {
+        return githubIssueAccManifest().githubIssue();
     }
 
     @Override

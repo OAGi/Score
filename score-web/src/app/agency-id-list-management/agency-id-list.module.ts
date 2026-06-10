@@ -13,6 +13,7 @@ import {ScoreCommonModule} from '../common/score-common.module';
 import {SearchBarModule} from '../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../common/column-selector/column-selector.module';
 import {TitleWithLibrarySelector} from '../common/title-with-library-selector/title-with-library-selector';
+import {GithubIssueBoxComponent} from '../cc-management/github-issue-box/github-issue-box.component';
 
 const routes: Routes = [
   {
@@ -45,7 +46,8 @@ const routes: Routes = [
         ScoreCommonModule,
         SearchBarModule,
         ColumnSelectorModule,
-        TitleWithLibrarySelector
+        TitleWithLibrarySelector,
+        GithubIssueBoxComponent
     ],
   declarations: [
     AgencyIdListListComponent,

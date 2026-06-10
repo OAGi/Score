@@ -532,6 +532,9 @@ public class LibraryCommandService {
                     .collect(Collectors.toList()));
         }
 
+        // Remove GitHub issue links before the CCs they reference are deleted (issue #1533).
+        repositoryFactory.gitHubIssueLinkCommandRepository(requester).deleteLinksByRelease(workingReleaseId);
+
         var ccCommand = repositoryFactory.ccCommandRepository(requester);
         ccCommand.clearReplacement(workingReleaseId);
         ccCommand.cleanUp(workingReleaseId);
