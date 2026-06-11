@@ -1,0 +1,382 @@
+/* Wide enough for comfortable Markdown editing of the pre-filled GitHub post.
+   ONE fixed width (the call sites pass no width in the MatDialog config, so this rule is the
+   single authority): the dialog must not change size when the Write/Preview tabs are toggled
+   or while typing. The max-width only guards small screens. */
+:host > div {
+  box-sizing: border-box;
+  width: 760px;
+  max-width: calc(100vw - 32px);
+  padding: 8px 16px;
+}
+
+/* Header/content/actions mirror the generic confirm dialog so the swap is visually seamless. */
+.header {
+  border-bottom: 1px solid transparent;
+  box-sizing: border-box;
+  font-family: 'Google Sans', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: .1px;
+  line-height: 24px;
+  padding-top: 8px;
+  height: auto;
+  left: 0;
+  top: 0;
+  width: 100%;
+}
+
+.close {
+  position: relative;
+  margin-left: auto;
+  left: 12px;
+}
+
+.close button {
+  outline: none;
+}
+
+.content {
+  display: inline-block;
+  box-sizing: border-box;
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  letter-spacing: .2px;
+  line-height: 20px;
+  min-height: 24px;
+  max-height: 60vh;
+  padding-bottom: 8px;
+  padding-top: 9px;
+  border-bottom: 1px solid transparent;
+  color: rgba(0, 0, 0, 0.7);
+  overflow-x: hidden;
+  overflow-y: auto;
+  width: 100%;
+}
+
+.content p {
+  margin-bottom: 0;
+}
+
+.actions {
+  bottom: 0;
+  left: 0;
+  overflow: visible;
+  width: 100%;
+  opacity: 1;
+  direction: rtl;
+}
+
+.btn {
+  transition: all .3s;
+  user-select: none;
+  background-image: none;
+  border-radius: 4px;
+  border-style: solid;
+  border-width: 1px;
+  box-shadow: none;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: inline-block;
+  font-family: 'Google Sans', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  height: 36px;
+  letter-spacing: .25px;
+  line-height: 34px;
+  min-height: 24px;
+  min-width: 72px;
+  outline: none;
+  padding: 1px 8px 2px;
+  text-align: center;
+  text-decoration: none;
+  text-transform: none;
+  vertical-align: middle;
+  white-space: nowrap;
+  background-color: transparent;
+  border-color: transparent;
+  color: #1a73e8;
+  float: right;
+  margin: 0 0 0 8px;
+}
+
+.btn:hover {
+  background-color: rgba(26, 115, 232, 0.06);
+  border-color: transparent;
+  text-decoration: none;
+}
+
+/* One section per target component: name, transition, linked issues, optional comment. */
+.target-list {
+  margin-top: 12px;
+}
+
+.target-section {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+/* Badge, then name (ellipsis if long), then the fixed transition hint — all on one row.
+   The badge itself is an unstyled <mat-chip>, IDENTICAL to the Type column of the
+   core-components list page (global Material theme styles, 11px label via styles.css). */
+.target-header {
+  display: flex;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.target-type {
+  flex: 0 0 auto;
+}
+
+.target-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.87);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.target-transition {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.target-hint {
+  margin-top: 4px;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 12px;
+}
+
+/* Linked issue rows, in the style of the GitHub box on the detail pages. */
+.github-issues {
+  margin-top: 4px;
+}
+
+.github-issue {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 3px 0;
+}
+
+.github-issue-link {
+  font-weight: 600;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+.github-issue-title {
+  flex: 1 1 auto;
+  color: rgba(0, 0, 0, 0.78);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Issue state pill in GitHub's colors: Open = green, Closed = purple, white text. */
+.github-issue-state {
+  flex: 0 0 auto;
+  text-transform: capitalize;
+  font-size: 11px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: #1f883d;
+  color: #ffffff;
+}
+
+.github-issue-state.is-closed {
+  background: #8250df;
+  color: #ffffff;
+}
+
+/* GitHub-style comment editor: Write / Preview tabs above the comment box. */
+.comment-editor {
+  margin-top: 10px;
+}
+
+/* Pre-fill failure: the box stays empty; the user writes the comment by hand or cancels. */
+.comment-prefill-warning {
+  margin-bottom: 6px;
+  color: rgba(0, 0, 0, 0.55);
+  font-size: 12px;
+  font-style: italic;
+}
+
+/* min-height pins the row to the 32px toolbar buttons' height on BOTH tabs, so toggling
+   Write <-> Preview (which removes the toolbar) never changes the row's — and so the
+   dialog's — size. */
+.comment-tabs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 32px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  margin-bottom: 8px;
+}
+
+/* GitHub's layout: tabs on the left, the Markdown formatting toolbar right-aligned in the
+   SAME row (rendered only while the Write tab is active). Styled to GitHub's comment-box
+   toolbar, measured from Primer's MarkdownEditor (@primer/react v36 drafts) + @primer/primitives
+   v11 light theme: buttons sit edge to edge (gap 0), groups separated by a thin divider. */
+.comment-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-left: auto;
+}
+
+/* Primer IconButton variant="invisible" size="medium": 32px square hit area
+   (--control-medium-size: 2rem), 6px radius (--borderRadius-medium), transparent at rest,
+   16px Octicon in --fgColor-muted (#59636e); hover/active backgrounds are Primer's
+   --control-transparent-bgColor-hover/-active. */
+.comment-toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background-color: transparent;
+  color: #59636e;
+  cursor: pointer;
+  outline: none;
+}
+
+.comment-toolbar-btn:hover {
+  background-color: #818b981a;
+}
+
+.comment-toolbar-btn:active {
+  background-color: #818b9826;
+}
+
+/* GitHub's group divider (Primer MarkdownEditor Divider): a 1px --borderColor-muted line,
+   half a button tall (calc(--control-medium-size / 2) = 16px), 8px horizontal margins
+   (--controlStack-medium-gap-condensed). */
+.comment-toolbar-divider {
+  display: inline-grid;
+  height: 16px;
+  margin: 0 8px;
+  border-left: 1px solid #d1d9e0b3;
+}
+
+.comment-tab {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 4px 10px 6px;
+  font-family: 'Google Sans', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .25px;
+  color: rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+  outline: none;
+}
+
+.comment-tab:hover {
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.comment-tab.active {
+  color: rgba(0, 0, 0, 0.87);
+  border-bottom-color: #1a73e8;
+}
+
+/* The Write textarea and the Preview pane are ONE fixed-height box with identical box-sizing,
+   border and padding, so toggling the tabs or typing never changes the dialog's size: long
+   content scrolls inside the pane (no autosize). The focus ring is an inset box-shadow, which
+   does not affect layout. */
+.comment-input,
+.comment-preview {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  height: 240px;
+  margin: 0;
+  border: 1px solid rgba(0, 0, 0, 0.38);
+  border-radius: 4px;
+  padding: 16px;
+  background-color: #ffffff;
+  overflow-y: auto;
+}
+
+/* The Write textarea while that target's Preview tab is active: kept ALIVE in the DOM
+   (display:none) instead of being removed, so the browser-native undo/redo stack and the
+   caret/selection persist across Write <-> Preview round-trips (GitHub does the same).
+   A class rule rather than the [hidden] attribute because the shared rule above sets an
+   explicit display:block, which would override [hidden]'s UA style; the two classes give
+   this rule higher specificity, so it wins regardless of order. */
+.comment-input.comment-pane-hidden {
+  display: none;
+}
+
+.comment-input {
+  resize: none;
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.87);
+  outline: none;
+}
+
+.comment-input:focus {
+  border-color: #1a73e8;
+  box-shadow: inset 0 0 0 1px #1a73e8;
+}
+
+.comment-input::placeholder {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* The hints live OUTSIDE the tab-swapped region so both tabs render the exact same rows. */
+.comment-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 4px;
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.55);
+}
+
+/* Rendered Markdown preview. Typography comes from github-markdown-css via the global
+   .markdown-body class (the only way to reach the innerHTML rendered by <markdown> without
+   ::ng-deep) — EXCEPT the base font-size: github-markdown-css uses GitHub's 16px document
+   scale, but GitHub renders issue COMMENT bodies at a 14px base (measured on a comment of
+   github.com/OAGi/Score/issues/27: body 14px/21px, h3 17.5px/600, p margin 0 0 16px,
+   strong 600). All child sizes in github-markdown-css are em-based, so pinning the base
+   here reproduces GitHub's comment rendering exactly; line-height stays the stylesheet's
+   1.5 (= the measured 21px). Do not redeclare color. */
+.comment-preview {
+  font-size: 14px;
+}
+
+/* The Preview pane is focusable (tabindex=0) so the Cmd/Ctrl+Shift+P toggle can land focus on
+   it and catch the shortcut again to flip back to Write; same focus ring as the textarea. */
+.comment-preview:focus {
+  border-color: #1a73e8;
+  box-shadow: inset 0 0 0 1px #1a73e8;
+  outline: none;
+}
+
+.comment-preview-empty {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+:host ::ng-deep .comment-preview markdown > :first-child {
+  margin-top: 0;
+}
+
+:host ::ng-deep .comment-preview markdown > :last-child {
+  margin-bottom: 0;
+}

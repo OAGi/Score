@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationQueryService;
-import org.oagi.score.gateway.http.api.integration_management.config.GitHubIntegrationProperties;
+import org.oagi.score.gateway.http.api.integration_management.github.config.GitHubIntegrationProperties;
 import org.oagi.score.gateway.http.configuration.oauth2.ScoreClientRegistrationRepository;
 import org.oagi.score.gateway.http.configuration.oauth2.ScoreOAuth2AuthorizedClientService;
 import org.springframework.beans.factory.annotation.Autowired;

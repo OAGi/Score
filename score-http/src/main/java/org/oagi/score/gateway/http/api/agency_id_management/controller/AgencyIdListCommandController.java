@@ -55,7 +55,8 @@ public class AgencyIdListCommandController {
 
         String toState = request.get("toState");
         agencyIdListCommandService.updateState(
-                sessionService.asScoreUser(user), agencyIdListManifestId, CcState.valueOf(toState));
+                sessionService.asScoreUser(user), agencyIdListManifestId, CcState.valueOf(toState),
+                request.get("comment"));
     }
 
     @PatchMapping(value = "/{agencyIdListManifestId:[\\d]+}/revise")

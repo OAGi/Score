@@ -139,13 +139,18 @@ export class AgencyIdListService {
     });
   }
 
-  update(agencyIdList: AgencyIdListDetails, state?: string): Observable<any> {
+  update(agencyIdList: AgencyIdListDetails, state?: string, comment?: string): Observable<any> {
     let body;
     if (state) {
       body = {
         releaseId: agencyIdList.release.releaseId,
         toState: state
       };
+      // An optional comment travels with the state change and is posted verbatim to the linked
+      // GitHub issues (issue #1533). Blank comments are not sent — nothing is posted.
+      if (comment && comment.trim().length > 0) {
+        body.comment = comment;
+      }
       return this.http.patch('/api/agency-id-lists/' + agencyIdList.agencyIdListManifestId + '/state', body);
     } else {
       body = {
@@ -166,8 +171,8 @@ export class AgencyIdListService {
     }
   }
 
-  updateState(agencyIdList: AgencyIdListDetails, state: string): Observable<any> {
-    return this.update(agencyIdList, state);
+  updateState(agencyIdList: AgencyIdListDetails, state: string, comment?: string): Observable<any> {
+    return this.update(agencyIdList, state, comment);
   }
 
   delete(...agencyIdListManifestIds): Observable<any> {

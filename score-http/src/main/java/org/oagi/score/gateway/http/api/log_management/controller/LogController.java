@@ -3,8 +3,11 @@ package org.oagi.score.gateway.http.api.log_management.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.oagi.score.gateway.http.api.cc_management.model.CcType;
 import org.oagi.score.gateway.http.api.log_management.controller.payload.LogListRequest;
+import org.oagi.score.gateway.http.api.log_management.model.ComponentChangeSummary;
 import org.oagi.score.gateway.http.api.log_management.model.Log;
+import org.oagi.score.gateway.http.api.log_management.service.ComponentChangeSummaryService;
 import org.oagi.score.gateway.http.api.log_management.service.LogService;
 import org.oagi.score.gateway.http.common.model.PageRequest;
 import org.oagi.score.gateway.http.common.model.PageResponse;
@@ -16,6 +19,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.util.EnumSet;
+import java.util.Set;
 
 import static org.oagi.score.gateway.http.common.util.ControllerUtils.pageRequest;
 import static org.springframework.util.StringUtils.hasLength;
@@ -27,6 +32,9 @@ public class LogController {
 
     @Autowired
     private LogService service;
+
+    @Autowired
+    private ComponentChangeSummaryService changeSummaryService;
 
     @Autowired
     private SessionService sessionService;
@@ -96,5 +104,53 @@ public class LogController {
             @Parameter(description = "ID of the log to retrieve the snapshot for.")
             @PathVariable("logId") BigInteger logId) {
         return service.getSnapshotById(sessionService.asScoreUser(user), logId);
+    }
+
+    /** Component types for which a change summary can be built (issue #1533). */
+    private static final Set<CcType> CHANGE_SUMMARY_TYPES = EnumSet.of(
+            CcType.ACC, CcType.ASCCP, CcType.BCCP, CcType.DT, CcType.CODE_LIST, CcType.AGENCY_ID_LIST);
+
+    @Operation(
+            summary = "Get a component's change summary",
+            description = "Summarizes a component revision (issue #1533): the current state for a new component " +
+                    "(revision 1), or what changed since the prior revision for a revised one (revision 2+)."
+    )
+    @GetMapping(value = "/change-summary")
+    public ComponentChangeSummary getChangeSummary(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+
+            @Parameter(description = "Component type: ACC, ASCCP, BCCP, DT, CODE_LIST or AGENCY_ID_LIST.")
+            @RequestParam(name = "ccType") String ccType,
+
+            @Parameter(description = "Component manifest ID.")
+            @RequestParam(name = "manifestId") BigInteger manifestId) {
+
+        CcType type;
+        try {
+            type = CcType.valueOf(ccType.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            type = null;
+        }
+        if (type == null || !CHANGE_SUMMARY_TYPES.contains(type)) {
+            throw new IllegalArgumentException("Unsupported component type for a change summary: " + ccType);
+        }
+        return changeSummaryService.buildSummary(sessionService.asScoreUser(user), type, manifestId);
+    }
+
+    @Operation(
+            summary = "Get the change summary between two log entries",
+            description = "Summarizes what changed between two selected log entries of the same component " +
+                    "(issue #1533) by diffing their stored snapshots — the summary counterpart of the compare view."
+    )
+    @GetMapping(value = "/change-summary/compare")
+    public ComponentChangeSummary getChangeSummaryByCompare(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+
+            @Parameter(description = "The older log ID.")
+            @RequestParam(name = "before") BigInteger before,
+
+            @Parameter(description = "The newer log ID.")
+            @RequestParam(name = "after") BigInteger after) {
+        return changeSummaryService.buildSummary(sessionService.asScoreUser(user), before, after);
     }
 }

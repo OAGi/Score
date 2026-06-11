@@ -3,7 +3,7 @@ import { Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren, in
 import {MatChipInputEvent} from '@angular/material/chips';
 import {MatSidenav} from '@angular/material/sidenav';
 import {MatTableDataSource} from '@angular/material/table';
-import {finalize, switchMap} from 'rxjs/operators';
+import {catchError, finalize, switchMap, take} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {AgencyIdListSummary} from '../../agency-id-list-management/domain/agency-id-list';
 import {AgencyIdListService} from '../../agency-id-list-management/domain/agency-id-list.service';
@@ -24,7 +24,12 @@ import {
   DtScFlatNode
 } from '../domain/cc-flat-tree';
 import {CcNodeService} from '../domain/core-component-node.service';
-import {GithubIntegrationService} from '../domain/github-integration.service';
+import {GithubIntegrationService, GithubStatus} from '../domain/github-integration.service';
+import {
+  StateChangeDialogComponent,
+  StateChangeDialogResult,
+  usesStateChangeDialog
+} from '../state-change-dialog/state-change-dialog.component';
 import {
   CcAccNodeInfo,
   CcAsccpNodeInfo,
@@ -46,7 +51,7 @@ import {
 } from '../domain/core-component-node';
 import {AuthService} from '../../authentication/auth.service';
 import {CommentControl} from '../domain/comment-component';
-import {forkJoin, ReplaySubject} from 'rxjs';
+import {forkJoin, of, ReplaySubject} from 'rxjs';
 import {Location} from '@angular/common';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {SearchOptionsService} from '../search-options-dialog/domain/search-options-service';
@@ -787,37 +792,77 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
       return;
     }
 
-    const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = 'Update state to \'' + state + '\'?';
-    dialogConfig.data.content = ['Are you sure you want to update the state to \'' + state + '\'?'];
-    dialogConfig.data.action = 'Update';
+    const header = 'Update state to \'' + state + '\'?';
+    const content = ['Are you sure you want to update the state to \'' + state + '\'?'];
+    const action = 'Update';
 
-    this.confirmDialogService.open(dialogConfig).afterClosed()
-        .pipe(
-            finalize(() => {
-              this.isUpdating = false;
-            })
-        )
-        .subscribe(result => {
-          if (!result) {
-            return;
+    // When the GitHub integration is enabled and the transition is Draft -> Candidate or
+    // Candidate -> WIP, a dedicated dialog shows the linked GitHub issues (and pre-fills
+    // the GitHub status post for the user to edit); otherwise the generic confirm dialog runs unchanged
+    // (issue #1533).
+    this.githubService.getStatus()
+        .pipe(take(1), catchError(() => of({enabled: false, connected: false} as GithubStatus)))
+        .subscribe(status => {
+          if (status.enabled && usesStateChangeDialog(this.rootNode.state, state)) {
+            const target = {
+              ccType: 'dt',
+              manifestId: this.rootNode.manifestId,
+              name: this.rootNode.name,
+              state: this.rootNode.state
+            };
+            this.dialog.open(StateChangeDialogComponent, {
+              data: {header, content, actionLabel: action, toState: state, targets: [target]},
+              autoFocus: false
+            }).afterClosed()
+                .pipe(
+                    finalize(() => {
+                      this.isUpdating = false;
+                    })
+                )
+                .subscribe((result: StateChangeDialogResult | undefined) => {
+                  if (!result || !result.confirmed) {
+                    return;
+                  }
+                  this._doUpdateState(state, result.comments[target.ccType + ':' + target.manifestId]);
+                });
+          } else {
+            const dialogConfig = this.confirmDialogService.newConfig();
+            dialogConfig.data.header = header;
+            dialogConfig.data.content = content;
+            dialogConfig.data.action = action;
+
+            this.confirmDialogService.open(dialogConfig).afterClosed()
+                .pipe(
+                    finalize(() => {
+                      this.isUpdating = false;
+                    })
+                )
+                .subscribe(result => {
+                  if (!result) {
+                    return;
+                  }
+                  this._doUpdateState(state);
+                });
           }
-          this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state).subscribe({
-            next: () => {
-              this.snackBar.open('Updated', '', {duration: 3000});
-
-              this.service.getDtDetails(this.manifestId).subscribe({
-                next: dtDetails => this.afterStateChanged(dtDetails.state, dtDetails.access),
-                error: err => console.error(err),
-                complete: () => (this.isUpdating = false),
-              });
-            },
-            error: err => {
-              this.isUpdating = false;
-              throw err;
-            },
-          });
         });
+  }
+
+  private _doUpdateState(state: string, comment?: string) {
+    this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state, comment).subscribe({
+      next: () => {
+        this.snackBar.open('Updated', '', {duration: 3000});
+
+        this.service.getDtDetails(this.manifestId).subscribe({
+          next: dtDetails => this.afterStateChanged(dtDetails.state, dtDetails.access),
+          error: err => console.error(err),
+          complete: () => (this.isUpdating = false),
+        });
+      },
+      error: err => {
+        this.isUpdating = false;
+        throw err;
+      },
+    });
   }
 
   updateState(state: string) {

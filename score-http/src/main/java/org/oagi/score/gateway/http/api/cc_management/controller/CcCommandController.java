@@ -62,9 +62,11 @@ public class CcCommandController {
     public ResponseEntity updateAccState(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @PathVariable("accManifestId") AccManifestId accManifestId,
-            @RequestParam("state") CcState state) {
+            @RequestParam("state") CcState state,
+            @RequestBody(required = false) CcUpdateStateCommentRequest request) {
 
-        boolean updated = ccCommandService.updateState(sessionService.asScoreUser(user), accManifestId, state);
+        boolean updated = ccCommandService.updateState(sessionService.asScoreUser(user), accManifestId, state,
+                (request != null) ? request.comment() : null);
         return updated ? ResponseEntity.ok().build() : ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
     }
 
@@ -195,9 +197,11 @@ public class CcCommandController {
     public ResponseEntity updateAsccpState(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @PathVariable("asccpManifestId") AsccpManifestId asccpManifestId,
-            @RequestParam("state") CcState state) {
+            @RequestParam("state") CcState state,
+            @RequestBody(required = false) CcUpdateStateCommentRequest request) {
 
-        boolean updated = ccCommandService.updateState(sessionService.asScoreUser(user), asccpManifestId, state);
+        boolean updated = ccCommandService.updateState(sessionService.asScoreUser(user), asccpManifestId, state,
+                (request != null) ? request.comment() : null);
         return updated ? ResponseEntity.ok().build() : ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
     }
 
@@ -268,9 +272,11 @@ public class CcCommandController {
     public void updateBccpState(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @PathVariable("bccpManifestId") BccpManifestId bccpManifestId,
-            @RequestParam("state") CcState state) {
+            @RequestParam("state") CcState state,
+            @RequestBody(required = false) CcUpdateStateCommentRequest request) {
 
-        ccCommandService.updateState(sessionService.asScoreUser(user), bccpManifestId, state);
+        ccCommandService.updateState(sessionService.asScoreUser(user), bccpManifestId, state,
+                (request != null) ? request.comment() : null);
     }
 
     @PatchMapping(value = "/bccp/{bccpManifestId:[\\d]+}/dt")
@@ -343,9 +349,11 @@ public class CcCommandController {
     public void updateDtState(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @PathVariable("dtManifestId") DtManifestId dtManifestId,
-            @RequestParam("state") CcState state) {
+            @RequestParam("state") CcState state,
+            @RequestBody(required = false) CcUpdateStateCommentRequest request) {
 
-        ccCommandService.updateState(sessionService.asScoreUser(user), dtManifestId, state);
+        ccCommandService.updateState(sessionService.asScoreUser(user), dtManifestId, state,
+                (request != null) ? request.comment() : null);
     }
 
     @DeleteMapping(value = "/dt/{dtManifestId:[\\d]+}")
@@ -408,13 +416,22 @@ public class CcCommandController {
 
         ScoreUser requester = sessionService.asScoreUser(user);
         request.accManifestIdList().forEach(accManifestId ->
-                ccCommandService.updateState(requester, accManifestId, request.toState()));
+                ccCommandService.updateState(requester, accManifestId, request.toState(),
+                        commentFor(request, "acc", accManifestId)));
         request.asccpManifestIdList().forEach(asccpManifestId ->
-                ccCommandService.updateState(requester, asccpManifestId, request.toState()));
+                ccCommandService.updateState(requester, asccpManifestId, request.toState(),
+                        commentFor(request, "asccp", asccpManifestId)));
         request.bccpManifestIdList().forEach(bccpManifestId ->
-                ccCommandService.updateState(requester, bccpManifestId, request.toState()));
+                ccCommandService.updateState(requester, bccpManifestId, request.toState(),
+                        commentFor(request, "bccp", bccpManifestId)));
         request.dtManifestIdList().forEach(dtManifestId ->
-                ccCommandService.updateState(requester, dtManifestId, request.toState()));
+                ccCommandService.updateState(requester, dtManifestId, request.toState(),
+                        commentFor(request, "dt", dtManifestId)));
+    }
+
+    /** The GitHub status comment for one component of a bulk state change, keyed {@code "<type>:<manifestId>"}. */
+    private static String commentFor(CcUpdateStateRequest request, String type, Object manifestId) {
+        return (request.comments() != null) ? request.comments().get(type + ":" + manifestId) : null;
     }
 
     @PatchMapping(value = "/mark-as-deleted")

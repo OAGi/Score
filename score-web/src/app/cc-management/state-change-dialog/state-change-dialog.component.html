@@ -1,0 +1,125 @@
+<div class="d-block">
+  <div class="header d-flex align-items-center" mat-dialog-title>
+    <span>{{ data.header }}</span>
+    <div class="close pe-2">
+      <button mat-icon-button mat-small-icon-button (click)="onNoClick()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div class="content" mat-dialog-content>
+    @for (text of data.content; track text) {
+      <p>
+        {{ text }}
+      </p>
+    }
+
+    <div class="target-list">
+      @for (target of data.targets; track key(target)) {
+        <div class="target-section">
+          <div class="target-header">
+            <!-- The exact same type badge the core-components list page renders in its Type column. -->
+            <mat-chip class="target-type">{{ typeLabel(target) }}</mat-chip>
+            <span class="target-name">{{ target.name }}</span>
+            <span class="target-transition">{{ target.state }} &rarr; {{ data.toState }}</span>
+          </div>
+          @if (issuesLoading) {
+            <div class="target-hint">Loading linked GitHub issues…</div>
+          } @else if (issuesOf(target).length === 0) {
+            <div class="target-hint">No linked issues.</div>
+          } @else {
+            <div class="github-issues">
+              @for (issue of issuesOf(target); track issue.linkId) {
+                <div class="github-issue">
+                  <a class="github-issue-link" [href]="issue.htmlUrl" target="_blank" rel="noopener">{{ issueLabel(issue) }}</a>
+                  <span class="github-issue-title">{{ issue.title }}</span>
+                  @if (issue.state) {
+                    <span class="github-issue-state" [class.is-closed]="issue.state === 'closed'">{{ issue.state }}</span>
+                  }
+                </div>
+              }
+            </div>
+            @if (commentEligible(target)) {
+              @if (prefillLoading(target)) {
+                <div class="target-hint">Preparing the GitHub post…</div>
+              } @else {
+                <!-- The comment-box keyboard shortcuts listen on the editor container (events
+                     bubble up from the textarea), so Cmd/Ctrl+Shift+P also works while the
+                     focusable Preview pane is shown and the hidden textarea cannot hold focus. -->
+                <div class="comment-editor" (keydown)="onCommentKeydown($event, target)">
+                  @if (prefillFailed(target)) {
+                    <div class="comment-prefill-warning">Couldn't pre-fill the post — write the comment yourself or cancel.</div>
+                  }
+                  <div class="comment-tabs" role="tablist">
+                    <button type="button" class="comment-tab" role="tab" [attr.aria-selected]="!showPreview(target)"
+                            [class.active]="!showPreview(target)" (click)="setPreview(target, false)">Write</button>
+                    <button type="button" class="comment-tab" role="tab" [attr.aria-selected]="showPreview(target)"
+                            [class.active]="showPreview(target)" (click)="setPreview(target, true)">Preview</button>
+                    <!-- GitHub's layout: tabs on the left, the formatting toolbar right-aligned in the
+                         same row, present only while the Write tab (and so the textarea) is active. -->
+                    @if (!showPreview(target)) {
+                      <div class="comment-toolbar" role="toolbar" aria-label="Markdown formatting">
+                        <!-- GitHub's grouping (Primer MarkdownEditor): heading/bold/italic |
+                             quote/code/link | lists, separated by a thin vertical divider.
+                             Icons are inline 16px Octicons drawn with fill="currentColor". -->
+                        @for (group of toolbarGroups; track $index) {
+                          @if (!$first) {
+                            <span class="comment-toolbar-divider" aria-hidden="true"></span>
+                          }
+                          @for (btn of group; track btn.action) {
+                            <button type="button" class="comment-toolbar-btn" tabindex="-1"
+                                    [matTooltip]="btn.tooltip" [attr.aria-label]="btn.tooltip"
+                                    (mousedown)="$event.preventDefault()"
+                                    (click)="applyToolbarAction(target, btn.action)">
+                              <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"
+                                   aria-hidden="true" focusable="false">
+                                <path [attr.d]="btn.path"/>
+                              </svg>
+                            </button>
+                          }
+                        }
+                      </div>
+                    }
+                  </div>
+                  <!-- The Write textarea STAYS in the DOM while Preview is shown — merely
+                       display:none'd via the class binding — so the browser-native undo/redo
+                       stack (which replaceText carefully preserves) and the caret/selection
+                       survive tab round-trips, exactly like GitHub's comment box. Swapping it
+                       out with @if would destroy the element and with it the undo history.
+                       The render-only Preview pane has no state to keep and may stay @if-created
+                       (each show re-renders the current text). Exactly one of the two is visible
+                       at a time, and both occupy the same fixed 240px box. -->
+                  <textarea class="comment-input" #commentInput [attr.data-key]="key(target)"
+                            [class.comment-pane-hidden]="showPreview(target)"
+                            placeholder="Leave a comment on the linked GitHub issues…"
+                            [maxlength]="maxCommentLength" [(ngModel)]="comments[key(target)]"></textarea>
+                  @if (showPreview(target)) {
+                    <div class="comment-preview markdown-body" #previewPane [attr.data-key]="key(target)" tabindex="0">
+                      @if (commentLength(target) > 0) {
+                        <markdown [data]="comments[key(target)]"></markdown>
+                      } @else {
+                        <span class="comment-preview-empty">Nothing to preview</span>
+                      }
+                    </div>
+                  }
+                  <div class="comment-footer">
+                    <span>Markdown is supported — clear the comment to post nothing</span>
+                    <span>{{ commentLength(target) }} / {{ maxCommentLength }}</span>
+                  </div>
+                </div>
+              }
+            }
+          }
+        </div>
+      }
+    </div>
+  </div>
+  <div class="actions ms-auto" mat-dialog-actions>
+    <button mat-button class="btn btn-outline-primary" color="primary" (click)="onConfirm()">
+      {{ data.actionLabel }}
+    </button>
+    <button mat-button class="btn" color="warn" (click)="onNoClick()">
+      Cancel
+    </button>
+  </div>
+</div>

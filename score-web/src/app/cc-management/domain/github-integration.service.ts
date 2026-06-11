@@ -47,6 +47,18 @@ export interface LinkIssueRequest {
   repoName?: string;
 }
 
+/** One component to look up linked issues for. {@code ccType} is lowercase (acc, asccp, bccp, dt, code_list, agency_id_list). */
+export interface IssueLookupTarget {
+  ccType: string;
+  manifestId: number;
+}
+
+export interface IssueLookupResult {
+  ccType: string;
+  manifestId: number;
+  issues: LinkedIssue[];
+}
+
 /**
  * Per-user GitHub connection + issue linking (issue #1533). Talks to the backend integration
  * endpoints (proxied as /api/integration/github/*). OAuth tokens live server-side (Redis);
@@ -61,11 +73,19 @@ export class GithubIntegrationService {
   /**
    * Per-user connection status, including whether the integration is enabled (SCORE_GITHUB_ENABLED).
    * Cached for the session so the page's enabled-gate and the (possibly several) boxes share ONE
-   * request; the cache is reset on disconnect so a later read reflects the change.
+   * request; the cache is reset on disconnect so a later read reflects the change, and on error so
+   * a transient /status failure doesn't stick for the whole session.
    */
   getStatus(): Observable<GithubStatus> {
     if (!this.status$) {
-      this.status$ = this.http.get<GithubStatus>('/api/integration/github/status').pipe(shareReplay(1));
+      this.status$ = this.http.get<GithubStatus>('/api/integration/github/status').pipe(
+        tap({
+          error: () => {
+            this.status$ = undefined;
+            this.enabledCache$ = undefined;
+          }
+        }),
+        shareReplay(1));
     }
     return this.status$;
   }
@@ -99,6 +119,15 @@ export class GithubIntegrationService {
   listIssues(ccType: string, manifestId: number): Observable<LinkedIssue[]> {
     return this.http.get<LinkedIssue[]>(
       '/api/integration/github/issues?ccType=' + ccType + '&manifestId=' + manifestId);
+  }
+
+  /**
+   * Cache-only bulk lookup of the linked issues of several components at once (no GitHub call,
+   * no refresh) — used by the state-change dialog to show the issues a status comment would go to.
+   */
+  lookupIssues(targets: IssueLookupTarget[]): Observable<IssueLookupResult[]> {
+    return this.http.post<IssueLookupResult[]>('/api/integration/github/issues/lookup',
+      targets.map(t => ({ccType: t.ccType, manifestId: t.manifestId})));
   }
 
   linkIssue(request: LinkIssueRequest): Observable<LinkedIssue[]> {

@@ -57,7 +57,8 @@ public class CodeListCommandController {
 
         String toState = request.get("toState");
         codeListCommandService.updateState(
-                sessionService.asScoreUser(user), codeListManifestId, CcState.valueOf(toState));
+                sessionService.asScoreUser(user), codeListManifestId, CcState.valueOf(toState),
+                request.get("comment"));
     }
 
     @PatchMapping(value = "/{codeListManifestId:[\\d]+}/revise")

@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {PageResponse} from '../../basis/basis';
-import {CcSnapshot, Log, LogListRequest} from './log';
+import {CcSnapshot, ComponentChangeSummary, Log, LogListRequest} from './log';
 import {map} from 'rxjs/operators';
 import {CcListEntry} from '../../cc-management/cc-list/domain/cc-list';
 
@@ -31,5 +31,19 @@ export class LogService {
 
   getSnapshot(revisionId: number): Observable<CcSnapshot> {
     return this.http.get<CcSnapshot>('/api/logs/' + revisionId + '/snapshot');
+  }
+
+  getChangeSummary(ccType: string, manifestId: number): Observable<ComponentChangeSummary> {
+    const params = new HttpParams()
+      .set('ccType', ccType)
+      .set('manifestId', '' + manifestId);
+    return this.http.get<ComponentChangeSummary>('/api/logs/change-summary', {params});
+  }
+
+  getChangeSummaryByCompare(beforeLogId: number, afterLogId: number): Observable<ComponentChangeSummary> {
+    const params = new HttpParams()
+      .set('before', '' + beforeLogId)
+      .set('after', '' + afterLogId);
+    return this.http.get<ComponentChangeSummary>('/api/logs/change-summary/compare', {params});
   }
 }

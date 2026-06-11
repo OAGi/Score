@@ -455,10 +455,13 @@ export class CcNodeService {
     });
   }
 
-  updateState(type: string, manifestId: number, state: string): Observable<any> {
+  updateState(type: string, manifestId: number, state: string, comment?: string): Observable<any> {
     const params = new HttpParams().set('state', state);
     const url = '/api/core-components/' + type.toLowerCase() + '/' + manifestId + '/state';
-    return this.http.patch<any>(url, {}, {params});
+    // An optional comment travels with the request and is posted verbatim to the linked GitHub
+    // issues (issue #1533). Blank comments are not sent — nothing is posted.
+    const body = (comment && comment.trim().length > 0) ? {comment} : {};
+    return this.http.patch<any>(url, body, {params});
   }
 
   purge(type: string, manifestId: number): Observable<any> {

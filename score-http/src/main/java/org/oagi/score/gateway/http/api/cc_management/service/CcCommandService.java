@@ -76,6 +76,9 @@ public class CcCommandService {
     @Autowired
     private GraphContextRepository graphContextRepository;
 
+    @Autowired
+    private ComponentStateChangeEventPublisher stateChangeEventPublisher;
+
     public AccManifestId createAcc(ScoreUser requester, AccCreateRequest request) {
 
         if (requester == null) {
@@ -1324,6 +1327,10 @@ public class CcCommandService {
     }
 
     public boolean updateState(ScoreUser requester, AccManifestId accManifestId, CcState state) {
+        return updateState(requester, accManifestId, state, null);
+    }
+
+    public boolean updateState(ScoreUser requester, AccManifestId accManifestId, CcState state, String comment) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -1363,6 +1370,8 @@ public class CcCommandService {
             makeLog(requester, accManifestId,
                     (nextState == CcState.Deleted) ? LogAction.Deleted :
                             (restore ? LogAction.Restored : LogAction.Modified));
+            stateChangeEventPublisher.publish(
+                    CcType.ACC, accManifestId, prevState, nextState, requester.userId(), comment);
         }
 
         return updated;
@@ -1420,6 +1429,10 @@ public class CcCommandService {
     }
 
     public boolean updateState(ScoreUser requester, AsccpManifestId asccpManifestId, CcState state) {
+        return updateState(requester, asccpManifestId, state, null);
+    }
+
+    public boolean updateState(ScoreUser requester, AsccpManifestId asccpManifestId, CcState state, String comment) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -1459,6 +1472,8 @@ public class CcCommandService {
             makeLog(requester, asccpManifestId,
                     (nextState == CcState.Deleted) ? LogAction.Deleted :
                             (restore ? LogAction.Restored : LogAction.Modified));
+            stateChangeEventPublisher.publish(
+                    CcType.ASCCP, asccpManifestId, prevState, nextState, requester.userId(), comment);
         }
 
         return updated;
@@ -1514,6 +1529,10 @@ public class CcCommandService {
     }
 
     public boolean updateState(ScoreUser requester, BccpManifestId bccpManifestId, CcState state) {
+        return updateState(requester, bccpManifestId, state, null);
+    }
+
+    public boolean updateState(ScoreUser requester, BccpManifestId bccpManifestId, CcState state, String comment) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -1553,12 +1572,18 @@ public class CcCommandService {
             makeLog(requester, bccpManifestId,
                     (nextState == CcState.Deleted) ? LogAction.Deleted :
                             (restore ? LogAction.Restored : LogAction.Modified));
+            stateChangeEventPublisher.publish(
+                    CcType.BCCP, bccpManifestId, prevState, nextState, requester.userId(), comment);
         }
 
         return updated;
     }
 
     public boolean updateState(ScoreUser requester, DtManifestId dtManifestId, CcState state) {
+        return updateState(requester, dtManifestId, state, null);
+    }
+
+    public boolean updateState(ScoreUser requester, DtManifestId dtManifestId, CcState state, String comment) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -1598,6 +1623,8 @@ public class CcCommandService {
             makeLog(requester, dtManifestId,
                     (nextState == CcState.Deleted) ? LogAction.Deleted :
                             (restore ? LogAction.Restored : LogAction.Modified));
+            stateChangeEventPublisher.publish(
+                    CcType.DT, dtManifestId, prevState, nextState, requester.userId(), comment);
         }
 
         return updated;

@@ -8,6 +8,7 @@ import org.oagi.score.gateway.http.api.agency_id_management.repository.AgencyIdL
 import org.oagi.score.gateway.http.api.agency_id_management.repository.AgencyIdListQueryRepository;
 import org.oagi.score.gateway.http.api.cc_management.model.CcState;
 import org.oagi.score.gateway.http.api.cc_management.model.CcType;
+import org.oagi.score.gateway.http.api.cc_management.service.ComponentStateChangeEventPublisher;
 import org.oagi.score.gateway.http.api.log_management.model.LogAction;
 import org.oagi.score.gateway.http.api.log_management.model.LogId;
 import org.oagi.score.gateway.http.api.log_management.repository.LogCommandRepository;
@@ -33,6 +34,9 @@ public class AgencyIdListCommandService {
 
     @Autowired
     private RepositoryFactory repositoryFactory;
+
+    @Autowired
+    private ComponentStateChangeEventPublisher stateChangeEventPublisher;
 
     private AgencyIdListCommandRepository command(ScoreUser requester) {
         return repositoryFactory.agencyIdListCommandRepository(requester);
@@ -142,6 +146,10 @@ public class AgencyIdListCommandService {
     }
 
     public boolean updateState(ScoreUser requester, AgencyIdListManifestId agencyIdListManifestId, CcState nextState) {
+        return updateState(requester, agencyIdListManifestId, nextState, null);
+    }
+
+    public boolean updateState(ScoreUser requester, AgencyIdListManifestId agencyIdListManifestId, CcState nextState, String comment) {
 
         var query = query(requester);
 
@@ -188,6 +196,11 @@ public class AgencyIdListCommandService {
         LogId logId = logCommand(requester).create(
                 query.getAgencyIdListDetails(agencyIdListManifestId), logAction);
         command.updateLogId(agencyIdListManifestId, logId);
+
+        if (result) {
+            stateChangeEventPublisher.publish(
+                    CcType.AGENCY_ID_LIST, agencyIdListManifestId, prevState, nextState, requester.userId(), comment);
+        }
 
         return result;
     }

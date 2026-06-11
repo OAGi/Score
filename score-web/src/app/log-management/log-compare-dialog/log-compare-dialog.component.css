@@ -1,3 +1,15 @@
+:host {
+  display: block;
+  position: relative;
+}
+
+.change-summary-action {
+  position: absolute;
+  top: 4px;
+  right: 12px;
+  z-index: 10;
+}
+
 .Added {
   color: darkgreen;
 }

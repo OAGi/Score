@@ -2,6 +2,7 @@ package org.oagi.score.gateway.http.api.code_list_management.service;
 
 import org.oagi.score.gateway.http.api.cc_management.model.CcState;
 import org.oagi.score.gateway.http.api.cc_management.model.CcType;
+import org.oagi.score.gateway.http.api.cc_management.service.ComponentStateChangeEventPublisher;
 import org.oagi.score.gateway.http.api.bie_management.model.CodeListBieReferenceRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.code_list_management.controller.payload.CodeListUpliftingResponse;
@@ -40,6 +41,9 @@ public class CodeListCommandService {
 
     @Autowired
     private RepositoryFactory repositoryFactory;
+
+    @Autowired
+    private ComponentStateChangeEventPublisher stateChangeEventPublisher;
 
     private CodeListCommandRepository command(ScoreUser requester) {
         return repositoryFactory.codeListCommandRepository(requester);
@@ -135,6 +139,10 @@ public class CodeListCommandService {
     }
 
     public boolean updateState(ScoreUser requester, CodeListManifestId codeListManifestId, CcState nextState) {
+        return updateState(requester, codeListManifestId, nextState, null);
+    }
+
+    public boolean updateState(ScoreUser requester, CodeListManifestId codeListManifestId, CcState nextState, String comment) {
 
         var query = query(requester);
 
@@ -174,6 +182,11 @@ public class CodeListCommandService {
         LogId logId = logCommand(requester).create(
                 query.getCodeListDetails(codeListManifestId), logAction);
         command.updateLogId(codeListManifestId, logId);
+
+        if (result) {
+            stateChangeEventPublisher.publish(
+                    CcType.CODE_LIST, codeListManifestId, prevState, nextState, requester.userId(), comment);
+        }
 
         return result;
     }

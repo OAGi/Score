@@ -6,6 +6,7 @@ import {AuthService} from '../authentication/auth.service';
 import {MaterialModule} from '../material.module';
 import {ScoreCommonModule} from '../common/score-common.module';
 import {LogService} from './domain/log.service';
+import {LogChangeSummaryDialogComponent} from './log-change-summary-dialog/log-change-summary-dialog.component';
 import {LogCompareDialogComponent} from './log-compare-dialog/log-compare-dialog.component';
 import {LogListComponent} from './log-list/log-list.component';
 import {ColumnSelectorModule} from '../common/column-selector/column-selector.module';
@@ -40,7 +41,8 @@ const routes: Routes = [
     ],
   declarations: [
     LogListComponent,
-    LogCompareDialogComponent
+    LogCompareDialogComponent,
+    LogChangeSummaryDialogComponent
   ],
   providers: [
     LogService,

@@ -411,3 +411,49 @@ export class SnapshotPair {
     }
   }
 }
+
+// ----- Per-component change summary (issue #1533, sub-task 3) -----
+
+export interface ComponentSummaryField {
+  label: string;
+  value: string;
+}
+
+export interface ComponentFieldChange {
+  label: string;
+  before?: string;
+  after?: string;
+}
+
+export interface ComponentChildSummary {
+  kind: string;
+  name: string;
+  fields: ComponentSummaryField[];
+}
+
+export interface ComponentChildChange {
+  kind: string;
+  name: string;
+  changes: ComponentFieldChange[];
+}
+
+/**
+ * Summary of a component revision: the current state for a new component (revision 1,
+ * summaryType 'NEW'), or what changed since the prior revision (revision 2+, 'REVISED').
+ */
+export interface ComponentChangeSummary {
+  ccType: string;
+  name: string;
+  guid: string;
+  revisionNum: number;
+  prevRevisionNum?: number;
+  summaryType: 'NEW' | 'REVISED';
+
+  fields: ComponentSummaryField[];
+  children: ComponentChildSummary[];
+
+  fieldChanges: ComponentFieldChange[];
+  childrenAdded: ComponentChildSummary[];
+  childrenRemoved: ComponentChildSummary[];
+  childrenChanged: ComponentChildChange[];
+}
