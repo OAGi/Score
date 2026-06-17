@@ -273,7 +273,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
 
         String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
         String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
-        assertTrue(snackBarMessage.equals("Target ASCCP is not reusable."));
+        assertTrue(snackBarMessage.equals("Target ASCCP is not reusable and already has 1 ASCC reference(s)."));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//score-multi-actions-snack-bar//span[contains(text(), \"Close\")]//ancestor::button[1]")));
     }

@@ -224,7 +224,7 @@ public class AddBIEForOpenAPIDocumentDialogImpl implements AddBIEForOpenAPIDocum
 
     @Override
     public void hitSearchButton() {
-        click(getSearchButton());
+        click(getDriver(), getSearchButton());
         invisibilityOfLoadingContainerElement(getDriver());
     }
 
@@ -293,7 +293,7 @@ public class AddBIEForOpenAPIDocumentDialogImpl implements AddBIEForOpenAPIDocum
 
     @Override
     public void hitAddButton() {
-        click(getAddButton(true));
+        click(getDriver(), getAddButton(true));
         waitFor(ofMillis(500L));
     }
 

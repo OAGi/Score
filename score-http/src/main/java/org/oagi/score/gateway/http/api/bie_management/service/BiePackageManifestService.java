@@ -854,13 +854,20 @@ public class BiePackageManifestService {
     // ----- Issue #1733: per-element backward-compatibility evaluation for MATCHED elements -----
 
     private void evaluateAsbieCompatibility(BieTrackContext context, Asbie current, Asbie prev) {
-        // ASBIE carries occurrence + nillable. Cardinality tightening and nillable removal break both syntaxes;
-        // crossing the JSON array/object boundary breaks JSON only.
+        // ASBIE carries occurrence + nillable. Cardinality tightening and nillable removal break both syntaxes.
         if (isMoreRestrictiveCardinality(current.getCardinalityMin(), current.getCardinalityMax(),
                 prev.getCardinalityMin(), prev.getCardinalityMax())) {
             context.recordBreak(true, true);
         }
-        evaluateJsonArrayFlip(context, current.getCardinalityMax(), prev.getCardinalityMax());
+        // Issue #1733: the JSON array/object shape follows the based ASCC's max cardinality, not the ASBIE max,
+        // so it flips only when the underlying component's array-ness actually differs between the two versions.
+        // Narrowing the ASBIE max alone no longer changes the rendering, so it is no longer a JSON break.
+        var accQueryRepository = repositoryFactory.accQueryRepository(context.requester);
+        AsccSummaryRecord currentAscc = safeGet(() -> accQueryRepository.getAsccSummary(current.getBasedAsccManifestId()));
+        AsccSummaryRecord prevAscc = safeGet(() -> accQueryRepository.getAsccSummary(prev.getBasedAsccManifestId()));
+        if (currentAscc != null && prevAscc != null) {
+            evaluateJsonArrayFlip(context, currentAscc.cardinality().max(), prevAscc.cardinality().max());
+        }
         evaluateNillable(context, current.isNillable(), prev.isNillable(), true); // ASBIE always renders as an element
     }
 
@@ -876,7 +883,11 @@ public class BiePackageManifestService {
                 prev.getCardinalityMin(), prev.getCardinalityMax())) {
             context.recordBreak(true, true);
         }
-        evaluateJsonArrayFlip(context, current.getCardinalityMax(), prev.getCardinalityMax());
+        // Issue #1733: the JSON array/object shape follows the based BCC's max cardinality, not the BBIE max,
+        // so it flips only when the underlying component's array-ness differs between the two versions.
+        if (currentBcc != null && prevBcc != null) {
+            evaluateJsonArrayFlip(context, currentBcc.cardinality().max(), prevBcc.cardinality().max());
+        }
         evaluateNillable(context, current.isNillable(), prev.isNillable(), currentIsElement);
         evaluateValueConstraint(context, current.getFixedValue(), prev.getFixedValue());
         evaluateFacet(context, current.getFacetMinLength(), current.getFacetMaxLength(), current.getFacetPattern(),
@@ -1068,10 +1079,11 @@ public class BiePackageManifestService {
 
     /*
      * JSON renders a repeatable element (max unbounded or > 1) as an array and a non-repeatable one (max 0 or 1)
-     * as a bare value, whereas XSD keeps the same element shape (only minOccurs/maxOccurs differ). Crossing that
-     * boundary therefore breaks JSON only: a single-object document is invalid against an array schema and vice
-     * versa. The array -> scalar direction is also a cardinality tightening already recorded as a
-     * syntax-independent break; the scalar -> array direction is a cardinality loosening that breaks JSON alone.
+     * as a bare value, whereas XSD keeps the same element shape. Since Issue #1733 the array/object decision in the
+     * JSON and OpenAPI generators is driven by the based ASCC/BCC max cardinality (not the ASBIE/BBIE max), so the
+     * callers pass the based component's max for the current and prior versions: the shape flips only when the
+     * underlying component's array-ness actually differs (e.g. its cardinality changed across releases), which is a
+     * JSON-only break. Narrowing the BIE's own max no longer flips the rendering and is therefore not a break here.
      */
     private void evaluateJsonArrayFlip(BieTrackContext context, int newMax, int oldMax) {
         if (BieBackwardCompatibilityRules.jsonArrayFlip(newMax, oldMax)) {

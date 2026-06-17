@@ -8,17 +8,24 @@ import org.oagi.score.e2e.api.APIFactory;
 import org.oagi.score.e2e.api.BusinessInformationEntityAPI;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AbieRecord;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AsbiepRecord;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BbieRecord;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BbiepRecord;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BiePackageTopLevelAsbiepRecord;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BizCtxAssignmentRecord;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.TopLevelAsbiepRecord;
 import org.oagi.score.e2e.obj.*;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import static org.jooq.impl.DSL.and;
 import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.*;
+import static org.oagi.score.e2e.obj.ObjectHelper.sha256;
 
 public class DSLContextBusinessInformationEntityAPIImpl implements BusinessInformationEntityAPI {
 
@@ -255,6 +262,128 @@ public class DSLContextBusinessInformationEntityAPIImpl implements BusinessInfor
 
         //Delete Top-level ASBIEP
         dslContext.deleteFrom(TOP_LEVEL_ASBIEP).where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiep.getTopLevelAsbiepId()))).execute();
+    }
+
+    @Override
+    public void materializeUsedBbieChildren(BigInteger topLevelAsbiepId, BigInteger createdByUserId) {
+        ULong ownerId = ULong.valueOf(topLevelAsbiepId);
+        ULong userId = ULong.valueOf(createdByUserId);
+
+        // The root ABIE of this top-level BIE (generateRandomTopLevelASBIEP creates exactly one).
+        AbieRecord rootAbie = dslContext.selectFrom(ABIE)
+                .where(ABIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ownerId))
+                .fetchAny();
+        if (rootAbie == null) {
+            throw new IllegalStateException(
+                    "No root ABIE found for top-level ASBIEP " + topLevelAsbiepId + "; cannot materialize BBIEs.");
+        }
+        ULong abieId = rootAbie.getAbieId();
+        String abiePath = rootAbie.getPath();
+
+        // The element BCCs (entity_type = 1) declared directly on the ABIE's ACC. createRandomACC
+        // produces a base-less ACC, so the directly-declared BCCs are the whole element set.
+        var bccManifests = dslContext
+                .select(BCC_MANIFEST.BCC_MANIFEST_ID, BCC_MANIFEST.TO_BCCP_MANIFEST_ID,
+                        BCC.CARDINALITY_MIN, BCC.CARDINALITY_MAX)
+                .from(BCC_MANIFEST)
+                .join(BCC).on(BCC_MANIFEST.BCC_ID.eq(BCC.BCC_ID))
+                .where(and(
+                        BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(rootAbie.getBasedAccManifestId()),
+                        BCC.ENTITY_TYPE.eq(1)))
+                .fetch();
+
+        LocalDateTime timestamp = LocalDateTime.now();
+        BigDecimal seqKey = BigDecimal.ONE;
+        for (var bccManifest : bccManifests) {
+            ULong bccManifestId = bccManifest.get(BCC_MANIFEST.BCC_MANIFEST_ID);
+            ULong bccpManifestId = bccManifest.get(BCC_MANIFEST.TO_BCCP_MANIFEST_ID);
+            Integer cardinalityMin = bccManifest.get(BCC.CARDINALITY_MIN);
+            Integer cardinalityMax = bccManifest.get(BCC.CARDINALITY_MAX);
+
+            String bbiepPath = abiePath + ">BCCP-" + bccpManifestId.toBigInteger();
+            BbiepRecord bbiep = new BbiepRecord();
+            bbiep.setGuid(randomGuid());
+            bbiep.setBasedBccpManifestId(bccpManifestId);
+            bbiep.setPath(bbiepPath);
+            bbiep.setHashPath(sha256(bbiepPath));
+            bbiep.setCreatedBy(userId);
+            bbiep.setLastUpdatedBy(userId);
+            bbiep.setCreationTimestamp(timestamp);
+            bbiep.setLastUpdateTimestamp(timestamp);
+            bbiep.setOwnerTopLevelAsbiepId(ownerId);
+            ULong bbiepId = dslContext.insertInto(BBIEP)
+                    .set(bbiep)
+                    .returning(BBIEP.BBIEP_ID)
+                    .fetchOne().getBbiepId();
+
+            String bbiePath = abiePath + ">BCC-" + bccManifestId.toBigInteger();
+            BbieRecord bbie = new BbieRecord();
+            bbie.setGuid(randomGuid());
+            bbie.setBasedBccManifestId(bccManifestId);
+            bbie.setPath(bbiePath);
+            bbie.setHashPath(sha256(bbiePath));
+            bbie.setFromAbieId(abieId);
+            bbie.setToBbiepId(bbiepId);
+            bbie.setCardinalityMin(cardinalityMin);
+            bbie.setCardinalityMax(cardinalityMax);
+            bbie.setIsNillable((byte) 0);
+            bbie.setIsNull((byte) 0);
+            bbie.setIsUsed((byte) 1);
+            bbie.setIsDeprecated((byte) 0);
+            bbie.setSeqKey(seqKey);
+            bbie.setCreatedBy(userId);
+            bbie.setLastUpdatedBy(userId);
+            bbie.setCreationTimestamp(timestamp);
+            bbie.setLastUpdateTimestamp(timestamp);
+            bbie.setOwnerTopLevelAsbiepId(ownerId);
+            dslContext.insertInto(BBIE).set(bbie).execute();
+
+            seqKey = seqKey.add(BigDecimal.ONE);
+        }
+    }
+
+    private static String randomGuid() {
+        return UUID.randomUUID().toString().replaceAll("-", "");
+    }
+
+    @Override
+    public void seedAllBbieProfiling(BigInteger topLevelAsbiepId, boolean used,
+                                     int cardinalityMin, int cardinalityMax, Long maxLengthFacet) {
+        var step = dslContext.update(BBIE)
+                .set(BBIE.IS_USED, (byte) (used ? 1 : 0))
+                .set(BBIE.CARDINALITY_MIN, cardinalityMin)
+                .set(BBIE.CARDINALITY_MAX, cardinalityMax);
+        if (maxLengthFacet == null) {
+            step = step.setNull(BBIE.FACET_MAX_LENGTH);
+        } else {
+            step = step.set(BBIE.FACET_MAX_LENGTH, ULong.valueOf(maxLengthFacet));
+        }
+        step.where(BBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)))
+                .execute();
+    }
+
+    @Override
+    public void addBieToBiePackage(BigInteger biePackageId, BigInteger topLevelAsbiepId, BigInteger createdByUserId) {
+        insertBiePackageTopLevelAsbiep(biePackageId, topLevelAsbiepId, null, createdByUserId);
+    }
+
+    @Override
+    public void replaceBieInBiePackage(BigInteger biePackageId, BigInteger prevTopLevelAsbiepId,
+                                       BigInteger topLevelAsbiepId, BigInteger createdByUserId) {
+        insertBiePackageTopLevelAsbiep(biePackageId, topLevelAsbiepId, prevTopLevelAsbiepId, createdByUserId);
+    }
+
+    private void insertBiePackageTopLevelAsbiep(BigInteger biePackageId, BigInteger topLevelAsbiepId,
+                                                BigInteger prevTopLevelAsbiepId, BigInteger createdByUserId) {
+        BiePackageTopLevelAsbiepRecord record = dslContext.newRecord(BIE_PACKAGE_TOP_LEVEL_ASBIEP);
+        record.setBiePackageId(ULong.valueOf(biePackageId));
+        record.setTopLevelAsbiepId(ULong.valueOf(topLevelAsbiepId));
+        if (prevTopLevelAsbiepId != null) {
+            record.setPrevTopLevelAsbiepId(ULong.valueOf(prevTopLevelAsbiepId));
+        }
+        record.setCreatedBy(ULong.valueOf(createdByUserId));
+        record.setCreationTimestamp(LocalDateTime.now());
+        record.insert();
     }
 
 }

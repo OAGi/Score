@@ -26,6 +26,12 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
     private static final By UPLIFT_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
 
+    private static final By UNSELECTED_REUSE_WARNING_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Proceed without selecting reuse BIEs\")]");
+
+    private static final By UNSELECTED_REUSE_CONTINUE_BUTTON_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Continue\")]//ancestor::button[1]");
+
     private static final By SOURCE_SEARCH_INPUT_LOCATOR =
             By.xpath("//mat-card-content/div[2]/div[1]//mat-label[contains(text(), \"Search\")]//ancestor::div[1]//input");
 
@@ -171,10 +177,34 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
 
     @Override
     public EditBIEPage uplift() {
+        submitUpliftReport();
+        return openUpliftedBIE();
+    }
+
+    @Override
+    public void submitUpliftReport() {
         invisibilityOfLoadingContainerElement(getDriver());
         click(getDriver(), getNextButton());
         invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
         click(getDriver(), elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
+    }
+
+    @Override
+    public WebElement getUnselectedReuseWarning() {
+        return visibilityOfElementLocated(getDriver(), UNSELECTED_REUSE_WARNING_LOCATOR);
+    }
+
+    @Override
+    public EditBIEPage confirmUnselectedReuseAndUplift() {
+        click(getDriver(), elementToBeClickable(getDriver(), UNSELECTED_REUSE_CONTINUE_BUTTON_LOCATOR));
+        return openUpliftedBIE();
+    }
+
+    /**
+     * Wait for the uplift to complete and open the resulting uplifted BIE, whose
+     * id is taken from the {@code /profile_bie/{id}} URL the app navigates to.
+     */
+    private EditBIEPage openUpliftedBIE() {
         invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
         waitFor(ofMillis(1000L));
 

@@ -258,7 +258,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
         String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
         String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
-        assertTrue(snackBarMessage.contains("Target ASCCP is not reusable."));
+        assertTrue(snackBarMessage.contains("Target ASCCP is not reusable and already has"));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//score-multi-actions-snack-bar//span[contains(text(), \"Close\")]//ancestor::button[1]")));
 

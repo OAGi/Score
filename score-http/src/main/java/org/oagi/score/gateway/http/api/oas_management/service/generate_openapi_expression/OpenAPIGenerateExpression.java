@@ -1219,7 +1219,11 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
         int minVal = asbie.cardinality().min();
         int maxVal = asbie.cardinality().max();
         // Issue #562
-        boolean isArray = (maxVal < 0 || maxVal > 1);
+        // Issue #1733: the array vs. object decision follows the based ASCC's max
+        // cardinality, not the (possibly narrowed) ASBIE max. The ASBIE cardinality
+        // still governs the array bounds (minItems/maxItems).
+        int basedMaxVal = generationContext.queryBasedASCC(asbie).cardinality().max();
+        boolean isArray = (basedMaxVal < 0 || basedMaxVal > 1);
         boolean isNillable = (asbie.nillable() != null) ? asbie.nillable() : false;
 
         boolean reused = !asbie.ownerTopLevelAsbiepId().equals(asbiep.ownerTopLevelAsbiepId());
@@ -1566,7 +1570,11 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
         int minVal = bbie.cardinality().min();
         int maxVal = bbie.cardinality().max();
         // Issue #562
-        boolean isArray = (maxVal < 0 || maxVal > 1);
+        // Issue #1733: the array vs. object decision follows the based BCC's max
+        // cardinality, not the (possibly narrowed) BBIE max. The BBIE cardinality
+        // still governs the array bounds (minItems/maxItems).
+        int basedMaxVal = bcc.cardinality().max();
+        boolean isArray = (basedMaxVal < 0 || basedMaxVal > 1);
         boolean isNillable = (bbie.nillable() != null) ? bbie.nillable() : false;
 
         String name = convertIdentifierToId(camelCase(bccp.propertyTerm()));

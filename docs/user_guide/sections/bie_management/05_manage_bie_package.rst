@@ -78,6 +78,38 @@ To edit a BIE package:
 5. Click the "Update" button.
 
 
+Revise a BIE Package
+~~~~~~~~~~~~~~~~~~~~~~
+
+A BIE package in the *Production* state can be revised. Revising creates a new
+WIP revision chained to the prior version so that its contents can be updated
+and re-promoted while the prior version remains unchanged.
+
+To revise a BIE package:
+
+1. On the top menu of the page, click "BIE".
+
+2. Choose "BIE Package" from the drop-down list.
+
+3. Locate the BIE package you want to revise. Click on the package name to open
+   its "Edit BIE Package" page. The package must be in the *Production* state.
+
+4. Click the "Revise" button at the top-right of the page.
+
+5. A "Revise this BIE Package?" dialog is open where you can confirm or cancel the request.
+
+6. On confirmation, a new revision is created in the *WIP* state and its
+   "Edit BIE Package" page is opened.
+
+When a BIE package is a revision (that is, it has a prior version), a
+*Revision Reason* field appears on its "Edit BIE Package" page directly under the
+*Description* field. Use it to capture, in free-form text, the reason for this
+revision. Like the other package fields, *Revision Reason* is optional and can be
+edited only while the package is in the *WIP* state and you have edit permission.
+To save it, type the reason in the *Revision Reason* field and click the
+"Update" button.
+
+
 Discard a BIE Package
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -184,4 +216,20 @@ To generate BIE Package schemas:
 
 5. Click the "Generate" button.
 
-The generated result is downloaded to the local drive.
+The generated result is downloaded to the local drive as a ZIP archive. The archive
+contains one schema file per BIE in the package and, alongside them, a `manifest.json`
+file that describes the package.
+
+The `manifest.json` records the package metadata (name, version, and the UUIDs of this
+package and, when this package is a revision, the prior package version), the
+*Revision Reason* captured on the "Edit BIE Package" page, and the list of BIEs in the
+package together with how they differ from the prior package version (which BIEs and
+components were added, removed, changed, or deprecated).
+
+For each BIE, the manifest also carries a *backward compatibility* indicator that reports
+whether the BIE remains backward compatible with its counterpart in the prior package
+version. The indicator is reported separately for the `XML Schema` expression and the
+`JSON Schema` expression (with an additional syntax-independent flag); a value of `true`
+means the BIE is backward compatible for that expression. A BIE that is new in this
+package version, or whose package has no prior version, has no prior counterpart to
+compare against.

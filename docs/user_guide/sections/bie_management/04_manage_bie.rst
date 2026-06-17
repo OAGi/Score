@@ -278,7 +278,7 @@ Below, we explain the fields in the detail pane of the few types of nodes descri
    * - *Example* (Optional)
      - It is a free form text field that can be used to provide a data instance example such as a date. The user should specify only one value. It may be serialized as part of a schema or used for an example instance generation function.
    * - *Value Domain Restriction* (Required)
-     - This field is required; however, it is defaulted to the same as that of the CC the BIE is derived from. There are three subfields within the *Value Domain Restriction*. They are: *Business Data Type*, which is not editable and indicates the semantics of the business data type used by the BIE node; *Value Domain Type*, which is used to indicate how the value domain will be restricted and changes the choices in the next field; and *Value Domain*. If selected *Value Domain Type* is *Primitive*, then this field gives the user the list of primitives to choose, e.g., integer, string, token, etc. The available choice depends on the Business Data Type and the primitive specified in the CC model. For example, if the primitive in the CC model is Integer, then only those primitives that are restrictions of Integer are available. If the Business Data Type is Date Time, all primitives related to date and time are available. Those primitives started by ‘xbt’ are primitives defined in connectSpec. If selected *Value Domain Type* is *Code*, then this field gives the user the choice of the applicable code list. Applicable code list depends on the primitive and code list derived from the CC model. If the BIE node uses primitive in the CC model, any code list is allowed. However, if the BIE node uses a particular code list (e.g., Language Code) in the CC model, then only code lists that are based on the Language Code are available for selection. If selected *Value Domain Type* is *Agency*, then this field gives the user the choices of agency identification lists.
+     - This field is required; however, it is defaulted to the same as that of the CC the BIE is derived from. There are three subfields within the *Value Domain Restriction*. They are: *Business Data Type*, which is not editable and indicates the semantics of the business data type used by the BIE node; *Value Domain Type*, which is used to indicate how the value domain will be restricted and changes the choices in the next field; and *Value Domain*. If selected *Value Domain Type* is *Primitive*, then this field gives the user the list of primitives to choose, e.g., integer, string, token, etc. The available choice depends on the Business Data Type and the primitive specified in the CC model. For example, if the primitive in the CC model is Integer, then only those primitives that are restrictions of Integer are available. If the Business Data Type is Date Time, all primitives related to date and time are available. Those primitives started by ‘xbt’ are primitives defined in connectSpec. If selected *Value Domain Type* is *Code*, then this field gives the user the choice of the applicable code list. Applicable code list depends on the primitive and code list derived from the CC model. If the BIE node uses primitive in the CC model, any code list is allowed. However, if the BIE node uses a particular code list (e.g., Language Code) in the CC model, then only code lists that are based on the Language Code are available for selection. When a developer (rather than an end user) edits the BIE, any end-user code list shown in the *Value Domain* list appears greyed out and cannot be selected; a developer can therefore see an end-user code list already assigned to the node but cannot assign or re-assign it, while developer code lists remain selectable. If selected *Value Domain Type* is *Agency*, then this field gives the user the choices of agency identification lists.
    * - *Context Definition* (Optional but highly recommended. Required in some situations)
      - This field should be used for capturing a context-specific semantic definition of the BIE in natural language. The context-specific semantic definition is based on the Association Definition and Component Definition, which describe the general, context-independent purpose of the data element as described in the next row. For example, this field may describe in detail how or in what situation the BIE should or should not be used, as in "The Tax Amount for internet order should always be zero unless the buyer address is in Maryland. In that case, Maryland tax rate shall apply." Implementation detail that should be considered by developer can be placed here as well, including mapping details.
    * - *Association Definition* and *Component Definition* (Uneditable)
@@ -1059,6 +1059,8 @@ However, the user has to select the BIE to be reused in the uplifted BIE.
 This BIE should belong to the same release as the uplifted BIE.
 Therefore, it is recommended that the BIE which is reused under the source BIE should be uplifted before uplifting the source BIE.
 The user can also create a completely new BIE in the newer release and reuse it under the uplifted BIE (see also `BIE reuse <#bie-reuse>`__).
+When a reuse BIE is selected for a reuse node, the uplifted BIE keeps a reference to that reused BIE.
+If a reuse node is left without a reuse BIE selected, its fields are copied directly into the uplifted BIE and no reference to a reused BIE is kept; connectCenter warns about this before the uplift proceeds (see Step 6 below).
 
 To uplift a BIE:
 
@@ -1167,10 +1169,26 @@ To uplift a BIE:
          User should take care of the issue manually when editing the
          uplifted BIE.
 
-6. Click "Uplift" to create and open the new uplifted BIE. At this stage
-   the user can make further changes to the BIE as described in
-   `Restrict a BIE <#restrict-a-bie>`__ or to resolve the reported
-   issues manually.
+6. Click "Uplift". If every BIE reuse node in the source BIE was
+   assigned a reuse BIE in the target release (see Step 4.2 above), or
+   the source BIE has no reuse nodes, the uplift proceeds directly.
+   However, if one or more used reuse nodes were left without a reuse
+   BIE selected for the target release, connectCenter displays a
+   confirmation dialog titled "Proceed without selecting reuse BIEs?"
+   before continuing. The dialog explains that the listed reuse nodes
+   have no reuse BIE selected for the target release and that, if you
+   continue, their fields will be copied into the uplifted BIE and the
+   reference to the reused BIE will NOT be kept. It also lists the path
+   of each unselected reuse node. To preserve the reference to the
+   reused BIE instead, click "Cancel" to return to the "Uplift BIE –
+   Verification" page, then click the reuse (exclamation) icon on each
+   listed node to select a target BIE (see Step 4.2). To proceed and
+   inline-copy the fields of the unselected reuse nodes, click
+   "Continue".
+
+7. The new uplifted BIE is created and opened. At this stage the user
+   can make further changes to the BIE as described in `Restrict a
+   BIE <#restrict-a-bie>`__ or to resolve the reported issues manually.
 
 **Important**
 

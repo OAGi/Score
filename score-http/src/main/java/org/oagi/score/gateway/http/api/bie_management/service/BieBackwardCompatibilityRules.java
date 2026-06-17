@@ -57,8 +57,9 @@ public final class BieBackwardCompatibilityRules {
     }
 
     /**
-     * True when the cardinality change crosses the JSON array/scalar boundary (array vs bare value). XSD keeps the
-     * same element shape, so this is a JSON-only concern.
+     * True when the array/scalar rendering crosses the JSON array vs bare-value boundary. XSD keeps the same element
+     * shape, so this is a JSON-only concern. Since Issue #1733 the JSON/OpenAPI generators decide array-ness from the
+     * based ASCC/BCC max cardinality, so callers pass the based component's max (current vs prior), not the BIE max.
      */
     public static boolean jsonArrayFlip(int newMax, int oldMax) {
         return isJsonArray(oldMax) != isJsonArray(newMax);
