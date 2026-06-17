@@ -28,15 +28,18 @@ public class InsertOasTagArguments {
     }
 
     public InsertOasTagArguments setGuid(String guid) {
-        return setGuid(guid);
+        this.guid = guid;
+        return this;
     }
 
     public InsertOasTagArguments setName(String name) {
-        return setName(name);
+        this.name = name;
+        return this;
     }
 
     public InsertOasTagArguments setDescription(String description) {
-        return setName(description);
+        this.description = description;
+        return this;
     }
 
     public InsertOasTagArguments setTimestamp(long millis) {
