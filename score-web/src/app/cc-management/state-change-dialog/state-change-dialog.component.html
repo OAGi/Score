@@ -14,14 +14,31 @@
       </p>
     }
 
+    @if (!issuesLoading && anyTargetHasIssues()) {
     <div class="target-list">
+      <!-- The connected user has the project scope but cannot WRITE the configured board — not an active
+           OAGi org member (or can't access it) — so a fieldOption move would not be applied (issue #1533). -->
+      @if (showProjectWriteWarning()) {
+        <div class="board-access-warn">
+          Your GitHub account{{ status?.login ? ' (@' + status?.login + ')' : '' }} doesn't have permission to
+          update the OAGi project board (you may not be an organization member or collaborator), so the linked
+          issues' field option won't be changed.
+        </div>
+      }
       @for (target of data.targets; track key(target)) {
         <div class="target-section">
           <div class="target-header">
             <!-- The exact same type badge the core-components list page renders in its Type column. -->
             <mat-chip class="target-type">{{ typeLabel(target) }}</mat-chip>
             <span class="target-name">{{ target.name }}</span>
-            <span class="target-transition">{{ target.state }} &rarr; {{ data.toState }}</span>
+            <!-- The plain state transition (issue #1533): the project board fieldOption move is shown per linked
+                 issue below (project name + "current fieldOption -> destination fieldOption"), since each issue's
+                 current fieldOption is read live from the board. -->
+            <span class="target-transition">
+              <span class="state-name">{{ target.state }}</span>
+              <span class="transition-arrow">&rarr;</span>
+              <span class="state-name">{{ toStateLabel() }}</span>
+            </span>
           </div>
           @if (issuesLoading) {
             <div class="target-hint">Loading linked GitHub issues…</div>
@@ -30,16 +47,67 @@
           } @else {
             <div class="github-issues">
               @for (issue of issuesOf(target); track issue.linkId) {
-                <div class="github-issue">
-                  <a class="github-issue-link" [href]="issue.htmlUrl" target="_blank" rel="noopener">{{ issueLabel(issue) }}</a>
-                  <span class="github-issue-title">{{ issue.title }}</span>
-                  @if (issue.state) {
-                    <span class="github-issue-state" [class.is-closed]="issue.state === 'closed'">{{ issue.state }}</span>
+                <div class="github-issue-row">
+                  <div class="github-issue">
+                    <a class="github-issue-link" [href]="issue.htmlUrl" target="_blank" rel="noopener">{{ issueLabel(issue) }}</a>
+                    <span class="github-issue-title">{{ issue.title }}</span>
+                    @if (issue.state) {
+                      <span class="github-issue-state" [class.is-closed]="issue.state === 'closed'">{{ issue.state }}</span>
+                    }
+                  </div>
+                  @if (issueRepoInaccessible(issue)) {
+                    <div class="issue-access-warn">
+                      No access to {{ issue.repoOwner }}/{{ issue.repoName }} with your GitHub account — a status comment can't be posted here.
+                    </div>
                   }
                 </div>
               }
             </div>
+            <!-- GitHub-style "Projects" card (issue #1533, Feature 2): mirrors the issue sidebar's Projects
+                 panel on github.com — the project name, then a "Status" row whose pill is the DESTINATION
+                 fieldOption the linked issue(s) will move to. The pill is an editable override dropdown (board
+                 options in their GitHub colors), or a read-only badge when the configured default is not a
+                 board option. The current board fieldOption is intentionally NOT shown (fetching it is slow).
+                 The override is per component, so this card and its single dropdown render once per target. -->
+            @if (fieldOptionTransitionShownFor(target)) {
+              <div class="project-card">
+                @if (projectTitle) {
+                  <div class="project-card-title">
+                    <svg class="project-icon" viewBox="0 0 16 16" width="16" height="16"
+                         fill="currentColor" aria-hidden="true" focusable="false">
+                      <path d="M1.75 0h12.5C15.216 0 16 .784 16 1.75v12.5A1.75 1.75 0 0 1 14.25 16H1.75A1.75 1.75 0 0 1 0 14.25V1.75C0 .784.784 0 1.75 0ZM1.5 1.75v12.5c0 .138.112.25.25.25h12.5a.25.25 0 0 0 .25-.25V1.75a.25.25 0 0 0-.25-.25H1.75a.25.25 0 0 0-.25.25ZM11.75 3a.75.75 0 0 1 .75.75v7.5a.75.75 0 0 1-1.5 0v-7.5a.75.75 0 0 1 .75-.75Zm-8.25.75a.75.75 0 0 1 1.5 0v5.5a.75.75 0 0 1-1.5 0ZM8 3a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 3Z"/>
+                    </svg>
+                    <span class="project-card-name">{{ projectTitle }}</span>
+                  </div>
+                }
+                <div class="project-card-status">
+                  <span class="project-card-status-label">{{ fieldName || 'Status' }}</span>
+                  @if (fieldOptionDropdownShownFor(target)) {
+                    <mat-select class="field-option-select" panelClass="field-option-panel"
+                                [panelWidth]="null"
+                                [(ngModel)]="fieldOptionSelections[key(target)]"
+                                [matTooltip]="(fieldName || 'Status') + ' — pick another to override where the linked issue(s) move'">
+                      <mat-select-trigger>
+                        <span class="field-option-badge" [ngStyle]="badgeStyle(fieldOptionSelections[key(target)])">{{ fieldOptionSelections[key(target)] }}</span>
+                      </mat-select-trigger>
+                      @for (opt of fieldOptions; track opt.name) {
+                        <mat-option [value]="opt.name">
+                          <span [ngStyle]="dotStyle(opt.name)"></span>{{ opt.name }}
+                        </mat-option>
+                      }
+                    </mat-select>
+                  } @else if (destinationFieldOption(target); as tgt) {
+                    <span class="field-option-badge" [ngStyle]="badgeStyle(tgt)">{{ tgt }}</span>
+                  }
+                </div>
+              </div>
+            }
             @if (commentEligible(target)) {
+              <!-- Divider between the Projects card and the comment editor below it (issue #1533); shown
+                   only when the card is present. -->
+              @if (fieldOptionTransitionShownFor(target)) {
+                <div class="card-comment-divider"></div>
+              }
               @if (prefillLoading(target)) {
                 <div class="target-hint">Preparing the GitHub post…</div>
               } @else {
@@ -113,6 +181,7 @@
         </div>
       }
     </div>
+    }
   </div>
   <div class="actions ms-auto" mat-dialog-actions>
     <button mat-button class="btn btn-outline-primary" color="primary" (click)="onConfirm()">

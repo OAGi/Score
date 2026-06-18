@@ -84,6 +84,23 @@
   text-decoration: underline;
 }
 
+/* Missing-permission warning beside Disconnect (issue #1533): the connected viewer can't comment on a
+   linked issue's repo and/or can't update the configured project board. Red to match the state-change
+   dialog's warnings (#b3261e); the alert octicon and weight make it stand out in the header row. */
+.github-perm-warn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #b3261e;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.github-perm-warn-icon {
+  fill: currentColor;
+  flex: 0 0 auto;
+}
+
 .github-issue-input {
   width: 320px;
   max-width: 46vw;
@@ -247,4 +264,44 @@
   color: #c62828;
   font-size: 12px;
   margin: 2px 12px 0 12px;
+}
+
+/* Full-page blocking overlay shown from the click on "Connect GitHub" until the OAuth redirect
+   navigates away (issue #1533): a centered spinner over a dimmed backdrop that covers the whole
+   viewport so no other action can be triggered during the connect round-trip. The z-index sits above
+   the app's in-page loading overlay (z-index 1000) and the sidenav so nothing shows through. */
+.github-connecting-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.32);
+}
+
+/* The GitHub mark itself is the loading indicator: it "breathes" (a soft scale + opacity pulse), the
+   way GitHub animates its logo while loading, instead of a generic Material spinner. */
+.github-loading-mark {
+  fill: #1f2328;
+  transform-origin: center;
+  animation: github-mark-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes github-mark-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.82);
+  }
+}
+
+/* Respect a reduced-motion preference: keep the mark visible but stop the pulse. */
+@media (prefers-reduced-motion: reduce) {
+  .github-loading-mark {
+    animation: none;
+  }
 }

@@ -455,12 +455,19 @@ export class CcNodeService {
     });
   }
 
-  updateState(type: string, manifestId: number, state: string, comment?: string): Observable<any> {
+  updateState(type: string, manifestId: number, state: string, comment?: string,
+              projectFieldOptionOverride?: string): Observable<any> {
     const params = new HttpParams().set('state', state);
     const url = '/api/core-components/' + type.toLowerCase() + '/' + manifestId + '/state';
-    // An optional comment travels with the request and is posted verbatim to the linked GitHub
-    // issues (issue #1533). Blank comments are not sent — nothing is posted.
-    const body = (comment && comment.trim().length > 0) ? {comment} : {};
+    // An optional comment + project board fieldOption override travel with the request (issue #1533). Blank
+    // values are not sent (post nothing / use the configured fieldOption).
+    const body: any = {};
+    if (comment && comment.trim().length > 0) {
+      body.comment = comment;
+    }
+    if (projectFieldOptionOverride) {
+      body.projectFieldOptionOverride = projectFieldOptionOverride;
+    }
     return this.http.patch<any>(url, body, {params});
   }
 
@@ -485,9 +492,19 @@ export class CcNodeService {
     return this.http.patch<any>(url, {});
   }
 
-  cancelRevision(type: string, manifestId: number): Observable<any> {
+  cancelRevision(type: string, manifestId: number, comment?: string,
+                 projectFieldOptionOverride?: string): Observable<any> {
     const url = '/api/core-components/' + type.toLowerCase() + '/' + manifestId + '/cancel';
-    return this.http.patch<any>(url, {});
+    // An optional comment + project board fieldOption override travel with the request (issue #1533). Blank
+    // values are not sent (post nothing / use the configured fieldOption).
+    const body: any = {};
+    if (comment && comment.trim().length > 0) {
+      body.comment = comment;
+    }
+    if (projectFieldOptionOverride) {
+      body.projectFieldOptionOverride = projectFieldOptionOverride;
+    }
+    return this.http.patch<any>(url, body);
   }
 
   postComment(reference: string, text: string, prevCommentId?: number): Observable<any> {

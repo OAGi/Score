@@ -104,7 +104,7 @@ class ComponentStateChangeEventPublisherTest {
     }
 
     @Test
-    void skipsTheImplicitReleaseMoves() {
+    void skipsTheImplicitReleaseMovesByDefault() {
         AccManifestId manifestId = new AccManifestId(BigInteger.TEN);
 
         publisher.publish(CcType.ACC, manifestId, CcState.Candidate, CcState.ReleaseDraft, USER_ID);
@@ -112,6 +112,63 @@ class ComponentStateChangeEventPublisherTest {
         publisher.publish(CcType.ACC, manifestId, CcState.ReleaseDraft, CcState.Candidate, USER_ID);
 
         verifyNoInteractions(redissonClient);
+    }
+
+    /** Sets every input of the publisher's readiness mirror so isProjectFieldOptionSyncReady() is true. */
+    private void enableProjectFieldOptionSync() {
+        ReflectionTestUtils.setField(publisher, "integrationEnabled", true);
+        ReflectionTestUtils.setField(publisher, "clientId", "id");
+        ReflectionTestUtils.setField(publisher, "clientSecret", "secret");
+        ReflectionTestUtils.setField(publisher, "projectEnabled", true);
+        ReflectionTestUtils.setField(publisher, "projectUrl", "https://github.com/orgs/OAGi/projects/8");
+    }
+
+    @Test
+    void publishesTheImplicitReleaseMovesWhenProjectFieldOptionSyncIsReady() {
+        // With the GitHub project fieldOption sync fully configured, the release-lifecycle implicit moves are
+        // published too (so the board can react to ReleaseDraft / Published); the comment path still
+        // ignores them.
+        enableProjectFieldOptionSync();
+        expectQueue();
+        AccManifestId manifestId = new AccManifestId(BigInteger.TEN);
+
+        publisher.publish(CcType.ACC, manifestId, CcState.Candidate, CcState.ReleaseDraft, USER_ID);
+        publisher.publish(CcType.ACC, manifestId, CcState.ReleaseDraft, CcState.Published, USER_ID);
+
+        verify(queue, times(2)).offer(any(ComponentStateChangeEvent.class));
+    }
+
+    @Test
+    void aPartialProjectConfigStillSuppressesImplicitReleaseMoves() {
+        // project-enabled is on but the rest is not fully configured (here a blank project-url; likewise
+        // missing credentials or integration disabled). The consumer would drop every event
+        // (isProjectConfigured() is false), so the publisher must keep suppressing the bulk
+        // release-lifecycle moves rather than re-flood the queue with events no one acts on.
+        ReflectionTestUtils.setField(publisher, "integrationEnabled", true);
+        ReflectionTestUtils.setField(publisher, "clientId", "id");
+        ReflectionTestUtils.setField(publisher, "clientSecret", "secret");
+        ReflectionTestUtils.setField(publisher, "projectEnabled", true);
+        ReflectionTestUtils.setField(publisher, "projectUrl", "");   // does not parse -> not ready
+
+        AccManifestId manifestId = new AccManifestId(BigInteger.TEN);
+        publisher.publish(CcType.ACC, manifestId, CcState.Candidate, CcState.ReleaseDraft, USER_ID);
+        publisher.publish(CcType.ACC, manifestId, CcState.ReleaseDraft, CcState.Published, USER_ID);
+
+        verifyNoInteractions(redissonClient);
+    }
+
+    @Test
+    void anImplicitMoveWithACommentIsPublishedEvenWhenFieldOptionSyncIsNotReady() {
+        // Comment and fieldOption sync are independent: an implicit (release-lifecycle) move is normally
+        // suppressed when fieldOption sync is off, but a comment-bearing one must still go out so the comment
+        // is posted. (Implicit moves are comment-less in practice, but the publisher must not drop one.)
+        expectQueue();
+        AccManifestId manifestId = new AccManifestId(BigInteger.TEN);
+
+        publisher.publish(CcType.ACC, manifestId, CcState.ReleaseDraft, CcState.Published, USER_ID,
+                "Released — closing this out.");
+
+        assertThat(publishedEvent().getComment()).isEqualTo("Released — closing this out.");
     }
 
     @Test
@@ -214,6 +271,60 @@ class ComponentStateChangeEventPublisherTest {
                 CcState.Draft, CcState.Candidate, USER_ID, null);
 
         assertThat(publishedEvent().getComment()).isNull();
+    }
+
+    // ----- Project fieldOption override normalization (issue #1533, Feature 2) -----
+
+    @Test
+    void aProjectFieldOptionOverridePassesThroughToTheEvent() {
+        expectQueue();
+
+        publisher.publish(CcType.ACC, new AccManifestId(BigInteger.TEN),
+                CcState.Draft, CcState.Candidate, USER_ID, null, "Implementing");
+
+        ComponentStateChangeEvent event = publishedEvent();
+        assertThat(event.getProjectFieldOptionOverride()).isEqualTo("Implementing");
+        assertThat(event.getComment()).isNull();
+    }
+
+    @Test
+    void aProjectFieldOptionOverrideIsTrimmedAndBlankBecomesNull() {
+        expectQueue();
+
+        publisher.publish(CcType.ACC, new AccManifestId(BigInteger.TEN),
+                CcState.Draft, CcState.Candidate, USER_ID, null, "  Ready for release  ");
+        assertThat(publishedEvent().getProjectFieldOptionOverride()).isEqualTo("Ready for release");
+    }
+
+    @Test
+    void aBlankProjectFieldOptionOverrideBecomesNull() {
+        expectQueue();
+
+        publisher.publish(CcType.ACC, new AccManifestId(BigInteger.TEN),
+                CcState.Draft, CcState.Candidate, USER_ID, null, "   ");
+        assertThat(publishedEvent().getProjectFieldOptionOverride()).isNull();
+    }
+
+    @Test
+    void anOverlongProjectFieldOptionOverrideIsTruncated() {
+        expectQueue();
+        String overlong = "y".repeat(ComponentStateChangeEventPublisher.MAX_PROJECT_FIELD_OPTION_OVERRIDE_LENGTH + 50);
+
+        publisher.publish(CcType.ACC, new AccManifestId(BigInteger.TEN),
+                CcState.Draft, CcState.Candidate, USER_ID, null, overlong);
+
+        assertThat(publishedEvent().getProjectFieldOptionOverride())
+                .hasSize(ComponentStateChangeEventPublisher.MAX_PROJECT_FIELD_OPTION_OVERRIDE_LENGTH);
+    }
+
+    @Test
+    void theCommentOnlyOverloadLeavesTheOverrideNull() {
+        expectQueue();
+
+        publisher.publish(CcType.ACC, new AccManifestId(BigInteger.TEN),
+                CcState.Draft, CcState.Candidate, USER_ID, "a comment");
+
+        assertThat(publishedEvent().getProjectFieldOptionOverride()).isNull();
     }
 
 }

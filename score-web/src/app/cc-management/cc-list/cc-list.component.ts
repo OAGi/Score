@@ -779,12 +779,12 @@ export class CcListComponent implements OnInit {
       return;
     }
 
-    const executeAction = (comments?: { [key: string]: string }) => {
+    const executeAction = (comments?: { [key: string]: string }, projectFieldOptionOverrides?: { [key: string]: string }) => {
       this.loading = true;
       let call;
       switch (actionType) {
         case 'Update':
-          call = this.service.updateState(this.selection.selected, toState, comments);
+          call = this.service.updateState(this.selection.selected, toState, comments, projectFieldOptionOverrides);
           break;
         case 'Delete':
           call = this.service.delete(this.selection.selected);
@@ -849,7 +849,7 @@ export class CcListComponent implements OnInit {
                 if (!result || !result.confirmed) {
                   return;
                 }
-                executeAction(result.comments);
+                executeAction(result.comments, result.fieldOptionOverrides);
               });
             } else {
               openConfirmDialog();

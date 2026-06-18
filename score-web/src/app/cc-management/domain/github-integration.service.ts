@@ -6,6 +6,68 @@ export interface GithubStatus {
   enabled: boolean;
   connected: boolean;
   login?: string;
+  /**
+   * Whether a Projects board fieldOption sync would actually run for this user (issue #1533, Feature 2):
+   * fieldOption sync is configured AND the user is connected with the {@code project} OAuth scope. Used to
+   * only promise a board move the backend can keep.
+   */
+  projectSyncAvailable?: boolean;
+  /**
+   * The CcState -> board fieldOption mapping (e.g. {@code {WIP: 'Implementing', ...}}), straight from the
+   * backend ProjectFieldOptions, so the dialog fieldOption preview has a single source of truth and never drifts.
+   */
+  fieldOptionByState?: { [state: string]: string };
+  /** The initial/reset fieldOption (e.g. 'New') a cancelled revision resets the card to. */
+  defaultFieldOption?: string;
+}
+
+/**
+ * One option of the board's fieldOption (single-select) field: its display name and the GitHub color the
+ * board assigns it (enum {@code GRAY|BLUE|GREEN|YELLOW|ORANGE|RED|PINK|PURPLE}, possibly absent), so the
+ * dialog can render each fieldOption in its board color (issue #1533, Feature 2).
+ */
+export interface ProjectFieldOption {
+  name: string;
+  color?: string;
+}
+
+/**
+ * The project board's fieldOption (single-select) field, fetched on demand by the state-change dialog for
+ * the fieldOption-override dropdown (issue #1533, Feature 2). {@code options} is every option of the field
+ * in board order; empty when fieldOption sync is not available for the viewer or the field is unresolved.
+ * {@code projectTitle} is the owning Projects v2 board's title, shown beside the fieldOption transition.
+ */
+export interface ProjectField {
+  projectTitle?: string;
+  name?: string;
+  options: ProjectFieldOption[];
+}
+
+/**
+ * Whether one linked issue's repository is accessible to the connected user (a prerequisite for
+ * commenting), for the state-change dialog (issue #1533). The issue's current board fieldOption is
+ * intentionally NOT fetched — resolving it is slow — so the dialog shows only the destination fieldOption.
+ */
+export interface IssueRepoAccess {
+  owner: string;
+  repo: string;
+  number: number;
+  repoAccessible: boolean;
+}
+
+/**
+ * The connected user's access to the configured project board, for a set of issues (issue #1533) — what
+ * the dialog needs for its permission warnings, NOT the board's contents. Used to warn when the user
+ * lacks GitHub permission to apply a fieldOption move.
+ */
+export interface ProjectAccessStatus {
+  projectConfigured: boolean;
+  /** Whether the connected user can READ the configured board. */
+  projectAccessible: boolean;
+  /** Best-effort: whether the connected user can WRITE the board (org membership). Drives the warning. */
+  projectWritable: boolean;
+  /** Each requested issue's repository accessibility. */
+  items: IssueRepoAccess[];
 }
 
 export interface GithubLabel {
@@ -105,6 +167,24 @@ export class GithubIntegrationService {
   disconnect(): Observable<void> {
     return this.http.delete<void>('/api/integration/github/connection')
       .pipe(tap(() => this.status$ = undefined));
+  }
+
+  /**
+   * The project board's fieldOption field name + options for the override dropdown (issue #1533, Feature 2).
+   * Hits GitHub's GraphQL API server-side (cached there), so the dialog calls it on demand — never on
+   * every page like {@link getStatus}. Returns empty options when fieldOption sync is unavailable.
+   */
+  getProjectField(): Observable<ProjectField> {
+    return this.http.get<ProjectField>('/api/integration/github/project-field');
+  }
+
+  /**
+   * Live board state for the given linked issues (issue #1533): each issue's current fieldOption + repo access,
+   * and whether the connected user can read the project board. Hits GitHub per issue (on demand), so the
+   * dialog calls it once with all its linked issues. Best-effort on the backend.
+   */
+  getProjectAccessStatus(issues: {owner: string; repo: string; number: number}[]): Observable<ProjectAccessStatus> {
+    return this.http.post<ProjectAccessStatus>('/api/integration/github/issues/project-access-status', issues);
   }
 
   /** Full-page redirect target that starts the OAuth connect flow and returns to {@code returnUrl}. */

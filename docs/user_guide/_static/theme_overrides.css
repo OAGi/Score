@@ -11,3 +11,23 @@
       overflow: visible !important;
    }
 }
+
+/* Let long, unbreakable tokens (URLs, env-var values rendered as inline literals)
+   wrap inside table cells instead of forcing the table wider than the page.
+   Without this, a value like http://localhost:4200/api/integration/github/callback
+   keeps the table from shrinking and it overflows the content area. */
+.wy-table-responsive table td,
+.wy-table-responsive table th,
+.rst-content table.docutils td,
+.rst-content table.docutils th {
+   overflow-wrap: break-word;
+}
+
+.wy-table-responsive table td code,
+.wy-table-responsive table th code,
+.rst-content table.docutils td code,
+.rst-content table.docutils th code {
+   white-space: normal !important;
+   word-break: break-all;
+   overflow-wrap: anywhere;
+}

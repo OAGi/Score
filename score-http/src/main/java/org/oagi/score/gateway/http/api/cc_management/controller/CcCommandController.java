@@ -66,7 +66,8 @@ public class CcCommandController {
             @RequestBody(required = false) CcUpdateStateCommentRequest request) {
 
         boolean updated = ccCommandService.updateState(sessionService.asScoreUser(user), accManifestId, state,
-                (request != null) ? request.comment() : null);
+                (request != null) ? request.comment() : null,
+                (request != null) ? request.projectFieldOptionOverride() : null);
         return updated ? ResponseEntity.ok().build() : ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
     }
 
@@ -157,9 +158,12 @@ public class CcCommandController {
     @PatchMapping(value = "/acc/{accManifestId:[\\d]+}/cancel")
     public void cancelAcc(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @PathVariable("accManifestId") AccManifestId accManifestId) {
+            @PathVariable("accManifestId") AccManifestId accManifestId,
+            @RequestBody(required = false) CcUpdateStateCommentRequest request) {
 
-        ccCommandService.cancelAcc(sessionService.asScoreUser(user), accManifestId);
+        ccCommandService.cancelAcc(sessionService.asScoreUser(user), accManifestId,
+                (request != null) ? request.comment() : null,
+                (request != null) ? request.projectFieldOptionOverride() : null);
     }
 
     @PostMapping(value = "/acc/{accManifestId:[\\d]+}/extension")
@@ -201,7 +205,8 @@ public class CcCommandController {
             @RequestBody(required = false) CcUpdateStateCommentRequest request) {
 
         boolean updated = ccCommandService.updateState(sessionService.asScoreUser(user), asccpManifestId, state,
-                (request != null) ? request.comment() : null);
+                (request != null) ? request.comment() : null,
+                (request != null) ? request.projectFieldOptionOverride() : null);
         return updated ? ResponseEntity.ok().build() : ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
     }
 
@@ -232,11 +237,14 @@ public class CcCommandController {
     }
 
     @PatchMapping(value = "/asccp/{asccpManifestId:[\\d]+}/cancel")
-    public void cancelAcc(
+    public void cancelAsccp(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @PathVariable("asccpManifestId") AsccpManifestId asccpManifestId) {
+            @PathVariable("asccpManifestId") AsccpManifestId asccpManifestId,
+            @RequestBody(required = false) CcUpdateStateCommentRequest request) {
 
-        ccCommandService.cancelAsccp(sessionService.asScoreUser(user), asccpManifestId);
+        ccCommandService.cancelAsccp(sessionService.asScoreUser(user), asccpManifestId,
+                (request != null) ? request.comment() : null,
+                (request != null) ? request.projectFieldOptionOverride() : null);
     }
 
     @PostMapping(value = "/oagis/bod")
@@ -276,7 +284,8 @@ public class CcCommandController {
             @RequestBody(required = false) CcUpdateStateCommentRequest request) {
 
         ccCommandService.updateState(sessionService.asScoreUser(user), bccpManifestId, state,
-                (request != null) ? request.comment() : null);
+                (request != null) ? request.comment() : null,
+                (request != null) ? request.projectFieldOptionOverride() : null);
     }
 
     @PatchMapping(value = "/bccp/{bccpManifestId:[\\d]+}/dt")
@@ -314,11 +323,14 @@ public class CcCommandController {
     }
 
     @PatchMapping(value = "/bccp/{bccpManifestId:[\\d]+}/cancel")
-    public void cancelAcc(
+    public void cancelBccp(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @PathVariable("bccpManifestId") BccpManifestId bccpManifestId) {
+            @PathVariable("bccpManifestId") BccpManifestId bccpManifestId,
+            @RequestBody(required = false) CcUpdateStateCommentRequest request) {
 
-        ccCommandService.cancelBccp(sessionService.asScoreUser(user), bccpManifestId);
+        ccCommandService.cancelBccp(sessionService.asScoreUser(user), bccpManifestId,
+                (request != null) ? request.comment() : null,
+                (request != null) ? request.projectFieldOptionOverride() : null);
     }
 
     @PostMapping(value = "/dt")
@@ -353,7 +365,8 @@ public class CcCommandController {
             @RequestBody(required = false) CcUpdateStateCommentRequest request) {
 
         ccCommandService.updateState(sessionService.asScoreUser(user), dtManifestId, state,
-                (request != null) ? request.comment() : null);
+                (request != null) ? request.comment() : null,
+                (request != null) ? request.projectFieldOptionOverride() : null);
     }
 
     @DeleteMapping(value = "/dt/{dtManifestId:[\\d]+}")
@@ -373,11 +386,14 @@ public class CcCommandController {
     }
 
     @PatchMapping(value = "/dt/{dtManifestId:[\\d]+}/cancel")
-    public void cancelAcc(
+    public void cancelDt(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @PathVariable("dtManifestId") DtManifestId dtManifestId) {
+            @PathVariable("dtManifestId") DtManifestId dtManifestId,
+            @RequestBody(required = false) CcUpdateStateCommentRequest request) {
 
-        ccCommandService.cancelDt(sessionService.asScoreUser(user), dtManifestId);
+        ccCommandService.cancelDt(sessionService.asScoreUser(user), dtManifestId,
+                (request != null) ? request.comment() : null,
+                (request != null) ? request.projectFieldOptionOverride() : null);
     }
 
     @PutMapping()
@@ -417,21 +433,27 @@ public class CcCommandController {
         ScoreUser requester = sessionService.asScoreUser(user);
         request.accManifestIdList().forEach(accManifestId ->
                 ccCommandService.updateState(requester, accManifestId, request.toState(),
-                        commentFor(request, "acc", accManifestId)));
+                        commentFor(request, "acc", accManifestId), fieldOptionOverrideFor(request, "acc", accManifestId)));
         request.asccpManifestIdList().forEach(asccpManifestId ->
                 ccCommandService.updateState(requester, asccpManifestId, request.toState(),
-                        commentFor(request, "asccp", asccpManifestId)));
+                        commentFor(request, "asccp", asccpManifestId), fieldOptionOverrideFor(request, "asccp", asccpManifestId)));
         request.bccpManifestIdList().forEach(bccpManifestId ->
                 ccCommandService.updateState(requester, bccpManifestId, request.toState(),
-                        commentFor(request, "bccp", bccpManifestId)));
+                        commentFor(request, "bccp", bccpManifestId), fieldOptionOverrideFor(request, "bccp", bccpManifestId)));
         request.dtManifestIdList().forEach(dtManifestId ->
                 ccCommandService.updateState(requester, dtManifestId, request.toState(),
-                        commentFor(request, "dt", dtManifestId)));
+                        commentFor(request, "dt", dtManifestId), fieldOptionOverrideFor(request, "dt", dtManifestId)));
     }
 
     /** The GitHub status comment for one component of a bulk state change, keyed {@code "<type>:<manifestId>"}. */
     private static String commentFor(CcUpdateStateRequest request, String type, Object manifestId) {
         return (request.comments() != null) ? request.comments().get(type + ":" + manifestId) : null;
+    }
+
+    /** The user-chosen project board fieldOption override for one component of a bulk state change, same key (issue #1533, Feature 2). */
+    private static String fieldOptionOverrideFor(CcUpdateStateRequest request, String type, Object manifestId) {
+        return (request.projectFieldOptionOverrides() != null)
+                ? request.projectFieldOptionOverrides().get(type + ":" + manifestId) : null;
     }
 
     @PatchMapping(value = "/mark-as-deleted")

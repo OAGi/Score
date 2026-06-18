@@ -143,8 +143,36 @@
 
 .target-transition {
   flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   white-space: nowrap;
   color: rgba(0, 0, 0, 0.6);
+}
+
+.target-transition .state-name {
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.75);
+}
+
+.target-transition .transition-arrow {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* A project-board fieldOption pill (issue #1533, Feature 2), styled like GitHub's borderless single-select
+   pill: a tinted fill with colored text, no border (the fg/bg come inline from badgeStyle() in the option's
+   GitHub board color; this is the shape + a neutral fallback for when no color is resolved). */
+.field-option-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: #eaeef2;
+  color: #59636e;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  white-space: nowrap;
 }
 
 .target-hint {
@@ -193,6 +221,129 @@
 .github-issue-state.is-closed {
   background: #8250df;
   color: #ffffff;
+}
+
+/* One linked issue (link/title/state) + its optional repo-access warning, stacked. */
+.github-issue-row {
+  padding: 3px 0;
+}
+
+.github-issue-row .github-issue {
+  padding: 0;
+}
+
+/* GitHub-style "Projects" card (issue #1533, Feature 2): mirrors the issue sidebar's Projects panel on
+   github.com — a bordered card with the project name, then a "Status" row holding the destination
+   fieldOption pill + dropdown caret. Shown once per target, right-aligned (margin-left:auto) so it sits
+   on the right like GitHub's sidebar. Uses Primer's light-theme tokens to match GitHub. */
+.project-card {
+  box-sizing: border-box;
+  width: fit-content;
+  min-width: 240px;
+  max-width: 100%;
+  margin: 8px 0 6px auto;
+  padding: 8px 12px;
+  border: 1px solid #d1d9e0;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.project-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  color: #1f2328;
+}
+
+.project-card-title .project-icon {
+  color: #59636e;
+  flex: 0 0 auto;
+}
+
+.project-card-title .project-card-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The "Status" row: the field name label + the destination fieldOption pill/dropdown. */
+.project-card-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+.project-card-status-label {
+  color: #59636e;
+}
+
+/* Divider between the Projects card and the comment editor below it (issue #1533). Full content width. */
+.card-comment-divider {
+  border-top: 1px solid #d1d9e0;
+  margin: 4px 0 10px;
+}
+
+/* The destination override — an Angular Material select (no form-field). The select chrome itself is
+   minimal; the colored GitHub-style pill is the trigger's .field-option-badge, with mat-select's arrow
+   as the dropdown caret. */
+.field-option-select.mat-mdc-select {
+  display: inline-flex;
+  align-items: center;
+  width: auto;
+  font-size: 12px;
+  line-height: 18px;
+  cursor: pointer;
+}
+
+.field-option-select.mat-mdc-select ::ng-deep .mat-mdc-select-trigger {
+  display: inline-flex;
+  align-items: center;
+}
+
+.field-option-select.mat-mdc-select ::ng-deep .mat-mdc-select-value {
+  display: inline-flex;
+  align-items: center;
+  max-width: 170px;
+}
+
+.field-option-select.mat-mdc-select ::ng-deep .mat-mdc-select-arrow-wrapper {
+  margin-left: 4px;
+}
+
+/* The override dropdown's overlay panel (issue #1533). It is projected into the global CDK overlay, so
+   these rules drop encapsulation (::ng-deep with no :host) to reach it. The panel sizes to its content
+   via [panelWidth]="null"; this keeps each option's dot + name on one line and bounds the panel width. */
+::ng-deep .field-option-panel.mat-mdc-select-panel {
+  min-width: 170px;
+  max-width: 280px;
+}
+
+::ng-deep .field-option-panel .mat-mdc-option .mdc-list-item__primary-text {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+/* The connected user lacks access to the issue's repo / the project board. */
+.issue-access-warn,
+.board-access-warn {
+  margin: 4px 0 0 0;
+  color: #b3261e;
+  font-size: 12px;
+}
+
+.board-access-warn {
+  margin: 0 0 10px 0;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #fdeceb;
+  border: 1px solid #f3c2bf;
 }
 
 /* GitHub-style comment editor: Write / Preview tabs above the comment box. */

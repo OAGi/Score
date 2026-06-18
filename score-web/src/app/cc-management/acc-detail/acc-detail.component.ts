@@ -27,6 +27,11 @@ import {
   usesStateChangeDialog
 } from '../state-change-dialog/state-change-dialog.component';
 import {
+  CANCEL_REVISION_TO_STATE,
+  cancelRevisionContent,
+  cancelRevisionHeader
+} from '../state-change-dialog/cancel-revision-dialog';
+import {
   AccDetails,
   AsccpOrBccpManifestId,
   AsccSummary,
@@ -1165,7 +1170,7 @@ export class AccDetailComponent implements OnInit {
               if (!result || !result.confirmed) {
                 return;
               }
-              this._doUpdateState(state, result.comments[target.ccType + ':' + target.manifestId]);
+              this._doUpdateState(state, result.comments[target.ccType + ':' + target.manifestId], result.fieldOptionOverrides[target.ccType + ':' + target.manifestId]);
             });
           } else {
             const dialogConfig = this.confirmDialogService.newConfig();
@@ -1185,8 +1190,8 @@ export class AccDetailComponent implements OnInit {
         });
   }
 
-  private _doUpdateState(state: string, comment?: string) {
-    this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state, comment).subscribe({
+  private _doUpdateState(state: string, comment?: string, projectFieldOptionOverride?: string) {
+    this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state, comment, projectFieldOptionOverride).subscribe({
       next: () => {
         this.snackBar.open('Updated', '', {duration: 3000});
 
@@ -1994,25 +1999,57 @@ export class AccDetailComponent implements OnInit {
 
   cancelRevision(): void {
     const isDeveloper = this.userRoles.includes('developer');
-    const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = (isDeveloper) ? 'Cancel this revision?' : 'Cancel this amendment?';
-    dialogConfig.data.content = [(isDeveloper) ? 'Are you sure you want to cancel this revision?' : 'Are you sure you want to cancel this amendment?'];
-    dialogConfig.data.action = 'Okay';
+    const header = cancelRevisionHeader(isDeveloper);
+    const content = cancelRevisionContent(isDeveloper);
 
-    this.confirmDialogService.open(dialogConfig).afterClosed()
-      .subscribe(result => {
-        if (!result) {
-          return;
-        }
+    // When the GitHub integration is enabled, cancel goes through the dedicated dialog that shows the
+    // linked GitHub issues and pre-fills the status post to publish on cancel (issue #1533); otherwise
+    // the generic confirm dialog runs. The data-loss warning travels in `content` on BOTH paths, so it
+    // is shown regardless of GitHub status.
+    this.githubService.getStatus()
+        .pipe(take(1), catchError(() => of({enabled: false, connected: false} as GithubStatus)))
+        .subscribe(status => {
+          if (status.enabled) {
+            const target = {
+              ccType: 'acc',
+              manifestId: this.rootNode.manifestId,
+              name: this.rootNode.name,
+              state: this.rootNode.state
+            };
+            this.dialog.open(StateChangeDialogComponent, {
+              data: {header, content, actionLabel: 'Okay', toState: CANCEL_REVISION_TO_STATE, targets: [target]},
+              autoFocus: false
+            }).afterClosed().subscribe((result: StateChangeDialogResult | undefined) => {
+              if (!result || !result.confirmed) {
+                return;
+              }
+              this._doCancelRevision(result.comments[target.ccType + ':' + target.manifestId], result.fieldOptionOverrides[target.ccType + ':' + target.manifestId]);
+            });
+          } else {
+            const dialogConfig = this.confirmDialogService.newConfig();
+            dialogConfig.data.header = header;
+            dialogConfig.data.content = content;
+            dialogConfig.data.action = 'Okay';
 
-        this.isUpdating = true;
-        this.service.cancelRevision(this.rootNode.type, this.rootNode.manifestId)
-          .subscribe(resp => {
-            this.reload('Canceled');
-          }, err => {
-            this.isUpdating = false;
-          });
-      });
+            this.confirmDialogService.open(dialogConfig).afterClosed()
+                .subscribe(result => {
+                  if (!result) {
+                    return;
+                  }
+                  this._doCancelRevision();
+                });
+          }
+        });
+  }
+
+  private _doCancelRevision(comment?: string, projectFieldOptionOverride?: string): void {
+    this.isUpdating = true;
+    this.service.cancelRevision(this.rootNode.type, this.rootNode.manifestId, comment, projectFieldOptionOverride)
+        .subscribe(resp => {
+          this.reload('Canceled');
+        }, err => {
+          this.isUpdating = false;
+        });
   }
 
   search(inputKeyword, backward?: boolean, force?: boolean) {

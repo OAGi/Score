@@ -58,7 +58,7 @@ public class CodeListCommandController {
         String toState = request.get("toState");
         codeListCommandService.updateState(
                 sessionService.asScoreUser(user), codeListManifestId, CcState.valueOf(toState),
-                request.get("comment"));
+                request.get("comment"), request.get("projectFieldOptionOverride"));
     }
 
     @PatchMapping(value = "/{codeListManifestId:[\\d]+}/revise")
@@ -72,9 +72,12 @@ public class CodeListCommandController {
     @PatchMapping(value = "/{codeListManifestId:[\\d]+}/cancel")
     public void cancelCodeList(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @PathVariable("codeListManifestId") CodeListManifestId codeListManifestId) {
+            @PathVariable("codeListManifestId") CodeListManifestId codeListManifestId,
+            @RequestBody(required = false) Map<String, String> request) {
 
-        codeListCommandService.cancel(sessionService.asScoreUser(user), codeListManifestId);
+        codeListCommandService.cancel(sessionService.asScoreUser(user), codeListManifestId,
+                (request != null) ? request.get("comment") : null,
+                (request != null) ? request.get("projectFieldOptionOverride") : null);
     }
 
     @PatchMapping(value = "/{codeListManifestId:[\\d]+}/mark-as-deleted")

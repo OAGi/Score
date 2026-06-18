@@ -181,6 +181,12 @@ public class GitHubIssueLinkService {
         // self proxy so its @Transactional actually applies (a same-class call would bypass it).
         String metadata = buildMetadataJson(integrationService.fetchIssue(requester, owner, repo, issueNumber));
         self.doLink(requester, ccType, manifestId, owner, repo, issueNumber, metadata);
+
+        // Best-effort, after the link committed and outside the transaction: place the issue in the
+        // initial fieldOption on the project board (adding it if absent), since linking starts tracking it
+        // (issue #1533, Feature 2). Uses the linking user's token; no-ops when fieldOption sync is not
+        // configured or the user lacks the project scope; never affects the link.
+        integrationService.addIssueToProjectOnLink(requester, owner, repo, issueNumber, metadata);
     }
 
     /**
@@ -203,24 +209,45 @@ public class GitHubIssueLinkService {
         createIssueLink(command(requester), ccType, manifestId, githubIssueId);
     }
 
-    /** Transactional so the link removal and the orphan GC commit together (no half-deleted state). */
-    @Transactional
+    /**
+     * Removes a link and takes the issue's card off the project board — unlinking ends this component's
+     * tracking, so the card is removed (issue #1533, Feature 2) — and drops its cached ETag. The board
+     * and ETag work happen outside the DB transaction so no connection is held during the (GitHub /
+     * Redis) calls, mirroring {@link #link}. Best-effort; no-ops when fieldOption sync is not configured.
+     */
     public void unlink(ScoreUser requester, CcType ccType, BigInteger linkId) {
         assertAuthenticated(requester);
+        GitHubIssueLinkRecord unlinked = self.doUnlink(requester, ccType, linkId);
+        if (unlinked != null) {
+            integrationService.evictIssueEtag(unlinked.repoOwner(), unlinked.repoName(), unlinked.issueNumber());
+            integrationService.removeIssueFromProject(requester, unlinked.repoOwner(), unlinked.repoName(),
+                    unlinked.issueNumber(), unlinked.cachedMetadata());
+        }
+    }
+
+    /**
+     * Transactional, DB-only part of {@link #unlink}: removes the link and garbage-collects the
+     * {@code github_issue} registry row (when this was its last link) in one transaction. Returns the
+     * unlinked issue (whenever a link was actually removed) so the caller can take its card off the
+     * board and drop its ETag outside the transaction; {@code null} if there was nothing to unlink.
+     * Public only so the Spring proxy can apply {@code @Transactional} — call {@link #unlink}.
+     */
+    @Transactional
+    public GitHubIssueLinkRecord doUnlink(ScoreUser requester, CcType ccType, BigInteger linkId) {
         GitHubIssueLinkQueryRepository query = query(requester);
         ComponentOwnerState ownerState = getComponentOwnerStateByLink(query, ccType, linkId);
         if (ownerState == null) {
-            return;
+            return null;
         }
         assertOwnerInWip(requester, ownerState);
 
-        // Capture the linked issue before removing the link, then garbage-collect the github_issue
-        // registry row (and evict its cached ETag) if this was the last component referencing it (#1533).
         GitHubIssueLinkRecord linked = getLinkedIssue(query, ccType, linkId);
         deleteIssueLink(command(requester), ccType, linkId);
-        if (linked != null && command(requester).deleteIssueIfOrphaned(linked.issueId())) {
-            integrationService.evictIssueEtag(linked.repoOwner(), linked.repoName(), linked.issueNumber());
+        // GC the registry row when this was the last reference (DB hygiene, independent of the board card).
+        if (linked != null) {
+            command(requester).deleteIssueIfOrphaned(linked.issueId());
         }
+        return linked;
     }
 
     /**

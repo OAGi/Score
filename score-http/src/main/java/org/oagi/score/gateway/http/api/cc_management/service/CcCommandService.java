@@ -1327,10 +1327,15 @@ public class CcCommandService {
     }
 
     public boolean updateState(ScoreUser requester, AccManifestId accManifestId, CcState state) {
-        return updateState(requester, accManifestId, state, null);
+        return updateState(requester, accManifestId, state, null, null);
     }
 
     public boolean updateState(ScoreUser requester, AccManifestId accManifestId, CcState state, String comment) {
+        return updateState(requester, accManifestId, state, comment, null);
+    }
+
+    public boolean updateState(ScoreUser requester, AccManifestId accManifestId, CcState state, String comment,
+                               String projectFieldOptionOverride) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -1371,7 +1376,7 @@ public class CcCommandService {
                     (nextState == CcState.Deleted) ? LogAction.Deleted :
                             (restore ? LogAction.Restored : LogAction.Modified));
             stateChangeEventPublisher.publish(
-                    CcType.ACC, accManifestId, prevState, nextState, requester.userId(), comment);
+                    CcType.ACC, accManifestId, prevState, nextState, requester.userId(), comment, projectFieldOptionOverride);
         }
 
         return updated;
@@ -1429,10 +1434,15 @@ public class CcCommandService {
     }
 
     public boolean updateState(ScoreUser requester, AsccpManifestId asccpManifestId, CcState state) {
-        return updateState(requester, asccpManifestId, state, null);
+        return updateState(requester, asccpManifestId, state, null, null);
     }
 
     public boolean updateState(ScoreUser requester, AsccpManifestId asccpManifestId, CcState state, String comment) {
+        return updateState(requester, asccpManifestId, state, comment, null);
+    }
+
+    public boolean updateState(ScoreUser requester, AsccpManifestId asccpManifestId, CcState state, String comment,
+                               String projectFieldOptionOverride) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -1473,7 +1483,7 @@ public class CcCommandService {
                     (nextState == CcState.Deleted) ? LogAction.Deleted :
                             (restore ? LogAction.Restored : LogAction.Modified));
             stateChangeEventPublisher.publish(
-                    CcType.ASCCP, asccpManifestId, prevState, nextState, requester.userId(), comment);
+                    CcType.ASCCP, asccpManifestId, prevState, nextState, requester.userId(), comment, projectFieldOptionOverride);
         }
 
         return updated;
@@ -1529,10 +1539,15 @@ public class CcCommandService {
     }
 
     public boolean updateState(ScoreUser requester, BccpManifestId bccpManifestId, CcState state) {
-        return updateState(requester, bccpManifestId, state, null);
+        return updateState(requester, bccpManifestId, state, null, null);
     }
 
     public boolean updateState(ScoreUser requester, BccpManifestId bccpManifestId, CcState state, String comment) {
+        return updateState(requester, bccpManifestId, state, comment, null);
+    }
+
+    public boolean updateState(ScoreUser requester, BccpManifestId bccpManifestId, CcState state, String comment,
+                               String projectFieldOptionOverride) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -1573,17 +1588,22 @@ public class CcCommandService {
                     (nextState == CcState.Deleted) ? LogAction.Deleted :
                             (restore ? LogAction.Restored : LogAction.Modified));
             stateChangeEventPublisher.publish(
-                    CcType.BCCP, bccpManifestId, prevState, nextState, requester.userId(), comment);
+                    CcType.BCCP, bccpManifestId, prevState, nextState, requester.userId(), comment, projectFieldOptionOverride);
         }
 
         return updated;
     }
 
     public boolean updateState(ScoreUser requester, DtManifestId dtManifestId, CcState state) {
-        return updateState(requester, dtManifestId, state, null);
+        return updateState(requester, dtManifestId, state, null, null);
     }
 
     public boolean updateState(ScoreUser requester, DtManifestId dtManifestId, CcState state, String comment) {
+        return updateState(requester, dtManifestId, state, comment, null);
+    }
+
+    public boolean updateState(ScoreUser requester, DtManifestId dtManifestId, CcState state, String comment,
+                               String projectFieldOptionOverride) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -1624,7 +1644,7 @@ public class CcCommandService {
                     (nextState == CcState.Deleted) ? LogAction.Deleted :
                             (restore ? LogAction.Restored : LogAction.Modified));
             stateChangeEventPublisher.publish(
-                    CcType.DT, dtManifestId, prevState, nextState, requester.userId(), comment);
+                    CcType.DT, dtManifestId, prevState, nextState, requester.userId(), comment, projectFieldOptionOverride);
         }
 
         return updated;
@@ -1942,9 +1962,13 @@ public class CcCommandService {
 
         repositoryFactory.accCommandRepository(requester).revise(accManifestId);
         makeLog(requester, accManifestId, LogAction.Revised);
+        // Revising creates a new WIP revision from the released state — publish it so the GitHub
+        // project fieldOption sync moves the linked issue back into the in-progress fieldOption (issue #1533).
+        stateChangeEventPublisher.publish(
+                CcType.ACC, accManifestId, prevAcc.state(), CcState.WIP, requester.userId());
     }
 
-    public void cancelAcc(ScoreUser requester, AccManifestId accManifestId) {
+    public void cancelAcc(ScoreUser requester, AccManifestId accManifestId, String comment, String projectFieldOptionOverride) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -1984,6 +2008,12 @@ public class CcCommandService {
         }
 
         repositoryFactory.accCommandRepository(requester).cancel(accManifestId);
+
+        // Cancelling reverts WIP to the previously released revision. Publish it like an explicit state
+        // change so any linked GitHub issues get the user-edited status comment (issue #1533 follow-up).
+        CcState revertedTo = requester.isDeveloper() ? CcState.Published : CcState.Production;
+        stateChangeEventPublisher.publish(
+                CcType.ACC, accManifestId, CcState.WIP, revertedTo, requester.userId(), comment, projectFieldOptionOverride);
     }
 
     public void reviseAsccp(ScoreUser requester, AsccpManifestId asccpManifestId) {
@@ -2031,9 +2061,13 @@ public class CcCommandService {
 
         repositoryFactory.asccpCommandRepository(requester).revise(asccpManifestId);
         makeLog(requester, asccpManifestId, LogAction.Revised);
+        // Publish the revise (released -> WIP) so the GitHub project fieldOption sync moves the linked issue
+        // back into the in-progress fieldOption (issue #1533).
+        stateChangeEventPublisher.publish(
+                CcType.ASCCP, asccpManifestId, prevAsccp.state(), CcState.WIP, requester.userId());
     }
 
-    public void cancelAsccp(ScoreUser requester, AsccpManifestId asccpManifestId) {
+    public void cancelAsccp(ScoreUser requester, AsccpManifestId asccpManifestId, String comment, String projectFieldOptionOverride) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -2073,6 +2107,10 @@ public class CcCommandService {
         }
 
         repositoryFactory.asccpCommandRepository(requester).cancel(asccpManifestId);
+
+        CcState revertedTo = requester.isDeveloper() ? CcState.Published : CcState.Production;
+        stateChangeEventPublisher.publish(
+                CcType.ASCCP, asccpManifestId, CcState.WIP, revertedTo, requester.userId(), comment, projectFieldOptionOverride);
     }
 
     public void reviseBccp(ScoreUser requester, BccpManifestId bccpManifestId) {
@@ -2120,9 +2158,13 @@ public class CcCommandService {
 
         repositoryFactory.bccpCommandRepository(requester).revise(bccpManifestId);
         makeLog(requester, bccpManifestId, LogAction.Revised);
+        // Publish the revise (released -> WIP) so the GitHub project fieldOption sync moves the linked issue
+        // back into the in-progress fieldOption (issue #1533).
+        stateChangeEventPublisher.publish(
+                CcType.BCCP, bccpManifestId, prevBccp.state(), CcState.WIP, requester.userId());
     }
 
-    public void cancelBccp(ScoreUser requester, BccpManifestId bccpManifestId) {
+    public void cancelBccp(ScoreUser requester, BccpManifestId bccpManifestId, String comment, String projectFieldOptionOverride) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -2162,6 +2204,10 @@ public class CcCommandService {
         }
 
         repositoryFactory.bccpCommandRepository(requester).cancel(bccpManifestId);
+
+        CcState revertedTo = requester.isDeveloper() ? CcState.Published : CcState.Production;
+        stateChangeEventPublisher.publish(
+                CcType.BCCP, bccpManifestId, CcState.WIP, revertedTo, requester.userId(), comment, projectFieldOptionOverride);
     }
 
     public void reviseDt(ScoreUser requester, DtManifestId dtManifestId) {
@@ -2209,9 +2255,13 @@ public class CcCommandService {
 
         repositoryFactory.dtCommandRepository(requester).revise(dtManifestId);
         makeLog(requester, dtManifestId, LogAction.Revised);
+        // Publish the revise (released -> WIP) so the GitHub project fieldOption sync moves the linked issue
+        // back into the in-progress fieldOption (issue #1533).
+        stateChangeEventPublisher.publish(
+                CcType.DT, dtManifestId, prevDt.state(), CcState.WIP, requester.userId());
     }
 
-    public void cancelDt(ScoreUser requester, DtManifestId dtManifestId) {
+    public void cancelDt(ScoreUser requester, DtManifestId dtManifestId, String comment, String projectFieldOptionOverride) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -2251,6 +2301,10 @@ public class CcCommandService {
         }
 
         repositoryFactory.dtCommandRepository(requester).cancel(dtManifestId);
+
+        CcState revertedTo = requester.isDeveloper() ? CcState.Published : CcState.Production;
+        stateChangeEventPublisher.publish(
+                CcType.DT, dtManifestId, CcState.WIP, revertedTo, requester.userId(), comment, projectFieldOptionOverride);
     }
 
     public void transferOwnership(

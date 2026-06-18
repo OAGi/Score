@@ -11,6 +11,11 @@ import {
   StateChangeDialogResult,
   usesStateChangeDialog
 } from '../../cc-management/state-change-dialog/state-change-dialog.component';
+import {
+  CANCEL_REVISION_TO_STATE,
+  cancelRevisionContent,
+  cancelRevisionHeader
+} from '../../cc-management/state-change-dialog/cancel-revision-dialog';
 import {AgencyIdListDetails, AgencyIdListValue, AgencyIdListValueDetails} from '../domain/agency-id-list';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatPaginator} from '@angular/material/paginator';
@@ -701,7 +706,7 @@ export class AgencyIdListDetailComponent implements OnInit {
               if (!result || !result.confirmed) {
                 return;
               }
-              this._doUpdateState(state, result.comments[target.ccType + ':' + target.manifestId]);
+              this._doUpdateState(state, result.comments[target.ccType + ':' + target.manifestId], result.fieldOptionOverrides[target.ccType + ':' + target.manifestId]);
             });
           } else {
             const dialogConfig = this.confirmDialogService.newConfig();
@@ -719,10 +724,10 @@ export class AgencyIdListDetailComponent implements OnInit {
         });
   }
 
-  private _doUpdateState(state: string, comment?: string) {
+  private _doUpdateState(state: string, comment?: string, projectFieldOptionOverride?: string) {
     this.isUpdating = true;
 
-    this.service.updateState(this.agencyIdList, state, comment).subscribe(_ => {
+    this.service.updateState(this.agencyIdList, state, comment, projectFieldOptionOverride).subscribe(_ => {
       forkJoin([
         this.service.getAgencyIdListDetails(this.manifestId),
       ]).subscribe(([agencyIdList]) => {
@@ -886,30 +891,62 @@ export class AgencyIdListDetailComponent implements OnInit {
 
   cancelRevision(): void {
     const isDeveloper = this.userRoles.includes('developer');
-    const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = (isDeveloper) ? 'Cancel this revision?' : 'Cancel this amendment?';
-    dialogConfig.data.content = [(isDeveloper) ? 'Are you sure you want to cancel this revision?' : 'Are you sure you want to cancel this amendment?'];
-    dialogConfig.data.action = 'Okay';
+    const header = cancelRevisionHeader(isDeveloper);
+    const content = cancelRevisionContent(isDeveloper);
 
-    this.confirmDialogService.open(dialogConfig).afterClosed()
-        .subscribe(result => {
-          if (!result) {
-            return;
-          }
+    // When the GitHub integration is enabled, cancel goes through the dedicated dialog that shows the
+    // linked GitHub issues and pre-fills the status post to publish on cancel (issue #1533); otherwise
+    // the generic confirm dialog runs. The data-loss warning travels in `content` on BOTH paths, so it
+    // is shown regardless of GitHub status.
+    this.githubService.getStatus()
+        .pipe(take(1), catchError(() => of({enabled: false, connected: false} as GithubStatus)))
+        .subscribe(status => {
+          if (status.enabled) {
+            const target = {
+              ccType: 'agency_id_list',
+              manifestId: this.agencyIdList.agencyIdListManifestId,
+              name: this.agencyIdList.name,
+              state: this.agencyIdList.state
+            };
+            this.dialog.open(StateChangeDialogComponent, {
+              data: {header, content, actionLabel: 'Okay', toState: CANCEL_REVISION_TO_STATE, targets: [target]},
+              autoFocus: false
+            }).afterClosed().subscribe((result: StateChangeDialogResult | undefined) => {
+              if (!result || !result.confirmed) {
+                return;
+              }
+              this._doCancelRevision(result.comments[target.ccType + ':' + target.manifestId], result.fieldOptionOverrides[target.ccType + ':' + target.manifestId]);
+            });
+          } else {
+            const dialogConfig = this.confirmDialogService.newConfig();
+            dialogConfig.data.header = header;
+            dialogConfig.data.content = content;
+            dialogConfig.data.action = 'Okay';
 
-          this.isUpdating = true;
-          this.service.cancelRevision(this.manifestId)
-              .subscribe(resp => {
-                this.service.getAgencyIdListDetails(this.manifestId).subscribe(agencyIdList => {
-                  this.init(agencyIdList);
-                  this.isUpdating = false;
-                  this.snackBar.open('Canceled', '', {
-                    duration: 3000,
-                  });
+            this.confirmDialogService.open(dialogConfig).afterClosed()
+                .subscribe(result => {
+                  if (!result) {
+                    return;
+                  }
+                  this._doCancelRevision();
                 });
-              }, err => {
-                this.isUpdating = false;
-              });
+          }
+        });
+  }
+
+  private _doCancelRevision(comment?: string, projectFieldOptionOverride?: string): void {
+    this.isUpdating = true;
+    this.service.cancelRevision(this.manifestId, comment, projectFieldOptionOverride)
+        .subscribe(resp => {
+          this.service.getAgencyIdListDetails(this.manifestId).subscribe(agencyIdList => {
+            this.init(agencyIdList);
+            this.isUpdating = false;
+            this.snackBar.open('Canceled', '', {
+              duration: 3000,
+            });
+          });
+        }, err => {
+          this.isUpdating = false;
         });
   }
 

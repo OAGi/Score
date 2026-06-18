@@ -67,6 +67,30 @@ export function revertPost(summary: ComponentChangeSummary, backTo: string = 'WI
   return out;
 }
 
+/**
+ * The comment suggested when a component's in-progress revision is cancelled (discarded). Cancel
+ * always reverts the WIP revision back to the previously released revision, throwing the WIP edits
+ * away, so the post announces the discard and lists the changes that were lost. A cancel only
+ * happens on a REVISED component (a prior revision must exist), but the NEW branch is kept defensive.
+ */
+export function cancelPost(summary: ComponentChangeSummary): string {
+  let out = '';
+  if (summary.summaryType === 'NEW') {
+    out += '### New ' + typeName(summary) + ' "' + summary.name + '" was withdrawn\n';
+    out += '\nThe newly introduced component linked to this issue had its revision **cancelled** '
+      + 'and was discarded.\n';
+  } else {
+    const prev = (summary.prevRevisionNum !== null && summary.prevRevisionNum !== undefined)
+      ? summary.prevRevisionNum : summary.revisionNum - 1;
+    out += '### ' + typeName(summary) + ' "' + summary.name
+      + '" — revision ' + summary.revisionNum + ' cancelled\n';
+    out += '\nThe in-progress revision was **cancelled**; the component reverted to rev. ' + prev
+      + ' and the following changes were discarded:\n';
+    out += renderChangeBody(summary);
+  }
+  return out;
+}
+
 // ----- REVISED body -----
 
 function changesIntro(summary: ComponentChangeSummary): string {

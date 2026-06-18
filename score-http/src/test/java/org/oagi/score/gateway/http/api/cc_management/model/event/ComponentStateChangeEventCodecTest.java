@@ -57,19 +57,20 @@ class ComponentStateChangeEventCodecTest {
         ComponentStateChangeEvent event = new ComponentStateChangeEvent(
                 CcType.ACC, new AccManifestId(BigInteger.TEN),
                 CcState.Draft, CcState.Candidate, new UserId(BigInteger.ONE), "event-1",
-                "Resolves the **mismatch** reported here.");
+                "Resolves the **mismatch** reported here.", "Implementing");
 
         ComponentStateChangeEvent decoded = roundTrip(event);
 
         assertThat(decoded).isEqualTo(event);
         assertThat(decoded.getManifestId()).isInstanceOf(AccManifestId.class);
+        assertThat(decoded.getProjectFieldOptionOverride()).isEqualTo("Implementing");
     }
 
     @Test
     void roundTripsEveryOtherFieldShape() throws Exception {
         ComponentStateChangeEvent event = new ComponentStateChangeEvent(
                 CcType.CODE_LIST, new CodeListManifestId(new BigInteger("12345678901234567890")),
-                CcState.Candidate, CcState.WIP, new UserId(BigInteger.TWO), null, null);
+                CcState.Candidate, CcState.WIP, new UserId(BigInteger.TWO), null, null, null);
 
         ComponentStateChangeEvent decoded = roundTrip(event);
 
@@ -83,7 +84,7 @@ class ComponentStateChangeEventCodecTest {
         // property: encode an event carrying a comment, strip the property out, and decode.
         ComponentStateChangeEvent event = new ComponentStateChangeEvent(
                 CcType.DT, new AccManifestId(BigInteger.TEN),
-                CcState.Draft, CcState.Candidate, new UserId(BigInteger.ONE), "event-1", "a comment");
+                CcState.Draft, CcState.Candidate, new UserId(BigInteger.ONE), "event-1", "a comment", null);
         String json = encodeToJson(event);
         String oldProducerJson = json.replace("\"comment\":\"a comment\",", "").replace(",\"comment\":\"a comment\"", "");
         assertThat(oldProducerJson).isNotEqualTo(json).doesNotContain("comment");
@@ -101,16 +102,43 @@ class ComponentStateChangeEventCodecTest {
         // producer's, so mixed-version consumers never see an explicit null to trip over.
         ComponentStateChangeEvent event = new ComponentStateChangeEvent(
                 CcType.ACC, new AccManifestId(BigInteger.TEN),
-                CcState.Draft, CcState.Candidate, new UserId(BigInteger.ONE), "event-1", null);
+                CcState.Draft, CcState.Candidate, new UserId(BigInteger.ONE), "event-1", null, null);
 
         assertThat(encodeToJson(event)).doesNotContain("comment");
+    }
+
+    @Test
+    void aPayloadWithoutTheProjectFieldOptionOverrideFieldDecodesWithANullOverride() throws Exception {
+        // An old producer's payload predates Feature 2: it has no projectFieldOptionOverride property.
+        ComponentStateChangeEvent event = new ComponentStateChangeEvent(
+                CcType.ACC, new AccManifestId(BigInteger.TEN),
+                CcState.Draft, CcState.Candidate, new UserId(BigInteger.ONE), "event-1", "a comment", "Implementing");
+        String json = encodeToJson(event);
+        String oldProducerJson = json
+                .replace("\"projectFieldOptionOverride\":\"Implementing\",", "")
+                .replace(",\"projectFieldOptionOverride\":\"Implementing\"", "");
+        assertThat(oldProducerJson).isNotEqualTo(json).doesNotContain("projectFieldOptionOverride");
+
+        ComponentStateChangeEvent decoded = decode(oldProducerJson);
+
+        assertThat(decoded.getProjectFieldOptionOverride()).isNull();
+        assertThat(decoded.getComment()).isEqualTo("a comment");
+    }
+
+    @Test
+    void aNullProjectFieldOptionOverrideIsOmittedFromThePayload() throws Exception {
+        ComponentStateChangeEvent event = new ComponentStateChangeEvent(
+                CcType.ACC, new AccManifestId(BigInteger.TEN),
+                CcState.Draft, CcState.Candidate, new UserId(BigInteger.ONE), "event-1", "a comment", null);
+
+        assertThat(encodeToJson(event)).doesNotContain("projectFieldOptionOverride");
     }
 
     @Test
     void aPayloadWithAnUnknownExtraFieldStillDecodes() throws Exception {
         ComponentStateChangeEvent event = new ComponentStateChangeEvent(
                 CcType.ACC, new AccManifestId(BigInteger.TEN),
-                CcState.Draft, CcState.Candidate, new UserId(BigInteger.ONE), "event-1", "a comment");
+                CcState.Draft, CcState.Candidate, new UserId(BigInteger.ONE), "event-1", "a comment", null);
         String json = encodeToJson(event);
         String futureProducerJson = json.substring(0, json.length() - 1) + ",\"futureField\":\"x\"}";
 

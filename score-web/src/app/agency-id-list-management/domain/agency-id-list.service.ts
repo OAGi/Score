@@ -139,17 +139,21 @@ export class AgencyIdListService {
     });
   }
 
-  update(agencyIdList: AgencyIdListDetails, state?: string, comment?: string): Observable<any> {
+  update(agencyIdList: AgencyIdListDetails, state?: string, comment?: string,
+         projectFieldOptionOverride?: string): Observable<any> {
     let body;
     if (state) {
       body = {
         releaseId: agencyIdList.release.releaseId,
         toState: state
       };
-      // An optional comment travels with the state change and is posted verbatim to the linked
-      // GitHub issues (issue #1533). Blank comments are not sent — nothing is posted.
+      // An optional comment + project board fieldOption override travel with the state change (issue #1533).
+      // Blank values are not sent (post nothing / use the configured fieldOption).
       if (comment && comment.trim().length > 0) {
         body.comment = comment;
+      }
+      if (projectFieldOptionOverride) {
+        body.projectFieldOptionOverride = projectFieldOptionOverride;
       }
       return this.http.patch('/api/agency-id-lists/' + agencyIdList.agencyIdListManifestId + '/state', body);
     } else {
@@ -171,8 +175,9 @@ export class AgencyIdListService {
     }
   }
 
-  updateState(agencyIdList: AgencyIdListDetails, state: string, comment?: string): Observable<any> {
-    return this.update(agencyIdList, state, comment);
+  updateState(agencyIdList: AgencyIdListDetails, state: string, comment?: string,
+              projectFieldOptionOverride?: string): Observable<any> {
+    return this.update(agencyIdList, state, comment, projectFieldOptionOverride);
   }
 
   delete(...agencyIdListManifestIds): Observable<any> {
@@ -225,9 +230,18 @@ export class AgencyIdListService {
     return this.http.patch('/api/agency-id-lists/' + agencyIdList.agencyIdListManifestId + '/revise', {});
   }
 
-  cancelRevision(manifestId: number): Observable<any> {
+  cancelRevision(manifestId: number, comment?: string, projectFieldOptionOverride?: string): Observable<any> {
     const url = '/api/agency-id-lists/' + manifestId + '/cancel';
-    return this.http.patch<any>(url, {});
+    // An optional comment + project board fieldOption override travel with the request (issue #1533). Blank
+    // values are not sent (post nothing / use the configured fieldOption).
+    const body: any = {};
+    if (comment && comment.trim().length > 0) {
+      body.comment = comment;
+    }
+    if (projectFieldOptionOverride) {
+      body.projectFieldOptionOverride = projectFieldOptionOverride;
+    }
+    return this.http.patch<any>(url, body);
   }
 
   postComment(reference: string, text: string, prevCommentId?: number): Observable<any> {

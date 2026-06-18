@@ -12,6 +12,7 @@ import org.oagi.score.gateway.http.api.cc_management.model.bccp.BccpManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.DtManifestId;
 import org.oagi.score.gateway.http.api.code_list_management.model.CodeListManifestId;
 import org.oagi.score.gateway.http.api.integration_management.github.handler.GitHubWebhookEventDispatcher;
+import org.oagi.score.gateway.http.api.integration_management.github.model.ProjectFieldOptions;
 import org.oagi.score.gateway.http.api.integration_management.github.service.GitHubIntegrationService;
 import org.oagi.score.gateway.http.api.integration_management.github.service.GitHubIssueLinkService;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
@@ -28,6 +29,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.springframework.util.StringUtils.hasText;
@@ -50,6 +52,9 @@ public class GitHubIntegrationController {
     private GitHubIntegrationService service;
 
     @Autowired
+    private ProjectFieldOptions projectFieldOptions;
+
+    @Autowired
     private GitHubIssueLinkService issueLinkService;
 
     @Autowired
@@ -61,7 +66,24 @@ public class GitHubIntegrationController {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public record GitHubStatusResponse(boolean enabled, boolean connected, String login) {
+    public record GitHubStatusResponse(boolean enabled, boolean connected, String login,
+                                       boolean projectSyncAvailable, Map<String, String> fieldOptionByState,
+                                       String defaultFieldOption) {
+    }
+
+    /**
+     * The project board's fieldOption field for the state-change dialog's override dropdown: the owning
+     * project's title, the field name, and its options (each with the GitHub color used on the board).
+     */
+    public record ProjectFieldResponse(String projectTitle, String name, List<ProjectFieldOption> options) {
+    }
+
+    /** One option of the board's fieldOption field: name + GitHub color enum (GRAY/BLUE/.../PURPLE; may be null). */
+    public record ProjectFieldOption(String name, String color) {
+    }
+
+    /** One issue to fetch board status for (the dialog passes the linked issues' coordinates). */
+    public record ProjectAccessRequestItem(String owner, String repo, Integer number) {
     }
 
     public record LinkIssueRequest(String ccType, BigInteger manifestId, Integer issueNumber,
@@ -114,11 +136,41 @@ public class GitHubIntegrationController {
     @GetMapping("/status")
     public GitHubStatusResponse status(@AuthenticationPrincipal AuthenticatedPrincipal user) {
         ScoreUser requester = sessionService.asScoreUser(user);
+        // The fieldOption map is the configured CcState -> fieldOption mapping (ProjectFieldOptions); the dialog reads it so
+        // the fieldOption preview never drifts from the backend. Harmless to send even when the integration is off.
+        Map<String, String> fieldOptionByState = projectFieldOptions.stateFieldOptionNames();
+        String defaultFieldOption = projectFieldOptions.getDefaultFieldOption();
         if (!service.isConfigured()) {
-            return new GitHubStatusResponse(false, false, null);
+            return new GitHubStatusResponse(false, false, null, false, fieldOptionByState, defaultFieldOption);
         }
         boolean connected = service.isConnected(requester);
-        return new GitHubStatusResponse(true, connected, connected ? service.getLogin(requester) : null);
+        return new GitHubStatusResponse(true, connected,
+                connected ? service.getLogin(requester) : null,
+                service.isProjectSyncAvailable(requester), fieldOptionByState, defaultFieldOption);
+    }
+
+    /**
+     * The project board's fieldOption (single-select) field name + all option names, for the state-change
+     * dialog's fieldOption-override dropdown (issue #1533, Feature 2). Hits GitHub's GraphQL API (cached
+     * in-process server-side), so it is a SEPARATE endpoint the dialog calls on demand — never folded
+     * into the cheap, frequently-polled {@code /status}. Returns empty options when fieldOption sync is not
+     * available for this user (not connected / no project scope / not configured) or the field cannot
+     * be resolved, so the dialog simply shows the plain transition without a dropdown.
+     */
+    @GetMapping("/project-field")
+    public ProjectFieldResponse projectField(@AuthenticationPrincipal AuthenticatedPrincipal user) {
+        ScoreUser requester = sessionService.asScoreUser(user);
+        if (!service.isProjectSyncAvailable(requester)) {
+            return new ProjectFieldResponse(null, null, List.of());
+        }
+        GitHubIntegrationService.ProjectField field = service.getProjectField(requester);
+        if (field == null) {
+            return new ProjectFieldResponse(null, null, List.of());
+        }
+        List<ProjectFieldOption> options = field.options().stream()
+                .map(o -> new ProjectFieldOption(o.name(), o.color()))
+                .toList();
+        return new ProjectFieldResponse(field.projectTitle(), field.name(), options);
     }
 
     /** Starts the OAuth authorization-code flow (full-page redirect to GitHub). */
@@ -150,6 +202,31 @@ public class GitHubIntegrationController {
     @DeleteMapping("/connection")
     public void disconnect(@AuthenticationPrincipal AuthenticatedPrincipal user) {
         service.disconnect(sessionService.asScoreUser(user));
+    }
+
+    /**
+     * The connected user's access to the configured project board, for the state-change dialog (issue
+     * #1533): per issue, whether its repository is accessible (a prerequisite for posting a comment);
+     * board-wide, whether the user can READ the board and a best-effort proxy for whether they can WRITE
+     * it. The dialog passes the linked issues' coordinates (owner/repo/number) and uses this to drive its
+     * permission warnings. Each issue's CURRENT board fieldOption is intentionally NOT fetched (it pages
+     * projectItems on GitHub and is slow). Hits GitHub per issue, so it is on demand — never folded into
+     * {@code /status}. Best-effort throughout.
+     */
+    @PostMapping("/issues/project-access-status")
+    public GitHubIntegrationService.ProjectAccessStatus projectAccessStatus(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @RequestBody(required = false) List<ProjectAccessRequestItem> request) {
+        ScoreUser requester = sessionService.asScoreUser(user);
+        List<GitHubIntegrationService.IssueRef> refs = new ArrayList<>();
+        if (request != null) {
+            for (ProjectAccessRequestItem item : request) {
+                if (item != null && hasText(item.owner()) && hasText(item.repo()) && item.number() != null) {
+                    refs.add(new GitHubIntegrationService.IssueRef(item.owner(), item.repo(), item.number()));
+                }
+            }
+        }
+        return service.getProjectAccessStatus(requester, refs);
     }
 
     /**

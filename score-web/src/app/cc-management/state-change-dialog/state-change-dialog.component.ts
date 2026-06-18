@@ -5,22 +5,27 @@ import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/
 import {MatButtonModule} from '@angular/material/button';
 import {MatChipsModule} from '@angular/material/chips';
 import {MatIconModule} from '@angular/material/icon';
+import {MatSelectModule} from '@angular/material/select';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MarkdownComponent} from 'ngx-markdown';
-import {GithubIntegrationService, GithubStatus, LinkedIssue} from '../domain/github-integration.service';
+import {GithubIntegrationService, GithubStatus, LinkedIssue, ProjectField, ProjectFieldOption, IssueRepoAccess} from '../domain/github-integration.service';
 import {LogService} from '../../log-management/domain/log.service';
-import {candidatePost, revertPost} from './github-status-post-renderer';
+import {candidatePost, cancelPost, revertPost} from './github-status-post-renderer';
+import {CANCEL_REVISION_TO_STATE} from './cancel-revision-dialog';
 import {MarkdownAction, applyMarkdownAction} from './markdown-toolbar';
 
 /**
- * Whether a state change routes through {@link StateChangeDialogComponent}: only the
- * Draft -> Candidate and Candidate -> WIP transitions have a GitHub status post (issue #1533).
- * Every other transition keeps the generic confirm dialog, even when the GitHub integration is
- * enabled.
+ * Whether a state change routes through {@link StateChangeDialogComponent} rather than the generic
+ * confirm dialog (issue #1533). When the GitHub integration is enabled (the callers gate on
+ * {@code status.enabled}) EVERY state transition uses this dialog, so a component's linked GitHub
+ * issues, the destination board fieldOption (with an override dropdown), and an optional status comment are
+ * shown on every transition. The dialog degrades to a plain confirm when the component has no linked
+ * issues, and the comment box pre-fills only for transitions that have a defined status post
+ * (Draft -> Candidate, Candidate -> WIP, revision cancel) — otherwise it is shown empty. The
+ * parameters are kept for call-site symmetry but no longer restrict the transition.
  */
 export function usesStateChangeDialog(state: string, toState: string): boolean {
-  return (state === 'Draft' && toState === 'Candidate')
-    || (state === 'Candidate' && toState === 'WIP');
+  return true;
 }
 
 /** One component whose state is about to change. {@code ccType} is lowercase (acc, asccp, bccp, dt, code_list, agency_id_list). */
@@ -45,6 +50,12 @@ export interface StateChangeDialogResult {
   confirmed: true;
   /** Non-blank comments only, keyed '<ccType>:<manifestId>'. A missing key means: post nothing. */
   comments: { [key: string]: string };
+  /**
+   * Project board fieldOption overrides, keyed '<ccType>:<manifestId>' (issue #1533, Feature 2). Only present
+   * when the user picked a fieldOption different from the configured default; a missing key means "use the
+   * configured fieldOption".
+   */
+  fieldOptionOverrides: { [key: string]: string };
 }
 
 /**
@@ -76,7 +87,7 @@ const OCTICON_PATHS: { [name: string]: string } = {
   standalone: true,
   selector: 'score-state-change-dialog',
   imports: [CommonModule, FormsModule, MatDialogModule,
-    MatButtonModule, MatChipsModule, MatIconModule, MatTooltipModule, MarkdownComponent],
+    MatButtonModule, MatChipsModule, MatIconModule, MatSelectModule, MatTooltipModule, MarkdownComponent],
   providers: [LogService],
   templateUrl: './state-change-dialog.component.html',
   styleUrls: ['./state-change-dialog.component.css'],
@@ -130,6 +141,30 @@ export class StateChangeDialogComponent implements OnInit {
   issuesLoading = true;
   private issuesByKey = new Map<string, LinkedIssue[]>();
   comments: { [key: string]: string } = {};
+  /**
+   * The board fieldOption (single-select) field's options for the override dropdown (issue #1533, Feature 2),
+   * in board order; empty until loaded / when fieldOption sync is unavailable. {@link fieldName} is the
+   * field's name (e.g. "Status"), shown as the dropdown's tooltip; {@link projectTitle} is the owning
+   * Projects v2 board's title, shown beside each issue's fieldOption transition.
+   */
+  fieldOptions: ProjectFieldOption[] = [];
+  fieldName?: string;
+  projectTitle?: string;
+  /** Each fieldOption's GitHub color enum (name -> GRAY/BLUE/.../PURPLE), for rendering it in its board color. */
+  private optionColorByName = new Map<string, string>();
+  /** The per-target destination fieldOption the issue will move to — defaults to the configured fieldOption, user-overridable. */
+  fieldOptionSelections: { [key: string]: string } = {};
+  /**
+   * Board-related permission state fetched from GitHub (issue #1533), used only for the dialog's warnings:
+   * per linked issue whether its repo is accessible (keyed '<owner>/<repo>#<number>'), and board-wide
+   * whether the connected user can write the configured board ({@link projectWritable}). The issue's
+   * current board fieldOption is NOT fetched (slow), so the dialog shows only the destination fieldOption.
+   * Populated once after the issues are looked up.
+   */
+  projectAccessStatusLoaded = false;
+  projectConfigured?: boolean;
+  projectWritable?: boolean;
+  private repoAccessByIssue = new Map<string, IssueRepoAccess>();
   /** Targets whose pre-fill (change summary) is still being fetched. */
   private prefillLoadingKeys = new Set<string>();
   /** Targets whose pre-fill failed — the box stays empty with a warning, confirm still allowed. */
@@ -141,6 +176,29 @@ export class StateChangeDialogComponent implements OnInit {
     this.githubService.getStatus().subscribe({
       next: (status) => {
         this.status = status;
+        // Default each target's destination fieldOption to the configured fieldOption; the user may override it.
+        const fieldOption = this.targetFieldOption();
+        if (fieldOption) {
+          for (const target of this.data.targets) {
+            this.fieldOptionSelections[this.key(target)] = fieldOption;
+          }
+        }
+        // FieldOption sync available for this viewer: fetch the board field's options for the dropdown.
+        // Best-effort — on failure the dialog just shows the fieldOption name without a dropdown.
+        if (status.projectSyncAvailable) {
+          this.githubService.getProjectField().subscribe({
+            next: (field) => {
+              this.fieldOptions = field?.options || [];
+              this.fieldName = field?.name;
+              this.projectTitle = field?.projectTitle;
+              this.optionColorByName.clear();
+              for (const opt of this.fieldOptions) {
+                this.optionColorByName.set(opt.name, opt.color || '');
+              }
+            },
+            error: (err) => console.error('Failed to load the GitHub project board field', err),
+          });
+        }
         this.lookupIssues();
       },
       error: (err) => {
@@ -162,6 +220,7 @@ export class StateChangeDialogComponent implements OnInit {
         }
         this.issuesLoading = false;
         this.prefillComments();
+        this.fetchProjectAccessStatus();
       },
       error: (err) => {
         // Graceful degradation: still allow confirm, just without issues/comments.
@@ -172,25 +231,93 @@ export class StateChangeDialogComponent implements OnInit {
   }
 
   /**
-   * Pre-fills each eligible target's comment box with the rendered GitHub status post: the
-   * component's change summary (GET /logs/change-summary) run through the post renderer —
-   * {@link candidatePost} for Draft -> Candidate, {@link revertPost} for Candidate -> WIP.
-   * The dialog's lowercase ccType maps to the backend CcType enum name by uppercasing
-   * (acc -> ACC, code_list -> CODE_LIST, …). On failure the box stays empty with a warning;
-   * the user may still write the comment by hand or cancel.
+   * Fetches the board-permission state from GitHub (issue #1533): whether the connected user can access
+   * each issue's repo / can write the project board, for the dialog's warnings only (NOT the current
+   * fieldOption, which is slow). Runs only when the viewer is connected; best-effort — on failure the
+   * warnings simply do not appear. Distinct issues across all targets are fetched in one request.
+   */
+  private fetchProjectAccessStatus(): void {
+    if (!this.status?.connected) {
+      return;
+    }
+    const seen = new Set<string>();
+    const issues: { owner: string; repo: string; number: number }[] = [];
+    for (const target of this.data.targets) {
+      for (const issue of this.issuesOf(target)) {
+        const k = this.issueRefKey(issue);
+        if (!seen.has(k)) {
+          seen.add(k);
+          issues.push({owner: issue.repoOwner, repo: issue.repoName, number: issue.issueNumber});
+        }
+      }
+    }
+    if (issues.length === 0) {
+      return;
+    }
+    this.githubService.getProjectAccessStatus(issues).subscribe({
+      next: (bs) => {
+        this.projectConfigured = bs?.projectConfigured;
+        this.projectWritable = bs?.projectWritable;
+        for (const item of (bs?.items || [])) {
+          this.repoAccessByIssue.set(item.owner + '/' + item.repo + '#' + item.number, item);
+        }
+        this.projectAccessStatusLoaded = true;
+      },
+      error: (err) => {
+        console.error('Failed to load the GitHub board status', err);
+        this.projectAccessStatusLoaded = true;
+      },
+    });
+  }
+
+  private issueRefKey(issue: LinkedIssue): string {
+    return issue.repoOwner + '/' + issue.repoName + '#' + issue.issueNumber;
+  }
+
+  private repoAccessOf(issue: LinkedIssue): IssueRepoAccess | undefined {
+    return this.repoAccessByIssue.get(this.issueRefKey(issue));
+  }
+
+  /** Whether the connected user can access this issue's repo (true/unknown -> no warning). */
+  issueRepoInaccessible(issue: LinkedIssue): boolean {
+    const repoAccess = this.repoAccessOf(issue);
+    return this.projectAccessStatusLoaded && !!repoAccess && !repoAccess.repoAccessible;
+  }
+
+  /**
+   * Whether to warn that the connected user cannot write the project board: fieldOption sync is available (they
+   * have the scope) but the board is not writable for them — they could not read it, or (org board) they
+   * are not an active member — so a fieldOption move would not be applied. Best-effort: when membership cannot
+   * be determined (e.g. the token lacks {@code read:org}) the backend reports writable, so no false warning.
+   */
+  showProjectWriteWarning(): boolean {
+    return !!this.status?.projectSyncAvailable && this.projectAccessStatusLoaded
+      && !!this.projectConfigured && this.projectWritable === false;
+  }
+
+  /**
+   * Pre-fills the comment box with the rendered GitHub status post for the transitions that HAVE a
+   * defined post — {@link candidatePost} for Draft -> Candidate, {@link revertPost} for
+   * Candidate -> WIP, and {@link cancelPost} for a revision cancel (toState
+   * {@link CANCEL_REVISION_TO_STATE}). The dialog now opens on every state change, so every other
+   * transition has no defined message and its box is left empty (the user may still type a comment,
+   * which is posted verbatim). The component's change summary is fetched only when there is a post to
+   * render (GET /logs/change-summary); the lowercase ccType maps to the backend CcType by uppercasing
+   * (acc -> ACC, code_list -> CODE_LIST, …). On failure the box stays empty with a warning.
    */
   private prefillComments(): void {
     for (const target of this.data.targets) {
-      if (!this.commentEligible(target)) {
+      if (!this.commentEligible(target) || !this.hasPrefill(target)) {
         continue;
       }
       const key = this.key(target);
       this.prefillLoadingKeys.add(key);
       this.logService.getChangeSummary(target.ccType.toUpperCase(), target.manifestId).subscribe({
         next: (summary) => {
-          this.comments[key] = (this.data.toState === 'WIP')
-            ? revertPost(summary, 'WIP')
-            : candidatePost(summary);
+          const post = this.renderPrefill(target, summary);
+          if (post != null) {
+            this.comments[key] = post;
+          }
           this.prefillLoadingKeys.delete(key);
         },
         error: (err) => {
@@ -200,6 +327,29 @@ export class StateChangeDialogComponent implements OnInit {
         },
       });
     }
+  }
+
+  /** Whether this target's transition has a defined status post to pre-fill (else the box starts empty). */
+  private hasPrefill(target: StateChangeDialogTarget): boolean {
+    const to = this.data.toState;
+    return to === CANCEL_REVISION_TO_STATE
+      || (target.state === 'Draft' && to === 'Candidate')
+      || (target.state === 'Candidate' && to === 'WIP');
+  }
+
+  /** The rendered status post for this target's transition, or null when it has no defined post. */
+  private renderPrefill(target: StateChangeDialogTarget, summary: any): string | null {
+    const to = this.data.toState;
+    if (to === CANCEL_REVISION_TO_STATE) {
+      return cancelPost(summary);
+    }
+    if (target.state === 'Draft' && to === 'Candidate') {
+      return candidatePost(summary);
+    }
+    if (target.state === 'Candidate' && to === 'WIP') {
+      return revertPost(summary, 'WIP');
+    }
+    return null;
   }
 
   key(target: StateChangeDialogTarget): string {
@@ -228,9 +378,123 @@ export class StateChangeDialogComponent implements OnInit {
     return this.issuesByKey.get(this.key(target)) || [];
   }
 
+  /**
+   * Whether any target has a linked GitHub issue. When none do, the dialog has nothing GitHub-related
+   * to show, so the per-target section is hidden and the dialog degrades to a plain warning/confirm
+   * (issue #1533 follow-up: no more "No linked issues." noise on e.g. cancelling a revision).
+   */
+  anyTargetHasIssues(): boolean {
+    return this.data.targets.some(target => this.issuesOf(target).length > 0);
+  }
+
   issueLabel(issue: LinkedIssue): string {
     return issue.repoOwner + '/' + issue.repoName + '#' + issue.issueNumber;
   }
+
+  /**
+   * The to-state shown in each target row. Cancel is not a real CcState, so its sentinel
+   * ({@link CANCEL_REVISION_TO_STATE}) is rendered as a readable label instead of "CancelRevision".
+   */
+  toStateLabel(): string {
+    return this.data.toState === CANCEL_REVISION_TO_STATE ? 'Cancelled' : this.data.toState;
+  }
+
+  /**
+   * The GitHub Projects board fieldOption the linked issue moves to for this transition (issue #1533,
+   * Feature 2): a lookup of the destination state in the backend-supplied fieldOption map
+   * ({@link GithubStatus#fieldOptionByState}, the authoritative ProjectFieldOptions mapping). Draft -> Candidate lands
+   * in 'Candidate', Candidate -> WIP in 'Implementing'. The cancel sentinel (revert of a revision)
+   * resets the card to the backend's initial fieldOption (e.g. 'New').
+   */
+  targetFieldOption(): string | undefined {
+    if (this.data.toState === CANCEL_REVISION_TO_STATE) {
+      return this.status?.defaultFieldOption;
+    }
+    return this.status?.fieldOptionByState?.[this.data.toState];
+  }
+
+  /**
+   * The effective destination fieldOption for a target — the (possibly user-overridden) dropdown selection,
+   * falling back to the configured default. The override is per component (it moves ALL of the target's
+   * linked issues), so it is chosen once in the GitHub-style Projects card and shown read-only when the
+   * dropdown cannot be offered (config/board name drift).
+   */
+  destinationFieldOption(target: StateChangeDialogTarget): string | undefined {
+    return this.fieldOptionSelections[this.key(target)] || this.targetFieldOption();
+  }
+
+  /** Whether fieldOption sync is available at all (configured + a destination fieldOption exists) — dialog-global. */
+  fieldOptionSyncShown(): boolean {
+    return !!this.status?.projectSyncAvailable && !!this.targetFieldOption();
+  }
+
+  /**
+   * Whether to render THIS target's GitHub-style "Projects" card (project name + a "Status" row with the
+   * destination fieldOption): fieldOption sync is on, this target has a linked issue, and the board field's
+   * options have loaded. An issue-less target in a bulk change can move nothing on the board, so it shows
+   * the plain "state -> state" only — no card.
+   */
+  fieldOptionTransitionShownFor(target: StateChangeDialogTarget): boolean {
+    return this.fieldOptionSyncShown() && this.issuesOf(target).length > 0 && this.fieldOptions.length > 0;
+  }
+
+  /**
+   * Whether THIS target's destination fieldOption is an editable dropdown: its transition is shown AND the
+   * configured default destination fieldOption is among the board's options. If config/board fieldOption names
+   * drifted so the default is absent, we render it read-only instead (the @else-if badge) rather than a
+   * dropdown that would show blank with no matching option.
+   */
+  fieldOptionDropdownShownFor(target: StateChangeDialogTarget): boolean {
+    const def = this.targetFieldOption();
+    return this.fieldOptionTransitionShownFor(target) && !!def
+      && this.fieldOptions.some(o => o.name === def);
+  }
+
+  /**
+   * GitHub's Projects v2 single-select option colors (the {@code ProjectV2SingleSelectFieldOptionColor}
+   * enum), mapped to the foreground/background/dot the dialog renders so a fieldOption looks like it does on
+   * the board. {@code GRAY} is the fallback for an unknown/absent color.
+   */
+  private static readonly OPTION_COLORS: { [k: string]: { fg: string; bg: string; dot: string } } = {
+    GRAY: {fg: '#59636e', bg: '#eaeef2', dot: '#818b98'},
+    BLUE: {fg: '#0969da', bg: '#ddf4ff', dot: '#218bff'},
+    GREEN: {fg: '#1a7f37', bg: '#dafbe1', dot: '#2da44e'},
+    YELLOW: {fg: '#9a6700', bg: '#fff8c5', dot: '#d4a72c'},
+    ORANGE: {fg: '#bc4c00', bg: '#fff1e5', dot: '#e16f24'},
+    RED: {fg: '#cf222e', bg: '#ffebe9', dot: '#fa4549'},
+    PINK: {fg: '#bf3989', bg: '#ffeff7', dot: '#d549a8'},
+    PURPLE: {fg: '#8250df', bg: '#fbefff', dot: '#a475f9'},
+  };
+
+  private colorOf(optionName?: string): { fg: string; bg: string; dot: string } {
+    const colors = StateChangeDialogComponent.OPTION_COLORS;
+    const enumName = (optionName ? this.optionColorByName.get(optionName) : '') || '';
+    return colors[enumName.toUpperCase()] || colors['GRAY'];
+  }
+
+  /** Inline style for a fieldOption pill (badge) in its GitHub board color (borderless, like GitHub's pill). */
+  badgeStyle(optionName?: string): { [k: string]: string } {
+    const c = this.colorOf(optionName);
+    return {color: c.fg, background: c.bg};
+  }
+
+  /**
+   * Inline style for the colored dot before a fieldOption name. The shape lives here (not only in CSS) so the
+   * dot also renders correctly inside the mat-select panel, which is projected into the global CDK overlay
+   * where this component's emulated-encapsulation styles do not reach.
+   */
+  dotStyle(optionName?: string): { [k: string]: string } {
+    return {
+      'background-color': this.colorOf(optionName).dot,
+      display: 'inline-block',
+      width: '8px',
+      height: '8px',
+      'border-radius': '50%',
+      'margin-right': '6px',
+      flex: '0 0 auto',
+    };
+  }
+
 
   /**
    * A comment may be posted for a target when the viewer's GitHub account is connected and the
@@ -416,12 +680,22 @@ export class StateChangeDialogComponent implements OnInit {
 
   onConfirm(): void {
     const comments: { [key: string]: string } = {};
+    const fieldOptionOverrides: { [key: string]: string } = {};
+    const defaultFieldOption = this.targetFieldOption();
     for (const target of this.data.targets) {
-      const comment = this.comments[this.key(target)];
+      const key = this.key(target);
+      const comment = this.comments[key];
       if (comment && comment.trim().length > 0) {
-        comments[this.key(target)] = comment;
+        comments[key] = comment;
+      }
+      // Send an override only when this target's dropdown was actually shown (fieldOption sync on, the target
+      // has issues, options loaded with the default present) AND the user picked a different fieldOption.
+      // A no-change selection — or any issue-less target — means "use the configured fieldOption" (no override).
+      const selected = this.fieldOptionSelections[key];
+      if (this.fieldOptionDropdownShownFor(target) && selected && selected !== defaultFieldOption) {
+        fieldOptionOverrides[key] = selected;
       }
     }
-    this.dialogRef.close({confirmed: true, comments});
+    this.dialogRef.close({confirmed: true, comments, fieldOptionOverrides});
   }
 }

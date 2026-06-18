@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, OnChanges, SimpleChanges, inject} from '@angular/core';
+import {Component, HostListener, Input, OnInit, OnChanges, SimpleChanges, inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {GithubIntegrationService, GithubStatus, LinkedIssue} from '../domain/github-integration.service';
@@ -39,6 +39,26 @@ export class GithubIssueBoxComponent implements OnInit, OnChanges {
   newIssue = '';
   busy = false;
   error = '';
+  /**
+   * True from the moment the viewer clicks "Connect GitHub" until the full-page OAuth redirect
+   * navigates away. While set, a blocking overlay (the GitHub mark animated as a loading indicator)
+   * covers the whole page so no other action can be triggered during the (server round-trip)
+   * transition. Reset on a bfcache restore — see {@link onPageShow} — so the overlay never sticks if
+   * the viewer hits Back from GitHub.
+   */
+  connecting = false;
+
+  /**
+   * Connected viewer's GitHub permissions for THIS box, probed best-effort after the issues load
+   * (issue #1533): whether each linked issue's repo is accessible (a prerequisite for posting status
+   * comments) and whether the configured project board is writable. Until {@link accessLoaded} the
+   * warnings stay hidden so nothing flashes; on any probe failure they stay hidden (never cry wolf).
+   */
+  private accessLoaded = false;
+  private projectConfigured = false;
+  private projectWritable?: boolean;
+  /** owner/repo of this box's linked issues the connected viewer can't access — so can't comment. */
+  private inaccessibleRepos: string[] = [];
 
   ngOnInit(): void {
     this.service.getStatus().subscribe({
@@ -96,13 +116,73 @@ export class GithubIssueBoxComponent implements OnInit, OnChanges {
     return this.service.connectUrl(window.location.href);
   }
 
+  /**
+   * Start the full-page OAuth connect redirect. The anchor still performs the navigation, so a
+   * modifier/middle click that opens a new tab keeps working (the early return leaves this tab as-is);
+   * for a plain left-click that navigates this tab we first raise a blocking overlay so the viewer
+   * can't trigger other actions while the connect round-trip is in flight.
+   */
+  onConnectClick(event: MouseEvent): void {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+      return;
+    }
+    this.connecting = true;
+  }
+
+  /**
+   * Drop the blocking overlay when the page is restored from the bfcache — e.g. the viewer clicked
+   * Connect, landed on GitHub's authorize page, then hit the browser Back button. Without this the
+   * restored page would keep the overlay (and stay blocked) until a manual reload.
+   */
+  @HostListener('window:pageshow', ['$event'])
+  onPageShow(event: PageTransitionEvent): void {
+    if (event.persisted) {
+      this.connecting = false;
+    }
+  }
+
+  /**
+   * Red warnings shown beside Disconnect when the connected viewer lacks a GitHub permission this box
+   * needs (issue #1533): commenting on a linked issue's repo, and/or updating the configured project
+   * board. Empty until the permissions are probed, when not connected, or when nothing is missing.
+   */
+  get permissionWarnings(): string[] {
+    if (!this.accessLoaded || !this.connected) {
+      return [];
+    }
+    const warnings: string[] = [];
+    if (this.inaccessibleRepos.length === 1) {
+      warnings.push('No permission to comment on ' + this.inaccessibleRepos[0]);
+    } else if (this.inaccessibleRepos.length > 1) {
+      warnings.push('No permission to comment on the linked repositories');
+    }
+    if (this.showProjectWriteWarning) {
+      warnings.push('No permission to update the project board');
+    }
+    return warnings;
+  }
+
+  /**
+   * Mirrors the state-change dialog: warn about board writability only when project sync is available
+   * for this viewer (they hold the {@code project} scope) and the configured board is definitely not
+   * writable for them. Best-effort on the backend, so an unknown result never produces a false warning.
+   */
+  private get showProjectWriteWarning(): boolean {
+    return !!this.status?.projectSyncAvailable && this.accessLoaded
+      && this.projectConfigured && this.projectWritable === false;
+  }
+
   disconnect(): void {
     this.service.disconnect().subscribe(() => {
       if (this.status) {
         this.status.connected = false;
         this.status.login = undefined;
       }
-      this.issues = [];
+      // The warnings are about the now-disconnected viewer's token, so drop them.
+      this.clearAccessStatus();
+      // Do NOT clear this.issues: linked issues are component data and stay visible (read-only)
+      // whether or not the viewer is connected. Clearing them here was wrong — it showed
+      // "No issues linked." until a reload re-fetched the still-present links.
     });
   }
 
@@ -111,16 +191,68 @@ export class GithubIssueBoxComponent implements OnInit, OnChanges {
     // GitHub in the background, so changes appear on the next view. While the call is in flight we show
     // a "Loading issues…" state instead of a misleading "No issues linked.".
     this.issuesLoading = true;
+    // Reset synchronously so a node switch (ngOnChanges reuses this instance) never shows the previous
+    // node's warning during the in-flight fetch; loadAccessStatus re-probes once the issues resolve.
+    this.clearAccessStatus();
     this.service.listIssues(this.ccType, this.manifestId).subscribe({
       next: (list) => {
         this.issues = list || [];
         this.issuesLoading = false;
+        this.loadAccessStatus();
       },
       error: () => {
         this.issues = [];
         this.issuesLoading = false;
+        // Still probe board writability — it doesn't depend on the (failed) issue list.
+        this.loadAccessStatus();
       },
     });
+  }
+
+  /**
+   * Probe the connected viewer's GitHub permissions for THIS box (issue #1533): which linked issues'
+   * repos they can't access (so can't comment on), and — independently of any issues — whether the
+   * configured project board is writable. Runs only for the connected viewer (the warning is about
+   * their token) and only when there is something to check (issues linked and/or board sync available),
+   * so a viewer with no linked issues and no board never triggers a needless GitHub call. Best-effort:
+   * on failure the warnings simply stay hidden.
+   */
+  private loadAccessStatus(): void {
+    this.clearAccessStatus();
+    // Only the owner of the page's own (editable) box probes + warns: they are the one who links
+    // issues and triggers the state changes whose comments/board moves the missing permission would
+    // block, so the warning is theirs to act on. This also avoids a GitHub call per read-only
+    // tree-expanded box and spares non-owner viewers an irrelevant warning about their own token.
+    if (!this.connected || !this.editable || !this.isOwner
+        || (this.issues.length === 0 && !this.status?.projectSyncAvailable)) {
+      return;
+    }
+    const refs = this.issues.map((i) => ({owner: i.repoOwner, repo: i.repoName, number: i.issueNumber}));
+    this.service.getProjectAccessStatus(refs).subscribe({
+      next: (s) => {
+        this.projectConfigured = !!s?.projectConfigured;
+        this.projectWritable = s?.projectWritable;
+        const denied = new Set<string>();
+        for (const item of (s?.items || [])) {
+          if (!item.repoAccessible) {
+            denied.add(item.owner + '/' + item.repo);
+          }
+        }
+        this.inaccessibleRepos = [...denied];
+        this.accessLoaded = true;
+      },
+      error: () => {
+        // Leave the warnings hidden on a transient failure rather than warning falsely.
+        this.accessLoaded = true;
+      },
+    });
+  }
+
+  private clearAccessStatus(): void {
+    this.accessLoaded = false;
+    this.projectConfigured = false;
+    this.projectWritable = undefined;
+    this.inaccessibleRepos = [];
   }
 
   addIssue(): void {

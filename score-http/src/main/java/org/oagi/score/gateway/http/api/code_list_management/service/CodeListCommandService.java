@@ -139,10 +139,15 @@ public class CodeListCommandService {
     }
 
     public boolean updateState(ScoreUser requester, CodeListManifestId codeListManifestId, CcState nextState) {
-        return updateState(requester, codeListManifestId, nextState, null);
+        return updateState(requester, codeListManifestId, nextState, null, null);
     }
 
     public boolean updateState(ScoreUser requester, CodeListManifestId codeListManifestId, CcState nextState, String comment) {
+        return updateState(requester, codeListManifestId, nextState, comment, null);
+    }
+
+    public boolean updateState(ScoreUser requester, CodeListManifestId codeListManifestId, CcState nextState,
+                               String comment, String projectFieldOptionOverride) {
 
         var query = query(requester);
 
@@ -185,7 +190,7 @@ public class CodeListCommandService {
 
         if (result) {
             stateChangeEventPublisher.publish(
-                    CcType.CODE_LIST, codeListManifestId, prevState, nextState, requester.userId(), comment);
+                    CcType.CODE_LIST, codeListManifestId, prevState, nextState, requester.userId(), comment, projectFieldOptionOverride);
         }
 
         return result;
@@ -377,9 +382,13 @@ public class CodeListCommandService {
         LogId logId = logCommand(requester).create(
                 query.getCodeListDetails(codeListManifestId), Revised);
         command.updateLogId(codeListManifestId, logId);
+        // Publish the revise (released -> WIP) so the GitHub project fieldOption sync moves the linked issue
+        // back into the in-progress fieldOption (issue #1533).
+        stateChangeEventPublisher.publish(
+                CcType.CODE_LIST, codeListManifestId, prevCodeListDetails.state(), WIP, requester.userId());
     }
 
-    public void cancel(ScoreUser requester, CodeListManifestId codeListManifestId) {
+    public void cancel(ScoreUser requester, CodeListManifestId codeListManifestId, String comment, String projectFieldOptionOverride) {
 
         CodeListDetailsRecord codeListDetails =
                 query(requester).getCodeListDetails(codeListManifestId);
@@ -391,12 +400,20 @@ public class CodeListCommandService {
             throw new IllegalArgumentException("Not found previous revision");
         }
 
+        CcState prevState = codeListDetails.state();
+
         var command = command(requester);
 
         command.cancel(codeListManifestId);
 
         LogId logId = logCommand(requester).revertToStableStateByReference(codeListDetails.guid(), CcType.CODE_LIST);
         command.updateLogId(codeListManifestId, logId);
+
+        // Cancelling reverts WIP to the previously released revision. Publish it like an explicit state
+        // change so any linked GitHub issues get the user-edited status comment (issue #1533 follow-up).
+        CcState revertedTo = requester.isDeveloper() ? Published : Production;
+        stateChangeEventPublisher.publish(
+                CcType.CODE_LIST, codeListManifestId, prevState, revertedTo, requester.userId(), comment, projectFieldOptionOverride);
     }
 
     public boolean markAsDeleted(ScoreUser requester, CodeListManifestId codeListManifestId) {

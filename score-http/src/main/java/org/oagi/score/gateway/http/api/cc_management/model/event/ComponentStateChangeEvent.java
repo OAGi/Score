@@ -28,6 +28,15 @@ import org.oagi.score.gateway.http.common.model.event.Event;
  * backend. {@code null} means the user cleared it (opt-out: nothing is posted). It is normalized
  * (trimmed, blank-to-null, length-capped) by the publisher before the event is built — events
  * serialized before the field existed decode with {@code comment == null}.</p>
+ *
+ * <p>The {@code projectFieldOptionOverride} is an optional user-chosen Projects v2 board fieldOption (issue #1533,
+ * Feature 2) for this transition: the state-change dialog lets the acting user override the
+ * config-derived destination fieldOption via a dropdown of the board field's options. {@code null} (the
+ * usual case) means "use the configured fieldOption for the destination state". When present, the fieldOption
+ * sync moves the linked issue to this fieldOption instead — see
+ * {@code GitHubStatusPostEventSubscriber.syncProjectFieldOption}. Normalized (trimmed, blank-to-null,
+ * length-capped) by the publisher; events serialized before the field existed decode with it
+ * {@code null}.</p>
  */
 @Data
 @NoArgsConstructor
@@ -47,5 +56,7 @@ public class ComponentStateChangeEvent implements Event {
     private String eventId;
 
     private String comment;
+
+    private String projectFieldOptionOverride;
 
 }
