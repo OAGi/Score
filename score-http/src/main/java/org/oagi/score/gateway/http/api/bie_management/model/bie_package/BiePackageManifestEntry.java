@@ -9,7 +9,9 @@ import java.util.Collection;
 public record BiePackageManifestEntry(BieManifestDetail bie,
                                       Guid priorUuidInPackage,
                                       String priorVersionIdInPackage,
-                                      BackwardCompatibility backwardCompatibility,
+                                      // Issue #1733: emitted only for manifest version 0.3; null (and thus omitted)
+                                      // for the stable 0.2 manifest.
+                                      @JsonInclude(JsonInclude.Include.NON_NULL) BackwardCompatibility backwardCompatibility,
                                       boolean includedInPriorPackageVersion,
                                       Collection<BieComponentChange> addedComponentsFromPriorPackageVersion,
                                       Collection<BieComponentChange> removedComponentsFromPriorPackageVersion,

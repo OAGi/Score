@@ -390,6 +390,27 @@
               <button mat-raised-button class="me-2" color="primary" (click)="generate()"
                       [hidden]="table.dataSource.data.length == 0">Generate
               </button>
+              <div class="manifest-version-control" [hidden]="table.dataSource.data.length == 0">
+                <label class="manifest-version-label">Manifest Version</label>
+                <button mat-stroked-button type="button" class="manifest-version-trigger"
+                        [matMenuTriggerFor]="manifestVersionMenu"
+                        aria-label="Select BIE Package manifest version">
+                  <span class="manifest-version-trigger-content">
+                    <span>{{ manifestVersionLabel }}</span>
+                    <mat-icon class="manifest-version-chevron">arrow_drop_down</mat-icon>
+                  </span>
+                </button>
+              </div>
+              <mat-menu #manifestVersionMenu="matMenu" xPosition="before" yPosition="below">
+                <button mat-menu-item type="button" class="manifest-version-item"
+                        (click)="manifestVersion = '0.2'">
+                  <span>0.2</span>
+                </button>
+                <button mat-menu-item type="button" class="manifest-version-item"
+                        (click)="manifestVersion = '0.3'">
+                  <span>0.3 (draft)</span>
+                </button>
+              </mat-menu>
             </div>
           </div>
         </div>

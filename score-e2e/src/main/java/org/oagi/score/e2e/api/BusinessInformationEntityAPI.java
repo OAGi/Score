@@ -45,6 +45,18 @@ public interface BusinessInformationEntityAPI {
                               int cardinalityMin, int cardinalityMax, Long maxLengthFacet);
 
     /**
+     * Override the primitive value domain (the assigned XBT) of every BBIE under the given top-level
+     * BIE with the XBT whose XSD built-in type is {@code builtInType} (for example
+     * {@code "xsd:normalizedString"} or {@code "xsd:token"}), resolved in the BIE's own release; any
+     * code-list / agency-id-list override is cleared. This bypasses the editor and is used to seed a
+     * deterministic value-domain (primitive) narrowing between two BIEs built on the same ASCCP
+     * (issue #1733). The XBT must be set on <em>both</em> the prior and the current BIE for the
+     * backward-compatibility diff to consider the value domain; if either side leaves the BBIE's XBT
+     * null, the backend short-circuits and records no value-domain break.
+     */
+    void seedAllBbieValueDomainByBuiltInType(BigInteger topLevelAsbiepId, String builtInType);
+
+    /**
      * Link an existing top-level BIE to a BIE Package (mirrors the backend "Add BIE" command without
      * driving the UI dialog). Used for deterministic BIE Package test setup.
      */

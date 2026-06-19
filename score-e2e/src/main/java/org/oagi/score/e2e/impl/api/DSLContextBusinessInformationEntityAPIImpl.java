@@ -363,6 +363,37 @@ public class DSLContextBusinessInformationEntityAPIImpl implements BusinessInfor
     }
 
     @Override
+    public void seedAllBbieValueDomainByBuiltInType(BigInteger topLevelAsbiepId, String builtInType) {
+        ULong ownerId = ULong.valueOf(topLevelAsbiepId);
+        ULong releaseId = dslContext.select(TOP_LEVEL_ASBIEP.RELEASE_ID)
+                .from(TOP_LEVEL_ASBIEP)
+                .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ownerId))
+                .fetchOne(TOP_LEVEL_ASBIEP.RELEASE_ID);
+        if (releaseId == null) {
+            throw new IllegalStateException(
+                    "No top-level ASBIEP " + topLevelAsbiepId + "; cannot resolve its release.");
+        }
+        ULong xbtManifestId = dslContext.select(XBT_MANIFEST.XBT_MANIFEST_ID)
+                .from(XBT_MANIFEST)
+                .join(XBT).on(XBT_MANIFEST.XBT_ID.eq(XBT.XBT_ID))
+                .where(and(
+                        XBT_MANIFEST.RELEASE_ID.eq(releaseId),
+                        XBT.BUILTIN_TYPE.eq(builtInType)))
+                .fetchAny(XBT_MANIFEST.XBT_MANIFEST_ID);
+        if (xbtManifestId == null) {
+            throw new IllegalStateException(
+                    "No XBT '" + builtInType + "' in release " + releaseId
+                            + "; cannot seed the BBIE value domain.");
+        }
+        dslContext.update(BBIE)
+                .set(BBIE.XBT_MANIFEST_ID, xbtManifestId)
+                .setNull(BBIE.CODE_LIST_MANIFEST_ID)
+                .setNull(BBIE.AGENCY_ID_LIST_MANIFEST_ID)
+                .where(BBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ownerId))
+                .execute();
+    }
+
+    @Override
     public void addBieToBiePackage(BigInteger biePackageId, BigInteger topLevelAsbiepId, BigInteger createdByUserId) {
         insertBiePackageTopLevelAsbiep(biePackageId, topLevelAsbiepId, null, createdByUserId);
     }

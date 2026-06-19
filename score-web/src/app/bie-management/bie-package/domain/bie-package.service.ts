@@ -242,10 +242,13 @@ export class BiePackageService {
     }
   }
 
-  generateBiePackage(biePackageId: number, option: BieExpressOption, ...topLevelAsbiepIdList: number[]): Observable<HttpResponse<Blob>> {
+  generateBiePackage(biePackageId: number, option: BieExpressOption, manifestVersion: string, ...topLevelAsbiepIdList: number[]): Observable<HttpResponse<Blob>> {
     let params: HttpParams = new HttpParams();
     if (topLevelAsbiepIdList && topLevelAsbiepIdList.length > 0) {
       params = params.set('topLevelAsbiepIdList', topLevelAsbiepIdList.map(e => e.toString()).join(','));
+    }
+    if (!!manifestVersion) {
+      params = params.set('manifestVersion', manifestVersion);
     }
     if (!!option) {
       const requestOption = {

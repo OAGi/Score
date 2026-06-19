@@ -379,4 +379,17 @@ CREATE TABLE `github_issue_agency_id_list_manifest`
   COLLATE = utf8mb4_general_ci
   ROW_FORMAT = DYNAMIC COMMENT ='Links an agency id list manifest to a GitHub issue (many-to-many).';
 
+-- ------------------------------------------------------------------------------------
+-- Prevent duplicate BIE membership rows in a BIE package.
+--
+-- A top-level ABIEP must appear at most once per BIE package, but the table had no
+-- unique constraint on (bie_package_id, top_level_asbiep_id). As a result the backend's
+-- INSERT ... ON DUPLICATE KEY UPDATE in addBiePackageTopLevelAsbiep() never matched, so
+-- repeatedly clicking "Add" for the same BIE accumulated duplicate link rows. The BIE list
+-- query de-duplicates on read, so those duplicates were invisible in the UI (the list
+-- appeared "not to refresh" after Add) while silently bloating the table.
+-- enforce uniqueness so the ON DUPLICATE KEY UPDATE upsert works as intended.
+ALTER TABLE `bie_package_top_level_asbiep`
+    ADD UNIQUE KEY `bie_package_top_level_asbiep_uk1` (`bie_package_id`, `top_level_asbiep_id`);
+
 SET FOREIGN_KEY_CHECKS = @OLD_FOREIGN_KEY_CHECKS;

@@ -64,8 +64,12 @@ import static org.oagi.score.gateway.http.common.util.StringUtils.hasLength;
 @Transactional(readOnly = true)
 public class BiePackageManifestService {
 
-    // Bumped 0.2 -> 0.3 for the package-level revisionReason field added per issue #1733.
-    private static final String BIE_PACKAGE_MANIFEST_VERSION = "0.3";
+    // Issue #1733: the BIE Package manifest version is selectable at generation time. "0.2" is the stable
+    // default and omits the issue #1733 additions (the per-BIE backwardCompatibility indicator and the
+    // package-level revisionReason); "0.3" is the draft version that includes both.
+    public static final String MANIFEST_VERSION_0_2 = "0.2";
+    public static final String MANIFEST_VERSION_0_3 = "0.3";
+    private static final String DEFAULT_MANIFEST_VERSION = MANIFEST_VERSION_0_2;
 
     @Autowired
     private RepositoryFactory repositoryFactory;
@@ -75,13 +79,24 @@ public class BiePackageManifestService {
 
     public BiePackageManifestResponse getBiePackageManifest(ScoreUser requester,
                                                             BiePackageId biePackageId, String pathDelimiter) {
-        return getBiePackageManifest(requester, biePackageId, pathDelimiter, Collections.emptyMap());
+        return getBiePackageManifest(requester, biePackageId, pathDelimiter, DEFAULT_MANIFEST_VERSION);
     }
 
     public BiePackageManifestResponse getBiePackageManifest(ScoreUser requester,
                                                             BiePackageId biePackageId,
                                                             String pathDelimiter,
-                                                            Map<TopLevelAsbiepId, String> generatedFilesByTopLevelAsbiepId) {
+                                                            String manifestVersion) {
+        return getBiePackageManifest(requester, biePackageId, pathDelimiter, Collections.emptyMap(), manifestVersion);
+    }
+
+    public BiePackageManifestResponse getBiePackageManifest(ScoreUser requester,
+                                                            BiePackageId biePackageId,
+                                                            String pathDelimiter,
+                                                            Map<TopLevelAsbiepId, String> generatedFilesByTopLevelAsbiepId,
+                                                            String manifestVersion) {
+
+        String resolvedManifestVersion = resolveManifestVersion(manifestVersion);
+        boolean includeIssue1733Fields = MANIFEST_VERSION_0_3.equals(resolvedManifestVersion);
 
         BiePackageQueryRepository biePackageQueryRepository = repositoryFactory.biePackageQueryRepository(requester);
         BiePackageSummaryRecord currentPackage = biePackageQueryRepository.getBiePackageSummary(biePackageId);
@@ -135,7 +150,7 @@ public class BiePackageManifestService {
                                     generatedFilesByTopLevelAsbiepId.get(currentTopLevelAsbiep.topLevelAsbiepId())),
                             prevTopLevelAsbiep.guid(),
                             prevTopLevelAsbiep.version(),
-                            backwardCompatibilityOf(context),
+                            (includeIssue1733Fields ? backwardCompatibilityOf(context) : null),
                             true,
                             context.added,
                             context.removed,
@@ -169,7 +184,7 @@ public class BiePackageManifestService {
                                 generatedFilesByTopLevelAsbiepId.get(currentTopLevelAsbiep.topLevelAsbiepId())),
                         null,
                         null,
-                        new BackwardCompatibility(false, false, false),
+                        (includeIssue1733Fields ? new BackwardCompatibility(false, false, false) : null),
                         false,
                         Collections.emptyList(),
                         Collections.emptyList(),
@@ -224,7 +239,7 @@ public class BiePackageManifestService {
                 (prevPackage != null) ? prevPackage.guid(): null,
                 (prevPackage != null) ? prevPackage.versionGuid() : null,
                 (prevPackage != null) ? prevPackage.versionId() : null,
-                currentPackage.revisionReason(),
+                (includeIssue1733Fields ? currentPackage.revisionReason() : null),
                 newBiesFromPriorPackageVersion,
                 removedBiesFromPriorPackageVersion,
                 changedBiesFromPriorPackageVersion,
@@ -232,9 +247,26 @@ public class BiePackageManifestService {
                 libraryCompatibilityCollection,
                 biePackageManifestEntryList);
         BiePackageManifestResponse biePackageManifest =
-                new BiePackageManifestResponse(BIE_PACKAGE_MANIFEST_VERSION, biePackageMetadata);
+                new BiePackageManifestResponse(resolvedManifestVersion, biePackageMetadata);
 
         return biePackageManifest;
+    }
+
+    /**
+     * Resolve the requested BIE Package manifest version. A blank value defaults to the stable
+     * {@value #MANIFEST_VERSION_0_2}; only {@value #MANIFEST_VERSION_0_2} and {@value #MANIFEST_VERSION_0_3}
+     * are supported (issue #1733). Any other value is rejected.
+     */
+    private static String resolveManifestVersion(String manifestVersion) {
+        if (!hasLength(manifestVersion)) {
+            return DEFAULT_MANIFEST_VERSION;
+        }
+        String trimmed = manifestVersion.trim();
+        if (MANIFEST_VERSION_0_2.equals(trimmed) || MANIFEST_VERSION_0_3.equals(trimmed)) {
+            return trimmed;
+        }
+        throw new IllegalArgumentException("Unsupported BIE Package manifest version: '" + manifestVersion
+                + "'. Supported versions are " + MANIFEST_VERSION_0_2 + " and " + MANIFEST_VERSION_0_3 + ".");
     }
 
     private String resolveRemark(org.oagi.score.gateway.http.api.bie_management.repository.AsbiepQueryRepository asbiepQueryRepository,
@@ -854,20 +886,13 @@ public class BiePackageManifestService {
     // ----- Issue #1733: per-element backward-compatibility evaluation for MATCHED elements -----
 
     private void evaluateAsbieCompatibility(BieTrackContext context, Asbie current, Asbie prev) {
-        // ASBIE carries occurrence + nillable. Cardinality tightening and nillable removal break both syntaxes.
+        // ASBIE carries occurrence + nillable. Cardinality tightening and nillable removal break both syntaxes;
+        // crossing the JSON array/object boundary breaks JSON only.
         if (isMoreRestrictiveCardinality(current.getCardinalityMin(), current.getCardinalityMax(),
                 prev.getCardinalityMin(), prev.getCardinalityMax())) {
             context.recordBreak(true, true);
         }
-        // Issue #1733: the JSON array/object shape follows the based ASCC's max cardinality, not the ASBIE max,
-        // so it flips only when the underlying component's array-ness actually differs between the two versions.
-        // Narrowing the ASBIE max alone no longer changes the rendering, so it is no longer a JSON break.
-        var accQueryRepository = repositoryFactory.accQueryRepository(context.requester);
-        AsccSummaryRecord currentAscc = safeGet(() -> accQueryRepository.getAsccSummary(current.getBasedAsccManifestId()));
-        AsccSummaryRecord prevAscc = safeGet(() -> accQueryRepository.getAsccSummary(prev.getBasedAsccManifestId()));
-        if (currentAscc != null && prevAscc != null) {
-            evaluateJsonArrayFlip(context, currentAscc.cardinality().max(), prevAscc.cardinality().max());
-        }
+        evaluateJsonArrayFlip(context, current.getCardinalityMax(), prev.getCardinalityMax());
         evaluateNillable(context, current.isNillable(), prev.isNillable(), true); // ASBIE always renders as an element
     }
 
@@ -883,11 +908,7 @@ public class BiePackageManifestService {
                 prev.getCardinalityMin(), prev.getCardinalityMax())) {
             context.recordBreak(true, true);
         }
-        // Issue #1733: the JSON array/object shape follows the based BCC's max cardinality, not the BBIE max,
-        // so it flips only when the underlying component's array-ness differs between the two versions.
-        if (currentBcc != null && prevBcc != null) {
-            evaluateJsonArrayFlip(context, currentBcc.cardinality().max(), prevBcc.cardinality().max());
-        }
+        evaluateJsonArrayFlip(context, current.getCardinalityMax(), prev.getCardinalityMax());
         evaluateNillable(context, current.isNillable(), prev.isNillable(), currentIsElement);
         evaluateValueConstraint(context, current.getFixedValue(), prev.getFixedValue());
         evaluateFacet(context, current.getFacetMinLength(), current.getFacetMaxLength(), current.getFacetPattern(),
@@ -1079,11 +1100,10 @@ public class BiePackageManifestService {
 
     /*
      * JSON renders a repeatable element (max unbounded or > 1) as an array and a non-repeatable one (max 0 or 1)
-     * as a bare value, whereas XSD keeps the same element shape. Since Issue #1733 the array/object decision in the
-     * JSON and OpenAPI generators is driven by the based ASCC/BCC max cardinality (not the ASBIE/BBIE max), so the
-     * callers pass the based component's max for the current and prior versions: the shape flips only when the
-     * underlying component's array-ness actually differs (e.g. its cardinality changed across releases), which is a
-     * JSON-only break. Narrowing the BIE's own max no longer flips the rendering and is therefore not a break here.
+     * as a bare value, whereas XSD keeps the same element shape (only minOccurs/maxOccurs differ). Crossing that
+     * boundary therefore breaks JSON only: a single-object document is invalid against an array schema and vice
+     * versa. The array -> scalar direction is also a cardinality tightening already recorded as a
+     * syntax-independent break; the scalar -> array direction is a cardinality loosening that breaks JSON alone.
      */
     private void evaluateJsonArrayFlip(BieTrackContext context, int newMax, int oldMax) {
         if (BieBackwardCompatibilityRules.jsonArrayFlip(newMax, oldMax)) {

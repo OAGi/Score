@@ -125,6 +125,24 @@ public class BIEPackageManifest {
         return null;
     }
 
+    /**
+     * Whether any BIE entry carries a {@code backwardCompatibility} object. The per-BIE backward
+     * compatibility indicator is emitted only in the draft {@code 0.3} manifest; the stable {@code 0.2}
+     * manifest omits it on every entry. Used to assert the 0.2 manifest does not leak the draft fields.
+     */
+    public boolean hasAnyBackwardCompatibility() {
+        JSONArray list = bieList();
+        if (list != null) {
+            for (int i = 0; i < list.length(); i++) {
+                JSONObject entry = list.getJSONObject(i);
+                if (entry.has("backwardCompatibility") && !entry.isNull("backwardCompatibility")) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private BackwardCompatibility backwardCompatibilityOf(JSONObject entry) {
         JSONObject backwardCompatibility = entry.getJSONObject("backwardCompatibility");
         return new BackwardCompatibility(

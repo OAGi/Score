@@ -229,4 +229,3 @@
 - [Test Suite 46 - BIE Package Management](/docs/test_cases/TestSuite46.md)
 	- [Test Case 46.1 - Revision Reason Text](/docs/test_cases/TestSuite46.md#test-case-461)
 	- [Test Case 46.2 - Backward Compatibility Indicator](/docs/test_cases/TestSuite46.md#test-case-462)
-	- [Test Case 46.3 - Array rendering follows the based component's cardinality](/docs/test_cases/TestSuite46.md#test-case-463)

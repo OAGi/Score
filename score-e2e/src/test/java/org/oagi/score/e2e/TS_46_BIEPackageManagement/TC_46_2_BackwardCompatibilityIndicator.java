@@ -42,7 +42,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TC_46_2_BackwardCompatibilityIndicator extends BaseTest {
 
     private static final String RELEASE_NUMBER = "10.8.8";
-    private static final String TEXT_BDT_GUID = "dd0c8f86b160428da3a82d2866a5b48d";
+    // The "Text" BDT: default primitive xsd:string, and it also offers xsd:normalizedString and
+    // xsd:token, which the value-domain narrowing scenario (#46.2.8) needs. (The cardinality/facet
+    // scenarios are primitive-agnostic: they never assign an XBT, so the value-domain rule never fires.)
+    private static final String TEXT_BDT_GUID = "89be97039be04d6f9cfda107d75926b5";
 
     private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
@@ -145,6 +148,8 @@ public class TC_46_2_BackwardCompatibilityIndicator extends BaseTest {
         revision.openPage(revision.getBiePackageId());
 
         revision.selectExpression("XML");
+        // The backward compatibility indicator is only emitted in the draft 0.3 manifest.
+        revision.selectManifestVersion("0.3");
         File generatedZip = revision.clickGenerateAndDownloadZip();
         // The revision's head-of-chain is the variant BIE, so the package has exactly one BIE.
         return BIEPackageManifest.fromGeneratedZip(generatedZip).backwardCompatibilityOfOnlyBie();
@@ -173,6 +178,8 @@ public class TC_46_2_BackwardCompatibilityIndicator extends BaseTest {
         revision.openPage(revision.getBiePackageId());
 
         revision.selectExpression("XML");
+        // The backward compatibility indicator is only emitted in the draft 0.3 manifest.
+        revision.selectManifestVersion("0.3");
         File generatedZip = revision.clickGenerateAndDownloadZip();
         BIEPackageManifest manifest = BIEPackageManifest.fromGeneratedZip(generatedZip);
 
@@ -226,15 +233,15 @@ public class TC_46_2_BackwardCompatibilityIndicator extends BaseTest {
 
     @Test
     @DisplayName("TC_46_2_6")
-    public void loosening_cardinality_keeps_both_syntaxes() {
-        // baseline: max 1; variant: max unbounded. Since issue #1733 the JSON array/object shape follows the
-        // underlying ASCC/BCC max (not the BIE max), so loosening the BIE cardinality no longer flips the JSON
-        // rendering -> the change is backward compatible in both syntaxes.
+    public void loosening_cardinality_breaks_json_only() {
+        // baseline: max 1 (scalar); variant: max unbounded (array). Loosening the cardinality from 1 to unbounded
+        // flips the JSON rendering from a bare value to an array, which is a JSON-only break; XSD keeps the same
+        // element shape, so it stays XML compatible.
         BackwardCompatibility bc = profilingDiff(new BbieSeed(true, 0, 1, null), new BbieSeed(true, 0, -1, null));
         // Assertion #46.2.6
         assertTrue(bc.xmlSchema(), "Loosening cardinality keeps XML schema compatibility.");
-        assertTrue(bc.jsonSchema(),
-                "Loosening cardinality keeps JSON schema compatibility (array shape follows the based component).");
+        assertFalse(bc.jsonSchema(),
+                "Loosening cardinality from 1 to unbounded flips the JSON shape to an array (JSON-only break).");
     }
 
     @Test
@@ -245,6 +252,48 @@ public class TC_46_2_BackwardCompatibilityIndicator extends BaseTest {
         // Assertion #46.2.7
         assertFalse(bc.xmlSchema(), "Tightening a facet breaks XML schema compatibility.");
         assertFalse(bc.jsonSchema(), "Tightening a facet breaks JSON schema compatibility.");
+    }
+
+    @Test
+    @DisplayName("TC_46_2_8")
+    public void narrowing_a_value_domain_in_xml_only_breaks_xml_only() {
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        AppUserObject user = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(user);
+
+        // Build a baseline and a variant BIE on the same (text) ASCCP, then narrow the variant's
+        // primitive from normalizedString to token. token is a sub-type (restriction) of
+        // normalizedString, so the XSD value space is narrowed (an XML break), while both map to the
+        // same JSON Schema type "string", so JSON stays compatible. Both sides must carry an explicit
+        // XBT or the backend short-circuits the value-domain comparison.
+        ASCCPObject asccp = createSharedAsccp(user, library);
+        TopLevelASBIEPObject baselineBie = createProductionBIE(user, asccp);
+        bieAPI().seedAllBbieValueDomainByBuiltInType(baselineBie.getTopLevelAsbiepId(), "xsd:normalizedString");
+        TopLevelASBIEPObject variantBie = createProductionBIE(user, asccp);
+        bieAPI().seedAllBbieValueDomainByBuiltInType(variantBie.getTopLevelAsbiepId(), "xsd:token");
+
+        HomePage homePage = loginPage().signIn(user.getLoginId(), user.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewBIEPackagePage viewBIEPackagePage = bieMenu.openBIEPackageSubMenu();
+        EditBIEPackagePage firstVersion = buildProductionPackageWith(viewBIEPackagePage, user, baselineBie);
+
+        // Revise, then replace the baseline BIE with the variant (same ASCCP) deterministically.
+        EditBIEPackagePage revision = firstVersion.revise();
+        bieAPI().replaceBieInBiePackage(revision.getBiePackageId(),
+                baselineBie.getTopLevelAsbiepId(), variantBie.getTopLevelAsbiepId(), user.getAppUserId());
+        revision.openPage(revision.getBiePackageId());
+
+        revision.selectExpression("XML");
+        // The backward compatibility indicator is only emitted in the draft 0.3 manifest.
+        revision.selectManifestVersion("0.3");
+        File generatedZip = revision.clickGenerateAndDownloadZip();
+        BackwardCompatibility bc = BIEPackageManifest.fromGeneratedZip(generatedZip).backwardCompatibilityOfOnlyBie();
+
+        // Assertion #46.2.8
+        assertFalse(bc.xmlSchema(),
+                "Narrowing the value domain from normalizedString to token breaks XML schema compatibility.");
+        assertTrue(bc.jsonSchema(),
+                "Narrowing the value domain to a sibling string-based type keeps JSON schema compatibility.");
     }
 
     @Test
@@ -265,6 +314,8 @@ public class TC_46_2_BackwardCompatibilityIndicator extends BaseTest {
         // Revise without changing anything; the BIE carries forward unchanged.
         EditBIEPackagePage revision = firstVersion.revise();
         revision.selectExpression("XML");
+        // The backward compatibility indicator is only emitted in the draft 0.3 manifest.
+        revision.selectManifestVersion("0.3");
         File generatedZip = revision.clickGenerateAndDownloadZip();
         BackwardCompatibility bc =
                 BIEPackageManifest.fromGeneratedZip(generatedZip).backwardCompatibilityByDen(asccp.getDen());

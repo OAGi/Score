@@ -100,45 +100,6 @@ public class OpenAPIDocumentExport {
         return (ref instanceof String) ? (String) ref : null;
     }
 
-    /**
-     * The property names declared under a component schema's {@code properties} map, or an empty set
-     * when the schema is absent or declares no properties.
-     */
-    public Set<String> schemaPropertyNames(String schemaName) {
-        Map<String, Object> schema = schema(schemaName);
-        Map<String, Object> properties = schema == null ? null : asMap(schema.get("properties"));
-        return properties == null ? Collections.emptySet() : new LinkedHashSet<>(properties.keySet());
-    }
-
-    /**
-     * The declared {@code type} of a child property inside a component schema's {@code properties} map
-     * (YAML path {@code components.schemas.<schemaName>.properties.<childName>.type}), or {@code null}
-     * when the property is absent or carries no explicit {@code type} (e.g. it is a bare {@code $ref}).
-     */
-    public String schemaPropertyType(String schemaName, String childName) {
-        Map<String, Object> schema = schema(schemaName);
-        Map<String, Object> properties = schema == null ? null : asMap(schema.get("properties"));
-        Map<String, Object> child = properties == null ? null : asMap(properties.get(childName));
-        Object type = child == null ? null : child.get("type");
-        return type == null ? null : String.valueOf(type);
-    }
-
-    /**
-     * A flat map of every component-schema property's declared {@code type}, keyed by
-     * {@code "<schemaName>.<propertyName>"}. Properties without an explicit scalar {@code type}
-     * (for example bare {@code $ref}s) map to {@code null}. Lets a test assert structurally that some
-     * child is rendered as an array without coupling to a specific (randomly named) schema/property.
-     */
-    public Map<String, String> objectPropertyTypes() {
-        Map<String, String> result = new LinkedHashMap<>();
-        for (String schemaName : schemaNames()) {
-            for (String property : schemaPropertyNames(schemaName)) {
-                result.put(schemaName + "." + property, schemaPropertyType(schemaName, property));
-            }
-        }
-        return result;
-    }
-
     /* -------------------------------------------------------------- security */
 
     public Map<String, Object> securitySchemes() {

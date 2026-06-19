@@ -66,7 +66,7 @@ public class BiePackageQueryService {
     public BieGenerateExpressionResult generate(
             ScoreUser requester, BiePackageId biePackageId,
             Collection<TopLevelAsbiepId> topLevelAsbiepIdList, GenerateExpressionOption option,
-            String pathDelimiter) throws IOException {
+            String pathDelimiter, String manifestVersion) throws IOException {
 
         var query = query(requester);
         BiePackageSummaryRecord biePackage = query.getBiePackageSummary(biePackageId);
@@ -108,7 +108,7 @@ public class BiePackageQueryService {
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getName()));
         BiePackageManifestResponse biePackageManifestResponse =
                 biePackageManifestService.getBiePackageManifest(
-                        requester, biePackageId, pathDelimiter, generatedFilesByTopLevelAsbiepId);
+                        requester, biePackageId, pathDelimiter, generatedFilesByTopLevelAsbiepId, manifestVersion);
 
         return makeGenerateBiePackageResponse(biePackage, result, biePackageManifestResponse);
     }

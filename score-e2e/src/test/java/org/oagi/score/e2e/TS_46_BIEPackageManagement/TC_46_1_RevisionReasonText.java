@@ -155,6 +155,8 @@ public class TC_46_1_RevisionReasonText extends BaseTest {
 
         // Assertion #46.1.7 - emitted in the generated manifest (version 0.3), after the prior package version id.
         revision.selectExpression("XML");
+        // The revision reason is only emitted in the draft 0.3 manifest.
+        revision.selectManifestVersion("0.3");
         File generatedZip = revision.clickGenerateAndDownloadZip();
         BIEPackageManifest manifest = BIEPackageManifest.fromGeneratedZip(generatedZip);
         assertEquals("0.3", manifest.manifestVersion(),
@@ -172,5 +174,51 @@ public class TC_46_1_RevisionReasonText extends BaseTest {
                 "The Revision Reason field should be shown on the next revision.");
         assertEquals("", nextRevision.getRevisionReason(),
                 "A new revision should start with an empty Revision Reason (no inheritance).");
+    }
+
+    @Test
+    @DisplayName("TC_46_1_9")
+    public void the_stable_0_2_manifest_omits_the_0_3_only_fields() {
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        TopLevelASBIEPObject bie = createProductionTopLevelBIE(endUser, library);
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewBIEPackagePage viewBIEPackagePage = bieMenu.openBIEPackageSubMenu();
+
+        // Create a Production BIE Package and revise it so the 0.3 manifest *would* emit the issue
+        // #1733 fields (a revised package, plus a captured Revision Reason).
+        EditBIEPackagePage firstVersion = viewBIEPackagePage.hitNewBIEPackageButton();
+        firstVersion.setName("TC 46.1.9 Package " + endUser.getLoginId());
+        firstVersion.setDescription("BIE Package for TC_46_1_9.");
+        firstVersion.hitUpdateButton();
+        getAPIFactory().getBusinessInformationEntityAPI().addBieToBiePackage(
+                firstVersion.getBiePackageId(), bie.getTopLevelAsbiepId(), endUser.getAppUserId());
+        firstVersion.openPage(firstVersion.getBiePackageId());
+        firstVersion.moveToQA();
+        firstVersion.moveToProduction();
+
+        EditBIEPackagePage revision = firstVersion.revise();
+        revision.setRevisionReason("This reason must not appear in the stable 0.2 manifest.");
+        revision.hitUpdateButton();
+
+        // Generate the stable 0.2 manifest and verify it omits the draft-only (0.3) fields while still
+        // carrying the prior package version id.
+        revision.selectExpression("XML");
+        revision.selectManifestVersion("0.2");
+        File generatedZip = revision.clickGenerateAndDownloadZip();
+        BIEPackageManifest manifest = BIEPackageManifest.fromGeneratedZip(generatedZip);
+
+        // Assertion #46.1.9
+        assertEquals("0.2", manifest.manifestVersion(),
+                "The stable BIE Package manifest version should be 0.2.");
+        assertFalse(manifest.hasRevisionReason(),
+                "The stable 0.2 manifest must omit the package-level Revision Reason.");
+        assertFalse(manifest.hasAnyBackwardCompatibility(),
+                "The stable 0.2 manifest must omit the per-BIE backward compatibility indicator.");
+        assertTrue(manifest.hasPriorPackageVersionId(),
+                "A revised package's 0.2 manifest still carries the prior package version id.");
     }
 }

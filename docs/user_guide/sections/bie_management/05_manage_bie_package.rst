@@ -214,22 +214,27 @@ To generate BIE Package schemas:
 
 4. In the generation options area, choose either `XML Schema` or `JSON Schema`.
 
-5. Click the "Generate" button.
+5. Next to the "Generate" button, choose the *Manifest Version* from the drop-down.
+   `0.2` (the default) produces the stable manifest; `0.3 (draft)` additionally includes
+   the *Revision Reason* and the per-BIE backward compatibility indicator described below.
+
+6. Click the "Generate" button.
 
 The generated result is downloaded to the local drive as a ZIP archive. The archive
 contains one schema file per BIE in the package and, alongside them, a `manifest.json`
 file that describes the package.
 
 The `manifest.json` records the package metadata (name, version, and the UUIDs of this
-package and, when this package is a revision, the prior package version), the
-*Revision Reason* captured on the "Edit BIE Package" page, and the list of BIEs in the
-package together with how they differ from the prior package version (which BIEs and
-components were added, removed, changed, or deprecated).
+package and, when this package is a revision, the prior package version) and the list of
+BIEs in the package together with how they differ from the prior package version (which
+BIEs and components were added, removed, changed, or deprecated).
 
-For each BIE, the manifest also carries a *backward compatibility* indicator that reports
-whether the BIE remains backward compatible with its counterpart in the prior package
-version. The indicator is reported separately for the `XML Schema` expression and the
-`JSON Schema` expression (with an additional syntax-independent flag); a value of `true`
-means the BIE is backward compatible for that expression. A BIE that is new in this
-package version, or whose package has no prior version, has no prior counterpart to
-compare against.
+When the `0.3 (draft)` *Manifest Version* is selected, the manifest also includes the
+*Revision Reason* captured on the "Edit BIE Package" page and, for each BIE, a *backward
+compatibility* indicator that reports whether the BIE remains backward compatible with its
+counterpart in the prior package version. The indicator is reported separately for the
+`XML Schema` expression and the `JSON Schema` expression; a value of `true` means the BIE
+is backward compatible for that expression. A BIE that is new in this package version, or
+whose package has no prior version, has no prior counterpart to compare against. The
+default `0.2` manifest omits both the *Revision Reason* and the backward compatibility
+indicator.

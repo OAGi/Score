@@ -220,6 +220,17 @@ public class EditBIEPackagePageImpl extends BasePageImpl implements EditBIEPacka
     }
 
     @Override
+    public void selectManifestVersion(String version) {
+        WebElement trigger = elementToBeClickable(getDriver(), By.xpath(
+                "//button[contains(@class, 'manifest-version-trigger')]"));
+        retry(() -> click(getDriver(), trigger));
+        WebElement item = visibilityOfElementLocated(getDriver(), By.xpath(
+                "//button[contains(@class, 'manifest-version-item')"
+                        + " and .//span[starts-with(normalize-space(.), " + xpathLiteral(version) + ")]]"));
+        retry(() -> click(getDriver(), item));
+    }
+
+    @Override
     public File clickGenerateAndDownloadZip() {
         long startedAt = System.currentTimeMillis();
         retry(() -> click(getDriver(), elementToBeClickable(getDriver(),GENERATE_BUTTON_LOCATOR)));

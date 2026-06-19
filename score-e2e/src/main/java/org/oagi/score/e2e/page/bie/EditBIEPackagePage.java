@@ -87,6 +87,13 @@ public interface EditBIEPackagePage extends Page {
     void selectExpression(String expression);
 
     /**
+     * Select the BIE Package manifest version from the dropdown next to the Generate button. Pass the
+     * version prefix, e.g. {@code "0.2"} (the stable default) or {@code "0.3"} (the draft that emits the
+     * backward compatibility indicator and the revision reason).
+     */
+    void selectManifestVersion(String version);
+
+    /**
      * Click 'Generate' and wait for the downloaded BIE Package ZIP.
      */
     File clickGenerateAndDownloadZip();
