@@ -1422,6 +1422,17 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("List Version Identifier"));
         escape(getDriver());
 
+        //BBIE to BBIE (DISALLOWED-primitive case): source Measure "Transport Temperature" was set to "float"
+        //(line ~1330). The target "Logical Identifier" is an Identifier BDT whose approved primitives do NOT
+        //include "float" in 10.9, so the uplift must DEFAULT it to the node default ("normalized string"),
+        //NOT carry "float" over. This exercises the "defaults disallowed values" half of the contract (#29.1.9.c).
+        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Get BOM/Data Area/BOM/BOM Option/Extension/Transport Temperature");
+        clickOn(sourceNode);
+        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Get BOM/Application Area/Sender/Logical Identifier");
+        clickOn(targetNode);
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Logical Identifier"));
+        escape(getDriver());
+
         //BBIE_SC to BBIE_SC
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Get BOM/Data Area/BOM/BOM Option/Extension/Transport Temperature/Unit Code");
         clickOn(sourceNode);
@@ -1466,11 +1477,23 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         editBIEPage.openPage();
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Application Area/Sender/Logical Identifier", 3);
+        waitFor(ofMillis(1000L));
+        // DISALLOWED-primitive default case: "Transport Temperature" (float) was mapped onto this Identifier
+        // node, where "float" is NOT an approved primitive in 10.9, so the uplift must default it to the node's
+        // default primitive ("normalized string") rather than carry "float". Guards the allowed-primitive gate
+        // in BieUpliftingService.setValueDomain (#29.1.9.c). Before that fix this carried "float" (unselectable).
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
         editBIEPage.expandTree("Logical Identifier");
         bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Application Area/Sender/Logical Identifier/Scheme Version Identifier");
         waitFor(ofMillis(1000L));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
-        assertEquals("normalized string", getText(bbiescPanel.getValueDomainField()));
+        // Source node "Transport Temperature/Unit Code" was set to "string" (line ~1338) and manually
+        // mapped here. For the target's BDT (Identifier, dt_sc "Scheme Version Identifier") in release
+        // 10.9, "string" IS an allowed primitive (dt_sc_awd_pri; default is "token", not "normalized
+        // string"), so per #29.1.9.b the uplift transfers the allowed source value verbatim => "string".
+        // The prior expectation "normalized string" was a copy-paste from the unrelated node at line ~1353.
+        assertEquals("string", getText(bbiescPanel.getValueDomainField()));
         homePage.logout();
     }
 

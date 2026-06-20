@@ -1278,7 +1278,12 @@ public class BieUpliftingService {
             if (sourceBbie.getXbtManifestId() != null) {
                 XbtSummaryRecord sourceXbt = sourceXbtList.stream().filter(e -> e.xbtManifestId().equals(sourceBbie.getXbtManifestId())).findAny().orElse(null);
                 XbtSummaryRecord targetXbt = getTargetXbtManifest(sourceXbt, targetXbtList);
-                if (targetXbt != null) {
+                // Only carry the source primitive if it is ALLOWED on the target node (its DT approved-primitive
+                // list); otherwise leave it null so the default-primitive block below assigns the target node's
+                // default. See the BBIE_SC branch for rationale (#29.1.9.c "default disallowed values").
+                if (targetXbt != null &&
+                        targetCcDocument.getDtAwdPriList(targetDt.dtManifestId()).stream()
+                                .anyMatch(e -> targetXbt.xbtManifestId().equals(e.xbtManifestId()))) {
                     targetBbie.setXbtManifestId(targetXbt.xbtManifestId());
                 }
             } else if (sourceBbie.getCodeListManifestId() != null) {
@@ -1339,7 +1344,14 @@ public class BieUpliftingService {
             if (sourceBbieSc.getXbtManifestId() != null) {
                 XbtSummaryRecord sourceXbt = sourceXbtList.stream().filter(e -> e.xbtManifestId().equals(sourceBbieSc.getXbtManifestId())).findAny().orElse(null);
                 XbtSummaryRecord targetXbt = getTargetXbtManifest(sourceXbt, targetXbtList);
-                if (targetXbt != null) {
+                // Only carry the source primitive if it is ALLOWED on the target node (its DT_SC approved-primitive
+                // list). If it is not allowed (or absent in the target release), leave it null so the default-primitive
+                // block below assigns the target node's default. Implements #29.1.9.c "default disallowed values":
+                // getTargetXbtManifest only checks the primitive exists somewhere in the release, not that it is
+                // allowed on this specific node, so without this gate a disallowed primitive would be carried verbatim.
+                if (targetXbt != null &&
+                        targetCcDocument.getDtScAwdPriList(targetDtSc.dtScManifestId()).stream()
+                                .anyMatch(e -> targetXbt.xbtManifestId().equals(e.xbtManifestId()))) {
                     targetBbieSc.setXbtManifestId(targetXbt.xbtManifestId());
                 }
             } else if (sourceBbieSc.getCodeListManifestId() != null) {
@@ -1444,7 +1456,7 @@ public class BieUpliftingService {
 
         Map<DtScAwdPriId, DtScAwdPriSummaryRecord> sourceDtScAwdPriMap = dtQuery.getDtScAwdPriSummaryList(sourceReleaseId).stream()
                 .collect(Collectors.toMap(DtScAwdPriSummaryRecord::dtScAwdPriId, Function.identity()));
-        Map<DtScId, List<DtScAwdPriSummaryRecord>> targetDtScAwdPriByDtScIdMap = dtQuery.getDtScAwdPriSummaryList(sourceReleaseId).stream()
+        Map<DtScId, List<DtScAwdPriSummaryRecord>> targetDtScAwdPriByDtScIdMap = dtQuery.getDtScAwdPriSummaryList(targetReleaseId).stream()
                 .collect(groupingBy(DtScAwdPriSummaryRecord::dtScId));
 
         BieUpliftingHandler upliftingHandler =
@@ -1502,7 +1514,7 @@ public class BieUpliftingService {
 
         Map<DtScAwdPriId, DtScAwdPriSummaryRecord> sourceDtScAwdPriMap = dtQuery.getDtScAwdPriSummaryList(sourceReleaseId).stream()
                 .collect(Collectors.toMap(DtScAwdPriSummaryRecord::dtScAwdPriId, Function.identity()));
-        Map<DtScId, List<DtScAwdPriSummaryRecord>> targetDtScAwdPriByDtScIdMap = dtQuery.getDtScAwdPriSummaryList(sourceReleaseId).stream()
+        Map<DtScId, List<DtScAwdPriSummaryRecord>> targetDtScAwdPriByDtScIdMap = dtQuery.getDtScAwdPriSummaryList(targetReleaseId).stream()
                 .collect(groupingBy(DtScAwdPriSummaryRecord::dtScId));
 
         request.getMappingList().forEach(mapping -> {
