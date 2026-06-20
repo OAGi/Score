@@ -183,6 +183,11 @@ public class BiePackageTopLevelAsbiep extends TableImpl<BiePackageTopLevelAsbiep
     }
 
     @Override
+    public List<UniqueKey<BiePackageTopLevelAsbiepRecord>> getUniqueKeys() {
+        return Arrays.asList(Keys.KEY_BIE_PACKAGE_TOP_LEVEL_ASBIEP_BIE_PACKAGE_TOP_LEVEL_ASBIEP_UK1);
+    }
+
+    @Override
     public List<ForeignKey<BiePackageTopLevelAsbiepRecord, ?>> getReferences() {
         return Arrays.asList(Keys.BIE_PACKAGE_TOP_LEVEL_ASBIEP_BIE_PACKAGE_ID_FK, Keys.BIE_PACKAGE_TOP_LEVEL_ASBIEP_PREV_TOP_LEVEL_ASBIEP_ID_FK, Keys.BIE_PACKAGE_TOP_LEVEL_ASBIEP_TOP_LEVEL_ASBIEP_ID_FK);
     }

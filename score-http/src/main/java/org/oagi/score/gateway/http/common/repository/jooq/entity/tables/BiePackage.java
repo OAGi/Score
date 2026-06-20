@@ -37,6 +37,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppUser.
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BiePackage.BiePackagePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BiePackageTopLevelAsbiep.BiePackageTopLevelAsbiepPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Library.LibraryPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.TopLevelAsbiep.TopLevelAsbiepPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.BiePackageRecord;
 
 
@@ -359,6 +360,14 @@ public class BiePackage extends TableImpl<BiePackageRecord> {
             _biePackageTopLevelAsbiep = new BiePackageTopLevelAsbiepPath(this, null, Keys.BIE_PACKAGE_TOP_LEVEL_ASBIEP_BIE_PACKAGE_ID_FK.getInverseKey());
 
         return _biePackageTopLevelAsbiep;
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the
+     * <code>oagi.top_level_asbiep</code> table
+     */
+    public TopLevelAsbiepPath topLevelAsbiep() {
+        return biePackageTopLevelAsbiep().biePackageTopLevelAsbiepTopLevelAsbiepIdFk();
     }
 
     @Override

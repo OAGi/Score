@@ -206,19 +206,6 @@ public class GithubIssue extends TableImpl<GithubIssueRecord> {
         return Arrays.asList(Keys.KEY_GITHUB_ISSUE_GITHUB_ISSUE_UK1);
     }
 
-    private transient AgencyIdListManifestPath _agencyIdListManifest;
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.agency_id_list_manifest</code> table
-     */
-    public AgencyIdListManifestPath agencyIdListManifest() {
-        if (_agencyIdListManifest == null)
-            _agencyIdListManifest = new AgencyIdListManifestPath(this, null, Keys.AGENCY_ID_LIST_MANIFEST_GITHUB_ISSUE_ID_FK.getInverseKey());
-
-        return _agencyIdListManifest;
-    }
-
     private transient GithubIssueAccManifestPath _githubIssueAccManifest;
 
     /**
@@ -303,6 +290,14 @@ public class GithubIssue extends TableImpl<GithubIssueRecord> {
      */
     public AccManifestPath accManifest() {
         return githubIssueAccManifest().accManifest();
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the
+     * <code>oagi.agency_id_list_manifest</code> table
+     */
+    public AgencyIdListManifestPath agencyIdListManifest() {
+        return githubIssueAgencyIdListManifest().agencyIdListManifest();
     }
 
     /**
