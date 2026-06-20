@@ -501,25 +501,41 @@ export class ExtensionDetailComponent implements OnInit {
   }
 
   isDeprecateAble(node?: CcFlatNode) {
-    if (!this.prevAccDetails) {
+    if (!this.prevAccDetails || !this.prevAccDetails.associations) {
       return false;
     }
 
     node = node || this.selectedNode;
+    if (!node || !node.detail) {
+      return false;
+    }
 
-    for (const assoc of this.prevAccDetails.associations) {
-      if (node.type === 'ASCCP' && 'toAsccpManifestId' in assoc) {
-        if (node.manifestId === (assoc as AsccSummary).toAsccpManifestId) {
+    // An association is deprecate-able only if it was carried over from the previous revision.
+    // A brand-new association appended during this amendment has no predecessor
+    // (prev*ManifestId == null) and must not be deprecate-able -- otherwise a fresh append to a
+    // CC the base already references would match a prior association to the same target and
+    // wrongly enable the checkbox. The trailing return stays outside the loop so every prior
+    // association is considered, not just the first.
+    if (node.type === 'ASCCP') {
+      if ((node.detail as CcAsccpNodeInfo).ascc.prevAsccManifestId == null) {
+        return false;
+      }
+      for (const assoc of this.prevAccDetails.associations) {
+        if ('toAsccpManifestId' in assoc && node.manifestId === (assoc as AsccSummary).toAsccpManifestId) {
           return !(assoc as AsccSummary).deprecated;
         }
-      } else if (node.type === 'BCCP' && 'toBccpManifestId' in assoc) {
-        if (node.manifestId === (assoc as BccSummary).toBccpManifestId) {
+      }
+    } else if (node.type === 'BCCP') {
+      if ((node.detail as CcBccpNodeInfo).bcc.prevBccManifestId == null) {
+        return false;
+      }
+      for (const assoc of this.prevAccDetails.associations) {
+        if ('toBccpManifestId' in assoc && node.manifestId === (assoc as BccSummary).toBccpManifestId) {
           return !(assoc as BccSummary).deprecated;
         }
       }
-
-      return false;
     }
+    return false;
   }
 
   getKey(node: CcFlatNode) {
@@ -1111,14 +1127,20 @@ export class ExtensionDetailComponent implements OnInit {
       obj = detail.ascc;
       if (this.prevAccDetails && this.prevAccDetails.associations) {
         prevRevision = this.prevAccDetails.associations.filter(assoc =>
-            'nextAsccManifestId' in assoc && (assoc as AsccSummary).nextAsccManifestId === detail.ascc.manifestId)[0];
+            'nextAsccManifestId' in assoc &&
+            ((assoc as AsccSummary).nextAsccManifestId === detail.ascc.manifestId ||
+                ((assoc as AsccSummary).nextAsccManifestId == null &&
+                    (assoc as AsccSummary).asccManifestId === detail.ascc.manifestId)))[0];
       }
     } else if (this.isBccpDetail(node)) {
       const detail = node.detail as CcBccpNodeInfo;
       obj = detail.bcc;
       if (this.prevAccDetails && this.prevAccDetails.associations) {
         prevRevision = this.prevAccDetails.associations.filter(assoc =>
-            'nextBccManifestId' in assoc && (assoc as BccSummary).nextBccManifestId === detail.bcc.manifestId)[0];
+            'nextBccManifestId' in assoc &&
+            ((assoc as BccSummary).nextBccManifestId === detail.bcc.manifestId ||
+                ((assoc as BccSummary).nextBccManifestId == null &&
+                    (assoc as BccSummary).bccManifestId === detail.bcc.manifestId)))[0];
       }
     } else if (this.isDtScDetail(node)) {
       obj = node.detail;
@@ -1196,14 +1218,20 @@ export class ExtensionDetailComponent implements OnInit {
       obj = detail.ascc;
       if (this.prevAccDetails && this.prevAccDetails.associations) {
         prevRevision = this.prevAccDetails.associations.filter(assoc =>
-            'nextAsccManifestId' in assoc && (assoc as AsccSummary).nextAsccManifestId === detail.ascc.manifestId)[0];
+            'nextAsccManifestId' in assoc &&
+            ((assoc as AsccSummary).nextAsccManifestId === detail.ascc.manifestId ||
+                ((assoc as AsccSummary).nextAsccManifestId == null &&
+                    (assoc as AsccSummary).asccManifestId === detail.ascc.manifestId)))[0];
       }
     } else if (this.isBccpDetail(node)) {
       const detail = node.detail as CcBccpNodeInfo;
       obj = detail.bcc;
       if (this.prevAccDetails && this.prevAccDetails.associations) {
         prevRevision = this.prevAccDetails.associations.filter(assoc =>
-            'nextBccManifestId' in assoc && (assoc as BccSummary).nextBccManifestId === detail.bcc.manifestId)[0];
+            'nextBccManifestId' in assoc &&
+            ((assoc as BccSummary).nextBccManifestId === detail.bcc.manifestId ||
+                ((assoc as BccSummary).nextBccManifestId == null &&
+                    (assoc as BccSummary).bccManifestId === detail.bcc.manifestId)))[0];
       }
     } else if (this.isDtScDetail(node)) {
       obj = node.detail;

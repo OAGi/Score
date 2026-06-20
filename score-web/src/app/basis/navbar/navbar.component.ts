@@ -48,8 +48,11 @@ export class NavbarComponent implements OnInit {
     translate.addLangs(['ccts', 'oagis']);
     translate.setDefaultLang('ccts');
     const browserLang = translate.getBrowserLang();
-    translate.use(browserLang.match(/ccts|oagis/) ? browserLang : 'ccts');
+    const savedLang = localStorage.getItem('score.lang');
+    translate.use((savedLang && savedLang.match(/ccts|oagis/)) ? savedLang
+        : (browserLang && browserLang.match(/ccts|oagis/) ? browserLang : 'ccts'));
     translate.onLangChange.subscribe((event: LangChangeEvent) => {
+      localStorage.setItem('score.lang', event.lang);
     });
 
     this.refreshBranding();

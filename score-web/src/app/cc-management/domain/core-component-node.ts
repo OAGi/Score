@@ -732,6 +732,7 @@ export const OagisComponentTypeMap = {
 class AsccNodeInfo {
   private _node: CcFlatNode;
   manifestId: number;
+  prevAsccManifestId: number;
   asccId: number;
   guid: string;
   den: string;
@@ -756,6 +757,7 @@ class AsccNodeInfo {
     this._node = node;
 
     this.manifestId = obj.asccManifestId;
+    this.prevAsccManifestId = obj.prevAsccManifestId;
     this.asccId = obj.asccId;
     this.guid = obj.guid;
     this.den = obj.den;
@@ -1047,6 +1049,7 @@ export const EntityTypes: EntityType[] = [
 class BccNodeInfo {
   private _node: CcFlatNode;
   manifestId: number;
+  prevBccManifestId: number;
   bccId: number;
   guid: string;
   den: string;
@@ -1076,6 +1079,7 @@ class BccNodeInfo {
     this._node = node;
 
     this.manifestId = obj.bccManifestId;
+    this.prevBccManifestId = obj.prevBccManifestId;
     this.bccId = obj.bccId;
     this.guid = obj.guid;
     this.den = obj.den;
