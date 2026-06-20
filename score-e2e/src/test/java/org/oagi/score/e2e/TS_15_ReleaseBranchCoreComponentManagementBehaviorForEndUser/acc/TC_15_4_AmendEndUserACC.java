@@ -155,7 +155,7 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(endUserBIE);
-        getDriver().manage().window().maximize();
+        getDriver().manage().window().setSize(new org.openqa.selenium.Dimension(1920, 1200));
         assertEquals("WIP", endUserBIE.getState());
 
         ACCExtensionViewEditPage accExtensionViewEditPage =

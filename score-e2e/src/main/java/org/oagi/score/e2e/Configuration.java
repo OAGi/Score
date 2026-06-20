@@ -117,6 +117,8 @@ public class Configuration {
         }
         // To support the docker environment.
         chromeOptions.addArguments("--remote-allow-origins=*");
+        // Fixed large viewport so headless detail panels keep top tabs / CDK overlays in the clickable region.
+        chromeOptions.addArguments("--window-size=1920,1200");
 
         // To support TC_6_3 TC_6_3_TA_6
         Map<String, Object> chromePrefs = new HashMap<>();
@@ -137,6 +139,8 @@ public class Configuration {
         }
         // To support the docker environment.
         edgeOptions.addArguments("--remote-allow-origins=*");
+        // Fixed large viewport so headless detail panels keep top tabs / CDK overlays in the clickable region.
+        edgeOptions.addArguments("--window-size=1920,1200");
 
         // To support TC_6_3 TC_6_3_TA_6
         Map<String, Object> edgePrefs = new HashMap<>();

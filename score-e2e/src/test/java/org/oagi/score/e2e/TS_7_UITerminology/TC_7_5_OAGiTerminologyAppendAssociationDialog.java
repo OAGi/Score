@@ -73,7 +73,7 @@ public class TC_7_5_OAGiTerminologyAppendAssociationDialog extends BaseTest {
 
         // TODO:
         // Can't open the context menu in a small size of the screen.
-        getDriver().manage().window().maximize();
+        getDriver().manage().window().setSize(new org.openqa.selenium.Dimension(1920, 1200));
         SelectAssociationDialog selectCCPropertyPage = ACCExtensionViewEditPage.appendPropertyAtLast("/" + asccp.getPropertyTerm() + " User Extension Group. Details");
         selectCCPropertyPage.showAdvancedSearchPanel();
 
@@ -117,7 +117,7 @@ public class TC_7_5_OAGiTerminologyAppendAssociationDialog extends BaseTest {
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
         // TODO:
         // Can't open the context menu in a small size of the screen.
-        getDriver().manage().window().maximize();
+        getDriver().manage().window().setSize(new org.openqa.selenium.Dimension(1920, 1200));
         ACCExtensionViewEditPage ACCExtensionViewEditPage = editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
         SelectAssociationDialog selectCCPropertyPage = ACCExtensionViewEditPage.appendPropertyAtLast("/" + asccp.getPropertyTerm() + " User Extension Group. Details");
         selectCCPropertyPage.showAdvancedSearchPanel();

@@ -74,8 +74,13 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
             By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button");
     private static final By CANCEL_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
+    // With the GitHub integration enabled, cancel-revision routes through the
+    // score-state-change-dialog ("Okay" confirm) instead of the generic score-confirm-dialog
+    // (issue #1533). In both dialogs the "Okay" label is a direct text node of the button, so match
+    // the button by either a nested span or its own text.
     public static final By CONTINUE_CANCEL_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Okay\")]//ancestor::button");
+            By.xpath("//mat-dialog-container//button[.//span[contains(text(), \"Okay\")] " +
+                    "or contains(normalize-space(.), \"Okay\")]");
     private static final By MOVE_TO_DRAFT_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to Draft\")]//ancestor::button[1]");
     private static final By MOVE_TO_CANDIDATE_BUTTON_LOCATOR =
@@ -349,8 +354,9 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
 
     @Override
     public void cancel() {
-        click(getCancelButton());
-        click(elementToBeClickable(getDriver(), CONTINUE_CANCEL_BUTTON_IN_DIALOG_LOCATOR));
+        click(getDriver(), getCancelButton());
+        click(getDriver(), elementToBeClickable(getDriver(), CONTINUE_CANCEL_BUTTON_IN_DIALOG_LOCATOR));
+        invisibilityOfElementLocated(getDriver(), By.xpath("//div[contains(@class, \"cdk-overlay-backdrop\")]"));
         invisibilityOfLoadingContainerElement(getDriver());
         assert "Canceled".equals(getSnackBarMessage(getDriver()));
     }

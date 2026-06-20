@@ -698,14 +698,26 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         WebElement td = viewEditBIEPage.getColumnByName(tr, "select");
         click(td);
         click(viewEditBIEPage.getDiscardButton(true));
-        click(elementToBeClickable(getDriver(), By.xpath(
-                "//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]")));
 
-        String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
-        String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
-        assertTrue(snackBarMessage.contains("Failed to discard BIE"));
+        WebElement discardButton = visibilityOfElementLocated(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]"));
+        assertFalse(discardButton.isEnabled());
+
+        String validationSummary = getText(visibilityOfElementLocated(getDriver(), By.xpath(
+                "//mat-dialog-container//*[contains(@class, \"validation-summary\")]")));
+        assertTrue(validationSummary.contains("This BIE cannot be discarded. Resolve the conflicting records to continue."));
+
+        WebElement reusingDependencyRow = visibilityOfElementLocated(getDriver(), By.xpath(
+                "//mat-dialog-container//td//*[contains(text(), \"" + developer_asccp_root.getPropertyTerm() +
+                        "\")]/ancestor::tr"));
+        assertTrue(!reusingDependencyRow.findElements(By.xpath(
+                ".//div[contains(@class, 'validation-message') and normalize-space(.)=\"This BIE must be discarded.\"]"))
+                .isEmpty());
+
         click(elementToBeClickable(getDriver(), By.xpath(
-                "//score-multi-actions-snack-bar//span[contains(text(), \"Close\")]//ancestor::button[1]")));
+                "//mat-dialog-container//span[contains(text(), \"Cancel\")]//ancestor::button[1]")));
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
     }
 
     @Test
@@ -741,7 +753,10 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             developer_asccp_root = coreComponentAPI.createRandomASCCP(developer_acc, developer, developerNamespace, "Published");
 
             developerBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_root, developer, "WIP");
-            reusedBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_lv2, developer, "WIP");
+            // The reused BIE must already satisfy the reusing BIE's target state. A reusing
+            // BIE moving WIP -> QA requires the reused BIE to be in 'QA' or higher, so the
+            // reused BIE is seeded in 'QA' to keep the transition unblocked.
+            reusedBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp_lv2, developer, "QA");
         }
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
@@ -850,6 +865,21 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         td = viewEditBIEPage.getColumnByName(tr, "select");
         click(td);
         click(viewEditBIEPage.getMoveToProduction(true));
+
+        // The reused BIE is still in 'QA', which blocks moving the reusing BIE to
+        // 'Production'. The dependency dialog opens with the Update button disabled
+        // until the reused-BIE row is checked to cascade it to 'Production'.
+        WebElement updateButton = visibilityOfElementLocated(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]"));
+        assertFalse(updateButton.isEnabled());
+
+        WebElement reusedDependencyRow = visibilityOfElementLocated(getDriver(), By.xpath(
+                "//mat-dialog-container//td//*[contains(text(), \"" + developer_asccp_lv2.getPropertyTerm() +
+                        "\")]/ancestor::tr"));
+        click(reusedDependencyRow.findElement(By.xpath("./td[1]//mat-checkbox")));
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
         invisibilityOfLoadingContainerElement(getDriver());
@@ -1072,6 +1102,21 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         td = viewEditBIEPage.getColumnByName(tr, "select");
         click(td);
         click(viewEditBIEPage.getBackToWIP(true));
+
+        // The reusing BIE is now in 'QA', which blocks moving the reused BIE back to
+        // 'WIP'. The dependency dialog opens with the Update button disabled until the
+        // reusing-BIE row is checked to cascade it to 'WIP'.
+        WebElement updateButton = visibilityOfElementLocated(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]"));
+        assertFalse(updateButton.isEnabled());
+
+        WebElement reusingDependencyRow = visibilityOfElementLocated(getDriver(), By.xpath(
+                "//mat-dialog-container//td//*[contains(text(), \"" + developer_asccp_root.getPropertyTerm() +
+                        "\")]/ancestor::tr"));
+        click(reusingDependencyRow.findElement(By.xpath("./td[1]//mat-checkbox")));
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
         invisibilityOfLoadingContainerElement(getDriver());
@@ -1314,7 +1359,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
 
         homePage.openPage();
         bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
+        getDriver().manage().window().setSize(new org.openqa.selenium.Dimension(1920, 1200));
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         expressBIEPage.selectBIEForExpression(current_release, developer_asccp_root.getDen());
         File generatedBIEExpression = null;
@@ -1404,6 +1449,8 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
+    @Disabled("Not yet automated - documented case 25.1.19 'Enable global schema for reused BIE references'. " +
+            "Was an empty test body reporting false-positive coverage; disabled until the global-schema toggle is automated.")
     public void enable_the_global_schema_for_reused_bie_references_no_matter_it_has_nested_reused_bie_or() {
 
 

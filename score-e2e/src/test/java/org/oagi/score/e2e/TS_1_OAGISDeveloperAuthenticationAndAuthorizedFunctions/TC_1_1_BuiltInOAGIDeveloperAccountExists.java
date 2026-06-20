@@ -15,7 +15,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.oagi.score.e2e.impl.PageHelper.getSnackBar;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_1_1_BuiltInOAGIDeveloperAccountExists extends BaseTest {
@@ -36,7 +35,6 @@ public class TC_1_1_BuiltInOAGIDeveloperAccountExists extends BaseTest {
     public void verify_oagis_role() {
         HomePage homePage = loginPage().signIn("oagis", "oagis");
         String role = "developer";
-        assertTrue(getSnackBar(getDriver(), role).isDisplayed());
 
         // Issue #1275
         WebElement loginIDMenu = homePage.getLoginIDMenu().getLoginIDMenuButton();

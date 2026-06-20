@@ -1682,13 +1682,13 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         bbiePanel.toggleUsed();
 
-        assertEquals(Integer.toString(1), getText(bbiePanel.getCardinalityMinField()));
+        int originalMin = Integer.parseInt(getText(bbiePanel.getCardinalityMinField()));
+        assertEquals(1, originalMin);
         assertEquals("unbounded", getText(bbiePanel.getCardinalityMaxField()));
 
         bbiePanel.setCardinalityMin(0);
-        int currentCardinalityMin = Integer.parseInt(getText(bbiePanel.getCardinalityMinField()));
         assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
-                "//mat-error[contains(text(), \"Cardinality Min must be greater than or equals to " + currentCardinalityMin + "\")]")).isDisplayed());
+                "//mat-error[contains(text(), \"Cardinality Min must be greater than or equals to " + originalMin + "\")]")).isDisplayed());
 
         bbiePanel.setCardinalityMax(0);
         assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(

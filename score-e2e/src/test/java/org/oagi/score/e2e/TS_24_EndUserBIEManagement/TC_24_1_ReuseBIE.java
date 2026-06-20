@@ -11,7 +11,6 @@ import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.MultiActionSnackBar;
 import org.oagi.score.e2e.page.bie.*;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
@@ -550,11 +549,19 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         WebElement td = viewEditBIEPage.getColumnByName(tr, "select");
         click(td);
         click(viewEditBIEPage.getDiscardButton(true));
-        click(elementToBeClickable(getDriver(), By.xpath(
-                "//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]")));
 
-        MultiActionSnackBar multiActionSnackBar = getMultiActionSnackBar(getDriver());
-        assertEquals("Failed to discard BIE", getText(multiActionSnackBar.getMessageElement()));
+        WebElement discardButton = visibilityOfElementLocated(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]"));
+        assertTrue(!discardButton.isEnabled());
+
+        String validationSummary = getText(visibilityOfElementLocated(getDriver(), By.xpath(
+                "//mat-dialog-container//*[contains(@class, \"validation-summary\")]")));
+        assertTrue(validationSummary.contains("This BIE cannot be discarded. Resolve the conflicting records to continue."));
+
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Cancel\")]//ancestor::button[1]")));
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
     }
 
     @Test
@@ -1160,7 +1167,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
 
         homePage.openPage();
         bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
+        getDriver().manage().window().setSize(new org.openqa.selenium.Dimension(1920, 1200));
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         expressBIEPage.selectBIEForExpression(current_release, asccp_for_usera.getDen());
         expressBIEPage.selectXMLSchemaExpression();
@@ -1247,6 +1254,8 @@ public class TC_24_1_ReuseBIE extends BaseTest {
     }
 
     @Test
+    @Disabled("Not yet automated - documented case 24.1.15 'Enable global schema for reused BIE references'. " +
+            "Was an empty test body reporting false-positive coverage; disabled until the global-schema toggle is automated.")
     public void enable_the_global_schema_for_reused_bie_references_no_matter_it_has_nested_reused() {
     }
 

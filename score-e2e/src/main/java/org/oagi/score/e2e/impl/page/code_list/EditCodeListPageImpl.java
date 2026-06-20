@@ -97,8 +97,13 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
             By.xpath("//mat-dialog-container//p");
     private static final By UPDATE_ANYWAY_BUTTON_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Update Anyway\")]//ancestor::button");
+    // With the GitHub integration enabled, cancel-revision routes through the
+    // score-state-change-dialog ("Okay" confirm) instead of the generic score-confirm-dialog
+    // (issue #1533). In both dialogs the "Okay" label is a direct text node of the button, so match
+    // the button by either a nested span or its own text.
     private static final By CONTINUE_CANCEL_REVISION_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Okay\")]//ancestor::button");
+            By.xpath("//mat-dialog-container//button[.//span[contains(text(), \"Okay\")] " +
+                    "or contains(normalize-space(.), \"Okay\")]");
     private final CodeListObject codeList;
 
     public EditCodeListPageImpl(BasePage parent, CodeListObject codeList) {
@@ -372,10 +377,11 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     @Override
     public void hitCancelButton() {
         retry(() -> {
-            click(getCancelButton());
+            click(getDriver(), getCancelButton());
             waitFor(ofMillis(1000L));
-            click(elementToBeClickable(getDriver(), CONTINUE_CANCEL_REVISION_BUTTON_IN_DIALOG_LOCATOR));
+            click(getDriver(), elementToBeClickable(getDriver(), CONTINUE_CANCEL_REVISION_BUTTON_IN_DIALOG_LOCATOR));
         });
+        invisibilityOfElementLocated(getDriver(), By.xpath("//div[contains(@class, \"cdk-overlay-backdrop\")]"));
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofMillis(500L));
     }

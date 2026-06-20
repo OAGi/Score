@@ -198,7 +198,10 @@ public abstract class PageHelper {
     }
 
     public static WebElement click(WebElement element) {
-        return click(null, element);
+        // Derive the owning driver from the element so scrollIntoView, the JS-click fallback,
+        // and snackbar/backdrop waits stay enabled for 1-arg callers (instead of passing null).
+        WebDriver driver = (element instanceof WrapsDriver) ? ((WrapsDriver) element).getWrappedDriver() : null;
+        return click(driver, element);
     }
 
     public static WebElement click(WebDriver driver, WebElement element) {
