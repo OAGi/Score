@@ -8,154 +8,189 @@
 
   <div class="pb-2">
     <mat-card-content class="mat-card-container">
-      <div class="loading-container" *ngIf="loading">
-        <mat-spinner [diameter]="40"></mat-spinner>
-      </div>
+      @if (loading) {
+        <div class="loading-container">
+          <mat-spinner [diameter]="40"></mat-spinner>
+        </div>
+      }
       <div class="row" [hidden]="loading">
         <div class="col-md-12 pt-2 pb-2 d-flex">
           <button mat-icon-button mat-tiny-icon-button class="nav-button me-2" (click)="lookUpUnmatched(-1)"
-                  [hidden]="unmatchedSource.length === 0">
+            [hidden]="unmatchedSource.length === 0">
             <mat-icon>arrow_back_ios</mat-icon>
           </button>
           <button mat-icon-button mat-tiny-icon-button class="nav-button me-2" (click)="lookUpUnmatched(1)"
-                  [hidden]="unmatchedSource.length === 0">
+            [hidden]="unmatchedSource.length === 0">
             <mat-icon>arrow_forward_ios</mat-icon>
           </button>
           <div class="ms-2">
-            <span *ngIf="unmatchedSource.length === 0">All contents are mapped.</span>
-            <span *ngIf="unmatchedSource.length > 0" class="nav-number">
-              {{unmatchedSource.indexOf(this.currentUnmatchedSource) + 1}}/{{unmatchedSource.length}}
-            </span>
+            @if (unmatchedSource.length === 0) {
+              <span>All contents are mapped.</span>
+            }
+            @if (unmatchedSource.length > 0) {
+              <span class="nav-number">
+                {{unmatchedSource.indexOf(this.currentUnmatchedSource) + 1}}/{{unmatchedSource.length}}
+              </span>
+            }
           </div>
         </div>
       </div>
 
       <div class="row ms-0 me-0" (window:resize)="onResize($event)">
         <div class="col-6 ps-0">
-          <div class="row tree-search-box" *ngIf="sourceSearcher && sourceDataSource">
-            <div class="col-8">
-              <mat-form-field>
-                <mat-label *ngIf="!sourceSelectedNode">Search</mat-label>
-                <mat-label *ngIf="sourceSelectedNode">Search > {{ (sourceSelectedNode.displayName ? sourceSelectedNode.displayName : sourceSelectedNode.name) }}</mat-label>
-                <input matInput type="search" [(ngModel)]="sourceSearcher.inputKeyword"
-                       [disabled]="sourceSearcher.isSearching"
-                       (keyup.enter)="search('source')">
-                <mat-hint matSuffix *ngIf="sourceSearcher.searchKeyword && sourceSearcher.searchResult.length > 0"
-                          align="end">{{sourceSearcher.searchIndex + 1}}/{{sourceSearcher.searchResult.length}} in {{ sourceSearcher.searchedItemCount }}{{ sourceSearcher.fullSearched ? '' : '+' }} nodes</mat-hint>
-                <mat-hint matSuffix *ngIf="sourceSearcher.searchKeyword && !sourceSearcher.fullSearched && sourceSearcher.searchResult.length === 0"
-                          align="end">0 results in {{ sourceSearcher.searchedItemCount }} nodes</mat-hint>
-                <mat-hint matSuffix *ngIf="sourceSearcher.searchKeyword && sourceSearcher.fullSearched && sourceSearcher.searchResult.length === 0"
-                          align="end">0 results</mat-hint>
-              </mat-form-field>
-            </div>
-            <div class="col-3 buttons">
-              <button mat-icon-button mat-small-icon-button
-                      [disabled]="!sourceSearcher.searchResult || sourceSearcher.searchResult.length === 0"
-                      (click)="move('source', -1)">
-                <mat-icon>keyboard_arrow_up</mat-icon>
-              </button>
-              <button mat-icon-button mat-small-icon-button
-                      [disabled]="!sourceSearcher.searchResult || sourceSearcher.searchResult.length === 0"
-                      (click)="move('source', 1)">
-                <mat-icon>keyboard_arrow_down</mat-icon>
-              </button>
-              <button mat-icon-button mat-small-icon-button
-                      [hidden]="sourceSearcher.fullSearched"
-                      [disabled]="sourceSearcher.isSearching"
-                      [matTooltip]="(sourceSearcher.searchKeyword && !sourceSearcher.fullSearched) ? 'Search more...' : 'Search'"
-                      (click)="search('source', false, true)">
-                <mat-icon>{{ (sourceSearcher.searchKeyword && !sourceSearcher.fullSearched) ? 'repeat' : 'search' }}</mat-icon>
-              </button>
-              <button mat-icon-button mat-small-icon-button
-                      [hidden]="!sourceSearcher.inputKeyword"
-                      (click)="sourceSearcher.resetSearch()">
-                <mat-icon>close</mat-icon>
-              </button>
-              <div style="height: 19px;">
-                <mat-progress-spinner mode="indeterminate" [diameter]="15" class="search-progress-bar"
-                                      [hidden]="!sourceSearcher.isSearching"></mat-progress-spinner>
+          @if (sourceSearcher && sourceDataSource) {
+            <div class="row tree-search-box">
+              <div class="col-8">
+                <mat-form-field>
+                  @if (!sourceSelectedNode) {
+                    <mat-label>Search</mat-label>
+                  }
+                  @if (sourceSelectedNode) {
+                    <mat-label>Search > {{ (sourceSelectedNode.displayName ? sourceSelectedNode.displayName : sourceSelectedNode.name) }}</mat-label>
+                  }
+                  <input matInput type="search" [(ngModel)]="sourceSearcher.inputKeyword"
+                    [disabled]="sourceSearcher.isSearching"
+                    (keyup.enter)="search('source')">
+                  @if (sourceSearcher.searchKeyword && sourceSearcher.searchResult.length > 0) {
+                    <mat-hint matSuffix
+                    align="end">{{sourceSearcher.searchIndex + 1}}/{{sourceSearcher.searchResult.length}} in {{ sourceSearcher.searchedItemCount }}{{ sourceSearcher.fullSearched ? '' : '+' }} nodes</mat-hint>
+                  }
+                  @if (sourceSearcher.searchKeyword && !sourceSearcher.fullSearched && sourceSearcher.searchResult.length === 0) {
+                    <mat-hint matSuffix
+                    align="end">0 results in {{ sourceSearcher.searchedItemCount }} nodes</mat-hint>
+                  }
+                  @if (sourceSearcher.searchKeyword && sourceSearcher.fullSearched && sourceSearcher.searchResult.length === 0) {
+                    <mat-hint matSuffix
+                    align="end">0 results</mat-hint>
+                  }
+                </mat-form-field>
               </div>
-            </div>
-            <div class="col-1 buttons">
-              <div class="actions ms-auto">
-                <button mat-icon-button mat-small-icon-button [matMenuTriggerFor]="sourceSettingsContextMenu">
-                  <mat-icon>settings</mat-icon>
+              <div class="col-3 buttons">
+                <button mat-icon-button mat-small-icon-button
+                  [disabled]="!sourceSearcher.searchResult || sourceSearcher.searchResult.length === 0"
+                  (click)="move('source', -1)">
+                  <mat-icon>keyboard_arrow_up</mat-icon>
                 </button>
+                <button mat-icon-button mat-small-icon-button
+                  [disabled]="!sourceSearcher.searchResult || sourceSearcher.searchResult.length === 0"
+                  (click)="move('source', 1)">
+                  <mat-icon>keyboard_arrow_down</mat-icon>
+                </button>
+                <button mat-icon-button mat-small-icon-button
+                  [hidden]="sourceSearcher.fullSearched"
+                  [disabled]="sourceSearcher.isSearching"
+                  [matTooltip]="(sourceSearcher.searchKeyword && !sourceSearcher.fullSearched) ? 'Search more...' : 'Search'"
+                  (click)="search('source', false, true)">
+                  <mat-icon>{{ (sourceSearcher.searchKeyword && !sourceSearcher.fullSearched) ? 'repeat' : 'search' }}</mat-icon>
+                </button>
+                <button mat-icon-button mat-small-icon-button
+                  [hidden]="!sourceSearcher.inputKeyword"
+                  (click)="sourceSearcher.resetSearch()">
+                  <mat-icon>close</mat-icon>
+                </button>
+                <div style="height: 19px;">
+                  <mat-progress-spinner mode="indeterminate" [diameter]="15" class="search-progress-bar"
+                  [hidden]="!sourceSearcher.isSearching"></mat-progress-spinner>
+                </div>
               </div>
+              <div class="col-1 buttons">
+                <div class="actions ms-auto">
+                  <button mat-icon-button mat-small-icon-button [matMenuTriggerFor]="sourceSettingsContextMenu">
+                    <mat-icon>settings</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <mat-menu class="context-menu" #sourceSettingsContextMenu="matMenu">
+                <button mat-menu-item>
+                  <mat-checkbox class="d-inline-flex pe-2"
+                    [(ngModel)]="sourceDataSource.hideCardinality">
+                    <span>Hide cardinality</span>
+                  </mat-checkbox>
+                </button>
+              </mat-menu>
             </div>
-            <mat-menu class="context-menu" #sourceSettingsContextMenu="matMenu">
-              <button mat-menu-item>
-                <mat-checkbox class="d-inline-flex pe-2"
-                              [(ngModel)]="sourceDataSource.hideCardinality">
-                  <span>Hide cardinality</span>
-                </mat-checkbox>
-              </button>
-            </mat-menu>
-          </div>
+          }
           <div class="row" style="padding: 0 15px;">
-            <div class="tree-breadcrumbs-wrap" id="bc-source" *ngIf="sourceSelectedNode">
-              <div class="tree-breadcrumb"
-                   *ngFor="let bread of sourceSelectedNode.parents; let last = last;">
-                <span aria-hidden="true" class="tree-breadcrumb-separator">/</span>
-                <span *ngIf="last"
+            @if (sourceSelectedNode) {
+              <div class="tree-breadcrumbs-wrap" id="bc-source">
+                @for (bread of sourceSelectedNode.parents; track bread; let last = $last) {
+                  <div class="tree-breadcrumb"
+                    >
+                    <span aria-hidden="true" class="tree-breadcrumb-separator">/</span>
+                    @if (last) {
+                      <span
                       class="tree-breadcrumb-item-last">{{ bread.displayName ? bread.displayName : bread.name }} {{ last ? scrollBreadcrumb('bc-source') : '' }}</span>
-                <span *ngIf="!last" class="tree-breadcrumb-item"
+                    }
+                    @if (!last) {
+                      <span class="tree-breadcrumb-item"
                       (click)="onSourceBreadCrumbClick(bread)">{{ bread.displayName ? bread.displayName : bread.name }}</span>
+                    }
+                  </div>
+                }
               </div>
-            </div>
+            }
           </div>
           <!-- Source BIE -->
           <mat-card class="bie-node-tree-panel overflow-auto">
             <mat-card-content class="mat-card-container">
               <cdk-virtual-scroll-viewport itemSize="{{ virtualScrollItemSize }}" minBufferPx="{{ minBufferPx }}" maxBufferPx="{{ maxBufferPx }}"
-                                           [style.height.px]="innerHeight" #sourceVirtualScroll>
+                [style.height.px]="innerHeight" #sourceVirtualScroll>
                 <div *cdkVirtualFor="let node of sourceDataSource" class="example-item">
                   <div class="mat-tree-node d-flex align-items-center pointer"
-                       tabIndex="0"
-                       [attr.data-path]="node.path"
-                       [class]="{'tree-node-selected': sourceSelectedNode === node}"
-                       (click)="onSourceClick(node)"
-                       [style.padding-left]="node.level * paddingPixel + 'px'">
-                    <button *ngIf="sourceDataSource.isExpandable(node); else sourceDisabledRef;"
-                            (click)="sourceDataSource.toggle(node)"
-                            mat-icon-button>
-                      <mat-icon class="mat-icon-rtl-mirror">
-                        {{ sourceDataSource.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
-                      </mat-icon>
-                    </button>
-                    <ng-template #sourceDisabledRef>
+                    tabIndex="0"
+                    [attr.data-path]="node.path"
+                    [class]="{'tree-node-selected': sourceSelectedNode === node}"
+                    (click)="onSourceClick(node)"
+                    [style.padding-left]="node.level * paddingPixel + 'px'">
+                    @if (sourceDataSource.isExpandable(node)) {
+                      <button
+                        (click)="sourceDataSource.toggle(node)"
+                        mat-icon-button>
+                        <mat-icon class="mat-icon-rtl-mirror">
+                          {{ sourceDataSource.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+                        </mat-icon>
+                      </button>
+                    } @else {
                       <button mat-icon-button disabled></button>
-                    </ng-template>
+                    }
 
-                    <mat-checkbox *ngIf="(node.level > 0 && !node.fixed)"
-                                  [checked]="node.target !== undefined"
-                                  [disabled]="true"></mat-checkbox>
+                    @if ((node.level > 0 && !node.fixed)) {
+                      <mat-checkbox
+                        [checked]="node.target !== undefined"
+                      [disabled]="true"></mat-checkbox>
+                    }
 
                     <div class="d-inline-flex align-items-center flex-grow-1">
                       <span [class]="[node.typeClass.toLowerCase(),
                                       this.sourceSearcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
                             [style.padding-right.px]="2"
-                            [class.deprecated]="node.deprecated"
-                            [matTooltip]="node.deprecated ? 'Deprecated' : ''"
-                            [class.search-index]="this.sourceSearcher.searchResult.indexOf(node) === this.sourceSearcher.searchIndex"
-                            [innerHTML]="(node.displayName ? node.displayName : node.name) | highlight : sourceSearcher.searchKeyword">
+                        [class.deprecated]="node.deprecated"
+                        [matTooltip]="node.deprecated ? 'Deprecated' : ''"
+                        [class.search-index]="this.sourceSearcher.searchResult.indexOf(node) === this.sourceSearcher.searchIndex"
+                        [innerHTML]="(node.displayName ? node.displayName : node.name) | highlight : sourceSearcher.searchKeyword">
                       </span>
 
-                      <span [class]="['ps-4']" *ngIf="!sourceDataSource.hideCardinality">
-                        {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
-                      </span>
+                      @if (!sourceDataSource.hideCardinality) {
+                        <span [class]="['ps-4']">
+                          {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
+                        </span>
+                      }
 
-                      <fa-icon [icon]="faRecycle"
-                               matTooltip="Reused"
-                               [class]="['ps-3', 'pointer']" class="pointer"
-                               *ngIf="node.reused"></fa-icon>
+                      @if (node.reused) {
+                        <fa-icon [icon]="faRecycle"
+                          matTooltip="Reused"
+                          [class]="['ps-3', 'pointer']" class="pointer"
+                        ></fa-icon>
+                      }
 
                       <div class="ms-auto me-2">
-                        <mat-icon *ngIf="sourceDataSource.isExpandable(node)"
-                                  class="context-menu-icon"
-                                  [matMenuTriggerFor]="contextMenu"
-                                  (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
-                        </mat-icon>
+                        @if (sourceDataSource.isExpandable(node)) {
+                          <mat-icon
+                            class="context-menu-icon"
+                            [matMenuTriggerFor]="contextMenu"
+                            (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
+                          </mat-icon>
+                        }
                       </div>
                     </div>
                   </div>
@@ -165,143 +200,174 @@
           </mat-card>
           <div class="row">
             <div class="col-12 text-center"
-                 matTooltip="All nodes in the Source BIE tree are used nodes. An unchecked checkbox means the node is not mapped.">
+              matTooltip="All nodes in the Source BIE tree are used nodes. An unchecked checkbox means the node is not mapped.">
               <div class="d-flex justify-content-center">Source BIE Tree <mat-icon [inline]="true">live_help</mat-icon></div>
             </div>
           </div>
         </div>
         <div class="col-6 ps-0 pe-0">
-          <div class="row tree-search-box" *ngIf="targetSearcher && targetDataSource">
-            <div class="col-8">
-              <mat-form-field>
-                <mat-label *ngIf="!targetSelectedNode">Search</mat-label>
-                <mat-label *ngIf="targetSelectedNode">Search > {{targetSelectedNode.name}}</mat-label>
-                <input matInput type="search" [(ngModel)]="targetSearcher.inputKeyword"
-                       [disabled]="targetSearcher.isSearching"
-                       (keyup.enter)="search('target')">
-                <mat-hint matSuffix *ngIf="targetSearcher.searchKeyword && targetSearcher.searchResult.length > 0"
-                          align="end">{{targetSearcher.searchIndex + 1}}/{{targetSearcher.searchResult.length}} in {{ targetSearcher.searchedItemCount }}{{ targetSearcher.fullSearched ? '' : '+' }} nodes</mat-hint>
-                <mat-hint matSuffix *ngIf="targetSearcher.searchKeyword && !targetSearcher.fullSearched && targetSearcher.searchResult.length === 0"
-                          align="end">0 results in {{ targetSearcher.searchedItemCount }} nodes</mat-hint>
-                <mat-hint matSuffix *ngIf="targetSearcher.searchKeyword && targetSearcher.fullSearched && targetSearcher.searchResult.length === 0"
-                          align="end">0 results</mat-hint>
-              </mat-form-field>
-            </div>
-            <div class="col-3 buttons">
-              <button mat-icon-button mat-small-icon-button
-                      [disabled]="!targetSearcher.searchResult || targetSearcher.searchResult.length === 0"
-                      (click)="move('target', -1)">
-                <mat-icon>keyboard_arrow_up</mat-icon>
-              </button>
-              <button mat-icon-button mat-small-icon-button
-                      [disabled]="!targetSearcher.searchResult || targetSearcher.searchResult.length === 0"
-                      (click)="move('target', 1)">
-                <mat-icon>keyboard_arrow_down</mat-icon>
-              </button>
-              <button mat-icon-button mat-small-icon-button
-                      [hidden]="targetSearcher.fullSearched"
-                      [disabled]="targetSearcher.isSearching"
-                      [matTooltip]="(targetSearcher.searchKeyword && !targetSearcher.fullSearched) ? 'Search more...' : 'Search'"
-                      (click)="search('target', false, true)">
-                <mat-icon>{{ (targetSearcher.searchKeyword && !targetSearcher.fullSearched) ? 'repeat' : 'search' }}</mat-icon>
-              </button>
-              <button mat-icon-button mat-small-icon-button
-                      [hidden]="!targetSearcher.inputKeyword"
-                      (click)="targetSearcher.resetSearch()">
-                <mat-icon>close</mat-icon>
-              </button>
-              <div style="height: 19px;">
-                <mat-progress-spinner mode="indeterminate" [diameter]="15" class="search-progress-bar"
-                                      [hidden]="!targetSearcher.isSearching"></mat-progress-spinner>
+          @if (targetSearcher && targetDataSource) {
+            <div class="row tree-search-box">
+              <div class="col-8">
+                <mat-form-field>
+                  @if (!targetSelectedNode) {
+                    <mat-label>Search</mat-label>
+                  }
+                  @if (targetSelectedNode) {
+                    <mat-label>Search > {{targetSelectedNode.name}}</mat-label>
+                  }
+                  <input matInput type="search" [(ngModel)]="targetSearcher.inputKeyword"
+                    [disabled]="targetSearcher.isSearching"
+                    (keyup.enter)="search('target')">
+                  @if (targetSearcher.searchKeyword && targetSearcher.searchResult.length > 0) {
+                    <mat-hint matSuffix
+                    align="end">{{targetSearcher.searchIndex + 1}}/{{targetSearcher.searchResult.length}} in {{ targetSearcher.searchedItemCount }}{{ targetSearcher.fullSearched ? '' : '+' }} nodes</mat-hint>
+                  }
+                  @if (targetSearcher.searchKeyword && !targetSearcher.fullSearched && targetSearcher.searchResult.length === 0) {
+                    <mat-hint matSuffix
+                    align="end">0 results in {{ targetSearcher.searchedItemCount }} nodes</mat-hint>
+                  }
+                  @if (targetSearcher.searchKeyword && targetSearcher.fullSearched && targetSearcher.searchResult.length === 0) {
+                    <mat-hint matSuffix
+                    align="end">0 results</mat-hint>
+                  }
+                </mat-form-field>
               </div>
-            </div>
-            <div class="col-1 buttons">
-              <div class="actions ms-auto">
-                <button mat-icon-button mat-small-icon-button [matMenuTriggerFor]="targetSettingsContextMenu">
-                  <mat-icon>settings</mat-icon>
+              <div class="col-3 buttons">
+                <button mat-icon-button mat-small-icon-button
+                  [disabled]="!targetSearcher.searchResult || targetSearcher.searchResult.length === 0"
+                  (click)="move('target', -1)">
+                  <mat-icon>keyboard_arrow_up</mat-icon>
                 </button>
+                <button mat-icon-button mat-small-icon-button
+                  [disabled]="!targetSearcher.searchResult || targetSearcher.searchResult.length === 0"
+                  (click)="move('target', 1)">
+                  <mat-icon>keyboard_arrow_down</mat-icon>
+                </button>
+                <button mat-icon-button mat-small-icon-button
+                  [hidden]="targetSearcher.fullSearched"
+                  [disabled]="targetSearcher.isSearching"
+                  [matTooltip]="(targetSearcher.searchKeyword && !targetSearcher.fullSearched) ? 'Search more...' : 'Search'"
+                  (click)="search('target', false, true)">
+                  <mat-icon>{{ (targetSearcher.searchKeyword && !targetSearcher.fullSearched) ? 'repeat' : 'search' }}</mat-icon>
+                </button>
+                <button mat-icon-button mat-small-icon-button
+                  [hidden]="!targetSearcher.inputKeyword"
+                  (click)="targetSearcher.resetSearch()">
+                  <mat-icon>close</mat-icon>
+                </button>
+                <div style="height: 19px;">
+                  <mat-progress-spinner mode="indeterminate" [diameter]="15" class="search-progress-bar"
+                  [hidden]="!targetSearcher.isSearching"></mat-progress-spinner>
+                </div>
               </div>
+              <div class="col-1 buttons">
+                <div class="actions ms-auto">
+                  <button mat-icon-button mat-small-icon-button [matMenuTriggerFor]="targetSettingsContextMenu">
+                    <mat-icon>settings</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <mat-menu class="context-menu" #targetSettingsContextMenu="matMenu">
+                <button mat-menu-item>
+                  <mat-checkbox class="d-inline-flex pe-2"
+                    [(ngModel)]="targetDataSource.hideCardinality">
+                    <span>Hide cardinality</span>
+                  </mat-checkbox>
+                </button>
+              </mat-menu>
             </div>
-            <mat-menu class="context-menu" #targetSettingsContextMenu="matMenu">
-              <button mat-menu-item>
-                <mat-checkbox class="d-inline-flex pe-2"
-                              [(ngModel)]="targetDataSource.hideCardinality">
-                  <span>Hide cardinality</span>
-                </mat-checkbox>
-              </button>
-            </mat-menu>
-          </div>
+          }
           <div class="row" style="padding: 0 15px;">
-            <div class="tree-breadcrumbs-wrap" id="bc-target" *ngIf="targetSelectedNode">
-              <div class="tree-breadcrumb"
-                   *ngFor="let bread of targetSelectedNode.parents; let last = last;">
-                <span aria-hidden="true" class="tree-breadcrumb-separator">/</span>
-                <span *ngIf="last"
+            @if (targetSelectedNode) {
+              <div class="tree-breadcrumbs-wrap" id="bc-target">
+                @for (bread of targetSelectedNode.parents; track bread; let last = $last) {
+                  <div class="tree-breadcrumb"
+                    >
+                    <span aria-hidden="true" class="tree-breadcrumb-separator">/</span>
+                    @if (last) {
+                      <span
                       class="tree-breadcrumb-item-last">{{ bread.name }} {{ last ? scrollBreadcrumb('bc-target') : '' }}</span>
-                <span *ngIf="!last" class="tree-breadcrumb-item"
+                    }
+                    @if (!last) {
+                      <span class="tree-breadcrumb-item"
                       (click)="onTargetBreadCrumbClick(bread)">{{ bread.name }}</span>
+                    }
+                  </div>
+                }
               </div>
-            </div>
+            }
           </div>
           <!-- Target BIE -->
           <mat-card class="bie-node-tree-panel overflow-auto">
             <mat-card-content class="mat-card-container">
               <cdk-virtual-scroll-viewport itemSize="{{ virtualScrollItemSize }}" minBufferPx="{{ minBufferPx }}" maxBufferPx="{{ maxBufferPx }}"
-                                           [style.height.px]="innerHeight" #targetVirtualScroll>
+                [style.height.px]="innerHeight" #targetVirtualScroll>
                 <div *cdkVirtualFor="let node of targetDataSource" class="example-item">
                   <div class="mat-tree-node d-flex align-items-center pointer"
-                       tabIndex="0"
-                       [attr.data-path]="node.path"
-                       [class]="{'tree-node-selected': targetSelectedNode === node}"
-                       (click)="onTargetClick(node)"
-                       [style.padding-left]="node.level * paddingPixel + 'px'">
-                    <button *ngIf="targetDataSource.isExpandable(node); else targetDisabledRef;"
-                            (click)="targetDataSource.toggle(node)"
-                            mat-icon-button>
-                      <mat-icon class="mat-icon-rtl-mirror">
-                        {{ targetDataSource.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
-                      </mat-icon>
-                    </button>
-                    <ng-template #targetDisabledRef>
+                    tabIndex="0"
+                    [attr.data-path]="node.path"
+                    [class]="{'tree-node-selected': targetSelectedNode === node}"
+                    (click)="onTargetClick(node)"
+                    [style.padding-left]="node.level * paddingPixel + 'px'">
+                    @if (targetDataSource.isExpandable(node)) {
+                      <button
+                        (click)="targetDataSource.toggle(node)"
+                        mat-icon-button>
+                        <mat-icon class="mat-icon-rtl-mirror">
+                          {{ targetDataSource.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+                        </mat-icon>
+                      </button>
+                    } @else {
                       <button mat-icon-button disabled></button>
-                    </ng-template>
+                    }
 
-                    <mat-checkbox *ngIf="node.level > 0"
-                                  [checked]="node.source !== undefined"
-                                  (change)="checkMatch($event, node)"
-                                  [disabled]="!canMatch(node)"></mat-checkbox>
+                    @if (node.level > 0) {
+                      <mat-checkbox
+                        [checked]="node.source !== undefined"
+                        (change)="checkMatch($event, node)"
+                      [disabled]="!canMatch(node)"></mat-checkbox>
+                    }
 
                     <div class="d-inline-flex align-items-center flex-grow-1">
                       <span [class]="[node.typeClass.toLowerCase(),
                                       this.targetSearcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
                             [style.padding-right.px]="2"
-                            [class.deprecated]="node.deprecated"
-                            [matTooltip]="node.deprecated ? 'Deprecated' : ''"
-                            [class.search-index]="this.targetSearcher.searchResult.indexOf(node) === this.targetSearcher.searchIndex"
-                            [innerHTML]="node.name | highlight : targetSearcher.searchKeyword">
+                        [class.deprecated]="node.deprecated"
+                        [matTooltip]="node.deprecated ? 'Deprecated' : ''"
+                        [class.search-index]="this.targetSearcher.searchResult.indexOf(node) === this.targetSearcher.searchIndex"
+                        [innerHTML]="node.name | highlight : targetSearcher.searchKeyword">
                       </span>
 
-                      <span [class]="['ps-4']" *ngIf="!targetDataSource.hideCardinality">
-                        {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
-                      </span>
+                      @if (!targetDataSource.hideCardinality) {
+                        <span [class]="['ps-4']">
+                          {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
+                        </span>
+                      }
 
-                      <fa-icon [icon]="faCircleExclamation"
-                               matTooltip="Select BIE"
-                               (click)="matchReused(node)"
-                               [class]="['ps-3', 'pointer', 'warn']" class="pointer"
-                               *ngIf="node.source && node.source.reused && !node.reusedTopLevelAsbiepId"></fa-icon>
-                      <fa-icon [icon]="faRecycle"
-                               matTooltip="Reused"
-                               (click)="matchReused(node)"
-                               [class]="['ps-3', 'pointer']" class="pointer"
-                               *ngIf="node.reusedTopLevelAsbiepId"></fa-icon>
+                      @if (node.source && node.source.reused && !node.reusedTopLevelAsbiepId) {
+                        <fa-icon [icon]="faCircleExclamation"
+                          matTooltip="Select BIE"
+                          (click)="matchReused(node)"
+                          [class]="['ps-3', 'pointer', 'warn']" class="pointer"
+                        ></fa-icon>
+                      }
+                      @if (node.reusedTopLevelAsbiepId) {
+                        <fa-icon [icon]="faRecycle"
+                          matTooltip="Reused"
+                          (click)="matchReused(node)"
+                          [class]="['ps-3', 'pointer']" class="pointer"
+                        ></fa-icon>
+                      }
 
                       <div class="ms-auto me-2">
-                        <mat-icon *ngIf="targetDataSource.isExpandable(node)"
-                                  class="context-menu-icon"
-                                  [matMenuTriggerFor]="contextMenu"
-                                  (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
-                        </mat-icon>
+                        @if (targetDataSource.isExpandable(node)) {
+                          <mat-icon
+                            class="context-menu-icon"
+                            [matMenuTriggerFor]="contextMenu"
+                            (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
+                          </mat-icon>
+                        }
                       </div>
                     </div>
                   </div>
@@ -319,22 +385,30 @@
 
       <!-- Context Menu Area -->
       <mat-menu class="context-menu" #contextMenu="matMenu">
-        <button mat-menu-item (click)="sourceDataSource.expandDescendants(contextMenuItem, 2)"
-                *ngIf="isSource(contextMenuItem)">
-          <span class="context-menu-item">Expand 2</span>
-        </button>
-        <button mat-menu-item (click)="sourceDataSource.expandDescendants(contextMenuItem, 3)"
-                *ngIf="isSource(contextMenuItem)">
-          <span class="context-menu-item">Expand 3</span>
-        </button>
-        <button mat-menu-item (click)="targetDataSource.expandDescendants(contextMenuItem, 2)"
-                *ngIf="isTarget(contextMenuItem)">
-          <span class="context-menu-item">Expand 2</span>
-        </button>
-        <button mat-menu-item (click)="targetDataSource.expandDescendants(contextMenuItem, 3)"
-                *ngIf="isTarget(contextMenuItem)">
-          <span class="context-menu-item">Expand 3</span>
-        </button>
+        @if (isSource(contextMenuItem)) {
+          <button mat-menu-item (click)="sourceDataSource.expandDescendants(contextMenuItem, 2)"
+            >
+            <span class="context-menu-item">Expand 2</span>
+          </button>
+        }
+        @if (isSource(contextMenuItem)) {
+          <button mat-menu-item (click)="sourceDataSource.expandDescendants(contextMenuItem, 3)"
+            >
+            <span class="context-menu-item">Expand 3</span>
+          </button>
+        }
+        @if (isTarget(contextMenuItem)) {
+          <button mat-menu-item (click)="targetDataSource.expandDescendants(contextMenuItem, 2)"
+            >
+            <span class="context-menu-item">Expand 2</span>
+          </button>
+        }
+        @if (isTarget(contextMenuItem)) {
+          <button mat-menu-item (click)="targetDataSource.expandDescendants(contextMenuItem, 3)"
+            >
+            <span class="context-menu-item">Expand 3</span>
+          </button>
+        }
       </mat-menu>
 
       <div class="row action-group m-0">

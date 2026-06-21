@@ -1,12 +1,14 @@
 <div class="d-block">
-  <div class="loading-container" *ngIf="loading">
-    <mat-spinner [diameter]="40"></mat-spinner>
-  </div>
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner [diameter]="40"></mat-spinner>
+    </div>
+  }
   <div>
     <div class="header d-flex align-items-center" mat-dialog-title>
       <score-title-with-library-selector [title]="title"
-                                         [libraries]="mappedLibraries"
-                                         (libraryChange)="onLibraryChange($event)"/>
+        [libraries]="mappedLibraries"
+        (libraryChange)="onLibraryChange($event)"/>
       <div class="close pe-2">
         <button mat-icon-button mat-small-icon-button (click)="onNoClick()">
           <mat-icon>close</mat-icon>
@@ -30,17 +32,19 @@
                     </mat-select-trigger>
                     <mat-option>
                       <ngx-mat-select-search [formControl]="sourceReleaseListFilterCtrl"
-                                             [placeholderLabel]="'Search...'"
-                                             [noEntriesFoundLabel]="'No matching branch found.'"></ngx-mat-select-search>
+                        [placeholderLabel]="'Search...'"
+                      [noEntriesFoundLabel]="'No matching branch found.'"></ngx-mat-select-search>
                     </mat-option>
-                    <mat-option *ngFor="let release of sourceReleaseFilteredList | async" [value]="release">
-                      <div class="d-flex">
-                        <span class="release-num">{{ release.releaseNum }}</span>
-                        <span class="f12 ms-auto pe-2 {{ release.state }}">
-                          {{ release.state | separate }}
-                        </span>
-                      </div>
-                    </mat-option>
+                    @for (release of sourceReleaseFilteredList | async; track release) {
+                      <mat-option [value]="release">
+                        <div class="d-flex">
+                          <span class="release-num">{{ release.releaseNum }}</span>
+                          <span class="f12 ms-auto pe-2 {{ release.state }}">
+                            {{ release.state | separate }}
+                          </span>
+                        </div>
+                      </mat-option>
+                    }
                   </mat-select>
                 </mat-form-field>
               </div>
@@ -56,17 +60,19 @@
                     </mat-select-trigger>
                     <mat-option>
                       <ngx-mat-select-search [formControl]="targetReleaseListFilterCtrl"
-                                             [placeholderLabel]="'Search...'"
-                                             [noEntriesFoundLabel]="'No matching branch found.'"></ngx-mat-select-search>
+                        [placeholderLabel]="'Search...'"
+                      [noEntriesFoundLabel]="'No matching branch found.'"></ngx-mat-select-search>
                     </mat-option>
-                    <mat-option *ngFor="let release of targetReleaseFilteredList | async" [value]="release">
-                      <div class="d-flex">
-                        <span class="release-num">{{ release.releaseNum }}</span>
-                        <span class="f12 ms-auto pe-2 {{ release.state }}">
-                          {{ release.state | separate }}
-                        </span>
-                      </div>
-                    </mat-option>
+                    @for (release of targetReleaseFilteredList | async; track release) {
+                      <mat-option [value]="release">
+                        <div class="d-flex">
+                          <span class="release-num">{{ release.releaseNum }}</span>
+                          <span class="f12 ms-auto pe-2 {{ release.state }}">
+                            {{ release.state | separate }}
+                          </span>
+                        </div>
+                      </mat-option>
+                    }
                   </mat-select>
                 </mat-form-field>
               </div>
@@ -92,8 +98,8 @@
                     <mat-select [(ngModel)]="request.ownerLoginIdList" multiple>
                       <mat-option>
                         <ngx-mat-select-search [formControl]="loginIdListFilterCtrl"
-                                               [placeholderLabel]="'Search...'"
-                                               [noEntriesFoundLabel]="'No matching owner found.'"></ngx-mat-select-search>
+                          [placeholderLabel]="'Search...'"
+                        [noEntriesFoundLabel]="'No matching owner found.'"></ngx-mat-select-search>
                       </mat-option>
                       <mat-option *ngFor="let loginId of filteredLoginIdList | async" [value]="loginId">
                         {{loginId}}
@@ -107,8 +113,8 @@
                     <mat-select [(ngModel)]="request.updaterLoginIdList" multiple>
                       <mat-option>
                         <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
-                                               [placeholderLabel]="'Search...'"
-                                               [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                          [placeholderLabel]="'Search...'"
+                        [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
                       </mat-option>
                       <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
                         {{loginId}}
@@ -120,7 +126,7 @@
                   <mat-form-field>
                     <mat-label>Updated start date</mat-label>
                     <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
-                           [(ngModel)]="request.updatedDate.start" [max]="request.updatedDate.end">
+                      [(ngModel)]="request.updatedDate.start" [max]="request.updatedDate.end">
                     <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
                     <mat-datepicker #dateStart></mat-datepicker>
                   </mat-form-field>
@@ -137,7 +143,7 @@
                   <mat-form-field>
                     <mat-label>Updated end date</mat-label>
                     <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
-                           [(ngModel)]="request.updatedDate.end" [min]="request.updatedDate.start">
+                      [(ngModel)]="request.updatedDate.end" [min]="request.updatedDate.start">
                     <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
                     <mat-datepicker #dateEnd></mat-datepicker>
                   </mat-form-field>
@@ -155,36 +161,36 @@
                   <mat-form-field>
                     <mat-label>DEN</mat-label>
                     <input matInput [(ngModel)]="request.filters.den"
-                           (ngModelChange)="onChange('filters.den', request.filters.den)"
-                           (keyup.enter)="this.paginator.pageIndex = 0; this.selection.clear(); this.loadBieListInBiePackage();"
-                           placeholder="DEN">
+                      (ngModelChange)="onChange('filters.den', request.filters.den)"
+                      (keyup.enter)="this.paginator.pageIndex = 0; this.selection.clear(); this.loadBieListInBiePackage();"
+                      placeholder="DEN">
                   </mat-form-field>
                 </div>
                 <div class="col-md-2 col-sm-12">
                   <mat-form-field>
                     <mat-label>Business Context</mat-label>
                     <input matInput [(ngModel)]="request.filters.businessContext"
-                           (ngModelChange)="onChange('filters.businessContext', request.filters.businessContext)"
-                           (keyup.enter)="this.paginator.pageIndex = 0; this.selection.clear(); this.loadBieListInBiePackage(); "
-                           placeholder="Business Context">
+                      (ngModelChange)="onChange('filters.businessContext', request.filters.businessContext)"
+                      (keyup.enter)="this.paginator.pageIndex = 0; this.selection.clear(); this.loadBieListInBiePackage(); "
+                      placeholder="Business Context">
                   </mat-form-field>
                 </div>
                 <div class="col-md-2 col-sm-12">
                   <mat-form-field>
                     <mat-label>Version</mat-label>
                     <input matInput [(ngModel)]="request.filters.version"
-                           (ngModelChange)="onChange('filters.version', request.filters.version)"
-                           (keyup.enter)="this.paginator.pageIndex = 0; this.selection.clear(); this.loadBieListInBiePackage(); "
-                           placeholder="Version">
+                      (ngModelChange)="onChange('filters.version', request.filters.version)"
+                      (keyup.enter)="this.paginator.pageIndex = 0; this.selection.clear(); this.loadBieListInBiePackage(); "
+                      placeholder="Version">
                   </mat-form-field>
                 </div>
                 <div class="col-md-2 col-sm-12">
                   <mat-form-field>
                     <mat-label>Remark</mat-label>
                     <input matInput [(ngModel)]="request.filters.remark"
-                           (ngModelChange)="onChange('filters.remark', request.filters.remark)"
-                           (keyup.enter)="this.paginator.pageIndex = 0; this.selection.clear(); this.loadBieListInBiePackage(); "
-                           placeholder="Remark">
+                      (ngModelChange)="onChange('filters.remark', request.filters.remark)"
+                      (keyup.enter)="this.paginator.pageIndex = 0; this.selection.clear(); this.loadBieListInBiePackage(); "
+                      placeholder="Remark">
                   </mat-form-field>
                 </div>
               </div>
@@ -192,7 +198,7 @@
           </mat-card-content>
           <mat-card-actions>
             <button mat-raised-button color="primary" type="submit"
-                    (click)="this.paginator.pageIndex = 0; this.selection.clear(); this.loadBieListInBiePackage();">
+              (click)="this.paginator.pageIndex = 0; this.selection.clear(); this.loadBieListInBiePackage();">
               <mat-icon>search</mat-icon>
               <span class="ms-2">Search</span>
             </button>
@@ -215,7 +221,9 @@
                   <ng-template #sortIndicator let-direction='direction' let-columnName='columnName'>
                     <div class="d-inline-flex align-items-center">
                       <span class="p-1 f12">{{ columnName }}</span>
-                      <mat-icon *ngIf="direction">{{direction === 'asc' ? 'arrow_upward' : 'arrow_downward'}}</mat-icon>
+                      @if (direction) {
+                        <mat-icon>{{direction === 'asc' ? 'arrow_upward' : 'arrow_downward'}}</mat-icon>
+                      }
                     </div>
                   </ng-template>
                 </mat-multi-sort-table-settings>
@@ -227,12 +235,14 @@
               <ng-container matColumnDef="state">
                 <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="state"> State</th>
                 <td mat-cell *matCellDef="let element">
-              <span class="bie-state {{ element.state }}"
+                  <span class="bie-state {{ element.state }}"
                     [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
                     'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state }}</span>
-                  <span *ngIf="element.deprecated" class="bie-state Deprecated" [matTooltip]="(!element.deprecatedReason ? '' : ('&#x2022; ' + element.deprecatedReason + '\n')) + (!element.deprecatedRemark ? '' : ('&#x2022; ' + element.deprecatedRemark))"
+                  @if (element.deprecated) {
+                    <span class="bie-state Deprecated" [matTooltip]="(!element.deprecatedReason ? '' : ('&#x2022; ' + element.deprecatedReason + '\n')) + (!element.deprecatedRemark ? '' : ('&#x2022; ' + element.deprecatedRemark))"
                         [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
                     'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
+                  }
                 </td>
               </ng-container>
 
@@ -248,10 +258,12 @@
                 <td mat-cell *matCellDef="let element">
                   <div class="den score-break-word">
                     <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}"
-                       matTooltip="{{ element.den }}">
+                      matTooltip="{{ element.den }}">
                       <div class="d-inline-flex align-items-center">
                         <span class="score-line-clamp-2 score-break-word">{{ element.den }}</span>
-                        <span *ngIf="element.displayName" class="bie-display-name ms-2">{{ element.displayName }}</span>
+                        @if (element.displayName) {
+                          <span class="bie-display-name ms-2">{{ element.displayName }}</span>
+                        }
                       </div>
                     </a>
                   </div>
@@ -270,14 +282,14 @@
                 <th mat-header-cell *matHeaderCellDef> Business Contexts</th>
                 <td mat-cell *matCellDef="let element">
                   <div class="business-context-list score-line-clamp-2 score-break-word">
-                    <ng-container *ngFor="let businessContext of element.businessContextList; let i = index">
+                    @for (businessContext of element.businessContextList; track businessContext; let i = $index) {
                       <span class="businessContext">
                         <a target="_blank" rel="noopener noreferrer"
-                           routerLink="/context_management/business_context/{{ businessContext.businessContextId }}">
+                          routerLink="/context_management/business_context/{{ businessContext.businessContextId }}">
                           <span>{{ businessContext.name }}</span>
                         </a>
                       </span>
-                    </ng-container>
+                    }
                   </div>
                 </td>
               </ng-container>
@@ -327,7 +339,7 @@
             <mat-paginator
               [pageSizeOptions]="[10, 25, 50]"
               (page)="onPageChange($event)"
-              showFirstLastButtons></mat-paginator>
+            showFirstLastButtons></mat-paginator>
           </div>
         </mat-expansion-panel>
       </mat-accordion>

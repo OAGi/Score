@@ -859,18 +859,20 @@
                               </mat-form-field>
                             </div>
                           </div>
-                          <div class="row" *ngIf="githubService.enabled$() | async">
-                            <div class="col-12">
-                              <score-github-issue-box
+                          @if (githubService.enabled$() | async) {
+                            <div class="row">
+                              <div class="col-12">
+                                <score-github-issue-box
                                   [manifestId]="asBccpDetail().bccp.manifestId"
                                   ccType="bccp"
                                   [state]="asBccpDetail().bccp.state"
                                   [ownerLoginId]="asBccpDetail()?.bccp?.owner?.loginId"
                                   [currentUser]="currentUser"
                                   [editable]="type === 'BCCP' && asBccpDetail().bccp.manifestId === manifestId">
-                              </score-github-issue-box>
+                                </score-github-issue-box>
+                              </div>
                             </div>
-                          </div>
+                          }
                         </div>
                       </mat-tab>
                     }
@@ -1025,18 +1027,20 @@
                               </mat-form-field>
                             </div>
                           </div>
-                          <div class="row" *ngIf="githubService.enabled$() | async">
-                            <div class="col-12">
-                              <score-github-issue-box
+                          @if (githubService.enabled$() | async) {
+                            <div class="row">
+                              <div class="col-12">
+                                <score-github-issue-box
                                   [manifestId]="asBccpDetail().bdt.manifestId"
                                   ccType="dt"
                                   [state]="asBccpDetail().bdt.state"
                                   [ownerLoginId]="asBccpDetail()?.bdt?.owner?.loginId"
                                   [currentUser]="currentUser"
                                   [editable]="false">
-                              </score-github-issue-box>
+                                </score-github-issue-box>
+                              </div>
                             </div>
-                          </div>
+                          }
                         </div>
                       </mat-tab>
                     }

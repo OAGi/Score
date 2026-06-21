@@ -9,22 +9,24 @@
     <mat-form-field>
       <mat-label>Verb</mat-label>
       <mat-select [(ngModel)]="operation.verb" (ngModelChange)="onVerbChange()">
-        <mat-option *ngFor="let verb of verbs" [value]="verb">{{ verb }}</mat-option>
+        @for (verb of verbs; track verb) {
+          <mat-option [value]="verb">{{ verb }}</mat-option>
+        }
       </mat-select>
     </mat-form-field>
 
     <mat-form-field>
       <mat-label>Resource Name (Path)</mat-label>
       <input matInput placeholder="/production-order/{id}"
-             [(ngModel)]="operation.resourceName"
-             (ngModelChange)="onResourceNameChange()">
+        [(ngModel)]="operation.resourceName"
+        (ngModelChange)="onResourceNameChange()">
       <mat-hint>Path segments wrapped in {{ '{' }}...{{ '}' }} become path parameters.</mat-hint>
     </mat-form-field>
 
     <mat-form-field>
       <mat-label>Operation ID</mat-label>
       <input matInput [(ngModel)]="operation.operationId"
-             (ngModelChange)="operationIdTouched = true">
+        (ngModelChange)="operationIdTouched = true">
       <mat-hint>Auto-generated from the verb and path; you can override it.</mat-hint>
     </mat-form-field>
 
@@ -43,8 +45,8 @@
 <mat-dialog-actions align="end">
   <button mat-button (click)="cancel()">Cancel</button>
   <button mat-raised-button color="primary"
-          [disabled]="!isValid || isWorking"
-          (click)="add()">
+    [disabled]="!isValid || isWorking"
+    (click)="add()">
     Add
   </button>
 </mat-dialog-actions>

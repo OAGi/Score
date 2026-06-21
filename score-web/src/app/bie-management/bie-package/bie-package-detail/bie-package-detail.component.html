@@ -3,35 +3,42 @@
     <mat-toolbar class="bg-white">
       <span class="title">{{ title }}</span>
       <span class="flex-11-auto"></span>
-      <button mat-raised-button class="ms-2" color="primary" (click)="update()"
-              *ngIf="biePackage.state === 'WIP' && (biePackage.access === 'CanEdit' || isAdmin)"
-              [disabled]="!isChanged() || isDisabled(biePackage)">
-        Update
-      </button>
-      <button mat-raised-button class="ms-2" color="accent" (click)="updateState('QA')"
-              *ngIf="biePackage.state === 'WIP' && (biePackage.access === 'CanEdit' || isAdmin)"
-              [disabled]="loading || isChanged()">
-        Move to QA
-      </button>
-      <button mat-raised-button class="ms-2" color="warn" (click)="updateState('WIP')"
-              *ngIf="biePackage.state === 'QA' && (biePackage.access === 'CanMove' || isAdmin)"
-              [disabled]="loading">
-        Back to WIP
-      </button>
-      <button mat-raised-button class="ms-2" color="accent" (click)="updateState('Production')"
-              *ngIf="biePackage.state === 'QA' && (biePackage.access === 'CanMove' || isAdmin)"
-              [disabled]="loading">
-        Move to Production
-      </button>
-      <button mat-raised-button class="ms-2" color="warn" (click)="makeNewRevision()"
-              *ngIf="biePackage.state === 'Production'"
-              [disabled]="loading">
-        Revise
-      </button>
-      <button mat-raised-button class="ms-2" color="warn" (click)="discard()"
-              *ngIf="biePackage.state === 'WIP' && (biePackage.access === 'CanEdit' || isAdmin)">
-        Discard
-      </button>
+      @if (biePackage.state === 'WIP' && (biePackage.access === 'CanEdit' || isAdmin)) {
+        <button mat-raised-button class="ms-2" color="primary" (click)="update()"
+          [disabled]="!isChanged() || isDisabled(biePackage)">
+          Update
+        </button>
+      }
+      @if (biePackage.state === 'WIP' && (biePackage.access === 'CanEdit' || isAdmin)) {
+        <button mat-raised-button class="ms-2" color="accent" (click)="updateState('QA')"
+          [disabled]="loading || isChanged()">
+          Move to QA
+        </button>
+      }
+      @if (biePackage.state === 'QA' && (biePackage.access === 'CanMove' || isAdmin)) {
+        <button mat-raised-button class="ms-2" color="warn" (click)="updateState('WIP')"
+          [disabled]="loading">
+          Back to WIP
+        </button>
+      }
+      @if (biePackage.state === 'QA' && (biePackage.access === 'CanMove' || isAdmin)) {
+        <button mat-raised-button class="ms-2" color="accent" (click)="updateState('Production')"
+          [disabled]="loading">
+          Move to Production
+        </button>
+      }
+      @if (biePackage.state === 'Production') {
+        <button mat-raised-button class="ms-2" color="warn" (click)="makeNewRevision()"
+          [disabled]="loading">
+          Revise
+        </button>
+      }
+      @if (biePackage.state === 'WIP' && (biePackage.access === 'CanEdit' || isAdmin)) {
+        <button mat-raised-button class="ms-2" color="warn" (click)="discard()"
+          >
+          Discard
+        </button>
+      }
     </mat-toolbar>
   </div>
 
@@ -45,7 +52,7 @@
                 <mat-form-field>
                   <mat-label>Package Name</mat-label>
                   <input matInput required [(ngModel)]="biePackage.name" maxlength="200"
-                         [disabled]="biePackage.state !== 'WIP' || biePackage.access !== 'CanEdit'"/>
+                    [disabled]="biePackage.state !== 'WIP' || biePackage.access !== 'CanEdit'"/>
                 </mat-form-field>
               </div>
             </div>
@@ -54,14 +61,14 @@
                 <mat-form-field>
                   <mat-label>Version ID</mat-label>
                   <input matInput required [(ngModel)]="biePackage.versionId" maxlength="100"
-                         [disabled]="biePackage.state !== 'WIP' || biePackage.access !== 'CanEdit'"/>
+                    [disabled]="biePackage.state !== 'WIP' || biePackage.access !== 'CanEdit'"/>
                 </mat-form-field>
               </div>
               <div class="col-8">
                 <mat-form-field>
                   <mat-label>Version Name</mat-label>
                   <input matInput required [(ngModel)]="biePackage.versionName" maxlength="200"
-                         [disabled]="biePackage.state !== 'WIP' || biePackage.access !== 'CanEdit'"/>
+                    [disabled]="biePackage.state !== 'WIP' || biePackage.access !== 'CanEdit'"/>
                 </mat-form-field>
               </div>
             </div>
@@ -70,14 +77,16 @@
             <mat-form-field>
               <mat-label>Description</mat-label>
               <textarea rows="4" cols="2000" matInput [(ngModel)]="biePackage.description"
-                        [disabled]="biePackage.state !== 'WIP' || biePackage.access !== 'CanEdit'"></textarea>
+              [disabled]="biePackage.state !== 'WIP' || biePackage.access !== 'CanEdit'"></textarea>
             </mat-form-field>
             <!-- Issue #1733: per-revision reason; only meaningful for a revised package (has a prior version). -->
-            <mat-form-field *ngIf="!!biePackage.prev">
-              <mat-label>Revision Reason</mat-label>
-              <textarea rows="2" cols="2000" matInput [(ngModel)]="biePackage.revisionReason"
-                        [disabled]="biePackage.state !== 'WIP' || biePackage.access !== 'CanEdit'"></textarea>
-            </mat-form-field>
+            @if (!!biePackage.prev) {
+              <mat-form-field>
+                <mat-label>Revision Reason</mat-label>
+                <textarea rows="2" cols="2000" matInput [(ngModel)]="biePackage.revisionReason"
+                [disabled]="biePackage.state !== 'WIP' || biePackage.access !== 'CanEdit'"></textarea>
+              </mat-form-field>
+            }
           </div>
         </div>
       </mat-card-content>
@@ -85,31 +94,38 @@
   </mat-card>
 
   <mat-card class="pt-0">
-    <div class="loading-container" *ngIf="loading">
-      <mat-spinner [diameter]="40"></mat-spinner>
-    </div>
+    @if (loading) {
+      <div class="loading-container">
+        <mat-spinner [diameter]="40"></mat-spinner>
+      </div>
+    }
     <mat-card-header class="align-items-baseline pt-0">
       <mat-toolbar class="bg-white p-0" style="box-shadow: none;">
         <span class="title">BIE List</span>
         <div style="padding: 8px 12px 8px 24px;">
-          <button mat-raised-button class="me-2" (click)="openAddDialog($event)" color="primary"
-                  *ngIf="biePackage.state === 'WIP' && biePackage.access === 'CanEdit'">
-            <mat-icon>add</mat-icon>
-            Add
-          </button>
-          <button mat-raised-button class="me-2" (click)="openReplaceDialog($event, this.selection.selected[0])" color="accent"
-                  *ngIf="biePackage.state === 'WIP' && biePackage.access === 'CanEdit' && !!biePackage.prev && this.selection.selected.length === 1">
-            <mat-icon>update</mat-icon>
-            Replace
-          </button>
-          <button mat-raised-button class="me-2" (click)="removeBieInBiePackage()"
-                  [hidden]="table.dataSource.data.length == 0"
-                  [disabled]="this.selection.selected.length == 0"
-                  *ngIf="biePackage.state === 'WIP' && biePackage.access === 'CanEdit'"
-                  color="warn">
-            <mat-icon>delete</mat-icon>
-            Remove
-          </button>
+          @if (biePackage.state === 'WIP' && biePackage.access === 'CanEdit') {
+            <button mat-raised-button class="me-2" (click)="openAddDialog($event)" color="primary"
+              >
+              <mat-icon>add</mat-icon>
+              Add
+            </button>
+          }
+          @if (biePackage.state === 'WIP' && biePackage.access === 'CanEdit' && !!biePackage.prev && this.selection.selected.length === 1) {
+            <button mat-raised-button class="me-2" (click)="openReplaceDialog($event, this.selection.selected[0])" color="accent"
+              >
+              <mat-icon>update</mat-icon>
+              Replace
+            </button>
+          }
+          @if (biePackage.state === 'WIP' && biePackage.access === 'CanEdit') {
+            <button mat-raised-button class="me-2" (click)="removeBieInBiePackage()"
+              [hidden]="table.dataSource.data.length == 0"
+              [disabled]="this.selection.selected.length == 0"
+              color="warn">
+              <mat-icon>delete</mat-icon>
+              Remove
+            </button>
+          }
         </div>
       </mat-toolbar>
     </mat-card-header>
@@ -129,7 +145,9 @@
             <ng-template #sortIndicator let-direction='direction' let-columnName='columnName'>
               <div class="d-inline-flex align-items-center">
                 <span class="p-1 f12">{{ columnName }}</span>
-                <mat-icon *ngIf="direction">{{direction === 'asc' ? 'arrow_upward' : 'arrow_downward'}}</mat-icon>
+                @if (direction) {
+                  <mat-icon>{{direction === 'asc' ? 'arrow_upward' : 'arrow_downward'}}</mat-icon>
+                }
               </div>
             </ng-template>
           </mat-multi-sort-table-settings>
@@ -147,30 +165,34 @@
             <ng-container matColumnDef="select">
               <th mat-header-cell *matHeaderCellDef></th>
               <td mat-cell *matCellDef="let row">
-                <mat-checkbox (click)="$event.stopPropagation()"
-                              (change)="$event ? toggle(row) : null"
-                              [checked]="isSelected(row)"
-                              *ngIf="biePackage.state === 'WIP' && biePackage.access === 'CanEdit'">
-                </mat-checkbox>
+                @if (biePackage.state === 'WIP' && biePackage.access === 'CanEdit') {
+                  <mat-checkbox (click)="$event.stopPropagation()"
+                    (change)="$event ? toggle(row) : null"
+                    [checked]="isSelected(row)"
+                    >
+                  </mat-checkbox>
+                }
               </td>
             </ng-container>
 
             <ng-container matColumnDef="state">
               <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="state"
-                  score-table-column-resize [defaultWidth]="width('State')" (onResize)="onResizeWidth($event)"> State</th>
+              score-table-column-resize [defaultWidth]="width('State')" (onResize)="onResizeWidth($event)"> State</th>
               <td mat-cell *matCellDef="let element">
-              <span class="bie-state {{ element.state }}"
+                <span class="bie-state {{ element.state }}"
                     [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
                     'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state }}</span>
-                <span *ngIf="element.deprecated" class="bie-state Deprecated" [matTooltip]="(!element.deprecatedReason ? '' : ('&#x2022; ' + element.deprecatedReason + '\n')) + (!element.deprecatedRemark ? '' : ('&#x2022; ' + element.deprecatedRemark))"
+                @if (element.deprecated) {
+                  <span class="bie-state Deprecated" [matTooltip]="(!element.deprecatedReason ? '' : ('&#x2022; ' + element.deprecatedReason + '\n')) + (!element.deprecatedRemark ? '' : ('&#x2022; ' + element.deprecatedRemark))"
                       [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
                     'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
+                }
               </td>
             </ng-container>
 
             <ng-container matColumnDef="branch">
               <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="branch"
-                  score-table-column-resize [defaultWidth]="width('Branch')" (onResize)="onResizeWidth($event)"> Branch</th>
+              score-table-column-resize [defaultWidth]="width('Branch')" (onResize)="onResizeWidth($event)"> Branch</th>
               <td mat-cell *matCellDef="let element">
                 <span [matTooltip]="element.release.releaseNum">{{ element.release.releaseNum }}</span>
               </td>
@@ -178,48 +200,54 @@
 
             <ng-container matColumnDef="den">
               <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="den"
-                  score-table-column-resize [defaultWidth]="width('DEN')" (onResize)="onResizeWidth($event)"> DEN</th>
+              score-table-column-resize [defaultWidth]="width('DEN')" (onResize)="onResizeWidth($event)"> DEN</th>
               <td mat-cell *matCellDef="let element">
                 <div class="den score-break-word">
                   <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}"
-                     matTooltip="{{ element.den }}">
+                    matTooltip="{{ element.den }}">
                     <div class="d-inline-flex align-items-center">
                       <span class="score-line-clamp-2 score-break-word">{{ element.den }}</span>
-                      <span *ngIf="element.displayName" class="bie-display-name ms-2">{{ element.displayName }}</span>
+                      @if (element.displayName) {
+                        <span class="bie-display-name ms-2">{{ element.displayName }}</span>
+                      }
                     </div>
                   </a>
                 </div>
                 <div class="bie-guid">{{ element.guid }}</div>
-                <div class="bie-source" *ngIf="!!element.source">
-                  <span>Source:</span>
-                  <a target="_blank" rel="noopener noreferrer"
+                @if (!!element.source) {
+                  <div class="bie-source">
+                    <span>Source:</span>
+                    <a target="_blank" rel="noopener noreferrer"
                      href="/profile_bie?{{ request.toQuery({
                       den: element.source.den,
                       releaseIds: element.source.release.releaseId,
                       topLevelAsbiepIds: element.source.topLevelAsbiepId }) }}">
-                    <span class="d-inline" matTooltip="{{ element.source.sourceAction | pastTense }} at {{ element.source.when | date: 'yyyy-MM-dd HH:mm:ss' }}">
-                      {{ element.source.den + ((element.source.displayName) ? (' (' + element.source.displayName + ')') : '') }}&nbsp;in&nbsp;{{ element.source.release.releaseNum }}
-                    </span>
-                  </a>
-                </div>
-                <div class="bie-based" *ngIf="!!element.based">
-                  <span>Based on:</span>
-                  <a target="_blank" rel="noopener noreferrer"
+                      <span class="d-inline" matTooltip="{{ element.source.sourceAction | pastTense }} at {{ element.source.when | date: 'yyyy-MM-dd HH:mm:ss' }}">
+                        {{ element.source.den + ((element.source.displayName) ? (' (' + element.source.displayName + ')') : '') }}&nbsp;in&nbsp;{{ element.source.release.releaseNum }}
+                      </span>
+                    </a>
+                  </div>
+                }
+                @if (!!element.based) {
+                  <div class="bie-based">
+                    <span>Based on:</span>
+                    <a target="_blank" rel="noopener noreferrer"
                      href="/profile_bie?{{ request.toQuery({
                       den: element.based.den,
                       releaseIds: element.based.release.releaseId,
                       topLevelAsbiepIds: element.based.topLevelAsbiepId }) }}">
-                    <span class="d-inline">
-                      {{ element.based.den + ((element.based.displayName) ? (' (' + element.based.displayName + ')') : '') }}&nbsp;in&nbsp;{{ element.based.release.releaseNum }}
-                    </span>
-                  </a>
-                </div>
+                      <span class="d-inline">
+                        {{ element.based.den + ((element.based.displayName) ? (' (' + element.based.displayName + ')') : '') }}&nbsp;in&nbsp;{{ element.based.release.releaseNum }}
+                      </span>
+                    </a>
+                  </div>
+                }
               </td>
             </ng-container>
 
             <ng-container matColumnDef="owner">
               <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="owner"
-                  score-table-column-resize [defaultWidth]="width('Owner')" (onResize)="onResizeWidth($event)"> Owner</th>
+              score-table-column-resize [defaultWidth]="width('Owner')" (onResize)="onResizeWidth($event)"> Owner</th>
               <td mat-cell *matCellDef="let element">
                 <span class="score-line-clamp-2 score-break-word" [matTooltip]="element.owner.username" [innerHTML]="element.owner.loginId"></span>
               </td>
@@ -227,27 +255,30 @@
 
             <ng-container matColumnDef="businessContexts">
               <th mat-header-cell *matHeaderCellDef
-                  score-table-column-resize [defaultWidth]="width('Business Contexts')" (onResize)="onResizeWidth($event)"> Business Contexts</th>
+              score-table-column-resize [defaultWidth]="width('Business Contexts')" (onResize)="onResizeWidth($event)"> Business Contexts</th>
               <td mat-cell *matCellDef="let element">
                 <div class="business-contexts-menu-wrapper">
                   <div class="business-contexts-menu-trigger"
-                       [class.is-clickable]="element.businessContextList.length > 1"
-                       [matMenuTriggerFor]="businessContextsMenu"
-                       (click)="$event.stopPropagation()">
+                    [class.is-clickable]="element.businessContextList.length > 1"
+                    [matMenuTriggerFor]="businessContextsMenu"
+                    (click)="$event.stopPropagation()">
                     <span class="business-contexts-menu-label score-line-clamp-2 score-break-word"
-                          [matTooltip]="businessContextSelection[element.topLevelAsbiepId]?.name || element.businessContextList[0]?.name || ''">
+                      [matTooltip]="businessContextSelection[element.topLevelAsbiepId]?.name || element.businessContextList[0]?.name || ''">
                       {{ businessContextSelection[element.topLevelAsbiepId]?.name || element.businessContextList[0]?.name || '' }}
                     </span>
-                    <mat-icon *ngIf="element.businessContextList.length > 1"
-                              class="business-contexts-menu-icon">arrow_drop_down</mat-icon>
+                    @if (element.businessContextList.length > 1) {
+                      <mat-icon
+                      class="business-contexts-menu-icon">arrow_drop_down</mat-icon>
+                    }
                   </div>
 
                   <mat-menu #businessContextsMenu="matMenu">
-                    <button mat-menu-item type="button"
-                            *ngFor="let businessContext of element.businessContextList"
-                            (click)="businessContextSelection[element.topLevelAsbiepId] = businessContext">
-                      <span class="score-break-word">{{ businessContext.name }}</span>
-                    </button>
+                    @for (businessContext of element.businessContextList; track businessContext) {
+                      <button mat-menu-item type="button"
+                        (click)="businessContextSelection[element.topLevelAsbiepId] = businessContext">
+                        <span class="score-break-word">{{ businessContext.name }}</span>
+                      </button>
+                    }
                   </mat-menu>
                 </div>
               </td>
@@ -255,7 +286,7 @@
 
             <ng-container matColumnDef="version">
               <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="version"
-                  score-table-column-resize [defaultWidth]="width('Version')" (onResize)="onResizeWidth($event)"> Version</th>
+              score-table-column-resize [defaultWidth]="width('Version')" (onResize)="onResizeWidth($event)"> Version</th>
               <td mat-cell *matCellDef="let element">
                 <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.version" [innerHTML]="element.version"></div>
               </td>
@@ -263,7 +294,7 @@
 
             <ng-container matColumnDef="status">
               <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="status"
-                  score-table-column-resize [defaultWidth]="width('Status')" (onResize)="onResizeWidth($event)"> Status</th>
+              score-table-column-resize [defaultWidth]="width('Status')" (onResize)="onResizeWidth($event)"> Status</th>
               <td mat-cell *matCellDef="let element">
                 <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.status" [innerHTML]="element.status"></div>
               </td>
@@ -271,7 +302,7 @@
 
             <ng-container matColumnDef="bizTerm">
               <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="bizTerm"
-                  score-table-column-resize [defaultWidth]="width('Business Term')" (onResize)="onResizeWidth($event)"> Business Term</th>
+              score-table-column-resize [defaultWidth]="width('Business Term')" (onResize)="onResizeWidth($event)"> Business Term</th>
               <td mat-cell *matCellDef="let element">
                 <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.bizTerm" [innerHTML]="element.bizTerm"></div>
               </td>
@@ -279,7 +310,7 @@
 
             <ng-container matColumnDef="remark">
               <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="remark"
-                  score-table-column-resize [defaultWidth]="width('Remark')" (onResize)="onResizeWidth($event)"> Remark</th>
+              score-table-column-resize [defaultWidth]="width('Remark')" (onResize)="onResizeWidth($event)"> Remark</th>
               <td mat-cell *matCellDef="let element">
                 <div class="score-line-clamp-2 score-break-word" [innerHTML]="element.remark"></div>
               </td>
@@ -287,7 +318,7 @@
 
             <ng-container matColumnDef="lastUpdateTimestamp">
               <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="lastUpdateTimestamp"
-                  score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
+              score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
               <td mat-cell *matCellDef="let element">
                 <div class="score-line-clamp-2 score-break-word">
                   <div>{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
@@ -303,7 +334,7 @@
           <mat-paginator
             [pageSizeOptions]="[10, 25, 50]"
             (page)="onPageChange($event)"
-            showFirstLastButtons></mat-paginator>
+          showFirstLastButtons></mat-paginator>
         </div>
       </div>
     </mat-card-content>
@@ -319,47 +350,47 @@
             </div>
             <div class="generate-option">
               <mat-checkbox [(ngModel)]="option.bieCctsMetaData"
-                            [disabled]="option.expressionOption !== 'XML'"
-                            (change)="bieAnnotationChange()">
+                [disabled]="option.expressionOption !== 'XML'"
+                (change)="bieAnnotationChange()">
                 <span class="{{ (option.expressionOption !== 'XML') ? 'toggle-disabled' : '' }}">BIE CCTS Meta Data</span>
               </mat-checkbox>
             </div>
             <div class="generate-option dependent-option">
               <mat-checkbox [(ngModel)]="option.includeCctsDefinitionTag"
-                            [disabled]="option.expressionOption !== 'XML' || option.bieCctsMetaData !== true">
+                [disabled]="option.expressionOption !== 'XML' || option.bieCctsMetaData !== true">
                 <span
-                  class="{{ (option.expressionOption !== 'XML' || option.bieCctsMetaData !== true) ? 'toggle-disabled' : '' }}">Include CCTS_Definition Tag</span>
+                class="{{ (option.expressionOption !== 'XML' || option.bieCctsMetaData !== true) ? 'toggle-disabled' : '' }}">Include CCTS_Definition Tag</span>
               </mat-checkbox>
             </div>
             <div class="generate-option">
               <mat-checkbox [(ngModel)]="option.bieGuid"
-                            [disabled]="option.expressionOption !== 'XML'">
+                [disabled]="option.expressionOption !== 'XML'">
                 <span class="{{ (option.expressionOption !== 'XML') ? 'toggle-disabled' : '' }}">BIE GUID</span>
               </mat-checkbox>
             </div>
             <div class="generate-option">
               <mat-checkbox [(ngModel)]="option.businessContext"
-                            [disabled]="option.expressionOption !== 'XML'">
+                [disabled]="option.expressionOption !== 'XML'">
                 <span class="{{ (option.expressionOption !== 'XML') ? 'toggle-disabled' : '' }}">Business Context</span>
               </mat-checkbox>
             </div>
             <div class="generate-option">
               <mat-checkbox [(ngModel)]="option.bieOagiScoreMetaData"
-                            [disabled]="option.expressionOption !== 'XML'"
-                            (change)="bieAnnotationChange()">
+                [disabled]="option.expressionOption !== 'XML'"
+                (change)="bieAnnotationChange()">
                 <span class="{{ (option.expressionOption !== 'XML') ? 'toggle-disabled' : '' }}">BIE OAGi/connectCenter Meta Data</span>
               </mat-checkbox>
             </div>
             <div class="generate-option dependent-option">
               <mat-checkbox [(ngModel)]="option.includeWhoColumns"
-                            [disabled]="option.expressionOption !== 'XML' || option.bieOagiScoreMetaData !== true">
+                [disabled]="option.expressionOption !== 'XML' || option.bieOagiScoreMetaData !== true">
                 <span
-                  class="{{ (option.expressionOption !== 'XML' || option.bieOagiScoreMetaData !== true) ? 'toggle-disabled' : '' }}">Include WHO Columns</span>
+                class="{{ (option.expressionOption !== 'XML' || option.bieOagiScoreMetaData !== true) ? 'toggle-disabled' : '' }}">Include WHO Columns</span>
               </mat-checkbox>
             </div>
             <div class="generate-option">
               <mat-checkbox [(ngModel)]="option.basedCcMetaData"
-                            [disabled]="isBasedCcMetaDataDisabled()">
+                [disabled]="isBasedCcMetaDataDisabled()">
                 <span class="{{ isBasedCcMetaDataDisabled() ? 'toggle-disabled' : '' }}">Based CC Meta Data</span>
               </mat-checkbox>
             </div>
@@ -370,7 +401,7 @@
           <span class="option-header">Select an expression</span>
           <div class="option-body">
             <mat-radio-group class="option-radio-group" [(ngModel)]="option.expressionOption"
-                             (change)="expressionOptionChange()">
+              (change)="expressionOptionChange()">
               <mat-radio-button class="option-radio-button" value="XML">
                 XML Schema
               </mat-radio-button>
@@ -388,13 +419,13 @@
           <div class="option-body">
             <div class="actions">
               <button mat-raised-button class="me-2" color="primary" (click)="generate()"
-                      [hidden]="table.dataSource.data.length == 0">Generate
+                [hidden]="table.dataSource.data.length == 0">Generate
               </button>
               <div class="manifest-version-control" [hidden]="table.dataSource.data.length == 0">
                 <label class="manifest-version-label">Manifest Version</label>
                 <button mat-stroked-button type="button" class="manifest-version-trigger"
-                        [matMenuTriggerFor]="manifestVersionMenu"
-                        aria-label="Select BIE Package manifest version">
+                  [matMenuTriggerFor]="manifestVersionMenu"
+                  aria-label="Select BIE Package manifest version">
                   <span class="manifest-version-trigger-content">
                     <span>{{ manifestVersionLabel }}</span>
                     <mat-icon class="manifest-version-chevron">arrow_drop_down</mat-icon>
@@ -403,11 +434,11 @@
               </div>
               <mat-menu #manifestVersionMenu="matMenu" xPosition="before" yPosition="below">
                 <button mat-menu-item type="button" class="manifest-version-item"
-                        (click)="manifestVersion = '0.2'">
+                  (click)="manifestVersion = '0.2'">
                   <span>0.2</span>
                 </button>
                 <button mat-menu-item type="button" class="manifest-version-item"
-                        (click)="manifestVersion = '0.3'">
+                  (click)="manifestVersion = '0.3'">
                   <span>0.3 (draft)</span>
                 </button>
               </mat-menu>

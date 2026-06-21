@@ -404,17 +404,19 @@
               </div>
             </div>
 
-            <div class="row" *ngIf="githubService.enabled$() | async">
-              <div class="col-12">
-                <score-github-issue-box
+            @if (githubService.enabled$() | async) {
+              <div class="row">
+                <div class="col-12">
+                  <score-github-issue-box
                     [manifestId]="manifestId"
                     ccType="code_list"
                     [state]="state"
                     [ownerLoginId]="codeList?.owner?.loginId"
                     [currentUser]="currentUser">
-                </score-github-issue-box>
+                  </score-github-issue-box>
+                </div>
               </div>
-            </div>
+            }
           </mat-card-content>
         </mat-card>
       </div>

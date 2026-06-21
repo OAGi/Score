@@ -1,5 +1,5 @@
 import {Component, HostListener, Input, OnInit, OnChanges, SimpleChanges, inject} from '@angular/core';
-import {CommonModule} from '@angular/common';
+
 import {FormsModule} from '@angular/forms';
 import {GithubIntegrationService, GithubStatus, LinkedIssue} from '../domain/github-integration.service';
 
@@ -13,7 +13,7 @@ import {GithubIntegrationService, GithubStatus, LinkedIssue} from '../domain/git
 @Component({
   standalone: true,
   selector: 'score-github-issue-box',
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './github-issue-box.component.html',
   styleUrls: ['./github-issue-box.component.css'],
 })
