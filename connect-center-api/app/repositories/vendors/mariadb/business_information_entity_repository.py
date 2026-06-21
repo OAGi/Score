@@ -9,6 +9,7 @@ from typing import Any, Sequence, Literal
 
 from sqlalchemy import and_, delete as sa_delete, func, or_, select, text, union
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased
 
 from app.repositories.contracts.business_information_entity import BusinessInformationEntityRepositoryContract
 from app.repositories.contracts.core_component import CoreComponentRepositoryContract
@@ -258,6 +259,10 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
         creation_timestamp_after: datetime | None = None,
         last_update_timestamp_before: datetime | None = None,
         last_update_timestamp_after: datetime | None = None,
+        included_owner_login_ids: list[str] | None = None,
+        excluded_owner_login_ids: list[str] | None = None,
+        included_updater_login_ids: list[str] | None = None,
+        excluded_updater_login_ids: list[str] | None = None,
     ) -> tuple[int, list[TopLevelAsbiepListRow]]:
         """Handle list top level asbieps.
 
@@ -275,10 +280,15 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
             creation_timestamp_after: Optional lower bound for creation timestamp.
             last_update_timestamp_before: Optional upper bound for last update timestamp.
             last_update_timestamp_after: Optional lower bound for last update timestamp.
+            included_owner_login_ids: Optional owner login IDs to include by exact match.
+            excluded_owner_login_ids: Optional owner login IDs to exclude by exact match.
+            included_updater_login_ids: Optional updater login IDs to include by exact match.
+            excluded_updater_login_ids: Optional updater login IDs to exclude by exact match.
 
         Returns:
             Result of the operation.
         """
+        updater_user = aliased(AppUser)
         conditions = [TopLevelAsbiep.asbiep_id.is_not(None)]
         if library_id is not None:
             conditions.append(Release.library_id == library_id)
@@ -310,6 +320,14 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
             conditions.append(TopLevelAsbiep.last_update_timestamp >= last_update_timestamp_after)
         if last_update_timestamp_before is not None:
             conditions.append(TopLevelAsbiep.last_update_timestamp <= last_update_timestamp_before)
+        if included_owner_login_ids:
+            conditions.append(AppUser.login_id.in_(included_owner_login_ids))
+        if excluded_owner_login_ids:
+            conditions.append(AppUser.login_id.not_in(excluded_owner_login_ids))
+        if included_updater_login_ids:
+            conditions.append(updater_user.login_id.in_(included_updater_login_ids))
+        if excluded_updater_login_ids:
+            conditions.append(updater_user.login_id.not_in(excluded_updater_login_ids))
 
         from_stmt = (
             TopLevelAsbiep.__table__
@@ -318,6 +336,8 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
             .join(Asccp, AsccpManifest.asccp_id == Asccp.asccp_id)
             .join(Release, TopLevelAsbiep.release_id == Release.release_id)
             .join(Library, Release.library_id == Library.library_id)
+            .join(AppUser, TopLevelAsbiep.owner_user_id == AppUser.app_user_id)
+            .join(updater_user, TopLevelAsbiep.last_updated_by == updater_user.app_user_id)
             .join(BizCtxAssignment, TopLevelAsbiep.top_level_asbiep_id == BizCtxAssignment.top_level_asbiep_id)
         )
 
@@ -1161,6 +1181,7 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
                 bbie_sc_map[item.based_dt_sc_manifest_id] = item
 
         owner_top = await self._build_top_level_info(owner_top_level_asbiep_id)
+        owner_release_id = int(owner_top.release.release_id)
         result: list[BbieScInfoRow] = []
         for manifest, dt_sc in dt_sc_manifest_rows:
             path = self._build_bbie_sc_path(
@@ -1172,6 +1193,7 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
             bbie_sc = bbie_sc_map.get(manifest.dt_sc_manifest_id)
             primitive = await self._get_default_primitive_for_dt_sc(
                 dt_sc_id=DataTypeSupplementaryComponentId(dt_sc.dt_sc_id),
+                release_id=owner_release_id,
                 owner_dt_manifest_id=DataTypeManifestId(manifest.owner_dt_manifest_id),
             )
             if bbie_sc is not None:
@@ -1625,6 +1647,33 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
         top_level.asbiep_id = asbiep.asbiep_id
         return top_level.top_level_asbiep_id
 
+    async def get_release_summary_by_asccp_manifest_id(
+        self,
+        *,
+        asccp_manifest_id: AsccpManifestId,
+    ) -> ReleaseSummaryRow | None:
+        """Resolve the release summary for an ASCCP manifest."""
+        row = (
+            await self._session.execute(
+                select(
+                    Release.release_id,
+                    Release.release_num,
+                    Release.state,
+                )
+                .join(AsccpManifest, AsccpManifest.release_id == Release.release_id)
+                .where(AsccpManifest.asccp_manifest_id == asccp_manifest_id)
+            )
+        ).first()
+        if row is None:
+            return None
+
+        release_id, release_num, state = row
+        return ReleaseSummaryRow(
+            release_id=int(release_id),
+            release_num=str(release_num) if release_num is not None else None,
+            state=str(state) if state is not None else None,
+        )
+
     async def update_top_level_asbiep(
         self,
         top_level_asbiep_id: int,
@@ -1816,7 +1865,7 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
         return [int(value) for value in (await self._session.execute(stmt)).scalars().all() if value is not None]
 
     async def list_assigned_code_list_manifest_ids(self, *, top_level_asbiep_id: int) -> list[int]:
-        """Return code-list manifest ids assigned by BBIE and BBIE_SC rows under the target top-level ASBIEP."""
+        """Return code list manifest ids assigned by BBIE and BBIE_SC rows under the target top-level ASBIEP."""
         stmt = union(
             select(Bbie.code_list_manifest_id.label("code_list_manifest_id")).where(
                 Bbie.owner_top_level_asbiep_id == top_level_asbiep_id,
@@ -2848,7 +2897,7 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
             facet_max_length: Facet maximum length.
             facet_pattern: Facet regular expression pattern.
             xbt_manifest_id: XBT manifest identifier to use as the primitive restriction for this BBIE.
-            code_list_manifest_id: Code-list manifest identifier to use as the primitive restriction for this BBIE.
+            code_list_manifest_id: Code list manifest identifier to use as the primitive restriction for this BBIE.
             agency_id_list_manifest_id: Agency-ID-list manifest identifier to use as the primitive restriction for this BBIE.
 
         Returns:
@@ -3050,6 +3099,7 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
             raise LookupError(self._not_found_message("DT_SC", dt_sc_manifest.dt_sc_id))
         primitive = await self._get_default_primitive_for_dt_sc(
             dt_sc_id=DataTypeSupplementaryComponentId(dt_sc_manifest.dt_sc_id),
+            release_id=int(top_level.release_id),
             owner_dt_manifest_id=DataTypeManifestId(dt_sc_manifest.owner_dt_manifest_id),
         )
         primitive_xbt_manifest_id, primitive_code_list_manifest_id, primitive_agency_id_list_manifest_id = (
@@ -3133,7 +3183,7 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
             facet_max_length: Facet maximum length.
             facet_pattern: Facet regular expression pattern.
             xbt_manifest_id: XBT manifest identifier to use as the primitive restriction for this BBIE supplementary component.
-            code_list_manifest_id: Code-list manifest identifier to use as the primitive restriction for this BBIE supplementary component.
+            code_list_manifest_id: Code list manifest identifier to use as the primitive restriction for this BBIE supplementary component.
             agency_id_list_manifest_id: Agency-ID-list manifest identifier to use as the primitive restriction for this BBIE supplementary component.
 
         Returns:
@@ -3427,12 +3477,16 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
         self,
         *,
         dt_sc_id: DataTypeSupplementaryComponentId,
+        release_id: ReleaseId | int,
         owner_dt_manifest_id: DataTypeManifestId | None = None,
     ) -> PrimitiveRestrictionRow | None:
         """Resolve default primitive restriction for a DT supplementary component.
 
         Args:
             dt_sc_id: DT supplementary component identifier.
+            release_id: Release identifier used to scope the lookup so the
+                returned primitive belongs to the same release as the owning
+                top-level ASBIEP.
             owner_dt_manifest_id: Owning DT manifest identifier used as a fallback.
 
         Returns:
@@ -3443,9 +3497,10 @@ class MariaDbBusinessInformationEntityRepository(BusinessInformationEntityReposi
                 select(DtScAwdPri)
                 .where(
                     DtScAwdPri.dt_sc_id == dt_sc_id,
+                    DtScAwdPri.release_id == int(release_id),
                     DtScAwdPri.is_default == True,
                 )
-                .order_by(DtScAwdPri.release_id.desc(), DtScAwdPri.dt_sc_awd_pri_id.desc())
+                .order_by(DtScAwdPri.dt_sc_awd_pri_id.desc())
             )
         ).scalars().first()
         if row is not None:

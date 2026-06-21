@@ -455,10 +455,20 @@ export class CcNodeService {
     });
   }
 
-  updateState(type: string, manifestId: number, state: string): Observable<any> {
+  updateState(type: string, manifestId: number, state: string, comment?: string,
+              projectFieldOptionOverride?: string): Observable<any> {
     const params = new HttpParams().set('state', state);
     const url = '/api/core-components/' + type.toLowerCase() + '/' + manifestId + '/state';
-    return this.http.patch<any>(url, {}, {params});
+    // An optional comment + project board fieldOption override travel with the request (issue #1533). Blank
+    // values are not sent (post nothing / use the configured fieldOption).
+    const body: any = {};
+    if (comment && comment.trim().length > 0) {
+      body.comment = comment;
+    }
+    if (projectFieldOptionOverride) {
+      body.projectFieldOptionOverride = projectFieldOptionOverride;
+    }
+    return this.http.patch<any>(url, body, {params});
   }
 
   purge(type: string, manifestId: number): Observable<any> {
@@ -482,9 +492,19 @@ export class CcNodeService {
     return this.http.patch<any>(url, {});
   }
 
-  cancelRevision(type: string, manifestId: number): Observable<any> {
+  cancelRevision(type: string, manifestId: number, comment?: string,
+                 projectFieldOptionOverride?: string): Observable<any> {
     const url = '/api/core-components/' + type.toLowerCase() + '/' + manifestId + '/cancel';
-    return this.http.patch<any>(url, {});
+    // An optional comment + project board fieldOption override travel with the request (issue #1533). Blank
+    // values are not sent (post nothing / use the configured fieldOption).
+    const body: any = {};
+    if (comment && comment.trim().length > 0) {
+      body.comment = comment;
+    }
+    if (projectFieldOptionOverride) {
+      body.projectFieldOptionOverride = projectFieldOptionOverride;
+    }
+    return this.http.patch<any>(url, body);
   }
 
   postComment(reference: string, text: string, prevCommentId?: number): Observable<any> {

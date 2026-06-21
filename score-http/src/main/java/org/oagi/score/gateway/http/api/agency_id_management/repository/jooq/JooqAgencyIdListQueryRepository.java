@@ -486,7 +486,7 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
                             AGENCY_ID_LIST.DEFINITION, AGENCY_ID_LIST.DEFINITION_SOURCE,
                             AGENCY_ID_LIST.REMARK,
                             AGENCY_ID_LIST.IS_DEPRECATED,
-                            iif(AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID.isNull(), true, false).as("new_component"),
+                            iif(and(RELEASE.PREV_RELEASE_ID.isNotNull(), AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID.isNull()), true, false).as("new_component"),
                             AGENCY_ID_LIST.STATE,
                             AGENCY_ID_LIST.CREATION_TIMESTAMP,
                             AGENCY_ID_LIST.LAST_UPDATE_TIMESTAMP,
@@ -641,7 +641,7 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
                             AGENCY_ID_LIST.as("prev").DEFINITION_SOURCE,
                             AGENCY_ID_LIST.as("prev").REMARK,
                             AGENCY_ID_LIST.as("prev").IS_DEPRECATED,
-                            iif(AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID.isNull(), true, false).as("new_component"),
+                            iif(and(RELEASE.PREV_RELEASE_ID.isNotNull(), AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID.isNull()), true, false).as("new_component"),
                             AGENCY_ID_LIST.as("prev").STATE,
                             AGENCY_ID_LIST.as("prev").CREATION_TIMESTAMP,
                             AGENCY_ID_LIST.as("prev").LAST_UPDATE_TIMESTAMP,
@@ -992,7 +992,7 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
                             AGENCY_ID_LIST.REMARK,
                             AGENCY_ID_LIST.NAMESPACE_ID,
                             AGENCY_ID_LIST.IS_DEPRECATED,
-                            iif(AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID.isNull(), true, false).as("new_component"),
+                            iif(and(RELEASE.PREV_RELEASE_ID.isNotNull(), AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID.isNull()), true, false).as("new_component"),
                             AGENCY_ID_LIST.STATE,
                             AGENCY_ID_LIST.CREATION_TIMESTAMP,
                             AGENCY_ID_LIST.LAST_UPDATE_TIMESTAMP,
@@ -1049,8 +1049,8 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
             }
             if (filterCriteria.newComponent() != null) {
                 conditions.add(filterCriteria.newComponent() ?
-                        AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID.isNull() :
-                        AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID.isNotNull());
+                        and(RELEASE.PREV_RELEASE_ID.isNotNull(), AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID.isNull()) :
+                        or(RELEASE.PREV_RELEASE_ID.isNull(), AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID.isNotNull()));
             }
             if (filterCriteria.namespaces() != null && !filterCriteria.namespaces().isEmpty()) {
                 conditions.add(AGENCY_ID_LIST.NAMESPACE_ID.in(valueOf(filterCriteria.namespaces())));

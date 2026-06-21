@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {OagisComponentTypes} from '../../cc-management/domain/core-component-node';
+import {LogChangeSummaryDialogComponent} from '../log-change-summary-dialog/log-change-summary-dialog.component';
 import {
   AccSnapshot,
   AsccpSnapshot,
@@ -22,12 +23,25 @@ import {forkJoin} from 'rxjs';
 })
 export class LogCompareDialogComponent implements OnInit {
   private service = inject(LogService);
+  private dialog = inject(MatDialog);
   dialogRef = inject<MatDialogRef<LogCompareDialogComponent>>(MatDialogRef);
   data = inject(MAT_DIALOG_DATA);
 
 
   componentTypes = OagisComponentTypes;
   pair: SnapshotPair;
+
+  /** Opens the change summary of the two compared log entries (issue #1533). */
+  openChangeSummary() {
+    this.dialog.open(LogChangeSummaryDialogComponent, {
+      data: {
+        before: this.data.before,
+        after: this.data.after
+      },
+      width: '720px',
+      maxWidth: '90vw'
+    });
+  }
 
   ngOnInit() {
     forkJoin([

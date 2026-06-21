@@ -6,6 +6,17 @@ import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {AuthService} from '../../authentication/auth.service';
 import {Comment} from '../../cc-management/domain/core-component-node';
 import {CodeListService} from '../domain/code-list.service';
+import {GithubIntegrationService, GithubStatus} from '../../cc-management/domain/github-integration.service';
+import {
+  StateChangeDialogComponent,
+  StateChangeDialogResult,
+  usesStateChangeDialog
+} from '../../cc-management/state-change-dialog/state-change-dialog.component';
+import {
+  CANCEL_REVISION_TO_STATE,
+  cancelRevisionContent,
+  cancelRevisionHeader
+} from '../../cc-management/state-change-dialog/cancel-revision-dialog';
 import {CodeListDetails, CodeListValue, CodeListValueDetails} from '../domain/code-list';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatPaginator} from '@angular/material/paginator';
@@ -14,10 +25,10 @@ import {MatSort} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {CodeListValueDialogComponent} from '../code-list-value-dialog/code-list-value-dialog.component';
 import {SelectionModel} from '@angular/cdk/collections';
-import {finalize, switchMap} from 'rxjs/operators';
+import {catchError, finalize, switchMap, take} from 'rxjs/operators';
 import {v4 as uuid} from 'uuid';
 import {FormControl} from '@angular/forms';
-import {forkJoin, Observable, ReplaySubject} from 'rxjs';
+import {forkJoin, Observable, of, ReplaySubject} from 'rxjs';
 import {hashCode, initFilter, saveBranch} from '../../common/utility';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {NamespaceSummary} from '../../namespace-management/domain/namespace';
@@ -41,6 +52,7 @@ import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 })
 export class CodeListDetailComponent implements OnInit {
   private service = inject(CodeListService);
+  protected githubService = inject(GithubIntegrationService);
   private agencyIdListService = inject(AgencyIdListService);
   private namespaceService = inject(NamespaceService);
   private location = inject(Location);
@@ -704,35 +716,69 @@ export class CodeListDetailComponent implements OnInit {
       return;
     }
 
-    const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = 'Update state to \'' + state + '\'?';
-    dialogConfig.data.content = ['Are you sure you want to update the state to \'' + state + '\'?'];
+    const header = 'Update state to \'' + state + '\'?';
+    const content = ['Are you sure you want to update the state to \'' + state + '\'?'];
     if (state === 'Published' || state === 'Production') {
-      dialogConfig.data.content.push(...['Once in the ' + state + ' state it can no longer be changed or discarded.', ]);
+      content.push(...['Once in the ' + state + ' state it can no longer be changed or discarded.', ]);
     }
-    dialogConfig.data.action = (state === 'Published' || state === 'Production') ? 'Update anyway' : 'Update';
+    const action = (state === 'Published' || state === 'Production') ? 'Update anyway' : 'Update';
 
-    this.confirmDialogService.open(dialogConfig).afterClosed()
-      .subscribe(result => {
-        if (result) {
-          this.isUpdating = true;
-
-          this.service.updateState(this.codeList, state).pipe(finalize(() => {
-            this.isUpdating = false;
-          })).subscribe(_ => {
-            forkJoin([
-              this.service.getCodeListDetails(this.manifestId)
-            ]).subscribe(([codeList]) => {
-              this.init(codeList);
-              this.snackBar.open('Updated', '', {
-                duration: 3000,
-              });
-            });
-          }, error => {
-            this.openStateUpdateErrorDialog(error);
+    // When the GitHub integration is enabled and the transition is Draft -> Candidate or
+    // Candidate -> WIP, a dedicated dialog shows the linked GitHub issues (and pre-fills
+    // the GitHub status post for the user to edit); otherwise the generic confirm dialog runs unchanged
+    // (issue #1533).
+    this.githubService.getStatus()
+      .pipe(take(1), catchError(() => of({enabled: false, connected: false} as GithubStatus)))
+      .subscribe(status => {
+        if (status.enabled && usesStateChangeDialog(this.codeList.state, state)) {
+          const target = {
+            ccType: 'code_list',
+            manifestId: this.codeList.codeListManifestId,
+            name: this.codeList.name,
+            state: this.codeList.state
+          };
+          this.dialog.open(StateChangeDialogComponent, {
+            data: {header, content, actionLabel: action, toState: state, targets: [target]},
+            autoFocus: false
+          }).afterClosed().subscribe((result: StateChangeDialogResult | undefined) => {
+            if (!result || !result.confirmed) {
+              return;
+            }
+            this._doUpdateState(state, result.comments[target.ccType + ':' + target.manifestId], result.fieldOptionOverrides[target.ccType + ':' + target.manifestId]);
           });
+        } else {
+          const dialogConfig = this.confirmDialogService.newConfig();
+          dialogConfig.data.header = header;
+          dialogConfig.data.content = content;
+          dialogConfig.data.action = action;
+
+          this.confirmDialogService.open(dialogConfig).afterClosed()
+            .subscribe(result => {
+              if (result) {
+                this._doUpdateState(state);
+              }
+            });
         }
       });
+  }
+
+  private _doUpdateState(state: string, comment?: string, projectFieldOptionOverride?: string) {
+    this.isUpdating = true;
+
+    this.service.updateState(this.codeList, state, comment, projectFieldOptionOverride).pipe(finalize(() => {
+      this.isUpdating = false;
+    })).subscribe(_ => {
+      forkJoin([
+        this.service.getCodeListDetails(this.manifestId)
+      ]).subscribe(([codeList]) => {
+        this.init(codeList);
+        this.snackBar.open('Updated', '', {
+          duration: 3000,
+        });
+      });
+    }, error => {
+      this.openStateUpdateErrorDialog(error);
+    });
   }
 
   /**
@@ -954,35 +1000,67 @@ export class CodeListDetailComponent implements OnInit {
 
   cancelRevision(): void {
     const isDeveloper = this.userRoles.includes('developer');
-    const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = (isDeveloper) ? 'Cancel this revision?' : 'Cancel this amendment?';
-    dialogConfig.data.content = [(isDeveloper) ? 'Are you sure you want to cancel this revision?' : 'Are you sure you want to cancel this amendment?'];
-    dialogConfig.data.action = 'Okay';
+    const header = cancelRevisionHeader(isDeveloper);
+    const content = cancelRevisionContent(isDeveloper);
 
-    this.confirmDialogService.open(dialogConfig).afterClosed()
-      .subscribe(result => {
-        if (!result) {
-          return;
-        }
-
-        this.isUpdating = true;
-        this.service.cancelRevision(this.manifestId)
-          .pipe(
-            finalize(() => {
-              this.isUpdating = false;
-            })
-          )
-          .subscribe(resp => {
-            forkJoin([
-              this.service.getCodeListDetails(this.manifestId)
-            ]).subscribe(([codeList]) => {
-              this.init(codeList);
-              this.snackBar.open('Canceled', '', {
-                duration: 3000,
-              });
-            });
-          }, err => {
+    // When the GitHub integration is enabled, cancel goes through the dedicated dialog that shows the
+    // linked GitHub issues and pre-fills the status post to publish on cancel (issue #1533); otherwise
+    // the generic confirm dialog runs. The data-loss warning travels in `content` on BOTH paths, so it
+    // is shown regardless of GitHub status.
+    this.githubService.getStatus()
+      .pipe(take(1), catchError(() => of({enabled: false, connected: false} as GithubStatus)))
+      .subscribe(status => {
+        if (status.enabled) {
+          const target = {
+            ccType: 'code_list',
+            manifestId: this.codeList.codeListManifestId,
+            name: this.codeList.name,
+            state: this.codeList.state
+          };
+          this.dialog.open(StateChangeDialogComponent, {
+            data: {header, content, actionLabel: 'Okay', toState: CANCEL_REVISION_TO_STATE, targets: [target]},
+            autoFocus: false
+          }).afterClosed().subscribe((result: StateChangeDialogResult | undefined) => {
+            if (!result || !result.confirmed) {
+              return;
+            }
+            this._doCancelRevision(result.comments[target.ccType + ':' + target.manifestId], result.fieldOptionOverrides[target.ccType + ':' + target.manifestId]);
           });
+        } else {
+          const dialogConfig = this.confirmDialogService.newConfig();
+          dialogConfig.data.header = header;
+          dialogConfig.data.content = content;
+          dialogConfig.data.action = 'Okay';
+
+          this.confirmDialogService.open(dialogConfig).afterClosed()
+            .subscribe(result => {
+              if (!result) {
+                return;
+              }
+              this._doCancelRevision();
+            });
+        }
+      });
+  }
+
+  private _doCancelRevision(comment?: string, projectFieldOptionOverride?: string): void {
+    this.isUpdating = true;
+    this.service.cancelRevision(this.manifestId, comment, projectFieldOptionOverride)
+      .pipe(
+        finalize(() => {
+          this.isUpdating = false;
+        })
+      )
+      .subscribe(resp => {
+        forkJoin([
+          this.service.getCodeListDetails(this.manifestId)
+        ]).subscribe(([codeList]) => {
+          this.init(codeList);
+          this.snackBar.open('Canceled', '', {
+            duration: 3000,
+          });
+        });
+      }, err => {
       });
   }
 

@@ -15,6 +15,9 @@ public record BiePackageManifest(Guid uuid,
                                  Guid priorPackageUuid,
                                  Guid priorPackageVersionNameUuid,
                                  String priorPackageVersionId,
+                                 // Issue #1733: emitted only for manifest version 0.3; null (and thus omitted)
+                                 // for the stable 0.2 manifest.
+                                 @JsonInclude(JsonInclude.Include.NON_NULL) String revisionReason,
                                  Collection<BieManifestSummary> newBiesFromPriorPackageVersion,
                                  Collection<BieManifestSummary> removedBiesFromPriorPackageVersion,
                                  Collection<BieManifestSummary> changedBiesFromPriorPackageVersion,

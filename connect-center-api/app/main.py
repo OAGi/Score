@@ -24,11 +24,13 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 
 # FastMCP
 from fastmcp import FastMCP
-from fastmcp.server.auth.oidc_proxy import OIDCProxy
+from fastmcp.server.auth import MultiAuth
+from fastmcp.server.auth.providers.jwt import JWTVerifier
+from mcp.types import Icon
 from fastmcp.utilities.lifespan import combine_lifespans
 
 # Application
@@ -39,6 +41,7 @@ from app.routes.biz_ctx import router as biz_ctx_router
 from app.routes.biz_ctx import value_router as biz_ctx_value_router
 from app.routes.business_information_entity import router as business_information_entity_router
 from app.routes.code_list import router as code_list_router
+from app.routes.code_list import value_router as code_list_value_router
 from app.routes.core_component import router as core_component_router
 from app.routes.ctx_category import router as ctx_category_router
 from app.routes.ctx_scheme import router as ctx_scheme_router
@@ -50,12 +53,46 @@ from app.routes.namespace import router as namespace_router
 from app.routes.release import router as release_router
 from app.routes.tag import router as tag_router
 from app.routes.xbt import router as xbt_router
+from app.security import ConnectCenterOIDCProxy
 from app.settings import settings
 
 _API_ROUTE_PREFIX = "/api"
 _MCP_ROUTE_PREFIX = "/mcp"
 _INTERNAL_ROUTE_PREFIXES = (_MCP_ROUTE_PREFIX, f"{_API_ROUTE_PREFIX}/openapi.json", "/swagger-ui", "/redoc")
 logger = logging.getLogger("connectcenter.main")
+
+
+_FASTMCP_SUPPORTED_JWT_ALGORITHMS = {
+    "HS256",
+    "HS384",
+    "HS512",
+    "RS256",
+    "RS384",
+    "RS512",
+    "ES256",
+    "ES384",
+    "ES512",
+    "PS256",
+    "PS384",
+    "PS512",
+}
+
+
+def _configured_mcp_jwt_algorithms() -> list[str]:
+    raw_value = (settings.mcp_jwt_algorithms or settings.mcp_jwt_algorithm or "ES256").strip()
+    algorithms: list[str] = []
+    for item in raw_value.split(","):
+        algorithm = item.strip()
+        if not algorithm or algorithm in algorithms:
+            continue
+        if algorithm not in _FASTMCP_SUPPORTED_JWT_ALGORITHMS:
+            raise ValueError(
+                f"Unsupported MCP JWT algorithm '{algorithm}'. "
+                "The installed FastMCP JWT verifier currently supports "
+                "HS256/384/512, RS256/384/512, ES256/384/512, and PS256/384/512."
+            )
+        algorithms.append(algorithm)
+    return algorithms or ["ES256"]
 
 
 # ---------------------------------------------------------------------------
@@ -175,6 +212,15 @@ def custom_openapi() -> dict[str, Any]:
 
 
 app.openapi = custom_openapi
+
+
+@app.middleware("http")
+async def normalize_standalone_mcp_get(request: Request, call_next):
+    """Tell streamable MCP clients that standalone GET streams are unsupported."""
+    if request.method == "GET" and request.url.path in {_MCP_ROUTE_PREFIX, f"{_MCP_ROUTE_PREFIX}/"}:
+        if "mcp-session-id" not in {name.lower() for name in request.headers.keys()}:
+            return Response(status_code=405)
+    return await call_next(request)
 
 
 @app.exception_handler(HTTPException)
@@ -314,13 +360,14 @@ for router in (
     tag_router,
     xbt_router,
     code_list_router,
+    code_list_value_router,
     agency_id_list_router,
     core_component_router,
     business_information_entity_router,
 ):
     app.include_router(router, prefix=_API_ROUTE_PREFIX)
 
-def _create_mcp_server(api_app: FastAPI) -> tuple[FastMCP, OIDCProxy | None]:
+def _create_mcp_server(api_app: FastAPI) -> tuple[FastMCP, MultiAuth | ConnectCenterOIDCProxy | JWTVerifier | None]:
     """Build the FastMCP server exposed by the API process."""
     from app.tools.agency_id_list import mcp as agency_id_list_mcp
     from app.tools.app_user import mcp as app_user_mcp
@@ -338,7 +385,18 @@ def _create_mcp_server(api_app: FastAPI) -> tuple[FastMCP, OIDCProxy | None]:
     from app.tools.xbt import mcp as xbt_mcp
 
     mcp_auth = _create_mcp_auth()
-    mcp = FastMCP("connectCenter MCP", auth=mcp_auth)
+
+    docs_base_url = settings.public_docs_base_url.rstrip("/")
+    website_url = docs_base_url or None
+    icon_src = f"{docs_base_url}/connectcenter-developers.svg" if docs_base_url else None
+    icons = [Icon(src=icon_src, mimeType="image/svg+xml")] if icon_src else None
+
+    mcp = FastMCP(
+        "connectCenter MCP",
+        auth=mcp_auth,
+        website_url=website_url,
+        icons=icons,
+    )
 
     mcp.mount(agency_id_list_mcp)
     mcp.mount(app_user_mcp)
@@ -362,8 +420,11 @@ def _create_mcp_server(api_app: FastAPI) -> tuple[FastMCP, OIDCProxy | None]:
 # ---------------------------------------------------------------------------
 
 
-def _create_mcp_auth() -> OIDCProxy | None:
-    """Build the FastMCP OIDC proxy from the existing API env configuration."""
+def _create_mcp_auth() -> MultiAuth | ConnectCenterOIDCProxy | JWTVerifier | None:
+    """Build the FastMCP auth configuration for interactive and external JWT access."""
+    auth_server: ConnectCenterOIDCProxy | None = None
+    token_verifiers: list[JWTVerifier] = []
+
     config_url = (settings.oauth2_configuration_url or "").strip()
     issuer_uri = (settings.oauth2_issuer_uri or "").strip().rstrip("/")
     client_id = (settings.oauth2_client_id or "").strip()
@@ -373,25 +434,50 @@ def _create_mcp_auth() -> OIDCProxy | None:
     if not config_url and issuer_uri:
         config_url = f"{issuer_uri}/.well-known/openid-configuration"
 
-    if not (config_url and client_id and client_secret):
-        logger.info("FastMCP OIDC proxy disabled: incomplete OAuth2 configuration.")
-        return None
-
     base_url = f"{settings.public_api_base_url.rstrip('/')}{_MCP_ROUTE_PREFIX}"
+    if config_url and client_id and client_secret:
+        auth_server = ConnectCenterOIDCProxy(
+            config_url=config_url,
+            client_id=client_id,
+            client_secret=client_secret,
+            audience=audience or None,
+            base_url=base_url,
+        )
+    else:
+        logger.info("FastMCP OIDC proxy disabled: incomplete OAuth2 configuration.")
 
-    return OIDCProxy(
-        config_url=config_url,
-        client_id=client_id,
-        client_secret=client_secret,
-        audience=audience or None,
-        base_url=base_url,
-    )
+    mcp_jwt_issuer = (settings.mcp_jwt_issuer_uri or "").strip().rstrip("/")
+    mcp_jwt_jwks_uri = (settings.mcp_jwt_jwks_uri or "").strip()
+    mcp_jwt_audience = (settings.mcp_jwt_audience or "").strip()
+    if mcp_jwt_issuer and mcp_jwt_jwks_uri and mcp_jwt_audience:
+        for algorithm in _configured_mcp_jwt_algorithms():
+            token_verifiers.append(
+                JWTVerifier(
+                    jwks_uri=mcp_jwt_jwks_uri,
+                    issuer=mcp_jwt_issuer,
+                    audience=mcp_jwt_audience,
+                    algorithm=algorithm,
+                    base_url=base_url,
+                )
+            )
+
+    if auth_server and token_verifiers:
+        return MultiAuth(server=auth_server, verifiers=token_verifiers, base_url=base_url)
+    if auth_server:
+        return auth_server
+    if token_verifiers:
+        if len(token_verifiers) > 1:
+            return MultiAuth(verifiers=token_verifiers, base_url=base_url)
+        return token_verifiers[0]
+    return None
 
 
 # Build the MCP server and OIDC auth proxy.
 mcp, mcp_auth = _create_mcp_server(app)
 # Wrap the MCP server as an ASGI app mounted at the root of the configured MCP prefix.
-mcp_app = mcp.http_app(path="/")
+# Use Streamable HTTP SSE responses so MCP progress notifications can reach
+# Spring's WebClientStreamableHttpTransport progress consumer during tool calls.
+mcp_app = mcp.http_app(path="/", json_response=False, stateless_http=False)
 # Merge the MCP lifespan with the FastAPI lifespan so both start and stop together.
 app.router.lifespan_context = combine_lifespans(app.router.lifespan_context, mcp_app.lifespan)
 # Mount the MCP ASGI app under the configured route prefix.

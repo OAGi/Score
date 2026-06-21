@@ -314,6 +314,10 @@ public class ReleaseCommandService implements InitializingBean {
                     }
                 }
 
+                // Remove GitHub issue links before the CCs they reference are deleted (issue #1533).
+                repositoryFactory.gitHubIssueLinkCommandRepository(requester)
+                        .deleteLinksByRelease(release.releaseId());
+
                 var ccCommand = repositoryFactory.ccCommandRepository(requester);
 
                 // Remove replacement
@@ -500,6 +504,12 @@ public class ReleaseCommandService implements InitializingBean {
 
             repositoryFactory.releaseCommandRepository(requester)
                     .copyDepsFromWorking(releaseId, workingReleaseId);
+
+            // Carry GitHub issue links over from the 'Working' release onto the new draft release's
+            // manifests, mirroring how component tags are carried over (issue #1533). The repository
+            // resolves the library's 'Working' release internally from the target release.
+            repositoryFactory.gitHubIssueLinkCommandRepository(requester)
+                    .copyLinksFromWorking(releaseId);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
@@ -523,6 +533,14 @@ public class ReleaseCommandService implements InitializingBean {
             var ccCommand = repositoryFactory.ccCommandRepository(requester);
             ccCommand.cleanUp(releaseCleanupEvent.getReleaseId());
             updateState(requester, releaseCleanupEvent.getReleaseId(), Published);
+
+            // The published release already holds its own copy of the GitHub issue links (carried over
+            // when it was drafted); remove the 'Working' release's links for the components included in
+            // this release so those issues live only in the published release going forward. Links on
+            // Working components not part of this release are kept (issue #1533). The repository resolves
+            // the library's 'Working' release internally from the published release.
+            repositoryFactory.gitHubIssueLinkCommandRepository(requester)
+                    .deleteWorkingLinksIncludedInRelease(releaseCleanupEvent.getReleaseId());
         } finally {
             lock.unlock();
         }

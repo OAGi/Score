@@ -37,13 +37,65 @@ public interface ReleaseQueryRepository {
      */
     ReleaseSummaryRecord getReleaseSummary(LibraryId libraryId, String releaseNum);
 
+    /**
+     * Retrieves all release summaries that belong to the specified library.
+     *
+     * @param libraryId the unique identifier of the library.
+     * @return a list of {@link ReleaseSummaryRecord}s for the library.
+     */
     List<ReleaseSummaryRecord> getReleaseSummaryList(LibraryId libraryId);
 
+    /**
+     * Retrieves release summaries for the specified release IDs.
+     *
+     * @param releaseIdSet the collection of release IDs to load.
+     * @return a list of matching {@link ReleaseSummaryRecord}s.
+     */
     List<ReleaseSummaryRecord> getReleaseSummaryList(Collection<ReleaseId> releaseIdSet);
 
+    /**
+     * Retrieves release summaries for the specified library, optionally filtered by release state.
+     *
+     * @param libraryId the unique identifier of the library.
+     * @param releaseStateSet the set of release states to include. If empty or {@code null},
+     *                        all releases in the library are returned.
+     * @return a list of {@link ReleaseSummaryRecord}s matching the criteria.
+     */
     List<ReleaseSummaryRecord> getReleaseSummaryList(LibraryId libraryId, Collection<ReleaseState> releaseStateSet);
 
+    /**
+     * Retrieves the releases that the specified release directly depends on.
+     *
+     * <p>This follows the {@code release_dep.release_id -> depend_on_release_id} direction and
+     * returns only release summary data for the target releases.</p>
+     *
+     * @param releaseId the release whose direct dependencies should be retrieved.
+     * @return a list of direct dependency {@link ReleaseSummaryRecord}s.
+     */
     List<ReleaseSummaryRecord> getDependentReleaseSummaryList(ReleaseId releaseId);
+
+    /**
+     * Retrieves the releases that directly depend on the specified release.
+     *
+     * <p>This is the inverse lookup of {@link #getDependentReleaseSummaryList(ReleaseId)} and is
+     * useful when validating whether a release can be changed or discarded.</p>
+     *
+     * @param releaseId the release whose dependents should be retrieved.
+     * @return a list of {@link ReleaseSummaryRecord}s that reference the release.
+     */
+    List<ReleaseSummaryRecord> getReleaseSummaryListDependingOn(ReleaseId releaseId);
+
+    /**
+     * Retrieves the direct dependency rows for the specified release, including the
+     * {@code release_dep_id} of each relationship.
+     *
+     * <p>Use this when the caller needs both the dependent release summary information and the
+     * identity of the underlying dependency relationship row.</p>
+     *
+     * @param releaseId the release whose direct dependency rows should be retrieved.
+     * @return a list of {@link ReleaseDependencySummaryRecord}s for the release.
+     */
+    List<ReleaseDependencySummaryRecord> getReleaseDependencySummaryList(ReleaseId releaseId);
 
     /**
      * Retrieves a set of all included {@code ReleaseSummaryRecord}s for a given {@code ReleaseId},
@@ -74,6 +126,13 @@ public interface ReleaseQueryRepository {
      */
     ReleaseDetailsRecord getReleaseDetails(ReleaseId releaseId);
 
+    /**
+     * Retrieves the detailed information of a release by its library ID and release number.
+     *
+     * @param libraryId the unique identifier of the library.
+     * @param releaseNum the release number associated with the library.
+     * @return a {@link ReleaseDetailsRecord} object containing detailed release information.
+     */
     ReleaseDetailsRecord getReleaseDetails(LibraryId libraryId, String releaseNum);
 
     /**
@@ -128,5 +187,11 @@ public interface ReleaseQueryRepository {
      */
     boolean hasRecordsByNamespaceId(NamespaceId namespaceId);
 
+    /**
+     * Retrieves the component assignment snapshot for the specified release.
+     *
+     * @param releaseId the unique identifier of the release.
+     * @return an {@link AssignComponents} object containing assigned component information.
+     */
     AssignComponents getAssignComponents(ReleaseId releaseId);
 }

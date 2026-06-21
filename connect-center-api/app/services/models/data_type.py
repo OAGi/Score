@@ -12,6 +12,7 @@ from app.services.models.library import LibrarySummaryServiceRecord
 from app.services.models.log import LogSummaryServiceRecord
 from app.services.models.namespace import NamespaceSummaryServiceRecord
 from app.services.models.release import ReleaseSummaryServiceRecord
+from app.services.models.tag import TagSummaryServiceRecord
 from app.services.utils.date import DateRange
 from app.services.utils.pagination import PaginationParams
 from app.services.utils.string import Guid
@@ -69,7 +70,9 @@ class DataTypeServiceResult:
         "ReleaseDraft",
         "Published",
     ]
+    primitives: list[DataTypePrimitiveServiceRecord] = field(default_factory=list)
     supplementary_components: list[DataTypeSupplementaryComponentServiceRecord] = field(default_factory=list)
+    tags: list[TagSummaryServiceRecord] = field(default_factory=list)
     namespace: NamespaceSummaryServiceRecord | None = None
     library: LibrarySummaryServiceRecord
     release: ReleaseSummaryServiceRecord
@@ -110,6 +113,17 @@ class DataTypeValueConstraintServiceRecord:
 
 
 @dataclass(kw_only=True)
+class DataTypePrimitiveServiceRecord:
+    """Primitive selection for a DT or DT_SC."""
+
+    cdt_pri_name: str | None = None
+    xbt_manifest_id: int | None = None
+    code_list_manifest_id: int | None = None
+    agency_id_list_manifest_id: int | None = None
+    is_default: bool
+
+
+@dataclass(kw_only=True)
 class DataTypeSupplementaryComponentServiceRecord:
     """Data type supplementary component information."""
 
@@ -125,6 +139,16 @@ class DataTypeSupplementaryComponentServiceRecord:
     cardinality_max: int
     value_constraint: DataTypeValueConstraintServiceRecord | None = None
     is_deprecated: bool
+    primitives: list[DataTypePrimitiveServiceRecord] = field(default_factory=list)
+
+    @property
+    def cardinality(self) -> Literal["Prohibited", "Optional", "Required"]:
+        """Return the score-web style DT_SC cardinality label."""
+        if self.cardinality_min == 0 and self.cardinality_max == 0:
+            return "Prohibited"
+        if self.cardinality_min == 0 and self.cardinality_max == 1:
+            return "Optional"
+        return "Required"
 
 
 @dataclass(kw_only=True)
@@ -147,3 +171,65 @@ class DataTypeSummaryServiceRecord:
     namespace: NamespaceSummaryServiceRecord | None = None
     library: LibrarySummaryServiceRecord
     release: ReleaseSummaryServiceRecord
+
+
+@dataclass(kw_only=True)
+class CreateDataTypeServiceResult:
+    """Data-type create response model."""
+
+    dt_manifest_id: DataTypeManifestId
+
+
+@dataclass(kw_only=True)
+class UpdateDataTypeServiceResult:
+    """Data-type update response model."""
+
+    dt_manifest_id: DataTypeManifestId
+    updates: list[str] = field(default_factory=list)
+
+
+@dataclass(kw_only=True)
+class TransferDataTypeOwnershipServiceResult:
+    """Data-type ownership-transfer response model."""
+
+    dt_manifest_id: DataTypeManifestId
+    updates: list[str] = field(default_factory=list)
+
+
+@dataclass(kw_only=True)
+class CreateDataTypeSupplementaryComponentServiceResult:
+    """Data-type supplementary-component create response model."""
+
+    dt_sc_manifest_id: DataTypeSupplementaryComponentManifestId
+
+
+@dataclass(kw_only=True)
+class UpdateDataTypeSupplementaryComponentServiceResult:
+    """Data-type supplementary-component update response model."""
+
+    dt_sc_manifest_id: DataTypeSupplementaryComponentManifestId
+    updates: list[str] = field(default_factory=list)
+
+
+@dataclass(kw_only=True)
+class DiscardDataTypeServiceResult:
+    """Data-type discard response model."""
+
+    dt_manifest_id: DataTypeManifestId
+    discarded: bool
+
+
+@dataclass(kw_only=True)
+class ReviseDataTypeServiceResult:
+    """Data-type revise response model."""
+
+    dt_manifest_id: DataTypeManifestId
+    revised: bool
+
+
+@dataclass(kw_only=True)
+class CancelDataTypeServiceResult:
+    """Data-type cancel response model."""
+
+    dt_manifest_id: DataTypeManifestId
+    cancelled: bool

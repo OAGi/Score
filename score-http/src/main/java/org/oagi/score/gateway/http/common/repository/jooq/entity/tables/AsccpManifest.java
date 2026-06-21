@@ -38,6 +38,8 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AsccMani
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Asccp.AsccpPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AsccpManifest.AsccpManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AsccpManifestTag.AsccpManifestTagPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.GithubIssue.GithubIssuePath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.GithubIssueAsccpManifest.GithubIssueAsccpManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Log.LogPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ModuleAsccpManifest.ModuleAsccpManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Release.ReleasePath;
@@ -328,6 +330,19 @@ public class AsccpManifest extends TableImpl<AsccpManifestRecord> {
         return _asccpManifestTag;
     }
 
+    private transient GithubIssueAsccpManifestPath _githubIssueAsccpManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_asccp_manifest</code> table
+     */
+    public GithubIssueAsccpManifestPath githubIssueAsccpManifest() {
+        if (_githubIssueAsccpManifest == null)
+            _githubIssueAsccpManifest = new GithubIssueAsccpManifestPath(this, null, Keys.GITHUB_ISSUE_ASCCP_MANIFEST_ASCCP_MANIFEST_ID_FK.getInverseKey());
+
+        return _githubIssueAsccpManifest;
+    }
+
     private transient ModuleAsccpManifestPath _moduleAsccpManifest;
 
     /**
@@ -347,6 +362,14 @@ public class AsccpManifest extends TableImpl<AsccpManifestRecord> {
      */
     public TagPath tag() {
         return asccpManifestTag().tag();
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the
+     * <code>oagi.github_issue</code> table
+     */
+    public GithubIssuePath githubIssue() {
+        return githubIssueAsccpManifest().githubIssue();
     }
 
     @Override

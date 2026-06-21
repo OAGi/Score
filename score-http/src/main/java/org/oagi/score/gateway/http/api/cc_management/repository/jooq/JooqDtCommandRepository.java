@@ -777,6 +777,11 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                     .execute();
         }
 
+        // discard corresponding GitHub issue links (issue #1533)
+        dslContext().deleteFrom(GITHUB_ISSUE_DT_MANIFEST)
+                .where(GITHUB_ISSUE_DT_MANIFEST.DT_MANIFEST_ID.eq(valueOf(dtManifestId)))
+                .execute();
+
         // discard corresponding tags
         dslContext().deleteFrom(DT_MANIFEST_TAG)
                 .where(DT_MANIFEST_TAG.DT_MANIFEST_ID.eq(valueOf(dtManifestId)))

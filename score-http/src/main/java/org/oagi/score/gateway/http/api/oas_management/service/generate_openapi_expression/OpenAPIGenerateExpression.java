@@ -29,6 +29,11 @@ import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScAwdPriSumma
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScSummaryRecord;
 import org.oagi.score.gateway.http.api.code_list_management.model.CodeListSummaryRecord;
 import org.oagi.score.gateway.http.api.code_list_management.model.CodeListValueSummaryRecord;
+import org.oagi.score.gateway.http.api.oas_management.model.OasOAuthFlow;
+import org.oagi.score.gateway.http.api.oas_management.model.OasOAuthScope;
+import org.oagi.score.gateway.http.api.oas_management.model.OasSecurityRequirement;
+import org.oagi.score.gateway.http.api.oas_management.model.OasSecurityRequirementScheme;
+import org.oagi.score.gateway.http.api.oas_management.model.OasSecurityScheme;
 import org.oagi.score.gateway.http.api.oas_management.model.OpenAPIExpressionFormat;
 import org.oagi.score.gateway.http.api.oas_management.model.OpenAPIGenerateExpressionOption;
 import org.oagi.score.gateway.http.api.oas_management.model.OpenAPITemplateForVerbOption;
@@ -144,6 +149,240 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
         scopes.put(bieName + "Read", "Allows " + basedAsccp.propertyTerm() + " data to be read");
         scopes.put(bieName + "Write", "Allows " + basedAsccp.propertyTerm() + " data to be written");
         return scopes;
+    }
+
+    // Issue #1729: configurable Security Schemes (components.securitySchemes). An empty/absent list keeps
+    // the legacy default OAuth2 scheme (per-operation Read/Write scopes). A non-empty list emits the
+    // configured schemes and only the selected root/operation Security Requirement Objects.
+    // Backend targets OpenAPI 3.0.3 (apiKey | http | oauth2 | openIdConnect).
+    private List<OasSecurityScheme> securitySchemes() {
+        if (option == null || option.getOasDoc() == null || option.getOasDoc().getSecuritySchemes() == null) {
+            return Collections.emptyList();
+        }
+        return option.getOasDoc().getSecuritySchemes();
+    }
+
+    private boolean isLegacyDefault() {
+        return securitySchemes().isEmpty();
+    }
+
+    // The deviceAuthorization OAuth flow is an OpenAPI 3.2+ feature; true only when the document's
+    // declared openapi version is >= 3.2.
+    private boolean supportsDeviceAuthorization() {
+        String version = (option == null || option.getOasDoc() == null) ? null : option.getOasDoc().getOpenAPIVersion();
+        if (!StringUtils.hasLength(version)) {
+            return false;
+        }
+        String[] parts = version.split("\\.");
+        try {
+            int major = Integer.parseInt(parts[0].trim());
+            int minor = parts.length > 1 ? Integer.parseInt(parts[1].trim()) : 0;
+            return major > 3 || (major == 3 && minor >= 2);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    // The document-level (global) security requirements — the root `security` array.
+    private List<OasSecurityRequirement> globalSecurityRequirements() {
+        if (option == null || option.getOasDoc() == null || option.getOasDoc().getSecurityRequirements() == null) {
+            return Collections.emptyList();
+        }
+        return option.getOasDoc().getSecurityRequirements();
+    }
+
+    private String resolveSchemeNameFor(OasSecurityScheme scheme) {
+        if (StringUtils.hasLength(scheme.getSchemeName())) {
+            return scheme.getSchemeName();
+        }
+        String type = scheme.getType();
+        if ("apiKey".equalsIgnoreCase(type)) {
+            return "ApiKeyAuth";
+        }
+        if ("http".equalsIgnoreCase(type)) {
+            return "basic".equalsIgnoreCase(scheme.getHttpScheme()) ? "BasicAuth" : "BearerAuth";
+        }
+        if ("openIdConnect".equalsIgnoreCase(type)) {
+            return "OpenID";
+        }
+        return "OAuth2";
+    }
+
+    // The legacy default OAuth2 component scheme with per-BIE Read/Write scopes (Issue #1730: a bodyless
+    // operation contributes no scopes). Used only when no explicit schemes are configured.
+    private Map<String, Object> buildLegacyOauth2Scheme(TopLevelAsbiepSummaryRecord topLevelAsbiep) {
+        return ImmutableMap.<String, Object>builder()
+                .put("OAuth2", ImmutableMap.<String, Object>builder()
+                        .put("type", "oauth2")
+                        .put("flows", ImmutableMap.<String, Object>builder()
+                                .put("authorizationCode", ImmutableMap.<String, Object>builder()
+                                        .put("authorizationUrl", "https://example.com/oauth/authorize")
+                                        .put("tokenUrl", "https://example.com/oauth/token")
+                                        .put("scopes", (topLevelAsbiep == null)
+                                                ? new LinkedHashMap<String, Object>()
+                                                : getAuthorizationCodeScopes(topLevelAsbiep))
+                                        .build())
+                                .build())
+                        .build())
+                .build();
+    }
+
+    // Builds the components.securitySchemes map for the explicitly configured schemes (insertion order).
+    private Map<String, Object> buildSecuritySchemes() {
+        Map<String, Object> result = new LinkedHashMap<>();
+        for (OasSecurityScheme scheme : securitySchemes()) {
+            if (scheme == null || !StringUtils.hasLength(scheme.getType())) {
+                continue;
+            }
+            result.put(resolveSchemeNameFor(scheme), buildSchemeObject(scheme));
+        }
+        return result;
+    }
+
+    private Map<String, Object> buildSchemeObject(OasSecurityScheme scheme) {
+        String type = scheme.getType();
+        ImmutableMap.Builder<String, Object> b = ImmutableMap.<String, Object>builder();
+        if ("apiKey".equalsIgnoreCase(type)) {
+            b.put("type", "apiKey");
+            if (StringUtils.hasLength(scheme.getApiKeyIn())) {
+                b.put("in", scheme.getApiKeyIn());
+            }
+            if (StringUtils.hasLength(scheme.getApiKeyName())) {
+                b.put("name", scheme.getApiKeyName());
+            }
+        } else if ("http".equalsIgnoreCase(type)) {
+            b.put("type", "http");
+            if (StringUtils.hasLength(scheme.getHttpScheme())) {
+                b.put("scheme", scheme.getHttpScheme());
+            }
+            // bearerFormat is only meaningful for the bearer scheme.
+            if ("bearer".equalsIgnoreCase(scheme.getHttpScheme()) && StringUtils.hasLength(scheme.getBearerFormat())) {
+                b.put("bearerFormat", scheme.getBearerFormat());
+            }
+        } else if ("openIdConnect".equalsIgnoreCase(type)) {
+            b.put("type", "openIdConnect");
+            if (StringUtils.hasLength(scheme.getOpenIdConnectUrl())) {
+                b.put("openIdConnectUrl", scheme.getOpenIdConnectUrl());
+            }
+        } else {
+            // oauth2 -- emit the configured OAuth Flows Object (or a default authorizationCode flow).
+            b.put("type", "oauth2");
+            b.put("flows", buildOAuthFlows(scheme));
+        }
+        if (StringUtils.hasLength(scheme.getDescription())) {
+            b.put("description", scheme.getDescription());
+        }
+        return b.build();
+    }
+
+    // Builds the OAuth Flows Object for an oauth2 scheme from its CONFIGURED flows (insertion order).
+    // It emits exactly what the user configured — there is NO fabricated fallback, so an oauth2 scheme
+    // with no flows yields an empty flows object. Per OpenAPI 3.0.3 each OAuth Flow Object's scopes key
+    // is REQUIRED (may be empty), so a scopes map is always emitted per flow. The deviceAuthorization
+    // flow (and its deviceAuthorizationUrl) is an OpenAPI 3.2+ feature, skipped for older documents.
+    private Map<String, Object> buildOAuthFlows(OasSecurityScheme scheme) {
+        boolean deviceAuthSupported = supportsDeviceAuthorization();
+        Map<String, Object> result = new LinkedHashMap<>();
+        List<OasOAuthFlow> flows = scheme.getFlows();
+        if (flows == null) {
+            return result;
+        }
+        for (OasOAuthFlow flow : flows) {
+            if (flow == null || !StringUtils.hasLength(flow.getFlowType())) {
+                continue;
+            }
+            if ("deviceAuthorization".equalsIgnoreCase(flow.getFlowType()) && !deviceAuthSupported) {
+                continue;
+            }
+            ImmutableMap.Builder<String, Object> fb = ImmutableMap.<String, Object>builder();
+            if (StringUtils.hasLength(flow.getAuthorizationUrl())) {
+                fb.put("authorizationUrl", flow.getAuthorizationUrl());
+            }
+            if (StringUtils.hasLength(flow.getTokenUrl())) {
+                fb.put("tokenUrl", flow.getTokenUrl());
+            }
+            if (deviceAuthSupported && StringUtils.hasLength(flow.getDeviceAuthorizationUrl())) {
+                fb.put("deviceAuthorizationUrl", flow.getDeviceAuthorizationUrl());
+            }
+            if (StringUtils.hasLength(flow.getRefreshUrl())) {
+                fb.put("refreshUrl", flow.getRefreshUrl());
+            }
+            Map<String, Object> scopes = new LinkedHashMap<>();
+            if (flow.getScopes() != null) {
+                for (OasOAuthScope scope : flow.getScopes()) {
+                    if (scope != null && StringUtils.hasLength(scope.getScopeName())) {
+                        scopes.put(scope.getScopeName(),
+                                scope.getDescription() != null ? scope.getDescription() : "");
+                    }
+                }
+            }
+            fb.put("scopes", scopes);
+            result.put(flow.getFlowType(), fb.build());
+        }
+        return result;
+    }
+
+    private List<Object> buildSecurityRequirements(List<OasSecurityRequirement> source) {
+        List<Object> requirements = new ArrayList<>();
+        if (source == null) {
+            return requirements;
+        }
+        // Resolve declared schemes by their emitted components.securitySchemes key so a Security
+        // Requirement Object only references declared schemes and uses the correct scope-array shape:
+        // oauth2/openIdConnect carry the scope names; all other types MUST be an empty array (3.0.3).
+        Map<String, OasSecurityScheme> declaredSchemes = new LinkedHashMap<>();
+        for (OasSecurityScheme scheme : securitySchemes()) {
+            if (scheme != null && StringUtils.hasLength(scheme.getType())) {
+                declaredSchemes.put(resolveSchemeNameFor(scheme), scheme);
+            }
+        }
+        for (OasSecurityRequirement requirement : source) {
+            if (requirement == null) {
+                continue;
+            }
+            if (requirement.isAnonymous()) {
+                requirements.add(new LinkedHashMap<String, Object>());
+                continue;
+            }
+            Map<String, Object> securityRequirement = new LinkedHashMap<>();
+            if (requirement.getSchemes() != null) {
+                for (OasSecurityRequirementScheme scheme : requirement.getSchemes()) {
+                    if (scheme == null || !StringUtils.hasLength(scheme.getSchemeName())) {
+                        continue;
+                    }
+                    OasSecurityScheme declared = declaredSchemes.get(scheme.getSchemeName());
+                    if (declared == null) {
+                        // Skip a requirement that references a scheme not present in components
+                        // (e.g. a stale operation override after the scheme was renamed/removed).
+                        continue;
+                    }
+                    boolean scoped = "oauth2".equalsIgnoreCase(declared.getType())
+                            || "openIdConnect".equalsIgnoreCase(declared.getType());
+                    securityRequirement.put(scheme.getSchemeName(),
+                            (scoped && scheme.getScopes() != null) ? scheme.getScopes() : Collections.emptyList());
+                }
+            }
+            if (!securityRequirement.isEmpty()) {
+                requirements.add(securityRequirement);
+            }
+        }
+        return requirements;
+    }
+
+    // Legacy documents keep the previous per-operation OAuth2 Read/Write scope behavior.
+    private void putOperationSecurity(Map<String, Object> path, String scope) {
+        if (isLegacyDefault()) {
+            path.put("security", Arrays.asList(ImmutableMap.builder()
+                    .put("OAuth2", Arrays.asList(scope))
+                    .build()));
+        }
+    }
+
+    private void putConfiguredOperationSecurity(OpenAPITemplateForVerbOption template, Map<String, Object> path) {
+        if (isLegacyDefault() || template == null || !template.isSecurityOverridden()) {
+            return;
+        }
+        path.put("security", buildSecurityRequirements(template.getSecurityRequirements()));
     }
 
     private String getBieName(TopLevelAsbiepSummaryRecord topLevelAsbiep) {
@@ -313,10 +552,11 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
                 path.put("summary", "");
                 path.put("description", "");
-                path.put("security", Arrays.asList(ImmutableMap.builder()
-                        .put("OAuth2", Arrays.asList(bieName + "Read"))
-                        .build()));
-                if (template.getTagName() != null) {
+                putOperationSecurity(path, bieName + "Read");
+                // Issue #1729: place the configured per-operation `security` right after `description`
+                // (same position as the legacy default), instead of appending it after the body/responses.
+                putConfiguredOperationSecurity(template, path);
+                if (StringUtils.hasLength(template.getTagName())) {
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
                 path.put("operationId", template.getOperationId());
@@ -362,7 +602,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 String schemaName = template.getSchemaName();
                 boolean isSuppressRoot = template.isSuppressRootProperty();
                 ensurePathParameters(path, getOperation(), isArray, template);
-                if (template.getTagName() != null && !path.containsKey("tags")) {
+                if (StringUtils.hasLength(template.getTagName()) && !path.containsKey("tags")) {
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
                 if (template.getMessageBodyType().equals("Request")) {
@@ -401,10 +641,9 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
                 path.put("summary", "");
                 path.put("description", "");
-                path.put("security", Arrays.asList(ImmutableMap.builder()
-                        .put("OAuth2", Arrays.asList(bieName + "Write"))
-                        .build()));
-                if (template.getTagName() != null) {
+                putOperationSecurity(path, bieName + "Write");
+                putConfiguredOperationSecurity(template, path);
+                if (StringUtils.hasLength(template.getTagName())) {
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
                 path.put("operationId", template.getOperationId());
@@ -472,7 +711,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 String schemaName = template.getSchemaName();
                 boolean isSuppressRoot = template.isSuppressRootProperty();
                 ensurePathParameters(path, getOperation(), isArray, template);
-                if (template.getTagName() != null && !path.containsKey("tags")) {
+                if (StringUtils.hasLength(template.getTagName()) && !path.containsKey("tags")) {
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
                 if (template.getMessageBodyType().equals("Request")) {
@@ -511,10 +750,9 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
                 path.put("summary", "");
                 path.put("description", "");
-                path.put("security", Arrays.asList(ImmutableMap.builder()
-                        .put("OAuth2", Arrays.asList(bieName + "Write"))
-                        .build()));
-                if (template.getTagName() != null) {
+                putOperationSecurity(path, bieName + "Write");
+                putConfiguredOperationSecurity(template, path);
+                if (StringUtils.hasLength(template.getTagName())) {
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
                 path.put("operationId", template.getOperationId());
@@ -581,7 +819,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 String schemaName = template.getSchemaName();
                 boolean isSuppressRoot = template.isSuppressRootProperty();
                 ensurePathParameters(path, getOperation(), isArray, template);
-                if (template.getTagName() != null && !path.containsKey("tags")) {
+                if (StringUtils.hasLength(template.getTagName()) && !path.containsKey("tags")) {
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
                 if (template.getMessageBodyType().equals("Request")) {
@@ -620,10 +858,9 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
                 path.put("summary", "");
                 path.put("description", "");
-                path.put("security", Arrays.asList(ImmutableMap.builder()
-                        .put("OAuth2", Arrays.asList(bieName + "Write"))
-                        .build()));
-                if (template.getTagName() != null) {
+                putOperationSecurity(path, bieName + "Write");
+                putConfiguredOperationSecurity(template, path);
+                if (StringUtils.hasLength(template.getTagName())) {
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
                 path.put("operationId", template.getOperationId());
@@ -695,10 +932,9 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
                 path.put("summary", "");
                 path.put("description", "");
-                path.put("security", Arrays.asList(ImmutableMap.builder()
-                        .put("OAuth2", Arrays.asList(bieName + "Write"))
-                        .build()));
-                if (template.getTagName() != null) {
+                putOperationSecurity(path, bieName + "Write");
+                putConfiguredOperationSecurity(template, path);
+                if (StringUtils.hasLength(template.getTagName())) {
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
                 path.put("operationId", template.getOperationId());
@@ -735,11 +971,15 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
     private void generateTemplate(OpenAPITemplateForVerbOption template) {
         TopLevelAsbiepSummaryRecord topLevelAsbiep = template.getTopLevelAsbiep();
-        AsbiepSummaryRecord asbiep = generationContext.findASBIEP(topLevelAsbiep.asbiepId(), topLevelAsbiep);
-        generationContext.referenceCounter().increase(asbiep);
+        // Issue #1730: a bodyless operation references no BIE (no ASBIEP / component schema).
+        boolean bodyless = (topLevelAsbiep == null);
+        AsbiepSummaryRecord asbiep = bodyless ? null : generationContext.findASBIEP(topLevelAsbiep.asbiepId(), topLevelAsbiep);
+        if (!bodyless) {
+            generationContext.referenceCounter().increase(asbiep);
+        }
         try {
-            AbieSummaryRecord typeAbie = generationContext.queryTargetABIE(asbiep);
-            ReleaseDetailsRecord release = generationContext.findRelease(topLevelAsbiep.release().releaseId());
+            AbieSummaryRecord typeAbie = bodyless ? null : generationContext.queryTargetABIE(asbiep);
+            ReleaseDetailsRecord release = bodyless ? null : generationContext.findRelease(topLevelAsbiep.release().releaseId());
 
             Map<String, Object> paths;
             Map<String, Object> securitySchemes;
@@ -782,22 +1022,21 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     infoBuilder = infoBuilder.put("license", licenseBuilder.build());
                 }
                 infoBuilder = infoBuilder.put("version", option.getOasDoc().getVersion())
-                        .put("x-oagis-license", StringUtils.hasLength(release.releaseLicense()) ? release.releaseLicense() : "");
+                        .put("x-oagis-license", (release != null && StringUtils.hasLength(release.releaseLicense())) ? release.releaseLicense() : "");
                 root.put("info", infoBuilder.build());
 
+                // Issue #1729: explicit schemes emit the document-level (global) Security Requirement
+                // selected in the UI, placed right after `info`. The legacy default adds no root entry.
+                if (!isLegacyDefault() && !globalSecurityRequirements().isEmpty()) {
+                    root.put("security", buildSecurityRequirements(globalSecurityRequirements()));
+                }
+
                 paths = new LinkedHashMap();
-                securitySchemes = ImmutableMap.<String, Object>builder()
-                        .put("OAuth2", ImmutableMap.<String, Object>builder()
-                                .put("type", "oauth2")
-                                .put("flows", ImmutableMap.<String, Object>builder()
-                                        .put("authorizationCode", ImmutableMap.<String, Object>builder()
-                                                .put("authorizationUrl", "https://example.com/oauth/authorize")
-                                                .put("tokenUrl", "https://example.com/oauth/token")
-                                                .put("scopes", getAuthorizationCodeScopes(topLevelAsbiep))
-                                                .build())
-                                        .build())
-                                .build())
-                        .build();
+                // Issue #1729: with no explicit schemes, keep the legacy OAuth2 component (per-operation
+                // Read/Write scopes); otherwise emit every configured scheme.
+                securitySchemes = isLegacyDefault()
+                        ? buildLegacyOauth2Scheme(topLevelAsbiep)
+                        : buildSecuritySchemes();
 
                 root.put("paths", paths);
                 root.put("components", ImmutableMap.<String, Object>builder()
@@ -809,11 +1048,17 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 paths = (Map<String, Object>) root.get("paths");
                 securitySchemes = (Map<String, Object>) ((Map<String, Object>) root.get("components")).get("securitySchemes");
 
-                Map<String, Object> oauth2 = (Map<String, Object>) securitySchemes.get("OAuth2");
-                Map<String, Object> flows = (Map<String, Object>) oauth2.get("flows");
-                Map<String, Object> authorizationCode = (Map<String, Object>) flows.get("authorizationCode");
-                Map<String, Object> scopes = (Map<String, Object>) authorizationCode.get("scopes");
-                scopes.putAll(getAuthorizationCodeScopes(topLevelAsbiep));
+                // Issue #1729: only the legacy default OAuth2 scheme accumulates per-BIE Read/Write scopes
+                // across BIEs; explicit schemes are static so there is nothing to merge.
+                if (isLegacyDefault()) {
+                    Map<String, Object> oauth2 = (Map<String, Object>) securitySchemes.get("OAuth2");
+                    Map<String, Object> flows = (Map<String, Object>) oauth2.get("flows");
+                    Map<String, Object> authorizationCode = (Map<String, Object>) flows.get("authorizationCode");
+                    Map<String, Object> scopes = (Map<String, Object>) authorizationCode.get("scopes");
+                    if (!bodyless) {
+                        scopes.putAll(getAuthorizationCodeScopes(topLevelAsbiep));
+                    }
+                }
             }
 
             Map<String, Object> pathMap = new LinkedHashMap<>();
@@ -834,13 +1079,89 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 }
             }
 
-            GeneratorForOperation generatorForOperation = generatorForOperationMap.get(template.getVerbOption());
-            if (generatorForOperation == null) {
-                throw new UnsupportedOperationException("Unsupported Operation: " + template.getVerbOption());
+            if (bodyless) {
+                // Issue #1730: emit a BIE-less operation (no request/response schema; status-only response).
+                generateBodylessOperation(template, path);
+            } else {
+                GeneratorForOperation generatorForOperation = generatorForOperationMap.get(template.getVerbOption());
+                if (generatorForOperation == null) {
+                    throw new UnsupportedOperationException("Unsupported Operation: " + template.getVerbOption());
+                }
+                generatorForOperation.proceed(topLevelAsbiep, template, path, asbiep);
             }
-            generatorForOperation.proceed(topLevelAsbiep, template, path, asbiep);
         } finally {
-            generationContext.referenceCounter().decrease(asbiep);
+            if (!bodyless) {
+                generationContext.referenceCounter().decrease(asbiep);
+            }
+        }
+    }
+
+    /**
+     * Issue #1730: Generates an operation that does not reference a BIE. Emits the HTTP method,
+     * path parameters and a single status-only response (e.g. 202 Accepted, 204 No Content)
+     * without any request/response body or component schema.
+     */
+    private void generateBodylessOperation(OpenAPITemplateForVerbOption template, Map<String, Object> path) {
+        // Populate operation metadata only if this path+verb has not been built yet, so that a
+        // collision with an already-generated operation is not clobbered (and an existing,
+        // immutable operation map is never mutated).
+        if (!path.containsKey("operationId")) {
+            path.put("summary", "");
+            path.put("description", "");
+            // Issue #1729: configured per-operation `security` right after `description` (before tags).
+            putConfiguredOperationSecurity(template, path);
+            if (StringUtils.hasLength(template.getTagName())) {
+                path.put("tags", Arrays.asList(template.getTagName()));
+            }
+            path.put("operationId", template.getOperationId());
+        }
+        ensurePathParameters(path, template.getVerbOption(), template.isArrayForJsonExpression(), template);
+
+        // A bodyless operation must still declare at least one (status-only) response.
+        // The status code is taken from the message body when present (Response-type), otherwise
+        // derived from the verb (Issue #1730: DELETE -> 202 Accepted, PATCH -> 204 No Content).
+        if (!path.containsKey("responses")) {
+            Integer statusCode = (template.getHttpStatusCode() != null)
+                    ? template.getHttpStatusCode()
+                    : defaultStatusForVerb(template.getVerbOption());
+            String statusKey = String.valueOf(statusCode);
+            path.put("responses", ImmutableMap.<String, Object>builder()
+                    .put(statusKey, ImmutableMap.<String, Object>builder()
+                            .put("description", reasonPhrase(statusCode))
+                            .build())
+                    .build());
+        }
+    }
+
+    private Integer defaultStatusForVerb(Operation verb) {
+        if (verb == null) {
+            return 200;
+        }
+        switch (verb) {
+            case DELETE:
+                return 202;
+            case PATCH:
+                return 204;
+            default:
+                return 200;
+        }
+    }
+
+    private String reasonPhrase(Integer statusCode) {
+        if (statusCode == null) {
+            return "";
+        }
+        switch (statusCode) {
+            case 200:
+                return "OK";
+            case 201:
+                return "Created";
+            case 202:
+                return "Accepted";
+            case 204:
+                return "No Content";
+            default:
+                return "";
         }
     }
 
@@ -863,12 +1184,6 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
         properties.put("additionalProperties", false);
 
         return properties;
-    }
-
-    private String getOperationId(String operation, TopLevelAsbiepSummaryRecord topLevelAsbiep) {
-        String controllerName = getBieName(topLevelAsbiep);
-        String action = operation + Character.toUpperCase(controllerName.charAt(0)) + controllerName.substring(1);
-        return controllerName + "_" + action;
     }
 
     private void suppressRootProperty(Map<String, Object> parent) {

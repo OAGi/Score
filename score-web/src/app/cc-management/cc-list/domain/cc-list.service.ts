@@ -199,7 +199,9 @@ export class CcListService {
     });
   }
 
-  updateState(ccListEntries: CcListEntry[], toState: string): Observable<any> {
+  updateState(ccListEntries: CcListEntry[], toState: string,
+              comments?: { [key: string]: string },
+              projectFieldOptionOverrides?: { [key: string]: string }): Observable<any> {
     const accManifestIdList = [];
     const asccpManifestIdList = [];
     const bccpManifestIdList = [];
@@ -222,13 +224,23 @@ export class CcListService {
       }
     }
 
-    return this.http.patch<any>('/api/core-components/state', {
+    const body: any = {
       toState,
       accManifestIdList,
       asccpManifestIdList,
       bccpManifestIdList,
       dtManifestIdList
-    });
+    };
+    // Optional per-component comments keyed '<type>:<manifestId>' (type lowercase: acc, asccp,
+    // bccp, dt), posted verbatim to the linked GitHub issues (issue #1533).
+    if (comments && Object.keys(comments).length > 0) {
+      body.comments = comments;
+    }
+    // Optional per-component project board fieldOption overrides, same keys (issue #1533, Feature 2).
+    if (projectFieldOptionOverrides && Object.keys(projectFieldOptionOverrides).length > 0) {
+      body.projectFieldOptionOverrides = projectFieldOptionOverrides;
+    }
+    return this.http.patch<any>('/api/core-components/state', body);
   }
 
   delete(ccListEntries: CcListEntry[]): Observable<any> {

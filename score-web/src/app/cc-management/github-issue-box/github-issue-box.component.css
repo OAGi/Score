@@ -1,0 +1,307 @@
+.github-box {
+  margin: 6px 0 20px 0;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+/* Header: left meta group, right-aligned action group. */
+.github-box-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px 16px;
+  flex-wrap: wrap;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.github-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.github-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.github-mark {
+  fill: currentColor;
+  flex: 0 0 auto;
+}
+
+.github-box-title {
+  font-weight: 600;
+}
+
+.github-sep {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+.github-box-account {
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+/* Small bordered button (Connect / Link), default input text color. */
+.github-btn {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid rgba(0, 0, 0, 0.24);
+  border-radius: 4px;
+  background: #fff;
+  color: rgba(0, 0, 0, 0.87);
+  font-size: 13px;
+  line-height: 28px;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.github-btn:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.github-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Disconnect: plain text link button. */
+.github-text-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 12px;
+  text-decoration: underline;
+}
+
+/* Missing-permission warning beside Disconnect (issue #1533): the connected viewer can't comment on a
+   linked issue's repo and/or can't update the configured project board. Red to match the state-change
+   dialog's warnings (#b3261e); the alert octicon and weight make it stand out in the header row. */
+.github-perm-warn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #b3261e;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.github-perm-warn-icon {
+  fill: currentColor;
+  flex: 0 0 auto;
+}
+
+.github-issue-input {
+  width: 320px;
+  max-width: 46vw;
+  height: 28px;
+  padding: 0 8px;
+  font-size: 13px;
+  border: 1px solid rgba(0, 0, 0, 0.24);
+  border-radius: 4px;
+}
+
+/* Body: one linked issue per row -> issue link, then its title to the right. */
+.github-box-body {
+  padding: 6px 12px 8px 12px;
+}
+
+/* Two columns: the issue link, then a content column (title row + labels row).
+   Putting title and labels in the same column makes the labels start at the title's start. */
+.github-issue {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 5px 0;
+}
+
+.github-issue-content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.github-issue-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Labels row, shown below the title (aligned to the title's start via the content column). */
+.github-issue-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  margin-top: 5px;
+}
+
+.github-issue-link {
+  font-weight: 600;
+  white-space: nowrap;
+  flex: 0 0 auto;
+  padding-top: 1px;
+}
+
+.github-issue-title {
+  flex: 1 1 auto;
+  color: rgba(0, 0, 0, 0.78);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Issue state pill in GitHub's colors: Open = green, Closed = purple, white text. */
+.github-issue-state {
+  flex: 0 0 auto;
+  text-transform: capitalize;
+  font-size: 11px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: #1f883d;
+  color: #ffffff;
+}
+
+.github-issue-state.is-closed {
+  background: #8250df;
+  color: #ffffff;
+}
+
+/* GitHub Issue Type chip. */
+.gh-type {
+  flex: 0 0 auto;
+  font-size: 11px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  color: rgba(0, 0, 0, 0.72);
+  background: #f6f8fa;
+}
+
+/* GitHub label pill (background color is bound dynamically). */
+.gh-label {
+  flex: 0 0 auto;
+  font-size: 11px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+.gh-label-more {
+  background: #e1e4e8 !important;
+  color: rgba(0, 0, 0, 0.65) !important;
+}
+
+/* Milestone chip. */
+/* Milestone chip in GitHub's neutral style (no vivid color), with the milestone octicon. */
+.gh-ms {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: #eaeef2;
+  color: #1f2328;
+  white-space: nowrap;
+}
+
+.gh-ms-icon {
+  fill: currentColor;
+}
+
+.gh-ms.is-closed {
+  background: #eef1f4;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+/* Assignees. */
+.gh-assignee {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.gh-assignee-login {
+  flex: 0 0 auto;
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.github-chip-x {
+  flex: 0 0 auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 2px;
+  font-size: 15px;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.55);
+}
+
+.github-chip-x:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.github-box-hint {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 12px;
+}
+
+.github-issue-error {
+  color: #c62828;
+  font-size: 12px;
+  margin: 2px 12px 0 12px;
+}
+
+/* Full-page blocking overlay shown from the click on "Connect GitHub" until the OAuth redirect
+   navigates away (issue #1533): a centered spinner over a dimmed backdrop that covers the whole
+   viewport so no other action can be triggered during the connect round-trip. The z-index sits above
+   the app's in-page loading overlay (z-index 1000) and the sidenav so nothing shows through. */
+.github-connecting-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.32);
+}
+
+/* The GitHub mark itself is the loading indicator: it "breathes" (a soft scale + opacity pulse), the
+   way GitHub animates its logo while loading, instead of a generic Material spinner. */
+.github-loading-mark {
+  fill: #1f2328;
+  transform-origin: center;
+  animation: github-mark-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes github-mark-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.82);
+  }
+}
+
+/* Respect a reduced-motion preference: keep the mark visible but stop the pulse. */
+@media (prefers-reduced-motion: reduce) {
+  .github-loading-mark {
+    animation: none;
+  }
+}

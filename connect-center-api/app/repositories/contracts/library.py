@@ -10,8 +10,8 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Protocol, Literal
 
-from app.repositories.models.library import LibraryRow
-from app.types.identifiers import LibraryId
+from app.repositories.models.library import LibraryReleaseRow, LibraryRow
+from app.types.identifiers import AppUserId, LibraryId, NamespaceId, ReleaseId
 
 
 class LibraryRepositoryContract(Protocol):
@@ -32,6 +32,8 @@ class LibraryRepositoryContract(Protocol):
         creation_timestamp_after: datetime | None = None,
         last_update_timestamp_before: datetime | None = None,
         last_update_timestamp_after: datetime | None = None,
+        included_updater_login_ids: list[str] | None = None,
+        excluded_updater_login_ids: list[str] | None = None,
     ) -> tuple[int, list[LibraryRow]]:
         """Repository contract for list.
 
@@ -49,6 +51,8 @@ class LibraryRepositoryContract(Protocol):
             creation_timestamp_after: Optional lower bound for creation timestamp.
             last_update_timestamp_before: Optional upper bound for last update timestamp.
             last_update_timestamp_after: Optional lower bound for last update timestamp.
+            included_updater_login_ids: Optional updater login IDs to include by exact match.
+            excluded_updater_login_ids: Optional updater login IDs to exclude by exact match.
 
         Returns:
             Result of the operation.
@@ -64,4 +68,126 @@ class LibraryRepositoryContract(Protocol):
         Returns:
             Result of the operation.
         """
+        pass
+
+    async def exists(self, library_id: LibraryId) -> bool:
+        """Return whether the target library exists."""
+        pass
+
+    async def has_duplicate_name(
+        self,
+        *,
+        name: str,
+        exclude_library_id: LibraryId | None = None,
+    ) -> bool:
+        """Return whether another library already uses the same name."""
+        pass
+
+    async def create_library(
+        self,
+        *,
+        type: str | None,
+        name: str,
+        organization: str | None,
+        description: str | None,
+        link: str | None,
+        domain: str | None,
+        state: str | None,
+        requester_user_id: AppUserId,
+    ) -> LibraryId:
+        """Create a library and return its identifier."""
+        pass
+
+    async def update_library(
+        self,
+        *,
+        library_id: LibraryId,
+        type: str | None,
+        name: str,
+        organization: str | None,
+        description: str | None,
+        link: str | None,
+        domain: str | None,
+        state: str | None,
+        is_default: bool | None,
+        requester_user_id: AppUserId,
+    ) -> bool:
+        """Update a library."""
+        pass
+
+    async def create_working_release(
+        self,
+        *,
+        library_id: LibraryId,
+        namespace_id: NamespaceId,
+        requester_user_id: AppUserId,
+    ) -> ReleaseId:
+        """Create the initial `Working` release for a library."""
+        pass
+
+    async def create_namespace(
+        self,
+        *,
+        library_id: LibraryId,
+        uri: str,
+        prefix: str,
+        description: str | None,
+        requester_user_id: AppUserId,
+        is_std_nmsp: bool,
+    ) -> NamespaceId:
+        """Create a namespace for the library and return its identifier."""
+        pass
+
+    async def create_xbt_manifest_records(self, *, release_id: ReleaseId) -> None:
+        """Seed XBT manifest rows for a newly created working release."""
+        pass
+
+    async def get_release_id_by_library_name_and_release_num(
+        self,
+        *,
+        library_name: str,
+        release_num: str,
+    ) -> ReleaseId | None:
+        """Return a release identifier by exact library name and release number."""
+        pass
+
+    async def get_working_release(self, *, library_id: LibraryId) -> LibraryReleaseRow | None:
+        """Return the library's working release when present."""
+        pass
+
+    async def get_library_releases(self, *, library_id: LibraryId) -> list[LibraryReleaseRow]:
+        """Return all releases belonging to a library."""
+        pass
+
+    async def get_releases_by_ids(self, *, release_ids: list[ReleaseId]) -> list[LibraryReleaseRow]:
+        """Return release summaries for the supplied identifiers."""
+        pass
+
+    async def get_release_dependency_ids(self, *, release_id: ReleaseId) -> list[ReleaseId]:
+        """Return direct dependency release identifiers for a release."""
+        pass
+
+    async def get_transitive_dependency_ids(self, *, release_id: ReleaseId) -> list[ReleaseId]:
+        """Return transitive dependency release identifiers for a release."""
+        pass
+
+    async def get_releases_depending_on(self, *, release_id: ReleaseId) -> list[LibraryReleaseRow]:
+        """Return releases that directly depend on the supplied release."""
+        pass
+
+    async def replace_release_dependencies(
+        self,
+        *,
+        release_id: ReleaseId,
+        dependency_release_ids: list[ReleaseId],
+    ) -> None:
+        """Replace all direct dependencies for a release."""
+        pass
+
+    async def discard_working_release(self, *, release_id: ReleaseId) -> None:
+        """Delete a working release and its seed dependency rows."""
+        pass
+
+    async def discard_library(self, *, library_id: LibraryId) -> bool:
+        """Delete a library row."""
         pass

@@ -11,6 +11,16 @@ from app.repositories.models.library import LibrarySummaryRow
 from app.repositories.models.namespace import NamespaceSummaryRow
 
 
+class ReleaseSummaryRow(BaseModel):
+    """Repository summary row for release references."""
+
+    release_id: int
+    release_num: str | None = None
+    state: str | None = None
+
+    model_config = ConfigDict(frozen=True, from_attributes=True)
+
+
 class ReleaseRow(BaseModel):
     """Represent ReleaseRow."""
     release_id: int
@@ -25,15 +35,8 @@ class ReleaseRow(BaseModel):
     creation_timestamp: datetime
     last_updated_by: int
     last_update_timestamp: datetime
-
-    model_config = ConfigDict(frozen=True, from_attributes=True)
-
-
-class ReleaseSummaryRow(BaseModel):
-    """Repository summary row for release references."""
-
-    release_id: int
-    release_num: str | None = None
-    state: str | None = None
+    is_latest: bool = False
+    prev_release: ReleaseSummaryRow | None = None
+    next_release: ReleaseSummaryRow | None = None
 
     model_config = ConfigDict(frozen=True, from_attributes=True)

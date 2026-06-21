@@ -8,6 +8,7 @@ import org.oagi.score.gateway.http.api.agency_id_management.repository.AgencyIdL
 import org.oagi.score.gateway.http.api.agency_id_management.repository.AgencyIdListQueryRepository;
 import org.oagi.score.gateway.http.api.cc_management.model.CcState;
 import org.oagi.score.gateway.http.api.cc_management.model.CcType;
+import org.oagi.score.gateway.http.api.cc_management.service.ComponentStateChangeEventPublisher;
 import org.oagi.score.gateway.http.api.log_management.model.LogAction;
 import org.oagi.score.gateway.http.api.log_management.model.LogId;
 import org.oagi.score.gateway.http.api.log_management.repository.LogCommandRepository;
@@ -33,6 +34,9 @@ public class AgencyIdListCommandService {
 
     @Autowired
     private RepositoryFactory repositoryFactory;
+
+    @Autowired
+    private ComponentStateChangeEventPublisher stateChangeEventPublisher;
 
     private AgencyIdListCommandRepository command(ScoreUser requester) {
         return repositoryFactory.agencyIdListCommandRepository(requester);
@@ -142,6 +146,15 @@ public class AgencyIdListCommandService {
     }
 
     public boolean updateState(ScoreUser requester, AgencyIdListManifestId agencyIdListManifestId, CcState nextState) {
+        return updateState(requester, agencyIdListManifestId, nextState, null, null);
+    }
+
+    public boolean updateState(ScoreUser requester, AgencyIdListManifestId agencyIdListManifestId, CcState nextState, String comment) {
+        return updateState(requester, agencyIdListManifestId, nextState, comment, null);
+    }
+
+    public boolean updateState(ScoreUser requester, AgencyIdListManifestId agencyIdListManifestId, CcState nextState,
+                               String comment, String projectFieldOptionOverride) {
 
         var query = query(requester);
 
@@ -189,6 +202,11 @@ public class AgencyIdListCommandService {
                 query.getAgencyIdListDetails(agencyIdListManifestId), logAction);
         command.updateLogId(agencyIdListManifestId, logId);
 
+        if (result) {
+            stateChangeEventPublisher.publish(
+                    CcType.AGENCY_ID_LIST, agencyIdListManifestId, prevState, nextState, requester.userId(), comment, projectFieldOptionOverride);
+        }
+
         return result;
     }
 
@@ -226,9 +244,14 @@ public class AgencyIdListCommandService {
         LogId logId = logCommand(requester).create(
                 query.getAgencyIdListDetails(agencyIdListManifestId), Revised);
         command.updateLogId(agencyIdListManifestId, logId);
+        // Publish the revise (released -> WIP) so the GitHub project fieldOption sync moves the linked issue
+        // back into the in-progress fieldOption (issue #1533).
+        stateChangeEventPublisher.publish(
+                CcType.AGENCY_ID_LIST, agencyIdListManifestId, prevAgencyIdListDetails.state(),
+                CcState.WIP, requester.userId());
     }
 
-    public void cancel(ScoreUser requester, AgencyIdListManifestId agencyIdListManifestId) {
+    public void cancel(ScoreUser requester, AgencyIdListManifestId agencyIdListManifestId, String comment, String projectFieldOptionOverride) {
 
         AgencyIdListDetailsRecord agencyIdListDetails =
                 query(requester).getAgencyIdListDetails(agencyIdListManifestId);
@@ -240,12 +263,20 @@ public class AgencyIdListCommandService {
             throw new IllegalArgumentException("Not found previous revision");
         }
 
+        CcState prevState = agencyIdListDetails.state();
+
         var command = command(requester);
 
         command.cancel(agencyIdListManifestId);
 
         LogId logId = logCommand(requester).revertToStableStateByReference(agencyIdListDetails.guid(), CcType.AGENCY_ID_LIST);
         command.updateLogId(agencyIdListManifestId, logId);
+
+        // Cancelling reverts WIP to the previously released revision. Publish it like an explicit state
+        // change so any linked GitHub issues get the user-edited status comment (issue #1533 follow-up).
+        CcState revertedTo = requester.isDeveloper() ? CcState.Published : CcState.Production;
+        stateChangeEventPublisher.publish(
+                CcType.AGENCY_ID_LIST, agencyIdListManifestId, prevState, revertedTo, requester.userId(), comment, projectFieldOptionOverride);
     }
 
     public boolean markAsDeleted(ScoreUser requester, AgencyIdListManifestId agencyIdListManifestId) {

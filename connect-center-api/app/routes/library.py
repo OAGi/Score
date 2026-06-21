@@ -1,26 +1,25 @@
-"""Library API routes.
-
-Provides read-only endpoints for listing libraries and retrieving a single
-library by ID. Supports filtering, sorting, and date-range queries.
-
-Key features:
-- Pagination via `limit`/`offset`.
-- Multi-column sorting via `order_by` with allowlisted columns.
-- Filtering on library attributes (name, type, organization, domain, state, description, is_default).
-- Date range filters for creation and last update timestamps.
-- Standardized error responses for invalid query parameters and missing records.
-"""
+"""Library API routes."""
 
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Response, status
 
 from app.deps import get_library_service
-from app.routes.models.library import GetLibraryByLibraryIdResponse, GetLibraryListResponse, LibraryEntry
-from app.utils.date import parse_date_range
+from app.routes.models.library import (
+    CreateLibraryRequest,
+    CreateLibraryResponse,
+    GetLibraryByLibraryIdResponse,
+    GetLibraryListResponse,
+    LibraryEntry,
+    ManageLibraryReleaseDependenciesResponse,
+    UpdateLibraryRequest,
+    UpdateLibraryResponse,
+)
 from app.services.library_service import LibraryService
-from app.types.identifiers import LibraryId
+from app.types.identifiers import LibraryId, ReleaseId
+from app.types.unset import UNSET
+from app.utils.date import parse_date_range
 
 router = APIRouter(prefix="/libraries", tags=["library"])
 
@@ -47,6 +46,10 @@ async def get_library_list(
         default=None,
         description="Filter by last update date using an inclusive range: '[before~after]'.",
     ),
+    updater: str | None = Query(
+        default=None,
+        description="Comma-separated updater login IDs to filter by exact match. Prefix a login ID with '!' to exclude it.",
+    ),
     order_by: str | None = Query(
         default=None,
         description=(
@@ -58,26 +61,7 @@ async def get_library_list(
     limit: int = Query(default=10, ge=1, le=100, description="The maximum number of items to return."),
     library_service: LibraryService = Depends(get_library_service),
 ) -> GetLibraryListResponse:
-    """Return a paginated list of libraries.
-
-    Args:
-        name: Optional name filter.
-        type: Optional type filter.
-        organization: Optional organization filter.
-        domain: Value for `domain`.
-        state: Optional lifecycle state filter.
-        description: Optional textual description filter or payload field.
-        is_default: Optional default-library flag filter.
-        created_on: Optional creation-time filter in ISO-8601 range form.
-        last_updated_on: Optional last-update-time filter in ISO-8601 range form.
-        order_by: Sort expression used for ordering the result set.
-        offset: Zero-based index of the first item to include in the page.
-        limit: Maximum number of items to return.
-        library_service: Library service dependency.
-
-    Returns:
-        Paginated response containing matching resources.
-    """
+    """Return a paginated list of libraries."""
     try:
         created_range = parse_date_range(created_on)
         updated_range = parse_date_range(last_updated_on)
@@ -94,6 +78,7 @@ async def get_library_list(
             is_default=is_default,
             created_on=created_range,
             last_updated_on=updated_range,
+            updater=updater,
         )
     except ValueError as e:
         raise HTTPException(
@@ -109,6 +94,47 @@ async def get_library_list(
     )
 
 
+@router.post(
+    "",
+    status_code=status.HTTP_201_CREATED,
+    summary="Create library",
+    description="Create a new library and seed its working release.",
+    response_model=CreateLibraryResponse,
+)
+async def create_library(
+    payload: CreateLibraryRequest = Body(...),
+    library_service: LibraryService = Depends(get_library_service),
+) -> CreateLibraryResponse:
+    """Create a library and return its identifier."""
+    try:
+        result = await library_service.create_library(
+            type=payload.type,
+            name=payload.name,
+            organization=payload.organization,
+            description=payload.description,
+            link=payload.link,
+            domain=payload.domain,
+            namespace_uri=payload.namespace_uri,
+            namespace_prefix=payload.namespace_prefix,
+        )
+        return CreateLibraryResponse.model_validate(result, from_attributes=True)
+    except PermissionError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"message": "You do not have permission to create libraries.", "cause": str(e)},
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "The request is invalid. Check the body and try again.", "cause": str(e)},
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"message": "We couldn't create the library.", "cause": str(e)},
+        )
+
+
 @router.get(
     "/{library_id}",
     summary="Retrieve a library",
@@ -119,15 +145,7 @@ async def get_library_by_library_id(
     library_id: LibraryId = Path(..., description="ID of the library to retrieve."),
     library_service: LibraryService = Depends(get_library_service),
 ) -> GetLibraryByLibraryIdResponse:
-    """Return a library by ID.
-
-    Args:
-        library_id: Library identifier used to scope the query.
-        library_service: Library service dependency.
-
-    Returns:
-        Response payload for the requested resource.
-    """
+    """Return a library by ID."""
     row = await library_service.get(library_id)
     if row is None:
         raise HTTPException(
@@ -138,3 +156,167 @@ async def get_library_by_library_id(
             },
         )
     return GetLibraryByLibraryIdResponse.model_validate(row, from_attributes=True)
+
+
+@router.post(
+    "/{library_id}",
+    summary="Update library",
+    description="Update an existing library.",
+    response_model=UpdateLibraryResponse,
+)
+async def update_library(
+    library_id: LibraryId = Path(..., description="Target library identifier."),
+    payload: UpdateLibraryRequest = Body(...),
+    library_service: LibraryService = Depends(get_library_service),
+) -> UpdateLibraryResponse:
+    """Update a library and return the changed fields."""
+    updates_payload = payload.model_dump(exclude_unset=True)
+    try:
+        result = await library_service.update_library(
+            library_id=library_id,
+            type=updates_payload.get("type", UNSET),
+            name=updates_payload.get("name", UNSET),
+            organization=updates_payload.get("organization", UNSET),
+            description=updates_payload.get("description", UNSET),
+            link=updates_payload.get("link", UNSET),
+            domain=updates_payload.get("domain", UNSET),
+            state=updates_payload.get("state", UNSET),
+            is_default=updates_payload.get("is_default", UNSET),
+        )
+        return UpdateLibraryResponse.model_validate(result, from_attributes=True)
+    except LookupError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": "The library was not found.", "cause": str(e)},
+        )
+    except PermissionError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"message": "You do not have permission to update libraries.", "cause": str(e)},
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "The request is invalid. Check the body and try again.", "cause": str(e)},
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"message": "We couldn't update the library.", "cause": str(e)},
+        )
+
+
+@router.post(
+    "/{library_id}/release-dependencies/{release_id}",
+    summary="Add library release dependency",
+    description="Add a direct dependency to the library's working release.",
+    response_model=ManageLibraryReleaseDependenciesResponse,
+)
+async def add_library_release_dependency(
+    library_id: LibraryId = Path(..., description="Target library identifier."),
+    release_id: ReleaseId = Path(..., description="Release identifier to add as a dependency."),
+    library_service: LibraryService = Depends(get_library_service),
+) -> ManageLibraryReleaseDependenciesResponse:
+    """Add a direct dependency to the library's working release."""
+    try:
+        result = await library_service.add_library_release_dependency(
+            library_id=library_id,
+            release_id=release_id,
+        )
+        return ManageLibraryReleaseDependenciesResponse.model_validate(result, from_attributes=True)
+    except LookupError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": "A referenced resource was not found.", "cause": str(e)},
+        )
+    except PermissionError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"message": "You do not have permission to add library release dependencies.", "cause": str(e)},
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "The request is invalid. Check the body and try again.", "cause": str(e)},
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"message": "We couldn't add the library release dependency.", "cause": str(e)},
+        )
+
+
+@router.delete(
+    "/{library_id}/release-dependencies/{release_id}",
+    summary="Remove library release dependency",
+    description="Remove a direct dependency from the library's working release.",
+    response_model=ManageLibraryReleaseDependenciesResponse,
+)
+async def remove_library_release_dependency(
+    library_id: LibraryId = Path(..., description="Target library identifier."),
+    release_id: ReleaseId = Path(..., description="Release identifier to remove from dependencies."),
+    library_service: LibraryService = Depends(get_library_service),
+) -> ManageLibraryReleaseDependenciesResponse:
+    """Remove a direct dependency from the library's working release."""
+    try:
+        result = await library_service.remove_library_release_dependency(
+            library_id=library_id,
+            release_id=release_id,
+        )
+        return ManageLibraryReleaseDependenciesResponse.model_validate(result, from_attributes=True)
+    except LookupError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": "A referenced resource was not found.", "cause": str(e)},
+        )
+    except PermissionError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"message": "You do not have permission to remove library release dependencies.", "cause": str(e)},
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "The request is invalid. Check the parameters and try again.", "cause": str(e)},
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"message": "We couldn't remove the library release dependency.", "cause": str(e)},
+        )
+
+
+@router.delete(
+    "/{library_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Discard library",
+    description="Discard a library permanently when it passes the discard checks.",
+)
+async def discard_library(
+    library_id: LibraryId = Path(..., description="Target library identifier."),
+    library_service: LibraryService = Depends(get_library_service),
+) -> Response:
+    """Discard a library."""
+    try:
+        await library_service.discard_library(library_id=library_id)
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+    except LookupError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": "The library was not found.", "cause": str(e)},
+        )
+    except PermissionError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"message": "You do not have permission to discard libraries.", "cause": str(e)},
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "The library cannot be discarded.", "cause": str(e)},
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"message": "We couldn't discard the library.", "cause": str(e)},
+        )

@@ -2,7 +2,7 @@ import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import { Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
-import {finalize, switchMap} from 'rxjs/operators';
+import {catchError, finalize, switchMap, take} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {NamespaceSummary} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
@@ -19,6 +19,17 @@ import {
   CcFlatNodeDataSourceSearcher
 } from '../domain/cc-flat-tree';
 import {CcNodeService} from '../domain/core-component-node.service';
+import {GithubIntegrationService, GithubStatus} from '../domain/github-integration.service';
+import {
+  StateChangeDialogComponent,
+  StateChangeDialogResult,
+  usesStateChangeDialog
+} from '../state-change-dialog/state-change-dialog.component';
+import {
+  CANCEL_REVISION_TO_STATE,
+  cancelRevisionContent,
+  cancelRevisionHeader
+} from '../state-change-dialog/cancel-revision-dialog';
 import {
   AccDetails,
   AsccpOrBccpManifestId,
@@ -50,7 +61,7 @@ import {AppendAssociationDialogComponent} from '../acc-detail/append-association
 import {AbstractControl, FormControl, ValidationErrors, Validators} from '@angular/forms';
 import {AuthService} from '../../authentication/auth.service';
 import {CommentControl} from '../domain/comment-component';
-import {forkJoin, ReplaySubject} from 'rxjs';
+import {forkJoin, of, ReplaySubject} from 'rxjs';
 import {Location} from '@angular/common';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {CcList} from '../cc-list/domain/cc-list';
@@ -77,6 +88,7 @@ import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 })
 export class ExtensionDetailComponent implements OnInit {
   private service = inject(CcNodeService);
+  protected githubService = inject(GithubIntegrationService);
   private searchOptionsService = inject(SearchOptionsService);
   private releaseService = inject(ReleaseService);
   private snackBar = inject(MatSnackBar);
@@ -489,25 +501,41 @@ export class ExtensionDetailComponent implements OnInit {
   }
 
   isDeprecateAble(node?: CcFlatNode) {
-    if (!this.prevAccDetails) {
+    if (!this.prevAccDetails || !this.prevAccDetails.associations) {
       return false;
     }
 
     node = node || this.selectedNode;
+    if (!node || !node.detail) {
+      return false;
+    }
 
-    for (const assoc of this.prevAccDetails.associations) {
-      if (node.type === 'ASCCP' && 'toAsccpManifestId' in assoc) {
-        if (node.manifestId === (assoc as AsccSummary).toAsccpManifestId) {
+    // An association is deprecate-able only if it was carried over from the previous revision.
+    // A brand-new association appended during this amendment has no predecessor
+    // (prev*ManifestId == null) and must not be deprecate-able -- otherwise a fresh append to a
+    // CC the base already references would match a prior association to the same target and
+    // wrongly enable the checkbox. The trailing return stays outside the loop so every prior
+    // association is considered, not just the first.
+    if (node.type === 'ASCCP') {
+      if ((node.detail as CcAsccpNodeInfo).ascc.prevAsccManifestId == null) {
+        return false;
+      }
+      for (const assoc of this.prevAccDetails.associations) {
+        if ('toAsccpManifestId' in assoc && node.manifestId === (assoc as AsccSummary).toAsccpManifestId) {
           return !(assoc as AsccSummary).deprecated;
         }
-      } else if (node.type === 'BCCP' && 'toBccpManifestId' in assoc) {
-        if (node.manifestId === (assoc as BccSummary).toBccpManifestId) {
+      }
+    } else if (node.type === 'BCCP') {
+      if ((node.detail as CcBccpNodeInfo).bcc.prevBccManifestId == null) {
+        return false;
+      }
+      for (const assoc of this.prevAccDetails.associations) {
+        if ('toBccpManifestId' in assoc && node.manifestId === (assoc as BccSummary).toBccpManifestId) {
           return !(assoc as BccSummary).deprecated;
         }
       }
-
-      return false;
     }
+    return false;
   }
 
   getKey(node: CcFlatNode) {
@@ -822,37 +850,77 @@ export class ExtensionDetailComponent implements OnInit {
       return;
     }
 
-    const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = 'Update state to \'' + state + '\'?';
-    dialogConfig.data.content = ['Are you sure you want to update the state to \'' + state + '\'?'];
-    dialogConfig.data.action = 'Update';
+    const header = 'Update state to \'' + state + '\'?';
+    const content = ['Are you sure you want to update the state to \'' + state + '\'?'];
+    const action = 'Update';
 
-    this.confirmDialogService.open(dialogConfig).afterClosed()
-        .pipe(
-            finalize(() => {
-              this.isUpdating = false;
-            })
-        )
-        .subscribe(result => {
-          if (!result) {
-            return;
+    // When the GitHub integration is enabled and the transition is Draft -> Candidate or
+    // Candidate -> WIP, a dedicated dialog shows the linked GitHub issues (and pre-fills
+    // the GitHub status post for the user to edit); otherwise the generic confirm dialog runs unchanged
+    // (issue #1533).
+    this.githubService.getStatus()
+        .pipe(take(1), catchError(() => of({enabled: false, connected: false} as GithubStatus)))
+        .subscribe(status => {
+          if (status.enabled && usesStateChangeDialog(this.rootNode.state, state)) {
+            const target = {
+              ccType: 'acc',
+              manifestId: this.rootNode.manifestId,
+              name: this.rootNode.name,
+              state: this.rootNode.state
+            };
+            this.dialog.open(StateChangeDialogComponent, {
+              data: {header, content, actionLabel: action, toState: state, targets: [target]},
+              autoFocus: false
+            }).afterClosed()
+                .pipe(
+                    finalize(() => {
+                      this.isUpdating = false;
+                    })
+                )
+                .subscribe((result: StateChangeDialogResult | undefined) => {
+                  if (!result || !result.confirmed) {
+                    return;
+                  }
+                  this._doUpdateState(state, result.comments[target.ccType + ':' + target.manifestId], result.fieldOptionOverrides[target.ccType + ':' + target.manifestId]);
+                });
+          } else {
+            const dialogConfig = this.confirmDialogService.newConfig();
+            dialogConfig.data.header = header;
+            dialogConfig.data.content = content;
+            dialogConfig.data.action = action;
+
+            this.confirmDialogService.open(dialogConfig).afterClosed()
+                .pipe(
+                    finalize(() => {
+                      this.isUpdating = false;
+                    })
+                )
+                .subscribe(result => {
+                  if (!result) {
+                    return;
+                  }
+                  this._doUpdateState(state);
+                });
           }
-          this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state).subscribe({
-            next: () => {
-              this.snackBar.open('Updated', '', {duration: 3000});
-
-              this.service.getAccDetails(this.manifestId).subscribe({
-                next: accDetails => this.afterStateChanged(accDetails.state, accDetails.access),
-                error: err => console.error(err),
-                complete: () => (this.isUpdating = false),
-              });
-            },
-            error: err => {
-              this.isUpdating = false;
-              throw err;
-            },
-          });
         });
+  }
+
+  private _doUpdateState(state: string, comment?: string, projectFieldOptionOverride?: string) {
+    this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state, comment, projectFieldOptionOverride).subscribe({
+      next: () => {
+        this.snackBar.open('Updated', '', {duration: 3000});
+
+        this.service.getAccDetails(this.manifestId).subscribe({
+          next: accDetails => this.afterStateChanged(accDetails.state, accDetails.access),
+          error: err => console.error(err),
+          complete: () => (this.isUpdating = false),
+        });
+      },
+      error: err => {
+        this.isUpdating = false;
+        throw err;
+      },
+    });
   }
 
   updateState(state: string) {
@@ -1059,14 +1127,20 @@ export class ExtensionDetailComponent implements OnInit {
       obj = detail.ascc;
       if (this.prevAccDetails && this.prevAccDetails.associations) {
         prevRevision = this.prevAccDetails.associations.filter(assoc =>
-            'nextAsccManifestId' in assoc && (assoc as AsccSummary).nextAsccManifestId === detail.ascc.manifestId)[0];
+            'nextAsccManifestId' in assoc &&
+            ((assoc as AsccSummary).nextAsccManifestId === detail.ascc.manifestId ||
+                ((assoc as AsccSummary).nextAsccManifestId == null &&
+                    (assoc as AsccSummary).asccManifestId === detail.ascc.manifestId)))[0];
       }
     } else if (this.isBccpDetail(node)) {
       const detail = node.detail as CcBccpNodeInfo;
       obj = detail.bcc;
       if (this.prevAccDetails && this.prevAccDetails.associations) {
         prevRevision = this.prevAccDetails.associations.filter(assoc =>
-            'nextBccManifestId' in assoc && (assoc as BccSummary).nextBccManifestId === detail.bcc.manifestId)[0];
+            'nextBccManifestId' in assoc &&
+            ((assoc as BccSummary).nextBccManifestId === detail.bcc.manifestId ||
+                ((assoc as BccSummary).nextBccManifestId == null &&
+                    (assoc as BccSummary).bccManifestId === detail.bcc.manifestId)))[0];
       }
     } else if (this.isDtScDetail(node)) {
       obj = node.detail;
@@ -1144,14 +1218,20 @@ export class ExtensionDetailComponent implements OnInit {
       obj = detail.ascc;
       if (this.prevAccDetails && this.prevAccDetails.associations) {
         prevRevision = this.prevAccDetails.associations.filter(assoc =>
-            'nextAsccManifestId' in assoc && (assoc as AsccSummary).nextAsccManifestId === detail.ascc.manifestId)[0];
+            'nextAsccManifestId' in assoc &&
+            ((assoc as AsccSummary).nextAsccManifestId === detail.ascc.manifestId ||
+                ((assoc as AsccSummary).nextAsccManifestId == null &&
+                    (assoc as AsccSummary).asccManifestId === detail.ascc.manifestId)))[0];
       }
     } else if (this.isBccpDetail(node)) {
       const detail = node.detail as CcBccpNodeInfo;
       obj = detail.bcc;
       if (this.prevAccDetails && this.prevAccDetails.associations) {
         prevRevision = this.prevAccDetails.associations.filter(assoc =>
-            'nextBccManifestId' in assoc && (assoc as BccSummary).nextBccManifestId === detail.bcc.manifestId)[0];
+            'nextBccManifestId' in assoc &&
+            ((assoc as BccSummary).nextBccManifestId === detail.bcc.manifestId ||
+                ((assoc as BccSummary).nextBccManifestId == null &&
+                    (assoc as BccSummary).bccManifestId === detail.bcc.manifestId)))[0];
       }
     } else if (this.isDtScDetail(node)) {
       obj = node.detail;
@@ -1601,24 +1681,56 @@ export class ExtensionDetailComponent implements OnInit {
 
   cancelRevision(): void {
     const isDeveloper = this.userRoles.includes('developer');
-    const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = (isDeveloper) ? 'Cancel this revision?' : 'Cancel this amendment?';
-    dialogConfig.data.content = [(isDeveloper) ? 'Are you sure you want to cancel this revision?' : 'Are you sure you want to cancel this amendment?'];
-    dialogConfig.data.action = 'Okay';
+    const header = cancelRevisionHeader(isDeveloper);
+    const content = cancelRevisionContent(isDeveloper);
 
-    this.confirmDialogService.open(dialogConfig).afterClosed()
-      .subscribe(result => {
-        if (!result) {
-          return;
-        }
-
-        this.isUpdating = true;
-        this.service.cancelRevision(this.rootNode.type, this.rootNode.manifestId)
-          .subscribe(resp => {
-            this.reload('Canceled');
-          }, err => {
-            this.isUpdating = false;
+    // When the GitHub integration is enabled, cancel goes through the dedicated dialog that shows the
+    // linked GitHub issues and pre-fills the status post to publish on cancel (issue #1533); otherwise
+    // the generic confirm dialog runs. The data-loss warning travels in `content` on BOTH paths, so it
+    // is shown regardless of GitHub status.
+    this.githubService.getStatus()
+      .pipe(take(1), catchError(() => of({enabled: false, connected: false} as GithubStatus)))
+      .subscribe(status => {
+        if (status.enabled) {
+          const target = {
+            ccType: 'acc',
+            manifestId: this.rootNode.manifestId,
+            name: this.rootNode.name,
+            state: this.rootNode.state
+          };
+          this.dialog.open(StateChangeDialogComponent, {
+            data: {header, content, actionLabel: 'Okay', toState: CANCEL_REVISION_TO_STATE, targets: [target]},
+            autoFocus: false
+          }).afterClosed().subscribe((result: StateChangeDialogResult | undefined) => {
+            if (!result || !result.confirmed) {
+              return;
+            }
+            this._doCancelRevision(result.comments[target.ccType + ':' + target.manifestId], result.fieldOptionOverrides[target.ccType + ':' + target.manifestId]);
           });
+        } else {
+          const dialogConfig = this.confirmDialogService.newConfig();
+          dialogConfig.data.header = header;
+          dialogConfig.data.content = content;
+          dialogConfig.data.action = 'Okay';
+
+          this.confirmDialogService.open(dialogConfig).afterClosed()
+            .subscribe(result => {
+              if (!result) {
+                return;
+              }
+              this._doCancelRevision();
+            });
+        }
+      });
+  }
+
+  private _doCancelRevision(comment?: string, projectFieldOptionOverride?: string): void {
+    this.isUpdating = true;
+    this.service.cancelRevision(this.rootNode.type, this.rootNode.manifestId, comment, projectFieldOptionOverride)
+      .subscribe(resp => {
+        this.reload('Canceled');
+      }, err => {
+        this.isUpdating = false;
       });
   }
 

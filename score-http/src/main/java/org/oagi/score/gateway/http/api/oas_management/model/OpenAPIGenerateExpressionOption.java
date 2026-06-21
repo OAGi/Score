@@ -19,7 +19,10 @@ public class OpenAPIGenerateExpressionOption {
     private List<OpenAPITemplateForVerbOption> openAPI30TemplateList = new ArrayList<>();
 
     public void addTemplate(OpenAPITemplateForVerbOption openAPITemplate) {
-        topLevelAsbiepIdSet.add(openAPITemplate.getTopLevelAsbiepId());
+        // Issue #1730: Bodyless operations have no BIE; only register actual BIEs for schema generation.
+        if (openAPITemplate.getTopLevelAsbiepId() != null) {
+            topLevelAsbiepIdSet.add(openAPITemplate.getTopLevelAsbiepId());
+        }
         openAPI30TemplateList.add(openAPITemplate);
     }
 

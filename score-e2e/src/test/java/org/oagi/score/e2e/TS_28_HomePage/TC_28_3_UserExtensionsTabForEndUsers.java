@@ -775,7 +775,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
                 EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
                 ACCExtensionViewEditPage accExtensionViewEditPage =
                         editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
-                getDriver().manage().window().maximize();
+                getDriver().manage().window().setSize(new org.openqa.selenium.Dimension(1920, 1200));
                 SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/" + asccp.getPropertyTerm() + " User Extension Group. Details");
                 selectCCPropertyPage.selectAssociation(bccpToAppend.getDen());
 

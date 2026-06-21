@@ -17,6 +17,7 @@ from app.repositories.models.business_information_entity import (
     TopLevelAsbiepInfoRow,
     TopLevelAsbiepListRow,
 )
+from app.repositories.models.release import ReleaseSummaryRow
 from app.types.identifiers import (
     AccManifestId,
     AgencyIdListManifestId,
@@ -53,6 +54,10 @@ class BusinessInformationEntityRepositoryContract(Protocol):
         creation_timestamp_after: datetime | None = None,
         last_update_timestamp_before: datetime | None = None,
         last_update_timestamp_after: datetime | None = None,
+        included_owner_login_ids: list[str] | None = None,
+        excluded_owner_login_ids: list[str] | None = None,
+        included_updater_login_ids: list[str] | None = None,
+        excluded_updater_login_ids: list[str] | None = None,
     ) -> tuple[int, list[TopLevelAsbiepListRow]]:
         """Repository contract for list top level asbieps.
 
@@ -70,6 +75,10 @@ class BusinessInformationEntityRepositoryContract(Protocol):
             creation_timestamp_after: Optional lower bound for creation timestamp.
             last_update_timestamp_before: Optional upper bound for last update timestamp.
             last_update_timestamp_after: Optional lower bound for last update timestamp.
+            included_owner_login_ids: Optional owner login IDs to include by exact match.
+            excluded_owner_login_ids: Optional owner login IDs to exclude by exact match.
+            included_updater_login_ids: Optional updater login IDs to include by exact match.
+            excluded_updater_login_ids: Optional updater login IDs to exclude by exact match.
 
         Returns:
             Result of the operation.
@@ -170,6 +179,21 @@ class BusinessInformationEntityRepositoryContract(Protocol):
         """
         pass
 
+    async def get_release_summary_by_asccp_manifest_id(
+        self,
+        *,
+        asccp_manifest_id: AsccpManifestId,
+    ) -> ReleaseSummaryRow | None:
+        """Resolve the release summary for an ASCCP manifest.
+
+        Args:
+            asccp_manifest_id: ASCCP manifest identifier.
+
+        Returns:
+            Release summary for the manifest, if found.
+        """
+        pass
+
     async def update_top_level_asbiep(
         self,
         top_level_asbiep_id: int,
@@ -266,13 +290,13 @@ class BusinessInformationEntityRepositoryContract(Protocol):
         pass
 
     async def list_assigned_code_list_manifest_ids(self, *, top_level_asbiep_id: int) -> list[int]:
-        """List code-list manifest identifiers assigned anywhere under the target top-level ASBIEP.
+        """List code list manifest identifiers assigned anywhere under the target top-level ASBIEP.
 
         Args:
             top_level_asbiep_id: Top-level ASBIEP identifier being inspected.
 
         Returns:
-            Distinct code-list manifest identifiers assigned by BBIE or BBIE_SC
+            Distinct code list manifest identifiers assigned by BBIE or BBIE_SC
             rows owned by the target top-level ASBIEP.
         """
         pass

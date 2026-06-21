@@ -21,6 +21,15 @@ public interface BiePackageQueryRepository {
     List<BiePackageSummaryRecord> getBiePackageSummaryList(
             Collection<BiePackageId> biePackageIds);
 
+    /**
+     * Returns the BIE packages that reference any of the given packages as their previous revision
+     * ({@code prev_bie_package_id}) but are NOT themselves part of the given collection. Revision is a real
+     * dependency, so these packages must be discarded together with (or before) the ones they reference.
+     * Copy/uplift provenance ({@code source_bie_package_id}) is intentionally excluded — breaking it is harmless.
+     */
+    List<BiePackageSummaryRecord> getBiePackagesReferencingAsPrevious(
+            Collection<BiePackageId> biePackageIds);
+
     ResultAndCount<BiePackageListEntryRecord> getBiePackageList(
             BiePackageListFilterCriteria filterCriteria, PageRequest pageRequest);
 

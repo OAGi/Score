@@ -19,6 +19,7 @@ type SidebarSubgroup = {
   label: string;
   methodKeys: SidebarResource['methods'][number]['key'][];
   defaultExpanded: boolean;
+  subgroups?: SidebarSubgroup[];
 };
 
 const resourceSubgroups: Record<string, SidebarSubgroup[]> = {
@@ -48,23 +49,107 @@ const resourceSubgroups: Record<string, SidebarSubgroup[]> = {
       defaultExpanded: false,
     },
   ],
+  code_lists: [
+    {
+      id: 'values',
+      label: 'Code List Value',
+      methodKeys: [
+        'retrieve_code_list_value',
+        'create_code_list_value',
+        'update_code_list_value',
+        'delete_code_list_value',
+      ],
+      defaultExpanded: false,
+    },
+  ],
+  data_types: [
+    {
+      id: 'supplementary-components',
+      label: 'Supplementary Components',
+      methodKeys: [
+        'create_dt_sc',
+        'update_dt_sc',
+        'delete_dt_sc',
+      ],
+      defaultExpanded: false,
+    },
+  ],
   core_components: [
     {
       id: 'acc',
       label: 'ACC',
-      methodKeys: ['get_acc'],
+      methodKeys: [
+        'get_acc',
+        'create_acc',
+        'update_acc',
+        'add_acc_tags',
+        'remove_acc_tags',
+        'change_acc_state',
+        'transfer_acc_ownership',
+        'revise_amend_acc',
+        'cancel_acc',
+        'discard_acc',
+      ],
       defaultExpanded: true,
+      subgroups: [
+        {
+          id: 'ascc',
+          label: 'ASCC',
+          methodKeys: [
+            'add_ascc_to_acc',
+            'reorder_ascc_in_acc',
+            'update_ascc',
+            'remove_ascc',
+          ],
+          defaultExpanded: false,
+        },
+        {
+          id: 'bcc',
+          label: 'BCC',
+          methodKeys: [
+            'add_bcc_to_acc',
+            'reorder_bcc_in_acc',
+            'update_bcc',
+            'remove_bcc',
+          ],
+          defaultExpanded: false,
+        },
+      ],
     },
     {
       id: 'asccp',
       label: 'ASCCP',
-      methodKeys: ['get_asccp'],
+      methodKeys: [
+        'get_asccp',
+        'create_asccp',
+        'update_asccp',
+        'change_asccp_state',
+        'transfer_asccp_ownership',
+        'change_asccp_role_of_acc',
+        'add_asccp_tags',
+        'remove_asccp_tags',
+        'revise_asccp',
+        'cancel_asccp',
+        'discard_asccp',
+      ],
       defaultExpanded: true,
     },
     {
       id: 'bccp',
       label: 'BCCP',
-      methodKeys: ['get_bccp'],
+      methodKeys: [
+        'get_bccp',
+        'create_bccp',
+        'update_bccp',
+        'change_bccp_state',
+        'transfer_bccp_ownership',
+        'change_bccp_bdt',
+        'add_bccp_tags',
+        'remove_bccp_tags',
+        'revise_bccp',
+        'cancel_bccp',
+        'discard_bccp',
+      ],
       defaultExpanded: true,
     },
   ],
@@ -107,22 +192,71 @@ function buildInitialExpandedSubgroups(
   resources: SidebarResource[],
 ): Record<string, boolean> {
   const next: Record<string, boolean> = {};
+
+  const visit = (
+    resource: SidebarResource,
+    group: SidebarSubgroup,
+    parentKey?: string,
+  ) => {
+    const groupKey = parentKey ? `${parentKey}-${group.id}` : `${resource.resource}-${group.id}`;
+    const hasActiveMethod = group.methodKeys.some(
+      (methodKey) =>
+        resource.methods.some((method) => method.key === methodKey) &&
+        pathname === methodHref(methodKey, resource.resource),
+    );
+    const hasActiveNestedMethod = (group.subgroups ?? []).some((subgroup) =>
+      hasActiveMethodInGroup(resource, subgroup, pathname),
+    );
+    next[groupKey] = hasActiveMethod || hasActiveNestedMethod;
+    for (const subgroup of group.subgroups ?? []) {
+      visit(resource, subgroup, groupKey);
+    }
+  };
+
   for (const resource of resources) {
     const groups = resourceSubgroups[resource.resource] ?? [];
-    const existingMethodKeys = new Set(resource.methods.map((method) => method.key));
     for (const group of groups) {
-      const groupMethods = group.methodKeys.filter((key) => existingMethodKeys.has(key));
-      if (groupMethods.length === 0) {
-        continue;
-      }
-      const groupKey = `${resource.resource}-${group.id}`;
-      const hasActiveMethod = groupMethods.some(
-        (methodKey) => pathname === methodHref(methodKey, resource.resource),
-      );
-      next[groupKey] = hasActiveMethod;
+      visit(resource, group);
     }
   }
   return next;
+}
+
+function hasActiveMethodInGroup(
+  resource: SidebarResource,
+  group: SidebarSubgroup,
+  pathname: string,
+): boolean {
+  const hasDirectMatch = group.methodKeys.some(
+    (methodKey) =>
+      resource.methods.some((method) => method.key === methodKey) &&
+      pathname === methodHref(methodKey, resource.resource),
+  );
+  if (hasDirectMatch) {
+    return true;
+  }
+  return (group.subgroups ?? []).some((subgroup) =>
+    hasActiveMethodInGroup(resource, subgroup, pathname),
+  );
+}
+
+function collectGroupedMethodKeys(groups: SidebarSubgroup[]): Set<SidebarResource['methods'][number]['key']> {
+  const groupedMethodKeys = new Set<SidebarResource['methods'][number]['key']>();
+
+  const visit = (group: SidebarSubgroup) => {
+    for (const methodKey of group.methodKeys) {
+      groupedMethodKeys.add(methodKey);
+    }
+    for (const subgroup of group.subgroups ?? []) {
+      visit(subgroup);
+    }
+  };
+
+  for (const group of groups) {
+    visit(group);
+  }
+
+  return groupedMethodKeys;
 }
 
 export function DocsSidebar({ resources, mobile = false }: Props) {
@@ -245,13 +379,14 @@ export function DocsSidebar({ resources, mobile = false }: Props) {
   const gettingStartedActive = onOverviewPage && activeOverviewSection === 'getting-started';
   const authenticationActive = onOverviewPage && activeOverviewSection === 'authentication';
   const navBase =
-    'block rounded-md px-2.5 py-1.5 text-[13px] leading-5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#93c5fd] focus-visible:ring-offset-1 focus-visible:ring-offset-white dark:focus-visible:ring-[#60a5fa] dark:focus-visible:ring-offset-black';
+    'block rounded-md px-2.5 py-1.5 text-[13px] leading-5 transition focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#93c5fd] focus-visible:ring-offset-1 focus-visible:ring-offset-white dark:focus-visible:ring-[#60a5fa] dark:focus-visible:ring-offset-black';
   const activeNavClass = 'bg-[#dbeafe] font-semibold text-[#0f172a] shadow-[inset_0_0_0_1px_rgba(59,130,246,0.25)] dark:bg-[#172554] dark:text-white dark:shadow-[inset_0_0_0_1px_rgba(96,165,250,0.35)]';
   const inactiveNavClass = 'bg-transparent text-[#374151] hover:bg-[#f4f4f5] hover:text-[#111827] dark:text-[#cbd5e1] dark:hover:bg-[#111111] dark:hover:text-white';
   const methodBadgeClass = {
     GET: 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-400/60 dark:bg-blue-500/15 dark:text-blue-200',
     POST: 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-400/60 dark:bg-emerald-500/15 dark:text-emerald-200',
     PUT: 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-400/70 dark:bg-amber-500/15 dark:text-amber-200',
+    PATCH: 'border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-400/70 dark:bg-violet-500/15 dark:text-violet-200',
     DELETE: 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-400/70 dark:bg-rose-500/15 dark:text-rose-200',
   } as const;
   const getDocsBasePrefixFromLocation = () => {
@@ -287,6 +422,97 @@ export function DocsSidebar({ resources, mobile = false }: Props) {
   const rootClassName = mobile
     ? 'docs-sidebar-root block h-full w-full shrink-0 overflow-y-auto border-r border-border bg-[linear-gradient(180deg,#ffffff_0%,#fbfdff_100%)] dark:border-[#1f2937] dark:bg-[linear-gradient(180deg,#000000_0%,#060b14_100%)]'
     : 'docs-sidebar-root hidden h-[calc(100vh-56px)] w-[336px] shrink-0 overflow-y-auto border-r border-border bg-[linear-gradient(180deg,#ffffff_0%,#fbfdff_100%)] dark:border-[#1f2937] dark:bg-[linear-gradient(180deg,#000000_0%,#060b14_100%)] xl:block';
+
+  const renderGroupedMethods = (
+    resource: SidebarResource,
+    group: SidebarSubgroup,
+    parentKey?: string,
+    depth = 0,
+  ) => {
+    const groupKey = parentKey ? `${parentKey}-${group.id}` : `${resource.resource}-${group.id}`;
+    const groupMethods = group.methodKeys
+      .map((methodKey) => resource.methods.find((method) => method.key === methodKey))
+      .filter((method): method is SidebarResource['methods'][number] => Boolean(method));
+    const nestedGroups = (group.subgroups ?? []).filter((subgroup) => {
+      const hasOwnMethods = subgroup.methodKeys.some((methodKey) =>
+        resource.methods.some((method) => method.key === methodKey),
+      );
+      const hasNestedMethods = (subgroup.subgroups ?? []).length > 0;
+      return hasOwnMethods || hasNestedMethods;
+    });
+    const groupExpanded = expandedSubgroups[groupKey] ?? group.defaultExpanded;
+    const indentClass = depth === 0 ? 'pl-3' : 'pl-6';
+
+    return (
+      <div key={groupKey} className="mt-2">
+        <button
+          type="button"
+          onClick={() =>
+            setExpandedSubgroups((prev) => ({ ...prev, [groupKey]: !(prev[groupKey] ?? group.defaultExpanded) }))
+          }
+          aria-expanded={groupExpanded}
+          aria-controls={`${groupKey}-methods`}
+          className={[
+            `${navBase} flex w-full items-center justify-between text-left`,
+            depth > 0 ? 'ml-3' : '',
+            inactiveNavClass,
+          ].join(' ')}
+        >
+          <span>{group.label}</span>
+          <svg
+            className={[
+              'h-3.5 w-3.5 text-[#6b7280] transition-transform dark:text-[#cbd5e1]',
+              groupExpanded ? 'rotate-90' : 'rotate-0',
+            ].join(' ')}
+            viewBox="0 0 20 20"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path d="M8 5L13 10L8 15" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+        {groupExpanded ? (
+          <div id={`${groupKey}-methods`} className={`mt-1 ${indentClass}`}>
+            {groupMethods.length > 0 ? (
+              <ul className="space-y-0.5">
+                {groupMethods.map((method) => {
+                  const href = methodHref(method.key, resource.resource);
+                  const active = canonicalPathname === href;
+
+                  return (
+                    <li key={`${resource.resource}-${method.key}`}>
+                      <Link
+                        href={href}
+                        className={[
+                          `${navBase} flex items-center gap-2`,
+                          active ? activeNavClass : inactiveNavClass,
+                        ].join(' ')}
+                      >
+                        <Badge
+                          className={[
+                            'w-[56px] shrink-0 justify-center px-1.5 py-0.5 text-[9px] leading-4',
+                            methodBadgeClass[method.method],
+                          ].join(' ')}
+                        >
+                          {method.method}
+                        </Badge>
+                        <span className="min-w-0 whitespace-normal leading-5">{method.title}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : null}
+
+            {nestedGroups.map((subgroup) =>
+              renderGroupedMethods(resource, subgroup, groupKey, depth + 1),
+            )}
+          </div>
+        ) : null}
+      </div>
+    );
+  };
 
   return (
     <aside className={rootClassName}>
@@ -357,15 +583,8 @@ export function DocsSidebar({ resources, mobile = false }: Props) {
           const expanded = expandedResources[resource.resource] ?? true;
           const resourceHref = `/resources/${resource.resource}`;
           const resourceActive = canonicalPathname === resourceHref;
-          const groups = (resourceSubgroups[resource.resource] ?? [])
-            .map((group) => ({
-              ...group,
-              methods: group.methodKeys
-                .map((methodKey) => resource.methods.find((method) => method.key === methodKey))
-                .filter((method): method is SidebarResource['methods'][number] => Boolean(method)),
-            }))
-            .filter((group) => group.methods.length > 0);
-          const groupedMethodKeys = new Set(groups.flatMap((group) => group.methodKeys));
+          const groups = resourceSubgroups[resource.resource] ?? [];
+          const groupedMethodKeys = collectGroupedMethodKeys(groups);
           const regularMethods = resource.methods.filter((method) => !groupedMethodKeys.has(method.key));
           return (
             <div key={resource.resource} className="mt-2">
@@ -440,70 +659,7 @@ export function DocsSidebar({ resources, mobile = false }: Props) {
                     })}
                   </ul>
 
-                  {groups.map((group) => {
-                    const groupKey = `${resource.resource}-${group.id}`;
-                    const groupExpanded = expandedSubgroups[groupKey] ?? group.defaultExpanded;
-                    return (
-                      <div key={groupKey} className="mt-2">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setExpandedSubgroups((prev) => ({ ...prev, [groupKey]: !(prev[groupKey] ?? group.defaultExpanded) }))
-                          }
-                          aria-expanded={groupExpanded}
-                          aria-controls={`${groupKey}-methods`}
-                          className={[
-                            `${navBase} flex w-full items-center justify-between text-left`,
-                            inactiveNavClass,
-                          ].join(' ')}
-                        >
-                          <span>{group.label}</span>
-                          <svg
-                            className={[
-                              'h-3.5 w-3.5 text-[#6b7280] transition-transform dark:text-[#cbd5e1]',
-                              groupExpanded ? 'rotate-90' : 'rotate-0',
-                            ].join(' ')}
-                            viewBox="0 0 20 20"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                            aria-hidden="true"
-                          >
-                            <path d="M8 5L13 10L8 15" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                        </button>
-                        {groupExpanded ? (
-                          <ul id={`${groupKey}-methods`} className="mt-1 space-y-0.5 pl-3">
-                            {group.methods.map((method) => {
-                              const href = methodHref(method.key, resource.resource);
-                              const active = canonicalPathname === href;
-
-                              return (
-                                <li key={`${resource.resource}-${method.key}`}>
-                                  <Link
-                                    href={href}
-                                    className={[
-                                      `${navBase} flex items-center gap-2`,
-                                      active ? activeNavClass : inactiveNavClass,
-                                    ].join(' ')}
-                                  >
-                                    <Badge
-                                      className={[
-                                        'w-[56px] shrink-0 justify-center px-1.5 py-0.5 text-[9px] leading-4',
-                                        methodBadgeClass[method.method],
-                                      ].join(' ')}
-                                    >
-                                      {method.method}
-                                    </Badge>
-                                    <span className="min-w-0 whitespace-normal leading-5">{method.title}</span>
-                                  </Link>
-                                </li>
-                              );
-                            })}
-                          </ul>
-                        ) : null}
-                      </div>
-                    );
-                  })}
+                  {groups.map((group) => renderGroupedMethods(resource, group))}
                 </div>
               ) : null}
             </div>

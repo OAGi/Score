@@ -10,7 +10,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.ollama.api.OllamaApi;
-import org.springframework.ai.ollama.api.OllamaOptions;
+import org.springframework.ai.ollama.api.OllamaChatOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,7 +74,7 @@ public class AiModelQueryService {
                         OllamaApi.Message.builder(OllamaApi.Message.Role.USER)
                                 .content(userPrompt)
                                 .build()))
-                .options(OllamaOptions.builder()
+                .options(OllamaChatOptions.builder()
                         .temperature(0.7)
                         .numCtx(64 * 1024)
                         .build())
@@ -169,7 +169,7 @@ public class AiModelQueryService {
                         OllamaApi.Message.builder(OllamaApi.Message.Role.USER)
                                 .content(userPrompt)
                                 .build()))
-                .options(OllamaOptions.builder()
+                .options(OllamaChatOptions.builder()
                         .temperature(0.7)
                         .numCtx(64 * 1024)
                         .build())

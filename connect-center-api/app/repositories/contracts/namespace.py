@@ -11,7 +11,7 @@ from datetime import datetime
 from typing import Protocol, Literal
 
 from app.repositories.models.namespace import NamespaceRow
-from app.types.identifiers import LibraryId, NamespaceId
+from app.types.identifiers import AppUserId, LibraryId, NamespaceId
 
 
 class NamespaceRepositoryContract(Protocol):
@@ -29,6 +29,10 @@ class NamespaceRepositoryContract(Protocol):
         creation_timestamp_after: datetime | None = None,
         last_update_timestamp_before: datetime | None = None,
         last_update_timestamp_after: datetime | None = None,
+        included_owner_login_ids: list[str] | None = None,
+        excluded_owner_login_ids: list[str] | None = None,
+        included_updater_login_ids: list[str] | None = None,
+        excluded_updater_login_ids: list[str] | None = None,
     ) -> tuple[int, list[NamespaceRow]]:
         """Repository contract for list.
 
@@ -43,6 +47,10 @@ class NamespaceRepositoryContract(Protocol):
             creation_timestamp_after: Optional lower bound for creation timestamp.
             last_update_timestamp_before: Optional upper bound for last update timestamp.
             last_update_timestamp_after: Optional lower bound for last update timestamp.
+            included_owner_login_ids: Optional owner login IDs to include by exact match.
+            excluded_owner_login_ids: Optional owner login IDs to exclude by exact match.
+            included_updater_login_ids: Optional updater login IDs to include by exact match.
+            excluded_updater_login_ids: Optional updater login IDs to exclude by exact match.
 
         Returns:
             Result of the operation.
@@ -58,4 +66,71 @@ class NamespaceRepositoryContract(Protocol):
         Returns:
             Result of the operation.
         """
+        pass
+
+    async def library_exists(self, library_id: LibraryId) -> bool:
+        """Return whether the target library exists."""
+        pass
+
+    async def has_duplicate_uri(
+        self,
+        *,
+        library_id: LibraryId,
+        uri: str,
+        exclude_namespace_id: NamespaceId | None = None,
+    ) -> bool:
+        """Return whether another namespace in the library already uses the URI."""
+        pass
+
+    async def has_duplicate_prefix(
+        self,
+        *,
+        library_id: LibraryId,
+        prefix: str,
+        exclude_namespace_id: NamespaceId | None = None,
+    ) -> bool:
+        """Return whether another namespace in the library already uses the prefix."""
+        pass
+
+    async def create_namespace(
+        self,
+        *,
+        library_id: LibraryId,
+        uri: str,
+        prefix: str,
+        description: str | None,
+        requester_user_id: AppUserId,
+        requester_is_developer: bool,
+    ) -> NamespaceId:
+        """Create a namespace and return its identifier."""
+        pass
+
+    async def update_namespace(
+        self,
+        *,
+        namespace_id: NamespaceId,
+        uri: str,
+        prefix: str,
+        description: str | None,
+        requester_user_id: AppUserId,
+    ) -> bool:
+        """Update a namespace owned by the requester."""
+        pass
+
+    async def discard_namespace(self, *, namespace_id: NamespaceId) -> bool:
+        """Delete a namespace row by identifier."""
+        pass
+
+    async def transfer_namespace_ownership(
+        self,
+        *,
+        namespace_id: NamespaceId,
+        requester_user_id: AppUserId,
+        target_user_id: AppUserId,
+    ) -> bool:
+        """Transfer namespace ownership."""
+        pass
+
+    async def namespace_is_used(self, *, namespace_id: NamespaceId) -> bool:
+        """Return whether any release or component still references the namespace."""
         pass

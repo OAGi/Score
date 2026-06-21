@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from app.services.models import WhoAndWhen
 from app.services.utils.date import DateRange
 from app.services.utils.pagination import PaginationParams
-from app.types.identifiers import LibraryId
+from app.types.identifiers import LibraryId, ReleaseId
 
 
 class LibraryServiceParams:
@@ -53,8 +53,20 @@ class LibraryServiceResult:
     state: str | None = None
     is_read_only: bool
     is_default: bool
+    release_dependencies: list["LibraryReleaseDependencyServiceResult"]
     created: WhoAndWhen
     last_updated: WhoAndWhen
+
+
+@dataclass(kw_only=True)
+class LibraryReleaseDependencyServiceResult:
+    """Release dependency information for a library's working release."""
+
+    release_id: ReleaseId
+    library_id: LibraryId
+    library_name: str
+    release_num: str
+    state: str
 
 
 @dataclass(kw_only=True)
@@ -63,3 +75,34 @@ class LibrarySummaryServiceRecord:
 
     library_id: LibraryId
     name: str
+
+
+@dataclass(kw_only=True)
+class CreateLibraryServiceResult:
+    """Result returned after creating a library."""
+
+    library_id: LibraryId
+
+
+@dataclass(kw_only=True)
+class UpdateLibraryServiceResult:
+    """Result returned after updating a library."""
+
+    library_id: LibraryId
+    updates: list[str]
+
+
+@dataclass(kw_only=True)
+class DiscardLibraryCheckServiceResult:
+    """Result returned by the discard-check operation."""
+
+    discardable: bool
+    message: str
+
+
+@dataclass(kw_only=True)
+class ManageLibraryReleaseDependenciesServiceResult:
+    """Result returned after adding or removing working-release dependencies."""
+
+    library_id: LibraryId
+    release_dependencies: list[LibraryReleaseDependencyServiceResult]

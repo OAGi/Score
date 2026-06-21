@@ -280,6 +280,7 @@ export abstract class BieFlatNodeImpl implements BieFlatNode {
   parent?: BieFlatNode;
   _children: BieFlatNode[] = [];
   _detail: BieEditNodeDetail;
+  _queryPath: string;
 
   deprecated: boolean;
   rootNode: BieEditAbieNode;
@@ -296,16 +297,20 @@ export abstract class BieFlatNodeImpl implements BieFlatNode {
   showCopyLinkIcon = false;
 
   get queryPath(): string {
-    let parent = this.parent;
-    while (!!parent && parent.isGroup) {
-      parent = parent.parent as BieFlatNode;
-    }
+    if (!this._queryPath) {
+      let parent = this.parent;
+      while (!!parent && parent.isGroup) {
+        parent = parent.parent as BieFlatNode;
+      }
 
-    if (!!parent) {
-      return [parent.queryPath,
-        this.name.replace(new RegExp(' ', 'g'), '')].join('/');
+      if (!!parent) {
+        this._queryPath = [parent.queryPath,
+          this.name.replace(new RegExp(' ', 'g'), '')].join('/');
+      } else {
+        this._queryPath = this.name.replace(new RegExp(' ', 'g'), '');
+      }
     }
-    return this.name.replace(new RegExp(' ', 'g'), '');
+    return this._queryPath;
   }
 
   reset() {
@@ -439,6 +444,13 @@ export class AbieFlatNode extends BieFlatNodeImpl {
   get ccDeprecated(): boolean {
     return this.asccpNode.deprecated || this.accNode.deprecated;
   }
+
+  protected resetCachedPath() {
+    this._asbiepPath = undefined;
+    this._path = undefined;
+    this._asbiepHashPath = undefined;
+    this._hashPath = undefined;
+  }
 }
 
 export class AsbiepFlatNode extends AbieFlatNode {
@@ -518,6 +530,8 @@ export class AsbiepFlatNode extends AbieFlatNode {
   set reused(reused: boolean) {
     this._reused = reused;
     this._asbiePath = undefined;
+    this._asbieHashPath = undefined;
+    this.resetCachedPath();
   }
 
   get cardinalityMin(): number {
@@ -2435,6 +2449,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
   private _baseUsedBbieMap = {};
   private _baseUsedBbieScMap = {};
 
+  private _usedBieList: UsedBie[] = [];
   private _refBieList: RefBie[] = [];
 
   dataSource: BieFlatNodeDataSource<T>;
@@ -2451,18 +2466,31 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
   }
 
   setUsedBieList(usedBieList: UsedBie[]) {
-    this._usedAsbieMap = usedBieList.filter(e => e.type === 'ASBIE').reduce((r, a) => {
+    this._usedBieList = usedBieList || [];
+    this._usedAsbieMap = this._usedBieList.filter(e => e.type === 'ASBIE').reduce((r, a) => {
       r[a.manifestId] = [...r[a.manifestId] || [], a];
       return r;
     }, {});
-    this._usedBbieMap = usedBieList.filter(e => e.type === 'BBIE').reduce((r, a) => {
+    this._usedBbieMap = this._usedBieList.filter(e => e.type === 'BBIE').reduce((r, a) => {
       r[a.manifestId] = [...r[a.manifestId] || [], a];
       return r;
     }, {});
-    this._usedBbieScMap = usedBieList.filter(e => e.type === 'BBIE_SC').reduce((r, a) => {
+    this._usedBbieScMap = this._usedBieList.filter(e => e.type === 'BBIE_SC').reduce((r, a) => {
       r[a.manifestId] = [...r[a.manifestId] || [], a];
       return r;
     }, {});
+  }
+
+  appendUsedBieList(usedBieList: UsedBie[]) {
+    this.setUsedBieList(this._usedBieList.concat(usedBieList || []));
+  }
+
+  setRefBieList(refBieList: RefBie[]) {
+    this._refBieList = refBieList || [];
+  }
+
+  appendRefBieList(refBieList: RefBie[]) {
+    this.setRefBieList(this._refBieList.concat(refBieList || []));
   }
 
   setBaseUsedBieList(baseUsedBieList: UsedBie[]) {
@@ -2550,7 +2578,11 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
   afterAsbiepFlatNode(node: AsbiepFlatNode) {
     let reused = this._refBieList.filter(u => u.basedAsccManifestId === node.asccNode.manifestId);
     if (!!reused && reused.length > 0) {
-      reused = reused.filter(u => u.hashPath === node.asbieHashPath);
+      reused = reused.filter(u => {
+        const reusingTopLevelAsbiepId = u.topLevelAsbiepId;
+        return reusingTopLevelAsbiepId === node.topLevelAsbiepId &&
+          u.hashPath === node.asbieHashPath;
+      });
     }
     node.reused = !!reused && reused.length > 0;
     if (node.reused) {
@@ -3152,20 +3184,12 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
     if (this.hideUnused) {
       children = children.filter(e => e.used);
     }
-    let index;
-    // Issue #1486
-    // It shouldn't use 'hashPath' to handle with the case of two BIEs referred to the same reused BIE.
-    if (node.reused) {
-      const asbiepNode = node as unknown as AsbiepFlatNode;
-      index = this.data.map(e => {
-        if (e.bieType !== 'ASBIEP') {
-          return '';
-        }
-        return (e as unknown as AsbiepFlatNode).asbiePath;
-      }).indexOf(asbiepNode.asbiePath);
-    } else {
-      index = this.data.map(e => e.hashPath).indexOf(node.hashPath);
-    }
+    // Use 'queryPath' (parent-chain name-based path) to locate the row.
+    // 'hashPath' collides for descendants of two ASBIEPs that share the same reused
+    // TopLevelAsbiep (their 'asbiepPath' collapses to 'ASCCP-<id>' by design), so
+    // indexOf(hashPath) returns the first match and inserts children at the wrong row.
+    // 'queryPath' walks the actual parent chain so it stays unique per tree position.
+    const index = this.data.map(e => e.queryPath).indexOf(node.queryPath);
 
     if (!children || index < 0) {
       // If no children, or cannot find the node, no op

@@ -18,6 +18,7 @@ import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {TagService} from '../../tag-management/domain/tag.service';
 import {SearchBarModule} from '../../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../../common/column-selector/column-selector.module';
+import {GithubIssueBoxComponent} from '../github-issue-box/github-issue-box.component';
 
 const routes: Routes = [
   {
@@ -49,7 +50,8 @@ const routes: Routes = [
         AngularSplitModule,
         FontAwesomeModule,
         SearchBarModule,
-        ColumnSelectorModule
+        ColumnSelectorModule,
+        GithubIssueBoxComponent
     ],
   declarations: [
     AccDetailComponent,

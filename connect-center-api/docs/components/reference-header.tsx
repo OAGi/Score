@@ -23,10 +23,15 @@ export function ReferenceHeader() {
   const [sidebarResources, setSidebarResources] = useState<SidebarResource[]>([]);
   const { isAuthenticated, isReady, logOut, user } = usePlaygroundAuth();
 
-  useEffect(() => {
+  // Close any open menus when the route changes. Handled during render
+  // (React's "adjust state when a prop changes" pattern) rather than in an
+  // effect, so it avoids an extra commit/render pass.
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
     setMobileOpen(false);
     setAccountMenuOpen(false);
-  }, [pathname]);
+  }
 
   useEffect(() => {
     if (typeof window === 'undefined') {

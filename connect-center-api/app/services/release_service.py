@@ -17,10 +17,12 @@ from app.repositories.models.app_user import AppUserRow
 from app.security import AuthenticatedUser
 from app.services import load_users_by_ids, to_user_summary
 from app.services.models import WhoAndWhen
+from app.services.models.release import ReleaseReferenceServiceRecord
 from app.services.models.release import ReleaseServiceResult
 from app.services.utils.date import DateRange
+from app.services.utils.owner import parse_login_id_filter
 from app.services.utils.pagination import PaginationParams, PaginationResponse
-from app.types.identifiers import ReleaseId
+from app.types.identifiers import LibraryId, ReleaseId
 
 logger = logging.getLogger("connectcenter.service.release")
 
@@ -118,6 +120,8 @@ class ReleaseService:
         state: str | None = None,
         created_on: DateRange | None = None,
         last_updated_on: DateRange | None = None,
+        creator: str | None = None,
+        updater: str | None = None,
     ) -> PaginationResponse[ReleaseServiceResult]:
         """Get releases with optional filtering and pagination.
 
@@ -136,6 +140,14 @@ class ReleaseService:
             order_by=order_by,
             allowed_sort_columns=self._ORDER_BY_ALLOWED,
         )
+        included_creator_login_ids, excluded_creator_login_ids = parse_login_id_filter(
+            creator,
+            filter_name="creator",
+        )
+        included_updater_login_ids, excluded_updater_login_ids = parse_login_id_filter(
+            updater,
+            filter_name="updater",
+        )
         total, rows = await self._repo.list(
             limit=pagination.limit,
             offset=pagination.offset,
@@ -147,6 +159,10 @@ class ReleaseService:
             creation_timestamp_after=created_on.after if created_on else None,
             last_update_timestamp_before=last_updated_on.before if last_updated_on else None,
             last_update_timestamp_after=last_updated_on.after if last_updated_on else None,
+            included_creator_login_ids=included_creator_login_ids,
+            excluded_creator_login_ids=excluded_creator_login_ids,
+            included_updater_login_ids=included_updater_login_ids,
+            excluded_updater_login_ids=excluded_updater_login_ids,
         )
         user_ids = sorted(
             {user_id for row in rows for user_id in (row.created_by, row.last_updated_by)},
@@ -175,6 +191,31 @@ class ReleaseService:
         logger.info("get release id=%d → found", int(release_id))
         return result
 
+    async def get_by_library_id_and_release_num(
+        self,
+        *,
+        library_id: LibraryId,
+        release_num: str,
+    ) -> ReleaseServiceResult | None:
+        """Get a release by exact library and release number."""
+        row = await self._repo.get_by_library_id_and_release_num(library_id, release_num)
+        if row is None:
+            logger.info(
+                "get release library_id=%d release_num=%s → not found",
+                int(library_id),
+                release_num,
+            )
+            return None
+        users_by_id = await load_users_by_ids(self._account_service_repo, [row.created_by, row.last_updated_by])
+        result = self._to_release_result(row, users_by_id=users_by_id)
+        logger.info(
+            "get release library_id=%d release_num=%s → found id=%d",
+            int(library_id),
+            release_num,
+            int(result.release_id),
+        )
+        return result
+
     async def get_dependent_releases(self, release_id: ReleaseId) -> list[ReleaseId]:
         """Get all releases that the given release depends on, recursively.
 
@@ -186,6 +227,12 @@ class ReleaseService:
         """
         deps = await self._repo.get_dependent_releases(release_id)
         logger.info("get_dependent_releases release_id=%d → %d dependencies", int(release_id), len(deps))
+        return deps
+
+    async def get_release_dependency_ids(self, release_id: ReleaseId) -> list[ReleaseId]:
+        """Get direct release dependency IDs from `release_dep`."""
+        deps = await self._repo.get_release_dependency_ids(release_id)
+        logger.info("get_release_dependency_ids release_id=%d → %d dependencies", int(release_id), len(deps))
         return deps
 
     def _to_release_result(
@@ -216,4 +263,17 @@ class ReleaseService:
             state=row.state,
             created=WhoAndWhen(who=created, when=row.creation_timestamp),
             last_updated=WhoAndWhen(who=updated, when=row.last_update_timestamp),
+            is_latest=bool(row.is_latest),
+            prev_release=self._to_release_reference(row.prev_release),
+            next_release=self._to_release_reference(row.next_release),
+        )
+
+    @staticmethod
+    def _to_release_reference(row: Any | None) -> ReleaseReferenceServiceRecord | None:
+        """Map a repository release summary to an adjacent release reference."""
+        if row is None:
+            return None
+        return ReleaseReferenceServiceRecord(
+            release_id=row.release_id,
+            release_num=str(row.release_num or ""),
         )

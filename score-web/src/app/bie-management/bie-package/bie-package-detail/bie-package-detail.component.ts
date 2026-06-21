@@ -53,6 +53,13 @@ export class BiePackageDetailComponent implements OnInit {
   hashCode;
   disabled: boolean;
   option: BieExpressOption;
+  // Issue #1733: BIE Package manifest version. '0.2' is the stable default; '0.3' is a draft that also
+  // emits the per-BIE backward compatibility indicator and the package-level revision reason.
+  manifestVersion = '0.2';
+
+  get manifestVersionLabel(): string {
+    return this.manifestVersion === '0.3' ? '0.3 (draft)' : '0.2';
+  }
 
   get columns(): TableColumnsProperty[] {
     if (!this.preferencesInfo) {
@@ -518,6 +525,10 @@ export class BiePackageDetailComponent implements OnInit {
           removeBieAction();
         }
       });
+    } else {
+      // No previous version to compare against (e.g. the initial, non-revised package),
+      // so there is nothing to warn about — remove the selected BIEs directly.
+      removeBieAction();
     }
   }
 
@@ -557,7 +568,7 @@ export class BiePackageDetailComponent implements OnInit {
 
     this.loading = true;
     this.biePackageService.generateBiePackage(
-      this.biePackage.biePackageId, this.option, ...topLevelAsbiepIdList).subscribe(resp => {
+      this.biePackage.biePackageId, this.option, this.manifestVersion, ...topLevelAsbiepIdList).subscribe(resp => {
       saveAsBlobResponse(resp);
 
       this.loading = false;

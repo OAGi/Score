@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.services.utils.string import Guid
@@ -22,6 +24,7 @@ class CodeListValueResponse(BaseModel):
     value: str
     meaning: str | None = None
     definition: str | None = None
+    definition_source: str | None = None
     is_deprecated: bool = False
 
     model_config = ConfigDict(frozen=True, from_attributes=True)
@@ -68,3 +71,49 @@ class GetCodeListPaginationResponse(BaseModel):
     items: list[CodeListResponseEntry]
 
     model_config = ConfigDict(frozen=True)
+
+
+class CreateCodeListResponse(BaseModel):
+    """Response for create_code_list tool."""
+
+    code_list_manifest_id: int
+
+    model_config = ConfigDict(frozen=True)
+
+
+class CreateCodeListValueResponse(BaseModel):
+    """Response for create_code_list_value tool."""
+
+    code_list_value_manifest_id: int
+
+    model_config = ConfigDict(frozen=True)
+
+
+class UpdateCodeListResponse(BaseModel):
+    """Response for update_code_list tool."""
+
+    code_list_manifest_id: int
+    updates: list[str] = Field(default_factory=list)
+
+    model_config = ConfigDict(frozen=True)
+
+
+class UpdateCodeListValueResponse(BaseModel):
+    """Response for update_code_list_value tool."""
+
+    code_list_value_manifest_id: int
+    updates: list[str] = Field(default_factory=list)
+
+    model_config = ConfigDict(frozen=True)
+
+
+class TransferCodeListOwnershipResponse(BaseModel):
+    """Response for transfer_code_list_ownership tool."""
+
+    code_list_manifest_id: int
+    updates: list[str] = Field(default_factory=list)
+
+    model_config = ConfigDict(frozen=True)
+
+
+CodeListLifecycleState = Literal["Deleted", "WIP", "Draft", "QA", "Candidate", "Production"]

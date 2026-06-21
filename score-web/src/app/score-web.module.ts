@@ -114,7 +114,8 @@ class ShouldReuseRouteFalseRouteReuseStrategy extends BaseRouteReuseStrategy {
     httpInterceptorsProviders,
     {
       provide: RxStompService,
-      useFactory: rxStompServiceFactory
+      useFactory: rxStompServiceFactory,
+      deps: [HttpClient]
     }
   ],
   bootstrap: [

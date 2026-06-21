@@ -328,10 +328,16 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
     @Override
     public void hitCancelButton() {
         retry(() -> {
-            click(getCancelButton());
-            click(elementToBeClickable(getDriver(), By.xpath(
-                    "//score-confirm-dialog//span[contains(text(), \"Okay\")]//ancestor::button[1]")));
+            click(getDriver(), getCancelButton());
+            // With the GitHub integration enabled, cancel-revision routes through the
+            // score-state-change-dialog ("Okay" confirm) instead of the generic
+            // score-confirm-dialog (issue #1533). In both dialogs the "Okay" label is a direct
+            // text node of the button, so match the button by either a nested span or its own text.
+            click(getDriver(), elementToBeClickable(getDriver(), By.xpath(
+                    "//mat-dialog-container//button[.//span[contains(text(), \"Okay\")] " +
+                            "or contains(normalize-space(.), \"Okay\")]")));
         });
+        invisibilityOfElementLocated(getDriver(), By.xpath("//div[contains(@class, \"cdk-overlay-backdrop\")]"));
         invisibilityOfLoadingContainerElement(getDriver());
         assert "Canceled".equals(getSnackBarMessage(getDriver()));
     }

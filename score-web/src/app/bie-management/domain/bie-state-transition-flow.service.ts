@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
-import {Observable, of} from 'rxjs';
-import {catchError, map, switchMap} from 'rxjs/operators';
+import {Observable} from 'rxjs';
+import {map, switchMap} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {
   BieStateDependencyDialogComponent,
@@ -13,14 +13,13 @@ import {StateDependencySelection, StateDependencyTarget} from './state-dependenc
  * Request contract for the shared state transition dialog workflow.
  *
  * <p>Both the single-BIE edit page and the bulk BIE list page follow the same
- * sequence: load dependency rows, show the simple confirm dialog when no rows
- * are present, otherwise open the dependency dialog and return the dependency
- * rows selected by the user.</p>
+ * sequence: validate the initial dependency selection, show the simple confirm
+ * dialog when no blocking rows are present, otherwise open the dependency
+ * dialog and return the dependency rows selected by the user.</p>
  */
 export interface BieStateTransitionFlowRequest {
   state: string;
   rootTopLevelAsbiepIds: number[];
-  loadDependencies: () => Observable<StateDependencyTarget[]>;
   validateSelection: (selection: StateDependencySelection) => Observable<StateDependencyTarget[]>;
   normalizeTargets?: (targets: StateDependencyTarget[]) => StateDependencyTarget[];
   confirmationHeader?: string;
@@ -44,10 +43,11 @@ export class BieStateTransitionFlowService {
    *
    * <p>The initial dialog load uses the same validation endpoint as checkbox
    * changes so the UI receives one normalized dependency snapshot for the
-   * current root selection. When no dependency rows are returned, this falls
-   * back to the existing confirm dialog and returns an empty dependency
-   * selection on approval. When dependency rows exist, the shared dependency
-   * dialog is opened and the selected dependency ids are returned.</p>
+   * current root selection. When no blocking dependency rows are returned,
+   * this falls back to the existing confirm dialog and returns an empty
+   * dependency selection on approval. When blocking dependency rows exist,
+   * the shared dependency dialog is opened and the selected dependency ids
+   * are returned.</p>
    */
   requestDependencySelection(request: BieStateTransitionFlowRequest): Observable<StateDependencySelection | undefined> {
     const initialSelection: StateDependencySelection = {
@@ -74,28 +74,7 @@ export class BieStateTransitionFlowService {
           maxWidth: '90vw',
           data: dialogData
         }).afterClosed();
-      }),
-      catchError(() => request.loadDependencies().pipe(
-        map(targets => request.normalizeTargets ? request.normalizeTargets(targets || []) : (targets || [])),
-        switchMap(targets => {
-          if (!this.hasBlockingIssues(targets || [])) {
-            return this.openSimpleConfirmation(request);
-          }
-
-          const dialogData: BieStateDependencyDialogData = {
-            state: request.state,
-            rootTopLevelAsbiepIds: request.rootTopLevelAsbiepIds,
-            targets,
-            validateSelection: request.validateSelection
-          };
-
-          return this.dialog.open(BieStateDependencyDialogComponent, {
-            width: '90vw',
-            maxWidth: '90vw',
-            data: dialogData
-          }).afterClosed();
-        })
-      ))
+      })
     );
   }
 

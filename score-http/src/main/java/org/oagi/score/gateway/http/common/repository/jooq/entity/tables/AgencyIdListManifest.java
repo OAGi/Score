@@ -39,6 +39,8 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Bbie.Bbi
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BbieSc.BbieScPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtAwdPri.DtAwdPriPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtScAwdPri.DtScAwdPriPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.GithubIssue.GithubIssuePath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.GithubIssueAgencyIdListManifest.GithubIssueAgencyIdListManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Log.LogPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ModuleAgencyIdListManifest.ModuleAgencyIdListManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Release.ReleasePath;
@@ -368,6 +370,19 @@ public class AgencyIdListManifest extends TableImpl<AgencyIdListManifestRecord> 
         return _dtScAwdPri;
     }
 
+    private transient GithubIssueAgencyIdListManifestPath _githubIssueAgencyIdListManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_agency_id_list_manifest</code> table
+     */
+    public GithubIssueAgencyIdListManifestPath githubIssueAgencyIdListManifest() {
+        if (_githubIssueAgencyIdListManifest == null)
+            _githubIssueAgencyIdListManifest = new GithubIssueAgencyIdListManifestPath(this, null, Keys.GITHUB_ISSUE_AGENCY_ID_LIST_MANIFEST_MANIFEST_ID_FK.getInverseKey());
+
+        return _githubIssueAgencyIdListManifest;
+    }
+
     private transient ModuleAgencyIdListManifestPath _moduleAgencyIdListManifest;
 
     /**
@@ -379,6 +394,14 @@ public class AgencyIdListManifest extends TableImpl<AgencyIdListManifestRecord> 
             _moduleAgencyIdListManifest = new ModuleAgencyIdListManifestPath(this, null, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_AGENCY_ID_LIST_MANIFEST_ID_FK.getInverseKey());
 
         return _moduleAgencyIdListManifest;
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the
+     * <code>oagi.github_issue</code> table
+     */
+    public GithubIssuePath githubIssue() {
+        return githubIssueAgencyIdListManifest().githubIssue();
     }
 
     @Override

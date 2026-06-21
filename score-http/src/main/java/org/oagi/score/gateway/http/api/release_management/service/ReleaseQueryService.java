@@ -94,6 +94,10 @@ public class ReleaseQueryService {
         return releases;
     }
 
+    public ReleaseSummaryRecord getWorkingReleaseSummary(ScoreUser requester, LibraryId libraryId) {
+        return query(requester).getReleaseSummary(libraryId, "Working");
+    }
+
     /**
      * Retrieves a paginated list of releases based on filter criteria.
      *

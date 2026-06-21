@@ -451,7 +451,7 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
                             CODE_LIST.REMARK,
                             CODE_LIST.IS_DEPRECATED,
                             CODE_LIST.EXTENSIBLE_INDICATOR,
-                            iif(CODE_LIST_MANIFEST.PREV_CODE_LIST_MANIFEST_ID.isNull(), true, false).as("new_component"),
+                            iif(and(RELEASE.PREV_RELEASE_ID.isNotNull(), CODE_LIST_MANIFEST.PREV_CODE_LIST_MANIFEST_ID.isNull()), true, false).as("new_component"),
                             CODE_LIST.STATE,
                             CODE_LIST.CREATION_TIMESTAMP,
                             CODE_LIST.LAST_UPDATE_TIMESTAMP,
@@ -604,7 +604,7 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
                             CODE_LIST.as("prev").REMARK,
                             CODE_LIST.as("prev").IS_DEPRECATED,
                             CODE_LIST.as("prev").EXTENSIBLE_INDICATOR,
-                            iif(CODE_LIST_MANIFEST.PREV_CODE_LIST_MANIFEST_ID.isNull(), true, false).as("new_component"),
+                            iif(and(RELEASE.PREV_RELEASE_ID.isNotNull(), CODE_LIST_MANIFEST.PREV_CODE_LIST_MANIFEST_ID.isNull()), true, false).as("new_component"),
                             CODE_LIST.as("prev").STATE,
                             CODE_LIST.as("prev").CREATION_TIMESTAMP,
                             CODE_LIST.as("prev").LAST_UPDATE_TIMESTAMP,
@@ -957,7 +957,7 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
                             CODE_LIST.NAMESPACE_ID,
                             CODE_LIST.IS_DEPRECATED,
                             CODE_LIST.EXTENSIBLE_INDICATOR,
-                            iif(CODE_LIST_MANIFEST.PREV_CODE_LIST_MANIFEST_ID.isNull(), true, false).as("new_component"),
+                            iif(and(RELEASE.PREV_RELEASE_ID.isNotNull(), CODE_LIST_MANIFEST.PREV_CODE_LIST_MANIFEST_ID.isNull()), true, false).as("new_component"),
                             CODE_LIST.STATE,
                             CODE_LIST.CREATION_TIMESTAMP,
                             CODE_LIST.LAST_UPDATE_TIMESTAMP,
@@ -1018,8 +1018,8 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
             }
             if (filterCriteria.newComponent() != null) {
                 conditions.add(filterCriteria.newComponent() ?
-                        CODE_LIST_MANIFEST.PREV_CODE_LIST_MANIFEST_ID.isNull() :
-                        CODE_LIST_MANIFEST.PREV_CODE_LIST_MANIFEST_ID.isNotNull());
+                        and(RELEASE.PREV_RELEASE_ID.isNotNull(), CODE_LIST_MANIFEST.PREV_CODE_LIST_MANIFEST_ID.isNull()) :
+                        or(RELEASE.PREV_RELEASE_ID.isNull(), CODE_LIST_MANIFEST.PREV_CODE_LIST_MANIFEST_ID.isNotNull()));
             }
             if (filterCriteria.access() != null) {
                 switch (filterCriteria.access()) {

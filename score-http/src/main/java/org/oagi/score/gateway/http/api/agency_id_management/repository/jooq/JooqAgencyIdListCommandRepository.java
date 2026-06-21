@@ -346,6 +346,11 @@ public class JooqAgencyIdListCommandRepository
                     .execute();
         }
 
+        // discard corresponding GitHub issue links (issue #1533)
+        dslContext().deleteFrom(GITHUB_ISSUE_AGENCY_ID_LIST_MANIFEST)
+                .where(GITHUB_ISSUE_AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(valueOf(agencyIdListDetails.agencyIdListManifestId())))
+                .execute();
+
         dslContext().deleteFrom(AGENCY_ID_LIST_MANIFEST)
                 .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(valueOf(agencyIdListDetails.agencyIdListManifestId())))
                 .execute();

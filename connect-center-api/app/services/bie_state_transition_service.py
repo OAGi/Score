@@ -26,7 +26,7 @@ class TopLevelAsbiepDependencyDetail:
 
 @dataclass(frozen=True, kw_only=True)
 class CodeListDependencyDetail:
-    """Minimal code-list information for blocked BIE transitions."""
+    """Minimal code list information for blocked BIE transitions."""
 
     code_list_manifest_id: int
     state: str | None = None
@@ -96,7 +96,7 @@ class _BieStateLevel:
 
 
 class _CodeListStateLevel:
-    """Compatibility rules between BIE states and assigned code-list states."""
+    """Compatibility rules between BIE states and assigned code list states."""
 
     @classmethod
     def compatible_states(cls, bie_state: str | None, *, developer_owned: bool) -> list[str]:

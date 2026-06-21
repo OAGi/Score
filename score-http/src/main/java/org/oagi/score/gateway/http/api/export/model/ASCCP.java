@@ -36,6 +36,11 @@ public abstract class ASCCP implements Component {
             case 5:
             case 6:
             case 7:
+            case 8:
+            case 9:
+            case 10:
+            case 11:
+            case 12:
                 return new ASCCPComplexType(asccp, roleOfAcc, namingStrategy);
             case 4:
                 return new ASCCPGroup(asccp, roleOfAcc, namingStrategy);

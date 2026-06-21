@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { FormEvent, startTransition, useEffect, useMemo, useRef, useState } from 'react';
+import { FormEvent, startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowRight, KeyRound, LoaderCircle, LogOut, ShieldCheck } from 'lucide-react';
 
 import { usePlaygroundAuth } from '@/components/playground-auth';
@@ -40,6 +40,11 @@ export default function LoginPage() {
     const params = new URLSearchParams({ returnTo });
     return `${resolveDocsPath('/auth/login')}?${params.toString()}`;
   }, [returnTo]);
+  const continueToDocs = useCallback(() => {
+    startTransition(() => {
+      router.push(returnTo);
+    });
+  }, [router, returnTo]);
 
   useEffect(() => {
     setHasMounted(true);
@@ -120,13 +125,7 @@ export default function LoginPage() {
       .finally(() => {
         setSubmittingMode(null);
       });
-  }, [isReady, logInWithAccessToken, logOut]);
-
-  const continueToDocs = () => {
-    startTransition(() => {
-      router.push(returnTo);
-    });
-  };
+  }, [isReady, logInWithAccessToken, logOut, continueToDocs]);
 
   const handleBasicSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -267,7 +266,7 @@ export default function LoginPage() {
                   onChange={(event) => setLoginId(event.target.value)}
                   autoComplete="username"
                   placeholder="Login ID"
-                  className="h-10 rounded-xl border border-border bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-[#cbd5e1] dark:bg-black"
+                  className="h-10 rounded-xl border border-border bg-white px-3 text-sm outline-hidden focus:ring-2 focus:ring-[#cbd5e1] dark:bg-black"
                 />
               </div>
               <div className="grid gap-2">
@@ -282,7 +281,7 @@ export default function LoginPage() {
                   onChange={(event) => setPassword(event.target.value)}
                   autoComplete="current-password"
                   placeholder="Password"
-                  className="h-10 rounded-xl border border-border bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-[#cbd5e1] dark:bg-black"
+                  className="h-10 rounded-xl border border-border bg-white px-3 text-sm outline-hidden focus:ring-2 focus:ring-[#cbd5e1] dark:bg-black"
                 />
               </div>
             </div>

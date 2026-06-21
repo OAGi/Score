@@ -3,6 +3,7 @@ package org.oagi.score.e2e.TS_21_ModuleManagement;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
@@ -451,6 +452,9 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
     }
 
     @Test
+    @Disabled("Not yet automated - documented case 21.1.5.c (TA_5_c): discarding a module directory whose module " +
+            "file is used in a module set release should prompt the user. Was an empty test body reporting " +
+            "false-positive coverage; disabled until implemented.")
     @DisplayName("TC_21_1_TA_5_c")
     public void a_module_directory_contains_a_module_file_is_used_in_a_module_release_set_the_system_should_ask_the() {
     }

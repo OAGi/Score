@@ -63,6 +63,7 @@ export class BieUpliftSourceFlatNode extends WrappedBieFlatNode {
 export class BieUpliftTargetFlatNode extends WrappedBieFlatNode {
   source: BieUpliftSourceFlatNode;
   reusedTopLevelAsbiepId: number;
+  reuseMapped: boolean;
   emptyRequired: boolean;
 
   constructor(node: BieFlatNode) {

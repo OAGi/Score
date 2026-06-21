@@ -43,7 +43,7 @@ class CodeListRow(BaseModel):
 
 
 class CodeListValueRow(BaseModel):
-    """Repository row for code-list values."""
+    """Repository row for code list values."""
 
     code_list_value_manifest_id: int
     code_list_value_id: int
@@ -51,8 +51,9 @@ class CodeListValueRow(BaseModel):
     value: str
     meaning: str | None = None
     definition: str | None = None
+    definition_source: str | None = None
     is_deprecated: bool
-    is_developer_default: bool
-    is_user_default: bool
+    is_developer_default: bool = False
+    is_user_default: bool = False
 
     model_config = ConfigDict(frozen=True, from_attributes=True)

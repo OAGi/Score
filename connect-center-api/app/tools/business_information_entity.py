@@ -22,8 +22,8 @@ interact with BIE data programmatically.
 Available Tools:
 Top-Level BIE Management:
 - get_top_level_asbiep_list: Retrieve paginated lists of Top-Level ASBIEPs filtered by release
-  with optional filters for library_id, release_id_list, den, version, status, state, is_deprecated,
-  and date ranges. Supports custom sorting. Note: Only returns BIEs that have at least one
+  with optional filters for library_id, release_id_list, den, version, status, state, owner, updater,
+  is_deprecated, and date ranges. Supports custom sorting. Note: Only returns BIEs that have at least one
   business context assigned (business rule requirement).
 
 - get_top_level_asbiep: Retrieve a single Top-Level ASBIEP by ID with full relationship loading,
@@ -152,95 +152,149 @@ async def get_app_user_service(
         "type": "object",
         "description": "Response containing paginated list of Top-Level ASBIEPs (Association Business Information Entity Properties).",
         "properties": {
-            "total_items": {"type": "integer",
-                            "description": "Total number of Top-Level ASBIEPs available. Allowed values: non-negative integers (≥0).",
-                            "example": 25},
-            "offset": {"type": "integer",
-                       "description": "Offset of the first item in this page. Allowed values: non-negative integers (≥0). Default value: 0.",
-                       "example": 0},
-            "limit": {"type": "integer",
-                      "description": "Number of items returned in this page. Allowed values: integers between 1 and 100 (inclusive). Default value: 10.",
-                      "example": 10},
+            "total_items": {
+                "type": "integer",
+                "description": "Total number of Top-Level ASBIEPs available. Allowed values: non-negative integers (≥0).",
+                "example": 25,
+            },
+            "offset": {
+                "type": "integer",
+                "description": "Offset of the first item in this page. Allowed values: non-negative integers (≥0). Default value: 0.",
+                "example": 0,
+            },
+            "limit": {
+                "type": "integer",
+                "description": "Number of items returned in this page. Allowed values: integers between 1 and 100 (inclusive). Default value: 10.",
+                "example": 10,
+            },
             "items": {
                 "type": "array",
                 "description": "List of Top-Level ASBIEPs on this page",
                 "items": {
                     "type": "object",
                     "properties": {
-                        "top_level_asbiep_id": {"type": "integer",
-                                                "description": "Unique identifier for the top-level ASBIEP (Association Business Information Entity Property)",
-                                                "example": 12345},
-                        "asbiep_id": {"type": "integer",
-                                      "description": "Unique identifier for the ASBIEP (Association Business Information Entity Property)",
-                                      "example": 12346},
-                        "guid": {"type": "string",
-                                 "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)",
-                                 "example": "a1b2c3d4e5f6789012345678901234ab"},
-                        "den": {"type": "string",
-                                "description": "Data Element Name (DEN) following the rule: property_term + '. ' + object_class_term",
-                                "example": "Purchase Order. Purchase Order"},
-                        "property_term": {"type": "string",
-                                          "description": "Property term from the based ASCCP (Association Core Component Property)",
-                                          "example": "Purchase Order"},
-                        "display_name": {"type": ["string", "null"],
-                                         "description": "Display name of the ASBIEP (Association Business Information Entity Property)",
-                                         "example": "Purchase Order BIE"},
-                        "version": {"type": ["string", "null"], "description": "Version number assigned by the user",
-                                    "example": "1.0"},
-                        "status": {"type": ["string", "null"],
-                                   "description": "Usage status of the top-level ASBIEP (Association Business Information Entity Property) (e.g., 'Prototype', 'Test', 'Production')",
-                                   "example": "Production"},
-                        "biz_term": {"type": ["string", "null"],
-                                     "description": "Business term to indicate what the BIE is called in a particular business context",
-                                     "example": "PO"},
-                        "remark": {"type": ["string", "null"],
-                                   "description": "Context-specific usage remarks about the BIE",
-                                   "example": "Used for procurement processes"},
+                        "top_level_asbiep_id": {
+                            "type": "integer",
+                            "description": "Unique identifier for the top-level ASBIEP (Association Business Information Entity Property)",
+                            "example": 12345,
+                        },
+                        "asbiep_id": {
+                            "type": "integer",
+                            "description": "Unique identifier for the ASBIEP (Association Business Information Entity Property)",
+                            "example": 12346,
+                        },
+                        "guid": {
+                            "type": "string",
+                            "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)",
+                            "example": "a1b2c3d4e5f6789012345678901234ab",
+                        },
+                        "den": {
+                            "type": "string",
+                            "description": "Data Element Name (DEN) following the rule: property_term + '. ' + object_class_term",
+                            "example": "Purchase Order. Purchase Order",
+                        },
+                        "property_term": {
+                            "type": "string",
+                            "description": "Property term from the based ASCCP (Association Core Component Property)",
+                            "example": "Purchase Order",
+                        },
+                        "display_name": {
+                            "type": ["string", "null"],
+                            "description": "Display name of the ASBIEP (Association Business Information Entity Property)",
+                            "example": "Purchase Order BIE",
+                        },
+                        "version": {
+                            "type": ["string", "null"],
+                            "description": "Version number assigned by the user",
+                            "example": "1.0",
+                        },
+                        "status": {
+                            "type": ["string", "null"],
+                            "description": "Usage status of the top-level ASBIEP (Association Business Information Entity Property) (e.g., 'Prototype', 'Test', 'Production')",
+                            "example": "Production",
+                        },
+                        "biz_term": {
+                            "type": ["string", "null"],
+                            "description": "Business term to indicate what the BIE is called in a particular business context",
+                            "example": "PO",
+                        },
+                        "remark": {
+                            "type": ["string", "null"],
+                            "description": "Context-specific usage remarks about the BIE",
+                            "example": "Used for procurement processes",
+                        },
                         "business_contexts": {
                             "type": "array",
                             "description": "List of associated business contexts",
                             "items": {
                                 "type": "object",
                                 "properties": {
-                                    "biz_ctx_id": {"type": "integer",
-                                                   "description": "Unique identifier for the business context",
-                                                   "example": 1},
-                                    "guid": {"type": "string",
-                                             "description": "Unique identifier for the business context",
-                                             "example": "a1b2c3d4e5f6789012345678901234ab"},
-                                    "name": {"type": ["string", "null"], "description": "Name of the business context",
-                                             "example": "Production Environment"}
+                                    "biz_ctx_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the business context",
+                                        "example": 1,
+                                    },
+                                    "guid": {
+                                        "type": "string",
+                                        "description": "Unique identifier for the business context",
+                                        "example": "a1b2c3d4e5f6789012345678901234ab",
+                                    },
+                                    "name": {
+                                        "type": ["string", "null"],
+                                        "description": "Name of the business context",
+                                        "example": "Production Environment",
+                                    },
                                 },
-                                "required": ["biz_ctx_id", "guid"]
-                            }
+                                "required": ["biz_ctx_id", "guid"],
+                            },
                         },
-                        "state": {"type": "string",
-                                  "description": "State of the top-level ASBIEP (Association Business Information Entity Property)",
-                                  "example": "Published"},
-                        "is_deprecated": {"type": "boolean",
-                                          "description": "Whether the top-level ASBIEP (Association Business Information Entity Property) is deprecated",
-                                          "example": False},
-                        "deprecated_reason": {"type": ["string", "null"],
-                                              "description": "The reason for the deprecation",
-                                              "example": "Replaced by new version"},
-                        "deprecated_remark": {"type": ["string", "null"],
-                                              "description": "Additional remarks about the deprecation",
-                                              "example": "Use version 2.0 instead"},
+                        "state": {
+                            "type": "string",
+                            "description": "State of the top-level ASBIEP (Association Business Information Entity Property)",
+                            "example": "Published",
+                        },
+                        "is_deprecated": {
+                            "type": "boolean",
+                            "description": "Whether the top-level ASBIEP (Association Business Information Entity Property) is deprecated",
+                            "example": False,
+                        },
+                        "deprecated_reason": {
+                            "type": ["string", "null"],
+                            "description": "The reason for the deprecation",
+                            "example": "Replaced by new version",
+                        },
+                        "deprecated_remark": {
+                            "type": ["string", "null"],
+                            "description": "Additional remarks about the deprecation",
+                            "example": "Use version 2.0 instead",
+                        },
                         "owner": {
                             "type": "object",
                             "description": "Owner information",
                             "properties": {
-                                "user_id": {"type": "integer", "description": "Unique identifier for the user",
-                                            "example": 1},
-                                "login_id": {"type": "string", "description": "User's login identifier",
-                                             "example": "admin"},
-                                "username": {"type": "string", "description": "Display name of the user",
-                                             "example": "Administrator"},
-                                "roles": {"type": "array",
-                                          "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
-                                          "description": "List of roles assigned to the user", "example": ["Admin"]}
+                                "user_id": {
+                                    "type": "integer",
+                                    "description": "Unique identifier for the user",
+                                    "example": 1,
+                                },
+                                "login_id": {
+                                    "type": "string",
+                                    "description": "User's login identifier",
+                                    "example": "admin",
+                                },
+                                "username": {
+                                    "type": "string",
+                                    "description": "Display name of the user",
+                                    "example": "Administrator",
+                                },
+                                "roles": {
+                                    "type": "array",
+                                    "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                    "description": "List of roles assigned to the user",
+                                    "example": ["Admin"],
+                                },
                             },
-                            "required": ["user_id", "login_id", "username", "roles"]
+                            "required": ["user_id", "login_id", "username", "roles"],
                         },
                         "created": {
                             "type": "object",
@@ -250,25 +304,38 @@ async def get_app_user_service(
                                     "type": "object",
                                     "description": "User who created the BIE (Business Information Entity)",
                                     "properties": {
-                                        "user_id": {"type": "integer", "description": "Unique identifier for the user",
-                                                    "example": 1},
-                                        "login_id": {"type": "string", "description": "User's login identifier",
-                                                     "example": "admin"},
-                                        "username": {"type": "string", "description": "Display name of the user",
-                                                     "example": "Administrator"},
-                                        "roles": {"type": "array", "items": {"type": "string",
-                                                                             "enum": ["Admin", "Developer",
-                                                                                      "End-User"]},
-                                                  "description": "List of roles assigned to the user",
-                                                  "example": ["Admin"]}
+                                        "user_id": {
+                                            "type": "integer",
+                                            "description": "Unique identifier for the user",
+                                            "example": 1,
+                                        },
+                                        "login_id": {
+                                            "type": "string",
+                                            "description": "User's login identifier",
+                                            "example": "admin",
+                                        },
+                                        "username": {
+                                            "type": "string",
+                                            "description": "Display name of the user",
+                                            "example": "Administrator",
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                            "description": "List of roles assigned to the user",
+                                            "example": ["Admin"],
+                                        },
                                     },
-                                    "required": ["user_id", "login_id", "username", "roles"]
+                                    "required": ["user_id", "login_id", "username", "roles"],
                                 },
-                                "when": {"type": "string", "format": "date-time",
-                                         "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
-                                         "example": "2024-01-15T10:30:00Z"}
+                                "when": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                                    "example": "2024-01-15T10:30:00Z",
+                                },
                             },
-                            "required": ["who", "when"]
+                            "required": ["who", "when"],
                         },
                         "last_updated": {
                             "type": "object",
@@ -278,49 +345,102 @@ async def get_app_user_service(
                                     "type": "object",
                                     "description": "User who last updated the BIE (Business Information Entity)",
                                     "properties": {
-                                        "user_id": {"type": "integer", "description": "Unique identifier for the user",
-                                                    "example": 1},
-                                        "login_id": {"type": "string", "description": "User's login identifier",
-                                                     "example": "admin"},
-                                        "username": {"type": "string", "description": "Display name of the user",
-                                                     "example": "Administrator"},
-                                        "roles": {"type": "array", "items": {"type": "string",
-                                                                             "enum": ["Admin", "Developer",
-                                                                                      "End-User"]},
-                                                  "description": "List of roles assigned to the user",
-                                                  "example": ["Admin"]}
+                                        "user_id": {
+                                            "type": "integer",
+                                            "description": "Unique identifier for the user",
+                                            "example": 1,
+                                        },
+                                        "login_id": {
+                                            "type": "string",
+                                            "description": "User's login identifier",
+                                            "example": "admin",
+                                        },
+                                        "username": {
+                                            "type": "string",
+                                            "description": "Display name of the user",
+                                            "example": "Administrator",
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                            "description": "List of roles assigned to the user",
+                                            "example": ["Admin"],
+                                        },
                                     },
-                                    "required": ["user_id", "login_id", "username", "roles"]
+                                    "required": ["user_id", "login_id", "username", "roles"],
                                 },
-                                "when": {"type": "string", "format": "date-time",
-                                         "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
-                                         "example": "2024-01-15T10:30:00Z"}
+                                "when": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                                    "example": "2024-01-15T10:30:00Z",
+                                },
                             },
-                            "required": ["who", "when"]
-                        }
+                            "required": ["who", "when"],
+                        },
                     },
-                    "required": ["top_level_asbiep_id", "asbiep_id", "guid", "den", "property_term", "state",
-                                 "business_contexts", "owner", "created", "last_updated"]
-                }
-            }
+                    "required": [
+                        "top_level_asbiep_id",
+                        "asbiep_id",
+                        "guid",
+                        "den",
+                        "property_term",
+                        "state",
+                        "business_contexts",
+                        "owner",
+                        "created",
+                        "last_updated",
+                    ],
+                },
+            },
         },
-        "required": ["total_items", "offset", "limit", "items"]
-    }
+        "required": ["total_items", "offset", "limit", "items"],
+    },
 )
 async def get_top_level_asbiep_list(
-    library_id: Annotated[int | str | None, Field(default=None, description="Filter by library ID. String values are converted to integers.")],
-    release_id_list: Annotated[str | None, Field(default=None, description="Filter by release IDs. Use a comma-separated list like '1,2,3'.")],
-    den: Annotated[str | None, Field(default=None, description="Filter by DEN or display name using partial match.")],
-    version: Annotated[str | None, Field(default=None, description="Filter by version using partial match.")],
-    status: Annotated[str | None, Field(default=None, description="Filter by status using partial match.")],
-    state: Annotated[str | None, Field(default=None, description="Filter by lifecycle state using partial match.")],
-    is_deprecated: Annotated[bool | str | None, Field(default=None, description="Filter by deprecation flag. Accepts bool values or 'true'/'false' strings.")],
-    created_on: Annotated[str | None, Field(default=None, description="Filter by creation date range using '[before~after]'.")],
-    last_updated_on: Annotated[str | None, Field(default=None, description="Filter by last update date range using '[before~after]'.")],
-    order_by: Annotated[str | None, Field(default=None, description="Comma-separated sort expression. Allowed columns: den, version, status, state, creation_timestamp, last_update_timestamp.")],
-    offset: Annotated[int, Field(default=0, ge=0, description="Zero-based page offset.")],
-    limit: Annotated[int, Field(default=10, ge=1, le=100, description="Maximum number of items to return.")],
-    business_information_entity_service: BusinessInformationEntityService = Depends(get_business_information_entity_service),
+    library_id: Annotated[
+        int | str | None, Field(description="Filter by library ID. String values are converted to integers.")
+    ] = None,
+    release_id_list: Annotated[
+        str | None, Field(description="Filter by release IDs. Use a comma-separated list like '1,2,3'.")
+    ] = None,
+    den: Annotated[str | None, Field(description="Filter by DEN or display name using partial match.")] = None,
+    version: Annotated[str | None, Field(description="Filter by version using partial match.")] = None,
+    status: Annotated[str | None, Field(description="Filter by status using partial match.")] = None,
+    state: Annotated[str | None, Field(description="Filter by lifecycle state using partial match.")] = None,
+    owner: Annotated[
+        str | None,
+        Field(
+            description="Comma-separated owner login IDs to filter by exact match. Prefix a login ID with '!' to exclude it."
+        ),
+    ] = None,
+    updater: Annotated[
+        str | None,
+        Field(
+            description="Comma-separated updater login IDs to filter by exact match. Prefix a login ID with '!' to exclude it."
+        ),
+    ] = None,
+    is_deprecated: Annotated[
+        bool | str | None,
+        Field(description="Filter by deprecation flag. Accepts bool values or 'true'/'false' strings."),
+    ] = None,
+    created_on: Annotated[
+        str | None, Field(description="Filter by creation date range using '[before~after]'.")
+    ] = None,
+    last_updated_on: Annotated[
+        str | None, Field(description="Filter by last update date range using '[before~after]'.")
+    ] = None,
+    order_by: Annotated[
+        str | None,
+        Field(
+            description="Comma-separated sort expression. Allowed columns: den, version, status, state, creation_timestamp, last_update_timestamp."
+        ),
+    ] = None,
+    offset: Annotated[int, Field(ge=0, description="Zero-based page offset.")] = 0,
+    limit: Annotated[int, Field(ge=1, le=100, description="Maximum number of items to return.")] = 10,
+    business_information_entity_service: BusinessInformationEntityService = Depends(
+        get_business_information_entity_service
+    ),
 ) -> GetTopLevelAsbiepPaginationResponse:
     """
     Get a paginated list of Top-Level ASBIEPs (Association Business Information Entity Properties).
@@ -339,6 +459,12 @@ async def get_top_level_asbiep_list(
         version (str | None, optional): Filter by version using partial match (case-insensitive). Defaults to None.
         status (str | None, optional): Filter by status using partial match (case-insensitive). Defaults to None.
         state (str | None, optional): Filter by state using partial match (case-insensitive). Defaults to None.
+        owner (str | None, optional): Comma-separated owner login IDs using exact match.
+            Prefix a login ID with '!' to exclude it. Examples: 'john.doe', 'john.doe,jane.doe',
+            '!john.doe', 'john.doe,!jane.doe'. Login IDs cannot contain '!' or ','. Defaults to None.
+        updater (str | None, optional): Comma-separated updater login IDs using exact match.
+            Prefix a login ID with '!' to exclude it. Examples: 'john.doe', 'john.doe,jane.doe',
+            '!john.doe', 'john.doe,!jane.doe'. Login IDs cannot contain '!' or ','. Defaults to None.
         is_deprecated (bool | str | None, optional): Filter by deprecation status. Accepts bool, str ('True'/'true'/'1' for True, 'False'/'false'/'0' for False), or None. Defaults to None.
         created_on (str | None, optional): Filter by creation date using an inclusive range: '[before~after]'.
             'before' and 'after' are date-time strings. Default date format: YYYY-MM-DD.
@@ -422,9 +548,7 @@ async def get_top_level_asbiep_list(
     except ToolError:
         raise
     except Exception as e:
-        raise ToolError(
-            f"Type conversion error: {str(e)}. Please check your parameter types and try again."
-        ) from e
+        raise ToolError(f"Type conversion error: {str(e)}. Please check your parameter types and try again.") from e
 
     try:
         page = await business_information_entity_service.list_top_level_asbieps(
@@ -437,6 +561,8 @@ async def get_top_level_asbiep_list(
             version=version,
             status=status,
             state=state,
+            owner=owner,
+            updater=updater,
             is_deprecated=is_deprecated,
             created_on=parse_date_range(created_on),
             last_updated_on=parse_date_range(last_updated_on),
@@ -461,141 +587,255 @@ async def get_top_level_asbiep_list(
         "type": "object",
         "description": "Response containing a top-level ASBIEP (Association Business Information Entity Property) with basic information. The ASBIEP is displayed first, with its relationships (ASBIE/BBIE) shown as children under the role_of_abie section. The relationships array is an ordered sequence that preserves the original order from the ABIE structure. IMPORTANT: Groups (component_type 3=SemanticGroup or 4=UserExtensionGroup) are automatically skipped in BIE expressions, so the BIE structure may differ from the CC structure. To find the correct from_abie_id for create_asbie/create_bbie, traverse the actual BIE structure recursively. Each relationship has an 'is_used' property indicating whether it's profiled for practical use (is_used=True means asbie_id/bbie_id exists). To explore relationships: (1) If relationship has asbie_id/bbie_id (is_used=True), use get_asbie_by_asbie_id(asbie_id) or get_bbie_by_bbie_id(bbie_id). (2) If relationship has no asbie_id/bbie_id (is_used=False), use get_asbie_by_based_ascc_manifest_id(top_level_asbiep_id, parent_abie_path, based_ascc_manifest_id) or get_bbie_by_based_bcc_manifest_id(top_level_asbiep_id, parent_abie_path, based_bcc_manifest_id) - extract parent_abie_path from relationship.path and manifest_id from relationship.based_ascc/based_bcc.",
         "properties": {
-            "top_level_asbiep_id": {"type": "integer", "description": "Unique identifier for the top-level ASBIEP",
-                                    "example": 12345},
+            "top_level_asbiep_id": {
+                "type": "integer",
+                "description": "Unique identifier for the top-level ASBIEP",
+                "example": 12345,
+            },
             "asbiep": {
                 "type": "object",
                 "description": "ASBIEP (Association Business Information Entity Property) information",
                 "properties": {
-                    "asbiep_id": {"type": "integer", "description": "Unique identifier for the ASBIEP",
-                                  "example": 12346},
+                    "asbiep_id": {
+                        "type": "integer",
+                        "description": "Unique identifier for the ASBIEP",
+                        "example": 12346,
+                    },
                     "owner_top_level_asbiep": {
                         "type": "object",
                         "description": "Top-Level ASBIEP information",
                         "properties": {
-                            "top_level_asbiep_id": {"type": "integer",
-                                                    "description": "Unique identifier for the top-level ASBIEP",
-                                                    "example": 12345},
+                            "top_level_asbiep_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the top-level ASBIEP",
+                                "example": 12345,
+                            },
                             "library": {
                                 "type": "object",
                                 "description": "Library information",
                                 "properties": {
-                                    "library_id": {"type": "integer",
-                                                   "description": "Unique identifier for the library", "example": 1},
-                                    "name": {"type": "string", "description": "Library name", "example": "OAGIS"}
+                                    "library_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the library",
+                                        "example": 1,
+                                    },
+                                    "name": {"type": "string", "description": "Library name", "example": "OAGIS"},
                                 },
-                                "required": ["library_id", "name"]
+                                "required": ["library_id", "name"],
                             },
                             "release": {
                                 "type": "object",
                                 "description": "Release information",
                                 "properties": {
-                                    "release_id": {"type": "integer",
-                                                   "description": "Unique identifier for the release", "example": 1},
-                                    "release_num": {"type": "string", "description": "Release number",
-                                                    "example": "10.6"},
-                                    "state": {"type": "string", "description": "Release state", "example": "Published"}
+                                    "release_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the release",
+                                        "example": 1,
+                                    },
+                                    "release_num": {
+                                        "type": "string",
+                                        "description": "Release number",
+                                        "example": "10.6",
+                                    },
+                                    "state": {"type": "string", "description": "Release state", "example": "Published"},
                                 },
-                                "required": ["release_id", "release_num", "state"]
+                                "required": ["release_id", "release_num", "state"],
                             },
                             "version": {"type": ["string", "null"], "description": "Version number", "example": "1.0"},
-                            "status": {"type": ["string", "null"], "description": "Status of the top-level ASBIEP",
-                                       "example": "Production"},
-                            "state": {"type": "string", "description": "State of the top-level ASBIEP",
-                                      "example": "Published"},
-                            "is_deprecated": {"type": "boolean",
-                                              "description": "Whether the top-level ASBIEP is deprecated",
-                                              "example": False},
-                            "deprecated_reason": {"type": ["string", "null"], "description": "Reason for deprecation",
-                                                  "example": "Replaced by newer version"},
-                            "deprecated_remark": {"type": ["string", "null"],
-                                                  "description": "Additional remarks about deprecation",
-                                                  "example": "Use version 2.0 instead"},
+                            "status": {
+                                "type": ["string", "null"],
+                                "description": "Status of the top-level ASBIEP",
+                                "example": "Production",
+                            },
+                            "state": {
+                                "type": "string",
+                                "description": "State of the top-level ASBIEP",
+                                "example": "Published",
+                            },
+                            "is_deprecated": {
+                                "type": "boolean",
+                                "description": "Whether the top-level ASBIEP is deprecated",
+                                "example": False,
+                            },
+                            "deprecated_reason": {
+                                "type": ["string", "null"],
+                                "description": "Reason for deprecation",
+                                "example": "Replaced by newer version",
+                            },
+                            "deprecated_remark": {
+                                "type": ["string", "null"],
+                                "description": "Additional remarks about deprecation",
+                                "example": "Use version 2.0 instead",
+                            },
                             "owner": {
                                 "type": "object",
                                 "description": "Owner information",
                                 "properties": {
-                                    "user_id": {"type": "integer", "description": "Unique identifier for the user",
-                                                "example": 100000001},
-                                    "login_id": {"type": "string", "description": "User's login identifier",
-                                                 "example": "john.doe"},
-                                    "username": {"type": "string", "description": "Display name of the user",
-                                                 "example": "John Doe"},
-                                    "roles": {"type": "array", "items": {"type": "string"},
-                                              "description": "List of roles assigned to the user",
-                                              "example": ["End-User"]}
+                                    "user_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the user",
+                                        "example": 100000001,
+                                    },
+                                    "login_id": {
+                                        "type": "string",
+                                        "description": "User's login identifier",
+                                        "example": "john.doe",
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "description": "Display name of the user",
+                                        "example": "John Doe",
+                                    },
+                                    "roles": {
+                                        "type": "array",
+                                        "items": {"type": "string"},
+                                        "description": "List of roles assigned to the user",
+                                        "example": ["End-User"],
+                                    },
                                 },
-                                "required": ["user_id", "login_id", "username", "roles"]
-                            }
+                                "required": ["user_id", "login_id", "username", "roles"],
+                            },
                         },
-                        "required": ["top_level_asbiep_id", "library", "release", "state", "is_deprecated", "owner"]
+                        "required": ["top_level_asbiep_id", "library", "release", "state", "is_deprecated", "owner"],
                     },
                     "based_asccp_manifest": {
                         "type": "object",
                         "description": "Based ASCCP manifest information",
                         "properties": {
-                            "asccp_manifest_id": {"type": "integer",
-                                                  "description": "Unique identifier for the ASCCP manifest",
-                                                  "example": 12347},
-                            "asccp_id": {"type": "integer", "description": "Unique identifier for the ASCCP",
-                                         "example": 12348},
-                            "role_of_acc_manifest_id": {"type": "integer", "description": "Role of ACC manifest ID",
-                                                        "example": 12349},
-                            "guid": {"type": "string", "description": "Unique identifier for the ASCCP",
-                                     "example": "a1b2c3d4e5f6789012345678901234ab"},
-                            "den": {"type": ["string", "null"], "description": "Data Element Name",
-                                    "example": "Purchase Order. Purchase Order"},
-                            "property_term": {"type": "string", "description": "Property term",
-                                              "example": "Purchase Order"},
-                            "definition": {"type": ["string", "null"], "description": "Definition of the ASCCP",
-                                           "example": "A purchase order document"},
-                            "definition_source": {"type": ["string", "null"], "description": "Source of the definition",
-                                                  "example": "https://example.com/spec"},
-                            "is_deprecated": {"type": "boolean", "description": "Whether the ASCCP is deprecated",
-                                              "example": False}
+                            "asccp_manifest_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the ASCCP manifest",
+                                "example": 12347,
+                            },
+                            "asccp_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the ASCCP",
+                                "example": 12348,
+                            },
+                            "role_of_acc_manifest_id": {
+                                "type": "integer",
+                                "description": "Role of ACC manifest ID",
+                                "example": 12349,
+                            },
+                            "guid": {
+                                "type": "string",
+                                "description": "Unique identifier for the ASCCP",
+                                "example": "a1b2c3d4e5f6789012345678901234ab",
+                            },
+                            "den": {
+                                "type": ["string", "null"],
+                                "description": "Data Element Name",
+                                "example": "Purchase Order. Purchase Order",
+                            },
+                            "property_term": {
+                                "type": "string",
+                                "description": "Property term",
+                                "example": "Purchase Order",
+                            },
+                            "definition": {
+                                "type": ["string", "null"],
+                                "description": "Definition of the ASCCP",
+                                "example": "A purchase order document",
+                            },
+                            "definition_source": {
+                                "type": ["string", "null"],
+                                "description": "Source of the definition",
+                                "example": "https://example.com/spec",
+                            },
+                            "is_deprecated": {
+                                "type": "boolean",
+                                "description": "Whether the ASCCP is deprecated",
+                                "example": False,
+                            },
                         },
-                        "required": ["asccp_manifest_id", "asccp_id", "role_of_acc_manifest_id", "guid", "den",
-                                     "property_term", "is_deprecated"]
+                        "required": [
+                            "asccp_manifest_id",
+                            "asccp_id",
+                            "role_of_acc_manifest_id",
+                            "guid",
+                            "den",
+                            "property_term",
+                            "is_deprecated",
+                        ],
                     },
                     "role_of_abie": {
                         "type": "object",
                         "description": "Role of ABIE information - contains the ABIE details and its relationships as children",
                         "properties": {
-                            "abie_id": {"type": ["integer", "null"],
-                                        "description": "Unique identifier for the ABIE. This can be passed to create_asbie() and create_bbie() as the from_abie_id parameter.",
-                                        "example": 12348},
-                            "guid": {"type": ["string", "null"], "description": "Unique identifier for the ABIE",
-                                     "example": "a1b2c3d4e5f6789012345678901234ab"},
+                            "abie_id": {
+                                "type": ["integer", "null"],
+                                "description": "Unique identifier for the ABIE. This can be passed to create_asbie() and create_bbie() as the from_abie_id parameter.",
+                                "example": 12348,
+                            },
+                            "guid": {
+                                "type": ["string", "null"],
+                                "description": "Unique identifier for the ABIE",
+                                "example": "a1b2c3d4e5f6789012345678901234ab",
+                            },
                             "based_acc_manifest": {
                                 "type": "object",
                                 "description": "Based ACC manifest information",
                                 "properties": {
-                                    "acc_manifest_id": {"type": "integer",
-                                                        "description": "Unique identifier for the ACC manifest",
-                                                        "example": 12349},
-                                    "acc_id": {"type": "integer", "description": "Unique identifier for the ACC",
-                                               "example": 12350},
-                                    "guid": {"type": "string", "description": "Unique identifier for the ACC",
-                                             "example": "a1b2c3d4e5f6789012345678901234ab"},
-                                    "den": {"type": "string", "description": "Data Element Name",
-                                            "example": "Purchase Order. Purchase Order"},
-                                    "object_class_term": {"type": "string", "description": "Object class term",
-                                                          "example": "Purchase Order"},
-                                    "definition": {"type": ["string", "null"], "description": "Definition of the ACC",
-                                                   "example": "A purchase order aggregation"},
-                                    "definition_source": {"type": ["string", "null"],
-                                                          "description": "Source of the definition",
-                                                          "example": "https://example.com/spec"},
-                                    "is_deprecated": {"type": "boolean", "description": "Whether the ACC is deprecated",
-                                                      "example": False}
+                                    "acc_manifest_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the ACC manifest",
+                                        "example": 12349,
+                                    },
+                                    "acc_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the ACC",
+                                        "example": 12350,
+                                    },
+                                    "guid": {
+                                        "type": "string",
+                                        "description": "Unique identifier for the ACC",
+                                        "example": "a1b2c3d4e5f6789012345678901234ab",
+                                    },
+                                    "den": {
+                                        "type": "string",
+                                        "description": "Data Element Name",
+                                        "example": "Purchase Order. Purchase Order",
+                                    },
+                                    "object_class_term": {
+                                        "type": "string",
+                                        "description": "Object class term",
+                                        "example": "Purchase Order",
+                                    },
+                                    "definition": {
+                                        "type": ["string", "null"],
+                                        "description": "Definition of the ACC",
+                                        "example": "A purchase order aggregation",
+                                    },
+                                    "definition_source": {
+                                        "type": ["string", "null"],
+                                        "description": "Source of the definition",
+                                        "example": "https://example.com/spec",
+                                    },
+                                    "is_deprecated": {
+                                        "type": "boolean",
+                                        "description": "Whether the ACC is deprecated",
+                                        "example": False,
+                                    },
                                 },
-                                "required": ["acc_manifest_id", "acc_id", "guid", "den", "object_class_term",
-                                             "is_deprecated"]
+                                "required": [
+                                    "acc_manifest_id",
+                                    "acc_id",
+                                    "guid",
+                                    "den",
+                                    "object_class_term",
+                                    "is_deprecated",
+                                ],
                             },
-                            "definition": {"type": ["string", "null"], "description": "Definition of the ABIE",
-                                           "example": "A purchase order aggregation"},
-                            "remark": {"type": ["string", "null"], "description": "Remarks about the ABIE",
-                                       "example": "Used for procurement"},
+                            "definition": {
+                                "type": ["string", "null"],
+                                "description": "Definition of the ABIE",
+                                "example": "A purchase order aggregation",
+                            },
+                            "remark": {
+                                "type": ["string", "null"],
+                                "description": "Remarks about the ABIE",
+                                "example": "Used for procurement",
+                            },
                             "relationships": {
                                 "type": "array",
                                 "description": "Ordered sequence of relationships (ASBIE/BBIE) displayed as children under the ABIE. The order is preserved from the original ABIE structure. Each relationship has an 'is_used' property: when is_used=True, the relationship is profiled for practical use (asbie_id/bbie_id exists), when is_used=False, it shows available relationships for profiling. To explore relationships: (1) For ASBIE relationships with asbie_id (is_used=True): use get_asbie_by_asbie_id(asbie_id) to get full details. (2) For ASBIE relationships without asbie_id (is_used=False): use get_asbie_by_based_ascc_manifest_id(top_level_asbiep_id, based_ascc_manifest_id) with 'based_ascc.ascc_manifest_id' for based_ascc_manifest_id. (3) For BBIE relationships with bbie_id (is_used=True): use get_bbie_by_bbie_id(bbie_id) to get full details. (4) For BBIE relationships without bbie_id (is_used=False): use get_bbie_by_based_bcc_manifest_id(top_level_asbiep_id, based_bcc_manifest_id) with 'based_bcc.bcc_manifest_id' for based_bcc_manifest_id. This includes all nested relationships from the hierarchical CC (Core Component) structure, presented as a single flat ordered list for traversal.",
@@ -605,171 +845,311 @@ async def get_top_level_asbiep_list(
                                             "type": "object",
                                             "description": "ASBIE (Association Business Information Entity) relationship",
                                             "properties": {
-                                                "component_type": {"type": "string",
-                                                                   "description": "Type of relationship, always 'ASBIE' for this type",
-                                                                   "example": "ASBIE"},
-                                                "is_used": {"type": "boolean",
-                                                            "description": "Whether this component is currently being used (profiled) in the BIE (True means asbie_id exists)"},
-                                                "cardinality_min": {"type": "integer",
-                                                                    "description": "Minimum cardinality (minimum number of occurrences required, typically 0 or 1)"},
-                                                "cardinality_max": {"type": "integer",
-                                                                    "description": "Maximum cardinality (maximum number of occurrences allowed, -1 means unbounded)"},
-                                                "is_nillable": {"type": "boolean",
-                                                                "description": "Whether the component can have a nil/null value"},
-                                                "remark": {"type": ["string", "null"],
-                                                           "description": "Additional remarks or notes about the component"},
-                                                "cardinality_display": {"type": "string",
-                                                                        "description": "Display cardinality with 'unbounded' for -1 values"},
-                                                "asbie_id": {"type": ["integer", "null"],
-                                                             "description": "Unique identifier for the ASBIE (base entity ID, None if is_used=False)"},
-                                                "guid": {"type": ["string", "null"],
-                                                         "description": "Globally unique identifier for the ASBIE (if available)"},
+                                                "component_type": {
+                                                    "type": "string",
+                                                    "description": "Type of relationship, always 'ASBIE' for this type",
+                                                    "example": "ASBIE",
+                                                },
+                                                "is_used": {
+                                                    "type": "boolean",
+                                                    "description": "Whether this component is currently being used (profiled) in the BIE (True means asbie_id exists)",
+                                                },
+                                                "cardinality_min": {
+                                                    "type": "integer",
+                                                    "description": "Minimum cardinality (minimum number of occurrences required, typically 0 or 1)",
+                                                },
+                                                "cardinality_max": {
+                                                    "type": "integer",
+                                                    "description": "Maximum cardinality (maximum number of occurrences allowed, -1 means unbounded)",
+                                                },
+                                                "is_nillable": {
+                                                    "type": "boolean",
+                                                    "description": "Whether the component can have a nil/null value",
+                                                },
+                                                "remark": {
+                                                    "type": ["string", "null"],
+                                                    "description": "Additional remarks or notes about the component",
+                                                },
+                                                "cardinality_display": {
+                                                    "type": "string",
+                                                    "description": "Display cardinality with 'unbounded' for -1 values",
+                                                },
+                                                "asbie_id": {
+                                                    "type": ["integer", "null"],
+                                                    "description": "Unique identifier for the ASBIE (base entity ID, None if is_used=False)",
+                                                },
+                                                "guid": {
+                                                    "type": ["string", "null"],
+                                                    "description": "Globally unique identifier for the ASBIE (if available)",
+                                                },
                                                 "based_ascc": {
                                                     "type": "object",
                                                     "description": "Information about the ASCC that this ASBIE component is based on",
                                                     "properties": {
-                                                        "ascc_manifest_id": {"type": "integer",
-                                                                             "description": "Unique identifier for the ASCC manifest. This can be passed to create_asbie() as the based_ascc_manifest_id parameter."},
-                                                        "ascc_id": {"type": "integer",
-                                                                    "description": "Unique identifier for the ASCC"},
-                                                        "guid": {"type": "string",
-                                                                 "description": "Unique identifier within the release"},
-                                                        "den": {"type": "string",
-                                                                "description": "Dictionary Entry Name (DEN)"},
-                                                        "cardinality_min": {"type": "integer",
-                                                                            "description": "Minimum cardinality"},
-                                                        "cardinality_max": {"type": "integer",
-                                                                            "description": "Maximum cardinality"},
-                                                        "is_deprecated": {"type": "boolean",
-                                                                          "description": "Whether the ASCC is deprecated"},
-                                                        "definition": {"type": ["string", "null"],
-                                                                       "description": "Definition or description of the ASCC"},
-                                                        "definition_source": {"type": ["string", "null"],
-                                                                              "description": "URL indicating the source of the definition"},
-                                                        "from_acc_manifest_id": {"type": "integer",
-                                                                                 "description": "Unique identifier for the source ACC manifest"},
-                                                        "to_asccp_manifest_id": {"type": "integer",
-                                                                                 "description": "Unique identifier for the target ASCCP manifest"}
+                                                        "ascc_manifest_id": {
+                                                            "type": "integer",
+                                                            "description": "Unique identifier for the ASCC manifest. This can be passed to create_asbie() as the based_ascc_manifest_id parameter.",
+                                                        },
+                                                        "ascc_id": {
+                                                            "type": "integer",
+                                                            "description": "Unique identifier for the ASCC",
+                                                        },
+                                                        "guid": {
+                                                            "type": "string",
+                                                            "description": "Unique identifier within the release",
+                                                        },
+                                                        "den": {
+                                                            "type": "string",
+                                                            "description": "Dictionary Entry Name (DEN)",
+                                                        },
+                                                        "cardinality_min": {
+                                                            "type": "integer",
+                                                            "description": "Minimum cardinality",
+                                                        },
+                                                        "cardinality_max": {
+                                                            "type": "integer",
+                                                            "description": "Maximum cardinality",
+                                                        },
+                                                        "is_deprecated": {
+                                                            "type": "boolean",
+                                                            "description": "Whether the ASCC is deprecated",
+                                                        },
+                                                        "definition": {
+                                                            "type": ["string", "null"],
+                                                            "description": "Definition or description of the ASCC",
+                                                        },
+                                                        "definition_source": {
+                                                            "type": ["string", "null"],
+                                                            "description": "URL indicating the source of the definition",
+                                                        },
+                                                        "from_acc_manifest_id": {
+                                                            "type": "integer",
+                                                            "description": "Unique identifier for the source ACC manifest",
+                                                        },
+                                                        "to_asccp_manifest_id": {
+                                                            "type": "integer",
+                                                            "description": "Unique identifier for the target ASCCP manifest",
+                                                        },
                                                     },
-                                                    "required": ["ascc_manifest_id", "ascc_id", "guid", "den",
-                                                                 "cardinality_min", "cardinality_max", "is_deprecated",
-                                                                 "from_acc_manifest_id", "to_asccp_manifest_id"]
+                                                    "required": [
+                                                        "ascc_manifest_id",
+                                                        "ascc_id",
+                                                        "guid",
+                                                        "den",
+                                                        "cardinality_min",
+                                                        "cardinality_max",
+                                                        "is_deprecated",
+                                                        "from_acc_manifest_id",
+                                                        "to_asccp_manifest_id",
+                                                    ],
                                                 },
-                                                "to_asbiep_id": {"type": ["integer", "null"],
-                                                                 "description": "Unique identifier for the target ASBIEP that this ASBIE connects to (if available)"}
+                                                "to_asbiep_id": {
+                                                    "type": ["integer", "null"],
+                                                    "description": "Unique identifier for the target ASBIEP that this ASBIE connects to (if available)",
+                                                },
                                             },
-                                            "required": ["component_type", "is_used",
-                                                         "cardinality_min", "cardinality_max", "is_nillable", "remark",
-                                                         "cardinality_display", "based_ascc"]
+                                            "required": [
+                                                "component_type",
+                                                "is_used",
+                                                "cardinality_min",
+                                                "cardinality_max",
+                                                "is_nillable",
+                                                "remark",
+                                                "cardinality_display",
+                                                "based_ascc",
+                                            ],
                                         },
                                         {
                                             "type": "object",
                                             "description": "BBIE (Basic Business Information Entity) relationship",
                                             "properties": {
-                                                "component_type": {"type": "string",
-                                                                   "description": "Type of relationship, always 'BBIE' for this type",
-                                                                   "example": "BBIE"},
-                                                "is_used": {"type": "boolean",
-                                                            "description": "Whether this component is currently being used (profiled) in the BIE (True means bbie_id exists)"},
-                                                "cardinality_min": {"type": "integer",
-                                                                    "description": "Minimum cardinality (minimum number of occurrences required, typically 0 or 1)"},
-                                                "cardinality_max": {"type": "integer",
-                                                                    "description": "Maximum cardinality (maximum number of occurrences allowed, -1 means unbounded)"},
-                                                "is_nillable": {"type": "boolean",
-                                                                "description": "Whether the component can have a nil/null value"},
-                                                "remark": {"type": ["string", "null"],
-                                                           "description": "Additional remarks or notes about the component"},
-                                                "cardinality_display": {"type": "string",
-                                                                        "description": "Display cardinality with 'unbounded' for -1 values"},
-                                                "bbie_id": {"type": ["integer", "null"],
-                                                            "description": "Unique identifier for the BBIE (base entity ID, None if is_used=False)"},
-                                                "guid": {"type": ["string", "null"],
-                                                         "description": "Globally unique identifier for the BBIE (if available)"},
+                                                "component_type": {
+                                                    "type": "string",
+                                                    "description": "Type of relationship, always 'BBIE' for this type",
+                                                    "example": "BBIE",
+                                                },
+                                                "is_used": {
+                                                    "type": "boolean",
+                                                    "description": "Whether this component is currently being used (profiled) in the BIE (True means bbie_id exists)",
+                                                },
+                                                "cardinality_min": {
+                                                    "type": "integer",
+                                                    "description": "Minimum cardinality (minimum number of occurrences required, typically 0 or 1)",
+                                                },
+                                                "cardinality_max": {
+                                                    "type": "integer",
+                                                    "description": "Maximum cardinality (maximum number of occurrences allowed, -1 means unbounded)",
+                                                },
+                                                "is_nillable": {
+                                                    "type": "boolean",
+                                                    "description": "Whether the component can have a nil/null value",
+                                                },
+                                                "remark": {
+                                                    "type": ["string", "null"],
+                                                    "description": "Additional remarks or notes about the component",
+                                                },
+                                                "cardinality_display": {
+                                                    "type": "string",
+                                                    "description": "Display cardinality with 'unbounded' for -1 values",
+                                                },
+                                                "bbie_id": {
+                                                    "type": ["integer", "null"],
+                                                    "description": "Unique identifier for the BBIE (base entity ID, None if is_used=False)",
+                                                },
+                                                "guid": {
+                                                    "type": ["string", "null"],
+                                                    "description": "Globally unique identifier for the BBIE (if available)",
+                                                },
                                                 "based_bcc": {
                                                     "type": "object",
                                                     "description": "Information about the BCC that this BBIE component is based on",
                                                     "properties": {
-                                                        "bcc_manifest_id": {"type": "integer",
-                                                                            "description": "Unique identifier for the BCC manifest. This can be passed to create_bbie() as the based_bcc_manifest_id parameter."},
-                                                        "bcc_id": {"type": "integer",
-                                                                   "description": "Unique identifier for the BCC"},
-                                                        "guid": {"type": "string",
-                                                                 "description": "Unique identifier within the release"},
-                                                        "den": {"type": "string",
-                                                                "description": "Dictionary Entry Name (DEN)"},
-                                                        "cardinality_min": {"type": "integer",
-                                                                            "description": "Minimum cardinality"},
-                                                        "cardinality_max": {"type": "integer",
-                                                                            "description": "Maximum cardinality"},
-                                                        "entity_type": {"type": ["string", "null"],
-                                                                        "description": "Entity type: 'Attribute' (XML attribute) or 'Element' (XML element)"},
-                                                        "is_nillable": {"type": "boolean",
-                                                                        "description": "Whether the BCC can have a nil/null value"},
-                                                        "is_deprecated": {"type": "boolean",
-                                                                          "description": "Whether the BCC is deprecated"},
-                                                        "definition": {"type": ["string", "null"],
-                                                                       "description": "Definition or description of the BCC"},
-                                                        "definition_source": {"type": ["string", "null"],
-                                                                              "description": "URL indicating the source of the definition"},
-                                                        "from_acc_manifest_id": {"type": "integer",
-                                                                                 "description": "Unique identifier for the source ACC manifest"},
-                                                        "to_bccp_manifest_id": {"type": "integer",
-                                                                                "description": "Unique identifier for the target BCCP manifest"}
+                                                        "bcc_manifest_id": {
+                                                            "type": "integer",
+                                                            "description": "Unique identifier for the BCC manifest. This can be passed to create_bbie() as the based_bcc_manifest_id parameter.",
+                                                        },
+                                                        "bcc_id": {
+                                                            "type": "integer",
+                                                            "description": "Unique identifier for the BCC",
+                                                        },
+                                                        "guid": {
+                                                            "type": "string",
+                                                            "description": "Unique identifier within the release",
+                                                        },
+                                                        "den": {
+                                                            "type": "string",
+                                                            "description": "Dictionary Entry Name (DEN)",
+                                                        },
+                                                        "cardinality_min": {
+                                                            "type": "integer",
+                                                            "description": "Minimum cardinality",
+                                                        },
+                                                        "cardinality_max": {
+                                                            "type": "integer",
+                                                            "description": "Maximum cardinality",
+                                                        },
+                                                        "entity_type": {
+                                                            "type": ["string", "null"],
+                                                            "description": "Entity type: 'Attribute' (XML attribute) or 'Element' (XML element)",
+                                                        },
+                                                        "is_nillable": {
+                                                            "type": "boolean",
+                                                            "description": "Whether the BCC can have a nil/null value",
+                                                        },
+                                                        "is_deprecated": {
+                                                            "type": "boolean",
+                                                            "description": "Whether the BCC is deprecated",
+                                                        },
+                                                        "definition": {
+                                                            "type": ["string", "null"],
+                                                            "description": "Definition or description of the BCC",
+                                                        },
+                                                        "definition_source": {
+                                                            "type": ["string", "null"],
+                                                            "description": "URL indicating the source of the definition",
+                                                        },
+                                                        "from_acc_manifest_id": {
+                                                            "type": "integer",
+                                                            "description": "Unique identifier for the source ACC manifest",
+                                                        },
+                                                        "to_bccp_manifest_id": {
+                                                            "type": "integer",
+                                                            "description": "Unique identifier for the target BCCP manifest",
+                                                        },
                                                     },
-                                                    "required": ["bcc_manifest_id", "bcc_id", "guid", "den",
-                                                                 "cardinality_min", "cardinality_max", "is_nillable",
-                                                                 "is_deprecated", "from_acc_manifest_id",
-                                                                 "to_bccp_manifest_id"]
+                                                    "required": [
+                                                        "bcc_manifest_id",
+                                                        "bcc_id",
+                                                        "guid",
+                                                        "den",
+                                                        "cardinality_min",
+                                                        "cardinality_max",
+                                                        "is_nillable",
+                                                        "is_deprecated",
+                                                        "from_acc_manifest_id",
+                                                        "to_bccp_manifest_id",
+                                                    ],
                                                 },
                                                 "primitiveRestriction": {
                                                     "type": "object",
                                                     "description": "Primitive restriction information for the BBIE. This field is required and must not be None. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set (not multiple, not none).",
                                                     "properties": {
-                                                        "xbtManifestId": {"type": ["integer", "null"],
-                                                                          "description": "XBT (eXtended Built-in Type) manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set."},
-                                                        "codeListManifestId": {"type": ["integer", "null"],
-                                                                               "description": "Code list manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set."},
-                                                        "agencyIdListManifestId": {"type": ["integer", "null"],
-                                                                                   "description": "Agency ID list manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set."}
+                                                        "xbtManifestId": {
+                                                            "type": ["integer", "null"],
+                                                            "description": "XBT (eXtended Built-in Type) manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set.",
+                                                        },
+                                                        "codeListManifestId": {
+                                                            "type": ["integer", "null"],
+                                                            "description": "Code list manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set.",
+                                                        },
+                                                        "agencyIdListManifestId": {
+                                                            "type": ["integer", "null"],
+                                                            "description": "Agency ID list manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set.",
+                                                        },
                                                     },
-                                                    "required": ["xbtManifestId", "codeListManifestId",
-                                                                 "agencyIdListManifestId"]
+                                                    "required": [
+                                                        "xbtManifestId",
+                                                        "codeListManifestId",
+                                                        "agencyIdListManifestId",
+                                                    ],
                                                 },
                                                 "valueConstraint": {
                                                     "type": ["object", "null"],
                                                     "description": "Value constraint information for the BBIE",
                                                     "properties": {
-                                                        "default_value": {"type": ["string", "null"],
-                                                                          "description": "Default value for the BBIE if not specified"},
-                                                        "fixed_value": {"type": ["string", "null"],
-                                                                        "description": "Fixed value that must always be used for this BBIE (cannot be changed)"}
+                                                        "default_value": {
+                                                            "type": ["string", "null"],
+                                                            "description": "Default value for the BBIE if not specified",
+                                                        },
+                                                        "fixed_value": {
+                                                            "type": ["string", "null"],
+                                                            "description": "Fixed value that must always be used for this BBIE (cannot be changed)",
+                                                        },
                                                     },
-                                                    "required": ["default_value", "fixed_value"]
+                                                    "required": ["default_value", "fixed_value"],
                                                 },
                                                 "facet": {
                                                     "type": ["object", "null"],
                                                     "description": "Facet restriction information for string values",
                                                     "properties": {
-                                                        "facet_min_length": {"type": ["integer", "null"],
-                                                                             "description": "Minimum length constraint for string values (facet restriction)"},
-                                                        "facet_max_length": {"type": ["integer", "null"],
-                                                                             "description": "Maximum length constraint for string values (facet restriction)"},
-                                                        "facet_pattern": {"type": ["string", "null"],
-                                                                          "description": "Pattern constraint (regular expression) for string values (facet restriction)"}
+                                                        "facet_min_length": {
+                                                            "type": ["integer", "null"],
+                                                            "description": "Minimum length constraint for string values (facet restriction)",
+                                                        },
+                                                        "facet_max_length": {
+                                                            "type": ["integer", "null"],
+                                                            "description": "Maximum length constraint for string values (facet restriction)",
+                                                        },
+                                                        "facet_pattern": {
+                                                            "type": ["string", "null"],
+                                                            "description": "Pattern constraint (regular expression) for string values (facet restriction)",
+                                                        },
                                                     },
-                                                    "required": ["facet_min_length", "facet_max_length",
-                                                                 "facet_pattern"]
+                                                    "required": [
+                                                        "facet_min_length",
+                                                        "facet_max_length",
+                                                        "facet_pattern",
+                                                    ],
                                                 },
-                                                "to_bbiep_id": {"type": ["integer", "null"],
-                                                                "description": "Unique identifier for the target BBIEP that this BBIE connects to (if available)"}
+                                                "to_bbiep_id": {
+                                                    "type": ["integer", "null"],
+                                                    "description": "Unique identifier for the target BBIEP that this BBIE connects to (if available)",
+                                                },
                                             },
-                                            "required": ["component_type", "is_used",
-                                                         "cardinality_min", "cardinality_max", "is_nillable", "remark",
-                                                         "cardinality_display", "based_bcc"]
-                                        }
+                                            "required": [
+                                                "component_type",
+                                                "is_used",
+                                                "cardinality_min",
+                                                "cardinality_max",
+                                                "is_nillable",
+                                                "remark",
+                                                "cardinality_display",
+                                                "based_bcc",
+                                            ],
+                                        },
                                     ]
                                 },
-                                "example": []
+                                "example": [],
                             },
                             "created": {
                                 "type": "object",
@@ -779,24 +1159,38 @@ async def get_top_level_asbiep_list(
                                         "type": "object",
                                         "description": "User who created the ABIE",
                                         "properties": {
-                                            "user_id": {"type": "integer",
-                                                        "description": "Unique identifier for the user",
-                                                        "example": 100000001},
-                                            "login_id": {"type": "string", "description": "User's login identifier",
-                                                         "example": "john.doe"},
-                                            "username": {"type": "string", "description": "Display name of the user",
-                                                         "example": "John Doe"},
-                                            "roles": {"type": "array", "items": {"type": "string"},
-                                                      "description": "List of roles assigned to the user",
-                                                      "example": ["End-User"]}
+                                            "user_id": {
+                                                "type": "integer",
+                                                "description": "Unique identifier for the user",
+                                                "example": 100000001,
+                                            },
+                                            "login_id": {
+                                                "type": "string",
+                                                "description": "User's login identifier",
+                                                "example": "john.doe",
+                                            },
+                                            "username": {
+                                                "type": "string",
+                                                "description": "Display name of the user",
+                                                "example": "John Doe",
+                                            },
+                                            "roles": {
+                                                "type": "array",
+                                                "items": {"type": "string"},
+                                                "description": "List of roles assigned to the user",
+                                                "example": ["End-User"],
+                                            },
                                         },
-                                        "required": ["user_id", "login_id", "username", "roles"]
+                                        "required": ["user_id", "login_id", "username", "roles"],
                                     },
-                                    "when": {"type": "string", "format": "date-time",
-                                             "description": "Timestamp when the ABIE was created",
-                                             "example": "2023-01-15T10:30:00Z"}
+                                    "when": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "description": "Timestamp when the ABIE was created",
+                                        "example": "2023-01-15T10:30:00Z",
+                                    },
                                 },
-                                "required": ["who", "when"]
+                                "required": ["who", "when"],
                             },
                             "last_updated": {
                                 "type": "object",
@@ -806,35 +1200,58 @@ async def get_top_level_asbiep_list(
                                         "type": "object",
                                         "description": "User who last updated the ABIE",
                                         "properties": {
-                                            "user_id": {"type": "integer",
-                                                        "description": "Unique identifier for the user",
-                                                        "example": 100000001},
-                                            "login_id": {"type": "string", "description": "User's login identifier",
-                                                         "example": "john.doe"},
-                                            "username": {"type": "string", "description": "Display name of the user",
-                                                         "example": "John Doe"},
-                                            "roles": {"type": "array", "items": {"type": "string"},
-                                                      "description": "List of roles assigned to the user",
-                                                      "example": ["End-User"]}
+                                            "user_id": {
+                                                "type": "integer",
+                                                "description": "Unique identifier for the user",
+                                                "example": 100000001,
+                                            },
+                                            "login_id": {
+                                                "type": "string",
+                                                "description": "User's login identifier",
+                                                "example": "john.doe",
+                                            },
+                                            "username": {
+                                                "type": "string",
+                                                "description": "Display name of the user",
+                                                "example": "John Doe",
+                                            },
+                                            "roles": {
+                                                "type": "array",
+                                                "items": {"type": "string"},
+                                                "description": "List of roles assigned to the user",
+                                                "example": ["End-User"],
+                                            },
                                         },
-                                        "required": ["user_id", "login_id", "username", "roles"]
+                                        "required": ["user_id", "login_id", "username", "roles"],
                                     },
-                                    "when": {"type": "string", "format": "date-time",
-                                             "description": "Timestamp when the ABIE was last updated",
-                                             "example": "2023-01-15T14:45:00Z"}
+                                    "when": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "description": "Timestamp when the ABIE was last updated",
+                                        "example": "2023-01-15T14:45:00Z",
+                                    },
                                 },
-                                "required": ["who", "when"]
-                            }
+                                "required": ["who", "when"],
+                            },
                         },
-                        "required": ["based_acc_manifest", "created", "last_updated"]
+                        "required": ["based_acc_manifest", "created", "last_updated"],
                     },
-                    "definition": {"type": ["string", "null"], "description": "Definition of the ASBIEP",
-                                   "example": "A purchase order property"},
-                    "remark": {"type": ["string", "null"], "description": "Remarks about the ASBIEP",
-                               "example": "Used for procurement processes"},
+                    "definition": {
+                        "type": ["string", "null"],
+                        "description": "Definition of the ASBIEP",
+                        "example": "A purchase order property",
+                    },
+                    "remark": {
+                        "type": ["string", "null"],
+                        "description": "Remarks about the ASBIEP",
+                        "example": "Used for procurement processes",
+                    },
                     "biz_term": {"type": ["string", "null"], "description": "Business term", "example": "PO"},
-                    "display_name": {"type": ["string", "null"], "description": "Display name of the ASBIEP",
-                                     "example": "Purchase Order Property"},
+                    "display_name": {
+                        "type": ["string", "null"],
+                        "description": "Display name of the ASBIEP",
+                        "example": "Purchase Order Property",
+                    },
                     "created": {
                         "type": "object",
                         "description": "Creation information",
@@ -843,23 +1260,38 @@ async def get_top_level_asbiep_list(
                                 "type": "object",
                                 "description": "User who created the ASBIEP",
                                 "properties": {
-                                    "user_id": {"type": "integer", "description": "Unique identifier for the user",
-                                                "example": 100000001},
-                                    "login_id": {"type": "string", "description": "User's login identifier",
-                                                 "example": "john.doe"},
-                                    "username": {"type": "string", "description": "Display name of the user",
-                                                 "example": "John Doe"},
-                                    "roles": {"type": "array", "items": {"type": "string"},
-                                              "description": "List of roles assigned to the user",
-                                              "example": ["End-User"]}
+                                    "user_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the user",
+                                        "example": 100000001,
+                                    },
+                                    "login_id": {
+                                        "type": "string",
+                                        "description": "User's login identifier",
+                                        "example": "john.doe",
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "description": "Display name of the user",
+                                        "example": "John Doe",
+                                    },
+                                    "roles": {
+                                        "type": "array",
+                                        "items": {"type": "string"},
+                                        "description": "List of roles assigned to the user",
+                                        "example": ["End-User"],
+                                    },
                                 },
-                                "required": ["user_id", "login_id", "username", "roles"]
+                                "required": ["user_id", "login_id", "username", "roles"],
                             },
-                            "when": {"type": "string", "format": "date-time",
-                                     "description": "Timestamp when the ASBIEP was created",
-                                     "example": "2023-01-15T10:30:00Z"}
+                            "when": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "Timestamp when the ASBIEP was created",
+                                "example": "2023-01-15T10:30:00Z",
+                            },
                         },
-                        "required": ["who", "when"]
+                        "required": ["who", "when"],
                     },
                     "last_updated": {
                         "type": "object",
@@ -869,68 +1301,119 @@ async def get_top_level_asbiep_list(
                                 "type": "object",
                                 "description": "User who last updated the ASBIEP",
                                 "properties": {
-                                    "user_id": {"type": "integer", "description": "Unique identifier for the user",
-                                                "example": 100000001},
-                                    "login_id": {"type": "string", "description": "User's login identifier",
-                                                 "example": "john.doe"},
-                                    "username": {"type": "string", "description": "Display name of the user",
-                                                 "example": "John Doe"},
-                                    "roles": {"type": "array", "items": {"type": "string"},
-                                              "description": "List of roles assigned to the user",
-                                              "example": ["End-User"]}
+                                    "user_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the user",
+                                        "example": 100000001,
+                                    },
+                                    "login_id": {
+                                        "type": "string",
+                                        "description": "User's login identifier",
+                                        "example": "john.doe",
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "description": "Display name of the user",
+                                        "example": "John Doe",
+                                    },
+                                    "roles": {
+                                        "type": "array",
+                                        "items": {"type": "string"},
+                                        "description": "List of roles assigned to the user",
+                                        "example": ["End-User"],
+                                    },
                                 },
-                                "required": ["user_id", "login_id", "username", "roles"]
+                                "required": ["user_id", "login_id", "username", "roles"],
                             },
-                            "when": {"type": "string", "format": "date-time",
-                                     "description": "Timestamp when the ASBIEP was last updated",
-                                     "example": "2023-01-15T14:45:00Z"}
+                            "when": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "Timestamp when the ASBIEP was last updated",
+                                "example": "2023-01-15T14:45:00Z",
+                            },
                         },
-                        "required": ["who", "when"]
-                    }
+                        "required": ["who", "when"],
+                    },
                 },
-                "required": ["asbiep_id", "owner_top_level_asbiep", "based_asccp_manifest", "role_of_abie", "created",
-                             "last_updated"]
+                "required": [
+                    "asbiep_id",
+                    "owner_top_level_asbiep",
+                    "based_asccp_manifest",
+                    "role_of_abie",
+                    "created",
+                    "last_updated",
+                ],
             },
-            "version": {"type": ["string", "null"], "description": "Version number assigned by the user",
-                        "example": "1.0"},
-            "status": {"type": ["string", "null"],
-                       "description": "Usage status of the top-level ASBIEP (e.g., 'Prototype', 'Test', 'Production')",
-                       "example": "Production"},
+            "version": {
+                "type": ["string", "null"],
+                "description": "Version number assigned by the user",
+                "example": "1.0",
+            },
+            "status": {
+                "type": ["string", "null"],
+                "description": "Usage status of the top-level ASBIEP (e.g., 'Prototype', 'Test', 'Production')",
+                "example": "Production",
+            },
             "business_contexts": {
                 "type": "array",
                 "description": "List of associated business contexts",
                 "items": {
                     "type": "object",
                     "properties": {
-                        "biz_ctx_id": {"type": "integer", "description": "Unique identifier for the business context",
-                                       "example": 1},
-                        "guid": {"type": "string", "description": "Unique identifier for the business context",
-                                 "example": "a1b2c3d4e5f6789012345678901234ab"},
-                        "name": {"type": ["string", "null"], "description": "Name of the business context",
-                                 "example": "Production Environment"}
+                        "biz_ctx_id": {
+                            "type": "integer",
+                            "description": "Unique identifier for the business context",
+                            "example": 1,
+                        },
+                        "guid": {
+                            "type": "string",
+                            "description": "Unique identifier for the business context",
+                            "example": "a1b2c3d4e5f6789012345678901234ab",
+                        },
+                        "name": {
+                            "type": ["string", "null"],
+                            "description": "Name of the business context",
+                            "example": "Production Environment",
+                        },
                     },
-                    "required": ["biz_ctx_id", "guid"]
-                }
+                    "required": ["biz_ctx_id", "guid"],
+                },
             },
             "state": {"type": "string", "description": "State of the top-level ASBIEP", "example": "Published"},
-            "is_deprecated": {"type": "boolean", "description": "Whether the top-level ASBIEP is deprecated",
-                              "example": False},
-            "deprecated_reason": {"type": ["string", "null"], "description": "The reason for the deprecation",
-                                  "example": "Replaced by new version"},
-            "deprecated_remark": {"type": ["string", "null"], "description": "Additional remarks about the deprecation",
-                                  "example": "Use version 2.0 instead"},
+            "is_deprecated": {
+                "type": "boolean",
+                "description": "Whether the top-level ASBIEP is deprecated",
+                "example": False,
+            },
+            "deprecated_reason": {
+                "type": ["string", "null"],
+                "description": "The reason for the deprecation",
+                "example": "Replaced by new version",
+            },
+            "deprecated_remark": {
+                "type": ["string", "null"],
+                "description": "Additional remarks about the deprecation",
+                "example": "Use version 2.0 instead",
+            },
             "owner": {
                 "type": "object",
                 "description": "Owner information",
                 "properties": {
                     "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
                     "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                    "username": {"type": "string", "description": "Display name of the user",
-                                 "example": "Administrator"},
-                    "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
-                              "description": "List of roles assigned to the user", "example": ["Admin"]}
+                    "username": {
+                        "type": "string",
+                        "description": "Display name of the user",
+                        "example": "Administrator",
+                    },
+                    "roles": {
+                        "type": "array",
+                        "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                        "description": "List of roles assigned to the user",
+                        "example": ["Admin"],
+                    },
                 },
-                "required": ["user_id", "login_id", "username", "roles"]
+                "required": ["user_id", "login_id", "username", "roles"],
             },
             "created": {
                 "type": "object",
@@ -940,23 +1423,38 @@ async def get_top_level_asbiep_list(
                         "type": "object",
                         "description": "User who created the BIE (Business Information Entity)",
                         "properties": {
-                            "user_id": {"type": "integer", "description": "Unique identifier for the user",
-                                        "example": 1},
-                            "login_id": {"type": "string", "description": "User's login identifier",
-                                         "example": "admin"},
-                            "username": {"type": "string", "description": "Display name of the user",
-                                         "example": "Administrator"},
-                            "roles": {"type": "array",
-                                      "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
-                                      "description": "List of roles assigned to the user", "example": ["Admin"]}
+                            "user_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the user",
+                                "example": 1,
+                            },
+                            "login_id": {
+                                "type": "string",
+                                "description": "User's login identifier",
+                                "example": "admin",
+                            },
+                            "username": {
+                                "type": "string",
+                                "description": "Display name of the user",
+                                "example": "Administrator",
+                            },
+                            "roles": {
+                                "type": "array",
+                                "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                "description": "List of roles assigned to the user",
+                                "example": ["Admin"],
+                            },
                         },
-                        "required": ["user_id", "login_id", "username", "roles"]
+                        "required": ["user_id", "login_id", "username", "roles"],
                     },
-                    "when": {"type": "string", "format": "date-time",
-                             "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
-                             "example": "2024-01-15T10:30:00Z"}
+                    "when": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                        "example": "2024-01-15T10:30:00Z",
+                    },
                 },
-                "required": ["who", "when"]
+                "required": ["who", "when"],
             },
             "last_updated": {
                 "type": "object",
@@ -966,32 +1464,59 @@ async def get_top_level_asbiep_list(
                         "type": "object",
                         "description": "User who last updated the BIE (Business Information Entity)",
                         "properties": {
-                            "user_id": {"type": "integer", "description": "Unique identifier for the user",
-                                        "example": 1},
-                            "login_id": {"type": "string", "description": "User's login identifier",
-                                         "example": "admin"},
-                            "username": {"type": "string", "description": "Display name of the user",
-                                         "example": "Administrator"},
-                            "roles": {"type": "array",
-                                      "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
-                                      "description": "List of roles assigned to the user", "example": ["Admin"]}
+                            "user_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the user",
+                                "example": 1,
+                            },
+                            "login_id": {
+                                "type": "string",
+                                "description": "User's login identifier",
+                                "example": "admin",
+                            },
+                            "username": {
+                                "type": "string",
+                                "description": "Display name of the user",
+                                "example": "Administrator",
+                            },
+                            "roles": {
+                                "type": "array",
+                                "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                "description": "List of roles assigned to the user",
+                                "example": ["Admin"],
+                            },
                         },
-                        "required": ["user_id", "login_id", "username", "roles"]
+                        "required": ["user_id", "login_id", "username", "roles"],
                     },
-                    "when": {"type": "string", "format": "date-time",
-                             "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
-                             "example": "2024-01-15T10:30:00Z"}
+                    "when": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                        "example": "2024-01-15T10:30:00Z",
+                    },
                 },
-                "required": ["who", "when"]
-            }
+                "required": ["who", "when"],
+            },
         },
-        "required": ["top_level_asbiep_id", "asbiep", "business_contexts", "state",
-                     "is_deprecated", "owner", "created", "last_updated"]
-    }
+        "required": [
+            "top_level_asbiep_id",
+            "asbiep",
+            "business_contexts",
+            "state",
+            "is_deprecated",
+            "owner",
+            "created",
+            "last_updated",
+        ],
+    },
 )
 async def get_top_level_asbiep(
-    top_level_asbiep_id: Annotated[int, Field(gt=0, description="Unique identifier of the top-level ASBIEP to retrieve.")],
-    business_information_entity_service: BusinessInformationEntityService = Depends(get_business_information_entity_service),
+    top_level_asbiep_id: Annotated[
+        int, Field(gt=0, description="Unique identifier of the top-level ASBIEP to retrieve.")
+    ],
+    business_information_entity_service: BusinessInformationEntityService = Depends(
+        get_business_information_entity_service
+    ),
 ) -> GetTopLevelAsbiepToolResponse:
     """
     Get a top-level ASBIEP (Association Business Information Entity Property) by its ID.
@@ -1174,228 +1699,397 @@ async def get_top_level_asbiep(
         "type": "object",
         "description": "Response containing ASBIE (Association Business Information Entity) information with its ASBIEP. Used for profiling core components – when is_used=True, the component is profiled for practical use (asbie_id will be created); when is_used=False, it shows all available components for profiling. IMPORTANT: Groups (component_type 3=SemanticGroup or 4=UserExtensionGroup) are automatically skipped in BIE expressions, so the BIE structure may differ from the CC structure. To find the correct from_abie_id for create_asbie, traverse the actual BIE structure recursively.",
         "properties": {
-            "asbie_id": {"type": ["integer", "null"],
-                         "description": "Unique identifier for the ASBIE (base entity ID, None if not yet created)",
-                         "example": 12345},
+            "asbie_id": {
+                "type": ["integer", "null"],
+                "description": "Unique identifier for the ASBIE (base entity ID, None if not yet created)",
+                "example": 12345,
+            },
             "owner_top_level_asbiep": {
                 "type": "object",
                 "description": "Top-Level ASBIEP information",
                 "properties": {
-                    "top_level_asbiep_id": {"type": "integer",
-                                            "description": "Unique identifier for the top-level ASBIEP",
-                                            "example": 12345},
+                    "top_level_asbiep_id": {
+                        "type": "integer",
+                        "description": "Unique identifier for the top-level ASBIEP",
+                        "example": 12345,
+                    },
                     "library": {
                         "type": "object",
                         "description": "Library information",
                         "properties": {
-                            "library_id": {"type": "integer", "description": "Unique identifier for the library",
-                                           "example": 1},
-                            "name": {"type": "string", "description": "Library name", "example": "OAGIS"}
+                            "library_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the library",
+                                "example": 1,
+                            },
+                            "name": {"type": "string", "description": "Library name", "example": "OAGIS"},
                         },
-                        "required": ["library_id", "name"]
+                        "required": ["library_id", "name"],
                     },
                     "release": {
                         "type": "object",
                         "description": "Release information",
                         "properties": {
-                            "release_id": {"type": "integer", "description": "Unique identifier for the release",
-                                           "example": 1},
-                            "release_num": {"type": "string", "description": "Release number",
-                                            "example": "10.6"},
-                            "state": {"type": "string", "description": "Release state", "example": "Published"}
+                            "release_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the release",
+                                "example": 1,
+                            },
+                            "release_num": {"type": "string", "description": "Release number", "example": "10.6"},
+                            "state": {"type": "string", "description": "Release state", "example": "Published"},
                         },
-                        "required": ["release_id", "release_num", "state"]
+                        "required": ["release_id", "release_num", "state"],
                     },
                     "version": {"type": ["string", "null"], "description": "Version number", "example": "1.0"},
-                    "status": {"type": ["string", "null"], "description": "Status of the top-level ASBIEP",
-                               "example": "Production"},
+                    "status": {
+                        "type": ["string", "null"],
+                        "description": "Status of the top-level ASBIEP",
+                        "example": "Production",
+                    },
                     "state": {"type": "string", "description": "State of the top-level ASBIEP", "example": "Published"},
-                    "is_deprecated": {"type": "boolean", "description": "Whether the top-level ASBIEP is deprecated",
-                                      "example": False},
-                    "deprecated_reason": {"type": ["string", "null"], "description": "Reason for deprecation",
-                                          "example": "Replaced by newer version"},
-                    "deprecated_remark": {"type": ["string", "null"],
-                                          "description": "Additional remarks about deprecation",
-                                          "example": "Use version 2.0 instead"},
+                    "is_deprecated": {
+                        "type": "boolean",
+                        "description": "Whether the top-level ASBIEP is deprecated",
+                        "example": False,
+                    },
+                    "deprecated_reason": {
+                        "type": ["string", "null"],
+                        "description": "Reason for deprecation",
+                        "example": "Replaced by newer version",
+                    },
+                    "deprecated_remark": {
+                        "type": ["string", "null"],
+                        "description": "Additional remarks about deprecation",
+                        "example": "Use version 2.0 instead",
+                    },
                     "owner": {
                         "type": "object",
                         "description": "Owner information",
                         "properties": {
-                            "user_id": {"type": "integer", "description": "Unique identifier for the user",
-                                        "example": 100000001},
-                            "login_id": {"type": "string", "description": "User's login identifier",
-                                         "example": "john.doe"},
-                            "username": {"type": "string", "description": "Display name of the user",
-                                         "example": "John Doe"},
-                            "roles": {"type": "array",
-                                      "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
-                                      "description": "List of roles assigned to the user", "example": ["End-User"]}
+                            "user_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the user",
+                                "example": 100000001,
+                            },
+                            "login_id": {
+                                "type": "string",
+                                "description": "User's login identifier",
+                                "example": "john.doe",
+                            },
+                            "username": {
+                                "type": "string",
+                                "description": "Display name of the user",
+                                "example": "John Doe",
+                            },
+                            "roles": {
+                                "type": "array",
+                                "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                "description": "List of roles assigned to the user",
+                                "example": ["End-User"],
+                            },
                         },
-                        "required": ["user_id", "login_id", "username", "roles"]
-                    }
+                        "required": ["user_id", "login_id", "username", "roles"],
+                    },
                 },
-                "required": ["top_level_asbiep_id", "library", "release", "state", "is_deprecated", "owner"]
+                "required": ["top_level_asbiep_id", "library", "release", "state", "is_deprecated", "owner"],
             },
-            "guid": {"type": ["string", "null"],
-                     "description": "Globally unique identifier for the ASBIE (if available)",
-                     "example": "a1b2c3d4e5f6789012345678901234ab"},
+            "guid": {
+                "type": ["string", "null"],
+                "description": "Globally unique identifier for the ASBIE (if available)",
+                "example": "a1b2c3d4e5f6789012345678901234ab",
+            },
             "based_ascc": {
                 "type": "object",
                 "description": "ASCC (Association Core Component) information that this ASBIE is based on",
                 "properties": {
-                    "ascc_manifest_id": {"type": "integer",
-                                         "description": "Unique identifier for the ASCC manifest. This can be passed to create_asbie() as the based_ascc_manifest_id parameter.",
-                                         "example": 12345},
+                    "ascc_manifest_id": {
+                        "type": "integer",
+                        "description": "Unique identifier for the ASCC manifest. This can be passed to create_asbie() as the based_ascc_manifest_id parameter.",
+                        "example": 12345,
+                    },
                     "ascc_id": {"type": "integer", "description": "Unique identifier for the ASCC", "example": 6789},
-                    "guid": {"type": "string", "description": "Unique identifier within the release",
-                             "example": "a1b2c3d4e5f6789012345678901234ab"},
-                    "den": {"type": "string", "description": "Dictionary Entry Name (DEN)",
-                            "example": "Purchase Order. Details"},
+                    "guid": {
+                        "type": "string",
+                        "description": "Unique identifier within the release",
+                        "example": "a1b2c3d4e5f6789012345678901234ab",
+                    },
+                    "den": {
+                        "type": "string",
+                        "description": "Dictionary Entry Name (DEN)",
+                        "example": "Purchase Order. Details",
+                    },
                     "cardinality_min": {"type": "integer", "description": "Minimum cardinality", "example": 0},
                     "cardinality_max": {"type": "integer", "description": "Maximum cardinality", "example": 1},
-                    "is_deprecated": {"type": "boolean", "description": "Whether the ASCC is deprecated",
-                                      "example": False},
-                    "definition": {"type": ["string", "null"], "description": "Definition of the ASCC",
-                                   "example": "Details of the purchase order"},
-                    "definition_source": {"type": ["string", "null"], "description": "Source of the definition",
-                                          "example": "https://example.com/spec"},
-                    "from_acc_manifest_id": {"type": "integer", "description": "Source ACC manifest ID",
-                                             "example": 12346},
-                    "to_asccp_manifest_id": {"type": "integer", "description": "Target ASCCP manifest ID",
-                                             "example": 12347}
+                    "is_deprecated": {
+                        "type": "boolean",
+                        "description": "Whether the ASCC is deprecated",
+                        "example": False,
+                    },
+                    "definition": {
+                        "type": ["string", "null"],
+                        "description": "Definition of the ASCC",
+                        "example": "Details of the purchase order",
+                    },
+                    "definition_source": {
+                        "type": ["string", "null"],
+                        "description": "Source of the definition",
+                        "example": "https://example.com/spec",
+                    },
+                    "from_acc_manifest_id": {
+                        "type": "integer",
+                        "description": "Source ACC manifest ID",
+                        "example": 12346,
+                    },
+                    "to_asccp_manifest_id": {
+                        "type": "integer",
+                        "description": "Target ASCCP manifest ID",
+                        "example": 12347,
+                    },
                 },
-                "required": ["ascc_manifest_id", "ascc_id", "guid", "den", "cardinality_min", "cardinality_max",
-                             "is_deprecated", "from_acc_manifest_id", "to_asccp_manifest_id"]
+                "required": [
+                    "ascc_manifest_id",
+                    "ascc_id",
+                    "guid",
+                    "den",
+                    "cardinality_min",
+                    "cardinality_max",
+                    "is_deprecated",
+                    "from_acc_manifest_id",
+                    "to_asccp_manifest_id",
+                ],
             },
             "to_asbiep": {
                 "type": "object",
                 "description": "ASBIEP (Association Business Information Entity Property) information",
                 "properties": {
-                    "asbiep_id": {"type": ["integer", "null"], "description": "Unique identifier for the ASBIEP",
-                                  "example": 12348},
+                    "asbiep_id": {
+                        "type": ["integer", "null"],
+                        "description": "Unique identifier for the ASBIEP",
+                        "example": 12348,
+                    },
                     "owner_top_level_asbiep": {
                         "type": ["object", "null"],
                         "description": "Top-Level ASBIEP information",
                         "properties": {
-                            "top_level_asbiep_id": {"type": "integer",
-                                                    "description": "Unique identifier for the top-level ASBIEP",
-                                                    "example": 12345},
+                            "top_level_asbiep_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the top-level ASBIEP",
+                                "example": 12345,
+                            },
                             "library": {
                                 "type": "object",
                                 "description": "Library information",
                                 "properties": {
-                                    "library_id": {"type": "integer",
-                                                   "description": "Unique identifier for the library", "example": 1},
-                                    "name": {"type": "string", "description": "Library name", "example": "OAGIS"}
+                                    "library_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the library",
+                                        "example": 1,
+                                    },
+                                    "name": {"type": "string", "description": "Library name", "example": "OAGIS"},
                                 },
-                                "required": ["library_id", "name"]
+                                "required": ["library_id", "name"],
                             },
                             "release": {
                                 "type": "object",
                                 "description": "Release information",
                                 "properties": {
-                                    "release_id": {"type": "integer",
-                                                   "description": "Unique identifier for the release", "example": 1},
-                                    "release_num": {"type": "string", "description": "Release number",
-                                                    "example": "10.6"},
-                                    "state": {"type": "string", "description": "Release state", "example": "Published"}
+                                    "release_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the release",
+                                        "example": 1,
+                                    },
+                                    "release_num": {
+                                        "type": "string",
+                                        "description": "Release number",
+                                        "example": "10.6",
+                                    },
+                                    "state": {"type": "string", "description": "Release state", "example": "Published"},
                                 },
-                                "required": ["release_id", "release_num", "state"]
+                                "required": ["release_id", "release_num", "state"],
                             },
                             "version": {"type": ["string", "null"], "description": "Version number", "example": "1.0"},
                             "status": {"type": ["string", "null"], "description": "Status", "example": "Production"},
                             "state": {"type": "string", "description": "State", "example": "Published"},
                             "is_deprecated": {"type": "boolean", "description": "Whether deprecated", "example": False},
-                            "deprecated_reason": {"type": ["string", "null"], "description": "Reason for deprecation",
-                                                  "example": None},
-                            "deprecated_remark": {"type": ["string", "null"],
-                                                  "description": "Remarks about deprecation", "example": None},
+                            "deprecated_reason": {
+                                "type": ["string", "null"],
+                                "description": "Reason for deprecation",
+                                "example": None,
+                            },
+                            "deprecated_remark": {
+                                "type": ["string", "null"],
+                                "description": "Remarks about deprecation",
+                                "example": None,
+                            },
                             "owner": {
                                 "type": "object",
                                 "description": "Owner information",
                                 "properties": {
-                                    "user_id": {"type": "integer", "description": "Unique identifier for the user",
-                                                "example": 100000001},
-                                    "login_id": {"type": "string", "description": "User's login identifier",
-                                                 "example": "john.doe"},
-                                    "username": {"type": "string", "description": "Display name of the user",
-                                                 "example": "John Doe"},
-                                    "roles": {"type": "array",
-                                              "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
-                                              "description": "List of roles assigned to the user",
-                                              "example": ["End-User"]}
+                                    "user_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the user",
+                                        "example": 100000001,
+                                    },
+                                    "login_id": {
+                                        "type": "string",
+                                        "description": "User's login identifier",
+                                        "example": "john.doe",
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "description": "Display name of the user",
+                                        "example": "John Doe",
+                                    },
+                                    "roles": {
+                                        "type": "array",
+                                        "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                        "description": "List of roles assigned to the user",
+                                        "example": ["End-User"],
+                                    },
                                 },
-                                "required": ["user_id", "login_id", "username", "roles"]
-                            }
+                                "required": ["user_id", "login_id", "username", "roles"],
+                            },
                         },
-                        "required": ["top_level_asbiep_id", "library", "release", "state", "is_deprecated", "owner"]
+                        "required": ["top_level_asbiep_id", "library", "release", "state", "is_deprecated", "owner"],
                     },
                     "based_asccp_manifest": {
                         "type": "object",
                         "description": "ASCCP information that this ASBIEP is based on",
                         "properties": {
-                            "asccp_manifest_id": {"type": "integer",
-                                                  "description": "Unique identifier for the ASCCP manifest",
-                                                  "example": 12347},
-                            "asccp_id": {"type": "integer", "description": "Unique identifier for the ASCCP",
-                                         "example": 6789},
-                            "role_of_acc_manifest_id": {"type": "integer", "description": "Role of ACC manifest ID",
-                                                        "example": 12349},
-                            "guid": {"type": "string", "description": "Unique identifier within the release",
-                                     "example": "a1b2c3d4e5f6789012345678901234ab"},
-                            "den": {"type": ["string", "null"], "description": "Data Element Name",
-                                    "example": "Purchase Order. Details"},
-                            "property_term": {"type": ["string", "null"], "description": "Property term",
-                                              "example": "Details"},
-                            "definition": {"type": ["string", "null"], "description": "Definition of the ASCCP",
-                                           "example": "Details of the purchase order"},
-                            "definition_source": {"type": ["string", "null"], "description": "Source of the definition",
-                                                  "example": "https://example.com/spec"},
-                            "is_deprecated": {"type": "boolean", "description": "Whether the ASCCP is deprecated",
-                                              "example": False}
+                            "asccp_manifest_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the ASCCP manifest",
+                                "example": 12347,
+                            },
+                            "asccp_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the ASCCP",
+                                "example": 6789,
+                            },
+                            "role_of_acc_manifest_id": {
+                                "type": "integer",
+                                "description": "Role of ACC manifest ID",
+                                "example": 12349,
+                            },
+                            "guid": {
+                                "type": "string",
+                                "description": "Unique identifier within the release",
+                                "example": "a1b2c3d4e5f6789012345678901234ab",
+                            },
+                            "den": {
+                                "type": ["string", "null"],
+                                "description": "Data Element Name",
+                                "example": "Purchase Order. Details",
+                            },
+                            "property_term": {
+                                "type": ["string", "null"],
+                                "description": "Property term",
+                                "example": "Details",
+                            },
+                            "definition": {
+                                "type": ["string", "null"],
+                                "description": "Definition of the ASCCP",
+                                "example": "Details of the purchase order",
+                            },
+                            "definition_source": {
+                                "type": ["string", "null"],
+                                "description": "Source of the definition",
+                                "example": "https://example.com/spec",
+                            },
+                            "is_deprecated": {
+                                "type": "boolean",
+                                "description": "Whether the ASCCP is deprecated",
+                                "example": False,
+                            },
                         },
-                        "required": ["asccp_manifest_id", "asccp_id", "role_of_acc_manifest_id", "guid", "den",
-                                     "property_term", "is_deprecated"]
+                        "required": [
+                            "asccp_manifest_id",
+                            "asccp_id",
+                            "role_of_acc_manifest_id",
+                            "guid",
+                            "den",
+                            "property_term",
+                            "is_deprecated",
+                        ],
                     },
                     "role_of_abie": {
                         "type": "object",
                         "description": "Role of ABIE information",
                         "properties": {
-                            "abie_id": {"type": ["integer", "null"],
-                                        "description": "Unique identifier for the ABIE. This can be passed to create_asbie() and create_bbie() as the from_abie_id parameter.",
-                                        "example": 12350},
-                            "guid": {"type": ["string", "null"], "description": "Unique identifier for the ABIE",
-                                     "example": "a1b2c3d4e5f6789012345678901234ab"},
+                            "abie_id": {
+                                "type": ["integer", "null"],
+                                "description": "Unique identifier for the ABIE. This can be passed to create_asbie() and create_bbie() as the from_abie_id parameter.",
+                                "example": 12350,
+                            },
+                            "guid": {
+                                "type": ["string", "null"],
+                                "description": "Unique identifier for the ABIE",
+                                "example": "a1b2c3d4e5f6789012345678901234ab",
+                            },
                             "based_acc_manifest": {
                                 "type": "object",
                                 "description": "Based ACC manifest information",
                                 "properties": {
-                                    "acc_manifest_id": {"type": "integer",
-                                                        "description": "Unique identifier for the ACC manifest",
-                                                        "example": 12351},
-                                    "acc_id": {"type": "integer", "description": "Unique identifier for the ACC",
-                                               "example": 7890},
-                                    "guid": {"type": "string", "description": "Unique identifier for the ACC",
-                                             "example": "a1b2c3d4e5f6789012345678901234ab"},
-                                    "den": {"type": "string", "description": "Data Element Name",
-                                            "example": "Purchase Order. Purchase Order"},
-                                    "object_class_term": {"type": "string", "description": "Object class term",
-                                                          "example": "Purchase Order"},
-                                    "definition": {"type": ["string", "null"], "description": "Definition of the ACC",
-                                                   "example": "A purchase order aggregation"},
-                                    "definition_source": {"type": ["string", "null"],
-                                                          "description": "Source of the definition",
-                                                          "example": "https://example.com/spec"},
-                                    "is_deprecated": {"type": "boolean", "description": "Whether the ACC is deprecated",
-                                                      "example": False}
+                                    "acc_manifest_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the ACC manifest",
+                                        "example": 12351,
+                                    },
+                                    "acc_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the ACC",
+                                        "example": 7890,
+                                    },
+                                    "guid": {
+                                        "type": "string",
+                                        "description": "Unique identifier for the ACC",
+                                        "example": "a1b2c3d4e5f6789012345678901234ab",
+                                    },
+                                    "den": {
+                                        "type": "string",
+                                        "description": "Data Element Name",
+                                        "example": "Purchase Order. Purchase Order",
+                                    },
+                                    "object_class_term": {
+                                        "type": "string",
+                                        "description": "Object class term",
+                                        "example": "Purchase Order",
+                                    },
+                                    "definition": {
+                                        "type": ["string", "null"],
+                                        "description": "Definition of the ACC",
+                                        "example": "A purchase order aggregation",
+                                    },
+                                    "definition_source": {
+                                        "type": ["string", "null"],
+                                        "description": "Source of the definition",
+                                        "example": "https://example.com/spec",
+                                    },
+                                    "is_deprecated": {
+                                        "type": "boolean",
+                                        "description": "Whether the ACC is deprecated",
+                                        "example": False,
+                                    },
                                 },
-                                "required": ["acc_manifest_id", "acc_id", "guid", "den", "object_class_term",
-                                             "is_deprecated"]
+                                "required": [
+                                    "acc_manifest_id",
+                                    "acc_id",
+                                    "guid",
+                                    "den",
+                                    "object_class_term",
+                                    "is_deprecated",
+                                ],
                             },
-                            "definition": {"type": ["string", "null"], "description": "Definition of the ABIE",
-                                           "example": "A purchase order aggregation"},
-                            "remark": {"type": ["string", "null"], "description": "Remarks about the ABIE",
-                                       "example": "Used for procurement"},
+                            "definition": {
+                                "type": ["string", "null"],
+                                "description": "Definition of the ABIE",
+                                "example": "A purchase order aggregation",
+                            },
+                            "remark": {
+                                "type": ["string", "null"],
+                                "description": "Remarks about the ABIE",
+                                "example": "Used for procurement",
+                            },
                             "relationships": {
                                 "type": "array",
                                 "description": "List of relationships (ASBIE/BBIE) displayed as children under the ABIE. Each relationship has an 'is_used' property: when is_used=True, the relationship is profiled for practical use (asbie_id/bbie_id will be created), when is_used=False, it shows available relationships for profiling. These relationships can be further explored using get_asbie_by_asbie_id(), get_asbie_by_based_ascc_manifest_id(), get_bbie_by_bbie_id(), and get_bbie_by_based_bcc_manifest_id() functions. This includes all nested relationships from the hierarchical CC (Core Component) structure, presented as a single flat list for traversal.",
@@ -1405,215 +2099,347 @@ async def get_top_level_asbiep(
                                             "type": "object",
                                             "description": "ASBIE (Association Business Information Entity) relationship",
                                             "properties": {
-                                                "component_type": {"type": "string",
-                                                                   "description": "Type of relationship, always 'ASBIE' for this type",
-                                                                   "example": "ASBIE"},
-                                                "asbie_id": {"type": ["integer", "null"],
-                                                             "description": "Unique identifier for the ASBIE (base entity ID, None if is_used=False)",
-                                                             "example": 12345},
-                                                "guid": {"type": ["string", "null"],
-                                                         "description": "Globally unique identifier for the ASBIE (if available)",
-                                                         "example": "a1b2c3d4e5f6789012345678901234ab"},
-                                                "is_used": {"type": "boolean",
-                                                            "description": "Whether this component is currently being used (profiled) in the BIE (True means asbie_id exists)",
-                                                            "example": True},
-                                                "cardinality_min": {"type": "integer",
-                                                                    "description": "Minimum cardinality (minimum number of occurrences required, typically 0 or 1)",
-                                                                    "example": 0},
-                                                "cardinality_max": {"type": "integer",
-                                                                    "description": "Maximum cardinality (maximum number of occurrences allowed, -1 means unbounded)",
-                                                                    "example": 1},
-                                                "is_nillable": {"type": "boolean",
-                                                                "description": "Whether the component can have a nil/null value",
-                                                                "example": False},
-                                                "remark": {"type": ["string", "null"],
-                                                           "description": "Additional remarks or notes about the component",
-                                                           "example": "Used for purchase orders"},
+                                                "component_type": {
+                                                    "type": "string",
+                                                    "description": "Type of relationship, always 'ASBIE' for this type",
+                                                    "example": "ASBIE",
+                                                },
+                                                "asbie_id": {
+                                                    "type": ["integer", "null"],
+                                                    "description": "Unique identifier for the ASBIE (base entity ID, None if is_used=False)",
+                                                    "example": 12345,
+                                                },
+                                                "guid": {
+                                                    "type": ["string", "null"],
+                                                    "description": "Globally unique identifier for the ASBIE (if available)",
+                                                    "example": "a1b2c3d4e5f6789012345678901234ab",
+                                                },
+                                                "is_used": {
+                                                    "type": "boolean",
+                                                    "description": "Whether this component is currently being used (profiled) in the BIE (True means asbie_id exists)",
+                                                    "example": True,
+                                                },
+                                                "cardinality_min": {
+                                                    "type": "integer",
+                                                    "description": "Minimum cardinality (minimum number of occurrences required, typically 0 or 1)",
+                                                    "example": 0,
+                                                },
+                                                "cardinality_max": {
+                                                    "type": "integer",
+                                                    "description": "Maximum cardinality (maximum number of occurrences allowed, -1 means unbounded)",
+                                                    "example": 1,
+                                                },
+                                                "is_nillable": {
+                                                    "type": "boolean",
+                                                    "description": "Whether the component can have a nil/null value",
+                                                    "example": False,
+                                                },
+                                                "remark": {
+                                                    "type": ["string", "null"],
+                                                    "description": "Additional remarks or notes about the component",
+                                                    "example": "Used for purchase orders",
+                                                },
                                                 "based_ascc": {
                                                     "type": "object",
                                                     "description": "ASCC (Association Core Component) information that this ASBIE component is based on",
                                                     "properties": {
-                                                        "ascc_manifest_id": {"type": "integer",
-                                                                             "description": "Unique identifier for the ASCC manifest. This can be passed to create_asbie() as the based_ascc_manifest_id parameter.",
-                                                                             "example": 12345},
-                                                        "ascc_id": {"type": "integer",
-                                                                    "description": "Unique identifier for the ASCC",
-                                                                    "example": 6789},
-                                                        "guid": {"type": "string",
-                                                                 "description": "Unique identifier within the release",
-                                                                 "example": "a1b2c3d4e5f6789012345678901234ab"},
-                                                        "den": {"type": "string",
-                                                                "description": "Dictionary Entry Name (DEN)",
-                                                                "example": "Purchase Order. Details"},
-                                                        "cardinality_min": {"type": "integer",
-                                                                            "description": "Minimum cardinality",
-                                                                            "example": 0},
-                                                        "cardinality_max": {"type": "integer",
-                                                                            "description": "Maximum cardinality",
-                                                                            "example": 1},
-                                                        "is_deprecated": {"type": "boolean",
-                                                                          "description": "Whether the ASCC is deprecated",
-                                                                          "example": False},
-                                                        "definition": {"type": ["string", "null"],
-                                                                       "description": "Definition of the ASCC",
-                                                                       "example": "Details of the purchase order"},
-                                                        "definition_source": {"type": ["string", "null"],
-                                                                              "description": "Source of the definition",
-                                                                              "example": "https://example.com/spec"},
-                                                        "from_acc_manifest_id": {"type": "integer",
-                                                                                 "description": "Source ACC manifest ID",
-                                                                                 "example": 12346},
-                                                        "to_asccp_manifest_id": {"type": "integer",
-                                                                                 "description": "Target ASCCP manifest ID",
-                                                                                 "example": 12347}
+                                                        "ascc_manifest_id": {
+                                                            "type": "integer",
+                                                            "description": "Unique identifier for the ASCC manifest. This can be passed to create_asbie() as the based_ascc_manifest_id parameter.",
+                                                            "example": 12345,
+                                                        },
+                                                        "ascc_id": {
+                                                            "type": "integer",
+                                                            "description": "Unique identifier for the ASCC",
+                                                            "example": 6789,
+                                                        },
+                                                        "guid": {
+                                                            "type": "string",
+                                                            "description": "Unique identifier within the release",
+                                                            "example": "a1b2c3d4e5f6789012345678901234ab",
+                                                        },
+                                                        "den": {
+                                                            "type": "string",
+                                                            "description": "Dictionary Entry Name (DEN)",
+                                                            "example": "Purchase Order. Details",
+                                                        },
+                                                        "cardinality_min": {
+                                                            "type": "integer",
+                                                            "description": "Minimum cardinality",
+                                                            "example": 0,
+                                                        },
+                                                        "cardinality_max": {
+                                                            "type": "integer",
+                                                            "description": "Maximum cardinality",
+                                                            "example": 1,
+                                                        },
+                                                        "is_deprecated": {
+                                                            "type": "boolean",
+                                                            "description": "Whether the ASCC is deprecated",
+                                                            "example": False,
+                                                        },
+                                                        "definition": {
+                                                            "type": ["string", "null"],
+                                                            "description": "Definition of the ASCC",
+                                                            "example": "Details of the purchase order",
+                                                        },
+                                                        "definition_source": {
+                                                            "type": ["string", "null"],
+                                                            "description": "Source of the definition",
+                                                            "example": "https://example.com/spec",
+                                                        },
+                                                        "from_acc_manifest_id": {
+                                                            "type": "integer",
+                                                            "description": "Source ACC manifest ID",
+                                                            "example": 12346,
+                                                        },
+                                                        "to_asccp_manifest_id": {
+                                                            "type": "integer",
+                                                            "description": "Target ASCCP manifest ID",
+                                                            "example": 12347,
+                                                        },
                                                     },
-                                                    "required": ["ascc_manifest_id", "ascc_id", "guid", "den",
-                                                                 "cardinality_min", "cardinality_max", "is_deprecated",
-                                                                 "from_acc_manifest_id", "to_asccp_manifest_id"]
+                                                    "required": [
+                                                        "ascc_manifest_id",
+                                                        "ascc_id",
+                                                        "guid",
+                                                        "den",
+                                                        "cardinality_min",
+                                                        "cardinality_max",
+                                                        "is_deprecated",
+                                                        "from_acc_manifest_id",
+                                                        "to_asccp_manifest_id",
+                                                    ],
                                                 },
-                                                "to_asbiep_id": {"type": ["integer", "null"],
-                                                                 "description": "Unique identifier for the target ASBIEP that this ASBIE connects to (if available)",
-                                                                 "example": 12348}
+                                                "to_asbiep_id": {
+                                                    "type": ["integer", "null"],
+                                                    "description": "Unique identifier for the target ASBIEP that this ASBIE connects to (if available)",
+                                                    "example": 12348,
+                                                },
                                             },
-                                            "required": ["component_type", "is_used",
-                                                         "cardinality_min", "cardinality_max", "is_nillable",
-                                                         "based_ascc"]
+                                            "required": [
+                                                "component_type",
+                                                "is_used",
+                                                "cardinality_min",
+                                                "cardinality_max",
+                                                "is_nillable",
+                                                "based_ascc",
+                                            ],
                                         },
                                         {
                                             "type": "object",
                                             "description": "BBIE (Basic Business Information Entity) relationship",
                                             "properties": {
-                                                "component_type": {"type": "string",
-                                                                   "description": "Type of relationship, always 'BBIE' for this type",
-                                                                   "example": "BBIE"},
-                                                "bbie_id": {"type": ["integer", "null"],
-                                                            "description": "Unique identifier for the BBIE (base entity ID, None if is_used=False)",
-                                                            "example": 12345},
-                                                "guid": {"type": ["string", "null"],
-                                                         "description": "Globally unique identifier for the BBIE (if available)",
-                                                         "example": "a1b2c3d4e5f6789012345678901234ab"},
-                                                "is_used": {"type": "boolean",
-                                                            "description": "Whether this component is currently being used (profiled) in the BIE (True means bbie_id exists)",
-                                                            "example": True},
-                                                "cardinality_min": {"type": "integer",
-                                                                    "description": "Minimum cardinality (minimum number of occurrences required, typically 0 or 1)",
-                                                                    "example": 0},
-                                                "cardinality_max": {"type": "integer",
-                                                                    "description": "Maximum cardinality (maximum number of occurrences allowed, -1 means unbounded)",
-                                                                    "example": 1},
-                                                "is_nillable": {"type": "boolean",
-                                                                "description": "Whether the component can have a nil/null value",
-                                                                "example": False},
-                                                "remark": {"type": ["string", "null"],
-                                                           "description": "Additional remarks or notes about the component",
-                                                           "example": "Used for purchase orders"},
+                                                "component_type": {
+                                                    "type": "string",
+                                                    "description": "Type of relationship, always 'BBIE' for this type",
+                                                    "example": "BBIE",
+                                                },
+                                                "bbie_id": {
+                                                    "type": ["integer", "null"],
+                                                    "description": "Unique identifier for the BBIE (base entity ID, None if is_used=False)",
+                                                    "example": 12345,
+                                                },
+                                                "guid": {
+                                                    "type": ["string", "null"],
+                                                    "description": "Globally unique identifier for the BBIE (if available)",
+                                                    "example": "a1b2c3d4e5f6789012345678901234ab",
+                                                },
+                                                "is_used": {
+                                                    "type": "boolean",
+                                                    "description": "Whether this component is currently being used (profiled) in the BIE (True means bbie_id exists)",
+                                                    "example": True,
+                                                },
+                                                "cardinality_min": {
+                                                    "type": "integer",
+                                                    "description": "Minimum cardinality (minimum number of occurrences required, typically 0 or 1)",
+                                                    "example": 0,
+                                                },
+                                                "cardinality_max": {
+                                                    "type": "integer",
+                                                    "description": "Maximum cardinality (maximum number of occurrences allowed, -1 means unbounded)",
+                                                    "example": 1,
+                                                },
+                                                "is_nillable": {
+                                                    "type": "boolean",
+                                                    "description": "Whether the component can have a nil/null value",
+                                                    "example": False,
+                                                },
+                                                "remark": {
+                                                    "type": ["string", "null"],
+                                                    "description": "Additional remarks or notes about the component",
+                                                    "example": "Used for purchase orders",
+                                                },
                                                 "based_bcc": {
                                                     "type": "object",
                                                     "description": "BCC (Basic Core Component) information that this BBIE component is based on",
                                                     "properties": {
-                                                        "bcc_manifest_id": {"type": "integer",
-                                                                            "description": "Unique identifier for the BCC manifest",
-                                                                            "example": 12345},
-                                                        "bcc_id": {"type": "integer",
-                                                                   "description": "Unique identifier for the BCC",
-                                                                   "example": 6789},
-                                                        "guid": {"type": "string",
-                                                                 "description": "Unique identifier within the release",
-                                                                 "example": "a1b2c3d4e5f6789012345678901234ab"},
-                                                        "den": {"type": "string",
-                                                                "description": "Dictionary Entry Name (DEN)",
-                                                                "example": "Purchase Order. Amount"},
-                                                        "cardinality_min": {"type": "integer",
-                                                                            "description": "Minimum cardinality",
-                                                                            "example": 0},
-                                                        "cardinality_max": {"type": "integer",
-                                                                            "description": "Maximum cardinality",
-                                                                            "example": 1},
-                                                        "entity_type": {"type": ["string", "null"],
-                                                                        "description": "Entity type: 'Attribute' or 'Element'",
-                                                                        "example": "Element"},
-                                                        "is_nillable": {"type": "boolean",
-                                                                        "description": "Whether the BCC is nillable",
-                                                                        "example": False},
-                                                        "is_deprecated": {"type": "boolean",
-                                                                          "description": "Whether the BCC is deprecated",
-                                                                          "example": False},
-                                                        "definition": {"type": ["string", "null"],
-                                                                       "description": "Definition of the BCC",
-                                                                       "example": "A monetary amount"},
-                                                        "definition_source": {"type": ["string", "null"],
-                                                                              "description": "Source of the definition",
-                                                                              "example": "https://example.com/spec"},
-                                                        "from_acc_manifest_id": {"type": "integer",
-                                                                                 "description": "Source ACC manifest ID",
-                                                                                 "example": 12346},
-                                                        "to_bccp_manifest_id": {"type": "integer",
-                                                                                "description": "Target BCCP manifest ID",
-                                                                                "example": 12347}
+                                                        "bcc_manifest_id": {
+                                                            "type": "integer",
+                                                            "description": "Unique identifier for the BCC manifest",
+                                                            "example": 12345,
+                                                        },
+                                                        "bcc_id": {
+                                                            "type": "integer",
+                                                            "description": "Unique identifier for the BCC",
+                                                            "example": 6789,
+                                                        },
+                                                        "guid": {
+                                                            "type": "string",
+                                                            "description": "Unique identifier within the release",
+                                                            "example": "a1b2c3d4e5f6789012345678901234ab",
+                                                        },
+                                                        "den": {
+                                                            "type": "string",
+                                                            "description": "Dictionary Entry Name (DEN)",
+                                                            "example": "Purchase Order. Amount",
+                                                        },
+                                                        "cardinality_min": {
+                                                            "type": "integer",
+                                                            "description": "Minimum cardinality",
+                                                            "example": 0,
+                                                        },
+                                                        "cardinality_max": {
+                                                            "type": "integer",
+                                                            "description": "Maximum cardinality",
+                                                            "example": 1,
+                                                        },
+                                                        "entity_type": {
+                                                            "type": ["string", "null"],
+                                                            "description": "Entity type: 'Attribute' or 'Element'",
+                                                            "example": "Element",
+                                                        },
+                                                        "is_nillable": {
+                                                            "type": "boolean",
+                                                            "description": "Whether the BCC is nillable",
+                                                            "example": False,
+                                                        },
+                                                        "is_deprecated": {
+                                                            "type": "boolean",
+                                                            "description": "Whether the BCC is deprecated",
+                                                            "example": False,
+                                                        },
+                                                        "definition": {
+                                                            "type": ["string", "null"],
+                                                            "description": "Definition of the BCC",
+                                                            "example": "A monetary amount",
+                                                        },
+                                                        "definition_source": {
+                                                            "type": ["string", "null"],
+                                                            "description": "Source of the definition",
+                                                            "example": "https://example.com/spec",
+                                                        },
+                                                        "from_acc_manifest_id": {
+                                                            "type": "integer",
+                                                            "description": "Source ACC manifest ID",
+                                                            "example": 12346,
+                                                        },
+                                                        "to_bccp_manifest_id": {
+                                                            "type": "integer",
+                                                            "description": "Target BCCP manifest ID",
+                                                            "example": 12347,
+                                                        },
                                                     },
-                                                    "required": ["bcc_manifest_id", "bcc_id", "guid", "den",
-                                                                 "cardinality_min", "cardinality_max", "is_nillable",
-                                                                 "is_deprecated", "from_acc_manifest_id",
-                                                                 "to_bccp_manifest_id"]
+                                                    "required": [
+                                                        "bcc_manifest_id",
+                                                        "bcc_id",
+                                                        "guid",
+                                                        "den",
+                                                        "cardinality_min",
+                                                        "cardinality_max",
+                                                        "is_nillable",
+                                                        "is_deprecated",
+                                                        "from_acc_manifest_id",
+                                                        "to_bccp_manifest_id",
+                                                    ],
                                                 },
                                                 "primitiveRestriction": {
                                                     "type": ["object", "null"],
                                                     "description": "Primitive restriction information for the BBIE",
                                                     "properties": {
-                                                        "xbtManifestId": {"type": ["integer", "null"],
-                                                                          "description": "XBT (eXtended Built-in Type) manifest ID",
-                                                                          "example": None},
-                                                        "codeListManifestId": {"type": ["integer", "null"],
-                                                                               "description": "Code list manifest ID",
-                                                                               "example": None},
-                                                        "agencyIdListManifestId": {"type": ["integer", "null"],
-                                                                                   "description": "Agency ID list manifest ID",
-                                                                                   "example": None}
+                                                        "xbtManifestId": {
+                                                            "type": ["integer", "null"],
+                                                            "description": "XBT (eXtended Built-in Type) manifest ID",
+                                                            "example": None,
+                                                        },
+                                                        "codeListManifestId": {
+                                                            "type": ["integer", "null"],
+                                                            "description": "Code list manifest ID",
+                                                            "example": None,
+                                                        },
+                                                        "agencyIdListManifestId": {
+                                                            "type": ["integer", "null"],
+                                                            "description": "Agency ID list manifest ID",
+                                                            "example": None,
+                                                        },
                                                     },
-                                                    "required": ["xbtManifestId", "codeListManifestId",
-                                                                 "agencyIdListManifestId"]
+                                                    "required": [
+                                                        "xbtManifestId",
+                                                        "codeListManifestId",
+                                                        "agencyIdListManifestId",
+                                                    ],
                                                 },
                                                 "valueConstraint": {
                                                     "type": ["object", "null"],
                                                     "description": "Value constraint information for the BBIE",
                                                     "properties": {
-                                                        "default_value": {"type": ["string", "null"],
-                                                                          "description": "Default value for the BBIE",
-                                                                          "example": None},
-                                                        "fixed_value": {"type": ["string", "null"],
-                                                                        "description": "Fixed value for the BBIE",
-                                                                        "example": None}
+                                                        "default_value": {
+                                                            "type": ["string", "null"],
+                                                            "description": "Default value for the BBIE",
+                                                            "example": None,
+                                                        },
+                                                        "fixed_value": {
+                                                            "type": ["string", "null"],
+                                                            "description": "Fixed value for the BBIE",
+                                                            "example": None,
+                                                        },
                                                     },
-                                                    "required": ["default_value", "fixed_value"]
+                                                    "required": ["default_value", "fixed_value"],
                                                 },
                                                 "facet": {
                                                     "type": ["object", "null"],
                                                     "description": "Facet restriction information for string values",
                                                     "properties": {
-                                                        "facet_min_length": {"type": ["integer", "null"],
-                                                                             "description": "Minimum length constraint for string values (facet restriction)",
-                                                                             "example": None},
-                                                        "facet_max_length": {"type": ["integer", "null"],
-                                                                             "description": "Maximum length constraint for string values (facet restriction)",
-                                                                             "example": None},
-                                                        "facet_pattern": {"type": ["string", "null"],
-                                                                          "description": "Pattern constraint (regular expression) for string values (facet restriction)",
-                                                                          "example": None}
+                                                        "facet_min_length": {
+                                                            "type": ["integer", "null"],
+                                                            "description": "Minimum length constraint for string values (facet restriction)",
+                                                            "example": None,
+                                                        },
+                                                        "facet_max_length": {
+                                                            "type": ["integer", "null"],
+                                                            "description": "Maximum length constraint for string values (facet restriction)",
+                                                            "example": None,
+                                                        },
+                                                        "facet_pattern": {
+                                                            "type": ["string", "null"],
+                                                            "description": "Pattern constraint (regular expression) for string values (facet restriction)",
+                                                            "example": None,
+                                                        },
                                                     },
-                                                    "required": ["facet_min_length", "facet_max_length",
-                                                                 "facet_pattern"]
+                                                    "required": [
+                                                        "facet_min_length",
+                                                        "facet_max_length",
+                                                        "facet_pattern",
+                                                    ],
                                                 },
-                                                "to_bbiep_id": {"type": ["integer", "null"],
-                                                                "description": "Unique identifier for the target BBIEP that this BBIE connects to (if available)",
-                                                                "example": 12348}
+                                                "to_bbiep_id": {
+                                                    "type": ["integer", "null"],
+                                                    "description": "Unique identifier for the target BBIEP that this BBIE connects to (if available)",
+                                                    "example": 12348,
+                                                },
                                             },
-                                            "required": ["component_type", "is_used",
-                                                         "cardinality_min", "cardinality_max", "is_nillable",
-                                                         "based_bcc"]
-                                        }
+                                            "required": [
+                                                "component_type",
+                                                "is_used",
+                                                "cardinality_min",
+                                                "cardinality_max",
+                                                "is_nillable",
+                                                "based_bcc",
+                                            ],
+                                        },
                                     ]
                                 },
-                                "example": []
+                                "example": [],
                             },
                             "created": {
                                 "type": ["object", "null"],
@@ -1623,25 +2449,37 @@ async def get_top_level_asbiep(
                                         "type": ["object", "null"],
                                         "description": "User who created the ABIE",
                                         "properties": {
-                                            "user_id": {"type": "integer",
-                                                        "description": "Unique identifier for the user",
-                                                        "example": 100000001},
-                                            "login_id": {"type": "string", "description": "User's login identifier",
-                                                         "example": "john.doe"},
-                                            "username": {"type": "string", "description": "Display name of the user",
-                                                         "example": "John Doe"},
-                                            "roles": {"type": "array", "items": {"type": "string",
-                                                                                 "enum": ["Admin", "Developer",
-                                                                                          "End-User"]},
-                                                      "description": "List of roles assigned to the user",
-                                                      "example": ["End-User"]}
+                                            "user_id": {
+                                                "type": "integer",
+                                                "description": "Unique identifier for the user",
+                                                "example": 100000001,
+                                            },
+                                            "login_id": {
+                                                "type": "string",
+                                                "description": "User's login identifier",
+                                                "example": "john.doe",
+                                            },
+                                            "username": {
+                                                "type": "string",
+                                                "description": "Display name of the user",
+                                                "example": "John Doe",
+                                            },
+                                            "roles": {
+                                                "type": "array",
+                                                "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                                "description": "List of roles assigned to the user",
+                                                "example": ["End-User"],
+                                            },
                                         },
-                                        "required": ["user_id", "login_id", "username", "roles"]
+                                        "required": ["user_id", "login_id", "username", "roles"],
                                     },
-                                    "when": {"type": ["string", "null"], "format": "date-time",
-                                             "description": "Timestamp when the ABIE was created",
-                                             "example": "2023-01-15T10:30:00Z"}
-                                }
+                                    "when": {
+                                        "type": ["string", "null"],
+                                        "format": "date-time",
+                                        "description": "Timestamp when the ABIE was created",
+                                        "example": "2023-01-15T10:30:00Z",
+                                    },
+                                },
                             },
                             "last_updated": {
                                 "type": ["object", "null"],
@@ -1651,36 +2489,57 @@ async def get_top_level_asbiep(
                                         "type": ["object", "null"],
                                         "description": "User who last updated the ABIE",
                                         "properties": {
-                                            "user_id": {"type": "integer",
-                                                        "description": "Unique identifier for the user",
-                                                        "example": 100000001},
-                                            "login_id": {"type": "string", "description": "User's login identifier",
-                                                         "example": "john.doe"},
-                                            "username": {"type": "string", "description": "Display name of the user",
-                                                         "example": "John Doe"},
-                                            "roles": {"type": "array", "items": {"type": "string",
-                                                                                 "enum": ["Admin", "Developer",
-                                                                                          "End-User"]},
-                                                      "description": "List of roles assigned to the user",
-                                                      "example": ["End-User"]}
+                                            "user_id": {
+                                                "type": "integer",
+                                                "description": "Unique identifier for the user",
+                                                "example": 100000001,
+                                            },
+                                            "login_id": {
+                                                "type": "string",
+                                                "description": "User's login identifier",
+                                                "example": "john.doe",
+                                            },
+                                            "username": {
+                                                "type": "string",
+                                                "description": "Display name of the user",
+                                                "example": "John Doe",
+                                            },
+                                            "roles": {
+                                                "type": "array",
+                                                "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                                "description": "List of roles assigned to the user",
+                                                "example": ["End-User"],
+                                            },
                                         },
-                                        "required": ["user_id", "login_id", "username", "roles"]
+                                        "required": ["user_id", "login_id", "username", "roles"],
                                     },
-                                    "when": {"type": ["string", "null"], "format": "date-time",
-                                             "description": "Timestamp when the ABIE was last updated",
-                                             "example": "2023-01-15T14:45:00Z"}
-                                }
-                            }
+                                    "when": {
+                                        "type": ["string", "null"],
+                                        "format": "date-time",
+                                        "description": "Timestamp when the ABIE was last updated",
+                                        "example": "2023-01-15T14:45:00Z",
+                                    },
+                                },
+                            },
                         },
-                        "required": ["based_acc_manifest"]
+                        "required": ["based_acc_manifest"],
                     },
-                    "definition": {"type": ["string", "null"], "description": "Definition of the ASBIEP",
-                                   "example": "A purchase order property"},
-                    "remark": {"type": ["string", "null"], "description": "Remarks about the ASBIEP",
-                               "example": "Used for procurement processes"},
+                    "definition": {
+                        "type": ["string", "null"],
+                        "description": "Definition of the ASBIEP",
+                        "example": "A purchase order property",
+                    },
+                    "remark": {
+                        "type": ["string", "null"],
+                        "description": "Remarks about the ASBIEP",
+                        "example": "Used for procurement processes",
+                    },
                     "biz_term": {"type": ["string", "null"], "description": "Business term", "example": "PO"},
-                    "display_name": {"type": ["string", "null"], "description": "Display name of the ASBIEP",
-                                     "example": "Purchase Order Property"},
+                    "display_name": {
+                        "type": ["string", "null"],
+                        "description": "Display name of the ASBIEP",
+                        "example": "Purchase Order Property",
+                    },
                     "created": {
                         "type": ["object", "null"],
                         "description": "Creation information",
@@ -1689,23 +2548,37 @@ async def get_top_level_asbiep(
                                 "type": ["object", "null"],
                                 "description": "User who created the ASBIEP",
                                 "properties": {
-                                    "user_id": {"type": "integer", "description": "Unique identifier for the user",
-                                                "example": 100000001},
-                                    "login_id": {"type": "string", "description": "User's login identifier",
-                                                 "example": "john.doe"},
-                                    "username": {"type": "string", "description": "Display name of the user",
-                                                 "example": "John Doe"},
-                                    "roles": {"type": "array",
-                                              "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
-                                              "description": "List of roles assigned to the user",
-                                              "example": ["End-User"]}
+                                    "user_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the user",
+                                        "example": 100000001,
+                                    },
+                                    "login_id": {
+                                        "type": "string",
+                                        "description": "User's login identifier",
+                                        "example": "john.doe",
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "description": "Display name of the user",
+                                        "example": "John Doe",
+                                    },
+                                    "roles": {
+                                        "type": "array",
+                                        "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                        "description": "List of roles assigned to the user",
+                                        "example": ["End-User"],
+                                    },
                                 },
-                                "required": ["user_id", "login_id", "username", "roles"]
+                                "required": ["user_id", "login_id", "username", "roles"],
                             },
-                            "when": {"type": ["string", "null"], "format": "date-time",
-                                     "description": "Timestamp when the ASBIEP was created",
-                                     "example": "2023-01-15T10:30:00Z"}
-                        }
+                            "when": {
+                                "type": ["string", "null"],
+                                "format": "date-time",
+                                "description": "Timestamp when the ASBIEP was created",
+                                "example": "2023-01-15T10:30:00Z",
+                            },
+                        },
                     },
                     "last_updated": {
                         "type": ["object", "null"],
@@ -1715,51 +2588,88 @@ async def get_top_level_asbiep(
                                 "type": ["object", "null"],
                                 "description": "User who last updated the ASBIEP",
                                 "properties": {
-                                    "user_id": {"type": "integer", "description": "Unique identifier for the user",
-                                                "example": 100000001},
-                                    "login_id": {"type": "string", "description": "User's login identifier",
-                                                 "example": "john.doe"},
-                                    "username": {"type": "string", "description": "Display name of the user",
-                                                 "example": "John Doe"},
-                                    "roles": {"type": "array",
-                                              "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
-                                              "description": "List of roles assigned to the user",
-                                              "example": ["End-User"]}
+                                    "user_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the user",
+                                        "example": 100000001,
+                                    },
+                                    "login_id": {
+                                        "type": "string",
+                                        "description": "User's login identifier",
+                                        "example": "john.doe",
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "description": "Display name of the user",
+                                        "example": "John Doe",
+                                    },
+                                    "roles": {
+                                        "type": "array",
+                                        "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                        "description": "List of roles assigned to the user",
+                                        "example": ["End-User"],
+                                    },
                                 },
-                                "required": ["user_id", "login_id", "username", "roles"]
+                                "required": ["user_id", "login_id", "username", "roles"],
                             },
-                            "when": {"type": ["string", "null"], "format": "date-time",
-                                     "description": "Timestamp when the ASBIEP was last updated",
-                                     "example": "2023-01-15T14:45:00Z"}
-                        }
-                    }
+                            "when": {
+                                "type": ["string", "null"],
+                                "format": "date-time",
+                                "description": "Timestamp when the ASBIEP was last updated",
+                                "example": "2023-01-15T14:45:00Z",
+                            },
+                        },
+                    },
                 },
-                "required": ["based_asccp_manifest", "role_of_abie"]
+                "required": ["based_asccp_manifest", "role_of_abie"],
             },
-            "is_used": {"type": "boolean",
-                        "description": "Whether this ASBIE is currently being used (profiled) in the BIE",
-                        "example": True},
-            "cardinality_min": {"type": "integer",
-                                "description": "Minimum cardinality (minimum number of occurrences required, typically 0 or 1)",
-                                "example": 0},
-            "cardinality_max": {"type": "integer",
-                                "description": "Maximum cardinality (maximum number of occurrences allowed, -1 means unbounded)",
-                                "example": 1},
-            "is_nillable": {"type": "boolean", "description": "Whether the ASBIE can have a nil/null value",
-                            "example": False},
-            "definition": {"type": ["string", "null"],
-                           "description": "Definition to override the ASCC definition. If NULL, it means that the definition should be derived from the based CC",
-                           "example": "A purchase order detail"},
-            "remark": {"type": ["string", "null"], "description": "Additional remarks or notes about the ASBIE",
-                       "example": "Used for purchase orders"}
+            "is_used": {
+                "type": "boolean",
+                "description": "Whether this ASBIE is currently being used (profiled) in the BIE",
+                "example": True,
+            },
+            "cardinality_min": {
+                "type": "integer",
+                "description": "Minimum cardinality (minimum number of occurrences required, typically 0 or 1)",
+                "example": 0,
+            },
+            "cardinality_max": {
+                "type": "integer",
+                "description": "Maximum cardinality (maximum number of occurrences allowed, -1 means unbounded)",
+                "example": 1,
+            },
+            "is_nillable": {
+                "type": "boolean",
+                "description": "Whether the ASBIE can have a nil/null value",
+                "example": False,
+            },
+            "definition": {
+                "type": ["string", "null"],
+                "description": "Definition to override the ASCC definition. If NULL, it means that the definition should be derived from the based CC",
+                "example": "A purchase order detail",
+            },
+            "remark": {
+                "type": ["string", "null"],
+                "description": "Additional remarks or notes about the ASBIE",
+                "example": "Used for purchase orders",
+            },
         },
-        "required": ["owner_top_level_asbiep", "based_ascc", "to_asbiep", "is_used",
-                     "cardinality_min", "cardinality_max", "is_nillable"]
-    }
+        "required": [
+            "owner_top_level_asbiep",
+            "based_ascc",
+            "to_asbiep",
+            "is_used",
+            "cardinality_min",
+            "cardinality_max",
+            "is_nillable",
+        ],
+    },
 )
 async def get_asbie_by_asbie_id(
     asbie_id: Annotated[int, Field(gt=0, description="Unique identifier of the ASBIE to retrieve.")],
-    business_information_entity_service: BusinessInformationEntityService = Depends(get_business_information_entity_service),
+    business_information_entity_service: BusinessInformationEntityService = Depends(
+        get_business_information_entity_service
+    ),
 ) -> GetAsbieResponse:
     """
     Get an ASBIE (Association Business Information Entity) by its ASBIE ID.
@@ -1821,228 +2731,393 @@ async def get_asbie_by_asbie_id(
         "type": "object",
         "description": "Response containing ASBIE (Association Business Information Entity) information with its ASBIEP. Used for profiling core components – when is_used=True, the component is profiled for practical use (asbie_id will be created); when is_used=False, it shows all available components for profiling. IMPORTANT: Groups (component_type 3=SemanticGroup or 4=UserExtensionGroup) are automatically skipped in BIE expressions, so the BIE structure may differ from the CC structure. To find the correct from_abie_id for create_asbie, traverse the actual BIE structure recursively.",
         "properties": {
-            "asbie_id": {"type": ["integer", "null"],
-                         "description": "Unique identifier for the ASBIE (base entity ID, None if not yet created)",
-                         "example": 12345},
+            "asbie_id": {
+                "type": ["integer", "null"],
+                "description": "Unique identifier for the ASBIE (base entity ID, None if not yet created)",
+                "example": 12345,
+            },
             "owner_top_level_asbiep": {
                 "type": "object",
                 "description": "Top-Level ASBIEP information",
                 "properties": {
-                    "top_level_asbiep_id": {"type": "integer",
-                                            "description": "Unique identifier for the top-level ASBIEP",
-                                            "example": 12345},
+                    "top_level_asbiep_id": {
+                        "type": "integer",
+                        "description": "Unique identifier for the top-level ASBIEP",
+                        "example": 12345,
+                    },
                     "library": {
                         "type": "object",
                         "description": "Library information",
                         "properties": {
-                            "library_id": {"type": "integer", "description": "Unique identifier for the library",
-                                           "example": 1},
-                            "name": {"type": "string", "description": "Library name", "example": "OAGIS"}
+                            "library_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the library",
+                                "example": 1,
+                            },
+                            "name": {"type": "string", "description": "Library name", "example": "OAGIS"},
                         },
-                        "required": ["library_id", "name"]
+                        "required": ["library_id", "name"],
                     },
                     "release": {
                         "type": "object",
                         "description": "Release information",
                         "properties": {
-                            "release_id": {"type": "integer", "description": "Unique identifier for the release",
-                                           "example": 1},
-                            "release_num": {"type": "string", "description": "Release number",
-                                            "example": "10.6"},
-                            "state": {"type": "string", "description": "Release state", "example": "Published"}
+                            "release_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the release",
+                                "example": 1,
+                            },
+                            "release_num": {"type": "string", "description": "Release number", "example": "10.6"},
+                            "state": {"type": "string", "description": "Release state", "example": "Published"},
                         },
-                        "required": ["release_id", "release_num", "state"]
+                        "required": ["release_id", "release_num", "state"],
                     },
                     "version": {"type": ["string", "null"], "description": "Version number", "example": "1.0"},
-                    "status": {"type": ["string", "null"], "description": "Status of the top-level ASBIEP",
-                               "example": "Production"},
+                    "status": {
+                        "type": ["string", "null"],
+                        "description": "Status of the top-level ASBIEP",
+                        "example": "Production",
+                    },
                     "state": {"type": "string", "description": "State of the top-level ASBIEP", "example": "Published"},
-                    "is_deprecated": {"type": "boolean", "description": "Whether the top-level ASBIEP is deprecated",
-                                      "example": False},
-                    "deprecated_reason": {"type": ["string", "null"], "description": "Reason for deprecation",
-                                          "example": "Replaced by newer version"},
-                    "deprecated_remark": {"type": ["string", "null"],
-                                          "description": "Additional remarks about deprecation",
-                                          "example": "Use version 2.0 instead"},
+                    "is_deprecated": {
+                        "type": "boolean",
+                        "description": "Whether the top-level ASBIEP is deprecated",
+                        "example": False,
+                    },
+                    "deprecated_reason": {
+                        "type": ["string", "null"],
+                        "description": "Reason for deprecation",
+                        "example": "Replaced by newer version",
+                    },
+                    "deprecated_remark": {
+                        "type": ["string", "null"],
+                        "description": "Additional remarks about deprecation",
+                        "example": "Use version 2.0 instead",
+                    },
                     "owner": {
                         "type": "object",
                         "description": "Owner information",
                         "properties": {
-                            "user_id": {"type": "integer", "description": "Unique identifier for the user",
-                                        "example": 100000001},
-                            "login_id": {"type": "string", "description": "User's login identifier",
-                                         "example": "john.doe"},
-                            "username": {"type": "string", "description": "Display name of the user",
-                                         "example": "John Doe"},
-                            "roles": {"type": "array",
-                                      "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
-                                      "description": "List of roles assigned to the user", "example": ["End-User"]}
+                            "user_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the user",
+                                "example": 100000001,
+                            },
+                            "login_id": {
+                                "type": "string",
+                                "description": "User's login identifier",
+                                "example": "john.doe",
+                            },
+                            "username": {
+                                "type": "string",
+                                "description": "Display name of the user",
+                                "example": "John Doe",
+                            },
+                            "roles": {
+                                "type": "array",
+                                "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                "description": "List of roles assigned to the user",
+                                "example": ["End-User"],
+                            },
                         },
-                        "required": ["user_id", "login_id", "username", "roles"]
-                    }
+                        "required": ["user_id", "login_id", "username", "roles"],
+                    },
                 },
-                "required": ["top_level_asbiep_id", "library", "release", "state", "is_deprecated", "owner"]
+                "required": ["top_level_asbiep_id", "library", "release", "state", "is_deprecated", "owner"],
             },
-            "guid": {"type": ["string", "null"],
-                     "description": "Globally unique identifier for the ASBIE (if available)",
-                     "example": "a1b2c3d4e5f6789012345678901234ab"},
+            "guid": {
+                "type": ["string", "null"],
+                "description": "Globally unique identifier for the ASBIE (if available)",
+                "example": "a1b2c3d4e5f6789012345678901234ab",
+            },
             "based_ascc": {
                 "type": "object",
                 "description": "ASCC (Association Core Component) information that this ASBIE is based on",
                 "properties": {
-                    "ascc_manifest_id": {"type": "integer",
-                                         "description": "Unique identifier for the ASCC manifest. This can be passed to create_asbie() as the based_ascc_manifest_id parameter.",
-                                         "example": 12345},
+                    "ascc_manifest_id": {
+                        "type": "integer",
+                        "description": "Unique identifier for the ASCC manifest. This can be passed to create_asbie() as the based_ascc_manifest_id parameter.",
+                        "example": 12345,
+                    },
                     "ascc_id": {"type": "integer", "description": "Unique identifier for the ASCC", "example": 6789},
-                    "guid": {"type": "string", "description": "Unique identifier within the release",
-                             "example": "a1b2c3d4e5f6789012345678901234ab"},
-                    "den": {"type": "string", "description": "Dictionary Entry Name (DEN)",
-                            "example": "Purchase Order. Details"},
+                    "guid": {
+                        "type": "string",
+                        "description": "Unique identifier within the release",
+                        "example": "a1b2c3d4e5f6789012345678901234ab",
+                    },
+                    "den": {
+                        "type": "string",
+                        "description": "Dictionary Entry Name (DEN)",
+                        "example": "Purchase Order. Details",
+                    },
                     "cardinality_min": {"type": "integer", "description": "Minimum cardinality", "example": 0},
                     "cardinality_max": {"type": "integer", "description": "Maximum cardinality", "example": 1},
-                    "is_deprecated": {"type": "boolean", "description": "Whether the ASCC is deprecated",
-                                      "example": False},
-                    "definition": {"type": ["string", "null"], "description": "Definition of the ASCC",
-                                   "example": "Details of the purchase order"},
-                    "definition_source": {"type": ["string", "null"], "description": "Source of the definition",
-                                          "example": "https://example.com/spec"},
-                    "from_acc_manifest_id": {"type": "integer", "description": "Source ACC manifest ID",
-                                             "example": 12346},
-                    "to_asccp_manifest_id": {"type": "integer", "description": "Target ASCCP manifest ID",
-                                             "example": 12347}
+                    "is_deprecated": {
+                        "type": "boolean",
+                        "description": "Whether the ASCC is deprecated",
+                        "example": False,
+                    },
+                    "definition": {
+                        "type": ["string", "null"],
+                        "description": "Definition of the ASCC",
+                        "example": "Details of the purchase order",
+                    },
+                    "definition_source": {
+                        "type": ["string", "null"],
+                        "description": "Source of the definition",
+                        "example": "https://example.com/spec",
+                    },
+                    "from_acc_manifest_id": {
+                        "type": "integer",
+                        "description": "Source ACC manifest ID",
+                        "example": 12346,
+                    },
+                    "to_asccp_manifest_id": {
+                        "type": "integer",
+                        "description": "Target ASCCP manifest ID",
+                        "example": 12347,
+                    },
                 },
-                "required": ["ascc_manifest_id", "ascc_id", "guid", "den", "cardinality_min", "cardinality_max",
-                             "is_deprecated", "from_acc_manifest_id", "to_asccp_manifest_id"]
+                "required": [
+                    "ascc_manifest_id",
+                    "ascc_id",
+                    "guid",
+                    "den",
+                    "cardinality_min",
+                    "cardinality_max",
+                    "is_deprecated",
+                    "from_acc_manifest_id",
+                    "to_asccp_manifest_id",
+                ],
             },
             "to_asbiep": {
                 "type": "object",
                 "description": "ASBIEP (Association Business Information Entity Property) information",
                 "properties": {
-                    "asbiep_id": {"type": ["integer", "null"], "description": "Unique identifier for the ASBIEP",
-                                  "example": 12348},
+                    "asbiep_id": {
+                        "type": ["integer", "null"],
+                        "description": "Unique identifier for the ASBIEP",
+                        "example": 12348,
+                    },
                     "owner_top_level_asbiep": {
                         "type": ["object", "null"],
                         "description": "Top-Level ASBIEP information",
                         "properties": {
-                            "top_level_asbiep_id": {"type": "integer",
-                                                    "description": "Unique identifier for the top-level ASBIEP",
-                                                    "example": 12345},
+                            "top_level_asbiep_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the top-level ASBIEP",
+                                "example": 12345,
+                            },
                             "library": {
                                 "type": "object",
                                 "description": "Library information",
                                 "properties": {
-                                    "library_id": {"type": "integer",
-                                                   "description": "Unique identifier for the library", "example": 1},
-                                    "name": {"type": "string", "description": "Library name", "example": "OAGIS"}
+                                    "library_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the library",
+                                        "example": 1,
+                                    },
+                                    "name": {"type": "string", "description": "Library name", "example": "OAGIS"},
                                 },
-                                "required": ["library_id", "name"]
+                                "required": ["library_id", "name"],
                             },
                             "release": {
                                 "type": "object",
                                 "description": "Release information",
                                 "properties": {
-                                    "release_id": {"type": "integer",
-                                                   "description": "Unique identifier for the release", "example": 1},
-                                    "release_num": {"type": "string", "description": "Release number",
-                                                    "example": "10.6"},
-                                    "state": {"type": "string", "description": "Release state", "example": "Published"}
+                                    "release_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the release",
+                                        "example": 1,
+                                    },
+                                    "release_num": {
+                                        "type": "string",
+                                        "description": "Release number",
+                                        "example": "10.6",
+                                    },
+                                    "state": {"type": "string", "description": "Release state", "example": "Published"},
                                 },
-                                "required": ["release_id", "release_num", "state"]
+                                "required": ["release_id", "release_num", "state"],
                             },
                             "version": {"type": ["string", "null"], "description": "Version number", "example": "1.0"},
                             "status": {"type": ["string", "null"], "description": "Status", "example": "Production"},
                             "state": {"type": "string", "description": "State", "example": "Published"},
                             "is_deprecated": {"type": "boolean", "description": "Whether deprecated", "example": False},
-                            "deprecated_reason": {"type": ["string", "null"], "description": "Reason for deprecation",
-                                                  "example": None},
-                            "deprecated_remark": {"type": ["string", "null"],
-                                                  "description": "Remarks about deprecation", "example": None},
+                            "deprecated_reason": {
+                                "type": ["string", "null"],
+                                "description": "Reason for deprecation",
+                                "example": None,
+                            },
+                            "deprecated_remark": {
+                                "type": ["string", "null"],
+                                "description": "Remarks about deprecation",
+                                "example": None,
+                            },
                             "owner": {
                                 "type": "object",
                                 "description": "Owner information",
                                 "properties": {
-                                    "user_id": {"type": "integer", "description": "Unique identifier for the user",
-                                                "example": 100000001},
-                                    "login_id": {"type": "string", "description": "User's login identifier",
-                                                 "example": "john.doe"},
-                                    "username": {"type": "string", "description": "Display name of the user",
-                                                 "example": "John Doe"},
-                                    "roles": {"type": "array",
-                                              "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
-                                              "description": "List of roles assigned to the user",
-                                              "example": ["End-User"]}
+                                    "user_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the user",
+                                        "example": 100000001,
+                                    },
+                                    "login_id": {
+                                        "type": "string",
+                                        "description": "User's login identifier",
+                                        "example": "john.doe",
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "description": "Display name of the user",
+                                        "example": "John Doe",
+                                    },
+                                    "roles": {
+                                        "type": "array",
+                                        "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                        "description": "List of roles assigned to the user",
+                                        "example": ["End-User"],
+                                    },
                                 },
-                                "required": ["user_id", "login_id", "username", "roles"]
-                            }
+                                "required": ["user_id", "login_id", "username", "roles"],
+                            },
                         },
-                        "required": ["top_level_asbiep_id", "library", "release", "state", "is_deprecated", "owner"]
+                        "required": ["top_level_asbiep_id", "library", "release", "state", "is_deprecated", "owner"],
                     },
                     "based_asccp_manifest": {
                         "type": "object",
                         "description": "ASCCP information that this ASBIEP is based on",
                         "properties": {
-                            "asccp_manifest_id": {"type": "integer",
-                                                  "description": "Unique identifier for the ASCCP manifest",
-                                                  "example": 12347},
-                            "asccp_id": {"type": "integer", "description": "Unique identifier for the ASCCP",
-                                         "example": 6789},
-                            "role_of_acc_manifest_id": {"type": "integer", "description": "Role of ACC manifest ID",
-                                                        "example": 12349},
-                            "guid": {"type": "string", "description": "Unique identifier within the release",
-                                     "example": "a1b2c3d4e5f6789012345678901234ab"},
-                            "den": {"type": ["string", "null"], "description": "Data Element Name",
-                                    "example": "Purchase Order. Details"},
-                            "property_term": {"type": "string", "description": "Property term",
-                                              "example": "Details"},
-                            "definition": {"type": ["string", "null"], "description": "Definition of the ASCCP",
-                                           "example": "Details of the purchase order"},
-                            "definition_source": {"type": ["string", "null"], "description": "Source of the definition",
-                                                  "example": "https://example.com/spec"},
-                            "is_deprecated": {"type": "boolean", "description": "Whether the ASCCP is deprecated",
-                                              "example": False}
+                            "asccp_manifest_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the ASCCP manifest",
+                                "example": 12347,
+                            },
+                            "asccp_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the ASCCP",
+                                "example": 6789,
+                            },
+                            "role_of_acc_manifest_id": {
+                                "type": "integer",
+                                "description": "Role of ACC manifest ID",
+                                "example": 12349,
+                            },
+                            "guid": {
+                                "type": "string",
+                                "description": "Unique identifier within the release",
+                                "example": "a1b2c3d4e5f6789012345678901234ab",
+                            },
+                            "den": {
+                                "type": ["string", "null"],
+                                "description": "Data Element Name",
+                                "example": "Purchase Order. Details",
+                            },
+                            "property_term": {"type": "string", "description": "Property term", "example": "Details"},
+                            "definition": {
+                                "type": ["string", "null"],
+                                "description": "Definition of the ASCCP",
+                                "example": "Details of the purchase order",
+                            },
+                            "definition_source": {
+                                "type": ["string", "null"],
+                                "description": "Source of the definition",
+                                "example": "https://example.com/spec",
+                            },
+                            "is_deprecated": {
+                                "type": "boolean",
+                                "description": "Whether the ASCCP is deprecated",
+                                "example": False,
+                            },
                         },
-                        "required": ["asccp_manifest_id", "asccp_id", "role_of_acc_manifest_id", "guid", "den",
-                                     "property_term", "is_deprecated"]
+                        "required": [
+                            "asccp_manifest_id",
+                            "asccp_id",
+                            "role_of_acc_manifest_id",
+                            "guid",
+                            "den",
+                            "property_term",
+                            "is_deprecated",
+                        ],
                     },
                     "role_of_abie": {
                         "type": "object",
                         "description": "Role of ABIE information",
                         "properties": {
-                            "abie_id": {"type": ["integer", "null"],
-                                        "description": "Unique identifier for the ABIE. This can be passed to create_asbie() and create_bbie() as the from_abie_id parameter.",
-                                        "example": 12350},
-                            "guid": {"type": ["string", "null"], "description": "Unique identifier for the ABIE",
-                                     "example": "a1b2c3d4e5f6789012345678901234ab"},
+                            "abie_id": {
+                                "type": ["integer", "null"],
+                                "description": "Unique identifier for the ABIE. This can be passed to create_asbie() and create_bbie() as the from_abie_id parameter.",
+                                "example": 12350,
+                            },
+                            "guid": {
+                                "type": ["string", "null"],
+                                "description": "Unique identifier for the ABIE",
+                                "example": "a1b2c3d4e5f6789012345678901234ab",
+                            },
                             "based_acc_manifest": {
                                 "type": "object",
                                 "description": "Based ACC manifest information",
                                 "properties": {
-                                    "acc_manifest_id": {"type": "integer",
-                                                        "description": "Unique identifier for the ACC manifest",
-                                                        "example": 12351},
-                                    "acc_id": {"type": "integer", "description": "Unique identifier for the ACC",
-                                               "example": 7890},
-                                    "guid": {"type": "string", "description": "Unique identifier for the ACC",
-                                             "example": "a1b2c3d4e5f6789012345678901234ab"},
-                                    "den": {"type": "string", "description": "Data Element Name",
-                                            "example": "Purchase Order. Purchase Order"},
-                                    "object_class_term": {"type": "string", "description": "Object class term",
-                                                          "example": "Purchase Order"},
-                                    "definition": {"type": ["string", "null"], "description": "Definition of the ACC",
-                                                   "example": "A purchase order aggregation"},
-                                    "definition_source": {"type": ["string", "null"],
-                                                          "description": "Source of the definition",
-                                                          "example": "https://example.com/spec"},
-                                    "is_deprecated": {"type": "boolean", "description": "Whether the ACC is deprecated",
-                                                      "example": False}
+                                    "acc_manifest_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the ACC manifest",
+                                        "example": 12351,
+                                    },
+                                    "acc_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the ACC",
+                                        "example": 7890,
+                                    },
+                                    "guid": {
+                                        "type": "string",
+                                        "description": "Unique identifier for the ACC",
+                                        "example": "a1b2c3d4e5f6789012345678901234ab",
+                                    },
+                                    "den": {
+                                        "type": "string",
+                                        "description": "Data Element Name",
+                                        "example": "Purchase Order. Purchase Order",
+                                    },
+                                    "object_class_term": {
+                                        "type": "string",
+                                        "description": "Object class term",
+                                        "example": "Purchase Order",
+                                    },
+                                    "definition": {
+                                        "type": ["string", "null"],
+                                        "description": "Definition of the ACC",
+                                        "example": "A purchase order aggregation",
+                                    },
+                                    "definition_source": {
+                                        "type": ["string", "null"],
+                                        "description": "Source of the definition",
+                                        "example": "https://example.com/spec",
+                                    },
+                                    "is_deprecated": {
+                                        "type": "boolean",
+                                        "description": "Whether the ACC is deprecated",
+                                        "example": False,
+                                    },
                                 },
-                                "required": ["acc_manifest_id", "acc_id", "guid", "den", "object_class_term",
-                                             "is_deprecated"]
+                                "required": [
+                                    "acc_manifest_id",
+                                    "acc_id",
+                                    "guid",
+                                    "den",
+                                    "object_class_term",
+                                    "is_deprecated",
+                                ],
                             },
-                            "definition": {"type": ["string", "null"], "description": "Definition of the ABIE",
-                                           "example": "A purchase order aggregation"},
-                            "remark": {"type": ["string", "null"], "description": "Remarks about the ABIE",
-                                       "example": "Used for procurement"},
+                            "definition": {
+                                "type": ["string", "null"],
+                                "description": "Definition of the ABIE",
+                                "example": "A purchase order aggregation",
+                            },
+                            "remark": {
+                                "type": ["string", "null"],
+                                "description": "Remarks about the ABIE",
+                                "example": "Used for procurement",
+                            },
                             "relationships": {
                                 "type": "array",
                                 "description": "List of relationships (ASBIE/BBIE) displayed as children under the ABIE. Each relationship has an 'is_used' property: when is_used=True, the relationship is profiled for practical use (asbie_id/bbie_id will be created), when is_used=False, it shows available relationships for profiling. These relationships can be further explored using get_asbie_by_asbie_id(), get_asbie_by_based_ascc_manifest_id(), get_bbie_by_bbie_id(), and get_bbie_by_based_bcc_manifest_id() functions. This includes all nested relationships from the hierarchical CC (Core Component) structure, presented as a single flat list for traversal.",
@@ -2052,215 +3127,347 @@ async def get_asbie_by_asbie_id(
                                             "type": "object",
                                             "description": "ASBIE (Association Business Information Entity) relationship",
                                             "properties": {
-                                                "component_type": {"type": "string",
-                                                                   "description": "Type of relationship, always 'ASBIE' for this type",
-                                                                   "example": "ASBIE"},
-                                                "asbie_id": {"type": ["integer", "null"],
-                                                             "description": "Unique identifier for the ASBIE (base entity ID, None if is_used=False)",
-                                                             "example": 12345},
-                                                "guid": {"type": ["string", "null"],
-                                                         "description": "Globally unique identifier for the ASBIE (if available)",
-                                                         "example": "a1b2c3d4e5f6789012345678901234ab"},
-                                                "is_used": {"type": "boolean",
-                                                            "description": "Whether this component is currently being used (profiled) in the BIE (True means asbie_id exists)",
-                                                            "example": True},
-                                                "cardinality_min": {"type": "integer",
-                                                                    "description": "Minimum cardinality (minimum number of occurrences required, typically 0 or 1)",
-                                                                    "example": 0},
-                                                "cardinality_max": {"type": "integer",
-                                                                    "description": "Maximum cardinality (maximum number of occurrences allowed, -1 means unbounded)",
-                                                                    "example": 1},
-                                                "is_nillable": {"type": "boolean",
-                                                                "description": "Whether the component can have a nil/null value",
-                                                                "example": False},
-                                                "remark": {"type": ["string", "null"],
-                                                           "description": "Additional remarks or notes about the component",
-                                                           "example": "Used for purchase orders"},
+                                                "component_type": {
+                                                    "type": "string",
+                                                    "description": "Type of relationship, always 'ASBIE' for this type",
+                                                    "example": "ASBIE",
+                                                },
+                                                "asbie_id": {
+                                                    "type": ["integer", "null"],
+                                                    "description": "Unique identifier for the ASBIE (base entity ID, None if is_used=False)",
+                                                    "example": 12345,
+                                                },
+                                                "guid": {
+                                                    "type": ["string", "null"],
+                                                    "description": "Globally unique identifier for the ASBIE (if available)",
+                                                    "example": "a1b2c3d4e5f6789012345678901234ab",
+                                                },
+                                                "is_used": {
+                                                    "type": "boolean",
+                                                    "description": "Whether this component is currently being used (profiled) in the BIE (True means asbie_id exists)",
+                                                    "example": True,
+                                                },
+                                                "cardinality_min": {
+                                                    "type": "integer",
+                                                    "description": "Minimum cardinality (minimum number of occurrences required, typically 0 or 1)",
+                                                    "example": 0,
+                                                },
+                                                "cardinality_max": {
+                                                    "type": "integer",
+                                                    "description": "Maximum cardinality (maximum number of occurrences allowed, -1 means unbounded)",
+                                                    "example": 1,
+                                                },
+                                                "is_nillable": {
+                                                    "type": "boolean",
+                                                    "description": "Whether the component can have a nil/null value",
+                                                    "example": False,
+                                                },
+                                                "remark": {
+                                                    "type": ["string", "null"],
+                                                    "description": "Additional remarks or notes about the component",
+                                                    "example": "Used for purchase orders",
+                                                },
                                                 "based_ascc": {
                                                     "type": "object",
                                                     "description": "ASCC (Association Core Component) information that this ASBIE component is based on",
                                                     "properties": {
-                                                        "ascc_manifest_id": {"type": "integer",
-                                                                             "description": "Unique identifier for the ASCC manifest. This can be passed to create_asbie() as the based_ascc_manifest_id parameter.",
-                                                                             "example": 12345},
-                                                        "ascc_id": {"type": "integer",
-                                                                    "description": "Unique identifier for the ASCC",
-                                                                    "example": 6789},
-                                                        "guid": {"type": "string",
-                                                                 "description": "Unique identifier within the release",
-                                                                 "example": "a1b2c3d4e5f6789012345678901234ab"},
-                                                        "den": {"type": "string",
-                                                                "description": "Dictionary Entry Name (DEN)",
-                                                                "example": "Purchase Order. Details"},
-                                                        "cardinality_min": {"type": "integer",
-                                                                            "description": "Minimum cardinality",
-                                                                            "example": 0},
-                                                        "cardinality_max": {"type": "integer",
-                                                                            "description": "Maximum cardinality",
-                                                                            "example": 1},
-                                                        "is_deprecated": {"type": "boolean",
-                                                                          "description": "Whether the ASCC is deprecated",
-                                                                          "example": False},
-                                                        "definition": {"type": ["string", "null"],
-                                                                       "description": "Definition of the ASCC",
-                                                                       "example": "Details of the purchase order"},
-                                                        "definition_source": {"type": ["string", "null"],
-                                                                              "description": "Source of the definition",
-                                                                              "example": "https://example.com/spec"},
-                                                        "from_acc_manifest_id": {"type": "integer",
-                                                                                 "description": "Source ACC manifest ID",
-                                                                                 "example": 12346},
-                                                        "to_asccp_manifest_id": {"type": "integer",
-                                                                                 "description": "Target ASCCP manifest ID",
-                                                                                 "example": 12347}
+                                                        "ascc_manifest_id": {
+                                                            "type": "integer",
+                                                            "description": "Unique identifier for the ASCC manifest. This can be passed to create_asbie() as the based_ascc_manifest_id parameter.",
+                                                            "example": 12345,
+                                                        },
+                                                        "ascc_id": {
+                                                            "type": "integer",
+                                                            "description": "Unique identifier for the ASCC",
+                                                            "example": 6789,
+                                                        },
+                                                        "guid": {
+                                                            "type": "string",
+                                                            "description": "Unique identifier within the release",
+                                                            "example": "a1b2c3d4e5f6789012345678901234ab",
+                                                        },
+                                                        "den": {
+                                                            "type": "string",
+                                                            "description": "Dictionary Entry Name (DEN)",
+                                                            "example": "Purchase Order. Details",
+                                                        },
+                                                        "cardinality_min": {
+                                                            "type": "integer",
+                                                            "description": "Minimum cardinality",
+                                                            "example": 0,
+                                                        },
+                                                        "cardinality_max": {
+                                                            "type": "integer",
+                                                            "description": "Maximum cardinality",
+                                                            "example": 1,
+                                                        },
+                                                        "is_deprecated": {
+                                                            "type": "boolean",
+                                                            "description": "Whether the ASCC is deprecated",
+                                                            "example": False,
+                                                        },
+                                                        "definition": {
+                                                            "type": ["string", "null"],
+                                                            "description": "Definition of the ASCC",
+                                                            "example": "Details of the purchase order",
+                                                        },
+                                                        "definition_source": {
+                                                            "type": ["string", "null"],
+                                                            "description": "Source of the definition",
+                                                            "example": "https://example.com/spec",
+                                                        },
+                                                        "from_acc_manifest_id": {
+                                                            "type": "integer",
+                                                            "description": "Source ACC manifest ID",
+                                                            "example": 12346,
+                                                        },
+                                                        "to_asccp_manifest_id": {
+                                                            "type": "integer",
+                                                            "description": "Target ASCCP manifest ID",
+                                                            "example": 12347,
+                                                        },
                                                     },
-                                                    "required": ["ascc_manifest_id", "ascc_id", "guid", "den",
-                                                                 "cardinality_min", "cardinality_max", "is_deprecated",
-                                                                 "from_acc_manifest_id", "to_asccp_manifest_id"]
+                                                    "required": [
+                                                        "ascc_manifest_id",
+                                                        "ascc_id",
+                                                        "guid",
+                                                        "den",
+                                                        "cardinality_min",
+                                                        "cardinality_max",
+                                                        "is_deprecated",
+                                                        "from_acc_manifest_id",
+                                                        "to_asccp_manifest_id",
+                                                    ],
                                                 },
-                                                "to_asbiep_id": {"type": ["integer", "null"],
-                                                                 "description": "Unique identifier for the target ASBIEP that this ASBIE connects to (if available)",
-                                                                 "example": 12348}
+                                                "to_asbiep_id": {
+                                                    "type": ["integer", "null"],
+                                                    "description": "Unique identifier for the target ASBIEP that this ASBIE connects to (if available)",
+                                                    "example": 12348,
+                                                },
                                             },
-                                            "required": ["component_type", "is_used",
-                                                         "cardinality_min", "cardinality_max", "is_nillable",
-                                                         "based_ascc"]
+                                            "required": [
+                                                "component_type",
+                                                "is_used",
+                                                "cardinality_min",
+                                                "cardinality_max",
+                                                "is_nillable",
+                                                "based_ascc",
+                                            ],
                                         },
                                         {
                                             "type": "object",
                                             "description": "BBIE (Basic Business Information Entity) relationship",
                                             "properties": {
-                                                "component_type": {"type": "string",
-                                                                   "description": "Type of relationship, always 'BBIE' for this type",
-                                                                   "example": "BBIE"},
-                                                "bbie_id": {"type": ["integer", "null"],
-                                                            "description": "Unique identifier for the BBIE (base entity ID, None if is_used=False)",
-                                                            "example": 12345},
-                                                "guid": {"type": ["string", "null"],
-                                                         "description": "Globally unique identifier for the BBIE (if available)",
-                                                         "example": "a1b2c3d4e5f6789012345678901234ab"},
-                                                "is_used": {"type": "boolean",
-                                                            "description": "Whether this component is currently being used (profiled) in the BIE (True means bbie_id exists)",
-                                                            "example": True},
-                                                "cardinality_min": {"type": "integer",
-                                                                    "description": "Minimum cardinality (minimum number of occurrences required, typically 0 or 1)",
-                                                                    "example": 0},
-                                                "cardinality_max": {"type": "integer",
-                                                                    "description": "Maximum cardinality (maximum number of occurrences allowed, -1 means unbounded)",
-                                                                    "example": 1},
-                                                "is_nillable": {"type": "boolean",
-                                                                "description": "Whether the component can have a nil/null value",
-                                                                "example": False},
-                                                "remark": {"type": ["string", "null"],
-                                                           "description": "Additional remarks or notes about the component",
-                                                           "example": "Used for purchase orders"},
+                                                "component_type": {
+                                                    "type": "string",
+                                                    "description": "Type of relationship, always 'BBIE' for this type",
+                                                    "example": "BBIE",
+                                                },
+                                                "bbie_id": {
+                                                    "type": ["integer", "null"],
+                                                    "description": "Unique identifier for the BBIE (base entity ID, None if is_used=False)",
+                                                    "example": 12345,
+                                                },
+                                                "guid": {
+                                                    "type": ["string", "null"],
+                                                    "description": "Globally unique identifier for the BBIE (if available)",
+                                                    "example": "a1b2c3d4e5f6789012345678901234ab",
+                                                },
+                                                "is_used": {
+                                                    "type": "boolean",
+                                                    "description": "Whether this component is currently being used (profiled) in the BIE (True means bbie_id exists)",
+                                                    "example": True,
+                                                },
+                                                "cardinality_min": {
+                                                    "type": "integer",
+                                                    "description": "Minimum cardinality (minimum number of occurrences required, typically 0 or 1)",
+                                                    "example": 0,
+                                                },
+                                                "cardinality_max": {
+                                                    "type": "integer",
+                                                    "description": "Maximum cardinality (maximum number of occurrences allowed, -1 means unbounded)",
+                                                    "example": 1,
+                                                },
+                                                "is_nillable": {
+                                                    "type": "boolean",
+                                                    "description": "Whether the component can have a nil/null value",
+                                                    "example": False,
+                                                },
+                                                "remark": {
+                                                    "type": ["string", "null"],
+                                                    "description": "Additional remarks or notes about the component",
+                                                    "example": "Used for purchase orders",
+                                                },
                                                 "based_bcc": {
                                                     "type": "object",
                                                     "description": "BCC (Basic Core Component) information that this BBIE component is based on",
                                                     "properties": {
-                                                        "bcc_manifest_id": {"type": "integer",
-                                                                            "description": "Unique identifier for the BCC manifest",
-                                                                            "example": 12345},
-                                                        "bcc_id": {"type": "integer",
-                                                                   "description": "Unique identifier for the BCC",
-                                                                   "example": 6789},
-                                                        "guid": {"type": "string",
-                                                                 "description": "Unique identifier within the release",
-                                                                 "example": "a1b2c3d4e5f6789012345678901234ab"},
-                                                        "den": {"type": "string",
-                                                                "description": "Dictionary Entry Name (DEN)",
-                                                                "example": "Purchase Order. Amount"},
-                                                        "cardinality_min": {"type": "integer",
-                                                                            "description": "Minimum cardinality",
-                                                                            "example": 0},
-                                                        "cardinality_max": {"type": "integer",
-                                                                            "description": "Maximum cardinality",
-                                                                            "example": 1},
-                                                        "entity_type": {"type": ["string", "null"],
-                                                                        "description": "Entity type: 'Attribute' or 'Element'",
-                                                                        "example": "Element"},
-                                                        "is_nillable": {"type": "boolean",
-                                                                        "description": "Whether the BCC is nillable",
-                                                                        "example": False},
-                                                        "is_deprecated": {"type": "boolean",
-                                                                          "description": "Whether the BCC is deprecated",
-                                                                          "example": False},
-                                                        "definition": {"type": ["string", "null"],
-                                                                       "description": "Definition of the BCC",
-                                                                       "example": "A monetary amount"},
-                                                        "definition_source": {"type": ["string", "null"],
-                                                                              "description": "Source of the definition",
-                                                                              "example": "https://example.com/spec"},
-                                                        "from_acc_manifest_id": {"type": "integer",
-                                                                                 "description": "Source ACC manifest ID",
-                                                                                 "example": 12346},
-                                                        "to_bccp_manifest_id": {"type": "integer",
-                                                                                "description": "Target BCCP manifest ID",
-                                                                                "example": 12347}
+                                                        "bcc_manifest_id": {
+                                                            "type": "integer",
+                                                            "description": "Unique identifier for the BCC manifest",
+                                                            "example": 12345,
+                                                        },
+                                                        "bcc_id": {
+                                                            "type": "integer",
+                                                            "description": "Unique identifier for the BCC",
+                                                            "example": 6789,
+                                                        },
+                                                        "guid": {
+                                                            "type": "string",
+                                                            "description": "Unique identifier within the release",
+                                                            "example": "a1b2c3d4e5f6789012345678901234ab",
+                                                        },
+                                                        "den": {
+                                                            "type": "string",
+                                                            "description": "Dictionary Entry Name (DEN)",
+                                                            "example": "Purchase Order. Amount",
+                                                        },
+                                                        "cardinality_min": {
+                                                            "type": "integer",
+                                                            "description": "Minimum cardinality",
+                                                            "example": 0,
+                                                        },
+                                                        "cardinality_max": {
+                                                            "type": "integer",
+                                                            "description": "Maximum cardinality",
+                                                            "example": 1,
+                                                        },
+                                                        "entity_type": {
+                                                            "type": ["string", "null"],
+                                                            "description": "Entity type: 'Attribute' or 'Element'",
+                                                            "example": "Element",
+                                                        },
+                                                        "is_nillable": {
+                                                            "type": "boolean",
+                                                            "description": "Whether the BCC is nillable",
+                                                            "example": False,
+                                                        },
+                                                        "is_deprecated": {
+                                                            "type": "boolean",
+                                                            "description": "Whether the BCC is deprecated",
+                                                            "example": False,
+                                                        },
+                                                        "definition": {
+                                                            "type": ["string", "null"],
+                                                            "description": "Definition of the BCC",
+                                                            "example": "A monetary amount",
+                                                        },
+                                                        "definition_source": {
+                                                            "type": ["string", "null"],
+                                                            "description": "Source of the definition",
+                                                            "example": "https://example.com/spec",
+                                                        },
+                                                        "from_acc_manifest_id": {
+                                                            "type": "integer",
+                                                            "description": "Source ACC manifest ID",
+                                                            "example": 12346,
+                                                        },
+                                                        "to_bccp_manifest_id": {
+                                                            "type": "integer",
+                                                            "description": "Target BCCP manifest ID",
+                                                            "example": 12347,
+                                                        },
                                                     },
-                                                    "required": ["bcc_manifest_id", "bcc_id", "guid", "den",
-                                                                 "cardinality_min", "cardinality_max", "is_nillable",
-                                                                 "is_deprecated", "from_acc_manifest_id",
-                                                                 "to_bccp_manifest_id"]
+                                                    "required": [
+                                                        "bcc_manifest_id",
+                                                        "bcc_id",
+                                                        "guid",
+                                                        "den",
+                                                        "cardinality_min",
+                                                        "cardinality_max",
+                                                        "is_nillable",
+                                                        "is_deprecated",
+                                                        "from_acc_manifest_id",
+                                                        "to_bccp_manifest_id",
+                                                    ],
                                                 },
                                                 "primitiveRestriction": {
                                                     "type": ["object", "null"],
                                                     "description": "Primitive restriction information for the BBIE",
                                                     "properties": {
-                                                        "xbtManifestId": {"type": ["integer", "null"],
-                                                                          "description": "XBT (eXtended Built-in Type) manifest ID",
-                                                                          "example": None},
-                                                        "codeListManifestId": {"type": ["integer", "null"],
-                                                                               "description": "Code list manifest ID",
-                                                                               "example": None},
-                                                        "agencyIdListManifestId": {"type": ["integer", "null"],
-                                                                                   "description": "Agency ID list manifest ID",
-                                                                                   "example": None}
+                                                        "xbtManifestId": {
+                                                            "type": ["integer", "null"],
+                                                            "description": "XBT (eXtended Built-in Type) manifest ID",
+                                                            "example": None,
+                                                        },
+                                                        "codeListManifestId": {
+                                                            "type": ["integer", "null"],
+                                                            "description": "Code list manifest ID",
+                                                            "example": None,
+                                                        },
+                                                        "agencyIdListManifestId": {
+                                                            "type": ["integer", "null"],
+                                                            "description": "Agency ID list manifest ID",
+                                                            "example": None,
+                                                        },
                                                     },
-                                                    "required": ["xbtManifestId", "codeListManifestId",
-                                                                 "agencyIdListManifestId"]
+                                                    "required": [
+                                                        "xbtManifestId",
+                                                        "codeListManifestId",
+                                                        "agencyIdListManifestId",
+                                                    ],
                                                 },
                                                 "valueConstraint": {
                                                     "type": ["object", "null"],
                                                     "description": "Value constraint information for the BBIE",
                                                     "properties": {
-                                                        "default_value": {"type": ["string", "null"],
-                                                                          "description": "Default value for the BBIE",
-                                                                          "example": None},
-                                                        "fixed_value": {"type": ["string", "null"],
-                                                                        "description": "Fixed value for the BBIE",
-                                                                        "example": None}
+                                                        "default_value": {
+                                                            "type": ["string", "null"],
+                                                            "description": "Default value for the BBIE",
+                                                            "example": None,
+                                                        },
+                                                        "fixed_value": {
+                                                            "type": ["string", "null"],
+                                                            "description": "Fixed value for the BBIE",
+                                                            "example": None,
+                                                        },
                                                     },
-                                                    "required": ["default_value", "fixed_value"]
+                                                    "required": ["default_value", "fixed_value"],
                                                 },
                                                 "facet": {
                                                     "type": ["object", "null"],
                                                     "description": "Facet restriction information for string values",
                                                     "properties": {
-                                                        "facet_min_length": {"type": ["integer", "null"],
-                                                                             "description": "Minimum length constraint for string values (facet restriction)",
-                                                                             "example": None},
-                                                        "facet_max_length": {"type": ["integer", "null"],
-                                                                             "description": "Maximum length constraint for string values (facet restriction)",
-                                                                             "example": None},
-                                                        "facet_pattern": {"type": ["string", "null"],
-                                                                          "description": "Pattern constraint (regular expression) for string values (facet restriction)",
-                                                                          "example": None}
+                                                        "facet_min_length": {
+                                                            "type": ["integer", "null"],
+                                                            "description": "Minimum length constraint for string values (facet restriction)",
+                                                            "example": None,
+                                                        },
+                                                        "facet_max_length": {
+                                                            "type": ["integer", "null"],
+                                                            "description": "Maximum length constraint for string values (facet restriction)",
+                                                            "example": None,
+                                                        },
+                                                        "facet_pattern": {
+                                                            "type": ["string", "null"],
+                                                            "description": "Pattern constraint (regular expression) for string values (facet restriction)",
+                                                            "example": None,
+                                                        },
                                                     },
-                                                    "required": ["facet_min_length", "facet_max_length",
-                                                                 "facet_pattern"]
+                                                    "required": [
+                                                        "facet_min_length",
+                                                        "facet_max_length",
+                                                        "facet_pattern",
+                                                    ],
                                                 },
-                                                "to_bbiep_id": {"type": ["integer", "null"],
-                                                                "description": "Unique identifier for the target BBIEP that this BBIE connects to (if available)",
-                                                                "example": 12348}
+                                                "to_bbiep_id": {
+                                                    "type": ["integer", "null"],
+                                                    "description": "Unique identifier for the target BBIEP that this BBIE connects to (if available)",
+                                                    "example": 12348,
+                                                },
                                             },
-                                            "required": ["component_type", "is_used",
-                                                         "cardinality_min", "cardinality_max", "is_nillable",
-                                                         "based_bcc"]
-                                        }
+                                            "required": [
+                                                "component_type",
+                                                "is_used",
+                                                "cardinality_min",
+                                                "cardinality_max",
+                                                "is_nillable",
+                                                "based_bcc",
+                                            ],
+                                        },
                                     ]
                                 },
-                                "example": []
+                                "example": [],
                             },
                             "created": {
                                 "type": ["object", "null"],
@@ -2270,25 +3477,37 @@ async def get_asbie_by_asbie_id(
                                         "type": ["object", "null"],
                                         "description": "User who created the ABIE",
                                         "properties": {
-                                            "user_id": {"type": "integer",
-                                                        "description": "Unique identifier for the user",
-                                                        "example": 100000001},
-                                            "login_id": {"type": "string", "description": "User's login identifier",
-                                                         "example": "john.doe"},
-                                            "username": {"type": "string", "description": "Display name of the user",
-                                                         "example": "John Doe"},
-                                            "roles": {"type": "array", "items": {"type": "string",
-                                                                                 "enum": ["Admin", "Developer",
-                                                                                          "End-User"]},
-                                                      "description": "List of roles assigned to the user",
-                                                      "example": ["End-User"]}
+                                            "user_id": {
+                                                "type": "integer",
+                                                "description": "Unique identifier for the user",
+                                                "example": 100000001,
+                                            },
+                                            "login_id": {
+                                                "type": "string",
+                                                "description": "User's login identifier",
+                                                "example": "john.doe",
+                                            },
+                                            "username": {
+                                                "type": "string",
+                                                "description": "Display name of the user",
+                                                "example": "John Doe",
+                                            },
+                                            "roles": {
+                                                "type": "array",
+                                                "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                                "description": "List of roles assigned to the user",
+                                                "example": ["End-User"],
+                                            },
                                         },
-                                        "required": ["user_id", "login_id", "username", "roles"]
+                                        "required": ["user_id", "login_id", "username", "roles"],
                                     },
-                                    "when": {"type": ["string", "null"], "format": "date-time",
-                                             "description": "Timestamp when the ABIE was created",
-                                             "example": "2023-01-15T10:30:00Z"}
-                                }
+                                    "when": {
+                                        "type": ["string", "null"],
+                                        "format": "date-time",
+                                        "description": "Timestamp when the ABIE was created",
+                                        "example": "2023-01-15T10:30:00Z",
+                                    },
+                                },
                             },
                             "last_updated": {
                                 "type": ["object", "null"],
@@ -2298,36 +3517,57 @@ async def get_asbie_by_asbie_id(
                                         "type": ["object", "null"],
                                         "description": "User who last updated the ABIE",
                                         "properties": {
-                                            "user_id": {"type": "integer",
-                                                        "description": "Unique identifier for the user",
-                                                        "example": 100000001},
-                                            "login_id": {"type": "string", "description": "User's login identifier",
-                                                         "example": "john.doe"},
-                                            "username": {"type": "string", "description": "Display name of the user",
-                                                         "example": "John Doe"},
-                                            "roles": {"type": "array", "items": {"type": "string",
-                                                                                 "enum": ["Admin", "Developer",
-                                                                                          "End-User"]},
-                                                      "description": "List of roles assigned to the user",
-                                                      "example": ["End-User"]}
+                                            "user_id": {
+                                                "type": "integer",
+                                                "description": "Unique identifier for the user",
+                                                "example": 100000001,
+                                            },
+                                            "login_id": {
+                                                "type": "string",
+                                                "description": "User's login identifier",
+                                                "example": "john.doe",
+                                            },
+                                            "username": {
+                                                "type": "string",
+                                                "description": "Display name of the user",
+                                                "example": "John Doe",
+                                            },
+                                            "roles": {
+                                                "type": "array",
+                                                "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                                "description": "List of roles assigned to the user",
+                                                "example": ["End-User"],
+                                            },
                                         },
-                                        "required": ["user_id", "login_id", "username", "roles"]
+                                        "required": ["user_id", "login_id", "username", "roles"],
                                     },
-                                    "when": {"type": ["string", "null"], "format": "date-time",
-                                             "description": "Timestamp when the ABIE was last updated",
-                                             "example": "2023-01-15T14:45:00Z"}
-                                }
-                            }
+                                    "when": {
+                                        "type": ["string", "null"],
+                                        "format": "date-time",
+                                        "description": "Timestamp when the ABIE was last updated",
+                                        "example": "2023-01-15T14:45:00Z",
+                                    },
+                                },
+                            },
                         },
-                        "required": ["based_acc_manifest"]
+                        "required": ["based_acc_manifest"],
                     },
-                    "definition": {"type": ["string", "null"], "description": "Definition of the ASBIEP",
-                                   "example": "A purchase order property"},
-                    "remark": {"type": ["string", "null"], "description": "Remarks about the ASBIEP",
-                               "example": "Used for procurement processes"},
+                    "definition": {
+                        "type": ["string", "null"],
+                        "description": "Definition of the ASBIEP",
+                        "example": "A purchase order property",
+                    },
+                    "remark": {
+                        "type": ["string", "null"],
+                        "description": "Remarks about the ASBIEP",
+                        "example": "Used for procurement processes",
+                    },
                     "biz_term": {"type": ["string", "null"], "description": "Business term", "example": "PO"},
-                    "display_name": {"type": ["string", "null"], "description": "Display name of the ASBIEP",
-                                     "example": "Purchase Order Property"},
+                    "display_name": {
+                        "type": ["string", "null"],
+                        "description": "Display name of the ASBIEP",
+                        "example": "Purchase Order Property",
+                    },
                     "created": {
                         "type": ["object", "null"],
                         "description": "Creation information",
@@ -2336,23 +3576,37 @@ async def get_asbie_by_asbie_id(
                                 "type": ["object", "null"],
                                 "description": "User who created the ASBIEP",
                                 "properties": {
-                                    "user_id": {"type": "integer", "description": "Unique identifier for the user",
-                                                "example": 100000001},
-                                    "login_id": {"type": "string", "description": "User's login identifier",
-                                                 "example": "john.doe"},
-                                    "username": {"type": "string", "description": "Display name of the user",
-                                                 "example": "John Doe"},
-                                    "roles": {"type": "array",
-                                              "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
-                                              "description": "List of roles assigned to the user",
-                                              "example": ["End-User"]}
+                                    "user_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the user",
+                                        "example": 100000001,
+                                    },
+                                    "login_id": {
+                                        "type": "string",
+                                        "description": "User's login identifier",
+                                        "example": "john.doe",
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "description": "Display name of the user",
+                                        "example": "John Doe",
+                                    },
+                                    "roles": {
+                                        "type": "array",
+                                        "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                        "description": "List of roles assigned to the user",
+                                        "example": ["End-User"],
+                                    },
                                 },
-                                "required": ["user_id", "login_id", "username", "roles"]
+                                "required": ["user_id", "login_id", "username", "roles"],
                             },
-                            "when": {"type": ["string", "null"], "format": "date-time",
-                                     "description": "Timestamp when the ASBIEP was created",
-                                     "example": "2023-01-15T10:30:00Z"}
-                        }
+                            "when": {
+                                "type": ["string", "null"],
+                                "format": "date-time",
+                                "description": "Timestamp when the ASBIEP was created",
+                                "example": "2023-01-15T10:30:00Z",
+                            },
+                        },
                     },
                     "last_updated": {
                         "type": ["object", "null"],
@@ -2362,52 +3616,89 @@ async def get_asbie_by_asbie_id(
                                 "type": ["object", "null"],
                                 "description": "User who last updated the ASBIEP",
                                 "properties": {
-                                    "user_id": {"type": "integer", "description": "Unique identifier for the user",
-                                                "example": 100000001},
-                                    "login_id": {"type": "string", "description": "User's login identifier",
-                                                 "example": "john.doe"},
-                                    "username": {"type": "string", "description": "Display name of the user",
-                                                 "example": "John Doe"},
-                                    "roles": {"type": "array",
-                                              "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
-                                              "description": "List of roles assigned to the user",
-                                              "example": ["End-User"]}
+                                    "user_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the user",
+                                        "example": 100000001,
+                                    },
+                                    "login_id": {
+                                        "type": "string",
+                                        "description": "User's login identifier",
+                                        "example": "john.doe",
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "description": "Display name of the user",
+                                        "example": "John Doe",
+                                    },
+                                    "roles": {
+                                        "type": "array",
+                                        "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                        "description": "List of roles assigned to the user",
+                                        "example": ["End-User"],
+                                    },
                                 },
-                                "required": ["user_id", "login_id", "username", "roles"]
+                                "required": ["user_id", "login_id", "username", "roles"],
                             },
-                            "when": {"type": ["string", "null"], "format": "date-time",
-                                     "description": "Timestamp when the ASBIEP was last updated",
-                                     "example": "2023-01-15T14:45:00Z"}
-                        }
-                    }
+                            "when": {
+                                "type": ["string", "null"],
+                                "format": "date-time",
+                                "description": "Timestamp when the ASBIEP was last updated",
+                                "example": "2023-01-15T14:45:00Z",
+                            },
+                        },
+                    },
                 },
-                "required": ["based_asccp_manifest", "role_of_abie"]
+                "required": ["based_asccp_manifest", "role_of_abie"],
             },
-            "is_used": {"type": "boolean",
-                        "description": "Whether this ASBIE is currently being used (profiled) in the BIE",
-                        "example": True},
-            "cardinality_min": {"type": "integer",
-                                "description": "Minimum cardinality (minimum number of occurrences required, typically 0 or 1)",
-                                "example": 0},
-            "cardinality_max": {"type": "integer",
-                                "description": "Maximum cardinality (maximum number of occurrences allowed, -1 means unbounded)",
-                                "example": 1},
-            "is_nillable": {"type": "boolean", "description": "Whether the ASBIE can have a nil/null value",
-                            "example": False},
-            "definition": {"type": ["string", "null"],
-                           "description": "Definition to override the ASCC definition. If NULL, it means that the definition should be derived from the based CC",
-                           "example": "A purchase order detail"},
-            "remark": {"type": ["string", "null"], "description": "Additional remarks or notes about the ASBIE",
-                       "example": "Used for purchase orders"}
+            "is_used": {
+                "type": "boolean",
+                "description": "Whether this ASBIE is currently being used (profiled) in the BIE",
+                "example": True,
+            },
+            "cardinality_min": {
+                "type": "integer",
+                "description": "Minimum cardinality (minimum number of occurrences required, typically 0 or 1)",
+                "example": 0,
+            },
+            "cardinality_max": {
+                "type": "integer",
+                "description": "Maximum cardinality (maximum number of occurrences allowed, -1 means unbounded)",
+                "example": 1,
+            },
+            "is_nillable": {
+                "type": "boolean",
+                "description": "Whether the ASBIE can have a nil/null value",
+                "example": False,
+            },
+            "definition": {
+                "type": ["string", "null"],
+                "description": "Definition to override the ASCC definition. If NULL, it means that the definition should be derived from the based CC",
+                "example": "A purchase order detail",
+            },
+            "remark": {
+                "type": ["string", "null"],
+                "description": "Additional remarks or notes about the ASBIE",
+                "example": "Used for purchase orders",
+            },
         },
-        "required": ["owner_top_level_asbiep", "based_ascc", "to_asbiep", "is_used",
-                     "cardinality_min", "cardinality_max", "is_nillable"]
-    }
+        "required": [
+            "owner_top_level_asbiep",
+            "based_ascc",
+            "to_asbiep",
+            "is_used",
+            "cardinality_min",
+            "cardinality_max",
+            "is_nillable",
+        ],
+    },
 )
 async def get_asbie_by_based_ascc_manifest_id(
     top_level_asbiep_id: Annotated[int, Field(gt=0, description="Owning top-level ASBIEP identifier.")],
     based_ascc_manifest_id: Annotated[int, Field(gt=0, description="Based ASCC manifest identifier.")],
-    business_information_entity_service: BusinessInformationEntityService = Depends(get_business_information_entity_service),
+    business_information_entity_service: BusinessInformationEntityService = Depends(
+        get_business_information_entity_service
+    ),
 ) -> GetAsbieTemplateResponse:
     """
     Get an ASBIE (Association Business Information Entity) by its based ASCC manifest ID.
@@ -2481,483 +3772,829 @@ async def get_asbie_by_based_ascc_manifest_id(
         "type": "object",
         "description": "Response containing BBIE (Basic Business Information Entity) information with its BBIEP. Used for profiling core components – when is_used=True, the component is profiled for practical use (bbie_id will be created); when is_used=False, it shows all available components for profiling. IMPORTANT: Groups (component_type 3=SemanticGroup or 4=UserExtensionGroup) are automatically skipped in BIE expressions, so the BIE structure may differ from the CC structure. To find the correct from_abie_id for create_bbie, traverse the actual BIE structure recursively.",
         "properties": {
-            "bbie_id": {"type": ["integer", "null"],
-                        "description": "Unique identifier for the BBIE (base entity ID, None if not yet created)",
-                        "example": 12345},
+            "bbie_id": {
+                "type": ["integer", "null"],
+                "description": "Unique identifier for the BBIE (base entity ID, None if not yet created)",
+                "example": 12345,
+            },
             "owner_top_level_asbiep": {
                 "type": "object",
                 "description": "Top-Level ASBIEP information",
                 "properties": {
-                    "top_level_asbiep_id": {"type": "integer",
-                                            "description": "Unique identifier for the top-level ASBIEP",
-                                            "example": 12345},
+                    "top_level_asbiep_id": {
+                        "type": "integer",
+                        "description": "Unique identifier for the top-level ASBIEP",
+                        "example": 12345,
+                    },
                     "library": {
                         "type": "object",
                         "description": "Library information",
                         "properties": {
-                            "library_id": {"type": "integer", "description": "Unique identifier for the library",
-                                           "example": 1},
-                            "name": {"type": "string", "description": "Library name", "example": "OAGIS"}
+                            "library_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the library",
+                                "example": 1,
+                            },
+                            "name": {"type": "string", "description": "Library name", "example": "OAGIS"},
                         },
-                        "required": ["library_id", "name"]
+                        "required": ["library_id", "name"],
                     },
                     "release": {
                         "type": "object",
                         "description": "Release information",
                         "properties": {
-                            "release_id": {"type": "integer", "description": "Unique identifier for the release",
-                                           "example": 1},
-                            "release_num": {"type": "string", "description": "Release number",
-                                            "example": "10.6"},
-                            "state": {"type": "string", "description": "Release state", "example": "Published"}
+                            "release_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the release",
+                                "example": 1,
+                            },
+                            "release_num": {"type": "string", "description": "Release number", "example": "10.6"},
+                            "state": {"type": "string", "description": "Release state", "example": "Published"},
                         },
-                        "required": ["release_id", "release_num", "state"]
+                        "required": ["release_id", "release_num", "state"],
                     },
                     "version": {"type": ["string", "null"], "description": "Version number", "example": "1.0"},
-                    "status": {"type": ["string", "null"], "description": "Status of the top-level ASBIEP",
-                               "example": "Production"},
+                    "status": {
+                        "type": ["string", "null"],
+                        "description": "Status of the top-level ASBIEP",
+                        "example": "Production",
+                    },
                     "state": {"type": "string", "description": "State of the top-level ASBIEP", "example": "Published"},
-                    "is_deprecated": {"type": "boolean", "description": "Whether the top-level ASBIEP is deprecated",
-                                      "example": False},
-                    "deprecated_reason": {"type": ["string", "null"], "description": "Reason for deprecation",
-                                          "example": "Replaced by newer version"},
-                    "deprecated_remark": {"type": ["string", "null"],
-                                          "description": "Additional remarks about deprecation",
-                                          "example": "Use version 2.0 instead"},
+                    "is_deprecated": {
+                        "type": "boolean",
+                        "description": "Whether the top-level ASBIEP is deprecated",
+                        "example": False,
+                    },
+                    "deprecated_reason": {
+                        "type": ["string", "null"],
+                        "description": "Reason for deprecation",
+                        "example": "Replaced by newer version",
+                    },
+                    "deprecated_remark": {
+                        "type": ["string", "null"],
+                        "description": "Additional remarks about deprecation",
+                        "example": "Use version 2.0 instead",
+                    },
                     "owner": {
                         "type": "object",
                         "description": "Owner information",
                         "properties": {
-                            "user_id": {"type": "integer", "description": "Unique identifier for the user",
-                                        "example": 100000001},
-                            "login_id": {"type": "string", "description": "User's login identifier",
-                                         "example": "john.doe"},
-                            "username": {"type": "string", "description": "Display name of the user",
-                                         "example": "John Doe"},
-                            "roles": {"type": "array",
-                                      "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
-                                      "description": "List of roles assigned to the user", "example": ["End-User"]}
+                            "user_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the user",
+                                "example": 100000001,
+                            },
+                            "login_id": {
+                                "type": "string",
+                                "description": "User's login identifier",
+                                "example": "john.doe",
+                            },
+                            "username": {
+                                "type": "string",
+                                "description": "Display name of the user",
+                                "example": "John Doe",
+                            },
+                            "roles": {
+                                "type": "array",
+                                "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                "description": "List of roles assigned to the user",
+                                "example": ["End-User"],
+                            },
                         },
-                        "required": ["user_id", "login_id", "username", "roles"]
-                    }
+                        "required": ["user_id", "login_id", "username", "roles"],
+                    },
                 },
-                "required": ["top_level_asbiep_id", "library", "release", "state", "is_deprecated", "owner"]
+                "required": ["top_level_asbiep_id", "library", "release", "state", "is_deprecated", "owner"],
             },
-            "guid": {"type": ["string", "null"],
-                     "description": "Globally unique identifier for the BBIE (if available)",
-                     "example": "a1b2c3d4e5f6789012345678901234ab"},
+            "guid": {
+                "type": ["string", "null"],
+                "description": "Globally unique identifier for the BBIE (if available)",
+                "example": "a1b2c3d4e5f6789012345678901234ab",
+            },
             "based_bcc": {
                 "type": "object",
                 "description": "BCC (Basic Core Component) information that this BBIE is based on",
                 "properties": {
-                    "bcc_manifest_id": {"type": "integer",
-                                        "description": "Unique identifier for the BCC manifest. This can be passed to create_bbie() as the based_bcc_manifest_id parameter.",
-                                        "example": 12345},
+                    "bcc_manifest_id": {
+                        "type": "integer",
+                        "description": "Unique identifier for the BCC manifest. This can be passed to create_bbie() as the based_bcc_manifest_id parameter.",
+                        "example": 12345,
+                    },
                     "bcc_id": {"type": "integer", "description": "Unique identifier for the BCC", "example": 6789},
-                    "guid": {"type": "string", "description": "Unique identifier within the release",
-                             "example": "a1b2c3d4e5f6789012345678901234ab"},
-                    "den": {"type": "string", "description": "Dictionary Entry Name (DEN)",
-                            "example": "Purchase Order. Amount"},
+                    "guid": {
+                        "type": "string",
+                        "description": "Unique identifier within the release",
+                        "example": "a1b2c3d4e5f6789012345678901234ab",
+                    },
+                    "den": {
+                        "type": "string",
+                        "description": "Dictionary Entry Name (DEN)",
+                        "example": "Purchase Order. Amount",
+                    },
                     "cardinality_min": {"type": "integer", "description": "Minimum cardinality", "example": 0},
                     "cardinality_max": {"type": "integer", "description": "Maximum cardinality", "example": 1},
-                    "entity_type": {"type": ["string", "null"], "description": "Entity type: 'Attribute' or 'Element'",
-                                    "example": "Element"},
+                    "entity_type": {
+                        "type": ["string", "null"],
+                        "description": "Entity type: 'Attribute' or 'Element'",
+                        "example": "Element",
+                    },
                     "is_nillable": {"type": "boolean", "description": "Whether the BCC is nillable", "example": False},
-                    "is_deprecated": {"type": "boolean", "description": "Whether the BCC is deprecated",
-                                      "example": False},
-                    "definition": {"type": ["string", "null"], "description": "Definition of the BCC",
-                                   "example": "A monetary amount"},
-                    "definition_source": {"type": ["string", "null"], "description": "Source of the definition",
-                                          "example": "https://example.com/spec"},
-                    "from_acc_manifest_id": {"type": "integer", "description": "Source ACC manifest ID",
-                                             "example": 12346},
-                    "to_bccp_manifest_id": {"type": "integer", "description": "Target BCCP manifest ID",
-                                            "example": 12347}
+                    "is_deprecated": {
+                        "type": "boolean",
+                        "description": "Whether the BCC is deprecated",
+                        "example": False,
+                    },
+                    "definition": {
+                        "type": ["string", "null"],
+                        "description": "Definition of the BCC",
+                        "example": "A monetary amount",
+                    },
+                    "definition_source": {
+                        "type": ["string", "null"],
+                        "description": "Source of the definition",
+                        "example": "https://example.com/spec",
+                    },
+                    "from_acc_manifest_id": {
+                        "type": "integer",
+                        "description": "Source ACC manifest ID",
+                        "example": 12346,
+                    },
+                    "to_bccp_manifest_id": {
+                        "type": "integer",
+                        "description": "Target BCCP manifest ID",
+                        "example": 12347,
+                    },
                 },
-                "required": ["bcc_manifest_id", "bcc_id", "guid", "den", "cardinality_min", "cardinality_max",
-                             "is_nillable", "is_deprecated", "from_acc_manifest_id", "to_bccp_manifest_id"]
+                "required": [
+                    "bcc_manifest_id",
+                    "bcc_id",
+                    "guid",
+                    "den",
+                    "cardinality_min",
+                    "cardinality_max",
+                    "is_nillable",
+                    "is_deprecated",
+                    "from_acc_manifest_id",
+                    "to_bccp_manifest_id",
+                ],
             },
             "to_bbiep": {
                 "type": "object",
                 "description": "BBIEP (Basic Business Information Entity Property) information",
                 "properties": {
-                    "bbiep_id": {"type": ["integer", "null"], "description": "Unique identifier for the BBIEP",
-                                 "example": 12348},
-                    "guid": {"type": ["string", "null"], "description": "Globally unique identifier for the BBIEP",
-                             "example": "a1b2c3d4e5f6789012345678901234ab"},
+                    "bbiep_id": {
+                        "type": ["integer", "null"],
+                        "description": "Unique identifier for the BBIEP",
+                        "example": 12348,
+                    },
+                    "guid": {
+                        "type": ["string", "null"],
+                        "description": "Globally unique identifier for the BBIEP",
+                        "example": "a1b2c3d4e5f6789012345678901234ab",
+                    },
                     "based_bccp": {
                         "type": "object",
                         "description": "BCCP information that this BBIEP is based on",
                         "properties": {
-                            "bccp_manifest_id": {"type": "integer",
-                                                 "description": "Unique identifier for the BCCP manifest",
-                                                 "example": 12347},
-                            "bccp_id": {"type": "integer", "description": "Unique identifier for the BCCP",
-                                        "example": 6789},
-                            "guid": {"type": "string", "description": "Unique identifier within the release",
-                                     "example": "a1b2c3d4e5f6789012345678901234ab"},
-                            "den": {"type": "string", "description": "Dictionary Entry Name (DEN)",
-                                    "example": "Purchase Order. Amount"},
+                            "bccp_manifest_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the BCCP manifest",
+                                "example": 12347,
+                            },
+                            "bccp_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the BCCP",
+                                "example": 6789,
+                            },
+                            "guid": {
+                                "type": "string",
+                                "description": "Unique identifier within the release",
+                                "example": "a1b2c3d4e5f6789012345678901234ab",
+                            },
+                            "den": {
+                                "type": "string",
+                                "description": "Dictionary Entry Name (DEN)",
+                                "example": "Purchase Order. Amount",
+                            },
                             "property_term": {"type": "string", "description": "Property term", "example": "Amount"},
-                            "representation_term": {"type": "string", "description": "Representation term",
-                                                    "example": "Amount"},
-                            "definition": {"type": ["string", "null"], "description": "Definition of the BCCP",
-                                           "example": "A monetary amount"},
-                            "definition_source": {"type": ["string", "null"], "description": "Source of the definition",
-                                                  "example": "https://example.com/spec"},
+                            "representation_term": {
+                                "type": "string",
+                                "description": "Representation term",
+                                "example": "Amount",
+                            },
+                            "definition": {
+                                "type": ["string", "null"],
+                                "description": "Definition of the BCCP",
+                                "example": "A monetary amount",
+                            },
+                            "definition_source": {
+                                "type": ["string", "null"],
+                                "description": "Source of the definition",
+                                "example": "https://example.com/spec",
+                            },
                             "bdt_manifest": {
                                 "type": "object",
                                 "description": "Basic Data Type (BDT) information",
                                 "properties": {
-                                    "dt_manifest_id": {"type": "integer",
-                                                       "description": "Unique identifier for the data type manifest",
-                                                       "example": 12349},
-                                    "dt_id": {"type": "integer", "description": "Unique identifier for the data type",
-                                              "example": 7890},
-                                    "guid": {"type": "string", "description": "Unique identifier within the release",
-                                             "example": "a1b2c3d4e5f6789012345678901234ab"},
-                                    "den": {"type": "string", "description": "Dictionary Entry Name (DEN)",
-                                            "example": "Amount. Type"},
-                                    "data_type_term": {"type": ["string", "null"], "description": "Data type term",
-                                                       "example": "Amount"},
-                                    "qualifier": {"type": ["string", "null"], "description": "Qualifier",
-                                                  "example": "Price"},
-                                    "representation_term": {"type": ["string", "null"],
-                                                            "description": "Representation term", "example": "Amount"},
-                                    "six_digit_id": {"type": ["string", "null"], "description": "Six-digit identifier",
-                                                     "example": "123456"},
-                                    "definition": {"type": ["string", "null"],
-                                                   "description": "Definition of the data type",
-                                                   "example": "A number of monetary units"},
-                                    "definition_source": {"type": ["string", "null"],
-                                                          "description": "Source of the definition",
-                                                          "example": "https://unece.org"},
-                                    "is_deprecated": {"type": "boolean",
-                                                      "description": "Whether the data type is deprecated",
-                                                      "example": False},
-                                    "based_dt_manifest_id": {"type": "integer",
-                                                             "description": "Base data type manifest ID",
-                                                             "example": 12350}
+                                    "dt_manifest_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the data type manifest",
+                                        "example": 12349,
+                                    },
+                                    "dt_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the data type",
+                                        "example": 7890,
+                                    },
+                                    "guid": {
+                                        "type": "string",
+                                        "description": "Unique identifier within the release",
+                                        "example": "a1b2c3d4e5f6789012345678901234ab",
+                                    },
+                                    "den": {
+                                        "type": "string",
+                                        "description": "Dictionary Entry Name (DEN)",
+                                        "example": "Amount. Type",
+                                    },
+                                    "data_type_term": {
+                                        "type": ["string", "null"],
+                                        "description": "Data type term",
+                                        "example": "Amount",
+                                    },
+                                    "qualifier": {
+                                        "type": ["string", "null"],
+                                        "description": "Qualifier",
+                                        "example": "Price",
+                                    },
+                                    "representation_term": {
+                                        "type": ["string", "null"],
+                                        "description": "Representation term",
+                                        "example": "Amount",
+                                    },
+                                    "six_digit_id": {
+                                        "type": ["string", "null"],
+                                        "description": "Six-digit identifier",
+                                        "example": "123456",
+                                    },
+                                    "definition": {
+                                        "type": ["string", "null"],
+                                        "description": "Definition of the data type",
+                                        "example": "A number of monetary units",
+                                    },
+                                    "definition_source": {
+                                        "type": ["string", "null"],
+                                        "description": "Source of the definition",
+                                        "example": "https://unece.org",
+                                    },
+                                    "is_deprecated": {
+                                        "type": "boolean",
+                                        "description": "Whether the data type is deprecated",
+                                        "example": False,
+                                    },
+                                    "based_dt_manifest_id": {
+                                        "type": "integer",
+                                        "description": "Base data type manifest ID",
+                                        "example": 12350,
+                                    },
                                 },
-                                "required": ["dt_manifest_id", "dt_id", "guid", "den", "representation_term",
-                                             "is_deprecated", "based_dt_manifest_id"]
+                                "required": [
+                                    "dt_manifest_id",
+                                    "dt_id",
+                                    "guid",
+                                    "den",
+                                    "representation_term",
+                                    "is_deprecated",
+                                    "based_dt_manifest_id",
+                                ],
                             },
-                            "is_deprecated": {"type": "boolean", "description": "Whether the BCCP is deprecated",
-                                              "example": False}
+                            "is_deprecated": {
+                                "type": "boolean",
+                                "description": "Whether the BCCP is deprecated",
+                                "example": False,
+                            },
                         },
-                        "required": ["bccp_manifest_id", "bccp_id", "guid", "den", "property_term",
-                                     "representation_term", "bdt_manifest", "is_deprecated"]
+                        "required": [
+                            "bccp_manifest_id",
+                            "bccp_id",
+                            "guid",
+                            "den",
+                            "property_term",
+                            "representation_term",
+                            "bdt_manifest",
+                            "is_deprecated",
+                        ],
                     },
-                    "definition": {"type": ["string", "null"], "description": "Definition of the BBIEP",
-                                   "example": "A monetary amount"},
-                    "remark": {"type": ["string", "null"], "description": "Remarks about the BBIEP",
-                               "example": "Used for purchase orders"},
+                    "definition": {
+                        "type": ["string", "null"],
+                        "description": "Definition of the BBIEP",
+                        "example": "A monetary amount",
+                    },
+                    "remark": {
+                        "type": ["string", "null"],
+                        "description": "Remarks about the BBIEP",
+                        "example": "Used for purchase orders",
+                    },
                     "biz_term": {"type": ["string", "null"], "description": "Business term", "example": "PO Amount"},
-                    "display_name": {"type": ["string", "null"], "description": "Display name",
-                                     "example": "Purchase Order Amount"},
+                    "display_name": {
+                        "type": ["string", "null"],
+                        "description": "Display name",
+                        "example": "Purchase Order Amount",
+                    },
                     "supplementary_components": {
                         "type": "array",
                         "description": "List of supplementary components. Each component contains 'based_dt_sc.dt_sc_manifest_id' (for use with create_bbie_sc()) and 'bbie_sc_id' (for use with update_bbie_sc() if the component already exists). Use get_bbie_by_bbie_id() or get_bbie_by_based_bcc_manifest_id() to retrieve available supplementary components, then use create_bbie_sc() with the dt_sc_manifest_id to enable them, or update_bbie_sc() with the bbie_sc_id to modify existing ones.",
                         "items": {
                             "type": "object",
                             "properties": {
-                                "bbie_sc_id": {"type": ["integer", "null"],
-                                               "description": "Unique identifier for the BBIE SC", "example": 12351},
-                                "guid": {"type": ["string", "null"],
-                                         "description": "Globally unique identifier for the BBIE SC",
-                                         "example": "a1b2c3d4e5f6789012345678901234ab"},
+                                "bbie_sc_id": {
+                                    "type": ["integer", "null"],
+                                    "description": "Unique identifier for the BBIE SC",
+                                    "example": 12351,
+                                },
+                                "guid": {
+                                    "type": ["string", "null"],
+                                    "description": "Globally unique identifier for the BBIE SC",
+                                    "example": "a1b2c3d4e5f6789012345678901234ab",
+                                },
                                 "based_dt_sc": {
                                     "type": "object",
                                     "description": "Data type supplementary component information",
                                     "properties": {
-                                        "dt_sc_manifest_id": {"type": "integer",
-                                                              "description": "Unique identifier for the DT_SC manifest",
-                                                              "example": 12352},
-                                        "dt_sc_id": {"type": "integer",
-                                                     "description": "Unique identifier for the DT_SC", "example": 7891},
-                                        "guid": {"type": "string",
-                                                 "description": "Unique identifier within the release",
-                                                 "example": "a1b2c3d4e5f6789012345678901234ab"},
-                                        "object_class_term": {"type": ["string", "null"],
-                                                              "description": "Object class term", "example": "Amount"},
-                                        "property_term": {"type": ["string", "null"], "description": "Property term",
-                                                          "example": "Currency"},
-                                        "representation_term": {"type": ["string", "null"],
-                                                                "description": "Representation term",
-                                                                "example": "Code"},
-                                        "definition": {"type": ["string", "null"], "description": "Definition",
-                                                       "example": "Currency code"},
-                                        "definition_source": {"type": ["string", "null"],
-                                                              "description": "Source of the definition",
-                                                              "example": "https://example.com"},
-                                        "cardinality_min": {"type": "integer", "description": "Minimum cardinality",
-                                                            "example": 0},
-                                        "cardinality_max": {"type": ["integer", "null"],
-                                                            "description": "Maximum cardinality", "example": 1},
-                                        "default_value": {"type": ["string", "null"], "description": "Default value",
-                                                          "example": "USD"},
-                                        "fixed_value": {"type": ["string", "null"], "description": "Fixed value",
-                                                        "example": None},
-                                        "is_deprecated": {"type": "boolean",
-                                                          "description": "Whether the DT_SC is deprecated",
-                                                          "example": False}
+                                        "dt_sc_manifest_id": {
+                                            "type": "integer",
+                                            "description": "Unique identifier for the DT_SC manifest",
+                                            "example": 12352,
+                                        },
+                                        "dt_sc_id": {
+                                            "type": "integer",
+                                            "description": "Unique identifier for the DT_SC",
+                                            "example": 7891,
+                                        },
+                                        "guid": {
+                                            "type": "string",
+                                            "description": "Unique identifier within the release",
+                                            "example": "a1b2c3d4e5f6789012345678901234ab",
+                                        },
+                                        "object_class_term": {
+                                            "type": ["string", "null"],
+                                            "description": "Object class term",
+                                            "example": "Amount",
+                                        },
+                                        "property_term": {
+                                            "type": ["string", "null"],
+                                            "description": "Property term",
+                                            "example": "Currency",
+                                        },
+                                        "representation_term": {
+                                            "type": ["string", "null"],
+                                            "description": "Representation term",
+                                            "example": "Code",
+                                        },
+                                        "definition": {
+                                            "type": ["string", "null"],
+                                            "description": "Definition",
+                                            "example": "Currency code",
+                                        },
+                                        "definition_source": {
+                                            "type": ["string", "null"],
+                                            "description": "Source of the definition",
+                                            "example": "https://example.com",
+                                        },
+                                        "cardinality_min": {
+                                            "type": "integer",
+                                            "description": "Minimum cardinality",
+                                            "example": 0,
+                                        },
+                                        "cardinality_max": {
+                                            "type": ["integer", "null"],
+                                            "description": "Maximum cardinality",
+                                            "example": 1,
+                                        },
+                                        "default_value": {
+                                            "type": ["string", "null"],
+                                            "description": "Default value",
+                                            "example": "USD",
+                                        },
+                                        "fixed_value": {
+                                            "type": ["string", "null"],
+                                            "description": "Fixed value",
+                                            "example": None,
+                                        },
+                                        "is_deprecated": {
+                                            "type": "boolean",
+                                            "description": "Whether the DT_SC is deprecated",
+                                            "example": False,
+                                        },
                                     },
-                                    "required": ["dt_sc_manifest_id", "dt_sc_id", "guid", "cardinality_min",
-                                                 "is_deprecated"]
+                                    "required": [
+                                        "dt_sc_manifest_id",
+                                        "dt_sc_id",
+                                        "guid",
+                                        "cardinality_min",
+                                        "is_deprecated",
+                                    ],
                                 },
-                                "definition": {"type": ["string", "null"], "description": "Definition of the BBIE SC",
-                                               "example": "Currency code"},
-                                "biz_term": {"type": ["string", "null"], "description": "Business term",
-                                             "example": "Item Name Type"},
-                                "display_name": {"type": ["string", "null"], "description": "Display name",
-                                                 "example": "Item Name Type Code"},
-                                "cardinality_min": {"type": "integer", "description": "Minimum cardinality",
-                                                    "example": 0},
-                                "cardinality_max": {"type": ["integer", "null"], "description": "Maximum cardinality",
-                                                    "example": 1},
+                                "definition": {
+                                    "type": ["string", "null"],
+                                    "description": "Definition of the BBIE SC",
+                                    "example": "Currency code",
+                                },
+                                "biz_term": {
+                                    "type": ["string", "null"],
+                                    "description": "Business term",
+                                    "example": "Item Name Type",
+                                },
+                                "display_name": {
+                                    "type": ["string", "null"],
+                                    "description": "Display name",
+                                    "example": "Item Name Type Code",
+                                },
+                                "cardinality_min": {
+                                    "type": "integer",
+                                    "description": "Minimum cardinality",
+                                    "example": 0,
+                                },
+                                "cardinality_max": {
+                                    "type": ["integer", "null"],
+                                    "description": "Maximum cardinality",
+                                    "example": 1,
+                                },
                                 "primitiveRestriction": {
                                     "type": "object",
                                     "description": "Primitive restriction information for the BBIE SC. This field is required and must not be None. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set (not multiple, not none).",
                                     "properties": {
-                                        "xbtManifestId": {"type": ["integer", "null"],
-                                                          "description": "XBT (eXtended Built-in Type) manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set.",
-                                                          "example": None},
-                                        "codeListManifestId": {"type": ["integer", "null"],
-                                                               "description": "Code list manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set.",
-                                                               "example": None},
-                                        "agencyIdListManifestId": {"type": ["integer", "null"],
-                                                                   "description": "Agency ID list manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set.",
-                                                                   "example": None}
+                                        "xbtManifestId": {
+                                            "type": ["integer", "null"],
+                                            "description": "XBT (eXtended Built-in Type) manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set.",
+                                            "example": None,
+                                        },
+                                        "codeListManifestId": {
+                                            "type": ["integer", "null"],
+                                            "description": "Code list manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set.",
+                                            "example": None,
+                                        },
+                                        "agencyIdListManifestId": {
+                                            "type": ["integer", "null"],
+                                            "description": "Agency ID list manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set.",
+                                            "example": None,
+                                        },
                                     },
-                                    "required": ["xbtManifestId", "codeListManifestId", "agencyIdListManifestId"]
+                                    "required": ["xbtManifestId", "codeListManifestId", "agencyIdListManifestId"],
                                 },
                                 "valueConstraint": {
                                     "type": ["object", "null"],
                                     "description": "Value constraint information for the BBIE SC",
                                     "properties": {
-                                        "default_value": {"type": ["string", "null"], "description": "Default value",
-                                                          "example": "USD"},
-                                        "fixed_value": {"type": ["string", "null"], "description": "Fixed value",
-                                                        "example": None}
+                                        "default_value": {
+                                            "type": ["string", "null"],
+                                            "description": "Default value",
+                                            "example": "USD",
+                                        },
+                                        "fixed_value": {
+                                            "type": ["string", "null"],
+                                            "description": "Fixed value",
+                                            "example": None,
+                                        },
                                     },
-                                    "required": ["default_value", "fixed_value"]
+                                    "required": ["default_value", "fixed_value"],
                                 },
                                 "facet": {
                                     "type": ["object", "null"],
                                     "description": "Facet restriction information for string values",
                                     "properties": {
-                                        "facet_min_length": {"type": ["integer", "null"],
-                                                             "description": "Minimum length constraint", "example": 3},
-                                        "facet_max_length": {"type": ["integer", "null"],
-                                                             "description": "Maximum length constraint", "example": 3},
-                                        "facet_pattern": {"type": ["string", "null"],
-                                                          "description": "Pattern constraint",
-                                                          "example": "[A-Z]{3}"}
+                                        "facet_min_length": {
+                                            "type": ["integer", "null"],
+                                            "description": "Minimum length constraint",
+                                            "example": 3,
+                                        },
+                                        "facet_max_length": {
+                                            "type": ["integer", "null"],
+                                            "description": "Maximum length constraint",
+                                            "example": 3,
+                                        },
+                                        "facet_pattern": {
+                                            "type": ["string", "null"],
+                                            "description": "Pattern constraint",
+                                            "example": "[A-Z]{3}",
+                                        },
                                     },
-                                    "required": ["facet_min_length", "facet_max_length", "facet_pattern"]
+                                    "required": ["facet_min_length", "facet_max_length", "facet_pattern"],
                                 },
                                 "owner_top_level_asbiep": {
                                     "type": "object",
                                     "description": "Top-Level ASBIEP information",
                                     "properties": {
-                                        "top_level_asbiep_id": {"type": "integer",
-                                                                "description": "Unique identifier for the top-level ASBIEP",
-                                                                "example": 12345},
+                                        "top_level_asbiep_id": {
+                                            "type": "integer",
+                                            "description": "Unique identifier for the top-level ASBIEP",
+                                            "example": 12345,
+                                        },
                                         "library": {
                                             "type": "object",
                                             "description": "Library information",
                                             "properties": {
-                                                "library_id": {"type": "integer",
-                                                               "description": "Unique identifier for the library",
-                                                               "example": 1},
-                                                "name": {"type": "string", "description": "Library name",
-                                                         "example": "OAGIS"}
+                                                "library_id": {
+                                                    "type": "integer",
+                                                    "description": "Unique identifier for the library",
+                                                    "example": 1,
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "description": "Library name",
+                                                    "example": "OAGIS",
+                                                },
                                             },
-                                            "required": ["library_id", "name"]
+                                            "required": ["library_id", "name"],
                                         },
                                         "release": {
                                             "type": "object",
                                             "description": "Release information",
                                             "properties": {
-                                                "release_id": {"type": "integer",
-                                                               "description": "Unique identifier for the release",
-                                                               "example": 1},
-                                                "release_num": {"type": "string",
-                                                                "description": "Release number", "example": "10.6"},
-                                                "state": {"type": "string", "description": "Release state",
-                                                          "example": "Published"}
+                                                "release_id": {
+                                                    "type": "integer",
+                                                    "description": "Unique identifier for the release",
+                                                    "example": 1,
+                                                },
+                                                "release_num": {
+                                                    "type": "string",
+                                                    "description": "Release number",
+                                                    "example": "10.6",
+                                                },
+                                                "state": {
+                                                    "type": "string",
+                                                    "description": "Release state",
+                                                    "example": "Published",
+                                                },
                                             },
-                                            "required": ["release_id", "release_num", "state"]
+                                            "required": ["release_id", "release_num", "state"],
                                         },
-                                        "version": {"type": ["string", "null"], "description": "Version number",
-                                                    "example": "1.0"},
-                                        "status": {"type": ["string", "null"], "description": "Status",
-                                                   "example": "Production"},
+                                        "version": {
+                                            "type": ["string", "null"],
+                                            "description": "Version number",
+                                            "example": "1.0",
+                                        },
+                                        "status": {
+                                            "type": ["string", "null"],
+                                            "description": "Status",
+                                            "example": "Production",
+                                        },
                                         "state": {"type": "string", "description": "State", "example": "Published"},
-                                        "is_deprecated": {"type": "boolean", "description": "Whether deprecated",
-                                                          "example": False},
-                                        "deprecated_reason": {"type": ["string", "null"],
-                                                              "description": "Reason for deprecation", "example": None},
-                                        "deprecated_remark": {"type": ["string", "null"],
-                                                              "description": "Remarks about deprecation",
-                                                              "example": None},
+                                        "is_deprecated": {
+                                            "type": "boolean",
+                                            "description": "Whether deprecated",
+                                            "example": False,
+                                        },
+                                        "deprecated_reason": {
+                                            "type": ["string", "null"],
+                                            "description": "Reason for deprecation",
+                                            "example": None,
+                                        },
+                                        "deprecated_remark": {
+                                            "type": ["string", "null"],
+                                            "description": "Remarks about deprecation",
+                                            "example": None,
+                                        },
                                         "owner": {
                                             "type": "object",
                                             "description": "Owner information",
                                             "properties": {
-                                                "user_id": {"type": "integer",
-                                                            "description": "Unique identifier for the user",
-                                                            "example": 100000001},
-                                                "login_id": {"type": "string", "description": "User's login identifier",
-                                                             "example": "john.doe"},
-                                                "username": {"type": "string",
-                                                             "description": "Display name of the user",
-                                                             "example": "John Doe"},
-                                                "roles": {"type": "array", "items": {"type": "string",
-                                                                                     "enum": ["Admin", "Developer",
-                                                                                              "End-User"]},
-                                                          "description": "List of roles assigned to the user",
-                                                          "example": ["End-User"]}
+                                                "user_id": {
+                                                    "type": "integer",
+                                                    "description": "Unique identifier for the user",
+                                                    "example": 100000001,
+                                                },
+                                                "login_id": {
+                                                    "type": "string",
+                                                    "description": "User's login identifier",
+                                                    "example": "john.doe",
+                                                },
+                                                "username": {
+                                                    "type": "string",
+                                                    "description": "Display name of the user",
+                                                    "example": "John Doe",
+                                                },
+                                                "roles": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "enum": ["Admin", "Developer", "End-User"],
+                                                    },
+                                                    "description": "List of roles assigned to the user",
+                                                    "example": ["End-User"],
+                                                },
                                             },
-                                            "required": ["user_id", "login_id", "username", "roles"]
-                                        }
+                                            "required": ["user_id", "login_id", "username", "roles"],
+                                        },
                                     },
-                                    "required": ["top_level_asbiep_id", "library", "release", "state", "is_deprecated",
-                                                 "owner"]
-                                }
+                                    "required": [
+                                        "top_level_asbiep_id",
+                                        "library",
+                                        "release",
+                                        "state",
+                                        "is_deprecated",
+                                        "owner",
+                                    ],
+                                },
                             },
-                            "required": ["based_dt_sc", "cardinality_min", "cardinality_max",
-                                         "owner_top_level_asbiep"]
-                        }
+                            "required": ["based_dt_sc", "cardinality_min", "cardinality_max", "owner_top_level_asbiep"],
+                        },
                     },
                     "owner_top_level_asbiep": {
                         "type": "object",
                         "description": "Top-Level ASBIEP information",
                         "properties": {
-                            "top_level_asbiep_id": {"type": "integer",
-                                                    "description": "Unique identifier for the top-level ASBIEP",
-                                                    "example": 12345},
+                            "top_level_asbiep_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the top-level ASBIEP",
+                                "example": 12345,
+                            },
                             "library": {
                                 "type": "object",
                                 "description": "Library information",
                                 "properties": {
-                                    "library_id": {"type": "integer",
-                                                   "description": "Unique identifier for the library", "example": 1},
-                                    "name": {"type": "string", "description": "Library name", "example": "OAGIS"}
+                                    "library_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the library",
+                                        "example": 1,
+                                    },
+                                    "name": {"type": "string", "description": "Library name", "example": "OAGIS"},
                                 },
-                                "required": ["library_id", "name"]
+                                "required": ["library_id", "name"],
                             },
                             "release": {
                                 "type": "object",
                                 "description": "Release information",
                                 "properties": {
-                                    "release_id": {"type": "integer",
-                                                   "description": "Unique identifier for the release", "example": 1},
-                                    "release_num": {"type": "string", "description": "Release number",
-                                                    "example": "10.6"},
-                                    "state": {"type": "string", "description": "Release state", "example": "Published"}
+                                    "release_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the release",
+                                        "example": 1,
+                                    },
+                                    "release_num": {
+                                        "type": "string",
+                                        "description": "Release number",
+                                        "example": "10.6",
+                                    },
+                                    "state": {"type": "string", "description": "Release state", "example": "Published"},
                                 },
-                                "required": ["release_id", "release_num", "state"]
+                                "required": ["release_id", "release_num", "state"],
                             },
                             "version": {"type": ["string", "null"], "description": "Version number", "example": "1.0"},
                             "status": {"type": ["string", "null"], "description": "Status", "example": "Production"},
                             "state": {"type": "string", "description": "State", "example": "Published"},
                             "is_deprecated": {"type": "boolean", "description": "Whether deprecated", "example": False},
-                            "deprecated_reason": {"type": ["string", "null"], "description": "Reason for deprecation",
-                                                  "example": None},
-                            "deprecated_remark": {"type": ["string", "null"],
-                                                  "description": "Remarks about deprecation", "example": None},
+                            "deprecated_reason": {
+                                "type": ["string", "null"],
+                                "description": "Reason for deprecation",
+                                "example": None,
+                            },
+                            "deprecated_remark": {
+                                "type": ["string", "null"],
+                                "description": "Remarks about deprecation",
+                                "example": None,
+                            },
                             "owner": {
                                 "type": "object",
                                 "description": "Owner information",
                                 "properties": {
-                                    "user_id": {"type": "integer", "description": "Unique identifier for the user",
-                                                "example": 100000001},
-                                    "login_id": {"type": "string", "description": "User's login identifier",
-                                                 "example": "john.doe"},
-                                    "username": {"type": "string", "description": "Display name of the user",
-                                                 "example": "John Doe"},
-                                    "roles": {"type": "array",
-                                              "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
-                                              "description": "List of roles assigned to the user",
-                                              "example": ["End-User"]}
+                                    "user_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the user",
+                                        "example": 100000001,
+                                    },
+                                    "login_id": {
+                                        "type": "string",
+                                        "description": "User's login identifier",
+                                        "example": "john.doe",
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "description": "Display name of the user",
+                                        "example": "John Doe",
+                                    },
+                                    "roles": {
+                                        "type": "array",
+                                        "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                        "description": "List of roles assigned to the user",
+                                        "example": ["End-User"],
+                                    },
                                 },
-                                "required": ["user_id", "login_id", "username", "roles"]
-                            }
+                                "required": ["user_id", "login_id", "username", "roles"],
+                            },
                         },
-                        "required": ["top_level_asbiep_id", "library", "release", "state", "is_deprecated", "owner"]
-                    }
+                        "required": ["top_level_asbiep_id", "library", "release", "state", "is_deprecated", "owner"],
+                    },
                 },
-                "required": ["based_bccp", "supplementary_components", "owner_top_level_asbiep"]
+                "required": ["based_bccp", "supplementary_components", "owner_top_level_asbiep"],
             },
-            "is_used": {"type": "boolean",
-                        "description": "Whether this BBIE is currently being used (profiled) in the BIE",
-                        "example": True},
-            "cardinality_min": {"type": "integer",
-                                "description": "Minimum cardinality (minimum number of occurrences required, typically 0 or 1)",
-                                "example": 0},
-            "cardinality_max": {"type": "integer",
-                                "description": "Maximum cardinality (maximum number of occurrences allowed, -1 means unbounded)",
-                                "example": 1},
-            "is_nillable": {"type": "boolean", "description": "Whether the BBIE can have a nil/null value",
-                            "example": False},
-            "definition": {"type": ["string", "null"],
-                           "description": "Definition to override the BCC definition. If NULL, it means that the definition should be inherited from the based BCC",
-                           "example": "A monetary amount"},
-            "remark": {"type": ["string", "null"], "description": "Additional remarks or notes about the BBIE",
-                       "example": "Used for purchase orders"},
+            "is_used": {
+                "type": "boolean",
+                "description": "Whether this BBIE is currently being used (profiled) in the BIE",
+                "example": True,
+            },
+            "cardinality_min": {
+                "type": "integer",
+                "description": "Minimum cardinality (minimum number of occurrences required, typically 0 or 1)",
+                "example": 0,
+            },
+            "cardinality_max": {
+                "type": "integer",
+                "description": "Maximum cardinality (maximum number of occurrences allowed, -1 means unbounded)",
+                "example": 1,
+            },
+            "is_nillable": {
+                "type": "boolean",
+                "description": "Whether the BBIE can have a nil/null value",
+                "example": False,
+            },
+            "definition": {
+                "type": ["string", "null"],
+                "description": "Definition to override the BCC definition. If NULL, it means that the definition should be inherited from the based BCC",
+                "example": "A monetary amount",
+            },
+            "remark": {
+                "type": ["string", "null"],
+                "description": "Additional remarks or notes about the BBIE",
+                "example": "Used for purchase orders",
+            },
             "primitiveRestriction": {
                 "type": "object",
                 "description": "Primitive restriction information for the BBIE. This field is required and must not be None. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set (not multiple, not none).",
                 "properties": {
-                    "xbtManifestId": {"type": ["integer", "null"],
-                                      "description": "XBT (eXtended Built-in Type) manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set.",
-                                      "example": None},
-                    "codeListManifestId": {"type": ["integer", "null"],
-                                           "description": "Code list manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set.",
-                                           "example": None},
-                    "agencyIdListManifestId": {"type": ["integer", "null"],
-                                               "description": "Agency ID list manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set.",
-                                               "example": None}
+                    "xbtManifestId": {
+                        "type": ["integer", "null"],
+                        "description": "XBT (eXtended Built-in Type) manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set.",
+                        "example": None,
+                    },
+                    "codeListManifestId": {
+                        "type": ["integer", "null"],
+                        "description": "Code list manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set.",
+                        "example": None,
+                    },
+                    "agencyIdListManifestId": {
+                        "type": ["integer", "null"],
+                        "description": "Agency ID list manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set.",
+                        "example": None,
+                    },
                 },
-                "required": ["xbtManifestId", "codeListManifestId", "agencyIdListManifestId"]
+                "required": ["xbtManifestId", "codeListManifestId", "agencyIdListManifestId"],
             },
             "valueConstraint": {
                 "type": ["object", "null"],
                 "description": "Value constraint information for the BBIE",
                 "properties": {
-                    "default_value": {"type": ["string", "null"], "description": "Default value for the BBIE",
-                                      "example": None},
-                    "fixed_value": {"type": ["string", "null"],
-                                    "description": "Fixed value for the BBIE",
-                                    "example": None}
+                    "default_value": {
+                        "type": ["string", "null"],
+                        "description": "Default value for the BBIE",
+                        "example": None,
+                    },
+                    "fixed_value": {
+                        "type": ["string", "null"],
+                        "description": "Fixed value for the BBIE",
+                        "example": None,
+                    },
                 },
-                "required": ["default_value", "fixed_value"]
+                "required": ["default_value", "fixed_value"],
             },
             "facet": {
                 "type": ["object", "null"],
                 "description": "Facet restriction information for string values",
                 "properties": {
-                    "facet_min_length": {"type": ["integer", "null"],
-                                         "description": "Minimum length constraint for string values (facet restriction)",
-                                         "example": None},
-                    "facet_max_length": {"type": ["integer", "null"],
-                                         "description": "Maximum length constraint for string values (facet restriction)",
-                                         "example": None},
-                    "facet_pattern": {"type": ["string", "null"],
-                                      "description": "Pattern constraint (regular expression) for string values (facet restriction)",
-                                      "example": None}
+                    "facet_min_length": {
+                        "type": ["integer", "null"],
+                        "description": "Minimum length constraint for string values (facet restriction)",
+                        "example": None,
+                    },
+                    "facet_max_length": {
+                        "type": ["integer", "null"],
+                        "description": "Maximum length constraint for string values (facet restriction)",
+                        "example": None,
+                    },
+                    "facet_pattern": {
+                        "type": ["string", "null"],
+                        "description": "Pattern constraint (regular expression) for string values (facet restriction)",
+                        "example": None,
+                    },
                 },
-                "required": ["facet_min_length", "facet_max_length", "facet_pattern"]
-            }
+                "required": ["facet_min_length", "facet_max_length", "facet_pattern"],
+            },
         },
-        "required": ["owner_top_level_asbiep", "based_bcc", "to_bbiep", "is_used",
-                     "cardinality_min", "cardinality_max", "is_nillable"]
-    }
+        "required": [
+            "owner_top_level_asbiep",
+            "based_bcc",
+            "to_bbiep",
+            "is_used",
+            "cardinality_min",
+            "cardinality_max",
+            "is_nillable",
+        ],
+    },
 )
 async def get_bbie_by_bbie_id(
     bbie_id: Annotated[int, Field(gt=0, description="Unique identifier of the BBIE to retrieve.")],
-    business_information_entity_service: BusinessInformationEntityService = Depends(get_business_information_entity_service),
+    business_information_entity_service: BusinessInformationEntityService = Depends(
+        get_business_information_entity_service
+    ),
 ) -> GetBbieResponse:
     """
     Get a BBIE (Basic Business Information Entity) by its BBIE ID.
@@ -3019,485 +4656,831 @@ async def get_bbie_by_bbie_id(
         "type": "object",
         "description": "Response containing BBIE (Basic Business Information Entity) information with its BBIEP. Used for profiling core components – when is_used=True, the component is profiled for practical use (bbie_id will be created); when is_used=False, it shows all available components for profiling. IMPORTANT: Groups (component_type 3=SemanticGroup or 4=UserExtensionGroup) are automatically skipped in BIE expressions, so the BIE structure may differ from the CC structure. To find the correct from_abie_id for create_bbie, traverse the actual BIE structure recursively.",
         "properties": {
-            "bbie_id": {"type": ["integer", "null"],
-                        "description": "Unique identifier for the BBIE (base entity ID, None if not yet created)",
-                        "example": 12345},
+            "bbie_id": {
+                "type": ["integer", "null"],
+                "description": "Unique identifier for the BBIE (base entity ID, None if not yet created)",
+                "example": 12345,
+            },
             "owner_top_level_asbiep": {
                 "type": "object",
                 "description": "Top-Level ASBIEP information",
                 "properties": {
-                    "top_level_asbiep_id": {"type": "integer",
-                                            "description": "Unique identifier for the top-level ASBIEP",
-                                            "example": 12345},
+                    "top_level_asbiep_id": {
+                        "type": "integer",
+                        "description": "Unique identifier for the top-level ASBIEP",
+                        "example": 12345,
+                    },
                     "library": {
                         "type": "object",
                         "description": "Library information",
                         "properties": {
-                            "library_id": {"type": "integer", "description": "Unique identifier for the library",
-                                           "example": 1},
-                            "name": {"type": "string", "description": "Library name", "example": "OAGIS"}
+                            "library_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the library",
+                                "example": 1,
+                            },
+                            "name": {"type": "string", "description": "Library name", "example": "OAGIS"},
                         },
-                        "required": ["library_id", "name"]
+                        "required": ["library_id", "name"],
                     },
                     "release": {
                         "type": "object",
                         "description": "Release information",
                         "properties": {
-                            "release_id": {"type": "integer", "description": "Unique identifier for the release",
-                                           "example": 1},
-                            "release_num": {"type": "string", "description": "Release number",
-                                            "example": "10.6"},
-                            "state": {"type": "string", "description": "Release state", "example": "Published"}
+                            "release_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the release",
+                                "example": 1,
+                            },
+                            "release_num": {"type": "string", "description": "Release number", "example": "10.6"},
+                            "state": {"type": "string", "description": "Release state", "example": "Published"},
                         },
-                        "required": ["release_id", "release_num", "state"]
+                        "required": ["release_id", "release_num", "state"],
                     },
                     "version": {"type": ["string", "null"], "description": "Version number", "example": "1.0"},
-                    "status": {"type": ["string", "null"], "description": "Status of the top-level ASBIEP",
-                               "example": "Production"},
+                    "status": {
+                        "type": ["string", "null"],
+                        "description": "Status of the top-level ASBIEP",
+                        "example": "Production",
+                    },
                     "state": {"type": "string", "description": "State of the top-level ASBIEP", "example": "Published"},
-                    "is_deprecated": {"type": "boolean", "description": "Whether the top-level ASBIEP is deprecated",
-                                      "example": False},
-                    "deprecated_reason": {"type": ["string", "null"], "description": "Reason for deprecation",
-                                          "example": "Replaced by newer version"},
-                    "deprecated_remark": {"type": ["string", "null"],
-                                          "description": "Additional remarks about deprecation",
-                                          "example": "Use version 2.0 instead"},
+                    "is_deprecated": {
+                        "type": "boolean",
+                        "description": "Whether the top-level ASBIEP is deprecated",
+                        "example": False,
+                    },
+                    "deprecated_reason": {
+                        "type": ["string", "null"],
+                        "description": "Reason for deprecation",
+                        "example": "Replaced by newer version",
+                    },
+                    "deprecated_remark": {
+                        "type": ["string", "null"],
+                        "description": "Additional remarks about deprecation",
+                        "example": "Use version 2.0 instead",
+                    },
                     "owner": {
                         "type": "object",
                         "description": "Owner information",
                         "properties": {
-                            "user_id": {"type": "integer", "description": "Unique identifier for the user",
-                                        "example": 100000001},
-                            "login_id": {"type": "string", "description": "User's login identifier",
-                                         "example": "john.doe"},
-                            "username": {"type": "string", "description": "Display name of the user",
-                                         "example": "John Doe"},
-                            "roles": {"type": "array",
-                                      "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
-                                      "description": "List of roles assigned to the user", "example": ["End-User"]}
+                            "user_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the user",
+                                "example": 100000001,
+                            },
+                            "login_id": {
+                                "type": "string",
+                                "description": "User's login identifier",
+                                "example": "john.doe",
+                            },
+                            "username": {
+                                "type": "string",
+                                "description": "Display name of the user",
+                                "example": "John Doe",
+                            },
+                            "roles": {
+                                "type": "array",
+                                "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                "description": "List of roles assigned to the user",
+                                "example": ["End-User"],
+                            },
                         },
-                        "required": ["user_id", "login_id", "username", "roles"]
-                    }
+                        "required": ["user_id", "login_id", "username", "roles"],
+                    },
                 },
-                "required": ["top_level_asbiep_id", "library", "release", "state", "is_deprecated", "owner"]
+                "required": ["top_level_asbiep_id", "library", "release", "state", "is_deprecated", "owner"],
             },
-            "guid": {"type": ["string", "null"],
-                     "description": "Globally unique identifier for the BBIE (if available)",
-                     "example": "a1b2c3d4e5f6789012345678901234ab"},
+            "guid": {
+                "type": ["string", "null"],
+                "description": "Globally unique identifier for the BBIE (if available)",
+                "example": "a1b2c3d4e5f6789012345678901234ab",
+            },
             "based_bcc": {
                 "type": "object",
                 "description": "BCC (Basic Core Component) information that this BBIE is based on",
                 "properties": {
-                    "bcc_manifest_id": {"type": "integer",
-                                        "description": "Unique identifier for the BCC manifest. This can be passed to create_bbie() as the based_bcc_manifest_id parameter.",
-                                        "example": 12345},
+                    "bcc_manifest_id": {
+                        "type": "integer",
+                        "description": "Unique identifier for the BCC manifest. This can be passed to create_bbie() as the based_bcc_manifest_id parameter.",
+                        "example": 12345,
+                    },
                     "bcc_id": {"type": "integer", "description": "Unique identifier for the BCC", "example": 6789},
-                    "guid": {"type": "string", "description": "Unique identifier within the release",
-                             "example": "a1b2c3d4e5f6789012345678901234ab"},
-                    "den": {"type": "string", "description": "Dictionary Entry Name (DEN)",
-                            "example": "Purchase Order. Amount"},
+                    "guid": {
+                        "type": "string",
+                        "description": "Unique identifier within the release",
+                        "example": "a1b2c3d4e5f6789012345678901234ab",
+                    },
+                    "den": {
+                        "type": "string",
+                        "description": "Dictionary Entry Name (DEN)",
+                        "example": "Purchase Order. Amount",
+                    },
                     "cardinality_min": {"type": "integer", "description": "Minimum cardinality", "example": 0},
                     "cardinality_max": {"type": "integer", "description": "Maximum cardinality", "example": 1},
-                    "entity_type": {"type": ["string", "null"], "description": "Entity type: 'Attribute' or 'Element'",
-                                    "example": "Element"},
+                    "entity_type": {
+                        "type": ["string", "null"],
+                        "description": "Entity type: 'Attribute' or 'Element'",
+                        "example": "Element",
+                    },
                     "is_nillable": {"type": "boolean", "description": "Whether the BCC is nillable", "example": False},
-                    "is_deprecated": {"type": "boolean", "description": "Whether the BCC is deprecated",
-                                      "example": False},
-                    "definition": {"type": ["string", "null"], "description": "Definition of the BCC",
-                                   "example": "A monetary amount"},
-                    "definition_source": {"type": ["string", "null"], "description": "Source of the definition",
-                                          "example": "https://example.com/spec"},
-                    "from_acc_manifest_id": {"type": "integer", "description": "Source ACC manifest ID",
-                                             "example": 12346},
-                    "to_bccp_manifest_id": {"type": "integer", "description": "Target BCCP manifest ID",
-                                            "example": 12347}
+                    "is_deprecated": {
+                        "type": "boolean",
+                        "description": "Whether the BCC is deprecated",
+                        "example": False,
+                    },
+                    "definition": {
+                        "type": ["string", "null"],
+                        "description": "Definition of the BCC",
+                        "example": "A monetary amount",
+                    },
+                    "definition_source": {
+                        "type": ["string", "null"],
+                        "description": "Source of the definition",
+                        "example": "https://example.com/spec",
+                    },
+                    "from_acc_manifest_id": {
+                        "type": "integer",
+                        "description": "Source ACC manifest ID",
+                        "example": 12346,
+                    },
+                    "to_bccp_manifest_id": {
+                        "type": "integer",
+                        "description": "Target BCCP manifest ID",
+                        "example": 12347,
+                    },
                 },
-                "required": ["bcc_manifest_id", "bcc_id", "guid", "den", "cardinality_min", "cardinality_max",
-                             "is_nillable", "is_deprecated", "from_acc_manifest_id", "to_bccp_manifest_id"]
+                "required": [
+                    "bcc_manifest_id",
+                    "bcc_id",
+                    "guid",
+                    "den",
+                    "cardinality_min",
+                    "cardinality_max",
+                    "is_nillable",
+                    "is_deprecated",
+                    "from_acc_manifest_id",
+                    "to_bccp_manifest_id",
+                ],
             },
             "to_bbiep": {
                 "type": "object",
                 "description": "BBIEP (Basic Business Information Entity Property) information",
                 "properties": {
-                    "bbiep_id": {"type": ["integer", "null"], "description": "Unique identifier for the BBIEP",
-                                 "example": 12348},
-                    "guid": {"type": ["string", "null"], "description": "Globally unique identifier for the BBIEP",
-                             "example": "a1b2c3d4e5f6789012345678901234ab"},
+                    "bbiep_id": {
+                        "type": ["integer", "null"],
+                        "description": "Unique identifier for the BBIEP",
+                        "example": 12348,
+                    },
+                    "guid": {
+                        "type": ["string", "null"],
+                        "description": "Globally unique identifier for the BBIEP",
+                        "example": "a1b2c3d4e5f6789012345678901234ab",
+                    },
                     "based_bccp": {
                         "type": "object",
                         "description": "BCCP information that this BBIEP is based on",
                         "properties": {
-                            "bccp_manifest_id": {"type": "integer",
-                                                 "description": "Unique identifier for the BCCP manifest",
-                                                 "example": 12347},
-                            "bccp_id": {"type": "integer", "description": "Unique identifier for the BCCP",
-                                        "example": 6789},
-                            "guid": {"type": "string", "description": "Unique identifier within the release",
-                                     "example": "a1b2c3d4e5f6789012345678901234ab"},
-                            "den": {"type": "string", "description": "Dictionary Entry Name (DEN)",
-                                    "example": "Purchase Order. Amount"},
+                            "bccp_manifest_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the BCCP manifest",
+                                "example": 12347,
+                            },
+                            "bccp_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the BCCP",
+                                "example": 6789,
+                            },
+                            "guid": {
+                                "type": "string",
+                                "description": "Unique identifier within the release",
+                                "example": "a1b2c3d4e5f6789012345678901234ab",
+                            },
+                            "den": {
+                                "type": "string",
+                                "description": "Dictionary Entry Name (DEN)",
+                                "example": "Purchase Order. Amount",
+                            },
                             "property_term": {"type": "string", "description": "Property term", "example": "Amount"},
-                            "representation_term": {"type": "string", "description": "Representation term",
-                                                    "example": "Amount"},
-                            "definition": {"type": ["string", "null"], "description": "Definition of the BCCP",
-                                           "example": "A monetary amount"},
-                            "definition_source": {"type": ["string", "null"], "description": "Source of the definition",
-                                                  "example": "https://example.com/spec"},
+                            "representation_term": {
+                                "type": "string",
+                                "description": "Representation term",
+                                "example": "Amount",
+                            },
+                            "definition": {
+                                "type": ["string", "null"],
+                                "description": "Definition of the BCCP",
+                                "example": "A monetary amount",
+                            },
+                            "definition_source": {
+                                "type": ["string", "null"],
+                                "description": "Source of the definition",
+                                "example": "https://example.com/spec",
+                            },
                             "bdt_manifest": {
                                 "type": "object",
                                 "description": "Basic Data Type (BDT) information",
                                 "properties": {
-                                    "dt_manifest_id": {"type": "integer",
-                                                       "description": "Unique identifier for the data type manifest",
-                                                       "example": 12349},
-                                    "dt_id": {"type": "integer", "description": "Unique identifier for the data type",
-                                              "example": 7890},
-                                    "guid": {"type": "string", "description": "Unique identifier within the release",
-                                             "example": "a1b2c3d4e5f6789012345678901234ab"},
-                                    "den": {"type": "string", "description": "Dictionary Entry Name (DEN)",
-                                            "example": "Amount. Type"},
-                                    "data_type_term": {"type": ["string", "null"], "description": "Data type term",
-                                                       "example": "Amount"},
-                                    "qualifier": {"type": ["string", "null"], "description": "Qualifier",
-                                                  "example": "Price"},
-                                    "representation_term": {"type": ["string", "null"],
-                                                            "description": "Representation term", "example": "Amount"},
-                                    "six_digit_id": {"type": ["string", "null"], "description": "Six-digit identifier",
-                                                     "example": "123456"},
-                                    "definition": {"type": ["string", "null"],
-                                                   "description": "Definition of the data type",
-                                                   "example": "A number of monetary units"},
-                                    "definition_source": {"type": ["string", "null"],
-                                                          "description": "Source of the definition",
-                                                          "example": "https://unece.org"},
-                                    "is_deprecated": {"type": "boolean",
-                                                      "description": "Whether the data type is deprecated",
-                                                      "example": False},
-                                    "based_dt_manifest_id": {"type": "integer",
-                                                             "description": "Base data type manifest ID",
-                                                             "example": 12350}
+                                    "dt_manifest_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the data type manifest",
+                                        "example": 12349,
+                                    },
+                                    "dt_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the data type",
+                                        "example": 7890,
+                                    },
+                                    "guid": {
+                                        "type": "string",
+                                        "description": "Unique identifier within the release",
+                                        "example": "a1b2c3d4e5f6789012345678901234ab",
+                                    },
+                                    "den": {
+                                        "type": "string",
+                                        "description": "Dictionary Entry Name (DEN)",
+                                        "example": "Amount. Type",
+                                    },
+                                    "data_type_term": {
+                                        "type": ["string", "null"],
+                                        "description": "Data type term",
+                                        "example": "Amount",
+                                    },
+                                    "qualifier": {
+                                        "type": ["string", "null"],
+                                        "description": "Qualifier",
+                                        "example": "Price",
+                                    },
+                                    "representation_term": {
+                                        "type": ["string", "null"],
+                                        "description": "Representation term",
+                                        "example": "Amount",
+                                    },
+                                    "six_digit_id": {
+                                        "type": ["string", "null"],
+                                        "description": "Six-digit identifier",
+                                        "example": "123456",
+                                    },
+                                    "definition": {
+                                        "type": ["string", "null"],
+                                        "description": "Definition of the data type",
+                                        "example": "A number of monetary units",
+                                    },
+                                    "definition_source": {
+                                        "type": ["string", "null"],
+                                        "description": "Source of the definition",
+                                        "example": "https://unece.org",
+                                    },
+                                    "is_deprecated": {
+                                        "type": "boolean",
+                                        "description": "Whether the data type is deprecated",
+                                        "example": False,
+                                    },
+                                    "based_dt_manifest_id": {
+                                        "type": "integer",
+                                        "description": "Base data type manifest ID",
+                                        "example": 12350,
+                                    },
                                 },
-                                "required": ["dt_manifest_id", "dt_id", "guid", "den", "representation_term",
-                                             "is_deprecated", "based_dt_manifest_id"]
+                                "required": [
+                                    "dt_manifest_id",
+                                    "dt_id",
+                                    "guid",
+                                    "den",
+                                    "representation_term",
+                                    "is_deprecated",
+                                    "based_dt_manifest_id",
+                                ],
                             },
-                            "is_deprecated": {"type": "boolean", "description": "Whether the BCCP is deprecated",
-                                              "example": False}
+                            "is_deprecated": {
+                                "type": "boolean",
+                                "description": "Whether the BCCP is deprecated",
+                                "example": False,
+                            },
                         },
-                        "required": ["bccp_manifest_id", "bccp_id", "guid", "den", "property_term",
-                                     "representation_term", "bdt_manifest", "is_deprecated"]
+                        "required": [
+                            "bccp_manifest_id",
+                            "bccp_id",
+                            "guid",
+                            "den",
+                            "property_term",
+                            "representation_term",
+                            "bdt_manifest",
+                            "is_deprecated",
+                        ],
                     },
-                    "definition": {"type": ["string", "null"], "description": "Definition of the BBIEP",
-                                   "example": "A monetary amount"},
-                    "remark": {"type": ["string", "null"], "description": "Remarks about the BBIEP",
-                               "example": "Used for purchase orders"},
+                    "definition": {
+                        "type": ["string", "null"],
+                        "description": "Definition of the BBIEP",
+                        "example": "A monetary amount",
+                    },
+                    "remark": {
+                        "type": ["string", "null"],
+                        "description": "Remarks about the BBIEP",
+                        "example": "Used for purchase orders",
+                    },
                     "biz_term": {"type": ["string", "null"], "description": "Business term", "example": "PO Amount"},
-                    "display_name": {"type": ["string", "null"], "description": "Display name",
-                                     "example": "Purchase Order Amount"},
+                    "display_name": {
+                        "type": ["string", "null"],
+                        "description": "Display name",
+                        "example": "Purchase Order Amount",
+                    },
                     "supplementary_components": {
                         "type": "array",
                         "description": "List of supplementary components. Each component contains 'based_dt_sc.dt_sc_manifest_id' (for use with create_bbie_sc()) and 'bbie_sc_id' (for use with update_bbie_sc() if the component already exists). Use get_bbie_by_based_bcc_manifest_id() to retrieve available supplementary components, then use create_bbie_sc() with the dt_sc_manifest_id to enable them, or update_bbie_sc() with the bbie_sc_id to modify existing ones.",
                         "items": {
                             "type": "object",
                             "properties": {
-                                "bbie_sc_id": {"type": ["integer", "null"],
-                                               "description": "Unique identifier for the BBIE SC", "example": 12351},
-                                "guid": {"type": ["string", "null"],
-                                         "description": "Globally unique identifier for the BBIE SC",
-                                         "example": "a1b2c3d4e5f6789012345678901234ab"},
+                                "bbie_sc_id": {
+                                    "type": ["integer", "null"],
+                                    "description": "Unique identifier for the BBIE SC",
+                                    "example": 12351,
+                                },
+                                "guid": {
+                                    "type": ["string", "null"],
+                                    "description": "Globally unique identifier for the BBIE SC",
+                                    "example": "a1b2c3d4e5f6789012345678901234ab",
+                                },
                                 "based_dt_sc": {
                                     "type": "object",
                                     "description": "Data type supplementary component information",
                                     "properties": {
-                                        "dt_sc_manifest_id": {"type": "integer",
-                                                              "description": "Unique identifier for the DT_SC manifest",
-                                                              "example": 12352},
-                                        "dt_sc_id": {"type": "integer",
-                                                     "description": "Unique identifier for the DT_SC", "example": 7891},
-                                        "guid": {"type": "string",
-                                                 "description": "Unique identifier within the release",
-                                                 "example": "a1b2c3d4e5f6789012345678901234ab"},
-                                        "object_class_term": {"type": ["string", "null"],
-                                                              "description": "Object class term", "example": "Amount"},
-                                        "property_term": {"type": ["string", "null"], "description": "Property term",
-                                                          "example": "Currency"},
-                                        "representation_term": {"type": ["string", "null"],
-                                                                "description": "Representation term",
-                                                                "example": "Code"},
-                                        "definition": {"type": ["string", "null"], "description": "Definition",
-                                                       "example": "Currency code"},
-                                        "definition_source": {"type": ["string", "null"],
-                                                              "description": "Source of the definition",
-                                                              "example": "https://example.com"},
-                                        "cardinality_min": {"type": "integer", "description": "Minimum cardinality",
-                                                            "example": 0},
-                                        "cardinality_max": {"type": ["integer", "null"],
-                                                            "description": "Maximum cardinality", "example": 1},
-                                        "default_value": {"type": ["string", "null"], "description": "Default value",
-                                                          "example": "USD"},
-                                        "fixed_value": {"type": ["string", "null"], "description": "Fixed value",
-                                                        "example": None},
-                                        "is_deprecated": {"type": "boolean",
-                                                          "description": "Whether the DT_SC is deprecated",
-                                                          "example": False}
+                                        "dt_sc_manifest_id": {
+                                            "type": "integer",
+                                            "description": "Unique identifier for the DT_SC manifest",
+                                            "example": 12352,
+                                        },
+                                        "dt_sc_id": {
+                                            "type": "integer",
+                                            "description": "Unique identifier for the DT_SC",
+                                            "example": 7891,
+                                        },
+                                        "guid": {
+                                            "type": "string",
+                                            "description": "Unique identifier within the release",
+                                            "example": "a1b2c3d4e5f6789012345678901234ab",
+                                        },
+                                        "object_class_term": {
+                                            "type": ["string", "null"],
+                                            "description": "Object class term",
+                                            "example": "Amount",
+                                        },
+                                        "property_term": {
+                                            "type": ["string", "null"],
+                                            "description": "Property term",
+                                            "example": "Currency",
+                                        },
+                                        "representation_term": {
+                                            "type": ["string", "null"],
+                                            "description": "Representation term",
+                                            "example": "Code",
+                                        },
+                                        "definition": {
+                                            "type": ["string", "null"],
+                                            "description": "Definition",
+                                            "example": "Currency code",
+                                        },
+                                        "definition_source": {
+                                            "type": ["string", "null"],
+                                            "description": "Source of the definition",
+                                            "example": "https://example.com",
+                                        },
+                                        "cardinality_min": {
+                                            "type": "integer",
+                                            "description": "Minimum cardinality",
+                                            "example": 0,
+                                        },
+                                        "cardinality_max": {
+                                            "type": ["integer", "null"],
+                                            "description": "Maximum cardinality",
+                                            "example": 1,
+                                        },
+                                        "default_value": {
+                                            "type": ["string", "null"],
+                                            "description": "Default value",
+                                            "example": "USD",
+                                        },
+                                        "fixed_value": {
+                                            "type": ["string", "null"],
+                                            "description": "Fixed value",
+                                            "example": None,
+                                        },
+                                        "is_deprecated": {
+                                            "type": "boolean",
+                                            "description": "Whether the DT_SC is deprecated",
+                                            "example": False,
+                                        },
                                     },
-                                    "required": ["dt_sc_manifest_id", "dt_sc_id", "guid", "cardinality_min",
-                                                 "is_deprecated"]
+                                    "required": [
+                                        "dt_sc_manifest_id",
+                                        "dt_sc_id",
+                                        "guid",
+                                        "cardinality_min",
+                                        "is_deprecated",
+                                    ],
                                 },
-                                "definition": {"type": ["string", "null"], "description": "Definition of the BBIE SC",
-                                               "example": "Currency code"},
-                                "biz_term": {"type": ["string", "null"], "description": "Business term",
-                                             "example": "Item Name Type"},
-                                "display_name": {"type": ["string", "null"], "description": "Display name",
-                                                 "example": "Item Name Type Code"},
-                                "cardinality_min": {"type": "integer", "description": "Minimum cardinality",
-                                                    "example": 0},
-                                "cardinality_max": {"type": ["integer", "null"], "description": "Maximum cardinality",
-                                                    "example": 1},
+                                "definition": {
+                                    "type": ["string", "null"],
+                                    "description": "Definition of the BBIE SC",
+                                    "example": "Currency code",
+                                },
+                                "biz_term": {
+                                    "type": ["string", "null"],
+                                    "description": "Business term",
+                                    "example": "Item Name Type",
+                                },
+                                "display_name": {
+                                    "type": ["string", "null"],
+                                    "description": "Display name",
+                                    "example": "Item Name Type Code",
+                                },
+                                "cardinality_min": {
+                                    "type": "integer",
+                                    "description": "Minimum cardinality",
+                                    "example": 0,
+                                },
+                                "cardinality_max": {
+                                    "type": ["integer", "null"],
+                                    "description": "Maximum cardinality",
+                                    "example": 1,
+                                },
                                 "primitiveRestriction": {
                                     "type": "object",
                                     "description": "Primitive restriction information for the BBIE SC. This field is required and must not be None. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set (not multiple, not none).",
                                     "properties": {
-                                        "xbtManifestId": {"type": ["integer", "null"],
-                                                          "description": "XBT (eXtended Built-in Type) manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set.",
-                                                          "example": None},
-                                        "codeListManifestId": {"type": ["integer", "null"],
-                                                               "description": "Code list manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set.",
-                                                               "example": None},
-                                        "agencyIdListManifestId": {"type": ["integer", "null"],
-                                                                   "description": "Agency ID list manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set.",
-                                                                   "example": None}
+                                        "xbtManifestId": {
+                                            "type": ["integer", "null"],
+                                            "description": "XBT (eXtended Built-in Type) manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set.",
+                                            "example": None,
+                                        },
+                                        "codeListManifestId": {
+                                            "type": ["integer", "null"],
+                                            "description": "Code list manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set.",
+                                            "example": None,
+                                        },
+                                        "agencyIdListManifestId": {
+                                            "type": ["integer", "null"],
+                                            "description": "Agency ID list manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set.",
+                                            "example": None,
+                                        },
                                     },
-                                    "required": ["xbtManifestId", "codeListManifestId", "agencyIdListManifestId"]
+                                    "required": ["xbtManifestId", "codeListManifestId", "agencyIdListManifestId"],
                                 },
                                 "valueConstraint": {
                                     "type": ["object", "null"],
                                     "description": "Value constraint information for the BBIE SC",
                                     "properties": {
-                                        "default_value": {"type": ["string", "null"], "description": "Default value",
-                                                          "example": "USD"},
-                                        "fixed_value": {"type": ["string", "null"], "description": "Fixed value",
-                                                        "example": None}
+                                        "default_value": {
+                                            "type": ["string", "null"],
+                                            "description": "Default value",
+                                            "example": "USD",
+                                        },
+                                        "fixed_value": {
+                                            "type": ["string", "null"],
+                                            "description": "Fixed value",
+                                            "example": None,
+                                        },
                                     },
-                                    "required": ["default_value", "fixed_value"]
+                                    "required": ["default_value", "fixed_value"],
                                 },
                                 "facet": {
                                     "type": ["object", "null"],
                                     "description": "Facet restriction information for string values",
                                     "properties": {
-                                        "facet_min_length": {"type": ["integer", "null"],
-                                                             "description": "Minimum length constraint", "example": 3},
-                                        "facet_max_length": {"type": ["integer", "null"],
-                                                             "description": "Maximum length constraint", "example": 3},
-                                        "facet_pattern": {"type": ["string", "null"],
-                                                          "description": "Pattern constraint",
-                                                          "example": "[A-Z]{3}"}
+                                        "facet_min_length": {
+                                            "type": ["integer", "null"],
+                                            "description": "Minimum length constraint",
+                                            "example": 3,
+                                        },
+                                        "facet_max_length": {
+                                            "type": ["integer", "null"],
+                                            "description": "Maximum length constraint",
+                                            "example": 3,
+                                        },
+                                        "facet_pattern": {
+                                            "type": ["string", "null"],
+                                            "description": "Pattern constraint",
+                                            "example": "[A-Z]{3}",
+                                        },
                                     },
-                                    "required": ["facet_min_length", "facet_max_length", "facet_pattern"]
+                                    "required": ["facet_min_length", "facet_max_length", "facet_pattern"],
                                 },
                                 "owner_top_level_asbiep": {
                                     "type": "object",
                                     "description": "Top-Level ASBIEP information",
                                     "properties": {
-                                        "top_level_asbiep_id": {"type": "integer",
-                                                                "description": "Unique identifier for the top-level ASBIEP",
-                                                                "example": 12345},
+                                        "top_level_asbiep_id": {
+                                            "type": "integer",
+                                            "description": "Unique identifier for the top-level ASBIEP",
+                                            "example": 12345,
+                                        },
                                         "library": {
                                             "type": "object",
                                             "description": "Library information",
                                             "properties": {
-                                                "library_id": {"type": "integer",
-                                                               "description": "Unique identifier for the library",
-                                                               "example": 1},
-                                                "name": {"type": "string", "description": "Library name",
-                                                         "example": "OAGIS"}
+                                                "library_id": {
+                                                    "type": "integer",
+                                                    "description": "Unique identifier for the library",
+                                                    "example": 1,
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "description": "Library name",
+                                                    "example": "OAGIS",
+                                                },
                                             },
-                                            "required": ["library_id", "name"]
+                                            "required": ["library_id", "name"],
                                         },
                                         "release": {
                                             "type": "object",
                                             "description": "Release information",
                                             "properties": {
-                                                "release_id": {"type": "integer",
-                                                               "description": "Unique identifier for the release",
-                                                               "example": 1},
-                                                "release_num": {"type": "string",
-                                                                "description": "Release number", "example": "10.6"},
-                                                "state": {"type": "string", "description": "Release state",
-                                                          "example": "Published"}
+                                                "release_id": {
+                                                    "type": "integer",
+                                                    "description": "Unique identifier for the release",
+                                                    "example": 1,
+                                                },
+                                                "release_num": {
+                                                    "type": "string",
+                                                    "description": "Release number",
+                                                    "example": "10.6",
+                                                },
+                                                "state": {
+                                                    "type": "string",
+                                                    "description": "Release state",
+                                                    "example": "Published",
+                                                },
                                             },
-                                            "required": ["release_id", "release_num", "state"]
+                                            "required": ["release_id", "release_num", "state"],
                                         },
-                                        "version": {"type": ["string", "null"], "description": "Version number",
-                                                    "example": "1.0"},
-                                        "status": {"type": ["string", "null"], "description": "Status",
-                                                   "example": "Production"},
+                                        "version": {
+                                            "type": ["string", "null"],
+                                            "description": "Version number",
+                                            "example": "1.0",
+                                        },
+                                        "status": {
+                                            "type": ["string", "null"],
+                                            "description": "Status",
+                                            "example": "Production",
+                                        },
                                         "state": {"type": "string", "description": "State", "example": "Published"},
-                                        "is_deprecated": {"type": "boolean", "description": "Whether deprecated",
-                                                          "example": False},
-                                        "deprecated_reason": {"type": ["string", "null"],
-                                                              "description": "Reason for deprecation", "example": None},
-                                        "deprecated_remark": {"type": ["string", "null"],
-                                                              "description": "Remarks about deprecation",
-                                                              "example": None},
+                                        "is_deprecated": {
+                                            "type": "boolean",
+                                            "description": "Whether deprecated",
+                                            "example": False,
+                                        },
+                                        "deprecated_reason": {
+                                            "type": ["string", "null"],
+                                            "description": "Reason for deprecation",
+                                            "example": None,
+                                        },
+                                        "deprecated_remark": {
+                                            "type": ["string", "null"],
+                                            "description": "Remarks about deprecation",
+                                            "example": None,
+                                        },
                                         "owner": {
                                             "type": "object",
                                             "description": "Owner information",
                                             "properties": {
-                                                "user_id": {"type": "integer",
-                                                            "description": "Unique identifier for the user",
-                                                            "example": 100000001},
-                                                "login_id": {"type": "string", "description": "User's login identifier",
-                                                             "example": "john.doe"},
-                                                "username": {"type": "string",
-                                                             "description": "Display name of the user",
-                                                             "example": "John Doe"},
-                                                "roles": {"type": "array", "items": {"type": "string",
-                                                                                     "enum": ["Admin", "Developer",
-                                                                                              "End-User"]},
-                                                          "description": "List of roles assigned to the user",
-                                                          "example": ["End-User"]}
+                                                "user_id": {
+                                                    "type": "integer",
+                                                    "description": "Unique identifier for the user",
+                                                    "example": 100000001,
+                                                },
+                                                "login_id": {
+                                                    "type": "string",
+                                                    "description": "User's login identifier",
+                                                    "example": "john.doe",
+                                                },
+                                                "username": {
+                                                    "type": "string",
+                                                    "description": "Display name of the user",
+                                                    "example": "John Doe",
+                                                },
+                                                "roles": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "enum": ["Admin", "Developer", "End-User"],
+                                                    },
+                                                    "description": "List of roles assigned to the user",
+                                                    "example": ["End-User"],
+                                                },
                                             },
-                                            "required": ["user_id", "login_id", "username", "roles"]
-                                        }
+                                            "required": ["user_id", "login_id", "username", "roles"],
+                                        },
                                     },
-                                    "required": ["top_level_asbiep_id", "library", "release", "state", "is_deprecated",
-                                                 "owner"]
-                                }
+                                    "required": [
+                                        "top_level_asbiep_id",
+                                        "library",
+                                        "release",
+                                        "state",
+                                        "is_deprecated",
+                                        "owner",
+                                    ],
+                                },
                             },
-                            "required": ["based_dt_sc", "cardinality_min", "cardinality_max",
-                                         "owner_top_level_asbiep"]
-                        }
+                            "required": ["based_dt_sc", "cardinality_min", "cardinality_max", "owner_top_level_asbiep"],
+                        },
                     },
                     "owner_top_level_asbiep": {
                         "type": "object",
                         "description": "Top-Level ASBIEP information",
                         "properties": {
-                            "top_level_asbiep_id": {"type": "integer",
-                                                    "description": "Unique identifier for the top-level ASBIEP",
-                                                    "example": 12345},
+                            "top_level_asbiep_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the top-level ASBIEP",
+                                "example": 12345,
+                            },
                             "library": {
                                 "type": "object",
                                 "description": "Library information",
                                 "properties": {
-                                    "library_id": {"type": "integer",
-                                                   "description": "Unique identifier for the library", "example": 1},
-                                    "name": {"type": "string", "description": "Library name", "example": "OAGIS"}
+                                    "library_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the library",
+                                        "example": 1,
+                                    },
+                                    "name": {"type": "string", "description": "Library name", "example": "OAGIS"},
                                 },
-                                "required": ["library_id", "name"]
+                                "required": ["library_id", "name"],
                             },
                             "release": {
                                 "type": "object",
                                 "description": "Release information",
                                 "properties": {
-                                    "release_id": {"type": "integer",
-                                                   "description": "Unique identifier for the release", "example": 1},
-                                    "release_num": {"type": "string", "description": "Release number",
-                                                    "example": "10.6"},
-                                    "state": {"type": "string", "description": "Release state", "example": "Published"}
+                                    "release_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the release",
+                                        "example": 1,
+                                    },
+                                    "release_num": {
+                                        "type": "string",
+                                        "description": "Release number",
+                                        "example": "10.6",
+                                    },
+                                    "state": {"type": "string", "description": "Release state", "example": "Published"},
                                 },
-                                "required": ["release_id", "release_num", "state"]
+                                "required": ["release_id", "release_num", "state"],
                             },
                             "version": {"type": ["string", "null"], "description": "Version number", "example": "1.0"},
                             "status": {"type": ["string", "null"], "description": "Status", "example": "Production"},
                             "state": {"type": "string", "description": "State", "example": "Published"},
                             "is_deprecated": {"type": "boolean", "description": "Whether deprecated", "example": False},
-                            "deprecated_reason": {"type": ["string", "null"], "description": "Reason for deprecation",
-                                                  "example": None},
-                            "deprecated_remark": {"type": ["string", "null"],
-                                                  "description": "Remarks about deprecation", "example": None},
+                            "deprecated_reason": {
+                                "type": ["string", "null"],
+                                "description": "Reason for deprecation",
+                                "example": None,
+                            },
+                            "deprecated_remark": {
+                                "type": ["string", "null"],
+                                "description": "Remarks about deprecation",
+                                "example": None,
+                            },
                             "owner": {
                                 "type": "object",
                                 "description": "Owner information",
                                 "properties": {
-                                    "user_id": {"type": "integer", "description": "Unique identifier for the user",
-                                                "example": 100000001},
-                                    "login_id": {"type": "string", "description": "User's login identifier",
-                                                 "example": "john.doe"},
-                                    "username": {"type": "string", "description": "Display name of the user",
-                                                 "example": "John Doe"},
-                                    "roles": {"type": "array",
-                                              "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
-                                              "description": "List of roles assigned to the user",
-                                              "example": ["End-User"]}
+                                    "user_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the user",
+                                        "example": 100000001,
+                                    },
+                                    "login_id": {
+                                        "type": "string",
+                                        "description": "User's login identifier",
+                                        "example": "john.doe",
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "description": "Display name of the user",
+                                        "example": "John Doe",
+                                    },
+                                    "roles": {
+                                        "type": "array",
+                                        "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                        "description": "List of roles assigned to the user",
+                                        "example": ["End-User"],
+                                    },
                                 },
-                                "required": ["user_id", "login_id", "username", "roles"]
-                            }
+                                "required": ["user_id", "login_id", "username", "roles"],
+                            },
                         },
-                        "required": ["top_level_asbiep_id", "library", "release", "state", "is_deprecated", "owner"]
-                    }
+                        "required": ["top_level_asbiep_id", "library", "release", "state", "is_deprecated", "owner"],
+                    },
                 },
-                "required": ["based_bccp", "supplementary_components", "owner_top_level_asbiep"]
+                "required": ["based_bccp", "supplementary_components", "owner_top_level_asbiep"],
             },
-            "is_used": {"type": "boolean",
-                        "description": "Whether this BBIE is currently being used (profiled) in the BIE",
-                        "example": True},
-            "cardinality_min": {"type": "integer",
-                                "description": "Minimum cardinality (minimum number of occurrences required, typically 0 or 1)",
-                                "example": 0},
-            "cardinality_max": {"type": "integer",
-                                "description": "Maximum cardinality (maximum number of occurrences allowed, -1 means unbounded)",
-                                "example": 1},
-            "is_nillable": {"type": "boolean", "description": "Whether the BBIE can have a nil/null value",
-                            "example": False},
-            "definition": {"type": ["string", "null"],
-                           "description": "Definition to override the BCC definition. If NULL, it means that the definition should be inherited from the based BCC",
-                           "example": "A monetary amount"},
-            "remark": {"type": ["string", "null"], "description": "Additional remarks or notes about the BBIE",
-                       "example": "Used for purchase orders"},
+            "is_used": {
+                "type": "boolean",
+                "description": "Whether this BBIE is currently being used (profiled) in the BIE",
+                "example": True,
+            },
+            "cardinality_min": {
+                "type": "integer",
+                "description": "Minimum cardinality (minimum number of occurrences required, typically 0 or 1)",
+                "example": 0,
+            },
+            "cardinality_max": {
+                "type": "integer",
+                "description": "Maximum cardinality (maximum number of occurrences allowed, -1 means unbounded)",
+                "example": 1,
+            },
+            "is_nillable": {
+                "type": "boolean",
+                "description": "Whether the BBIE can have a nil/null value",
+                "example": False,
+            },
+            "definition": {
+                "type": ["string", "null"],
+                "description": "Definition to override the BCC definition. If NULL, it means that the definition should be inherited from the based BCC",
+                "example": "A monetary amount",
+            },
+            "remark": {
+                "type": ["string", "null"],
+                "description": "Additional remarks or notes about the BBIE",
+                "example": "Used for purchase orders",
+            },
             "primitiveRestriction": {
                 "type": "object",
                 "description": "Primitive restriction information for the BBIE. This field is required and must not be None. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set (not multiple, not none).",
                 "properties": {
-                    "xbtManifestId": {"type": ["integer", "null"],
-                                      "description": "XBT (eXtended Built-in Type) manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set.",
-                                      "example": None},
-                    "codeListManifestId": {"type": ["integer", "null"],
-                                           "description": "Code list manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set.",
-                                           "example": None},
-                    "agencyIdListManifestId": {"type": ["integer", "null"],
-                                               "description": "Agency ID list manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set.",
-                                               "example": None}
+                    "xbtManifestId": {
+                        "type": ["integer", "null"],
+                        "description": "XBT (eXtended Built-in Type) manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set.",
+                        "example": None,
+                    },
+                    "codeListManifestId": {
+                        "type": ["integer", "null"],
+                        "description": "Code list manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set.",
+                        "example": None,
+                    },
+                    "agencyIdListManifestId": {
+                        "type": ["integer", "null"],
+                        "description": "Agency ID list manifest ID. Exactly one of xbtManifestId, codeListManifestId, or agencyIdListManifestId must be set.",
+                        "example": None,
+                    },
                 },
-                "required": ["xbtManifestId", "codeListManifestId", "agencyIdListManifestId"]
+                "required": ["xbtManifestId", "codeListManifestId", "agencyIdListManifestId"],
             },
             "valueConstraint": {
                 "type": ["object", "null"],
                 "description": "Value constraint information for the BBIE",
                 "properties": {
-                    "default_value": {"type": ["string", "null"],
-                                      "description": "Default value for the BBIE if not specified",
-                                      "example": None},
-                    "fixed_value": {"type": ["string", "null"],
-                                    "description": "Fixed value that must always be used for this BBIE (cannot be changed)",
-                                    "example": None}
+                    "default_value": {
+                        "type": ["string", "null"],
+                        "description": "Default value for the BBIE if not specified",
+                        "example": None,
+                    },
+                    "fixed_value": {
+                        "type": ["string", "null"],
+                        "description": "Fixed value that must always be used for this BBIE (cannot be changed)",
+                        "example": None,
+                    },
                 },
-                "required": ["default_value", "fixed_value"]
+                "required": ["default_value", "fixed_value"],
             },
             "facet": {
                 "type": ["object", "null"],
                 "description": "Facet restriction information for string values",
                 "properties": {
-                    "facet_min_length": {"type": ["integer", "null"],
-                                         "description": "Minimum length constraint for string values (facet restriction)",
-                                         "example": None},
-                    "facet_max_length": {"type": ["integer", "null"],
-                                         "description": "Maximum length constraint for string values (facet restriction)",
-                                         "example": None},
-                    "facet_pattern": {"type": ["string", "null"],
-                                      "description": "Pattern constraint (regular expression) for string values (facet restriction)",
-                                      "example": None}
+                    "facet_min_length": {
+                        "type": ["integer", "null"],
+                        "description": "Minimum length constraint for string values (facet restriction)",
+                        "example": None,
+                    },
+                    "facet_max_length": {
+                        "type": ["integer", "null"],
+                        "description": "Maximum length constraint for string values (facet restriction)",
+                        "example": None,
+                    },
+                    "facet_pattern": {
+                        "type": ["string", "null"],
+                        "description": "Pattern constraint (regular expression) for string values (facet restriction)",
+                        "example": None,
+                    },
                 },
-                "required": ["facet_min_length", "facet_max_length", "facet_pattern"]
-            }
+                "required": ["facet_min_length", "facet_max_length", "facet_pattern"],
+            },
         },
-        "required": ["owner_top_level_asbiep", "based_bcc", "to_bbiep", "is_used",
-                     "cardinality_min", "cardinality_max", "is_nillable", "primitiveRestriction"]
-    }
+        "required": [
+            "owner_top_level_asbiep",
+            "based_bcc",
+            "to_bbiep",
+            "is_used",
+            "cardinality_min",
+            "cardinality_max",
+            "is_nillable",
+            "primitiveRestriction",
+        ],
+    },
 )
 async def get_bbie_by_based_bcc_manifest_id(
     top_level_asbiep_id: Annotated[int, Field(gt=0, description="Owning top-level ASBIEP identifier.")],
     based_bcc_manifest_id: Annotated[int, Field(gt=0, description="Based BCC manifest identifier.")],
-    business_information_entity_service: BusinessInformationEntityService = Depends(get_business_information_entity_service),
+    business_information_entity_service: BusinessInformationEntityService = Depends(
+        get_business_information_entity_service
+    ),
 ) -> GetBbieTemplateResponse:
     """
     Get a BBIE (Basic Business Information Entity) by its based BCC manifest ID.
@@ -3572,57 +5555,87 @@ async def get_bbie_by_based_bcc_manifest_id(
         "type": "object",
         "description": "Response containing the newly created top-level ASBIEP information. The 'asbiep' field contains ASBIEP structure with role_of_abie (excludes remark, is_nillable from relationships).",
         "properties": {
-            "top_level_asbiep_id": {"type": "integer",
-                                    "description": "ID of the created top-level ASBIEP (Association Business Information Entity Property)",
-                                    "example": 12345},
-            "asbiep": {"type": ["object", "null"],
-                       "description": "ASBIEP structure with role_of_abie. Shows the hierarchical structure with asbiep_id and role_of_abie containing abie_id. Excludes remark and is_nillable fields from relationships.",
-                       "properties": {
-                           "asbiep_id": {"type": "integer", "description": "Unique identifier of the ASBIEP",
-                                         "example": 12346},
-                           "role_of_abie": {"type": ["object", "null"],
-                                            "description": "The ABIE that this ASBIEP points to", "properties": {
-                                   "abie_id": {"type": "integer", "description": "Unique identifier of the ABIE",
-                                               "example": 12347},
-                                   "relationships": {"type": "array",
-                                                     "description": "List of relationships (ASBIEs and BBIEs) from this ABIE",
-                                                     "items": {
-                                                         "type": "object",
-                                                         "description": "A relationship that can be either an ASBIE or BBIE",
-                                                         "properties": {
-                                                             "asbie": {"type": ["object", "null"],
-                                                                       "description": "ASBIE relationship (if this is an ASBIE). Excludes is_nillable and remark fields.",
-                                                                       "properties": {
-                                                                           "asbie_id": {"type": "integer"},
-                                                                           "guid": {"type": ["string", "null"]},
-                                                                           "cardinality_min": {"type": "integer"},
-                                                                           "cardinality_max": {"type": "integer"},
-                                                                           "based_ascc": {"type": "object"},
-                                                                           "asbiep": {"type": ["object", "null"],
-                                                                                      "description": "Recursive structure - ASBIEP with its role_of_abie and relationships"}
-                                                                       }},
-                                                             "bbie": {"type": ["object", "null"],
-                                                                      "description": "BBIE relationship (if this is a BBIE). Excludes remark field.",
-                                                                      "properties": {
-                                                                          "bbie_id": {"type": "integer"},
-                                                                          "guid": {"type": ["string", "null"]},
-                                                                          "cardinality_min": {"type": "integer"},
-                                                                          "cardinality_max": {"type": "integer"},
-                                                                          "is_nillable": {"type": "boolean"},
-                                                                          "based_bcc": {"type": "object"}
-                                                                      }}
-                                                         }
-                                                     }}
-                               }}
-                       }}
+            "top_level_asbiep_id": {
+                "type": "integer",
+                "description": "ID of the created top-level ASBIEP (Association Business Information Entity Property)",
+                "example": 12345,
+            },
+            "asbiep": {
+                "type": ["object", "null"],
+                "description": "ASBIEP structure with role_of_abie. Shows the hierarchical structure with asbiep_id and role_of_abie containing abie_id. Excludes remark and is_nillable fields from relationships.",
+                "properties": {
+                    "asbiep_id": {
+                        "type": "integer",
+                        "description": "Unique identifier of the ASBIEP",
+                        "example": 12346,
+                    },
+                    "role_of_abie": {
+                        "type": ["object", "null"],
+                        "description": "The ABIE that this ASBIEP points to",
+                        "properties": {
+                            "abie_id": {
+                                "type": "integer",
+                                "description": "Unique identifier of the ABIE",
+                                "example": 12347,
+                            },
+                            "relationships": {
+                                "type": "array",
+                                "description": "List of relationships (ASBIEs and BBIEs) from this ABIE",
+                                "items": {
+                                    "type": "object",
+                                    "description": "A relationship that can be either an ASBIE or BBIE",
+                                    "properties": {
+                                        "asbie": {
+                                            "type": ["object", "null"],
+                                            "description": "ASBIE relationship (if this is an ASBIE). Excludes is_nillable and remark fields.",
+                                            "properties": {
+                                                "asbie_id": {"type": "integer"},
+                                                "guid": {"type": ["string", "null"]},
+                                                "cardinality_min": {"type": "integer"},
+                                                "cardinality_max": {"type": "integer"},
+                                                "based_ascc": {"type": "object"},
+                                                "asbiep": {
+                                                    "type": ["object", "null"],
+                                                    "description": "Recursive structure - ASBIEP with its role_of_abie and relationships",
+                                                },
+                                            },
+                                        },
+                                        "bbie": {
+                                            "type": ["object", "null"],
+                                            "description": "BBIE relationship (if this is a BBIE). Excludes remark field.",
+                                            "properties": {
+                                                "bbie_id": {"type": "integer"},
+                                                "guid": {"type": ["string", "null"]},
+                                                "cardinality_min": {"type": "integer"},
+                                                "cardinality_max": {"type": "integer"},
+                                                "is_nillable": {"type": "boolean"},
+                                                "based_bcc": {"type": "object"},
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
-        "required": ["top_level_asbiep_id"]
-    }
+        "required": ["top_level_asbiep_id"],
+    },
 )
 async def create_top_level_asbiep(
-    asccp_manifest_id: Annotated[int, Field(gt=0, description="ASCCP manifest identifier for the new top-level ASBIEP.")],
-    biz_ctx_list: Annotated[list[int] | str, Field(description="Business context IDs to assign. Provide a JSON array or a comma-separated string like '1,2'.")],
-    business_information_entity_service: BusinessInformationEntityService = Depends(get_business_information_entity_service),
+    asccp_manifest_id: Annotated[
+        int, Field(gt=0, description="ASCCP manifest identifier for the new top-level ASBIEP.")
+    ],
+    biz_ctx_list: Annotated[
+        list[int] | str,
+        Field(
+            description="Business context IDs to assign. Provide a JSON array or a comma-separated string like '1,2'."
+        ),
+    ],
+    business_information_entity_service: BusinessInformationEntityService = Depends(
+        get_business_information_entity_service
+    ),
 ) -> CreateTopLevelAsbiepResponse:
     """
     Create a new BIE (Business Information Entity) with the specified ASCCP (Association Core Component Property) manifest and business contexts.
@@ -3689,27 +5702,39 @@ async def create_top_level_asbiep(
         "type": "object",
         "description": "Response containing the updated Top-Level ASBIEP information.",
         "properties": {
-            "top_level_asbiep_id": {"type": "integer",
-                                    "description": "ID of the updated Top-Level ASBIEP (Association Business Information Entity Property)"},
-            "updates": {"type": "array", "items": {"type": "string"},
-                        "description": "A list of updated fields, each represented by its name",
-                        "example": ["version", "status", "is_deprecated"]}
+            "top_level_asbiep_id": {
+                "type": "integer",
+                "description": "ID of the updated Top-Level ASBIEP (Association Business Information Entity Property)",
+            },
+            "updates": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "A list of updated fields, each represented by its name",
+                "example": ["version", "status", "is_deprecated"],
+            },
         },
-        "required": ["top_level_asbiep_id", "updates"]
-    }
+        "required": ["top_level_asbiep_id", "updates"],
+    },
 )
 async def update_top_level_asbiep(
     top_level_asbiep_id: Annotated[int, Field(gt=0, description="Target top-level ASBIEP identifier.")],
-    version: Annotated[str | None, Field(default=None, description="New version string to store as-is.")],
-    status: Annotated[str | None, Field(default=None, description="New status value.")],
-    display_name: Annotated[str | None, Field(default=None, description="Display name override.")],
-    biz_term: Annotated[str | None, Field(default=None, description="Business term override.")],
-    definition: Annotated[str | None, Field(default=None, description="ASBIEP definition override.")],
-    remark: Annotated[str | None, Field(default=None, description="ASBIEP remark override.")],
-    is_deprecated: Annotated[bool | str | None, Field(default=None, description="Deprecation flag. Accepts bool values or 'true'/'false' strings.")],
-    deprecated_reason: Annotated[str | None, Field(default=None, description="Deprecation reason.")],
-    deprecated_remark: Annotated[str | None, Field(default=None, description="Deprecation remark.")],
-    business_information_entity_service: BusinessInformationEntityService = Depends(get_business_information_entity_service),
+    version: Annotated[
+        str | None, Field(description="New version string to store as-is. Omit to leave unchanged.")
+    ] = None,
+    status: Annotated[str | None, Field(description="New status value. Omit to leave unchanged.")] = None,
+    display_name: Annotated[str | None, Field(description="Display name override. Omit to leave unchanged.")] = None,
+    biz_term: Annotated[str | None, Field(description="Business term override. Omit to leave unchanged.")] = None,
+    definition: Annotated[str | None, Field(description="ASBIEP definition override. Omit to leave unchanged.")] = None,
+    remark: Annotated[str | None, Field(description="ASBIEP remark override. Omit to leave unchanged.")] = None,
+    is_deprecated: Annotated[
+        bool | str | None,
+        Field(description="Deprecation flag. Accepts bool values or 'true'/'false' strings. Omit to leave unchanged."),
+    ] = None,
+    deprecated_reason: Annotated[str | None, Field(description="Deprecation reason. Omit to leave unchanged.")] = None,
+    deprecated_remark: Annotated[str | None, Field(description="Deprecation remark. Omit to leave unchanged.")] = None,
+    business_information_entity_service: BusinessInformationEntityService = Depends(
+        get_business_information_entity_service
+    ),
 ) -> UpdateTopLevelAsbiepResponse:
     """
     Update a Top-Level ASBIEP (Association Business Information Entity Property) with new version, status, deprecation information, and ASBIEP properties.
@@ -3801,9 +5826,7 @@ async def update_top_level_asbiep(
     except ToolError:
         raise
     except Exception as e:
-        raise ToolError(
-            f"Type conversion error: {str(e)}. Please check your parameter types and try again."
-        ) from e
+        raise ToolError(f"Type conversion error: {str(e)}. Please check your parameter types and try again.") from e
 
     try:
         payload = await business_information_entity_service.update_top_level_asbiep(
@@ -3829,19 +5852,29 @@ async def update_top_level_asbiep(
     output_schema={
         "type": "object",
         "properties": {
-            "top_level_asbiep_id": {"type": "integer",
-                                    "description": "ID of the Top-Level ASBIEP (Association Business Information Entity Property)"},
-            "updates": {"type": "array", "items": {"type": "string"},
-                        "description": "A list of updated fields, each represented by its name", "example": ["state"]}
+            "top_level_asbiep_id": {
+                "type": "integer",
+                "description": "ID of the Top-Level ASBIEP (Association Business Information Entity Property)",
+            },
+            "updates": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "A list of updated fields, each represented by its name",
+                "example": ["state"],
+            },
         },
-        "required": ["top_level_asbiep_id", "updates"]
-    }
+        "required": ["top_level_asbiep_id", "updates"],
+    },
 )
 async def update_top_level_asbiep_state(
     top_level_asbiep_id: Annotated[int, Field(gt=0, description="Target top-level ASBIEP identifier.")],
-    new_state: Annotated[str, Field(description="Target lifecycle state. Valid values are 'WIP', 'QA', and 'Production'.")],
+    new_state: Annotated[
+        str, Field(description="Target lifecycle state. Valid values are 'WIP', 'QA', and 'Production'.")
+    ],
     ctx: Context,
-    business_information_entity_service: BusinessInformationEntityService = Depends(get_business_information_entity_service),
+    business_information_entity_service: BusinessInformationEntityService = Depends(
+        get_business_information_entity_service
+    ),
 ) -> UpdateTopLevelAsbiepStateToolResponse:
     """
     Update the state of a BIE (Business Information Entity) following the state transition rules.
@@ -3905,9 +5938,7 @@ async def update_top_level_asbiep_state(
     try:
         valid_states = {"WIP", "QA", "Production"}
         if new_state not in valid_states:
-            raise ToolError(
-                f"Invalid state '{new_state}'. Valid states are: {', '.join(sorted(valid_states))}."
-            )
+            raise ToolError(f"Invalid state '{new_state}'. Valid states are: {', '.join(sorted(valid_states))}.")
 
         row = await business_information_entity_service.get_top_level_asbiep(
             top_level_asbiep_id=top_level_asbiep_id,
@@ -3939,7 +5970,9 @@ async def update_top_level_asbiep_state(
         )
         return UpdateTopLevelAsbiepStateToolResponse.model_validate(payload, from_attributes=True)
     except Exception as exc:
-        raise _to_tool_error(exc, fallback=f"Unable to update the state of top-level ASBIEP {top_level_asbiep_id}.") from exc
+        raise _to_tool_error(
+            exc, fallback=f"Unable to update the state of top-level ASBIEP {top_level_asbiep_id}."
+        ) from exc
 
 
 @mcp.tool(
@@ -3949,19 +5982,25 @@ async def update_top_level_asbiep_state(
         "type": "object",
         "description": "Response containing the deleted top-level ASBIEP ID or cancellation message",
         "properties": {
-            "top_level_asbiep_id": {"type": ["integer", "null"],
-                                    "description": "ID of the deleted top-level ASBIEP (Association Business Information Entity Property) (null if deletion was cancelled)"},
-            "message": {"type": ["string", "null"],
-                        "description": "Optional message indicating the status of the deletion operation",
-                        "example": "Deletion cancelled by user"}
+            "top_level_asbiep_id": {
+                "type": ["integer", "null"],
+                "description": "ID of the deleted top-level ASBIEP (Association Business Information Entity Property) (null if deletion was cancelled)",
+            },
+            "message": {
+                "type": ["string", "null"],
+                "description": "Optional message indicating the status of the deletion operation",
+                "example": "Deletion cancelled by user",
+            },
         },
-        "required": []
-    }
+        "required": [],
+    },
 )
 async def delete_top_level_asbiep(
     top_level_asbiep_id: Annotated[int, Field(gt=0, description="Target top-level ASBIEP identifier.")],
     ctx: Context,
-    business_information_entity_service: BusinessInformationEntityService = Depends(get_business_information_entity_service),
+    business_information_entity_service: BusinessInformationEntityService = Depends(
+        get_business_information_entity_service
+    ),
 ) -> DeleteTopLevelAsbiepToolResponse:
     """
     Delete a Top-Level ASBIEP (Association Business Information Entity Property) and all related records.
@@ -4063,20 +6102,27 @@ async def delete_top_level_asbiep(
     output_schema={
         "type": "object",
         "properties": {
-            "top_level_asbiep_id": {"type": "integer",
-                                    "description": "ID of the Top-Level ASBIEP (Association Business Information Entity Property)"},
-            "updates": {"type": "array", "items": {"type": "string"},
-                        "description": "A list of updated fields, each represented by its name",
-                        "example": ["owner_user_id"]}
+            "top_level_asbiep_id": {
+                "type": "integer",
+                "description": "ID of the Top-Level ASBIEP (Association Business Information Entity Property)",
+            },
+            "updates": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "A list of updated fields, each represented by its name",
+                "example": ["owner_user_id"],
+            },
         },
-        "required": ["top_level_asbiep_id", "updates"]
-    }
+        "required": ["top_level_asbiep_id", "updates"],
+    },
 )
 async def transfer_top_level_asbiep_ownership(
     top_level_asbiep_id: Annotated[int, Field(gt=0, description="Target top-level ASBIEP identifier.")],
     new_owner_user_id: Annotated[int, Field(gt=0, description="User ID of the new owner.")],
     ctx: Context,
-    business_information_entity_service: BusinessInformationEntityService = Depends(get_business_information_entity_service),
+    business_information_entity_service: BusinessInformationEntityService = Depends(
+        get_business_information_entity_service
+    ),
     app_user_service: AppUserService = Depends(get_app_user_service),
 ) -> TransferTopLevelAsbiepOwnershipResponse:
     """
@@ -4146,8 +6192,7 @@ async def transfer_top_level_asbiep_ownership(
 
         elicit_result = await ctx.elicit(
             message=(
-                f"Are you sure you want to transfer ownership of '{_top_level_label(row)}' "
-                f"to {target_user_label}?"
+                f"Are you sure you want to transfer ownership of '{_top_level_label(row)}' to {target_user_label}?"
             ),
             response_type=None,
         )
@@ -4168,7 +6213,9 @@ async def transfer_top_level_asbiep_ownership(
             case CancelledElicitation():
                 raise ToolError("Ownership transfer cancelled by user.")
     except Exception as exc:
-        raise _to_tool_error(exc, fallback=f"Unable to transfer ownership of top-level ASBIEP {top_level_asbiep_id}.") from exc
+        raise _to_tool_error(
+            exc, fallback=f"Unable to transfer ownership of top-level ASBIEP {top_level_asbiep_id}."
+        ) from exc
 
 
 @mcp.tool(
@@ -4178,17 +6225,22 @@ async def transfer_top_level_asbiep_ownership(
         "type": "object",
         "properties": {
             "top_level_asbiep_id": {"type": "integer", "description": "ID of the BIE (Business Information Entity)"},
-            "updates": {"type": "array", "items": {"type": "string"},
-                        "description": "A list of updated fields, each represented by its name",
-                        "example": ["business_contexts"]}
+            "updates": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "A list of updated fields, each represented by its name",
+                "example": ["business_contexts"],
+            },
         },
-        "required": ["top_level_asbiep_id", "updates"]
-    }
+        "required": ["top_level_asbiep_id", "updates"],
+    },
 )
 async def assign_biz_ctx_to_top_level_asbiep(
     top_level_asbiep_id: Annotated[int, Field(gt=0, description="Target top-level ASBIEP identifier.")],
     biz_ctx_id: Annotated[int, Field(gt=0, description="Business context identifier to assign.")],
-    business_information_entity_service: BusinessInformationEntityService = Depends(get_business_information_entity_service),
+    business_information_entity_service: BusinessInformationEntityService = Depends(
+        get_business_information_entity_service
+    ),
 ) -> AssignBizCtxToTopLevelAsbiepToolResponse:
     """
     Assign a business context to a BIE (Business Information Entity).
@@ -4254,17 +6306,22 @@ async def assign_biz_ctx_to_top_level_asbiep(
         "type": "object",
         "properties": {
             "top_level_asbiep_id": {"type": "integer", "description": "ID of the BIE (Business Information Entity)"},
-            "updates": {"type": "array", "items": {"type": "string"},
-                        "description": "A list of updated fields, each represented by its name",
-                        "example": ["business_contexts"]}
+            "updates": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "A list of updated fields, each represented by its name",
+                "example": ["business_contexts"],
+            },
         },
-        "required": ["top_level_asbiep_id", "updates"]
-    }
+        "required": ["top_level_asbiep_id", "updates"],
+    },
 )
 async def unassign_biz_ctx_from_top_level_asbiep(
     top_level_asbiep_id: Annotated[int, Field(gt=0, description="Target top-level ASBIEP identifier.")],
     biz_ctx_id: Annotated[int, Field(gt=0, description="Business context identifier to remove.")],
-    business_information_entity_service: BusinessInformationEntityService = Depends(get_business_information_entity_service),
+    business_information_entity_service: BusinessInformationEntityService = Depends(
+        get_business_information_entity_service
+    ),
 ) -> UnassignBizCtxFromTopLevelAsbiepToolResponse:
     """
     Unassign a business context from a BIE (Business Information Entity).
@@ -4328,67 +6385,80 @@ async def unassign_biz_ctx_from_top_level_asbiep(
         "type": "object",
         "description": "Response containing the newly created and enabled ASBIE information. The ASBIE is automatically enabled (is_used=True) for BIE profiling. IMPORTANT: The based_ascc_manifest_id must point to an ASCC that associates with a non-group ACC (component_type must not be 3=SemanticGroup or 4=UserExtensionGroup). Groups are automatically skipped in BIE expressions and cannot be created directly. Always use the exact ascc_manifest_id obtained from get_top_level_asbiep() or get_asbie_by_*() tools. All mandatory relationships (cardinality_min >= 1) are automatically created or enabled recursively. The 'asbiep' field contains a simplified recursive structure showing all created/enabled ASBIEs and BBIEs (excludes is_nillable, remark).",
         "properties": {
-            "asbie_id": {"type": "integer", "description": "Unique identifier of the newly created and enabled ASBIE",
-                         "example": 12345},
-            "asbiep": {"type": ["object", "null"],
-                       "description": "Simplified recursive structure containing ASBIEP and all created/enabled relationships. Shows the hierarchical structure of all ASBIEs and BBIEs that were automatically created or enabled during mandatory relationship processing. Excludes is_nillable and remark fields.",
-                       "properties": {
-                           "asbiep_id": {"type": "integer", "description": "Unique identifier of the ASBIEP",
-                                         "example": 12346},
-                           "role_of_abie": {"type": ["object", "null"],
-                                            "description": "The ABIE that this ASBIEP points to, with its relationships",
+            "asbie_id": {
+                "type": "integer",
+                "description": "Unique identifier of the newly created and enabled ASBIE",
+                "example": 12345,
+            },
+            "asbiep": {
+                "type": ["object", "null"],
+                "description": "Simplified recursive structure containing ASBIEP and all created/enabled relationships. Shows the hierarchical structure of all ASBIEs and BBIEs that were automatically created or enabled during mandatory relationship processing. Excludes is_nillable and remark fields.",
+                "properties": {
+                    "asbiep_id": {
+                        "type": "integer",
+                        "description": "Unique identifier of the ASBIEP",
+                        "example": 12346,
+                    },
+                    "role_of_abie": {
+                        "type": ["object", "null"],
+                        "description": "The ABIE that this ASBIEP points to, with its relationships",
+                        "properties": {
+                            "abie_id": {
+                                "type": "integer",
+                                "description": "Unique identifier of the ABIE",
+                                "example": 12347,
+                            },
+                            "relationships": {
+                                "type": "array",
+                                "description": "List of relationships (ASBIEs and BBIEs) from this ABIE",
+                                "items": {
+                                    "type": "object",
+                                    "description": "A relationship that can be either an ASBIE or BBIE",
+                                    "properties": {
+                                        "asbie": {
+                                            "type": ["object", "null"],
+                                            "description": "ASBIE relationship (if this is an ASBIE). Excludes is_nillable and remark fields.",
                                             "properties": {
-                                                "abie_id": {"type": "integer",
-                                                            "description": "Unique identifier of the ABIE",
-                                                            "example": 12347},
-                                                "relationships": {"type": "array",
-                                                                  "description": "List of relationships (ASBIEs and BBIEs) from this ABIE",
-                                                                  "items": {
-                                                                      "type": "object",
-                                                                      "description": "A relationship that can be either an ASBIE or BBIE",
-                                                                      "properties": {
-                                                                          "asbie": {"type": ["object", "null"],
-                                                                                    "description": "ASBIE relationship (if this is an ASBIE). Excludes is_nillable and remark fields.",
-                                                                                    "properties": {
-                                                                                        "asbie_id": {"type": "integer"},
-                                                                                        "guid": {
-                                                                                            "type": ["string", "null"]},
-                                                                                        "cardinality_min": {
-                                                                                            "type": "integer"},
-                                                                                        "cardinality_max": {
-                                                                                            "type": "integer"},
-                                                                                        "based_ascc": {
-                                                                                            "type": "object"},
-                                                                                        "asbiep": {
-                                                                                            "type": ["object", "null"],
-                                                                                            "description": "Recursive structure - ASBIEP with its role_of_abie and relationships"}
-                                                                                    }},
-                                                                          "bbie": {"type": ["object", "null"],
-                                                                                   "description": "BBIE relationship (if this is a BBIE). Excludes remark field.",
-                                                                                   "properties": {
-                                                                                       "bbie_id": {"type": "integer"},
-                                                                                       "guid": {
-                                                                                           "type": ["string", "null"]},
-                                                                                       "cardinality_min": {
-                                                                                           "type": "integer"},
-                                                                                       "cardinality_max": {
-                                                                                           "type": "integer"},
-                                                                                       "is_nillable": {
-                                                                                           "type": "boolean"},
-                                                                                       "based_bcc": {"type": "object"}
-                                                                                   }}
-                                                                      }
-                                                                  }}
-                                            }}
-                       }}
+                                                "asbie_id": {"type": "integer"},
+                                                "guid": {"type": ["string", "null"]},
+                                                "cardinality_min": {"type": "integer"},
+                                                "cardinality_max": {"type": "integer"},
+                                                "based_ascc": {"type": "object"},
+                                                "asbiep": {
+                                                    "type": ["object", "null"],
+                                                    "description": "Recursive structure - ASBIEP with its role_of_abie and relationships",
+                                                },
+                                            },
+                                        },
+                                        "bbie": {
+                                            "type": ["object", "null"],
+                                            "description": "BBIE relationship (if this is a BBIE). Excludes remark field.",
+                                            "properties": {
+                                                "bbie_id": {"type": "integer"},
+                                                "guid": {"type": ["string", "null"]},
+                                                "cardinality_min": {"type": "integer"},
+                                                "cardinality_max": {"type": "integer"},
+                                                "is_nillable": {"type": "boolean"},
+                                                "based_bcc": {"type": "object"},
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
-        "required": ["asbie_id"]
-    }
+        "required": ["asbie_id"],
+    },
 )
 async def create_asbie(
     from_abie_id: Annotated[int, Field(gt=0, description="Parent ABIE identifier.")],
     based_ascc_manifest_id: Annotated[int, Field(gt=0, description="Based ASCC manifest identifier.")],
-    business_information_entity_service: BusinessInformationEntityService = Depends(get_business_information_entity_service),
+    business_information_entity_service: BusinessInformationEntityService = Depends(
+        get_business_information_entity_service
+    ),
 ) -> CreateAsbieToolResponse:
     """
     Enable (use) an ASBIE (Association Business Information Entity) during BIE profiling.
@@ -4486,46 +6556,69 @@ async def create_asbie(
         "type": "object",
         "description": "Response containing the updated ASBIE information after reusing the top-level ASBIEP",
         "properties": {
-            "asbie_id": {"type": "integer", "description": "Unique identifier of the ASBIE that was updated",
-                         "example": 12345},
-            "updates": {"type": "array", "items": {"type": "string"},
-                        "description": "A list of field names that were updated on the ASBIE itself (e.g., ['to_asbiep_id'])",
-                        "example": ["to_asbiep_id"]},
-            "asbiep": {"type": ["object", "null"],
-                       "description": "Nested structure showing ASBIEP and all updated relationships with their updates",
-                       "properties": {
-                           "asbiep_id": {"type": "integer", "description": "Unique identifier of the ASBIEP"},
-                           "updates": {"type": "array", "items": {"type": "string"},
-                                       "description": "List of fields updated on the ASBIEP (typically empty)"},
-                           "role_of_abie": {"type": ["object", "null"],
-                                            "description": "The ABIE that this ASBIEP points to, with its relationships",
-                                            "properties": {
-                                                "abie_id": {"type": "integer",
-                                                            "description": "Unique identifier of the ABIE"},
-                                                "updates": {"type": "array", "items": {"type": "string"},
-                                                            "description": "List of fields updated on the ABIE (typically empty)"},
-                                                "relationships": {"type": "array",
-                                                                  "description": "List of relationships (ASBIEs and BBIEs) with their updates",
-                                                                  "items": {
-                                                                      "type": "object",
-                                                                      "description": "A relationship that can be either an ASBIE or BBIE",
-                                                                      "properties": {
-                                                                          "asbie": {"type": ["object", "null"],
-                                                                                    "description": "ASBIE relationship with updates"},
-                                                                          "bbie": {"type": ["object", "null"],
-                                                                                   "description": "BBIE relationship with updates"}
-                                                                      }
-                                                                  }}
-                                            }}
-                       }}
+            "asbie_id": {
+                "type": "integer",
+                "description": "Unique identifier of the ASBIE that was updated",
+                "example": 12345,
+            },
+            "updates": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "A list of field names that were updated on the ASBIE itself (e.g., ['to_asbiep_id'])",
+                "example": ["to_asbiep_id"],
+            },
+            "asbiep": {
+                "type": ["object", "null"],
+                "description": "Nested structure showing ASBIEP and all updated relationships with their updates",
+                "properties": {
+                    "asbiep_id": {"type": "integer", "description": "Unique identifier of the ASBIEP"},
+                    "updates": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "List of fields updated on the ASBIEP (typically empty)",
+                    },
+                    "role_of_abie": {
+                        "type": ["object", "null"],
+                        "description": "The ABIE that this ASBIEP points to, with its relationships",
+                        "properties": {
+                            "abie_id": {"type": "integer", "description": "Unique identifier of the ABIE"},
+                            "updates": {
+                                "type": "array",
+                                "items": {"type": "string"},
+                                "description": "List of fields updated on the ABIE (typically empty)",
+                            },
+                            "relationships": {
+                                "type": "array",
+                                "description": "List of relationships (ASBIEs and BBIEs) with their updates",
+                                "items": {
+                                    "type": "object",
+                                    "description": "A relationship that can be either an ASBIE or BBIE",
+                                    "properties": {
+                                        "asbie": {
+                                            "type": ["object", "null"],
+                                            "description": "ASBIE relationship with updates",
+                                        },
+                                        "bbie": {
+                                            "type": ["object", "null"],
+                                            "description": "BBIE relationship with updates",
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
-        "required": ["asbie_id", "updates"]
-    }
+        "required": ["asbie_id", "updates"],
+    },
 )
 async def reuse_top_level_asbiep(
     asbie_id: Annotated[int, Field(gt=0, description="Target ASBIE identifier.")],
     reuse_top_level_asbiep_id: Annotated[int, Field(gt=0, description="Top-level ASBIEP identifier to reuse.")],
-    business_information_entity_service: BusinessInformationEntityService = Depends(get_business_information_entity_service),
+    business_information_entity_service: BusinessInformationEntityService = Depends(
+        get_business_information_entity_service
+    ),
 ) -> ReuseTopLevelAsbiepToolResponse:
     """
     Reuse an existing Top-Level ASBIEP (Association Business Information Entity Property) for an ASBIE.
@@ -4584,45 +6677,68 @@ async def reuse_top_level_asbiep(
         "type": "object",
         "description": "Response containing the updated ASBIE information after removing the reused top-level ASBIEP",
         "properties": {
-            "asbie_id": {"type": "integer", "description": "Unique identifier of the ASBIE that was updated",
-                         "example": 12345},
-            "updates": {"type": "array", "items": {"type": "string"},
-                        "description": "A list of field names that were updated on the ASBIE itself (e.g., ['to_asbiep_id'])",
-                        "example": ["to_asbiep_id"]},
-            "asbiep": {"type": ["object", "null"],
-                       "description": "Nested structure showing ASBIEP and all updated relationships with their updates",
-                       "properties": {
-                           "asbiep_id": {"type": "integer", "description": "Unique identifier of the ASBIEP"},
-                           "updates": {"type": "array", "items": {"type": "string"},
-                                       "description": "List of fields updated on the ASBIEP (typically empty)"},
-                           "role_of_abie": {"type": ["object", "null"],
-                                            "description": "The ABIE that this ASBIEP points to, with its relationships",
-                                            "properties": {
-                                                "abie_id": {"type": "integer",
-                                                            "description": "Unique identifier of the ABIE"},
-                                                "updates": {"type": "array", "items": {"type": "string"},
-                                                            "description": "List of fields updated on the ABIE (typically empty)"},
-                                                "relationships": {"type": "array",
-                                                                  "description": "List of relationships (ASBIEs and BBIEs) with their updates",
-                                                                  "items": {
-                                                                      "type": "object",
-                                                                      "description": "A relationship that can be either an ASBIE or BBIE",
-                                                                      "properties": {
-                                                                          "asbie": {"type": ["object", "null"],
-                                                                                    "description": "ASBIE relationship with updates"},
-                                                                          "bbie": {"type": ["object", "null"],
-                                                                                   "description": "BBIE relationship with updates"}
-                                                                      }
-                                                                  }}
-                                            }}
-                       }}
+            "asbie_id": {
+                "type": "integer",
+                "description": "Unique identifier of the ASBIE that was updated",
+                "example": 12345,
+            },
+            "updates": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "A list of field names that were updated on the ASBIE itself (e.g., ['to_asbiep_id'])",
+                "example": ["to_asbiep_id"],
+            },
+            "asbiep": {
+                "type": ["object", "null"],
+                "description": "Nested structure showing ASBIEP and all updated relationships with their updates",
+                "properties": {
+                    "asbiep_id": {"type": "integer", "description": "Unique identifier of the ASBIEP"},
+                    "updates": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "List of fields updated on the ASBIEP (typically empty)",
+                    },
+                    "role_of_abie": {
+                        "type": ["object", "null"],
+                        "description": "The ABIE that this ASBIEP points to, with its relationships",
+                        "properties": {
+                            "abie_id": {"type": "integer", "description": "Unique identifier of the ABIE"},
+                            "updates": {
+                                "type": "array",
+                                "items": {"type": "string"},
+                                "description": "List of fields updated on the ABIE (typically empty)",
+                            },
+                            "relationships": {
+                                "type": "array",
+                                "description": "List of relationships (ASBIEs and BBIEs) with their updates",
+                                "items": {
+                                    "type": "object",
+                                    "description": "A relationship that can be either an ASBIE or BBIE",
+                                    "properties": {
+                                        "asbie": {
+                                            "type": ["object", "null"],
+                                            "description": "ASBIE relationship with updates",
+                                        },
+                                        "bbie": {
+                                            "type": ["object", "null"],
+                                            "description": "BBIE relationship with updates",
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
-        "required": ["asbie_id", "updates"]
-    }
+        "required": ["asbie_id", "updates"],
+    },
 )
 async def remove_reused_top_level_asbiep(
     asbie_id: Annotated[int, Field(gt=0, description="Target ASBIE identifier.")],
-    business_information_entity_service: BusinessInformationEntityService = Depends(get_business_information_entity_service),
+    business_information_entity_service: BusinessInformationEntityService = Depends(
+        get_business_information_entity_service
+    ),
 ) -> RemoveReusedTopLevelAsbiepToolResponse:
     """
     Remove a reused top-level ASBIEP by creating a new ASBIEP and ABIE.
@@ -4675,83 +6791,116 @@ async def remove_reused_top_level_asbiep(
         "description": "Response containing the updated ASBIE information with nested structure showing all updated relationships. The updates list includes all fields that were updated on the ASBIE itself. The asbiep field contains nested structure with role_of_abie and relationships, each showing their updates. When is_used is set to True, mandatory relationships are automatically processed. When is_used is set to False, all underlying relationships are automatically disabled.",
         "properties": {
             "asbie_id": {"type": "integer", "description": "Unique identifier of the updated ASBIE", "example": 12345},
-            "updates": {"type": "array", "items": {"type": "string"},
-                        "description": "A list of field names that were updated on the ASBIE itself (includes 'is_used' when toggling enable/disable during profiling)",
-                        "example": ["is_used", "definition", "cardinality_min", "remark"]},
-            "asbiep": {"type": ["object", "null"],
-                       "description": "Nested structure showing ASBIEP and all updated relationships with their updates",
-                       "properties": {
-                           "asbiep_id": {"type": "integer", "description": "Unique identifier of the ASBIEP"},
-                           "updates": {"type": "array", "items": {"type": "string"},
-                                       "description": "List of fields updated on the ASBIEP (typically empty)"},
-                           "role_of_abie": {"type": ["object", "null"],
-                                            "description": "The ABIE that this ASBIEP points to, with its relationships",
+            "updates": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "A list of field names that were updated on the ASBIE itself (includes 'is_used' when toggling enable/disable during profiling)",
+                "example": ["is_used", "definition", "cardinality_min", "remark"],
+            },
+            "asbiep": {
+                "type": ["object", "null"],
+                "description": "Nested structure showing ASBIEP and all updated relationships with their updates",
+                "properties": {
+                    "asbiep_id": {"type": "integer", "description": "Unique identifier of the ASBIEP"},
+                    "updates": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "List of fields updated on the ASBIEP (typically empty)",
+                    },
+                    "role_of_abie": {
+                        "type": ["object", "null"],
+                        "description": "The ABIE that this ASBIEP points to, with its relationships",
+                        "properties": {
+                            "abie_id": {"type": "integer", "description": "Unique identifier of the ABIE"},
+                            "updates": {
+                                "type": "array",
+                                "items": {"type": "string"},
+                                "description": "List of fields updated on the ABIE (typically empty)",
+                            },
+                            "relationships": {
+                                "type": "array",
+                                "description": "List of relationships (ASBIEs and BBIEs) with their updates",
+                                "items": {
+                                    "type": "object",
+                                    "description": "A relationship that can be either an ASBIE or BBIE",
+                                    "properties": {
+                                        "asbie": {
+                                            "type": ["object", "null"],
+                                            "description": "ASBIE relationship with updates",
                                             "properties": {
-                                                "abie_id": {"type": "integer",
-                                                            "description": "Unique identifier of the ABIE"},
-                                                "updates": {"type": "array", "items": {"type": "string"},
-                                                            "description": "List of fields updated on the ABIE (typically empty)"},
-                                                "relationships": {"type": "array",
-                                                                  "description": "List of relationships (ASBIEs and BBIEs) with their updates",
-                                                                  "items": {
-                                                                      "type": "object",
-                                                                      "description": "A relationship that can be either an ASBIE or BBIE",
-                                                                      "properties": {
-                                                                          "asbie": {"type": ["object", "null"],
-                                                                                    "description": "ASBIE relationship with updates",
-                                                                                    "properties": {
-                                                                                        "asbie_id": {"type": "integer"},
-                                                                                        "updates": {"type": "array",
-                                                                                                    "items": {
-                                                                                                        "type": "string"},
-                                                                                                    "description": "List of fields updated on this ASBIE (e.g., ['is_used'])"},
-                                                                                        "guid": {
-                                                                                            "type": ["string", "null"]},
-                                                                                        "cardinality_min": {
-                                                                                            "type": "integer"},
-                                                                                        "cardinality_max": {
-                                                                                            "type": "integer"},
-                                                                                        "based_ascc": {
-                                                                                            "type": "object"},
-                                                                                        "asbiep": {
-                                                                                            "type": ["object", "null"],
-                                                                                            "description": "Recursive structure - ASBIEP with its role_of_abie and relationships"}
-                                                                                    }},
-                                                                          "bbie": {"type": ["object", "null"],
-                                                                                   "description": "BBIE relationship with updates",
-                                                                                   "properties": {
-                                                                                       "bbie_id": {"type": "integer"},
-                                                                                       "updates": {"type": "array",
-                                                                                                   "items": {
-                                                                                                       "type": "string"},
-                                                                                                   "description": "List of fields updated on this BBIE (e.g., ['is_used'])"},
-                                                                                       "guid": {
-                                                                                           "type": ["string", "null"]},
-                                                                                       "cardinality_min": {
-                                                                                           "type": "integer"},
-                                                                                       "cardinality_max": {
-                                                                                           "type": "integer"},
-                                                                                       "is_nillable": {
-                                                                                           "type": "boolean"},
-                                                                                       "based_bcc": {"type": "object"}
-                                                                                   }}
-                                                                      }
-                                                                  }}
-                                            }}
-                       }}
+                                                "asbie_id": {"type": "integer"},
+                                                "updates": {
+                                                    "type": "array",
+                                                    "items": {"type": "string"},
+                                                    "description": "List of fields updated on this ASBIE (e.g., ['is_used'])",
+                                                },
+                                                "guid": {"type": ["string", "null"]},
+                                                "cardinality_min": {"type": "integer"},
+                                                "cardinality_max": {"type": "integer"},
+                                                "based_ascc": {"type": "object"},
+                                                "asbiep": {
+                                                    "type": ["object", "null"],
+                                                    "description": "Recursive structure - ASBIEP with its role_of_abie and relationships",
+                                                },
+                                            },
+                                        },
+                                        "bbie": {
+                                            "type": ["object", "null"],
+                                            "description": "BBIE relationship with updates",
+                                            "properties": {
+                                                "bbie_id": {"type": "integer"},
+                                                "updates": {
+                                                    "type": "array",
+                                                    "items": {"type": "string"},
+                                                    "description": "List of fields updated on this BBIE (e.g., ['is_used'])",
+                                                },
+                                                "guid": {"type": ["string", "null"]},
+                                                "cardinality_min": {"type": "integer"},
+                                                "cardinality_max": {"type": "integer"},
+                                                "is_nillable": {"type": "boolean"},
+                                                "based_bcc": {"type": "object"},
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
-        "required": ["asbie_id", "updates"]
-    }
+        "required": ["asbie_id", "updates"],
+    },
 )
 async def update_asbie(
     asbie_id: Annotated[int, Field(gt=0, description="Target ASBIE identifier.")],
-    is_used: Annotated[bool | str | None, Field(default=None, description="Whether the ASBIE is profiled/used. Accepts bool values or 'true'/'false' strings.")],
-    is_nillable: Annotated[bool | str | None, Field(default=None, description="Whether the ASBIE is nillable. Accepts bool values or 'true'/'false' strings.")],
-    definition: Annotated[str | None, Field(default=None, description="Definition text for this ASBIE.")],
-    cardinality_min: Annotated[int | None, Field(default=None, ge=0, description="Minimum cardinality override.")],
-    cardinality_max: Annotated[int | None, Field(default=None, description="Maximum cardinality override. Use -1 for unbounded.")],
-    remark: Annotated[str | None, Field(default=None, description="Remark text for the ASBIE property.")],
-    business_information_entity_service: BusinessInformationEntityService = Depends(get_business_information_entity_service),
+    is_used: Annotated[
+        bool | str | None,
+        Field(
+            description="Whether the ASBIE is profiled/used. Accepts bool values or 'true'/'false' strings. Omit to leave unchanged."
+        ),
+    ] = None,
+    is_nillable: Annotated[
+        bool | str | None,
+        Field(
+            description="Whether the ASBIE is nillable. Accepts bool values or 'true'/'false' strings. Omit to leave unchanged."
+        ),
+    ] = None,
+    definition: Annotated[
+        str | None, Field(description="Definition text for this ASBIE. Omit to leave unchanged.")
+    ] = None,
+    cardinality_min: Annotated[
+        int | None, Field(ge=0, description="Minimum cardinality override. Omit to leave unchanged.")
+    ] = None,
+    cardinality_max: Annotated[
+        int | None, Field(description="Maximum cardinality override. Use -1 for unbounded. Omit to leave unchanged.")
+    ] = None,
+    remark: Annotated[
+        str | None, Field(description="Remark text for the ASBIE property. Omit to leave unchanged.")
+    ] = None,
+    business_information_entity_service: BusinessInformationEntityService = Depends(
+        get_business_information_entity_service
+    ),
 ) -> UpdateAsbieToolResponse:
     """
     Update an existing ASBIE (Association Business Information Entity) during BIE profiling.
@@ -4857,9 +7006,7 @@ async def update_asbie(
     except ToolError:
         raise
     except Exception as e:
-        raise ToolError(
-            f"Type conversion error: {str(e)}. Please check your parameter types and try again."
-        ) from e
+        raise ToolError(f"Type conversion error: {str(e)}. Please check your parameter types and try again.") from e
 
     try:
         payload = await business_information_entity_service.update_asbie(
@@ -4883,46 +7030,73 @@ async def update_asbie(
         "type": "object",
         "description": "Response containing the newly created and enabled BBIE information. The BBIE is automatically enabled (is_used=True) for BIE profiling. All mandatory BBIE SCs (supplementary components with cardinality_min >= 1) are automatically created or enabled. The 'bbiep' field contains simplified BBIEP information including all created/enabled supplementary components.",
         "properties": {
-            "bbie_id": {"type": "integer", "description": "Unique identifier of the newly created and enabled BBIE",
-                        "example": 12345},
-            "bbiep": {"type": ["object", "null"],
-                      "description": "Simplified BBIEP information including all created/enabled supplementary components. Excludes definition, remark, biz_term, display_name, default_value, fixed_value, and facet fields that won't have values for newly generated records. Shows the BBIEP structure with supplementary_components array containing all BBIE SCs that were automatically created or enabled.",
-                      "properties": {
-                          "bbiep_id": {"type": ["integer", "null"], "description": "Unique identifier of the BBIEP",
-                                       "example": 12346},
-                          "guid": {"type": ["string", "null"], "description": "Globally unique identifier of the BBIEP",
-                                   "example": "a1b2c3d4e5f6789012345678901234ab"},
-                          "based_bccp": {"type": "object",
-                                         "description": "Information about the BCCP that this BBIEP is based on"},
-                          "supplementary_components": {"type": "array",
-                                                       "description": "List of supplementary components. Each component contains 'bbie_sc_id' (if created), 'based_dt_sc.dt_sc_manifest_id', and cardinality information. Excludes definition, remark, default_value, fixed_value, and facet fields.",
-                                                       "items": {
-                                                           "type": "object",
-                                                           "properties": {
-                                                               "bbie_sc_id": {"type": ["integer", "null"],
-                                                                              "description": "Unique identifier for the BBIE SC (if created)",
-                                                                              "example": 12351},
-                                                               "guid": {"type": ["string", "null"],
-                                                                        "description": "Globally unique identifier for the BBIE SC"},
-                                                               "based_dt_sc": {"type": "object",
-                                                                               "description": "Data type supplementary component information"},
-                                                               "cardinality_min": {"type": "integer",
-                                                                                   "description": "Minimum cardinality",
-                                                                                   "example": 0},
-                                                               "cardinality_max": {"type": "integer",
-                                                                                   "description": "Maximum cardinality",
-                                                                                   "example": 1}
-                                                           }
-                                                       }}
-                      }}
+            "bbie_id": {
+                "type": "integer",
+                "description": "Unique identifier of the newly created and enabled BBIE",
+                "example": 12345,
+            },
+            "bbiep": {
+                "type": ["object", "null"],
+                "description": "Simplified BBIEP information including all created/enabled supplementary components. Excludes definition, remark, biz_term, display_name, default_value, fixed_value, and facet fields that won't have values for newly generated records. Shows the BBIEP structure with supplementary_components array containing all BBIE SCs that were automatically created or enabled.",
+                "properties": {
+                    "bbiep_id": {
+                        "type": ["integer", "null"],
+                        "description": "Unique identifier of the BBIEP",
+                        "example": 12346,
+                    },
+                    "guid": {
+                        "type": ["string", "null"],
+                        "description": "Globally unique identifier of the BBIEP",
+                        "example": "a1b2c3d4e5f6789012345678901234ab",
+                    },
+                    "based_bccp": {
+                        "type": "object",
+                        "description": "Information about the BCCP that this BBIEP is based on",
+                    },
+                    "supplementary_components": {
+                        "type": "array",
+                        "description": "List of supplementary components. Each component contains 'bbie_sc_id' (if created), 'based_dt_sc.dt_sc_manifest_id', and cardinality information. Excludes definition, remark, default_value, fixed_value, and facet fields.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "bbie_sc_id": {
+                                    "type": ["integer", "null"],
+                                    "description": "Unique identifier for the BBIE SC (if created)",
+                                    "example": 12351,
+                                },
+                                "guid": {
+                                    "type": ["string", "null"],
+                                    "description": "Globally unique identifier for the BBIE SC",
+                                },
+                                "based_dt_sc": {
+                                    "type": "object",
+                                    "description": "Data type supplementary component information",
+                                },
+                                "cardinality_min": {
+                                    "type": "integer",
+                                    "description": "Minimum cardinality",
+                                    "example": 0,
+                                },
+                                "cardinality_max": {
+                                    "type": "integer",
+                                    "description": "Maximum cardinality",
+                                    "example": 1,
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
-        "required": ["bbie_id"]
-    }
+        "required": ["bbie_id"],
+    },
 )
 async def create_bbie(
     from_abie_id: Annotated[int, Field(gt=0, description="Parent ABIE identifier.")],
     based_bcc_manifest_id: Annotated[int, Field(gt=0, description="Based BCC manifest identifier.")],
-    business_information_entity_service: BusinessInformationEntityService = Depends(get_business_information_entity_service),
+    business_information_entity_service: BusinessInformationEntityService = Depends(
+        get_business_information_entity_service
+    ),
 ) -> CreateBbieToolResponse:
     """
     Enable (use) a BBIE (Basic Business Information Entity) during BIE profiling.
@@ -5011,61 +7185,125 @@ async def create_bbie(
         "description": "Response containing the updated BBIE information with nested structure showing all updated supplementary components. The updates list includes all fields that were updated on the BBIE itself. The bbiep field contains nested structure with supplementary_components, each showing their updates. When is_used is set to True, mandatory supplementary components are automatically processed. When is_used is set to False, all supplementary components are automatically disabled.",
         "properties": {
             "bbie_id": {"type": "integer", "description": "Unique identifier of the updated BBIE", "example": 12345},
-            "updates": {"type": "array", "items": {"type": "string"},
-                        "description": "A list of field names that were updated on the BBIE itself (includes 'is_used' when toggling enable/disable during profiling)",
-                        "example": ["is_used", "definition", "cardinality_min", "default_value", "facet_min_length"]},
-            "bbiep": {"type": ["object", "null"],
-                      "description": "Nested structure showing BBIEP and all updated supplementary components with their updates",
-                      "properties": {
-                          "bbiep_id": {"type": ["integer", "null"], "description": "Unique identifier of the BBIEP"},
-                          "updates": {"type": "array", "items": {"type": "string"},
-                                      "description": "List of fields updated on the BBIEP (typically empty)"},
-                          "guid": {"type": ["string", "null"],
-                                   "description": "Globally unique identifier of the BBIEP"},
-                          "based_bccp": {"type": "object",
-                                         "description": "Information about the BCCP that this BBIEP is based on"},
-                          "supplementary_components": {"type": "array",
-                                                       "description": "List of supplementary components with their updates",
-                                                       "items": {
-                                                           "type": "object",
-                                                           "properties": {
-                                                               "bbie_sc_id": {"type": ["integer", "null"],
-                                                                              "description": "Unique identifier for the BBIE SC"},
-                                                               "updates": {"type": "array", "items": {"type": "string"},
-                                                                           "description": "List of fields updated on this BBIE SC (e.g., ['is_used'])"},
-                                                               "guid": {"type": ["string", "null"],
-                                                                        "description": "Globally unique identifier for the BBIE SC"},
-                                                               "based_dt_sc": {"type": "object",
-                                                                               "description": "Data type supplementary component information"},
-                                                               "cardinality_min": {"type": "integer",
-                                                                                   "description": "Minimum cardinality"},
-                                                               "cardinality_max": {"type": "integer",
-                                                                                   "description": "Maximum cardinality"}
-                                                           }
-                                                       }}
-                      }}
+            "updates": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "A list of field names that were updated on the BBIE itself (includes 'is_used' when toggling enable/disable during profiling)",
+                "example": ["is_used", "definition", "cardinality_min", "default_value", "facet_min_length"],
+            },
+            "bbiep": {
+                "type": ["object", "null"],
+                "description": "Nested structure showing BBIEP and all updated supplementary components with their updates",
+                "properties": {
+                    "bbiep_id": {"type": ["integer", "null"], "description": "Unique identifier of the BBIEP"},
+                    "updates": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "List of fields updated on the BBIEP (typically empty)",
+                    },
+                    "guid": {"type": ["string", "null"], "description": "Globally unique identifier of the BBIEP"},
+                    "based_bccp": {
+                        "type": "object",
+                        "description": "Information about the BCCP that this BBIEP is based on",
+                    },
+                    "supplementary_components": {
+                        "type": "array",
+                        "description": "List of supplementary components with their updates",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "bbie_sc_id": {
+                                    "type": ["integer", "null"],
+                                    "description": "Unique identifier for the BBIE SC",
+                                },
+                                "updates": {
+                                    "type": "array",
+                                    "items": {"type": "string"},
+                                    "description": "List of fields updated on this BBIE SC (e.g., ['is_used'])",
+                                },
+                                "guid": {
+                                    "type": ["string", "null"],
+                                    "description": "Globally unique identifier for the BBIE SC",
+                                },
+                                "based_dt_sc": {
+                                    "type": "object",
+                                    "description": "Data type supplementary component information",
+                                },
+                                "cardinality_min": {"type": "integer", "description": "Minimum cardinality"},
+                                "cardinality_max": {"type": "integer", "description": "Maximum cardinality"},
+                            },
+                        },
+                    },
+                },
+            },
         },
-        "required": ["bbie_id", "updates"]
-    }
+        "required": ["bbie_id", "updates"],
+    },
 )
 async def update_bbie(
     bbie_id: Annotated[int, Field(gt=0, description="Target BBIE identifier.")],
-    is_used: Annotated[bool | str | None, Field(default=None, description="Whether the BBIE is profiled/used. Accepts bool values or 'true'/'false' strings.")],
-    is_nillable: Annotated[bool | str | None, Field(default=None, description="Whether the BBIE is nillable. Accepts bool values or 'true'/'false' strings.")],
-    cardinality_min: Annotated[int | None, Field(default=None, ge=0, description="Minimum cardinality override.")],
-    cardinality_max: Annotated[int | None, Field(default=None, description="Maximum cardinality override. Use -1 for unbounded.")],
-    definition: Annotated[str | None, Field(default=None, description="Relationship definition override.")],
-    example: Annotated[str | None, Field(default=None, description="Illustrative example value or content for this BBIE.")],
-    remark: Annotated[str | None, Field(default=None, description="Relationship remark override.")],
-    default_value: Annotated[str | None, Field(default=None, description="Default value constraint.")],
-    fixed_value: Annotated[str | None, Field(default=None, description="Fixed value constraint.")],
-    facet_min_length: Annotated[int | None, Field(default=None, ge=0, description="Facet min-length restriction.")],
-    facet_max_length: Annotated[int | None, Field(default=None, ge=0, description="Facet max-length restriction.")],
-    facet_pattern: Annotated[str | None, Field(default=None, description="Facet pattern restriction.")],
-    xbt_manifest_id: Annotated[int | None, Field(default=None, gt=0, description="XBT manifest identifier to use as the primitive restriction for this BBIE.")],
-    code_list_manifest_id: Annotated[int | None, Field(default=None, gt=0, description="Code-list manifest identifier to use as the primitive restriction for this BBIE.")],
-    agency_id_list_manifest_id: Annotated[int | None, Field(default=None, gt=0, description="Agency-ID-list manifest identifier to use as the primitive restriction for this BBIE.")],
-    business_information_entity_service: BusinessInformationEntityService = Depends(get_business_information_entity_service),
+    is_used: Annotated[
+        bool | str | None,
+        Field(
+            description="Whether the BBIE is profiled/used. Accepts bool values or 'true'/'false' strings. Omit to leave unchanged."
+        ),
+    ] = None,
+    is_nillable: Annotated[
+        bool | str | None,
+        Field(
+            description="Whether the BBIE is nillable. Accepts bool values or 'true'/'false' strings. Omit to leave unchanged."
+        ),
+    ] = None,
+    cardinality_min: Annotated[
+        int | None, Field(ge=0, description="Minimum cardinality override. Omit to leave unchanged.")
+    ] = None,
+    cardinality_max: Annotated[
+        int | None, Field(description="Maximum cardinality override. Use -1 for unbounded. Omit to leave unchanged.")
+    ] = None,
+    definition: Annotated[
+        str | None, Field(description="Relationship definition override. Omit to leave unchanged.")
+    ] = None,
+    example: Annotated[
+        str | None, Field(description="Illustrative example value or content for this BBIE. Omit to leave unchanged.")
+    ] = None,
+    remark: Annotated[str | None, Field(description="Relationship remark override. Omit to leave unchanged.")] = None,
+    default_value: Annotated[
+        str | None, Field(description="Default value constraint. Omit to leave unchanged.")
+    ] = None,
+    fixed_value: Annotated[str | None, Field(description="Fixed value constraint. Omit to leave unchanged.")] = None,
+    facet_min_length: Annotated[
+        int | None, Field(ge=0, description="Facet min-length restriction. Omit to leave unchanged.")
+    ] = None,
+    facet_max_length: Annotated[
+        int | None, Field(ge=0, description="Facet max-length restriction. Omit to leave unchanged.")
+    ] = None,
+    facet_pattern: Annotated[
+        str | None, Field(description="Facet pattern restriction. Omit to leave unchanged.")
+    ] = None,
+    xbt_manifest_id: Annotated[
+        int | None,
+        Field(
+            gt=0,
+            description="XBT manifest identifier to use as the primitive restriction for this BBIE. Omit to leave unchanged.",
+        ),
+    ] = None,
+    code_list_manifest_id: Annotated[
+        int | None,
+        Field(
+            gt=0,
+            description="Code list manifest identifier to use as the primitive restriction for this BBIE. Omit to leave unchanged.",
+        ),
+    ] = None,
+    agency_id_list_manifest_id: Annotated[
+        int | None,
+        Field(
+            gt=0,
+            description="Agency-ID-list manifest identifier to use as the primitive restriction for this BBIE. Omit to leave unchanged.",
+        ),
+    ] = None,
+    business_information_entity_service: BusinessInformationEntityService = Depends(
+        get_business_information_entity_service
+    ),
 ) -> UpdateBbieToolResponse:
     """
     Update an existing BBIE (Basic Business Information Entity) during BIE profiling.
@@ -5128,7 +7366,7 @@ async def update_bbie(
             Accepts int, str (converted to int), or None. If not provided, will not be updated.
         facet_pattern (str | None, optional): Pattern facet (regex) for string types
         xbt_manifest_id (int | None, optional): XBT manifest identifier to use as the primitive restriction for this BBIE. Mutually exclusive with code_list_manifest_id and agency_id_list_manifest_id.
-        code_list_manifest_id (int | None, optional): Code-list manifest identifier to use as the primitive restriction for this BBIE. Mutually exclusive with xbt_manifest_id and agency_id_list_manifest_id.
+        code_list_manifest_id (int | None, optional): Code list manifest identifier to use as the primitive restriction for this BBIE. Mutually exclusive with xbt_manifest_id and agency_id_list_manifest_id.
         agency_id_list_manifest_id (int | None, optional): Agency-ID-list manifest identifier to use as the primitive restriction for this BBIE. Mutually exclusive with xbt_manifest_id and code_list_manifest_id.
 
     Returns:
@@ -5183,9 +7421,7 @@ async def update_bbie(
     except ToolError:
         raise
     except Exception as e:
-        raise ToolError(
-            f"Type conversion error: {str(e)}. Please check your parameter types and try again."
-        ) from e
+        raise ToolError(f"Type conversion error: {str(e)}. Please check your parameter types and try again.") from e
 
     try:
         payload = await business_information_entity_service.update_bbie(
@@ -5218,20 +7454,27 @@ async def update_bbie(
         "type": "object",
         "description": "Response containing the newly created and enabled BBIE_SC information. The BBIE_SC is automatically enabled (is_used=True) for BIE profiling.",
         "properties": {
-            "bbie_sc_id": {"type": "integer",
-                           "description": "Unique identifier of the newly created and enabled BBIE_SC",
-                           "example": 12345},
-            "updates": {"type": "array", "items": {"type": "string"},
-                        "description": "A list of field names that were set during creation (includes 'is_used' as the BBIE_SC is enabled)",
-                        "example": ["bbie_sc_id", "is_used", "cardinality_min", "cardinality_max"]}
+            "bbie_sc_id": {
+                "type": "integer",
+                "description": "Unique identifier of the newly created and enabled BBIE_SC",
+                "example": 12345,
+            },
+            "updates": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "A list of field names that were set during creation (includes 'is_used' as the BBIE_SC is enabled)",
+                "example": ["bbie_sc_id", "is_used", "cardinality_min", "cardinality_max"],
+            },
         },
-        "required": ["bbie_sc_id", "updates"]
-    }
+        "required": ["bbie_sc_id", "updates"],
+    },
 )
 async def create_bbie_sc(
     bbie_id: Annotated[int, Field(gt=0, description="Parent BBIE identifier.")],
     based_dt_sc_manifest_id: Annotated[int, Field(gt=0, description="Based DT_SC manifest identifier.")],
-    business_information_entity_service: BusinessInformationEntityService = Depends(get_business_information_entity_service),
+    business_information_entity_service: BusinessInformationEntityService = Depends(
+        get_business_information_entity_service
+    ),
 ) -> CreateBbieScToolResponse:
     """
     Enable (use) a BBIE_SC (Basic Business Information Entity Supplementary Component) during BIE profiling.
@@ -5291,34 +7534,86 @@ async def create_bbie_sc(
         "type": "object",
         "description": "Response containing the updated BBIE_SC information. The updates list includes 'is_used' when the BBIE_SC is toggled between enabled/disabled (used/unused) during BIE profiling.",
         "properties": {
-            "bbie_sc_id": {"type": "integer", "description": "Unique identifier of the updated BBIE_SC",
-                           "example": 12345},
-            "updates": {"type": "array", "items": {"type": "string"},
-                        "description": "A list of field names that were updated (includes 'is_used' when toggling enable/disable during profiling)",
-                        "example": ["is_used", "definition", "cardinality_min", "default_value", "facet_min_length"]}
+            "bbie_sc_id": {
+                "type": "integer",
+                "description": "Unique identifier of the updated BBIE_SC",
+                "example": 12345,
+            },
+            "updates": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "A list of field names that were updated (includes 'is_used' when toggling enable/disable during profiling)",
+                "example": ["is_used", "definition", "cardinality_min", "default_value", "facet_min_length"],
+            },
         },
-        "required": ["bbie_sc_id", "updates"]
-    }
+        "required": ["bbie_sc_id", "updates"],
+    },
 )
 async def update_bbie_sc(
     bbie_sc_id: Annotated[int, Field(gt=0, description="Target BBIE supplementary-component identifier.")],
-    is_used: Annotated[bool | str | None, Field(default=None, description="Whether the BBIE supplementary component is profiled/used. Accepts bool values or 'true'/'false' strings.")],
-    cardinality_min: Annotated[int | None, Field(default=None, ge=0, description="Minimum cardinality override.")],
-    cardinality_max: Annotated[int | None, Field(default=None, description="Maximum cardinality override. Use -1 for unbounded.")],
-    definition: Annotated[str | None, Field(default=None, description="Definition text for this BBIE supplementary component.")],
-    example: Annotated[str | None, Field(default=None, description="Illustrative example value or content for this BBIE supplementary component.")],
-    remark: Annotated[str | None, Field(default=None, description="Remark text for this BBIE supplementary component.")],
-    biz_term: Annotated[str | None, Field(default=None, description="Business term override.")],
-    display_name: Annotated[str | None, Field(default=None, description="Display name override.")],
-    default_value: Annotated[str | None, Field(default=None, description="Default value constraint.")],
-    fixed_value: Annotated[str | None, Field(default=None, description="Fixed value constraint.")],
-    facet_min_length: Annotated[int | None, Field(default=None, ge=0, description="Facet min-length restriction.")],
-    facet_max_length: Annotated[int | None, Field(default=None, ge=0, description="Facet max-length restriction.")],
-    facet_pattern: Annotated[str | None, Field(default=None, description="Facet pattern restriction.")],
-    xbt_manifest_id: Annotated[int | None, Field(default=None, gt=0, description="XBT manifest identifier to use as the primitive restriction for this BBIE supplementary component.")],
-    code_list_manifest_id: Annotated[int | None, Field(default=None, gt=0, description="Code-list manifest identifier to use as the primitive restriction for this BBIE supplementary component.")],
-    agency_id_list_manifest_id: Annotated[int | None, Field(default=None, gt=0, description="Agency-ID-list manifest identifier to use as the primitive restriction for this BBIE supplementary component.")],
-    business_information_entity_service: BusinessInformationEntityService = Depends(get_business_information_entity_service),
+    is_used: Annotated[
+        bool | str | None,
+        Field(
+            description="Whether the BBIE supplementary component is profiled/used. Accepts bool values or 'true'/'false' strings. Omit to leave unchanged."
+        ),
+    ] = None,
+    cardinality_min: Annotated[
+        int | None, Field(ge=0, description="Minimum cardinality override. Omit to leave unchanged.")
+    ] = None,
+    cardinality_max: Annotated[
+        int | None, Field(description="Maximum cardinality override. Use -1 for unbounded. Omit to leave unchanged.")
+    ] = None,
+    definition: Annotated[
+        str | None, Field(description="Definition text for this BBIE supplementary component. Omit to leave unchanged.")
+    ] = None,
+    example: Annotated[
+        str | None,
+        Field(
+            description="Illustrative example value or content for this BBIE supplementary component. Omit to leave unchanged."
+        ),
+    ] = None,
+    remark: Annotated[
+        str | None, Field(description="Remark text for this BBIE supplementary component. Omit to leave unchanged.")
+    ] = None,
+    biz_term: Annotated[str | None, Field(description="Business term override. Omit to leave unchanged.")] = None,
+    display_name: Annotated[str | None, Field(description="Display name override. Omit to leave unchanged.")] = None,
+    default_value: Annotated[
+        str | None, Field(description="Default value constraint. Omit to leave unchanged.")
+    ] = None,
+    fixed_value: Annotated[str | None, Field(description="Fixed value constraint. Omit to leave unchanged.")] = None,
+    facet_min_length: Annotated[
+        int | None, Field(ge=0, description="Facet min-length restriction. Omit to leave unchanged.")
+    ] = None,
+    facet_max_length: Annotated[
+        int | None, Field(ge=0, description="Facet max-length restriction. Omit to leave unchanged.")
+    ] = None,
+    facet_pattern: Annotated[
+        str | None, Field(description="Facet pattern restriction. Omit to leave unchanged.")
+    ] = None,
+    xbt_manifest_id: Annotated[
+        int | None,
+        Field(
+            gt=0,
+            description="XBT manifest identifier to use as the primitive restriction for this BBIE supplementary component. Omit to leave unchanged.",
+        ),
+    ] = None,
+    code_list_manifest_id: Annotated[
+        int | None,
+        Field(
+            gt=0,
+            description="Code list manifest identifier to use as the primitive restriction for this BBIE supplementary component. Omit to leave unchanged.",
+        ),
+    ] = None,
+    agency_id_list_manifest_id: Annotated[
+        int | None,
+        Field(
+            gt=0,
+            description="Agency-ID-list manifest identifier to use as the primitive restriction for this BBIE supplementary component. Omit to leave unchanged.",
+        ),
+    ] = None,
+    business_information_entity_service: BusinessInformationEntityService = Depends(
+        get_business_information_entity_service
+    ),
 ) -> UpdateBbieScToolResponse:
     """
     Update an existing BBIE_SC (Basic Business Information Entity Supplementary Component) during BIE profiling.
@@ -5370,7 +7665,7 @@ async def update_bbie_sc(
             Accepts int, str (converted to int), or None. If not provided, will not be updated.
         facet_pattern (str | None, optional): Pattern facet (regex) for string types
         xbt_manifest_id (int | None, optional): XBT manifest identifier to use as the primitive restriction for this BBIE supplementary component. Mutually exclusive with code_list_manifest_id and agency_id_list_manifest_id.
-        code_list_manifest_id (int | None, optional): Code-list manifest identifier to use as the primitive restriction for this BBIE supplementary component. Mutually exclusive with xbt_manifest_id and agency_id_list_manifest_id.
+        code_list_manifest_id (int | None, optional): Code list manifest identifier to use as the primitive restriction for this BBIE supplementary component. Mutually exclusive with xbt_manifest_id and agency_id_list_manifest_id.
         agency_id_list_manifest_id (int | None, optional): Agency-ID-list manifest identifier to use as the primitive restriction for this BBIE supplementary component. Mutually exclusive with xbt_manifest_id and code_list_manifest_id.
 
     Returns:
@@ -5411,9 +7706,7 @@ async def update_bbie_sc(
     except ToolError:
         raise
     except Exception as e:
-        raise ToolError(
-            f"Type conversion error: {str(e)}. Please check your parameter types and try again."
-        ) from e
+        raise ToolError(f"Type conversion error: {str(e)}. Please check your parameter types and try again.") from e
 
     try:
         payload = await business_information_entity_service.update_bbie_sc(

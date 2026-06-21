@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationQueryService;
+import org.oagi.score.gateway.http.api.integration_management.github.config.GitHubIntegrationProperties;
 import org.oagi.score.gateway.http.configuration.oauth2.ScoreClientRegistrationRepository;
 import org.oagi.score.gateway.http.configuration.oauth2.ScoreOAuth2AuthorizedClientService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,9 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Configuration
@@ -70,6 +73,9 @@ public class SecurityConfiguration {
 
     @Autowired
     private SessionService sessionService;
+
+    @Autowired
+    private GitHubIntegrationProperties gitHubIntegrationProperties;
 
     @Value("${resource-server.jwk-set-uri}")
     private String jwkSetUri;
@@ -206,8 +212,18 @@ public class SecurityConfiguration {
                             });
                 })
                 .authorizeHttpRequests(requestMatcherRegistry -> {
+                    List<String> permitAllPaths = new ArrayList<>(
+                            Arrays.asList("/health", "/info/**", "/ws/**", "/oauth2/**", "/ai/**"));
+                    // The GitHub OAuth callback and webhook are reached without a Score session, so they
+                    // must be permitAll — but only when the integration is enabled (SCORE_GITHUB_ENABLED);
+                    // otherwise the feature is off and these endpoints should not be exposed
+                    // unauthenticated (issue #1533).
+                    if (gitHubIntegrationProperties.isEnabled()) {
+                        permitAllPaths.add("/integration/github/callback");
+                        permitAllPaths.add("/integration/github/webhook");
+                    }
                     requestMatcherRegistry
-                            .requestMatchers("/info/**", "/ws/**", "/oauth2/**", "/ai/**").permitAll()
+                            .requestMatchers(permitAllPaths.toArray(new String[0])).permitAll()
                             .anyRequest().authenticated();
                 })
                 .exceptionHandling(exceptionHandlingConfigurer -> {

@@ -534,6 +534,7 @@ def get_core_component_repo(
 def get_core_component_service(
     core_component_repository: CoreComponentRepositoryContract = Depends(get_core_component_repo),
     release_repository: ReleaseRepositoryContract = Depends(get_release_repo),
+    data_type_service: DataTypeService = Depends(get_data_type_service),
     authenticated_user: AuthenticatedUser = Depends(get_authenticated_user),
     app_user_repository: AppUserRepositoryContract = Depends(get_app_user_repo),
 ) -> CoreComponentService:
@@ -554,6 +555,7 @@ def get_core_component_service(
             app_user_repository,
             requester=authenticated_user,
         ),
+        data_type_service,
         app_user_repository,
         requester=authenticated_user,
     )

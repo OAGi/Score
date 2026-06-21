@@ -785,6 +785,18 @@
                             </mat-form-field>
                           </div>
                         </div>
+                        <div class="row" *ngIf="githubService.enabled$() | async">
+                          <div class="col-12">
+                            <score-github-issue-box
+                                [manifestId]="asAccDetail().manifestId"
+                                ccType="acc"
+                                [state]="asAccDetail().state"
+                                [ownerLoginId]="asAccDetail()?.owner?.loginId"
+                                [currentUser]="currentUser"
+                                [editable]="type === 'ACC' && asAccDetail().manifestId === manifestId">
+                            </score-github-issue-box>
+                          </div>
+                        </div>
                       </div>
                     </mat-tab>
                   </mat-tab-group>
@@ -1164,6 +1176,18 @@
                                   }
                                 </div>
                               </mat-form-field>
+                            </div>
+                          </div>
+                          <div class="row" *ngIf="githubService.enabled$() | async">
+                            <div class="col-12">
+                              <score-github-issue-box
+                                  [manifestId]="asAsccpDetail().asccp.manifestId"
+                                  ccType="asccp"
+                                  [state]="asAsccpDetail().asccp.state"
+                                  [ownerLoginId]="asAsccpDetail()?.asccp?.owner?.loginId"
+                                  [currentUser]="currentUser"
+                                  [editable]="type === 'ASCCP' && asAsccpDetail().asccp.manifestId === manifestId">
+                              </score-github-issue-box>
                             </div>
                           </div>
                         </div>
@@ -1615,6 +1639,18 @@
                               </mat-form-field>
                             </div>
                           </div>
+                          <div class="row" *ngIf="githubService.enabled$() | async">
+                            <div class="col-12">
+                              <score-github-issue-box
+                                  [manifestId]="asBccpDetail().bccp.manifestId"
+                                  ccType="bccp"
+                                  [state]="asBccpDetail().bccp.state"
+                                  [ownerLoginId]="asBccpDetail()?.bccp?.owner?.loginId"
+                                  [currentUser]="currentUser"
+                                  [editable]="type === 'BCCP' && asBccpDetail().bccp.manifestId === manifestId">
+                              </score-github-issue-box>
+                            </div>
+                          </div>
                         </div>
                       </mat-tab>
                     }
@@ -1767,6 +1803,18 @@
                                   }
                                 </div>
                               </mat-form-field>
+                            </div>
+                          </div>
+                          <div class="row" *ngIf="githubService.enabled$() | async">
+                            <div class="col-12">
+                              <score-github-issue-box
+                                  [manifestId]="asBccpDetail().bdt.manifestId"
+                                  ccType="dt"
+                                  [state]="asBccpDetail().bdt.state"
+                                  [ownerLoginId]="asBccpDetail()?.bdt?.owner?.loginId"
+                                  [currentUser]="currentUser"
+                                  [editable]="false">
+                              </score-github-issue-box>
                             </div>
                           </div>
                         </div>

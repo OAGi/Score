@@ -1,8 +1,4 @@
-"""MariaDB repository implementation for Namespaces.
-
-Implements list/get operations with filtering, pagination, and sorting.
-Joins library and user tables to include related summaries in response DTOs.
-"""
+"""MariaDB repository implementation for Namespaces."""
 
 
 from __future__ import annotations
@@ -10,15 +6,22 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Literal
 
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, literal, or_, select, union_all, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.contracts.namespace import NamespaceRepositoryContract
 from app.repositories.models import LibrarySummaryRow
 from app.repositories.models.namespace import NamespaceRow
+from app.repositories.vendors.mariadb.models.app_user import AppUser
+from app.repositories.vendors.mariadb.models.agency_id_list import AgencyIdList
+from app.repositories.vendors.mariadb.models.core_component import Acc, Asccp, Bccp
+from app.repositories.vendors.mariadb.models.data_type import Dt
+from app.repositories.vendors.mariadb.models.code_list import CodeList
 from app.repositories.vendors.mariadb.models.library import Library
 from app.repositories.vendors.mariadb.models.namespace import Namespace
+from app.repositories.vendors.mariadb.models.release import Release
 from app.types.identifiers import (
+    AppUserId,
     LibraryId,
     NamespaceId,
 )
@@ -55,6 +58,10 @@ class MariaDbNamespaceRepository(NamespaceRepositoryContract):
         creation_timestamp_after: datetime | None = None,
         last_update_timestamp_before: datetime | None = None,
         last_update_timestamp_after: datetime | None = None,
+        included_owner_login_ids: list[str] | None = None,
+        excluded_owner_login_ids: list[str] | None = None,
+        included_updater_login_ids: list[str] | None = None,
+        excluded_updater_login_ids: list[str] | None = None,
     ) -> tuple[int, list[NamespaceRow]]:
         """Handle list.
 
@@ -69,6 +76,10 @@ class MariaDbNamespaceRepository(NamespaceRepositoryContract):
             creation_timestamp_after: Optional lower bound for creation timestamp.
             last_update_timestamp_before: Optional upper bound for last update timestamp.
             last_update_timestamp_after: Optional lower bound for last update timestamp.
+            included_owner_login_ids: Optional owner login IDs to include by exact match.
+            excluded_owner_login_ids: Optional owner login IDs to exclude by exact match.
+            included_updater_login_ids: Optional updater login IDs to include by exact match.
+            excluded_updater_login_ids: Optional updater login IDs to exclude by exact match.
 
         Returns:
             Result of the operation.
@@ -82,6 +93,10 @@ class MariaDbNamespaceRepository(NamespaceRepositoryContract):
             creation_timestamp_after=creation_timestamp_after,
             last_update_timestamp_before=last_update_timestamp_before,
             last_update_timestamp_after=last_update_timestamp_after,
+            included_owner_login_ids=included_owner_login_ids,
+            excluded_owner_login_ids=excluded_owner_login_ids,
+            included_updater_login_ids=included_updater_login_ids,
+            excluded_updater_login_ids=excluded_updater_login_ids,
         )
 
         total_stmt = select(func.count()).select_from(Namespace)
@@ -113,6 +128,155 @@ class MariaDbNamespaceRepository(NamespaceRepositoryContract):
         res = await self._session.execute(stmt)
         row = res.first()
         return _to_namespace_row(row) if row else None
+
+    async def library_exists(self, library_id: LibraryId) -> bool:
+        """Return whether the target library exists."""
+        stmt = select(func.count()).select_from(Library).where(Library.library_id == int(library_id))
+        res = await self._session.execute(stmt)
+        return int(res.scalar_one()) > 0
+
+    async def has_duplicate_uri(
+        self,
+        *,
+        library_id: LibraryId,
+        uri: str,
+        exclude_namespace_id: NamespaceId | None = None,
+    ) -> bool:
+        """Return whether another namespace in the library already uses the URI."""
+        stmt = (
+            select(func.count())
+            .select_from(Namespace)
+            .where(
+                Namespace.library_id == int(library_id),
+                Namespace.uri == uri,
+            )
+        )
+        if exclude_namespace_id is not None:
+            stmt = stmt.where(Namespace.namespace_id != int(exclude_namespace_id))
+        res = await self._session.execute(stmt)
+        return int(res.scalar_one()) > 0
+
+    async def has_duplicate_prefix(
+        self,
+        *,
+        library_id: LibraryId,
+        prefix: str,
+        exclude_namespace_id: NamespaceId | None = None,
+    ) -> bool:
+        """Return whether another namespace in the library already uses the prefix."""
+        normalized_prefix = prefix.strip()
+        blank_prefix_filter = or_(Namespace.prefix.is_(None), Namespace.prefix == "")
+        prefix_filter = blank_prefix_filter if normalized_prefix == "" else Namespace.prefix == normalized_prefix
+        stmt = (
+            select(func.count())
+            .select_from(Namespace)
+            .where(
+                Namespace.library_id == int(library_id),
+                prefix_filter,
+            )
+        )
+        if exclude_namespace_id is not None:
+            stmt = stmt.where(Namespace.namespace_id != int(exclude_namespace_id))
+        res = await self._session.execute(stmt)
+        return int(res.scalar_one()) > 0
+
+    async def create_namespace(
+        self,
+        *,
+        library_id: LibraryId,
+        uri: str,
+        prefix: str,
+        description: str | None,
+        requester_user_id: AppUserId,
+        requester_is_developer: bool,
+    ) -> NamespaceId:
+        """Create a namespace and return its identifier."""
+        now = datetime.utcnow()
+        namespace = Namespace(
+            library_id=int(library_id),
+            uri=uri,
+            prefix=prefix,
+            description=description,
+            is_std_nmsp=bool(requester_is_developer),
+            owner_user_id=int(requester_user_id),
+            created_by=int(requester_user_id),
+            last_updated_by=int(requester_user_id),
+            creation_timestamp=now,
+            last_update_timestamp=now,
+        )
+        self._session.add(namespace)
+        await self._session.flush()
+        await self._session.refresh(namespace)
+        return NamespaceId(int(namespace.namespace_id))
+
+    async def update_namespace(
+        self,
+        *,
+        namespace_id: NamespaceId,
+        uri: str,
+        prefix: str,
+        description: str | None,
+        requester_user_id: AppUserId,
+    ) -> bool:
+        """Update a namespace owned by the requester."""
+        stmt = (
+            update(Namespace)
+            .where(
+                Namespace.namespace_id == int(namespace_id),
+                Namespace.owner_user_id == int(requester_user_id),
+            )
+            .values(
+                uri=uri,
+                prefix=prefix,
+                description=description,
+                last_updated_by=int(requester_user_id),
+                last_update_timestamp=datetime.utcnow(),
+            )
+        )
+        res = await self._session.execute(stmt)
+        return int(res.rowcount or 0) == 1
+
+    async def discard_namespace(self, *, namespace_id: NamespaceId) -> bool:
+        """Delete a namespace row by identifier."""
+        stmt = delete(Namespace).where(Namespace.namespace_id == int(namespace_id))
+        res = await self._session.execute(stmt)
+        return int(res.rowcount or 0) == 1
+
+    async def transfer_namespace_ownership(
+        self,
+        *,
+        namespace_id: NamespaceId,
+        requester_user_id: AppUserId,
+        target_user_id: AppUserId,
+    ) -> bool:
+        """Transfer namespace ownership."""
+        stmt = (
+            update(Namespace)
+            .where(Namespace.namespace_id == int(namespace_id))
+            .values(
+                owner_user_id=int(target_user_id),
+                last_updated_by=int(requester_user_id),
+                last_update_timestamp=datetime.utcnow(),
+            )
+        )
+        res = await self._session.execute(stmt)
+        return int(res.rowcount or 0) == 1
+
+    async def namespace_is_used(self, *, namespace_id: NamespaceId) -> bool:
+        """Return whether any release or component still references the namespace."""
+        ns_id = int(namespace_id)
+        usage_union = union_all(
+            select(literal(1)).select_from(Release).where(Release.namespace_id == ns_id).limit(1),
+            select(literal(1)).select_from(Acc).where(Acc.namespace_id == ns_id).limit(1),
+            select(literal(1)).select_from(Asccp).where(Asccp.namespace_id == ns_id).limit(1),
+            select(literal(1)).select_from(Bccp).where(Bccp.namespace_id == ns_id).limit(1),
+            select(literal(1)).select_from(Dt).where(Dt.namespace_id == ns_id).limit(1),
+            select(literal(1)).select_from(CodeList).where(CodeList.namespace_id == ns_id).limit(1),
+            select(literal(1)).select_from(AgencyIdList).where(AgencyIdList.namespace_id == ns_id).limit(1),
+        ).subquery()
+        stmt = select(func.count()).select_from(usage_union)
+        res = await self._session.execute(stmt)
+        return int(res.scalar_one()) > 0
 
 
 def _as_dt(value: object) -> datetime:
@@ -197,6 +361,10 @@ def _build_where_clauses(
     creation_timestamp_after: datetime | None,
     last_update_timestamp_before: datetime | None,
     last_update_timestamp_after: datetime | None,
+    included_owner_login_ids: list[str] | None = None,
+    excluded_owner_login_ids: list[str] | None = None,
+    included_updater_login_ids: list[str] | None = None,
+    excluded_updater_login_ids: list[str] | None = None,
 ) -> list[object]:
     """Internal helper for build where clauses.
 
@@ -230,6 +398,30 @@ def _build_where_clauses(
         clauses.append(Namespace.last_update_timestamp >= last_update_timestamp_after)
     if last_update_timestamp_before is not None:
         clauses.append(Namespace.last_update_timestamp <= last_update_timestamp_before)
+    if included_owner_login_ids:
+        clauses.append(
+            Namespace.owner_user_id.in_(
+                select(AppUser.app_user_id).where(AppUser.login_id.in_(included_owner_login_ids))
+            )
+        )
+    if excluded_owner_login_ids:
+        clauses.append(
+            Namespace.owner_user_id.not_in(
+                select(AppUser.app_user_id).where(AppUser.login_id.in_(excluded_owner_login_ids))
+            )
+        )
+    if included_updater_login_ids:
+        clauses.append(
+            Namespace.last_updated_by.in_(
+                select(AppUser.app_user_id).where(AppUser.login_id.in_(included_updater_login_ids))
+            )
+        )
+    if excluded_updater_login_ids:
+        clauses.append(
+            Namespace.last_updated_by.not_in(
+                select(AppUser.app_user_id).where(AppUser.login_id.in_(excluded_updater_login_ids))
+            )
+        )
     return clauses
 
 

@@ -2,7 +2,7 @@
 
 import { Braces, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useState } from 'react';
 
 import { MethodMarkdownActions } from '@/components/method-markdown-actions';
 import { CopyButton } from '@/components/copy-button';
@@ -28,7 +28,7 @@ function FieldFilterSelect({
 }) {
   return (
     <Select value={value} onValueChange={(next) => onChange(next as FieldFilter)}>
-      <SelectTrigger className="h-7 !w-auto min-w-[78px] !flex !justify-between px-2 text-[11px] text-[#111827] !outline-none !ring-0 !focus:outline-none !focus:ring-0 !focus:ring-offset-0 !focus-visible:outline-none !focus-visible:ring-0 !focus-visible:ring-offset-0 dark:text-[#e5e7eb]">
+      <SelectTrigger className="h-7 w-auto! min-w-[78px] flex! justify-between! px-2 text-[11px] text-[#111827] outline-hidden! ring-0! focus:outline-hidden! focus:ring-0! focus:ring-offset-0! focus-visible:outline-hidden! focus-visible:ring-0! focus-visible:ring-offset-0! dark:text-[#e5e7eb]">
         <SelectValue placeholder="Filter" />
       </SelectTrigger>
       <SelectContent>
@@ -45,6 +45,7 @@ function MethodBadge({ method }: { method: MethodDoc['method'] }) {
     GET: 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-400/60 dark:bg-blue-500/15 dark:text-blue-200',
     POST: 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-400/60 dark:bg-emerald-500/15 dark:text-emerald-200',
     PUT: 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-400/70 dark:bg-amber-500/15 dark:text-amber-200',
+    PATCH: 'border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-400/70 dark:bg-violet-500/15 dark:text-violet-200',
     DELETE: 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-400/70 dark:bg-rose-500/15 dark:text-rose-200',
   };
 
@@ -124,8 +125,9 @@ function PropertyList({ fields, requiredFilter }: { fields: MethodDoc['body_para
   return (
     <div className="divide-y divide-border rounded-lg bg-white dark:bg-[#050505]">
       {rootFields.map((field) => {
-        const children = fields.filter((candidate) => candidate.name.startsWith(`${field.name}.`) && matchesRequiredFilter(candidate.required));
-        const expandable = /\bobject\b/i.test(field.type) && children.length > 0;
+        const prefix = childFieldPrefix(field.name, field.type);
+        const children = fields.filter((candidate) => candidate.name.startsWith(prefix) && matchesRequiredFilter(candidate.required));
+        const expandable = (isObjectLikeType(field.type) || isArrayType(field.type)) && children.length > 0;
 
         if (!expandable) {
           return (
@@ -145,9 +147,9 @@ function PropertyList({ fields, requiredFilter }: { fields: MethodDoc['body_para
         }
 
         return (
-          <details key={field.name} className="group overflow-visible px-4 py-3">
-            <summary className="relative cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-              <ChevronRight className="absolute -left-3 top-0.5 h-4 w-4 text-[#94a3b8] transition-transform group-open:rotate-90" />
+          <details key={field.name} className="group overflow-visible">
+            <summary className="relative cursor-pointer list-none px-4 py-3 [&::-webkit-details-marker]:hidden">
+              <ChevronRight className="absolute -left-3 top-3.5 h-4 w-4 text-[#94a3b8] transition-transform group-open:rotate-90" />
               <div className="flex items-center gap-2">
                 <span className="font-mono text-[12px] text-[#0f172a]">{field.name}</span>
                 <span className="rounded border border-border bg-[#f8fafc] px-2 py-0.5 text-[11px] text-[#6b7280]">
@@ -163,7 +165,7 @@ function PropertyList({ fields, requiredFilter }: { fields: MethodDoc['body_para
               {children.map((child, index) => (
                 <div key={child.name} className={index === 0 ? 'px-4 py-3' : 'border-t border-border px-4 py-3'}>
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-[12px] text-[#0f172a]">{child.name.slice(field.name.length + 1)}</span>
+                    <span className="font-mono text-[12px] text-[#0f172a]">{childFieldLabel(field.name, field.type, child.name)}</span>
                     <span className="rounded border border-border bg-[#f8fafc] px-2 py-0.5 text-[11px] text-[#6b7280]">
                       {child.type}
                     </span>
@@ -578,7 +580,7 @@ function CodePane({ title, code, kind }: { title: string; code: string; kind: st
             {lines.map((line, index) => (
               <div key={`${index}-${line}`} className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-3">
                 <span className="syntax-line-number select-none text-right">{index + 1}</span>
-                <span className="min-w-0 whitespace-pre-wrap break-words">{renderHighlightedLine(line || ' ', syntaxKind)}</span>
+                <span className="min-w-0 whitespace-pre-wrap wrap-break-word">{renderHighlightedLine(line || ' ', syntaxKind)}</span>
               </div>
             ))}
           </code>
@@ -598,10 +600,19 @@ function isArrayType(type: string): boolean {
   return /\barray\b/i.test(type);
 }
 
+function childFieldPrefix(fieldName: string, fieldType: string): string {
+  return isArrayType(fieldType) ? `${fieldName}[].` : `${fieldName}.`;
+}
+
+function childFieldLabel(parentName: string, parentType: string, childName: string): string {
+  return childName.slice(childFieldPrefix(parentName, parentType).length);
+}
+
 function getStructuredBodyFields(fields: MethodDoc['body_params']): MethodDoc['body_params'] {
   return fields.filter((field) => {
-    const hasChildren = fields.some((candidate) => candidate.name.startsWith(`${field.name}.`));
-    if (isObjectLikeType(field.type) && hasChildren) {
+    const prefix = childFieldPrefix(field.name, field.type);
+    const hasChildren = fields.some((candidate) => candidate.name.startsWith(prefix));
+    if ((isObjectLikeType(field.type) || isArrayType(field.type)) && hasChildren) {
       return false;
     }
     return true;
@@ -781,9 +792,14 @@ function ApiPlayground({
   const structuredBodyPreview = JSON.stringify(buildStructuredBodyPayload(bodyParams, bodyValues).payload ?? {}, null, 2);
   const showDividerBeforeSubmit = !authorizationHeader || pathParams.length > 0 || queryParams.length > 0 || methodSupportsBody;
 
-  useEffect(() => {
+  // Re-initialize the body form whenever its field structure changes. Handled
+  // during render (React's "adjust state on prop change" pattern), keyed on the
+  // field signature so unrelated re-renders don't discard the user's input.
+  const [prevBodyFieldSignature, setPrevBodyFieldSignature] = useState(bodyFieldSignature);
+  if (prevBodyFieldSignature !== bodyFieldSignature) {
+    setPrevBodyFieldSignature(bodyFieldSignature);
     setBodyValues(buildInitialBodyValues(bodyParams));
-  }, [bodyFieldSignature]);
+  }
 
   const serializeOrderBy = (columns: string[], directionMap: Record<string, 'asc' | 'desc'>): string => {
     return columns
@@ -918,7 +934,7 @@ function ApiPlayground({
                     }))
                   }
                   placeholder={field.name}
-                  className="h-9 rounded-md border border-border px-3 text-sm outline-none focus:ring-2 focus:ring-[#cbd5e1]"
+                  className="h-9 rounded-md border border-border px-3 text-sm outline-hidden focus:ring-2 focus:ring-[#cbd5e1]"
                 />
               )
             ))}
@@ -1033,7 +1049,7 @@ function ApiPlayground({
                     }))
                   }
                   placeholder={field.name}
-                  className="h-9 rounded-md border border-border px-3 text-sm outline-none focus:ring-2 focus:ring-[#cbd5e1]"
+                  className="h-9 rounded-md border border-border px-3 text-sm outline-hidden focus:ring-2 focus:ring-[#cbd5e1]"
                 />
               )
             ))}
@@ -1077,7 +1093,7 @@ function ApiPlayground({
                             }
                             rows={4}
                             placeholder={isArrayType(field.type) ? '[]' : '{}'}
-                            className="w-full rounded-md border border-border px-3 py-2 font-mono text-xs outline-none focus:ring-2 focus:ring-[#cbd5e1]"
+                            className="w-full rounded-md border border-border px-3 py-2 font-mono text-xs outline-hidden focus:ring-2 focus:ring-[#cbd5e1]"
                           />
                         ) : (
                           <input
@@ -1091,7 +1107,7 @@ function ApiPlayground({
                               }))
                             }
                             placeholder={field.name}
-                            className="h-9 rounded-md border border-border px-3 text-sm outline-none focus:ring-2 focus:ring-[#cbd5e1]"
+                            className="h-9 rounded-md border border-border px-3 text-sm outline-hidden focus:ring-2 focus:ring-[#cbd5e1]"
                           />
                         )}
                       </div>
@@ -1162,10 +1178,18 @@ export function MethodReference({
   const [selectedEndpoint, setSelectedEndpoint] = useState(doc.endpoint);
   const [endpointMenuOpen, setEndpointMenuOpen] = useState(false);
 
-  useEffect(() => {
+  // Reset the endpoint selection when the document changes. Handled during
+  // render (React's "adjust state when a prop changes" pattern) instead of an
+  // effect, so it avoids an extra commit/render pass. Keyed on the same values
+  // the previous effect depended on (endpoint + alternate_endpoints identity).
+  const [prevEndpoint, setPrevEndpoint] = useState(doc.endpoint);
+  const [prevAlternates, setPrevAlternates] = useState(doc.alternate_endpoints);
+  if (prevEndpoint !== doc.endpoint || prevAlternates !== doc.alternate_endpoints) {
+    setPrevEndpoint(doc.endpoint);
+    setPrevAlternates(doc.alternate_endpoints);
     setSelectedEndpoint(doc.endpoint);
     setEndpointMenuOpen(false);
-  }, [doc.endpoint, doc.alternate_endpoints]);
+  }
 
   const statusInExample = doc.response_example.match(/\bHTTP\/\d(?:\.\d)?\s+(\d{3})\b/);
   const inferredStatus =
@@ -1234,7 +1258,7 @@ export function MethodReference({
                     onOpenChange={(open) => setEndpointMenuOpen(endpointOptions.length > 1 ? open : false)}
                   >
                     <SelectTrigger
-                      className={`h-9 max-w-full min-w-[340px] flex-1 bg-[#f8fafc] font-mono text-[12px] text-[#334155] !outline-none !ring-0 !shadow-none !focus:outline-none !focus:ring-0 !focus:ring-offset-0 !focus:shadow-none !focus-visible:outline-none !focus-visible:ring-0 !focus-visible:ring-offset-0 !focus-visible:shadow-none [--tw-ring-shadow:0_0_#0000] [--tw-ring-offset-shadow:0_0_#0000] [--tw-ring-offset-width:0px] ${
+                      className={`h-9 max-w-full min-w-[340px] flex-1 bg-[#f8fafc] font-mono text-[12px] text-[#334155] outline-hidden! ring-0! shadow-none! focus:outline-hidden! focus:ring-0! focus:ring-offset-0! focus:shadow-none! focus-visible:outline-hidden! focus-visible:ring-0! focus-visible:ring-offset-0! focus-visible:shadow-none! [--tw-ring-shadow:0_0_#0000] [--tw-ring-offset-shadow:0_0_#0000] [--tw-ring-offset-width:0px] ${
                         endpointOptions.length === 1 ? 'cursor-default' : ''
                       }`}
                       style={{ boxShadow: 'none', outline: 'none' }}

@@ -344,6 +344,7 @@ export class TableColumnsInfo {
     {name: 'Array Indicator', selected: true, width: 120},
     {name: 'Suppress Root Indicator', selected: true, width: 120},
     {name: 'Message Body', selected: true, width: 120},
+    {name: 'Security', selected: true, width: 120},
     {name: 'Resource Name', selected: true, width: '15%'},
     {name: 'Operation ID', selected: true, width: '15%'},
     {name: 'Tag Name', selected: true, width: '10%'}

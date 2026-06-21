@@ -40,4 +40,32 @@ public interface UpliftBIEVerificationPage extends Page {
      */
     EditBIEPage uplift();
 
+    /**
+     * Click the verification 'Next' button (which opens the 'Uplift BIE Report'
+     * dialog) and then the report dialog's 'Uplift' button, without waiting for
+     * the uplift to complete.
+     * <p>
+     * When a mapped reuse node was left without a target BIE selected, this
+     * surfaces the 'Proceed without selecting reuse BIEs?' confirmation
+     * (OAGi/Score#1735) instead of finishing the uplift.
+     */
+    void submitUpliftReport();
+
+    /**
+     * Return the header element of the unselected-reuse confirmation dialog
+     * ('Proceed without selecting reuse BIEs?') shown when one or more mapped
+     * reuse nodes were left without a target BIE selected (OAGi/Score#1735).
+     *
+     * @return the header element of the unselected-reuse confirmation dialog
+     */
+    WebElement getUnselectedReuseWarning();
+
+    /**
+     * Confirm the unselected-reuse warning by clicking 'Continue' and return the
+     * resulting uplifted BIE edit page (OAGi/Score#1735).
+     *
+     * @return the uplifted BIE edit page
+     */
+    EditBIEPage confirmUnselectedReuseAndUplift();
+
 }

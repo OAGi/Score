@@ -34,6 +34,7 @@ import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasOperationSecurity.OasOperationSecurityPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasParameterLink.OasParameterLinkPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasRequest.OasRequestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasResource.OasResourcePath;
@@ -111,6 +112,13 @@ public class OasOperation extends TableImpl<OasOperationRecord> {
      * declared operation. Default value is false.
      */
     public final TableField<OasOperationRecord, Byte> DEPRECATED = createField(DSL.name("deprecated"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Declares this operation to be deprecated. Consumers SHOULD refrain from usage of the declared operation. Default value is false.");
+
+    /**
+     * The column <code>oagi.oas_operation.security_overridden</code>. 1 = this
+     * operation overrides the document-level security (0 rows =&gt; security:
+     * []; rows =&gt; the operation array). 0 = inherit the root security.
+     */
+    public final TableField<OasOperationRecord, Byte> SECURITY_OVERRIDDEN = createField(DSL.name("security_overridden"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "1 = this operation overrides the document-level security (0 rows => security: []; rows => the operation array). 0 = inherit the root security.");
 
     /**
      * The column <code>oagi.oas_operation.created_by</code>. The user who
@@ -254,6 +262,19 @@ public class OasOperation extends TableImpl<OasOperationRecord> {
             _oasResource = new OasResourcePath(this, Keys.OAS_OPERATION_OAS_RESOURCE_ID_FK, null);
 
         return _oasResource;
+    }
+
+    private transient OasOperationSecurityPath _oasOperationSecurity;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_operation_security</code> table
+     */
+    public OasOperationSecurityPath oasOperationSecurity() {
+        if (_oasOperationSecurity == null)
+            _oasOperationSecurity = new OasOperationSecurityPath(this, null, Keys.OAS_OPERATION_SECURITY_OAS_OPERATION_ID_FK.getInverseKey());
+
+        return _oasOperationSecurity;
     }
 
     private transient OasParameterLinkPath _oasParameterLink;

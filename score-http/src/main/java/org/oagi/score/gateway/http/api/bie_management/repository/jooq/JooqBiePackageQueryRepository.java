@@ -68,6 +68,23 @@ public class JooqBiePackageQueryRepository extends JooqBaseRepository implements
                 .fetch(queryBuilder.mapper());
     }
 
+    @Override
+    public List<BiePackageSummaryRecord> getBiePackagesReferencingAsPrevious(Collection<BiePackageId> biePackageIds) {
+        if (biePackageIds == null || biePackageIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        var ids = valueOf(biePackageIds);
+        var queryBuilder = new GetBiePackageSummaryQueryBuilder();
+        return queryBuilder.select()
+                .where(and(
+                        BIE_PACKAGE.PREV_BIE_PACKAGE_ID.in(ids),
+                        BIE_PACKAGE.BIE_PACKAGE_ID.notIn(ids)
+                ))
+                .groupBy(BIE_PACKAGE.BIE_PACKAGE_ID)
+                .fetch(queryBuilder.mapper());
+    }
+
     private class GetBiePackageSummaryQueryBuilder {
 
         SelectOnConditionStep<? extends org.jooq.Record> select() {
@@ -79,6 +96,7 @@ public class JooqBiePackageQueryRepository extends JooqBaseRepository implements
                             BIE_PACKAGE.VERSION_ID,
                             BIE_PACKAGE.VERSION_NAME,
                             BIE_PACKAGE.DESCRIPTION,
+                            BIE_PACKAGE.REVISION_REASON,
                             groupConcatDistinct(RELEASE.RELEASE_ID).as("release_id_list"),
                             groupConcatDistinct(RELEASE.RELEASE_NUM).as("release_num_list"),
                             BIE_PACKAGE.STATE,
@@ -119,6 +137,7 @@ public class JooqBiePackageQueryRepository extends JooqBaseRepository implements
                         record.get(BIE_PACKAGE.VERSION_ID),
                         record.get(BIE_PACKAGE.VERSION_NAME),
                         record.get(BIE_PACKAGE.DESCRIPTION),
+                        record.get(BIE_PACKAGE.REVISION_REASON),
                         releases,
                         state,
                         owner,
@@ -376,6 +395,7 @@ public class JooqBiePackageQueryRepository extends JooqBaseRepository implements
                             BIE_PACKAGE.VERSION_ID,
                             BIE_PACKAGE.VERSION_NAME,
                             BIE_PACKAGE.DESCRIPTION,
+                            BIE_PACKAGE.REVISION_REASON,
                             groupConcatDistinct(RELEASE.RELEASE_ID).as("release_id_list"),
                             groupConcatDistinct(RELEASE.RELEASE_NUM).as("release_num_list"),
                             BIE_PACKAGE.STATE,
@@ -437,6 +457,7 @@ public class JooqBiePackageQueryRepository extends JooqBaseRepository implements
                         record.get(BIE_PACKAGE.VERSION_ID),
                         record.get(BIE_PACKAGE.VERSION_NAME),
                         record.get(BIE_PACKAGE.DESCRIPTION),
+                        record.get(BIE_PACKAGE.REVISION_REASON),
                         releases,
                         state,
                         toAccessPrivilege(owner.userId(), state),

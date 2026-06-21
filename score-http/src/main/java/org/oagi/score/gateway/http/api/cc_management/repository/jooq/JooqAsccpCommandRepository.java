@@ -341,6 +341,11 @@ public class JooqAsccpCommandRepository extends JooqBaseRepository implements As
                 .where(MODULE_ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(valueOf(asccpManifestId)))
                 .execute();
 
+        // discard corresponding GitHub issue links (issue #1533)
+        dslContext().deleteFrom(GITHUB_ISSUE_ASCCP_MANIFEST)
+                .where(GITHUB_ISSUE_ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(valueOf(asccpManifestId)))
+                .execute();
+
         // discard corresponding tags
         dslContext().deleteFrom(ASCCP_MANIFEST_TAG)
                 .where(ASCCP_MANIFEST_TAG.ASCCP_MANIFEST_ID.eq(valueOf(asccpManifestId)))

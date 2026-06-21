@@ -15,7 +15,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.ollama.api.OllamaApi;
-import org.springframework.ai.ollama.api.OllamaOptions;
+import org.springframework.ai.ollama.api.OllamaChatOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -126,7 +126,7 @@ public class CcQueryInterpreter {
                         OllamaApi.Message.builder(OllamaApi.Message.Role.USER)
                                 .content(statement)
                                 .build()))
-                .options(OllamaOptions.builder().temperature(1.0).build())
+                .options(OllamaChatOptions.builder().temperature(1.0).build())
                 .build();
         OllamaApi.ChatResponse response;
         try {

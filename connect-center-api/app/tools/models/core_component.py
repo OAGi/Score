@@ -4,12 +4,13 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.tools.models.shared import LibrarySummaryRecord
 from app.tools.models.shared import LogSummaryRecord
 from app.tools.models.shared import NamespaceSummaryRecord
 from app.tools.models.shared import ReleaseSummaryRecord
+from app.tools.models.shared import TagSummaryRecord
 from app.tools.models.shared import UserSummary
 from app.tools.models.shared import ValueConstraintRecord
 from app.tools.models.shared import WhoAndWhen
@@ -30,6 +31,7 @@ class CoreComponentListEntryResponse(BaseModel):
     namespace: NamespaceSummaryRecord | None = None
     library: LibrarySummaryRecord
     release: ReleaseSummaryRecord
+    tags: list[TagSummaryRecord] = Field(default_factory=list)
     log: LogSummaryRecord | None = None
     owner: UserSummary
     created: WhoAndWhen
@@ -210,6 +212,32 @@ class BccRelationshipResponse(BaseModel):
     model_config = ConfigDict(frozen=True, from_attributes=True)
 
 
+BccEntityTypeUpdate = Literal["Element", "Attribute", 1, 0]
+
+
+class BccValueConstraintInput(BaseModel):
+    """Mutually exclusive value-constraint input for BCC updates."""
+
+    default_value: str | None = Field(
+        default=None,
+        description="Default value to apply when the element is omitted.",
+    )
+    fixed_value: str | None = Field(
+        default=None,
+        description="Fixed value to require for the element.",
+    )
+
+    @model_validator(mode="after")
+    def validate_exactly_one_selection(self) -> "BccValueConstraintInput":
+        """Require exactly one value-constraint option."""
+        provided = [self.default_value, self.fixed_value]
+        if sum(value is not None for value in provided) != 1:
+            raise ValueError("Exactly one of default_value or fixed_value must be provided.")
+        return self
+
+    model_config = ConfigDict(frozen=True)
+
+
 class GetCoreComponentPaginationResponse(BaseModel):
     """Response for get_core_components tool."""
 
@@ -217,6 +245,163 @@ class GetCoreComponentPaginationResponse(BaseModel):
     offset: int
     limit: int
     items: list[CoreComponentListEntryResponse]
+
+    model_config = ConfigDict(frozen=True)
+
+
+class CreateAccResponse(BaseModel):
+    """Response for create_acc tool."""
+
+    acc_manifest_id: int
+
+    model_config = ConfigDict(frozen=True)
+
+
+class CreateAsccpResponse(BaseModel):
+    """Response for create_asccp tool."""
+
+    asccp_manifest_id: int
+
+    model_config = ConfigDict(frozen=True)
+
+
+class CreateBccpResponse(BaseModel):
+    """Response for create_bccp tool."""
+
+    bccp_manifest_id: int
+
+    model_config = ConfigDict(frozen=True)
+
+
+class AddAsccToAccResponse(BaseModel):
+    """Response for add_ascc_to_acc tool."""
+
+    ascc_manifest_id: int
+
+    model_config = ConfigDict(frozen=True)
+
+
+class AddBccToAccResponse(BaseModel):
+    """Response for add_bcc_to_acc tool."""
+
+    bcc_manifest_id: int
+
+    model_config = ConfigDict(frozen=True)
+
+
+class ReorderAsccInAccResponse(BaseModel):
+    """Response for reorder_ascc_in_acc tool."""
+
+    ascc_manifest_id: int
+    updates: list[str]
+
+    model_config = ConfigDict(frozen=True)
+
+
+class ReorderBccInAccResponse(BaseModel):
+    """Response for reorder_bcc_in_acc tool."""
+
+    bcc_manifest_id: int
+    updates: list[str]
+
+    model_config = ConfigDict(frozen=True)
+
+
+class UpdateAccResponse(BaseModel):
+    """Response for update_acc tool."""
+
+    acc_manifest_id: int
+    updates: list[str]
+
+    model_config = ConfigDict(frozen=True)
+
+
+class UpdateAsccResponse(BaseModel):
+    """Response for update_ascc tool."""
+
+    ascc_manifest_id: int
+    updates: list[str]
+
+    model_config = ConfigDict(frozen=True)
+
+
+class UpdateBccResponse(BaseModel):
+    """Response for update_bcc tool."""
+
+    bcc_manifest_id: int
+    updates: list[str]
+
+    model_config = ConfigDict(frozen=True)
+
+
+class UpdateAsccpResponse(BaseModel):
+    """Response for update_asccp tool."""
+
+    asccp_manifest_id: int
+    updates: list[str]
+
+    model_config = ConfigDict(frozen=True)
+
+
+class UpdateBccpResponse(BaseModel):
+    """Response for update_bccp tool."""
+
+    bccp_manifest_id: int
+    updates: list[str]
+
+    model_config = ConfigDict(frozen=True)
+
+
+class TransferAccOwnershipResponse(BaseModel):
+    """Response for transfer_acc_ownership tool."""
+
+    acc_manifest_id: int
+    updates: list[str]
+
+    model_config = ConfigDict(frozen=True)
+
+
+class TransferAsccpOwnershipResponse(BaseModel):
+    """Response for transfer_asccp_ownership tool."""
+
+    asccp_manifest_id: int
+    updates: list[str]
+
+    model_config = ConfigDict(frozen=True)
+
+
+class TransferBccpOwnershipResponse(BaseModel):
+    """Response for transfer_bccp_ownership tool."""
+
+    bccp_manifest_id: int
+    updates: list[str]
+
+    model_config = ConfigDict(frozen=True)
+
+
+class UpdateAccTagsResponse(BaseModel):
+    """Response for ACC tag update tools."""
+
+    acc_manifest_id: int
+    updates: list[str]
+
+    model_config = ConfigDict(frozen=True)
+
+
+class ChangeAccStateResponse(BaseModel):
+    """Response for change_acc_state tool."""
+
+    acc_manifest_id: int
+    updates: list[str]
+
+    model_config = ConfigDict(frozen=True)
+
+
+class DiscardAccResponse(BaseModel):
+    """Response for discard_acc tool."""
+
+    acc_manifest_id: int
+    discarded: bool
 
     model_config = ConfigDict(frozen=True)
 
@@ -241,6 +426,7 @@ class GetAccResponse(BaseModel):
     namespace: NamespaceSummaryRecord | None = None
     library: LibrarySummaryRecord
     release: ReleaseSummaryRecord
+    tags: list[TagSummaryRecord] = Field(default_factory=list)
     log: LogSummaryRecord | None = None
     owner: UserSummary
     created: WhoAndWhen
@@ -267,6 +453,7 @@ class GetAsccpResponse(BaseModel):
     namespace: NamespaceSummaryRecord | None = None
     library: LibrarySummaryRecord
     release: ReleaseSummaryRecord
+    tags: list[TagSummaryRecord] = Field(default_factory=list)
     log: LogSummaryRecord | None = None
     owner: UserSummary
     created: WhoAndWhen

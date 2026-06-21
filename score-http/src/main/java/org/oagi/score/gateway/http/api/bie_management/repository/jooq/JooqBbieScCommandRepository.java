@@ -7,8 +7,11 @@ import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.bbie_sc.BbieScDetailsRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.bbie_sc.BbieScNode;
 import org.oagi.score.gateway.http.api.bie_management.repository.BbieScCommandRepository;
+import org.oagi.score.gateway.http.api.cc_management.model.CcState;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScAwdPriSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScSummaryRecord;
+import org.oagi.score.gateway.http.api.code_list_management.model.CodeListManifestId;
+import org.oagi.score.gateway.http.api.code_list_management.model.CodeListSummaryRecord;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.JooqBaseRepository;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
@@ -46,6 +49,13 @@ public class JooqBbieScCommandRepository extends JooqBaseRepository implements B
         ScoreUser requester = requester();
         ULong userId = valueOf(requester.userId());
         LocalDateTime timestamp = LocalDateTime.now();
+
+        // Issue #1723: a developer must not assign an end-user's code list (Production state or
+        // end-user-owned) to a BBIE_SC. Pre-existing assignments are preserved (only a change is
+        // rejected); the UI also renders such options read-only.
+        assertDeveloperMayAssignCodeList(
+                (bbieScRecord != null) ? bbieScRecord.getCodeListManifestId() : null,
+                bbieSc.getCodeListManifestId());
 
         if (bbieScRecord == null) {
             bbieScRecord = new BbieScRecord();
@@ -297,6 +307,36 @@ public class JooqBbieScCommandRepository extends JooqBaseRepository implements B
         }
 
         return getBbieSc(request.getTopLevelAsbiepId(), hashPath);
+    }
+
+    /**
+     * Issue #1723: A developer must not assign an end-user's code list to a BIE supplementary
+     * component. End-user code lists are owned by a non-developer and/or kept in {@code Production}
+     * state, whereas developer-owned, assignable code lists are {@code Published}. Existing
+     * assignments are preserved: only a <em>change</em> to a forbidden code list is rejected.
+     */
+    private void assertDeveloperMayAssignCodeList(ULong currentCodeListManifestId,
+                                                  CodeListManifestId newCodeListManifestId) {
+        if (newCodeListManifestId == null || !requester().isDeveloper()) {
+            return;
+        }
+        // Unchanged assignment -> allow.
+        if (currentCodeListManifestId != null
+                && currentCodeListManifestId.toBigInteger().equals(newCodeListManifestId.value())) {
+            return;
+        }
+        CodeListSummaryRecord codeList = repositoryFactory()
+                .codeListQueryRepository(requester())
+                .getCodeListSummary(newCodeListManifestId);
+        if (codeList == null) {
+            return;
+        }
+        boolean endUserOwned = codeList.owner() != null && !codeList.owner().isDeveloper();
+        if (codeList.state() == CcState.Production || endUserOwned) {
+            throw new IllegalArgumentException(
+                    "A developer cannot assign an end-user's code list to a BIE: '"
+                            + codeList.name() + "' (state: " + codeList.state() + ").");
+        }
     }
 
     private BbieScNode.BbieSc getBbieSc(TopLevelAsbiepId topLevelAsbiepId, String hashPath) {

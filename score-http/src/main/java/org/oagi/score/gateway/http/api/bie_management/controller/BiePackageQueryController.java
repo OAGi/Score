@@ -158,6 +158,7 @@ public class BiePackageQueryController {
             @RequestParam(name = "topLevelAsbiepIdList", required = false) String topLevelAsbiepIdList,
             @RequestParam(name = "schemaExpression", required = false) String schemaExpression,
             @RequestParam(name = "pathDelimiter", required = false, defaultValue = ".") String pathDelimiter,
+            @RequestParam(name = "manifestVersion", required = false, defaultValue = "0.2") String manifestVersion,
             GenerateExpressionOption option,
             HttpServletRequest httpServletRequest) throws IOException {
 
@@ -171,7 +172,7 @@ public class BiePackageQueryController {
 
         BieGenerateExpressionResult response = biePackageQueryService.generate(requester, biePackageId,
                 separate(topLevelAsbiepIdList).map(e -> TopLevelAsbiepId.from(e)).collect(toSet()),
-                option, pathDelimiter);
+                option, pathDelimiter, manifestVersion);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + response.filename() + "\"")
@@ -269,10 +270,11 @@ public class BiePackageQueryController {
     public BiePackageManifestResponse getBiePackageManifest(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @PathVariable("biePackageId") BiePackageId biePackageId,
-            @RequestParam(value = "pathDelimiter", required = false, defaultValue = ".") String pathDelimiter) {
+            @RequestParam(value = "pathDelimiter", required = false, defaultValue = ".") String pathDelimiter,
+            @RequestParam(value = "manifestVersion", required = false, defaultValue = "0.2") String manifestVersion) {
 
         return biePackageManifestService.getBiePackageManifest(
-                sessionService.asScoreUser(user), biePackageId, pathDelimiter);
+                sessionService.asScoreUser(user), biePackageId, pathDelimiter, manifestVersion);
     }
 
 }

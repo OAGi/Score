@@ -22,6 +22,7 @@ import org.oagi.score.gateway.http.api.context_management.business_context.repos
 import org.oagi.score.gateway.http.api.context_management.context_scheme.model.ContextSchemeDetailsRecord;
 import org.oagi.score.gateway.http.api.context_management.context_scheme.model.ContextSchemeId;
 import org.oagi.score.gateway.http.api.context_management.context_scheme.repository.ContextSchemeQueryRepository;
+import org.oagi.score.gateway.http.api.cc_management.model.bcc.EntityType;
 import org.oagi.score.gateway.http.api.cc_management.model.ascc.AsccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.bcc.BccSummaryRecord;
@@ -49,6 +50,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -62,7 +64,12 @@ import static org.oagi.score.gateway.http.common.util.StringUtils.hasLength;
 @Transactional(readOnly = true)
 public class BiePackageManifestService {
 
-    private static final String BIE_PACKAGE_MANIFEST_VERSION = "0.2";
+    // Issue #1733: the BIE Package manifest version is selectable at generation time. "0.2" is the stable
+    // default and omits the issue #1733 additions (the per-BIE backwardCompatibility indicator and the
+    // package-level revisionReason); "0.3" is the draft version that includes both.
+    public static final String MANIFEST_VERSION_0_2 = "0.2";
+    public static final String MANIFEST_VERSION_0_3 = "0.3";
+    private static final String DEFAULT_MANIFEST_VERSION = MANIFEST_VERSION_0_2;
 
     @Autowired
     private RepositoryFactory repositoryFactory;
@@ -72,13 +79,24 @@ public class BiePackageManifestService {
 
     public BiePackageManifestResponse getBiePackageManifest(ScoreUser requester,
                                                             BiePackageId biePackageId, String pathDelimiter) {
-        return getBiePackageManifest(requester, biePackageId, pathDelimiter, Collections.emptyMap());
+        return getBiePackageManifest(requester, biePackageId, pathDelimiter, DEFAULT_MANIFEST_VERSION);
     }
 
     public BiePackageManifestResponse getBiePackageManifest(ScoreUser requester,
                                                             BiePackageId biePackageId,
                                                             String pathDelimiter,
-                                                            Map<TopLevelAsbiepId, String> generatedFilesByTopLevelAsbiepId) {
+                                                            String manifestVersion) {
+        return getBiePackageManifest(requester, biePackageId, pathDelimiter, Collections.emptyMap(), manifestVersion);
+    }
+
+    public BiePackageManifestResponse getBiePackageManifest(ScoreUser requester,
+                                                            BiePackageId biePackageId,
+                                                            String pathDelimiter,
+                                                            Map<TopLevelAsbiepId, String> generatedFilesByTopLevelAsbiepId,
+                                                            String manifestVersion) {
+
+        String resolvedManifestVersion = resolveManifestVersion(manifestVersion);
+        boolean includeIssue1733Fields = MANIFEST_VERSION_0_3.equals(resolvedManifestVersion);
 
         BiePackageQueryRepository biePackageQueryRepository = repositoryFactory.biePackageQueryRepository(requester);
         BiePackageSummaryRecord currentPackage = biePackageQueryRepository.getBiePackageSummary(biePackageId);
@@ -132,7 +150,7 @@ public class BiePackageManifestService {
                                     generatedFilesByTopLevelAsbiepId.get(currentTopLevelAsbiep.topLevelAsbiepId())),
                             prevTopLevelAsbiep.guid(),
                             prevTopLevelAsbiep.version(),
-                            null,
+                            (includeIssue1733Fields ? backwardCompatibilityOf(context) : null),
                             true,
                             context.added,
                             context.removed,
@@ -166,7 +184,7 @@ public class BiePackageManifestService {
                                 generatedFilesByTopLevelAsbiepId.get(currentTopLevelAsbiep.topLevelAsbiepId())),
                         null,
                         null,
-                        null,
+                        (includeIssue1733Fields ? new BackwardCompatibility(false, false, false) : null),
                         false,
                         Collections.emptyList(),
                         Collections.emptyList(),
@@ -221,6 +239,7 @@ public class BiePackageManifestService {
                 (prevPackage != null) ? prevPackage.guid(): null,
                 (prevPackage != null) ? prevPackage.versionGuid() : null,
                 (prevPackage != null) ? prevPackage.versionId() : null,
+                (includeIssue1733Fields ? currentPackage.revisionReason() : null),
                 newBiesFromPriorPackageVersion,
                 removedBiesFromPriorPackageVersion,
                 changedBiesFromPriorPackageVersion,
@@ -228,9 +247,26 @@ public class BiePackageManifestService {
                 libraryCompatibilityCollection,
                 biePackageManifestEntryList);
         BiePackageManifestResponse biePackageManifest =
-                new BiePackageManifestResponse(BIE_PACKAGE_MANIFEST_VERSION, biePackageMetadata);
+                new BiePackageManifestResponse(resolvedManifestVersion, biePackageMetadata);
 
         return biePackageManifest;
+    }
+
+    /**
+     * Resolve the requested BIE Package manifest version. A blank value defaults to the stable
+     * {@value #MANIFEST_VERSION_0_2}; only {@value #MANIFEST_VERSION_0_2} and {@value #MANIFEST_VERSION_0_3}
+     * are supported (issue #1733). Any other value is rejected.
+     */
+    private static String resolveManifestVersion(String manifestVersion) {
+        if (!hasLength(manifestVersion)) {
+            return DEFAULT_MANIFEST_VERSION;
+        }
+        String trimmed = manifestVersion.trim();
+        if (MANIFEST_VERSION_0_2.equals(trimmed) || MANIFEST_VERSION_0_3.equals(trimmed)) {
+            return trimmed;
+        }
+        throw new IllegalArgumentException("Unsupported BIE Package manifest version: '" + manifestVersion
+                + "'. Supported versions are " + MANIFEST_VERSION_0_2 + " and " + MANIFEST_VERSION_0_3 + ".");
     }
 
     private String resolveRemark(org.oagi.score.gateway.http.api.bie_management.repository.AsbiepQueryRepository asbiepQueryRepository,
@@ -327,6 +363,18 @@ public class BiePackageManifestService {
         Collection<BieComponentChange> changed = new ArrayList<>();
         Collection<BieComponentChange> deprecated = new ArrayList<>();
 
+        // Issue #1733: schema-level (Type-A) backward-incompatibility accumulated across the whole BIE tree
+        // (including reused/nested subtrees), tracked per target syntax via the pure rules' accumulator.
+        final BieBackwardCompatibilityRules.Accumulator compatibility = new BieBackwardCompatibilityRules.Accumulator();
+
+        void recordBreak(boolean xmlSchema, boolean jsonSchema) {
+            this.compatibility.recordBreak(xmlSchema, jsonSchema);
+        }
+
+        void recordStructuralBreak() {
+            this.compatibility.recordStructuralBreak();
+        }
+
         public BieTrackContext(ScoreUser requester,
                                BieDocument currentBieDocument, BieDocument prevBieDocument) {
             this.requester = requester;
@@ -392,6 +440,8 @@ public class BiePackageManifestService {
                 context.changed.add(newBieElementChange(context, currentAsbie, parentPath, changes));
             }
 
+            evaluateAsbieCompatibility(context, currentAsbie, prevAsbie);
+
             if (currentAsbie.isDeprecated() && !prevAsbie.isDeprecated()) {
                 context.deprecated.add(newBieElementChange(context, currentAsbie, parentPath, Collections.emptyList()));
             }
@@ -442,6 +492,8 @@ public class BiePackageManifestService {
                 context.changed.add(newBieElementChange(context, currentBbie, parentPath, changes));
             }
 
+            evaluateBbieCompatibility(context, currentBbie, prevBbie);
+
             if (currentBbie.isDeprecated() && !prevBbie.isDeprecated()) {
                 context.deprecated.add(newBieElementChange(context, currentBbie, parentPath, Collections.emptyList()));
             }
@@ -449,6 +501,12 @@ public class BiePackageManifestService {
 
         List<BbieSc> currentBbieScs = context.currentBieDocument.getBbieScList(currentBbie);
         List<BbieSc> prevBbieScs = context.prevBieDocument.getBbieScList(prevBbie);
+
+        if (currentBbie != null && prevBbie != null) {
+            // JSON renders a BBIE with used supplementary components as an object and one without as a bare scalar;
+            // crossing that boundary (gaining the first / losing the last used SC) invalidates old JSON documents.
+            evaluateJsonScWrapperFlip(context, !currentBbieScs.isEmpty(), !prevBbieScs.isEmpty());
+        }
 
         if (currentBccp != null) {
             String bbiepPath = path(context, parentPath, currentBccp.propertyTerm());
@@ -466,11 +524,18 @@ public class BiePackageManifestService {
                         context.changed.add(newBieElementChange(context, currentBbieSc, bbiepPath, changes));
                     }
 
+                    evaluateBbieScCompatibility(context, currentBbieSc, prevBbieSc);
+
                     if (currentBbieSc.isDeprecated() && !prevBbieSc.isDeprecated()) {
                         context.deprecated.add(newBieElementChange(context, currentBbieSc, bbiepPath, Collections.emptyList()));
                     }
                 } else {
                     context.added.add(newBieElementChange(context, currentBbieSc, bbiepPath, Collections.emptyList()));
+                    // boundary add of a REQUIRED supplementary component (parent BBIE already existed): a new
+                    // required component in the structure -> rejected by both syntaxes; structure changes.
+                    if (prevBbie != null && currentBbieSc.getCardinalityMin() > 0) {
+                        context.recordStructuralBreak();
+                    }
                 }
             }
         }
@@ -482,7 +547,15 @@ public class BiePackageManifestService {
                     .filter(e -> matches(prevBbieSc, context.prevBieDocument, e, context.currentBieDocument))
                     .findFirst().orElse(null);
             boolean matched = (currentBbieSc != null);
-            if (!matched) context.removed.add(newBieElementChange(context, prevBbieSc, bbiepPath, Collections.emptyList()));
+            if (!matched) {
+                context.removed.add(newBieElementChange(context, prevBbieSc, bbiepPath, Collections.emptyList()));
+                // boundary removal (parent BBIE still exists): a supplementary component disappears from the
+                // structure -> any old document that used it becomes invalid (closed XSD restriction / JSON
+                // additionalProperties:false), required or not; structure changes.
+                if (currentBbie != null) {
+                    context.recordStructuralBreak();
+                }
+            }
         }
     }
 
@@ -537,7 +610,7 @@ public class BiePackageManifestService {
         // check 'value constraint'
         if (hasLength(a.getFixedValue()) && !Objects.equals(a.getFixedValue(), b.getFixedValue())) {
             changes.add("value constraint");
-        } else if (hasLength(a.getDefaultValue()) && !!Objects.equals(a.getDefaultValue(), b.getDefaultValue())) {
+        } else if (hasLength(a.getDefaultValue()) && !Objects.equals(a.getDefaultValue(), b.getDefaultValue())) {
             changes.add("value constraint");
         } else if (hasLength(b.getFixedValue()) || hasLength(b.getDefaultValue())) {
             changes.add("value constraint");
@@ -594,7 +667,7 @@ public class BiePackageManifestService {
         // check 'value constraint'
         if (hasLength(a.getFixedValue()) && !Objects.equals(a.getFixedValue(), b.getFixedValue())) {
             changes.add("value constraint");
-        } else if (hasLength(a.getDefaultValue()) && !!Objects.equals(a.getDefaultValue(), b.getDefaultValue())) {
+        } else if (hasLength(a.getDefaultValue()) && !Objects.equals(a.getDefaultValue(), b.getDefaultValue())) {
             changes.add("value constraint");
         } else if (hasLength(b.getFixedValue()) || hasLength(b.getDefaultValue())) {
             changes.add("value constraint");
@@ -673,11 +746,21 @@ public class BiePackageManifestService {
             if (current.isAsbie()) {
                 if (!matched) {
                     context.added.add(newBieElementChange(context, (Asbie) current, parentPath, Collections.emptyList()));
+                    // boundary add of a REQUIRED element (parent ABIE already existed): a new required element in
+                    // the structure -> rejected by both syntaxes and breaks the syntax-independent structure.
+                    if (prevAbie != null && ((Asbie) current).getCardinalityMin() > 0) {
+                        context.recordStructuralBreak();
+                    }
                 }
                 traverse(context, (Asbie) current, (matchedPrev != null) ? ((Asbie) matchedPrev) : null, parentPath);
             } else {
                 if (!matched) {
                     context.added.add(newBieElementChange(context, (Bbie) current, parentPath, Collections.emptyList()));
+                    // boundary add of a REQUIRED element (parent ABIE already existed): a new required element in
+                    // the structure -> rejected by both syntaxes and breaks the syntax-independent structure.
+                    if (prevAbie != null && ((Bbie) current).getCardinalityMin() > 0) {
+                        context.recordStructuralBreak();
+                    }
                 }
                 traverse(context, (Bbie) current, (matchedPrev != null) ? ((Bbie) matchedPrev) : null, parentPath);
             }
@@ -692,11 +775,23 @@ public class BiePackageManifestService {
             if (prev.isAsbie()) {
                 if (!matched) {
                     context.removed.add(newBieElementChange(context, (Asbie) prev, parentPath, Collections.emptyList()));
+                    // boundary removal (parent ABIE still exists): an element disappears from the structure -> any
+                    // old document that used it is invalid (closed XSD sequence / JSON additionalProperties:false),
+                    // required or not, and the syntax-independent structure changes.
+                    if (currentAbie != null) {
+                        context.recordStructuralBreak();
+                    }
                     traverse(context, null, (Asbie) prev, parentPath);
                 }
             } else {
                 if (!matched) {
                     context.removed.add(newBieElementChange(context, (Bbie) prev, parentPath, Collections.emptyList()));
+                    // boundary removal (parent ABIE still exists): an element disappears from the structure -> any
+                    // old document that used it is invalid (closed XSD sequence / JSON additionalProperties:false),
+                    // required or not, and the syntax-independent structure changes.
+                    if (currentAbie != null) {
+                        context.recordStructuralBreak();
+                    }
                     traverse(context, null, (Bbie) prev, parentPath);
                 }
             }
@@ -776,6 +871,264 @@ public class BiePackageManifestService {
 
     private String dtScName(DtScSummaryRecord dtSc) {
         return String.join(" ", Arrays.asList(dtSc.propertyTerm(), dtSc.representationTerm()));
+    }
+
+    /*
+     * Issue #1733: builds the schema-level (Type-A) backward-compatibility indicator for a BIE that was replaced
+     * from the prior package version. syntaxIndependent reflects breaks that apply regardless of rendering;
+     * xmlSchema / jsonSchema additionally reflect breaks specific to each syntax. Service-level (Type-B)
+     * compatibility (e.g. movement of data, code-list semantics) is out of scope.
+     */
+    private BackwardCompatibility backwardCompatibilityOf(BieTrackContext context) {
+        return context.compatibility.toBackwardCompatibility();
+    }
+
+    // ----- Issue #1733: per-element backward-compatibility evaluation for MATCHED elements -----
+
+    private void evaluateAsbieCompatibility(BieTrackContext context, Asbie current, Asbie prev) {
+        // ASBIE carries occurrence + nillable. Cardinality tightening and nillable removal break both syntaxes;
+        // crossing the JSON array/object boundary breaks JSON only.
+        if (isMoreRestrictiveCardinality(current.getCardinalityMin(), current.getCardinalityMax(),
+                prev.getCardinalityMin(), prev.getCardinalityMax())) {
+            context.recordBreak(true, true);
+        }
+        evaluateJsonArrayFlip(context, current.getCardinalityMax(), prev.getCardinalityMax());
+        evaluateNillable(context, current.isNillable(), prev.isNillable(), true); // ASBIE always renders as an element
+    }
+
+    private void evaluateBbieCompatibility(BieTrackContext context, Bbie current, Bbie prev) {
+        // Resolve the based BCC once: its entity type drives both the entity-type flip check and the
+        // element-vs-attribute scoping of the nillable check.
+        var accQueryRepository = repositoryFactory.accQueryRepository(context.requester);
+        BccSummaryRecord currentBcc = safeGet(() -> accQueryRepository.getBccSummary(current.getBasedBccManifestId()));
+        BccSummaryRecord prevBcc = safeGet(() -> accQueryRepository.getBccSummary(prev.getBasedBccManifestId()));
+        boolean currentIsElement = (currentBcc == null) || currentBcc.entityType() == EntityType.Element;
+
+        if (isMoreRestrictiveCardinality(current.getCardinalityMin(), current.getCardinalityMax(),
+                prev.getCardinalityMin(), prev.getCardinalityMax())) {
+            context.recordBreak(true, true);
+        }
+        evaluateJsonArrayFlip(context, current.getCardinalityMax(), prev.getCardinalityMax());
+        evaluateNillable(context, current.isNillable(), prev.isNillable(), currentIsElement);
+        evaluateValueConstraint(context, current.getFixedValue(), prev.getFixedValue());
+        evaluateFacet(context, current.getFacetMinLength(), current.getFacetMaxLength(), current.getFacetPattern(),
+                prev.getFacetMinLength(), prev.getFacetMaxLength(), prev.getFacetPattern());
+        evaluateValueDomain(context,
+                current.getXbtManifestId(), current.getCodeListManifestId(), current.getAgencyIdListManifestId(),
+                prev.getXbtManifestId(), prev.getCodeListManifestId(), prev.getAgencyIdListManifestId());
+        // Entity-type flip (Element <-> Attribute, possible across releases): the XSD shape (xsd:element vs
+        // xsd:attribute) and the name's first-letter casing change, so old documents are invalid; the JSON
+        // generator ignores entity type entirely (every BBIE is a camelCase property) -> XML-only break.
+        if (currentBcc != null && prevBcc != null && currentBcc.entityType() != prevBcc.entityType()) {
+            context.recordBreak(true, false);
+        }
+    }
+
+    private void evaluateBbieScCompatibility(BieTrackContext context, BbieSc current, BbieSc prev) {
+        if (isMoreRestrictiveCardinality(current.getCardinalityMin(), current.getCardinalityMax(),
+                prev.getCardinalityMin(), prev.getCardinalityMax())) {
+            context.recordBreak(true, true);
+        }
+        // A supplementary component renders as an XSD attribute (no xsi:nil), so nillable is JSON-only.
+        evaluateNillable(context, current.isNillable(), prev.isNillable(), false);
+        evaluateValueConstraint(context, current.getFixedValue(), prev.getFixedValue());
+        evaluateFacet(context, current.getFacetMinLength(), current.getFacetMaxLength(), current.getFacetPattern(),
+                prev.getFacetMinLength(), prev.getFacetMaxLength(), prev.getFacetPattern());
+        evaluateValueDomain(context,
+                current.getXbtManifestId(), current.getCodeListManifestId(), current.getAgencyIdListManifestId(),
+                prev.getXbtManifestId(), prev.getCodeListManifestId(), prev.getAgencyIdListManifestId());
+    }
+
+    /*
+     * nillable true -> false drops the null representation, invalidating documents that relied on it. In XSD only
+     * elements carry nillable (xsi:nil); an xsd:attribute cannot be nillable. The JSON generator emits a "null"
+     * type union for any nillable leaf regardless of entity type. So on an element the removal breaks both
+     * syntaxes; on an attribute / supplementary component (where XSD never carried nillable) it breaks JSON only.
+     * Turning nillable on is non-breaking.
+     */
+    private void evaluateNillable(BieTrackContext context, boolean newNillable, boolean oldNillable,
+                                 boolean xsdNillableApplies) {
+        if (BieBackwardCompatibilityRules.nillableRemoved(newNillable, oldNillable)) {
+            context.recordBreak(xsdNillableApplies, true);
+        }
+    }
+
+    /*
+     * Adding a fixed value where none existed, or changing an existing fixed value, rejects previously valid
+     * instances in both XSD (@fixed) and JSON ("const"). Removing a fixed value is a loosening; a default value
+     * never constrains instances and is therefore ignored.
+     */
+    private void evaluateValueConstraint(BieTrackContext context, String newFixed, String oldFixed) {
+        if (BieBackwardCompatibilityRules.fixedValueBreaks(newFixed, oldFixed)) {
+            context.recordBreak(true, true);
+        }
+    }
+
+    /*
+     * Tightening a length/pattern facet (raising minLength, lowering maxLength, or adding/changing a pattern)
+     * rejects previously valid values. Both XSD and the JSON generator emit these facets for string types, so a
+     * tightening is treated as syntax-independent. Loosening / removing facets is non-breaking.
+     */
+    private void evaluateFacet(BieTrackContext context,
+                               BigInteger newMinLength, BigInteger newMaxLength, String newPattern,
+                               BigInteger oldMinLength, BigInteger oldMaxLength, String oldPattern) {
+        if (BieBackwardCompatibilityRules.facetTightened(newMinLength, newMaxLength, newPattern,
+                oldMinLength, oldMaxLength, oldPattern)) {
+            context.recordBreak(true, true);
+        }
+    }
+
+    /*
+     * Value-domain (primitive XBT / code list / agency id list) narrowing. This is the main per-syntax case:
+     * a primitive restriction (e.g. xsd:normalizedString -> xsd:token) narrows the XSD value space but maps to the
+     * identical JSON "string", so it breaks XML only. A code-list value removal or a type narrowing that also
+     * narrows the JSON type/bounds breaks both.
+     */
+    private void evaluateValueDomain(BieTrackContext context,
+                                     XbtManifestId newXbtId, CodeListManifestId newClId, AgencyIdListManifestId newAlId,
+                                     XbtManifestId oldXbtId, CodeListManifestId oldClId, AgencyIdListManifestId oldAlId) {
+        var curCc = context.currentBieDocument.getCcDocument();
+        var prevCc = context.prevBieDocument.getCcDocument();
+
+        boolean newIsCl = (newClId != null), newIsAl = (!newIsCl && newAlId != null);
+        boolean oldIsCl = (oldClId != null), oldIsAl = (!oldIsCl && oldAlId != null);
+        boolean newIsXbt = (!newIsCl && !newIsAl), oldIsXbt = (!oldIsCl && !oldIsAl);
+
+        // enum -> enum of the same kind: compatible iff the new value set is a superset of the old one.
+        if (oldIsCl && newIsCl) {
+            Set<String> oldValues = codeListValues(safeGet(() -> prevCc.getCodeList(oldClId)));
+            Set<String> newValues = codeListValues(safeGet(() -> curCc.getCodeList(newClId)));
+            if (!newValues.containsAll(oldValues)) {
+                context.recordBreak(true, true); // a code value was removed -> enum rejects it in both syntaxes
+            }
+            return;
+        }
+        if (oldIsAl && newIsAl) {
+            Set<String> oldValues = agencyIdListValues(safeGet(() -> prevCc.getAgencyIdList(oldAlId)));
+            Set<String> newValues = agencyIdListValues(safeGet(() -> curCc.getAgencyIdList(newAlId)));
+            if (!newValues.containsAll(oldValues)) {
+                context.recordBreak(true, true);
+            }
+            return;
+        }
+        // primitive -> enum adds an enumeration restriction (narrowing) in both syntaxes.
+        if (oldIsXbt && (newIsCl || newIsAl)) {
+            context.recordBreak(true, true);
+            return;
+        }
+        // enum -> primitive removes the enumeration (widening) -> compatible.
+        if ((oldIsCl || oldIsAl) && newIsXbt) {
+            return;
+        }
+        // code list <-> agency id list, or any other kind switch involving enums -> conservative break.
+        if (!(oldIsXbt && newIsXbt)) {
+            context.recordBreak(true, true);
+            return;
+        }
+
+        // primitive XBT -> primitive XBT.
+        XbtSummaryRecord oldXbt = (oldXbtId != null) ? safeGet(() -> prevCc.getXbt(oldXbtId)) : null;
+        XbtSummaryRecord newXbt = (newXbtId != null) ? safeGet(() -> curCc.getXbt(newXbtId)) : null;
+        if (oldXbt == null || newXbt == null || oldXbt.guid().equals(newXbt.guid())) {
+            return; // unresolved or unchanged
+        }
+        // XSD: walk the built-in type derivation lattice. A WIDENING (new is a super-type of old) accepts every old
+        // value -> compatible. A RESTRICTION (new is a sub-type of old, e.g. normalizedString -> token) constrains
+        // the value space -> break. A CROSS-BRANCH change breaks unless the new type accepts any character data
+        // (a universal text type such as xsd:string), e.g. xsd:integer -> xsd:string stays XSD-compatible.
+        boolean newIsSuperTypeOfOld = isAncestorOrSame(newXbt.guid(), oldXbt, prevCc);
+        boolean newIsSubTypeOfOld = isAncestorOrSame(oldXbt.guid(), newXbt, curCc);
+        boolean breaksXml = BieBackwardCompatibilityRules.xbtBreaksXml(
+                newIsSuperTypeOfOld, newIsSubTypeOfOld, newXbt.builtInType());
+        boolean breaksJson = BieBackwardCompatibilityRules.jsonTypeNarrows(
+                oldXbt.jbt202012Map(), newXbt.jbt202012Map());
+        if (breaksXml || breaksJson) {
+            context.recordBreak(breaksXml, breaksJson);
+        }
+    }
+
+    /*
+     * Walks the XBT restriction lattice (subtype_of chain) of {@code descendant} within its release document and
+     * returns true if {@code ancestorGuid} is the descendant itself or one of its super-types — i.e. the new type
+     * is a widening of (or equal to) the old type. GUIDs are stable across releases, so this is release-safe.
+     */
+    private boolean isAncestorOrSame(Guid ancestorGuid, XbtSummaryRecord descendant,
+                                     org.oagi.score.gateway.http.api.cc_management.model.CcDocument ccDocument) {
+        XbtSummaryRecord node = descendant;
+        int guard = 0;
+        while (node != null && guard++ < 64) {
+            if (ancestorGuid.equals(node.guid())) {
+                return true;
+            }
+            XbtManifestId parentId = node.subTypeOfXbtId();
+            node = (parentId != null) ? safeGet(() -> ccDocument.getXbt(parentId)) : null;
+        }
+        return false;
+    }
+
+    private Set<String> codeListValues(CodeListSummaryRecord codeList) {
+        Set<String> values = new HashSet<>();
+        if (codeList != null && codeList.valueList() != null) {
+            codeList.valueList().forEach(v -> {
+                if (v.value() != null) {
+                    values.add(v.value());
+                }
+            });
+        }
+        return values;
+    }
+
+    private Set<String> agencyIdListValues(AgencyIdListSummaryRecord agencyIdList) {
+        Set<String> values = new HashSet<>();
+        if (agencyIdList != null && agencyIdList.valueList() != null) {
+            agencyIdList.valueList().forEach(v -> {
+                if (v.value() != null) {
+                    values.add(v.value());
+                }
+            });
+        }
+        return values;
+    }
+
+    private <T> T safeGet(Supplier<T> supplier) {
+        try {
+            return supplier.get();
+        } catch (Exception ignored) {
+            return null;
+        }
+    }
+
+    /*
+     * JSON renders a repeatable element (max unbounded or > 1) as an array and a non-repeatable one (max 0 or 1)
+     * as a bare value, whereas XSD keeps the same element shape (only minOccurs/maxOccurs differ). Crossing that
+     * boundary therefore breaks JSON only: a single-object document is invalid against an array schema and vice
+     * versa. The array -> scalar direction is also a cardinality tightening already recorded as a
+     * syntax-independent break; the scalar -> array direction is a cardinality loosening that breaks JSON alone.
+     */
+    private void evaluateJsonArrayFlip(BieTrackContext context, int newMax, int oldMax) {
+        if (BieBackwardCompatibilityRules.jsonArrayFlip(newMax, oldMax)) {
+            context.recordBreak(false, true);
+        }
+    }
+
+    /*
+     * JSON renders a BBIE that has used supplementary components as an object ({"content": ..., "<sc>": ...}) and
+     * one without any used SC as a bare scalar, whereas XSD keeps the element shape (gaining an optional attribute
+     * is compatible). Crossing that boundary breaks JSON. (Losing all SCs additionally breaks XSD via the removed
+     * attributes, which the per-SC removal logic already records; gaining the first SC breaks JSON only.)
+     */
+    private void evaluateJsonScWrapperFlip(BieTrackContext context, boolean newHasUsedSc, boolean oldHasUsedSc) {
+        if (newHasUsedSc != oldHasUsedSc) {
+            context.recordBreak(false, true);
+        }
+    }
+
+    /*
+     * Issue #1733: returns true when the new occurrence constraint is strictly more restrictive than the old one,
+     * i.e. the minimum was raised or the maximum was lowered. A cardinality_max of -1 means "unbounded".
+     */
+    private boolean isMoreRestrictiveCardinality(int newMin, int newMax, int oldMin, int oldMax) {
+        return BieBackwardCompatibilityRules.cardinalityMoreRestrictive(newMin, newMax, oldMin, oldMax);
     }
 
 }

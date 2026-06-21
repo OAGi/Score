@@ -1,0 +1,15 @@
+spring:
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: true
+      additional-paths:
+        - src/main/java
+        - src/main/resources
+      poll-interval: 2s
+      quiet-period: 1s
+
+logging:
+  level:
+    org.springframework.boot.devtools: INFO

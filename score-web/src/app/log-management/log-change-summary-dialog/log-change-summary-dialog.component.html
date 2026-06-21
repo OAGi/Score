@@ -1,0 +1,81 @@
+<h2 mat-dialog-title>Change Summary</h2>
+<mat-dialog-content>
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner [diameter]="32"></mat-spinner>
+    </div>
+  } @else if (errorMessage) {
+    <p class="error">{{ errorMessage }}</p>
+  } @else if (summary) {
+    <div class="summary-header">
+      <span class="component-name">{{ summary.ccType }} "{{ summary.name }}"</span>
+      <span class="revision-badge" [class.new]="isNew">
+        @if (isNew) {
+          Revision {{ summary.revisionNum }} (new)
+        } @else if (prevRevisionNum === summary.revisionNum) {
+          Revision {{ summary.revisionNum }} (changes within Revision {{ summary.revisionNum }})
+        } @else {
+          Revision {{ summary.revisionNum }} (changes from Revision {{ prevRevisionNum }})
+        }
+      </span>
+    </div>
+
+    @if (isNew) {
+      <ul class="summary-list">
+        @for (field of summary.fields; track field.label) {
+          <li><span class="field-label">{{ field.label }}</span>: {{ field.value }}</li>
+        }
+        @for (child of summary.children; track child.name) {
+          <li>
+            <span class="kind">{{ child.kind }}</span> "{{ child.name }}"
+            @if (child.fields.length) {
+              <ul>
+                @for (field of child.fields; track field.label) {
+                  <li><span class="field-label">{{ field.label }}</span>: {{ field.value }}</li>
+                }
+              </ul>
+            }
+          </li>
+        }
+      </ul>
+    } @else if (isEmptyRevision) {
+      <p class="no-changes">No content changes.</p>
+    } @else {
+      <ul class="summary-list">
+        @for (change of summary.fieldChanges; track change.label) {
+          <li>{{ changeText(change) }}</li>
+        }
+        @for (child of summary.childrenAdded; track child.name) {
+          <li class="added">
+            <span class="bucket">Added</span> {{ child.kind }} "{{ child.name }}"
+            @if (child.fields.length) {
+              <ul>
+                @for (field of child.fields; track field.label) {
+                  <li><span class="field-label">{{ field.label }}</span>: {{ field.value }}</li>
+                }
+              </ul>
+            }
+          </li>
+        }
+        @for (child of summary.childrenRemoved; track child.name) {
+          <li class="removed">
+            <span class="bucket">Removed</span> {{ child.kind }} "{{ child.name }}"
+          </li>
+        }
+        @for (child of summary.childrenChanged; track child.name) {
+          <li class="changed">
+            <span class="bucket">Changed</span> {{ child.kind }} "{{ child.name }}"
+            <ul>
+              @for (change of child.changes; track change.label) {
+                <li>{{ changeText(change) }}</li>
+              }
+            </ul>
+          </li>
+        }
+      </ul>
+    }
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-raised-button color="primary" (click)="dialogRef.close()">Close</button>
+</mat-dialog-actions>

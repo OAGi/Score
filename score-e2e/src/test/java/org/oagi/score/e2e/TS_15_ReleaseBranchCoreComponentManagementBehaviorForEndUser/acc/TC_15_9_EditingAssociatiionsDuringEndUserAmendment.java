@@ -188,6 +188,8 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendASCCPDialog.selectAssociation("Account Identifiers. Named Identifiers");
+        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+
         assert visibilityOfElementLocated(getDriver(),
                 By.xpath("//score-multi-actions-snack-bar//div[contains(@class, \"header\")]")).isDisplayed();
 
@@ -273,7 +275,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
 
         String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
         String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
-        assertTrue(snackBarMessage.equals("Target ASCCP is not reusable."));
+        assertTrue(snackBarMessage.equals("Target ASCCP is not reusable and already has 1 ASCC reference(s)."));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//score-multi-actions-snack-bar//span[contains(text(), \"Close\")]//ancestor::button[1]")));
     }
@@ -751,6 +753,8 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
 
         appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendBCCPDialog.selectAssociation("Accrued Amount");
+        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+
         assert visibilityOfElementLocated(getDriver(),
                 By.xpath("//score-multi-actions-snack-bar//div[contains(@class, \"header\")]")).isDisplayed();
 
@@ -1606,14 +1610,14 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         click(tr.findElement(By.className("mat-column-" + "select")));
         click(elementToBeClickable(getDriver(), APPLY_BUTTON_LOCATOR));
 
-        assert visibilityOfElementLocated(getDriver(),
-                By.xpath("//score-multi-actions-snack-bar//div[contains(@class, \"header\")]")).isDisplayed();
+        assertEquals("Set Based ACC", getText(visibilityOfElementLocated(getDriver(),
+                By.xpath("//score-confirm-dialog//div[contains(@class, \"mat-mdc-dialog-title\")]/span"))));
 
-        String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
-        String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
-        assertTrue(snackBarMessage.contains("There is a conflict in ASCCPs between the current ACC and the base ACC"));
-        click(elementToBeClickable(getDriver(), By.xpath(
-                "//score-multi-actions-snack-bar//span[contains(text(), \"Close\")]//ancestor::button[1]")));
+        String dialogMessage = getText(visibilityOfElementLocated(getDriver(),
+                By.xpath("//score-confirm-dialog//p")));
+        assertTrue(dialogMessage.contains("There is a duplicate property term"));
+
+        click(getDialogButtonByName(getDriver(), "Cancel"));
     }
 
     @Test
@@ -1694,6 +1698,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.hitAmendButton();
         viewEditCoreComponentPage.openPage();
+        viewEditCoreComponentPage.toggleToDevView();
         {
             viewEditCoreComponentPage.setBranch(branch);
             waitFor(Duration.ofMillis(1500));
@@ -1701,7 +1706,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
             viewEditCoreComponentPage.hitSearchButton();
 
             WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(acc.getDen());
-            WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
+            WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "owner");
             assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
             TransferCCOwnershipDialog transferCCOwnershipDialog =
                     viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
@@ -1729,6 +1734,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         homePage = loginPage().signIn(anotherUser.getLoginId(), anotherUser.getPassword());
         viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         {
             viewEditCoreComponentPage.setBranch(branch);
             waitFor(Duration.ofMillis(1500));
@@ -1736,7 +1742,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
             viewEditCoreComponentPage.hitSearchButton();
 
             WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(acc.getDen());
-            WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
+            WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "owner");
             assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
 
             TransferCCOwnershipDialog transferCCOwnershipDialog =
@@ -1830,6 +1836,8 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
         assertEquals("2", getText(asccPanel.getRevisionField()));
         asccPanel.setCardinalityMinField("30");
+        visibilityOfElementLocated(getDriver(),
+                By.xpath("//*[contains(text(), \"Cardinality Min must be less than or equals to\")]"));
         assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(), \"Min must be less than or equals to\")]")).size());
         assertDisabled(accViewEditPage.getUpdateButton(false));
     }
@@ -1871,6 +1879,8 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
         assertEquals("2", getText(asccPanel.getRevisionField()));
         asccPanel.setCardinalityMaxField("50");
+        visibilityOfElementLocated(getDriver(),
+                By.xpath("//*[contains(text(), \"Cardinality Max must be greater than\")]"));
         assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(), \"Max must be greater than\")]")).size());
         assertDisabled(accViewEditPage.getUpdateButton(false));
     }

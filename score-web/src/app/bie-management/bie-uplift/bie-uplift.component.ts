@@ -29,6 +29,7 @@ import {
 import {CcGraphNode} from '../../cc-management/domain/core-component-node';
 import {ReportDialogComponent} from './report-dialog/report-dialog.component';
 import {BieEditAbieNode} from '../bie-edit/domain/bie-edit-node';
+import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {saveBooleanProperty} from '../../common/utility';
 import {WebPageInfoService} from '../../basis/basis.service';
 import {Title} from '@angular/platform-browser';
@@ -77,6 +78,7 @@ export class BieUpliftComponent implements OnInit {
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);
   private titleService = inject(Title);
+  private confirmDialogService = inject(ConfirmDialogService);
   webPageInfo = inject(WebPageInfoService);
 
 
@@ -454,7 +456,7 @@ export class BieUpliftComponent implements OnInit {
     let index = -1;
     let currentNode = node;
     while (currentNode) {
-      index = this.sourceDataSource.data.map(e => e.hashPath).indexOf(node.hashPath);
+      index = this.sourceDataSource.data.map(e => e.queryPath).indexOf(node.queryPath);
       if (index !== -1) {
         break;
       }
@@ -468,7 +470,7 @@ export class BieUpliftComponent implements OnInit {
     let index = -1;
     let currentNode = node;
     while (currentNode) {
-      index = this.targetDataSource.data.map(e => e.hashPath).indexOf(node.hashPath);
+      index = this.targetDataSource.data.map(e => e.queryPath).indexOf(node.queryPath);
       if (index !== -1) {
         break;
       }
@@ -519,6 +521,9 @@ export class BieUpliftComponent implements OnInit {
   }
 
   canMatch(node: BieUpliftTargetFlatNode): boolean {
+    if (node.reuseMapped) {
+      return false;
+    }
     if (!this.sourceSelectedNode || this.sourceSelectedNode.fixed) {
       return false;
     }
@@ -537,17 +542,147 @@ export class BieUpliftComponent implements OnInit {
 
     if (node.source) {
       node.source = undefined;
+      node.reuseMapped = false;
       node.reusedTopLevelAsbiepId = undefined;
       this.sourceSelectedNode.target = undefined;
     } else {
       if (this.sourceSelectedNode.target) {
         this.sourceSelectedNode.target.reusedTopLevelAsbiepId = undefined;
         this.sourceSelectedNode.target.source = undefined;
+        this.sourceSelectedNode.target.reuseMapped = false;
       }
       this.sourceSelectedNode.target = undefined;
       node.source = this.sourceSelectedNode;
+      node.reuseMapped = false;
       this.sourceSelectedNode.target = node;
     }
+  }
+
+  private collectLoadedDescendants<T extends BieFlatNode>(node: T): T[] {
+    const result: T[] = [];
+    let stack = [...node.children] as T[];
+    while (stack.length > 0) {
+      const item = stack.shift();
+      result.push(item);
+      stack = (item.children as T[]).concat(stack);
+    }
+    return result;
+  }
+
+  private collectUsedDescendants<T extends BieFlatNode>(dataSource: BieFlatNodeDataSource<T>, node: T): T[] {
+    const result: T[] = [];
+    let stack = [node, ];
+    while (stack.length > 0) {
+      const item = stack.shift();
+      if (item.expandable && item.children.length === 0) {
+        dataSource.database.loadChildren(item);
+      }
+      if (item !== node && !item.isGroup && item.used) {
+        result.push(item);
+      }
+      stack = (item.children as T[]).filter(e => e.isGroup || e.used).concat(stack);
+    }
+    return result;
+  }
+
+  private getRelativeQueryPath(root: BieFlatNode, node: BieFlatNode): string {
+    const prefix = root.queryPath + '/';
+    return node.queryPath.startsWith(prefix) ? node.queryPath.substring(prefix.length) : node.queryPath;
+  }
+
+  private getReuseMappingKey(root: BieFlatNode, node: BieFlatNode): string {
+    return [node.bieType.toUpperCase(), this.getRelativeQueryPath(root, node)].join(':');
+  }
+
+  private clearReuseDescendantMatches(node: BieUpliftTargetFlatNode) {
+    this.collectLoadedDescendants(node).forEach(target => {
+      if (target.source) {
+        target.source.target = undefined;
+        target.source = undefined;
+      }
+      target.reuseMapped = false;
+      target.reusedTopLevelAsbiepId = undefined;
+    });
+  }
+
+  private prepareTargetReuseNode(node: BieUpliftTargetFlatNode, selectedTopLevelAsbiepId: number,
+                                 rootNode: BieEditAbieNode) {
+    if (this.targetDataSource.isExpanded(node)) {
+      this.targetDataSource.collapse(node);
+    }
+
+    const asbiepNode = node._node as AsbiepFlatNode;
+    asbiepNode.reused = true;
+    asbiepNode.topLevelAsbiepId = selectedTopLevelAsbiepId;
+    asbiepNode.basedTopLevelAsbiepId = rootNode?.basedTopLevelAsbiepId;
+    asbiepNode.rootNode = rootNode || new BieEditAbieNode();
+    asbiepNode.rootNode.topLevelAsbiepId = selectedTopLevelAsbiepId;
+    asbiepNode.children = [];
+    asbiepNode.expandable = undefined;
+  }
+
+  private clearTargetReuseNode(node: BieUpliftTargetFlatNode) {
+    const wasExpanded = this.targetDataSource.isExpanded(node);
+    if (wasExpanded) {
+      this.targetDataSource.collapse(node);
+    }
+
+    const asbiepNode = node._node as AsbiepFlatNode;
+    asbiepNode.reused = false;
+    asbiepNode.topLevelAsbiepId = undefined;
+    asbiepNode.basedTopLevelAsbiepId = undefined;
+    asbiepNode.rootNode = undefined;
+    asbiepNode.children = [];
+    asbiepNode.expandable = undefined;
+
+    if (wasExpanded) {
+      this.targetDataSource.expand(node);
+    }
+  }
+
+  private matchReuseDescendants(sourceRoot: BieUpliftSourceFlatNode, targetRoot: BieUpliftTargetFlatNode) {
+    const targetsByKey = new Map<string, BieUpliftTargetFlatNode[]>();
+    this.collectUsedDescendants(this.targetDataSource, targetRoot).forEach(target => {
+      const key = this.getReuseMappingKey(targetRoot, target);
+      if (!targetsByKey.has(key)) {
+        targetsByKey.set(key, []);
+      }
+      targetsByKey.get(key).push(target);
+    });
+
+    this.collectUsedDescendants(this.sourceDataSource, sourceRoot).forEach(source => {
+      const candidates = targetsByKey.get(this.getReuseMappingKey(sourceRoot, source)) || [];
+      const target = candidates.find(e => !e.source || e.source === source);
+      if (!target) {
+        return;
+      }
+
+      if (source.target && source.target !== target) {
+        source.target.source = undefined;
+        source.target.reuseMapped = false;
+        source.target.reusedTopLevelAsbiepId = undefined;
+      }
+      if (target.source && target.source !== source) {
+        target.source.target = undefined;
+      }
+
+      source.target = target;
+      target.source = source;
+      target.reuseMapped = true;
+    });
+  }
+
+  private applyReuseSelection(node: BieUpliftTargetFlatNode, selectedTopLevelAsbiepId: number,
+                              rootNode: BieEditAbieNode) {
+    this.clearReuseDescendantMatches(node);
+    this.prepareTargetReuseNode(node, selectedTopLevelAsbiepId, rootNode);
+
+    this.sourceDataSource.expand(node.source);
+    this.targetDataSource.expand(node);
+    this.matchReuseDescendants(node.source, node);
+
+    this.sourceDataSource.dataChange.next(this.sourceDataSource.data);
+    this.targetDataSource.dataChange.next(this.targetDataSource.data);
   }
 
   createUpliftBIE() {
@@ -654,8 +789,22 @@ export class BieUpliftComponent implements OnInit {
       dialogRef.afterClosed().subscribe(selectedTopLevelAsbiepId => {
         if (!selectedTopLevelAsbiepId) {
           node.reusedTopLevelAsbiepId = undefined;
+          this.clearReuseDescendantMatches(node);
+          this.clearTargetReuseNode(node);
         } else {
           node.reusedTopLevelAsbiepId = selectedTopLevelAsbiepId;
+          this.loading = true;
+          forkJoin([
+            this.bieEditService.getRootNode(selectedTopLevelAsbiepId),
+            this.bieEditService.getUsedBieList(selectedTopLevelAsbiepId),
+            this.bieEditService.getRefBieList(selectedTopLevelAsbiepId)
+          ]).pipe(finalize(() => {
+            this.loading = false;
+          })).subscribe(([rootNode, usedBieList, refBieList]) => {
+            this.targetDataSource.database.appendUsedBieList(usedBieList);
+            this.targetDataSource.database.appendRefBieList(refBieList);
+            this.applyReuseSelection(node, selectedTopLevelAsbiepId, rootNode);
+          });
         }
       });
     }
@@ -687,6 +836,45 @@ export class BieUpliftComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(uplift => {
       if (uplift) {
+        this.confirmUnselectedReuseThenUplift();
+      }
+    });
+  }
+
+  // Source reuse nodes that the user left without a target BIE selected for the
+  // target release. A reuse node is unselected when it has no target carrying a
+  // reusedTopLevelAsbiepId. Descendants auto-mapped under an already-selected
+  // reuse (target.reuseMapped) are excluded: their subtree is covered by the
+  // ancestor's reference, so it is not inline-copied. The level/used/locked
+  // filter matches report()'s row filter.
+  private collectUnselectedReuseNodes(): BieUpliftSourceFlatNode[] {
+    return this.sourceDataSource.data.filter(e =>
+      e.level > 0 && e.used && !e.locked && e.reused &&
+      !(e.target && (e.target.reusedTopLevelAsbiepId || e.target.reuseMapped)));
+  }
+
+  // Issue #1735: when reuse nodes are left unselected, the uplift inline-copies
+  // their fields instead of keeping a reference to the reused BIE. Make that
+  // consequence explicit before proceeding so the user can go back and select.
+  private confirmUnselectedReuseThenUplift() {
+    const unselectedReuseNodes = this.collectUnselectedReuseNodes();
+    if (unselectedReuseNodes.length === 0) {
+      this.createUpliftBIE();
+      return;
+    }
+
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Proceed without selecting reuse BIEs?';
+    dialogConfig.data.content = [
+      unselectedReuseNodes.length + ' reuse BIE node(s) below have no reuse BIE selected for the target release.',
+      'If you continue, their fields will be copied into the uplifted BIE and the reference to the reused BIE will NOT be kept.',
+      'To preserve the reference instead, go back and click the reuse icon on each node to select a target BIE.'
+    ];
+    dialogConfig.data.list = unselectedReuseNodes.map(e => '/' + e.parents.map(i => i.name).join('/'));
+    dialogConfig.data.action = 'Continue';
+
+    this.confirmDialogService.open(dialogConfig).afterClosed().subscribe(result => {
+      if (result) {
         this.createUpliftBIE();
       }
     });

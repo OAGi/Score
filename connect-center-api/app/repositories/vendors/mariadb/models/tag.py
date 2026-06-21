@@ -30,6 +30,8 @@ class AccManifestTag(Base):
 
     acc_manifest_id: Mapped[int] = mapped_column(Integer, ForeignKey("acc_manifest.acc_manifest_id"), primary_key=True)
     tag_id: Mapped[int] = mapped_column(Integer, ForeignKey("tag.tag_id"), primary_key=True)
+    created_by: Mapped[int] = mapped_column(Integer, ForeignKey("app_user.app_user_id"), nullable=False)
+    creation_timestamp: Mapped[object] = mapped_column(DateTime, nullable=False, server_default=func.now())
 
 
 class AsccpManifestTag(Base):
@@ -38,6 +40,8 @@ class AsccpManifestTag(Base):
 
     asccp_manifest_id: Mapped[int] = mapped_column(Integer, ForeignKey("asccp_manifest.asccp_manifest_id"), primary_key=True)
     tag_id: Mapped[int] = mapped_column(Integer, ForeignKey("tag.tag_id"), primary_key=True)
+    created_by: Mapped[int] = mapped_column(Integer, ForeignKey("app_user.app_user_id"), nullable=False)
+    creation_timestamp: Mapped[object] = mapped_column(DateTime, nullable=False, server_default=func.now())
 
 
 class BccpManifestTag(Base):
@@ -46,3 +50,15 @@ class BccpManifestTag(Base):
 
     bccp_manifest_id: Mapped[int] = mapped_column(Integer, ForeignKey("bccp_manifest.bccp_manifest_id"), primary_key=True)
     tag_id: Mapped[int] = mapped_column(Integer, ForeignKey("tag.tag_id"), primary_key=True)
+    created_by: Mapped[int] = mapped_column(Integer, ForeignKey("app_user.app_user_id"), nullable=False)
+    creation_timestamp: Mapped[object] = mapped_column(DateTime, nullable=False, server_default=func.now())
+
+
+class DtManifestTag(Base):
+    """Represent DtManifestTag."""
+    __tablename__ = "dt_manifest_tag"
+
+    dt_manifest_id: Mapped[int] = mapped_column(Integer, ForeignKey("dt_manifest.dt_manifest_id"), primary_key=True)
+    tag_id: Mapped[int] = mapped_column(Integer, ForeignKey("tag.tag_id"), primary_key=True)
+    created_by: Mapped[int] = mapped_column(Integer, ForeignKey("app_user.app_user_id"), nullable=False)
+    creation_timestamp: Mapped[object] = mapped_column(DateTime, nullable=False, server_default=func.now())

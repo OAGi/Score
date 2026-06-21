@@ -2,6 +2,7 @@ package org.oagi.score.gateway.http.api.cc_management.model;
 
 import org.oagi.score.gateway.http.api.account_management.model.UserSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.OagisComponentType;
+import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
 import org.oagi.score.gateway.http.api.library_management.model.LibrarySummaryRecord;
 import org.oagi.score.gateway.http.api.log_management.model.LogSummaryRecord;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseSummaryRecord;
@@ -26,6 +27,7 @@ public record CcListEntryRecord(
         Definition definition,
         String module,
         OagisComponentType oagisComponentType,
+        NamespaceId namespaceId,
         CcState state,
         boolean deprecated,
         boolean newComponent,
@@ -46,5 +48,4 @@ public record CcListEntryRecord(
     }
 
 }
-
 

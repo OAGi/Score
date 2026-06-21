@@ -47,7 +47,7 @@ export type OpenApiSpec = {
   >;
 };
 
-export type HttpMethod = 'get' | 'post' | 'put' | 'delete';
+export type HttpMethod = 'get' | 'post' | 'put' | 'patch' | 'delete';
 
 let openApiSpecCache: OpenApiSpec | null = null;
 let openApiSpecPromise: Promise<OpenApiSpec> | null = null;
@@ -170,7 +170,12 @@ export function getBusinessContextOperation(spec: OpenApiSpec, key: string): Ope
 export function getLibraryOperation(spec: OpenApiSpec, key: string): OperationLookup | null {
   const mapping: Record<string, { path: string; method: HttpMethod }> = {
     list: { path: '/libraries', method: 'get' },
+    create: { path: '/libraries', method: 'post' },
     retrieve: { path: '/libraries/{library_id}', method: 'get' },
+    update: { path: '/libraries/{library_id}', method: 'post' },
+    delete: { path: '/libraries/{library_id}', method: 'delete' },
+    add_release_dependency: { path: '/libraries/{library_id}/release-dependencies/{release_id}', method: 'post' },
+    remove_release_dependency: { path: '/libraries/{library_id}/release-dependencies/{release_id}', method: 'delete' },
   };
 
   const target = mapping[key];
@@ -197,7 +202,11 @@ export function getAccountOperation(spec: OpenApiSpec, key: string): OperationLo
 export function getNamespaceOperation(spec: OpenApiSpec, key: string): OperationLookup | null {
   const mapping: Record<string, { path: string; method: HttpMethod }> = {
     list: { path: '/namespaces', method: 'get' },
+    create: { path: '/namespaces', method: 'post' },
     retrieve: { path: '/namespaces/{namespace_id}', method: 'get' },
+    update: { path: '/namespaces/{namespace_id}', method: 'post' },
+    delete: { path: '/namespaces/{namespace_id}', method: 'delete' },
+    transfer_namespace_ownership: { path: '/namespaces/{namespace_id}/ownership', method: 'post' },
   };
 
   const target = mapping[key];
@@ -211,6 +220,7 @@ export function getReleaseOperation(spec: OpenApiSpec, key: string): OperationLo
   const mapping: Record<string, { path: string; method: HttpMethod }> = {
     list: { path: '/releases', method: 'get' },
     retrieve: { path: '/releases/{release_id}', method: 'get' },
+    retrieve_working: { path: '/releases/working', method: 'get' },
   };
 
   const target = mapping[key];
@@ -223,7 +233,19 @@ export function getReleaseOperation(spec: OpenApiSpec, key: string): OperationLo
 export function getDataTypeOperation(spec: OpenApiSpec, key: string): OperationLookup | null {
   const mapping: Record<string, { path: string; method: HttpMethod }> = {
     list: { path: '/data-types', method: 'get' },
+    create_dt: { path: '/data-types', method: 'post' },
     retrieve: { path: '/data-types/{dt_manifest_id}', method: 'get' },
+    update_dt: { path: '/data-types/{dt_manifest_id}', method: 'post' },
+    transfer_dt_ownership: { path: '/data-types/{dt_manifest_id}/ownership', method: 'post' },
+    create_dt_sc: { path: '/data-types/{dt_manifest_id}/supplementary-components', method: 'post' },
+    update_dt_sc: { path: '/data-types/supplementary-components/{dt_sc_manifest_id}', method: 'post' },
+    delete_dt_sc: { path: '/data-types/supplementary-components/{dt_sc_manifest_id}', method: 'delete' },
+    add_dt_tags: { path: '/data-types/{dt_manifest_id}/tags', method: 'post' },
+    remove_dt_tags: { path: '/data-types/{dt_manifest_id}/tags', method: 'delete' },
+    change_dt_state: { path: '/data-types/{dt_manifest_id}/state', method: 'post' },
+    revise_dt: { path: '/data-types/{dt_manifest_id}/revise', method: 'post' },
+    cancel_dt: { path: '/data-types/{dt_manifest_id}/cancel', method: 'post' },
+    discard_dt: { path: '/data-types/{dt_manifest_id}', method: 'delete' },
   };
 
   const target = mapping[key];
@@ -260,7 +282,27 @@ export function getXbtOperation(spec: OpenApiSpec, key: string): OperationLookup
 export function getCodeListOperation(spec: OpenApiSpec, key: string): OperationLookup | null {
   const mapping: Record<string, { path: string; method: HttpMethod }> = {
     list: { path: '/code-lists', method: 'get' },
+    create_code_list: { path: '/code-lists', method: 'post' },
     retrieve: { path: '/code-lists/{code_list_manifest_id}', method: 'get' },
+    update_code_list: { path: '/code-lists/{code_list_manifest_id}', method: 'post' },
+    retrieve_code_list_value: {
+      path: '/code-lists/{code_list_manifest_id}/values/{code_list_value_manifest_id}',
+      method: 'get',
+    },
+    create_code_list_value: { path: '/code-lists/{code_list_manifest_id}/values', method: 'post' },
+    update_code_list_value: {
+      path: '/code-lists/{code_list_manifest_id}/values/{code_list_value_manifest_id}',
+      method: 'post',
+    },
+    delete_code_list_value: {
+      path: '/code-lists/{code_list_manifest_id}/values/{code_list_value_manifest_id}',
+      method: 'delete',
+    },
+    transfer_code_list_ownership: { path: '/code-lists/{code_list_manifest_id}/ownership', method: 'post' },
+    change_code_list_state: { path: '/code-lists/{code_list_manifest_id}/state', method: 'post' },
+    revise_code_list: { path: '/code-lists/{code_list_manifest_id}/revise', method: 'post' },
+    cancel_code_list: { path: '/code-lists/{code_list_manifest_id}/cancel', method: 'post' },
+    discard_code_list: { path: '/code-lists/{code_list_manifest_id}', method: 'delete' },
   };
 
   const target = mapping[key];
@@ -286,9 +328,46 @@ export function getAgencyIdListOperation(spec: OpenApiSpec, key: string): Operat
 export function getCoreComponentOperation(spec: OpenApiSpec, key: string): OperationLookup | null {
   const mapping: Record<string, { path: string; method: HttpMethod }> = {
     list: { path: '/core-components', method: 'get' },
+    create_acc: { path: '/core-components/acc', method: 'post' },
     get_acc: { path: '/core-components/acc/{acc_manifest_id}', method: 'get' },
+    update_acc: { path: '/core-components/acc/{acc_manifest_id}', method: 'post' },
+    transfer_acc_ownership: { path: '/core-components/acc/{acc_manifest_id}/ownership', method: 'post' },
+    add_acc_tags: { path: '/core-components/acc/{acc_manifest_id}/tags', method: 'post' },
+    remove_acc_tags: { path: '/core-components/acc/{acc_manifest_id}/tags', method: 'delete' },
+    change_acc_state: { path: '/core-components/acc/{acc_manifest_id}/state', method: 'post' },
+    revise_amend_acc: { path: '/core-components/acc/{acc_manifest_id}/revise', method: 'post' },
+    cancel_acc: { path: '/core-components/acc/{acc_manifest_id}/cancel', method: 'post' },
+    discard_acc: { path: '/core-components/acc/{acc_manifest_id}', method: 'delete' },
+    add_ascc_to_acc: { path: '/core-components/acc/{acc_manifest_id}/ascc/{asccp_manifest_id}', method: 'post' },
+    reorder_ascc_in_acc: { path: '/core-components/ascc/{ascc_manifest_id}/move', method: 'post' },
+    remove_ascc: { path: '/core-components/ascc/{ascc_manifest_id}', method: 'delete' },
+    update_ascc: { path: '/core-components/ascc/{ascc_manifest_id}', method: 'post' },
+    add_bcc_to_acc: { path: '/core-components/acc/{acc_manifest_id}/bcc/{bccp_manifest_id}', method: 'post' },
+    reorder_bcc_in_acc: { path: '/core-components/bcc/{bcc_manifest_id}/move', method: 'post' },
+    remove_bcc: { path: '/core-components/bcc/{bcc_manifest_id}', method: 'delete' },
+    update_bcc: { path: '/core-components/bcc/{bcc_manifest_id}', method: 'post' },
     get_asccp: { path: '/core-components/asccp/{asccp_manifest_id}', method: 'get' },
+    create_asccp: { path: '/core-components/asccp', method: 'post' },
+    update_asccp: { path: '/core-components/asccp/{asccp_manifest_id}', method: 'post' },
+    transfer_asccp_ownership: { path: '/core-components/asccp/{asccp_manifest_id}/ownership', method: 'post' },
+    change_asccp_state: { path: '/core-components/asccp/{asccp_manifest_id}/state', method: 'post' },
+    change_asccp_role_of_acc: { path: '/core-components/asccp/{asccp_manifest_id}/acc', method: 'post' },
+    add_asccp_tags: { path: '/core-components/asccp/{asccp_manifest_id}/tags', method: 'post' },
+    remove_asccp_tags: { path: '/core-components/asccp/{asccp_manifest_id}/tags', method: 'delete' },
+    revise_asccp: { path: '/core-components/asccp/{asccp_manifest_id}/revise', method: 'post' },
+    cancel_asccp: { path: '/core-components/asccp/{asccp_manifest_id}/cancel', method: 'post' },
+    discard_asccp: { path: '/core-components/asccp/{asccp_manifest_id}', method: 'delete' },
     get_bccp: { path: '/core-components/bccp/{bccp_manifest_id}', method: 'get' },
+    create_bccp: { path: '/core-components/bccp', method: 'post' },
+    update_bccp: { path: '/core-components/bccp/{bccp_manifest_id}', method: 'post' },
+    transfer_bccp_ownership: { path: '/core-components/bccp/{bccp_manifest_id}/ownership', method: 'post' },
+    change_bccp_state: { path: '/core-components/bccp/{bccp_manifest_id}/state', method: 'post' },
+    change_bccp_bdt: { path: '/core-components/bccp/{bccp_manifest_id}/bdt', method: 'post' },
+    add_bccp_tags: { path: '/core-components/bccp/{bccp_manifest_id}/tags', method: 'post' },
+    remove_bccp_tags: { path: '/core-components/bccp/{bccp_manifest_id}/tags', method: 'delete' },
+    revise_bccp: { path: '/core-components/bccp/{bccp_manifest_id}/revise', method: 'post' },
+    cancel_bccp: { path: '/core-components/bccp/{bccp_manifest_id}/cancel', method: 'post' },
+    discard_bccp: { path: '/core-components/bccp/{bccp_manifest_id}', method: 'delete' },
   };
 
   const target = mapping[key];

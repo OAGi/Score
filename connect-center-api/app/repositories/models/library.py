@@ -35,3 +35,16 @@ class LibrarySummaryRow(BaseModel):
     name: str
 
     model_config = ConfigDict(frozen=True, from_attributes=True)
+
+
+class LibraryReleaseRow(BaseModel):
+    """Repository row model for library-scoped release summaries."""
+
+    release_id: int
+    library_id: int
+    library_name: str
+    release_num: str
+    state: str
+    is_working_release: bool
+
+    model_config = ConfigDict(frozen=True, from_attributes=True)

@@ -66,9 +66,21 @@ async def get_tag_service(
         "type": "object",
         "description": "Response containing paginated list of tags. Tags are classification labels used to categorize and organize core components, enabling filtering and grouping of components by shared characteristics. Common examples include semantic classifications such as 'Noun' and 'Verb', as well as domain-specific groupings like 'BOD' (Business Object Document) in connectSpec.",
         "properties": {
-            "total_items": {"type": "integer", "description": "Total number of tags available. Allowed values: non-negative integers (≥0).", "example": 25},
-            "offset": {"type": "integer", "description": "Offset of the first item in this page. Allowed values: non-negative integers (≥0). Default value: 0.", "example": 0},
-            "limit": {"type": "integer", "description": "Number of items returned in this page. Allowed values: integers between 1 and 100 (inclusive). Default value: 10.", "example": 10},
+            "total_items": {
+                "type": "integer",
+                "description": "Total number of tags available. Allowed values: non-negative integers (≥0).",
+                "example": 25,
+            },
+            "offset": {
+                "type": "integer",
+                "description": "Offset of the first item in this page. Allowed values: non-negative integers (≥0). Default value: 0.",
+                "example": 0,
+            },
+            "limit": {
+                "type": "integer",
+                "description": "Number of items returned in this page. Allowed values: integers between 1 and 100 (inclusive). Default value: 10.",
+                "example": 10,
+            },
             "items": {
                 "type": "array",
                 "description": "List of tags on this page",
@@ -76,10 +88,26 @@ async def get_tag_service(
                     "type": "object",
                     "properties": {
                         "tag_id": {"type": "integer", "description": "Unique identifier for the tag", "example": 1},
-                        "name": {"type": "string", "description": "Name of the tag used to categorize core components", "example": "BOD"},
-                        "description": {"type": ["string", "null"], "description": "Description of the tag and its purpose in categorizing core components", "example": "Business Object Document"},
-                        "color": {"type": ["string", "null"], "description": "Background color of the tag in hexadecimal format", "example": "#D1446B"},
-                        "text_color": {"type": ["string", "null"], "description": "Text color of the tag in hexadecimal format", "example": "#FFFFFF"},
+                        "name": {
+                            "type": "string",
+                            "description": "Name of the tag used to categorize core components",
+                            "example": "BOD",
+                        },
+                        "description": {
+                            "type": ["string", "null"],
+                            "description": "Description of the tag and its purpose in categorizing core components",
+                            "example": "Business Object Document",
+                        },
+                        "color": {
+                            "type": ["string", "null"],
+                            "description": "Background color of the tag in hexadecimal format",
+                            "example": "#D1446B",
+                        },
+                        "text_color": {
+                            "type": ["string", "null"],
+                            "description": "Text color of the tag in hexadecimal format",
+                            "example": "#FFFFFF",
+                        },
                         "created": {
                             "type": "object",
                             "description": "Information about the creation of the tag",
@@ -88,16 +116,38 @@ async def get_tag_service(
                                     "type": "object",
                                     "description": "User who created the tag",
                                     "properties": {
-                                        "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                                        "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                                        "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                                        "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                                        "user_id": {
+                                            "type": "integer",
+                                            "description": "Unique identifier for the user",
+                                            "example": 1,
+                                        },
+                                        "login_id": {
+                                            "type": "string",
+                                            "description": "User's login identifier",
+                                            "example": "admin",
+                                        },
+                                        "username": {
+                                            "type": "string",
+                                            "description": "Display name of the user",
+                                            "example": "Administrator",
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                            "description": "List of roles assigned to the user",
+                                            "example": ["Admin"],
+                                        },
                                     },
-                                    "required": ["user_id", "login_id", "username", "roles"]
+                                    "required": ["user_id", "login_id", "username", "roles"],
                                 },
-                                "when": {"type": "string", "format": "date-time", "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-15T10:30:00Z"}
+                                "when": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                                    "example": "2024-01-15T10:30:00Z",
+                                },
                             },
-                            "required": ["who", "when"]
+                            "required": ["who", "when"],
                         },
                         "last_updated": {
                             "type": "object",
@@ -107,33 +157,66 @@ async def get_tag_service(
                                     "type": "object",
                                     "description": "User who last updated the tag",
                                     "properties": {
-                                        "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                                        "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                                        "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                                        "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                                        "user_id": {
+                                            "type": "integer",
+                                            "description": "Unique identifier for the user",
+                                            "example": 1,
+                                        },
+                                        "login_id": {
+                                            "type": "string",
+                                            "description": "User's login identifier",
+                                            "example": "admin",
+                                        },
+                                        "username": {
+                                            "type": "string",
+                                            "description": "Display name of the user",
+                                            "example": "Administrator",
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                            "description": "List of roles assigned to the user",
+                                            "example": ["Admin"],
+                                        },
                                     },
-                                    "required": ["user_id", "login_id", "username", "roles"]
+                                    "required": ["user_id", "login_id", "username", "roles"],
                                 },
-                                "when": {"type": "string", "format": "date-time", "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-20T14:45:00Z"}
+                                "when": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                                    "example": "2024-01-20T14:45:00Z",
+                                },
                             },
-                            "required": ["who", "when"]
-                        }
+                            "required": ["who", "when"],
+                        },
                     },
-                    "required": ["tag_id", "name", "created", "last_updated"]
-                }
-            }
+                    "required": ["tag_id", "name", "created", "last_updated"],
+                },
+            },
         },
-        "required": ["total_items", "offset", "limit", "items"]
-    }
+        "required": ["total_items", "offset", "limit", "items"],
+    },
 )
 async def get_tags(
-    name: Annotated[str | None, Field(default=None, description="Filter by tag name using partial match (case-insensitive).")],
-    description: Annotated[str | None, Field(default=None, description="Filter by tag description using partial match (case-insensitive).")],
-    created_on: Annotated[str | None, Field(default=None, description="Filter by creation date using an inclusive range: '[before~after]'.")],
-    last_updated_on: Annotated[str | None, Field(default=None, description="Filter by last update date using an inclusive range: '[before~after]'.")],
-    order_by: Annotated[str | None, Field(default=None, description="Comma-separated list of properties to order results by. Allowed columns: name, description, creation_timestamp, last_update_timestamp.")],
-    offset: Annotated[int, Field(default=0, ge=0, description="The offset from the beginning of the list.")],
-    limit: Annotated[int, Field(default=10, ge=1, le=100, description="The maximum number of items to return.")],
+    name: Annotated[str | None, Field(description="Filter by tag name using partial match (case-insensitive).")] = None,
+    description: Annotated[
+        str | None, Field(description="Filter by tag description using partial match (case-insensitive).")
+    ] = None,
+    created_on: Annotated[
+        str | None, Field(description="Filter by creation date using an inclusive range: '[before~after]'.")
+    ] = None,
+    last_updated_on: Annotated[
+        str | None, Field(description="Filter by last update date using an inclusive range: '[before~after]'.")
+    ] = None,
+    order_by: Annotated[
+        str | None,
+        Field(
+            description="Comma-separated list of properties to order results by. Allowed columns: name, description, creation_timestamp, last_update_timestamp."
+        ),
+    ] = None,
+    offset: Annotated[int, Field(ge=0, description="The offset from the beginning of the list.")] = 0,
+    limit: Annotated[int, Field(ge=1, le=100, description="The maximum number of items to return.")] = 10,
     tag_service: TagService = Depends(get_tag_service),
 ) -> GetTagPaginationResponse:
     """

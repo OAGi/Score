@@ -50,6 +50,17 @@ class ReleaseServiceResult:
     state: Literal["Processing", "Initialized", "Draft", "Published"]
     created: WhoAndWhen
     last_updated: WhoAndWhen
+    is_latest: bool = False
+    prev_release: "ReleaseReferenceServiceRecord | None" = None
+    next_release: "ReleaseReferenceServiceRecord | None" = None
+
+
+@dataclass(kw_only=True)
+class ReleaseReferenceServiceRecord:
+    """Service-layer adjacent release reference."""
+
+    release_id: ReleaseId
+    release_num: str = ""
 
 
 @dataclass(kw_only=True)

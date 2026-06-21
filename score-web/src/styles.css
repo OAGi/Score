@@ -1,3 +1,8 @@
+/* GitHub's canonical Markdown typography, scoped under .markdown-body (light-only app).
+   Imported first so its class-scoped rules still win over the element-level resets below
+   (e.g. the h1-h6 margin zeroing), which would otherwise wreck rendered Markdown previews. */
+@import "github-markdown-css/github-markdown-light.css";
+
 body {
   font-family: Roboto, Helvetica, Arial, sans-serif;
   font-size: 13px;

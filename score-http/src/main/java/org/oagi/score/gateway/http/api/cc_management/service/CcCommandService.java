@@ -76,6 +76,9 @@ public class CcCommandService {
     @Autowired
     private GraphContextRepository graphContextRepository;
 
+    @Autowired
+    private ComponentStateChangeEventPublisher stateChangeEventPublisher;
+
     public AccManifestId createAcc(ScoreUser requester, AccCreateRequest request) {
 
         if (requester == null) {
@@ -87,6 +90,25 @@ public class CcCommandService {
         }
 
         assertReleaseIsPublished(requester, request.releaseId());
+        ReleaseSummaryRecord targetRelease = repositoryFactory.releaseQueryRepository(requester)
+                .getReleaseSummary(request.releaseId());
+        if (targetRelease == null) {
+            throw new IllegalArgumentException("Target release does not exist.");
+        }
+        if (request.basedAccManifestId() != null) {
+            AccSummaryRecord basedAcc = repositoryFactory.accQueryRepository(requester)
+                    .getAccSummary(request.basedAccManifestId());
+            if (basedAcc == null) {
+                throw new IllegalArgumentException("Base ACC does not exist.");
+            }
+            assertReferencedReleaseAllowed(
+                    requester,
+                    targetRelease,
+                    basedAcc.release(),
+                    "The base ACC",
+                    "the target release",
+                    "a base ACC");
+        }
 
         var command = repositoryFactory.accCommandRepository(requester);
 
@@ -110,6 +132,40 @@ public class CcCommandService {
         }
 
         return accManifestId;
+    }
+
+    private void assertReferencedReleaseAllowed(
+            ScoreUser requester,
+            ReleaseSummaryRecord targetRelease,
+            ReleaseSummaryRecord referencedRelease,
+            String referencedLabel,
+            String targetLabel,
+            String selectionPhrase) {
+
+        if (targetRelease == null || referencedRelease == null) {
+            throw new IllegalArgumentException("Referenced release information is missing.");
+        }
+
+        if (targetRelease.libraryId().equals(referencedRelease.libraryId())) {
+            if (!targetRelease.releaseId().equals(referencedRelease.releaseId())) {
+                throw new IllegalArgumentException(
+                        referencedLabel + " must belong to the same release as " + targetLabel
+                                + " when both components are in the same library. "
+                                + "Please choose " + selectionPhrase + " from the target release and try again.");
+            }
+            return;
+        }
+
+        boolean allowed = repositoryFactory.releaseQueryRepository(requester)
+                .getReleaseDependencySummaryList(targetRelease.releaseId()).stream()
+                .anyMatch(dependency -> dependency.releaseId().equals(referencedRelease.releaseId()));
+        if (!allowed) {
+            throw new IllegalArgumentException(
+                    referencedLabel + " must come from a release dependency of " + targetLabel
+                            + " when the components are in different libraries. "
+                            + "Please choose " + selectionPhrase
+                            + " from one of the target release dependencies and try again.");
+        }
     }
 
     private void makeLog(ScoreUser requester, AccManifestId accManifestId, LogAction action) {
@@ -158,9 +214,25 @@ public class CcCommandService {
         if (toAsccp == null) {
             throw new IllegalArgumentException("Target ASCCP does not exist.");
         }
+        assertReferencedReleaseAllowed(
+                requester,
+                fromAcc.release(),
+                toAsccp.release(),
+                "The target ASCCP",
+                "the source ACC",
+                "an ASCCP");
 
-        if (!request.skipReusableCheck() && !toAsccp.reusable()) {
-            throw new IllegalArgumentException("Target ASCCP is not reusable.");
+        // ASCCP.reusable_indicator means "this ASCCP may be referenced by more
+        // than one ASCC". When the indicator is false, the first ASCC reference
+        // is still allowed; only subsequent references must be rejected.
+        if (!toAsccp.reusable()) {
+            List<AsccSummaryRecord> existingReferences =
+                    accQuery.getAsccSummaryList(request.asccpManifestId());
+            if (!existingReferences.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Target ASCCP is not reusable and already has "
+                                + existingReferences.size() + " ASCC reference(s).");
+            }
         }
 
         if (toAsccp.type() == AsccpType.Extension) {
@@ -214,6 +286,13 @@ public class CcCommandService {
         if (toBccp == null) {
             throw new IllegalArgumentException("Target BCCP does not exist.");
         }
+        assertReferencedReleaseAllowed(
+                requester,
+                fromAcc.release(),
+                toBccp.release(),
+                "The target BCCP",
+                "the source ACC",
+                "a BCCP");
 
         BccManifestId bccManifestId = repositoryFactory.accCommandRepository(requester)
                 .createBcc(request.accManifestId(), request.bccpManifestId(),
@@ -236,9 +315,24 @@ public class CcCommandService {
         }
 
         assertReleaseIsPublished(requester, request.releaseId());
+        ReleaseSummaryRecord targetRelease = repositoryFactory.releaseQueryRepository(requester)
+                .getReleaseSummary(request.releaseId());
+        if (targetRelease == null) {
+            throw new IllegalArgumentException("Target release does not exist.");
+        }
 
         AccSummaryRecord roleOfAcc = repositoryFactory.accQueryRepository(requester)
                 .getAccSummary(request.roleOfAccManifestId());
+        if (roleOfAcc == null) {
+            throw new IllegalArgumentException("Role ACC does not exist.");
+        }
+        assertReferencedReleaseAllowed(
+                requester,
+                targetRelease,
+                roleOfAcc.release(),
+                "The role ACC",
+                "the target release",
+                "a role ACC");
         if (roleOfAcc.isAbstract()) {
             throw new IllegalArgumentException("An abstract ACC cannot be used to create a new ASCCP.");
         }
@@ -398,6 +492,22 @@ public class CcCommandService {
 
     public BccpManifestId createBccp(ScoreUser requester, BccpCreateRequest request) {
         assertReleaseIsPublished(requester, request.releaseId());
+        ReleaseSummaryRecord targetRelease = repositoryFactory.releaseQueryRepository(requester)
+                .getReleaseSummary(request.releaseId());
+        if (targetRelease == null) {
+            throw new IllegalArgumentException("Target release does not exist.");
+        }
+        DtSummaryRecord bdt = repositoryFactory.dtQueryRepository(requester).getDtSummary(request.basedDtManifestId());
+        if (bdt == null) {
+            throw new IllegalArgumentException("Target BDT does not exist.");
+        }
+        assertReferencedReleaseAllowed(
+                requester,
+                targetRelease,
+                bdt.release(),
+                "The target BDT",
+                "the target release",
+                "a BDT");
 
         var command = repositoryFactory.bccpCommandRepository(requester);
 
@@ -438,6 +548,23 @@ public class CcCommandService {
         }
 
         assertReleaseIsPublished(requester, request.releaseId());
+        ReleaseSummaryRecord targetRelease = repositoryFactory.releaseQueryRepository(requester)
+                .getReleaseSummary(request.releaseId());
+        if (targetRelease == null) {
+            throw new IllegalArgumentException("Target release does not exist.");
+        }
+        DtSummaryRecord basedDt = repositoryFactory.dtQueryRepository(requester)
+                .getDtSummary(request.basedDtManifestId());
+        if (basedDt == null) {
+            throw new IllegalArgumentException("Base DT does not exist.");
+        }
+        assertReferencedReleaseAllowed(
+                requester,
+                targetRelease,
+                basedDt.release(),
+                "The base DT",
+                "the target release",
+                "a base DT");
 
         var command = repositoryFactory.dtCommandRepository(requester);
         DtManifestId dtManifestId = command.create(request.releaseId(), request.basedDtManifestId());
@@ -508,7 +635,6 @@ public class CcCommandService {
 
         // create ASCC between extension ACC and extension ASCCP
         createAscc(requester, AsccCreateRequest.builder(accManifestId, extensionAsccpManifestId)
-                .skipReusableCheck(true)
                 .build());
 
         return accManifestId;
@@ -1182,12 +1308,34 @@ public class CcCommandService {
         if (!requester.isAdministrator() && !acc.owner().userId().equals(requester.userId())) {
             throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
         }
+        if (basedAccManifestId != null) {
+            AccSummaryRecord basedAcc = query.getAccSummary(basedAccManifestId);
+            if (basedAcc == null) {
+                throw new IllegalArgumentException("Base ACC does not exist.");
+            }
+            assertReferencedReleaseAllowed(
+                    requester,
+                    acc.release(),
+                    basedAcc.release(),
+                    "The base ACC",
+                    "the target ACC",
+                    "a base ACC");
+        }
 
         var command = repositoryFactory.accCommandRepository(requester);
         return command.updateBasedAccManifestId(accManifestId, basedAccManifestId);
     }
 
     public boolean updateState(ScoreUser requester, AccManifestId accManifestId, CcState state) {
+        return updateState(requester, accManifestId, state, null, null);
+    }
+
+    public boolean updateState(ScoreUser requester, AccManifestId accManifestId, CcState state, String comment) {
+        return updateState(requester, accManifestId, state, comment, null);
+    }
+
+    public boolean updateState(ScoreUser requester, AccManifestId accManifestId, CcState state, String comment,
+                               String projectFieldOptionOverride) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -1227,6 +1375,8 @@ public class CcCommandService {
             makeLog(requester, accManifestId,
                     (nextState == CcState.Deleted) ? LogAction.Deleted :
                             (restore ? LogAction.Restored : LogAction.Modified));
+            stateChangeEventPublisher.publish(
+                    CcType.ACC, accManifestId, prevState, nextState, requester.userId(), comment, projectFieldOptionOverride);
         }
 
         return updated;
@@ -1259,6 +1409,17 @@ public class CcCommandService {
         if (!requester.isAdministrator() && !asccp.owner().userId().equals(requester.userId())) {
             throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
         }
+        AccSummaryRecord roleOfAcc = repositoryFactory.accQueryRepository(requester).getAccSummary(roleOfAccManifestId);
+        if (roleOfAcc == null) {
+            throw new IllegalArgumentException("Role ACC does not exist.");
+        }
+        assertReferencedReleaseAllowed(
+                requester,
+                asccp.release(),
+                roleOfAcc.release(),
+                "The role ACC",
+                "the target ASCCP",
+                "a role ACC");
 
         boolean updated = repositoryFactory.asccpCommandRepository(requester).updateRoleOfAcc(asccpManifestId, roleOfAccManifestId);
         if (updated) {
@@ -1273,6 +1434,15 @@ public class CcCommandService {
     }
 
     public boolean updateState(ScoreUser requester, AsccpManifestId asccpManifestId, CcState state) {
+        return updateState(requester, asccpManifestId, state, null, null);
+    }
+
+    public boolean updateState(ScoreUser requester, AsccpManifestId asccpManifestId, CcState state, String comment) {
+        return updateState(requester, asccpManifestId, state, comment, null);
+    }
+
+    public boolean updateState(ScoreUser requester, AsccpManifestId asccpManifestId, CcState state, String comment,
+                               String projectFieldOptionOverride) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -1312,6 +1482,8 @@ public class CcCommandService {
             makeLog(requester, asccpManifestId,
                     (nextState == CcState.Deleted) ? LogAction.Deleted :
                             (restore ? LogAction.Restored : LogAction.Modified));
+            stateChangeEventPublisher.publish(
+                    CcType.ASCCP, asccpManifestId, prevState, nextState, requester.userId(), comment, projectFieldOptionOverride);
         }
 
         return updated;
@@ -1342,6 +1514,17 @@ public class CcCommandService {
         if (!requester.isAdministrator() && !bccp.owner().userId().equals(requester.userId())) {
             throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
         }
+        DtSummaryRecord bdt = repositoryFactory.dtQueryRepository(requester).getDtSummary(dtManifestId);
+        if (bdt == null) {
+            throw new IllegalArgumentException("Target BDT does not exist.");
+        }
+        assertReferencedReleaseAllowed(
+                requester,
+                bccp.release(),
+                bdt.release(),
+                "The target BDT",
+                "the target BCCP",
+                "a BDT");
 
         boolean updated = repositoryFactory.bccpCommandRepository(requester).updateDt(bccpManifestId, dtManifestId);
         if (updated) {
@@ -1356,6 +1539,15 @@ public class CcCommandService {
     }
 
     public boolean updateState(ScoreUser requester, BccpManifestId bccpManifestId, CcState state) {
+        return updateState(requester, bccpManifestId, state, null, null);
+    }
+
+    public boolean updateState(ScoreUser requester, BccpManifestId bccpManifestId, CcState state, String comment) {
+        return updateState(requester, bccpManifestId, state, comment, null);
+    }
+
+    public boolean updateState(ScoreUser requester, BccpManifestId bccpManifestId, CcState state, String comment,
+                               String projectFieldOptionOverride) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -1395,12 +1587,23 @@ public class CcCommandService {
             makeLog(requester, bccpManifestId,
                     (nextState == CcState.Deleted) ? LogAction.Deleted :
                             (restore ? LogAction.Restored : LogAction.Modified));
+            stateChangeEventPublisher.publish(
+                    CcType.BCCP, bccpManifestId, prevState, nextState, requester.userId(), comment, projectFieldOptionOverride);
         }
 
         return updated;
     }
 
     public boolean updateState(ScoreUser requester, DtManifestId dtManifestId, CcState state) {
+        return updateState(requester, dtManifestId, state, null, null);
+    }
+
+    public boolean updateState(ScoreUser requester, DtManifestId dtManifestId, CcState state, String comment) {
+        return updateState(requester, dtManifestId, state, comment, null);
+    }
+
+    public boolean updateState(ScoreUser requester, DtManifestId dtManifestId, CcState state, String comment,
+                               String projectFieldOptionOverride) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -1440,6 +1643,8 @@ public class CcCommandService {
             makeLog(requester, dtManifestId,
                     (nextState == CcState.Deleted) ? LogAction.Deleted :
                             (restore ? LogAction.Restored : LogAction.Modified));
+            stateChangeEventPublisher.publish(
+                    CcType.DT, dtManifestId, prevState, nextState, requester.userId(), comment, projectFieldOptionOverride);
         }
 
         return updated;
@@ -1757,9 +1962,13 @@ public class CcCommandService {
 
         repositoryFactory.accCommandRepository(requester).revise(accManifestId);
         makeLog(requester, accManifestId, LogAction.Revised);
+        // Revising creates a new WIP revision from the released state — publish it so the GitHub
+        // project fieldOption sync moves the linked issue back into the in-progress fieldOption (issue #1533).
+        stateChangeEventPublisher.publish(
+                CcType.ACC, accManifestId, prevAcc.state(), CcState.WIP, requester.userId());
     }
 
-    public void cancelAcc(ScoreUser requester, AccManifestId accManifestId) {
+    public void cancelAcc(ScoreUser requester, AccManifestId accManifestId, String comment, String projectFieldOptionOverride) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -1799,6 +2008,12 @@ public class CcCommandService {
         }
 
         repositoryFactory.accCommandRepository(requester).cancel(accManifestId);
+
+        // Cancelling reverts WIP to the previously released revision. Publish it like an explicit state
+        // change so any linked GitHub issues get the user-edited status comment (issue #1533 follow-up).
+        CcState revertedTo = requester.isDeveloper() ? CcState.Published : CcState.Production;
+        stateChangeEventPublisher.publish(
+                CcType.ACC, accManifestId, CcState.WIP, revertedTo, requester.userId(), comment, projectFieldOptionOverride);
     }
 
     public void reviseAsccp(ScoreUser requester, AsccpManifestId asccpManifestId) {
@@ -1846,9 +2061,13 @@ public class CcCommandService {
 
         repositoryFactory.asccpCommandRepository(requester).revise(asccpManifestId);
         makeLog(requester, asccpManifestId, LogAction.Revised);
+        // Publish the revise (released -> WIP) so the GitHub project fieldOption sync moves the linked issue
+        // back into the in-progress fieldOption (issue #1533).
+        stateChangeEventPublisher.publish(
+                CcType.ASCCP, asccpManifestId, prevAsccp.state(), CcState.WIP, requester.userId());
     }
 
-    public void cancelAsccp(ScoreUser requester, AsccpManifestId asccpManifestId) {
+    public void cancelAsccp(ScoreUser requester, AsccpManifestId asccpManifestId, String comment, String projectFieldOptionOverride) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -1888,6 +2107,10 @@ public class CcCommandService {
         }
 
         repositoryFactory.asccpCommandRepository(requester).cancel(asccpManifestId);
+
+        CcState revertedTo = requester.isDeveloper() ? CcState.Published : CcState.Production;
+        stateChangeEventPublisher.publish(
+                CcType.ASCCP, asccpManifestId, CcState.WIP, revertedTo, requester.userId(), comment, projectFieldOptionOverride);
     }
 
     public void reviseBccp(ScoreUser requester, BccpManifestId bccpManifestId) {
@@ -1935,9 +2158,13 @@ public class CcCommandService {
 
         repositoryFactory.bccpCommandRepository(requester).revise(bccpManifestId);
         makeLog(requester, bccpManifestId, LogAction.Revised);
+        // Publish the revise (released -> WIP) so the GitHub project fieldOption sync moves the linked issue
+        // back into the in-progress fieldOption (issue #1533).
+        stateChangeEventPublisher.publish(
+                CcType.BCCP, bccpManifestId, prevBccp.state(), CcState.WIP, requester.userId());
     }
 
-    public void cancelBccp(ScoreUser requester, BccpManifestId bccpManifestId) {
+    public void cancelBccp(ScoreUser requester, BccpManifestId bccpManifestId, String comment, String projectFieldOptionOverride) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -1977,6 +2204,10 @@ public class CcCommandService {
         }
 
         repositoryFactory.bccpCommandRepository(requester).cancel(bccpManifestId);
+
+        CcState revertedTo = requester.isDeveloper() ? CcState.Published : CcState.Production;
+        stateChangeEventPublisher.publish(
+                CcType.BCCP, bccpManifestId, CcState.WIP, revertedTo, requester.userId(), comment, projectFieldOptionOverride);
     }
 
     public void reviseDt(ScoreUser requester, DtManifestId dtManifestId) {
@@ -2024,9 +2255,13 @@ public class CcCommandService {
 
         repositoryFactory.dtCommandRepository(requester).revise(dtManifestId);
         makeLog(requester, dtManifestId, LogAction.Revised);
+        // Publish the revise (released -> WIP) so the GitHub project fieldOption sync moves the linked issue
+        // back into the in-progress fieldOption (issue #1533).
+        stateChangeEventPublisher.publish(
+                CcType.DT, dtManifestId, prevDt.state(), CcState.WIP, requester.userId());
     }
 
-    public void cancelDt(ScoreUser requester, DtManifestId dtManifestId) {
+    public void cancelDt(ScoreUser requester, DtManifestId dtManifestId, String comment, String projectFieldOptionOverride) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -2066,6 +2301,10 @@ public class CcCommandService {
         }
 
         repositoryFactory.dtCommandRepository(requester).cancel(dtManifestId);
+
+        CcState revertedTo = requester.isDeveloper() ? CcState.Published : CcState.Production;
+        stateChangeEventPublisher.publish(
+                CcType.DT, dtManifestId, CcState.WIP, revertedTo, requester.userId(), comment, projectFieldOptionOverride);
     }
 
     public void transferOwnership(
@@ -2442,7 +2681,6 @@ public class CcCommandService {
         createAscc(requester, AsccCreateRequest.builder(eAcc.accManifestId(), ueAsccpManifestId)
                 .cardinalityMin(1)
                 .cardinalityMax(1)
-                .skipReusableCheck(true)
                 .build());
 
         return ueAccManifestId;
@@ -2465,8 +2703,7 @@ public class CcCommandService {
                 accManifestId,
                 targetAscc.toAsccpManifestId(),
                 -1,
-                targetAscc.cardinality(),
-                false), LogAction.Refactored, hash, false);
+                targetAscc.cardinality()), LogAction.Refactored, hash, false);
     }
 
     public BccManifestId refactorBcc(ScoreUser requester, BccManifestId bccManifestId, AccManifestId accManifestId) {

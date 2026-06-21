@@ -33,6 +33,7 @@ import org.oagi.score.gateway.http.api.info_management.model.SummaryCcExt;
 import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
 import org.oagi.score.gateway.http.api.log_management.model.LogId;
 import org.oagi.score.gateway.http.api.log_management.model.LogSummaryRecord;
+import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseSummaryRecord;
 import org.oagi.score.gateway.http.api.release_management.repository.ReleaseQueryRepository;
@@ -322,6 +323,9 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                         record.getValue("module_path", String.class),
 
                         (componentType != null) ? OagisComponentType.valueOf(componentType) : null,
+                        record.getValue("namespace_id", BigInteger.class) != null
+                                ? NamespaceId.from(record.getValue("namespace_id", BigInteger.class))
+                                : null,
                         CcState.valueOf(record.getValue("state", String.class)),
                         record.getValue("is_deprecated", Byte.class) == 1,
                         record.getValue("new_component", Byte.class) == 1,
@@ -428,6 +432,7 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                     ACC.DEFINITION_SOURCE,
                     ACC.OBJECT_CLASS_TERM.as("term"),
                     ACC.OAGIS_COMPONENT_TYPE.as("oagis_component_type"),
+                    ACC.NAMESPACE_ID.as("namespace_id"),
                     ACC.STATE,
                     ACC.IS_DEPRECATED,
                     ACC.CREATION_TIMESTAMP,
@@ -625,6 +630,7 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                     ASCC.DEFINITION_SOURCE,
                     val((String) null).as("term"),
                     val((String) null).as("oagis_component_type"),
+                    ACC.NAMESPACE_ID.as("namespace_id"),
                     ACC.STATE,
                     ASCC.IS_DEPRECATED,
                     ASCC.CREATION_TIMESTAMP,
@@ -755,6 +761,7 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                     BCC.DEFINITION_SOURCE,
                     val((String) null).as("term"),
                     val((String) null).as("oagis_component_type"),
+                    ACC.NAMESPACE_ID.as("namespace_id"),
                     ACC.STATE,
                     BCC.IS_DEPRECATED,
                     BCC.CREATION_TIMESTAMP,
@@ -883,6 +890,7 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                     ASCCP.DEFINITION_SOURCE,
                     ASCCP.PROPERTY_TERM.as("term"),
                     val((Integer) null).as("oagis_component_type"),
+                    ASCCP.NAMESPACE_ID.as("namespace_id"),
                     ASCCP.STATE,
                     ASCCP.IS_DEPRECATED,
                     ASCCP.CREATION_TIMESTAMP,
@@ -1034,6 +1042,7 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                     BCCP.DEFINITION_SOURCE,
                     BCCP.PROPERTY_TERM.as("term"),
                     val((Integer) null).as("oagis_component_type"),
+                    BCCP.NAMESPACE_ID.as("namespace_id"),
                     BCCP.STATE,
                     BCCP.IS_DEPRECATED,
                     BCCP.CREATION_TIMESTAMP,
@@ -1164,6 +1173,7 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                     DT.DEFINITION_SOURCE,
                     DT.DATA_TYPE_TERM.as("term"),
                     val((Integer) null).as("oagis_component_type"),
+                    DT.NAMESPACE_ID.as("namespace_id"),
                     DT.STATE,
                     DT.IS_DEPRECATED,
                     DT.CREATION_TIMESTAMP,

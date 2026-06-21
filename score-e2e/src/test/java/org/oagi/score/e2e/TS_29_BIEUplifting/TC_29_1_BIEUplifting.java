@@ -789,7 +789,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         upliftBIEPage.hitSearchButton();
         WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
-        click(td);
+        click(getDriver(), td);
         UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.next();
         editBIEPage = upliftBIEVerificationPage.uplift();
         editBIEPage.moveToQA();
@@ -804,7 +804,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         upliftBIEPage.hitSearchButton();
         tr = upliftBIEPage.getTableRecordAtIndex(1);
         td = upliftBIEPage.getColumnByName(tr, "select");
-        click(td);
+        click(getDriver(), td);
         upliftBIEVerificationPage = upliftBIEPage.next();
         selectProfileBIEToReuseDialog = upliftBIEVerificationPage.reuseBIEOnNode("/From UOM Package/Unit Packaging", "Unit Packaging");
         selectProfileBIEToReuseDialog.selectBIEToReuse(preconditionsTa2915dReusedChild.topLevelASBIEP);
@@ -823,7 +823,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         upliftBIEPage.hitSearchButton();
         tr = upliftBIEPage.getTableRecordAtIndex(1);
         td = upliftBIEPage.getColumnByName(tr, "select");
-        click(td);
+        click(getDriver(), td);
         upliftBIEVerificationPage = upliftBIEPage.next();
         selectProfileBIEToReuseDialog = upliftBIEVerificationPage.reuseBIEOnNode("/UOM Code Conversion Rate/From UOM Package", "From UOM Package");
         assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(), \"Unit Packaging\")]//ancestor::tr[1]/td[1]/mat-checkbox/label/span[1]")).size());
@@ -882,13 +882,91 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals("0", getText(asbiePanel.getCardinalityMinField()));
         assertEquals("1", getText(asbiePanel.getCardinalityMaxField()));
 
-        // reopened uplifted nodes should not expose reuse links in the tree
+        // Issue #1735: a reuse node selected during uplift must keep its reference to the
+        // reused BIE (it must not be inline-copied). On reopen the uplifted nodes therefore
+        // still expose their reuse links in the tree: 'From UOM Package' references the
+        // uplifted reused parent, and the nested 'Unit Packaging' references the uplifted
+        // reused child.
         viewEditBIEPage.openPage();
         editBIEPage = viewEditBIEPage.openEditBIEPage(upliftedReusedScenarioTopLevelASBIEP);
         editBIEPage.getNodeByPath("/UOM Code Conversion Rate/From UOM Package");
-        assertEquals(0, getDriver().findElements(By.xpath("//span[.=\"From UOM Package\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"From UOM Package\"]//ancestor::div[1]/fa-icon")).size());
         editBIEPage.getNodeByPath("/UOM Code Conversion Rate/From UOM Package/Unit Packaging");
-        assertEquals(0, getDriver().findElements(By.xpath("//span[.=\"Unit Packaging\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"Unit Packaging\"]//ancestor::div[1]/fa-icon")).size());
+        homePage.logout();
+    }
+
+    @Test
+    public void if_a_node_of_the_source_bie_is_a_reuse_node_left_unselected_warn_before_uplift() {
+        // Issue #1735 (Problem 2): leaving a mapped reuse node without selecting a
+        // BIE to reuse for the target release inline-copies the reuse fields and
+        // does NOT keep a reference to the reused BIE. Before creating the uplifted
+        // BIE the system must warn the user listing the unselected reuse node(s);
+        // if the user continues, the uplifted reuse node carries no reuse reference
+        // (contrast with if_a_node_of_the_source_bie_is_a_reuse_node_and_it_was,
+        // where selecting a reuse BIE keeps the reference / reuse icon).
+        String prev_release = "10.8.7.1";
+        String curr_release = "10.9";
+        AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(userb);
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+
+        Preconditions_TA_29_1_5d_BIEReusedChild preconditionsReusedChild =
+                preconditions_ta_29_1_5d_ReusedChild(userb, library, prev_release);
+        Preconditions_TA_29_1_5d_BIEReusedParent preconditionsReusedParent =
+                preconditions_ta_29_1_5d_ReusedParent(userb, library, prev_release);
+
+        // The parent BIE reuses the child on '/From UOM Package/Unit Packaging',
+        // then is published so the developer can uplift it.
+        HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(preconditionsReusedParent.topLevelASBIEP);
+        editBIEPage.getNodeByPath("/From UOM Package/Unit Packaging");
+        waitFor(ofMillis(1000L));
+        SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog =
+                editBIEPage.reuseBIEOnNode("/From UOM Package/Unit Packaging");
+        selectProfileBIEToReuseDialog.selectBIEToReuse(preconditionsReusedChild.topLevelASBIEP);
+        editBIEPage.moveToQA();
+        editBIEPage.moveToProduction();
+        homePage.logout();
+
+        // The developer uplifts the parent but leaves the 'Unit Packaging' reuse
+        // node unselected on the verification page.
+        homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        bieMenu = homePage.getBIEMenu();
+        UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
+        upliftBIEPage.showAdvancedSearchPanel();
+        upliftBIEPage.setSourceBranch(prev_release);
+        upliftBIEPage.setTargetBranch(curr_release);
+        upliftBIEPage.setDEN(preconditionsReusedParent.topLevelASBIEP.getDen());
+        upliftBIEPage.hitSearchButton();
+        WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
+        WebElement td = upliftBIEPage.getColumnByName(tr, "select");
+        // Use the driver-aware click so a lingering snackbar is waited out and the
+        // row-select checkbox is scrolled into view before clicking.
+        click(getDriver(), td);
+        UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.next();
+
+        // Submit the report without selecting a reuse BIE: the unselected-reuse
+        // warning must appear and list the '/From UOM Package/Unit Packaging' node.
+        upliftBIEVerificationPage.submitUpliftReport();
+        assertTrue(getText(upliftBIEVerificationPage.getUnselectedReuseWarning())
+                .contains("Proceed without selecting reuse BIEs"));
+        assertEquals(1, getDriver().findElements(By.xpath(
+                "//mat-dialog-container//li[contains(text(), \"Unit Packaging\")]")).size());
+
+        // Continue: the reuse fields are inline-copied with no reference kept, so
+        // the uplifted 'Unit Packaging' node exposes no reuse icon in the tree.
+        editBIEPage = upliftBIEVerificationPage.confirmUnselectedReuseAndUplift();
+        TopLevelASBIEPObject upliftedParentTopLevelASBIEP = editBIEPage.getTopLevelASBIEP();
+        viewEditBIEPage.openPage();
+        editBIEPage = viewEditBIEPage.openEditBIEPage(upliftedParentTopLevelASBIEP);
+        editBIEPage.getNodeByPath("/From UOM Package/Unit Packaging");
+        assertEquals(0, getDriver().findElements(By.xpath(
+                "//span[.=\"Unit Packaging\"]//ancestor::div[1]/fa-icon")).size());
         homePage.logout();
     }
 
@@ -1344,6 +1422,17 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("List Version Identifier"));
         escape(getDriver());
 
+        //BBIE to BBIE (DISALLOWED-primitive case): source Measure "Transport Temperature" was set to "float"
+        //(line ~1330). The target "Logical Identifier" is an Identifier BDT whose approved primitives do NOT
+        //include "float" in 10.9, so the uplift must DEFAULT it to the node default ("normalized string"),
+        //NOT carry "float" over. This exercises the "defaults disallowed values" half of the contract (#29.1.9.c).
+        sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Get BOM/Data Area/BOM/BOM Option/Extension/Transport Temperature");
+        clickOn(sourceNode);
+        targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Get BOM/Application Area/Sender/Logical Identifier");
+        clickOn(targetNode);
+        click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Logical Identifier"));
+        escape(getDriver());
+
         //BBIE_SC to BBIE_SC
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Get BOM/Data Area/BOM/BOM Option/Extension/Transport Temperature/Unit Code");
         clickOn(sourceNode);
@@ -1388,11 +1477,23 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         editBIEPage.openPage();
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Application Area/Sender/Logical Identifier", 3);
+        waitFor(ofMillis(1000L));
+        // DISALLOWED-primitive default case: "Transport Temperature" (float) was mapped onto this Identifier
+        // node, where "float" is NOT an approved primitive in 10.9, so the uplift must default it to the node's
+        // default primitive ("normalized string") rather than carry "float". Guards the allowed-primitive gate
+        // in BieUpliftingService.setValueDomain (#29.1.9.c). Before that fix this carried "float" (unselectable).
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
         editBIEPage.expandTree("Logical Identifier");
         bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Application Area/Sender/Logical Identifier/Scheme Version Identifier");
         waitFor(ofMillis(1000L));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
-        assertEquals("normalized string", getText(bbiescPanel.getValueDomainField()));
+        // Source node "Transport Temperature/Unit Code" was set to "string" (line ~1338) and manually
+        // mapped here. For the target's BDT (Identifier, dt_sc "Scheme Version Identifier") in release
+        // 10.9, "string" IS an allowed primitive (dt_sc_awd_pri; default is "token", not "normalized
+        // string"), so per #29.1.9.b the uplift transfers the allowed source value verbatim => "string".
+        // The prior expectation "normalized string" was a copy-paste from the unrelated node at line ~1353.
+        assertEquals("string", getText(bbiescPanel.getValueDomainField()));
         homePage.logout();
     }
 

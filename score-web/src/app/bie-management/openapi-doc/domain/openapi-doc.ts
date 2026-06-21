@@ -92,6 +92,52 @@ export class OasDocListRequest {
   }
 }
 
+// Issue #1729: one entry of an OAuth Flow Object's scopes map (name -> description).
+export class OasOAuthScope {
+  oasOAuthScopeId?: number;
+  guid?: string;
+  scopeName: string;
+  description?: string;
+}
+
+// Issue #1729: one OAuth Flow Object for an oauth2 scheme (a scheme may declare several flows).
+export class OasOAuthFlow {
+  oasOAuthFlowId?: number;
+  guid?: string;
+  flowType: string;             // implicit | password | clientCredentials | authorizationCode | deviceAuthorization
+  authorizationUrl?: string;    // required for implicit & authorizationCode
+  tokenUrl?: string;            // required for password, clientCredentials, authorizationCode, deviceAuthorization
+  refreshUrl?: string;          // optional
+  deviceAuthorizationUrl?: string; // required for deviceAuthorization (OpenAPI 3.2+)
+  scopes?: OasOAuthScope[];
+}
+
+// Issue #1729: one named OpenAPI Security Scheme. A document can configure several (the OpenAPI
+// components.securitySchemes is a map). An empty list keeps the legacy default OAuth2 scheme.
+export class OasSecurityScheme {
+  oasSecuritySchemeId?: number;
+  guid?: string;
+  schemeName?: string;       // the components.securitySchemes map key (unique within the document)
+  type: string;              // 'apiKey' | 'http' | 'oauth2' | 'openIdConnect'
+  description?: string;
+  apiKeyName?: string;       // required when type === 'apiKey'
+  apiKeyIn?: string;         // 'header' | 'query' | 'cookie'
+  httpScheme?: string;       // 'bearer' | 'basic'
+  bearerFormat?: string;     // optional, only for httpScheme === 'bearer'
+  openIdConnectUrl?: string; // required when type === 'openIdConnect'
+  flows?: OasOAuthFlow[];    // the OAuth Flows Object, when type === 'oauth2'
+}
+
+export class OasSecurityRequirementScheme {
+  schemeName: string;
+  scopes?: string[];
+}
+
+export class OasSecurityRequirement {
+  anonymous?: boolean;
+  schemes?: OasSecurityRequirementScheme[];
+}
+
 export class OasDoc {
   oasDocId: number;
   guid: string;
@@ -108,6 +154,9 @@ export class OasDoc {
   contactEmail: string;
   licenseName: string;
   licenseUrl: string;
+  // Issue #1729: the document's Security Schemes (empty = default OAuth2).
+  securitySchemes: OasSecurityScheme[];
+  securityRequirements: OasSecurityRequirement[];
   access: string;
   ownerUserId: string;
   lastUpdateTimestamp: Date;
@@ -284,6 +333,7 @@ export class BieForOasDoc {
   status: string;
   state: string;
   businessContext: string;
+  httpStatusCode: number;
   lastUpdateTimestamp: Date;
   createdBy: ScoreUser;
   lastUpdatedBy: ScoreUser;
@@ -295,6 +345,8 @@ export class BieForOasDoc {
   private _arrayIndicator: boolean;
   private _suppressRootIndicator: boolean;
   private _messageBody: string;
+  private _securityOverridden: boolean;
+  private _securityRequirements: OasSecurityRequirement[];
   private $hashCode: number;
   listeners: ChangeListener<BieForOasDoc>[] = [];
 
@@ -315,10 +367,13 @@ export class BieForOasDoc {
     this.status = obj && obj.status || '';
     this.state = obj && obj.state || '';
     this.businessContext = obj && obj.businessContext || '';
+    this.httpStatusCode = obj && obj.httpStatusCode || undefined;
     this.verb = obj && obj.verb || '';
     this.arrayIndicator = obj && obj.arrayIndicator || false;
     this.suppressRootIndicator = obj && obj.suppressRootIndicator || false;
     this.messageBody = obj && obj.messageBody || '';
+    this.securityOverridden = obj && obj.securityOverridden || false;
+    this.securityRequirements = obj && obj.securityRequirements || [];
     this.resourceName = obj && obj.resourceName || '';
     this.operationId = obj && obj.operationId || '';
     this.tagName = obj && obj.tagName || '';
@@ -342,7 +397,10 @@ export class BieForOasDoc {
       arrayIndicator: this.arrayIndicator,
       suppressRootIndicator: this.suppressRootIndicator,
       messageBody: this.messageBody,
-      tagName: this.tagName
+      tagName: this.tagName,
+      httpStatusCode: this.httpStatusCode,
+      securityOverridden: this.securityOverridden,
+      securityRequirements: this.securityRequirements
     };
   }
 
@@ -404,10 +462,27 @@ export class BieForOasDoc {
     this._messageBody = messageBody;
   }
 
+  get securityOverridden(): boolean {
+    return this._securityOverridden;
+  }
+
+  set securityOverridden(securityOverridden: boolean) {
+    this._securityOverridden = securityOverridden;
+  }
+
+  get securityRequirements(): OasSecurityRequirement[] {
+    return this._securityRequirements;
+  }
+
+  set securityRequirements(securityRequirements: OasSecurityRequirement[]) {
+    this._securityRequirements = securityRequirements || [];
+  }
+
   get hashCode(): number {
     return hashCode4Array([this.oasDocId, this.topLevelAsbiepId, this.oasResourceId, this.oasOperationId,
       this.verb, this.messageBody, this.resourceName, this.operationId, this.tagName,
-      this.arrayIndicator, this.suppressRootIndicator]);
+      this.arrayIndicator, this.suppressRootIndicator, this.securityOverridden,
+      JSON.stringify(this.securityRequirements || [])]);
   }
 
   reset(): void {
@@ -430,6 +505,88 @@ export class AssignBieForOasDoc {
   suppressRootIndicator: boolean;
   messageBody: string;
   tagName: string;
+  // Issue #1732: the frontend owns operationId and sends it on Add; the backend just stores it.
+  operationId: string;
+}
+
+// ---------------------------------------------------------------------------
+// operationId naming (issue #1732)
+//
+// operationId follows '<verb><BIEName>[List]' with NO business-context prefix. The frontend is the
+// single source of truth: it builds the operationId on Add and on verb change, and the backend
+// stores whatever is sent (same pattern as the issue #1730 add-operation flow).
+// ---------------------------------------------------------------------------
+
+const OPERATION_ID_VERB_WORDS: { [verb: string]: string } = {
+  GET: 'query', POST: 'create', PUT: 'replace', PATCH: 'update', DELETE: 'delete',
+  OPTIONS: 'options', HEAD: 'head', TRACE: 'trace'
+};
+// Verb words that may already lead an operationId (incl. the legacy 'get'/'update' words).
+const KNOWN_OPERATION_ID_VERB_WORDS =
+  ['query', 'create', 'replace', 'update', 'delete', 'options', 'head', 'trace', 'get'];
+
+export function operationIdVerbWord(verb: string): string {
+  return OPERATION_ID_VERB_WORDS[verb] || '';
+}
+
+// Builds the operationId from a bare BIE name (e.g. the property term).
+export function buildOperationId(verb: string, bieName: string, isArray: boolean): string {
+  const word = operationIdVerbWord(verb);
+  if (!word) {
+    return '';
+  }
+  const name = capitalizeFirst((bieName || '').replace(/\s/g, ''));
+  return word + name + (isArray ? 'List' : '');
+}
+
+// Recomputes the operationId after a verb/array change, swapping only the leading verb word so a
+// manually edited name survives. Tolerates the legacy '<businessContext>_<verb><BIEName>' format.
+export function recomputeOperationId(verb: string, oldOperationId: string, isArray: boolean): string {
+  if (!operationIdVerbWord(verb)) {
+    return oldOperationId;
+  }
+  return buildOperationId(verb, extractBieName(oldOperationId), isArray);
+}
+
+// Recovers the BIE-name segment from an existing operationId so the verb word can be replaced.
+export function extractBieName(operationId: string): string {
+  let name = (operationId || '').trim();
+  // Drop a legacy '<businessContext>_' prefix if present (the new format has no underscore).
+  const underscore = name.lastIndexOf('_');
+  if (underscore >= 0) {
+    name = name.substring(underscore + 1);
+  }
+  // Strip a leading verb word so it can be replaced.
+  for (const word of KNOWN_OPERATION_ID_VERB_WORDS) {
+    const next = name.charAt(word.length);
+    if (name.length > word.length && name.startsWith(word)
+        && next !== next.toLowerCase() && next === next.toUpperCase()) {
+      name = name.substring(word.length);
+      break;
+    }
+  }
+  // Strip a trailing 'List' marker; it gets re-applied from the array indicator.
+  if (name.endsWith('List')) {
+    name = name.substring(0, name.length - 'List'.length);
+  }
+  return name;
+}
+
+function capitalizeFirst(value: string): string {
+  return value ? value.charAt(0).toUpperCase() + value.slice(1) : value;
+}
+
+// Issue #1730: payload to add an API operation (endpoint) that does NOT reference a BIE.
+export class AddOperationForOasDoc {
+  oasDocId: number;
+  verb: string;
+  resourceName: string;
+  operationId: string;
+  tagName: string;
+  messageBody: string;        // 'Request' | 'Response'
+  httpStatusCode: number;     // only applies when messageBody === 'Response'
+  summary: string;
+  description: string;
 }
 
 export class BieForOasDocUpdateRequest {

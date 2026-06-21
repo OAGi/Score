@@ -40,3 +40,11 @@ class TagServiceResult:
     text_color: str | None = None
     created: WhoAndWhen
     last_updated: WhoAndWhen
+
+
+@dataclass(kw_only=True)
+class TagSummaryServiceRecord:
+    """Compact tag summary used in nested component detail payloads."""
+
+    tag_id: TagId
+    name: str

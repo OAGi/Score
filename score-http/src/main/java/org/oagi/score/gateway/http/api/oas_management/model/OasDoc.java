@@ -6,6 +6,7 @@ import org.oagi.score.gateway.http.common.model.base.Auditable;
 
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.List;
 
 public class OasDoc extends Auditable {
     private BigInteger oasDocId;
@@ -20,6 +21,13 @@ public class OasDoc extends Auditable {
     private String contactEmail;
     private String licenseName;
     private String licenseUrl;
+    // Issue #1729: configurable Security Schemes (components.securitySchemes) for the generated OpenAPI
+    // document. Empty/null = the legacy default OAuth2 scheme.
+    private List<OasSecurityScheme> securitySchemes;
+    // Issue #1729: the document root-level `security` (a list of Security Requirement Objects, OR'd).
+    // Empty/null with explicit schemes => no root-level `security` is emitted.
+    // Ignored entirely when securitySchemes is empty (legacy default).
+    private List<OasSecurityRequirement> securityRequirements;
     private UserId ownerUserId;
     private Date lastUpdateTimestamp;
     private Date creationTimestamp;
@@ -123,6 +131,22 @@ public class OasDoc extends Auditable {
 
     public void setLicenseUrl(String licenseUrl) {
         this.licenseUrl = licenseUrl;
+    }
+
+    public List<OasSecurityScheme> getSecuritySchemes() {
+        return securitySchemes;
+    }
+
+    public void setSecuritySchemes(List<OasSecurityScheme> securitySchemes) {
+        this.securitySchemes = securitySchemes;
+    }
+
+    public List<OasSecurityRequirement> getSecurityRequirements() {
+        return securityRequirements;
+    }
+
+    public void setSecurityRequirements(List<OasSecurityRequirement> securityRequirements) {
+        this.securityRequirements = securityRequirements;
     }
 
     @Override

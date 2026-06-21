@@ -80,65 +80,145 @@ async def get_agency_id_list_service(
         "type": "object",
         "description": "Response containing paginated list of agency ID lists",
         "properties": {
-            "total_items": {"type": "integer", "description": "Total number of agency ID lists available. Allowed values: non-negative integers (≥0).", "example": 25},
-            "offset": {"type": "integer", "description": "Offset of the first item in this page. Allowed values: non-negative integers (≥0). Default value: 0.", "example": 0},
-            "limit": {"type": "integer", "description": "Number of items returned in this page. Allowed values: integers between 1 and 100 (inclusive). Default value: 10.", "example": 10},
+            "total_items": {
+                "type": "integer",
+                "description": "Total number of agency ID lists available. Allowed values: non-negative integers (≥0).",
+                "example": 25,
+            },
+            "offset": {
+                "type": "integer",
+                "description": "Offset of the first item in this page. Allowed values: non-negative integers (≥0). Default value: 0.",
+                "example": 0,
+            },
+            "limit": {
+                "type": "integer",
+                "description": "Number of items returned in this page. Allowed values: integers between 1 and 100 (inclusive). Default value: 10.",
+                "example": 10,
+            },
             "items": {
                 "type": "array",
                 "description": "List of agency ID lists on this page",
                 "items": {
                     "type": "object",
                     "properties": {
-                        "agency_id_list_manifest_id": {"type": "integer", "description": "Unique identifier for the agency ID list manifest", "example": 12345},
-                        "agency_id_list_id": {"type": "integer", "description": "Unique identifier for the agency ID list", "example": 6789},
-                        "guid": {"type": "string", "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)", "example": "a1b2c3d4e5f6789012345678901234ab"},
-                        "enum_type_guid": {"type": ["string", "null"], "description": "Enum type GUID for the agency ID list", "example": "a1b2c3d4e5f6789012345678901234ab"},
-                        "name": {"type": "string", "description": "Name of the agency ID list", "example": "Country Code"},
+                        "agency_id_list_manifest_id": {
+                            "type": "integer",
+                            "description": "Unique identifier for the agency ID list manifest",
+                            "example": 12345,
+                        },
+                        "agency_id_list_id": {
+                            "type": "integer",
+                            "description": "Unique identifier for the agency ID list",
+                            "example": 6789,
+                        },
+                        "guid": {
+                            "type": "string",
+                            "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)",
+                            "example": "a1b2c3d4e5f6789012345678901234ab",
+                        },
+                        "enum_type_guid": {
+                            "type": ["string", "null"],
+                            "description": "Enum type GUID for the agency ID list",
+                            "example": "a1b2c3d4e5f6789012345678901234ab",
+                        },
+                        "name": {
+                            "type": "string",
+                            "description": "Name of the agency ID list",
+                            "example": "Country Code",
+                        },
                         "list_id": {"type": "string", "description": "List identifier", "example": "ISO3166-1"},
                         "version_id": {"type": "string", "description": "Version identifier", "example": "1.0"},
-                        "definition": {"type": ["string", "null"], "description": "Definition of the agency ID list", "example": "Standard country codes"},
-                        "remark": {"type": ["string", "null"], "description": "Remarks about the agency ID list", "example": "Based on ISO 3166-1"},
-                        "definition_source": {"type": ["string", "null"], "description": "URL indicating the source of the definition", "example": "https://www.iso.org/iso-3166-country-codes.html"},
-                        "is_deprecated": {"type": "boolean", "description": "Whether the agency ID list is deprecated", "example": False},
-                        "state": {"type": ["string", "null"], "description": "Current state of the agency ID list", "example": "Published"},
+                        "definition": {
+                            "type": ["string", "null"],
+                            "description": "Definition of the agency ID list",
+                            "example": "Standard country codes",
+                        },
+                        "remark": {
+                            "type": ["string", "null"],
+                            "description": "Remarks about the agency ID list",
+                            "example": "Based on ISO 3166-1",
+                        },
+                        "definition_source": {
+                            "type": ["string", "null"],
+                            "description": "URL indicating the source of the definition",
+                            "example": "https://www.iso.org/iso-3166-country-codes.html",
+                        },
+                        "is_deprecated": {
+                            "type": "boolean",
+                            "description": "Whether the agency ID list is deprecated",
+                            "example": False,
+                        },
+                        "state": {
+                            "type": ["string", "null"],
+                            "description": "Current state of the agency ID list",
+                            "example": "Published",
+                        },
                         "namespace": {
                             "type": ["object", "null"],
                             "description": "Namespace information",
                             "properties": {
-                                "namespace_id": {"type": "integer", "description": "Unique identifier for the namespace", "example": 1},
-                                "uri": {"type": "string", "description": "Namespace URI (Uniform Resource Identifier)", "example": "http://www.openapplications.org/oagis/10"},
-                                "prefix": {"type": ["string", "null"], "description": "Namespace prefix", "example": "oagis"}
+                                "namespace_id": {
+                                    "type": "integer",
+                                    "description": "Unique identifier for the namespace",
+                                    "example": 1,
+                                },
+                                "uri": {
+                                    "type": "string",
+                                    "description": "Namespace URI (Uniform Resource Identifier)",
+                                    "example": "http://www.openapplications.org/oagis/10",
+                                },
+                                "prefix": {
+                                    "type": ["string", "null"],
+                                    "description": "Namespace prefix",
+                                    "example": "oagis",
+                                },
                             },
-                            "required": ["namespace_id", "uri"]
+                            "required": ["namespace_id", "uri"],
                         },
                         "library": {
                             "type": "object",
                             "description": "Library information",
                             "properties": {
-                                "library_id": {"type": "integer", "description": "Unique identifier for the library", "example": 1},
-                                "name": {"type": "string", "description": "Library name", "example": "connectSpec"}
+                                "library_id": {
+                                    "type": "integer",
+                                    "description": "Unique identifier for the library",
+                                    "example": 1,
+                                },
+                                "name": {"type": "string", "description": "Library name", "example": "connectSpec"},
                             },
-                            "required": ["library_id", "name"]
+                            "required": ["library_id", "name"],
                         },
                         "release": {
                             "type": "object",
                             "description": "Release information",
                             "properties": {
-                                "release_id": {"type": "integer", "description": "Unique identifier for the release", "example": 1},
+                                "release_id": {
+                                    "type": "integer",
+                                    "description": "Unique identifier for the release",
+                                    "example": 1,
+                                },
                                 "release_num": {"type": "string", "description": "Release number", "example": "10.6"},
-                                "state": {"type": "string", "description": "Release state", "example": "Published"}
+                                "state": {"type": "string", "description": "Release state", "example": "Published"},
                             },
-                            "required": ["release_id", "release_num", "state"]
+                            "required": ["release_id", "release_num", "state"],
                         },
                         "log": {
                             "type": ["object", "null"],
                             "description": "Log information",
                             "properties": {
-                                "log_id": {"type": "integer", "description": "Unique identifier for the log", "example": 1},
+                                "log_id": {
+                                    "type": "integer",
+                                    "description": "Unique identifier for the log",
+                                    "example": 1,
+                                },
                                 "revision_num": {"type": "integer", "description": "Revision number", "example": 1},
-                                "revision_tracking_num": {"type": "integer", "description": "Revision tracking number", "example": 1}
+                                "revision_tracking_num": {
+                                    "type": "integer",
+                                    "description": "Revision tracking number",
+                                    "example": 1,
+                                },
                             },
-                            "required": ["log_id", "revision_num", "revision_tracking_num"]
+                            "required": ["log_id", "revision_num", "revision_tracking_num"],
                         },
                         "values": {
                             "type": "array",
@@ -146,29 +226,88 @@ async def get_agency_id_list_service(
                             "items": {
                                 "type": "object",
                                 "properties": {
-                                    "agency_id_list_value_manifest_id": {"type": "integer", "description": "Unique identifier for the agency ID list value manifest", "example": 12345},
-                                    "agency_id_list_value_id": {"type": "integer", "description": "Unique identifier for the agency ID list value", "example": 6789},
-                                    "guid": {"type": "string", "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)", "example": "a1b2c3d4e5f6789012345678901234ab"},
-                                    "value": {"type": "string", "description": "Value of the agency ID list", "example": "US"},
-                                    "name": {"type": ["string", "null"], "description": "Name of the agency ID list value", "example": "United States"},
-                                    "definition": {"type": ["string", "null"], "description": "Definition of the agency ID list value", "example": "United States of America"},
-                                    "is_deprecated": {"type": "boolean", "description": "Whether the agency ID list value is deprecated", "example": False},
-                                    "is_developer_default": {"type": "boolean", "description": "Whether this is the developer default value", "example": False},
-                                    "is_user_default": {"type": "boolean", "description": "Whether this is the user default value", "example": False}
+                                    "agency_id_list_value_manifest_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the agency ID list value manifest",
+                                        "example": 12345,
+                                    },
+                                    "agency_id_list_value_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the agency ID list value",
+                                        "example": 6789,
+                                    },
+                                    "guid": {
+                                        "type": "string",
+                                        "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)",
+                                        "example": "a1b2c3d4e5f6789012345678901234ab",
+                                    },
+                                    "value": {
+                                        "type": "string",
+                                        "description": "Value of the agency ID list",
+                                        "example": "US",
+                                    },
+                                    "name": {
+                                        "type": ["string", "null"],
+                                        "description": "Name of the agency ID list value",
+                                        "example": "United States",
+                                    },
+                                    "definition": {
+                                        "type": ["string", "null"],
+                                        "description": "Definition of the agency ID list value",
+                                        "example": "United States of America",
+                                    },
+                                    "is_deprecated": {
+                                        "type": "boolean",
+                                        "description": "Whether the agency ID list value is deprecated",
+                                        "example": False,
+                                    },
+                                    "is_developer_default": {
+                                        "type": "boolean",
+                                        "description": "Whether this is the developer default value",
+                                        "example": False,
+                                    },
+                                    "is_user_default": {
+                                        "type": "boolean",
+                                        "description": "Whether this is the user default value",
+                                        "example": False,
+                                    },
                                 },
-                                "required": ["agency_id_list_value_manifest_id", "agency_id_list_value_id", "guid", "value", "is_deprecated"]
-                            }
+                                "required": [
+                                    "agency_id_list_value_manifest_id",
+                                    "agency_id_list_value_id",
+                                    "guid",
+                                    "value",
+                                    "is_deprecated",
+                                ],
+                            },
                         },
                         "owner": {
                             "type": "object",
                             "description": "Owner information",
                             "properties": {
-                                "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                                "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                                "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                                "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                                "user_id": {
+                                    "type": "integer",
+                                    "description": "Unique identifier for the user",
+                                    "example": 1,
+                                },
+                                "login_id": {
+                                    "type": "string",
+                                    "description": "User's login identifier",
+                                    "example": "admin",
+                                },
+                                "username": {
+                                    "type": "string",
+                                    "description": "Display name of the user",
+                                    "example": "Administrator",
+                                },
+                                "roles": {
+                                    "type": "array",
+                                    "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                    "description": "List of roles assigned to the user",
+                                    "example": ["Admin"],
+                                },
                             },
-                            "required": ["user_id", "login_id", "username", "roles"]
+                            "required": ["user_id", "login_id", "username", "roles"],
                         },
                         "created": {
                             "type": "object",
@@ -178,16 +317,38 @@ async def get_agency_id_list_service(
                                     "type": "object",
                                     "description": "User who created the agency ID list",
                                     "properties": {
-                                        "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                                        "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                                        "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                                        "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                                        "user_id": {
+                                            "type": "integer",
+                                            "description": "Unique identifier for the user",
+                                            "example": 1,
+                                        },
+                                        "login_id": {
+                                            "type": "string",
+                                            "description": "User's login identifier",
+                                            "example": "admin",
+                                        },
+                                        "username": {
+                                            "type": "string",
+                                            "description": "Display name of the user",
+                                            "example": "Administrator",
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                            "description": "List of roles assigned to the user",
+                                            "example": ["Admin"],
+                                        },
                                     },
-                                    "required": ["user_id", "login_id", "username", "roles"]
+                                    "required": ["user_id", "login_id", "username", "roles"],
                                 },
-                                "when": {"type": "string", "format": "date-time", "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-15T10:30:00Z"}
+                                "when": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                                    "example": "2024-01-15T10:30:00Z",
+                                },
                             },
-                            "required": ["who", "when"]
+                            "required": ["who", "when"],
                         },
                         "last_updated": {
                             "type": "object",
@@ -197,35 +358,97 @@ async def get_agency_id_list_service(
                                     "type": "object",
                                     "description": "User who last updated the agency ID list",
                                     "properties": {
-                                        "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                                        "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                                        "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                                        "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                                        "user_id": {
+                                            "type": "integer",
+                                            "description": "Unique identifier for the user",
+                                            "example": 1,
+                                        },
+                                        "login_id": {
+                                            "type": "string",
+                                            "description": "User's login identifier",
+                                            "example": "admin",
+                                        },
+                                        "username": {
+                                            "type": "string",
+                                            "description": "Display name of the user",
+                                            "example": "Administrator",
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                            "description": "List of roles assigned to the user",
+                                            "example": ["Admin"],
+                                        },
                                     },
-                                    "required": ["user_id", "login_id", "username", "roles"]
+                                    "required": ["user_id", "login_id", "username", "roles"],
                                 },
-                                "when": {"type": "string", "format": "date-time", "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-15T10:30:00Z"}
+                                "when": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                                    "example": "2024-01-15T10:30:00Z",
+                                },
                             },
-                            "required": ["who", "when"]
-                        }
+                            "required": ["who", "when"],
+                        },
                     },
-                    "required": ["agency_id_list_manifest_id", "agency_id_list_id", "guid", "name", "list_id", "version_id", "is_deprecated", "library", "release", "owner", "created", "last_updated"]
-                }
-            }
+                    "required": [
+                        "agency_id_list_manifest_id",
+                        "agency_id_list_id",
+                        "guid",
+                        "name",
+                        "list_id",
+                        "version_id",
+                        "is_deprecated",
+                        "library",
+                        "release",
+                        "owner",
+                        "created",
+                        "last_updated",
+                    ],
+                },
+            },
         },
-        "required": ["total_items", "offset", "limit", "items"]
-    }
+        "required": ["total_items", "offset", "limit", "items"],
+    },
 )
 async def get_agency_id_lists(
     release_id: Annotated[int, Field(gt=0, description="Filter by release ID using exact match.")],
-    name: Annotated[str | None, Field(default=None, description="Filter by agency ID list name using partial match (case-insensitive).")],
-    list_id: Annotated[str | None, Field(default=None, description="Filter by list ID using partial match (case-insensitive).")],
-    version_id: Annotated[str | None, Field(default=None, description="Filter by version ID using partial match (case-insensitive).")],
-    created_on: Annotated[str | None, Field(default=None, description="Filter by creation date using an inclusive range: '[before~after]'.")],
-    last_updated_on: Annotated[str | None, Field(default=None, description="Filter by last update date using an inclusive range: '[before~after]'.")],
-    order_by: Annotated[str | None, Field(default=None, description="Comma-separated list of properties to order results by. Allowed columns: name, list_id, version_id, definition, creation_timestamp, last_update_timestamp.")],
-    offset: Annotated[int, Field(default=0, ge=0, description="The offset from the beginning of the list.")],
-    limit: Annotated[int, Field(default=10, ge=1, le=100, description="The maximum number of items to return.")],
+    name: Annotated[
+        str | None, Field(description="Filter by agency ID list name using partial match (case-insensitive).")
+    ] = None,
+    list_id: Annotated[
+        str | None, Field(description="Filter by list ID using partial match (case-insensitive).")
+    ] = None,
+    version_id: Annotated[
+        str | None, Field(description="Filter by version ID using partial match (case-insensitive).")
+    ] = None,
+    owner: Annotated[
+        str | None,
+        Field(
+            description="Comma-separated owner login IDs to filter by exact match. Prefix a login ID with '!' to exclude it."
+        ),
+    ] = None,
+    updater: Annotated[
+        str | None,
+        Field(
+            description="Comma-separated updater login IDs to filter by exact match. Prefix a login ID with '!' to exclude it."
+        ),
+    ] = None,
+    created_on: Annotated[
+        str | None, Field(description="Filter by creation date using an inclusive range: '[before~after]'.")
+    ] = None,
+    last_updated_on: Annotated[
+        str | None, Field(description="Filter by last update date using an inclusive range: '[before~after]'.")
+    ] = None,
+    order_by: Annotated[
+        str | None,
+        Field(
+            description="Comma-separated list of properties to order results by. Allowed columns: name, list_id, version_id, definition, creation_timestamp, last_update_timestamp."
+        ),
+    ] = None,
+    offset: Annotated[int, Field(ge=0, description="The offset from the beginning of the list.")] = 0,
+    limit: Annotated[int, Field(ge=1, le=100, description="The maximum number of items to return.")] = 10,
     agency_id_list_service: AgencyIdListService = Depends(get_agency_id_list_service),
 ) -> GetAgencyIdListPaginationResponse:
     """
@@ -241,6 +464,8 @@ async def get_agency_id_lists(
         name (str | None, optional): Filter by agency ID list name using partial match (case-insensitive). Defaults to None.
         list_id (str | None, optional): Filter by list ID using partial match (case-insensitive). Defaults to None.
         version_id (str | None, optional): Filter by version ID using partial match (case-insensitive). Defaults to None.
+        owner (str | None, optional): Comma-separated owner login IDs using exact match.
+            Prefix a login ID with '!' to exclude it. Login IDs cannot contain '!' or ','. Defaults to None.
         created_on (str | None, optional): Filter by creation date using an inclusive range: '[before~after]'.
             'before' and 'after' are date-time strings. Default date format: YYYY-MM-DD.
             Examples: '[2025-01-01~2025-02-01]'. Either 'before' or 'after' can be omitted,
@@ -316,6 +541,8 @@ async def get_agency_id_lists(
             name=name,
             list_id=list_id,
             version_id=version_id,
+            owner=owner,
+            updater=updater,
             created_on=parse_date_range(created_on),
             last_updated_on=parse_date_range(last_updated_on),
         )
@@ -331,36 +558,80 @@ async def get_agency_id_lists(
         "type": "object",
         "description": "Response containing agency ID list information",
         "properties": {
-            "agency_id_list_manifest_id": {"type": "integer", "description": "Unique identifier for the agency ID list manifest", "example": 12345},
-            "agency_id_list_id": {"type": "integer", "description": "Unique identifier for the agency ID list", "example": 6789},
-            "guid": {"type": "string", "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)", "example": "a1b2c3d4e5f6789012345678901234ab"},
-            "enum_type_guid": {"type": ["string", "null"], "description": "Enum type GUID for the agency ID list", "example": "a1b2c3d4e5f6789012345678901234ab"},
+            "agency_id_list_manifest_id": {
+                "type": "integer",
+                "description": "Unique identifier for the agency ID list manifest",
+                "example": 12345,
+            },
+            "agency_id_list_id": {
+                "type": "integer",
+                "description": "Unique identifier for the agency ID list",
+                "example": 6789,
+            },
+            "guid": {
+                "type": "string",
+                "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)",
+                "example": "a1b2c3d4e5f6789012345678901234ab",
+            },
+            "enum_type_guid": {
+                "type": ["string", "null"],
+                "description": "Enum type GUID for the agency ID list",
+                "example": "a1b2c3d4e5f6789012345678901234ab",
+            },
             "name": {"type": "string", "description": "Name of the agency ID list", "example": "Country Code"},
             "list_id": {"type": "string", "description": "List identifier", "example": "ISO3166-1"},
             "version_id": {"type": "string", "description": "Version identifier", "example": "1.0"},
-            "definition": {"type": ["string", "null"], "description": "Definition of the agency ID list", "example": "Standard country codes"},
-            "remark": {"type": ["string", "null"], "description": "Remarks about the agency ID list", "example": "Based on ISO 3166-1"},
-            "definition_source": {"type": ["string", "null"], "description": "URL indicating the source of the definition", "example": "https://www.iso.org/iso-3166-country-codes.html"},
-            "is_deprecated": {"type": "boolean", "description": "Whether the agency ID list is deprecated", "example": False},
-            "state": {"type": ["string", "null"], "description": "Current state of the agency ID list", "example": "Published"},
+            "definition": {
+                "type": ["string", "null"],
+                "description": "Definition of the agency ID list",
+                "example": "Standard country codes",
+            },
+            "remark": {
+                "type": ["string", "null"],
+                "description": "Remarks about the agency ID list",
+                "example": "Based on ISO 3166-1",
+            },
+            "definition_source": {
+                "type": ["string", "null"],
+                "description": "URL indicating the source of the definition",
+                "example": "https://www.iso.org/iso-3166-country-codes.html",
+            },
+            "is_deprecated": {
+                "type": "boolean",
+                "description": "Whether the agency ID list is deprecated",
+                "example": False,
+            },
+            "state": {
+                "type": ["string", "null"],
+                "description": "Current state of the agency ID list",
+                "example": "Published",
+            },
             "namespace": {
                 "type": ["object", "null"],
                 "description": "Namespace information",
                 "properties": {
-                    "namespace_id": {"type": "integer", "description": "Unique identifier for the namespace", "example": 1},
-                    "uri": {"type": "string", "description": "Namespace URI (Uniform Resource Identifier)", "example": "http://www.openapplications.org/oagis/10"},
-                    "prefix": {"type": ["string", "null"], "description": "Namespace prefix", "example": "oagis"}
+                    "namespace_id": {
+                        "type": "integer",
+                        "description": "Unique identifier for the namespace",
+                        "example": 1,
+                    },
+                    "uri": {
+                        "type": "string",
+                        "description": "Namespace URI (Uniform Resource Identifier)",
+                        "example": "http://www.openapplications.org/oagis/10",
+                    },
+                    "prefix": {"type": ["string", "null"], "description": "Namespace prefix", "example": "oagis"},
                 },
-                "required": ["namespace_id", "uri"]
+                "required": ["namespace_id", "uri"],
             },
             "library": {
                 "type": "object",
                 "description": "Library information",
                 "properties": {
                     "library_id": {"type": "integer", "description": "Unique identifier for the library", "example": 1},
-                    "name": {"type": "string", "description": "Library name", "example": "connectSpec"}
+                    "name": {"type": "string", "description": "Library name", "example": "connectSpec"},
                 },
-                "required": ["library_id", "name"]
+                "required": ["library_id", "name"],
             },
             "release": {
                 "type": "object",
@@ -368,9 +639,9 @@ async def get_agency_id_lists(
                 "properties": {
                     "release_id": {"type": "integer", "description": "Unique identifier for the release", "example": 1},
                     "release_num": {"type": "string", "description": "Release number", "example": "10.6"},
-                    "state": {"type": "string", "description": "Release state", "example": "Published"}
+                    "state": {"type": "string", "description": "Release state", "example": "Published"},
                 },
-                "required": ["release_id", "release_num", "state"]
+                "required": ["release_id", "release_num", "state"],
             },
             "log": {
                 "type": ["object", "null"],
@@ -378,9 +649,13 @@ async def get_agency_id_lists(
                 "properties": {
                     "log_id": {"type": "integer", "description": "Unique identifier for the log", "example": 1},
                     "revision_num": {"type": "integer", "description": "Revision number", "example": 1},
-                    "revision_tracking_num": {"type": "integer", "description": "Revision tracking number", "example": 1}
+                    "revision_tracking_num": {
+                        "type": "integer",
+                        "description": "Revision tracking number",
+                        "example": 1,
+                    },
                 },
-                "required": ["log_id", "revision_num", "revision_tracking_num"]
+                "required": ["log_id", "revision_num", "revision_tracking_num"],
             },
             "values": {
                 "type": "array",
@@ -388,18 +663,56 @@ async def get_agency_id_lists(
                 "items": {
                     "type": "object",
                     "properties": {
-                        "agency_id_list_value_manifest_id": {"type": "integer", "description": "Unique identifier for the agency ID list value manifest", "example": 12345},
-                        "agency_id_list_value_id": {"type": "integer", "description": "Unique identifier for the agency ID list value", "example": 6789},
-                        "guid": {"type": "string", "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)", "example": "a1b2c3d4e5f6789012345678901234ab"},
+                        "agency_id_list_value_manifest_id": {
+                            "type": "integer",
+                            "description": "Unique identifier for the agency ID list value manifest",
+                            "example": 12345,
+                        },
+                        "agency_id_list_value_id": {
+                            "type": "integer",
+                            "description": "Unique identifier for the agency ID list value",
+                            "example": 6789,
+                        },
+                        "guid": {
+                            "type": "string",
+                            "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)",
+                            "example": "a1b2c3d4e5f6789012345678901234ab",
+                        },
                         "value": {"type": "string", "description": "Value of the agency ID list", "example": "US"},
-                        "name": {"type": ["string", "null"], "description": "Name of the agency ID list value", "example": "United States"},
-                        "definition": {"type": ["string", "null"], "description": "Definition of the agency ID list value", "example": "United States of America"},
-                        "is_deprecated": {"type": "boolean", "description": "Whether the agency ID list value is deprecated", "example": False},
-                        "is_developer_default": {"type": "boolean", "description": "Whether this is the developer default value", "example": False},
-                        "is_user_default": {"type": "boolean", "description": "Whether this is the user default value", "example": False}
+                        "name": {
+                            "type": ["string", "null"],
+                            "description": "Name of the agency ID list value",
+                            "example": "United States",
+                        },
+                        "definition": {
+                            "type": ["string", "null"],
+                            "description": "Definition of the agency ID list value",
+                            "example": "United States of America",
+                        },
+                        "is_deprecated": {
+                            "type": "boolean",
+                            "description": "Whether the agency ID list value is deprecated",
+                            "example": False,
+                        },
+                        "is_developer_default": {
+                            "type": "boolean",
+                            "description": "Whether this is the developer default value",
+                            "example": False,
+                        },
+                        "is_user_default": {
+                            "type": "boolean",
+                            "description": "Whether this is the user default value",
+                            "example": False,
+                        },
                     },
-                    "required": ["agency_id_list_value_manifest_id", "agency_id_list_value_id", "guid", "value", "is_deprecated"]
-                }
+                    "required": [
+                        "agency_id_list_value_manifest_id",
+                        "agency_id_list_value_id",
+                        "guid",
+                        "value",
+                        "is_deprecated",
+                    ],
+                },
             },
             "owner": {
                 "type": "object",
@@ -407,10 +720,19 @@ async def get_agency_id_lists(
                 "properties": {
                     "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
                     "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                    "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                    "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                    "username": {
+                        "type": "string",
+                        "description": "Display name of the user",
+                        "example": "Administrator",
+                    },
+                    "roles": {
+                        "type": "array",
+                        "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                        "description": "List of roles assigned to the user",
+                        "example": ["Admin"],
+                    },
                 },
-                "required": ["user_id", "login_id", "username", "roles"]
+                "required": ["user_id", "login_id", "username", "roles"],
             },
             "created": {
                 "type": "object",
@@ -420,16 +742,38 @@ async def get_agency_id_lists(
                         "type": "object",
                         "description": "User who created the agency ID list",
                         "properties": {
-                            "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                            "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                            "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                            "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                            "user_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the user",
+                                "example": 1,
+                            },
+                            "login_id": {
+                                "type": "string",
+                                "description": "User's login identifier",
+                                "example": "admin",
+                            },
+                            "username": {
+                                "type": "string",
+                                "description": "Display name of the user",
+                                "example": "Administrator",
+                            },
+                            "roles": {
+                                "type": "array",
+                                "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                "description": "List of roles assigned to the user",
+                                "example": ["Admin"],
+                            },
                         },
-                        "required": ["user_id", "login_id", "username", "roles"]
+                        "required": ["user_id", "login_id", "username", "roles"],
                     },
-                    "when": {"type": "string", "format": "date-time", "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-15T10:30:00Z"}
+                    "when": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                        "example": "2024-01-15T10:30:00Z",
+                    },
                 },
-                "required": ["who", "when"]
+                "required": ["who", "when"],
             },
             "last_updated": {
                 "type": "object",
@@ -439,23 +783,59 @@ async def get_agency_id_lists(
                         "type": "object",
                         "description": "User who last updated the agency ID list",
                         "properties": {
-                            "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                            "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                            "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                            "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                            "user_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the user",
+                                "example": 1,
+                            },
+                            "login_id": {
+                                "type": "string",
+                                "description": "User's login identifier",
+                                "example": "admin",
+                            },
+                            "username": {
+                                "type": "string",
+                                "description": "Display name of the user",
+                                "example": "Administrator",
+                            },
+                            "roles": {
+                                "type": "array",
+                                "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                "description": "List of roles assigned to the user",
+                                "example": ["Admin"],
+                            },
                         },
-                        "required": ["user_id", "login_id", "username", "roles"]
+                        "required": ["user_id", "login_id", "username", "roles"],
                     },
-                    "when": {"type": "string", "format": "date-time", "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-15T10:30:00Z"}
+                    "when": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                        "example": "2024-01-15T10:30:00Z",
+                    },
                 },
-                "required": ["who", "when"]
-            }
+                "required": ["who", "when"],
+            },
         },
-        "required": ["agency_id_list_manifest_id", "agency_id_list_id", "guid", "name", "list_id", "version_id", "library", "release", "owner", "created", "last_updated"]
-    }
+        "required": [
+            "agency_id_list_manifest_id",
+            "agency_id_list_id",
+            "guid",
+            "name",
+            "list_id",
+            "version_id",
+            "library",
+            "release",
+            "owner",
+            "created",
+            "last_updated",
+        ],
+    },
 )
 async def get_agency_id_list(
-    agency_id_list_manifest_id: Annotated[int, Field(gt=0, description="Unique numeric identifier of the agency ID list manifest to retrieve.")],
+    agency_id_list_manifest_id: Annotated[
+        int, Field(gt=0, description="Unique numeric identifier of the agency ID list manifest to retrieve.")
+    ],
     agency_id_list_service: AgencyIdListService = Depends(get_agency_id_list_service),
 ) -> GetAgencyIdListResponse:
     """

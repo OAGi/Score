@@ -10,3 +10,138 @@
 .highlight {
   background: #42A948;
 }
+
+/* Issue #1729: make the Description fill the height of the two info rows on its left so its underline
+   lines up with the Contact Email field, leaving the Security Scheme row aligned with Terms of Service.
+   The right column stretches to the left column's height (flex row), the Description grows to fill the
+   space above the (single-row) Security Scheme block. */
+.oas-right-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.oas-description-field {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.oas-description-field ::ng-deep .mat-mdc-text-field-wrapper {
+  flex: 1 1 auto;
+}
+
+.oas-description-field ::ng-deep .mat-mdc-form-field-flex {
+  height: 100%;
+}
+
+.oas-description-field ::ng-deep .mat-mdc-form-field-infix {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.oas-description-field ::ng-deep textarea.mat-mdc-input-element {
+  flex: 1 1 auto;
+  height: 100% !important;
+  resize: none;
+  box-sizing: border-box;
+}
+
+/* Issue #1729: small clickable cards for each configured Security Scheme. */
+.oas-scheme-card {
+  width: 240px;
+  padding: 10px 12px !important;
+  cursor: pointer;
+}
+
+.oas-scheme-card:hover {
+  background: #f5f5f5;
+}
+
+.oas-scheme-card-name {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.oas-scheme-card-type {
+  font-size: 12px;
+  color: #1976d2;
+}
+
+.oas-scheme-card-summary {
+  font-size: 11px;
+  color: #767676;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.oas-security-summary {
+  color: #555;
+  display: inline-block;
+  font-size: 12px;
+  max-width: 520px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Document-level (root) security button: shows the current summary in its label, ellipsized. */
+.oas-doc-security-label {
+  display: inline-block;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* Keep the Security column at ~Message-Body width; a long override summary wraps inside it (down),
+   instead of widening the column or collapsing it to a sliver. */
+.mat-column-security {
+  min-width: 120px;
+}
+
+/* Per-operation Security cell: status text, click to edit (no heavy button). A long override summary
+   WRAPS within the column (like the DEN column) rather than widening it. */
+.oas-security-cell {
+  position: relative;
+  display: block;
+  max-width: 100%;
+  /* reserve space on the right for the edit icon so wrapped text never hides/overlaps it */
+  padding: 2px 22px 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.oas-security-cell:hover {
+  background: #f5f5f5;
+}
+
+.oas-security-text {
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+/* Pinned to the cell's top-right so it stays visible regardless of how many lines the summary wraps to. */
+.oas-security-edit {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: #767676;
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+
+.oas-security-cell:hover .oas-security-edit {
+  opacity: 1;
+}
+
+.oas-security-na {
+  color: #bdbdbd;
+}

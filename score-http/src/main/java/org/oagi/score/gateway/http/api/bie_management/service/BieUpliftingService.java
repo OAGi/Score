@@ -220,12 +220,13 @@ public class BieUpliftingService {
         }
 
         @Override
-        public void visitAbie(Abie abie, BieVisitContext context) {
+        public BieVisitResult visitAbie(Abie abie, BieVisitContext context) {
             CcDocument sourceCcDocument = context.getBieDocument().getCcDocument();
-            // reused bie case;
+            // Defensive: no ABIE to descend into (getAbie returned null). Poll the
+            // matching target ACC to keep the queue balanced, then continue.
             if (abie == null) {
                 targetAccQueue.poll();
-                return;
+                return BieVisitResult.CONTINUE;
             }
             AccSummaryRecord sourceAcc = sourceCcDocument.getAcc(abie.getBasedAccManifestId());
             List<Association> sourceAssociations =
@@ -238,10 +239,11 @@ public class BieUpliftingService {
                         getAssociationsRegardingBases(currentTargetPath, targetCcDocument, targetAcc);
                 abieTargetAssociationsMap.put(abie.getAbieId(), targetAssociations);
             }
+            return BieVisitResult.CONTINUE;
         }
 
         @Override
-        public void visitAsbie(Asbie asbie, BieVisitContext context) {
+        public BieVisitResult visitAsbie(Asbie asbie, BieVisitContext context) {
             CcDocument sourceCcDocument = context.getBieDocument().getCcDocument();
             AsccSummaryRecord sourceAscc = sourceCcDocument.getAscc(asbie.getBasedAsccManifestId());
             List<Association> sourceAssociations =
@@ -284,10 +286,12 @@ public class BieUpliftingService {
                         ((AsccSummaryRecord) targetAssociation.getCcAssociation()).toAsccpManifestId());
                 targetAsccpQueue.offer(toAsccp);
             }
+
+            return BieVisitResult.CONTINUE;
         }
 
         @Override
-        public void visitBbie(Bbie bbie, BieVisitContext context) {
+        public BieVisitResult visitBbie(Bbie bbie, BieVisitContext context) {
             CcDocument sourceCcDocument = context.getBieDocument().getCcDocument();
             BccSummaryRecord sourceBcc = sourceCcDocument.getBcc(bbie.getBasedBccManifestId());
             List<Association> sourceAssociations =
@@ -331,15 +335,17 @@ public class BieUpliftingService {
                 this.previousBbie = bbie;
                 targetBccpQueue.offer(toBccp);
             }
+            return BieVisitResult.CONTINUE;
         }
 
         @Override
-        public void visitAsbiep(Asbiep asbiep, BieVisitContext context) {
+        public BieVisitResult visitAsbiep(Asbiep asbiep, BieVisitContext context) {
             CcDocument sourceCcDocument = context.getBieDocument().getCcDocument();
-            // reused bie case;
+            // Defensive: no ASBIEP to descend into (getAsbiep returned null). Poll the
+            // matching target ASCCP to keep the queue balanced, then continue.
             if (asbiep == null) {
                 targetAsccpQueue.poll();
-                return;
+                return BieVisitResult.CONTINUE;
             }
             AsccpSummaryRecord sourceAsccp = sourceCcDocument.getAsccp(asbiep.getBasedAsccpManifestId());
 
@@ -355,10 +361,11 @@ public class BieUpliftingService {
                         currentTargetPath + ">" + "ASCCP-" + targetAsccp.asccpManifestId() :
                         "ASCCP-" + targetAsccp.asccpManifestId();
             }
+            return BieVisitResult.CONTINUE;
         }
 
         @Override
-        public void visitBbiep(Bbiep bbiep, BieVisitContext context) {
+        public BieVisitResult visitBbiep(Bbiep bbiep, BieVisitContext context) {
             CcDocument sourceCcDocument = context.getBieDocument().getCcDocument();
             BccpSummaryRecord sourceBccp = sourceCcDocument.getBccp(bbiep.getBasedBccpManifestId());
             DtSummaryRecord sourceDt = sourceCcDocument.getDt(sourceBccp.dtManifestId());
@@ -374,10 +381,11 @@ public class BieUpliftingService {
                 currentTargetPath = currentTargetPath + ">" + "BCCP-" + targetBccp.bccpManifestId() + ">" +
                         "DT-" + targetDt.dtManifestId();
             }
+            return BieVisitResult.CONTINUE;
         }
 
         @Override
-        public void visitBbieSc(BbieSc bbieSc, BieVisitContext context) {
+        public BieVisitResult visitBbieSc(BbieSc bbieSc, BieVisitContext context) {
             CcDocument sourceCcDocument = context.getBieDocument().getCcDocument();
             DtScSummaryRecord sourceDtSc = sourceCcDocument.getDtSc(bbieSc.getBasedDtScManifestId());
 
@@ -407,6 +415,7 @@ public class BieUpliftingService {
                             targetDtSc, targetPath);
                 });
             }
+            return BieVisitResult.CONTINUE;
         }
     }
 
@@ -896,11 +905,13 @@ public class BieUpliftingService {
         }
 
         @Override
-        public void visitAbie(Abie abie, BieVisitContext context) {
+        public BieVisitResult visitAbie(Abie abie, BieVisitContext context) {
             CcDocument sourceCcDocument = context.getBieDocument().getCcDocument();
+            // Defensive: no ABIE to descend into (getAbie returned null). Poll the
+            // matching target ACC to keep the queue balanced, then continue.
             if (abie == null) {
                 targetAccQueue.poll();
-                return;
+                return BieVisitResult.CONTINUE;
             }
             AccSummaryRecord sourceAcc = sourceCcDocument.getAcc(abie.getBasedAccManifestId());
             List<Association> sourceAssociations =
@@ -926,10 +937,11 @@ public class BieUpliftingService {
                 this.roleOfAbieToAsbiepMap.get(abie.getAbieId()).setRoleOfAbie(targetAbie);
                 this.abieIdToAbieMap.put(abie.getAbieId(), targetAbie);
             }
+            return BieVisitResult.CONTINUE;
         }
 
         @Override
-        public void visitAsbie(Asbie asbie, BieVisitContext context) {
+        public BieVisitResult visitAsbie(Asbie asbie, BieVisitContext context) {
             CcDocument sourceCcDocument = context.getBieDocument().getCcDocument();
             AsccSummaryRecord sourceAsccManifest = sourceCcDocument.getAscc(asbie.getBasedAsccManifestId());
             List<Association> sourceAssociations =
@@ -964,9 +976,21 @@ public class BieUpliftingService {
             }
 
             if (targetAscc != null) {
-                AsccpSummaryRecord toAsccp = targetCcDocument.getAsccp(
-                        targetAscc.toAsccpManifestId());
-                targetAsccpQueue.offer(toAsccp);
+                // Issue #1735: when the ASBIE is uplifted as a reuse reference
+                // (the user mapped it to another top-level BIE via the reuse '!'),
+                // create the reference ASBIE but do NOT descend into its subtree.
+                // The subtree lives in the referenced BIE; re-traversing it both
+                // corrupts the source-id-keyed maps (duplicate visits -> orphaned
+                // BBIE with null from_abie_id) and overwrites the reference with a
+                // private copy. Skipping the queue offer keeps the target-path queues
+                // balanced, since the matching visitAsbiep poll will not run.
+                boolean reuseReference =
+                        (targetAsccMapping != null && targetAsccMapping.getRefTopLevelAsbiepId() != null);
+                if (!reuseReference) {
+                    AsccpSummaryRecord toAsccp = targetCcDocument.getAsccp(
+                            targetAscc.toAsccpManifestId());
+                    targetAsccpQueue.offer(toAsccp);
+                }
 
                 Asbie targetAsbie = new Asbie();
                 targetAsbie.setGuid(ScoreGuidUtils.randomGuid());
@@ -1002,11 +1026,16 @@ public class BieUpliftingService {
                     newWrappedAsbieList.add(upliftingAsbie);
                     this.toAsbiepToAsbieMap.put(asbie.getToAsbiepId(), newWrappedAsbieList);
                 }
+
+                // Skip descent into the reuse target's subtree; descend otherwise.
+                return reuseReference ? BieVisitResult.SKIP_SUBTREE : BieVisitResult.CONTINUE;
             }
+
+            return BieVisitResult.CONTINUE;
         }
 
         @Override
-        public void visitBbie(Bbie bbie, BieVisitContext context) {
+        public BieVisitResult visitBbie(Bbie bbie, BieVisitContext context) {
             CcDocument sourceCcDocument = context.getBieDocument().getCcDocument();
             BccSummaryRecord sourceBcc = sourceCcDocument.getBcc(bbie.getBasedBccManifestId());
             List<Association> sourceAssociations =
@@ -1083,14 +1112,17 @@ public class BieUpliftingService {
                 this.toBbiepToBbieMap.put(bbie.getToBbiepId(), upliftingBbie);
                 this.bbieMap.put(bbie.getBbieId(), targetBbie);
             }
+            return BieVisitResult.CONTINUE;
         }
 
         @Override
-        public void visitAsbiep(Asbiep asbiep, BieVisitContext context) {
+        public BieVisitResult visitAsbiep(Asbiep asbiep, BieVisitContext context) {
             CcDocument sourceCcDocument = context.getBieDocument().getCcDocument();
+            // Defensive: no ASBIEP to descend into (getAsbiep returned null). Poll the
+            // matching target ASCCP to keep the queue balanced, then continue.
             if (asbiep == null) {
                 targetAsccpQueue.poll();
-                return;
+                return BieVisitResult.CONTINUE;
             }
             AsccpSummaryRecord sourceAsccp = sourceCcDocument.getAsccp(
                     asbiep.getBasedAsccpManifestId());
@@ -1129,10 +1161,11 @@ public class BieUpliftingService {
                 this.asbiepMap.put(asbiep.getAsbiepId(), upliftingAsbiep);
                 this.roleOfAbieToAsbiepMap.put(asbiep.getRoleOfAbieId(), upliftingAsbiep);
             }
+            return BieVisitResult.CONTINUE;
         }
 
         @Override
-        public void visitBbiep(Bbiep bbiep, BieVisitContext context) {
+        public BieVisitResult visitBbiep(Bbiep bbiep, BieVisitContext context) {
             CcDocument sourceCcDocument = context.getBieDocument().getCcDocument();
             BccpSummaryRecord sourceBccp = sourceCcDocument.getBccp(bbiep.getBasedBccpManifestId());
             currentSourcePath = currentSourcePath + ">" + "BCCP-" + sourceBccp.bccpManifestId();
@@ -1158,10 +1191,11 @@ public class BieUpliftingService {
 
                 this.toBbiepToBbieMap.get(bbiep.getBbiepId()).setToBbiep(targetBbiep);
             }
+            return BieVisitResult.CONTINUE;
         }
 
         @Override
-        public void visitBbieSc(BbieSc bbieSc, BieVisitContext context) {
+        public BieVisitResult visitBbieSc(BbieSc bbieSc, BieVisitContext context) {
             CcDocument sourceCcDocument = context.getBieDocument().getCcDocument();
             DtScSummaryRecord sourceDtSc = sourceCcDocument.getDtSc(bbieSc.getBasedDtScManifestId());
             DtSummaryRecord sourceDt = sourceCcDocument.getDt(sourceDtSc.ownerDtManifestId());
@@ -1228,6 +1262,7 @@ public class BieUpliftingService {
 
                 this.bbieScList.add(upliftingBbieSc);
             }
+            return BieVisitResult.CONTINUE;
         }
 
         private Bbie setValueDomain(Bbie sourceBbie,
@@ -1243,7 +1278,12 @@ public class BieUpliftingService {
             if (sourceBbie.getXbtManifestId() != null) {
                 XbtSummaryRecord sourceXbt = sourceXbtList.stream().filter(e -> e.xbtManifestId().equals(sourceBbie.getXbtManifestId())).findAny().orElse(null);
                 XbtSummaryRecord targetXbt = getTargetXbtManifest(sourceXbt, targetXbtList);
-                if (targetXbt != null) {
+                // Only carry the source primitive if it is ALLOWED on the target node (its DT approved-primitive
+                // list); otherwise leave it null so the default-primitive block below assigns the target node's
+                // default. See the BBIE_SC branch for rationale (#29.1.9.c "default disallowed values").
+                if (targetXbt != null &&
+                        targetCcDocument.getDtAwdPriList(targetDt.dtManifestId()).stream()
+                                .anyMatch(e -> targetXbt.xbtManifestId().equals(e.xbtManifestId()))) {
                     targetBbie.setXbtManifestId(targetXbt.xbtManifestId());
                 }
             } else if (sourceBbie.getCodeListManifestId() != null) {
@@ -1304,7 +1344,14 @@ public class BieUpliftingService {
             if (sourceBbieSc.getXbtManifestId() != null) {
                 XbtSummaryRecord sourceXbt = sourceXbtList.stream().filter(e -> e.xbtManifestId().equals(sourceBbieSc.getXbtManifestId())).findAny().orElse(null);
                 XbtSummaryRecord targetXbt = getTargetXbtManifest(sourceXbt, targetXbtList);
-                if (targetXbt != null) {
+                // Only carry the source primitive if it is ALLOWED on the target node (its DT_SC approved-primitive
+                // list). If it is not allowed (or absent in the target release), leave it null so the default-primitive
+                // block below assigns the target node's default. Implements #29.1.9.c "default disallowed values":
+                // getTargetXbtManifest only checks the primitive exists somewhere in the release, not that it is
+                // allowed on this specific node, so without this gate a disallowed primitive would be carried verbatim.
+                if (targetXbt != null &&
+                        targetCcDocument.getDtScAwdPriList(targetDtSc.dtScManifestId()).stream()
+                                .anyMatch(e -> targetXbt.xbtManifestId().equals(e.xbtManifestId()))) {
                     targetBbieSc.setXbtManifestId(targetXbt.xbtManifestId());
                 }
             } else if (sourceBbieSc.getCodeListManifestId() != null) {
@@ -1409,7 +1456,7 @@ public class BieUpliftingService {
 
         Map<DtScAwdPriId, DtScAwdPriSummaryRecord> sourceDtScAwdPriMap = dtQuery.getDtScAwdPriSummaryList(sourceReleaseId).stream()
                 .collect(Collectors.toMap(DtScAwdPriSummaryRecord::dtScAwdPriId, Function.identity()));
-        Map<DtScId, List<DtScAwdPriSummaryRecord>> targetDtScAwdPriByDtScIdMap = dtQuery.getDtScAwdPriSummaryList(sourceReleaseId).stream()
+        Map<DtScId, List<DtScAwdPriSummaryRecord>> targetDtScAwdPriByDtScIdMap = dtQuery.getDtScAwdPriSummaryList(targetReleaseId).stream()
                 .collect(groupingBy(DtScAwdPriSummaryRecord::dtScId));
 
         BieUpliftingHandler upliftingHandler =
@@ -1467,7 +1514,7 @@ public class BieUpliftingService {
 
         Map<DtScAwdPriId, DtScAwdPriSummaryRecord> sourceDtScAwdPriMap = dtQuery.getDtScAwdPriSummaryList(sourceReleaseId).stream()
                 .collect(Collectors.toMap(DtScAwdPriSummaryRecord::dtScAwdPriId, Function.identity()));
-        Map<DtScId, List<DtScAwdPriSummaryRecord>> targetDtScAwdPriByDtScIdMap = dtQuery.getDtScAwdPriSummaryList(sourceReleaseId).stream()
+        Map<DtScId, List<DtScAwdPriSummaryRecord>> targetDtScAwdPriByDtScIdMap = dtQuery.getDtScAwdPriSummaryList(targetReleaseId).stream()
                 .collect(groupingBy(DtScAwdPriSummaryRecord::dtScId));
 
         request.getMappingList().forEach(mapping -> {

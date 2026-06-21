@@ -40,6 +40,7 @@ export class BiePackageDetails {
   versionId: string;
   versionName: string;
   description: string;
+  revisionReason: string;
   releases: ReleaseSummary[];
   state: string;
   access: string;
@@ -88,6 +89,7 @@ export class BiePackageMetadata {
   versionId: string;
   versionName: string;
   priorPackageVersionId: string;
+  revisionReason: string;
   newBiesFromPriorPackageVersion: boolean;
   removedBiesFromPriorPackageVersion: boolean;
   changedBiesFromPriorPackageVersion: boolean;

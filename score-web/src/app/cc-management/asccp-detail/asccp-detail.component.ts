@@ -1,7 +1,7 @@
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import { Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
-import {finalize, switchMap} from 'rxjs/operators';
+import {catchError, finalize, switchMap, take} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {NamespaceSummary} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
@@ -10,6 +10,17 @@ import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {AsccpFlatNode, CcFlatNode, CcFlatNodeDatabase, CcFlatNodeDataSource, CcFlatNodeDataSourceSearcher} from '../domain/cc-flat-tree';
 import {CcNodeService} from '../domain/core-component-node.service';
+import {GithubIntegrationService, GithubStatus} from '../domain/github-integration.service';
+import {
+  StateChangeDialogComponent,
+  StateChangeDialogResult,
+  usesStateChangeDialog
+} from '../state-change-dialog/state-change-dialog.component';
+import {
+  CANCEL_REVISION_TO_STATE,
+  cancelRevisionContent,
+  cancelRevisionHeader
+} from '../state-change-dialog/cancel-revision-dialog';
 import {
   AsccpDetails,
   CcAccNodeInfo,
@@ -26,7 +37,7 @@ import {
 import {CreateAsccpDialogComponent} from '../cc-list/create-asccp-dialog/create-asccp-dialog.component';
 import {AuthService} from '../../authentication/auth.service';
 import {CommentControl} from '../domain/comment-component';
-import {forkJoin, ReplaySubject} from 'rxjs';
+import {forkJoin, of, ReplaySubject} from 'rxjs';
 import {Location} from '@angular/common';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {SearchOptionsService} from '../search-options-dialog/domain/search-options-service';
@@ -55,6 +66,7 @@ import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 })
 export class AsccpDetailComponent implements OnInit {
   private service = inject(CcNodeService);
+  protected githubService = inject(GithubIntegrationService);
   private searchOptionsService = inject(SearchOptionsService);
   private releaseService = inject(ReleaseService);
   private snackBar = inject(MatSnackBar);
@@ -712,33 +724,67 @@ export class AsccpDetailComponent implements OnInit {
       return;
     }
 
-    const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = 'Update state to \'' + state + '\'?';
-    dialogConfig.data.content = ['Are you sure you want to update the state to \'' + state + '\'?'];
-    dialogConfig.data.action = 'Update';
+    const header = 'Update state to \'' + state + '\'?';
+    const content = ['Are you sure you want to update the state to \'' + state + '\'?'];
+    const action = 'Update';
 
-    this.confirmDialogService.open(dialogConfig).afterClosed()
-      .subscribe(result => {
-        if (!result) {
-          return;
-        }
+    // When the GitHub integration is enabled and the transition is Draft -> Candidate or
+    // Candidate -> WIP, a dedicated dialog shows the linked GitHub issues (and pre-fills
+    // the GitHub status post for the user to edit); otherwise the generic confirm dialog runs unchanged
+    // (issue #1533).
+    this.githubService.getStatus()
+      .pipe(take(1), catchError(() => of({enabled: false, connected: false} as GithubStatus)))
+      .subscribe(status => {
+        if (status.enabled && usesStateChangeDialog(this.rootNode.state, state)) {
+          const target = {
+            ccType: 'asccp',
+            manifestId: this.rootNode.manifestId,
+            name: this.rootNode.name,
+            state: this.rootNode.state
+          };
+          this.dialog.open(StateChangeDialogComponent, {
+            data: {header, content, actionLabel: action, toState: state, targets: [target]},
+            autoFocus: false
+          }).afterClosed().subscribe((result: StateChangeDialogResult | undefined) => {
+            if (!result || !result.confirmed) {
+              return;
+            }
+            this._doUpdateState(state, result.comments[target.ccType + ':' + target.manifestId], result.fieldOptionOverrides[target.ccType + ':' + target.manifestId]);
+          });
+        } else {
+          const dialogConfig = this.confirmDialogService.newConfig();
+          dialogConfig.data.header = header;
+          dialogConfig.data.content = content;
+          dialogConfig.data.action = action;
 
-        this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state).subscribe({
-          next: () => {
-            this.snackBar.open('Updated', '', {duration: 3000});
+          this.confirmDialogService.open(dialogConfig).afterClosed()
+            .subscribe(result => {
+              if (!result) {
+                return;
+              }
 
-            this.service.getAsccpDetails(this.manifestId).subscribe({
-              next: asccpDetails => this.afterStateChanged(asccpDetails.state, asccpDetails.access),
-              error: err => console.error(err),
-              complete: () => (this.isUpdating = false),
+              this._doUpdateState(state);
             });
-          },
-          error: err => {
-            this.isUpdating = false;
-            throw err;
-          },
-        });
+        }
       });
+  }
+
+  private _doUpdateState(state: string, comment?: string, projectFieldOptionOverride?: string) {
+    this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state, comment, projectFieldOptionOverride).subscribe({
+      next: () => {
+        this.snackBar.open('Updated', '', {duration: 3000});
+
+        this.service.getAsccpDetails(this.manifestId).subscribe({
+          next: asccpDetails => this.afterStateChanged(asccpDetails.state, asccpDetails.access),
+          error: err => console.error(err),
+          complete: () => (this.isUpdating = false),
+        });
+      },
+      error: err => {
+        this.isUpdating = false;
+        throw err;
+      },
+    });
   }
 
   updateState(state: string) {
@@ -1065,24 +1111,56 @@ export class AsccpDetailComponent implements OnInit {
 
   cancelRevision(): void {
     const isDeveloper = this.userRoles.includes('developer');
-    const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = (isDeveloper) ? 'Cancel this revision?' : 'Cancel this amendment?';
-    dialogConfig.data.content = [(isDeveloper) ? 'Are you sure you want to cancel this revision?' : 'Are you sure you want to cancel this amendment?'];
-    dialogConfig.data.action = 'Okay';
+    const header = cancelRevisionHeader(isDeveloper);
+    const content = cancelRevisionContent(isDeveloper);
 
-    this.confirmDialogService.open(dialogConfig).afterClosed()
-      .subscribe(result => {
-        if (!result) {
-          return;
-        }
-
-        this.isUpdating = true;
-        this.service.cancelRevision(this.rootNode.type, this.rootNode.manifestId)
-          .subscribe(resp => {
-            this.reload('Canceled');
-          }, err => {
-            this.isUpdating = false;
+    // When the GitHub integration is enabled, cancel goes through the dedicated dialog that shows the
+    // linked GitHub issues and pre-fills the status post to publish on cancel (issue #1533); otherwise
+    // the generic confirm dialog runs. The data-loss warning travels in `content` on BOTH paths, so it
+    // is shown regardless of GitHub status.
+    this.githubService.getStatus()
+      .pipe(take(1), catchError(() => of({enabled: false, connected: false} as GithubStatus)))
+      .subscribe(status => {
+        if (status.enabled) {
+          const target = {
+            ccType: 'asccp',
+            manifestId: this.rootNode.manifestId,
+            name: this.rootNode.name,
+            state: this.rootNode.state
+          };
+          this.dialog.open(StateChangeDialogComponent, {
+            data: {header, content, actionLabel: 'Okay', toState: CANCEL_REVISION_TO_STATE, targets: [target]},
+            autoFocus: false
+          }).afterClosed().subscribe((result: StateChangeDialogResult | undefined) => {
+            if (!result || !result.confirmed) {
+              return;
+            }
+            this._doCancelRevision(result.comments[target.ccType + ':' + target.manifestId], result.fieldOptionOverrides[target.ccType + ':' + target.manifestId]);
           });
+        } else {
+          const dialogConfig = this.confirmDialogService.newConfig();
+          dialogConfig.data.header = header;
+          dialogConfig.data.content = content;
+          dialogConfig.data.action = 'Okay';
+
+          this.confirmDialogService.open(dialogConfig).afterClosed()
+            .subscribe(result => {
+              if (!result) {
+                return;
+              }
+              this._doCancelRevision();
+            });
+        }
+      });
+  }
+
+  private _doCancelRevision(comment?: string, projectFieldOptionOverride?: string): void {
+    this.isUpdating = true;
+    this.service.cancelRevision(this.rootNode.type, this.rootNode.manifestId, comment, projectFieldOptionOverride)
+      .subscribe(resp => {
+        this.reload('Canceled');
+      }, err => {
+        this.isUpdating = false;
       });
   }
 

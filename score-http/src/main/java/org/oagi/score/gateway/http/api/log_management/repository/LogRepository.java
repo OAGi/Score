@@ -16,6 +16,7 @@ import org.oagi.score.gateway.http.api.log_management.controller.payload.LogList
 import org.oagi.score.gateway.http.api.log_management.model.Log;
 import org.oagi.score.gateway.http.api.log_management.model.LogAction;
 import org.oagi.score.gateway.http.api.log_management.model.LogId;
+import org.oagi.score.gateway.http.api.log_management.model.LogSnapshotEntry;
 import org.oagi.score.gateway.http.api.log_management.service.LogSerializer;
 import org.oagi.score.gateway.http.common.model.*;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
@@ -119,6 +120,23 @@ public class LogRepository {
                         .where(LOG.LOG_ID.eq(ULong.valueOf(logId)))
                         .fetchOptionalInto(String.class).orElse(null)
         ).toString();
+    }
+
+    /** The LOG row's identity (reference + revision) and raw snapshot, for diffing two revisions (issue #1533). */
+    public LogSnapshotEntry getSnapshotEntryById(ScoreUser requester, BigInteger logId) {
+        if (logId == null || logId.longValue() <= 0L) {
+            return null;
+        }
+
+        return dslContext.select(LOG.LOG_ID, LOG.REFERENCE, LOG.REVISION_NUM, LOG.REVISION_TRACKING_NUM, LOG.SNAPSHOT)
+                .from(LOG)
+                .where(LOG.LOG_ID.eq(ULong.valueOf(logId)))
+                .fetchOne(record -> new LogSnapshotEntry(
+                        record.get(LOG.LOG_ID).toBigInteger(),
+                        record.get(LOG.REFERENCE),
+                        record.get(LOG.REVISION_NUM).intValue(),
+                        record.get(LOG.REVISION_TRACKING_NUM).intValue(),
+                        record.get(LOG.SNAPSHOT)));
     }
 
     private static Field<String> jsonExtract(Field<?> field, String jsonPath) {

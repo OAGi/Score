@@ -530,7 +530,7 @@ public class TC_5_3_OAGISDevelopersAuthorizedManagementOfBusinessContexts extend
 
             WebElement tr = viewEditBIEPage.getTableRecordAtIndex(1);
             WebElement td_bc = viewEditBIEPage.getColumnByName(tr, "businessContexts");
-            assertEquals(newName, getText(td_bc.findElement(By.xpath("span/a"))));
+            assertEquals(newName, getText(td_bc.findElement(By.xpath(".//span[@class='businessContext']/a"))));
         }
     }
 

@@ -15,6 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.contracts.ctx_category import ContextCategoryRepositoryContract
 from app.repositories.models.ctx_category import ContextCategoryRow
+from app.repositories.vendors.mariadb.models.app_user import AppUser
 from app.repositories.vendors.mariadb.models.ctx_category import ContextCategory
 from app.types.identifiers import (
     AppUserId,
@@ -44,6 +45,8 @@ class MariaDbContextCategoryRepository(ContextCategoryRepositoryContract):
         creation_timestamp_after: datetime | None = None,
         last_update_timestamp_before: datetime | None = None,
         last_update_timestamp_after: datetime | None = None,
+        included_updater_login_ids: list[str] | None = None,
+        excluded_updater_login_ids: list[str] | None = None,
     ) -> tuple[int, list[ContextCategoryRow]]:
         """Handle list.
 
@@ -57,6 +60,8 @@ class MariaDbContextCategoryRepository(ContextCategoryRepositoryContract):
             creation_timestamp_after: Include rows created on/after this timestamp.
             last_update_timestamp_before: Include rows updated on/before this timestamp.
             last_update_timestamp_after: Include rows updated on/after this timestamp.
+            included_updater_login_ids: Optional updater login IDs to include by exact match.
+            excluded_updater_login_ids: Optional updater login IDs to exclude by exact match.
 
         Returns:
             Result of the operation.
@@ -68,6 +73,8 @@ class MariaDbContextCategoryRepository(ContextCategoryRepositoryContract):
             creation_timestamp_after=creation_timestamp_after,
             last_update_timestamp_before=last_update_timestamp_before,
             last_update_timestamp_after=last_update_timestamp_after,
+            included_updater_login_ids=included_updater_login_ids,
+            excluded_updater_login_ids=excluded_updater_login_ids,
         )
 
         total_stmt = select(func.count()).select_from(ContextCategory)
@@ -259,6 +266,8 @@ def _build_where_clauses(
     creation_timestamp_after: datetime | None,
     last_update_timestamp_before: datetime | None,
     last_update_timestamp_after: datetime | None,
+    included_updater_login_ids: list[str] | None = None,
+    excluded_updater_login_ids: list[str] | None = None,
 ) -> list[object]:
     """Internal helper for build where clauses.
 
@@ -286,6 +295,18 @@ def _build_where_clauses(
         clauses.append(ContextCategory.last_update_timestamp >= last_update_timestamp_after)
     if last_update_timestamp_before is not None:
         clauses.append(ContextCategory.last_update_timestamp <= last_update_timestamp_before)
+    if included_updater_login_ids:
+        clauses.append(
+            ContextCategory.last_updated_by.in_(
+                select(AppUser.app_user_id).where(AppUser.login_id.in_(included_updater_login_ids))
+            )
+        )
+    if excluded_updater_login_ids:
+        clauses.append(
+            ContextCategory.last_updated_by.not_in(
+                select(AppUser.app_user_id).where(AppUser.login_id.in_(excluded_updater_login_ids))
+            )
+        )
     return clauses
 
 

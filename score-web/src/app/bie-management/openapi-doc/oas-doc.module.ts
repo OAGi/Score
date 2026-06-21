@@ -8,6 +8,9 @@ import {OasDocListComponent} from './oas-doc-list/oas-doc-list.component';
 import {OasDocDetailComponent} from './oas-doc-detail/oas-doc-detail.component';
 import {OpenAPIService} from './domain/openapi.service';
 import {OasDocAssignDialogComponent} from './oas-doc-assign-dialog/oas-doc-assign-dialog.component';
+import {OasDocAddOperationDialogComponent} from './oas-doc-add-operation-dialog/oas-doc-add-operation-dialog.component';
+import {OasDocSecuritySchemeDialogComponent} from './oas-doc-security-scheme-dialog/oas-doc-security-scheme-dialog.component';
+import {OasDocSecurityRequirementDialogComponent} from './oas-doc-security-requirement-dialog/oas-doc-security-requirement-dialog.component';
 import {MatMultiSortModule} from 'ngx-mat-multi-sort';
 import {AuthService} from '../../authentication/auth.service';
 import {MaterialModule} from '../../material.module';
@@ -64,7 +67,10 @@ const routes: Routes = [
     OasDocCreateComponent,
     OasDocListComponent,
     OasDocDetailComponent,
-    OasDocAssignDialogComponent
+    OasDocAssignDialogComponent,
+    OasDocAddOperationDialogComponent,
+    OasDocSecuritySchemeDialogComponent,
+    OasDocSecurityRequirementDialogComponent
   ],
   imports: [
     RouterModule.forChild(routes),

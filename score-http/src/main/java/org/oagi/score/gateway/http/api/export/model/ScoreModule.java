@@ -18,6 +18,7 @@ public class ScoreModule {
     private Namespace releaseNamespace;
     private String versionNum;
     private String path;
+    private String rootDefinitionName;
 
     public String getModulePath() {
         return this.path;

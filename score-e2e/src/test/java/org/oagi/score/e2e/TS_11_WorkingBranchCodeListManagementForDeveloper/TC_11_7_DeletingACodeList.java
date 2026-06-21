@@ -202,8 +202,7 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
 
             viewEditCoreComponentPage.openPage();
             accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), workingBranch.getReleaseNumber());
-            String bccPath = "/" + acc.getDen() + "/" + createdBCCP.getPropertyTerm();
-            WebElement bccNode = accViewEditPage.clickOnDropDownMenuByPath(bccPath);
+            WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + createdBCCP.getPropertyTerm());
             ACCViewEditPage.BCCPanelContainer bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
             assertEquals(createdBCCP.getDen(), getText(bccPanelContainer.getBCCPPanel().getDENField()));
             BCCPViewEditPage descendantBccpViewEditPage = accViewEditPage.openBCCPInNewTab(bccNode);

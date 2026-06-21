@@ -153,7 +153,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
+        getDriver().manage().window().setSize(new org.openqa.selenium.Dimension(1920, 1200));
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             assertNotEquals(usera.getAppUserId(), topLevelAsbiep.getOwnerUserId());
@@ -396,7 +396,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         }
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
+        getDriver().manage().window().setSize(new org.openqa.selenium.Dimension(1920, 1200));
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             assertDoesNotThrow(() -> {
@@ -594,7 +594,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
+        getDriver().manage().window().setSize(new org.openqa.selenium.Dimension(1920, 1200));
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             assertDoesNotThrow(() -> {

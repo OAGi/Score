@@ -17,10 +17,8 @@ export const scoreRxStompConfig: RxStompConfig = {
   heartbeatIncoming: 0, // Typical value 0 - disabled
   heartbeatOutgoing: 20000, // Typical value 20000 - every 20 seconds
 
-  // Wait in milliseconds before attempting auto reconnect
-  // Set to 0 to disable
-  // Typical value 500 (500 milli seconds)
-  reconnectDelay: 500,
+  // Reconnection is managed by RxStompService after the gateway health ping succeeds.
+  reconnectDelay: 0,
 
   // Will log diagnostics on console
   // It can be quite verbose, not recommended in production

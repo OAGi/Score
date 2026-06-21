@@ -9,10 +9,11 @@ public record UpdateBiePackageRequest(
         String versionId,
         String versionName,
         String description,
+        String revisionReason,
         BieState state) {
 
     public UpdateBiePackageRequest withBiePackageId(BiePackageId biePackageId) {
-        return new UpdateBiePackageRequest(biePackageId, name, versionId, versionName, description, state);
+        return new UpdateBiePackageRequest(biePackageId, name, versionId, versionName, description, revisionReason, state);
     }
 
 }

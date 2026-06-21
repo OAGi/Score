@@ -545,9 +545,9 @@ public class JooqAccQueryRepository extends JooqBaseRepository implements AccQue
                         componentType,
                         (byte) 1 == record.get(ACC.as("prev").IS_ABSTRACT),
                         componentType.isGroup(),
-                        (byte) 1 == record.get(ACC.as("prev").IS_DEPRECATED),
                         hasExtension(accManifestId),
                         hasChild(accManifestId),
+                        (byte) 1 == record.get(ACC.as("prev").IS_DEPRECATED),
                         state,
                         (record.get(NAMESPACE.NAMESPACE_ID) != null) ?
                                 new NamespaceSummaryRecord(

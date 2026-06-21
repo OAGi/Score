@@ -41,7 +41,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -201,22 +200,6 @@ public class BieEditController {
                             @RequestBody UpdateBieStateRequest request) {
         bieStateTransitionService.updateState(sessionService.asScoreUser(user), topLevelAsbiepId,
                 request.getState(), request.getDependencyTopLevelAsbiepIds(), request.getDependencyCodeListManifestIds());
-    }
-
-    @GetMapping(value = "/profile_bie/node/root/{id:[\\d]+}/state/dependencies",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    /**
-     * Builds the dependency preview graph for a single root BIE and destination state.
-     */
-    public List<BieStateDependencyTarget> getStateDependencies(
-            @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @PathVariable("id") TopLevelAsbiepId topLevelAsbiepId,
-            @RequestParam("state") BieState state) {
-        return bieStateTransitionService.getStateDependencies(
-                sessionService.asScoreUser(user),
-                List.of(topLevelAsbiepId),
-                Collections.emptyList(),
-                state);
     }
 
     @PostMapping(value = "/profile_bie/node/root/{id:[\\d]+}/state/dependencies/validate",

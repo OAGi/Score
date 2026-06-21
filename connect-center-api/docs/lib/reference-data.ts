@@ -43,8 +43,12 @@ export type MethodKey =
   | 'create'
   | 'update'
   | 'delete'
+  | 'add_release_dependency'
+  | 'remove_release_dependency'
+  | 'transfer_namespace_ownership'
   | 'list'
   | 'retrieve'
+  | 'retrieve_working'
   | 'retrieve_value_by_id'
   | 'update_value_by_id'
   | 'delete_value_by_id'
@@ -52,9 +56,46 @@ export type MethodKey =
   | 'create_value'
   | 'update_value'
   | 'delete_value'
+  | 'create_acc'
+  | 'update_acc'
+  | 'transfer_acc_ownership'
+  | 'add_acc_tags'
+  | 'remove_acc_tags'
+  | 'change_acc_state'
+  | 'revise_amend_acc'
+  | 'cancel_acc'
+  | 'discard_acc'
+  | 'add_ascc_to_acc'
+  | 'reorder_ascc_in_acc'
+  | 'remove_ascc'
+  | 'update_ascc'
+  | 'add_bcc_to_acc'
+  | 'reorder_bcc_in_acc'
+  | 'remove_bcc'
+  | 'update_bcc'
   | 'get_acc'
   | 'get_asccp'
+  | 'create_asccp'
+  | 'update_asccp'
+  | 'transfer_asccp_ownership'
+  | 'change_asccp_state'
+  | 'change_asccp_role_of_acc'
+  | 'add_asccp_tags'
+  | 'remove_asccp_tags'
+  | 'revise_asccp'
+  | 'cancel_asccp'
+  | 'discard_asccp'
   | 'get_bccp'
+  | 'create_bccp'
+  | 'update_bccp'
+  | 'transfer_bccp_ownership'
+  | 'change_bccp_state'
+  | 'change_bccp_bdt'
+  | 'add_bccp_tags'
+  | 'remove_bccp_tags'
+  | 'revise_bccp'
+  | 'cancel_bccp'
+  | 'discard_bccp'
   | 'get_top_level_asbiep_list'
   | 'get_top_level_asbiep'
   | 'get_asbie_by_asbie_id'
@@ -75,9 +116,32 @@ export type MethodKey =
   | 'create_bbie_sc'
   | 'update_bbie_sc'
   | 'reuse_top_level_asbiep'
-  | 'remove_reused_top_level_asbiep';
+  | 'remove_reused_top_level_asbiep'
+  | 'create_dt'
+  | 'update_dt'
+  | 'transfer_dt_ownership'
+  | 'create_dt_sc'
+  | 'update_dt_sc'
+  | 'delete_dt_sc'
+  | 'add_dt_tags'
+  | 'remove_dt_tags'
+  | 'change_dt_state'
+  | 'revise_dt'
+  | 'cancel_dt'
+  | 'discard_dt'
+  | 'create_code_list'
+  | 'update_code_list'
+  | 'transfer_code_list_ownership'
+  | 'change_code_list_state'
+  | 'revise_code_list'
+  | 'cancel_code_list'
+  | 'discard_code_list'
+  | 'retrieve_code_list_value'
+  | 'create_code_list_value'
+  | 'update_code_list_value'
+  | 'delete_code_list_value';
 
-export type MethodType = 'GET' | 'POST' | 'PUT' | 'DELETE';
+export type MethodType = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 export type BodyType = 'JSON' | 'Query' | 'Path' | 'None';
 
@@ -605,7 +669,9 @@ export async function fetchBusinessContextMethod(method: string): Promise<Method
 
 export async function fetchLibraryResource(): Promise<ResourceDoc> {
   const spec = await fetchOpenApi();
-  const methodOrder: Array<Extract<MethodKey, 'list' | 'retrieve'>> = ['list', 'retrieve'];
+  const methodOrder: Array<
+    Extract<MethodKey, 'list' | 'retrieve' | 'create' | 'update' | 'add_release_dependency' | 'remove_release_dependency' | 'delete'>
+  > = ['list', 'retrieve', 'create', 'update', 'add_release_dependency', 'remove_release_dependency', 'delete'];
 
   const methods: MethodSummary[] = [];
   for (const key of methodOrder) {
@@ -677,7 +743,14 @@ export async function fetchAccountMethod(method: string): Promise<MethodDoc | nu
 
 export async function fetchNamespaceResource(): Promise<ResourceDoc> {
   const spec = await fetchOpenApi();
-  const methodOrder: Array<Extract<MethodKey, 'list' | 'retrieve'>> = ['list', 'retrieve'];
+  const methodOrder: Array<Extract<MethodKey, 'list' | 'retrieve' | 'create' | 'update' | 'transfer_namespace_ownership' | 'delete'>> = [
+    'list',
+    'retrieve',
+    'create',
+    'update',
+    'transfer_namespace_ownership',
+    'delete',
+  ];
 
   const methods: MethodSummary[] = [];
   for (const key of methodOrder) {
@@ -713,7 +786,11 @@ export async function fetchNamespaceMethod(method: string): Promise<MethodDoc | 
 
 export async function fetchReleaseResource(): Promise<ResourceDoc> {
   const spec = await fetchOpenApi();
-  const methodOrder: Array<Extract<MethodKey, 'list' | 'retrieve'>> = ['list', 'retrieve'];
+  const methodOrder: Array<Extract<MethodKey, 'list' | 'retrieve' | 'retrieve_working'>> = [
+    'list',
+    'retrieve',
+    'retrieve_working',
+  ];
 
   const methods: MethodSummary[] = [];
   for (const key of methodOrder) {
@@ -749,7 +826,40 @@ export async function fetchReleaseMethod(method: string): Promise<MethodDoc | nu
 
 export async function fetchDataTypeResource(): Promise<ResourceDoc> {
   const spec = await fetchOpenApi();
-  const methodOrder: Array<Extract<MethodKey, 'list' | 'retrieve'>> = ['list', 'retrieve'];
+  const methodOrder: Array<
+    Extract<
+      MethodKey,
+      | 'list'
+      | 'create_dt'
+      | 'retrieve'
+      | 'update_dt'
+      | 'add_dt_tags'
+      | 'remove_dt_tags'
+      | 'change_dt_state'
+      | 'transfer_dt_ownership'
+      | 'revise_dt'
+      | 'cancel_dt'
+      | 'discard_dt'
+      | 'create_dt_sc'
+      | 'update_dt_sc'
+      | 'delete_dt_sc'
+    >
+  > = [
+    'list',
+    'retrieve',
+    'create_dt',
+    'update_dt',
+    'add_dt_tags',
+    'remove_dt_tags',
+    'change_dt_state',
+    'transfer_dt_ownership',
+    'revise_dt',
+    'cancel_dt',
+    'discard_dt',
+    'create_dt_sc',
+    'update_dt_sc',
+    'delete_dt_sc',
+  ];
 
   const methods: MethodSummary[] = [];
   for (const key of methodOrder) {
@@ -775,7 +885,7 @@ export async function fetchDataTypeMethod(method: string): Promise<MethodDoc | n
   const key = method as MethodKey;
   const lookup = getDataTypeOperation(spec, key);
   if (!lookup) return null;
-  return buildMethodDocFromOperation(spec, key, lookup);
+  return buildReferenceMethodDoc(spec, key, lookup);
 }
 
 export async function fetchTagResource(): Promise<ResourceDoc> {
@@ -842,7 +952,38 @@ export async function fetchXbtMethod(method: string): Promise<MethodDoc | null> 
 
 export async function fetchCodeListResource(): Promise<ResourceDoc> {
   const spec = await fetchOpenApi();
-  const methodOrder: Array<Extract<MethodKey, 'list' | 'retrieve'>> = ['list', 'retrieve'];
+  const methodOrder: Array<
+    Extract<
+      MethodKey,
+      | 'list'
+      | 'retrieve'
+      | 'create_code_list'
+      | 'update_code_list'
+      | 'transfer_code_list_ownership'
+      | 'change_code_list_state'
+      | 'revise_code_list'
+      | 'cancel_code_list'
+      | 'discard_code_list'
+      | 'retrieve_code_list_value'
+      | 'create_code_list_value'
+      | 'update_code_list_value'
+      | 'delete_code_list_value'
+    >
+  > = [
+    'list',
+    'retrieve',
+    'create_code_list',
+    'update_code_list',
+    'transfer_code_list_ownership',
+    'change_code_list_state',
+    'revise_code_list',
+    'cancel_code_list',
+    'discard_code_list',
+    'retrieve_code_list_value',
+    'create_code_list_value',
+    'update_code_list_value',
+    'delete_code_list_value',
+  ];
 
   const methods: MethodSummary[] = [];
   for (const key of methodOrder) {
@@ -868,7 +1009,7 @@ export async function fetchCodeListMethod(method: string): Promise<MethodDoc | n
   const key = method as MethodKey;
   const lookup = getCodeListOperation(spec, key);
   if (!lookup) return null;
-  return buildMethodDocFromOperation(spec, key, lookup);
+  return buildReferenceMethodDoc(spec, key, lookup);
 }
 
 export async function fetchAgencyIdListResource(): Promise<ResourceDoc> {
@@ -904,11 +1045,93 @@ export async function fetchAgencyIdListMethod(method: string): Promise<MethodDoc
 
 export async function fetchCoreComponentResource(): Promise<ResourceDoc> {
   const spec = await fetchOpenApi();
-  const methodOrder: Array<Extract<MethodKey, 'list' | 'get_acc' | 'get_asccp' | 'get_bccp'>> = [
+  const methodOrder: Array<
+    Extract<
+      MethodKey,
+      | 'list'
+      | 'get_acc'
+      | 'create_acc'
+      | 'update_acc'
+      | 'add_acc_tags'
+      | 'remove_acc_tags'
+      | 'change_acc_state'
+      | 'transfer_acc_ownership'
+      | 'revise_amend_acc'
+      | 'cancel_acc'
+      | 'discard_acc'
+      | 'add_ascc_to_acc'
+      | 'reorder_ascc_in_acc'
+      | 'remove_ascc'
+      | 'update_ascc'
+      | 'add_bcc_to_acc'
+      | 'reorder_bcc_in_acc'
+      | 'remove_bcc'
+      | 'update_bcc'
+      | 'get_asccp'
+      | 'create_asccp'
+      | 'update_asccp'
+      | 'change_asccp_state'
+      | 'transfer_asccp_ownership'
+      | 'change_asccp_role_of_acc'
+      | 'add_asccp_tags'
+      | 'remove_asccp_tags'
+      | 'revise_asccp'
+      | 'cancel_asccp'
+      | 'discard_asccp'
+      | 'get_bccp'
+      | 'create_bccp'
+      | 'update_bccp'
+      | 'change_bccp_state'
+      | 'transfer_bccp_ownership'
+      | 'change_bccp_bdt'
+      | 'add_bccp_tags'
+      | 'remove_bccp_tags'
+      | 'revise_bccp'
+      | 'cancel_bccp'
+      | 'discard_bccp'
+    >
+  > = [
     'list',
     'get_acc',
+    'create_acc',
+    'update_acc',
+    'add_acc_tags',
+    'remove_acc_tags',
+    'change_acc_state',
+    'transfer_acc_ownership',
+    'revise_amend_acc',
+    'cancel_acc',
+    'discard_acc',
+    'add_ascc_to_acc',
+    'reorder_ascc_in_acc',
+    'update_ascc',
+    'remove_ascc',
+    'add_bcc_to_acc',
+    'reorder_bcc_in_acc',
+    'update_bcc',
+    'remove_bcc',
     'get_asccp',
+    'create_asccp',
+    'update_asccp',
+    'change_asccp_state',
+    'transfer_asccp_ownership',
+    'change_asccp_role_of_acc',
+    'add_asccp_tags',
+    'remove_asccp_tags',
+    'revise_asccp',
+    'cancel_asccp',
+    'discard_asccp',
     'get_bccp',
+    'create_bccp',
+    'update_bccp',
+    'change_bccp_state',
+    'transfer_bccp_ownership',
+    'change_bccp_bdt',
+    'add_bccp_tags',
+    'remove_bccp_tags',
+    'revise_bccp',
+    'cancel_bccp',
+    'discard_bccp',
   ];
 
   const methods: MethodSummary[] = [];
@@ -935,7 +1158,7 @@ export async function fetchCoreComponentMethod(method: string): Promise<MethodDo
   const key = method as MethodKey;
   const lookup = getCoreComponentOperation(spec, key);
   if (!lookup) return null;
-  return buildMethodDocFromOperation(spec, key, lookup);
+  return buildReferenceMethodDoc(spec, key, lookup);
 }
 
 export async function fetchBusinessInformationEntityResource(): Promise<ResourceDoc> {

@@ -83,6 +83,8 @@ public class JooqBiePackageCommandRepository extends JooqBaseRepository implemen
         biePackageRecord.setDescription(biePackageDetails.description());
         biePackageRecord.setState(BieState.WIP.name());
         biePackageRecord.setPrevBiePackageId(valueOf(biePackageId));
+        // Issue #1733: a new revision starts with NO reason; the owner enters it afterward via the WIP edit
+        // form. It must NOT inherit the previous revision's reason (unlike name/versionName/description above).
         biePackageRecord.setOwnerUserId(valueOf(requester().userId()));
         biePackageRecord.setCreatedBy(valueOf(requester().userId()));
         biePackageRecord.setLastUpdatedBy(valueOf(requester().userId()));
@@ -105,7 +107,7 @@ public class JooqBiePackageCommandRepository extends JooqBaseRepository implemen
 
     @Override
     public boolean update(BiePackageId biePackageId,
-                          String name, String versionId, String versionName, String description) {
+                          String name, String versionId, String versionName, String description, String revisionReason) {
 
         UpdateSetFirstStep<BiePackageRecord> firstStep = dslContext().update(BIE_PACKAGE);
         UpdateSetMoreStep<BiePackageRecord> step;
@@ -128,6 +130,12 @@ public class JooqBiePackageCommandRepository extends JooqBaseRepository implemen
             step = step.set(BIE_PACKAGE.DESCRIPTION, description);
         } else {
             step = step.setNull(BIE_PACKAGE.DESCRIPTION);
+        }
+        // Issue #1733: optional per-revision reason; a blank value clears it (null).
+        if (hasLength(revisionReason)) {
+            step = step.set(BIE_PACKAGE.REVISION_REASON, revisionReason);
+        } else {
+            step = step.setNull(BIE_PACKAGE.REVISION_REASON);
         }
 
         int numOfUpdatedRecords = step.set(BIE_PACKAGE.LAST_UPDATED_BY, valueOf(requester().userId()))
@@ -183,6 +191,8 @@ public class JooqBiePackageCommandRepository extends JooqBaseRepository implemen
         copiedBiePackageRecord.setSourceBiePackageId(biePackageRecord.getBiePackageId());
         copiedBiePackageRecord.setSourceAction("Copy");
         copiedBiePackageRecord.setSourceTimestamp(now);
+        // Issue #1733: a copy is a new independent draft, not a revision; do not carry the source's reason.
+        copiedBiePackageRecord.setRevisionReason(null);
         BiePackageId copiedBiePackageId = new BiePackageId(
                 dslContext().insertInto(BIE_PACKAGE)
                         .set(copiedBiePackageRecord)
@@ -210,11 +220,23 @@ public class JooqBiePackageCommandRepository extends JooqBaseRepository implemen
             return 0;
         }
 
+        // source_bie_package_id is only copy/uplift provenance ("where this was copied from"); breaking it does not
+        // harm the referencing package. So detach it from EVERY package pointing at a discarded one — inside or
+        // outside this set — letting surviving copies keep working with a null source.
         dslContext().update(BIE_PACKAGE)
                 .setNull(BIE_PACKAGE.SOURCE_BIE_PACKAGE_ID)
                 .setNull(BIE_PACKAGE.SOURCE_ACTION)
                 .setNull(BIE_PACKAGE.SOURCE_TIMESTAMP)
                 .where(BIE_PACKAGE.SOURCE_BIE_PACKAGE_ID.in(valueOf(biePackageIdList)))
+                .execute();
+
+        // prev_bie_package_id is the revision-history dependency: the service rejects the request when a package
+        // OUTSIDE this set references one of these as its previous revision, so at this point only rows that are all
+        // about to be deleted can still carry the link. Null it among them so the single multi-row delete does not
+        // trip the row-by-row FK enforcement.
+        dslContext().update(BIE_PACKAGE)
+                .setNull(BIE_PACKAGE.PREV_BIE_PACKAGE_ID)
+                .where(BIE_PACKAGE.PREV_BIE_PACKAGE_ID.in(valueOf(biePackageIdList)))
                 .execute();
 
         dslContext().deleteFrom(BIE_PACKAGE_TOP_LEVEL_ASBIEP)

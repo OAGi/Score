@@ -157,7 +157,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIE);
-        getDriver().manage().window().maximize();
+        getDriver().manage().window().setSize(new org.openqa.selenium.Dimension(1920, 1200));
         assertEquals("WIP", useraBIE.getState());
 
         ACCExtensionViewEditPage accExtensionViewEditPage =
@@ -250,7 +250,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             BIEMenu bieMenu = homePage.getBIEMenu();
             ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
             EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
-            getDriver().manage().window().maximize();
+            getDriver().manage().window().setSize(new org.openqa.selenium.Dimension(1920, 1200));
             assertEquals("WIP", topLevelAsbiep.getState());
 
             ACCExtensionViewEditPage accExtensionViewEditPage =

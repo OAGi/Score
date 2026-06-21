@@ -37,6 +37,8 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.Dt.DtPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtManifest.DtManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtManifestTag.DtManifestTagPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtScManifest.DtScManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.GithubIssue.GithubIssuePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.GithubIssueDtManifest.GithubIssueDtManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Log.LogPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleDtManifest.ModuleDtManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Release.ReleasePath;
@@ -328,6 +330,19 @@ public class DtManifest extends TableImpl<DtManifestRecord> {
         return _dtScManifest;
     }
 
+    private transient GithubIssueDtManifestPath _githubIssueDtManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_dt_manifest</code> table
+     */
+    public GithubIssueDtManifestPath githubIssueDtManifest() {
+        if (_githubIssueDtManifest == null)
+            _githubIssueDtManifest = new GithubIssueDtManifestPath(this, null, Keys.GITHUB_ISSUE_DT_MANIFEST_DT_MANIFEST_ID_FK.getInverseKey());
+
+        return _githubIssueDtManifest;
+    }
+
     private transient ModuleDtManifestPath _moduleDtManifest;
 
     /**
@@ -347,6 +362,14 @@ public class DtManifest extends TableImpl<DtManifestRecord> {
      */
     public TagPath tag() {
         return dtManifestTag().tag();
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the
+     * <code>oagi.github_issue</code> table
+     */
+    public GithubIssuePath githubIssue() {
+        return githubIssueDtManifest().githubIssue();
     }
 
     @Override

@@ -24,6 +24,7 @@ import org.oagi.score.e2e.TS_15_ReleaseBranchCoreComponentManagementBehaviorForE
         TC_15_7_RestoringEndUserACC.class,
         TC_15_8_EditingAssociationsBrandNewEndUserACC.class,
         TC_15_9_EditingAssociationsDuringAnEndUserACCAmendment.class,
+        TC_15_9_EditingAssociatiionsDuringEndUserAmendment.class,
         TC_15_10_CreatingBrandNewEndUserASCCP.class,
         TC_15_11_EditingBrandNewEndUserASCCP.class,
         TC_15_12_AmendEndUserASCCP.class,

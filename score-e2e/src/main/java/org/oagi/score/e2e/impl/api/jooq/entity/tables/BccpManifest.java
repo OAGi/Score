@@ -38,6 +38,8 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bccp.BccpPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccpManifest.BccpManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccpManifestTag.BccpManifestTagPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtManifest.DtManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.GithubIssue.GithubIssuePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.GithubIssueBccpManifest.GithubIssueBccpManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Log.LogPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleBccpManifest.ModuleBccpManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Release.ReleasePath;
@@ -327,6 +329,19 @@ public class BccpManifest extends TableImpl<BccpManifestRecord> {
         return _bccpManifestTag;
     }
 
+    private transient GithubIssueBccpManifestPath _githubIssueBccpManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_bccp_manifest</code> table
+     */
+    public GithubIssueBccpManifestPath githubIssueBccpManifest() {
+        if (_githubIssueBccpManifest == null)
+            _githubIssueBccpManifest = new GithubIssueBccpManifestPath(this, null, Keys.GITHUB_ISSUE_BCCP_MANIFEST_BCCP_MANIFEST_ID_FK.getInverseKey());
+
+        return _githubIssueBccpManifest;
+    }
+
     private transient ModuleBccpManifestPath _moduleBccpManifest;
 
     /**
@@ -346,6 +361,14 @@ public class BccpManifest extends TableImpl<BccpManifestRecord> {
      */
     public TagPath tag() {
         return bccpManifestTag().tag();
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the
+     * <code>oagi.github_issue</code> table
+     */
+    public GithubIssuePath githubIssue() {
+        return githubIssueBccpManifest().githubIssue();
     }
 
     @Override

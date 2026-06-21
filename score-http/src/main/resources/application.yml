@@ -58,6 +58,15 @@ logging:
     org.jooq: DEBUG
     org.oagi.score: DEBUG
 
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      group:
+        readiness:
+          additional-path: server:/health
+
 resource-server:
   jwk-set-uri: ${RS_JWK_SET_URI:}
   allowed-types: ${RS_ALLOWED_TYPES:JWT,at+jwt}
@@ -65,3 +74,45 @@ resource-server:
 springdoc:
   swagger-ui:
     tags-sorter: alpha
+
+score:
+  integration:
+    github:
+      enabled: ${SCORE_GITHUB_ENABLED:false}
+      client-id: ${GITHUB_CLIENT_ID:}
+      client-secret: ${GITHUB_CLIENT_SECRET:}
+      scope: ${GITHUB_OAUTH_SCOPE:repo}
+      authorization-uri: https://github.com/login/oauth/authorize
+      token-uri: https://github.com/login/oauth/access_token
+      api-base-url: https://api.github.com
+      default-repo-url: ${SCORE_GITHUB_DEFAULT_REPO_URL:https://github.com/OAGi/oagis}
+      redirect-uri: ${GITHUB_REDIRECT_URI:http://localhost:4200/api/integration/github/callback}
+      web-base-url: ${SCORE_WEB_BASE_URL:http://localhost:4200}
+      webhook-secret: ${GITHUB_WEBHOOK_SECRET:}
+      # GitHub Projects v2 board fieldOption sync (issue #1533). When project-enabled is on, a component's
+      # state change moves its linked issue into the matching fieldOption (or removes it) on the project board
+      # at project-url, using the ACTING (connected) user's GitHub token — so the connect flow then also
+      # requests the OAuth `project` (board write) and `read:org` (to verify org membership / warn when
+      # the user can't write the board) scopes; users connected before must reconnect to grant them.
+      # The board's owner/type/number are parsed from the URL.
+      project-enabled: ${SCORE_GITHUB_PROJECT_ENABLED:false}
+      project-url: ${SCORE_GITHUB_PROJECT_URL:https://github.com/orgs/OAGi/projects/8}
+      # The board's single-select fieldOption field, BY NAME (the "Status" field). Change this to point fieldOption sync
+      # at a differently-named field; if no field matches, sync falls back to discovering the field whose
+      # options best cover the fieldOption names below.
+      project-status-field-name: ${SCORE_GITHUB_PROJECT_STATUS_FIELD:Status}
+      # The initial/reset fieldOption: a freshly LINKED issue (not yet on the board) is added here, and a
+      # cancelled revision resets the card here. Set it to MATCH the board field's Default option — GitHub's
+      # API does not expose that Default, so it cannot be read automatically. Leave BLANK to not place
+      # linked issues in an initial fieldOption at all ("if there is no default, don't set it").
+      project-default-field-option: ${SCORE_GITHUB_PROJECT_DEFAULT_FIELD_OPTION:New}
+      # CcState -> board fieldOption name (keyed on the destination state of a transition). Keys must be
+      # CcState values (anything else is ignored); blank fieldOptionByState are ignored, and each fieldOption name can be
+      # overridden by its own environment variable. These names must match options of the fieldOption field
+      # (project-status-field-name). A card is REMOVED from the board only on release (CcState.Published)
+      # and on unlink — both fixed, not configured.
+      project-field-option-by-state:
+        WIP: ${SCORE_GITHUB_PROJECT_FIELD_OPTION_WIP:Implementing}
+        Draft: ${SCORE_GITHUB_PROJECT_FIELD_OPTION_DRAFT:Implemented}
+        Candidate: ${SCORE_GITHUB_PROJECT_FIELD_OPTION_CANDIDATE:Candidate}
+        ReleaseDraft: ${SCORE_GITHUB_PROJECT_FIELD_OPTION_RELEASE_DRAFT:Ready for release}

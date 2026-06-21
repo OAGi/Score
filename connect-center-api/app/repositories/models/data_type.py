@@ -11,6 +11,19 @@ from app.repositories.models.library import LibrarySummaryRow
 from app.repositories.models.log import LogSummaryRow
 from app.repositories.models.namespace import NamespaceSummaryRow
 from app.repositories.models.release import ReleaseSummaryRow
+from app.repositories.models.tag import TagSummaryRow
+
+
+class DataTypePrimitiveRow(BaseModel):
+    """Repository row for DT / DT_SC primitive selections."""
+
+    cdt_pri_name: str | None = None
+    xbt_manifest_id: int | None = None
+    code_list_manifest_id: int | None = None
+    agency_id_list_manifest_id: int | None = None
+    is_default: bool
+
+    model_config = ConfigDict(frozen=True, from_attributes=True)
 
 
 class DataTypeRow(BaseModel):
@@ -30,7 +43,9 @@ class DataTypeRow(BaseModel):
     commonly_used: bool
     is_deprecated: bool
     state: str | None = None
+    primitives: list[DataTypePrimitiveRow] = Field(default_factory=list)
     supplementary_components: list[DataTypeSupplementaryComponentRow] = Field(default_factory=list)
+    tags: list[TagSummaryRow] = Field(default_factory=list)
     namespace: NamespaceSummaryRow | None = None
     library: LibrarySummaryRow
     release: ReleaseSummaryRow
@@ -88,5 +103,6 @@ class DataTypeSupplementaryComponentRow(BaseModel):
     default_value: str | None = None
     fixed_value: str | None = None
     is_deprecated: bool
+    primitives: list[DataTypePrimitiveRow] = Field(default_factory=list)
 
     model_config = ConfigDict(frozen=True, from_attributes=True)

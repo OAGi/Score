@@ -28,6 +28,10 @@ class ReleaseRepositoryContract(Protocol):
         creation_timestamp_after: datetime | None = None,
         last_update_timestamp_before: datetime | None = None,
         last_update_timestamp_after: datetime | None = None,
+        included_creator_login_ids: list[str] | None = None,
+        excluded_creator_login_ids: list[str] | None = None,
+        included_updater_login_ids: list[str] | None = None,
+        excluded_updater_login_ids: list[str] | None = None,
     ) -> tuple[int, list[ReleaseRow]]:
         """Repository contract for list.
 
@@ -41,6 +45,10 @@ class ReleaseRepositoryContract(Protocol):
             creation_timestamp_after: Optional lower bound for creation timestamp.
             last_update_timestamp_before: Optional upper bound for last update timestamp.
             last_update_timestamp_after: Optional lower bound for last update timestamp.
+            included_creator_login_ids: Optional creator login IDs to include by exact match.
+            excluded_creator_login_ids: Optional creator login IDs to exclude by exact match.
+            included_updater_login_ids: Optional updater login IDs to include by exact match.
+            excluded_updater_login_ids: Optional updater login IDs to exclude by exact match.
 
         Returns:
             Result of the operation.
@@ -58,6 +66,22 @@ class ReleaseRepositoryContract(Protocol):
         """
         pass
 
+    async def get_by_library_id_and_release_num(
+        self,
+        library_id: LibraryId,
+        release_num: str,
+    ) -> ReleaseRow | None:
+        """Repository contract for exact library/release-number lookup.
+
+        Args:
+            library_id: Library identifier used to scope the query.
+            release_num: Exact release number to locate.
+
+        Returns:
+            Result of the operation.
+        """
+        pass
+
     async def get_dependent_releases(self, release_id: ReleaseId) -> list[ReleaseId]:
         """Repository contract for get dependent releases.
 
@@ -66,5 +90,16 @@ class ReleaseRepositoryContract(Protocol):
 
         Returns:
             Result of the operation.
+        """
+        pass
+
+    async def get_release_dependency_ids(self, release_id: ReleaseId) -> list[ReleaseId]:
+        """Repository contract for direct release dependencies.
+
+        Args:
+            release_id: Release identifier used to scope the query.
+
+        Returns:
+            Direct dependency release identifiers from `release_dep`.
         """
         pass

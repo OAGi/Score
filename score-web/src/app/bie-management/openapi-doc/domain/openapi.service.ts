@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import {
+  AddOperationForOasDoc,
   AssignBieForOasDoc,
   BieForOasDoc,
   BieForOasDocDeleteRequest,
@@ -92,7 +93,9 @@ export class OpenAPIService {
       contactName: oasDoc.contactName,
       contactUrl: oasDoc.contactUrl,
       contactEmail: oasDoc.contactEmail,
-      licenseUrl: oasDoc.licenseUrl
+      licenseUrl: oasDoc.licenseUrl,
+      securitySchemes: oasDoc.securitySchemes,
+      securityRequirements: oasDoc.securityRequirements
     });
   }
 
@@ -108,7 +111,9 @@ export class OpenAPIService {
       contactName: oasDoc.contactName,
       contactUrl: oasDoc.contactUrl,
       contactEmail: oasDoc.contactEmail,
-      licenseUrl: oasDoc.licenseUrl
+      licenseUrl: oasDoc.licenseUrl,
+      securitySchemes: oasDoc.securitySchemes,
+      securityRequirements: oasDoc.securityRequirements
     });
   }
 
@@ -259,12 +264,29 @@ export class OpenAPIService {
         required: assignBieForOasDoc.required,
         arrayIndicator: assignBieForOasDoc.arrayIndicator,
         suppressRootIndicator: assignBieForOasDoc.suppressRootIndicator,
-        messageBody: assignBieForOasDoc.messageBody
+        messageBody: assignBieForOasDoc.messageBody,
+        operationId: assignBieForOasDoc.operationId
       });
   }
 
   removeBieForOasDoc(request: BieForOasDocDeleteRequest): Observable<any> {
     return this.http.post<any>('/api/oas_doc/' + request.oasDocId + '/bie_list/delete', request.json);
+  }
+
+  // Issue #1730: add an API operation (endpoint) that does NOT reference a BIE.
+  addOperationForOasDoc(addOperation: AddOperationForOasDoc): Observable<any> {
+    return this.http.post<any>('/api/oas_doc/' + addOperation.oasDocId + '/operation',
+      {
+        oasDocId: addOperation.oasDocId,
+        verb: addOperation.verb,
+        resourceName: addOperation.resourceName,
+        operationId: addOperation.operationId,
+        tagName: addOperation.tagName,
+        messageBody: addOperation.messageBody,
+        httpStatusCode: addOperation.httpStatusCode,
+        summary: addOperation.summary,
+        description: addOperation.description
+      });
   }
 
   generateOpenAPI(oasDocId: number, page: PageRequest): Observable<HttpResponse<Blob>> {

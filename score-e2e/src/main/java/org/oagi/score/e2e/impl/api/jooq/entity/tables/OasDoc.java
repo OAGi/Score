@@ -34,10 +34,12 @@ import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasDocSecurity.OasDocSecurityPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasDocTag.OasDocTagPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasExternalDoc.OasExternalDocPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasExternalDocDoc.OasExternalDocDocPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasResource.OasResourcePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasSecurityScheme.OasSecuritySchemePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasServer.OasServerPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasTag.OasTagPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.OasDocRecord;
@@ -290,6 +292,19 @@ public class OasDoc extends TableImpl<OasDocRecord> {
         return _oasDocOwnerUserIdFk;
     }
 
+    private transient OasDocSecurityPath _oasDocSecurity;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_doc_security</code> table
+     */
+    public OasDocSecurityPath oasDocSecurity() {
+        if (_oasDocSecurity == null)
+            _oasDocSecurity = new OasDocSecurityPath(this, null, Keys.OAS_DOC_SECURITY_OAS_DOC_ID_FK.getInverseKey());
+
+        return _oasDocSecurity;
+    }
+
     private transient OasDocTagPath _oasDocTag;
 
     /**
@@ -327,6 +342,19 @@ public class OasDoc extends TableImpl<OasDocRecord> {
             _oasResource = new OasResourcePath(this, null, Keys.OAS_RESOURCE_OAS_DOC_ID_FK.getInverseKey());
 
         return _oasResource;
+    }
+
+    private transient OasSecuritySchemePath _oasSecurityScheme;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_security_scheme</code> table
+     */
+    public OasSecuritySchemePath oasSecurityScheme() {
+        if (_oasSecurityScheme == null)
+            _oasSecurityScheme = new OasSecuritySchemePath(this, null, Keys.OAS_SECURITY_SCHEME_OAS_DOC_ID_FK.getInverseKey());
+
+        return _oasSecurityScheme;
     }
 
     private transient OasServerPath _oasServer;

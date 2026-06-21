@@ -11,6 +11,7 @@ import {ScoreCommonModule} from '../../common/score-common.module';
 import {AngularSplitModule} from 'angular-split';
 import {ExtensionDetailComponent} from './extension-detail.component';
 import {SearchOptionsDialogModule} from '../search-options-dialog/search-options-dialog.module';
+import {GithubIssueBoxComponent} from '../github-issue-box/github-issue-box.component';
 
 const routes: Routes = [
   {
@@ -38,7 +39,8 @@ const routes: Routes = [
     ScoreCommonModule,
     SearchOptionsDialogModule,
     DragDropModule,
-    AngularSplitModule
+    AngularSplitModule,
+    GithubIssueBoxComponent
   ],
   declarations: [
     ExtensionDetailComponent

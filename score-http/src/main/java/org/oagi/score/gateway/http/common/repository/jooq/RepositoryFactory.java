@@ -43,6 +43,10 @@ import org.oagi.score.gateway.http.api.context_management.context_scheme.reposit
 import org.oagi.score.gateway.http.api.context_management.context_scheme.repository.ContextSchemeQueryRepository;
 import org.oagi.score.gateway.http.api.context_management.context_scheme.repository.jooq.JooqContextSchemeCommandRepository;
 import org.oagi.score.gateway.http.api.context_management.context_scheme.repository.jooq.JooqContextSchemeQueryRepository;
+import org.oagi.score.gateway.http.api.integration_management.github.repository.GitHubIssueLinkCommandRepository;
+import org.oagi.score.gateway.http.api.integration_management.github.repository.GitHubIssueLinkQueryRepository;
+import org.oagi.score.gateway.http.api.integration_management.github.repository.jooq.JooqGitHubIssueLinkCommandRepository;
+import org.oagi.score.gateway.http.api.integration_management.github.repository.jooq.JooqGitHubIssueLinkQueryRepository;
 import org.oagi.score.gateway.http.api.library_management.repository.LibraryCommandRepository;
 import org.oagi.score.gateway.http.api.library_management.repository.LibraryQueryRepository;
 import org.oagi.score.gateway.http.api.library_management.repository.jooq.JooqLibraryCommandRepository;
@@ -279,6 +283,14 @@ public class RepositoryFactory {
 
     public TagQueryRepository tagQueryRepository(ScoreUser requester) {
         return new JooqTagQueryRepository(dslContext, requester, this);
+    }
+
+    public GitHubIssueLinkCommandRepository gitHubIssueLinkCommandRepository(ScoreUser requester) {
+        return new JooqGitHubIssueLinkCommandRepository(dslContext, requester, this);
+    }
+
+    public GitHubIssueLinkQueryRepository gitHubIssueLinkQueryRepository(ScoreUser requester) {
+        return new JooqGitHubIssueLinkQueryRepository(dslContext, requester, this);
     }
 
     public OpenApiDocumentCommandRepository openApiDocumentCommandRepository(ScoreUser requester) {

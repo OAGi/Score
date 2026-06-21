@@ -21,6 +21,7 @@ from app.services.models.ctx_scheme import (
 )
 from app.services.models.mapper import to_dataclass
 from app.services.utils.date import DateRange
+from app.services.utils.owner import parse_login_id_filter
 from app.services.utils.pagination import PaginationParams, PaginationResponse
 from app.services.utils.string import Guid, new_guid
 from app.types.identifiers import CtxSchemeId, CtxSchemeValueId
@@ -74,6 +75,7 @@ class CtxSchemeService:
         ctx_category_name: str | None = None,
         created_on: DateRange | None = None,
         last_updated_on: DateRange | None = None,
+        updater: str | None = None,
     ) -> PaginationResponse[CtxSchemeServiceResult]:
         """List context schemes with optional filters and pagination.
 
@@ -92,6 +94,10 @@ class CtxSchemeService:
             allowed_sort_columns=self._ORDER_BY_ALLOWED,
         )
         logger.info("list ctx_schemes limit=%d offset=%d", limit, offset)
+        included_updater_login_ids, excluded_updater_login_ids = parse_login_id_filter(
+            updater,
+            filter_name="updater",
+        )
         total, rows = await self._repo.list(
             scheme_id=scheme_id,
             scheme_name=scheme_name,
@@ -104,6 +110,8 @@ class CtxSchemeService:
             creation_timestamp_after=created_on.after if created_on else None,
             last_update_timestamp_before=last_updated_on.before if last_updated_on else None,
             last_update_timestamp_after=last_updated_on.after if last_updated_on else None,
+            included_updater_login_ids=included_updater_login_ids,
+            excluded_updater_login_ids=excluded_updater_login_ids,
             limit=pagination.limit,
             offset=pagination.offset,
             sorts=[(s.column, s.direction.upper()) for s in pagination.sorts],

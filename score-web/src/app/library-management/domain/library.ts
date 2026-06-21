@@ -19,6 +19,8 @@ export class LibraryDetails {
   link: string;
   domain: string;
   description: string;
+  namespaceUri: string;
+  namespacePrefix: string;
   state: string;
   readOnly: boolean;
   isDefault: boolean;
@@ -41,6 +43,26 @@ export class LibraryListEntry {
 
   created: WhoAndWhen;
   lastUpdated: WhoAndWhen;
+}
+
+export interface DiscardLibraryCheck {
+  discardable: boolean;
+  message: string;
+}
+
+export interface LibraryReleaseDependency {
+  releaseDepId?: number | null;
+  releaseId: number;
+  libraryId: number;
+  libraryName: string;
+  releaseNum: string;
+  state: string;
+  workingRelease: boolean;
+}
+
+export interface LibraryReleaseDependenciesResponse {
+  currentDependencies: LibraryReleaseDependency[];
+  availableDependencies: LibraryReleaseDependency[];
 }
 
 export class LibraryListRequest {

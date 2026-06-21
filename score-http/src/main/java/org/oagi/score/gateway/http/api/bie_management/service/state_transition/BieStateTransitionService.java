@@ -194,43 +194,11 @@ public class BieStateTransitionService {
     private List<BieStateTransitionRule> stateTransitionRules = Collections.emptyList();
 
     /**
-     * Builds the dependency graph for the requested transition and projects it
-     * into the dialog rows shown on the UI.
-     *
-     * <p>The caller may provide requested BIE ids, requested code-list ids, or
-     * both. The preview is empty only when both requested collections are
-     * empty.</p>
-     */
-    public List<BieStateDependencyTarget> getStateDependencies(
-            ScoreUser requester,
-            Collection<TopLevelAsbiepId> requestedTopLevelAsbiepIds,
-            Collection<CodeListManifestId> requestedCodeListManifestIds,
-            BieState nextState) {
-        if ((requestedTopLevelAsbiepIds == null || requestedTopLevelAsbiepIds.isEmpty()) &&
-                (requestedCodeListManifestIds == null || requestedCodeListManifestIds.isEmpty())) {
-            return Collections.emptyList();
-        }
-
-        BieStateDependencyGraph dependencyGraph = buildStateDependencyGraph(
-                requester,
-                requestedTopLevelAsbiepIds,
-                requestedCodeListManifestIds,
-                nextState);
-        List<BieStateDependencyTarget> targets = buildDependencyTargets(
-                requester,
-                dependencyGraph,
-                nextState,
-                null,
-                Collections.emptySet());
-        return targets;
-    }
-
-    /**
      * Revalidates the user's current dependency selection against the same
      * projected graph used to build the initial dialog.
      *
-     * <p>Like the initial preview, validation may be rooted from requested
-     * BIE ids, requested code-list ids, or both.</p>
+     * <p>Validation may be rooted from requested BIE ids, requested code-list
+     * ids, or both.</p>
      */
     public List<BieStateDependencyTarget> validateStateDependencies(
             ScoreUser requester,

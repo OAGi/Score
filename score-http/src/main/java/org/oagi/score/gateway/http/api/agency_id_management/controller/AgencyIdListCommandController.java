@@ -55,7 +55,8 @@ public class AgencyIdListCommandController {
 
         String toState = request.get("toState");
         agencyIdListCommandService.updateState(
-                sessionService.asScoreUser(user), agencyIdListManifestId, CcState.valueOf(toState));
+                sessionService.asScoreUser(user), agencyIdListManifestId, CcState.valueOf(toState),
+                request.get("comment"), request.get("projectFieldOptionOverride"));
     }
 
     @PatchMapping(value = "/{agencyIdListManifestId:[\\d]+}/revise")
@@ -69,9 +70,12 @@ public class AgencyIdListCommandController {
     @PatchMapping(value = "/{agencyIdListManifestId:[\\d]+}/cancel")
     public void cancelAgencyIdList(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @PathVariable("agencyIdListManifestId") AgencyIdListManifestId agencyIdListManifestId) {
+            @PathVariable("agencyIdListManifestId") AgencyIdListManifestId agencyIdListManifestId,
+            @RequestBody(required = false) Map<String, String> request) {
 
-        agencyIdListCommandService.cancel(sessionService.asScoreUser(user), agencyIdListManifestId);
+        agencyIdListCommandService.cancel(sessionService.asScoreUser(user), agencyIdListManifestId,
+                (request != null) ? request.get("comment") : null,
+                (request != null) ? request.get("projectFieldOptionOverride") : null);
     }
 
     @PatchMapping(value = "/{agencyIdListManifestId:[\\d]+}/mark-as-deleted")

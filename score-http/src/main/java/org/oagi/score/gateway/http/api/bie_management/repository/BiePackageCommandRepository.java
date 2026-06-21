@@ -14,7 +14,7 @@ public interface BiePackageCommandRepository {
 
     BiePackageId revise(BiePackageId biePackageId, String versionId);
 
-    boolean update(BiePackageId biePackageId, String name, String versionId, String versionName, String description);
+    boolean update(BiePackageId biePackageId, String name, String versionId, String versionName, String description, String revisionReason);
 
     boolean updateState(BiePackageId biePackageId, BieState state);
 

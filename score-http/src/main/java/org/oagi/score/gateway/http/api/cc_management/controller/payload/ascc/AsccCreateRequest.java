@@ -8,8 +8,7 @@ public record AsccCreateRequest(
         AccManifestId accManifestId,
         AsccpManifestId asccpManifestId,
         int pos,
-        Cardinality cardinality,
-        boolean skipReusableCheck) {
+        Cardinality cardinality) {
 
     public static Builder builder(AccManifestId accManifestId,
                                   AsccpManifestId asccpManifestId) {
@@ -22,7 +21,6 @@ public record AsccCreateRequest(
         private int pos = -1;
         private int cardinalityMin = 0;
         private int cardinalityMax = -1;
-        private boolean skipReusableCheck = false;
 
         public Builder(AccManifestId accManifestId, AsccpManifestId asccpManifestId) {
             this.accManifestId = accManifestId;
@@ -44,15 +42,9 @@ public record AsccCreateRequest(
             return this;
         }
 
-        public Builder skipReusableCheck(boolean skipReusableCheck) {
-            this.skipReusableCheck = skipReusableCheck;
-            return this;
-        }
-
         public AsccCreateRequest build() {
             return new AsccCreateRequest(accManifestId, asccpManifestId,
-                    pos, new Cardinality(cardinalityMin, cardinalityMax),
-                    skipReusableCheck);
+                    pos, new Cardinality(cardinalityMin, cardinalityMax));
         }
     }
 }

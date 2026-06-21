@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { playgroundAuthStorageKey } from '@/lib/auth-storage';
 import { resolveBackendApiBase } from '@/lib/openapi';
@@ -225,7 +225,11 @@ export function PlaygroundAuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<PlaygroundAuthUser | null>(null);
 
   useEffect(() => {
+    // Hydrate auth state from storage on mount. Storage is browser-only and
+    // cannot be read during SSR, so this one-time synchronous setState is
+    // intentional.
     const stored = readStoredAuth();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time client hydration from session/local storage
     setAuthMethod(stored.authMethod ?? null);
     setLoginId(stored.loginId ?? '');
     setAccessToken(stored.accessToken ?? '');
@@ -260,7 +264,7 @@ export function PlaygroundAuthProvider({ children }: { children: ReactNode }) {
     });
   }, [accessToken, authMethod, basicAuthorization, isReady, loginId, user]);
 
-  const logInWithAccessToken = async (nextAccessToken: string) => {
+  const logInWithAccessToken = useCallback(async (nextAccessToken: string) => {
     const normalizedAccessToken = nextAccessToken.trim();
     if (!normalizedAccessToken) {
       throw new Error('Access token is required.');
@@ -273,9 +277,9 @@ export function PlaygroundAuthProvider({ children }: { children: ReactNode }) {
     setAccessToken(normalizedAccessToken);
     setBasicAuthorization('');
     setUser(profile);
-  };
+  }, []);
 
-  const logInWithBasic = async (nextLoginId: string, password: string) => {
+  const logInWithBasic = useCallback(async (nextLoginId: string, password: string) => {
     const normalizedLoginId = nextLoginId.trim();
     if (!normalizedLoginId || !password) {
       throw new Error('Login ID and password are required.');
@@ -288,15 +292,15 @@ export function PlaygroundAuthProvider({ children }: { children: ReactNode }) {
     setAccessToken('');
     setBasicAuthorization(authorizationHeader);
     setUser(profile);
-  };
+  }, []);
 
-  const logOut = () => {
+  const logOut = useCallback(() => {
     setAuthMethod(null);
     setLoginId('');
     setAccessToken('');
     setBasicAuthorization('');
     setUser(null);
-  };
+  }, []);
 
   const authorizationHeader = getAuthorizationHeader(authMethod, accessToken, basicAuthorization);
   const isAuthenticated = Boolean(authorizationHeader);

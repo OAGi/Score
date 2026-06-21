@@ -31,8 +31,13 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
             By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button");
     public static final By CANCEL_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
+    // With the GitHub integration enabled, cancel-revision routes through the
+    // score-state-change-dialog ("Okay" confirm) instead of the generic score-confirm-dialog
+    // (issue #1533). In both dialogs the "Okay" label is a direct text node of the button, so match
+    // the button by either a nested span or its own text.
     public static final By CONFIRM_CANCEL_REVISION_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Okay\")]//ancestor::button");
+            By.xpath("//mat-dialog-container//button[.//span[contains(text(), \"Okay\")] " +
+                    "or contains(normalize-space(.), \"Okay\")]");
     public static final By DELETE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Delete\")]//ancestor::button[1]");
     public static final By CONFIRM_DELETE_IN_DIALOG_LOCATOR =
@@ -135,8 +140,9 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
 
     @Override
     public void hitCancelButton() {
-        click(getCancelButton());
-        click(elementToBeClickable(getDriver(), CONFIRM_CANCEL_REVISION_IN_DIALOG_LOCATOR));
+        click(getDriver(), getCancelButton());
+        click(getDriver(), elementToBeClickable(getDriver(), CONFIRM_CANCEL_REVISION_IN_DIALOG_LOCATOR));
+        invisibilityOfElementLocated(getDriver(), By.xpath("//div[contains(@class, \"cdk-overlay-backdrop\")]"));
         invisibilityOfLoadingContainerElement(getDriver());
         assert "Canceled".equals(getSnackBarMessage(getDriver()));
     }

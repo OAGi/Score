@@ -85,6 +85,10 @@ public class OpenAPIGenerateController {
             openAPITemplate.setSuppressRootProperty(bieForOasDoc.isSuppressRootIndicator());
             openAPITemplate.setResourceName(bieForOasDoc.getResourceName());
             openAPITemplate.setOperationId(bieForOasDoc.getOperationId());
+            // Issue #1730: carry the HTTP status code so bodyless (BIE-less) operations emit 202/204 etc.
+            openAPITemplate.setHttpStatusCode(bieForOasDoc.getHttpStatusCode());
+            openAPITemplate.setSecurityOverridden(bieForOasDoc.isSecurityOverridden());
+            openAPITemplate.setSecurityRequirements(bieForOasDoc.getSecurityRequirements());
 
             OasTag oasTag = oasDocService.getAssignedOasTag(requester, new GetAssignedOasTagRequest(requester)
                             .withOasOperationId(bieForOasDoc.getOasOperationId())

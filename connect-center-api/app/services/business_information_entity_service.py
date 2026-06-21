@@ -21,6 +21,7 @@ from app.repositories.models.business_information_entity import (
     TopLevelAsbiepDetailRow,
     TopLevelAsbiepInfoRow,
 )
+from app.repositories.models.release import ReleaseSummaryRow
 from app.security import AuthenticatedUser
 from app.services import load_users_by_ids, to_user_summary
 from app.services.bie_state_transition_service import (
@@ -67,6 +68,7 @@ from app.services.models.library import LibrarySummaryServiceRecord
 from app.services.models.mapper import to_dataclass
 from app.services.models.release import ReleaseSummaryServiceRecord
 from app.services.utils.date import DateRange
+from app.services.utils.owner import parse_login_id_filter, parse_owner_filter
 from app.services.utils.pagination import PaginationParams, PaginationResponse
 
 logger = logging.getLogger("connectcenter.service.business_information_entity")
@@ -101,7 +103,7 @@ class BusinessInformationEntityService:
             business_information_entity_repository: Value for `business_information_entity_repository`.
             requester: Requesting user used for authorization checks.
             account_service_repo: Account repository used to resolve user summaries.
-            code_list_repo: Code-list repository used for transition dependency validation.
+            code_list_repo: Code list repository used for transition dependency validation.
         """
         self._repo = business_information_entity_repository
         self._requester = requester
@@ -123,6 +125,8 @@ class BusinessInformationEntityService:
         is_deprecated: bool | None = None,
         created_on: DateRange | None = None,
         last_updated_on: DateRange | None = None,
+        owner: str | None = None,
+        updater: str | None = None,
     ) -> PaginationResponse[TopLevelAsbiepListServiceResult]:
         """List top-level ASBIEPs with filters, sorting, and pagination.
 
@@ -139,6 +143,8 @@ class BusinessInformationEntityService:
             is_deprecated: Optional deprecation flag filter.
             created_on: Optional creation-time filter in ISO-8601 range form.
             last_updated_on: Optional last-update-time filter in ISO-8601 range form.
+            owner: Optional comma-separated owner login ID filter. Prefix a login ID with '!' to exclude it.
+            updater: Optional comma-separated updater login ID filter. Prefix a login ID with '!' to exclude it.
 
         Returns:
             Result of the operation.
@@ -149,6 +155,11 @@ class BusinessInformationEntityService:
             offset=offset,
             order_by=order_by,
             allowed_sort_columns=self._ORDER_BY_ALLOWED,
+        )
+        included_owner_login_ids, excluded_owner_login_ids = parse_owner_filter(owner)
+        included_updater_login_ids, excluded_updater_login_ids = parse_login_id_filter(
+            updater,
+            filter_name="updater",
         )
         total, rows = await self._repo.list_top_level_asbieps(
             limit=pagination.limit,
@@ -165,6 +176,10 @@ class BusinessInformationEntityService:
             creation_timestamp_after=created_on.after if created_on else None,
             last_update_timestamp_before=last_updated_on.before if last_updated_on else None,
             last_update_timestamp_after=last_updated_on.after if last_updated_on else None,
+            included_owner_login_ids=included_owner_login_ids,
+            excluded_owner_login_ids=excluded_owner_login_ids,
+            included_updater_login_ids=included_updater_login_ids,
+            excluded_updater_login_ids=excluded_updater_login_ids,
         )
         user_ids = sorted(
             {
@@ -399,6 +414,13 @@ class BusinessInformationEntityService:
             Result of the operation.
         """
         logger.info("create top_level_asbiep asccp_manifest_id=%d biz_ctx_list=%s", asccp_manifest_id, biz_ctx_list)
+        release = await self._repo.get_release_summary_by_asccp_manifest_id(asccp_manifest_id=asccp_manifest_id)
+        if release is None:
+            raise LookupError(
+                f"No ASCCP manifest exists with ID {int(asccp_manifest_id)}. "
+                "Please verify the identifier and try again."
+            )
+        self._assert_can_create_top_level_asbiep(release=release)
         top_level_asbiep_id = await self._repo.create_top_level_asbiep(
             asccp_manifest_id=asccp_manifest_id,
             biz_ctx_ids=biz_ctx_list,
@@ -1040,7 +1062,7 @@ class BusinessInformationEntityService:
             facet_max_length: Facet maximum length.
             facet_pattern: Facet regular expression pattern.
             xbt_manifest_id: XBT manifest identifier to use as the primitive restriction for this BBIE.
-            code_list_manifest_id: Code-list manifest identifier to use as the primitive restriction for this BBIE.
+            code_list_manifest_id: Code list manifest identifier to use as the primitive restriction for this BBIE.
             agency_id_list_manifest_id: Agency-ID-list manifest identifier to use as the primitive restriction for this BBIE.
 
         Returns:
@@ -1171,7 +1193,7 @@ class BusinessInformationEntityService:
             facet_max_length: Facet maximum length.
             facet_pattern: Facet regular expression pattern.
             xbt_manifest_id: XBT manifest identifier to use as the primitive restriction for this BBIE supplementary component.
-            code_list_manifest_id: Code-list manifest identifier to use as the primitive restriction for this BBIE supplementary component.
+            code_list_manifest_id: Code list manifest identifier to use as the primitive restriction for this BBIE supplementary component.
             agency_id_list_manifest_id: Agency-ID-list manifest identifier to use as the primitive restriction for this BBIE supplementary component.
 
         Returns:
@@ -1333,6 +1355,23 @@ class BusinessInformationEntityService:
             raise PermissionError(
                 "Only the owner or an admin can transfer top-level ASBIEP ownership. "
                 "Please sign in as the current owner or an administrator and try again."
+            )
+
+    @staticmethod
+    def _assert_can_create_top_level_asbiep(*, release: ReleaseSummaryRow) -> None:
+        """Require BIE creation to use a published non-Working release."""
+        release_num = str(release.release_num or "")
+        release_state = str(release.state or "")
+
+        if release_num == "Working":
+            raise ValueError(
+                "Cannot create a top-level ASBIEP in the 'Working' release. "
+                "Please use a Published, non-'Working' release."
+            )
+        if release_state != "Published":
+            raise ValueError(
+                f"Cannot create a top-level ASBIEP in a '{release_state}' release. "
+                "Please use a Published, non-'Working' release."
             )
 
     def _assert_owner_or_admin_for_top_level(self, *, owner_user_id: int) -> None:

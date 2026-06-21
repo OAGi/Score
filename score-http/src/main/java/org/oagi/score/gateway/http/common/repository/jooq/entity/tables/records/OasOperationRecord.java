@@ -145,11 +145,29 @@ public class OasOperationRecord extends UpdatableRecordImpl<OasOperationRecord> 
     }
 
     /**
+     * Setter for <code>oagi.oas_operation.security_overridden</code>. 1 = this
+     * operation overrides the document-level security (0 rows =&gt; security:
+     * []; rows =&gt; the operation array). 0 = inherit the root security.
+     */
+    public void setSecurityOverridden(Byte value) {
+        set(7, value);
+    }
+
+    /**
+     * Getter for <code>oagi.oas_operation.security_overridden</code>. 1 = this
+     * operation overrides the document-level security (0 rows =&gt; security:
+     * []; rows =&gt; the operation array). 0 = inherit the root security.
+     */
+    public Byte getSecurityOverridden() {
+        return (Byte) get(7);
+    }
+
+    /**
      * Setter for <code>oagi.oas_operation.created_by</code>. The user who
      * creates the record.
      */
     public void setCreatedBy(ULong value) {
-        set(7, value);
+        set(8, value);
     }
 
     /**
@@ -157,7 +175,7 @@ public class OasOperationRecord extends UpdatableRecordImpl<OasOperationRecord> 
      * creates the record.
      */
     public ULong getCreatedBy() {
-        return (ULong) get(7);
+        return (ULong) get(8);
     }
 
     /**
@@ -165,7 +183,7 @@ public class OasOperationRecord extends UpdatableRecordImpl<OasOperationRecord> 
      * last updates the record.
      */
     public void setLastUpdatedBy(ULong value) {
-        set(8, value);
+        set(9, value);
     }
 
     /**
@@ -173,7 +191,7 @@ public class OasOperationRecord extends UpdatableRecordImpl<OasOperationRecord> 
      * last updates the record.
      */
     public ULong getLastUpdatedBy() {
-        return (ULong) get(8);
+        return (ULong) get(9);
     }
 
     /**
@@ -181,7 +199,7 @@ public class OasOperationRecord extends UpdatableRecordImpl<OasOperationRecord> 
      * timestamp when the record is created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
-        set(9, value);
+        set(10, value);
     }
 
     /**
@@ -189,7 +207,7 @@ public class OasOperationRecord extends UpdatableRecordImpl<OasOperationRecord> 
      * timestamp when the record is created.
      */
     public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(9);
+        return (LocalDateTime) get(10);
     }
 
     /**
@@ -197,7 +215,7 @@ public class OasOperationRecord extends UpdatableRecordImpl<OasOperationRecord> 
      * timestamp when the record is last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(10, value);
+        set(11, value);
     }
 
     /**
@@ -205,7 +223,7 @@ public class OasOperationRecord extends UpdatableRecordImpl<OasOperationRecord> 
      * timestamp when the record is last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
-        return (LocalDateTime) get(10);
+        return (LocalDateTime) get(11);
     }
 
     // -------------------------------------------------------------------------
@@ -231,7 +249,7 @@ public class OasOperationRecord extends UpdatableRecordImpl<OasOperationRecord> 
     /**
      * Create a detached, initialised OasOperationRecord
      */
-    public OasOperationRecord(ULong oasOperationId, ULong oasResourceId, String verb, String operationId, String summary, String description, Byte deprecated, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
+    public OasOperationRecord(ULong oasOperationId, ULong oasResourceId, String verb, String operationId, String summary, String description, Byte deprecated, Byte securityOverridden, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
         super(OasOperation.OAS_OPERATION);
 
         setOasOperationId(oasOperationId);
@@ -241,6 +259,7 @@ public class OasOperationRecord extends UpdatableRecordImpl<OasOperationRecord> 
         setSummary(summary);
         setDescription(description);
         setDeprecated(deprecated);
+        setSecurityOverridden(securityOverridden);
         setCreatedBy(createdBy);
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);

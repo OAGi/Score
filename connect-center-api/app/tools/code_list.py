@@ -26,6 +26,12 @@ Available Tools:
   related information such as namespace, release, library, log, and associated
   value manifests.
 
+- create_code_list_value: Create a new code list value under a WIP Code List.
+
+- update_code_list_value: Update one existing code list value under a WIP Code List.
+
+- delete_code_list_value: Delete one existing code list value under a WIP Code List.
+
 Key Features:
 - Full relationship loading (namespace, creator, owner, release, library, log)
 - Support for filtering, pagination, and sorting
@@ -41,22 +47,47 @@ from __future__ import annotations
 import logging
 from typing import Annotated, Any
 
-from fastmcp import FastMCP
+from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
+from fastmcp.exceptions import ToolError
+from fastmcp.server.elicitation import (
+    AcceptedElicitation,
+    CancelledElicitation,
+    DeclinedElicitation,
+)
 from pydantic import Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.vendor_plugins import get_vendor_plugin
 from app.utils.date import parse_date_range
 from app.security import AuthenticatedUser
+from app.services.app_user_service import AppUserService
 from app.services.code_list_service import CodeListService
 from app.services.release_service import ReleaseService
 from app.tools import _to_tool_error, get_tool_authenticated_user, tool_session
-from app.tools.models.code_list import CodeListResponseEntry, GetCodeListPaginationResponse, GetCodeListResponse
+from app.tools.models.code_list import (
+    CodeListLifecycleState,
+    CodeListResponseEntry,
+    CreateCodeListResponse,
+    CreateCodeListValueResponse,
+    GetCodeListPaginationResponse,
+    GetCodeListResponse,
+    TransferCodeListOwnershipResponse,
+    UpdateCodeListResponse,
+    UpdateCodeListValueResponse,
+)
+from app.types.unset import UNSET
 
 logger = logging.getLogger("connectcenter.mcp.code_list")
 
 mcp = FastMCP("connectCenter MCP - Code List Tools")
+
+EMPTY_OUTPUT_SCHEMA = {
+    "type": "object",
+    "description": "Empty response body.",
+    "properties": {},
+    "additionalProperties": False,
+}
 
 
 async def get_code_list_service(
@@ -67,6 +98,16 @@ async def get_code_list_service(
     return _build_code_list_service(session, requester)
 
 
+async def get_app_user_service(
+    session: AsyncSession = Depends(tool_session),
+) -> AppUserService:
+    """Provide a requester-scoped app-user service for MCP tools."""
+    requester = await get_tool_authenticated_user(session)
+    vendor_plugin = get_vendor_plugin()
+    app_user_repository = vendor_plugin.create_app_user_repository(session)
+    return AppUserService(app_user_repository=app_user_repository, requester=requester)
+
+
 @mcp.tool(
     name="get_code_lists",
     description="Get a paginated list of code lists associated with a specific release.",
@@ -74,66 +115,146 @@ async def get_code_list_service(
         "type": "object",
         "description": "Response containing paginated list of code lists",
         "properties": {
-            "total_items": {"type": "integer", "description": "Total number of code lists available. Allowed values: non-negative integers (≥0).", "example": 25},
-            "offset": {"type": "integer", "description": "Offset of the first item in this page. Allowed values: non-negative integers (≥0). Default value: 0.", "example": 0},
-            "limit": {"type": "integer", "description": "Number of items returned in this page. Allowed values: integers between 1 and 100 (inclusive). Default value: 10.", "example": 10},
+            "total_items": {
+                "type": "integer",
+                "description": "Total number of code lists available. Allowed values: non-negative integers (≥0).",
+                "example": 25,
+            },
+            "offset": {
+                "type": "integer",
+                "description": "Offset of the first item in this page. Allowed values: non-negative integers (≥0). Default value: 0.",
+                "example": 0,
+            },
+            "limit": {
+                "type": "integer",
+                "description": "Number of items returned in this page. Allowed values: integers between 1 and 100 (inclusive). Default value: 10.",
+                "example": 10,
+            },
             "items": {
                 "type": "array",
                 "description": "List of code lists on this page",
                 "items": {
                     "type": "object",
                     "properties": {
-                        "code_list_manifest_id": {"type": "integer", "description": "Unique identifier for the code list manifest", "example": 12345},
-                        "code_list_id": {"type": "integer", "description": "Unique identifier for the code list", "example": 6789},
-                        "guid": {"type": "string", "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)", "example": "a1b2c3d4e5f6789012345678901234ab"},
-                        "enum_type_guid": {"type": ["string", "null"], "description": "Enum type GUID for the code list", "example": "a1b2c3d4e5f6789012345678901234ab"},
+                        "code_list_manifest_id": {
+                            "type": "integer",
+                            "description": "Unique identifier for the code list manifest",
+                            "example": 12345,
+                        },
+                        "code_list_id": {
+                            "type": "integer",
+                            "description": "Unique identifier for the code list",
+                            "example": 6789,
+                        },
+                        "guid": {
+                            "type": "string",
+                            "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)",
+                            "example": "a1b2c3d4e5f6789012345678901234ab",
+                        },
+                        "enum_type_guid": {
+                            "type": ["string", "null"],
+                            "description": "Enum type GUID for the code list",
+                            "example": "a1b2c3d4e5f6789012345678901234ab",
+                        },
                         "name": {"type": "string", "description": "Name of the code list", "example": "Currency Code"},
                         "list_id": {"type": "string", "description": "List identifier", "example": "ISO4217"},
                         "version_id": {"type": "string", "description": "Version identifier", "example": "1.0"},
-                        "definition": {"type": ["string", "null"], "description": "Definition of the code list", "example": "Standard currency codes"},
-                        "remark": {"type": ["string", "null"], "description": "Remarks about the code list", "example": "Based on ISO 4217"},
-                        "definition_source": {"type": ["string", "null"], "description": "URL indicating the source of the definition", "example": "https://www.iso.org/iso-4217-currency-codes.html"},
-                        "extensible_indicator": {"type": "boolean", "description": "Whether the code list is extensible", "example": False},
-                        "is_deprecated": {"type": "boolean", "description": "Whether the code list is deprecated", "example": False},
-                        "state": {"type": ["string", "null"], "description": "Current state of the code list", "example": "Published"},
+                        "definition": {
+                            "type": ["string", "null"],
+                            "description": "Definition of the code list",
+                            "example": "Standard currency codes",
+                        },
+                        "remark": {
+                            "type": ["string", "null"],
+                            "description": "Remarks about the code list",
+                            "example": "Based on ISO 4217",
+                        },
+                        "definition_source": {
+                            "type": ["string", "null"],
+                            "description": "URL indicating the source of the definition",
+                            "example": "https://www.iso.org/iso-4217-currency-codes.html",
+                        },
+                        "extensible_indicator": {
+                            "type": "boolean",
+                            "description": "Whether the code list is extensible",
+                            "example": False,
+                        },
+                        "is_deprecated": {
+                            "type": "boolean",
+                            "description": "Whether the code list is deprecated",
+                            "example": False,
+                        },
+                        "state": {
+                            "type": ["string", "null"],
+                            "description": "Current state of the code list",
+                            "example": "Published",
+                        },
                         "namespace": {
                             "type": ["object", "null"],
                             "description": "Namespace information",
                             "properties": {
-                                "namespace_id": {"type": "integer", "description": "Unique identifier for the namespace", "example": 1},
-                                "uri": {"type": "string", "description": "Namespace URI (Uniform Resource Identifier)", "example": "http://www.openapplications.org/oagis/10"},
-                                "prefix": {"type": ["string", "null"], "description": "Namespace prefix", "example": "oagis"}
+                                "namespace_id": {
+                                    "type": "integer",
+                                    "description": "Unique identifier for the namespace",
+                                    "example": 1,
+                                },
+                                "uri": {
+                                    "type": "string",
+                                    "description": "Namespace URI (Uniform Resource Identifier)",
+                                    "example": "http://www.openapplications.org/oagis/10",
+                                },
+                                "prefix": {
+                                    "type": ["string", "null"],
+                                    "description": "Namespace prefix",
+                                    "example": "oagis",
+                                },
                             },
-                            "required": ["namespace_id", "uri"]
+                            "required": ["namespace_id", "uri"],
                         },
                         "library": {
                             "type": "object",
                             "description": "Library information",
                             "properties": {
-                                "library_id": {"type": "integer", "description": "Unique identifier for the library", "example": 1},
-                                "name": {"type": "string", "description": "Library name", "example": "connectSpec"}
+                                "library_id": {
+                                    "type": "integer",
+                                    "description": "Unique identifier for the library",
+                                    "example": 1,
+                                },
+                                "name": {"type": "string", "description": "Library name", "example": "connectSpec"},
                             },
-                            "required": ["library_id", "name"]
+                            "required": ["library_id", "name"],
                         },
                         "release": {
                             "type": "object",
                             "description": "Release information",
                             "properties": {
-                                "release_id": {"type": "integer", "description": "Unique identifier for the release", "example": 1},
+                                "release_id": {
+                                    "type": "integer",
+                                    "description": "Unique identifier for the release",
+                                    "example": 1,
+                                },
                                 "release_num": {"type": "string", "description": "Release number", "example": "10.6"},
-                                "state": {"type": "string", "description": "Release state", "example": "Published"}
+                                "state": {"type": "string", "description": "Release state", "example": "Published"},
                             },
-                            "required": ["release_id", "release_num", "state"]
+                            "required": ["release_id", "release_num", "state"],
                         },
                         "log": {
                             "type": ["object", "null"],
                             "description": "Log information",
                             "properties": {
-                                "log_id": {"type": "integer", "description": "Unique identifier for the log", "example": 1},
+                                "log_id": {
+                                    "type": "integer",
+                                    "description": "Unique identifier for the log",
+                                    "example": 1,
+                                },
                                 "revision_num": {"type": "integer", "description": "Revision number", "example": 1},
-                                "revision_tracking_num": {"type": "integer", "description": "Revision tracking number", "example": 1}
+                                "revision_tracking_num": {
+                                    "type": "integer",
+                                    "description": "Revision tracking number",
+                                    "example": 1,
+                                },
                             },
-                            "required": ["log_id", "revision_num", "revision_tracking_num"]
+                            "required": ["log_id", "revision_num", "revision_tracking_num"],
                         },
                         "values": {
                             "type": "array",
@@ -141,27 +262,78 @@ async def get_code_list_service(
                             "items": {
                                 "type": "object",
                                 "properties": {
-                                    "code_list_value_manifest_id": {"type": "integer", "description": "Unique identifier for the code list value manifest", "example": 12345},
-                                    "code_list_value_id": {"type": "integer", "description": "Unique identifier for the code list value", "example": 6789},
-                                    "guid": {"type": "string", "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)", "example": "a1b2c3d4e5f6789012345678901234ab"},
-                                    "value": {"type": "string", "description": "Value of the code list", "example": "USD"},
-                                    "meaning": {"type": ["string", "null"], "description": "Meaning of the code list value", "example": "US Dollar"},
-                                    "definition": {"type": ["string", "null"], "description": "Definition of the code list value", "example": "United States Dollar"},
-                                    "is_deprecated": {"type": "boolean", "description": "Whether the code list value is deprecated", "example": False}
+                                    "code_list_value_manifest_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the code list value manifest",
+                                        "example": 12345,
+                                    },
+                                    "code_list_value_id": {
+                                        "type": "integer",
+                                        "description": "Unique identifier for the code list value",
+                                        "example": 6789,
+                                    },
+                                    "guid": {
+                                        "type": "string",
+                                        "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)",
+                                        "example": "a1b2c3d4e5f6789012345678901234ab",
+                                    },
+                                    "value": {
+                                        "type": "string",
+                                        "description": "Value of the code list",
+                                        "example": "USD",
+                                    },
+                                    "meaning": {
+                                        "type": ["string", "null"],
+                                        "description": "Meaning of the code list value",
+                                        "example": "US Dollar",
+                                    },
+                                    "definition": {
+                                        "type": ["string", "null"],
+                                        "description": "Definition of the code list value",
+                                        "example": "United States Dollar",
+                                    },
+                                    "is_deprecated": {
+                                        "type": "boolean",
+                                        "description": "Whether the code list value is deprecated",
+                                        "example": False,
+                                    },
                                 },
-                                "required": ["code_list_value_manifest_id", "code_list_value_id", "guid", "value", "is_deprecated"]
-                            }
+                                "required": [
+                                    "code_list_value_manifest_id",
+                                    "code_list_value_id",
+                                    "guid",
+                                    "value",
+                                    "is_deprecated",
+                                ],
+                            },
                         },
                         "owner": {
                             "type": "object",
                             "description": "Owner information",
                             "properties": {
-                                "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                                "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                                "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                                "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                                "user_id": {
+                                    "type": "integer",
+                                    "description": "Unique identifier for the user",
+                                    "example": 1,
+                                },
+                                "login_id": {
+                                    "type": "string",
+                                    "description": "User's login identifier",
+                                    "example": "admin",
+                                },
+                                "username": {
+                                    "type": "string",
+                                    "description": "Display name of the user",
+                                    "example": "Administrator",
+                                },
+                                "roles": {
+                                    "type": "array",
+                                    "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                    "description": "List of roles assigned to the user",
+                                    "example": ["Admin"],
+                                },
                             },
-                            "required": ["user_id", "login_id", "username", "roles"]
+                            "required": ["user_id", "login_id", "username", "roles"],
                         },
                         "created": {
                             "type": "object",
@@ -171,16 +343,38 @@ async def get_code_list_service(
                                     "type": "object",
                                     "description": "User who created the code list",
                                     "properties": {
-                                        "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                                        "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                                        "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                                        "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                                        "user_id": {
+                                            "type": "integer",
+                                            "description": "Unique identifier for the user",
+                                            "example": 1,
+                                        },
+                                        "login_id": {
+                                            "type": "string",
+                                            "description": "User's login identifier",
+                                            "example": "admin",
+                                        },
+                                        "username": {
+                                            "type": "string",
+                                            "description": "Display name of the user",
+                                            "example": "Administrator",
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                            "description": "List of roles assigned to the user",
+                                            "example": ["Admin"],
+                                        },
                                     },
-                                    "required": ["user_id", "login_id", "username", "roles"]
+                                    "required": ["user_id", "login_id", "username", "roles"],
                                 },
-                                "when": {"type": "string", "format": "date-time", "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-15T10:30:00Z"}
+                                "when": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                                    "example": "2024-01-15T10:30:00Z",
+                                },
                             },
-                            "required": ["who", "when"]
+                            "required": ["who", "when"],
                         },
                         "last_updated": {
                             "type": "object",
@@ -190,35 +384,97 @@ async def get_code_list_service(
                                     "type": "object",
                                     "description": "User who last updated the code list",
                                     "properties": {
-                                        "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                                        "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                                        "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                                        "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                                        "user_id": {
+                                            "type": "integer",
+                                            "description": "Unique identifier for the user",
+                                            "example": 1,
+                                        },
+                                        "login_id": {
+                                            "type": "string",
+                                            "description": "User's login identifier",
+                                            "example": "admin",
+                                        },
+                                        "username": {
+                                            "type": "string",
+                                            "description": "Display name of the user",
+                                            "example": "Administrator",
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                            "description": "List of roles assigned to the user",
+                                            "example": ["Admin"],
+                                        },
                                     },
-                                    "required": ["user_id", "login_id", "username", "roles"]
+                                    "required": ["user_id", "login_id", "username", "roles"],
                                 },
-                                "when": {"type": "string", "format": "date-time", "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-15T10:30:00Z"}
+                                "when": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                                    "example": "2024-01-15T10:30:00Z",
+                                },
                             },
-                            "required": ["who", "when"]
-                        }
+                            "required": ["who", "when"],
+                        },
                     },
-                    "required": ["code_list_manifest_id", "code_list_id", "guid", "name", "list_id", "version_id", "is_deprecated", "library", "release", "owner", "created", "last_updated"]
-                }
-            }
+                    "required": [
+                        "code_list_manifest_id",
+                        "code_list_id",
+                        "guid",
+                        "name",
+                        "list_id",
+                        "version_id",
+                        "is_deprecated",
+                        "library",
+                        "release",
+                        "owner",
+                        "created",
+                        "last_updated",
+                    ],
+                },
+            },
         },
-        "required": ["total_items", "offset", "limit", "items"]
-    }
+        "required": ["total_items", "offset", "limit", "items"],
+    },
 )
 async def get_code_lists(
     release_id: Annotated[int, Field(gt=0, description="Filter by release ID using exact match.")],
-    name: Annotated[str | None, Field(default=None, description="Filter by code list name using partial match (case-insensitive).")],
-    list_id: Annotated[str | None, Field(default=None, description="Filter by list ID using partial match (case-insensitive).")],
-    version_id: Annotated[str | None, Field(default=None, description="Filter by version ID using partial match (case-insensitive).")],
-    created_on: Annotated[str | None, Field(default=None, description="Filter by creation date using an inclusive range: '[before~after]'.")],
-    last_updated_on: Annotated[str | None, Field(default=None, description="Filter by last update date using an inclusive range: '[before~after]'.")],
-    order_by: Annotated[str | None, Field(default=None, description="Comma-separated list of properties to order results by. Allowed columns: name, list_id, version_id, definition, creation_timestamp, last_update_timestamp.")],
-    offset: Annotated[int, Field(default=0, ge=0, description="The offset from the beginning of the list.")],
-    limit: Annotated[int, Field(default=10, ge=1, le=100, description="The maximum number of items to return.")],
+    name: Annotated[
+        str | None, Field(description="Filter by code list name using partial match (case-insensitive).")
+    ] = None,
+    list_id: Annotated[
+        str | None, Field(description="Filter by list ID using partial match (case-insensitive).")
+    ] = None,
+    version_id: Annotated[
+        str | None, Field(description="Filter by version ID using partial match (case-insensitive).")
+    ] = None,
+    owner: Annotated[
+        str | None,
+        Field(
+            description="Comma-separated owner login IDs to filter by exact match. Prefix a login ID with '!' to exclude it."
+        ),
+    ] = None,
+    updater: Annotated[
+        str | None,
+        Field(
+            description="Comma-separated updater login IDs to filter by exact match. Prefix a login ID with '!' to exclude it."
+        ),
+    ] = None,
+    created_on: Annotated[
+        str | None, Field(description="Filter by creation date using an inclusive range: '[before~after]'.")
+    ] = None,
+    last_updated_on: Annotated[
+        str | None, Field(description="Filter by last update date using an inclusive range: '[before~after]'.")
+    ] = None,
+    order_by: Annotated[
+        str | None,
+        Field(
+            description="Comma-separated list of properties to order results by. Allowed columns: name, list_id, version_id, definition, creation_timestamp, last_update_timestamp."
+        ),
+    ] = None,
+    offset: Annotated[int, Field(ge=0, description="The offset from the beginning of the list.")] = 0,
+    limit: Annotated[int, Field(ge=1, le=100, description="The maximum number of items to return.")] = 10,
     code_list_service: CodeListService = Depends(get_code_list_service),
 ) -> GetCodeListPaginationResponse:
     """
@@ -234,6 +490,8 @@ async def get_code_lists(
         name (str | None, optional): Filter by code list name using partial match (case-insensitive). Defaults to None.
         list_id (str | None, optional): Filter by list ID using partial match (case-insensitive). Defaults to None.
         version_id (str | None, optional): Filter by version ID using partial match (case-insensitive). Defaults to None.
+        owner (str | None, optional): Comma-separated owner login IDs using exact match.
+            Prefix a login ID with '!' to exclude it. Login IDs cannot contain '!' or ','. Defaults to None.
         created_on (str | None, optional): Filter by creation date using an inclusive range: '[before~after]'.
             'before' and 'after' are date-time strings. Default date format: YYYY-MM-DD.
             Examples: '[2025-01-01~2025-02-01]'. Either 'before' or 'after' can be omitted,
@@ -310,6 +568,8 @@ async def get_code_lists(
             name=name,
             list_id=list_id,
             version_id=version_id,
+            owner=owner,
+            updater=updater,
             created_on=parse_date_range(created_on),
             last_updated_on=parse_date_range(last_updated_on),
         )
@@ -325,37 +585,81 @@ async def get_code_lists(
         "type": "object",
         "description": "Response containing code list information",
         "properties": {
-            "code_list_manifest_id": {"type": "integer", "description": "Unique identifier for the code list manifest", "example": 12345},
+            "code_list_manifest_id": {
+                "type": "integer",
+                "description": "Unique identifier for the code list manifest",
+                "example": 12345,
+            },
             "code_list_id": {"type": "integer", "description": "Unique identifier for the code list", "example": 6789},
-            "guid": {"type": "string", "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)", "example": "a1b2c3d4e5f6789012345678901234ab"},
-            "enum_type_guid": {"type": ["string", "null"], "description": "Enum type GUID for the code list", "example": "a1b2c3d4e5f6789012345678901234ab"},
+            "guid": {
+                "type": "string",
+                "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)",
+                "example": "a1b2c3d4e5f6789012345678901234ab",
+            },
+            "enum_type_guid": {
+                "type": ["string", "null"],
+                "description": "Enum type GUID for the code list",
+                "example": "a1b2c3d4e5f6789012345678901234ab",
+            },
             "name": {"type": "string", "description": "Name of the code list", "example": "Currency Code"},
             "list_id": {"type": "string", "description": "List identifier", "example": "ISO4217"},
             "version_id": {"type": "string", "description": "Version identifier", "example": "1.0"},
-            "definition": {"type": ["string", "null"], "description": "Definition of the code list", "example": "Standard currency codes"},
-            "remark": {"type": ["string", "null"], "description": "Remarks about the code list", "example": "Based on ISO 4217"},
-            "definition_source": {"type": ["string", "null"], "description": "URL indicating the source of the definition", "example": "https://www.iso.org/iso-4217-currency-codes.html"},
-            "extensible_indicator": {"type": "boolean", "description": "Whether the code list is extensible", "example": False},
-            "is_deprecated": {"type": "boolean", "description": "Whether the code list is deprecated", "example": False},
-            "state": {"type": ["string", "null"], "description": "Current state of the code list", "example": "Published"},
+            "definition": {
+                "type": ["string", "null"],
+                "description": "Definition of the code list",
+                "example": "Standard currency codes",
+            },
+            "remark": {
+                "type": ["string", "null"],
+                "description": "Remarks about the code list",
+                "example": "Based on ISO 4217",
+            },
+            "definition_source": {
+                "type": ["string", "null"],
+                "description": "URL indicating the source of the definition",
+                "example": "https://www.iso.org/iso-4217-currency-codes.html",
+            },
+            "extensible_indicator": {
+                "type": "boolean",
+                "description": "Whether the code list is extensible",
+                "example": False,
+            },
+            "is_deprecated": {
+                "type": "boolean",
+                "description": "Whether the code list is deprecated",
+                "example": False,
+            },
+            "state": {
+                "type": ["string", "null"],
+                "description": "Current state of the code list",
+                "example": "Published",
+            },
             "namespace": {
                 "type": ["object", "null"],
                 "description": "Namespace information",
                 "properties": {
-                    "namespace_id": {"type": "integer", "description": "Unique identifier for the namespace", "example": 1},
-                    "uri": {"type": "string", "description": "Namespace URI (Uniform Resource Identifier)", "example": "http://www.openapplications.org/oagis/10"},
-                    "prefix": {"type": ["string", "null"], "description": "Namespace prefix", "example": "oagis"}
+                    "namespace_id": {
+                        "type": "integer",
+                        "description": "Unique identifier for the namespace",
+                        "example": 1,
+                    },
+                    "uri": {
+                        "type": "string",
+                        "description": "Namespace URI (Uniform Resource Identifier)",
+                        "example": "http://www.openapplications.org/oagis/10",
+                    },
+                    "prefix": {"type": ["string", "null"], "description": "Namespace prefix", "example": "oagis"},
                 },
-                "required": ["namespace_id", "uri"]
+                "required": ["namespace_id", "uri"],
             },
             "library": {
                 "type": "object",
                 "description": "Library information",
                 "properties": {
                     "library_id": {"type": "integer", "description": "Unique identifier for the library", "example": 1},
-                    "name": {"type": "string", "description": "Library name", "example": "connectSpec"}
+                    "name": {"type": "string", "description": "Library name", "example": "connectSpec"},
                 },
-                "required": ["library_id", "name"]
+                "required": ["library_id", "name"],
             },
             "release": {
                 "type": "object",
@@ -363,9 +667,9 @@ async def get_code_lists(
                 "properties": {
                     "release_id": {"type": "integer", "description": "Unique identifier for the release", "example": 1},
                     "release_num": {"type": "string", "description": "Release number", "example": "10.6"},
-                    "state": {"type": "string", "description": "Release state", "example": "Published"}
+                    "state": {"type": "string", "description": "Release state", "example": "Published"},
                 },
-                "required": ["release_id", "release_num", "state"]
+                "required": ["release_id", "release_num", "state"],
             },
             "log": {
                 "type": ["object", "null"],
@@ -373,9 +677,13 @@ async def get_code_lists(
                 "properties": {
                     "log_id": {"type": "integer", "description": "Unique identifier for the log", "example": 1},
                     "revision_num": {"type": "integer", "description": "Revision number", "example": 1},
-                    "revision_tracking_num": {"type": "integer", "description": "Revision tracking number", "example": 1}
+                    "revision_tracking_num": {
+                        "type": "integer",
+                        "description": "Revision tracking number",
+                        "example": 1,
+                    },
                 },
-                "required": ["log_id", "revision_num", "revision_tracking_num"]
+                "required": ["log_id", "revision_num", "revision_tracking_num"],
             },
             "values": {
                 "type": "array",
@@ -383,16 +691,40 @@ async def get_code_lists(
                 "items": {
                     "type": "object",
                     "properties": {
-                        "code_list_value_manifest_id": {"type": "integer", "description": "Unique identifier for the code list value manifest", "example": 12345},
-                        "code_list_value_id": {"type": "integer", "description": "Unique identifier for the code list value", "example": 6789},
-                        "guid": {"type": "string", "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)", "example": "a1b2c3d4e5f6789012345678901234ab"},
+                        "code_list_value_manifest_id": {
+                            "type": "integer",
+                            "description": "Unique identifier for the code list value manifest",
+                            "example": 12345,
+                        },
+                        "code_list_value_id": {
+                            "type": "integer",
+                            "description": "Unique identifier for the code list value",
+                            "example": 6789,
+                        },
+                        "guid": {
+                            "type": "string",
+                            "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)",
+                            "example": "a1b2c3d4e5f6789012345678901234ab",
+                        },
                         "value": {"type": "string", "description": "Value of the code list", "example": "USD"},
-                        "meaning": {"type": ["string", "null"], "description": "Meaning of the code list value", "example": "US Dollar"},
-                        "definition": {"type": ["string", "null"], "description": "Definition of the code list value", "example": "United States Dollar"},
-                        "is_deprecated": {"type": "boolean", "description": "Whether the code list value is deprecated", "example": False}
+                        "meaning": {
+                            "type": ["string", "null"],
+                            "description": "Meaning of the code list value",
+                            "example": "US Dollar",
+                        },
+                        "definition": {
+                            "type": ["string", "null"],
+                            "description": "Definition of the code list value",
+                            "example": "United States Dollar",
+                        },
+                        "is_deprecated": {
+                            "type": "boolean",
+                            "description": "Whether the code list value is deprecated",
+                            "example": False,
+                        },
                     },
-                    "required": ["code_list_value_manifest_id", "code_list_value_id", "guid", "value", "is_deprecated"]
-                }
+                    "required": ["code_list_value_manifest_id", "code_list_value_id", "guid", "value", "is_deprecated"],
+                },
             },
             "owner": {
                 "type": "object",
@@ -400,10 +732,19 @@ async def get_code_lists(
                 "properties": {
                     "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
                     "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                    "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                    "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                    "username": {
+                        "type": "string",
+                        "description": "Display name of the user",
+                        "example": "Administrator",
+                    },
+                    "roles": {
+                        "type": "array",
+                        "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                        "description": "List of roles assigned to the user",
+                        "example": ["Admin"],
+                    },
                 },
-                "required": ["user_id", "login_id", "username", "roles"]
+                "required": ["user_id", "login_id", "username", "roles"],
             },
             "created": {
                 "type": "object",
@@ -413,16 +754,38 @@ async def get_code_lists(
                         "type": "object",
                         "description": "User who created the code list",
                         "properties": {
-                            "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                            "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                            "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                            "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                            "user_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the user",
+                                "example": 1,
+                            },
+                            "login_id": {
+                                "type": "string",
+                                "description": "User's login identifier",
+                                "example": "admin",
+                            },
+                            "username": {
+                                "type": "string",
+                                "description": "Display name of the user",
+                                "example": "Administrator",
+                            },
+                            "roles": {
+                                "type": "array",
+                                "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                "description": "List of roles assigned to the user",
+                                "example": ["Admin"],
+                            },
                         },
-                        "required": ["user_id", "login_id", "username", "roles"]
+                        "required": ["user_id", "login_id", "username", "roles"],
                     },
-                    "when": {"type": "string", "format": "date-time", "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-15T10:30:00Z"}
+                    "when": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                        "example": "2024-01-15T10:30:00Z",
+                    },
                 },
-                "required": ["who", "when"]
+                "required": ["who", "when"],
             },
             "last_updated": {
                 "type": "object",
@@ -432,23 +795,59 @@ async def get_code_lists(
                         "type": "object",
                         "description": "User who last updated the code list",
                         "properties": {
-                            "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                            "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                            "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                            "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                            "user_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the user",
+                                "example": 1,
+                            },
+                            "login_id": {
+                                "type": "string",
+                                "description": "User's login identifier",
+                                "example": "admin",
+                            },
+                            "username": {
+                                "type": "string",
+                                "description": "Display name of the user",
+                                "example": "Administrator",
+                            },
+                            "roles": {
+                                "type": "array",
+                                "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                "description": "List of roles assigned to the user",
+                                "example": ["Admin"],
+                            },
                         },
-                        "required": ["user_id", "login_id", "username", "roles"]
+                        "required": ["user_id", "login_id", "username", "roles"],
                     },
-                    "when": {"type": "string", "format": "date-time", "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-15T10:30:00Z"}
+                    "when": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                        "example": "2024-01-15T10:30:00Z",
+                    },
                 },
-                "required": ["who", "when"]
-            }
+                "required": ["who", "when"],
+            },
         },
-        "required": ["code_list_manifest_id", "code_list_id", "guid", "name", "list_id", "version_id", "library", "release", "owner", "created", "last_updated"]
-    }
+        "required": [
+            "code_list_manifest_id",
+            "code_list_id",
+            "guid",
+            "name",
+            "list_id",
+            "version_id",
+            "library",
+            "release",
+            "owner",
+            "created",
+            "last_updated",
+        ],
+    },
 )
 async def get_code_list(
-    code_list_manifest_id: Annotated[int, Field(gt=0, description="Unique numeric identifier of the code list manifest to retrieve.")],
+    code_list_manifest_id: Annotated[
+        int, Field(gt=0, description="Unique numeric identifier of the code list manifest to retrieve.")
+    ],
     code_list_service: CodeListService = Depends(get_code_list_service),
 ) -> GetCodeListResponse:
     """
@@ -513,6 +912,487 @@ async def get_code_list(
         return GetCodeListResponse.model_validate(row, from_attributes=True)
     except Exception as exc:
         raise _to_tool_error(exc, fallback=f"Unable to retrieve code list {code_list_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="create_code_list",
+    description="Create a new code list in a role-appropriate release branch.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the created code list manifest identifier.",
+        "properties": {
+            "code_list_manifest_id": {
+                "type": "integer",
+                "description": "Created code list manifest identifier.",
+                "example": 12345,
+            }
+        },
+        "required": ["code_list_manifest_id"],
+    },
+)
+async def create_code_list(
+    release_id: Annotated[
+        int,
+        Field(
+            gt=0,
+            description=(
+                "Target release identifier. Developers must use the `Working` release, "
+                "and end-users must use a non-`Working` release."
+            ),
+        ),
+    ],
+    name: Annotated[str, Field(min_length=1, description="Name to save for this code list.")],
+    based_code_list_manifest_id: Annotated[
+        int | None,
+        Field(
+            gt=0,
+            description="Optional base code list manifest identifier used to derive the new code list.",
+        ),
+    ] = None,
+    version_id: Annotated[
+        str | None,
+        Field(
+            description=(
+                "Version identifier to save for this code list. If omitted, the base code list's "
+                "version identifier is used when creating from a base code list; otherwise `1` is used."
+            ),
+        ),
+    ] = None,
+    list_id: Annotated[
+        str | None,
+        Field(
+            description="External list identifier to save for this code list. If omitted, a generated list identifier is used.",
+        ),
+    ] = None,
+    agency_id_list_value_manifest_id: Annotated[
+        int | None,
+        Field(gt=0, description="Agency ID list value to use for this code list."),
+    ] = None,
+    definition: Annotated[
+        str | None,
+        Field(
+            description="Definition text to save for this code list. This is the explanatory text that describes what the code list means.",
+        ),
+    ] = None,
+    definition_source: Annotated[
+        str | None,
+        Field(
+            description=(
+                "Definition source to save for this code list. Use this to record where the definition came from, "
+                "such as a specification, standard, or reference URL."
+            ),
+        ),
+    ] = None,
+    remark: Annotated[
+        str | None,
+        Field(description="Remark to save for this code list."),
+    ] = None,
+    namespace_id: Annotated[
+        int | None,
+        Field(gt=0, description="Namespace identifier to use for this code list."),
+    ] = None,
+    deprecated: Annotated[
+        bool | None,
+        Field(description="Whether this code list should start as deprecated."),
+    ] = None,
+    extensible_indicator: Annotated[
+        bool | None,
+        Field(description="Whether this code list should be extensible."),
+    ] = None,
+    code_list_service: CodeListService = Depends(get_code_list_service),
+) -> CreateCodeListResponse:
+    """Create a code list, optionally derived from a base code list."""
+    try:
+        result = await code_list_service.create_code_list(
+            release_id=release_id,
+            based_code_list_manifest_id=based_code_list_manifest_id,
+            name=name,
+            version_id=version_id,
+            list_id=list_id,
+            agency_id_list_value_manifest_id=agency_id_list_value_manifest_id,
+            definition=definition,
+            definition_source=definition_source,
+            remark=remark,
+            namespace_id=namespace_id,
+            deprecated=deprecated,
+            extensible_indicator=extensible_indicator,
+        )
+        return CreateCodeListResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback="Unable to create the code list.") from exc
+
+
+@mcp.tool(
+    name="update_code_list",
+    description="Update mutable code list fields while the code list is in WIP.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the updated code list manifest identifier and changed fields.",
+        "properties": {
+            "code_list_manifest_id": {
+                "type": "integer",
+                "description": "Target code list manifest identifier.",
+                "example": 12345,
+            },
+            "updates": {
+                "type": "array",
+                "description": "Updated field names.",
+                "items": {"type": "string"},
+                "example": ["definition", "remark"],
+            },
+        },
+        "required": ["code_list_manifest_id", "updates"],
+    },
+)
+async def update_code_list(
+    code_list_manifest_id: Annotated[int, Field(gt=0, description="Target code list manifest identifier.")],
+    name: Annotated[str | None, Field(description="Updated name. Omit to leave unchanged.")] = None,
+    version_id: Annotated[str | None, Field(description="Updated version identifier. Omit to leave unchanged.")] = None,
+    list_id: Annotated[
+        str | None, Field(description="Updated external list identifier. Omit to leave unchanged.")
+    ] = None,
+    agency_id_list_value_manifest_id: Annotated[
+        int | None,
+        Field(
+            ge=0,
+            description=(
+                "Updated agency ID list value manifest identifier. Omit to leave unchanged. Use `0` to clear it."
+            ),
+        ),
+    ] = None,
+    definition: Annotated[
+        str | None,
+        Field(
+            description="Definition text. This is the explanatory text that describes what the code list means. Omit to leave unchanged.",
+        ),
+    ] = None,
+    definition_source: Annotated[
+        str | None,
+        Field(
+            description=(
+                "Definition source. Use this to record where the definition came from, such as a "
+                "specification, standard, or reference URL. Omit to leave unchanged."
+            ),
+        ),
+    ] = None,
+    remark: Annotated[str | None, Field(description="Updated remark. Omit to leave unchanged.")] = None,
+    namespace_id: Annotated[
+        int | None,
+        Field(
+            ge=0,
+            description="Updated namespace identifier. Omit to leave unchanged. Use `0` to clear the namespace.",
+        ),
+    ] = None,
+    deprecated: Annotated[bool | None, Field(description="Updated deprecation flag. Omit to leave unchanged.")] = None,
+    extensible_indicator: Annotated[
+        bool | None,
+        Field(description="Updated extensibility flag. Omit to leave unchanged."),
+    ] = None,
+    code_list_service: CodeListService = Depends(get_code_list_service),
+) -> UpdateCodeListResponse:
+    """Update mutable code list fields."""
+    try:
+        result = await code_list_service.update_code_list(
+            code_list_manifest_id=code_list_manifest_id,
+            name=UNSET if name is None else name,
+            version_id=UNSET if version_id is None else version_id,
+            list_id=UNSET if list_id is None else list_id,
+            agency_id_list_value_manifest_id=(
+                UNSET
+                if agency_id_list_value_manifest_id is None
+                else (None if agency_id_list_value_manifest_id == 0 else agency_id_list_value_manifest_id)
+            ),
+            definition=UNSET if definition is None else definition,
+            definition_source=UNSET if definition_source is None else definition_source,
+            remark=UNSET if remark is None else remark,
+            namespace_id=UNSET if namespace_id is None else (None if namespace_id == 0 else namespace_id),
+            deprecated=UNSET if deprecated is None else deprecated,
+            extensible_indicator=UNSET if extensible_indicator is None else extensible_indicator,
+        )
+        return UpdateCodeListResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to update code list {code_list_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="create_code_list_value",
+    description="Create a new code list value while the owner code list is in WIP.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the created code list value manifest identifier.",
+        "properties": {
+            "code_list_value_manifest_id": {
+                "type": "integer",
+                "description": "Created code list value manifest identifier.",
+                "example": 12345,
+            }
+        },
+        "required": ["code_list_value_manifest_id"],
+    },
+)
+async def create_code_list_value(
+    code_list_manifest_id: Annotated[int, Field(gt=0, description="Owner code list manifest identifier.")],
+    value: Annotated[str, Field(min_length=1, description="Value for the new code list entry.")],
+    meaning: Annotated[str | None, Field(description="Meaning of the new code list value.")] = None,
+    definition: Annotated[str | None, Field(description="Definition of the new code list value.")] = None,
+    definition_source: Annotated[
+        str | None,
+        Field(description="Definition source URL for the new code list value."),
+    ] = None,
+    deprecated: Annotated[bool, Field(description="Whether the new code list value is deprecated.")] = False,
+    code_list_service: CodeListService = Depends(get_code_list_service),
+) -> CreateCodeListValueResponse:
+    """Create one code list value under the target code list."""
+    try:
+        result = await code_list_service.create_code_list_value(
+            code_list_manifest_id=code_list_manifest_id,
+            value=value,
+            meaning=meaning,
+            definition=definition,
+            definition_source=definition_source,
+            deprecated=deprecated,
+        )
+        return CreateCodeListValueResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(
+            exc,
+            fallback=f"Unable to create a code list value for code list {code_list_manifest_id}.",
+        ) from exc
+
+
+@mcp.tool(
+    name="update_code_list_value",
+    description="Update selected fields of an existing code list value while the owner code list is in WIP.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the updated code list value manifest identifier and changed fields.",
+        "properties": {
+            "code_list_value_manifest_id": {
+                "type": "integer",
+                "description": "Target code list value manifest identifier.",
+                "example": 12345,
+            },
+            "updates": {
+                "type": "array",
+                "description": "Updated field names.",
+                "items": {"type": "string"},
+                "example": ["meaning", "definition"],
+            },
+        },
+        "required": ["code_list_value_manifest_id", "updates"],
+    },
+)
+async def update_code_list_value(
+    code_list_manifest_id: Annotated[int, Field(gt=0, description="Owner code list manifest identifier.")],
+    code_list_value_manifest_id: Annotated[int, Field(gt=0, description="Target code list value manifest identifier.")],
+    value: Annotated[str | None, Field(description="Updated value. Omit to leave unchanged.")] = None,
+    meaning: Annotated[str | None, Field(description="Updated meaning. Omit to leave unchanged.")] = None,
+    definition: Annotated[str | None, Field(description="Updated definition. Omit to leave unchanged.")] = None,
+    definition_source: Annotated[
+        str | None,
+        Field(description="Updated definition source URL. Omit to leave unchanged."),
+    ] = None,
+    deprecated: Annotated[bool | None, Field(description="Updated deprecation flag. Omit to leave unchanged.")] = None,
+    code_list_service: CodeListService = Depends(get_code_list_service),
+) -> UpdateCodeListValueResponse:
+    """Update one code list value under the target code list."""
+    try:
+        result = await code_list_service.update_code_list_value(
+            code_list_manifest_id=code_list_manifest_id,
+            code_list_value_manifest_id=code_list_value_manifest_id,
+            value=UNSET if value is None else value,
+            meaning=UNSET if meaning is None else meaning,
+            definition=UNSET if definition is None else definition,
+            definition_source=UNSET if definition_source is None else definition_source,
+            deprecated=UNSET if deprecated is None else deprecated,
+        )
+        return UpdateCodeListValueResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(
+            exc,
+            fallback=f"Unable to update code list value {code_list_value_manifest_id}.",
+        ) from exc
+
+
+@mcp.tool(
+    name="delete_code_list_value",
+    description="Delete an existing code list value while the owner code list is in WIP.",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def delete_code_list_value(
+    code_list_manifest_id: Annotated[int, Field(gt=0, description="Owner code list manifest identifier.")],
+    code_list_value_manifest_id: Annotated[int, Field(gt=0, description="Target code list value manifest identifier.")],
+    code_list_service: CodeListService = Depends(get_code_list_service),
+) -> dict[str, object]:
+    """Delete one code list value under the target code list."""
+    try:
+        await code_list_service.delete_code_list_value(
+            code_list_manifest_id=code_list_manifest_id,
+            code_list_value_manifest_id=code_list_value_manifest_id,
+        )
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(
+            exc,
+            fallback=f"Unable to delete code list value {code_list_value_manifest_id}.",
+        ) from exc
+
+
+@mcp.tool(
+    name="transfer_code_list_ownership",
+    description="Transfer ownership of a code list to another user.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the code list manifest identifier and changed fields.",
+        "properties": {
+            "code_list_manifest_id": {
+                "type": "integer",
+                "description": "Target code list manifest identifier.",
+                "example": 12345,
+            },
+            "updates": {
+                "type": "array",
+                "description": "Updated field names.",
+                "items": {"type": "string"},
+                "example": ["owner_user_id"],
+            },
+        },
+        "required": ["code_list_manifest_id", "updates"],
+    },
+)
+async def transfer_code_list_ownership(
+    code_list_manifest_id: Annotated[int, Field(gt=0, description="Target code list manifest identifier.")],
+    new_owner_user_id: Annotated[int, Field(gt=0, description="User ID of the new owner.")],
+    ctx: Context,
+    code_list_service: CodeListService = Depends(get_code_list_service),
+    app_user_service: AppUserService = Depends(get_app_user_service),
+) -> TransferCodeListOwnershipResponse:
+    """Transfer code list ownership to another user after confirmation."""
+    try:
+        row = await code_list_service.get(code_list_manifest_id)
+        if row is None:
+            raise ToolError(
+                f"The code list with manifest ID {code_list_manifest_id} was not found. Please check the ID and try again."
+            )
+        target_user = await app_user_service.get(new_owner_user_id)
+        if target_user is None:
+            raise ToolError(
+                f"The target user with ID {new_owner_user_id} was not found. Please check the ID and try again."
+            )
+
+        target_user_label = target_user.login_id
+        if target_user.username and target_user.username != target_user.login_id:
+            target_user_label = f"{target_user.login_id} ({target_user.username})"
+        code_list_label = row.name or row.list_id or f"Code list {code_list_manifest_id}"
+
+        elicit_result = await ctx.elicit(
+            message=(f"Are you sure you want to transfer ownership of '{code_list_label}' to {target_user_label}?"),
+            response_type=None,
+        )
+        match elicit_result:
+            case AcceptedElicitation():
+                payload = await code_list_service.transfer_code_list_ownership(
+                    code_list_manifest_id=code_list_manifest_id,
+                    target_user_id=new_owner_user_id,
+                )
+                updates = [] if int(new_owner_user_id) == int(row.owner.user_id) else ["owner_user_id"]
+                return TransferCodeListOwnershipResponse(
+                    code_list_manifest_id=payload.code_list_manifest_id,
+                    updates=updates,
+                )
+            case DeclinedElicitation():
+                raise ToolError("Code list ownership transfer declined by user.")
+            case CancelledElicitation():
+                raise ToolError("Code list ownership transfer cancelled by user.")
+    except Exception as exc:
+        raise _to_tool_error(
+            exc,
+            fallback=f"Unable to transfer ownership of code list {code_list_manifest_id}.",
+        ) from exc
+
+
+@mcp.tool(
+    name="change_code_list_state",
+    description="Change the lifecycle state of a code list.",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def change_code_list_state(
+    code_list_manifest_id: Annotated[int, Field(gt=0, description="Target code list manifest identifier.")],
+    state: Annotated[CodeListLifecycleState, Field(description="Target lifecycle state.")],
+    code_list_service: CodeListService = Depends(get_code_list_service),
+) -> dict[str, object]:
+    """
+    Change a code list lifecycle state according to connectCenter rules.
+
+    Valid transitions depend on the release branch:
+    - `Working` release code lists: `Deleted -> WIP`, `WIP -> Deleted|Draft`, `Draft -> WIP|Candidate`, `Candidate -> WIP`
+    - non-`Working` release code lists: `Deleted -> WIP`, `WIP -> Deleted|QA`, `QA -> WIP|Production`, `Production` is terminal
+    """
+    try:
+        await code_list_service.change_code_list_state(
+            code_list_manifest_id=code_list_manifest_id,
+            state=state,
+        )
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(
+            exc,
+            fallback=f"Unable to change the code list state for {code_list_manifest_id}.",
+        ) from exc
+
+
+@mcp.tool(
+    name="revise_or_amend_code_list",
+    description=(
+        "Create a new editable code list revision from a stable code list revision. "
+        "For end-user code lists, this is called an amendment."
+    ),
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def revise_or_amend_code_list(
+    code_list_manifest_id: Annotated[int, Field(gt=0, description="Target code list manifest identifier.")],
+    code_list_service: CodeListService = Depends(get_code_list_service),
+) -> dict[str, object]:
+    """Revise or amend a code list according to connectCenter rules."""
+    try:
+        await code_list_service.revise_code_list(code_list_manifest_id=code_list_manifest_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to revise or amend code list {code_list_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="cancel_code_list",
+    description="Cancel the current code list revision and restore the previous stable revision.",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def cancel_code_list(
+    code_list_manifest_id: Annotated[int, Field(gt=0, description="Target code list manifest identifier.")],
+    code_list_service: CodeListService = Depends(get_code_list_service),
+) -> dict[str, object]:
+    """Cancel the current code list revision according to connectCenter rules."""
+    try:
+        await code_list_service.cancel_code_list(code_list_manifest_id=code_list_manifest_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to cancel code list {code_list_manifest_id}.") from exc
+
+
+@mcp.tool(
+    name="discard_code_list",
+    description="Discard a Deleted code list and its direct records permanently.",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def discard_code_list(
+    code_list_manifest_id: Annotated[int, Field(gt=0, description="Target code list manifest identifier.")],
+    code_list_service: CodeListService = Depends(get_code_list_service),
+) -> dict[str, object]:
+    """Discard a Deleted code list from the database."""
+    try:
+        await code_list_service.discard_code_list(code_list_manifest_id=code_list_manifest_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to discard code list {code_list_manifest_id}.") from exc
 
 
 def _build_code_list_service(

@@ -132,6 +132,9 @@ public class OpenAPIDocController {
         request.setContactUrl(oasDoc.getContactUrl());
         request.setLicenseName(oasDoc.getLicenseName());
         request.setLicenseUrl(oasDoc.getLicenseUrl());
+        // Issue #1729: carry the configured Security Schemes.
+        request.setSecuritySchemes(oasDoc.getSecuritySchemes());
+        request.setSecurityRequirements(oasDoc.getSecurityRequirements());
 
         CreateOasDocResponse response = oasDocService.createOasDoc(sessionService.asScoreUser(user), request);
 
@@ -349,7 +352,7 @@ public class OpenAPIDocController {
         GetBieForOasDocResponse bieForOasDocList = oasDocService.getBieForOasDoc(sessionService.asScoreUser(user), request);
 
         return bieForOasDocList.getResults().stream()
-                .filter(c -> c.getTopLevelAsbiepId().equals(selectedTopLevelAsbiepId))
+                .filter(c -> c.getTopLevelAsbiepId() != null && c.getTopLevelAsbiepId().equals(selectedTopLevelAsbiepId))
                 .findAny().get();
     }
 
@@ -399,9 +402,13 @@ public class OpenAPIDocController {
         }
         request.setPath(resourceName);
         request.setVerb(verbOption);
-        SetOperationIdWithVerb setOperationIdWithVerb = new SetOperationIdWithVerb(verbOption, businessContextName, assignBieForOasDoc.getPropertyTerm(),
-                isArray);
-        String operationId = setOperationIdWithVerb.verbToOperationId();
+        // Issue #1732: the frontend builds the operationId ('<verb><BIEName>[List]', no
+        // business-context prefix) and sends it; the backend just stores it. businessContextName
+        // above is still used to build the resource path. Guard: operationId is required (NOT NULL).
+        String operationId = assignBieForOasDoc.getOperationId();
+        if (operationId == null || operationId.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
         request.setOperationId(operationId);
         request.setMakeArrayIndicator(assignBieForOasDoc.isArrayIndicator());
         //issue#1492 Comments by Scott without displaying, default Suppress Root = true when Adding BIE
@@ -409,6 +416,33 @@ public class OpenAPIDocController {
         request.setRequiredForRequestBody(assignBieForOasDoc.isRequired());
         request.setDeprecatedForOperation(false);
         AddBieForOasDocResponse response = oasDocService.addBieForOasDoc(sessionService.asScoreUser(user), request);
+        if (response.getOasResponseId() != null || response.getOasRequestId() != null) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    // Issue #1730: Add an API operation (endpoint) that does NOT reference a BIE
+    // (e.g. DELETE/PATCH with no body, 202 Accepted / 204 No Content).
+    @RequestMapping(value = "/oas_doc/{id:[\\d]+}/operation", method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity addOperationForOasDoc(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("id") OasDocId oasDocId,
+            @RequestBody AddOperationForOasDoc addOperationForOasDoc) {
+        ScoreUser requester = sessionService.asScoreUser(user);
+        AddOperationForOasDocRequest request = new AddOperationForOasDocRequest(requester);
+        request.setOasDocId(oasDocId);
+        request.setOasRequest("Request".equals(addOperationForOasDoc.getMessageBody()));
+        request.setVerb(addOperationForOasDoc.getVerb());
+        request.setPath(addOperationForOasDoc.getResourceName());
+        request.setOperationId(addOperationForOasDoc.getOperationId());
+        request.setTagName(addOperationForOasDoc.getTagName());
+        request.setHttpStatusCode(addOperationForOasDoc.getHttpStatusCode());
+        request.setSummary(addOperationForOasDoc.getSummary());
+        request.setDescription(addOperationForOasDoc.getDescription());
+        AddBieForOasDocResponse response = oasDocService.addOperationForOasDoc(requester, request);
         if (response.getOasResponseId() != null || response.getOasRequestId() != null) {
             return ResponseEntity.noContent().build();
         } else {
@@ -432,6 +466,10 @@ public class OpenAPIDocController {
         if (bieForOasDocList != null && bieForOasDocList.getResults() != null) {
             for (BieForOasDoc bieForOasDoc : bieForOasDocList.getResults()) {
                 TopLevelAsbiepId selectedTopLevelAsbiepId = bieForOasDoc.getTopLevelAsbiepId();
+                // Issue #1730: Bodyless operations have no BIE; skip them in the reuse check.
+                if (selectedTopLevelAsbiepId == null) {
+                    continue;
+                }
 
                 reusedBIEViolationCheck.getReusedBIE(selectedTopLevelAsbiepId)
                         .putOperation(bieForOasDoc.getVerb(), Pair.of(bieForOasDoc.getMessageBody(), bieForOasDoc.getOperationId()));
@@ -474,6 +512,10 @@ public class OpenAPIDocController {
         if (bieForOasDocList != null && bieForOasDocList.getResults() != null) {
             for (BieForOasDoc bieForOasDoc : bieForOasDocList.getResults()) {
                 TopLevelAsbiepId selectedTopLevelAsbiepId = bieForOasDoc.getTopLevelAsbiepId();
+                // Issue #1730: Bodyless operations have no BIE; skip them in the reuse check.
+                if (selectedTopLevelAsbiepId == null) {
+                    continue;
+                }
 
                 reusedBIEViolationCheck.getReusedBIE(selectedTopLevelAsbiepId)
                         .putOperation(bieForOasDoc.getVerb(), Pair.of(bieForOasDoc.getMessageBody(), bieForOasDoc.getOperationId()));
@@ -607,89 +649,12 @@ public class OpenAPIDocController {
         ScoreUser requester = sessionService.asScoreUser(user);
 
         for (BieForOasDoc bieForOasDoc : updateBieForOasDocRequest.getBieForOasDocList()) {
-            if (bieForOasDoc.getOasResourceId() != null) {
-                GetOasOperationRequest getOasOperationRequest = new GetOasOperationRequest(requester)
-                        .withOasResourceId(bieForOasDoc.getOasResourceId());
-                GetOasOperationResponse oasOperationResponse = oasDocService.getOasOperation(requester, getOasOperationRequest);
-                if (!bieForOasDoc.getVerb().equals(oasOperationResponse.getOasOperation().getVerb())) {
-
-                    UpdateOperationIdWhenVerbChanged updateOperationIdWhenVerbChanged = new UpdateOperationIdWhenVerbChanged(
-                            bieForOasDoc.getVerb(), bieForOasDoc.getOperationId(), bieForOasDoc.isArrayIndicator());
-                    String updatedOperationId = updateOperationIdWhenVerbChanged.verbToOperationId();
-                    bieForOasDoc.setOperationId(updatedOperationId);
-                }
-            }
-
-            if (bieForOasDoc.getOasOperationId() != null) {
-                if (bieForOasDoc.getMessageBody().equals("Request")) {
-                    GetOasRequestTableRequest getOasRequestTableRequest = new GetOasRequestTableRequest(requester)
-                            .withOasOperationId(bieForOasDoc.getOasOperationId());
-                    GetOasRequestTableResponse oasRequestTableResponse = oasDocService.getOasRequestTable(requester, getOasRequestTableRequest);
-                    if (oasRequestTableResponse != null &&
-                            oasRequestTableResponse.getOasRequestTable() != null
-                            && bieForOasDoc.isArrayIndicator() != oasRequestTableResponse.getOasRequestTable().isMakeArrayIndicator()) {
-                        String newResourceName = null;
-                        String newOperationId = null;
-                        String oldResourceName = bieForOasDoc.getResourceName();
-                        String oldOperationId = bieForOasDoc.getOperationId();
-                        if (bieForOasDoc.isArrayIndicator()) {
-                            if (!oldResourceName.endsWith("-list")) {
-                                newResourceName = oldResourceName + "-list";
-                            }
-                            if (!oldOperationId.endsWith("List")) {
-                                newOperationId = oldOperationId + "List";
-                            }
-                        } else {
-                            if (oldResourceName.endsWith("-list")) {
-                                newResourceName = oldResourceName.substring(0, oldResourceName.length() - 5);
-                            }
-                            if (oldOperationId.endsWith("List")) {
-                                newOperationId = oldOperationId.substring(0, oldOperationId.length() - 4);
-                            }
-                        }
-                        if (newResourceName != null) {
-                            bieForOasDoc.setResourceName(newResourceName);
-                        }
-                        if (newOperationId != null) {
-                            bieForOasDoc.setOperationId(newOperationId);
-                        }
-                    }
-                }
-
-                if (bieForOasDoc.getMessageBody().equals("Response")) {
-                    GetOasResponseTableRequest getOasResponseTableRequest = new GetOasResponseTableRequest(requester)
-                            .withOasOperationId(bieForOasDoc.getOasOperationId());
-                    GetOasResponseTableResponse oasResponseTableResponse = oasDocService.getOasResponseTable(requester, getOasResponseTableRequest);
-                    if (oasResponseTableResponse != null &&
-                            oasResponseTableResponse.getOasResponseTable() != null
-                            && bieForOasDoc.isArrayIndicator() != oasResponseTableResponse.getOasResponseTable().isMakeArrayIndicator()) {
-                        String newResourceName = null;
-                        String newOperationId = null;
-                        String oldResourceName = bieForOasDoc.getResourceName();
-                        String oldOperationId = bieForOasDoc.getOperationId();
-                        if (bieForOasDoc.isArrayIndicator()) {
-                            if (!oldResourceName.endsWith("-list")) {
-                                newResourceName = oldResourceName + "-list";
-                            }
-                            if (!oldOperationId.endsWith("List")) {
-                                newOperationId = oldOperationId + "List";
-                            }
-                        } else {
-                            if (oldResourceName.endsWith("-list")) {
-                                newResourceName = oldResourceName.substring(0, oldResourceName.length() - 5);
-                            }
-                            if (oldOperationId.endsWith("List")) {
-                                newOperationId = oldOperationId.substring(0, oldOperationId.length() - 4);
-                            }
-                        }
-                        if (newResourceName != null) {
-                            bieForOasDoc.setResourceName(newResourceName);
-                        }
-                        if (newOperationId != null) {
-                            bieForOasDoc.setOperationId(newOperationId);
-                        }
-                    }
-                }
+            // Issue #1732: operationId (verb word and the array 'List' suffix included) and
+            // resourceName are computed by the frontend and sent verbatim; the backend persists them
+            // as-is — it does not recompute or adjust them here. Guard: operationId is required.
+            String operationId = bieForOasDoc.getOperationId();
+            if (operationId == null || operationId.isBlank()) {
+                return ResponseEntity.badRequest().build();
             }
         }
 
@@ -738,6 +703,9 @@ public class OpenAPIDocController {
         request.setContactUrl(oasDoc.getContactUrl());
         request.setLicenseName(oasDoc.getLicenseName());
         request.setLicenseUrl(oasDoc.getLicenseUrl());
+        // Issue #1729: carry the configured Security Schemes.
+        request.setSecuritySchemes(oasDoc.getSecuritySchemes());
+        request.setSecurityRequirements(oasDoc.getSecurityRequirements());
 
         UpdateOasDocResponse response = oasDocService.updateOasDoc(sessionService.asScoreUser(user), request);
 

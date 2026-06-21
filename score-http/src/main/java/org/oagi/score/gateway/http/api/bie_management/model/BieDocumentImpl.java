@@ -28,6 +28,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.oagi.score.gateway.http.api.bie_management.service.BieVisitResult.SKIP_SUBTREE;
+
 @Data
 public class BieDocumentImpl implements BieDocument {
 
@@ -219,12 +221,16 @@ public class BieDocumentImpl implements BieDocument {
     }
 
     private void accept(BieVisitor visitor, Asbiep asbiep, BieVisitContext context) {
-        visitor.visitAsbiep(asbiep, context);
+        if (visitor.visitAsbiep(asbiep, context) == SKIP_SUBTREE) {
+            return;
+        }
         accept(visitor, getAbie(asbiep), context);
     }
 
     private void accept(BieVisitor visitor, Abie abie, BieVisitContext context) {
-        visitor.visitAbie(abie, context);
+        if (visitor.visitAbie(abie, context) == SKIP_SUBTREE) {
+            return;
+        }
         for (BieAssociation bieAssociation : getAssociations(abie)) {
             accept(visitor, bieAssociation, context);
         }
@@ -232,12 +238,23 @@ public class BieDocumentImpl implements BieDocument {
 
     private void accept(BieVisitor visitor, BieAssociation bieAssociation, BieVisitContext context) {
         if (bieAssociation.isAsbie()) {
-            visitor.visitAsbie((Asbie) bieAssociation, context);
-            accept(visitor, getAsbiep((Asbie) bieAssociation), context);
+            Asbie asbie = (Asbie) bieAssociation;
+            // A reuse-reference ASBIE returns SKIP_SUBTREE: it points at another top-level
+            // BIE, so re-traversing its to_asbiep subtree would both duplicate work
+            // (corrupting the source-id-keyed maps) and overwrite the reference with a
+            // private copy.
+            if (visitor.visitAsbie(asbie, context) == SKIP_SUBTREE) {
+                return;
+            }
+            accept(visitor, getAsbiep(asbie), context);
         } else if (bieAssociation.isBbie()) {
             Bbie bbie = (Bbie) bieAssociation;
-            visitor.visitBbie(bbie, context);
-            visitor.visitBbiep(getBbiep(bbie), context);
+            if (visitor.visitBbie(bbie, context) == SKIP_SUBTREE) {
+                return;
+            }
+            if (visitor.visitBbiep(getBbiep(bbie), context) == SKIP_SUBTREE) {
+                return;
+            }
             for (BbieSc bbieSc : getBbieScList(bbie)) {
                 visitor.visitBbieSc(bbieSc, context);
             }

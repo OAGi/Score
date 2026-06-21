@@ -307,6 +307,8 @@ public class ModuleSetReleaseQueryService implements InitializingBean {
                     schemaSources.put(schemaId, content);
                     schemaSources.put("/" + schemaId, content);
                 }
+            } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+                logger.warn("Skipping JSON schema id registration for invalid JSON source: {}", schemaFile, e);
             } catch (IOException e) {
                 throw new IllegalStateException("Failed to read JSON schema source: " + schemaFile, e);
             }

@@ -120,13 +120,22 @@ export class CodeListService {
     });
   }
 
-  update(codeList: CodeListDetails, state?: string): Observable<any> {
+  update(codeList: CodeListDetails, state?: string, comment?: string,
+         projectFieldOptionOverride?: string): Observable<any> {
     let body;
     if (state) {
       body = {
         releaseId: codeList.release.releaseId,
         toState: state
       };
+      // An optional comment + project board fieldOption override travel with the state change (issue #1533).
+      // Blank values are not sent (post nothing / use the configured fieldOption).
+      if (comment && comment.trim().length > 0) {
+        body.comment = comment;
+      }
+      if (projectFieldOptionOverride) {
+        body.projectFieldOptionOverride = projectFieldOptionOverride;
+      }
       return this.http.patch('/api/code-lists/' + codeList.codeListManifestId + '/state', body, {
         context: this.suppressErrorAlert()
       });
@@ -149,8 +158,9 @@ export class CodeListService {
     return this.http.put('/api/code-lists/' + codeList.codeListManifestId, body);
   }
 
-  updateState(codeList: CodeListDetails, state: string): Observable<any> {
-    return this.update(codeList, state);
+  updateState(codeList: CodeListDetails, state: string, comment?: string,
+              projectFieldOptionOverride?: string): Observable<any> {
+    return this.update(codeList, state, comment, projectFieldOptionOverride);
   }
 
   delete(...codeListManifestIds): Observable<any> {
@@ -201,9 +211,18 @@ export class CodeListService {
     return this.http.patch('/api/code-lists/' + codeList.codeListManifestId + '/revise', {});
   }
 
-  cancelRevision(manifestId: number): Observable<any> {
+  cancelRevision(manifestId: number, comment?: string, projectFieldOptionOverride?: string): Observable<any> {
     const url = '/api/code-lists/' + manifestId + '/cancel';
-    return this.http.patch<any>(url, {});
+    // An optional comment + project board fieldOption override travel with the request (issue #1533). Blank
+    // values are not sent (post nothing / use the configured fieldOption).
+    const body: any = {};
+    if (comment && comment.trim().length > 0) {
+      body.comment = comment;
+    }
+    if (projectFieldOptionOverride) {
+      body.projectFieldOptionOverride = projectFieldOptionOverride;
+    }
+    return this.http.patch<any>(url, body);
   }
 
   transferOwnership(manifestId: number, targetLoginId: string): Observable<any> {

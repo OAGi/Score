@@ -5,6 +5,9 @@ import {
   BieForOasDocListRequest,
   BieForOasDocUpdateRequest,
   OasDoc,
+  OasSecurityRequirement,
+  OasSecurityScheme,
+  recomputeOperationId,
   SimpleOasDoc
 } from '../domain/openapi-doc';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
@@ -12,12 +15,17 @@ import {OpenAPIService} from '../domain/openapi.service';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {ErrorStateMatcher} from '@angular/material/core';
+import {UntypedFormControl} from '@angular/forms';
 import {forkJoin} from 'rxjs';
 import {hashCode, saveAsBlobResponse, saveBranch} from 'src/app/common/utility';
 import {SelectionModel} from '@angular/cdk/collections';
 import {finalize} from 'rxjs/operators';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {OasDocAssignDialogComponent} from '../oas-doc-assign-dialog/oas-doc-assign-dialog.component';
+import {OasDocAddOperationDialogComponent} from '../oas-doc-add-operation-dialog/oas-doc-add-operation-dialog.component';
+import {OasDocSecuritySchemeDialogComponent} from '../oas-doc-security-scheme-dialog/oas-doc-security-scheme-dialog.component';
+import {OasDocSecurityRequirementDialogComponent} from '../oas-doc-security-requirement-dialog/oas-doc-security-requirement-dialog.component';
 import {MatMultiSort, MatMultiSortTableDataSource, TableData} from 'ngx-mat-multi-sort';
 import {BusinessContext} from '../../../context-management/business-context/domain/business-context';
 import {BieExpressOption} from '../../bie-express/domain/generate-expression';
@@ -89,6 +97,23 @@ export class OasDocDetailComponent implements OnInit {
     });
   }
 
+  ensureSecurityColumn() {
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfBieForOasDocPage;
+    // Position the Security column right after Message Body (preserve a saved entry's width/selected).
+    let entry = columns.find(c => c.name === 'Security');
+    if (entry) {
+      columns.splice(columns.indexOf(entry), 1);
+    } else {
+      entry = {name: 'Security', selected: true, width: 120};
+    }
+    const idx = columns.findIndex(c => c.name === 'Message Body');
+    if (idx >= 0) {
+      columns.splice(idx + 1, 0, entry);
+    } else {
+      columns.push(entry);
+    }
+  }
+
   onColumnsReset() {
     const defaultTableColumnInfo = new TableColumnsInfo();
     this.columns = defaultTableColumnInfo.columnsOfBieForOasDocPage;
@@ -150,6 +175,7 @@ export class OasDocDetailComponent implements OnInit {
     {id: 'arrayIndicator', name: 'Array Indicator', isActive: true},
     {id: 'suppressRootIndicator', name: 'Suppress Root Indicator', isActive: true},
     {id: 'messageBody', name: 'Message Body', isActive: true},
+    {id: 'security', name: 'Security', isActive: true},
     {id: 'resourceName', name: 'Resource Name', isActive: true},
     {id: 'operationId', name: 'Operation ID', isActive: true},
     {id: 'tagName', name: 'Tag Name', isActive: true}
@@ -210,6 +236,11 @@ export class OasDocDetailComponent implements OnInit {
               displayedColumns.push('tagName');
             }
             break;
+          case 'Security':
+            if (column.selected) {
+              displayedColumns.push('security');
+            }
+            break;
         }
       }
     }
@@ -226,6 +257,18 @@ export class OasDocDetailComponent implements OnInit {
   option: BieExpressOption;
   openApiFormats: string[] = ['YAML', 'JSON'];
   topLevelAsbiepIds: number[];
+
+  // Issue #1732: operationId no longer carries a business-context prefix, so the same BIE+verb
+  // under different contexts can produce identical operationIds. OpenAPI requires operationId to be
+  // unique within a document, so collisions among the loaded operations are flagged as a mat-error
+  // (application-level validation). User-entered values are never auto-corrected or blocked.
+  duplicateOperationIds = new Set<string>();
+  operationIdErrorStateMatcher: ErrorStateMatcher = {
+    isErrorState: (control: UntypedFormControl | null): boolean => {
+      const value = (control?.value || '').trim();
+      return !value || this.duplicateOperationIds.has(value);
+    }
+  };
 
   @ViewChild(MatMultiSort, {static: true}) sort: MatMultiSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -284,6 +327,7 @@ export class OasDocDetailComponent implements OnInit {
       }
 
       this.preferencesInfo = preferencesInfo;
+      this.ensureSecurityColumn();
       this.onColumnsChange(this.preferencesInfo.tableColumnsInfo.columnsOfBieForOasDocPage);
 
       this.oasDoc = simpleOasDoc;
@@ -315,10 +359,275 @@ export class OasDocDetailComponent implements OnInit {
   }
 
   init(oasDoc: OasDoc) {
+    // Issue #1729: default to an empty list (= legacy OAuth2 default) so the baseline hashCode
+    // includes it and adding/removing schemes is detected as a change.
+    if (!oasDoc.securitySchemes) {
+      oasDoc.securitySchemes = [];
+    }
+    if (!oasDoc.securityRequirements) {
+      oasDoc.securityRequirements = [];
+    }
     this.hashCodeForOasDoc = hashCode(oasDoc);
     this.oasDoc = oasDoc;
     setAppTitleIfPresent(this.titleService, this.oasDoc.title, 'OpenAPI Document');
     this.isUpdating = false;
+  }
+
+  // Issue #1729: selectable security scheme types (OpenAPI 3.0.3).
+  securitySchemeTypes = [
+    {value: 'apiKey', label: 'API Key'},
+    {value: 'http', label: 'HTTP'},
+    {value: 'oauth2', label: 'OAuth 2.0'},
+    {value: 'openIdConnect', label: 'OpenID Connect'}
+  ];
+
+  // The document's Security Schemes (empty = default OAuth2).
+  get securitySchemes(): OasSecurityScheme[] {
+    if (!this.oasDoc.securitySchemes) {
+      this.oasDoc.securitySchemes = [];
+    }
+    return this.oasDoc.securitySchemes;
+  }
+
+  // Issue #1729: open the dialog to add a new security scheme.
+  addSecurityScheme() {
+    this.openSchemeDialog(null, -1);
+  }
+
+  // Open the dialog to edit an existing scheme (clicking its card).
+  editSecurityScheme(scheme: OasSecurityScheme, index: number) {
+    this.openSchemeDialog(scheme, index);
+  }
+
+  removeSecurityScheme(index: number, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
+    const removedSchemeName = this.securitySchemes[index]?.schemeName;
+    this.securitySchemes.splice(index, 1);
+    if (removedSchemeName) {
+      this.oasDoc.securityRequirements = this.pruneSecurityRequirements(this.oasDoc.securityRequirements, removedSchemeName);
+      (this.table?.dataSource?.data || []).forEach(row => {
+        const hadRequirements = (row.securityRequirements || []).length > 0;
+        row.securityRequirements = this.pruneSecurityRequirements(row.securityRequirements, removedSchemeName);
+        // Only a custom override that lost ALL its schemes reverts to inherit. A Public override
+        // (securityOverridden=true with intentionally-empty requirements) must stay public.
+        if (hadRequirements && row.securityRequirements.length === 0) {
+          row.securityOverridden = false;
+        }
+      });
+    }
+  }
+
+  private openSchemeDialog(scheme: OasSecurityScheme, index: number) {
+    const isNew = index < 0;
+    // Deep copy so Cancel discards edits; existingNames excludes the scheme being edited.
+    const working: OasSecurityScheme = scheme
+      ? JSON.parse(JSON.stringify(scheme))
+      : ({type: 'apiKey'} as OasSecurityScheme);
+    const existingNames = this.securitySchemes
+      .filter((_, i) => i !== index)
+      .map(s => s.schemeName)
+      .filter(n => !!n);
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.data = {scheme: working, isNew, existingNames};
+    dialogConfig.width = '720px';
+    dialogConfig.maxHeight = '85vh';
+    dialogConfig.autoFocus = false;
+    this.dialog.open(OasDocSecuritySchemeDialogComponent, dialogConfig)
+      .afterClosed().subscribe(result => {
+        if (!result) {
+          return;
+        }
+        if (isNew) {
+          this.securitySchemes.push(result);
+        } else {
+          const previousSchemeName = this.securitySchemes[index]?.schemeName;
+          this.securitySchemes[index] = result;
+          if (previousSchemeName && previousSchemeName !== result.schemeName) {
+            const newName = result.schemeName;
+            // Propagate a rename into the dependent requirements (the scheme keeps its id). A blank new
+            // name (shouldn't happen — Update is gated) falls back to pruning the now-unnamed references.
+            const apply = (reqs: OasSecurityRequirement[]) => newName
+              ? this.renameSecurityRequirements(reqs, previousSchemeName, newName)
+              : this.pruneSecurityRequirements(reqs, previousSchemeName);
+            this.oasDoc.securityRequirements = apply(this.oasDoc.securityRequirements);
+            (this.table?.dataSource?.data || []).forEach(row => {
+              const hadRequirements = (row.securityRequirements || []).length > 0;
+              row.securityRequirements = apply(row.securityRequirements);
+              // Preserve a Public override (empty by intent); only revert a custom override that lost all schemes.
+              if (hadRequirements && row.securityRequirements.length === 0) {
+                row.securityOverridden = false;
+              }
+            });
+          }
+        }
+      });
+  }
+
+  // A short label/summary for a scheme card.
+  securitySchemeTypeLabel(type: string): string {
+    const t = this.securitySchemeTypes.find(x => x.value === type);
+    return t ? t.label : type;
+  }
+
+  securitySchemeSummary(scheme: OasSecurityScheme): string {
+    if (scheme.type === 'apiKey') {
+      return `in: ${scheme.apiKeyIn || ''}, name: ${scheme.apiKeyName || ''}`;
+    }
+    if (scheme.type === 'http') {
+      return `scheme: ${scheme.httpScheme || ''}` + (scheme.bearerFormat ? `, ${scheme.bearerFormat}` : '');
+    }
+    if (scheme.type === 'openIdConnect') {
+      return scheme.openIdConnectUrl || '';
+    }
+    if (scheme.type === 'oauth2') {
+      const flows = (scheme.flows || []).map(f => f.flowType).join(', ');
+      return flows ? `flows: ${flows}` : 'default flow';
+    }
+    return '';
+  }
+
+  // Validate every scheme: Scheme Name required + unique; type-specific required fields present.
+  areSecuritySchemesValid(oasDoc1: OasDoc): boolean {
+    const schemes = oasDoc1.securitySchemes || [];
+    const names = new Set<string>();
+    for (const s of schemes) {
+      if (!s.type) {
+        return false;
+      }
+      const name = (s.schemeName || '').trim();
+      if (!name || names.has(name)) {
+        return false;
+      }
+      names.add(name);
+      if (s.type === 'apiKey' && (!s.apiKeyIn || !s.apiKeyName)) {
+        return false;
+      }
+      if (s.type === 'http' && !s.httpScheme) {
+        return false;
+      }
+      if (s.type === 'openIdConnect' && !s.openIdConnectUrl) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  areSecurityRequirementsValid(oasDoc1: OasDoc): boolean {
+    const schemeNames = new Set((oasDoc1.securitySchemes || []).map(s => s.schemeName));
+    const valid = (requirements: OasSecurityRequirement[]) => (requirements || []).every(req =>
+      (req.schemes || []).every(scheme => schemeNames.has(scheme.schemeName)));
+    return valid(oasDoc1.securityRequirements);
+  }
+
+  documentSecuritySummary(): string {
+    const summary = this.securityRequirementSummary(this.oasDoc.securityRequirements, false);
+    return summary === 'No Security' ? 'None' : summary;
+  }
+
+  operationSecuritySummary(row: BieForOasDoc): string {
+    if (!row.securityOverridden) {
+      return 'Inherited';
+    }
+    const summary = this.securityRequirementSummary(row.securityRequirements, false);
+    // securityOverridden with no requirements => security: [] (public).
+    return summary === 'No Security' ? 'Public' : summary;
+  }
+
+  openDocumentSecurityDialog() {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.data = {
+      title: 'Document Security',
+      securitySchemes: this.securitySchemes,
+      securityRequirements: JSON.parse(JSON.stringify(this.oasDoc.securityRequirements || [])),
+      allowInherit: false
+    };
+    dialogConfig.width = '760px';
+    dialogConfig.maxHeight = '85vh';
+    dialogConfig.autoFocus = false;
+    this.dialog.open(OasDocSecurityRequirementDialogComponent, dialogConfig)
+      .afterClosed().subscribe(result => {
+        if (!result) {
+          return;
+        }
+        this.oasDoc.securityRequirements = result.securityRequirements || [];
+      });
+  }
+
+  openOperationSecurityDialog(row: BieForOasDoc, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.data = {
+      title: 'Operation Security',
+      securitySchemes: this.securitySchemes,
+      securityOverridden: row.securityOverridden,
+      securityRequirements: JSON.parse(JSON.stringify(row.securityRequirements || [])),
+      allowInherit: true
+    };
+    dialogConfig.width = '760px';
+    dialogConfig.maxHeight = '85vh';
+    dialogConfig.autoFocus = false;
+    this.dialog.open(OasDocSecurityRequirementDialogComponent, dialogConfig)
+      .afterClosed().subscribe(result => {
+        if (!result) {
+          return;
+        }
+        // An oas_operation can be shown as two rows (Request + Response). Security is per operation, so
+        // apply the result to every sibling row sharing the oasOperationId (each gets its own copy).
+        // Truthy check: a not-yet-persisted operation has oasOperationId 0 (falsy); never treat those as
+        // siblings of one another, otherwise the edit would cross-contaminate unrelated new rows.
+        const siblings = (this.table.dataSource.data || []).filter(r =>
+          !!r.oasOperationId && r.oasOperationId === row.oasOperationId);
+        const targets = siblings.length > 0 ? siblings : [row];
+        targets.forEach(r => {
+          r.securityOverridden = result.securityOverridden;
+          r.securityRequirements = JSON.parse(JSON.stringify(result.securityRequirements || []));
+        });
+      });
+  }
+
+  private securityRequirementSummary(requirements: OasSecurityRequirement[], inherit: boolean): string {
+    if (inherit) {
+      return 'Use Root';
+    }
+    if (!requirements || requirements.length === 0) {
+      return 'No Security';
+    }
+    return requirements.map(req => {
+      if (req.anonymous) {
+        return 'anonymous';
+      }
+      return (req.schemes || [])
+        .filter(scheme => !!scheme.schemeName)
+        .map(scheme => {
+          const scopes = scheme.scopes && scheme.scopes.length > 0 ? ` (${scheme.scopes.join(', ')})` : '';
+          return `${scheme.schemeName}${scopes}`;
+        })
+        .join(' + ');
+    })
+      .filter(text => !!text)
+      .join(' OR ');
+  }
+
+  private pruneSecurityRequirements(requirements: OasSecurityRequirement[], schemeName: string): OasSecurityRequirement[] {
+    return (requirements || [])
+      .map(req => ({
+        anonymous: req.anonymous,
+        schemes: (req.schemes || []).filter(s => s.schemeName !== schemeName)
+      }))
+      .filter(req => req.anonymous || req.schemes.length > 0);
+  }
+
+  // A renamed scheme keeps its oas_security_scheme_id, so carry the new name into the dependent
+  // requirements (which reference schemes by name) instead of dropping them.
+  private renameSecurityRequirements(requirements: OasSecurityRequirement[], oldName: string, newName: string): OasSecurityRequirement[] {
+    return (requirements || []).map(req => ({
+      anonymous: req.anonymous,
+      schemes: (req.schemes || []).map(s => s.schemeName === oldName ? {...s, schemeName: newName} : s)
+    }));
   }
 
   getPath(commands?: any[]): string {
@@ -355,6 +664,7 @@ export class OasDocDetailComponent implements OnInit {
       this.table.dataSource.data.forEach((elm: BieForOasDoc) => {
         this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContext;
       });
+      this.recomputeDuplicateOperationIds();
 
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
@@ -384,7 +694,10 @@ export class OasDocDetailComponent implements OnInit {
       (oasDoc1.oasDocId === undefined || !oasDoc1.oasDocId) ||
       (oasDoc1.title === undefined || oasDoc1.title === '') ||
       (oasDoc1.openAPIVersion === undefined || oasDoc1.openAPIVersion === '') ||
-      (oasDoc1.version === undefined || oasDoc1.version === '');
+      (oasDoc1.version === undefined || oasDoc1.version === '') ||
+      // Issue #1729: block update/generate while any security scheme is incomplete.
+      !this.areSecuritySchemesValid(oasDoc1) ||
+      !this.areSecurityRequirementsValid(oasDoc1);
   }
   back() {
     this.location.back();
@@ -406,6 +719,7 @@ export class OasDocDetailComponent implements OnInit {
       if (source.verb === 'GET' && source.messageBody === 'Request') {
         source.messageBody = 'Response';
       }
+      this.updateOperationIdForVerb(source);
     }
   }
 
@@ -470,16 +784,45 @@ export class OasDocDetailComponent implements OnInit {
   doUpdate() {
     // See #isChanged for the conditions in this method.
 
-    if (this.hashCodeForOasDoc !== hashCode(this.oasDoc)) {
-      this.openAPIService.updateOasDoc(this.oasDoc).subscribe(_ => {
-        this.init(this.oasDoc);
-        this.snackBar.open('Updated', '', {
-          duration: 3000,
-        });
-      });
+    // Issue #1732: never persist a blank operationId (it is required and NOT NULL in the DB).
+    const blankOperationId = this.getChanged().some(e => !e.operationId || !e.operationId.trim());
+    if (blankOperationId) {
+      this.snackBar.open('Operation ID is required.', '', {duration: 3000});
+      return;
     }
 
-    if (this.getChanged().length > 0) {
+    const docChanged = this.hashCodeForOasDoc !== hashCode(this.oasDoc);
+    const detailsChanged = this.getChanged().length > 0;
+
+    if (docChanged) {
+      // Persist the document (incl. its security schemes) FIRST, then the per-operation details.
+      // updateDetails() resolves each operation Security Requirement's scheme name to its
+      // oas_security_scheme_id from the database, so a renamed/added scheme must be committed before the
+      // operation rows are saved — otherwise the lookup misses and the requirement is silently dropped.
+      this.openAPIService.updateOasDoc(this.oasDoc).subscribe(_ => {
+        // Re-fetch the persisted document so its Security Schemes carry their freshly-assigned
+        // oas_security_scheme_id. A scheme added/edited in this session has no id yet; without it the
+        // NEXT updateOasDoc would send schemes with no id, and the backend (matching kept schemes by id)
+        // would treat every scheme as removed, delete-and-reinsert them, and wipe every operation's
+        // security override. Reloading the ids here keeps subsequent updates a stable in-place diff.
+        this.openAPIService.getOasDoc(this.oasDoc.oasDocId).subscribe(reloaded => {
+          if (reloaded) {
+            this.oasDoc.securitySchemes = reloaded.securitySchemes || [];
+            this.oasDoc.securityRequirements = reloaded.securityRequirements || [];
+          }
+          this.init(this.oasDoc);
+          if (detailsChanged) {
+            // Pass a no-op callback so updateDetails() stays silent (it still persists the rows); this
+            // method shows the single 'Updated' snackBar below. Otherwise both fire and it shows twice.
+            this.updateDetails(() => {});
+          }
+          this.snackBar.open('Updated', '', {
+            duration: 3000,
+          });
+        });
+      });
+    } else if (detailsChanged) {
+      // No scheme change -> existing schemes are already persisted, so resolution is safe.
       this.updateDetails();
     }
   }
@@ -569,9 +912,73 @@ export class OasDocDetailComponent implements OnInit {
     });
   }
 
+  // Issue #1730: open the dialog to add a BIE-less operation (endpoint).
+  openAddOperationDialog($event: any) {
+    $event.preventDefault();
+    $event.stopPropagation();
+
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.data = {oasDoc: this.oasDoc};
+    dialogConfig.autoFocus = false;
+    dialogConfig.width = '600px';
+
+    this.isUpdating = true;
+    const dialogRef = this.dialog.open(OasDocAddOperationDialogComponent, dialogConfig);
+    dialogRef.afterClosed().pipe(finalize(() => {
+      this.isUpdating = false;
+    })).subscribe(result => {
+      if (!result) {
+        return;
+      }
+
+      this.loadBieListForOasDoc();
+    });
+  }
+
   _updateDataSource(data: BieForOasDoc[]) {
     this.table.dataSource.data = data;
     this.oasDoc.bieList = data;
+    this.recomputeDuplicateOperationIds();
+  }
+
+  // Recomputes the set of operationIds that occur more than once among the loaded operations.
+  // Note: the list is server-paginated, so this validates within the currently loaded rows.
+  recomputeDuplicateOperationIds(): void {
+    const counts = new Map<string, number>();
+    for (const row of (this.table?.dataSource?.data || [])) {
+      const id = (row.operationId || '').trim();
+      if (id) {
+        counts.set(id, (counts.get(id) || 0) + 1);
+      }
+    }
+    this.duplicateOperationIds = new Set<string>(
+      Array.from(counts.entries()).filter(([, count]) => count > 1).map(([id]) => id));
+  }
+
+  // Issue #1732: keep the Operation ID's verb word in sync when the Verb changes. Swaps only the
+  // leading verb word, preserving the BIE-name segment (so a manually edited name survives), and
+  // re-applies the 'List' suffix from the array indicator. The frontend owns the operationId; the
+  // backend stores it verbatim on save.
+  updateOperationIdForVerb(element: BieForOasDoc): void {
+    element.operationId = recomputeOperationId(element.verb, element.operationId, element.arrayIndicator);
+    this.recomputeDuplicateOperationIds();
+  }
+
+  // Issue #1732: when the Array Indicator toggles, keep the 'List' suffix on operationId and the
+  // '-list' suffix on resourceName in sync. The frontend owns these; the backend stores them as-is.
+  // Only the suffix is touched (the verb word / name are preserved).
+  updateOperationIdForArray(element: BieForOasDoc): void {
+    element.operationId = this.applySuffix(element.operationId, 'List', element.arrayIndicator);
+    element.resourceName = this.applySuffix(element.resourceName, '-list', element.arrayIndicator);
+    this.recomputeDuplicateOperationIds();
+  }
+
+  private applySuffix(value: string, suffix: string, present: boolean): string {
+    const current = value || '';
+    if (present) {
+      return current.endsWith(suffix) ? current : current + suffix;
+    }
+    return current.endsWith(suffix) ? current.substring(0, current.length - suffix.length) : current;
   }
 
   select(row: BieForOasDoc) {

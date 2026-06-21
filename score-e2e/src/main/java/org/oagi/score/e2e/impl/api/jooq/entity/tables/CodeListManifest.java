@@ -40,6 +40,8 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeListManifest.CodeListM
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeListValueManifest.CodeListValueManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtAwdPri.DtAwdPriPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtScAwdPri.DtScAwdPriPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.GithubIssue.GithubIssuePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.GithubIssueCodeListManifest.GithubIssueCodeListManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Log.LogPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleCodeListManifest.ModuleCodeListManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Release.ReleasePath;
@@ -375,6 +377,19 @@ public class CodeListManifest extends TableImpl<CodeListManifestRecord> {
         return _dtScAwdPri;
     }
 
+    private transient GithubIssueCodeListManifestPath _githubIssueCodeListManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_code_list_manifest</code> table
+     */
+    public GithubIssueCodeListManifestPath githubIssueCodeListManifest() {
+        if (_githubIssueCodeListManifest == null)
+            _githubIssueCodeListManifest = new GithubIssueCodeListManifestPath(this, null, Keys.GITHUB_ISSUE_CODE_LIST_MANIFEST_CODE_LIST_MANIFEST_ID_FK.getInverseKey());
+
+        return _githubIssueCodeListManifest;
+    }
+
     private transient ModuleCodeListManifestPath _moduleCodeListManifest;
 
     /**
@@ -386,6 +401,14 @@ public class CodeListManifest extends TableImpl<CodeListManifestRecord> {
             _moduleCodeListManifest = new ModuleCodeListManifestPath(this, null, Keys.MODULE_CODE_LIST_MANIFEST_CODE_LIST_MANIFEST_ID_FK.getInverseKey());
 
         return _moduleCodeListManifest;
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the
+     * <code>oagi.github_issue</code> table
+     */
+    public GithubIssuePath githubIssue() {
+        return githubIssueCodeListManifest().githubIssue();
     }
 
     @Override

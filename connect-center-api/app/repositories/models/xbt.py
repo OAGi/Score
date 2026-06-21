@@ -43,5 +43,11 @@ class XbtSummaryRow(BaseModel):
     """Repository summary row for subtype-of XBT references."""
 
     xbt_manifest_id: int
+    xbt_id: int
+    guid: str
+    name: str | None = None
+    builtIn_type: str | None = None
+    library: LibrarySummaryRow
+    release: ReleaseSummaryRow
 
     model_config = ConfigDict(frozen=True, from_attributes=True)

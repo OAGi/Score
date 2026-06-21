@@ -21,3 +21,12 @@ class TagRow(BaseModel):
     last_update_timestamp: datetime
 
     model_config = ConfigDict(frozen=True, from_attributes=True)
+
+
+class TagSummaryRow(BaseModel):
+    """Compact tag projection used in nested detail payloads."""
+
+    tag_id: int
+    name: str
+
+    model_config = ConfigDict(frozen=True, from_attributes=True)

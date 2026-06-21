@@ -98,32 +98,47 @@ async def get_ctx_category_service(
         "type": "object",
         "description": "Response containing paginated list of context categories",
         "properties": {
-            "total_items": {"type": "integer",
-                            "description": "Total number of context categories available. Allowed values: non-negative integers (≥0).",
-                            "example": 25},
-            "offset": {"type": "integer",
-                       "description": "Offset of the first item in this page. Allowed values: non-negative integers (≥0). Default value: 0.",
-                       "example": 0},
-            "limit": {"type": "integer",
-                      "description": "Number of items returned in this page. Allowed values: integers between 1 and 100 (inclusive). Default value: 10.",
-                      "example": 10},
+            "total_items": {
+                "type": "integer",
+                "description": "Total number of context categories available. Allowed values: non-negative integers (≥0).",
+                "example": 25,
+            },
+            "offset": {
+                "type": "integer",
+                "description": "Offset of the first item in this page. Allowed values: non-negative integers (≥0). Default value: 0.",
+                "example": 0,
+            },
+            "limit": {
+                "type": "integer",
+                "description": "Number of items returned in this page. Allowed values: integers between 1 and 100 (inclusive). Default value: 10.",
+                "example": 10,
+            },
             "items": {
                 "type": "array",
                 "description": "List of context categories on this page",
                 "items": {
                     "type": "object",
                     "properties": {
-                        "ctx_category_id": {"type": "integer",
-                                            "description": "Unique identifier for the context category",
-                                            "example": 123},
-                        "guid": {"type": "string",
-                                 "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)",
-                                 "example": "a1b2c3d4e5f6789012345678901234ab"},
-                        "name": {"type": "string", "description": "Name of the context category",
-                                 "example": "Geographic"},
-                        "description": {"type": ["string", "null"],
-                                        "description": "Description of the context category",
-                                        "example": "Geographic context for location-based data"},
+                        "ctx_category_id": {
+                            "type": "integer",
+                            "description": "Unique identifier for the context category",
+                            "example": 123,
+                        },
+                        "guid": {
+                            "type": "string",
+                            "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)",
+                            "example": "a1b2c3d4e5f6789012345678901234ab",
+                        },
+                        "name": {
+                            "type": "string",
+                            "description": "Name of the context category",
+                            "example": "Geographic",
+                        },
+                        "description": {
+                            "type": ["string", "null"],
+                            "description": "Description of the context category",
+                            "example": "Geographic context for location-based data",
+                        },
                         "created": {
                             "type": "object",
                             "description": "Information about the creation of the context category",
@@ -132,25 +147,38 @@ async def get_ctx_category_service(
                                     "type": "object",
                                     "description": "User who created the context category",
                                     "properties": {
-                                        "user_id": {"type": "integer", "description": "Unique identifier for the user",
-                                                    "example": 1},
-                                        "login_id": {"type": "string", "description": "User's login identifier",
-                                                     "example": "admin"},
-                                        "username": {"type": "string", "description": "Display name of the user",
-                                                     "example": "Administrator"},
-                                        "roles": {"type": "array", "items": {"type": "string",
-                                                                             "enum": ["Admin", "Developer",
-                                                                                      "End-User"]},
-                                                  "description": "List of roles assigned to the user",
-                                                  "example": ["Admin"]}
+                                        "user_id": {
+                                            "type": "integer",
+                                            "description": "Unique identifier for the user",
+                                            "example": 1,
+                                        },
+                                        "login_id": {
+                                            "type": "string",
+                                            "description": "User's login identifier",
+                                            "example": "admin",
+                                        },
+                                        "username": {
+                                            "type": "string",
+                                            "description": "Display name of the user",
+                                            "example": "Administrator",
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                            "description": "List of roles assigned to the user",
+                                            "example": ["Admin"],
+                                        },
                                     },
-                                    "required": ["user_id", "login_id", "username", "roles"]
+                                    "required": ["user_id", "login_id", "username", "roles"],
                                 },
-                                "when": {"type": "string", "format": "date-time",
-                                         "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
-                                         "example": "2024-01-15T10:30:00Z"}
+                                "when": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                                    "example": "2024-01-15T10:30:00Z",
+                                },
                             },
-                            "required": ["who", "when"]
+                            "required": ["who", "when"],
                         },
                         "last_updated": {
                             "type": "object",
@@ -160,75 +188,89 @@ async def get_ctx_category_service(
                                     "type": "object",
                                     "description": "User who last updated the context category",
                                     "properties": {
-                                        "user_id": {"type": "integer", "description": "Unique identifier for the user",
-                                                    "example": 1},
-                                        "login_id": {"type": "string", "description": "User's login identifier",
-                                                     "example": "admin"},
-                                        "username": {"type": "string", "description": "Display name of the user",
-                                                     "example": "Administrator"},
-                                        "roles": {"type": "array", "items": {"type": "string",
-                                                                             "enum": ["Admin", "Developer",
-                                                                                      "End-User"]},
-                                                  "description": "List of roles assigned to the user",
-                                                  "example": ["Admin"]}
+                                        "user_id": {
+                                            "type": "integer",
+                                            "description": "Unique identifier for the user",
+                                            "example": 1,
+                                        },
+                                        "login_id": {
+                                            "type": "string",
+                                            "description": "User's login identifier",
+                                            "example": "admin",
+                                        },
+                                        "username": {
+                                            "type": "string",
+                                            "description": "Display name of the user",
+                                            "example": "Administrator",
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                            "description": "List of roles assigned to the user",
+                                            "example": ["Admin"],
+                                        },
                                     },
-                                    "required": ["user_id", "login_id", "username", "roles"]
+                                    "required": ["user_id", "login_id", "username", "roles"],
                                 },
-                                "when": {"type": "string", "format": "date-time",
-                                         "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
-                                         "example": "2024-01-15T10:30:00Z"}
+                                "when": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                                    "example": "2024-01-15T10:30:00Z",
+                                },
                             },
-                            "required": ["who", "when"]
-                        }
+                            "required": ["who", "when"],
+                        },
                     },
-                    "required": ["ctx_category_id", "guid", "name", "created", "last_updated"]
-                }
-            }
+                    "required": ["ctx_category_id", "guid", "name", "created", "last_updated"],
+                },
+            },
         },
-        "required": ["total_items", "offset", "limit", "items"]
-    }
+        "required": ["total_items", "offset", "limit", "items"],
+    },
 )
 async def get_context_categories(
-    name: Annotated[str | None, Field(default=None, description="Filter categories by name.")],
-    description: Annotated[str | None, Field(default=None, description="Filter categories by description.")],
+    name: Annotated[str | None, Field(description="Filter categories by name.")] = None,
+    description: Annotated[str | None, Field(description="Filter categories by description.")] = None,
     created_on: Annotated[
         str | None,
         Field(
-            default=None,
             description="Filter by creation date using an inclusive range: '[before~after]'. 'before' and 'after' are date-time strings. Default date format: YYYY-MM-DD. Examples: '[2025-01-01~2025-02-01]'. Either 'before' or 'after' can be omitted, e.g., '[~2025-02-01]' or '[2025-01-01~]'.",
         ),
-    ],
+    ] = None,
     last_updated_on: Annotated[
         str | None,
         Field(
-            default=None,
             description="Filter by last update date using an inclusive range: '[before~after]'. 'before' and 'after' are date-time strings. Default date format: YYYY-MM-DD. Examples: '[2025-01-01~2025-02-01]'. Either 'before' or 'after' can be omitted, e.g., '[~2025-02-01]' or '[2025-01-01~]'.",
         ),
-    ],
+    ] = None,
+    updater: Annotated[
+        str | None,
+        Field(
+            description="Comma-separated updater login IDs to filter by exact match. Prefix a login ID with '!' to exclude it."
+        ),
+    ] = None,
     order_by: Annotated[
         str | None,
         Field(
-            default=None,
             description="Comma-separated list of properties to order results by. Prefix with '-' for descending, '+' for ascending (default ascending). Allowed columns: name, description, creation_timestamp, last_update_timestamp. Example: '-last_update_timestamp,+name,description' translates to 'last_update_timestamp DESC, name ASC, description ASC'.",
         ),
-    ],
+    ] = None,
     offset: Annotated[
         int,
         Field(
-            default=0,
             ge=0,
             description="The offset from the beginning of the list. Must be a non-negative number.",
         ),
-    ],
+    ] = 0,
     limit: Annotated[
         int,
         Field(
-            default=10,
             ge=1,
             le=100,
             description="The maximum number of items to return. Must be between 1 and 100 (inclusive).",
         ),
-    ],
+    ] = 10,
     context_category_service: ContextCategoryService = Depends(get_ctx_category_service),
 ) -> GetCtxCategoryPaginationResponse:
     """
@@ -297,6 +339,7 @@ async def get_context_categories(
             description=description,
             created_on=parse_date_range(created_on),
             last_updated_on=parse_date_range(last_updated_on),
+            updater=updater,
         )
         return _to_list_response(items=page.items, total=page.total, offset=page.offset, limit=page.limit)
     except Exception as exc:
@@ -310,10 +353,22 @@ async def get_context_categories(
         "type": "object",
         "description": "Response containing context category information",
         "properties": {
-            "ctx_category_id": {"type": "integer", "description": "Unique identifier for the context category", "example": 123},
-            "guid": {"type": "string", "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)", "example": "a1b2c3d4e5f6789012345678901234ab"},
+            "ctx_category_id": {
+                "type": "integer",
+                "description": "Unique identifier for the context category",
+                "example": 123,
+            },
+            "guid": {
+                "type": "string",
+                "description": "Unique identifier within the release. 32-character hexadecimal identifier (lowercase, no hyphens)",
+                "example": "a1b2c3d4e5f6789012345678901234ab",
+            },
             "name": {"type": "string", "description": "Name of the context category", "example": "Geographic"},
-            "description": {"type": ["string", "null"], "description": "Description of the context category", "example": "Geographic context for location-based data"},
+            "description": {
+                "type": ["string", "null"],
+                "description": "Description of the context category",
+                "example": "Geographic context for location-based data",
+            },
             "created": {
                 "type": "object",
                 "description": "Information about the creation of the context category",
@@ -322,16 +377,38 @@ async def get_context_categories(
                         "type": "object",
                         "description": "User who created the context category",
                         "properties": {
-                            "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                            "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                            "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                            "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                            "user_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the user",
+                                "example": 1,
+                            },
+                            "login_id": {
+                                "type": "string",
+                                "description": "User's login identifier",
+                                "example": "admin",
+                            },
+                            "username": {
+                                "type": "string",
+                                "description": "Display name of the user",
+                                "example": "Administrator",
+                            },
+                            "roles": {
+                                "type": "array",
+                                "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                "description": "List of roles assigned to the user",
+                                "example": ["Admin"],
+                            },
                         },
-                        "required": ["user_id", "login_id", "username", "roles"]
+                        "required": ["user_id", "login_id", "username", "roles"],
                     },
-                    "when": {"type": "string", "format": "date-time", "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-15T10:30:00Z"}
+                    "when": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                        "example": "2024-01-15T10:30:00Z",
+                    },
                 },
-                "required": ["who", "when"]
+                "required": ["who", "when"],
             },
             "last_updated": {
                 "type": "object",
@@ -341,23 +418,47 @@ async def get_context_categories(
                         "type": "object",
                         "description": "User who last updated the context category",
                         "properties": {
-                            "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                            "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                            "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                            "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                            "user_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the user",
+                                "example": 1,
+                            },
+                            "login_id": {
+                                "type": "string",
+                                "description": "User's login identifier",
+                                "example": "admin",
+                            },
+                            "username": {
+                                "type": "string",
+                                "description": "Display name of the user",
+                                "example": "Administrator",
+                            },
+                            "roles": {
+                                "type": "array",
+                                "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                "description": "List of roles assigned to the user",
+                                "example": ["Admin"],
+                            },
                         },
-                        "required": ["user_id", "login_id", "username", "roles"]
+                        "required": ["user_id", "login_id", "username", "roles"],
                     },
-                    "when": {"type": "string", "format": "date-time", "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-15T10:30:00Z"}
+                    "when": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                        "example": "2024-01-15T10:30:00Z",
+                    },
                 },
-                "required": ["who", "when"]
-            }
+                "required": ["who", "when"],
+            },
         },
-        "required": ["ctx_category_id", "guid", "name", "created", "last_updated"]
-    }
+        "required": ["ctx_category_id", "guid", "name", "created", "last_updated"],
+    },
 )
 async def get_context_category(
-    ctx_category_id: Annotated[int, Field(description="Unique numeric identifier of the context category to retrieve.", gt=0)],
+    ctx_category_id: Annotated[
+        int, Field(description="Unique numeric identifier of the context category to retrieve.", gt=0)
+    ],
     context_category_service: ContextCategoryService = Depends(get_ctx_category_service),
 ) -> GetCtxCategoryResponse:
     """
@@ -397,7 +498,9 @@ async def get_context_category(
     try:
         row = await context_category_service.get(ctx_category_id)
         if row is None:
-            raise ToolError(f"The context category with ID {ctx_category_id} was not found. Please check the ID and try again.")
+            raise ToolError(
+                f"The context category with ID {ctx_category_id} was not found. Please check the ID and try again."
+            )
         return GetCtxCategoryResponse.model_validate(row, from_attributes=True)
     except Exception as exc:
         raise _to_tool_error(exc, fallback=f"Unable to retrieve context category {ctx_category_id}.") from exc
@@ -410,14 +513,22 @@ async def get_context_category(
         "type": "object",
         "description": "Response containing the created context category ID",
         "properties": {
-            "ctx_category_id": {"type": "integer", "description": "Unique identifier for the created context category", "example": 123}
+            "ctx_category_id": {
+                "type": "integer",
+                "description": "Unique identifier for the created context category",
+                "example": 123,
+            }
         },
-        "required": ["ctx_category_id"]
-    }
+        "required": ["ctx_category_id"],
+    },
 )
 async def create_context_category(
-    name: Annotated[str, Field(description="Human-readable name of the context category to create.", min_length=1, max_length=100)],
-    description: Annotated[str | None, Field(default=None, description="A detailed description or purpose of the new context category.")],
+    name: Annotated[
+        str, Field(description="Human-readable name of the context category to create.", min_length=1, max_length=100)
+    ],
+    description: Annotated[
+        str | None, Field(description="A detailed description or purpose of the new context category.")
+    ] = None,
     context_category_service: ContextCategoryService = Depends(get_ctx_category_service),
 ) -> CreateCtxCategoryResponse:
     """
@@ -465,16 +576,30 @@ async def create_context_category(
         "type": "object",
         "description": "Response containing the updated context category ID and list of updated fields",
         "properties": {
-            "ctx_category_id": {"type": "integer", "description": "Unique identifier of the updated context category", "example": 123},
-            "updates": {"type": "array", "items": {"type": "string"}, "description": "A list of updated fields, each represented by its name", "example": ["name", "description"]}
+            "ctx_category_id": {
+                "type": "integer",
+                "description": "Unique identifier of the updated context category",
+                "example": 123,
+            },
+            "updates": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "A list of updated fields, each represented by its name",
+                "example": ["name", "description"],
+            },
         },
-        "required": ["ctx_category_id", "updates"]
-    }
+        "required": ["ctx_category_id", "updates"],
+    },
 )
 async def update_context_category(
     ctx_category_id: Annotated[int, Field(description="Unique identifier of the context category to update.", gt=0)],
-    name: Annotated[str | None, Field(default=None, description="The new name for the context category.")],
-    description: Annotated[str | None, Field(default=None, description="The new description or purpose for the context category.")],
+    name: Annotated[
+        str | None, Field(description="The new name for the context category. Omit to leave unchanged.")
+    ] = None,
+    description: Annotated[
+        str | None,
+        Field(description="The new description or purpose for the context category. Omit to leave unchanged."),
+    ] = None,
     context_category_service: ContextCategoryService = Depends(get_ctx_category_service),
 ) -> UpdateCtxCategoryResponse:
     """
@@ -528,7 +653,9 @@ async def update_context_category(
             description=UNSET if description is None else description,
         )
         if result is None:
-            raise ToolError(f"The context category with ID {ctx_category_id} was not found. Please check the ID and try again.")
+            raise ToolError(
+                f"The context category with ID {ctx_category_id} was not found. Please check the ID and try again."
+            )
         updated_id, updates = result
         return UpdateCtxCategoryResponse(ctx_category_id=updated_id, updates=updates)
     except Exception as exc:
@@ -542,11 +669,19 @@ async def update_context_category(
         "type": "object",
         "description": "Response containing the deleted context category ID or cancellation message",
         "properties": {
-            "ctx_category_id": {"type": ["integer", "null"], "description": "Unique identifier of the deleted context category (null if deletion was cancelled)", "example": 123},
-            "message": {"type": ["string", "null"], "description": "Optional message indicating the status of the deletion operation", "example": "Deletion cancelled by user"}
+            "ctx_category_id": {
+                "type": ["integer", "null"],
+                "description": "Unique identifier of the deleted context category (null if deletion was cancelled)",
+                "example": 123,
+            },
+            "message": {
+                "type": ["string", "null"],
+                "description": "Optional message indicating the status of the deletion operation",
+                "example": "Deletion cancelled by user",
+            },
         },
-        "required": []
-    }
+        "required": [],
+    },
 )
 async def delete_context_category(
     ctx_category_id: Annotated[int, Field(description="Unique identifier of the context category to delete.", gt=0)],
@@ -592,12 +727,13 @@ async def delete_context_category(
     try:
         row = await context_category_service.get(ctx_category_id)
         if row is None:
-            raise ToolError(f"The context category with ID {ctx_category_id} was not found. Please check the ID and try again.")
+            raise ToolError(
+                f"The context category with ID {ctx_category_id} was not found. Please check the ID and try again."
+            )
 
         elicit_result = await ctx.elicit(
             message=(
-                f"Are you sure you want to discard '{row.name}' context category?\n\n"
-                "It will be permanently removed.\n"
+                f"Are you sure you want to discard '{row.name}' context category?\n\nIt will be permanently removed.\n"
             ),
             response_type=None,
         )
@@ -606,7 +742,9 @@ async def delete_context_category(
             case AcceptedElicitation():
                 deleted = await context_category_service.delete(ctx_category_id)
                 if not deleted:
-                    raise ToolError(f"The context category with ID {ctx_category_id} was not found. Please check the ID and try again.")
+                    raise ToolError(
+                        f"The context category with ID {ctx_category_id} was not found. Please check the ID and try again."
+                    )
                 return DeleteCtxCategoryResponse(ctx_category_id=ctx_category_id)
             case DeclinedElicitation():
                 return DeleteCtxCategoryResponse(ctx_category_id=None, message="Deletion declined by user")

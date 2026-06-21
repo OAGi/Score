@@ -32,9 +32,11 @@ import org.oagi.score.gateway.http.common.util.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -73,7 +75,6 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
         Map<ModuleId, SchemaModule> moduleMap = moduleList.stream()
                 .map(e -> new SchemaModule(e, this))
                 .collect(Collectors.toMap(SchemaModule::getModuleId, Function.identity()));
-
         createSchemaModules(context, moduleMap);
         createAgencyIdList(moduleMap);
         createCodeLists(moduleMap);
@@ -82,10 +83,25 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
         createBCCP(moduleMap);
         createACC(moduleMap);
         createASCCP(moduleMap);
+        assignRootDefinitions(moduleMap);
         createBlobContents(moduleMap);
         minimizeDependency(moduleMap);
 
         return context;
+    }
+
+    private void assignRootDefinitions(Map<ModuleId, SchemaModule> moduleMap) {
+        for (SchemaModule schemaModule : moduleMap.values()) {
+            if (schemaModule.getASCCPMap().size() != 1) {
+                continue;
+            }
+            ASCCP asccp = schemaModule.getASCCPMap().values().iterator().next();
+            ModuleCCID<AccManifestId> roleOfAccModuleCCID = moduleCcDocument.getModuleAcc(asccp.roleOfAccManifestId());
+            if (roleOfAccModuleCCID == null || !Objects.equals(roleOfAccModuleCCID.moduleId(), schemaModule.getModuleId())) {
+                continue;
+            }
+            schemaModule.setRootDefinitionName(asccp.getTypeName());
+        }
     }
 
     private void addDependency(SchemaModule source, SchemaModule target) {
@@ -368,8 +384,7 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
                 ModuleCCID asccpModuleCCID = moduleCcDocument.getModuleAsccp(asccp.asccpManifestId());
                 if (asccpModuleCCID != null) {
                     addDependency(schemaModule, moduleMap.get(asccpModuleCCID.moduleId()));
-                }
-                if (asccp != null && !asccp.reusable()) {
+                } else if (asccp != null) {
                     ModuleCCID roleOfAccModuleCCID = moduleCcDocument.getModuleAcc(asccp.roleOfAccManifestId());
                     if (roleOfAccModuleCCID != null) {
                         addDependency(schemaModule, moduleMap.get(roleOfAccModuleCCID.moduleId()));
@@ -381,6 +396,14 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
                 ModuleCCID bccpModuleCCID = moduleCcDocument.getModuleBccp(e.toBccpManifestId());
                 if (bccpModuleCCID != null) {
                     addDependency(schemaModule, moduleMap.get(bccpModuleCCID.moduleId()));
+                } else {
+                    BccpSummaryRecord bccp = moduleCcDocument.getBccp(e.toBccpManifestId());
+                    if (bccp != null) {
+                        ModuleCCID dtModuleCCID = moduleCcDocument.getModuleDt(bccp.dtManifestId());
+                        if (dtModuleCCID != null) {
+                            addDependency(schemaModule, moduleMap.get(dtModuleCCID.moduleId()));
+                        }
+                    }
                 }
             });
         }

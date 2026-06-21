@@ -40,6 +40,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asbiep.AsbiepPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bbie.BbiePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BbieSc.BbieScPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bbiep.BbiepPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BiePackage.BiePackagePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BiePackageTopLevelAsbiep.BiePackageTopLevelAsbiepPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BieUserExtRevision.BieUserExtRevisionPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtx.BizCtxPath;
@@ -510,6 +511,14 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
             _oasResponsePaginationTopLevelAsbiepIdFk = new OasResponsePath(this, null, Keys.OAS_RESPONSE_PAGINATION_TOP_LEVEL_ASBIEP_ID_FK.getInverseKey());
 
         return _oasResponsePaginationTopLevelAsbiepIdFk;
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the
+     * <code>oagi.bie_package</code> table
+     */
+    public BiePackagePath biePackage() {
+        return biePackageTopLevelAsbiepTopLevelAsbiepIdFk().biePackage();
     }
 
     /**

@@ -7,9 +7,12 @@ import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.bbie.BbieDetailsRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.bbie.BbieNode;
 import org.oagi.score.gateway.http.api.bie_management.repository.BbieCommandRepository;
+import org.oagi.score.gateway.http.api.cc_management.model.CcState;
 import org.oagi.score.gateway.http.api.cc_management.model.bcc.BccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.bccp.BccpSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.DtAwdPriSummaryRecord;
+import org.oagi.score.gateway.http.api.code_list_management.model.CodeListManifestId;
+import org.oagi.score.gateway.http.api.code_list_management.model.CodeListSummaryRecord;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.JooqBaseRepository;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
@@ -47,6 +50,13 @@ public class JooqBbieCommandRepository extends JooqBaseRepository implements Bbi
         ScoreUser requester = requester();
         ULong requesterId = valueOf(requester.userId());
         LocalDateTime timestamp = LocalDateTime.now();
+
+        // Issue #1723: a developer must not assign an end-user's code list (Production state or
+        // end-user-owned) to a BBIE. Pre-existing assignments are preserved (only a change is
+        // rejected); the UI also renders such options read-only.
+        assertDeveloperMayAssignCodeList(
+                (bbieRecord != null) ? bbieRecord.getCodeListManifestId() : null,
+                bbie.getCodeListManifestId());
 
         if (bbieRecord == null) {
             bbieRecord = new BbieRecord();
@@ -309,6 +319,38 @@ public class JooqBbieCommandRepository extends JooqBaseRepository implements Bbi
             }
         }
         return getBbie(request.getTopLevelAsbiepId(), hashPath);
+    }
+
+    /**
+     * Issue #1723: A developer must not assign an end-user's code list to a BIE.
+     * End-user code lists are owned by a non-developer and/or kept in {@code Production} state,
+     * whereas developer-owned, assignable code lists are {@code Published}. Existing assignments
+     * are preserved: only a <em>change</em> to a forbidden code list is rejected, so a BIE that
+     * already references such a code list (e.g. assigned by an end-user, or via a shared/uplifted
+     * BIE) remains editable and savable by a developer.
+     */
+    private void assertDeveloperMayAssignCodeList(ULong currentCodeListManifestId,
+                                                  CodeListManifestId newCodeListManifestId) {
+        if (newCodeListManifestId == null || !requester().isDeveloper()) {
+            return;
+        }
+        // Unchanged assignment -> allow.
+        if (currentCodeListManifestId != null
+                && currentCodeListManifestId.toBigInteger().equals(newCodeListManifestId.value())) {
+            return;
+        }
+        CodeListSummaryRecord codeList = repositoryFactory()
+                .codeListQueryRepository(requester())
+                .getCodeListSummary(newCodeListManifestId);
+        if (codeList == null) {
+            return;
+        }
+        boolean endUserOwned = codeList.owner() != null && !codeList.owner().isDeveloper();
+        if (codeList.state() == CcState.Production || endUserOwned) {
+            throw new IllegalArgumentException(
+                    "A developer cannot assign an end-user's code list to a BIE: '"
+                            + codeList.name() + "' (state: " + codeList.state() + ").");
+        }
     }
 
     private BbieNode.Bbie getBbie(TopLevelAsbiepId topLevelAsbiepId, String hashPath) {

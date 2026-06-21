@@ -1,0 +1,38 @@
+.dependency-section-title {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.release-dependency-field {
+  width: 100%;
+}
+
+.removed-dependency-field {
+  margin-top: 12px;
+  width: 100%;
+}
+
+.removed-dependency-chip-list {
+  display: block;
+  gap: 8px;
+  width: 100%;
+}
+
+.removed-dependency-title {
+  color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+  font-size: 12px;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.chip-grid-hidden-input {
+  border: 0;
+  height: 0;
+  margin: 0;
+  opacity: 0;
+  padding: 0;
+  pointer-events: none;
+  position: absolute;
+  width: 0;
+}

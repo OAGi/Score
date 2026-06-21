@@ -14,7 +14,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.13</version>
+        <version>3.5.15</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -45,7 +45,7 @@
             <dependency>
                 <groupId>org.springframework.ai</groupId>
                 <artifactId>spring-ai-bom</artifactId>
-                <version>1.0.0</version>
+                <version>${spring-ai.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -64,14 +64,14 @@
         <db.password>oagi</db.password>
 
         <cglib.version>3.3.0</cglib.version>
-        <aspectj.version>1.9.24</aspectj.version>
+        <aspectj.version>1.9.25.1</aspectj.version>
         <lettuce.version>6.8.2.RELEASE</lettuce.version>
         <redisson.version>3.52.0</redisson.version>
-        <netty.version>4.2.12.Final</netty.version>
-        <lombok.version>1.18.44</lombok.version>
-        <mariadb-client.version>3.5.7</mariadb-client.version>
-        <log4j.version>2.25.3</log4j.version>
-        <jOOQ.version>3.20.12</jOOQ.version>
+        <netty.version>4.2.15.Final</netty.version>
+        <lombok.version>1.18.46</lombok.version>
+        <mariadb-client.version>3.5.9</mariadb-client.version>
+        <log4j.version>2.25.4</log4j.version>
+        <jOOQ.version>3.20.17</jOOQ.version>
         <guava.version>33.5.0-jre</guava.version>
         <gson.version>2.13.2</gson.version>
         <jdom2.version>2.0.6.1</jdom2.version>
@@ -81,13 +81,13 @@
         <commons-csv.version>1.14.1</commons-csv.version>
         <fastods.version>0.8.1</fastods.version>
         <poi.version>5.5.1</poi.version>
-        <plantuml.version>1.2026.2</plantuml.version>
-        <springdoc.version>2.8.15</springdoc.version>
+        <plantuml.version>1.2026.6</plantuml.version>
+        <springdoc.version>2.8.17</springdoc.version>
         <snakeyaml.version>2.6</snakeyaml.version>
-        <json-schema-validator.version>2.0.1</json-schema-validator.version>
+        <json-schema-validator.version>2.0.2</json-schema-validator.version>
         <saxon.version>10.6</saxon.version>
-        <xsom.version>4.0.6</xsom.version>
-        <spring-ai.version>1.1.3</spring-ai.version>
+        <xsom.version>4.0.9</xsom.version>
+        <spring-ai.version>1.1.8</spring-ai.version>
     </properties>
 
     <dependencies>
@@ -111,6 +111,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -139,6 +143,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
@@ -342,6 +352,11 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <profiles>
+                        <profile>dev</profile>
+                    </profiles>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
@@ -423,4 +438,16 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <spring-boot.run.profiles>dev</spring-boot.run.profiles>
+                <spring-boot.run.fork>true</spring-boot.run.fork>
+                <spring-boot.run.addResources>true</spring-boot.run.addResources>
+                <spring-boot.run.jvmArguments>-Dspring.devtools.restart.enabled=true -Dspring.devtools.livereload.enabled=true</spring-boot.run.jvmArguments>
+            </properties>
+        </profile>
+    </profiles>
 </project>

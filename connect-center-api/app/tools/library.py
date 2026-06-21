@@ -18,7 +18,7 @@ MCP interface, enabling clients to interact with Library data programmatically.
 
 Available Tools:
 - get_libraries: Retrieve paginated lists of libraries with optional filters for name,
-  type, organization, domain, state, description, and is_default flag. Supports date
+  type, organization, domain, state, description, is_default flag, and updater. Supports date
   range filtering and custom sorting.
 
 - get_library: Retrieve a single library by its ID, including creator and last_updater
@@ -41,22 +41,38 @@ from __future__ import annotations
 import logging
 from typing import Annotated, Any
 
-from fastmcp import FastMCP
+from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from fastmcp.exceptions import ToolError
+from fastmcp.server.elicitation import AcceptedElicitation, CancelledElicitation, DeclinedElicitation
 from pydantic import Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.vendor_plugins import get_vendor_plugin
-from app.utils.date import parse_date_range
 from app.security import AuthenticatedUser
 from app.services.library_service import LibraryService
 from app.tools import _to_tool_error, get_tool_authenticated_user, str_to_bool, tool_session
-from app.tools.models.library import GetLibraryPaginationResponse, GetLibraryResponse, LibraryResponseEntry
+from app.tools.models.library import (
+    CreateLibraryResponse,
+    GetLibraryPaginationResponse,
+    GetLibraryResponse,
+    LibraryResponseEntry,
+    ManageLibraryReleaseDependenciesResponse,
+    UpdateLibraryResponse,
+)
+from app.types.unset import UNSET
+from app.utils.date import parse_date_range
 
 logger = logging.getLogger("connectcenter.mcp.library")
 
 mcp = FastMCP("connectCenter MCP - Library Tools")
+
+EMPTY_OUTPUT_SCHEMA = {
+    "type": "object",
+    "description": "Empty response body.",
+    "properties": {},
+    "additionalProperties": False,
+}
 
 
 async def get_library_service(
@@ -74,25 +90,73 @@ async def get_library_service(
         "type": "object",
         "description": "Response containing paginated list of libraries.",
         "properties": {
-            "total_items": {"type": "integer", "description": "Total number of libraries available. Allowed values: non-negative integers (≥0).", "example": 5},
-            "offset": {"type": "integer", "description": "Offset of the first item in this page. Allowed values: non-negative integers (≥0). Default value: 0.", "example": 0},
-            "limit": {"type": "integer", "description": "Number of items returned in this page. Allowed values: integers between 1 and 100 (inclusive). Default value: 10.", "example": 10},
+            "total_items": {
+                "type": "integer",
+                "description": "Total number of libraries available. Allowed values: non-negative integers (≥0).",
+                "example": 5,
+            },
+            "offset": {
+                "type": "integer",
+                "description": "Offset of the first item in this page. Allowed values: non-negative integers (≥0). Default value: 0.",
+                "example": 0,
+            },
+            "limit": {
+                "type": "integer",
+                "description": "Number of items returned in this page. Allowed values: integers between 1 and 100 (inclusive). Default value: 10.",
+                "example": 10,
+            },
             "items": {
                 "type": "array",
                 "description": "List of libraries on this page",
                 "items": {
                     "type": "object",
                     "properties": {
-                        "library_id": {"type": "integer", "description": "Unique identifier for the library", "example": 1},
+                        "library_id": {
+                            "type": "integer",
+                            "description": "Unique identifier for the library",
+                            "example": 1,
+                        },
                         "name": {"type": "string", "description": "Name of the library", "example": "connectSpec"},
-                        "type": {"type": ["string", "null"], "description": "Type of the library", "example": "Standard"},
-                        "organization": {"type": ["string", "null"], "description": "Organization that owns the library", "example": "OAGI"},
-                        "description": {"type": ["string", "null"], "description": "Description of the library", "example": "Core specification library"},
-                        "link": {"type": ["string", "null"], "description": "URL link to the library", "example": "https://oagi.org"},
-                        "domain": {"type": ["string", "null"], "description": "Domain of the library", "example": "Enterprise Interoperability"},
-                        "state": {"type": ["string", "null"], "description": "Current state of the library", "example": "Published"},
-                        "is_read_only": {"type": "boolean", "description": "Whether the library is read-only", "example": False},
-                        "is_default": {"type": "boolean", "description": "Whether this is the default library", "example": True},
+                        "type": {
+                            "type": ["string", "null"],
+                            "description": "Type of the library",
+                            "example": "Standard",
+                        },
+                        "organization": {
+                            "type": ["string", "null"],
+                            "description": "Organization that owns the library",
+                            "example": "OAGI",
+                        },
+                        "description": {
+                            "type": ["string", "null"],
+                            "description": "Description of the library",
+                            "example": "Core specification library",
+                        },
+                        "link": {
+                            "type": ["string", "null"],
+                            "description": "URL link to the library",
+                            "example": "https://oagi.org",
+                        },
+                        "domain": {
+                            "type": ["string", "null"],
+                            "description": "Domain of the library",
+                            "example": "Enterprise Interoperability",
+                        },
+                        "state": {
+                            "type": ["string", "null"],
+                            "description": "Current state of the library",
+                            "example": "Published",
+                        },
+                        "is_read_only": {
+                            "type": "boolean",
+                            "description": "Whether the library is read-only",
+                            "example": False,
+                        },
+                        "is_default": {
+                            "type": "boolean",
+                            "description": "Whether this is the default library",
+                            "example": True,
+                        },
                         "created": {
                             "type": "object",
                             "description": "Information about the creation of the library",
@@ -101,16 +165,38 @@ async def get_library_service(
                                     "type": "object",
                                     "description": "User who created the library",
                                     "properties": {
-                                        "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                                        "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                                        "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                                        "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                                        "user_id": {
+                                            "type": "integer",
+                                            "description": "Unique identifier for the user",
+                                            "example": 1,
+                                        },
+                                        "login_id": {
+                                            "type": "string",
+                                            "description": "User's login identifier",
+                                            "example": "admin",
+                                        },
+                                        "username": {
+                                            "type": "string",
+                                            "description": "Display name of the user",
+                                            "example": "Administrator",
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                            "description": "List of roles assigned to the user",
+                                            "example": ["Admin"],
+                                        },
                                     },
-                                    "required": ["user_id", "login_id", "username", "roles"]
+                                    "required": ["user_id", "login_id", "username", "roles"],
                                 },
-                                "when": {"type": "string", "format": "date-time", "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-15T10:30:00Z"}
+                                "when": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                                    "example": "2024-01-15T10:30:00Z",
+                                },
                             },
-                            "required": ["who", "when"]
+                            "required": ["who", "when"],
                         },
                         "last_updated": {
                             "type": "object",
@@ -120,38 +206,83 @@ async def get_library_service(
                                     "type": "object",
                                     "description": "User who last updated the library",
                                     "properties": {
-                                        "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                                        "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                                        "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                                        "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                                        "user_id": {
+                                            "type": "integer",
+                                            "description": "Unique identifier for the user",
+                                            "example": 1,
+                                        },
+                                        "login_id": {
+                                            "type": "string",
+                                            "description": "User's login identifier",
+                                            "example": "admin",
+                                        },
+                                        "username": {
+                                            "type": "string",
+                                            "description": "Display name of the user",
+                                            "example": "Administrator",
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                            "description": "List of roles assigned to the user",
+                                            "example": ["Admin"],
+                                        },
                                     },
-                                    "required": ["user_id", "login_id", "username", "roles"]
+                                    "required": ["user_id", "login_id", "username", "roles"],
                                 },
-                                "when": {"type": "string", "format": "date-time", "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-20T14:45:00Z"}
+                                "when": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                                    "example": "2024-01-20T14:45:00Z",
+                                },
                             },
-                            "required": ["who", "when"]
-                        }
+                            "required": ["who", "when"],
+                        },
                     },
-                    "required": ["library_id", "name", "is_read_only", "is_default", "created", "last_updated"]
-                }
-            }
+                    "required": ["library_id", "name", "is_read_only", "is_default", "created", "last_updated"],
+                },
+            },
         },
-        "required": ["total_items", "offset", "limit", "items"]
-    }
+        "required": ["total_items", "offset", "limit", "items"],
+    },
 )
 async def get_libraries(
-    name: Annotated[str | None, Field(default=None, description="Filter by library name using partial match (case-insensitive).")],
-    type: Annotated[str | None, Field(default=None, description="Filter by library type using partial match (case-insensitive).")],
-    organization: Annotated[str | None, Field(default=None, description="Filter by organization using partial match (case-insensitive).")],
-    domain: Annotated[str | None, Field(default=None, description="Filter by domain using partial match (case-insensitive).")],
-    state: Annotated[str | None, Field(default=None, description="Filter by state using partial match (case-insensitive).")],
-    description: Annotated[str | None, Field(default=None, description="Filter by description using partial match (case-insensitive).")],
-    is_default: Annotated[bool | str | None, Field(default=None, description="Filter by default library flag.")],
-    created_on: Annotated[str | None, Field(default=None, description="Filter by creation date using an inclusive range: '[before~after]'.")],
-    last_updated_on: Annotated[str | None, Field(default=None, description="Filter by last update date using an inclusive range: '[before~after]'.")],
-    order_by: Annotated[str | None, Field(default=None, description="Comma-separated list of properties to order results by. Allowed columns: name, type, organization, domain, state, description, is_default, creation_timestamp, last_update_timestamp.")],
-    offset: Annotated[int, Field(default=0, ge=0, description="The offset from the beginning of the list.")],
-    limit: Annotated[int, Field(default=10, ge=1, le=100, description="The maximum number of items to return.")],
+    name: Annotated[
+        str | None, Field(description="Filter by library name using partial match (case-insensitive).")
+    ] = None,
+    type: Annotated[
+        str | None, Field(description="Filter by library type using partial match (case-insensitive).")
+    ] = None,
+    organization: Annotated[
+        str | None, Field(description="Filter by organization using partial match (case-insensitive).")
+    ] = None,
+    domain: Annotated[str | None, Field(description="Filter by domain using partial match (case-insensitive).")] = None,
+    state: Annotated[str | None, Field(description="Filter by state using partial match (case-insensitive).")] = None,
+    description: Annotated[
+        str | None, Field(description="Filter by description using partial match (case-insensitive).")
+    ] = None,
+    is_default: Annotated[bool | str | None, Field(description="Filter by default library flag.")] = None,
+    created_on: Annotated[
+        str | None, Field(description="Filter by creation date using an inclusive range: '[before~after]'.")
+    ] = None,
+    last_updated_on: Annotated[
+        str | None, Field(description="Filter by last update date using an inclusive range: '[before~after]'.")
+    ] = None,
+    updater: Annotated[
+        str | None,
+        Field(
+            description="Comma-separated updater login IDs to filter by exact match. Prefix a login ID with '!' to exclude it."
+        ),
+    ] = None,
+    order_by: Annotated[
+        str | None,
+        Field(
+            description="Comma-separated list of properties to order results by. Allowed columns: name, type, organization, domain, state, description, is_default, creation_timestamp, last_update_timestamp."
+        ),
+    ] = None,
+    offset: Annotated[int, Field(ge=0, description="The offset from the beginning of the list.")] = 0,
+    limit: Annotated[int, Field(ge=1, le=100, description="The maximum number of items to return.")] = 10,
     library_service: LibraryService = Depends(get_library_service),
 ) -> GetLibraryPaginationResponse:
     """
@@ -177,6 +308,9 @@ async def get_libraries(
             'before' and 'after' are date-time strings. Default date format: YYYY-MM-DD.
             Examples: '[2025-01-01~2025-02-01]'. Either 'before' or 'after' can be omitted,
             e.g., '[~2025-02-01]' or '[2025-01-01~]'. Defaults to None.
+        updater (str | None, optional): Comma-separated updater login IDs using exact match.
+            Prefix a login ID with '!' to exclude it. Examples: 'john.doe', 'john.doe,jane.doe',
+            '!john.doe', 'john.doe,!jane.doe'. Login IDs cannot contain '!' or ','. Defaults to None.
         order_by (str | None, optional): Comma-separated list of properties to order results by.
             Prefix with '-' for descending, '+' for ascending (default ascending).
             Allowed columns: name, type, organization, domain, state, description, is_default, creation_timestamp, last_update_timestamp.
@@ -228,9 +362,7 @@ async def get_libraries(
     except ToolError:
         raise
     except Exception as e:
-        raise ToolError(
-            f"Type conversion error: {str(e)}. Please check your parameter types and try again."
-        ) from e
+        raise ToolError(f"Type conversion error: {str(e)}. Please check your parameter types and try again.") from e
 
     try:
         page = await library_service.list(
@@ -246,6 +378,7 @@ async def get_libraries(
             is_default=is_default,
             created_on=parse_date_range(created_on),
             last_updated_on=parse_date_range(last_updated_on),
+            updater=updater,
         )
         return _to_list_response(items=page.items, total=page.total, offset=page.offset, limit=page.limit)
     except Exception as exc:
@@ -262,11 +395,31 @@ async def get_libraries(
             "library_id": {"type": "integer", "description": "Unique identifier for the library", "example": 1},
             "name": {"type": "string", "description": "Name of the library", "example": "connectSpec"},
             "type": {"type": ["string", "null"], "description": "Type of the library", "example": "Standard"},
-            "organization": {"type": ["string", "null"], "description": "Organization that owns the library", "example": "OAGI"},
-            "description": {"type": ["string", "null"], "description": "Description of the library", "example": "Core specification library"},
-            "link": {"type": ["string", "null"], "description": "URL link to the library", "example": "https://oagi.org"},
-            "domain": {"type": ["string", "null"], "description": "Domain of the library", "example": "Enterprise Interoperability"},
-            "state": {"type": ["string", "null"], "description": "Current state of the library", "example": "Published"},
+            "organization": {
+                "type": ["string", "null"],
+                "description": "Organization that owns the library",
+                "example": "OAGI",
+            },
+            "description": {
+                "type": ["string", "null"],
+                "description": "Description of the library",
+                "example": "Core specification library",
+            },
+            "link": {
+                "type": ["string", "null"],
+                "description": "URL link to the library",
+                "example": "https://oagi.org",
+            },
+            "domain": {
+                "type": ["string", "null"],
+                "description": "Domain of the library",
+                "example": "Enterprise Interoperability",
+            },
+            "state": {
+                "type": ["string", "null"],
+                "description": "Current state of the library",
+                "example": "Published",
+            },
             "is_read_only": {"type": "boolean", "description": "Whether the library is read-only", "example": False},
             "is_default": {"type": "boolean", "description": "Whether this is the default library", "example": True},
             "created": {
@@ -277,16 +430,38 @@ async def get_libraries(
                         "type": "object",
                         "description": "User who created the library",
                         "properties": {
-                            "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                            "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                            "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                            "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                            "user_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the user",
+                                "example": 1,
+                            },
+                            "login_id": {
+                                "type": "string",
+                                "description": "User's login identifier",
+                                "example": "admin",
+                            },
+                            "username": {
+                                "type": "string",
+                                "description": "Display name of the user",
+                                "example": "Administrator",
+                            },
+                            "roles": {
+                                "type": "array",
+                                "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                "description": "List of roles assigned to the user",
+                                "example": ["Admin"],
+                            },
                         },
-                        "required": ["user_id", "login_id", "username", "roles"]
+                        "required": ["user_id", "login_id", "username", "roles"],
                     },
-                    "when": {"type": "string", "format": "date-time", "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-15T10:30:00Z"}
+                    "when": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Creation timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                        "example": "2024-01-15T10:30:00Z",
+                    },
                 },
-                "required": ["who", "when"]
+                "required": ["who", "when"],
             },
             "last_updated": {
                 "type": "object",
@@ -296,20 +471,69 @@ async def get_libraries(
                         "type": "object",
                         "description": "User who last updated the library",
                         "properties": {
-                            "user_id": {"type": "integer", "description": "Unique identifier for the user", "example": 1},
-                            "login_id": {"type": "string", "description": "User's login identifier", "example": "admin"},
-                            "username": {"type": "string", "description": "Display name of the user", "example": "Administrator"},
-                            "roles": {"type": "array", "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]}, "description": "List of roles assigned to the user", "example": ["Admin"]}
+                            "user_id": {
+                                "type": "integer",
+                                "description": "Unique identifier for the user",
+                                "example": 1,
+                            },
+                            "login_id": {
+                                "type": "string",
+                                "description": "User's login identifier",
+                                "example": "admin",
+                            },
+                            "username": {
+                                "type": "string",
+                                "description": "Display name of the user",
+                                "example": "Administrator",
+                            },
+                            "roles": {
+                                "type": "array",
+                                "items": {"type": "string", "enum": ["Admin", "Developer", "End-User"]},
+                                "description": "List of roles assigned to the user",
+                                "example": ["Admin"],
+                            },
                         },
-                        "required": ["user_id", "login_id", "username", "roles"]
+                        "required": ["user_id", "login_id", "username", "roles"],
                     },
-                    "when": {"type": "string", "format": "date-time", "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)", "example": "2024-01-20T14:45:00Z"}
+                    "when": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Last update timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
+                        "example": "2024-01-20T14:45:00Z",
+                    },
                 },
-                "required": ["who", "when"]
-            }
+                "required": ["who", "when"],
+            },
+            "release_dependencies": {
+                "type": "array",
+                "description": "Direct dependencies of the library's working release.",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "release_id": {"type": "integer", "description": "Release identifier", "example": 101},
+                        "library_id": {"type": "integer", "description": "Owning library identifier", "example": 3},
+                        "library_name": {
+                            "type": "string",
+                            "description": "Owning library name",
+                            "example": "CCTS Data Type Catalogue v3",
+                        },
+                        "release_num": {"type": "string", "description": "Release number", "example": "3.1"},
+                        "state": {"type": "string", "description": "Release lifecycle state", "example": "Published"},
+                    },
+                    "required": ["release_id", "library_id", "library_name", "release_num", "state"],
+                },
+            },
         },
-        "required": ["library_id", "name", "is_read_only", "is_default", "created", "last_updated"]
-    }
+        "required": [
+            "library_id",
+            "name",
+            "is_read_only",
+            "is_default",
+            "created",
+            "last_updated",
+            "release_dependencies",
+        ],
+    },
 )
 async def get_library(
     library_id: Annotated[int, Field(gt=0, description="Unique numeric identifier of the library to retrieve.")],
@@ -339,6 +563,7 @@ async def get_library(
             - is_default: Whether the library is the default
             - created: Information about the creation of the library
             - last_updated: Information about the last update of the library
+            - release_dependencies: Direct dependencies of the library's working release
 
     Raises:
         ToolError: If validation fails, the library is not found, or other errors occur.
@@ -367,6 +592,254 @@ async def get_library(
         return GetLibraryResponse.model_validate(row, from_attributes=True)
     except Exception as exc:
         raise _to_tool_error(exc, fallback=f"Unable to retrieve library {library_id}.") from exc
+
+
+@mcp.tool(
+    name="create_library",
+    description="Create a library and seed its working release.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the created library identifier.",
+        "properties": {
+            "library_id": {"type": "integer", "description": "Created library identifier.", "example": 12},
+        },
+        "required": ["library_id"],
+    },
+)
+async def create_library(
+    name: Annotated[str, Field(min_length=1, description="Library name.")],
+    namespace_uri: Annotated[
+        str,
+        Field(min_length=1, description="URI for the default standard namespace."),
+    ],
+    namespace_prefix: Annotated[
+        str | None,
+        Field(default=None, description="Prefix for the default standard namespace."),
+    ] = None,
+    type: Annotated[str | None, Field(default=None, description="Type of the library.")] = None,
+    organization: Annotated[str | None, Field(default=None, description="Owning organization.")] = None,
+    link: Annotated[str | None, Field(default=None, description="Library URL.")] = None,
+    domain: Annotated[str | None, Field(default=None, description="Library domain.")] = None,
+    description: Annotated[str | None, Field(default=None, description="Library description.")] = None,
+    library_service: LibraryService = Depends(get_library_service),
+) -> CreateLibraryResponse:
+    """Create a library."""
+    try:
+        result = await library_service.create_library(
+            type=type,
+            name=name,
+            organization=organization,
+            description=description,
+            link=link,
+            domain=domain,
+            namespace_uri=namespace_uri,
+            namespace_prefix=namespace_prefix,
+        )
+        return CreateLibraryResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback="Unable to create the library.") from exc
+
+
+@mcp.tool(
+    name="update_library",
+    description="Update an existing library.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the target library identifier and changed fields.",
+        "properties": {
+            "library_id": {"type": "integer", "description": "Target library identifier.", "example": 12},
+            "updates": {
+                "type": "array",
+                "description": "Updated field names.",
+                "items": {"type": "string"},
+                "example": ["name", "domain"],
+            },
+        },
+        "required": ["library_id", "updates"],
+    },
+)
+async def update_library(
+    library_id: Annotated[int, Field(gt=0, description="Target library identifier.")],
+    name: Annotated[
+        str | None, Field(default=None, min_length=1, description="Library name to save. Omit to leave it unchanged.")
+    ] = None,
+    type: Annotated[
+        str | None, Field(default=None, description="Library type to save. Omit to leave it unchanged.")
+    ] = None,
+    organization: Annotated[
+        str | None, Field(default=None, description="Owning organization to save. Omit to leave it unchanged.")
+    ] = None,
+    link: Annotated[
+        str | None, Field(default=None, description="Library URL to save. Omit to leave it unchanged.")
+    ] = None,
+    domain: Annotated[
+        str | None, Field(default=None, description="Library domain to save. Omit to leave it unchanged.")
+    ] = None,
+    description: Annotated[
+        str | None, Field(default=None, description="Library description to save. Omit to leave it unchanged.")
+    ] = None,
+    state: Annotated[
+        str | None, Field(default=None, description="Library state to save. Omit to leave it unchanged.")
+    ] = None,
+    is_default: Annotated[
+        bool | str | None,
+        Field(default=None, description="Whether this library should be the default. Omit to leave it unchanged."),
+    ] = None,
+    library_service: LibraryService = Depends(get_library_service),
+) -> UpdateLibraryResponse:
+    """Update a library."""
+    try:
+        result = await library_service.update_library(
+            library_id=library_id,
+            type=UNSET if type is None else type,
+            name=UNSET if name is None else name,
+            organization=UNSET if organization is None else organization,
+            description=UNSET if description is None else description,
+            link=UNSET if link is None else link,
+            domain=UNSET if domain is None else domain,
+            state=UNSET if state is None else state,
+            is_default=UNSET if is_default is None else str_to_bool(is_default),
+        )
+        return UpdateLibraryResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to update library {library_id}.") from exc
+
+
+@mcp.tool(
+    name="add_library_release_dependency",
+    description="Add a direct dependency to a library's working release.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the target library identifier and the direct dependencies now assigned.",
+        "properties": {
+            "library_id": {"type": "integer", "description": "Target library identifier.", "example": 12},
+            "release_dependencies": {
+                "type": "array",
+                "description": "Direct dependencies now assigned to the library's working release.",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "release_id": {"type": "integer", "description": "Release identifier.", "example": 101},
+                        "library_id": {"type": "integer", "description": "Owning library identifier.", "example": 3},
+                        "library_name": {
+                            "type": "string",
+                            "description": "Owning library name.",
+                            "example": "CCTS Data Type Catalogue v3",
+                        },
+                        "release_num": {"type": "string", "description": "Release number.", "example": "3.1"},
+                        "state": {"type": "string", "description": "Release lifecycle state.", "example": "Published"},
+                    },
+                    "required": ["release_id", "library_id", "library_name", "release_num", "state"],
+                },
+            },
+        },
+        "required": ["library_id", "release_dependencies"],
+    },
+)
+async def add_library_release_dependency(
+    library_id: Annotated[int, Field(gt=0, description="Target library identifier.")],
+    release_id: Annotated[int, Field(gt=0, description="Release identifier to add as a dependency.")],
+    library_service: LibraryService = Depends(get_library_service),
+) -> ManageLibraryReleaseDependenciesResponse:
+    """Add a direct dependency to a library's working release."""
+    try:
+        result = await library_service.add_library_release_dependency(
+            library_id=library_id,
+            release_id=release_id,
+        )
+        return ManageLibraryReleaseDependenciesResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(
+            exc, fallback=f"Unable to add release dependency {release_id} to library {library_id}."
+        ) from exc
+
+
+@mcp.tool(
+    name="remove_library_release_dependency",
+    description="Remove a direct dependency from a library's working release.",
+    output_schema={
+        "type": "object",
+        "description": "Response containing the target library identifier and the direct dependencies now assigned.",
+        "properties": {
+            "library_id": {"type": "integer", "description": "Target library identifier.", "example": 12},
+            "release_dependencies": {
+                "type": "array",
+                "description": "Direct dependencies now assigned to the library's working release.",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "release_id": {"type": "integer", "description": "Release identifier.", "example": 101},
+                        "library_id": {"type": "integer", "description": "Owning library identifier.", "example": 3},
+                        "library_name": {
+                            "type": "string",
+                            "description": "Owning library name.",
+                            "example": "CCTS Data Type Catalogue v3",
+                        },
+                        "release_num": {"type": "string", "description": "Release number.", "example": "3.1"},
+                        "state": {"type": "string", "description": "Release lifecycle state.", "example": "Published"},
+                    },
+                    "required": ["release_id", "library_id", "library_name", "release_num", "state"],
+                },
+            },
+        },
+        "required": ["library_id", "release_dependencies"],
+    },
+)
+async def remove_library_release_dependency(
+    library_id: Annotated[int, Field(gt=0, description="Target library identifier.")],
+    release_id: Annotated[int, Field(gt=0, description="Release identifier to remove from dependencies.")],
+    library_service: LibraryService = Depends(get_library_service),
+) -> ManageLibraryReleaseDependenciesResponse:
+    """Remove a direct dependency from a library's working release."""
+    try:
+        result = await library_service.remove_library_release_dependency(
+            library_id=library_id,
+            release_id=release_id,
+        )
+        return ManageLibraryReleaseDependenciesResponse.model_validate(result, from_attributes=True)
+    except Exception as exc:
+        raise _to_tool_error(
+            exc, fallback=f"Unable to remove release dependency {release_id} from library {library_id}."
+        ) from exc
+
+
+@mcp.tool(
+    name="discard_library",
+    description="Discard a library permanently after explicit confirmation when it passes the discard checks.",
+    output_schema=EMPTY_OUTPUT_SCHEMA,
+)
+async def discard_library(
+    library_id: Annotated[int, Field(gt=0, description="Target library identifier.")],
+    ctx: Context,
+    library_service: LibraryService = Depends(get_library_service),
+) -> dict[str, object]:
+    """Discard a library after confirmation."""
+    row = await library_service.get(library_id)
+    if row is None:
+        raise ToolError(f"The library with ID {library_id} was not found. Please check the ID and try again.")
+
+    elicit_result = await ctx.elicit(
+        message=(
+            f"Are you sure you want to discard library '{row.name}' permanently?\n\n"
+            "This permanently deletes the library record, its current working release, "
+            "its namespaces, and the current working-release authored data tied to that library. "
+            "This cannot be undone."
+        ),
+        response_type=None,
+    )
+    match elicit_result:
+        case AcceptedElicitation():
+            pass
+        case DeclinedElicitation():
+            raise ToolError("Library discard was not confirmed.")
+        case CancelledElicitation():
+            raise ToolError("Library discard was cancelled.")
+
+    try:
+        await library_service.discard_library(library_id=library_id)
+        return {}
+    except Exception as exc:
+        raise _to_tool_error(exc, fallback=f"Unable to discard library {library_id}.") from exc
 
 
 def _build_library_service(

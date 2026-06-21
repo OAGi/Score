@@ -1501,6 +1501,13 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     return validState.indexOf(state) > -1;
   }
 
+  // Issue #1723: a developer may see end-user (Production) code lists in the Value Domain list
+  // so an already-assigned one is visible, but must not (re)assign them. Such options are shown
+  // read-only. End-users are unaffected (they assign their own Production code lists).
+  isValueDomainAssignable(state: string): boolean {
+    return !(this.isDeveloper && state === 'Production');
+  }
+
   goToBusinessTermsForBie(bieId: number, bieType: string) {
     if (bieType === 'ASBIE') {
       const link = this.router.serializeUrl(
@@ -2438,7 +2445,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     this.stateTransitionFlowService.requestDependencySelection({
       state,
       rootTopLevelAsbiepIds: [this.rootNode.topLevelAsbiepId],
-      loadDependencies: () => this.service.getStateDependencies(this.rootNode.topLevelAsbiepId, state),
       validateSelection: (selection: StateDependencySelection) =>
         this.service.validateStateDependencies(this.rootNode.topLevelAsbiepId, state, selection),
       normalizeTargets: (dependencyTargets) => {
@@ -2495,7 +2501,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     this.stateTransitionFlowService.requestDependencySelection({
       state: 'Discard',
       rootTopLevelAsbiepIds: [this.rootNode.topLevelAsbiepId],
-      loadDependencies: () => this.service.getStateDependencies(this.rootNode.topLevelAsbiepId, 'Discard'),
       validateSelection: (selection: StateDependencySelection) =>
         this.service.validateStateDependencies(this.rootNode.topLevelAsbiepId, 'Discard', selection),
       normalizeTargets: (dependencyTargets) => {

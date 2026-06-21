@@ -61,6 +61,12 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.Dt.DtPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtManifestTag.DtManifestTagPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtSc.DtScPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Exception.ExceptionPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.GithubIssueAccManifest.GithubIssueAccManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.GithubIssueAgencyIdListManifest.GithubIssueAgencyIdListManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.GithubIssueAsccpManifest.GithubIssueAsccpManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.GithubIssueBccpManifest.GithubIssueBccpManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.GithubIssueCodeListManifest.GithubIssueCodeListManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.GithubIssueDtManifest.GithubIssueDtManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Library.LibraryPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Log.LogPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Message.MessagePath;
@@ -77,6 +83,8 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleSetRelease.ModuleSet
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleXbtManifest.ModuleXbtManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Namespace.NamespacePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasDoc.OasDocPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasDocSecurity.OasDocSecurityPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasDocSecurityScope.OasDocSecurityScopePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasDocTag.OasDocTagPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasExample.OasExamplePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasExternalDoc.OasExternalDocPath;
@@ -84,7 +92,11 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasExternalDocDoc.OasExter
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasHttpHeader.OasHttpHeaderPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasMediaType.OasMediaTypePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasMessageBody.OasMessageBodyPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasOauthFlow.OasOauthFlowPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasOauthScope.OasOauthScopePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasOperation.OasOperationPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasOperationSecurity.OasOperationSecurityPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasOperationSecurityScope.OasOperationSecurityScopePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasParameter.OasParameterPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasParameterLink.OasParameterLinkPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasRequest.OasRequestPath;
@@ -92,6 +104,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasRequestParameter.OasReq
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasResource.OasResourcePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasResponse.OasResponsePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasResponseHeaders.OasResponseHeadersPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasSecurityScheme.OasSecuritySchemePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasServer.OasServerPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasServerVariable.OasServerVariablePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasTag.OasTagPath;
@@ -1069,6 +1082,174 @@ public class AppUser extends TableImpl<AppUserRecord> {
         return _exception;
     }
 
+    private transient GithubIssueAccManifestPath _githubIssueAccManifestCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_acc_manifest</code> table, via the
+     * <code>github_issue_acc_manifest_created_by_fk</code> key
+     */
+    public GithubIssueAccManifestPath githubIssueAccManifestCreatedByFk() {
+        if (_githubIssueAccManifestCreatedByFk == null)
+            _githubIssueAccManifestCreatedByFk = new GithubIssueAccManifestPath(this, null, Keys.GITHUB_ISSUE_ACC_MANIFEST_CREATED_BY_FK.getInverseKey());
+
+        return _githubIssueAccManifestCreatedByFk;
+    }
+
+    private transient GithubIssueAccManifestPath _githubIssueAccManifestLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_acc_manifest</code> table, via the
+     * <code>github_issue_acc_manifest_last_updated_by_fk</code> key
+     */
+    public GithubIssueAccManifestPath githubIssueAccManifestLastUpdatedByFk() {
+        if (_githubIssueAccManifestLastUpdatedByFk == null)
+            _githubIssueAccManifestLastUpdatedByFk = new GithubIssueAccManifestPath(this, null, Keys.GITHUB_ISSUE_ACC_MANIFEST_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _githubIssueAccManifestLastUpdatedByFk;
+    }
+
+    private transient GithubIssueAgencyIdListManifestPath _githubIssueAgencyIdListManifestCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_agency_id_list_manifest</code> table, via the
+     * <code>github_issue_agency_id_list_manifest_created_by_fk</code> key
+     */
+    public GithubIssueAgencyIdListManifestPath githubIssueAgencyIdListManifestCreatedByFk() {
+        if (_githubIssueAgencyIdListManifestCreatedByFk == null)
+            _githubIssueAgencyIdListManifestCreatedByFk = new GithubIssueAgencyIdListManifestPath(this, null, Keys.GITHUB_ISSUE_AGENCY_ID_LIST_MANIFEST_CREATED_BY_FK.getInverseKey());
+
+        return _githubIssueAgencyIdListManifestCreatedByFk;
+    }
+
+    private transient GithubIssueAgencyIdListManifestPath _githubIssueAgencyIdListManifestLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_agency_id_list_manifest</code> table, via the
+     * <code>github_issue_agency_id_list_manifest_last_updated_by_fk</code> key
+     */
+    public GithubIssueAgencyIdListManifestPath githubIssueAgencyIdListManifestLastUpdatedByFk() {
+        if (_githubIssueAgencyIdListManifestLastUpdatedByFk == null)
+            _githubIssueAgencyIdListManifestLastUpdatedByFk = new GithubIssueAgencyIdListManifestPath(this, null, Keys.GITHUB_ISSUE_AGENCY_ID_LIST_MANIFEST_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _githubIssueAgencyIdListManifestLastUpdatedByFk;
+    }
+
+    private transient GithubIssueAsccpManifestPath _githubIssueAsccpManifestCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_asccp_manifest</code> table, via the
+     * <code>github_issue_asccp_manifest_created_by_fk</code> key
+     */
+    public GithubIssueAsccpManifestPath githubIssueAsccpManifestCreatedByFk() {
+        if (_githubIssueAsccpManifestCreatedByFk == null)
+            _githubIssueAsccpManifestCreatedByFk = new GithubIssueAsccpManifestPath(this, null, Keys.GITHUB_ISSUE_ASCCP_MANIFEST_CREATED_BY_FK.getInverseKey());
+
+        return _githubIssueAsccpManifestCreatedByFk;
+    }
+
+    private transient GithubIssueAsccpManifestPath _githubIssueAsccpManifestLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_asccp_manifest</code> table, via the
+     * <code>github_issue_asccp_manifest_last_updated_by_fk</code> key
+     */
+    public GithubIssueAsccpManifestPath githubIssueAsccpManifestLastUpdatedByFk() {
+        if (_githubIssueAsccpManifestLastUpdatedByFk == null)
+            _githubIssueAsccpManifestLastUpdatedByFk = new GithubIssueAsccpManifestPath(this, null, Keys.GITHUB_ISSUE_ASCCP_MANIFEST_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _githubIssueAsccpManifestLastUpdatedByFk;
+    }
+
+    private transient GithubIssueBccpManifestPath _githubIssueBccpManifestCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_bccp_manifest</code> table, via the
+     * <code>github_issue_bccp_manifest_created_by_fk</code> key
+     */
+    public GithubIssueBccpManifestPath githubIssueBccpManifestCreatedByFk() {
+        if (_githubIssueBccpManifestCreatedByFk == null)
+            _githubIssueBccpManifestCreatedByFk = new GithubIssueBccpManifestPath(this, null, Keys.GITHUB_ISSUE_BCCP_MANIFEST_CREATED_BY_FK.getInverseKey());
+
+        return _githubIssueBccpManifestCreatedByFk;
+    }
+
+    private transient GithubIssueBccpManifestPath _githubIssueBccpManifestLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_bccp_manifest</code> table, via the
+     * <code>github_issue_bccp_manifest_last_updated_by_fk</code> key
+     */
+    public GithubIssueBccpManifestPath githubIssueBccpManifestLastUpdatedByFk() {
+        if (_githubIssueBccpManifestLastUpdatedByFk == null)
+            _githubIssueBccpManifestLastUpdatedByFk = new GithubIssueBccpManifestPath(this, null, Keys.GITHUB_ISSUE_BCCP_MANIFEST_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _githubIssueBccpManifestLastUpdatedByFk;
+    }
+
+    private transient GithubIssueCodeListManifestPath _githubIssueCodeListManifestCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_code_list_manifest</code> table, via the
+     * <code>github_issue_code_list_manifest_created_by_fk</code> key
+     */
+    public GithubIssueCodeListManifestPath githubIssueCodeListManifestCreatedByFk() {
+        if (_githubIssueCodeListManifestCreatedByFk == null)
+            _githubIssueCodeListManifestCreatedByFk = new GithubIssueCodeListManifestPath(this, null, Keys.GITHUB_ISSUE_CODE_LIST_MANIFEST_CREATED_BY_FK.getInverseKey());
+
+        return _githubIssueCodeListManifestCreatedByFk;
+    }
+
+    private transient GithubIssueCodeListManifestPath _githubIssueCodeListManifestLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_code_list_manifest</code> table, via the
+     * <code>github_issue_code_list_manifest_last_updated_by_fk</code> key
+     */
+    public GithubIssueCodeListManifestPath githubIssueCodeListManifestLastUpdatedByFk() {
+        if (_githubIssueCodeListManifestLastUpdatedByFk == null)
+            _githubIssueCodeListManifestLastUpdatedByFk = new GithubIssueCodeListManifestPath(this, null, Keys.GITHUB_ISSUE_CODE_LIST_MANIFEST_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _githubIssueCodeListManifestLastUpdatedByFk;
+    }
+
+    private transient GithubIssueDtManifestPath _githubIssueDtManifestCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_dt_manifest</code> table, via the
+     * <code>github_issue_dt_manifest_created_by_fk</code> key
+     */
+    public GithubIssueDtManifestPath githubIssueDtManifestCreatedByFk() {
+        if (_githubIssueDtManifestCreatedByFk == null)
+            _githubIssueDtManifestCreatedByFk = new GithubIssueDtManifestPath(this, null, Keys.GITHUB_ISSUE_DT_MANIFEST_CREATED_BY_FK.getInverseKey());
+
+        return _githubIssueDtManifestCreatedByFk;
+    }
+
+    private transient GithubIssueDtManifestPath _githubIssueDtManifestLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.github_issue_dt_manifest</code> table, via the
+     * <code>github_issue_dt_manifest_last_updated_by_fk</code> key
+     */
+    public GithubIssueDtManifestPath githubIssueDtManifestLastUpdatedByFk() {
+        if (_githubIssueDtManifestLastUpdatedByFk == null)
+            _githubIssueDtManifestLastUpdatedByFk = new GithubIssueDtManifestPath(this, null, Keys.GITHUB_ISSUE_DT_MANIFEST_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _githubIssueDtManifestLastUpdatedByFk;
+    }
+
     private transient LibraryPath _libraryCreatedByFk;
 
     /**
@@ -1528,6 +1709,62 @@ public class AppUser extends TableImpl<AppUserRecord> {
         return _oasDocOwnerUserIdFk;
     }
 
+    private transient OasDocSecurityPath _oasDocSecurityCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_doc_security</code> table, via the
+     * <code>oas_doc_security_created_by_fk</code> key
+     */
+    public OasDocSecurityPath oasDocSecurityCreatedByFk() {
+        if (_oasDocSecurityCreatedByFk == null)
+            _oasDocSecurityCreatedByFk = new OasDocSecurityPath(this, null, Keys.OAS_DOC_SECURITY_CREATED_BY_FK.getInverseKey());
+
+        return _oasDocSecurityCreatedByFk;
+    }
+
+    private transient OasDocSecurityPath _oasDocSecurityLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_doc_security</code> table, via the
+     * <code>oas_doc_security_last_updated_by_fk</code> key
+     */
+    public OasDocSecurityPath oasDocSecurityLastUpdatedByFk() {
+        if (_oasDocSecurityLastUpdatedByFk == null)
+            _oasDocSecurityLastUpdatedByFk = new OasDocSecurityPath(this, null, Keys.OAS_DOC_SECURITY_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasDocSecurityLastUpdatedByFk;
+    }
+
+    private transient OasDocSecurityScopePath _oasDocSecurityScopeCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_doc_security_scope</code> table, via the
+     * <code>oas_doc_security_scope_created_by_fk</code> key
+     */
+    public OasDocSecurityScopePath oasDocSecurityScopeCreatedByFk() {
+        if (_oasDocSecurityScopeCreatedByFk == null)
+            _oasDocSecurityScopeCreatedByFk = new OasDocSecurityScopePath(this, null, Keys.OAS_DOC_SECURITY_SCOPE_CREATED_BY_FK.getInverseKey());
+
+        return _oasDocSecurityScopeCreatedByFk;
+    }
+
+    private transient OasDocSecurityScopePath _oasDocSecurityScopeLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_doc_security_scope</code> table, via the
+     * <code>oas_doc_security_scope_last_updated_by_fk</code> key
+     */
+    public OasDocSecurityScopePath oasDocSecurityScopeLastUpdatedByFk() {
+        if (_oasDocSecurityScopeLastUpdatedByFk == null)
+            _oasDocSecurityScopeLastUpdatedByFk = new OasDocSecurityScopePath(this, null, Keys.OAS_DOC_SECURITY_SCOPE_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasDocSecurityScopeLastUpdatedByFk;
+    }
+
     private transient OasDocTagPath _oasDocTagCreatedByFk;
 
     /**
@@ -1748,6 +1985,62 @@ public class AppUser extends TableImpl<AppUserRecord> {
         return _oasMessageBodyLastUpdatedByFk;
     }
 
+    private transient OasOauthFlowPath _oasOauthFlowCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_oauth_flow</code> table, via the
+     * <code>oas_oauth_flow_created_by_fk</code> key
+     */
+    public OasOauthFlowPath oasOauthFlowCreatedByFk() {
+        if (_oasOauthFlowCreatedByFk == null)
+            _oasOauthFlowCreatedByFk = new OasOauthFlowPath(this, null, Keys.OAS_OAUTH_FLOW_CREATED_BY_FK.getInverseKey());
+
+        return _oasOauthFlowCreatedByFk;
+    }
+
+    private transient OasOauthFlowPath _oasOauthFlowLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_oauth_flow</code> table, via the
+     * <code>oas_oauth_flow_last_updated_by_fk</code> key
+     */
+    public OasOauthFlowPath oasOauthFlowLastUpdatedByFk() {
+        if (_oasOauthFlowLastUpdatedByFk == null)
+            _oasOauthFlowLastUpdatedByFk = new OasOauthFlowPath(this, null, Keys.OAS_OAUTH_FLOW_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasOauthFlowLastUpdatedByFk;
+    }
+
+    private transient OasOauthScopePath _oasOauthScopeCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_oauth_scope</code> table, via the
+     * <code>oas_oauth_scope_created_by_fk</code> key
+     */
+    public OasOauthScopePath oasOauthScopeCreatedByFk() {
+        if (_oasOauthScopeCreatedByFk == null)
+            _oasOauthScopeCreatedByFk = new OasOauthScopePath(this, null, Keys.OAS_OAUTH_SCOPE_CREATED_BY_FK.getInverseKey());
+
+        return _oasOauthScopeCreatedByFk;
+    }
+
+    private transient OasOauthScopePath _oasOauthScopeLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_oauth_scope</code> table, via the
+     * <code>oas_oauth_scope_last_updated_by_fk</code> key
+     */
+    public OasOauthScopePath oasOauthScopeLastUpdatedByFk() {
+        if (_oasOauthScopeLastUpdatedByFk == null)
+            _oasOauthScopeLastUpdatedByFk = new OasOauthScopePath(this, null, Keys.OAS_OAUTH_SCOPE_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasOauthScopeLastUpdatedByFk;
+    }
+
     private transient OasOperationPath _oasOperationCreatedByFk;
 
     /**
@@ -1772,6 +2065,62 @@ public class AppUser extends TableImpl<AppUserRecord> {
             _oasOperationLastUpdatedByFk = new OasOperationPath(this, null, Keys.OAS_OPERATION_LAST_UPDATED_BY_FK.getInverseKey());
 
         return _oasOperationLastUpdatedByFk;
+    }
+
+    private transient OasOperationSecurityPath _oasOperationSecurityCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_operation_security</code> table, via the
+     * <code>oas_operation_security_created_by_fk</code> key
+     */
+    public OasOperationSecurityPath oasOperationSecurityCreatedByFk() {
+        if (_oasOperationSecurityCreatedByFk == null)
+            _oasOperationSecurityCreatedByFk = new OasOperationSecurityPath(this, null, Keys.OAS_OPERATION_SECURITY_CREATED_BY_FK.getInverseKey());
+
+        return _oasOperationSecurityCreatedByFk;
+    }
+
+    private transient OasOperationSecurityPath _oasOperationSecurityLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_operation_security</code> table, via the
+     * <code>oas_operation_security_last_updated_by_fk</code> key
+     */
+    public OasOperationSecurityPath oasOperationSecurityLastUpdatedByFk() {
+        if (_oasOperationSecurityLastUpdatedByFk == null)
+            _oasOperationSecurityLastUpdatedByFk = new OasOperationSecurityPath(this, null, Keys.OAS_OPERATION_SECURITY_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasOperationSecurityLastUpdatedByFk;
+    }
+
+    private transient OasOperationSecurityScopePath _oasOperationSecurityScopeCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_operation_security_scope</code> table, via the
+     * <code>oas_operation_security_scope_created_by_fk</code> key
+     */
+    public OasOperationSecurityScopePath oasOperationSecurityScopeCreatedByFk() {
+        if (_oasOperationSecurityScopeCreatedByFk == null)
+            _oasOperationSecurityScopeCreatedByFk = new OasOperationSecurityScopePath(this, null, Keys.OAS_OPERATION_SECURITY_SCOPE_CREATED_BY_FK.getInverseKey());
+
+        return _oasOperationSecurityScopeCreatedByFk;
+    }
+
+    private transient OasOperationSecurityScopePath _oasOperationSecurityScopeLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_operation_security_scope</code> table, via the
+     * <code>oas_operation_security_scope_last_updated_by_fk</code> key
+     */
+    public OasOperationSecurityScopePath oasOperationSecurityScopeLastUpdatedByFk() {
+        if (_oasOperationSecurityScopeLastUpdatedByFk == null)
+            _oasOperationSecurityScopeLastUpdatedByFk = new OasOperationSecurityScopePath(this, null, Keys.OAS_OPERATION_SECURITY_SCOPE_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasOperationSecurityScopeLastUpdatedByFk;
     }
 
     private transient OasParameterPath _oasParameterCreatedByFk;
@@ -1960,6 +2309,34 @@ public class AppUser extends TableImpl<AppUserRecord> {
             _oasResponseLastUpdatedByFk = new OasResponsePath(this, null, Keys.OAS_RESPONSE_LAST_UPDATED_BY_FK.getInverseKey());
 
         return _oasResponseLastUpdatedByFk;
+    }
+
+    private transient OasSecuritySchemePath _oasSecuritySchemeCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_security_scheme</code> table, via the
+     * <code>oas_security_scheme_created_by_fk</code> key
+     */
+    public OasSecuritySchemePath oasSecuritySchemeCreatedByFk() {
+        if (_oasSecuritySchemeCreatedByFk == null)
+            _oasSecuritySchemeCreatedByFk = new OasSecuritySchemePath(this, null, Keys.OAS_SECURITY_SCHEME_CREATED_BY_FK.getInverseKey());
+
+        return _oasSecuritySchemeCreatedByFk;
+    }
+
+    private transient OasSecuritySchemePath _oasSecuritySchemeLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_security_scheme</code> table, via the
+     * <code>oas_security_scheme_last_updated_by_fk</code> key
+     */
+    public OasSecuritySchemePath oasSecuritySchemeLastUpdatedByFk() {
+        if (_oasSecuritySchemeLastUpdatedByFk == null)
+            _oasSecuritySchemeLastUpdatedByFk = new OasSecuritySchemePath(this, null, Keys.OAS_SECURITY_SCHEME_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasSecuritySchemeLastUpdatedByFk;
     }
 
     private transient OasServerPath _oasServerCreatedByFk;

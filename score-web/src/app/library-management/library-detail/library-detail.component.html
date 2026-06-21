@@ -61,6 +61,57 @@
           [disabled]="!isAdmin">Default
         </mat-checkbox>
 
+        <mat-form-field class="release-dependency-field pt-3">
+          <mat-label>Release Dependencies</mat-label>
+          <mat-chip-grid #dependencyChipGrid>
+            @for (dependency of selectedDependencies; track dependency.releaseId) {
+              <mat-chip-row [removable]="isAdmin" (removed)="removeDependency(dependency.releaseId)">
+                {{ releaseDependencyLabel(dependency) }}
+                @if (isAdmin) {
+                  <button matChipRemove aria-label="Remove dependency">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                }
+              </mat-chip-row>
+            }
+            <input
+                #dependencyInput
+                placeholder="Add release dependency"
+                [formControl]="dependencyCtrl"
+                [matAutocomplete]="dependencyAuto"
+                [matChipInputFor]="dependencyChipGrid"
+                >
+          </mat-chip-grid>
+          <mat-autocomplete #dependencyAuto="matAutocomplete" (optionSelected)="addDependency($event)">
+            @for (dependency of filteredDependencyOptions | async; track dependency.releaseId) {
+              <mat-option [value]="dependency">
+                {{ releaseDependencyLabel(dependency) }}
+              </mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
+
+        @if (removedDependencies.length > 0) {
+          <div class="removed-dependency-field">
+            <div class="removed-dependency-title">Removed Release Dependencies</div>
+            <mat-chip-grid #removedDependencyChipGrid class="removed-dependency-chip-list">
+              @for (dependency of removedDependencies; track dependency.releaseId) {
+                <mat-chip-row [removable]="true" (removed)="recoverDependency(dependency)">
+                  {{ releaseDependencyLabel(dependency) }}
+                  <button matChipRemove aria-label="Recover dependency">
+                    <mat-icon>undo</mat-icon>
+                  </button>
+                </mat-chip-row>
+              }
+              <input
+                  class="chip-grid-hidden-input"
+                  [matChipInputFor]="removedDependencyChipGrid"
+                  tabindex="-1"
+                  aria-hidden="true"
+                  readonly>
+            </mat-chip-grid>
+          </div>
+        }
       </mat-card-content>
     </mat-card>
   </div>

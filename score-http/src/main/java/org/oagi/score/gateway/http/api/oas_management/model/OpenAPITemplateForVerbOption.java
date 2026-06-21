@@ -5,6 +5,7 @@ import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummaryRecord;
 
 import java.math.BigInteger;
+import java.util.List;
 
 @Data
 public class OpenAPITemplateForVerbOption {
@@ -17,6 +18,9 @@ public class OpenAPITemplateForVerbOption {
     private String operationId;
     private String tagName;
     private String messageBodyType;
+    private Integer httpStatusCode;
+    private boolean securityOverridden;
+    private List<OasSecurityRequirement> securityRequirements;
 
     private boolean arrayForJsonExpression;
     private boolean suppressRootProperty;

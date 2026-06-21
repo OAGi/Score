@@ -113,29 +113,32 @@ export class ContextSchemeService {
 
   checkUniqueness(schemeId: string, schemeAgencyId: string, schemeVersionId: string,
                   contextSchemeId?: number): Observable<boolean> {
-    let params = new HttpParams()
+    const params = new HttpParams()
         .set('schemeId', schemeId)
         .set('schemeAgencyId', schemeAgencyId)
         .set('schemeVersionId', schemeVersionId);
-    if (!!contextSchemeId) {
-      params = params.set('ctxSchemeId', '' + contextSchemeId);
-    }
+    // When editing an existing scheme, exclude itself from the duplicate check;
+    // otherwise the scheme always matches its own triplet and is wrongly flagged as a duplicate.
+    const url = (!!contextSchemeId)
+        ? '/api/context-schemes/' + contextSchemeId + '/check-uniqueness'
+        : '/api/context-schemes/check-uniqueness';
 
-    return this.http.get<boolean>('/api/context-schemes/check-uniqueness', {params});
+    return this.http.get<boolean>(url, {params});
   }
 
   checkNameUniqueness(schemeName: string, schemeId: string, schemeAgencyId: string, schemeVersionId: string,
                       contextSchemeId?: number): Observable<any> {
-    let params = new HttpParams()
+    const params = new HttpParams()
         .set('schemeName', schemeName)
         .set('schemeId', schemeId)
         .set('schemeAgencyId', schemeAgencyId)
         .set('schemeVersionId', schemeVersionId);
-    if (!!contextSchemeId) {
-      params = params.set('ctxSchemeId', '' + contextSchemeId);
-    }
+    // Same as checkUniqueness: exclude the current scheme when editing.
+    const url = (!!contextSchemeId)
+        ? '/api/context-schemes/' + contextSchemeId + '/check-name-uniqueness'
+        : '/api/context-schemes/check-name-uniqueness';
 
-    return this.http.get<boolean>('/api/context-schemes/check-name-uniqueness', {params});
+    return this.http.get<boolean>(url, {params});
   }
 
 }

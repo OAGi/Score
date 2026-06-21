@@ -53,12 +53,12 @@ class UpdateContextCategoryRequest(BaseModel):
     name: str | None = Field(
         default=None,
         max_length=45,
-        description="Short name of the context category.",
+        description="Short name of the context category. Omit to leave unchanged.",
         examples=["Business Process"],
     )
     description: str | None = Field(
         default=None,
-        description="Explanation of what the context category is.",
+        description="Explanation of what the context category is. Omit to leave unchanged.",
         examples=["Categorizes contexts by business process."],
     )
 

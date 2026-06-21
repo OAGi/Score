@@ -1,12 +1,14 @@
 """Release API routes.
 
-Provides read-only endpoints for listing releases and retrieving a single
-release by ID. Supports filtering, sorting, and date-range queries.
+Provides read-only endpoints for listing releases, retrieving a single
+release by ID, and retrieving a library's `Working` release. Supports
+filtering, sorting, and date-range queries.
 
 Key features:
 - Pagination via `limit`/`offset`.
 - Multi-column sorting via `order_by` with allowlisted columns.
 - Filtering on release attributes (library_id, release_num, state).
+- Retrieve a library's `Working` release by `library_id`.
 - Date range filters for creation and last update timestamps.
 - Standardized error responses for invalid query parameters and missing records.
 """
@@ -44,11 +46,20 @@ async def get_release_list(
         default=None,
         description="Filter by last update date using an inclusive range: '[before~after]'.",
     ),
+    creator: str | None = Query(
+        default=None,
+        description="Comma-separated creator login IDs to filter by exact match. Prefix a login ID with '!' to exclude it.",
+    ),
+    updater: str | None = Query(
+        default=None,
+        description="Comma-separated updater login IDs to filter by exact match. Prefix a login ID with '!' to exclude it.",
+    ),
     order_by: str | None = Query(
         default=None,
         description=(
             "Comma-separated list of properties to order results by. Prefix with '-' for descending, '+' for ascending. "
-            "Allowed columns: release_num, state, creation_timestamp, last_update_timestamp."
+            "Allowed columns: release_num, state, creation_timestamp, last_update_timestamp. "
+            "Use the is_latest response field to identify the latest published release."
         ),
     ),
     offset: int = Query(default=0, ge=0, description="The offset from the beginning of the list."),
@@ -63,6 +74,8 @@ async def get_release_list(
         state: Optional lifecycle state filter.
         created_on: Optional creation-time filter in ISO-8601 range form.
         last_updated_on: Optional last-update-time filter in ISO-8601 range form.
+        creator: Optional comma-separated creator login ID filter.
+        updater: Optional comma-separated updater login ID filter.
         order_by: Sort expression used for ordering the result set.
         offset: Zero-based index of the first item to include in the page.
         limit: Maximum number of items to return.
@@ -83,6 +96,8 @@ async def get_release_list(
             state=state,
             created_on=created_range,
             last_updated_on=updated_range,
+            creator=creator,
+            updater=updater,
         )
     except ValueError as e:
         raise HTTPException(
@@ -96,6 +111,40 @@ async def get_release_list(
         limit=limit,
         offset=offset,
     )
+
+
+@router.get(
+    "/working",
+    summary="Retrieve the Working release",
+    description="Retrieve the `Working` release for a library by library ID.",
+    response_model=GetReleaseByReleaseIdResponse,
+)
+async def get_working_release(
+    library_id: LibraryId = Query(..., ge=1, description="ID of the library whose `Working` release to retrieve."),
+    release_service: ReleaseService = Depends(get_release_service),
+) -> GetReleaseByReleaseIdResponse:
+    """Return the `Working` release for a library.
+
+    Args:
+        library_id: Library identifier used to scope the query.
+        release_service: Release service dependency.
+
+    Returns:
+        Response payload for the requested resource.
+    """
+    row = await release_service.get_by_library_id_and_release_num(
+        library_id=library_id,
+        release_num="Working",
+    )
+    if row is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "message": "The Working release was not found.",
+                "cause": f"No Working release exists for library ID {int(library_id)}.",
+            },
+        )
+    return GetReleaseByReleaseIdResponse.model_validate(row, from_attributes=True)
 
 
 @router.get(

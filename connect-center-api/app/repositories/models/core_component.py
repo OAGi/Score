@@ -12,6 +12,7 @@ from app.repositories.models.library import LibrarySummaryRow
 from app.repositories.models.log import LogSummaryRow
 from app.repositories.models.namespace import NamespaceSummaryRow
 from app.repositories.models.release import ReleaseSummaryRow
+from app.repositories.models.tag import TagSummaryRow
 
 CoreComponentType = Literal["ACC", "ASCCP", "BCCP"]
 
@@ -240,6 +241,7 @@ class GetAccRow(BaseModel):
     namespace: NamespaceSummaryRow | None = None
     library: LibrarySummaryRow
     release: ReleaseSummaryRow
+    tags: list[TagSummaryRow] = Field(default_factory=list)
     log: LogSummaryRow | None = None
     owner_user_id: int
     created_by: int
@@ -268,6 +270,7 @@ class GetAsccpRow(BaseModel):
     namespace: NamespaceSummaryRow | None = None
     library: LibrarySummaryRow
     release: ReleaseSummaryRow
+    tags: list[TagSummaryRow] = Field(default_factory=list)
     log: LogSummaryRow | None = None
     owner_user_id: int
     created_by: int
@@ -297,6 +300,7 @@ class GetBccpRow(BaseModel):
     namespace: NamespaceSummaryRow | None = None
     library: LibrarySummaryRow
     release: ReleaseSummaryRow
+    tags: list[TagSummaryRow] = Field(default_factory=list)
     log: LogSummaryRow | None = None
     owner_user_id: int
     created_by: int

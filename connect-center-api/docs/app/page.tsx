@@ -32,7 +32,7 @@ export default function HomePage() {
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <Link
                 href="/overview"
-                className="inline-flex items-center rounded-md bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="inline-flex items-center rounded-md bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 API Reference
               </Link>
@@ -40,7 +40,7 @@ export default function HomePage() {
                 href={openApiDocumentUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center rounded-md border border-[#cbd5e1] bg-white px-4 py-2.5 text-sm font-semibold text-[#1e293b] transition hover:border-[#64748b] hover:text-[#0f172a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#93c5fd] focus-visible:ring-offset-2 dark:border-[#334155] dark:bg-black dark:text-[#cbd5e1] dark:hover:border-[#64748b] dark:hover:text-white"
+                className="inline-flex items-center rounded-md border border-[#cbd5e1] bg-white px-4 py-2.5 text-sm font-semibold text-[#1e293b] transition hover:border-[#64748b] hover:text-[#0f172a] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#93c5fd] focus-visible:ring-offset-2 dark:border-[#334155] dark:bg-black dark:text-[#cbd5e1] dark:hover:border-[#64748b] dark:hover:text-white"
               >
                 OpenAPI Document
               </a>

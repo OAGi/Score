@@ -18,6 +18,7 @@ public record BiePackageSummaryRecord(
         String versionId,
         String versionName,
         String description,
+        String revisionReason,
         List<ReleaseSummaryRecord> releases,
         BieState state,
         UserSummaryRecord owner,

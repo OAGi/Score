@@ -15,6 +15,7 @@ import {AuthService} from '../../authentication/auth.service';
   styleUrl: './library-create.component.css'
 })
 export class LibraryCreateComponent {
+  private readonly uriPattern = '\\w+:(\\/?\\/?)[^\\s]+';
   private service = inject(LibraryService);
   private snackBar = inject(MatSnackBar);
   private confirmDialogService = inject(ConfirmDialogService);
@@ -27,18 +28,29 @@ export class LibraryCreateComponent {
   title = 'Create Library';
   loading = false;
   library: LibraryDetails;
-  uriForm = new FormControl('');
+  linkForm = new FormControl('');
+  namespaceUriForm = new FormControl('');
+  namespacePrefixForm = new FormControl('');
 
   ngOnInit() {
+    if (!this.isAdmin) {
+      this.router.navigateByUrl('/');
+      return;
+    }
+
     this.library = new LibraryDetails();
 
-    this.uriForm = new FormControl({value: this.library.link, disabled: !this.isAdmin},
-        Validators.pattern('\\w+:(\\/?\\/?)[^\\s]+'));
+    this.linkForm = new FormControl({value: this.library.link, disabled: !this.isAdmin},
+        Validators.pattern(this.uriPattern));
+    this.namespaceUriForm = new FormControl({value: this.library.namespaceUri, disabled: !this.isAdmin},
+        [Validators.required, Validators.pattern(this.uriPattern)]);
+    this.namespacePrefixForm = new FormControl({value: this.library.namespacePrefix, disabled: !this.isAdmin});
   }
 
   get isDisabled() {
     return (!this.library.name) ||
-        (!this.uriForm.valid) ||
+        (!this.linkForm.valid) ||
+        (!this.namespaceUriForm.valid) ||
         (!this.library.organization) ||
         (!this.library.domain);
   }
@@ -57,7 +69,9 @@ export class LibraryCreateComponent {
     }
 
     this.loading = true;
-    this.library.link = this.uriForm.value;
+    this.library.link = this.linkForm.value;
+    this.library.namespaceUri = this.namespaceUriForm.value?.trim();
+    this.library.namespacePrefix = this.namespacePrefixForm.value?.trim() || '';
     this.service.create(this.library).subscribe(_ => {
       this.snackBar.open('Created', '', {
         duration: 3000,

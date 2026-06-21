@@ -14,6 +14,16 @@ import java.util.Collection;
 public interface ReleaseCommandRepository {
 
     /**
+     * Creates the default working release for the specified library.
+     *
+     * @param libraryId the library associated with the release.
+     * @return the unique identifier of the newly created release.
+     */
+    default ReleaseId create(LibraryId libraryId) {
+        return create(libraryId, null, "Working", null, null);
+    }
+
+    /**
      * Creates a new release with the specified details.
      *
      * @param libraryId      the library associated with the release.
@@ -57,6 +67,10 @@ public interface ReleaseCommandRepository {
     int delete(Collection<ReleaseId> releaseIdList);
 
     void copyDepsFromWorking(ReleaseId releaseId, ReleaseId workingReleaseId);
+
+    void createDeps(ReleaseId releaseId, Collection<ReleaseId> dependOnReleaseIds);
+
+    void deleteDeps(ReleaseId releaseId, Collection<ReleaseId> dependOnReleaseIds);
 
     void deleteDeps(ReleaseId releaseId);
 

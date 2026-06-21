@@ -13,6 +13,7 @@ import {AngularSplitModule} from 'angular-split';
 import {SearchOptionsDialogModule} from '../search-options-dialog/search-options-dialog.module';
 import {CcPlantumlDiagramModule} from '../cc-plantuml-diagram/cc-plantuml-diagram.module';
 import {CcPlantumlDiagramComponent} from '../cc-plantuml-diagram/cc-plantuml-diagram.component';
+import {GithubIssueBoxComponent} from '../github-issue-box/github-issue-box.component';
 
 const routes: Routes = [
   {
@@ -47,7 +48,8 @@ const routes: Routes = [
     SearchOptionsDialogModule,
     DragDropModule,
     AngularSplitModule,
-    CcPlantumlDiagramModule
+    CcPlantumlDiagramModule,
+    GithubIssueBoxComponent
   ],
   declarations: [
     AsccpDetailComponent

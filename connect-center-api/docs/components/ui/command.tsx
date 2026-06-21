@@ -14,7 +14,7 @@ function CommandInput({ className, ...props }: React.ComponentProps<typeof Comma
   return (
     <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
       <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-      <CommandPrimitive.Input className={cn('flex h-9 w-full bg-transparent text-sm outline-none', className)} {...props} />
+      <CommandPrimitive.Input className={cn('flex h-9 w-full bg-transparent text-sm outline-hidden', className)} {...props} />
     </div>
   );
 }
@@ -34,7 +34,7 @@ function CommandGroup({ className, ...props }: React.ComponentProps<typeof Comma
 function CommandItem({ className, ...props }: React.ComponentProps<typeof CommandPrimitive.Item>) {
   return (
     <CommandPrimitive.Item
-      className={cn('relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[selected=true]:bg-[#f3f4f6]', className)}
+      className={cn('relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-hidden data-[selected=true]:bg-[#f3f4f6]', className)}
       {...props}
     />
   );

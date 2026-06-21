@@ -333,6 +333,11 @@ public class JooqBccpCommandRepository extends JooqBaseRepository implements Bcc
                 .where(MODULE_BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(valueOf(bccpManifestId)))
                 .execute();
 
+        // discard corresponding GitHub issue links (issue #1533)
+        dslContext().deleteFrom(GITHUB_ISSUE_BCCP_MANIFEST)
+                .where(GITHUB_ISSUE_BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(valueOf(bccpManifestId)))
+                .execute();
+
         // discard corresponding tags
         dslContext().deleteFrom(BCCP_MANIFEST_TAG)
                 .where(BCCP_MANIFEST_TAG.BCCP_MANIFEST_ID.eq(valueOf(bccpManifestId)))

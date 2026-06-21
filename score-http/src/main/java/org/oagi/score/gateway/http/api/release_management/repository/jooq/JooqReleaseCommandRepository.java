@@ -43,7 +43,8 @@ public class JooqReleaseCommandRepository extends JooqBaseRepository implements 
                             String releaseNote,
                             String releaseLicense) {
 
-        ReleaseState initialReleaseState = ReleaseState.Initialized;
+        ReleaseState initialReleaseState = "Working".equals(releaseNum) ?
+                ReleaseState.Published : ReleaseState.Initialized;
 
         LocalDateTime timestamp = LocalDateTime.now();
         ReleaseRecord releaseRecord = new ReleaseRecord();
@@ -52,6 +53,7 @@ public class JooqReleaseCommandRepository extends JooqBaseRepository implements 
         releaseRecord.setReleaseNote(releaseNote);
         releaseRecord.setReleaseLicense(releaseLicense);
         releaseRecord.setLibraryId(valueOf(libraryId));
+        releaseRecord.setState(initialReleaseState.name());
         if (namespaceId != null) {
             releaseRecord.setNamespaceId(valueOf(namespaceId));
         }
@@ -162,6 +164,31 @@ public class JooqReleaseCommandRepository extends JooqBaseRepository implements 
                                 RELEASE_DEP.DEPEND_ON_RELEASE_ID)
                         .from(RELEASE_DEP)
                         .where(RELEASE_DEP.RELEASE_ID.eq(valueOf(workingReleaseId)))).execute();
+    }
+
+    @Override
+    public void createDeps(ReleaseId releaseId, Collection<ReleaseId> dependOnReleaseIds) {
+        if (releaseId == null || dependOnReleaseIds == null || dependOnReleaseIds.isEmpty()) {
+            return;
+        }
+
+        dependOnReleaseIds.forEach(dependOnReleaseId ->
+                dslContext().insertInto(RELEASE_DEP)
+                        .set(RELEASE_DEP.RELEASE_ID, valueOf(releaseId))
+                        .set(RELEASE_DEP.DEPEND_ON_RELEASE_ID, valueOf(dependOnReleaseId))
+                        .execute());
+    }
+
+    @Override
+    public void deleteDeps(ReleaseId releaseId, Collection<ReleaseId> dependOnReleaseIds) {
+        if (releaseId == null || dependOnReleaseIds == null || dependOnReleaseIds.isEmpty()) {
+            return;
+        }
+
+        dslContext().deleteFrom(RELEASE_DEP)
+                .where(RELEASE_DEP.RELEASE_ID.eq(valueOf(releaseId))
+                        .and(RELEASE_DEP.DEPEND_ON_RELEASE_ID.in(valueOf(dependOnReleaseIds))))
+                .execute();
     }
 
     @Override

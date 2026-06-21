@@ -102,7 +102,7 @@ export abstract class ModelBrowserNodeImpl implements ModelBrowserNode {
     let node: ModelBrowserNode = this;
     const result: ModelBrowserNode[] = [node];
     while (node.parent) {
-      if (!(node.parent as ModelBrowserNode).isGroup) {
+      if (!(node.parent as ModelBrowserNode).isGroup && !(node.parent as ModelBrowserNode).isChoice) {
         result.push(node.parent as ModelBrowserNode);
       }
       node = node.parent as ModelBrowserNode;
@@ -116,7 +116,7 @@ export abstract class ModelBrowserNodeImpl implements ModelBrowserNode {
 
   set expanded(expanded: boolean) {
     this._expanded = expanded;
-    this.children.filter(e => (e as ModelBrowserNode).isGroup)
+    this.children.filter(e => (e as ModelBrowserNode).isGroup || (e as ModelBrowserNode).isChoice)
       .filter(e => e.expanded !== expanded)
       .forEach(child => {
         child.expanded = expanded;
@@ -193,7 +193,7 @@ export abstract class ModelBrowserNodeImpl implements ModelBrowserNode {
 
   get queryPath(): string {
     let parent = this.parent;
-    while (!!parent && parent.isGroup) {
+    while (!!parent && (parent.isGroup || parent.isChoice)) {
       parent = parent.parent as ModelBrowserNode;
     }
 
@@ -938,11 +938,15 @@ export class DtDetail {
     return 'Primitive';
   }
 
+  get primitiveDtAwdPriList(): DtAwdPriDetails[] {
+    return (this.dtAwdPriList || []).filter(e => !!e.xbt && !e.codeList && !e.agencyIdList);
+  }
+
   get defaultDtAwdPri(): any {
-    if (!this.dtAwdPriList) {
+    if (!this.primitiveDtAwdPriList.length) {
       return {};
     }
-    return this.dtAwdPriList.filter(e => e.isDefault)[0];
+    return this.primitiveDtAwdPriList.filter(e => e.isDefault)[0];
   }
 
 }
@@ -985,11 +989,15 @@ export class BdtScDetail {
     return 'Primitive';
   }
 
+  get primitiveDtScAwdPriList(): DtScAwdPriDetails[] {
+    return (this.dtScAwdPriList || []).filter(e => !!e.xbt && !e.codeList && !e.agencyIdList);
+  }
+
   get defaultDtScAwdPri(): any {
-    if (!this.dtScAwdPriList) {
+    if (!this.primitiveDtScAwdPriList.length) {
       return {};
     }
-    return this.dtScAwdPriList.filter(e => e.isDefault)[0];
+    return this.primitiveDtScAwdPriList.filter(e => e.isDefault)[0];
   }
 
   get path(): string {
@@ -1585,7 +1593,7 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
     const attributes = [];
     node.children.map(e => e as T).forEach(e => {
       const _node = e.self; // in case of it is WrappedBieFlatNode
-      if (_node.isGroup) {
+      if (_node.isGroup || _node.isChoice) {
         if ((_node as ModelBrowserAsccpNode).accNode.componentType === 'AttributeGroup') {
           attributes.push(...this.children(e));
         } else {
@@ -1626,7 +1634,7 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
       });
 
       node.children.map(e => e as T).forEach(e => {
-        if (e.isGroup) {
+        if (e.isGroup || e.isChoice) {
           this.loadChildren(e);
         }
       });
@@ -1763,7 +1771,7 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
     node.asccpNode = this.getChildren(node.asccNode)[0];
     node.accNode = this.getChildren(node.asccpNode)[0];
     node.name = node.asccpNode.propertyTerm;
-    if (parent.isGroup) {
+    if (parent.isGroup || parent.isChoice) {
       node.level = parent.level;
       node.parent = parent;
     } else {
@@ -1792,7 +1800,7 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
     node.bccpNode = this.getChildren(node.bccNode)[0];
     node.bdtNode = this.getChildren(node.bccpNode)[0];
     node.name = node.bccpNode.propertyTerm;
-    if (parent.isGroup) {
+    if (parent.isGroup || parent.isChoice) {
       node.level = parent.level;
       node.parent = parent;
     } else {
@@ -1933,7 +1941,7 @@ export class ModelBrowserNodeDataSourceSearcher<T extends ModelBrowserNode>
       while (searchResult.length < threshold && expandingLimit > 0 && data.length > 0) {
         const item = data.shift();
         this.searchedItemCount++;
-        if (!item.isGroup && evaluator.eval(item)) {
+        if (!item.isGroup && !item.isChoice && evaluator.eval(item)) {
           searchResult.push(item);
         }
         if (item.expandable) {
@@ -2019,7 +2027,7 @@ export class ModelBrowserNodeDataSourceSearcher<T extends ModelBrowserNode>
 export class ModelBrowserNodePathExpressionEvaluator<T extends ModelBrowserNode> extends PathLikeExpressionEvaluator<T> {
   protected next(node: T): T {
     let next = node.parent as T;
-    while (next && next.isGroup) {
+    while (next && (next.isGroup || next.isChoice)) {
       next = next.parent as T;
     }
     return next;

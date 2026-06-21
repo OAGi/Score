@@ -17,6 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.repositories.contracts.ctx_scheme import CtxSchemeRepositoryContract
 from app.repositories.models import ContextCategorySummaryRow, CtxSchemeValueRow
 from app.repositories.models.ctx_scheme import CtxSchemeRow
+from app.repositories.vendors.mariadb.models.app_user import AppUser
 from app.repositories.vendors.mariadb.models.biz_ctx import BizCtxValue
 from app.repositories.vendors.mariadb.models.ctx_category import ContextCategory
 from app.repositories.vendors.mariadb.models.ctx_scheme import CtxScheme, CtxSchemeValue
@@ -56,6 +57,8 @@ class MariaDbCtxSchemeRepository(CtxSchemeRepositoryContract):
         creation_timestamp_after: datetime | None = None,
         last_update_timestamp_before: datetime | None = None,
         last_update_timestamp_after: datetime | None = None,
+        included_updater_login_ids: list[str] | None = None,
+        excluded_updater_login_ids: list[str] | None = None,
     ) -> tuple[int, list[CtxSchemeRow]]:
         """Handle list.
 
@@ -73,6 +76,8 @@ class MariaDbCtxSchemeRepository(CtxSchemeRepositoryContract):
             creation_timestamp_after: Optional lower bound for creation timestamp.
             last_update_timestamp_before: Optional upper bound for last update timestamp.
             last_update_timestamp_after: Optional lower bound for last update timestamp.
+            included_updater_login_ids: Optional updater login IDs to include by exact match.
+            excluded_updater_login_ids: Optional updater login IDs to exclude by exact match.
 
         Returns:
             Result of the operation.
@@ -89,6 +94,8 @@ class MariaDbCtxSchemeRepository(CtxSchemeRepositoryContract):
             creation_timestamp_after=creation_timestamp_after,
             last_update_timestamp_before=last_update_timestamp_before,
             last_update_timestamp_after=last_update_timestamp_after,
+            included_updater_login_ids=included_updater_login_ids,
+            excluded_updater_login_ids=excluded_updater_login_ids,
         )
 
         total_stmt = select(func.count()).select_from(CtxScheme)
@@ -486,6 +493,8 @@ def _build_where_clauses(
     creation_timestamp_after: datetime | None,
     last_update_timestamp_before: datetime | None,
     last_update_timestamp_after: datetime | None,
+    included_updater_login_ids: list[str] | None = None,
+    excluded_updater_login_ids: list[str] | None = None,
 ):
     """Internal helper for build where clauses.
 
@@ -531,6 +540,18 @@ def _build_where_clauses(
         clauses.append(CtxScheme.last_update_timestamp >= last_update_timestamp_after)
     if last_update_timestamp_before is not None:
         clauses.append(CtxScheme.last_update_timestamp <= last_update_timestamp_before)
+    if included_updater_login_ids:
+        clauses.append(
+            CtxScheme.last_updated_by.in_(
+                select(AppUser.app_user_id).where(AppUser.login_id.in_(included_updater_login_ids))
+            )
+        )
+    if excluded_updater_login_ids:
+        clauses.append(
+            CtxScheme.last_updated_by.not_in(
+                select(AppUser.app_user_id).where(AppUser.login_id.in_(excluded_updater_login_ids))
+            )
+        )
 
     return clauses
 

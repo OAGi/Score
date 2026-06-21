@@ -1,7 +1,7 @@
 import {SelectionModel} from '@angular/cdk/collections';
 import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {faFlask} from '@fortawesome/free-solid-svg-icons';
-import {forkJoin, ReplaySubject} from 'rxjs';
+import {forkJoin, of, ReplaySubject} from 'rxjs';
 import {CreateBodDialogComponent} from './create-bod-dialog/create-bod-dialog.component';
 import {CcListService} from './domain/cc-list.service';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
@@ -18,6 +18,12 @@ import {AuthService} from '../../authentication/auth.service';
 import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {AccountList} from '../../account-management/domain/accounts';
 import {CcNodeService} from '../domain/core-component-node.service';
+import {GithubIntegrationService, GithubStatus} from '../domain/github-integration.service';
+import {
+  StateChangeDialogComponent,
+  StateChangeDialogResult,
+  usesStateChangeDialog
+} from '../state-change-dialog/state-change-dialog.component';
 import {ActivatedRoute, Router} from '@angular/router';
 import {CreateAsccpDialogComponent} from './create-asccp-dialog/create-asccp-dialog.component';
 import {CreateBccpDialogComponent} from './create-bccp-dialog/create-bccp-dialog.component';
@@ -26,7 +32,7 @@ import {FormControl} from '@angular/forms';
 import {initFilter, loadBranch, loadLibrary, saveAsBlobResponse, saveBranch, saveLibrary} from '../../common/utility';
 import {ReleaseSummary, WorkingRelease} from '../../release-management/domain/release';
 import {OagisComponentType, OagisComponentTypes} from '../domain/core-component-node';
-import {finalize} from 'rxjs/operators';
+import {catchError, finalize, take} from 'rxjs/operators';
 import {Location} from '@angular/common';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {CreateVerbDialogComponent} from './create-verb-dialog/create-verb-dialog.component';
@@ -60,6 +66,7 @@ import {LibraryService} from '../../library-management/domain/library.service';
 export class CcListComponent implements OnInit {
   private service = inject(CcListService);
   private nodeService = inject(CcNodeService);
+  protected githubService = inject(GithubIntegrationService);
   private releaseService = inject(ReleaseService);
   private libraryService = inject(LibraryService);
   private accountService = inject(AccountListService);
@@ -764,39 +771,93 @@ export class CcListComponent implements OnInit {
         return false;
     }
 
-    this.confirmDialogService.open(dialogConfig).afterClosed()
-        .subscribe(result => {
-          if (!result) {
-            return;
-          }
+    if (actionType === 'Update' && toState !== 'WIP' &&
+      this.selection.selected.some(item => !item.namespaceId)) {
+      this.snackBar.open('Namespace is required for all selected components before moving to Draft/QA.', '', {
+        duration: 3000
+      });
+      return;
+    }
 
-          this.loading = true;
-          let call;
-          switch (actionType) {
-            case 'Update':
-              call = this.service.updateState(this.selection.selected, toState);
-              break;
-            case 'Delete':
-              call = this.service.delete(this.selection.selected);
-              break;
-            case 'Restore':
-              call = this.service.restore(this.selection.selected);
-              break;
-            case 'Purge':
-              call = this.service.purge(this.selection.selected);
-              break;
-          }
-          call.subscribe(_ => {
-            this.snackBar.open(notiMsg, '', {
-              duration: 3000
-            });
-            this.selection.clear();
-            this.loadCcList();
-          }, err => {
-            this.loading = false;
-            throw err;
-          });
+    const executeAction = (comments?: { [key: string]: string }, projectFieldOptionOverrides?: { [key: string]: string }) => {
+      this.loading = true;
+      let call;
+      switch (actionType) {
+        case 'Update':
+          call = this.service.updateState(this.selection.selected, toState, comments, projectFieldOptionOverrides);
+          break;
+        case 'Delete':
+          call = this.service.delete(this.selection.selected);
+          break;
+        case 'Restore':
+          call = this.service.restore(this.selection.selected);
+          break;
+        case 'Purge':
+          call = this.service.purge(this.selection.selected);
+          break;
+      }
+      call.subscribe(_ => {
+        this.snackBar.open(notiMsg, '', {
+          duration: 3000
         });
+        this.selection.clear();
+        this.loadCcList();
+      }, err => {
+        this.loading = false;
+        throw err;
+      });
+    };
+
+    const openConfirmDialog = () => {
+      this.confirmDialogService.open(dialogConfig).afterClosed()
+          .subscribe(result => {
+            if (!result) {
+              return;
+            }
+
+            executeAction();
+          });
+    };
+
+    if (actionType === 'Update') {
+      // When the GitHub integration is enabled and at least one selected component undergoes a
+      // Draft -> Candidate or Candidate -> WIP transition, a dedicated dialog shows those
+      // components' linked GitHub issues (and pre-fills per-component
+      // GitHub status posts for the user to edit); otherwise the generic confirm dialog runs unchanged (issue #1533).
+      // Either way, the confirm still updates ALL selected components.
+      this.githubService.getStatus()
+          .pipe(take(1), catchError(() => of({enabled: false, connected: false} as GithubStatus)))
+          .subscribe(status => {
+            const eligibleRows = this.selection.selected.filter(item => usesStateChangeDialog(item.state, toState));
+            if (status.enabled && eligibleRows.length > 0) {
+              const targets = eligibleRows.map(item => ({
+                ccType: item.type.toLowerCase(),
+                manifestId: item.manifestId,
+                name: item.den || item.name,
+                state: item.state
+              }));
+              this.dialog.open(StateChangeDialogComponent, {
+                data: {
+                  header: dialogConfig.data.header,
+                  content: dialogConfig.data.content,
+                  actionLabel: dialogConfig.data.action,
+                  toState,
+                  targets
+                },
+                autoFocus: false
+              }).afterClosed().subscribe((result: StateChangeDialogResult | undefined) => {
+                if (!result || !result.confirmed) {
+                  return;
+                }
+                executeAction(result.comments, result.fieldOptionOverrides);
+              });
+            } else {
+              openConfirmDialog();
+            }
+          });
+    } else {
+      openConfirmDialog();
+    }
   }
 
   exportStandaloneSchemas(expressionOption: 'XML' | 'JSON' = 'XML') {
