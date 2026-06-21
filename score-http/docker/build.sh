@@ -20,6 +20,43 @@ if [ -z "$project_version" ]; then
   exit 1
 fi
 
+# Guard against drift between the VERSION file and the pom's <revision> default.
+# build.sh passes -Drevision below so the build itself would still succeed, but a mismatch
+# means the committed sources drifted (one bumped without the other) -- fail fast so it gets fixed.
+pom_revision=$(sed -n 's|^[[:space:]]*<revision>\(.*\)</revision>[[:space:]]*$|\1|p' "$project_dir/pom.xml" | head -n 1)
+if [ -z "$pom_revision" ]; then
+  echo "Error: <revision> not found in $project_dir/pom.xml. Add it under <properties> and keep it in sync with VERSION." >&2
+  exit 1
+fi
+if [ -f "$project_dir/VERSION" ]; then
+  version_file_value=$(tr -d '[:space:]' < "$project_dir/VERSION")
+  if [ -n "$version_file_value" ] && [ "$version_file_value" != "$pom_revision" ]; then
+    echo "Error: version mismatch between VERSION and pom.xml <revision>." >&2
+    echo "  VERSION            = $version_file_value" >&2
+    echo "  pom.xml <revision> = $pom_revision" >&2
+    echo "Set both to the same value (VERSION is the single source of truth), then re-run." >&2
+    exit 1
+  fi
+fi
+
+# Keep the score-e2e module in lockstep with the same version (it has no VERSION file of its own).
+# Skipped if the module is not checked out alongside score-http.
+score_e2e_pom="$project_dir/../score-e2e/pom.xml"
+if [ -f "$score_e2e_pom" ]; then
+  e2e_revision=$(sed -n 's|^[[:space:]]*<revision>\(.*\)</revision>[[:space:]]*$|\1|p' "$score_e2e_pom" | head -n 1)
+  if [ -z "$e2e_revision" ]; then
+    echo "Error: <revision> not found in $score_e2e_pom. Add it under <properties> and keep it in sync with VERSION." >&2
+    exit 1
+  fi
+  if [ "$e2e_revision" != "$pom_revision" ]; then
+    echo "Error: version mismatch between score-http and score-e2e <revision>." >&2
+    echo "  score-http pom.xml <revision> = $pom_revision" >&2
+    echo "  score-e2e  pom.xml <revision> = $e2e_revision" >&2
+    echo "Set both to the same value (VERSION is the single source of truth), then re-run." >&2
+    exit 1
+  fi
+fi
+
 mariadb_client_version=$(sed -n 's|^[[:space:]]*<mariadb-client.version>\(.*\)</mariadb-client.version>[[:space:]]*$|\1|p' "$project_dir/pom.xml" | head -n 1)
 if [ -z "$mariadb_client_version" ]; then
   echo "Error: unable to resolve mariadb-client.version from $project_dir/pom.xml." >&2
