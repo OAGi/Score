@@ -1,9 +1,12 @@
-.markdown-body h2 {
+/* Scoped to .about-body (not .markdown-body) so this static page is unaffected by the global
+   github-markdown-css import in styles.css, which is there for the <markdown> innerHTML preview
+   in state-change-dialog and would otherwise enlarge this page's base font (16px) and headings. */
+.about-body h2 {
   font-size: 2em;
   border-bottom: 1px solid #eee;
 }
 
-.markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4, .markdown-body h5, .markdown-body h6 {
+.about-body h1, .about-body h2, .about-body h3, .about-body h4, .about-body h5, .about-body h6 {
   margin: 1em 0 15px;
   padding: 0;
   font-weight: bold;
@@ -12,6 +15,6 @@
   position: relative;
 }
 
-.markdown-body p, .markdown-body blockquote, .markdown-body ul, .markdown-body ol, .markdown-body dl, .markdown-body table, .markdown-body pre {
+.about-body p, .about-body blockquote, .about-body ul, .about-body ol, .about-body dl, .about-body table, .about-body pre {
   margin: 15px 0;
 }
