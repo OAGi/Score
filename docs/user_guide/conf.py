@@ -24,9 +24,9 @@ copyright = u'2025, NIST'
 author = u'NIST'
 
 # The short X.Y version
-version = u'3.5.1'
+version = u'3.5.2-dev'
 # The full version, including alpha/beta/rc tags
-release = u'3.5.1'
+release = u'3.5.2-dev'
 
 
 # -- General configuration ---------------------------------------------------
