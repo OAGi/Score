@@ -131,12 +131,20 @@
                   <cdk-virtual-scroll-viewport itemSize="{{ virtualScrollItemSize }}"
                     minBufferPx="{{ minBufferPx }}" maxBufferPx="{{ maxBufferPx }}"
                     [style.height.px]="innerHeight" #virtualScroll>
+                    <div cdkDropList #cdkDropList
+                      [cdkDropListEnterPredicate]="canDrop"
+                      [cdkDropListData]="dataSource"
+                      (cdkDropListDropped)="drop($event)">
                     <div *cdkVirtualFor="let node of dataSource" class="example-item"
-                      (mouseover)="node.showCopyLinkIcon = true" (mouseout)="node.showCopyLinkIcon = false">
+                      (mouseover)="node.showCopyLinkIcon = true" (mouseout)="node.showCopyLinkIcon = false"
+                      cdkDrag [cdkDragData]="node" [cdkDragDisabled]="!canReorder(node)"
+                      (cdkDragStarted)="onDragStarted(node)" (cdkDragMoved)="onDragMoved($event)" (cdkDragEnded)="onDragEnded()">
+                      <div class="dragPlaceholder" [class.dragPlaceholder-invalid]="dropInvalid" *cdkDragPlaceholder></div>
                       <div class="mat-tree-node d-flex align-items-center pointer"
                         tabIndex="0"
                         [attr.data-level]="node.level"
                         [attr.data-path]="node.path"
+                        [attr.data-hash-path]="node.hashPath"
                         [class]="{'tree-node-selected': cursorNode === node}"
                         (click)="onClick(node, $event)"
                         (keydown)="keyNavigation(node, $event)"
@@ -164,6 +172,7 @@
                         }
 
                         <div class="d-inline-flex align-items-center flex-grow-1">
+                          @let orderWeight = currentWeightOf(node);
                           <span [class]="[node.type.toLowerCase(),
                                           this.searcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
                                 [style.padding-right.px]="2"
@@ -179,6 +188,12 @@
                             </span>
                           }
 
+                          <!-- Issue #1638: a reorderable node with a custom sibling order weight shows it as a
+                               small badge (developer-only / ACC view parent, mirroring the drag handle gate). -->
+                          @if (canReorder(node) && orderWeight !== undefined && orderWeight !== null) {
+                            <span class="order-weight-badge ms-4" matTooltip="Order weight">{{ orderWeight }}</span>
+                          }
+
                           <div class="ms-auto me-2">
                             <mat-icon style="{{ node.showCopyLinkIcon ? '' : 'visibility: hidden' }}"
                               class="copy-link-icon"
@@ -186,6 +201,11 @@
                               (click)="copyLink(node, $event)">
                               link
                             </mat-icon>
+                            @if (canReorder(node)) {
+                              <mat-icon class="dragHandle" cdkDragHandle
+                                [style.visibility]="(node.showCopyLinkIcon && !dragging) ? '' : 'hidden'"
+                                (click)="$event.stopPropagation()">drag_handle</mat-icon>
+                            }
                             <mat-icon class="context-menu-icon"
                               [matMenuTriggerFor]="dataSource.isExpandable(node) ? contextMenu : contextMenuForLeaf"
                               [matMenuTriggerData]="{'menuId': 'contextMenu', 'hashPath': node.hashPath}"
@@ -195,6 +215,7 @@
                         </div>
                       </div>
                     </div>
+                    </div>
                   </cdk-virtual-scroll-viewport>
 
                   <!-- Context Menu Area -->
@@ -202,6 +223,12 @@
                     <button mat-menu-item (click)="copyPath(contextMenuItem)">
                       <span class="context-menu-item">Copy Path</span>
                     </button>
+                    @if (canReorder(contextMenuItem)) {
+                      <mat-divider></mat-divider>
+                      <button mat-menu-item (click)="setWeight(contextMenuItem)">
+                        <span class="context-menu-item">Order Weight</span>
+                      </button>
+                    }
                   </mat-menu>
 
                   <mat-menu class="context-menu" #contextMenu="matMenu">
@@ -225,6 +252,20 @@
                     <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 3)">
                       <span class="context-menu-item">Expand 3</span>
                     </button>
+                    @if (canReorder(contextMenuItem)) {
+                      <mat-divider></mat-divider>
+                      <button mat-menu-item (click)="setWeight(contextMenuItem)">
+                        <span class="context-menu-item">Order Weight</span>
+                      </button>
+                    }
+                    @if (canResetOrderWeights(contextMenuItem)) {
+                      @if (!canReorder(contextMenuItem)) {
+                        <mat-divider></mat-divider>
+                      }
+                      <button mat-menu-item (click)="resetOrderWeights(contextMenuItem)">
+                        <span class="context-menu-item">Reset Order Weights</span>
+                      </button>
+                    }
                   </mat-menu>
                 </mat-card-content>
               </mat-card>

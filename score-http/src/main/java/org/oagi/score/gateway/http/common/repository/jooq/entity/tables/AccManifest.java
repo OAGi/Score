@@ -39,6 +39,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AccManif
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AsccManifest.AsccManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AsccpManifest.AsccpManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BccManifest.BccManifestPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BieViewOrder.BieViewOrderPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.GithubIssue.GithubIssuePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.GithubIssueAccManifest.GithubIssueAccManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Log.LogPath;
@@ -357,6 +358,19 @@ public class AccManifest extends TableImpl<AccManifestRecord> {
             _bccManifest = new BccManifestPath(this, null, Keys.BCC_MANIFEST_FROM_ACC_MANIFEST_ID_FK.getInverseKey());
 
         return _bccManifest;
+    }
+
+    private transient BieViewOrderPath _bieViewOrder;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.bie_view_order</code> table
+     */
+    public BieViewOrderPath bieViewOrder() {
+        if (_bieViewOrder == null)
+            _bieViewOrder = new BieViewOrderPath(this, null, Keys.BIE_VIEW_ORDER_FROM_ACC_MANIFEST_ID_FK.getInverseKey());
+
+        return _bieViewOrder;
     }
 
     private transient GithubIssueAccManifestPath _githubIssueAccManifest;

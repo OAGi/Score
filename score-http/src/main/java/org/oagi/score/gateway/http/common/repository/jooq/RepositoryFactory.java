@@ -167,6 +167,14 @@ public class RepositoryFactory {
         return new JooqBieQueryRepository(dslContext, requester, this);
     }
 
+    public BieViewOrderQueryRepository bieViewOrderQueryRepository(ScoreUser requester) {
+        return new JooqBieViewOrderQueryRepository(dslContext, requester, this);
+    }
+
+    public BieViewOrderCommandRepository bieViewOrderCommandRepository(ScoreUser requester) {
+        return new JooqBieViewOrderCommandRepository(dslContext, requester, this);
+    }
+
     public ContextCategoryCommandRepository contextCategoryCommandRepository(ScoreUser requester) {
         return new JooqContextCategoryCommandRepository(dslContext, requester, this);
     }

@@ -13,13 +13,14 @@ import {hashCode4Array, hashCode4String, sha256} from '../../common/utility';
 import {ExpressionEvaluator, FlatNode, getKey, PathLikeExpressionEvaluator} from '../../common/flat-tree';
 import {BieDetailUpdateResponse, BieEditAbieNode, RefBie, UsedBie} from '../bie-edit/domain/bie-edit-node';
 import {CollectionViewer, DataSource, SelectionChange} from '@angular/cdk/collections';
-import {BehaviorSubject, empty, forkJoin, Observable} from 'rxjs';
+import {BehaviorSubject, empty, forkJoin, Observable, Subject} from 'rxjs';
 import {BieEditService} from '../bie-edit/domain/bie-edit.service';
 import {ScoreUser} from '../../authentication/domain/auth';
 import {Cardinality, Facet, PrimitiveRestriction, ValueConstraint, WhoAndWhen} from '../../basis/basis';
 import {LibrarySummary} from '../../library-management/domain/library';
 import {ReleaseSummary} from '../../release-management/domain/release';
 import {CcNodeService} from '../../cc-management/domain/core-component-node.service';
+import {applyViewOrder, asccViewOrderKey, bccViewOrderKey, BieViewOrderEntry} from '../../cc-management/model-browser/domain/bie-view-order';
 
 
 export interface BieFlatNode extends FlatNode {
@@ -2451,11 +2452,14 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
 
   private _usedBieList: UsedBie[] = [];
   private _refBieList: RefBie[] = [];
+  // Issue #1638: instance-level sibling sort weights, keyed "<viewParentAcc>:ASCC|BCC:<child>".
+  // Shared CC-level order with the model browser; empty by default => children() is a stable no-op.
+  private _viewOrderMap: Map<string, number> = new Map<string, number>();
 
   dataSource: BieFlatNodeDataSource<T>;
 
   constructor(ccGraph: CcGraph, abieNode: BieEditAbieNode, topLevelAsbiepId: number,
-              usedBieList: UsedBie[], refBieList: RefBie[]) {
+              usedBieList: UsedBie[], refBieList: RefBie[], viewOrderMap?: Map<string, number>) {
     this._ccGraph = ccGraph;
     this._abieNode = abieNode;
     this._topLevelAsbiepId = topLevelAsbiepId;
@@ -2463,6 +2467,46 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
 
     this.setUsedBieList(usedBieList);
     this._refBieList = refBieList;
+    if (viewOrderMap) {
+      this._viewOrderMap = viewOrderMap;
+    }
+  }
+
+  setViewOrderMap(viewOrderMap: Map<string, number>) {
+    this._viewOrderMap = viewOrderMap || new Map<string, number>();
+  }
+
+  /**
+   * Replace the stored weights for ONE view parent (Issue #1638): drop that parent's existing keys,
+   * then set the given entries. Used by the lazy per-parent fetch as each ABIE node is expanded;
+   * clearing first means a reset (a removed row) correctly drops back to the seq_key order.
+   */
+  setViewOrderForParent(viewParentAccManifestId: number, entries: BieViewOrderEntry[]) {
+    const prefix = viewParentAccManifestId + ':';
+    for (const key of Array.from(this._viewOrderMap.keys())) {
+      if (key.startsWith(prefix)) {
+        this._viewOrderMap.delete(key);
+      }
+    }
+    (entries || []).forEach(e => {
+      if (e.asccManifestId !== undefined && e.asccManifestId !== null) {
+        this._viewOrderMap.set(asccViewOrderKey(e.fromAccManifestId, e.asccManifestId), e.weight);
+      } else if (e.bccManifestId !== undefined && e.bccManifestId !== null) {
+        this._viewOrderMap.set(bccViewOrderKey(e.fromAccManifestId, e.bccManifestId), e.weight);
+      }
+    });
+  }
+
+  /** The current weight of a flattened sibling under the given view parent, or undefined if none. */
+  getViewOrderWeight(viewParentAccManifestId: number, node: T): number | undefined {
+    const key = this.viewOrderKey(viewParentAccManifestId, node);
+    return (key !== undefined) ? this._viewOrderMap.get(key) : undefined;
+  }
+
+  /** The view-parent ACC manifest id of an expanded node (the key the children's weights are stored under). */
+  viewParentAccManifestId(node: T): number | undefined {
+    const self = node.self as AbieFlatNode;
+    return (self && self.accNode) ? self.accNode.manifestId : undefined;
   }
 
   setUsedBieList(usedBieList: UsedBie[]) {
@@ -2513,15 +2557,31 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
       return [];
     }
 
-    const nodes = [];
-    const attributes = [];
+    // Flatten groups first (no sorting), then apply the view order ONCE at this expanded node using
+    // ITS acc as the view parent — so the order matches the model browser and the weights stored
+    // under the displayed parent, regardless of intervening group nesting (#1638).
+    const {attributes, nodes} = this.flatten(node);
+    const viewParentAccManifestId = this.viewParentAccManifestId(node);
+    return this.sortByViewOrder(viewParentAccManifestId, attributes)
+      .concat(this.sortByViewOrder(viewParentAccManifestId, nodes));
+  }
+
+  /**
+   * Recursively flatten a node's children into the attributes-first partition WITHOUT sorting.
+   * Preserves the exact pre-#1638 partitioning (attribute groups + attribute BBIEs => attributes).
+   */
+  private flatten(node: T): {attributes: T[], nodes: T[]} {
+    const nodes: T[] = [];
+    const attributes: T[] = [];
     node.children.map(e => e as T).forEach(e => {
       const _node = e.self; // in case of it is WrappedBieFlatNode
       if (_node.isGroup) {
+        const sub = this.flatten(e);
+        const combined = sub.attributes.concat(sub.nodes);
         if ((_node as AsbiepFlatNode).accNode.componentType === 'AttributeGroup') {
-          attributes.push(...this.children(e));
+          attributes.push(...combined);
         } else {
-          nodes.push(...this.children(e));
+          nodes.push(...combined);
         }
       } else {
         if (_node instanceof BbiepFlatNode && (_node as BbiepFlatNode).bccNode.entityType === 'Attribute') {
@@ -2531,8 +2591,40 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
         }
       }
     });
-    const children = attributes.concat(nodes);
-    return children;
+    return {attributes, nodes};
+  }
+
+  /** The weight-map key for a flattened sibling under the given view parent, or undefined if not keyable. */
+  private viewOrderKey(viewParentAccManifestId: number | undefined, node: T): string | undefined {
+    if (viewParentAccManifestId === undefined || viewParentAccManifestId === null) {
+      return undefined;
+    }
+    const self = node.self;
+    if (self instanceof AsbiepFlatNode && (self as AsbiepFlatNode).asccNode) {
+      return asccViewOrderKey(viewParentAccManifestId, (self as AsbiepFlatNode).asccNode.manifestId);
+    }
+    if (self instanceof BbiepFlatNode && (self as BbiepFlatNode).bccNode) {
+      return bccViewOrderKey(viewParentAccManifestId, (self as BbiepFlatNode).bccNode.manifestId);
+    }
+    return undefined;
+  }
+
+  /**
+   * Sort within a partition by weight DESC, then (among weighted ties) property term ASC; unweighted
+   * siblings keep their current (seq_key) order after all weighted ones. Stable => empty map is a no-op.
+   */
+  private sortByViewOrder(viewParentAccManifestId: number | undefined, list: T[]): T[] {
+    if (!this._viewOrderMap || this._viewOrderMap.size === 0 || viewParentAccManifestId === undefined) {
+      return list;
+    }
+    return applyViewOrder(
+      list,
+      (n: T) => {
+        const key = this.viewOrderKey(viewParentAccManifestId, n);
+        return (key !== undefined) ? this._viewOrderMap.get(key) : undefined;
+      },
+      (n: T) => n.name
+    );
   }
 
   loadChildren(node: T) {
@@ -2910,6 +3002,9 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
 export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<T>, ChangeListener<T> {
 
   dataChange = new BehaviorSubject<T[]>([]);
+  // Issue #1638: emits each time a node is expanded, so the editor can lazily fetch that view
+  // parent's sibling order (the view parent is known only on the client — group flattening is here).
+  readonly nodeExpanded$ = new Subject<T>();
   _listeners: ChangeListener<BieFlatNodeDataSource<T>>[] = [];
 
   _hideUnused = false;
@@ -3226,6 +3321,11 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
     // notify the change
     this.dataChange.next(this.data);
     node.expanded = expand;
+
+    // Issue #1638: announce expansions so the editor can lazily fetch this view parent's order.
+    if (expand) {
+      this.nodeExpanded$.next(node);
+    }
   }
 
   loadDetails(node: T, callbackFn?) {

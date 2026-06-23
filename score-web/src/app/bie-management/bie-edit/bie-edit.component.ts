@@ -2,10 +2,11 @@ import { ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, QueryLi
 import {HttpErrorResponse} from '@angular/common/http';
 import {faRecycle, faSitemap} from '@fortawesome/free-solid-svg-icons';
 import {BieEditService} from '../bie-edit/domain/bie-edit.service';
-import {finalize, map, startWith, switchMap} from 'rxjs/operators';
+import {catchError, finalize, map, startWith, switchMap} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {Location} from '@angular/common';
-import {forkJoin, Observable, ReplaySubject} from 'rxjs';
+import {forkJoin, Observable, of, ReplaySubject} from 'rxjs';
+import {BieViewOrderService} from '../../cc-management/model-browser/domain/bie-view-order.service';
 import {BusinessContextService} from '../../context-management/business-context/domain/business-context.service';
 import {
   BieDetailUpdateRequest,
@@ -78,6 +79,7 @@ import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   private service = inject(BieEditService);
   private ccNodeService = inject(CcNodeService);
+  private bieViewOrderService = inject(BieViewOrderService);
   private bizCtxService = inject(BusinessContextService);
   private snackBar = inject(MatSnackBar);
   private location = inject(Location);
@@ -112,6 +114,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   innerY: number = window.innerHeight;
   dataSource: BieFlatNodeDataSource<BieFlatNode>;
   searcher: BieFlatNodeDataSourceSearcher<BieFlatNode>;
+  // Issue #1638: view-parent ACC manifest ids whose sibling order has already been fetched, so each
+  // parent is requested at most once per tree build.
+  private _viewOrderLoaded = new Set<number>();
   cursorNode: BieFlatNode;
   selectedNode: BieFlatNode;
 
@@ -307,11 +312,16 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         map((value: string | BusinessContext | null) => value ? this._filter(value) : this._filter()));
       this.preferencesInfo = preferencesInfo;
 
+      // Issue #1638: the sibling view order is fetched LAZILY, one view-parent ACC at a time, as ABIE
+      // nodes are expanded (see onNodeExpanded) — never upfront — and the view parent is resolved on
+      // the client where group/choice flattening happens.
+      this._viewOrderLoaded.clear();
       const database = new BieFlatNodeDatabase<BieFlatNode>(ccGraph,
         this.rootNode, this.topLevelAsbiepId, usedBieList, refBieList);
 
       const doAfter = () => {
         this.dataSource = new BieFlatNodeDataSource<BieFlatNode>(database, this.service, this.ccNodeService, [this,]);
+        this.dataSource.nodeExpanded$.subscribe(node => this.onNodeExpanded(node));
         this.searcher = new BieFlatNodeDataSourceSearcher<BieFlatNode>(this.dataSource, database);
         this.dataSource.init();
         this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
@@ -899,8 +909,12 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       [ccGraph, usedBieList, refBieList, rootNode]) => {
       this.initRootNode(rootNode);
 
+      // Issue #1638: the sibling view order is fetched lazily per view parent as nodes re-expand.
+      this._viewOrderLoaded.clear();
+
       const doAfter = () => {
         this.dataSource = new BieFlatNodeDataSource<BieFlatNode>(database, this.service, this.ccNodeService, [this,]);
+        this.dataSource.nodeExpanded$.subscribe(node => this.onNodeExpanded(node));
         this.searcher = new BieFlatNodeDataSourceSearcher<BieFlatNode>(this.dataSource, database);
         this.dataSource.init();
 
@@ -947,6 +961,63 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         doAfter();
       }
     });
+  }
+
+  /**
+   * Issue #1638 (view-only): the first time an ABIE node is expanded, lazily fetch its based ACC's
+   * sibling order, merge it, and re-sort that node's children. Most parents have no rows (empty list
+   * => no visible change); only an explicitly reordered parent re-sorts.
+   */
+  private onNodeExpanded(node: BieFlatNode) {
+    const viewParentAccManifestId = this.dataSource.database.viewParentAccManifestId(node);
+    if (viewParentAccManifestId === undefined || this._viewOrderLoaded.has(viewParentAccManifestId)) {
+      return; // already fetched -> children() already sorts this position against the cached map
+    }
+    this._viewOrderLoaded.add(viewParentAccManifestId);
+    this.bieViewOrderService.getViewOrder(viewParentAccManifestId)
+      .pipe(catchError(() => of(null)))
+      .subscribe((entries) => {
+        if (entries === null) {
+          // Transient failure: un-mark so the next expand retries (don't poison to seq_key order).
+          this._viewOrderLoaded.delete(viewParentAccManifestId);
+          return;
+        }
+        this.dataSource.database.setViewOrderForParent(viewParentAccManifestId, entries);
+        if (entries.length > 0) {
+          this.resortAllExpandedFor(viewParentAccManifestId);
+        }
+      });
+  }
+
+  /**
+   * Re-render EVERY currently-expanded position of a view parent. The same based-ACC can sit at
+   * several tree positions (reused ABIEs); any expanded while this GET was in flight rendered in
+   * seq_key order, so they all need re-sorting once the weights arrive.
+   */
+  private resortAllExpandedFor(viewParentAccManifestId: number) {
+    const targets = this.dataSource.data.filter(n =>
+      n.expanded && this.dataSource.database.viewParentAccManifestId(n) === viewParentAccManifestId);
+    targets.forEach(n => this.resortUnder(n));
+  }
+
+  /**
+   * Re-render a parent's children in the (updated) view order, preserving the user's deeper expansion.
+   * Snapshot/restore by queryPath (not hashPath): hashPath collides for descendants of two ASBIEPs
+   * that reuse the same TopLevelAsbiep, exactly as toggleNode documents.
+   */
+  private resortUnder(displayParent: BieFlatNode) {
+    if (!displayParent || !this.dataSource.isExpanded(displayParent)) {
+      return;
+    }
+    const expandedQueryPaths = this.dataSource.data.filter(e => e.expanded).map(e => e.queryPath);
+    this.dataSource.collapse(displayParent);
+    this.dataSource.expand(displayParent);
+    for (const queryPath of expandedQueryPaths) {
+      const datum = this.dataSource.data.find(d => d.queryPath === queryPath && !d.expanded);
+      if (datum) {
+        this.dataSource.expand(datum);
+      }
+    }
   }
 
   reuseBIE(node: BieFlatNode) {

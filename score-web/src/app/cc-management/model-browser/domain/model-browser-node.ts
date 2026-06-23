@@ -1,7 +1,7 @@
 import {CollectionViewer, DataSource, SelectionChange} from '@angular/cdk/collections';
 import {ChangeListener} from '../../../bie-management/domain/bie-flat-tree';
 import {ExpressionEvaluator, FlatNode, getKey, PathLikeExpressionEvaluator} from '../../../common/flat-tree';
-import {BehaviorSubject, empty, forkJoin, Observable} from 'rxjs';
+import {BehaviorSubject, empty, forkJoin, Observable, Subject} from 'rxjs';
 import {
   AccDetails,
   AsccDetails,
@@ -17,6 +17,7 @@ import {
 } from '../../domain/core-component-node';
 import {hashCode4String, sha256} from '../../../common/utility';
 import {CcNodeService} from '../../domain/core-component-node.service';
+import {applyViewOrder, asccViewOrderKey, bccViewOrderKey, BieViewOrderEntry} from './bie-view-order';
 
 export interface ModelBrowserNode extends FlatNode {
 
@@ -1294,6 +1295,9 @@ export class Association {
 export class ModelBrowserNodeDataSource<T extends ModelBrowserNode> implements DataSource<T>, ChangeListener<T> {
 
   dataChange = new BehaviorSubject<T[]>([]);
+  // Issue #1638: emits each time a node is expanded, so the component can lazily fetch that view
+  // parent's sibling order (the view parent is known only on the client — group flattening is here).
+  readonly nodeExpanded$ = new Subject<T>();
   _listeners: ChangeListener<ModelBrowserNodeDataSource<T>>[] = [];
 
   _hideUnused = false;
@@ -1492,6 +1496,11 @@ export class ModelBrowserNodeDataSource<T extends ModelBrowserNode> implements D
     // notify the change
     this.dataChange.next(this.data);
     node.expanded = expand;
+
+    // Issue #1638: announce expansions so the component can lazily fetch this view parent's order.
+    if (expand) {
+      this.nodeExpanded$.next(node);
+    }
   }
 
   loadDetail(node: T, callbackFn?) {
@@ -1575,13 +1584,50 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
   private _ccGraph: CcGraph;
   private _type: string;
   private _manifestId: number;
+  // Issue #1638: instance-level sibling sort weights, keyed "<viewParentAcc>:ASCC|BCC:<child>".
+  // Empty by default => children() is a stable no-op (identical to the seq_key order).
+  private _viewOrderMap: Map<string, number> = new Map<string, number>();
 
   dataSource: ModelBrowserNodeDataSource<T>;
 
-  constructor(ccGraph: CcGraph, type: string, manifestId: number) {
+  constructor(ccGraph: CcGraph, type: string, manifestId: number, viewOrderMap?: Map<string, number>) {
     this._ccGraph = ccGraph;
     this._type = type;
     this._manifestId = manifestId;
+    if (viewOrderMap) {
+      this._viewOrderMap = viewOrderMap;
+    }
+  }
+
+  setViewOrderMap(viewOrderMap: Map<string, number>) {
+    this._viewOrderMap = viewOrderMap || new Map<string, number>();
+  }
+
+  /**
+   * Replace the stored weights for ONE view parent (Issue #1638): drop that parent's existing keys,
+   * then set the given entries. Used by the lazy per-parent fetch on expand and the post-write
+   * refresh — clearing first means a reset (a removed row) correctly drops back to the seq_key order.
+   */
+  setViewOrderForParent(viewParentAccManifestId: number, entries: BieViewOrderEntry[]) {
+    const prefix = viewParentAccManifestId + ':';
+    for (const key of Array.from(this._viewOrderMap.keys())) {
+      if (key.startsWith(prefix)) {
+        this._viewOrderMap.delete(key);
+      }
+    }
+    (entries || []).forEach(e => {
+      if (e.asccManifestId !== undefined && e.asccManifestId !== null) {
+        this._viewOrderMap.set(asccViewOrderKey(e.fromAccManifestId, e.asccManifestId), e.weight);
+      } else if (e.bccManifestId !== undefined && e.bccManifestId !== null) {
+        this._viewOrderMap.set(bccViewOrderKey(e.fromAccManifestId, e.bccManifestId), e.weight);
+      }
+    });
+  }
+
+  /** The current weight of a flattened sibling under the given view parent, or undefined if none. */
+  getViewOrderWeight(viewParentAccManifestId: number, node: T): number | undefined {
+    const key = this.viewOrderKey(viewParentAccManifestId, node);
+    return (key !== undefined) ? this._viewOrderMap.get(key) : undefined;
   }
 
   children(node: T): T[] {
@@ -1589,15 +1635,31 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
       return [];
     }
 
-    const nodes = [];
-    const attributes = [];
+    // Flatten groups/choices first (structural recursion, no sorting), then apply the view order
+    // ONCE at this expanded node using ITS acc as the view parent — so weights set under the
+    // displayed parent match the keys used here, regardless of intervening group nesting (#1638).
+    const {attributes, nodes} = this.flatten(node);
+    const viewParentAccManifestId = this.viewParentAccManifestId(node);
+    return this.sortByViewOrder(viewParentAccManifestId, attributes)
+      .concat(this.sortByViewOrder(viewParentAccManifestId, nodes));
+  }
+
+  /**
+   * Recursively flatten a node's children into the attributes-first partition WITHOUT sorting.
+   * Preserves the exact pre-#1638 partitioning (attribute groups + attribute BCCs => attributes).
+   */
+  private flatten(node: T): {attributes: T[], nodes: T[]} {
+    const nodes: T[] = [];
+    const attributes: T[] = [];
     node.children.map(e => e as T).forEach(e => {
       const _node = e.self; // in case of it is WrappedBieFlatNode
       if (_node.isGroup || _node.isChoice) {
+        const sub = this.flatten(e);
+        const combined = sub.attributes.concat(sub.nodes);
         if ((_node as ModelBrowserAsccpNode).accNode.componentType === 'AttributeGroup') {
-          attributes.push(...this.children(e));
+          attributes.push(...combined);
         } else {
-          nodes.push(...this.children(e));
+          nodes.push(...combined);
         }
       } else {
         if (_node instanceof ModelBrowserBccpNode && (_node as ModelBrowserBccpNode).bccNode.entityType === 'Attribute') {
@@ -1607,8 +1669,51 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
         }
       }
     });
-    const children = attributes.concat(nodes);
-    return children;
+    return {attributes, nodes};
+  }
+
+  /** A view parent's flattened children in seq_key (default, pre-weight) order, by partition. */
+  seqKeyPartitions(node: T): {attributes: T[], nodes: T[]} {
+    return this.flatten(node);
+  }
+
+  /** The view-parent ACC manifest id of an expanded node (the key the children's weights are stored under). */
+  viewParentAccManifestId(node: T): number | undefined {
+    const self = node.self as ModelBrowserAccNode;
+    return (self && self.accNode) ? self.accNode.manifestId : undefined;
+  }
+
+  /** The weight-map key for a flattened sibling under the given view parent, or undefined if not keyable. */
+  private viewOrderKey(viewParentAccManifestId: number | undefined, node: T): string | undefined {
+    if (viewParentAccManifestId === undefined || viewParentAccManifestId === null) {
+      return undefined;
+    }
+    const self = node.self;
+    if (self instanceof ModelBrowserAsccpNode && (self as ModelBrowserAsccpNode).asccNode) {
+      return asccViewOrderKey(viewParentAccManifestId, (self as ModelBrowserAsccpNode).asccNode.manifestId);
+    }
+    if (self instanceof ModelBrowserBccpNode && (self as ModelBrowserBccpNode).bccNode) {
+      return bccViewOrderKey(viewParentAccManifestId, (self as ModelBrowserBccpNode).bccNode.manifestId);
+    }
+    return undefined;
+  }
+
+  /**
+   * Sort within a partition by weight DESC, then (among weighted ties) property term ASC; unweighted
+   * siblings keep their current (seq_key) order after all weighted ones. Stable => empty map is a no-op.
+   */
+  private sortByViewOrder(viewParentAccManifestId: number | undefined, list: T[]): T[] {
+    if (!this._viewOrderMap || this._viewOrderMap.size === 0 || viewParentAccManifestId === undefined) {
+      return list;
+    }
+    return applyViewOrder(
+      list,
+      (n: T) => {
+        const key = this.viewOrderKey(viewParentAccManifestId, n);
+        return (key !== undefined) ? this._viewOrderMap.get(key) : undefined;
+      },
+      (n: T) => n.name
+    );
   }
 
   loadChildren(node: T) {

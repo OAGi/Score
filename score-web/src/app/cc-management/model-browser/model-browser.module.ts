@@ -7,6 +7,7 @@ import {TranslateModule} from '@ngx-translate/core';
 import {MatDialogModule} from '@angular/material/dialog';
 import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 import {AngularSplitModule} from 'angular-split';
+import {DragDropModule} from '@angular/cdk/drag-drop';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {ModelBrowserComponent} from './model-browser.component';
 import {AuthService} from '../../authentication/auth.service';
@@ -51,6 +52,7 @@ const routes: Routes = [
     MatDialogModule,
     NgxMatSelectSearchModule,
     AngularSplitModule,
+    DragDropModule,
     MarkdownModule,
     FontAwesomeModule,
     CcPlantumlDiagramModule

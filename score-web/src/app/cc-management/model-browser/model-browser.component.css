@@ -1,3 +1,57 @@
+/* Issue #1638 — drag&drop sibling reorder */
+.dragHandle {
+  cursor: grab;
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.cdk-drag:not(.cdk-drag-disabled):active .dragHandle {
+  cursor: grabbing;
+}
+
+.dragPlaceholder {
+  background: #e8eaf6;
+  border: dashed 2px #9fa8da;
+  min-height: 33px;
+}
+
+/* The drop slot is shown red when dropping at the current position would be invalid
+   (cross-level, or attribute<->element/ASCCP crossing) — issue #1638. */
+.dragPlaceholder.dragPlaceholder-invalid {
+  background: rgba(211, 47, 47, 0.18);
+  border-color: rgba(211, 47, 47, 0.75);
+}
+
+/* Small badge to the right of the cardinality showing a sibling's custom order weight — issue #1638. */
+.order-weight-badge {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 9px;
+  background: rgba(63, 81, 181, 0.12);
+  color: #3f51b5;
+  font-size: 11px;
+  line-height: 18px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: default;
+}
+
+.cdk-drag-preview {
+  background: #fff;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  opacity: 0.95;
+  /* let elementFromPoint() during drag hit the row beneath the cursor, not the preview clone */
+  pointer-events: none;
+}
+
+.cdk-drag-animating {
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
 .node-progress-bar {
   margin-left: 30px;
 }
