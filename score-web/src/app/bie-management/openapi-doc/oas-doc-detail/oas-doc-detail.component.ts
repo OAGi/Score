@@ -679,7 +679,7 @@ export class OasDocDetailComponent implements OnInit {
     if (!this.table.dataSource) {
       return [];
     }
-    return this.table.dataSource.data.filter(e => e.isChanged);
+    return (this.table.dataSource.data || []).filter(e => e.isChanged);
   }
 
   isChanged(): boolean {
@@ -716,11 +716,30 @@ export class OasDocDetailComponent implements OnInit {
       this.sort.direction = '';
     }
     if (property === 'verb') {
-      if (source.verb === 'GET' && source.messageBody === 'Request') {
+      // A request body is never valid for GET, so revert it to Response. A DELETE request body is kept
+      // in any version (Issue #1610): it is honored in OpenAPI 3.1 and dropped (with a banner) in 3.0.3.
+      if (source.messageBody === 'Request' && source.verb === 'GET') {
         source.messageBody = 'Response';
       }
       this.updateOperationIdForVerb(source);
     }
+  }
+
+  // Issue #1610: true when the document targets OpenAPI 3.1.x (where a DELETE request body is honored).
+  isOpenApi31(): boolean {
+    return !!this.oasDoc && !!this.oasDoc.openAPIVersion && this.oasDoc.openAPIVersion.trim().startsWith('3.1');
+  }
+
+  // Issue #1610: a DELETE request body is honored only from OpenAPI 3.1. When the document targets an
+  // earlier version (3.0.3), the body is dropped from the generated document, so a banner above the
+  // Endpoint Details table prompts the user to switch to 3.1.1. (The list is server-paginated, so this
+  // reflects the operations currently loaded on this page.)
+  hasIgnoredDeleteRequestBody(): boolean {
+    if (this.isOpenApi31()) {
+      return false;
+    }
+    return (this.table?.dataSource?.data || []).some(
+      element => element.verb === 'DELETE' && element.messageBody === 'Request');
   }
 
   reset(type: string) {
@@ -1015,6 +1034,15 @@ export class OasDocDetailComponent implements OnInit {
   }
 
   generate() {
+    // Issue #1610: the document is generated from the persisted record, so any pending edit (e.g. an
+    // OpenAPI Version change from 3.0.3 to 3.1.1, or a new DELETE Request body) would NOT be reflected.
+    // Block generation while there are unsaved changes and prompt the user to Update first.
+    if (this.isChanged()) {
+      this.snackBar.open('There are unsaved changes. Please click Update before generating the document.', '', {
+        duration: 5000,
+      });
+      return;
+    }
     this.loading = true;
     this.openAPIService.generateOpenAPI(this.oasDoc.oasDocId, this.request.page).subscribe(resp => {
       saveAsBlobResponse(resp);

@@ -24,6 +24,7 @@
                   <mat-label>OpenAPI Version</mat-label>
                   <mat-select required [(value)]="oasDoc.openAPIVersion">
                     <mat-option [value]="'3.0.3'">3.0.3</mat-option>
+                    <mat-option [value]="'3.1.1'">3.1.1</mat-option>
                   </mat-select>
                 </mat-form-field>
               </div>
@@ -173,6 +174,15 @@
       </mat-toolbar>
     </mat-card-header>
     <mat-card-content class="mat-card-container">
+      <!-- Issue #1610: a DELETE request body is honored only from OpenAPI 3.1.1. When the document
+           targets 3.0.3, warn that the body on any DELETE operation is ignored during generation. -->
+      @if (hasIgnoredDeleteRequestBody()) {
+        <div class="oas-delete-body-warning d-flex align-items-center">
+          <mat-icon class="oas-delete-body-warning-icon">warning</mat-icon>
+          <span>A Request Body on a DELETE operation is ignored in OpenAPI 3.0.3. Change the OpenAPI
+            Version to 3.1.1 to include it in the generated document.</span>
+        </div>
+      }
       <div class="table-container">
         <div class="d-flex">
           <mat-multi-sort-table-settings [tableData]="table" [closeDialogOnChoice]="false">
@@ -295,7 +305,9 @@
                   score-table-column-resize [defaultWidth]="width('Message Body')" (onResize)="onResizeWidth($event)"> Message Body</th>
               <td mat-cell *matCellDef="let element">
                 <mat-select [(ngModel)]="element.messageBody" [panelWidth]="null" [disabled]="!element.topLevelAsbiepId">
-                  <mat-option value="Request" [disabled]="element.verb === 'GET' || element.verb === 'DELETE'">Request</mat-option>
+                  <!-- Issue #1610: GET never carries a request body. DELETE may, in any version; in 3.0.3
+                       it is dropped from the generated document (see the banner above the table). -->
+                  <mat-option value="Request" [disabled]="element.verb === 'GET'">Request</mat-option>
                   <mat-option value="Response">Response</mat-option>
                 </mat-select>
               </td>

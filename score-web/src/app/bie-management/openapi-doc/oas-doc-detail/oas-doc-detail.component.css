@@ -145,3 +145,21 @@
 .oas-security-na {
   color: #bdbdbd;
 }
+
+/* Issue #1610: amber banner shown above the Endpoint Details table when the document targets
+   OpenAPI 3.0.3 and a DELETE operation still carries a Request body (which is dropped on generation). */
+.oas-delete-body-warning {
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border: 1px solid #ffe082;
+  border-left: 4px solid #f9a825;
+  border-radius: 4px;
+  background: #fff8e1;
+  color: #6d4c00;
+  font-size: 13px;
+}
+
+.oas-delete-body-warning-icon {
+  color: #f9a825;
+  margin-right: 8px;
+}

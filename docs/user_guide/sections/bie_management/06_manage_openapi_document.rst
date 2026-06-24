@@ -21,7 +21,7 @@ To create an OpenAPI document:
 
 4. On the returned "Create OpenAPI Document" page, fill out the following fields:
 
-   1. OpenAPI Version (Mandatory) Note, "3.0.3" is selected as default.
+   1. OpenAPI Version (Mandatory) Note, "3.1.1" is selected as default.
    2. Title (Mandatory)
    3. Document Version (Mandatory)
    4. Terms of Service A URI to the terms of service for the API
@@ -308,7 +308,7 @@ To remove BIEs from an OpenAPI Document:
 OpenAPI YML Expression generation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The end user uses OpenAPI document to represent the selected BIEs into OpenAPI 3.0.3 syntax.
+The end user uses OpenAPI document to represent the selected BIEs into OpenAPI 3.0.3 or 3.1.1 syntax.
 
 To generate an OpenAPI YML file:
 

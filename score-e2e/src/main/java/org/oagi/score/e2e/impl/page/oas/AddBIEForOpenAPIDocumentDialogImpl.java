@@ -275,11 +275,15 @@ public class AddBIEForOpenAPIDocumentDialogImpl implements AddBIEForOpenAPIDocum
     public boolean isMessageBodyOptionDisabled(WebElement tableRecord, String messageBody) {
         WebElement messageBodyCell = getColumnByName(tableRecord, "messageBody");
         click(getDriver(), messageBodyCell.findElement(By.tagName("mat-select")));
-        WebElement option = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option[.//span[normalize-space(.) = \"" + messageBody + "\"]]"));
+        By optionLocator = By.xpath("//mat-option[.//span[normalize-space(.) = \"" + messageBody + "\"]]");
+        WebElement option = visibilityOfElementLocated(getDriver(), optionLocator);
         boolean disabled = "true".equals(option.getAttribute("aria-disabled")) ||
                 option.getAttribute("class").contains("mdc-list-item--disabled");
         escape(getDriver());
+        // Wait for the option panel to be fully dismissed before returning. Otherwise the lingering
+        // CDK overlay (its backdrop) can swallow the click that the next setVerb/setMessageBody uses to
+        // open another dropdown, leaving that dropdown closed (its options never become clickable).
+        invisibilityOfElementLocated(getDriver(), optionLocator);
         return disabled;
     }
 

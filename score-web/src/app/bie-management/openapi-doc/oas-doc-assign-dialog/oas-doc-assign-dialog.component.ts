@@ -332,8 +332,9 @@ export class OasDocAssignDialogComponent implements OnInit {
       saveBranch(this.auth.getUserToken(), 'BIE', source.releaseId);
     }
     if (property === 'verbSelection') {
-      if ((this.verbSelection[source] === 'GET' || this.verbSelection[source] === 'DELETE')
-        && this.messageBodySelection[source] === 'Request') {
+      // A request body is never valid for GET, so revert it to Response. A DELETE request body is kept
+      // in any version (Issue #1610): honored in OpenAPI 3.1, dropped (with a banner) in 3.0.3.
+      if (this.messageBodySelection[source] === 'Request' && this.verbSelection[source] === 'GET') {
         this.messageBodySelection[source] = 'Response';
       }
     }

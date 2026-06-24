@@ -316,7 +316,9 @@
                   <mat-select [(ngModel)]="messageBodySelection[element.topLevelAsbiepId]" required="true"
                     [panelWidth]="null"
                     (click)="$event.stopPropagation()">
-                    <mat-option value="Request" [disabled]="verbSelection[element.topLevelAsbiepId] === 'GET' || verbSelection[element.topLevelAsbiepId] === 'DELETE'">Request</mat-option>
+                    <!-- Issue #1610: GET never carries a request body; DELETE may, in any version
+                         (dropped from the generated document in 3.0.3). -->
+                    <mat-option value="Request" [disabled]="verbSelection[element.topLevelAsbiepId] === 'GET'">Request</mat-option>
                     <mat-option value="Response">Response</mat-option>
                   </mat-select>
                   @if (isSelected(element) && !messageBodySelection[element.topLevelAsbiepId]) {

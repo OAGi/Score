@@ -41,9 +41,6 @@ public class EditOpenAPIDocumentPageImpl extends BasePageImpl implements EditOpe
     private static final By OPENAPI_VERSION_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"OpenAPI Version\")]//ancestor::mat-form-field[1]//mat-select");
 
-    private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
-            By.xpath("//input[@aria-label=\"dropdown search\"]");
-
     private static final By TITLE_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Title\")]//ancestor::mat-form-field//input");
 
@@ -144,11 +141,12 @@ public class EditOpenAPIDocumentPageImpl extends BasePageImpl implements EditOpe
 
     @Override
     public void setOpenAPIVersion(String openAPIVersion) {
+        // The OpenAPI Version control is a plain mat-select (static 3.0.3 / 3.1.1 options) with no
+        // ngx-mat-select-search box, so select the option directly instead of typing into a search field.
         click(getOpenAPIVersionSelectField());
-        sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), openAPIVersion);
-        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
+        WebElement optionField = visibilityOfElementLocated(getDriver(),
                 By.xpath("//mat-option//span[text() = \"" + openAPIVersion + "\"]"));
-        click(searchedSelectField);
+        click(optionField);
         escape(getDriver());
     }
 

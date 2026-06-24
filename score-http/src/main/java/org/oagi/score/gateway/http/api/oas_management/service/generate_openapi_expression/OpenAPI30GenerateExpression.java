@@ -66,7 +66,7 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 
 @Component
 @Scope(SCOPE_PROTOTYPE)
-public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, InitializingBean {
+public class OpenAPI30GenerateExpression implements BieGenerateOpenApiExpression, InitializingBean {
 
     private static final String OPEN_API_VERSION = "3.0.3";
     static final String VERSION_PATH_PARAMETER = "{version}";
@@ -85,7 +85,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
     private Map<String, Object> schemas = new LinkedHashMap<>();
     private Map<TopLevelAsbiepId, String> reusedTopLevelAsbiepNameMap;
 
-    public OpenAPIGenerateExpression(GenerationContext generationContext, OpenAPIGenerateExpressionOption option) {
+    public OpenAPI30GenerateExpression(GenerationContext generationContext, OpenAPIGenerateExpressionOption option) {
         this.generationContext = generationContext;
         this.option = option;
 
@@ -922,6 +922,13 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                             OpenAPITemplateForVerbOption template,
                             Map<String, Object> path,
                             AsbiepSummaryRecord asbiep) {
+            // Issue #1610: OpenAPI 3.0.3 forbids a request body on DELETE (the specification states it
+            // "SHALL be ignored"). A "Request" message body therefore drops the body (a banner in the editor
+            // prompts switching to OpenAPI 3.1.1 to keep it; see OpenAPI31GenerateExpression) and emits a
+            // status-only 202 (Accepted) success -- consistent with the 3.1 generator and anticipating #1347
+            // (RFC 9457 error responses), whose proposed Verb x Array matrix makes the DELETE success a 202.
+            // A "Response" message body still emits a 200 response carrying the BIE (a response body is
+            // allowed in 3.0.3), exactly like the other verbs.
             if (path != null && path.size() > 0) {
                 ensurePathParameters(path, getOperation(), template.isArrayForJsonExpression(), template);
             } else {
@@ -952,9 +959,17 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                             .build())
                                     .build())
                             .build());
+                    // The response references the BIE schema, so generate it.
+                    fillPropertiesForTemplate(schemaName, asbiep, isArray, isSuppressRoot);
+                } else {
+                    // Request: the body is dropped (3.0.3 forbids it); emit a status-only 202. Nothing
+                    // references the BIE schema here, so none is generated (avoids an orphan component).
+                    path.put("responses", ImmutableMap.<String, Object>builder()
+                            .put("202", ImmutableMap.<String, Object>builder()
+                                    .put("description", "")
+                                    .build())
+                            .build());
                 }
-
-                fillPropertiesForTemplate(schemaName, asbiep, isArray, isSuppressRoot);
             }
         }
     }

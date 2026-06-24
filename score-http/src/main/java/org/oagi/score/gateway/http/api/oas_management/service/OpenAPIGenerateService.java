@@ -10,7 +10,8 @@ import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpSummaryRec
 import org.oagi.score.gateway.http.api.oas_management.model.OpenAPIGenerateExpressionOption;
 import org.oagi.score.gateway.http.api.oas_management.model.OpenAPITemplateForVerbOption;
 import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.BieGenerateOpenApiExpression;
-import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.OpenAPIGenerateExpression;
+import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.OpenAPI30GenerateExpression;
+import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.OpenAPI31GenerateExpression;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.common.util.StringUtils;
@@ -291,7 +292,21 @@ public class OpenAPIGenerateService {
 
     private BieGenerateOpenApiExpression createBieGenerateOpenAPIExpression(
             GenerationContext generationContext, OpenAPIGenerateExpressionOption option) {
-        return applicationContext.getBean(OpenAPIGenerateExpression.class, generationContext, option);
+        // Issue #1610: select the OpenAPI 3.1 (JSON Schema 2020-12) generator when the document
+        // declares a 3.1.x version; otherwise keep the OpenAPI 3.0 generator.
+        String openAPIVersion = (option != null && option.getOasDoc() != null)
+                ? option.getOasDoc().getOpenAPIVersion() : null;
+        if (isOpenApi31Version(openAPIVersion)) {
+            return applicationContext.getBean(OpenAPI31GenerateExpression.class, generationContext, option);
+        }
+        return applicationContext.getBean(OpenAPI30GenerateExpression.class, generationContext, option);
+    }
+
+    private boolean isOpenApi31Version(String openAPIVersion) {
+        if (!StringUtils.hasLength(openAPIVersion)) {
+            return false;
+        }
+        return openAPIVersion.trim().startsWith("3.1");
     }
 
 }

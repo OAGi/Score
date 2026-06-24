@@ -504,3 +504,66 @@ A single `Updated` confirmation message is shown after Update completes, and the
 31. Verify that the operation's override survives the later no-op Update and that the generated YAML still emits the operation's configured security rather than turning it Public. (Assertion [#15](#test-assertion-43815))
 32. Complete a normal Update with all schemes and requirements valid, then introduce an incomplete security scheme or requirement and observe the `Update` button.
 33. Verify that a single `Updated` confirmation message is shown after a valid Update, and that the `Update` button is disabled while any security scheme or requirement is incomplete. (Assertion [#16](#test-assertion-43816))
+
+## Test Case 43.9
+
+**Generate an OpenAPI 3.1.1 Document**
+
+Pre-condition: An end-user account that can access the BIE menu exists, and the environment allows downloading the generated OpenAPI document file (YAML) for inspection. A new OpenAPI Document defaults to OpenAPI Version `3.1.1`, and the `OpenAPI Version` selector on the Edit OpenAPI Document page offers both `3.0.3` and `3.1.1`.
+
+### Test Assertion:
+
+#### Test Assertion #43.9.1
+An OpenAPI Document whose OpenAPI Version is `3.1.1`, after a BIE is assigned and `Generate` is clicked, downloads a YAML file whose root `openapi` field is `3.1.1`, that does not use the OpenAPI 3.0-only `nullable: true` construct (OpenAPI 3.1 expresses nullability with a JSON Schema 2020-12 type union or an `anyOf` null branch), and in which the BIE-backed operation contributes a `components/schemas` entry referenced via `#/components/schemas/<BIEName>`.
+
+#### Test Assertion #43.9.2
+The same document switched to OpenAPI Version `3.0.3` and regenerated downloads a YAML file whose root `openapi` field is `3.0.3`, confirming that the generator branches on the document's configured OpenAPI Version.
+
+### Test Step Pre-condition:
+1. An end-user account that can access the BIE menu is available in connectCenter.
+2. A BIE that the end user can assign to an OpenAPI Document exists.
+3. An OpenAPI Document exists that the end user can open into the Edit OpenAPI Document page.
+4. The environment allows downloading the generated OpenAPI document file (YAML) for inspection.
+
+### Test Step:
+1. Sign in to connectCenter as the end user.
+2. Open the OpenAPI Document into the Edit OpenAPI Document page and ensure the `OpenAPI Version` is `3.1.1` (the default for a new document), then click `Update` if the version was changed.
+3. Assign a BIE to the document with a supported Verb and Message Body (for example `POST` and `Request`).
+4. Click `Generate` and open the downloaded YAML file.
+5. Verify that the root `openapi` field is `3.1.1`, that the file contains no `nullable: true` construct, and that the BIE-backed operation references a `#/components/schemas/<BIEName>` component schema. (Assertion [#1](#test-assertion-4391))
+6. Change the `OpenAPI Version` to `3.0.3`, click `Update`, then click `Generate` and open the downloaded YAML file.
+7. Verify that the root `openapi` field is now `3.0.3`. (Assertion [#2](#test-assertion-4392))
+
+## Test Case 43.10
+
+**DELETE Operation Request Body Across OpenAPI Versions**
+
+Pre-condition: An end-user account that can access the BIE menu exists, a BIE is available to assign to an OpenAPI Document, and the environment allows downloading the generated OpenAPI document file (YAML) for inspection. A `Request` Message Body is selectable for a `DELETE` operation in any OpenAPI Version (only `GET` forbids a `Request` body), but the request body is only honored from OpenAPI Version `3.1.1`.
+
+### Test Assertion:
+
+#### Test Assertion #43.10.1
+In an OpenAPI Document whose OpenAPI Version is `3.1.1`, a `DELETE` operation with Message Body `Request`, after `Generate`, emits a `requestBody` for that operation together with a status-only `202` success response.
+
+#### Test Assertion #43.10.2
+In an OpenAPI Document whose OpenAPI Version is `3.0.3`, the same `DELETE` operation with Message Body `Request` shows an amber banner in Endpoint Details warning that the request body is ignored, and after `Generate` the operation emits NO `requestBody` while the status-only `202` success response remains (the request body is dropped, with no orphan request schema).
+
+#### Test Assertion #43.10.3
+A `DELETE` operation with Message Body `Response`, after `Generate`, emits a `200` response carrying the BIE via `#/components/schemas/<BIEName>` and emits no `requestBody`, like the other body-bearing verbs.
+
+### Test Step Pre-condition:
+1. An end-user account that can access the BIE menu is available in connectCenter.
+2. A BIE that the end user can assign to an OpenAPI Document exists.
+3. An OpenAPI Document exists that the end user can open into the Edit OpenAPI Document page.
+4. The environment allows downloading the generated OpenAPI document file (YAML) for inspection.
+
+### Test Step:
+1. Sign in to connectCenter as the end user and open the OpenAPI Document into the Edit OpenAPI Document page.
+2. Set the `OpenAPI Version` to `3.1.1` and click `Update`, then assign the BIE with Verb `DELETE` and Message Body `Request`.
+3. Click `Generate` and open the downloaded YAML file, then inspect the `DELETE` operation.
+4. Verify that the `DELETE` operation has a `requestBody` and declares a status-only `202` success response. (Assertion [#1](#test-assertion-43101))
+5. On a `3.0.3` document, assign the BIE with Verb `DELETE` and Message Body `Request` and observe the Endpoint Details table.
+6. Verify that an amber banner warns that the `Request` body on a `DELETE` operation is ignored in OpenAPI 3.0.3, then click `Generate` and open the downloaded YAML file.
+7. Verify that the `DELETE` operation has no `requestBody` while it still declares a status-only `202` success response. (Assertion [#2](#test-assertion-43102))
+8. On a `3.1.1` document, assign the BIE with Verb `DELETE` and Message Body `Response`, click `Generate`, and open the downloaded YAML file.
+9. Verify that the `DELETE` operation has no `requestBody` and declares a `200` response that references the BIE via `#/components/schemas/<BIEName>`. (Assertion [#3](#test-assertion-43103))

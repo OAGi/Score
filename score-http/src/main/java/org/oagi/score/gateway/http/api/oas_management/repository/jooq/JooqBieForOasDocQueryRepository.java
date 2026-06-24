@@ -79,7 +79,7 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
                 .from(OAS_MESSAGE_BODY)
                 .leftJoin(OAS_REQUEST).on(OAS_REQUEST.OAS_MESSAGE_BODY_ID.eq(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID))
                 .leftJoin(OAS_OPERATION.as("oas_operation")).on(OAS_REQUEST.OAS_OPERATION_ID.eq(OAS_OPERATION.as("oas_operation").OAS_OPERATION_ID))
-                .leftJoin(OAS_RESOURCE.as("oas_resource")).on(OAS_OPERATION.as("oas_operation").OAS_OPERATION_ID.eq(OAS_RESOURCE.as("oas_resource").OAS_RESOURCE_ID))
+                .leftJoin(OAS_RESOURCE.as("oas_resource")).on(OAS_OPERATION.as("oas_operation").OAS_RESOURCE_ID.eq(OAS_RESOURCE.as("oas_resource").OAS_RESOURCE_ID))
                 .leftJoin(OAS_DOC.as("oas_doc")).on(OAS_RESOURCE.as("oas_resource").OAS_DOC_ID.eq(OAS_DOC.as("oas_doc").OAS_DOC_ID))
                 .leftJoin(OAS_RESOURCE_TAG.as("oas_resource_tag")).on(OAS_RESOURCE_TAG.as("oas_resource_tag").OAS_OPERATION_ID.eq(OAS_OPERATION.as("oas_operation").OAS_OPERATION_ID))
                 .leftJoin(OAS_TAG.as("oas_tag")).on(OAS_RESOURCE_TAG.as("oas_resource_tag").OAS_TAG_ID.eq(OAS_TAG.as("oas_tag").OAS_TAG_ID))
