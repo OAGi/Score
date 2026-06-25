@@ -105,8 +105,10 @@ To add BIEs to an OpenAPI Document:
    *Updated start date*, or *Updated end date* search filters to help locate the desired BIE. (see `How to use Search
    Filters <#how-to-use-search-filters>`__).
 
-6. Select the desired BIE node. Select the required Verb option and the required Message Body option from
-   the dropdown list.
+6. Select the desired BIE node. Select the required *Verb* option and the required *Message Body*
+   (``Request`` or ``Response``) option from the dropdown list. A ``Request`` body is not available for a
+   ``GET`` (a ``GET`` never carries a request body); it is available for every other verb, including
+   ``DELETE`` (see `DELETE operations with a request body <#delete-operations-with-a-request-body>`__).
 
 7. Check the Array Indicator box if needed. When you add the BIE, an *Operation ID* is generated
    automatically in the form ``<verb><BIEName>`` (for example ``createItemInstance``) using the
@@ -237,6 +239,32 @@ status-only response derived from the verb: ``DELETE`` produces ``202 Accepted``
 produces ``204 No Content``.
 
 
+DELETE operations with a request body
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A ``DELETE`` operation backed by a BIE can carry a *Message Body*:
+
+- ``Response`` — the generated ``DELETE`` operation returns the BIE in a ``200`` response, like the
+  other body-bearing verbs.
+- ``Request`` — the generated ``DELETE`` operation carries the BIE as a request body. Whether the
+  request body is kept depends on the document's *OpenAPI Version*:
+
+  - In **OpenAPI 3.1.1**, a request body on ``DELETE`` is honored: the generated operation includes a
+    ``requestBody`` paired with a status-only ``202`` (Accepted) success response.
+  - In **OpenAPI 3.0.3**, the specification does not permit a request body on ``DELETE``, so it is
+    dropped during generation: the generated operation has no ``requestBody`` (and leaves no orphan
+    request schema behind), keeping only the status-only ``202`` (Accepted) success response.
+
+When a ``3.0.3`` document contains a ``DELETE`` operation with a ``Request`` message body, an amber
+warning banner appears above the *Endpoint Details* table:
+
+   *A Request Body on a DELETE operation is ignored in OpenAPI 3.0.3. Change the OpenAPI Version to
+   3.1.1 to include it in the generated document.*
+
+To keep the request body, change the document's *OpenAPI Version* to ``3.1.1`` and click the "Update"
+button. (You can change the *OpenAPI Version* at the top of the "Edit OpenAPI Document" page.)
+
+
 View/Edit Endpoint Details of an OpenAPI Document
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -309,6 +337,13 @@ OpenAPI YML Expression generation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The end user uses OpenAPI document to represent the selected BIEs into OpenAPI 3.0.3 or 3.1.1 syntax.
+The *OpenAPI Version* chosen on the document determines the syntax of the generated file:
+
+- **3.1.1** (the default) generates JSON Schema 2020-12 shapes — for example, nullability is expressed
+  with a type union or an ``anyOf`` null branch rather than the OpenAPI 3.0-only ``nullable: true``
+  keyword — and honors a request body on a ``DELETE`` operation.
+- **3.0.3** generates OpenAPI 3.0 shapes and drops any request body on a ``DELETE`` operation (see
+  `DELETE operations with a request body <#delete-operations-with-a-request-body>`__).
 
 To generate an OpenAPI YML file:
 
@@ -321,7 +356,10 @@ To generate an OpenAPI YML file:
    OpenAPI Document. (see `How to use Search
    Filters <#how-to-use-search-filters>`__). Click on the title to open its "Edit OpenAPI Document" page.
 
-4. Click the "Generate" button.
+4. Click the "Generate" button. The document is generated from its saved state, so if there are unsaved
+   changes the action is blocked with the notice "There are unsaved changes. Please click Update before
+   generating the document." In that case, click the "Update" button first and then click "Generate"
+   again.
 
 5. A YML file with the filename format: title-version-timestamp.yml will be saved to the local drive.
    The generated file includes the configured security schemes under ``components.securitySchemes`` together

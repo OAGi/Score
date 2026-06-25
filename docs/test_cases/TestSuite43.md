@@ -82,7 +82,7 @@ On Add BIE For OpenAPI Document page, the end user can view BIEs available to be
 On Add BIE For OpenAPI Document page, the end user can search BIEs by DEN, Business Context, Version, Remark, Updated Start Date, and Updated End Date. Branch, State, Owner, and Updater controls may also be available depending on the environment.
 
 #### Test Assertion #43.2.4
-On Add BIE For OpenAPI Document page, when `GET` or `DELETE` is selected as Verb, `Request` is not available as Message Body, and the Add action remains unavailable until both Verb and Message Body are specified for every selected BIE.
+On Add BIE For OpenAPI Document page, `Request` is not available as Message Body only when `GET` is selected as Verb (a `GET` never carries a request body). For every other verb, including `DELETE`, `Request` remains selectable (Issue #1610 — a `DELETE` request body is honored in OpenAPI 3.1.1 and dropped in 3.0.3). The Add action remains unavailable until both Verb and Message Body are specified for every selected BIE.
 
 #### Test Assertion #43.2.5
 On Add BIE For OpenAPI Document page, the end user can add a selected BIE to the current OpenAPI Document when a valid Verb and Message Body combination is specified.
@@ -113,8 +113,8 @@ The same BIE can be assigned again to the same OpenAPI Document when the generat
 5. Verify that assignable BIE rows are listed and can be selected for assignment. (Assertion [#2](#test-assertion-4322))
 6. Search the candidate BIEs by DEN, Business Context, Version, Remark, Updated Start Date, and Updated End Date.
 7. Verify that each search filter returns the expected BIE results. If Branch, State, Owner, or Updater filters are available in the environment, verify those as additional checks. (Assertion [#3](#test-assertion-4323))
-8. Select a BIE row, choose a Verb, and inspect the Message Body choices.
-9. Verify that `Request` is not available when the Verb is `GET` or `DELETE`, and verify that the Add action is unavailable until all selected BIE rows have both Verb and Message Body values. (Assertion [#4](#test-assertion-4324))
+8. Select a BIE row, set the Verb to `GET`, and inspect the Message Body choices; then set the Verb to `DELETE` and inspect them again.
+9. Verify that `Request` is not available (disabled) when the Verb is `GET`, that `Request` IS available when the Verb is `DELETE`, and verify that the Add action is unavailable until all selected BIE rows have both Verb and Message Body values. (Assertion [#4](#test-assertion-4324))
 10. Select a BIE row with a valid Verb and Message Body combination and add it to the current OpenAPI Document.
 11. Verify that the add operation succeeds. (Assertion [#5](#test-assertion-4325))
 12. Return to the Edit OpenAPI Document page and review the BIE list.
@@ -519,6 +519,9 @@ An OpenAPI Document whose OpenAPI Version is `3.1.1`, after a BIE is assigned an
 #### Test Assertion #43.9.2
 The same document switched to OpenAPI Version `3.0.3` and regenerated downloads a YAML file whose root `openapi` field is `3.0.3`, confirming that the generator branches on the document's configured OpenAPI Version.
 
+#### Test Assertion #43.9.3
+Because the document is generated from its persisted record, clicking `Generate` while the Edit OpenAPI Document page has unsaved changes (for example, after changing the `OpenAPI Version` without clicking `Update`) is blocked: a notification reads `There are unsaved changes. Please click Update before generating the document.` and no file is downloaded. After clicking `Update`, `Generate` produces a file whose root `openapi` field reflects the newly saved version.
+
 ### Test Step Pre-condition:
 1. An end-user account that can access the BIE menu is available in connectCenter.
 2. A BIE that the end user can assign to an OpenAPI Document exists.
@@ -533,6 +536,8 @@ The same document switched to OpenAPI Version `3.0.3` and regenerated downloads 
 5. Verify that the root `openapi` field is `3.1.1`, that the file contains no `nullable: true` construct, and that the BIE-backed operation references a `#/components/schemas/<BIEName>` component schema. (Assertion [#1](#test-assertion-4391))
 6. Change the `OpenAPI Version` to `3.0.3`, click `Update`, then click `Generate` and open the downloaded YAML file.
 7. Verify that the root `openapi` field is now `3.0.3`. (Assertion [#2](#test-assertion-4392))
+8. Change the `OpenAPI Version` again (for example back to `3.1.1`) but do NOT click `Update`, then click `Generate`.
+9. Verify that generation is blocked, that the notification `There are unsaved changes. Please click Update before generating the document.` is shown, and that no file is downloaded; then click `Update`, click `Generate`, and verify that the downloaded file's root `openapi` field reflects the saved version. (Assertion [#3](#test-assertion-4393))
 
 ## Test Case 43.10
 
@@ -543,7 +548,7 @@ Pre-condition: An end-user account that can access the BIE menu exists, a BIE is
 ### Test Assertion:
 
 #### Test Assertion #43.10.1
-In an OpenAPI Document whose OpenAPI Version is `3.1.1`, a `DELETE` operation with Message Body `Request`, after `Generate`, emits a `requestBody` for that operation together with a status-only `202` success response.
+In an OpenAPI Document whose OpenAPI Version is `3.1.1`, a `DELETE` operation with Message Body `Request` shows no "ignored DELETE body" banner (the body is honored) and, after `Generate`, emits a `requestBody` for that operation together with a status-only `202` success response.
 
 #### Test Assertion #43.10.2
 In an OpenAPI Document whose OpenAPI Version is `3.0.3`, the same `DELETE` operation with Message Body `Request` shows an amber banner in Endpoint Details warning that the request body is ignored, and after `Generate` the operation emits NO `requestBody` while the status-only `202` success response remains (the request body is dropped, with no orphan request schema).
@@ -560,10 +565,10 @@ A `DELETE` operation with Message Body `Response`, after `Generate`, emits a `20
 ### Test Step:
 1. Sign in to connectCenter as the end user and open the OpenAPI Document into the Edit OpenAPI Document page.
 2. Set the `OpenAPI Version` to `3.1.1` and click `Update`, then assign the BIE with Verb `DELETE` and Message Body `Request`.
-3. Click `Generate` and open the downloaded YAML file, then inspect the `DELETE` operation.
+3. Confirm that no "ignored DELETE body" banner is shown above the Endpoint Details table, then click `Generate` and open the downloaded YAML file and inspect the `DELETE` operation.
 4. Verify that the `DELETE` operation has a `requestBody` and declares a status-only `202` success response. (Assertion [#1](#test-assertion-43101))
 5. On a `3.0.3` document, assign the BIE with Verb `DELETE` and Message Body `Request` and observe the Endpoint Details table.
 6. Verify that an amber banner warns that the `Request` body on a `DELETE` operation is ignored in OpenAPI 3.0.3, then click `Generate` and open the downloaded YAML file.
-7. Verify that the `DELETE` operation has no `requestBody` while it still declares a status-only `202` success response. (Assertion [#2](#test-assertion-43102))
+7. Verify that the `DELETE` operation has no `requestBody` while it still declares a status-only `202` success response, and that no orphan request schema for the BIE remains in `components/schemas`. (Assertion [#2](#test-assertion-43102))
 8. On a `3.1.1` document, assign the BIE with Verb `DELETE` and Message Body `Response`, click `Generate`, and open the downloaded YAML file.
 9. Verify that the `DELETE` operation has no `requestBody` and declares a `200` response that references the BIE via `#/components/schemas/<BIEName>`. (Assertion [#3](#test-assertion-43103))

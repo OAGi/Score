@@ -36,6 +36,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.oagi.score.e2e.impl.PageHelper.getSnackBarMessage;
 import static org.oagi.score.e2e.impl.PageHelper.sendKeys;
 
 /**
@@ -103,6 +104,30 @@ public class TC_43_9_GenerateOpenAPI31 extends BaseTest {
         assertEquals("3.0.3", String.valueOf(export.raw().get("openapi")),
                 "The generated document's openapi field should reflect the document's OpenAPI Version (3.0.3), "
                         + "confirming the generator branches on the configured version");
+    }
+
+    @Test
+    @DisplayName("TC_43_9_3")
+    public void generate_is_blocked_while_there_are_unsaved_changes() throws IOException {
+        // A BIE-backed operation makes the Endpoint Details table non-empty so Generate is enabled.
+        Fixture fixture = newDocumentWithBie();
+        assignBie(fixture.editPage, fixture.bie, "POST", "Request");
+
+        // Change the OpenAPI Version but do NOT click Update: the document now has unsaved changes.
+        // The document is generated from its persisted record, so generation must be blocked until the
+        // edit is saved (Issue #1610).
+        fixture.editPage.setOpenAPIVersion("3.1.1");
+        fixture.editPage.clickGenerateButton();
+        assertEquals("There are unsaved changes. Please click Update before generating the document.",
+                getSnackBarMessage(getDriver()),
+                "Generate must be blocked while an unsaved OpenAPI Version change is pending");
+
+        // After Update, Generate succeeds and reflects the newly saved version (3.1.1).
+        fixture.editPage.hitUpdateButton();
+        OpenAPIDocumentExport export =
+                OpenAPIDocumentExport.from(fixture.editPage.clickGenerateAndDownload());
+        assertEquals("3.1.1", String.valueOf(export.raw().get("openapi")),
+                "After Update, the generated document reflects the saved OpenAPI Version");
     }
 
     private Fixture newDocumentWithBie() {

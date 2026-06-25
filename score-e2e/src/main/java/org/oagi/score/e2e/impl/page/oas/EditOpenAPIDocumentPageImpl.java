@@ -89,6 +89,9 @@ public class EditOpenAPIDocumentPageImpl extends BasePageImpl implements EditOpe
     private static final By GENERATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Generate\")]//ancestor::button[1]");
 
+    private static final By DELETE_BODY_WARNING_LOCATOR =
+            By.cssSelector("div.oas-delete-body-warning");
+
     private static final By SECURITY_SCHEMES_SECTION_LOCATOR =
             By.xpath("//span[normalize-space(.) = \"Security Schemes\"]");
 
@@ -330,6 +333,20 @@ public class EditOpenAPIDocumentPageImpl extends BasePageImpl implements EditOpe
         } catch (IOException | InterruptedException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    @Override
+    public void clickGenerateButton() {
+        // Driver-aware click: clear any lingering snackbar, scroll into view, JS-click on intercept.
+        // No download is awaited; the unsaved-changes guard (Issue #1610) blocks generation and only
+        // raises a snackbar, so the caller reads getSnackBarMessage(...) rather than a downloaded file.
+        click(getDriver(), getGenerateButton(true));
+        waitFor(ofMillis(500L));
+    }
+
+    @Override
+    public boolean isDeleteRequestBodyIgnoredWarningDisplayed() {
+        return isElementPresent(getDriver(), DELETE_BODY_WARNING_LOCATOR);
     }
 
     private static boolean isParseableYaml(File file) {

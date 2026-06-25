@@ -221,6 +221,23 @@ public interface EditOpenAPIDocumentPage extends Page {
     File clickGenerateAndDownload();
 
     /**
+     * Click the 'Generate' button without waiting for a download. Used to assert the unsaved-changes
+     * guard (Issue #1610): generation is blocked with a snackbar and no file is produced, so the caller
+     * reads the snackbar instead of a downloaded file.
+     */
+    void clickGenerateButton();
+
+    /**
+     * Return whether the amber "A Request Body on a DELETE operation is ignored in OpenAPI 3.0.3 ..."
+     * banner (Issue #1610) is shown above the 'Endpoint Details' table. It appears only when the document
+     * targets an OpenAPI version earlier than 3.1 and at least one loaded operation is a {@code DELETE}
+     * carrying a {@code Request} message body.
+     *
+     * @return {@code true} when the banner is displayed
+     */
+    boolean isDeleteRequestBodyIgnoredWarningDisplayed();
+
+    /**
      * Open 'Add BIE for OpenAPI Document' dialog.
      *
      * @return 'Add BIE for OpenAPI Document' dialog

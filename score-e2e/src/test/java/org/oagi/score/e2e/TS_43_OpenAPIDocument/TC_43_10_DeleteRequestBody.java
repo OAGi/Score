@@ -69,6 +69,11 @@ public class TC_43_10_DeleteRequestBody extends BaseTest {
         fixture.editPage.hitUpdateButton();
         assignBie(fixture.editPage, fixture.bie, "DELETE", "Request");
 
+        // Sync on the assigned row so the operation list (and the banner state) has rendered.
+        fixture.editPage.getTableRecordByValue(fixture.bie.getDen());
+        assertFalse(fixture.editPage.isDeleteRequestBodyIgnoredWarningDisplayed(),
+                "An OpenAPI 3.1.1 document honors a DELETE request body, so no 'ignored DELETE body' banner is shown");
+
         OpenAPIDocumentExport export =
                 OpenAPIDocumentExport.from(fixture.editPage.clickGenerateAndDownload());
 
@@ -88,6 +93,11 @@ public class TC_43_10_DeleteRequestBody extends BaseTest {
         Fixture fixture = newDocumentWithBie();
         assignBie(fixture.editPage, fixture.bie, "DELETE", "Request");
 
+        // Sync on the assigned row so the operation list (and the banner state) has rendered.
+        fixture.editPage.getTableRecordByValue(fixture.bie.getDen());
+        assertTrue(fixture.editPage.isDeleteRequestBodyIgnoredWarningDisplayed(),
+                "An OpenAPI 3.0.3 document drops a DELETE request body, so the amber 'ignored DELETE body' banner is shown");
+
         OpenAPIDocumentExport export =
                 OpenAPIDocumentExport.from(fixture.editPage.clickGenerateAndDownload());
 
@@ -98,6 +108,8 @@ public class TC_43_10_DeleteRequestBody extends BaseTest {
                 "OpenAPI 3.0.3 should DROP the request body of a DELETE + Request operation");
         assertTrue(export.operationResponseCodes(deletePath, "delete").contains("202"),
                 "A DELETE + Request operation should still declare a status-only 202 (Accepted) success in 3.0.3");
+        assertTrue(export.schemaNames().isEmpty(),
+                "When the DELETE request body is dropped in 3.0.3, no orphan request schema is left in components/schemas");
     }
 
     @Test
