@@ -51,6 +51,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bcc.BccPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bccp.BccpPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccpManifestTag.BccpManifestTagPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BiePackage.BiePackagePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BieViewOrder.BieViewOrderPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtx.BizCtxPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeList.CodeListPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeListValue.CodeListValuePath;
@@ -805,6 +806,34 @@ public class AppUser extends TableImpl<AppUserRecord> {
             _biePackageOwnerUserIdFk = new BiePackagePath(this, null, Keys.BIE_PACKAGE_OWNER_USER_ID_FK.getInverseKey());
 
         return _biePackageOwnerUserIdFk;
+    }
+
+    private transient BieViewOrderPath _bieViewOrderCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.bie_view_order</code> table, via the
+     * <code>bie_view_order_created_by_fk</code> key
+     */
+    public BieViewOrderPath bieViewOrderCreatedByFk() {
+        if (_bieViewOrderCreatedByFk == null)
+            _bieViewOrderCreatedByFk = new BieViewOrderPath(this, null, Keys.BIE_VIEW_ORDER_CREATED_BY_FK.getInverseKey());
+
+        return _bieViewOrderCreatedByFk;
+    }
+
+    private transient BieViewOrderPath _bieViewOrderLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.bie_view_order</code> table, via the
+     * <code>bie_view_order_last_updated_by_fk</code> key
+     */
+    public BieViewOrderPath bieViewOrderLastUpdatedByFk() {
+        if (_bieViewOrderLastUpdatedByFk == null)
+            _bieViewOrderLastUpdatedByFk = new BieViewOrderPath(this, null, Keys.BIE_VIEW_ORDER_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _bieViewOrderLastUpdatedByFk;
     }
 
     private transient BizCtxPath _bizCtxCreatedByFk;

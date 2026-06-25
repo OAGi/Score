@@ -37,6 +37,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asbie.AsbiePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Ascc.AsccPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsccManifest.AsccManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsccpManifest.AsccpManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BieViewOrder.BieViewOrderPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Release.ReleasePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.SeqKey.SeqKeyPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AsccManifestRecord;
@@ -314,6 +315,19 @@ public class AsccManifest extends TableImpl<AsccManifestRecord> {
             _asbie = new AsbiePath(this, null, Keys.ASBIE_BASED_ASCC_MANIFEST_ID_FK.getInverseKey());
 
         return _asbie;
+    }
+
+    private transient BieViewOrderPath _bieViewOrder;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.bie_view_order</code> table
+     */
+    public BieViewOrderPath bieViewOrder() {
+        if (_bieViewOrder == null)
+            _bieViewOrder = new BieViewOrderPath(this, null, Keys.BIE_VIEW_ORDER_ASCC_MANIFEST_ID_FK.getInverseKey());
+
+        return _bieViewOrder;
     }
 
     @Override

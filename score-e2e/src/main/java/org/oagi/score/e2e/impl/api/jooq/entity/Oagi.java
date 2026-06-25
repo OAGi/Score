@@ -45,6 +45,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.BiePackage;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BiePackageTopLevelAsbiep;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BieUsageRule;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BieUserExtRevision;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BieViewOrder;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtx;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtxAssignment;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtxValue;
@@ -369,6 +370,12 @@ public class Oagi extends SchemaImpl {
      * user extension to the the OAGIS extension component/ACC.
      */
     public final BieUserExtRevision BIE_USER_EXT_REVISION = BieUserExtRevision.BIE_USER_EXT_REVISION;
+
+    /**
+     * Instance-level, release-decoupled sibling sort weights for model browsing
+     * and BIE editing (Issue #1638). NOT used for generated output.
+     */
+    public final BieViewOrder BIE_VIEW_ORDER = BieViewOrder.BIE_VIEW_ORDER;
 
     /**
      * This table represents a business context. A business context is a
@@ -925,6 +932,7 @@ public class Oagi extends SchemaImpl {
             BiePackageTopLevelAsbiep.BIE_PACKAGE_TOP_LEVEL_ASBIEP,
             BieUsageRule.BIE_USAGE_RULE,
             BieUserExtRevision.BIE_USER_EXT_REVISION,
+            BieViewOrder.BIE_VIEW_ORDER,
             BizCtx.BIZ_CTX,
             BizCtxAssignment.BIZ_CTX_ASSIGNMENT,
             BizCtxValue.BIZ_CTX_VALUE,

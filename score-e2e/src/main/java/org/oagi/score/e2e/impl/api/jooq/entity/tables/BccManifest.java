@@ -37,6 +37,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bbie.BbiePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bcc.BccPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccManifest.BccManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccpManifest.BccpManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BieViewOrder.BieViewOrderPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Release.ReleasePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.SeqKey.SeqKeyPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BccManifestRecord;
@@ -314,6 +315,19 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
             _bbie = new BbiePath(this, null, Keys.BBIE_BASED_BCC_MANIFEST_ID_FK.getInverseKey());
 
         return _bbie;
+    }
+
+    private transient BieViewOrderPath _bieViewOrder;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.bie_view_order</code> table
+     */
+    public BieViewOrderPath bieViewOrder() {
+        if (_bieViewOrder == null)
+            _bieViewOrder = new BieViewOrderPath(this, null, Keys.BIE_VIEW_ORDER_BCC_MANIFEST_ID_FK.getInverseKey());
+
+        return _bieViewOrder;
     }
 
     @Override

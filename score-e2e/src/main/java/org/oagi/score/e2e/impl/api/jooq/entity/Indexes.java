@@ -20,6 +20,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.BbieSc;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bbiep;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bcc;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bccp;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BieViewOrder;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtxAssignment;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Comment;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Dt;
@@ -66,6 +67,9 @@ public class Indexes {
     public static final Index BCC_BCC_LAST_UPDATE_TIMESTAMP_DESC_IDX = Internal.createIndex(DSL.name("bcc_last_update_timestamp_desc_idx"), Bcc.BCC, new OrderField[] { Bcc.BCC.LAST_UPDATE_TIMESTAMP }, false);
     public static final Index BCCP_BCCP_GUID_IDX = Internal.createIndex(DSL.name("bccp_guid_idx"), Bccp.BCCP, new OrderField[] { Bccp.BCCP.GUID }, false);
     public static final Index BCCP_BCCP_LAST_UPDATE_TIMESTAMP_DESC_IDX = Internal.createIndex(DSL.name("bccp_last_update_timestamp_desc_idx"), Bccp.BCCP, new OrderField[] { Bccp.BCCP.LAST_UPDATE_TIMESTAMP }, false);
+    public static final Index BIE_VIEW_ORDER_BIE_VIEW_ORDER_ASCC_MANIFEST_ID = Internal.createIndex(DSL.name("bie_view_order_ascc_manifest_id"), BieViewOrder.BIE_VIEW_ORDER, new OrderField[] { BieViewOrder.BIE_VIEW_ORDER.ASCC_MANIFEST_ID }, false);
+    public static final Index BIE_VIEW_ORDER_BIE_VIEW_ORDER_BCC_MANIFEST_ID = Internal.createIndex(DSL.name("bie_view_order_bcc_manifest_id"), BieViewOrder.BIE_VIEW_ORDER, new OrderField[] { BieViewOrder.BIE_VIEW_ORDER.BCC_MANIFEST_ID }, false);
+    public static final Index BIE_VIEW_ORDER_BIE_VIEW_ORDER_FROM_ACC_MANIFEST_ID = Internal.createIndex(DSL.name("bie_view_order_from_acc_manifest_id"), BieViewOrder.BIE_VIEW_ORDER, new OrderField[] { BieViewOrder.BIE_VIEW_ORDER.FROM_ACC_MANIFEST_ID }, false);
     public static final Index BIZ_CTX_ASSIGNMENT_BIZ_CTX_ID = Internal.createIndex(DSL.name("biz_ctx_id"), BizCtxAssignment.BIZ_CTX_ASSIGNMENT, new OrderField[] { BizCtxAssignment.BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID }, false);
     public static final Index DT_DT_GUID_IDX = Internal.createIndex(DSL.name("dt_guid_idx"), Dt.DT, new OrderField[] { Dt.DT.GUID }, false);
     public static final Index DT_DT_LAST_UPDATE_TIMESTAMP_DESC_IDX = Internal.createIndex(DSL.name("dt_last_update_timestamp_desc_idx"), Dt.DT, new OrderField[] { Dt.DT.LAST_UPDATE_TIMESTAMP }, false);

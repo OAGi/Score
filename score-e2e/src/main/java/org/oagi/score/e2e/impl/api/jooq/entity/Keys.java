@@ -44,6 +44,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.BiePackage;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BiePackageTopLevelAsbiep;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BieUsageRule;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BieUserExtRevision;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BieViewOrder;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtx;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtxAssignment;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtxValue;
@@ -168,6 +169,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BiePackageRecord;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BiePackageTopLevelAsbiepRecord;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BieUsageRuleRecord;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BieUserExtRevisionRecord;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BieViewOrderRecord;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BizCtxAssignmentRecord;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BizCtxRecord;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BizCtxValueRecord;
@@ -309,6 +311,9 @@ public class Keys {
     public static final UniqueKey<BiePackageTopLevelAsbiepRecord> KEY_BIE_PACKAGE_TOP_LEVEL_ASBIEP_PRIMARY = Internal.createUniqueKey(BiePackageTopLevelAsbiep.BIE_PACKAGE_TOP_LEVEL_ASBIEP, DSL.name("KEY_bie_package_top_level_asbiep_PRIMARY"), new TableField[] { BiePackageTopLevelAsbiep.BIE_PACKAGE_TOP_LEVEL_ASBIEP.BIE_PACKAGE_TOP_LEVEL_ASBIEP_ID }, true);
     public static final UniqueKey<BieUsageRuleRecord> KEY_BIE_USAGE_RULE_PRIMARY = Internal.createUniqueKey(BieUsageRule.BIE_USAGE_RULE, DSL.name("KEY_bie_usage_rule_PRIMARY"), new TableField[] { BieUsageRule.BIE_USAGE_RULE.BIE_USAGE_RULE_ID }, true);
     public static final UniqueKey<BieUserExtRevisionRecord> KEY_BIE_USER_EXT_REVISION_PRIMARY = Internal.createUniqueKey(BieUserExtRevision.BIE_USER_EXT_REVISION, DSL.name("KEY_bie_user_ext_revision_PRIMARY"), new TableField[] { BieUserExtRevision.BIE_USER_EXT_REVISION.BIE_USER_EXT_REVISION_ID }, true);
+    public static final UniqueKey<BieViewOrderRecord> KEY_BIE_VIEW_ORDER_BIE_VIEW_ORDER_ASCC_UK = Internal.createUniqueKey(BieViewOrder.BIE_VIEW_ORDER, DSL.name("KEY_bie_view_order_bie_view_order_ascc_uk"), new TableField[] { BieViewOrder.BIE_VIEW_ORDER.FROM_ACC_MANIFEST_ID, BieViewOrder.BIE_VIEW_ORDER.ASCC_MANIFEST_ID }, true);
+    public static final UniqueKey<BieViewOrderRecord> KEY_BIE_VIEW_ORDER_BIE_VIEW_ORDER_BCC_UK = Internal.createUniqueKey(BieViewOrder.BIE_VIEW_ORDER, DSL.name("KEY_bie_view_order_bie_view_order_bcc_uk"), new TableField[] { BieViewOrder.BIE_VIEW_ORDER.FROM_ACC_MANIFEST_ID, BieViewOrder.BIE_VIEW_ORDER.BCC_MANIFEST_ID }, true);
+    public static final UniqueKey<BieViewOrderRecord> KEY_BIE_VIEW_ORDER_PRIMARY = Internal.createUniqueKey(BieViewOrder.BIE_VIEW_ORDER, DSL.name("KEY_bie_view_order_PRIMARY"), new TableField[] { BieViewOrder.BIE_VIEW_ORDER.BIE_VIEW_ORDER_ID }, true);
     public static final UniqueKey<BizCtxRecord> KEY_BIZ_CTX_BIZ_CTX_UK1 = Internal.createUniqueKey(BizCtx.BIZ_CTX, DSL.name("KEY_biz_ctx_biz_ctx_uk1"), new TableField[] { BizCtx.BIZ_CTX.GUID }, true);
     public static final UniqueKey<BizCtxRecord> KEY_BIZ_CTX_PRIMARY = Internal.createUniqueKey(BizCtx.BIZ_CTX, DSL.name("KEY_biz_ctx_PRIMARY"), new TableField[] { BizCtx.BIZ_CTX.BIZ_CTX_ID }, true);
     public static final UniqueKey<BizCtxAssignmentRecord> KEY_BIZ_CTX_ASSIGNMENT_BIZ_CTX_ASSIGNMENT_UK = Internal.createUniqueKey(BizCtxAssignment.BIZ_CTX_ASSIGNMENT, DSL.name("KEY_biz_ctx_assignment_biz_ctx_assignment_uk"), new TableField[] { BizCtxAssignment.BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID, BizCtxAssignment.BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID }, true);
@@ -613,6 +618,11 @@ public class Keys {
     public static final ForeignKey<BieUserExtRevisionRecord, AccRecord> BIE_USER_EXT_REVISION_EXT_ACC_ID_FK = ForeignKeys0.BIE_USER_EXT_REVISION_EXT_ACC_ID_FK;
     public static final ForeignKey<BieUserExtRevisionRecord, TopLevelAsbiepRecord> BIE_USER_EXT_REVISION_TOP_LEVEL_ASBIEP_ID_FK = ForeignKeys0.BIE_USER_EXT_REVISION_TOP_LEVEL_ASBIEP_ID_FK;
     public static final ForeignKey<BieUserExtRevisionRecord, AccRecord> BIE_USER_EXT_REVISION_USER_EXT_ACC_ID_FK = ForeignKeys0.BIE_USER_EXT_REVISION_USER_EXT_ACC_ID_FK;
+    public static final ForeignKey<BieViewOrderRecord, AsccManifestRecord> BIE_VIEW_ORDER_ASCC_MANIFEST_ID_FK = ForeignKeys0.BIE_VIEW_ORDER_ASCC_MANIFEST_ID_FK;
+    public static final ForeignKey<BieViewOrderRecord, BccManifestRecord> BIE_VIEW_ORDER_BCC_MANIFEST_ID_FK = ForeignKeys0.BIE_VIEW_ORDER_BCC_MANIFEST_ID_FK;
+    public static final ForeignKey<BieViewOrderRecord, AppUserRecord> BIE_VIEW_ORDER_CREATED_BY_FK = ForeignKeys0.BIE_VIEW_ORDER_CREATED_BY_FK;
+    public static final ForeignKey<BieViewOrderRecord, AccManifestRecord> BIE_VIEW_ORDER_FROM_ACC_MANIFEST_ID_FK = ForeignKeys0.BIE_VIEW_ORDER_FROM_ACC_MANIFEST_ID_FK;
+    public static final ForeignKey<BieViewOrderRecord, AppUserRecord> BIE_VIEW_ORDER_LAST_UPDATED_BY_FK = ForeignKeys0.BIE_VIEW_ORDER_LAST_UPDATED_BY_FK;
     public static final ForeignKey<BizCtxRecord, AppUserRecord> BIZ_CTX_CREATED_BY_FK = ForeignKeys0.BIZ_CTX_CREATED_BY_FK;
     public static final ForeignKey<BizCtxRecord, AppUserRecord> BIZ_CTX_LAST_UPDATED_BY_FK = ForeignKeys0.BIZ_CTX_LAST_UPDATED_BY_FK;
     public static final ForeignKey<BizCtxAssignmentRecord, BizCtxRecord> BIZ_CTX_ASSIGNMENT_BIZ_CTX_ID_FK = ForeignKeys0.BIZ_CTX_ASSIGNMENT_BIZ_CTX_ID_FK;
@@ -923,11 +933,11 @@ public class Keys {
     public static final ForeignKey<XbtRecord, AppUserRecord> XBT_LAST_UPDATED_BY_FK = ForeignKeys0.XBT_LAST_UPDATED_BY_FK;
     public static final ForeignKey<XbtRecord, AppUserRecord> XBT_OWNER_USER_ID_FK = ForeignKeys0.XBT_OWNER_USER_ID_FK;
     public static final ForeignKey<XbtRecord, XbtRecord> XBT_SUBTYPE_OF_XBT_ID_FK = ForeignKeys0.XBT_SUBTYPE_OF_XBT_ID_FK;
-    public static final ForeignKey<XbtManifestRecord, CdtPriRecord> XBT_MANIFEST_CDT_PRI_ID_FK = ForeignKeys0.XBT_MANIFEST_CDT_PRI_ID_FK;
-    public static final ForeignKey<XbtManifestRecord, LogRecord> XBT_MANIFEST_LOG_ID_FK = ForeignKeys0.XBT_MANIFEST_LOG_ID_FK;
-    public static final ForeignKey<XbtManifestRecord, XbtManifestRecord> XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK = ForeignKeys0.XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK;
-    public static final ForeignKey<XbtManifestRecord, XbtManifestRecord> XBT_MANIFEST_PREV_XBT_MANIFEST_ID_FK = ForeignKeys0.XBT_MANIFEST_PREV_XBT_MANIFEST_ID_FK;
-    public static final ForeignKey<XbtManifestRecord, ReleaseRecord> XBT_MANIFEST_RELEASE_ID_FK = ForeignKeys0.XBT_MANIFEST_RELEASE_ID_FK;
+    public static final ForeignKey<XbtManifestRecord, CdtPriRecord> XBT_MANIFEST_CDT_PRI_ID_FK = ForeignKeys1.XBT_MANIFEST_CDT_PRI_ID_FK;
+    public static final ForeignKey<XbtManifestRecord, LogRecord> XBT_MANIFEST_LOG_ID_FK = ForeignKeys1.XBT_MANIFEST_LOG_ID_FK;
+    public static final ForeignKey<XbtManifestRecord, XbtManifestRecord> XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK = ForeignKeys1.XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK;
+    public static final ForeignKey<XbtManifestRecord, XbtManifestRecord> XBT_MANIFEST_PREV_XBT_MANIFEST_ID_FK = ForeignKeys1.XBT_MANIFEST_PREV_XBT_MANIFEST_ID_FK;
+    public static final ForeignKey<XbtManifestRecord, ReleaseRecord> XBT_MANIFEST_RELEASE_ID_FK = ForeignKeys1.XBT_MANIFEST_RELEASE_ID_FK;
     public static final ForeignKey<XbtManifestRecord, XbtRecord> XBT_MANIFEST_XBT_ID_FK = ForeignKeys1.XBT_MANIFEST_XBT_ID_FK;
 
     // -------------------------------------------------------------------------
@@ -1120,6 +1130,11 @@ public class Keys {
         public static final ForeignKey<BieUserExtRevisionRecord, AccRecord> BIE_USER_EXT_REVISION_EXT_ACC_ID_FK = Internal.createForeignKey(BieUserExtRevision.BIE_USER_EXT_REVISION, DSL.name("bie_user_ext_revision_ext_acc_id_fk"), new TableField[] { BieUserExtRevision.BIE_USER_EXT_REVISION.EXT_ACC_ID }, Keys.KEY_ACC_PRIMARY, new TableField[] { Acc.ACC.ACC_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<BieUserExtRevisionRecord, TopLevelAsbiepRecord> BIE_USER_EXT_REVISION_TOP_LEVEL_ASBIEP_ID_FK = Internal.createForeignKey(BieUserExtRevision.BIE_USER_EXT_REVISION, DSL.name("bie_user_ext_revision_top_level_asbiep_id_fk"), new TableField[] { BieUserExtRevision.BIE_USER_EXT_REVISION.TOP_LEVEL_ASBIEP_ID }, Keys.KEY_TOP_LEVEL_ASBIEP_PRIMARY, new TableField[] { TopLevelAsbiep.TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<BieUserExtRevisionRecord, AccRecord> BIE_USER_EXT_REVISION_USER_EXT_ACC_ID_FK = Internal.createForeignKey(BieUserExtRevision.BIE_USER_EXT_REVISION, DSL.name("bie_user_ext_revision_user_ext_acc_id_fk"), new TableField[] { BieUserExtRevision.BIE_USER_EXT_REVISION.USER_EXT_ACC_ID }, Keys.KEY_ACC_PRIMARY, new TableField[] { Acc.ACC.ACC_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
+        public static final ForeignKey<BieViewOrderRecord, AsccManifestRecord> BIE_VIEW_ORDER_ASCC_MANIFEST_ID_FK = Internal.createForeignKey(BieViewOrder.BIE_VIEW_ORDER, DSL.name("bie_view_order_ascc_manifest_id_fk"), new TableField[] { BieViewOrder.BIE_VIEW_ORDER.ASCC_MANIFEST_ID }, Keys.KEY_ASCC_MANIFEST_PRIMARY, new TableField[] { AsccManifest.ASCC_MANIFEST.ASCC_MANIFEST_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
+        public static final ForeignKey<BieViewOrderRecord, BccManifestRecord> BIE_VIEW_ORDER_BCC_MANIFEST_ID_FK = Internal.createForeignKey(BieViewOrder.BIE_VIEW_ORDER, DSL.name("bie_view_order_bcc_manifest_id_fk"), new TableField[] { BieViewOrder.BIE_VIEW_ORDER.BCC_MANIFEST_ID }, Keys.KEY_BCC_MANIFEST_PRIMARY, new TableField[] { BccManifest.BCC_MANIFEST.BCC_MANIFEST_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
+        public static final ForeignKey<BieViewOrderRecord, AppUserRecord> BIE_VIEW_ORDER_CREATED_BY_FK = Internal.createForeignKey(BieViewOrder.BIE_VIEW_ORDER, DSL.name("bie_view_order_created_by_fk"), new TableField[] { BieViewOrder.BIE_VIEW_ORDER.CREATED_BY }, Keys.KEY_APP_USER_PRIMARY, new TableField[] { AppUser.APP_USER.APP_USER_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
+        public static final ForeignKey<BieViewOrderRecord, AccManifestRecord> BIE_VIEW_ORDER_FROM_ACC_MANIFEST_ID_FK = Internal.createForeignKey(BieViewOrder.BIE_VIEW_ORDER, DSL.name("bie_view_order_from_acc_manifest_id_fk"), new TableField[] { BieViewOrder.BIE_VIEW_ORDER.FROM_ACC_MANIFEST_ID }, Keys.KEY_ACC_MANIFEST_PRIMARY, new TableField[] { AccManifest.ACC_MANIFEST.ACC_MANIFEST_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
+        public static final ForeignKey<BieViewOrderRecord, AppUserRecord> BIE_VIEW_ORDER_LAST_UPDATED_BY_FK = Internal.createForeignKey(BieViewOrder.BIE_VIEW_ORDER, DSL.name("bie_view_order_last_updated_by_fk"), new TableField[] { BieViewOrder.BIE_VIEW_ORDER.LAST_UPDATED_BY }, Keys.KEY_APP_USER_PRIMARY, new TableField[] { AppUser.APP_USER.APP_USER_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<BizCtxRecord, AppUserRecord> BIZ_CTX_CREATED_BY_FK = Internal.createForeignKey(BizCtx.BIZ_CTX, DSL.name("biz_ctx_created_by_fk"), new TableField[] { BizCtx.BIZ_CTX.CREATED_BY }, Keys.KEY_APP_USER_PRIMARY, new TableField[] { AppUser.APP_USER.APP_USER_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<BizCtxRecord, AppUserRecord> BIZ_CTX_LAST_UPDATED_BY_FK = Internal.createForeignKey(BizCtx.BIZ_CTX, DSL.name("biz_ctx_last_updated_by_fk"), new TableField[] { BizCtx.BIZ_CTX.LAST_UPDATED_BY }, Keys.KEY_APP_USER_PRIMARY, new TableField[] { AppUser.APP_USER.APP_USER_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<BizCtxAssignmentRecord, BizCtxRecord> BIZ_CTX_ASSIGNMENT_BIZ_CTX_ID_FK = Internal.createForeignKey(BizCtxAssignment.BIZ_CTX_ASSIGNMENT, DSL.name("biz_ctx_assignment_biz_ctx_id_fk"), new TableField[] { BizCtxAssignment.BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID }, Keys.KEY_BIZ_CTX_PRIMARY, new TableField[] { BizCtx.BIZ_CTX.BIZ_CTX_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
@@ -1430,14 +1445,14 @@ public class Keys {
         public static final ForeignKey<XbtRecord, AppUserRecord> XBT_LAST_UPDATED_BY_FK = Internal.createForeignKey(Xbt.XBT, DSL.name("xbt_last_updated_by_fk"), new TableField[] { Xbt.XBT.LAST_UPDATED_BY }, Keys.KEY_APP_USER_PRIMARY, new TableField[] { AppUser.APP_USER.APP_USER_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<XbtRecord, AppUserRecord> XBT_OWNER_USER_ID_FK = Internal.createForeignKey(Xbt.XBT, DSL.name("xbt_owner_user_id_fk"), new TableField[] { Xbt.XBT.OWNER_USER_ID }, Keys.KEY_APP_USER_PRIMARY, new TableField[] { AppUser.APP_USER.APP_USER_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<XbtRecord, XbtRecord> XBT_SUBTYPE_OF_XBT_ID_FK = Internal.createForeignKey(Xbt.XBT, DSL.name("xbt_subtype_of_xbt_id_fk"), new TableField[] { Xbt.XBT.SUBTYPE_OF_XBT_ID }, Keys.KEY_XBT_PRIMARY, new TableField[] { Xbt.XBT.XBT_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
+    }
+
+    private static class ForeignKeys1 {
         public static final ForeignKey<XbtManifestRecord, CdtPriRecord> XBT_MANIFEST_CDT_PRI_ID_FK = Internal.createForeignKey(XbtManifest.XBT_MANIFEST, DSL.name("xbt_manifest_cdt_pri_id_fk"), new TableField[] { XbtManifest.XBT_MANIFEST.CDT_PRI_ID }, Keys.KEY_CDT_PRI_PRIMARY, new TableField[] { CdtPri.CDT_PRI.CDT_PRI_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<XbtManifestRecord, LogRecord> XBT_MANIFEST_LOG_ID_FK = Internal.createForeignKey(XbtManifest.XBT_MANIFEST, DSL.name("xbt_manifest_log_id_fk"), new TableField[] { XbtManifest.XBT_MANIFEST.LOG_ID }, Keys.KEY_LOG_PRIMARY, new TableField[] { Log.LOG.LOG_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<XbtManifestRecord, XbtManifestRecord> XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK = Internal.createForeignKey(XbtManifest.XBT_MANIFEST, DSL.name("xbt_manifest_next_xbt_manifest_id_fk"), new TableField[] { XbtManifest.XBT_MANIFEST.NEXT_XBT_MANIFEST_ID }, Keys.KEY_XBT_MANIFEST_PRIMARY, new TableField[] { XbtManifest.XBT_MANIFEST.XBT_MANIFEST_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<XbtManifestRecord, XbtManifestRecord> XBT_MANIFEST_PREV_XBT_MANIFEST_ID_FK = Internal.createForeignKey(XbtManifest.XBT_MANIFEST, DSL.name("xbt_manifest_prev_xbt_manifest_id_fk"), new TableField[] { XbtManifest.XBT_MANIFEST.PREV_XBT_MANIFEST_ID }, Keys.KEY_XBT_MANIFEST_PRIMARY, new TableField[] { XbtManifest.XBT_MANIFEST.XBT_MANIFEST_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<XbtManifestRecord, ReleaseRecord> XBT_MANIFEST_RELEASE_ID_FK = Internal.createForeignKey(XbtManifest.XBT_MANIFEST, DSL.name("xbt_manifest_release_id_fk"), new TableField[] { XbtManifest.XBT_MANIFEST.RELEASE_ID }, Keys.KEY_RELEASE_PRIMARY, new TableField[] { Release.RELEASE.RELEASE_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
-    }
-
-    private static class ForeignKeys1 {
         public static final ForeignKey<XbtManifestRecord, XbtRecord> XBT_MANIFEST_XBT_ID_FK = Internal.createForeignKey(XbtManifest.XBT_MANIFEST, DSL.name("xbt_manifest_xbt_id_fk"), new TableField[] { XbtManifest.XBT_MANIFEST.XBT_ID }, Keys.KEY_XBT_PRIMARY, new TableField[] { Xbt.XBT.XBT_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
     }
 }

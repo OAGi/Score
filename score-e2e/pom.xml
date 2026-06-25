@@ -40,7 +40,7 @@
         <snakeyaml.version>2.5</snakeyaml.version>
         <mariadb-client.version>3.5.7</mariadb-client.version>
         <hikariCP.version>6.3.3</hikariCP.version>
-        <jOOQ.version>3.20.12</jOOQ.version>
+        <jOOQ.version>3.20.17</jOOQ.version>
         <json.version>20250517</json.version>
     </properties>
 
