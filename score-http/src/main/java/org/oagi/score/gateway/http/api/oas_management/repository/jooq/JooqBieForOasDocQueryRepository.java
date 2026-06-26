@@ -57,6 +57,10 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
                         ASCCP.ASCCP_ID,
                         ASBIEP.GUID,
                         ASCCP_MANIFEST.DEN,
+                        // Issue #1492: the property term is the stable identity the assign dialog's
+                        // duplicate-body pre-check keys on (the backend derives the resource path from it),
+                        // so the document's existing rows must carry it too.
+                        ASCCP.PROPERTY_TERM,
                         RELEASE.RELEASE_NUM,
                         ASBIEP.REMARK,
                         inline("Request").as("oas_doc_message_body_type"),
@@ -108,6 +112,9 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
                         ASCCP.ASCCP_ID,
                         ASBIEP.GUID,
                         ASCCP_MANIFEST.DEN,
+                        // Issue #1492: see selectForRequest -- the duplicate-body pre-check keys on the
+                        // property term, so existing Response rows must carry it too (union column parity).
+                        ASCCP.PROPERTY_TERM,
                         RELEASE.RELEASE_NUM,
                         ASBIEP.REMARK,
                         inline("Response").as("oas_doc_message_body_type"),
@@ -157,6 +164,8 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
                 bieForOasDoc.setState(BieState.valueOf(record.get(TOP_LEVEL_ASBIEP.STATE)));
                 bieForOasDoc.setVersion(record.get(TOP_LEVEL_ASBIEP.VERSION));
                 bieForOasDoc.setDen(record.get(ASCCP_MANIFEST.DEN));
+                // Issue #1492: feed the assign dialog's client-side duplicate-body pre-check.
+                bieForOasDoc.setPropertyTerm(record.get(ASCCP.PROPERTY_TERM));
                 bieForOasDoc.setReleaseNum(record.get(RELEASE.RELEASE_NUM));
                 bieForOasDoc.setRemark(record.get(ASBIEP.REMARK));
                 bieForOasDoc.setGuid(record.get(ASCCP.GUID));

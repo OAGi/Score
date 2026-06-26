@@ -278,6 +278,9 @@
                   <mat-option value="DELETE">DELETE</mat-option>
                   <mat-option value="PATCH">PATCH</mat-option>
                 </mat-select>
+                <!-- Issue #1492 (Option 2): the duplicate-body-slot sentence is surfaced only on the
+                     Resource Name column (with the specific "Duplicate <body>" note on Message Body), so
+                     it is intentionally not repeated here. -->
               </td>
             </ng-container>
 
@@ -304,12 +307,18 @@
               <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="messageBody"
                   score-table-column-resize [defaultWidth]="width('Message Body')" (onResize)="onResizeWidth($event)"> Message Body</th>
               <td mat-cell *matCellDef="let element">
-                <mat-select [(ngModel)]="element.messageBody" [panelWidth]="null" [disabled]="!element.topLevelAsbiepId">
+                <mat-select [(ngModel)]="element.messageBody" [panelWidth]="null" [disabled]="!element.topLevelAsbiepId"
+                            (ngModelChange)="recomputeDuplicateBodySlots()"
+                            [class.oas-body-slot-error]="isDuplicateBodySlot(element)">
                   <!-- Issue #1610: GET never carries a request body. DELETE may, in any version; in 3.0.3
                        it is dropped from the generated document (see the banner above the table). -->
                   <mat-option value="Request" [disabled]="element.verb === 'GET'">Request</mat-option>
                   <mat-option value="Response">Response</mat-option>
                 </mat-select>
+                @if (isDuplicateBodySlot(element)) {
+                  <!-- Issue #1492 (Option 2): duplicate body on this (path, verb). -->
+                  <div class="oas-body-slot-error-text">Duplicate {{ element.messageBody }} body on this endpoint.</div>
+                }
               </td>
             </ng-container>
 
@@ -318,7 +327,12 @@
                   score-table-column-resize [defaultWidth]="width('Resource Name')" (onResize)="onResizeWidth($event)"> Resource Name</th>
               <td mat-cell *matCellDef="let element">
                 <mat-form-field>
-                  <input matInput [(ngModel)]="element.resourceName">
+                  <input matInput [(ngModel)]="element.resourceName"
+                         (ngModelChange)="recomputeDuplicateBodySlots()"
+                         [errorStateMatcher]="bodySlotErrorStateMatcher(element)">
+                  <!-- Issue #1492 (Option 2): the resource name is part of the (path, verb) key, so a
+                       duplicate body slot is surfaced here too. -->
+                  <mat-error>Each (Resource Name, Verb) can have only one Request and one Response body.</mat-error>
                 </mat-form-field>
               </td>
             </ng-container>

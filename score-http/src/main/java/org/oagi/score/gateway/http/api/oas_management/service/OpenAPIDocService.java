@@ -186,15 +186,18 @@ public class OpenAPIDocService {
                 .setTimestamp(millis)
                 .execute();
 
-        OasResourceId oasResourceId = new InsertOasResourceArguments(command)
+        // Issue #1492: find-or-create the (oasDocId, path) resource and the
+        // (resourceId, verb) operation so a Request BIE and a Response BIE for one endpoint share
+        // ONE oas_operation instead of minting two distinct operations on the same (path, verb).
+        OasResourceId oasResourceId = command.findOrCreateOasResource(new InsertOasResourceArguments(command)
                 .setUserId(userId)
                 .setOasDocId(request.getOasDocId())
                 .setPath(request.getPath())
                 .setRef(request.getRef())
-                .setTimestamp(millis)
-                .execute();
+                .setTimestamp(millis));
 
-        OasOperationId oasOperationId = new InsertOasOperationArguments(command)
+        boolean operationExisted = command.findOasOperationId(oasResourceId, request.getVerb()) != null;
+        OasOperationId oasOperationId = command.findOrCreateOasOperation(new InsertOasOperationArguments(command)
                 .setUserId(userId)
                 .setOperationId(request.getOperationId())
                 .setOasResourceId(oasResourceId)
@@ -202,10 +205,14 @@ public class OpenAPIDocService {
                 .setSummary(request.getSummary())
                 .setDescription(request.getDescriptionForOperation())
                 .setDeprecated(request.isDeprecatedForOperation())
-                .setTimestamp(millis)
-                .execute();
+                .setTimestamp(millis));
 
-        if (request.getTagName() != null && !request.getTagName().isBlank()) {
+        // Issue #1492: reject a 2nd Request (or 2nd Response) on a (path, verb) that already has one.
+        assertOperationHasNoBodyOfType(command, oasOperationId, request.isOasRequest(),
+                request.getVerb(), request.getPath());
+
+        // Issue #1492: only tag a NEWLY created operation; do not duplicate tags on an existing op.
+        if (!operationExisted && request.getTagName() != null && !request.getTagName().isBlank()) {
             OasTagId oasTagId = new InsertOasTagArguments(command)
                     .setUserId(userId)
                     .setGuid(randomGuid())
@@ -281,15 +288,17 @@ public class OpenAPIDocService {
                 .setTimestamp(millis)
                 .execute();
 
-        OasResourceId oasResourceId = new InsertOasResourceArguments(command)
+        // Issue #1492: find-or-create the (oasDocId, path) resource + (resourceId, verb)
+        // operation so a bodyless add attaches to the SAME operation that a sibling body uses.
+        OasResourceId oasResourceId = command.findOrCreateOasResource(new InsertOasResourceArguments(command)
                 .setUserId(userId)
                 .setOasDocId(request.getOasDocId())
                 .setPath(request.getPath())
                 .setRef(request.getRef())
-                .setTimestamp(millis)
-                .execute();
+                .setTimestamp(millis));
 
-        OasOperationId oasOperationId = new InsertOasOperationArguments(command)
+        boolean operationExisted = command.findOasOperationId(oasResourceId, request.getVerb()) != null;
+        OasOperationId oasOperationId = command.findOrCreateOasOperation(new InsertOasOperationArguments(command)
                 .setUserId(userId)
                 .setOperationId(request.getOperationId())
                 .setOasResourceId(oasResourceId)
@@ -297,10 +306,14 @@ public class OpenAPIDocService {
                 .setSummary(request.getSummary())
                 .setDescription(request.getDescription())
                 .setDeprecated(false)
-                .setTimestamp(millis)
-                .execute();
+                .setTimestamp(millis));
 
-        if (request.getTagName() != null && !request.getTagName().isBlank()) {
+        // Issue #1492: reject a 2nd Request (or 2nd Response) on a (path, verb) that already has one.
+        assertOperationHasNoBodyOfType(command, oasOperationId, request.isOasRequest(),
+                request.getVerb(), request.getPath());
+
+        // Issue #1492: only tag a NEWLY created operation; do not duplicate tags on an existing op.
+        if (!operationExisted && request.getTagName() != null && !request.getTagName().isBlank()) {
             OasTagId oasTagId = new InsertOasTagArguments(command)
                     .setUserId(userId)
                     .setGuid(randomGuid())
@@ -351,6 +364,23 @@ public class OpenAPIDocService {
         }
 
         return new AddBieForOasDocResponse(oasRequestId, oasResponseId);
+    }
+
+    /**
+     * Issue #1492: an operation can own at most one Request and one Response body.
+     * Throws an {@link IllegalArgumentException} (mapped to HTTP 400) when the operation already has a
+     * body of the requested type, with the message contracted in the plan (§3.1).
+     */
+    private void assertOperationHasNoBodyOfType(org.oagi.score.gateway.http.api.oas_management.repository.OasDocCommandRepository command,
+                                                OasOperationId oasOperationId, boolean isRequest,
+                                                String verb, String path) {
+        if (command.operationHasBody(oasOperationId, isRequest)) {
+            String bodyType = isRequest ? "Request" : "Response";
+            String verbLabel = (verb == null) ? "" : verb.toUpperCase();
+            throw new IllegalArgumentException(
+                    "This operation (" + verbLabel + " " + path + ") already has a " + bodyType
+                            + " body. An operation can have at most one Request and one Response body.");
+        }
     }
 
     private void validateOasDocRequest(String openApiVersion,

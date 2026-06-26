@@ -325,6 +325,11 @@
                     <mat-error>
                       Message Body is required.
                     </mat-error>
+                  } @else if (isSelected(element) && isDuplicateBodySlotForAdd(element)) {
+                    <!-- Issue #1492 (Option 2): this (verb, message body) already exists on the document. -->
+                    <mat-error>
+                      This endpoint already has a {{ messageBodySelection[element.topLevelAsbiepId] }} body.
+                    </mat-error>
                   }
                 </td>
               </ng-container>
@@ -353,7 +358,7 @@
   </div>
   <div class="actions ms-auto" mat-dialog-actions>
     <button mat-raised-button class="me-2" (click)="addBieForOasDoc()" color="primary"
-      [disabled]="selection.isEmpty() || isOptionMissing()">
+      [disabled]="loading || selection.isEmpty() || isOptionMissing() || hasDuplicateBodySlotSelected()">
       <mat-icon>add</mat-icon>
       <span class="ps-2">Add</span>
     </button>

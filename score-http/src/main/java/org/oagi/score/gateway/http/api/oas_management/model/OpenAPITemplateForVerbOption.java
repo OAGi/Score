@@ -16,6 +16,12 @@ public class OpenAPITemplateForVerbOption {
     private Operation verbOption;
     private String resourceName;
     private String operationId;
+
+    // The owning oas_operation's id. One operation produces up to two templates (Request + Response) that
+    // share this id, so it lets generation tell that normal Request/Response split apart from a real
+    // collision: two DISTINCT operations resolving to the same (path, verb) — an illegal collapse in the
+    // emitted document (a path-item can hold only one operation per verb).
+    private OasOperationId oasOperationId;
     private String tagName;
     private String messageBodyType;
     private Integer httpStatusCode;

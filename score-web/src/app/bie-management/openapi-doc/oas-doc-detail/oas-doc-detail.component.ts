@@ -309,6 +309,30 @@ export class OasDocDetailComponent implements OnInit {
     }
   };
 
+  // Issue #1492 (Option 2): one oas_operation = one (path, verb) endpoint owning at most one Request
+  // body and at most one Response body. A second Request (or second Response) on the same
+  // (Resource Name, Verb) is a true duplicate. As with the operationId guard, collisions among the
+  // loaded rows are flagged as a mat-error on the Verb / Message Body / Resource Name cells (the
+  // backend 400 is the source of truth). Keyed `${resourceName}|${verb}|${messageBody}`.
+  duplicateBodySlots = new Set<string>();
+
+  // The body-slot key is composite (Resource Name + Verb + Message Body), so the error state is
+  // computed per row rather than from a single control value (cf. operationIdErrorStateMatcher, whose
+  // key IS the control value). Each cell binds a per-row matcher built by bodySlotErrorStateMatcher().
+  bodySlotKey(row: BieForOasDoc): string {
+    return `${(row.resourceName || '').trim()}|${row.verb || ''}|${row.messageBody || ''}`;
+  }
+
+  isDuplicateBodySlot(row: BieForOasDoc): boolean {
+    return this.duplicateBodySlots.has(this.bodySlotKey(row));
+  }
+
+  bodySlotErrorStateMatcher(row: BieForOasDoc): ErrorStateMatcher {
+    return {
+      isErrorState: (): boolean => this.isDuplicateBodySlot(row)
+    };
+  }
+
   @ViewChild(MatMultiSort, {static: true}) sort: MatMultiSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
@@ -803,6 +827,7 @@ export class OasDocDetailComponent implements OnInit {
         this.committedErrorResponseBodyType.set(elm, elm.errorResponseBodyType || 'NONE');
       });
       this.recomputeDuplicateOperationIds();
+      this.recomputeDuplicateBodySlots();
 
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
@@ -945,6 +970,14 @@ export class OasDocDetailComponent implements OnInit {
     const blankOperationId = this.getChanged().some(e => !e.operationId || !e.operationId.trim());
     if (blankOperationId) {
       this.snackBar.open('Operation ID is required.', '', {duration: 3000});
+      return;
+    }
+
+    // Issue #1492 (Option 2): block an update that would leave two same-type bodies on one (path, verb).
+    // The backend rejects this with a 400 as well; this gives immediate feedback before the round trip.
+    this.recomputeDuplicateBodySlots();
+    if (this.duplicateBodySlots.size > 0) {
+      this.snackBar.open('Each (Resource Name, Verb) can have only one Request and one Response body.', '', {duration: 5000});
       return;
     }
 
@@ -1096,20 +1129,54 @@ export class OasDocDetailComponent implements OnInit {
     this.table.dataSource.data = data;
     this.oasDoc.bieList = data;
     this.recomputeDuplicateOperationIds();
+    this.recomputeDuplicateBodySlots();
   }
 
-  // Recomputes the set of operationIds that occur more than once among the loaded operations.
-  // Note: the list is server-paginated, so this validates within the currently loaded rows.
+  // Recomputes the set of operationIds that are shared across MORE THAN ONE operation.
+  // OpenAPI requires operationId to be unique among operations; an operation is a (resourceName, verb)
+  // endpoint (#1492), which may surface as two rows — a Request body and a Response body — that
+  // legitimately share one operationId. So we group rows by operationId and count the DISTINCT
+  // operations (resourceName|verb, messageBody EXCLUDED) each operationId spans: only when an
+  // operationId belongs to 2+ distinct operations is it a real duplicate. The complementary
+  // recomputeDuplicateBodySlots() (keyed on resourceName|verb|messageBody) owns the "two Request (or
+  // two Response) bodies on one endpoint" case. Note: the list is server-paginated, so this validates
+  // within the currently loaded rows; the backend 400 is the source of truth.
   recomputeDuplicateOperationIds(): void {
-    const counts = new Map<string, number>();
+    const operationsByOperationId = new Map<string, Set<string>>();
     for (const row of (this.table?.dataSource?.data || [])) {
       const id = (row.operationId || '').trim();
-      if (id) {
-        counts.set(id, (counts.get(id) || 0) + 1);
+      if (!id) {
+        continue;
       }
+      const operationKey = `${(row.resourceName || '').trim()}|${row.verb || ''}`;
+      let operations = operationsByOperationId.get(id);
+      if (!operations) {
+        operations = new Set<string>();
+        operationsByOperationId.set(id, operations);
+      }
+      operations.add(operationKey);
     }
     this.duplicateOperationIds = new Set<string>(
-      Array.from(counts.entries()).filter(([, count]) => count > 1).map(([id]) => id));
+      Array.from(operationsByOperationId.entries())
+        .filter(([, operations]) => operations.size > 1).map(([id]) => id));
+  }
+
+  // Issue #1492 (Option 2): recomputes the set of (Resource Name, Verb, Message Body) slots that occur
+  // more than once among the loaded operations — a true duplicate body (a 2nd Request or 2nd Response
+  // on one endpoint). The legitimate "one operation, a Request AND a Response" pair has two DIFFERENT
+  // Message Body values, so it never collides. Like recomputeDuplicateOperationIds, this validates
+  // within the currently loaded (server-paginated) rows; the backend 400 is the source of truth.
+  recomputeDuplicateBodySlots(): void {
+    const counts = new Map<string, number>();
+    for (const row of (this.table?.dataSource?.data || [])) {
+      if (!row.verb || !row.messageBody) {
+        continue;
+      }
+      const key = this.bodySlotKey(row);
+      counts.set(key, (counts.get(key) || 0) + 1);
+    }
+    this.duplicateBodySlots = new Set<string>(
+      Array.from(counts.entries()).filter(([, count]) => count > 1).map(([key]) => key));
   }
 
   // Issue #1732: keep the Operation ID's verb word in sync when the Verb changes. Swaps only the
@@ -1119,6 +1186,7 @@ export class OasDocDetailComponent implements OnInit {
   updateOperationIdForVerb(element: BieForOasDoc): void {
     element.operationId = recomputeOperationId(element.verb, element.operationId, element.arrayIndicator);
     this.recomputeDuplicateOperationIds();
+    this.recomputeDuplicateBodySlots();
   }
 
   // Issue #1732: when the Array Indicator toggles, keep the 'List' suffix on operationId and the
@@ -1128,6 +1196,9 @@ export class OasDocDetailComponent implements OnInit {
     element.operationId = this.applySuffix(element.operationId, 'List', element.arrayIndicator);
     element.resourceName = this.applySuffix(element.resourceName, '-list', element.arrayIndicator);
     this.recomputeDuplicateOperationIds();
+    // The array indicator also rewrites resourceName (the '-list' suffix), which is part of the
+    // body-slot key, so the duplicate set must be recomputed here too.
+    this.recomputeDuplicateBodySlots();
   }
 
   private applySuffix(value: string, suffix: string, present: boolean): string {

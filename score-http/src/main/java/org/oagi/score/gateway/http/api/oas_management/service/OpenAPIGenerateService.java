@@ -11,6 +11,7 @@ import org.oagi.score.gateway.http.api.oas_management.model.OpenAPIErrorResponse
 import org.oagi.score.gateway.http.api.oas_management.model.OpenAPIGenerateExpressionOption;
 import org.oagi.score.gateway.http.api.oas_management.model.OpenAPITemplateForVerbOption;
 import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.BieGenerateOpenApiExpression;
+import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.OasOperationCollisionValidator;
 import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.OpenAPI30GenerateExpression;
 import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.OpenAPI31GenerateExpression;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
@@ -70,6 +71,13 @@ public class OpenAPIGenerateService {
     }
 
     public File generateSchemaForAll(ScoreUser requester, OpenAPIGenerateExpressionOption option) throws BieGenerateFailureException {
+        // A path-item can hold only one operation per verb, but nothing at the DB/service/UI layer forbids
+        // two distinct oas_operations from resolving to the same (path, verb). Such a collision would
+        // silently merge/clobber in the emitted document (and collapse in the #1347 error-response
+        // post-step), so reject it up front with a clear message before any generation work.
+        OasOperationCollisionValidator.assertNoCollision(option.getTemplates(),
+                (option.getOasDoc() != null) ? option.getOasDoc().getVersion() : null);
+
         // leave metaHeader and pagination response untouched at this time for OpenAPI generation
         // need to pass the params
         var topLevelAsbiepQuery = repositoryFactory.topLevelAsbiepQueryRepository(requester);

@@ -22,6 +22,7 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -58,6 +59,27 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
         OasDocId oasDocId = request.getOasDocId();
         if (oasDocId == null) {
             throw new IllegalArgumentException("`oasDocId` parameter must not be null.");
+        }
+
+        // Issue #1492: reject an inline edit producing two same-type bodies on one
+        // (path, verb), or two distinct operations on one (path, verb).
+        assertNoDuplicateBodySlot(request.getBieForOasDocList());
+
+        // Message Body flip (Request<->Response): the body types this update submits per operation. An
+        // UPDATE only ever INSERTs a new body when a row's Message Body was flipped in place (genuine adds
+        // persist through the assign/add-operation endpoints and reload, so they never arrive here as a new
+        // body). On such an INSERT the opposite body is removed UNLESS the same payload still carries a row
+        // of that opposite type for the operation (a legitimately dual-body endpoint the user kept). This
+        // implements the (operation, message-body)-keyed reconcile while never touching an unchanged or
+        // off-page sibling, because it is gated on the DB INSERT signal, not on payload inference.
+        Map<ULong, Set<String>> submittedBodyTypesByOp = new HashMap<>();
+        for (BieForOasDoc submitted : request.getBieForOasDocList()) {
+            if (submitted.getOasOperationId() == null) {
+                continue;
+            }
+            submittedBodyTypesByOp
+                    .computeIfAbsent(valueOf(submitted.getOasOperationId()), k -> new HashSet<>())
+                    .add(submitted.getMessageBody());
         }
 
         List<Field<?>> oasResourceChangedField = new ArrayList();
@@ -166,11 +188,9 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
                 ULong oasRequestId = null;
                 ULong oasResponseId = null;
                 OasRequestRecord oasRequestRecord = dslContext().selectFrom(OAS_REQUEST).where(OAS_REQUEST.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
-                OasResponseRecord oasResponseRecord = dslContext().selectFrom(OAS_RESPONSE).where(OAS_RESPONSE.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
-                if (oasResponseRecord != null) {
-                    dslContext().delete(OAS_RESPONSE).where(OAS_RESPONSE.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId()))).execute();
-                    dslContext().delete(OAS_MESSAGE_BODY).where(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID.eq(oasResponseRecord.getOasMessageBodyId())).execute();
-                }
+                // Issue #1492: the Request branch no longer deletes the operation's Response
+                // body. One operation owns at most one Request AND one Response; editing the Request must
+                // leave the sibling Response intact (the old delete-opposite-body behavior is removed).
                 if (oasRequestRecord == null) {
                     ULong oasMessageBodyId = dslContext().insertInto(OAS_MESSAGE_BODY)
                             .set(OAS_MESSAGE_BODY.CREATED_BY, valueOf(requesterId))
@@ -194,6 +214,16 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
                             .set(OAS_REQUEST.REQUIRED, (byte) (1))
                             .returningResult(OAS_REQUEST.OAS_REQUEST_ID)
                             .fetchOne().value1();
+
+                    // Message Body flipped Response->Request: a new Request was just INSERTed in an UPDATE,
+                    // which only happens for an in-place body-type flip. Convert in place by removing the
+                    // now-replaced Response body, unless the payload still carries a Response row for this
+                    // operation (a kept dual-body endpoint).
+                    if (!submittedBodyTypesByOp
+                            .getOrDefault(valueOf(bieForOasDoc.getOasOperationId()), Collections.emptySet())
+                            .contains("Response")) {
+                        deleteResponseBodyOnly(valueOf(bieForOasDoc.getOasOperationId()));
+                    }
                 } else {
 
                     if (BooleanToByte(bieForOasDoc.isArrayIndicator()) != oasRequestRecord.getMakeArrayIndicator()) {
@@ -310,15 +340,12 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
                 }
 
                 //update arrayIndicator and SuppressRootIndicator
-                //update arrayIndicator and SuppressRootIndicator
                 ULong oasRequestId = null;
                 ULong oasResponseId = null;
-                OasRequestRecord oasRequestRecord = dslContext().selectFrom(OAS_REQUEST).where(OAS_REQUEST.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
                 OasResponseRecord oasResponseRecord = dslContext().selectFrom(OAS_RESPONSE).where(OAS_RESPONSE.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
-                if (oasRequestRecord != null) {
-                    dslContext().delete(OAS_REQUEST).where(OAS_REQUEST.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId()))).execute();
-                    dslContext().delete(OAS_MESSAGE_BODY).where(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID.eq(oasRequestRecord.getOasMessageBodyId())).execute();
-                }
+                // Issue #1492: the Response branch no longer deletes the operation's Request
+                // body. One operation owns at most one Request AND one Response; editing the Response must
+                // leave the sibling Request intact (the old delete-opposite-body behavior is removed).
                 if (oasResponseRecord == null) {
                     ULong oasMessageBodyId = dslContext().insertInto(OAS_MESSAGE_BODY)
                             .set(OAS_MESSAGE_BODY.CREATED_BY, valueOf(requesterId))
@@ -341,6 +368,16 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
                             .set(OAS_RESPONSE.INCLUDE_CONFIRM_INDICATOR, (byte) 0)
                             .returningResult(OAS_RESPONSE.OAS_RESPONSE_ID)
                             .fetchOne().value1();
+
+                    // Message Body flipped Request->Response (the reported bug): a new Response was just
+                    // INSERTed in an UPDATE, which only happens for an in-place body-type flip. Convert in
+                    // place by removing the now-replaced Request body, unless the payload still carries a
+                    // Request row for this operation (a kept dual-body endpoint).
+                    if (!submittedBodyTypesByOp
+                            .getOrDefault(valueOf(bieForOasDoc.getOasOperationId()), Collections.emptySet())
+                            .contains("Request")) {
+                        deleteRequestBodyOnly(valueOf(bieForOasDoc.getOasOperationId()));
+                    }
                 } else {
                     if (BooleanToByte(bieForOasDoc.isArrayIndicator()) != oasResponseRecord.getMakeArrayIndicator()) {
                         oasResponseChangedField.add(OAS_RESPONSE.MAKE_ARRAY_INDICATOR);
@@ -386,6 +423,38 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
         return new UpdateBieForOasDocResponse(oasDocId, !oasResourceChangedField.isEmpty() || !oasOperationChangedField.isEmpty()
                 || !oasRequestChangedField.isEmpty() || !oasResponseChangedField.isEmpty() || !oasTagChangeField.isEmpty()
                 || securityChanged);
+    }
+
+    // Issue #1492: an inline edit must not produce, within one document, two bodies of the same type on a
+    // (resourceName, verb) — i.e. a duplicate (Resource Name, Verb, Message Body). A (resourceName, verb) MAY
+    // be backed by more than one oas_operation row (e.g. a legacy/imported doc that stored the Request and
+    // Response as separate operations, possibly with different auto-derived operationIds); the generator
+    // merges those into one path item, so saving such a doc must not be blocked. The rejected condition
+    // surfaces as the contracted 400 message (mapped from IllegalArgumentException). This mirrors the frontend
+    // (path, verb, bodyType) mat-error guard.
+    static void assertNoDuplicateBodySlot(List<BieForOasDoc> bieForOasDocList) {
+        if (bieForOasDocList == null || bieForOasDocList.isEmpty()) {
+            return;
+        }
+        Set<String> seenBodySlots = new HashSet<>();
+        for (BieForOasDoc bieForOasDoc : bieForOasDocList) {
+            if (bieForOasDoc == null) {
+                continue;
+            }
+            String resourceName = bieForOasDoc.getResourceName();
+            String verb = bieForOasDoc.getVerb();
+            String messageBody = bieForOasDoc.getMessageBody();
+            if (resourceName == null || verb == null || messageBody == null) {
+                continue;
+            }
+            String pathVerb = resourceName + "|" + verb;
+            String bodySlot = pathVerb + "|" + messageBody;
+            if (!seenBodySlots.add(bodySlot)) {
+                throw new IllegalArgumentException(
+                        "This operation (" + verb.toUpperCase() + " " + resourceName + ") already has a "
+                                + messageBody + " body. An operation can have at most one Request and one Response body.");
+            }
+        }
     }
 
     // Issue #1729: persist an operation's Security Requirement override as a DIFF (not delete-then-reinsert):
@@ -606,56 +675,128 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
         if (bieForOasDocList == null || bieForOasDocList.isEmpty()) {
             return new DeleteBieForOasDocResponse(Collections.emptyList());
         }
-        // based on the message type , delete from oas_request or oas_response
+        // Issue #1492: one operation owns at most one Request AND one Response. Removing a
+        // body deletes ONLY that body (and its children); the operation/resource are removed ONLY when
+        // they have no remaining child, so a surviving sibling body is never orphaned/FK-violated.
         for (BieForOasDoc bieForOasDoc : request.getBieForOasDocList()) {
-            if (bieForOasDoc.getMessageBody().equals("Request")) {
-                //delete oas_request
-                OasRequestRecord oasRequestRecord = dslContext().selectFrom(OAS_REQUEST).where(OAS_REQUEST.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
-                OasOperationRecord oasOperationRecord = dslContext().selectFrom(OAS_OPERATION).where(OAS_OPERATION.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
-                OasResourceTagRecord req_oasResourceTagRecord = dslContext().selectFrom(OAS_RESOURCE_TAG.as("req_oas_resource_tag"))
-                        .where(OAS_RESOURCE_TAG.as("req_oas_resource_tag").OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId())))
-                        .fetchOptional().orElse(null);
-                if (oasRequestRecord != null) {
-                    dslContext().delete(OAS_REQUEST).where(OAS_REQUEST.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId()))).execute();
-                    dslContext().delete(OAS_MESSAGE_BODY).where(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID.eq(oasRequestRecord.getOasMessageBodyId())).execute();
-                    if (oasOperationRecord != null) {
-                        if (req_oasResourceTagRecord != null) {
-                            ULong oasTagId = req_oasResourceTagRecord.getOasTagId();
-                            dslContext().delete(OAS_RESOURCE_TAG).where(OAS_RESOURCE_TAG.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId()))).execute();
-                            dslContext().delete(OAS_TAG).where(OAS_TAG.OAS_TAG_ID.eq(oasTagId)).execute();
-                        }
-                        deleteOperationSecurity(valueOf(bieForOasDoc.getOasOperationId()));
-                        dslContext().delete(OAS_OPERATION).where(OAS_OPERATION.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId()))).execute();
-                        dslContext().delete(OAS_RESOURCE).where(OAS_RESOURCE.OAS_RESOURCE_ID.eq(oasOperationRecord.getOasResourceId())).execute();
-                    }
+            ULong oasOperationId = valueOf(bieForOasDoc.getOasOperationId());
+            if (oasOperationId == null) {
+                continue;
+            }
+
+            if ("Request".equals(bieForOasDoc.getMessageBody())) {
+                if (deleteRequestBodyOnly(oasOperationId)) {
+                    deleteOperationAndResourceIfEmpty(oasOperationId);
                 }
             }
 
-            if (bieForOasDoc.getMessageBody().equals("Response")) {
-                //delete oas_response
-                OasResponseRecord oasResponseRecord = dslContext().selectFrom(OAS_RESPONSE).where(OAS_RESPONSE.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
-                OasOperationRecord oasOperationRecord = dslContext().selectFrom(OAS_OPERATION).where(OAS_OPERATION.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
-                OasResourceTagRecord res_oasResourceTagRecord = dslContext().selectFrom(OAS_RESOURCE_TAG.as("res_oas_resource_tag"))
-                        .where(OAS_RESOURCE_TAG.as("res_oas_resource_tag").OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId())))
-                        .fetchOptional().orElse(null);
-                if (oasResponseRecord != null) {
-                    dslContext().delete(OAS_RESPONSE).where(OAS_RESPONSE.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId()))).execute();
-                    dslContext().delete(OAS_MESSAGE_BODY).where(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID.eq(oasResponseRecord.getOasMessageBodyId())).execute();
-                    if (oasOperationRecord != null) {
-                        if (res_oasResourceTagRecord != null) {
-                            ULong oasTagId = res_oasResourceTagRecord.getOasTagId();
-                            dslContext().delete(OAS_RESOURCE_TAG).where(OAS_RESOURCE_TAG.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId()))).execute();
-                            dslContext().delete(OAS_TAG).where(OAS_TAG.OAS_TAG_ID.eq(oasTagId)).execute();
-                        }
-                        deleteOperationSecurity(valueOf(bieForOasDoc.getOasOperationId()));
-                        dslContext().delete(OAS_OPERATION).where(OAS_OPERATION.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId()))).execute();
-                        dslContext().delete(OAS_RESOURCE).where(OAS_RESOURCE.OAS_RESOURCE_ID.eq(oasOperationRecord.getOasResourceId())).execute();
-                    }
+            if ("Response".equals(bieForOasDoc.getMessageBody())) {
+                if (deleteResponseBodyOnly(oasOperationId)) {
+                    deleteOperationAndResourceIfEmpty(oasOperationId);
                 }
             }
         }
 
         DeleteBieForOasDocResponse response = new DeleteBieForOasDocResponse(bieForOasDocList);
         return response;
+    }
+
+    /**
+     * Remove ONLY the operation's Request body and its children (oas_request_parameter) and message body,
+     * leaving the operation/resource intact. Returns {@code true} when a Request body existed and was
+     * removed. Shared by {@link #deleteBieForOasDoc} (which then calls
+     * {@link #deleteOperationAndResourceIfEmpty}) and the in-place Message Body flip in
+     * {@link #updateBieForOasDoc} (which does NOT, because the operation still owns the just-inserted
+     * opposite body). Keeping one cascade prevents the delete paths from drifting apart.
+     */
+    private boolean deleteRequestBodyOnly(ULong oasOperationId) {
+        if (oasOperationId == null) {
+            return false;
+        }
+        OasRequestRecord oasRequestRecord = dslContext().selectFrom(OAS_REQUEST)
+                .where(OAS_REQUEST.OAS_OPERATION_ID.eq(oasOperationId)).fetchOptional().orElse(null);
+        if (oasRequestRecord == null) {
+            return false;
+        }
+        // Request children: oas_request_parameter (by oas_request_id), then the request row, then its
+        // message body.
+        dslContext().delete(OAS_REQUEST_PARAMETER)
+                .where(OAS_REQUEST_PARAMETER.OAS_REQUEST_ID.eq(oasRequestRecord.getOasRequestId())).execute();
+        dslContext().delete(OAS_REQUEST).where(OAS_REQUEST.OAS_REQUEST_ID.eq(oasRequestRecord.getOasRequestId())).execute();
+        dslContext().delete(OAS_MESSAGE_BODY)
+                .where(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID.eq(oasRequestRecord.getOasMessageBodyId())).execute();
+        return true;
+    }
+
+    /**
+     * Remove ONLY the operation's Response body and its children (oas_response_headers, oas_parameter_link)
+     * and message body, leaving the operation/resource intact. Returns {@code true} when a Response body
+     * existed and was removed. See {@link #deleteRequestBodyOnly} for the shared-cascade rationale.
+     */
+    private boolean deleteResponseBodyOnly(ULong oasOperationId) {
+        if (oasOperationId == null) {
+            return false;
+        }
+        OasResponseRecord oasResponseRecord = dslContext().selectFrom(OAS_RESPONSE)
+                .where(OAS_RESPONSE.OAS_OPERATION_ID.eq(oasOperationId)).fetchOptional().orElse(null);
+        if (oasResponseRecord == null) {
+            return false;
+        }
+        // Response children: oas_response_headers AND oas_parameter_link (by oas_response_id, a NOT NULL
+        // RESTRICT FK), then the response row, then its message body.
+        dslContext().delete(OAS_RESPONSE_HEADERS)
+                .where(OAS_RESPONSE_HEADERS.OAS_RESPONSE_ID.eq(oasResponseRecord.getOasResponseId())).execute();
+        dslContext().delete(OAS_PARAMETER_LINK)
+                .where(OAS_PARAMETER_LINK.OAS_RESPONSE_ID.eq(oasResponseRecord.getOasResponseId())).execute();
+        dslContext().delete(OAS_RESPONSE).where(OAS_RESPONSE.OAS_RESPONSE_ID.eq(oasResponseRecord.getOasResponseId())).execute();
+        dslContext().delete(OAS_MESSAGE_BODY)
+                .where(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID.eq(oasResponseRecord.getOasMessageBodyId())).execute();
+        return true;
+    }
+
+    /**
+     * Issue #1492: delete the operation (and its resource) ONLY when no body remains.
+     * If a sibling Request/Response still references the operation, nothing is removed (the operation
+     * and its tag/security stay intact). When the operation IS removed, its tag/security and the
+     * nullable {@code oas_parameter_link} operation edge are cleared first; the resource is removed only
+     * after its last operation goes away.
+     */
+    private void deleteOperationAndResourceIfEmpty(ULong oasOperationId) {
+        boolean hasRequest = dslContext().fetchExists(
+                dslContext().selectOne().from(OAS_REQUEST).where(OAS_REQUEST.OAS_OPERATION_ID.eq(oasOperationId)));
+        boolean hasResponse = dslContext().fetchExists(
+                dslContext().selectOne().from(OAS_RESPONSE).where(OAS_RESPONSE.OAS_OPERATION_ID.eq(oasOperationId)));
+        if (hasRequest || hasResponse) {
+            return; // a sibling body still uses this operation -> keep operation + resource.
+        }
+
+        OasOperationRecord oasOperationRecord = dslContext().selectFrom(OAS_OPERATION)
+                .where(OAS_OPERATION.OAS_OPERATION_ID.eq(oasOperationId)).fetchOptional().orElse(null);
+        if (oasOperationRecord == null) {
+            return;
+        }
+
+        // Operation tag (link + the now-orphan tag).
+        OasResourceTagRecord oasResourceTagRecord = dslContext().selectFrom(OAS_RESOURCE_TAG)
+                .where(OAS_RESOURCE_TAG.OAS_OPERATION_ID.eq(oasOperationId)).fetchOptional().orElse(null);
+        if (oasResourceTagRecord != null) {
+            ULong oasTagId = oasResourceTagRecord.getOasTagId();
+            dslContext().delete(OAS_RESOURCE_TAG).where(OAS_RESOURCE_TAG.OAS_OPERATION_ID.eq(oasOperationId)).execute();
+            dslContext().delete(OAS_TAG).where(OAS_TAG.OAS_TAG_ID.eq(oasTagId)).execute();
+        }
+        // Operation-level security (scopes -> entries).
+        deleteOperationSecurity(oasOperationId);
+        // Nullable oas_parameter_link operation edge (its response edge was already cleared per body).
+        dslContext().delete(OAS_PARAMETER_LINK).where(OAS_PARAMETER_LINK.OAS_OPERATION_ID.eq(oasOperationId)).execute();
+
+        dslContext().delete(OAS_OPERATION).where(OAS_OPERATION.OAS_OPERATION_ID.eq(oasOperationId)).execute();
+
+        // Remove the resource only when it has no remaining operation.
+        ULong oasResourceId = oasOperationRecord.getOasResourceId();
+        boolean hasOtherOperation = dslContext().fetchExists(
+                dslContext().selectOne().from(OAS_OPERATION).where(OAS_OPERATION.OAS_RESOURCE_ID.eq(oasResourceId)));
+        if (!hasOtherOperation) {
+            dslContext().delete(OAS_RESOURCE).where(OAS_RESOURCE.OAS_RESOURCE_ID.eq(oasResourceId)).execute();
+        }
     }
 }

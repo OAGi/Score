@@ -199,3 +199,18 @@
   color: #f9a825;
   margin-right: 8px;
 }
+
+/* Issue #1492 (Option 2): mark the Verb / Message Body selects red when this row is a duplicate body
+   slot (a 2nd Request or 2nd Response on one (path, verb)), matching the mat-error treatment used for
+   the Operation ID cell. The accompanying message renders below the cell. */
+.oas-body-slot-error ::ng-deep .mat-mdc-select-value,
+.oas-body-slot-error ::ng-deep .mat-mdc-select-arrow {
+  color: #c62828;
+}
+
+.oas-body-slot-error-text {
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 1.2;
+  color: #c62828;
+}

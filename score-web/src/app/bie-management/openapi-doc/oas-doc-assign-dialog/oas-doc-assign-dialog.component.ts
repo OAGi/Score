@@ -2,14 +2,14 @@ import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {FormControl} from '@angular/forms';
-import {forkJoin, ReplaySubject} from 'rxjs';
+import {EMPTY, forkJoin, from, of, ReplaySubject} from 'rxjs';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatDatepicker} from '@angular/material/datepicker';
-import {finalize} from 'rxjs/operators';
+import {catchError, concatMap, finalize} from 'rxjs/operators';
 import {AssignBieForOasDoc, BieForOasDoc, BieForOasDocListRequest, buildOperationId, OasDoc} from '../domain/openapi-doc';
 import {OpenAPIService} from '../domain/openapi.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -181,6 +181,8 @@ export class OasDocAssignDialogComponent implements OnInit {
   assignBieForOasDoc: AssignBieForOasDoc;
   assignBieForOasDocList: AssignBieForOasDoc[];
   preferencesInfo: PreferencesInfo;
+  // Issue #1492 (Option 2): the document's already-added rows, for the duplicate-body pre-check.
+  existingRows: BieForOasDoc[] = [];
 
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
@@ -191,6 +193,10 @@ export class OasDocAssignDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.oasDoc = this.data.oasDoc;
+    // Issue #1492 (Option 2): the live existing rows of the document are passed as the dialog data
+    // (an array, with oasDoc/webPageInfo/isEditable attached as extra properties). Capture them so a
+    // fast client pre-check can block adding a body that already exists on a (resourceName, verb).
+    this.existingRows = Array.isArray(this.data) ? (this.data as BieForOasDoc[]).slice() : [];
     this.assignBieForOasDoc = new AssignBieForOasDoc();
     this.assignBieForOasDocList = [];
     // Init BIE list table for OasDoc
@@ -379,43 +385,132 @@ export class OasDocAssignDialogComponent implements OnInit {
     return false;
   }
 
+  // Issue #1492 (Option 2): the (path, verb, bodyType) slot a selected BIE would occupy. The backend
+  // derives the resource path from the property term (+ array indicator), so the property term is the
+  // stable identity used for the client-side duplicate pre-check. Normalized to a comparable key.
+  private bodySlotKeyForAdd(propertyTerm: string, verb: string, messageBody: string): string {
+    return `${(propertyTerm || '').trim().toLowerCase()}|${verb || ''}|${messageBody || ''}`;
+  }
+
+  // Issue #1492 (Option 2): true when this row's chosen (verb, messageBody) would duplicate a body
+  // already on the document. Surfaced inline (mat-error) and used to disable Add for that selection.
+  isDuplicateBodySlotForAdd(bieForOasDoc: BieForOasDoc): boolean {
+    const verb = this.verbSelection[bieForOasDoc.topLevelAsbiepId];
+    const messageBody = this.messageBodySelection[bieForOasDoc.topLevelAsbiepId];
+    if (!verb || !messageBody) {
+      return false;
+    }
+    const key = this.bodySlotKeyForAdd(bieForOasDoc.propertyTerm, verb, messageBody);
+    return (this.existingRows || []).some(row =>
+      row.verb && row.messageBody &&
+      (this.bodySlotKeyForAdd(row.propertyTerm, row.verb, row.messageBody) === key ||
+        (!!row.resourceName && this.bodySlotKeyForAdd(row.resourceName, row.verb, row.messageBody) === key)));
+  }
+
+  // Issue #1492 (Option 2): block the Add button when any selected row duplicates an existing body slot.
+  hasDuplicateBodySlotSelected(): boolean {
+    return this.selection.selected.some(row => this.isDuplicateBodySlotForAdd(row));
+  }
+
   addBieForOasDoc() {
     const selectedBieForOasDocs = this.selection.selected;
     for (const bieForOasDoc of selectedBieForOasDocs) {
       bieForOasDoc.verb = this.verbSelection[bieForOasDoc.topLevelAsbiepId];
       bieForOasDoc.messageBody = this.messageBodySelection[bieForOasDoc.topLevelAsbiepId];
-      this.openAPIService.checkBIEReusedAcrossMultipleOperations(bieForOasDoc, this.oasDoc).subscribe(
-        resp => {
-          if (resp.errorMessages && resp.errorMessages.length > 0) {
-            this.snackBar.open(resp.errorMessages[0], '', {
-              duration: 5000,
-            });
-          } else {
-            this.doAddBieForOasDoc(bieForOasDoc);
-          }
-        }, _ => {
-        });
     }
+
+    // Issue #1492 (Option 2): fast client pre-check — block before any POST if a selection would add a
+    // body that already exists on the document (a loaded row), or two selections collide within this
+    // batch on the same (propertyTerm, verb, messageBody). The backend 400 remains the source of truth.
+    const existingKeys = new Set<string>();
+    for (const row of (this.existingRows || [])) {
+      if (row.verb && row.messageBody) {
+        existingKeys.add(this.bodySlotKeyForAdd(row.propertyTerm, row.verb, row.messageBody));
+        // A row may have been added under a renamed Resource Name; also key by it so a rename is caught.
+        if (row.resourceName && row.resourceName !== row.propertyTerm) {
+          existingKeys.add(this.bodySlotKeyForAdd(row.resourceName, row.verb, row.messageBody));
+        }
+      }
+    }
+    const batchKeys = new Set<string>();
+    for (const bieForOasDoc of selectedBieForOasDocs) {
+      const verb = this.verbSelection[bieForOasDoc.topLevelAsbiepId];
+      const messageBody = this.messageBodySelection[bieForOasDoc.topLevelAsbiepId];
+      const key = this.bodySlotKeyForAdd(bieForOasDoc.propertyTerm, verb, messageBody);
+      if (existingKeys.has(key) || batchKeys.has(key)) {
+        this.snackBar.open('This endpoint already has a ' + messageBody + ' body.', '', {
+          duration: 5000,
+        });
+        return;
+      }
+      batchKeys.add(key);
+    }
+
+    // Issue #1492 (Option 2): SERIALIZE the adds. Each Add find-or-creates the (path, verb) operation
+    // on the backend; firing the POSTs concurrently can race two find-or-creates into duplicate
+    // operations, and the old loop also closed the dialog on the first response. Run them one at a time
+    // (checkBIEReusedAcrossMultipleOperations then assignBieForOasDoc per BIE) and close only after all
+    // complete.
+    this.loading = true;
+    let addedCount = 0;
+    from(selectedBieForOasDocs).pipe(
+      concatMap(bieForOasDoc => this.openAPIService.checkBIEReusedAcrossMultipleOperations(bieForOasDoc, this.oasDoc).pipe(
+        concatMap(resp => {
+          if (resp.errorMessages && resp.errorMessages.length > 0) {
+            this.snackBar.open(resp.errorMessages[0], '', {duration: 5000});
+            return EMPTY; // skip this BIE, continue the batch
+          }
+          return this.openAPIService.assignBieForOasDoc(this.buildAssignPayload(bieForOasDoc)).pipe(
+            concatMap(_ => {
+              addedCount++;
+              return of(true);
+            }),
+            // The global interceptor surfaces the backend 400 (dup-body) message; swallow it here so the
+            // remaining adds still run and the dialog closes to reload whatever did succeed.
+            catchError(_ => EMPTY)
+          );
+        }),
+        catchError(_ => EMPTY)
+      )),
+      finalize(() => {
+        this.loading = false;
+        if (addedCount > 0) {
+          this.snackBar.open('Added', '', {duration: 3000});
+        }
+        this.dialogRef.close({
+          result: {
+            status: 'OK'
+          }
+        });
+      })
+    ).subscribe();
   }
 
+  // Builds the assign payload for one selected BIE (extracted so the serialized add pipeline can map
+  // each BIE to its POST). Issue #1732: the frontend owns the initial operationId ('<verb><BIEName>[List]').
+  private buildAssignPayload(bieForOasDoc: BieForOasDoc): AssignBieForOasDoc {
+    const payload = new AssignBieForOasDoc();
+    payload.messageBody = this.messageBodySelection[bieForOasDoc.topLevelAsbiepId];
+    payload.propertyTerm = bieForOasDoc.propertyTerm;
+    payload.tagName = bieForOasDoc.propertyTerm;
+    payload.topLevelAsbiepId = bieForOasDoc.topLevelAsbiepId;
+    payload.verb = this.verbSelection[bieForOasDoc.topLevelAsbiepId];
+    if (payload.messageBody === 'Request') {
+      payload.oasRequest = true;
+    } else if (payload.messageBody === 'Response') {
+      payload.oasRequest = false;
+    }
+    payload.oasDocId = this.oasDoc.oasDocId;
+    payload.arrayIndicator = bieForOasDoc.arrayIndicator;
+    payload.suppressRootIndicator = bieForOasDoc.suppressRootIndicator;
+    payload.operationId = buildOperationId(payload.verb, bieForOasDoc.propertyTerm, bieForOasDoc.arrayIndicator);
+    return payload;
+  }
+
+  // Retained for the unit spec (#1610): maps a single selection to the shared assignBieForOasDoc field
+  // and POSTs it. The Add button uses the serialized addBieForOasDoc() pipeline above.
   doAddBieForOasDoc(bieForOasDoc: BieForOasDoc) {
-      this.assignBieForOasDoc.messageBody = this.messageBodySelection[bieForOasDoc.topLevelAsbiepId];
-      this.assignBieForOasDoc.propertyTerm = bieForOasDoc.propertyTerm;
-      this.assignBieForOasDoc.tagName = bieForOasDoc.propertyTerm;
-      this.assignBieForOasDoc.topLevelAsbiepId = bieForOasDoc.topLevelAsbiepId;
-      this.assignBieForOasDoc.verb = this.verbSelection[bieForOasDoc.topLevelAsbiepId];
-      if (this.assignBieForOasDoc.messageBody === 'Request') {
-        this.assignBieForOasDoc.oasRequest = true;
-      } else if (this.assignBieForOasDoc.messageBody === 'Response') {
-        this.assignBieForOasDoc.oasRequest = false;
-      }
-      this.assignBieForOasDoc.oasDocId = this.oasDoc.oasDocId;
-      this.assignBieForOasDoc.arrayIndicator = bieForOasDoc.arrayIndicator;
-      this.assignBieForOasDoc.suppressRootIndicator = bieForOasDoc.suppressRootIndicator;
-      // Issue #1732: the frontend owns the initial operationId ('<verb><BIEName>[List]'); the
-      // backend stores it verbatim.
-      this.assignBieForOasDoc.operationId = buildOperationId(
-        this.assignBieForOasDoc.verb, bieForOasDoc.propertyTerm, bieForOasDoc.arrayIndicator);
+      this.assignBieForOasDoc = this.buildAssignPayload(bieForOasDoc);
       this.openAPIService.assignBieForOasDoc(this.assignBieForOasDoc).subscribe(resp => {
         this.snackBar.open('Added', '', {
           duration: 3000,

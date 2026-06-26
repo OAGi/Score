@@ -85,6 +85,9 @@ public class OpenAPIGenerateController {
             openAPITemplate.setSuppressRootProperty(bieForOasDoc.isSuppressRootIndicator());
             openAPITemplate.setResourceName(bieForOasDoc.getResourceName());
             openAPITemplate.setOperationId(bieForOasDoc.getOperationId());
+            // Carry the owning oas_operation id so generation can reject two distinct operations that
+            // resolve to the same (path, verb) (an illegal path-item collapse in the emitted document).
+            openAPITemplate.setOasOperationId(bieForOasDoc.getOasOperationId());
             // Issue #1730: carry the HTTP status code so bodyless (BIE-less) operations emit 202/204 etc.
             openAPITemplate.setHttpStatusCode(bieForOasDoc.getHttpStatusCode());
             openAPITemplate.setSecurityOverridden(bieForOasDoc.isSecurityOverridden());

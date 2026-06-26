@@ -386,6 +386,103 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
     }
 
     @Override
+    public OasResourceId findOrCreateOasResource(InsertOasResourceArguments arguments) {
+        // Issue #1492: code-level find-or-create (no DB unique constraint). Reuse the existing
+        // (oas_doc_id, path) resource when present -- findOasResourceId returns the lowest id, so legacy
+        // duplicate rows do not throw -- otherwise insert a new one and return its id in one statement.
+        // (The frontend serializes batch adds, so there is no concurrent same-endpoint insert to race.)
+        OasResourceId existing = findOasResourceId(arguments.getOasDocId(), arguments.getPath());
+        if (existing != null) {
+            return existing;
+        }
+        return new OasResourceId(dslContext().insertInto(OAS_RESOURCE)
+                .set(OAS_RESOURCE.CREATED_BY, valueOf(arguments.getUserId()))
+                .set(OAS_RESOURCE.LAST_UPDATED_BY, valueOf(arguments.getUserId()))
+                .set(OAS_RESOURCE.CREATION_TIMESTAMP, arguments.getTimestamp())
+                .set(OAS_RESOURCE.LAST_UPDATE_TIMESTAMP, arguments.getTimestamp())
+                .set(OAS_RESOURCE.OAS_DOC_ID, valueOf(arguments.getOasDocId()))
+                .set(OAS_RESOURCE.PATH, arguments.getPath())
+                .set(OAS_RESOURCE.REF, arguments.getRef())
+                .returningResult(OAS_RESOURCE.OAS_RESOURCE_ID)
+                .fetchOne().value1().toBigInteger());
+    }
+
+    @Override
+    public OasOperationId findOrCreateOasOperation(InsertOasOperationArguments arguments) {
+        // Issue #1492: code-level find-or-create (no DB unique constraint). When an operation already
+        // exists for (oas_resource_id, verb) the EXISTING operation wins -- its operationId/summary/
+        // description/deprecated are kept and the second add only contributes its body. The lookup
+        // orders by id and limits to one, so legacy duplicate rows resolve to the lowest id rather
+        // than throwing; otherwise insert a new operation and return its id in one statement.
+        ULong existing = dslContext().select(OAS_OPERATION.OAS_OPERATION_ID)
+                .from(OAS_OPERATION)
+                .where(OAS_OPERATION.OAS_RESOURCE_ID.eq(arguments.getOasResourceId())
+                        .and(OAS_OPERATION.VERB.eq(arguments.getVerb())))
+                .orderBy(OAS_OPERATION.OAS_OPERATION_ID.asc())
+                .limit(1)
+                .fetchOne(OAS_OPERATION.OAS_OPERATION_ID);
+        if (existing != null) {
+            return new OasOperationId(existing.toBigInteger());
+        }
+        return new OasOperationId(dslContext().insertInto(OAS_OPERATION)
+                .set(OAS_OPERATION.CREATED_BY, valueOf(arguments.getUserId()))
+                .set(OAS_OPERATION.LAST_UPDATED_BY, valueOf(arguments.getUserId()))
+                .set(OAS_OPERATION.CREATION_TIMESTAMP, arguments.getTimestamp())
+                .set(OAS_OPERATION.LAST_UPDATE_TIMESTAMP, arguments.getTimestamp())
+                .set(OAS_OPERATION.OAS_RESOURCE_ID, arguments.getOasResourceId())
+                .set(OAS_OPERATION.VERB, arguments.getVerb())
+                .set(OAS_OPERATION.OPERATION_ID, arguments.getOperationId())
+                .set(OAS_OPERATION.SUMMARY, arguments.getSummary())
+                .set(OAS_OPERATION.DESCRIPTION, arguments.getDescription())
+                .set(OAS_OPERATION.DEPRECATED, (byte) (arguments.isDeprecated() ? 1 : 0))
+                .returningResult(OAS_OPERATION.OAS_OPERATION_ID)
+                .fetchOne().value1().toBigInteger());
+    }
+
+    @Override
+    public boolean operationHasBody(OasOperationId oasOperationId, boolean isRequest) {
+        if (oasOperationId == null) {
+            return false;
+        }
+        if (isRequest) {
+            return dslContext().fetchExists(dslContext().selectOne().from(OAS_REQUEST)
+                    .where(OAS_REQUEST.OAS_OPERATION_ID.eq(valueOf(oasOperationId))));
+        }
+        return dslContext().fetchExists(dslContext().selectOne().from(OAS_RESPONSE)
+                .where(OAS_RESPONSE.OAS_OPERATION_ID.eq(valueOf(oasOperationId))));
+    }
+
+    @Override
+    public OasResourceId findOasResourceId(OasDocId oasDocId, String path) {
+        if (oasDocId == null || path == null) {
+            return null;
+        }
+        ULong oasResourceId = dslContext().select(OAS_RESOURCE.OAS_RESOURCE_ID)
+                .from(OAS_RESOURCE)
+                .where(OAS_RESOURCE.OAS_DOC_ID.eq(valueOf(oasDocId))
+                        .and(OAS_RESOURCE.PATH.eq(path)))
+                .orderBy(OAS_RESOURCE.OAS_RESOURCE_ID.asc())
+                .limit(1)
+                .fetchOne(OAS_RESOURCE.OAS_RESOURCE_ID);
+        return (oasResourceId == null) ? null : new OasResourceId(oasResourceId.toBigInteger());
+    }
+
+    @Override
+    public OasOperationId findOasOperationId(OasResourceId oasResourceId, String verb) {
+        if (oasResourceId == null || verb == null) {
+            return null;
+        }
+        ULong oasOperationId = dslContext().select(OAS_OPERATION.OAS_OPERATION_ID)
+                .from(OAS_OPERATION)
+                .where(OAS_OPERATION.OAS_RESOURCE_ID.eq(valueOf(oasResourceId))
+                        .and(OAS_OPERATION.VERB.eq(verb)))
+                .orderBy(OAS_OPERATION.OAS_OPERATION_ID.asc())
+                .limit(1)
+                .fetchOne(OAS_OPERATION.OAS_OPERATION_ID);
+        return (oasOperationId == null) ? null : new OasOperationId(oasOperationId.toBigInteger());
+    }
+
+    @Override
     public OasTagId insertOasTag(InsertOasTagArguments arguments) {
         return new OasTagId(dslContext().insertInto(OAS_TAG)
                 .set(OAS_TAG.CREATED_BY, valueOf(arguments.getUserId()))
