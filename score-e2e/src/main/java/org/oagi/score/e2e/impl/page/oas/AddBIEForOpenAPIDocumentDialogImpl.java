@@ -272,6 +272,16 @@ public class AddBIEForOpenAPIDocumentDialogImpl implements AddBIEForOpenAPIDocum
     }
 
     @Override
+    public void setArrayIndicator(WebElement tableRecord, boolean checked) {
+        WebElement checkbox = getColumnByName(tableRecord, "arrayIndicator").findElement(By.tagName("mat-checkbox"));
+        if (org.oagi.score.e2e.impl.PageHelper.isChecked(checkbox) != checked) {
+            // Click the inner <input> (not the mat-checkbox host) to reliably fire Angular Material's toggle,
+            // mirroring EditOpenAPIDocumentPageImpl.setRowArrayIndicator.
+            click(getDriver(), checkbox.findElement(By.tagName("input")));
+        }
+    }
+
+    @Override
     public boolean isMessageBodyOptionDisabled(WebElement tableRecord, String messageBody) {
         WebElement messageBodyCell = getColumnByName(tableRecord, "messageBody");
         click(getDriver(), messageBodyCell.findElement(By.tagName("mat-select")));
@@ -285,6 +295,28 @@ public class AddBIEForOpenAPIDocumentDialogImpl implements AddBIEForOpenAPIDocum
         // open another dropdown, leaving that dropdown closed (its options never become clickable).
         invisibilityOfElementLocated(getDriver(), optionLocator);
         return disabled;
+    }
+
+    @Override
+    public String getRowMessageBodyError(WebElement tableRecord) {
+        // Issue #1492 (Option 2): the Message Body cell renders a mat-error. It can be either
+        // 'Message Body is required.' (no selection) or 'This endpoint already has a <...> body.' (the
+        // duplicate-body pre-check). Return only the duplicate-body message; otherwise an empty string.
+        WebElement messageBodyCell = getColumnByName(tableRecord, "messageBody");
+        for (WebElement error : messageBodyCell.findElements(By.tagName("mat-error"))) {
+            String text = org.oagi.score.e2e.impl.PageHelper.getText(error);
+            if (text != null && text.contains("already has")) {
+                return text.trim();
+            }
+        }
+        return "";
+    }
+
+    @Override
+    public boolean isDuplicateEndpointWarningDisplayed() {
+        By dupErrorLocator = By.xpath(BASE_XPATH
+                + "//mat-error[contains(normalize-space(.), \"already has a\")]");
+        return !getDriver().findElements(dupErrorLocator).isEmpty();
     }
 
     @Override

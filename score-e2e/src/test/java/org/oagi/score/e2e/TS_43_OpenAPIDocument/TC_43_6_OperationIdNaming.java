@@ -104,6 +104,30 @@ public class TC_43_6_OperationIdNaming extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_43_6_11")
+    public void array_indicator_checked_at_add_time_in_the_dialog_yields_list_suffix_operation_id() {
+        Scenario scenario = newScenario();
+        EditOpenAPIDocumentPage editPage = openEditOpenAPIDocumentPage(scenario.endUser, scenario.openAPIDocument);
+
+        AddBIEForOpenAPIDocumentDialog dialog = editPage.openAddBIEForOpenAPIDocumentDialog();
+        sendKeys(dialog.getInputFieldInSearchBar(), scenario.bie.getDen());
+        dialog.hitSearchButton();
+
+        WebElement candidateRow = dialog.getTableRecordByValue(scenario.bie.getDen());
+        dialog.toggleSelect(candidateRow);
+        dialog.setVerb(candidateRow, "POST");
+        dialog.setMessageBody(candidateRow, "Request");
+        dialog.setArrayIndicator(candidateRow, true);
+        dialog.hitAddButton();
+
+        WebElement row = editPage.getTableRecordAtIndex(1);
+        assertTrue(editPage.getRowOperationId(row).endsWith("List"),
+                "Checking the Array Indicator at add time in the dialog should yield a 'List'-suffixed Operation ID");
+        assertTrue(editPage.isRowArrayIndicatorChecked(row),
+                "The assigned operation's Array Indicator should already be checked, without toggling it after add");
+    }
+
+    @Test
     @DisplayName("TC_43_6_4")
     public void changing_verb_swaps_only_the_verb_word_and_preserves_the_bie_name() {
         EditOpenAPIDocumentPage editPage = assignPost();
@@ -145,8 +169,12 @@ public class TC_43_6_OperationIdNaming extends BaseTest {
     public void duplicate_operation_id_is_flagged_with_an_inline_error() {
         Scenario scenario = newScenario();
         EditOpenAPIDocumentPage editPage = openEditOpenAPIDocumentPage(scenario.endUser, scenario.openAPIDocument);
+        // Two DISTINCT operations are needed to create an Operation ID collision: #1492 no longer allows a
+        // second Request body on one (path, verb), so add the same BIE under two different verbs (each verb
+        // owns its own operation). Then force their Operation IDs to be equal and assert the #1732 inline
+        // uniqueness error.
         assignBie(editPage, scenario.bie, "POST", "Request");
-        assignBie(editPage, scenario.bie, "POST", "Request");
+        assignBie(editPage, scenario.bie, "PUT", "Request");
 
         WebElement firstRow = editPage.getTableRecordAtIndex(1);
         WebElement secondRow = editPage.getTableRecordAtIndex(2);
@@ -154,7 +182,7 @@ public class TC_43_6_OperationIdNaming extends BaseTest {
 
         editPage.setRowOperationId(secondRow, firstOperationId);
         assertEquals("Operation ID must be unique within the document.",
-                editPage.getRowOperationIdError(secondRow));
+                editPage.getRowOperationIdError(editPage.getTableRecordAtIndex(2)));
     }
 
     @Test

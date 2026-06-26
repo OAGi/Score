@@ -46,6 +46,35 @@ describe('BieForOasDoc change detection for DELETE edits (#1610)', () => {
   });
 });
 
+describe('BieForOasDoc error-response body type (#1347)', () => {
+  it('defaults to NONE and round-trips through the save payload', () => {
+    const bie = new BieForOasDoc();
+    expect(bie.errorResponseBodyType).toBe('NONE');
+    expect(bie.json.errorResponseBodyType).toBe('NONE');
+    expect(bie.json.confirmMessageTopLevelAsbiepId).toBeUndefined();
+  });
+
+  it('detects an error-response body type change as unsaved', () => {
+    const bie = new BieForOasDoc();
+    bie.verb = 'POST';
+    bie.messageBody = 'Request';
+    bie.reset();
+    expect(bie.isChanged).toBe(false);
+    bie.errorResponseBodyType = 'PROBLEM_DETAILS';
+    expect(bie.isChanged).toBe(true);
+  });
+
+  it('detects a ConfirmMessage BIE change as unsaved and carries it in the payload', () => {
+    const bie = new BieForOasDoc();
+    bie.errorResponseBodyType = 'CONFIRM_MESSAGE';
+    bie.reset();
+    expect(bie.isChanged).toBe(false);
+    bie.confirmMessageTopLevelAsbiepId = 42;
+    expect(bie.isChanged).toBe(true);
+    expect(bie.json.confirmMessageTopLevelAsbiepId).toBe(42);
+  });
+});
+
 describe('operationId construction for DELETE (#1610 DELETE operations)', () => {
   it('maps the DELETE verb to the "delete" word', () => {
     expect(operationIdVerbWord('DELETE')).toBe('delete');

@@ -37,6 +37,9 @@ The end user cannot discard an OpenAPI Document in "OpenAPI Document" page if it
 #### Test Assertion #43.1.10
 The end user can discard an OpenAPI Document in View/Edit OpenAPI Document page if it is not in any assignments.
 
+#### Test Assertion #43.1.11
+On the Create OpenAPI Document page, the `OpenAPI Version` field defaults to `3.1.1` when the page is opened, so a newly created document starts as an OpenAPI 3.1.1 document unless the end user changes it (Issue #1610).
+
 ### Test Step Pre-condition:
 1. An end-user account that can access the BIE menu is available in connectCenter.
 2. OpenAPI Document records needed for create, search, edit, discard, and used-document validation scenarios are available or can be created during the test.
@@ -63,6 +66,8 @@ The end user can discard an OpenAPI Document in View/Edit OpenAPI Document page 
 17. Verify that the discard is rejected for the used OpenAPI Document. (Assertion [#8](#test-assertion-4318))
 18. Open an OpenAPI Document that is not used in any dependent OpenAPI-related records or assignments in the View/Edit OpenAPI Document page and discard it.
 19. Verify that the discard succeeds and that the discarded OpenAPI Document no longer appears in the OpenAPI Document list. (Assertion [#10](#test-assertion-43110))
+20. Open the Create OpenAPI Document page without changing any field, and inspect the `OpenAPI Version` field's value.
+21. Verify that the `OpenAPI Version` field defaults to `3.1.1`. (Assertion [#11](#test-assertion-43111))
 
 ## Test Case 43.2
 
@@ -340,6 +345,9 @@ Attempting to save the document with a blank Operation ID is blocked and the mes
 #### Test Assertion #43.6.10
 After the end user edits an Operation ID to a custom value and saves, that exact Operation ID value is persisted and appears verbatim in the file produced by the Generate action.
 
+#### Test Assertion #43.6.11
+When the Array Indicator is checked AT ADD TIME in the `Add BIE For OpenAPI Document` dialog (before the BIE is added), the resulting assignment's Operation ID already carries the trailing `List` suffix and the assigned row's Array Indicator is already checked, without the end user toggling the Array Indicator on the row after the add (Issue #1732).
+
 ### Test Step Pre-condition:
 1. An end-user account that can access the BIE menu and the OpenAPI Document feature is available in connectCenter.
 2. At least one OpenAPI Document exists and can be opened on the Edit OpenAPI Document page.
@@ -361,6 +369,8 @@ After the end user edits an Operation ID to a custom value and saves, that exact
 11. Clear the Operation ID of one assignment so it is blank, and verify that the inline error `Operation ID is required.` is shown on that Operation ID field. (Assertion [#8](#test-assertion-4368))
 12. With one Operation ID still blank, attempt to save the document, and verify that the save is blocked, the message `Operation ID is required.` is shown, and the blank value is not persisted. (Assertion [#9](#test-assertion-4369))
 13. Edit an Operation ID to a custom value, save the document successfully, then trigger the Generate action and open the downloaded file, and verify that the custom Operation ID value is persisted and appears verbatim in the generated file. (Assertion [#10](#test-assertion-43610))
+14. Open the `Add BIE For OpenAPI Document` dialog, select an assignable BIE, choose a Verb (for example `POST`) and a valid Message Body, check the Array Indicator in the dialog before adding, and add the BIE; then inspect the new assignment's Operation ID and Array Indicator on the Edit OpenAPI Document page.
+15. Verify that the resulting Operation ID already ends with the `List` suffix and that the assigned row's Array Indicator is already checked, without toggling the Array Indicator on the row after the add. (Assertion [#11](#test-assertion-43611))
 
 ## Test Case 43.7
 
@@ -522,6 +532,9 @@ The same document switched to OpenAPI Version `3.0.3` and regenerated downloads 
 #### Test Assertion #43.9.3
 Because the document is generated from its persisted record, clicking `Generate` while the Edit OpenAPI Document page has unsaved changes (for example, after changing the `OpenAPI Version` without clicking `Update`) is blocked: a notification reads `There are unsaved changes. Please click Update before generating the document.` and no file is downloaded. After clicking `Update`, `Generate` produces a file whose root `openapi` field reflects the newly saved version.
 
+#### Test Assertion #43.9.4
+A BBIE that carries a Fixed Value is expressed with the JSON Schema 2020-12 `const` keyword in an OpenAPI `3.1.1` document — the property emits `const: <value>` and does NOT also emit the OpenAPI 3.0-only single-value `enum` — and is expressed with a single-element `enum: [<value>]` in an OpenAPI `3.0.3` document, where the property emits exactly that one-element `enum` and does NOT emit the 3.1-only `const` (Issue #1610).
+
 ### Test Step Pre-condition:
 1. An end-user account that can access the BIE menu is available in connectCenter.
 2. A BIE that the end user can assign to an OpenAPI Document exists.
@@ -538,6 +551,8 @@ Because the document is generated from its persisted record, clicking `Generate`
 7. Verify that the root `openapi` field is now `3.0.3`. (Assertion [#2](#test-assertion-4392))
 8. Change the `OpenAPI Version` again (for example back to `3.1.1`) but do NOT click `Update`, then click `Generate`.
 9. Verify that generation is blocked, that the notification `There are unsaved changes. Please click Update before generating the document.` is shown, and that no file is downloaded; then click `Update`, click `Generate`, and verify that the downloaded file's root `openapi` field reflects the saved version. (Assertion [#3](#test-assertion-4393))
+10. Prepare a BIE whose BBIE carries a Fixed Value (for example, in the BIE editor mark the BBIE used, set its value constraint to `Fixed Value`, enter a fixed value, and restrict the value domain to the `Primitive` `token`). On a document set to OpenAPI Version `3.1.1` (click `Update` after the version change), assign that BIE, click `Generate`, and locate the fixed-value property in the generated component schema; then on a document at OpenAPI Version `3.0.3`, assign the same BIE, click `Generate`, and locate the same property.
+11. Verify that in the `3.1.1` document the fixed-value property emits `const: <value>` and no `enum`, and that in the `3.0.3` document the same property emits a single-element `enum: [<value>]` and no `const`. (Assertion [#4](#test-assertion-4394))
 
 ## Test Case 43.10
 
@@ -556,6 +571,12 @@ In an OpenAPI Document whose OpenAPI Version is `3.0.3`, the same `DELETE` opera
 #### Test Assertion #43.10.3
 A `DELETE` operation with Message Body `Response`, after `Generate`, emits a `200` response carrying the BIE via `#/components/schemas/<BIEName>` and emits no `requestBody`, like the other body-bearing verbs.
 
+#### Test Assertion #43.10.4
+In an OpenAPI Version `3.1.1` document, a `DELETE` operation with Message Body `Request` whose `Error Response` body type is set to `IETF Problem Details` emits the request-body error responses `415` and `422` (in addition to the always-present `500`) in the defaulted error matrix; the `415` and `422` responses are `$ref`s to the reusable `#/components/responses/415_UnsupportedMediaType` and `#/components/responses/422_UnprocessableContent` components (both materialized in `components/responses`). When the same document is switched to OpenAPI Version `3.0.3` and regenerated, the DELETE request body is dropped, so `415` and `422` no longer appear while the always-present `500` (Internal Server Error) remains (Issue #1610 × Issue #1347).
+
+#### Test Assertion #43.10.5
+In an OpenAPI Version `3.0.3` document, a `DELETE` operation with Message Body `Request` whose body is ignored (the amber "ignored DELETE body" banner is shown) still emits the defaulted error matrix carrying the status-only `202` (Accepted) success and the `404` (Not Found) and `500` (Internal Server Error) error responses, but NOT the request-body errors `415` and `422` (those require OpenAPI 3.1+ on `DELETE`), and the operation emits no `requestBody` (Issue #1610 × Issue #1347).
+
 ### Test Step Pre-condition:
 1. An end-user account that can access the BIE menu is available in connectCenter.
 2. A BIE that the end user can assign to an OpenAPI Document exists.
@@ -572,3 +593,175 @@ A `DELETE` operation with Message Body `Response`, after `Generate`, emits a `20
 7. Verify that the `DELETE` operation has no `requestBody` while it still declares a status-only `202` success response, and that no orphan request schema for the BIE remains in `components/schemas`. (Assertion [#2](#test-assertion-43102))
 8. On a `3.1.1` document, assign the BIE with Verb `DELETE` and Message Body `Response`, click `Generate`, and open the downloaded YAML file.
 9. Verify that the `DELETE` operation has no `requestBody` and declares a `200` response that references the BIE via `#/components/schemas/<BIEName>`. (Assertion [#3](#test-assertion-43103))
+10. On a `3.1.1` document, assign the BIE with Verb `DELETE` and Message Body `Request`, set that operation row's `Error Response` body type to `IETF Problem Details`, click `Update`, then click `Generate` and open the downloaded YAML file and inspect the `DELETE` operation's responses; then switch the same document's `OpenAPI Version` to `3.0.3`, click `Update`, click `Generate` again, and re-inspect the `DELETE` operation's responses.
+11. Verify that in `3.1.1` the `DELETE` operation declares `415`, `422`, and `500` responses, that the `415` response `$ref`s `#/components/responses/415_UnsupportedMediaType` and the `422` response `$ref`s `#/components/responses/422_UnprocessableContent` (both components are emitted), and that in `3.0.3` the `415` and `422` responses are gone while the `500` (Internal Server Error) response remains. (Assertion [#4](#test-assertion-43104))
+12. On a `3.0.3` document, assign the BIE with Verb `DELETE` and Message Body `Request`, leave the `Error Response` body type at its default (`No Response Body`), confirm the amber "ignored DELETE body" banner is shown, then click `Generate` and open the downloaded YAML file and inspect the `DELETE` operation.
+13. Verify that the `DELETE` operation has no `requestBody`, that it declares the status-only `202` (Accepted) success and the `404` and `500` error responses, and that it declares neither `415` nor `422`. (Assertion [#5](#test-assertion-43105))
+
+## Test Case 43.11
+
+**Configure the Error Response Body Type**
+
+Pre-condition: An end-user account that can access the BIE menu exists, and the environment allows downloading the generated OpenAPI document file (YAML) for inspection. On the Edit OpenAPI Document page, every operation row in the Endpoint Details table carries an inline `Error Response` selector offering `No Response Body`, `IETF Problem Details`, and `OAGi Confirm Message`. The body type lives on the operation and controls only the body of the defaulted 4xx/5xx error responses; the status codes are always emitted. Choosing `OAGi Confirm Message` opens a dedicated `Select ConfirmMessage BIE` dialog — a clone of the BIE-Express `Include Meta Header` and `Pagination Response` pickers, locked to the standard `Confirm Message` BIE: the DEN filter is fixed to `Confirm Message. Confirm Message` and the search box is disabled, the library is fixed to `connectSpec` (no Library selector), and the Branch is locked (disabled) to the release of the document's connected BIE. The listed candidates therefore share that DEN and are distinguished by their Business Context. For the `OAGi Confirm Message` cases a `Confirm Message. Confirm Message` BIE is available in that release.
+
+### Test Assertion:
+
+#### Test Assertion #43.11.1
+The `Error Response` cell of every operation is an inline selector offering exactly `No Response Body`, `IETF Problem Details`, and `OAGi Confirm Message`; it defaults to `No Response Body`, and it stays enabled even for a bodyless operation (one that references no BIE). While the body type is `No Response Body` no Confirm Message chip is shown.
+
+#### Test Assertion #43.11.2
+Selecting `IETF Problem Details` from the selector commits immediately without opening any dialog, the cell reads `IETF Problem Details`, and no Confirm Message chip is shown.
+
+#### Test Assertion #43.11.3
+Selecting `OAGi Confirm Message` opens a dialog titled `Select ConfirmMessage BIE` whose `Select` button is disabled until a BIE is chosen. After selecting a Confirm Message BIE (identified by its Business Context, since the picker is locked to `Confirm Message. Confirm Message` in the connected BIE's release) and clicking `Select`, the selector reads `OAGi Confirm Message` and an icon-only chip whose tooltip carries the picked BIE's DEN appears beneath it. The chosen body type and BIE persist after `Update` and reopening the document.
+
+#### Test Assertion #43.11.4
+Opening the `Select ConfirmMessage BIE` dialog and cancelling it without choosing a BIE — when the operation had no previously-picked Confirm Message BIE — reverts the selector to its previously committed body type (for example, back to `IETF Problem Details`), and no Confirm Message chip remains.
+
+#### Test Assertion #43.11.5
+Once `OAGi Confirm Message` is set with a picked BIE, clicking the chip reopens the `Select ConfirmMessage BIE` dialog; picking a different Confirm Message BIE (a different Business Context) keeps the body type `OAGi Confirm Message` and the chip, while cancelling that dialog keeps the existing BIE.
+
+#### Test Assertion #43.11.6
+Changing an operation's `Error Response` selector from `OAGi Confirm Message` back to `No Response Body` clears the picked Confirm Message BIE and removes the chip.
+
+#### Test Assertion #43.11.7
+After `Update` and `Generate`, the downloaded YAML emits the defaulted 4xx/5xx error responses according to each operation's body type: a `No Response Body` operation emits description-only error responses (no `content` body and no `$ref`); an `IETF Problem Details` operation references a reusable `#/components/responses/<code>_<Reason>` whose content is `application/problem+json` referencing a shared `#/components/schemas/ProblemDetails` schema; and an `OAGi Confirm Message` operation emits an `application/json` error-response body referencing the picked Confirm Message BIE's `#/components/schemas/<BIEName>` schema, which is materialized in `components/schemas`.
+
+#### Test Assertion #43.11.8
+In a document whose `OpenAPI Version` is `3.0.3`, the defaulted error responses render per body type identically to a `3.1.1` document (using the version-independent `500` Internal Server Error response as the anchor): a `No Response Body` operation's `500` response is description-only (description `Internal Server Error`, no `content` body, not a `$ref`); an `IETF Problem Details` operation's `500` response is a `$ref` to `#/components/responses/500_InternalServerError`, whose `application/problem+json` content references `#/components/schemas/ProblemDetails`; and an `OAGi Confirm Message` operation's `500` response carries an `application/json` body referencing the picked Confirm Message BIE's `#/components/schemas/<BIEName>` schema, which is materialized in `components/schemas` (Issue #1347).
+
+#### Test Assertion #43.11.9
+Changing an operation row's `Error Response` body type to `No Response Body` and then clicking `Update` clears the stored Confirm Message BIE reference (not merely the on-screen chip): after reopening the document, the row reads `No Response Body` and shows no Confirm Message chip, proving the stored reference was cleared (Issue #1347).
+
+### Test Step Pre-condition:
+1. An end-user account that can access the BIE menu is available in connectCenter.
+2. A `Confirm Message. Confirm Message` BIE that the end user can pick (in the connected BIE's release, under a known Business Context) exists for the `OAGi Confirm Message` cases.
+3. An OpenAPI Document exists that the end user can open into the Edit OpenAPI Document page.
+4. The environment allows downloading the generated OpenAPI document file (YAML) for inspection.
+
+### Test Step:
+1. Sign in to connectCenter as the end user and open the OpenAPI Document into the Edit OpenAPI Document page.
+2. Add a bodyless operation (for example a `DELETE` operation with path `/alpha`) and inspect its `Error Response` cell.
+3. Verify that the `Error Response` selector offers `No Response Body`, `IETF Problem Details`, and `OAGi Confirm Message`, defaults to `No Response Body`, stays enabled for the bodyless operation, and shows no Confirm Message chip. (Assertion [#1](#test-assertion-43111-1))
+4. Set the operation's `Error Response` selector to `IETF Problem Details`.
+5. Verify that `IETF Problem Details` commits straight from the selector with no dialog and shows no Confirm Message chip. (Assertion [#2](#test-assertion-43112))
+6. Set the selector to `OAGi Confirm Message`, observe the dialog, select the Confirm Message BIE by its Business Context, and click `Select`; then click `Update`, reopen the document, and re-inspect the operation.
+7. Verify that the `Select ConfirmMessage BIE` dialog opens with `Select` disabled until a BIE is chosen, that after picking a BIE the selector reads `OAGi Confirm Message` with a chip, and that the body type and picked BIE persist across `Update` and reopen. (Assertion [#3](#test-assertion-43113))
+8. On an operation set to `IETF Problem Details`, set the selector to `OAGi Confirm Message`, then cancel the `Select ConfirmMessage BIE` dialog without choosing a BIE.
+9. Verify that the selector reverts to `IETF Problem Details` and no Confirm Message chip remains. (Assertion [#4](#test-assertion-43114))
+10. On an operation already set to `OAGi Confirm Message` with a picked BIE, click the chip, pick a different Confirm Message BIE (a different Business Context), and click `Select`; then click the chip again and cancel the dialog.
+11. Verify that re-picking a different Confirm Message BIE keeps the body type `OAGi Confirm Message` (the chip carries the shared DEN), and that cancelling the chip dialog keeps the existing BIE. (Assertion [#5](#test-assertion-43115))
+12. On an operation set to `OAGi Confirm Message`, change the `Error Response` selector back to `No Response Body`.
+13. Verify that the Confirm Message BIE is cleared and the chip is removed. (Assertion [#6](#test-assertion-43116))
+14. Prepare three operations with `Error Response` set to `No Response Body`, `IETF Problem Details`, and `OAGi Confirm Message` (picking a BIE for the last), click `Update`, then click `Generate` and open the downloaded YAML file.
+15. Verify that the `No Response Body` operation's error responses are description-only (no `content`, no `$ref`), that the `IETF Problem Details` operation references `#/components/responses/<code>_<Reason>` whose content is `application/problem+json` referencing `#/components/schemas/ProblemDetails`, and that the `OAGi Confirm Message` operation's error responses carry an `application/json` body referencing the picked BIE's `#/components/schemas/<BIEName>` schema (materialized in `components/schemas`). (Assertion [#7](#test-assertion-43117))
+16. Set the document's `OpenAPI Version` to `3.0.3` and click `Update`, then prepare three operations with `Error Response` set to `No Response Body`, `IETF Problem Details`, and `OAGi Confirm Message` (picking a Confirm Message BIE for the last), click `Update`, then click `Generate` and open the downloaded YAML file, using each operation's `500` response as the anchor.
+17. Verify that the generated document targets OpenAPI `3.0.3`, that the `No Response Body` operation's `500` response is description-only (description `Internal Server Error`, no `content`, not a `$ref`), that the `IETF Problem Details` operation's `500` response `$ref`s `#/components/responses/500_InternalServerError` whose `application/problem+json` content references `#/components/schemas/ProblemDetails`, and that the `OAGi Confirm Message` operation's `500` response carries an `application/json` body referencing the picked BIE's `#/components/schemas/<BIEName>` schema (materialized in `components/schemas`). (Assertion [#8](#test-assertion-43118))
+18. On an operation set to `OAGi Confirm Message` with a picked BIE, change the `Error Response` body type back to `No Response Body`, click `Update`, then reopen the document and re-inspect the operation row.
+19. Verify that the reopened row reads `No Response Body` and shows no Confirm Message chip, confirming that the stored Confirm Message BIE reference was cleared (not merely hidden). (Assertion [#9](#test-assertion-43119))
+
+## Test Case 43.12
+
+**Request and Response on a Single Operation**
+
+Pre-condition: An end-user account that can access the BIE menu exists, and the environment allows downloading the generated OpenAPI document file (YAML) for inspection. One `oas_operation` represents one `(path, verb)` endpoint and can own at most one Request body and at most one Response body. On the Edit OpenAPI Document page, adding a Request BIE and then a Response BIE on the same `(path, verb)` find-or-creates a single operation, surfaced in the Endpoint Details table as two rows that share one `Operation ID`. A legitimate Request + Response pair must generate one path-item carrying both a `requestBody` and a body-bearing 2xx response, and must not be rejected by the operation-collision guard. A true duplicate — a second body of the same type (a 2nd Request or a 2nd Response) on the same `(path, verb)` — is blocked: at Add time the `Add BIE For OpenAPI Document` dialog disables `Add` and shows the candidate-row error `This endpoint already has a <Request|Response> body.`; at Update time a row driven into an existing `(Resource Name, Verb, Message Body)` slot flags the Verb / Message Body cells and clicking `Update` is blocked with the snackbar `Each (path, verb) can have only one Request and one Response body.` (no save, no download). The previously delivered `DELETE` + Request body (Issue #1610) and per-operation `Error Response Body Type` (Issue #1347) behaviors remain valid for such an operation, and removing one body of a two-body operation leaves the sibling body intact. Flipping an existing row's inline `Message Body` dropdown (`Request` &harr; `Response`) CONVERTS that body in place — it replaces the existing body rather than adding a second one that would re-fetch as a duplicate row.
+
+### Test Assertion:
+
+#### Test Assertion #43.12.1
+Adding a Request BIE and then a Response BIE for the same BIE on the same `(path, verb)` produces two Endpoint Details rows — one `Request` row and one `Response` row — that share a single, non-empty `Operation ID` (the second Add does not overwrite the existing operation's Operation ID). Neither row is flagged as a duplicate body slot, because the two bodies differ.
+
+#### Test Assertion #43.12.2
+After `Generate`, the downloaded YAML emits exactly one path-item for that `(path, verb)`; the single operation carries both the `requestBody` (from the Request body) and a `200` response (from the Response body) whose `application/json` content references the BIE via `#/components/schemas/<BIEName>`, and that schema is materialized in `components/schemas`.
+
+#### Test Assertion #43.12.3
+The legitimate Request + Response pair (two rows sharing one operation) is not rejected by the operation-collision guard: `Generate` succeeds and produces a downloadable file containing the `(path, verb)` path-item.
+
+#### Test Assertion #43.12.4
+A second body of the same type on one `(path, verb)` is blocked both at Add time and at Update time. At Add time, re-selecting the same BIE with the same `(verb, Message Body)` shows the `Add BIE For OpenAPI Document` candidate-row error `This endpoint already has a <Request|Response> body.` and disables `Add`, so no second body is added (the row count for the BIE is unchanged). At Update time, inline-editing a second BIE's row so its `(Resource Name, Verb, Message Body)` matches an existing operation's body slot flags the row as a duplicate body, and clicking `Update` is blocked with the snackbar `Each (path, verb) can have only one Request and one Response body.` — no save occurs and no file is downloaded.
+
+#### Test Assertion #43.12.5
+A `DELETE` operation may carry both a Request and a Response body on one operation (Issue #1610). In OpenAPI 3.1.1 the generated `DELETE` path-item carries a `requestBody` and a `200` response; in OpenAPI 3.0.3 the request body is dropped (the amber "ignored DELETE body" banner is shown above the Endpoint Details table) while the `200` response survives. Removing one body (the Request body) of the two-body operation leaves the sibling Response body intact: the `Response` row remains, the `Request` row is gone, and `Generate` still emits the `DELETE` operation with the surviving `200` response and no `requestBody`.
+
+#### Test Assertion #43.12.6
+An operation that carries both a Request and a Response body still honors its per-operation `Error Response Body Type` (Issue #1347). With `IETF Problem Details` selected, the generated operation keeps its `requestBody` and `200` success response and additionally emits the defaulted error-response matrix; the `500` (Internal Server Error) response is a `$ref` to the reusable `#/components/responses/500_InternalServerError` entry, which references the shared `#/components/schemas/ProblemDetails` schema.
+
+#### Test Assertion #43.12.7
+When an operation that carries both a Request and a Response body has its `Error Response Body Type` set to `OAGi Confirm Message` with a picked Confirm Message BIE, both Endpoint Details rows (the `Request` row and the `Response` row) read `OAGi Confirm Message` and show the Confirm Message DEN chip, and that body type and picked BIE survive `Update` and reopening the document on BOTH rows — the Response row's chip still carries the picked Confirm Message DEN after reopen (Issue #1347).
+
+#### Test Assertion #43.12.8
+Because the `Error Response Body Type` lives on the operation, setting it on ONE of the two rows of a Request + Response operation propagates LIVE to the sibling row before any `Update`: setting `IETF Problem Details` on the `Request` row makes the `Response` row read `IETF Problem Details` without saving, and flipping the `Response` row back to `No Response Body` makes the `Request` row read `No Response Body` (Issue #1347).
+
+#### Test Assertion #43.12.10
+Removing the `Response` body of a two-body operation leaves the `Request` sibling intact: the `Request` row remains and the `Response` row is gone, and after `Generate` the operation still carries its `requestBody` (from the surviving Request body) while no longer carrying a `200` success response (the removed Response body's response is dropped) (Issue #1492).
+
+#### Test Assertion #43.12.11
+A Request and a Response body on one `(path, verb)` operation share a single generated `Operation ID` and are NOT flagged with the `Operation ID must be unique within the document.` inline error: with both rows left on the generated `Operation ID`, neither the `Request` row nor the `Response` row shows the uniqueness mat-error (contrast Test Case 43.6, where two distinct operations colliding on one Operation ID ARE flagged) (Issue #1732).
+
+#### Test Assertion #43.12.12
+Flipping an existing operation row's inline `Message Body` dropdown from `Request` to `Response` and clicking `Update` CONVERTS that body in place rather than adding a second one: after reopening the document the Endpoint Details table shows exactly one row for the BIE, its `Message Body` reads `Response`, and the original `Request` body no longer exists. (Previously the flip left the `Request` row and added a `Response` row, so the operation owned both bodies and re-fetched as a duplicate.)
+
+#### Test Assertion #43.12.13
+The conversion is symmetric: flipping an existing `POST` operation row's `Message Body` from `Response` to `Request` and clicking `Update` likewise leaves exactly one row for the BIE after reopen, now reading `Request`, with the original `Response` body gone (no duplicate row).
+
+### Test Step Pre-condition:
+1. An end-user account that can access the BIE menu is available in connectCenter.
+2. Two top-level BIEs that the end user can add to an OpenAPI document exist (one for the single operation; a second, distinct one for the update-time duplicate case).
+3. An OpenAPI Document exists that the end user can open into the Edit OpenAPI Document page.
+4. The environment allows downloading the generated OpenAPI document file (YAML) for inspection.
+5. For the `OAGi Confirm Message` body-type case, a `Confirm Message. Confirm Message` BIE (in the connected BIE's release, under a known Business Context) exists so the locked ConfirmMessage picker shows a selectable candidate.
+
+### Test Step:
+1. Sign in to connectCenter as the end user and open the OpenAPI Document into the Edit OpenAPI Document page.
+2. Add the BIE with `POST` + `Request`, then add the same BIE with `POST` + `Response`, and inspect the two Endpoint Details rows.
+3. Verify that the two rows (one `Request`, one `Response`) share one non-empty `Operation ID` and that neither is flagged as a duplicate body. (Assertion [#1](#test-assertion-43121))
+4. Click `Generate` and open the downloaded YAML file.
+5. Verify that exactly one path-item exists for the `(path, POST)`, carrying both a `requestBody` and a `200` response that references `#/components/schemas/<BIEName>` (materialized in `components/schemas`). (Assertion [#2](#test-assertion-43122))
+6. Verify that generation succeeded and produced a downloadable file (the legitimate Request + Response pair is not rejected as a collision). (Assertion [#3](#test-assertion-43123))
+7. With the BIE already added as `POST` + `Request`, reopen the `Add BIE For OpenAPI Document` dialog, select the same BIE, and choose `POST` + `Request` again; observe the candidate-row error and the `Add` button. Then add a `POST` + `Response` to complete the first operation, add the second BIE as `GET` + `Response`, and inline-edit the second BIE's row Verb to `POST` and its Resource Name to match the first operation, then click `Update`.
+8. Verify that the dialog shows `This endpoint already has a Request body.` and disables `Add` (no second body added), and that after the inline edit the row is flagged as a duplicate body and clicking `Update` is blocked with the snackbar `Each (path, verb) can have only one Request and one Response body.` (no save, no download). (Assertion [#4](#test-assertion-43124))
+9. On a fresh document, set the OpenAPI Version to `3.1.1`, click `Update`, add the BIE as `DELETE` + `Request` and then `DELETE` + `Response`, and click `Generate`; then set the OpenAPI Version to `3.0.3`, click `Update`, inspect the banner, and click `Generate` again; finally set the version back to `3.1.1`, click `Update`, remove the `Request` row, and click `Generate` once more.
+10. Verify that the 3.1.1 `DELETE` path-item carries a `requestBody` and a `200` response; that in 3.0.3 the request body is dropped (the amber "ignored DELETE body" banner appears) while the `200` survives; and that after removing the `Request` body the `Response` row remains, the `Request` row is gone, and the `DELETE` operation still generates with the surviving `200` response and no `requestBody`. (Assertion [#5](#test-assertion-43125))
+11. On a fresh document, add the BIE as `POST` + `Request` and `POST` + `Response`, set the operation's `Error Response` selector to `IETF Problem Details`, click `Update`, then click `Generate` and open the downloaded YAML file.
+12. Verify that the `POST` operation keeps its `requestBody` and `200` response and additionally emits a `500` error response that `$ref`s `#/components/responses/500_InternalServerError`, which references `#/components/schemas/ProblemDetails`. (Assertion [#6](#test-assertion-43126))
+13. On a fresh document, add a `Confirm Message. Confirm Message` BIE as `POST` + `Request` and `POST` + `Response`, set the operation's `Error Response` selector (on the `Request` row) to `OAGi Confirm Message`, pick the Confirm Message BIE by its Business Context, inspect both rows, then click `Update`, reopen the document, and re-inspect both rows.
+14. Verify that before saving both the `Request` and `Response` rows read `OAGi Confirm Message` and show the Confirm Message DEN chip, and that after `Update` and reopen both rows still read `OAGi Confirm Message` with the Response row's chip carrying the picked Confirm Message DEN. (Assertion [#7](#test-assertion-43127))
+15. On a fresh document, add the BIE as `POST` + `Request` and `POST` + `Response`, set the `Request` row's `Error Response` selector to `IETF Problem Details` and read the `Response` row without saving, then set the `Response` row's selector to `No Response Body` and read the `Request` row without saving.
+16. Verify that setting `IETF Problem Details` on the `Request` row makes the `Response` row read `IETF Problem Details` live (before any `Update`), and that flipping the `Response` row to `No Response Body` makes the `Request` row read `No Response Body` live. (Assertion [#8](#test-assertion-43128))
+17. On a fresh document, add a bodyless operation `POST` `/x`, then add the BIE as `POST` + `Response` and set that row's Resource Name to `/x`, and click `Generate`; then add the second BIE as `GET` + `Response` and inline-edit its Verb to `POST` and its Resource Name to `/x`, and click `Update`.
+18. Verify that `Generate` emits exactly one `POST` path-item under `/x` carrying the Response body's `200` response, that the second `Response` body on `POST /x` is flagged as a duplicate body, and that clicking `Update` is blocked with the snackbar `Each (Resource Name, Verb) can have only one Request and one Response body.` (no save, no download). (Assertion [#9](#test-assertion-43129))
+19. On a fresh document, add the BIE as `POST` + `Request` and `POST` + `Response`, select and remove only the `Response` row, then click `Generate` and open the downloaded YAML file.
+20. Verify that the `Request` row remains and the `Response` row is gone, and that the generated `POST` operation still carries its `requestBody` while no longer carrying a `200` success response. (Assertion [#10](#test-assertion-431210))
+21. On a fresh document, add the BIE as `POST` + `Request` and `POST` + `Response`, leave both rows on the generated `Operation ID`, and inspect each row's `Operation ID` and any inline error.
+22. Verify that the `Request` and `Response` rows share one generated `Operation ID` and that neither row shows the `Operation ID must be unique within the document.` inline error. (Assertion [#11](#test-assertion-431211))
+
+## Test Case 43.13
+
+**Multi-select Add and OpenAPI Document Uniqueness**
+
+Pre-condition: An end-user account that can access the BIE menu exists. On the Edit OpenAPI Document page, the `Add BIE For OpenAPI Document` dialog lets the user check more than one candidate BIE — each with its own inline `Verb`, `Message Body`, and `Array Indicator` — and click `Add` once to add them all. Selecting several BIEs must add EVERY selected BIE, including two BIEs that merely share a property term: two profiles of one ASCCP under two different Business Contexts carry the same DEN but resolve to two different resource paths (the backend derives the path from the Business Context), so both can be added even when each is configured with the same `(Verb, Message Body)` such as `GET` + `Response`. (Previously the dialog de-duplicated the batch on `(property term, Verb, Message Body)` alone and aborted the whole `Add` on the first such collision, so selecting two same-property-term BIEs silently added nothing.) Separately, an OpenAPI Document is unique on the tuple `(Title, OpenAPI Version, Document Version, License Name)`. Creating a document whose tuple duplicates an existing document is rejected by the server, and editing one document's metadata so its tuple duplicates another document's is blocked before any save.
+
+### Test Assertion:
+
+#### Test Assertion #43.13.1
+In the `Add BIE For OpenAPI Document` dialog, checking two BIEs that share one DEN / property term (two Business-Context profiles of a single ASCCP), configuring BOTH as `GET` + `Response`, and clicking `Add` once adds both BIEs: the Endpoint Details table then carries two rows for the shared DEN (one per Business Context). The multi-select `Add` does not silently abort on the shared property term.
+
+#### Test Assertion #43.13.2
+Creating an OpenAPI Document whose `(Title, OpenAPI Version, Document Version, License Name)` equals an existing document's is rejected by the server: clicking `Create` surfaces the error `An OpenAPI document with the same Title, OpenAPI Version, Document Version, and License Name already exists.` and no second document is created.
+
+#### Test Assertion #43.13.3
+Editing an existing document's metadata so its `(Title, OpenAPI Version, Document Version, License Name)` equals another document's and clicking `Update` is blocked before any save: an `Invalid parameters` dialog states that another OpenAPI Doc with the same title, OpenAPI Version, Doc Version and License Name already exists, and the document is left unchanged.
+
+### Test Step Pre-condition:
+1. An end-user account that can access the BIE menu is available in connectCenter.
+2. For the multi-select case: a single ASCCP profiled into two top-level BIEs, each under a different Business Context, so the two BIEs carry the same DEN; and an OpenAPI Document the end user can open into the Edit OpenAPI Document page.
+3. For the uniqueness cases: two distinct OpenAPI Documents whose `(Title, OpenAPI Version, Document Version, License Name)` tuples are known (each with a non-empty License Name).
+
+### Test Step:
+1. Sign in to connectCenter as the end user and open the OpenAPI Document into the Edit OpenAPI Document page.
+2. Open the `Add BIE For OpenAPI Document` dialog, search by the shared DEN, check BOTH candidate rows, set each row's `Verb` to `GET` and `Message Body` to `Response`, and click `Add`.
+3. Verify that both BIEs were added — the Endpoint Details table shows two rows for the shared DEN. (Assertion [#1](#test-assertion-43131))
+4. Open the `Create OpenAPI Document` page, enter the same `OpenAPI Version`, `Title`, `Document Version`, and `License Name` as an existing document, and click `Create`.
+5. Verify that the create is rejected with `An OpenAPI document with the same Title, OpenAPI Version, Document Version, and License Name already exists.` and that no second document is created. (Assertion [#2](#test-assertion-43132))
+6. Open a different existing document into the Edit OpenAPI Document page, change its `Title`, `Document Version`, and `License Name` to equal another document's (keeping the same `OpenAPI Version`), and click `Update`.
+7. Verify that the update is blocked before any save with an `Invalid parameters` dialog stating that another OpenAPI Doc with the same title, OpenAPI Version, Doc Version and License Name already exists, and that the document is unchanged. (Assertion [#3](#test-assertion-43133))

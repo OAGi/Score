@@ -530,4 +530,119 @@ public interface EditOpenAPIDocumentPage extends Page {
      */
     boolean isRowMessageBodyDisabled(WebElement tableRecord);
 
+    /* ----------------------------------------------------- Issue #1492 (Option 2): one operation, two bodies */
+
+    /**
+     * Return the Message Body shown on an operation row ({@code Request} or {@code Response}).
+     *
+     * @param tableRecord the operation row
+     * @return the Message Body value
+     */
+    String getRowMessageBody(WebElement tableRecord);
+
+    /**
+     * Flip an operation row's inline 'Message Body' dropdown to the given value ({@code Request} or
+     * {@code Response}). On an already-saved row this is an in-place body-type conversion: clicking Update
+     * must convert the existing body rather than add a second one (no duplicate row).
+     *
+     * @param tableRecord the operation row
+     * @param messageBody {@code Request} or {@code Response}
+     */
+    void setRowMessageBody(WebElement tableRecord, String messageBody);
+
+    /**
+     * Click the 'Update' button WITHOUT asserting the success snackbar. Unlike {@link #hitUpdateButton()}
+     * (which asserts {@code Updated}), this is used to exercise the Issue #1492 update-time duplicate-body
+     * guard: clicking Update on a document that has two same-type bodies on one {@code (path, verb)} is
+     * blocked with a snackbar and no save occurs, so the caller reads {@code getSnackBarMessage(...)}.
+     */
+    void clickUpdateButton();
+
+    /**
+     * Return the inline duplicate-body error message currently shown on an operation row's
+     * {@code Message Body} cell (Issue #1492, Option 2), or an empty string when there is no error. The
+     * frontend surfaces {@code "Duplicate <Request|Response> body on this endpoint."} on the Message Body
+     * cell of a row whose {@code (Resource Name, Verb, Message Body)} slot occurs more than once.
+     *
+     * @param tableRecord the operation row
+     * @return the inline error message, or an empty string
+     */
+    String getRowMessageBodyError(WebElement tableRecord);
+
+    /**
+     * Return whether an operation row is flagged as a duplicate body slot (Issue #1492, Option 2). The
+     * frontend renders an {@code .oas-body-slot-error-text} hint on the Verb / Message Body cells of a row
+     * whose {@code (Resource Name, Verb, Message Body)} slot occurs more than once among the loaded rows.
+     *
+     * @param tableRecord the operation row
+     * @return {@code true} when the row shows the duplicate-body error
+     */
+    boolean isRowDuplicateBodyWarningDisplayed(WebElement tableRecord);
+
+    /* ----------------------------------------------------- Issue #1347: error response body type */
+
+    /**
+     * Return the body type shown on an operation row's inline Error Response selector
+     * ({@code None} | {@code ProblemDetails} | {@code ConfirmMessage}).
+     *
+     * @param tableRecord the operation row
+     * @return the selected body-type label
+     */
+    String getRowErrorResponseBodyType(WebElement tableRecord);
+
+    /**
+     * Return whether the inline Error Response selector of an operation row is enabled (it stays enabled
+     * for every operation, including a bodyless one that references no BIE).
+     *
+     * @param tableRecord the operation row
+     * @return {@code true} when enabled
+     */
+    boolean isRowErrorResponseSelectorEnabled(WebElement tableRecord);
+
+    /**
+     * Set an operation row's Error Response body type to {@code No Response Body} or
+     * {@code IETF Problem Details}. These commit immediately without opening a dialog. Use
+     * {@link #openConfirmMessageDialogViaSelector} for the {@code OAGi Confirm Message} option, which
+     * opens the BIE-selection dialog.
+     *
+     * @param tableRecord the operation row
+     * @param label       {@code No Response Body} or {@code IETF Problem Details}
+     */
+    void setRowErrorResponseBodyType(WebElement tableRecord, String label);
+
+    /**
+     * Select the {@code OAGi Confirm Message} option on an operation row's Error Response selector, which
+     * opens the 'Select ConfirmMessage BIE' dialog.
+     *
+     * @param tableRecord the operation row
+     * @return the opened dialog
+     */
+    OasDocConfirmMessageDialog openConfirmMessageDialogViaSelector(WebElement tableRecord);
+
+    /**
+     * Re-open the 'Select ConfirmMessage BIE' dialog from an operation row's ConfirmMessage DEN chip
+     * (shown once CONFIRM_MESSAGE is selected).
+     *
+     * @param tableRecord the operation row
+     * @return the opened dialog
+     */
+    OasDocConfirmMessageDialog openConfirmMessageDialogViaChip(WebElement tableRecord);
+
+    /**
+     * Return whether an operation row shows the ConfirmMessage DEN chip (present only for CONFIRM_MESSAGE).
+     *
+     * @param tableRecord the operation row
+     * @return {@code true} when the chip is displayed
+     */
+    boolean isRowConfirmMessageChipDisplayed(WebElement tableRecord);
+
+    /**
+     * Return the text of an operation row's ConfirmMessage DEN chip (the picked DEN, or a 'pick' prompt
+     * when no BIE has been chosen yet), or an empty string when the chip is absent.
+     *
+     * @param tableRecord the operation row
+     * @return the chip text
+     */
+    String getRowConfirmMessageChipText(WebElement tableRecord);
+
 }

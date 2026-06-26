@@ -128,7 +128,7 @@ export class OpenAPIService {
   }
 
   checkTitleUniqueness(oasDoc: OasDoc): Observable<any> {
-    return this.http.post('/api/oas_docs/check_name_uniqueness', {
+    return this.http.post('/api/oas_docs/check_title_uniqueness', {
       oasDocId: oasDoc.oasDocId,
       title: oasDoc.title
     });

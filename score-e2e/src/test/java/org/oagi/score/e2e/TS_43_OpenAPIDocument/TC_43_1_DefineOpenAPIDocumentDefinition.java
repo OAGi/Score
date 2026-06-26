@@ -301,6 +301,21 @@ public class TC_43_1_DefineOpenAPIDocumentDefinition extends BaseTest {
         assertThrows(NoSuchElementException.class, () -> discardedOpenAPIDocumentPage.openEditOpenAPIDocumentPage(randomOpenAPIDocument));
     }
 
+    @Test
+    @DisplayName("TC_43_1_11")
+    public void create_dialog_defaults_openapi_version_to_3_1_1() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        OpenAPIDocumentPage openAPIDocumentPage = bieMenu.openOpenAPIDocumentSubMenu();
+        CreateOpenAPIDocumentPage createOpenAPIDocumentPage = openAPIDocumentPage.openCreateOpenAPIDocumentPage();
+
+        // Issue #1610: the Create dialog must default the OpenAPI Version to "3.1.1".
+        assertEquals("3.1.1", getText(createOpenAPIDocumentPage.getOpenAPIVersionSelectField()));
+    }
+
     @AfterEach
     public void tearDown() {
         super.tearDown();

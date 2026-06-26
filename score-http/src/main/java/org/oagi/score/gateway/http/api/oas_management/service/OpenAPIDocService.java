@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -91,6 +92,9 @@ public class OpenAPIDocService {
                 request.getLicenseUrl());
         validateSecuritySchemes(request.getSecuritySchemes());
         validateSecurityRequirements(request.getSecuritySchemes(), request.getSecurityRequirements());
+        // Enforce document uniqueness server-side (the frontend's check_uniqueness is advisory only).
+        assertOasDocUnique(requester, null,
+                request.getTitle(), request.getOpenAPIVersion(), request.getVersion(), request.getLicenseName());
         CreateOasDocResponse response = command(requester).createOasDoc(request);
         return response;
     }
@@ -106,6 +110,11 @@ public class OpenAPIDocService {
                 request.getLicenseUrl());
         validateSecuritySchemes(request.getSecuritySchemes());
         validateSecurityRequirements(request.getSecuritySchemes(), request.getSecurityRequirements());
+        // Enforce document uniqueness server-side, excluding this document's own id (the frontend's
+        // check_uniqueness is advisory only).
+        assertOasDocUnique(requester,
+                (request.getOasDocId() != null) ? request.getOasDocId().value() : null,
+                request.getTitle(), request.getOpenAPIVersion(), request.getVersion(), request.getLicenseName());
         UpdateOasDocResponse response = command(requester).updateOasDoc(request);
         return response;
     }
@@ -609,6 +618,29 @@ public class OpenAPIDocService {
         if (value != null && value.length() > maxLength) {
             throw new IllegalArgumentException(
                     String.format("`%s` must not exceed %d characters.", fieldName, maxLength));
+        }
+    }
+
+    // Server-side guard mirroring the frontend `check_uniqueness`: an OpenAPI document is unique on
+    // (Title, OpenAPI Version, Document Version, License Name). `oasDocId` is null on create (no
+    // self-exclusion) and the current id on update (so a document does not conflict with itself).
+    private void assertOasDocUnique(ScoreUser requester, BigInteger oasDocId,
+                                    String title, String openAPIVersion, String version, String licenseName) {
+        // The uniqueness query requires title + OpenAPI version; if either is absent, leave it to the
+        // field-level validation / persistence to surface the problem rather than throwing a vague error.
+        if (isBlank(title) || isBlank(openAPIVersion)) {
+            return;
+        }
+        OasDoc probe = new OasDoc();
+        probe.setOasDocId(oasDocId);
+        probe.setTitle(title);
+        probe.setOpenAPIVersion(openAPIVersion);
+        probe.setVersion(version);
+        probe.setLicenseName(licenseName);
+        // checkOasDocUniqueness returns true when unique (no conflicting row).
+        if (!checkOasDocUniqueness(requester, probe)) {
+            throw new IllegalArgumentException(
+                    "An OpenAPI document with the same Title, OpenAPI Version, Document Version, and License Name already exists.");
         }
     }
 

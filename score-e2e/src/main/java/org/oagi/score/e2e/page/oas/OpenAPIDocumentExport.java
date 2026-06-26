@@ -100,6 +100,36 @@ public class OpenAPIDocumentExport {
         return (ref instanceof String) ? (String) ref : null;
     }
 
+    /**
+     * The schema object of one property of a named schema — {@code schemas.<schemaName>.properties.<propertyName>}
+     * — or {@code null} when the schema or property is absent. (Issue #1610: lets a test read into the inner
+     * shape of a generated BIE schema, e.g. a fixed-value or example-bearing BBIE property.)
+     */
+    public Map<String, Object> schemaProperty(String schemaName, String propertyName) {
+        Map<String, Object> schema = schema(schemaName);
+        Map<String, Object> properties = schema == null ? null : asMap(schema.get("properties"));
+        return properties == null ? null : asMap(properties.get(propertyName));
+    }
+
+    /**
+     * The {@code const} (fixed value) of a property schema — OpenAPI 3.1 / JSON Schema 2020-12 — or
+     * {@code null} when the property is not a fixed value. The 3.0 generator emits a single-element
+     * {@code enum} instead (see {@link #schemaProperty}).
+     */
+    public Object schemaConst(String schemaName, String propertyName) {
+        Map<String, Object> property = schemaProperty(schemaName, propertyName);
+        return property == null ? null : property.get("const");
+    }
+
+    /**
+     * The {@code examples} array of a property schema (OpenAPI 3.1), or an empty list when absent.
+     */
+    public List<Object> schemaExamples(String schemaName, String propertyName) {
+        Map<String, Object> property = schemaProperty(schemaName, propertyName);
+        List<Object> examples = property == null ? null : asList(property.get("examples"));
+        return examples == null ? Collections.emptyList() : examples;
+    }
+
     /* -------------------------------------------------------------- security */
 
     public Map<String, Object> securitySchemes() {
@@ -374,6 +404,100 @@ public class OpenAPIDocumentExport {
             }
         }
         return null;
+    }
+
+    /**
+     * The raw response object (a map) at the given path / method / status code, or {@code null} when
+     * absent. The code is matched against the serialized key (which SnakeYAML may parse as an integer).
+     */
+    public Map<String, Object> responseNode(String path, String method, String code) {
+        Map<String, Object> operation = operation(path, method);
+        if (operation == null) {
+            return null;
+        }
+        Map<String, Object> responses = asMap(operation.get("responses"));
+        if (responses == null) {
+            return null;
+        }
+        for (Map.Entry<String, Object> entry : responses.entrySet()) {
+            if (String.valueOf(entry.getKey()).equals(code)) {
+                return asMap(entry.getValue());
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Whether the operation declares a response for the given status code.
+     */
+    public boolean operationHasResponse(String path, String method, String code) {
+        return operationResponseCodes(path, method).contains(code);
+    }
+
+    /**
+     * The {@code $ref} of a response object (e.g. a PROBLEM_DETAILS response referencing a reusable
+     * {@code components.responses} entry), or {@code null} when the response is inline / absent.
+     */
+    public String responseRef(String path, String method, String code) {
+        Map<String, Object> response = responseNode(path, method, code);
+        Object ref = response == null ? null : response.get("$ref");
+        return (ref instanceof String) ? (String) ref : null;
+    }
+
+    /**
+     * Whether a response declares any {@code content} (a body). NONE responses are description-only.
+     */
+    public boolean responseHasContent(String path, String method, String code) {
+        Map<String, Object> response = responseNode(path, method, code);
+        return response != null && asMap(response.get("content")) != null;
+    }
+
+    /**
+     * The media-type keys of a response's {@code content} (e.g. {@code application/json}), or empty.
+     */
+    public Set<String> responseMediaTypes(String path, String method, String code) {
+        Map<String, Object> response = responseNode(path, method, code);
+        Map<String, Object> content = response == null ? null : asMap(response.get("content"));
+        return content == null ? Collections.emptySet() : new LinkedHashSet<>(content.keySet());
+    }
+
+    /**
+     * The {@code content.<mediaType>.schema.$ref} of a response (e.g. a CONFIRM_MESSAGE response's
+     * {@code application/json} schema reference), or {@code null} when absent.
+     */
+    public String responseContentSchemaRef(String path, String method, String code, String mediaType) {
+        Map<String, Object> response = responseNode(path, method, code);
+        Map<String, Object> content = response == null ? null : asMap(response.get("content"));
+        Map<String, Object> media = content == null ? null : asMap(content.get(mediaType));
+        Map<String, Object> schema = media == null ? null : asMap(media.get("schema"));
+        Object ref = schema == null ? null : schema.get("$ref");
+        return (ref instanceof String) ? (String) ref : null;
+    }
+
+    /**
+     * The reusable {@code components.responses} map (used by PROBLEM_DETAILS error responses), or empty.
+     */
+    public Map<String, Object> componentResponses() {
+        Map<String, Object> components = components();
+        Map<String, Object> responses = components == null ? null : asMap(components.get("responses"));
+        return responses == null ? Collections.emptyMap() : responses;
+    }
+
+    public boolean hasComponentResponse(String name) {
+        return componentResponses().containsKey(name);
+    }
+
+    /**
+     * The {@code content.<mediaType>.schema.$ref} of a reusable {@code components.responses} entry,
+     * or {@code null} when absent.
+     */
+    public String componentResponseContentSchemaRef(String name, String mediaType) {
+        Map<String, Object> response = asMap(componentResponses().get(name));
+        Map<String, Object> content = response == null ? null : asMap(response.get("content"));
+        Map<String, Object> media = content == null ? null : asMap(content.get(mediaType));
+        Map<String, Object> schema = media == null ? null : asMap(media.get("schema"));
+        Object ref = schema == null ? null : schema.get("$ref");
+        return (ref instanceof String) ? (String) ref : null;
     }
 
     /* ------------------------------------------------------- deep collectors */

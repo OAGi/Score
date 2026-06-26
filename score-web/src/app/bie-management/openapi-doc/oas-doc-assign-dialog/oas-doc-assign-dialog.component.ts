@@ -432,18 +432,37 @@ export class OasDocAssignDialogComponent implements OnInit {
         }
       }
     }
+    // De-duplicate the batch WITHOUT aborting it. The in-batch key is identity-aware (topLevelAsbiepId +
+    // array indicator) so two DIFFERENT selected BIEs that merely share a property term + (verb,
+    // messageBody) are not collapsed into one slot — that false collision previously made a multi-select
+    // Add silently no-op. A selection that truly duplicates a body already on the document, or an exact
+    // in-batch duplicate, is SKIPPED (not aborted) so the remaining selections are still added. The
+    // backend 400 remains the source of truth for real (path, verb, body) collisions.
     const batchKeys = new Set<string>();
+    const toAdd: BieForOasDoc[] = [];
+    let skipped = 0;
     for (const bieForOasDoc of selectedBieForOasDocs) {
       const verb = this.verbSelection[bieForOasDoc.topLevelAsbiepId];
       const messageBody = this.messageBodySelection[bieForOasDoc.topLevelAsbiepId];
-      const key = this.bodySlotKeyForAdd(bieForOasDoc.propertyTerm, verb, messageBody);
-      if (existingKeys.has(key) || batchKeys.has(key)) {
-        this.snackBar.open('This endpoint already has a ' + messageBody + ' body.', '', {
-          duration: 5000,
-        });
-        return;
+      const existingKey = this.bodySlotKeyForAdd(bieForOasDoc.propertyTerm, verb, messageBody);
+      const batchKey = `${bieForOasDoc.topLevelAsbiepId}|${!!bieForOasDoc.arrayIndicator}|${existingKey}`;
+      if (existingKeys.has(existingKey) || batchKeys.has(batchKey)) {
+        skipped++;
+        continue;
       }
-      batchKeys.add(key);
+      batchKeys.add(batchKey);
+      toAdd.push(bieForOasDoc);
+    }
+    if (toAdd.length === 0) {
+      this.snackBar.open('The selected BIE(s) already have that message body on this document.', '', {
+        duration: 5000,
+      });
+      return;
+    }
+    if (skipped > 0) {
+      this.snackBar.open(skipped + ' selection(s) skipped — that message body already exists on this document.', '', {
+        duration: 5000,
+      });
     }
 
     // Issue #1492 (Option 2): SERIALIZE the adds. Each Add find-or-creates the (path, verb) operation
@@ -453,7 +472,7 @@ export class OasDocAssignDialogComponent implements OnInit {
     // complete.
     this.loading = true;
     let addedCount = 0;
-    from(selectedBieForOasDocs).pipe(
+    from(toAdd).pipe(
       concatMap(bieForOasDoc => this.openAPIService.checkBIEReusedAcrossMultipleOperations(bieForOasDoc, this.oasDoc).pipe(
         concatMap(resp => {
           if (resp.errorMessages && resp.errorMessages.length > 0) {

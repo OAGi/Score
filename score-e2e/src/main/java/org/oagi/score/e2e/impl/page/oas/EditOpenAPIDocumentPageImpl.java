@@ -7,6 +7,7 @@ import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.oas.AddBIEForOpenAPIDocumentDialog;
 import org.oagi.score.e2e.page.oas.AddOperationForOpenAPIDocumentDialog;
 import org.oagi.score.e2e.page.oas.EditOpenAPIDocumentPage;
+import org.oagi.score.e2e.page.oas.OasDocConfirmMessageDialog;
 import org.oagi.score.e2e.page.oas.OasSecurityRequirementDialog;
 import org.oagi.score.e2e.page.oas.OasSecuritySchemeDialog;
 import org.oagi.score.e2e.page.oas.OpenAPIDocumentPage;
@@ -699,7 +700,12 @@ public class EditOpenAPIDocumentPageImpl extends BasePageImpl implements EditOpe
 
     @Override
     public void setRowResourceName(WebElement tableRecord, String resourceName) {
-        sendKeys(getColumnByName(tableRecord, "resourceName").findElement(By.tagName("input")), resourceName);
+        WebElement input = getColumnByName(tableRecord, "resourceName").findElement(By.tagName("input"));
+        // sendKeys() only clears when getText() is non-empty, but an <input>'s value is not its text content,
+        // so it would APPEND to the row's existing (derived) resource name. Clear explicitly to REPLACE it,
+        // which also fires (ngModelChange)="recomputeDuplicateBodySlots()" so the live duplicate warning updates.
+        clear(input);
+        sendKeys(input, resourceName);
     }
 
     @Override
@@ -738,5 +744,122 @@ public class EditOpenAPIDocumentPageImpl extends BasePageImpl implements EditOpe
         WebElement select = getColumnByName(tableRecord, "messageBody").findElement(By.tagName("mat-select"));
         return "true".equals(select.getAttribute("aria-disabled"))
                 || select.getAttribute("class").contains("mat-mdc-select-disabled");
+    }
+
+    /* ----------------------------------------------------- Issue #1492 (Option 2): one operation, two bodies */
+
+    @Override
+    public String getRowMessageBody(WebElement tableRecord) {
+        return getText(getColumnByName(tableRecord, "messageBody").findElement(By.tagName("mat-select")));
+    }
+
+    @Override
+    public void setRowMessageBody(WebElement tableRecord, String messageBody) {
+        WebElement messageBodyCell = getColumnByName(tableRecord, "messageBody");
+        click(getDriver(), messageBodyCell.findElement(By.tagName("mat-select")));
+        WebElement option = elementToBeClickable(getDriver(),
+                By.xpath("//mat-option[.//span[normalize-space(.) = \"" + messageBody + "\"]]"));
+        click(getDriver(), option);
+        waitFor(ofMillis(300L));
+    }
+
+    @Override
+    public void clickUpdateButton() {
+        // Driver-aware click: clear any lingering snackbar, scroll into view, JS-click on intercept.
+        // Unlike hitUpdateButton(), this does NOT assert the "Updated" snackbar: it is used to exercise the
+        // Issue #1492 update-time duplicate-body guard, where the click yields the dup-body snackbar (or the
+        // backend 400) instead of "Updated". The caller reads the snackbar.
+        click(getDriver(), getUpdateButton(true));
+        waitFor(ofMillis(500L));
+    }
+
+    @Override
+    public String getRowMessageBodyError(WebElement tableRecord) {
+        // Issue #1492 (Option 2): the Message Body cell renders 'Duplicate <Request|Response> body on this
+        // endpoint.' inside div.oas-body-slot-error-text when the row's (Resource Name, Verb, Message Body)
+        // slot is duplicated; absent otherwise.
+        WebElement cell = getColumnByName(tableRecord, "messageBody");
+        var errors = cell.findElements(By.cssSelector("div.oas-body-slot-error-text"));
+        return errors.isEmpty() ? "" : getText(errors.get(0));
+    }
+
+    @Override
+    public boolean isRowDuplicateBodyWarningDisplayed(WebElement tableRecord) {
+        // Issue #1492: a duplicate body slot surfaces 'Duplicate <Request|Response> body on this endpoint.'
+        // inside div.oas-body-slot-error-text in the MESSAGE BODY cell (the Verb cell intentionally does NOT
+        // repeat it; the Resource Name cell shows a separate mat-error). Check the Message Body cell.
+        WebElement messageBodyCell = getColumnByName(tableRecord, "messageBody");
+        return !messageBodyCell.findElements(By.cssSelector("div.oas-body-slot-error-text")).isEmpty();
+    }
+
+    /* ----------------------------------------------------- Issue #1347: error response body type */
+
+    @Override
+    public String getRowErrorResponseBodyType(WebElement tableRecord) {
+        WebElement select = getColumnByName(tableRecord, "errorResponse").findElement(By.tagName("mat-select"));
+        String text = getText(select);
+        return text == null ? "" : text.trim();
+    }
+
+    @Override
+    public boolean isRowErrorResponseSelectorEnabled(WebElement tableRecord) {
+        WebElement select = getColumnByName(tableRecord, "errorResponse").findElement(By.tagName("mat-select"));
+        return !"true".equals(select.getAttribute("aria-disabled"))
+                && !select.getAttribute("class").contains("mat-mdc-select-disabled");
+    }
+
+    @Override
+    public void setRowErrorResponseBodyType(WebElement tableRecord, String label) {
+        WebElement cell = getColumnByName(tableRecord, "errorResponse");
+        click(getDriver(), cell.findElement(By.tagName("mat-select")));
+        WebElement option = elementToBeClickable(getDriver(),
+                By.xpath("//mat-option[normalize-space(.) = " + xpathLiteral(label) + "]"));
+        click(getDriver(), option);
+        waitFor(ofMillis(400L));
+    }
+
+    @Override
+    public OasDocConfirmMessageDialog openConfirmMessageDialogViaSelector(WebElement tableRecord) {
+        retry(() -> {
+            WebElement cell = getColumnByName(tableRecord, "errorResponse");
+            click(getDriver(), cell.findElement(By.tagName("mat-select")));
+            WebElement option = elementToBeClickable(getDriver(),
+                    By.xpath("//mat-option[normalize-space(.) = \"OAGi Confirm Message\"]"));
+            click(getDriver(), option);
+            waitFor(ofMillis(1000L));
+        });
+        OasDocConfirmMessageDialog dialog = new OasDocConfirmMessageDialogImpl(this);
+        assert dialog.isOpened();
+        return dialog;
+    }
+
+    @Override
+    public OasDocConfirmMessageDialog openConfirmMessageDialogViaChip(WebElement tableRecord) {
+        retry(() -> {
+            WebElement cell = getColumnByName(tableRecord, "errorResponse");
+            click(getDriver(), cell.findElement(By.cssSelector("div.oas-confirm-message-chip")));
+            waitFor(ofMillis(1000L));
+        });
+        OasDocConfirmMessageDialog dialog = new OasDocConfirmMessageDialogImpl(this);
+        assert dialog.isOpened();
+        return dialog;
+    }
+
+    @Override
+    public boolean isRowConfirmMessageChipDisplayed(WebElement tableRecord) {
+        WebElement cell = getColumnByName(tableRecord, "errorResponse");
+        return !cell.findElements(By.cssSelector("div.oas-confirm-message-chip")).isEmpty();
+    }
+
+    @Override
+    public String getRowConfirmMessageChipText(WebElement tableRecord) {
+        WebElement cell = getColumnByName(tableRecord, "errorResponse");
+        if (cell.findElements(By.cssSelector("div.oas-confirm-message-chip")).isEmpty()) {
+            return "";
+        }
+        // The chip is icon-only now (space is tight); the picked DEN / 'pick' prompt is carried by the
+        // chip's aria-label (= its tooltip text) rather than by visible text.
+        String label = cell.findElement(By.cssSelector("div.oas-confirm-message-chip")).getAttribute("aria-label");
+        return label == null ? "" : label.trim();
     }
 }

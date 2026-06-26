@@ -221,6 +221,10 @@ public class TC_43_2_AddBIEToOpenAPIDocument extends BaseTest {
     @Test
     @DisplayName("TC_43_2_8")
     public void enduser_can_add_same_bie_again_when_operation_combination_differs() {
+        // Issue #1492 (Option 2): one oas_operation = one (path, verb). A GET+Response and a POST+Request
+        // for the same BIE resolve to DIFFERENT (path, verb) endpoints (the verb differs), so they remain
+        // two distinct operations / two grid rows even under Option 2. (Two DIFFERENT message bodies on the
+        // SAME (path, verb) now collapse into ONE operation — that case is covered by TC_43_12.)
         OpenApiAssignmentScenario scenario = createScenario(false);
 
         EditOpenAPIDocumentPage editOpenAPIDocumentPage =
@@ -237,7 +241,12 @@ public class TC_43_2_AddBIEToOpenAPIDocument extends BaseTest {
 
     @Test
     @DisplayName("TC_43_2_9")
-    public void enduser_can_add_same_bie_again_when_generated_operation_id_differs() {
+    public void enduser_cannot_add_same_bie_with_the_same_verb_and_message_body_twice() {
+        // Issue #1492 (Option 2): re-adding the SAME BIE with the SAME (verb, messageBody) is now a true
+        // duplicate body on one (path, verb). Under the old "two operations per add" model this produced a
+        // second row; under Option 2 the Add dialog blocks it: the candidate row shows the
+        // "This endpoint already has a <...> body." mat-error and the Add button is disabled, so no second
+        // row is created. (This supersedes the former TC_43_2_9, which asserted a second row was added.)
         OpenApiAssignmentScenario scenario = createScenario(false);
 
         EditOpenAPIDocumentPage editOpenAPIDocumentPage =
@@ -252,14 +261,20 @@ public class TC_43_2_AddBIEToOpenAPIDocument extends BaseTest {
         dialog.toggleSelect(row);
         dialog.setVerb(row, "GET");
         dialog.setMessageBody(row, "Response");
-        dialog.hitAddButton();
 
-        assertFalse(dialog.isOpened());
+        // The duplicate-body pre-check disables Add and surfaces the mat-error on the Message Body cell.
+        assertTrue(dialog.isDuplicateEndpointWarningDisplayed(),
+                "Re-adding the same (verb, message body) should warn that the endpoint already has that body");
+        assertEquals("This endpoint already has a Response body.",
+                dialog.getRowMessageBodyError(dialog.getTableRecordByValue(scenario.targetBie.getDen())));
+        assertThrows(TimeoutException.class, () -> dialog.getAddButton(true));
+        dialog.close();
 
+        // Only the original GET/Response row exists; the duplicate was never added.
         List<WebElement> rows = getDriver().findElements(By.xpath(
                 "//tbody/tr[.//*[contains(normalize-space(.), " +
                         org.oagi.score.e2e.impl.PageHelper.xpathLiteral(scenario.targetBie.getDen()) + ")]]"));
-        assertEquals(2, rows.size());
+        assertEquals(1, rows.size());
     }
 
     private OpenApiAssignmentScenario createScenario(boolean includeVisibleSecondaryBie) {

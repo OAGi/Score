@@ -133,6 +133,106 @@ public class TC_43_10_DeleteRequestBody extends BaseTest {
                 "A DELETE + Response operation should reference the BIE component schema via $ref");
     }
 
+    @Test
+    @DisplayName("TC_43_10_4")
+    public void delete_request_problem_details_emits_415_and_422_in_3_1_1_but_drops_them_in_3_0_3_keeping_500() {
+        // OpenAPI 3.1.1 honors a DELETE request body, so the 415/422 request-body error responses appear
+        // in the defaulted error matrix; OpenAPI 3.0.3 drops the DELETE request body, so 415/422 are gone
+        // while 500 (Internal Server Error, present for every verb in every version) always remains
+        // (Issue #1610 x Issue #1347).
+        Fixture fixture = newDocumentWithBie();
+        fixture.editPage.setOpenAPIVersion("3.1.1");
+        fixture.editPage.hitUpdateButton();
+        assignBie(fixture.editPage, fixture.bie, "DELETE", "Request");
+
+        // Re-fetch the assigned row (Angular re-renders the table on assign) and set the Error Response
+        // body type to IETF Problem Details, which materializes the reusable RFC 9457 response components.
+        WebElement row = fixture.editPage.getTableRecordByValue(fixture.bie.getDen());
+        fixture.editPage.setRowErrorResponseBodyType(row, "IETF Problem Details");
+        fixture.editPage.hitUpdateButton();
+
+        OpenAPIDocumentExport export =
+                OpenAPIDocumentExport.from(fixture.editPage.clickGenerateAndDownload());
+
+        assertEquals("3.1.1", String.valueOf(export.raw().get("openapi")));
+        String deletePath = findDeletePath(export);
+        assertNotNull(deletePath, "A DELETE operation should be emitted for the assigned BIE");
+        assertTrue(export.operationResponseCodes(deletePath, "delete").containsAll(Arrays.asList("415", "422", "500")),
+                "OpenAPI 3.1.1 should emit the 415/422 request-body errors (DELETE carries a body) plus the always-present 500 (were: "
+                        + export.operationResponseCodes(deletePath, "delete") + ")");
+        assertEquals("#/components/responses/415_UnsupportedMediaType",
+                export.responseRef(deletePath, "delete", "415"),
+                "The 415 PROBLEM_DETAILS error response should $ref the reusable 415 response component");
+        assertEquals("#/components/responses/422_UnprocessableContent",
+                export.responseRef(deletePath, "delete", "422"),
+                "The 422 PROBLEM_DETAILS error response should $ref the reusable 422 response component");
+        assertTrue(export.hasComponentResponse("415_UnsupportedMediaType"),
+                "The reusable 415 response component should be emitted");
+        assertTrue(export.hasComponentResponse("422_UnprocessableContent"),
+                "The reusable 422 response component should be emitted");
+
+        // Switch the same document to OpenAPI 3.0.3, save, and regenerate: 3.0.3 drops the DELETE request
+        // body, so 415/422 disappear from the error matrix while 500 remains.
+        fixture.editPage.setOpenAPIVersion("3.0.3");
+        fixture.editPage.hitUpdateButton();
+
+        OpenAPIDocumentExport export30 =
+                OpenAPIDocumentExport.from(fixture.editPage.clickGenerateAndDownload());
+
+        assertEquals("3.0.3", String.valueOf(export30.raw().get("openapi")));
+        String deletePath30 = findDeletePath(export30);
+        assertNotNull(deletePath30, "A DELETE operation should be emitted for the assigned BIE");
+        assertFalse(export30.operationResponseCodes(deletePath30, "delete").contains("415"),
+                "OpenAPI 3.0.3 drops the DELETE request body, so the 415 request-body error must not appear (were: "
+                        + export30.operationResponseCodes(deletePath30, "delete") + ")");
+        assertFalse(export30.operationResponseCodes(deletePath30, "delete").contains("422"),
+                "OpenAPI 3.0.3 drops the DELETE request body, so the 422 request-body error must not appear (were: "
+                        + export30.operationResponseCodes(deletePath30, "delete") + ")");
+        assertTrue(export30.operationResponseCodes(deletePath30, "delete").contains("500"),
+                "The always-present 500 (Internal Server Error) must remain in OpenAPI 3.0.3 (were: "
+                        + export30.operationResponseCodes(deletePath30, "delete") + ")");
+    }
+
+    @Test
+    @DisplayName("TC_43_10_5")
+    public void delete_request_body_dropped_in_3_0_3_still_emits_error_matrix_with_202_500_404_but_not_415_422() {
+        // The document created through the API defaults to OpenAPI Version 3.0.3, which drops a DELETE
+        // request body. The error matrix still defaults (body type NONE = description-only), carrying the
+        // verb's 404/500 errors plus the status-only 202 success, but NOT the 415/422 request-body errors
+        // (those need OpenAPI 3.1+ on DELETE) (Issue #1610 x Issue #1347).
+        Fixture fixture = newDocumentWithBie();
+        assignBie(fixture.editPage, fixture.bie, "DELETE", "Request");
+
+        // Sync on the assigned row so the operation list (and the banner state) has rendered.
+        fixture.editPage.getTableRecordByValue(fixture.bie.getDen());
+        assertTrue(fixture.editPage.isDeleteRequestBodyIgnoredWarningDisplayed(),
+                "An OpenAPI 3.0.3 document drops a DELETE request body, so the amber 'ignored DELETE body' banner is shown");
+
+        OpenAPIDocumentExport export =
+                OpenAPIDocumentExport.from(fixture.editPage.clickGenerateAndDownload());
+
+        assertEquals("3.0.3", String.valueOf(export.raw().get("openapi")));
+        String deletePath = findDeletePath(export);
+        assertNotNull(deletePath, "A DELETE operation should be emitted for the assigned BIE");
+        assertFalse(export.operationHasRequestBody(deletePath, "delete"),
+                "OpenAPI 3.0.3 should DROP the request body of a DELETE + Request operation");
+        assertTrue(export.operationResponseCodes(deletePath, "delete").contains("202"),
+                "A DELETE + Request operation should still declare a status-only 202 (Accepted) success in 3.0.3 (were: "
+                        + export.operationResponseCodes(deletePath, "delete") + ")");
+        assertTrue(export.operationResponseCodes(deletePath, "delete").contains("500"),
+                "The always-present 500 (Internal Server Error) must appear in the default error matrix (were: "
+                        + export.operationResponseCodes(deletePath, "delete") + ")");
+        assertTrue(export.operationResponseCodes(deletePath, "delete").contains("404"),
+                "A DELETE operation's default error matrix carries 404 (Not Found) (were: "
+                        + export.operationResponseCodes(deletePath, "delete") + ")");
+        assertFalse(export.operationResponseCodes(deletePath, "delete").contains("415"),
+                "OpenAPI 3.0.3 drops the DELETE request body, so the 415 request-body error must not appear (were: "
+                        + export.operationResponseCodes(deletePath, "delete") + ")");
+        assertFalse(export.operationResponseCodes(deletePath, "delete").contains("422"),
+                "OpenAPI 3.0.3 drops the DELETE request body, so the 422 request-body error must not appear (were: "
+                        + export.operationResponseCodes(deletePath, "delete") + ")");
+    }
+
     private static String findDeletePath(OpenAPIDocumentExport export) {
         return export.pathNames().stream()
                 .filter(path -> export.operation(path, "delete") != null)
