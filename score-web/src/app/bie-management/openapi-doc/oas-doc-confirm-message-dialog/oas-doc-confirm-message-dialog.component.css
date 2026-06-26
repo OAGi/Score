@@ -1,0 +1,88 @@
+.mat-paginator {
+  margin-bottom: 20px;
+}
+
+.element-detail {
+  overflow: hidden;
+  display: flex;
+}
+
+tr.detail-row {
+  height: 0;
+}
+
+tr.element-row:not(.expanded-row):hover {
+  background: #f5f5f5;
+}
+
+tr.element-row:not(.expanded-row):active {
+  background: #efefef;
+}
+
+.bie-guid {
+  font-size: 11px !important;
+  color: #767676 !important;
+}
+
+.bie-source, .bie-based {
+  font-size: 11px !important;
+  color: #767676 !important;
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.bie-source > a,
+.bie-based > a {
+  min-width: 0;
+}
+
+.element-row td {
+  border-bottom-width: 0;
+}
+
+.mat-column-businessContexts .businessContext {
+  display: block;
+}
+
+.mat-column-businessContexts .businessContext:not(:last-child) {
+  margin-bottom: 2px;
+}
+
+.mat-column-owner {
+  font-size: 13px;
+}
+
+.header {
+  border-bottom: 1px solid transparent;
+  box-sizing: border-box;
+  font-family: 'Google Sans', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: .1px;
+  line-height: 24px;
+  padding-top: 8px;
+  height: auto;
+  left: 0;
+  top: 0;
+  width: 100%;
+}
+
+.close {
+  position: relative;
+  margin-left: auto;
+  left: 12px;
+}
+
+.close button {
+  outline: none;
+}
+
+.actions {
+  bottom: 0;
+  left: 0;
+  overflow: visible;
+  width: 100%;
+  opacity: 1;
+  padding: 16px;
+}

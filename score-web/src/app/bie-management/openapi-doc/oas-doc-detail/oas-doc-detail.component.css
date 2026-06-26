@@ -146,6 +146,42 @@
   color: #bdbdbd;
 }
 
+/* Issue #1347: the re-pickable ConfirmMessage BIE chip shown under the Error Response selector when
+   CONFIRM_MESSAGE is chosen. Clicking it re-opens the BIE-selection dialog. */
+.oas-confirm-message-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Icon-only: keep the click/focus target at the 24px minimum (18px glyph + 3px padding each side). */
+  min-width: 24px;
+  min-height: 24px;
+  margin-top: 4px;
+  padding: 3px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #3f51b5;
+}
+
+.oas-confirm-message-chip:hover {
+  background: #f5f5f5;
+}
+
+.oas-confirm-message-chip:focus-visible {
+  outline: 2px solid #3f51b5;
+  outline-offset: 1px;
+}
+
+.oas-confirm-message-chip.unset {
+  color: #c62828;
+}
+
+.oas-confirm-message-chip-edit {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: inherit;
+}
+
 /* Issue #1610: amber banner shown above the Endpoint Details table when the document targets
    OpenAPI 3.0.3 and a DELETE operation still carries a Request body (which is dropped on generation). */
 .oas-delete-body-warning {

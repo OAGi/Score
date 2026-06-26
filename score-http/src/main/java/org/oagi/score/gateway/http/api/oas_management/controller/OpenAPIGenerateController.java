@@ -89,6 +89,10 @@ public class OpenAPIGenerateController {
             openAPITemplate.setHttpStatusCode(bieForOasDoc.getHttpStatusCode());
             openAPITemplate.setSecurityOverridden(bieForOasDoc.isSecurityOverridden());
             openAPITemplate.setSecurityRequirements(bieForOasDoc.getSecurityRequirements());
+            // Issue #1347: carry the per-operation error-response body type + ConfirmMessage BIE so the
+            // generator's post-step can emit/decorate the defaulted 4xx/5xx error responses.
+            openAPITemplate.setErrorResponseBodyType(bieForOasDoc.getErrorResponseBodyType());
+            openAPITemplate.setConfirmMessageTopLevelAsbiepId(bieForOasDoc.getConfirmMessageTopLevelAsbiepId());
 
             OasTag oasTag = oasDocService.getAssignedOasTag(requester, new GetAssignedOasTagRequest(requester)
                             .withOasOperationId(bieForOasDoc.getOasOperationId())

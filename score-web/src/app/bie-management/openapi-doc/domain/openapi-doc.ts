@@ -327,6 +327,9 @@ export class BieForOasDoc {
   bizCtxId: number;
   bizCtxName: string;
   access: string;
+  // Issue #1347: the release of this connected BIE. The OpenAPI Document has no release of its own, so
+  // the ConfirmMessage picker is locked to this (all connected BIEs of a document share one release).
+  releaseId: number;
   releaseNum: string;
   owner: string;
   version: string;
@@ -334,6 +337,11 @@ export class BieForOasDoc {
   state: string;
   businessContext: string;
   httpStatusCode: number;
+  // Issue #1347: per-operation error-response body type (PROBLEM_DETAILS | CONFIRM_MESSAGE | NONE) and,
+  // for CONFIRM_MESSAGE, the picked ConfirmMessage BIE (id + DEN for display).
+  errorResponseBodyType: string;
+  confirmMessageTopLevelAsbiepId: number;
+  confirmMessageDen: string;
   lastUpdateTimestamp: Date;
   createdBy: ScoreUser;
   lastUpdatedBy: ScoreUser;
@@ -361,6 +369,7 @@ export class BieForOasDoc {
     this.bizCtxId = obj && obj.bizCtxId || 0;
     this.bizCtxName = obj && obj.bizCtxName || '';
     this.access = obj && obj.access || '';
+    this.releaseId = obj && obj.releaseId || 0;
     this.releaseNum = obj && obj.releaseNum || '';
     this.owner = obj && obj.owner || '';
     this.version = obj && obj.version || '';
@@ -368,6 +377,9 @@ export class BieForOasDoc {
     this.state = obj && obj.state || '';
     this.businessContext = obj && obj.businessContext || '';
     this.httpStatusCode = obj && obj.httpStatusCode || undefined;
+    this.errorResponseBodyType = obj && obj.errorResponseBodyType || 'NONE';
+    this.confirmMessageTopLevelAsbiepId = obj && obj.confirmMessageTopLevelAsbiepId || undefined;
+    this.confirmMessageDen = obj && obj.confirmMessageDen || '';
     this.verb = obj && obj.verb || '';
     this.arrayIndicator = obj && obj.arrayIndicator || false;
     this.suppressRootIndicator = obj && obj.suppressRootIndicator || false;
@@ -400,7 +412,9 @@ export class BieForOasDoc {
       tagName: this.tagName,
       httpStatusCode: this.httpStatusCode,
       securityOverridden: this.securityOverridden,
-      securityRequirements: this.securityRequirements
+      securityRequirements: this.securityRequirements,
+      errorResponseBodyType: this.errorResponseBodyType,
+      confirmMessageTopLevelAsbiepId: this.confirmMessageTopLevelAsbiepId
     };
   }
 
@@ -482,7 +496,8 @@ export class BieForOasDoc {
     return hashCode4Array([this.oasDocId, this.topLevelAsbiepId, this.oasResourceId, this.oasOperationId,
       this.verb, this.messageBody, this.resourceName, this.operationId, this.tagName,
       this.arrayIndicator, this.suppressRootIndicator, this.securityOverridden,
-      JSON.stringify(this.securityRequirements || [])]);
+      JSON.stringify(this.securityRequirements || []),
+      this.errorResponseBodyType, this.confirmMessageTopLevelAsbiepId]);
   }
 
   reset(): void {

@@ -11,6 +11,7 @@ import {OasDocAssignDialogComponent} from './oas-doc-assign-dialog/oas-doc-assig
 import {OasDocAddOperationDialogComponent} from './oas-doc-add-operation-dialog/oas-doc-add-operation-dialog.component';
 import {OasDocSecuritySchemeDialogComponent} from './oas-doc-security-scheme-dialog/oas-doc-security-scheme-dialog.component';
 import {OasDocSecurityRequirementDialogComponent} from './oas-doc-security-requirement-dialog/oas-doc-security-requirement-dialog.component';
+import {OasDocConfirmMessageDialogComponent} from './oas-doc-confirm-message-dialog/oas-doc-confirm-message-dialog.component';
 import {MatMultiSortModule} from 'ngx-mat-multi-sort';
 import {AuthService} from '../../authentication/auth.service';
 import {MaterialModule} from '../../material.module';
@@ -70,7 +71,8 @@ const routes: Routes = [
     OasDocAssignDialogComponent,
     OasDocAddOperationDialogComponent,
     OasDocSecuritySchemeDialogComponent,
-    OasDocSecurityRequirementDialogComponent
+    OasDocSecurityRequirementDialogComponent,
+    OasDocConfirmMessageDialogComponent
   ],
   imports: [
     RouterModule.forChild(routes),

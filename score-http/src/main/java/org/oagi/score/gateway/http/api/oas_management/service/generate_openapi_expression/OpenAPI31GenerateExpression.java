@@ -9,6 +9,8 @@ import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListVa
 import org.oagi.score.gateway.http.api.bie_management.model.BIE;
 import org.oagi.score.gateway.http.api.bie_management.model.Facet;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
+
+import java.math.BigInteger;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.abie.AbieSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.asbie.AsbieSummaryRecord;
@@ -142,6 +144,24 @@ public class OpenAPI31GenerateExpression implements BieGenerateOpenApiExpression
     @Override
     public void generate(OpenAPITemplateForVerbOption template) {
         generateTemplate(template);
+    }
+
+    @Override
+    public void generateErrorResponses() {
+        // Issue #1347: merge the defaulted 4xx/5xx error responses into every generated operation.
+        // is31=true gates 415/422 onto DELETE (DELETE carries a request body only in 3.1+ — #1610).
+        List<ErrorResponseSchemas.OperationErrorSpec> specs = ErrorResponseSchemas.buildSpecs(
+                option.getTemplates(), this::getResolvedResourceName, this::resolveConfirmSchemaName);
+        ErrorResponseSchemas.injectErrorResponses(root, schemas, specs, true);
+    }
+
+    // Issue #1347: the components.schemas name of a ConfirmMessage BIE materialized via generate(TLA).
+    // resolveReusedSchemaName caches it in reusedTopLevelAsbiepNameMap keyed by the (owner) top-level id.
+    private String resolveConfirmSchemaName(BigInteger topLevelAsbiepId) {
+        if (topLevelAsbiepId == null || reusedTopLevelAsbiepNameMap == null) {
+            return null;
+        }
+        return reusedTopLevelAsbiepNameMap.get(new TopLevelAsbiepId(topLevelAsbiepId));
     }
 
     private boolean isFriendly() {

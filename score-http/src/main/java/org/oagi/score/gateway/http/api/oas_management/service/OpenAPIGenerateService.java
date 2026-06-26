@@ -7,6 +7,7 @@ import org.oagi.score.gateway.http.api.bie_management.model.expression.BieGenera
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.BieGenerateFailureException;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.GenerationContext;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpSummaryRecord;
+import org.oagi.score.gateway.http.api.oas_management.model.OpenAPIErrorResponseBodyType;
 import org.oagi.score.gateway.http.api.oas_management.model.OpenAPIGenerateExpressionOption;
 import org.oagi.score.gateway.http.api.oas_management.model.OpenAPITemplateForVerbOption;
 import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.BieGenerateOpenApiExpression;
@@ -24,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -80,6 +82,20 @@ public class OpenAPIGenerateService {
             template.setTopLevelAsbiep(topLevelAsbiepMap.get(template.getTopLevelAsbiepId()));
         }
 
+        // Issue #1347: seed each ConfirmMessage BIE (the picked error_confirm_top_level_asbiep_id of any
+        // CONFIRM_MESSAGE operation) into the context so its schema can be materialized and $ref'd by the
+        // defaulted error responses. This also makes the context non-null for an otherwise bodyless doc.
+        List<TopLevelAsbiepSummaryRecord> confirmMessageBies = new ArrayList<>();
+        for (TopLevelAsbiepId confirmId : collectConfirmMessageTlaIds(option)) {
+            TopLevelAsbiepSummaryRecord confirmRecord = topLevelAsbiepMap.get(confirmId);
+            if (confirmRecord == null) {
+                confirmRecord = topLevelAsbiepQuery.getTopLevelAsbiepSummary(confirmId);
+                topLevelAsbieps.add(confirmRecord);
+                topLevelAsbiepMap.put(confirmId, confirmRecord);
+            }
+            confirmMessageBies.add(confirmRecord);
+        }
+
         long millis = System.currentTimeMillis();
         String filename;
         if (StringUtils.hasLength(option.getOasDoc().getVersion())) {
@@ -102,6 +118,16 @@ public class OpenAPIGenerateService {
         for (OpenAPITemplateForVerbOption template : option.getTemplates()) {
             generateExpression.generate(template);
         }
+
+        // Issue #1347: materialize each ConfirmMessage BIE schema after the operation schemas (so the
+        // reused-name dedup is stable) so the error responses can $ref it by its resolved schema name.
+        for (TopLevelAsbiepSummaryRecord confirmRecord : confirmMessageBies) {
+            generateExpression.generate(confirmRecord);
+        }
+
+        // Issue #1347: single idempotent post-step — merge the defaulted 4xx/5xx error responses
+        // into every generated operation (after all templates are built, before serialization).
+        generateExpression.generateErrorResponses();
 
         File schemaExpressionFile;
         try {
@@ -300,6 +326,19 @@ public class OpenAPIGenerateService {
             return applicationContext.getBean(OpenAPI31GenerateExpression.class, generationContext, option);
         }
         return applicationContext.getBean(OpenAPI30GenerateExpression.class, generationContext, option);
+    }
+
+    // Issue #1347: the distinct ConfirmMessage BIEs referenced by CONFIRM_MESSAGE operations, in
+    // first-seen order (deduped).
+    private Set<TopLevelAsbiepId> collectConfirmMessageTlaIds(OpenAPIGenerateExpressionOption option) {
+        Set<TopLevelAsbiepId> ids = new LinkedHashSet<>();
+        for (OpenAPITemplateForVerbOption template : option.getTemplates()) {
+            if (OpenAPIErrorResponseBodyType.from(template.getErrorResponseBodyType()) == OpenAPIErrorResponseBodyType.CONFIRM_MESSAGE
+                    && template.getConfirmMessageTopLevelAsbiepId() != null) {
+                ids.add(new TopLevelAsbiepId(template.getConfirmMessageTopLevelAsbiepId()));
+            }
+        }
+        return ids;
     }
 
     private boolean isOpenApi31Version(String openAPIVersion) {

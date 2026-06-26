@@ -41,6 +41,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasResou
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasResourceTag.OasResourceTagPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasResponse.OasResponsePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasTag.OasTagPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.TopLevelAsbiep.TopLevelAsbiepPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.OasOperationRecord;
 
 
@@ -119,6 +120,21 @@ public class OasOperation extends TableImpl<OasOperationRecord> {
      * []; rows =&gt; the operation array). 0 = inherit the root security.
      */
     public final TableField<OasOperationRecord, Byte> SECURITY_OVERRIDDEN = createField(DSL.name("security_overridden"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "1 = this operation overrides the document-level security (0 rows => security: []; rows => the operation array). 0 = inherit the root security.");
+
+    /**
+     * The column <code>oagi.oas_operation.error_response_body_type</code>.
+     * PROBLEM_DETAILS | CONFIRM_MESSAGE | NONE -- body for this operation's
+     * defaulted 4xx/5xx error responses (issue #1347).
+     */
+    public final TableField<OasOperationRecord, String> ERROR_RESPONSE_BODY_TYPE = createField(DSL.name("error_response_body_type"), SQLDataType.VARCHAR(20).nullable(false).defaultValue(DSL.field(DSL.raw("'NONE'"), SQLDataType.VARCHAR)), this, "PROBLEM_DETAILS | CONFIRM_MESSAGE | NONE -- body for this operation's defaulted 4xx/5xx error responses (issue #1347).");
+
+    /**
+     * The column
+     * <code>oagi.oas_operation.error_confirm_top_level_asbiep_id</code>. When
+     * error_response_body_type = CONFIRM_MESSAGE, the ConfirmMessage BIE to
+     * emit (issue #1347).
+     */
+    public final TableField<OasOperationRecord, ULong> ERROR_CONFIRM_TOP_LEVEL_ASBIEP_ID = createField(DSL.name("error_confirm_top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "When error_response_body_type = CONFIRM_MESSAGE, the ConfirmMessage BIE to emit (issue #1347).");
 
     /**
      * The column <code>oagi.oas_operation.created_by</code>. The user who
@@ -223,7 +239,7 @@ public class OasOperation extends TableImpl<OasOperationRecord> {
 
     @Override
     public List<ForeignKey<OasOperationRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.OAS_OPERATION_CREATED_BY_FK, Keys.OAS_OPERATION_LAST_UPDATED_BY_FK, Keys.OAS_OPERATION_OAS_RESOURCE_ID_FK);
+        return Arrays.asList(Keys.OAS_OPERATION_CREATED_BY_FK, Keys.OAS_OPERATION_ERROR_CONFIRM_TLA_FK, Keys.OAS_OPERATION_LAST_UPDATED_BY_FK, Keys.OAS_OPERATION_OAS_RESOURCE_ID_FK);
     }
 
     private transient AppUserPath _oasOperationCreatedByFk;
@@ -237,6 +253,19 @@ public class OasOperation extends TableImpl<OasOperationRecord> {
             _oasOperationCreatedByFk = new AppUserPath(this, Keys.OAS_OPERATION_CREATED_BY_FK, null);
 
         return _oasOperationCreatedByFk;
+    }
+
+    private transient TopLevelAsbiepPath _topLevelAsbiep;
+
+    /**
+     * Get the implicit join path to the <code>oagi.top_level_asbiep</code>
+     * table.
+     */
+    public TopLevelAsbiepPath topLevelAsbiep() {
+        if (_topLevelAsbiep == null)
+            _topLevelAsbiep = new TopLevelAsbiepPath(this, Keys.OAS_OPERATION_ERROR_CONFIRM_TLA_FK, null);
+
+        return _topLevelAsbiep;
     }
 
     private transient AppUserPath _oasOperationLastUpdatedByFk;

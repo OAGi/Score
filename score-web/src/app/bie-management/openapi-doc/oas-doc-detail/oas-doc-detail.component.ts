@@ -26,6 +26,10 @@ import {OasDocAssignDialogComponent} from '../oas-doc-assign-dialog/oas-doc-assi
 import {OasDocAddOperationDialogComponent} from '../oas-doc-add-operation-dialog/oas-doc-add-operation-dialog.component';
 import {OasDocSecuritySchemeDialogComponent} from '../oas-doc-security-scheme-dialog/oas-doc-security-scheme-dialog.component';
 import {OasDocSecurityRequirementDialogComponent} from '../oas-doc-security-requirement-dialog/oas-doc-security-requirement-dialog.component';
+import {
+  OasDocConfirmMessageDialogComponent,
+  OasDocConfirmMessageDialogResult
+} from '../oas-doc-confirm-message-dialog/oas-doc-confirm-message-dialog.component';
 import {MatMultiSort, MatMultiSortTableDataSource, TableData} from 'ngx-mat-multi-sort';
 import {BusinessContext} from '../../../context-management/business-context/domain/business-context';
 import {BieExpressOption} from '../../bie-express/domain/generate-expression';
@@ -114,6 +118,23 @@ export class OasDocDetailComponent implements OnInit {
     }
   }
 
+  // Issue #1347: position the Error Response column right after Security (preserve a saved entry).
+  ensureErrorResponseColumn() {
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfBieForOasDocPage;
+    let entry = columns.find(c => c.name === 'Error Response');
+    if (entry) {
+      columns.splice(columns.indexOf(entry), 1);
+    } else {
+      entry = {name: 'Error Response', selected: true, width: 200};
+    }
+    const idx = columns.findIndex(c => c.name === 'Security');
+    if (idx >= 0) {
+      columns.splice(idx + 1, 0, entry);
+    } else {
+      columns.push(entry);
+    }
+  }
+
   onColumnsReset() {
     const defaultTableColumnInfo = new TableColumnsInfo();
     this.columns = defaultTableColumnInfo.columnsOfBieForOasDocPage;
@@ -176,6 +197,7 @@ export class OasDocDetailComponent implements OnInit {
     {id: 'suppressRootIndicator', name: 'Suppress Root Indicator', isActive: true},
     {id: 'messageBody', name: 'Message Body', isActive: true},
     {id: 'security', name: 'Security', isActive: true},
+    {id: 'errorResponse', name: 'Error Response', isActive: true},
     {id: 'resourceName', name: 'Resource Name', isActive: true},
     {id: 'operationId', name: 'Operation ID', isActive: true},
     {id: 'tagName', name: 'Tag Name', isActive: true}
@@ -241,6 +263,11 @@ export class OasDocDetailComponent implements OnInit {
               displayedColumns.push('security');
             }
             break;
+          case 'Error Response':
+            if (column.selected) {
+              displayedColumns.push('errorResponse');
+            }
+            break;
         }
       }
     }
@@ -257,6 +284,18 @@ export class OasDocDetailComponent implements OnInit {
   option: BieExpressOption;
   openApiFormats: string[] = ['YAML', 'JSON'];
   topLevelAsbiepIds: number[];
+
+  // Issue #1347: the Error Response column is an inline selector. The body type lives on the operation,
+  // so a change propagates to every sibling row sharing the oasOperationId. CONFIRM_MESSAGE additionally
+  // requires a picked ConfirmMessage BIE (a separate BIE-selection dialog), so when the user selects it
+  // and cancels the dialog without a BIE we must revert the selector to its previously committed value —
+  // this WeakMap remembers that value per row (seeded on load, refreshed on every commit).
+  errorResponseBodyTypeOptions: { value: string; label: string }[] = [
+    {value: 'NONE', label: 'No Response Body'},
+    {value: 'PROBLEM_DETAILS', label: 'IETF Problem Details'},
+    {value: 'CONFIRM_MESSAGE', label: 'OAGi Confirm Message'}
+  ];
+  private committedErrorResponseBodyType = new WeakMap<BieForOasDoc, string>();
 
   // Issue #1732: operationId no longer carries a business-context prefix, so the same BIE+verb
   // under different contexts can produce identical operationIds. OpenAPI requires operationId to be
@@ -328,6 +367,7 @@ export class OasDocDetailComponent implements OnInit {
 
       this.preferencesInfo = preferencesInfo;
       this.ensureSecurityColumn();
+      this.ensureErrorResponseColumn();
       this.onColumnsChange(this.preferencesInfo.tableColumnsInfo.columnsOfBieForOasDocPage);
 
       this.oasDoc = simpleOasDoc;
@@ -589,6 +629,101 @@ export class OasDocDetailComponent implements OnInit {
       });
   }
 
+  // Issue #1347: the DEN shown beside the selector when CONFIRM_MESSAGE is chosen. The chip is clickable
+  // to re-pick the ConfirmMessage BIE; a blank DEN prompts the author to pick one.
+  confirmMessageChipLabel(row: BieForOasDoc): string {
+    return row.confirmMessageDen ? row.confirmMessageDen : 'Pick a ConfirmMessage BIE…';
+  }
+
+  // Issue #1347: the inline Error Response selector changed. NONE / PROBLEM_DETAILS commit immediately
+  // (and clear any ConfirmMessage BIE); CONFIRM_MESSAGE opens the BIE-selection dialog. If the dialog is
+  // cancelled without a BIE (and none was previously chosen) the selector reverts to its prior value.
+  onErrorResponseBodyTypeChange(row: BieForOasDoc): void {
+    const newType = row.errorResponseBodyType;
+    const previousType = this.committedErrorResponseBodyType.get(row) || 'NONE';
+    if (newType !== 'CONFIRM_MESSAGE') {
+      this.applyErrorResponseBodyType(row, newType, undefined, undefined);
+      return;
+    }
+    this.openConfirmMessageDialog(row, result => {
+      if (result) {
+        this.applyErrorResponseBodyType(row, 'CONFIRM_MESSAGE', result.topLevelAsbiepId, result.den);
+      } else if (row.confirmMessageTopLevelAsbiepId) {
+        // Cancelled, but the operation already had a ConfirmMessage BIE — keep CONFIRM_MESSAGE as-is.
+        this.applyErrorResponseBodyType(row, 'CONFIRM_MESSAGE',
+          row.confirmMessageTopLevelAsbiepId, row.confirmMessageDen);
+      } else {
+        // Cancelled with no BIE picked — revert the selector to the previously committed body type.
+        this.applyErrorResponseBodyType(row, previousType, undefined, undefined);
+      }
+    });
+  }
+
+  // Issue #1347: re-open the ConfirmMessage BIE picker from the cell chip (CONFIRM_MESSAGE already set).
+  // Cancelling keeps the existing BIE; picking replaces it on every sibling row.
+  openConfirmMessageBiePicker(row: BieForOasDoc, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+      // Keyboard activation (Enter/Space) reaches here too; stop Space from scrolling the page.
+      event.preventDefault();
+    }
+    this.openConfirmMessageDialog(row, result => {
+      if (result) {
+        this.applyErrorResponseBodyType(row, 'CONFIRM_MESSAGE', result.topLevelAsbiepId, result.den);
+      }
+    });
+  }
+
+  private openConfirmMessageDialog(row: BieForOasDoc,
+                                   handler: (result: OasDocConfirmMessageDialogResult | undefined) => void): void {
+    // Lock the picker to the release of the document's connected BIE (the document has no release of
+    // its own). Like the 'Include Meta Header' / 'Pagination Response' pickers, the dialog fixes the
+    // library (connectSpec) and Branch (this release) and lists only 'Confirm Message' BIEs.
+    const release = this.resolveOasDocRelease(row);
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.data = {
+      title: 'Select ConfirmMessage BIE',
+      releaseId: release.releaseId,
+      releaseNum: release.releaseNum
+    };
+    // Full-width like the BIE-Express 'Include Meta Header' / 'Pagination Response' BIE pickers.
+    dialogConfig.width = window.innerWidth + 'px';
+    dialogConfig.autoFocus = false;
+    this.dialog.open(OasDocConfirmMessageDialogComponent, dialogConfig)
+      .afterClosed().subscribe((result: OasDocConfirmMessageDialogResult | undefined) => handler(result));
+  }
+
+  // Issue #1347: resolve the release the ConfirmMessage picker is locked to. The OpenAPI Document
+  // carries no release; its connected BIEs all share one release, so prefer the acted-on row's release
+  // and fall back to any BIE-backed row (a document with only bodyless operations has none, in which
+  // case the dialog defaults to the connectSpec library's latest release).
+  private resolveOasDocRelease(row: BieForOasDoc): { releaseId: number; releaseNum: string } {
+    const rows = this.table.dataSource.data || [];
+    const withRelease = rows.find(r => !!r.releaseId);
+    return {
+      releaseId: row.releaseId || (withRelease ? withRelease.releaseId : undefined),
+      releaseNum: row.releaseNum || (withRelease ? withRelease.releaseNum : undefined)
+    };
+  }
+
+  // Issue #1347: apply an error-response body type (and ConfirmMessage BIE, if any) to an operation.
+  // An oas_operation can be shown as two rows (Request + Response); the body type is per operation, so
+  // the value is applied to every sibling row sharing the oasOperationId. Truthy check: a not-yet-
+  // persisted operation has oasOperationId 0 (falsy) and must never be treated as a sibling.
+  private applyErrorResponseBodyType(row: BieForOasDoc, bodyType: string,
+                                     confirmTopLevelAsbiepId: number, confirmDen: string): void {
+    const siblings = (this.table.dataSource.data || []).filter(r =>
+      !!r.oasOperationId && r.oasOperationId === row.oasOperationId);
+    const targets = siblings.length > 0 ? siblings : [row];
+    const clearConfirm = bodyType !== 'CONFIRM_MESSAGE';
+    targets.forEach(r => {
+      r.errorResponseBodyType = bodyType;
+      r.confirmMessageTopLevelAsbiepId = clearConfirm ? undefined : confirmTopLevelAsbiepId;
+      r.confirmMessageDen = clearConfirm ? '' : (confirmDen || '');
+      this.committedErrorResponseBodyType.set(r, bodyType);
+    });
+  }
+
   private securityRequirementSummary(requirements: OasSecurityRequirement[], inherit: boolean): string {
     if (inherit) {
       return 'Use Root';
@@ -663,6 +798,9 @@ export class OasDocDetailComponent implements OnInit {
       });
       this.table.dataSource.data.forEach((elm: BieForOasDoc) => {
         this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContext;
+        // Issue #1347: seed the per-row baseline body type so the inline selector can revert a
+        // cancelled CONFIRM_MESSAGE choice to its last committed value.
+        this.committedErrorResponseBodyType.set(elm, elm.errorResponseBodyType || 'NONE');
       });
       this.recomputeDuplicateOperationIds();
 

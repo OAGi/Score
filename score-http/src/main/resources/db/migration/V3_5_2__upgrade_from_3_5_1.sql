@@ -53,4 +53,29 @@ CREATE TABLE `bie_view_order`
   COLLATE = utf8mb4_general_ci
   ROW_FORMAT = DYNAMIC COMMENT ='Instance-level, release-decoupled sibling sort weights for model browsing and BIE editing (Issue #1638). NOT used for generated output.';
 
+-- ------------------------------------------------------------------
+-- Issue #1347 - OAS Doc default error responses + Error Response Body Type
+-- ------------------------------------------------------------------
+--
+-- Per-operation selection of the body carried by the defaulted 4xx/5xx error
+-- responses emitted into every generated operation. Stored on oas_operation (the
+-- common parent of the Request and Response entries), so a single setting applies
+-- even when both exist (and even for request-only / bodyless operations).
+--
+--   error_response_body_type = NONE            -> status code + description only (default; backward-compatible)
+--                            = PROBLEM_DETAILS  -> application/problem+json -> a hardcoded RFC 9457 ProblemDetails
+--                            = CONFIRM_MESSAGE   -> application/json -> the picked ConfirmMessage BIE schema
+--
+-- error_confirm_top_level_asbiep_id is the ConfirmMessage BIE, used only when
+-- error_response_body_type = CONFIRM_MESSAGE (NULL otherwise).
+ALTER TABLE `oas_operation`
+    ADD COLUMN `error_response_body_type` varchar(20) NOT NULL DEFAULT 'NONE'
+          COMMENT 'PROBLEM_DETAILS | CONFIRM_MESSAGE | NONE -- body for this operation''s defaulted 4xx/5xx error responses (issue #1347).'
+          AFTER `security_overridden`,
+    ADD COLUMN `error_confirm_top_level_asbiep_id` bigint(20) unsigned DEFAULT NULL
+          COMMENT 'When error_response_body_type = CONFIRM_MESSAGE, the ConfirmMessage BIE to emit (issue #1347).'
+          AFTER `error_response_body_type`,
+    ADD CONSTRAINT `oas_operation_error_confirm_tla_fk`
+          FOREIGN KEY (`error_confirm_top_level_asbiep_id`) REFERENCES `top_level_asbiep` (`top_level_asbiep_id`);
+
 SET FOREIGN_KEY_CHECKS = @OLD_FOREIGN_KEY_CHECKS;

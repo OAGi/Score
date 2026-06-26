@@ -46,6 +46,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.BieUserExtRevision.BieUser
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtx.BizCtxPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtxAssignment.BizCtxAssignmentPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasMessageBody.OasMessageBodyPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasOperation.OasOperationPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasRequest.OasRequestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasResponse.OasResponsePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Release.ReleasePath;
@@ -455,6 +456,19 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
             _oasMessageBody = new OasMessageBodyPath(this, null, Keys.OAS_MESSAGE_BODY_TOP_LEVEL_ASBIEP_ID_FK.getInverseKey());
 
         return _oasMessageBody;
+    }
+
+    private transient OasOperationPath _oasOperation;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_operation</code>
+     * table
+     */
+    public OasOperationPath oasOperation() {
+        if (_oasOperation == null)
+            _oasOperation = new OasOperationPath(this, null, Keys.OAS_OPERATION_ERROR_CONFIRM_TLA_FK.getInverseKey());
+
+        return _oasOperation;
     }
 
     private transient OasRequestPath _oasRequestMetaHeaderTopLevelAsbiepIdFk;

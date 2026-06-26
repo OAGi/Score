@@ -17,6 +17,13 @@ public interface BieGenerateOpenApiExpression {
 
     void generate(OpenAPITemplateForVerbOption template);
 
+    /**
+     * Issue #1347: the single idempotent post-step that merges the defaulted 4xx/5xx error responses
+     * into every generated operation. Called once after all templates are generated and before
+     * {@link #asFile(String)}. A no-op when the document has no operations.
+     */
+    void generateErrorResponses();
+
     File asFile(String filename) throws IOException;
 
 }

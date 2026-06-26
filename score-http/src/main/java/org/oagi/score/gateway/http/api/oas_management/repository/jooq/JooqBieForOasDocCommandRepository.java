@@ -8,6 +8,7 @@ import org.oagi.score.gateway.http.api.oas_management.controller.payload.*;
 import org.oagi.score.gateway.http.api.oas_management.model.BieForOasDoc;
 import org.oagi.score.gateway.http.api.oas_management.model.OasDocId;
 import org.oagi.score.gateway.http.api.oas_management.model.OasSecurityRequirement;
+import org.oagi.score.gateway.http.api.oas_management.model.OpenAPIErrorResponseBodyType;
 import org.oagi.score.gateway.http.api.oas_management.repository.BieForOasDocCommandRepository;
 import org.oagi.score.gateway.http.common.model.AccessControl;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
@@ -17,6 +18,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.*;
 import org.oagi.score.gateway.http.common.util.StringUtils;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,6 +26,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import static org.jooq.impl.DSL.and;
@@ -68,6 +71,7 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
         Map<String, ULong> schemeIdByName = loadSchemeIdByName(valueOf(oasDocId));
         // Issue #1729: an oas_operation appears as up to two rows (Request + Response). Persist its
         // security exactly once to avoid the second row's delete-then-reinsert clobbering the first.
+        // Issue #1347: the same twin-row guard also covers the per-operation error-response body type.
         Set<ULong> securityProcessedOps = new HashSet<>();
         for (BieForOasDoc bieForOasDoc : request.getBieForOasDocList()) {
             if (bieForOasDoc.getMessageBody().equals("Request")) {
@@ -369,6 +373,14 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
                         schemeIdByName,
                         valueOf(requesterId),
                         timestamp);
+                // Issue #1347: persist the operation's error-response body type + ConfirmMessage BIE once
+                // per operation (same dedup), so the Request/Response twin rows don't clobber each other.
+                securityChanged |= saveOperationErrorResponseBody(
+                        valueOf(bieForOasDoc.getOasOperationId()),
+                        bieForOasDoc.getErrorResponseBodyType(),
+                        bieForOasDoc.getConfirmMessageTopLevelAsbiepId(),
+                        valueOf(requesterId),
+                        timestamp);
             }
         }
         return new UpdateBieForOasDocResponse(oasDocId, !oasResourceChangedField.isEmpty() || !oasOperationChangedField.isEmpty()
@@ -441,6 +453,40 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
                     .execute();
         }
         return changed || flagChanged;
+    }
+
+    // Issue #1347: persist an operation's error-response body type (and, for CONFIRM_MESSAGE, the picked
+    // ConfirmMessage BIE) once per operation. Touches the row only when a value actually changes, to avoid
+    // needless last_update_timestamp churn and the Request/Response twin-row clobber. The ConfirmMessage id
+    // is cleared for any non-CONFIRM_MESSAGE type so a stale FK reference can never linger.
+    private boolean saveOperationErrorResponseBody(ULong oasOperationId, String errorResponseBodyType,
+                                                   BigInteger confirmTopLevelAsbiepId,
+                                                   ULong requesterId, LocalDateTime timestamp) {
+        OpenAPIErrorResponseBodyType type = OpenAPIErrorResponseBodyType.from(errorResponseBodyType);
+        String desiredType = type.name();
+        ULong desiredConfirmId = (type == OpenAPIErrorResponseBodyType.CONFIRM_MESSAGE && confirmTopLevelAsbiepId != null)
+                ? ULong.valueOf(confirmTopLevelAsbiepId) : null;
+
+        var current = dslContext()
+                .select(OAS_OPERATION.ERROR_RESPONSE_BODY_TYPE, OAS_OPERATION.ERROR_CONFIRM_TOP_LEVEL_ASBIEP_ID)
+                .from(OAS_OPERATION)
+                .where(OAS_OPERATION.OAS_OPERATION_ID.eq(oasOperationId))
+                .fetchOne();
+        if (current == null) {
+            return false;
+        }
+        boolean changed = !desiredType.equals(current.get(OAS_OPERATION.ERROR_RESPONSE_BODY_TYPE))
+                || !Objects.equals(desiredConfirmId, current.get(OAS_OPERATION.ERROR_CONFIRM_TOP_LEVEL_ASBIEP_ID));
+        if (changed) {
+            dslContext().update(OAS_OPERATION)
+                    .set(OAS_OPERATION.ERROR_RESPONSE_BODY_TYPE, desiredType)
+                    .set(OAS_OPERATION.ERROR_CONFIRM_TOP_LEVEL_ASBIEP_ID, desiredConfirmId)
+                    .set(OAS_OPERATION.LAST_UPDATED_BY, requesterId)
+                    .set(OAS_OPERATION.LAST_UPDATE_TIMESTAMP, timestamp)
+                    .where(OAS_OPERATION.OAS_OPERATION_ID.eq(oasOperationId))
+                    .execute();
+        }
+        return changed;
     }
 
     // Issue #1729: reconcile an operation requirement entry's free-text scopes in place — insert names not

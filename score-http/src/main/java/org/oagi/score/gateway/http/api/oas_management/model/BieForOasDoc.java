@@ -43,6 +43,12 @@ public class BieForOasDoc extends Auditable {
     // true with requirements => that operation's `security` array. Keyed by the oas_operation.
     private boolean securityOverridden;
     private List<OasSecurityRequirement> securityRequirements;
+    // Issue #1347: per-operation error-response body type (PROBLEM_DETAILS | CONFIRM_MESSAGE | NONE,
+    // default NONE) and, for CONFIRM_MESSAGE, the picked ConfirmMessage BIE (id + DEN for display).
+    // Keyed by the oas_operation, so the Request and Response entries of one operation share these.
+    private String errorResponseBodyType;
+    private BigInteger confirmMessageTopLevelAsbiepId;
+    private String confirmMessageDen;
     private Date lastUpdateTimestamp;
     private Date creationTimestamp;
     private UserSummaryRecord createdBy;
@@ -265,6 +271,30 @@ public class BieForOasDoc extends Auditable {
 
     public void setSecurityRequirements(List<OasSecurityRequirement> securityRequirements) {
         this.securityRequirements = securityRequirements;
+    }
+
+    public String getErrorResponseBodyType() {
+        return errorResponseBodyType;
+    }
+
+    public void setErrorResponseBodyType(String errorResponseBodyType) {
+        this.errorResponseBodyType = errorResponseBodyType;
+    }
+
+    public BigInteger getConfirmMessageTopLevelAsbiepId() {
+        return confirmMessageTopLevelAsbiepId;
+    }
+
+    public void setConfirmMessageTopLevelAsbiepId(BigInteger confirmMessageTopLevelAsbiepId) {
+        this.confirmMessageTopLevelAsbiepId = confirmMessageTopLevelAsbiepId;
+    }
+
+    public String getConfirmMessageDen() {
+        return confirmMessageDen;
+    }
+
+    public void setConfirmMessageDen(String confirmMessageDen) {
+        this.confirmMessageDen = confirmMessageDen;
     }
 
     @Override

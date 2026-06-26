@@ -163,11 +163,49 @@ public class OasOperationRecord extends UpdatableRecordImpl<OasOperationRecord> 
     }
 
     /**
+     * Setter for <code>oagi.oas_operation.error_response_body_type</code>.
+     * PROBLEM_DETAILS | CONFIRM_MESSAGE | NONE -- body for this operation's
+     * defaulted 4xx/5xx error responses (issue #1347).
+     */
+    public void setErrorResponseBodyType(String value) {
+        set(8, value);
+    }
+
+    /**
+     * Getter for <code>oagi.oas_operation.error_response_body_type</code>.
+     * PROBLEM_DETAILS | CONFIRM_MESSAGE | NONE -- body for this operation's
+     * defaulted 4xx/5xx error responses (issue #1347).
+     */
+    public String getErrorResponseBodyType() {
+        return (String) get(8);
+    }
+
+    /**
+     * Setter for
+     * <code>oagi.oas_operation.error_confirm_top_level_asbiep_id</code>. When
+     * error_response_body_type = CONFIRM_MESSAGE, the ConfirmMessage BIE to
+     * emit (issue #1347).
+     */
+    public void setErrorConfirmTopLevelAsbiepId(ULong value) {
+        set(9, value);
+    }
+
+    /**
+     * Getter for
+     * <code>oagi.oas_operation.error_confirm_top_level_asbiep_id</code>. When
+     * error_response_body_type = CONFIRM_MESSAGE, the ConfirmMessage BIE to
+     * emit (issue #1347).
+     */
+    public ULong getErrorConfirmTopLevelAsbiepId() {
+        return (ULong) get(9);
+    }
+
+    /**
      * Setter for <code>oagi.oas_operation.created_by</code>. The user who
      * creates the record.
      */
     public void setCreatedBy(ULong value) {
-        set(8, value);
+        set(10, value);
     }
 
     /**
@@ -175,7 +213,7 @@ public class OasOperationRecord extends UpdatableRecordImpl<OasOperationRecord> 
      * creates the record.
      */
     public ULong getCreatedBy() {
-        return (ULong) get(8);
+        return (ULong) get(10);
     }
 
     /**
@@ -183,7 +221,7 @@ public class OasOperationRecord extends UpdatableRecordImpl<OasOperationRecord> 
      * last updates the record.
      */
     public void setLastUpdatedBy(ULong value) {
-        set(9, value);
+        set(11, value);
     }
 
     /**
@@ -191,7 +229,7 @@ public class OasOperationRecord extends UpdatableRecordImpl<OasOperationRecord> 
      * last updates the record.
      */
     public ULong getLastUpdatedBy() {
-        return (ULong) get(9);
+        return (ULong) get(11);
     }
 
     /**
@@ -199,7 +237,7 @@ public class OasOperationRecord extends UpdatableRecordImpl<OasOperationRecord> 
      * timestamp when the record is created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
-        set(10, value);
+        set(12, value);
     }
 
     /**
@@ -207,7 +245,7 @@ public class OasOperationRecord extends UpdatableRecordImpl<OasOperationRecord> 
      * timestamp when the record is created.
      */
     public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(10);
+        return (LocalDateTime) get(12);
     }
 
     /**
@@ -215,7 +253,7 @@ public class OasOperationRecord extends UpdatableRecordImpl<OasOperationRecord> 
      * timestamp when the record is last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(11, value);
+        set(13, value);
     }
 
     /**
@@ -223,7 +261,7 @@ public class OasOperationRecord extends UpdatableRecordImpl<OasOperationRecord> 
      * timestamp when the record is last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
-        return (LocalDateTime) get(11);
+        return (LocalDateTime) get(13);
     }
 
     // -------------------------------------------------------------------------
@@ -249,7 +287,7 @@ public class OasOperationRecord extends UpdatableRecordImpl<OasOperationRecord> 
     /**
      * Create a detached, initialised OasOperationRecord
      */
-    public OasOperationRecord(ULong oasOperationId, ULong oasResourceId, String verb, String operationId, String summary, String description, Byte deprecated, Byte securityOverridden, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
+    public OasOperationRecord(ULong oasOperationId, ULong oasResourceId, String verb, String operationId, String summary, String description, Byte deprecated, Byte securityOverridden, String errorResponseBodyType, ULong errorConfirmTopLevelAsbiepId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
         super(OasOperation.OAS_OPERATION);
 
         setOasOperationId(oasOperationId);
@@ -260,6 +298,8 @@ public class OasOperationRecord extends UpdatableRecordImpl<OasOperationRecord> 
         setDescription(description);
         setDeprecated(deprecated);
         setSecurityOverridden(securityOverridden);
+        setErrorResponseBodyType(errorResponseBodyType);
+        setErrorConfirmTopLevelAsbiepId(errorConfirmTopLevelAsbiepId);
         setCreatedBy(createdBy);
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);

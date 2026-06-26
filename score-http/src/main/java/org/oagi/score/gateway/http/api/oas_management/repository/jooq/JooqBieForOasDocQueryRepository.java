@@ -73,6 +73,9 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
                         OAS_OPERATION.as("oas_operation").OPERATION_ID.as("operation_id"),
                         OAS_OPERATION.as("oas_operation").OAS_OPERATION_ID.as("oas_operation_id"),
                         OAS_OPERATION.as("oas_operation").SECURITY_OVERRIDDEN.as("security_overridden"),
+                        // Issue #1347: per-operation error-response body type + ConfirmMessage BIE.
+                        OAS_OPERATION.as("oas_operation").ERROR_RESPONSE_BODY_TYPE.as("error_response_body_type"),
+                        OAS_OPERATION.as("oas_operation").ERROR_CONFIRM_TOP_LEVEL_ASBIEP_ID.as("error_confirm_top_level_asbiep_id"),
                         OAS_MESSAGE_BODY.CREATION_TIMESTAMP,
                         OAS_MESSAGE_BODY.LAST_UPDATE_TIMESTAMP
                 ), ownerFields(), creatorFields(), updaterFields()))
@@ -120,6 +123,9 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
                         OAS_OPERATION.as("oas_operation").OPERATION_ID.as("operation_id"),
                         OAS_OPERATION.as("oas_operation").OAS_OPERATION_ID.as("oas_operation_id"),
                         OAS_OPERATION.as("oas_operation").SECURITY_OVERRIDDEN.as("security_overridden"),
+                        // Issue #1347: per-operation error-response body type + ConfirmMessage BIE.
+                        OAS_OPERATION.as("oas_operation").ERROR_RESPONSE_BODY_TYPE.as("error_response_body_type"),
+                        OAS_OPERATION.as("oas_operation").ERROR_CONFIRM_TOP_LEVEL_ASBIEP_ID.as("error_confirm_top_level_asbiep_id"),
                         OAS_MESSAGE_BODY.CREATION_TIMESTAMP,
                         OAS_MESSAGE_BODY.LAST_UPDATE_TIMESTAMP
                 ), ownerFields(), creatorFields(), updaterFields()))
@@ -187,6 +193,14 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
                 Byte securityOverridden = record.get(field("security_overridden", Byte.class));
                 bieForOasDoc.setSecurityOverridden(securityOverridden != null && securityOverridden == (byte) 1);
                 bieForOasDoc.setSecurityRequirements(securityRequirements);
+                // Issue #1347: surface the persisted error-response body type and, for CONFIRM_MESSAGE, the
+                // picked ConfirmMessage BIE (id + DEN for display).
+                bieForOasDoc.setErrorResponseBodyType(record.get(field("error_response_body_type", String.class)));
+                ULong confirmTlaId = record.get(field("error_confirm_top_level_asbiep_id", ULong.class));
+                if (confirmTlaId != null) {
+                    bieForOasDoc.setConfirmMessageTopLevelAsbiepId(confirmTlaId.toBigInteger());
+                    bieForOasDoc.setConfirmMessageDen(loadConfirmMessageDen(confirmTlaId));
+                }
             }
             if (topLevelAsbiepId != null) {
                 bieForOasDoc.setReleaseId(new ReleaseId(record.get(TOP_LEVEL_ASBIEP.RELEASE_ID).toBigInteger()));
@@ -251,6 +265,19 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
                 .where(OAS_OPERATION_SECURITY_SCOPE.OAS_OPERATION_SECURITY_ID.eq(oasOperationSecurityId))
                 .orderBy(OAS_OPERATION_SECURITY_SCOPE.OAS_OPERATION_SECURITY_SCOPE_ID.asc())
                 .fetchInto(String.class);
+    }
+
+    // Issue #1347: resolve the DEN of the picked ConfirmMessage BIE, for display in the body-type dialog.
+    private String loadConfirmMessageDen(ULong topLevelAsbiepId) {
+        if (topLevelAsbiepId == null) {
+            return null;
+        }
+        return dslContext().select(ASCCP_MANIFEST.DEN)
+                .from(TOP_LEVEL_ASBIEP)
+                .join(ASBIEP).on(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
+                .join(ASCCP_MANIFEST).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
+                .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(topLevelAsbiepId))
+                .fetchOptional(ASCCP_MANIFEST.DEN).orElse(null);
     }
 
     private Collection<Condition> getConditions(GetBieForOasDocRequest request) {
