@@ -46,7 +46,9 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
         super(dslContext, requester, repositoryFactory);
     }
 
-    private SelectOnConditionStep selectForRequest() {
+    // Package-private (not private) so a jOOQ MockDataProvider unit test can assert the emitted join SQL
+    // (issue #1610: oas_operation.oas_resource_id = oas_resource.oas_resource_id, an FK join — not PK=PK).
+    SelectOnConditionStep selectForRequest() {
         return dslContext().select(concat(fields(
                         TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
                         TOP_LEVEL_ASBIEP.STATE,
@@ -101,7 +103,8 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
                 .join(updaterTable()).on(updaterTablePk().eq(OAS_MESSAGE_BODY.LAST_UPDATED_BY));
     }
 
-    private SelectOnConditionStep selectForResponse() {
+    // Package-private (see selectForRequest): testable so the response join SQL is asserted too.
+    SelectOnConditionStep selectForResponse() {
         return dslContext().select(concat(fields(
                         TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
                         TOP_LEVEL_ASBIEP.STATE,

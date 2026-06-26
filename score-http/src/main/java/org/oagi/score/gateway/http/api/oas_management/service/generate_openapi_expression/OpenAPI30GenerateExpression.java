@@ -949,7 +949,40 @@ public class OpenAPI30GenerateExpression implements BieGenerateOpenApiExpression
             // A "Response" message body still emits a 200 response carrying the BIE (a response body is
             // allowed in 3.0.3), exactly like the other verbs.
             if (path != null && path.size() > 0) {
-                ensurePathParameters(path, getOperation(), template.isArrayForJsonExpression(), template);
+                // Issue #1610/#1347: a subsequent template for the SAME DELETE operation (e.g. the Response
+                // sibling of a Request). The first template scaffolds the operation; this one must still
+                // contribute its success response, otherwise a DELETE carrying both a Request and a Response
+                // would keep only the first template's response -- the Response body's 200 was being lost when
+                // the Request template happened to be processed first. A "Response" body's 200 (carrying the
+                // BIE) wins over a "Request" body's status-only 202, matching the 3.1 generator.
+                boolean isArray = template.isArrayForJsonExpression();
+                String schemaName = template.getSchemaName();
+                boolean isSuppressRoot = template.isSuppressRootProperty();
+                ensurePathParameters(path, getOperation(), isArray, template);
+                if (template.getMessageBodyType().equals("Response")) {
+                    path.put("responses", ImmutableMap.<String, Object>builder()
+                            .put("200", ImmutableMap.<String, Object>builder()
+                                    .put("description", "")
+                                    .put("content", ImmutableMap.<String, Object>builder()
+                                            .put("application/json", ImmutableMap.<String, Object>builder()
+                                                    .put("schema", ImmutableMap.<String, Object>builder()
+                                                            .put("$ref", "#/components/schemas/" + schemaName)
+                                                            .build())
+                                                    .build())
+                                            .build())
+                                    .build())
+                            .build());
+                    // The response references the BIE schema, so generate it.
+                    fillPropertiesForTemplate(schemaName, asbiep, isArray, isSuppressRoot);
+                } else if (!path.containsKey("responses")) {
+                    // Request: 3.0.3 drops the DELETE body; emit a status-only 202 only when a Response
+                    // sibling has not already set the success response (do not clobber its 200).
+                    path.put("responses", ImmutableMap.<String, Object>builder()
+                            .put("202", ImmutableMap.<String, Object>builder()
+                                    .put("description", "")
+                                    .build())
+                            .build());
+                }
             } else {
                 boolean isArray = template.isArrayForJsonExpression();
                 String schemaName = template.getSchemaName();
@@ -1388,7 +1421,8 @@ public class OpenAPI30GenerateExpression implements BieGenerateOpenApiExpression
         ((Map<String, Object>) parent.get("properties")).put(name, properties);
     }
 
-    private Map<String, Object> toProperties(XbtSummaryRecord xbt) {
+    // Package-private for unit tests (issue #1610): asserts the 3.0 built-in body is read from openApi30Map().
+    Map<String, Object> toProperties(XbtSummaryRecord xbt) {
         String openapi30Map = xbt.openApi30Map();
         try {
             return mapper.readValue(openapi30Map, LinkedHashMap.class);
@@ -1714,7 +1748,8 @@ public class OpenAPI30GenerateExpression implements BieGenerateOpenApiExpression
         ((Map<String, Object>) parent.get("properties")).put(name, properties);
     }
 
-    private Object emptyExample(XbtSummaryRecord xbt) {
+    // Package-private for unit tests (issue #1610).
+    Object emptyExample(XbtSummaryRecord xbt) {
         Map<String, Object> properties = toProperties(xbt);
         Object type = properties.getOrDefault("type", "string");
         if ("boolean".equals(type)) {

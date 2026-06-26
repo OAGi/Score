@@ -1451,7 +1451,8 @@ public class OpenAPI31GenerateExpression implements BieGenerateOpenApiExpression
         ((Map<String, Object>) parent.get("properties")).put(name, properties);
     }
 
-    private Map<String, Object> toProperties(XbtSummaryRecord xbt) {
+    // Package-private for unit tests (issue #1610): asserts the 2020-12 built-in body is read from openApi31Map().
+    Map<String, Object> toProperties(XbtSummaryRecord xbt) {
         // Issue #1610: JSON Schema 2020-12 built-in type definitions.
         String openApi31Map = xbt.openApi31Map();
         try {
@@ -1774,7 +1775,8 @@ public class OpenAPI31GenerateExpression implements BieGenerateOpenApiExpression
         ((Map<String, Object>) parent.get("properties")).put(name, properties);
     }
 
-    private Object emptyExample(XbtSummaryRecord xbt) {
+    // Package-private for unit tests (issue #1610).
+    Object emptyExample(XbtSummaryRecord xbt) {
         Map<String, Object> properties = toProperties(xbt);
         Object type = properties.getOrDefault("type", "string");
         if ("boolean".equals(type)) {
@@ -1787,7 +1789,8 @@ public class OpenAPI31GenerateExpression implements BieGenerateOpenApiExpression
     }
 
     // Issue #692 / JSON Schema 2020-12: wraps the (possibly empty) example into the `examples` array.
-    private List<Object> buildExamples(XbtSummaryRecord xbt, String exampleText) {
+    // Package-private for unit tests (issue #1610 / #692).
+    List<Object> buildExamples(XbtSummaryRecord xbt, String exampleText) {
         if (StringUtils.hasLength(exampleText)) {
             return Arrays.asList(exampleText);
         }
@@ -1811,7 +1814,8 @@ public class OpenAPI31GenerateExpression implements BieGenerateOpenApiExpression
     // Issue #1610: JSON Schema 2020-12 nullability. Instead of the 3.0-only `nullable: true` flag, a
     // nillable type becomes a type union ([type, "null"]); schemas without an explicit `type`
     // (e.g. allOf/$ref) fall back to an `anyOf` with a `{"type": "null"}` branch.
-    private Map<String, Object> applyNillableTypeUnion(Map<String, Object> properties,
+    // Package-private for unit tests (issue #1610): asserts the 2020-12 type-union / anyOf-null nullability shapes.
+    Map<String, Object> applyNillableTypeUnion(Map<String, Object> properties,
                                                        boolean isNillable) {
         if (isNillable) {
             Object type = properties.get("type");
