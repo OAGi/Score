@@ -1,3 +1,10 @@
+### Dev lanes (scripts/lane.sh) — per-lane git bundles + app logs
+.lanes/
+
+### Local agent tooling — not committed
+.claude/
+.playwright-mcp/
+
 ### IntelliJ IDEA ###
 .idea
 *.iws

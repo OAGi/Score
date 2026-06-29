@@ -1,0 +1,91 @@
+# Per-lane isolated development stack: DB + Redis + a code-workspace container.
+#
+# Each "lane" N runs as a fully isolated docker compose project named `score-lane-N`.
+# The dev container clones the host repo's committed `develop` into its OWN volume and
+# branches to `feature/lane-N`, so concurrent agents never touch each other's files,
+# localhost, Redis, or schema.
+#
+# DO NOT run this file directly — drive it through scripts/lane.sh, which exports the
+# required LANE_N / *_PORT_HOST variables and picks a per-lane port offset (N*100).
+#
+#   scripts/lane.sh up 1      # bring up db+redis+dev, clone+branch feature/lane-1
+#   scripts/lane.sh serve 1   # build+run backend (9100) + frontend (4300) in the container
+#   scripts/lane.sh merge 1   # bundle the branch back to the host & merge into develop
+#   scripts/lane.sh down 1    # tear the lane down (REMOVES the workspace volume)
+
+name: score-lane-${LANE_N:?run via scripts/lane.sh}
+
+services:
+  db:
+    # MariaDB-based image; first start runs the heavy oagis.sql init script.
+    image: oagi1docker/srt-repo:latest
+    ports:
+      - "${DB_PORT_HOST:?}:3306"
+    volumes:
+      - lane-db:/var/lib/mysql
+    healthcheck:
+      # Query the oagi DB as the oagi user. The network only opens AFTER the heavy
+      # oagis.sql init completes, so this passes exactly when the DB is usable.
+      test: ["CMD-SHELL", "mariadb -uoagi -poagi -e 'SELECT 1' oagi >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 40
+      start_period: 240s
+
+  redis:
+    image: redis:7
+    ports:
+      - "${REDIS_PORT_HOST:?}:6379"
+    volumes:
+      - lane-redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  dev:
+    build:
+      context: ./docker/dev
+    image: score-dev-lane:latest
+    depends_on:
+      db:
+        condition: service_healthy   # wait out the heavy DB init before the workspace starts
+      redis:
+        condition: service_started
+    ports:
+      - "${FE_PORT_HOST:?}:4200"      # browser -> ng serve (in the container)
+      - "${BE_PORT_HOST:?}:9000"      # browser/STOMP -> spring boot (in the container)
+    volumes:
+      - .:/host-repo:ro               # read-only source of the clone (committed develop)
+      - lane-workspace:/workspace     # the lane's OWN working copy (isolated)
+      - lane-m2:/root/.m2             # per-lane maven cache (no cross-lane build races)
+      - ./.lanes/lane-${LANE_N}:/out  # channel for git bundles back to the host
+    environment:
+      LANE_N: "${LANE_N}"
+      REPO_BRANCH: "feature/lane-${LANE_N}"
+      GIT_USER_NAME: "${GIT_USER_NAME:-Hakju Oh}"
+      GIT_USER_EMAIL: "${GIT_USER_EMAIL:-dev-lane@local}"
+      FE_PORT_HOST: "${FE_PORT_HOST}"
+      BE_PORT_HOST: "${BE_PORT_HOST}"
+      # backend talks to db/redis over the lane-internal network (no offset needed inside)
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_DATABASE: oagi               # keep schema name 'oagi' so jOOQ <inputSchema>oagi</inputSchema> matches
+      DB_USERNAME: oagi
+      DB_PASSWORD: oagi
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      SERVER_PORT: "9000"
+      # OAuth callback points at THIS lane's published frontend port; disabled by default
+      # because one GitHub OAuth App cannot register N localhost callbacks.
+      SCORE_WEB_BASE_URL: "http://localhost:${FE_PORT_HOST}"
+      GITHUB_REDIRECT_URI: "http://localhost:${FE_PORT_HOST}/api/integration/github/callback"
+      SCORE_GITHUB_ENABLED: "false"
+    working_dir: /workspace
+
+volumes:
+  lane-db:
+  lane-redis:
+  lane-workspace:
+  lane-m2:
