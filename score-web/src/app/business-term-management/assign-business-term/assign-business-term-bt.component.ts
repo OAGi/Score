@@ -342,7 +342,15 @@ export class AssignBusinessTermBtComponent implements OnInit {
         this.snackBar.open('Created', '', {
           duration: 3000,
         });
-        this.router.navigateByUrl('/business_term_management/assign_business_term');
+        // #1753 - M1 (#1374): after Create, scope the assignment list to the BIE just assigned
+        // (only meaningful when a single BIE was targeted; the list reads bieId/bieType).
+        const bies = this.postAssignBtObj.biesToAssign;
+        if (bies && bies.length === 1) {
+          this.router.navigate(['/business_term_management/assign_business_term'],
+            {queryParams: {bieId: bies[0].bieId, bieType: bies[0].bieType}});
+        } else {
+          this.router.navigateByUrl('/business_term_management/assign_business_term');
+        }
       });
   }
 

@@ -370,7 +370,9 @@ export class BusinessTermService {
   }
 
   updateAssignment(assignedBusinessTerm: AssignedBusinessTermDetails): Observable<any> {
-    return this.http.put('/api/business-terms/assign/' + assignedBusinessTerm.bieType + '/' + assignedBusinessTerm.assignedBizTermId, {
+    // #1753 - L3: lower-case the {type} path segment, consistent with getAssignedBusinessTerm()
+    // and deleteAssignments().
+    return this.http.put('/api/business-terms/assign/' + assignedBusinessTerm.bieType.toLowerCase() + '/' + assignedBusinessTerm.assignedBizTermId, {
       bieType: assignedBusinessTerm.bieType,
       bieId: assignedBusinessTerm.bieId,
       typeCode: assignedBusinessTerm.typeCode,

@@ -265,7 +265,12 @@ public class JooqBusinessTermCommandRepository extends JooqBaseRepository implem
                             .execute();
                 }
                 return bbieBiztermRecordId.toBigInteger();
-            } else throw new IllegalArgumentException("Wrong BIE type");
+            } else {
+                // #1753 - L1: business-term assignment is only modeled for ASBIE/BBIE nodes
+                // (no bbie_sc_bizterm table). Reject BBIE_SC and any other type clearly.
+                throw new IllegalArgumentException(
+                        "Business term assignment is not supported for BIE type: " + bieToAssign.getBieType());
+            }
         }).collect(Collectors.toList());
 
         return assignedBizTermIds;

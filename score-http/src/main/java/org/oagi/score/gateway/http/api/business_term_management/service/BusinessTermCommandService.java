@@ -77,7 +77,7 @@ public class BusinessTermCommandService {
                 request.comment());
     }
 
-    public List<BusinessTermId> create(ScoreUser requester, InputStream inputStream) throws IOException {
+    public BusinessTermCsvImportResult create(ScoreUser requester, InputStream inputStream) throws IOException {
         assertBusinessTermEnabled(requester);
 
         var query = repositoryFactory.businessTermQueryRepository(requester);
@@ -85,6 +85,11 @@ public class BusinessTermCommandService {
                 new InputStreamReader(inputStream, "UTF-8"), ',')) {
             String errorMessage;
             List<BusinessTermId> businessTermIdList = new ArrayList<>();
+            int createdCount = 0;
+            int updatedCount = 0;
+            // Track URIs already handled in this import so an intra-file duplicate URI is not
+            // counted twice in the created/updated summary (review finding #1).
+            java.util.Set<String> urisSeenInThisImport = new java.util.HashSet<>();
             BusinessTermTemplateParser templateParser = new BusinessTermTemplateParser(reader);
             while (templateParser.hasNext()) {
                 errorMessage = null;
@@ -107,6 +112,18 @@ public class BusinessTermCommandService {
                     throw new IllegalArgumentException("Fail to parse CSV file: " + errorMessage);
                 }
 
+                // #1753 - L6: import is an upsert keyed by external reference URI. Classify each
+                // DISTINCT URI exactly once, by whether it existed in the DB *before* this
+                // import — so a URI introduced by an earlier row of the same file is not later
+                // miscounted as "updated" (review finding #1).
+                if (urisSeenInThisImport.add(externalReferenceUri)) {
+                    if (query.existsByExternalReferenceUri(externalReferenceUri)) {
+                        updatedCount++;
+                    } else {
+                        createdCount++;
+                    }
+                }
+
                 BusinessTermId businessTermId = create(requester, new BusinessTermCreateRequest(
                         businessTerm,
                         record.externalReferenceId(),
@@ -117,7 +134,7 @@ public class BusinessTermCommandService {
                 businessTermIdList.add(businessTermId);
             }
 
-            return businessTermIdList;
+            return new BusinessTermCsvImportResult(businessTermIdList, createdCount, updatedCount);
         }
 
     }

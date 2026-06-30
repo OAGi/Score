@@ -151,7 +151,7 @@ export class BusinessTermDetailComponent implements OnInit {
 
   openDialogBusinessTermUpdateIgnore() {
     const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = 'The business term already has a variable with the same properties';
+    dialogConfig.data.header = 'Another business term with the same name already exists';
     dialogConfig.data.content = [
       'Are you sure you want to update the business term?'
     ];

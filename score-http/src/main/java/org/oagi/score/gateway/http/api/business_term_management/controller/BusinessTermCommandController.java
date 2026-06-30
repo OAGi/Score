@@ -52,11 +52,16 @@ public class BusinessTermCommandController {
             @RequestParam("file") MultipartFile file) throws IOException {
         if (DEFAULT_ALLOWED_CONTENT_TYPE.equals(file.getContentType())) {
 
-            List<BusinessTermId> businessTermIdList =
+            BusinessTermCsvImportResult result =
                     businessTermCommandService.create(sessionService.asScoreUser(user), file.getInputStream());
-            if (businessTermIdList != null && !businessTermIdList.isEmpty()) {
-                logger.debug("Uploaded the file successfully: " + file.getOriginalFilename() + " with created record IDs " + businessTermIdList);
-                return ResponseEntity.noContent().build();
+            if (result != null && result.totalCount() > 0) {
+                logger.debug("Uploaded the file successfully: " + file.getOriginalFilename()
+                        + " (created=" + result.createdCount() + ", updated=" + result.updatedCount() + ")");
+                // #1753 - L6: report a created/updated summary via headers so the UI can show it.
+                return ResponseEntity.noContent()
+                        .header("X-Import-Created-Count", String.valueOf(result.createdCount()))
+                        .header("X-Import-Updated-Count", String.valueOf(result.updatedCount()))
+                        .build();
             } else {
                 return ResponseEntity.status(200).build();
             }
@@ -68,7 +73,14 @@ public class BusinessTermCommandController {
     @PutMapping(value = "/{businessTermId:[\\d]+}")
     public ResponseEntity update(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("businessTermId") BusinessTermId businessTermId,
             @RequestBody BusinessTermUpdateRequest request) {
+
+        // #1753 - L2: the path id is authoritative; reject a body that targets a different id.
+        if (request.businessTermId() == null || !businessTermId.equals(request.businessTermId())) {
+            throw new IllegalArgumentException(
+                    "The business term id in the path does not match the request body.");
+        }
 
         businessTermCommandService.update(sessionService.asScoreUser(user), request);
         return ResponseEntity.noContent().build();

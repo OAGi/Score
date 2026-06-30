@@ -52,6 +52,18 @@ export class BusinessTermCreateComponent implements OnInit {
     this.confirmDialogService.open(dialogConfig).afterClosed().subscribe(_ => {});
   }
 
+  // #1753 - L5: distinct message for the name-only uniqueness failure so it no longer wrongly
+  // claims the external reference URI also matched.
+  openDialogBusinessTermNameExists() {
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Invalid parameters';
+    dialogConfig.data.content = [
+      'Another business term with the same name already exists!'
+    ];
+
+    this.confirmDialogService.open(dialogConfig).afterClosed().subscribe(_ => {});
+  }
+
   doCreate() {
     this.service.create(this.businessTerm).subscribe(_ => {
       this.snackBar.open('Created', '', {
@@ -74,7 +86,7 @@ export class BusinessTermCreateComponent implements OnInit {
         businessTerm.businessTermId,
         businessTerm.businessTerm).subscribe(resp => {
       if (!resp) {
-        this.openDialogbusinessTermCreate();
+        this.openDialogBusinessTermNameExists();
         return;
       }
       return callbackFn && callbackFn();

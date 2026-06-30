@@ -686,6 +686,48 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
                 randomBusinessTerm.getBusinessTermId()));
     }
 
+    @Test
+    @DisabledIfBusinessTermProperty(value = false)
+    @DisplayName("TC_42_2_12")
+    public void end_user_lands_on_the_assignment_list_scoped_to_the_bie_after_creating_a_single_assignment() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        //use pre-existing BBIE node
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(library, "Source Activity. Source Activity", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, endUser, "WIP");
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+        String path = "/" + asccp.getPropertyTerm() + "/Note";
+        WebElement bbieNode = editBIEPage.getNodeByPath(path);
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        editBIEPage.hitUpdateButton();
+
+        assertTrue(bbiePanel.getAssignBusinessTermButton(true).isEnabled());
+        AssignBusinessTermBTPage assignBusinessTermBTPage = bbiePanel.clickAssignBusinessTermButton();
+        BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+        assignBusinessTermBTPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
+        assignBusinessTermBTPage.hitSearchButton();
+        click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(1));
+        click(assignBusinessTermBTPage.getCreateButton());
+
+        // #1753 - M1 (#1374): after creating an assignment for a single BIE, the assignment list
+        // is scoped to that BIE (the navigation carries the bieId query parameter).
+        assertEquals("Created", getSnackBarMessage(getDriver()));
+        new org.openqa.selenium.support.ui.WebDriverWait(getDriver(), java.time.Duration.ofSeconds(10L))
+                .until(d -> d.getCurrentUrl().contains("bieId="));
+        assertTrue(getDriver().getCurrentUrl().contains("bieId="),
+                "Expected the assignment list to be scoped to the created BIE, but the URL was: "
+                        + getDriver().getCurrentUrl());
+    }
+
     @AfterEach
     public void tearDown() {
         super.tearDown();

@@ -56,13 +56,16 @@ export class BusinessTermUploadFileComponent implements OnInit {
         }
         if (event.type === HttpEventType.Response) {
           if (event.status === 204) {
-            this.snackBar.open('Uploaded', '', {
-              duration: 3000,
+            // #1753 - L6: surface the created/updated counts reported by the import endpoint.
+            const created = Number(event.headers.get('X-Import-Created-Count') || 0);
+            const updated = Number(event.headers.get('X-Import-Updated-Count') || 0);
+            this.snackBar.open('Imported: ' + created + ' created, ' + updated + ' updated.', '', {
+              duration: 5000,
             });
             this.router.navigateByUrl('/business_term_management/business_term');
           }
           if (event.status === 200) {
-            this.snackBar.open('Uploaded. Some of the business terms already existed.', '', {
+            this.snackBar.open('No business terms were imported.', '', {
               duration: 3000,
             });
             this.router.navigateByUrl('/business_term_management/business_term');

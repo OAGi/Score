@@ -115,6 +115,9 @@ For each selected BIE, creating another preferred Business Term assignment promp
 #### Test Assertion #42.2.11
 Discarding a Business Term assignment from the assignment detail page removes only that assignment; the underlying catalog Business Term remains in the registry.
 
+#### Test Assertion #42.2.12
+After creating a single Business Term assignment for one selected BIE, connectCenter opens the assignment list scoped to that BIE.
+
 ### Test Step Pre-condition:
 1. Business Term is enabled in Application Settings in connectCenter.
 2. The users, branches, releases, and records needed to exercise this test case are available in connectCenter.
@@ -151,6 +154,8 @@ Discarding a Business Term assignment from the assignment detail page removes on
 27. Verify that connectCenter shows an overwrite warning for the existing preferred assignment. (Assertion [#10](#test-assertion-42210))
 28. The end user creates a Business Term assignment, opens that assignment on its detail page, and discards it.
 29. Verify that the assignment is removed while the catalog Business Term still exists in `View/Edit Business Term`. (Assertion [#11](#test-assertion-42211))
+30. The end user clicks `Assign Business Term` for a single selected BIE node and creates one assignment.
+31. Verify that connectCenter opens the assignment list scoped to the selected BIE (the BIE filter is applied). (Assertion [#12](#test-assertion-42212))
 
 ## Test Case 42.3
 **Business Term from BIE Detail Page**

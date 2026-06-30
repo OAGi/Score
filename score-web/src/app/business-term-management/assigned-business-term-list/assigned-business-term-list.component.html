@@ -215,7 +215,7 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
               score-table-column-resize [defaultWidth]="width('External Reference URI')" (onResize)="onResizeWidth($event)"> External Reference URI</th>
               <td mat-cell *matCellDef="let element">
-                <a target="_blank" href="{{element.externalReferenceUri}}">
+                <a target="_blank" rel="noopener noreferrer" href="{{element.externalReferenceUri}}">
                   <span class="score-line-clamp-2 score-break-word">{{ element.externalReferenceUri }}</span>
                 </a>
               </td>
