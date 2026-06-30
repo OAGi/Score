@@ -11,6 +11,7 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.condition.DisabledIfBusinessTermProperty;
+import org.oagi.score.e2e.impl.AuthenticatedApiClient;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
@@ -21,6 +22,11 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import java.io.IOException;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -253,10 +259,12 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         BIEMenu bieMenu = homePage.getBIEMenu();
         EditBusinessTermPage editBusinessTermPage = bieMenu.openViewEditBusinessTermSubMenu().openEditBusinessTermPageByTerm(randomBusinessTerm.getBusinessTerm());
 
-        click(editBusinessTermPage.getDiscardButton());
-        WebElement confirmDiscardButton = elementToBeClickable(getDriver(), By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]"));
-        click(confirmDiscardButton);
-        assertEquals("Discard's forbidden! The business term is used.", getSnackBarMessage(getDriver()));
+        // #1752 - H2: an in-use term can no longer be discarded from the edit page. The fix populates
+        // the `used` flag server-side and hides the Discard button (@if (!businessTerm.used)) rather
+        // than letting the delete fail with a misleading foreign-key HTTP 500. Wait for the form to
+        // render (its always-present Business Term field) before asserting the button is absent.
+        assertEquals(randomBusinessTerm.getBusinessTerm(), editBusinessTermPage.getBusinessTermFieldText());
+        assertFalse(editBusinessTermPage.isDiscardButtonPresent());
     }
 
     @Test
@@ -302,14 +310,14 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         BIEMenu bieMenu = homePage.getBIEMenu();
         EditBusinessTermPage editBusinessTermPage = bieMenu.openViewEditBusinessTermSubMenu().openEditBusinessTermPageByTerm(randomBusinessTerm.getBusinessTerm());
 
-        click(editBusinessTermPage.getDiscardButton());
-        WebElement confirmDiscardButton = elementToBeClickable(getDriver(), By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]"));
-        click(confirmDiscardButton);
-        assertEquals("Discard's forbidden! The business term is used.", getSnackBarMessage(getDriver()));
+        // #1752 - H2: while the term is assigned (used) the edit-page Discard button is hidden.
+        assertEquals(randomBusinessTerm.getBusinessTerm(), editBusinessTermPage.getBusinessTermFieldText());
+        assertFalse(editBusinessTermPage.isDiscardButtonPresent());
 
+        // Remove the assignment through the BIE node's "Show Business Terms" list.
         EditBIEPage editBIEPageForDiscard = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
-        WebElement bbieNodeForDiscard = editBIEPage.getNodeByPath(path);
-        EditBIEPage.BBIEPanel bbiePanelForDiscard = editBIEPage.getBBIEPanel(bbieNodeForDiscard);
+        WebElement bbieNodeForDiscard = editBIEPageForDiscard.getNodeByPath(path);
+        EditBIEPage.BBIEPanel bbiePanelForDiscard = editBIEPageForDiscard.getBBIEPanel(bbieNodeForDiscard);
         BusinessTermAssignmentPage businessTermAssignmentPageForDiscard = bbiePanelForDiscard.clickShowBusinessTermsButton();
         businessTermAssignmentPageForDiscard.showAdvancedSearchPanel();
         businessTermAssignmentPageForDiscard.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
@@ -319,13 +327,14 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         WebElement confirmDiscardAssignmentButton = elementToBeClickable(getDriver(), By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]"));
         click(confirmDiscardAssignmentButton);
 
+        // #1752 - H2: once the assignment is gone the term is no longer used, so the Discard button
+        // reappears on the edit page and the term can be discarded with a clean success.
+        editBusinessTermPage = bieMenu.openViewEditBusinessTermSubMenu().openEditBusinessTermPageByTerm(randomBusinessTerm.getBusinessTerm());
+        assertEquals(randomBusinessTerm.getBusinessTerm(), editBusinessTermPage.getBusinessTermFieldText());
+        assertTrue(editBusinessTermPage.isDiscardButtonPresent());
+        editBusinessTermPage.discardBusinessTerm();
+
         ViewEditBusinessTermPage viewEditBusinessTermPageForDiscard = bieMenu.openViewEditBusinessTermSubMenu();
-        viewEditBusinessTermPageForDiscard.setTerm(randomBusinessTerm.getBusinessTerm());
-        viewEditBusinessTermPageForDiscard.hitSearchButton();
-        click(viewEditBusinessTermPageForDiscard.getSelectCheckboxAtIndex(1));
-        click(viewEditBusinessTermPageForDiscard.getDiscardButton());
-        WebElement confirmDiscardTermButton = elementToBeClickable(getDriver(), By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]"));
-        click(confirmDiscardTermButton);
         assertThrows(NoSuchElementException.class, () -> {
             viewEditBusinessTermPageForDiscard.openEditBusinessTermPageByTerm(randomBusinessTerm.getBusinessTerm());
         });
@@ -353,6 +362,126 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         editBusinessTermPage = bieMenu.openViewEditBusinessTermSubMenu()
                 .openEditBusinessTermPageByTerm(randomBusinessTerm.getBusinessTerm());
         assertEquals(longUri, editBusinessTermPage.getExternalReferenceURIFieldText());
+    }
+
+    @Test
+    @DisplayName("TC_42_1_12")
+    public void business_term_endpoints_reject_a_developer_via_direct_api() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        // #1752 - H1: the navbar and BIE editor hide the Business Term area from developers
+        // (isBusinessTermEnabled && !isDeveloper). The REST endpoints must not trust the UI: a direct
+        // API call by a developer is rejected server-side with 403, for both reads and writes. The
+        // suite only runs when the feature flag is on, so a 403 here is unambiguously the role gate.
+        loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        AuthenticatedApiClient api = new AuthenticatedApiClient(getDriver(), getConfig().getBaseUrl());
+
+        AuthenticatedApiClient.ApiResponse readResponse = api.getJson("/api/business-terms/1");
+        assertEquals(403, readResponse.statusCode());
+        assertTrue(String.valueOf(readResponse.header("X-Error-Message")).contains("developer"));
+
+        String createBody = "{\"businessTerm\":\"bt_" + RandomStringUtils.secure().nextAlphanumeric(8)
+                + "\",\"externalReferenceUri\":\"https://example.org/"
+                + RandomStringUtils.secure().nextAlphanumeric(8) + "\"}";
+        AuthenticatedApiClient.ApiResponse writeResponse = api.postJson("/api/business-terms", createBody);
+        assertEquals(403, writeResponse.statusCode());
+        assertTrue(String.valueOf(writeResponse.header("X-Error-Message")).contains("developer"));
+    }
+
+    @Test
+    @DisplayName("TC_42_1_13")
+    public void list_filter_survives_a_page_reload() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBusinessTermPage viewEditBusinessTermPage = bieMenu.openViewEditBusinessTermSubMenu();
+        viewEditBusinessTermPage.showAdvancedSearchPanel();
+        viewEditBusinessTermPage.setExternalReferenceURI(randomBusinessTerm.getExternalReferenceUri());
+        viewEditBusinessTermPage.hitSearchButton();
+        assertBusinessTermNameInTheSearchResultsAtFirst(viewEditBusinessTermPage, randomBusinessTerm.getExternalReferenceUri(), "externalReferenceUri");
+
+        // #1752 - M2: the External Reference URI filter must round-trip through the URL so a
+        // reload/bookmark keeps it (its (de)serialization keys are now aligned). The advanced-search
+        // panel is restored open on reload (adv_ser flag), so the filter value is still shown.
+        getDriver().navigate().refresh();
+        assertEquals(randomBusinessTerm.getExternalReferenceUri(),
+                viewEditBusinessTermPage.getExternalReferenceURIField().getAttribute("value"));
+        assertBusinessTermNameInTheSearchResultsAtFirst(viewEditBusinessTermPage, randomBusinessTerm.getExternalReferenceUri(), "externalReferenceUri");
+    }
+
+    @Test
+    @DisplayName("TC_42_1_14")
+    public void create_rejects_a_malformed_external_reference_uri() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        CreateBusinessTermPage createBusinessTermPage = bieMenu.openViewEditBusinessTermSubMenu().openCreateBusinessTermPage();
+        createBusinessTermPage.setBusinessTerm("bt_" + RandomStringUtils.secure().nextAlphanumeric(5, 10));
+        // #1752 - M5: the create form has no URI format check, but the JSON create path now validates
+        // the URI server-side, so a malformed URI is rejected with a 400 surfaced as an error snackbar.
+        createBusinessTermPage.setExternalReferenceURI("not a valid uri !!!");
+        click(createBusinessTermPage.getCreateButton());
+
+        WebElement errorSnackBar = visibilityOfElementLocated(getDriver(),
+                By.xpath("//score-multi-actions-snack-bar//div[contains(@class, \"message\")]"));
+        assertTrue(getText(errorSnackBar).contains("is not a valid URI"));
+    }
+
+    @Test
+    @DisplayName("TC_42_1_15")
+    public void csv_import_reports_created_and_updated_counts() throws IOException {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        BusinessTermObject existing = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+
+        // #1753 - L6: one row reuses an existing external reference URI (-> updated) and one is new
+        // (-> created); the import must report "Imported: 1 created, 1 updated.".
+        String newName = "bt_" + RandomStringUtils.secure().nextAlphanumeric(8);
+        String newUri = "https://example.org/" + RandomStringUtils.secure().nextAlphanumeric(12);
+        String csv = "\"businessTerm\",\"externalReferenceUri\",\"externalReferenceId\",\"definition\",\"comment\"\n"
+                + "\"" + existing.getBusinessTerm() + "\",\"" + existing.getExternalReferenceUri() + "\",\"\",\"\",\"\"\n"
+                + "\"" + newName + "\",\"" + newUri + "\",\"\",\"\",\"\"\n";
+        Path csvFile = Files.createTempFile("bt-import-", ".csv");
+        Files.write(csvFile, csv.getBytes(StandardCharsets.UTF_8));
+
+        UploadBusinessTermsPage uploadBusinessTermsPage = bieMenu.openViewEditBusinessTermSubMenu().hitUploadBusinessTermsButton();
+        uploadBusinessTermsPage.getFileUploadInput().sendKeys(csvFile.toAbsolutePath().toString());
+        assertEquals("Imported: 1 created, 1 updated.", getSnackBarMessage(getDriver()));
+    }
+
+    @Test
+    @DisplayName("TC_42_1_16")
+    public void update_rejects_a_body_that_targets_a_different_id() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+
+        loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        AuthenticatedApiClient api = new AuthenticatedApiClient(getDriver(), getConfig().getBaseUrl());
+
+        BigInteger id = randomBusinessTerm.getBusinessTermId();
+        BigInteger otherId = id.add(BigInteger.ONE);
+        // #1753 - L2: PUT /business-terms/{id} honors the path id and rejects a body that targets a
+        // different id with a 400.
+        String mismatchBody = "{\"businessTermId\":" + otherId
+                + ",\"businessTerm\":\"" + randomBusinessTerm.getBusinessTerm()
+                + "\",\"externalReferenceUri\":\"" + randomBusinessTerm.getExternalReferenceUri() + "\"}";
+        assertEquals(400, api.putJson("/api/business-terms/" + id, mismatchBody).statusCode());
+
+        // Positive control: a matching id succeeds (also proves an end-user passes the H1 gate).
+        String matchBody = "{\"businessTermId\":" + id
+                + ",\"businessTerm\":\"" + randomBusinessTerm.getBusinessTerm()
+                + "\",\"externalReferenceUri\":\"" + randomBusinessTerm.getExternalReferenceUri() + "\"}";
+        assertEquals(204, api.putJson("/api/business-terms/" + id, matchBody).statusCode());
     }
 
     @AfterEach

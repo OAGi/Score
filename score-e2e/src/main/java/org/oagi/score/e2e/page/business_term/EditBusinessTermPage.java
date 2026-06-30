@@ -129,6 +129,14 @@ public interface EditBusinessTermPage extends Page {
     WebElement getDiscardButton();
 
     /**
+     * Returns {@code true} when the 'Discard' button is present in the DOM. The catalog edit page
+     * hides it for an in-use business term (#1752 - H2), so an in-use term reports {@code false}.
+     *
+     * @return whether the 'Discard' button is present
+     */
+    boolean isDiscardButtonPresent();
+
+    /**
      * Discard the business term
      *
      * @return 'View/Edit Business Term' page object

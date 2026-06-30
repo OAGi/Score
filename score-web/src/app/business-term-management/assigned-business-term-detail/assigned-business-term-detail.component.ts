@@ -115,7 +115,7 @@ export class AssignedBusinessTermDetailComponent implements OnInit {
           const dialogConfig = this.confirmDialogService.newConfig();
           dialogConfig.data.header = 'Overwrite previous preferred business term?';
           dialogConfig.data.content = [
-            'The preferred business term already exists for selected BIE and type code.',
+            'The preferred business term already exists for the selected BIE and type code.',
             'Are you sure you want to do the update and overwrite the previous preferred business term assignment?'
           ];
           dialogConfig.data.action = 'Update';

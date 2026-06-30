@@ -147,6 +147,13 @@ public class EditBusinessTermPageImpl extends BasePageImpl implements EditBusine
     }
 
     @Override
+    public boolean isDiscardButtonPresent() {
+        // #1752 - H2: the catalog edit page hides the Discard button for an in-use term
+        // (@if (!businessTerm.used)), so the button is absent from the DOM rather than disabled.
+        return isElementPresent(getDriver(), DISCARD_BUTTON_LOCATOR);
+    }
+
+    @Override
     public ViewEditBusinessTermPage discard() {
         click(getDiscardButton());
         WebElement confirmDiscardButton = elementToBeClickable(getDriver(), By.xpath(

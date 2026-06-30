@@ -377,6 +377,43 @@ public class JooqBusinessTermCommandRepository extends JooqBaseRepository implem
                 .execute();
     }
 
+    /**
+     * #1752 - M1: demote every OTHER preferred assignment on the same ASBIE node, excluding the
+     * assignment row being promoted. The update path holds an assignment PK (ASBIE_BIZTERM_ID),
+     * not a node id, so it must filter on the node id (ASBIE_ID) resolved from the assignment
+     * record and exclude itself — otherwise "Set as Preferred" leaves the previous preferred term
+     * in place, breaking the single-preferred-per-node invariant (#1381).
+     */
+    private int updateOtherAsbieBiztermToNotPrimaryByNode(ULong asbieId, AsbieBusinessTermId exceptAsbieBusinessTermId) {
+        LocalDateTime timestamp = LocalDateTime.now();
+        return dslContext().update(ASBIE_BIZTERM)
+                .set(ASBIE_BIZTERM.PRIMARY_INDICATOR, (byte) 0)
+                .set(ASBIE_BIZTERM.LAST_UPDATED_BY, valueOf(requester().userId()))
+                .set(ASBIE_BIZTERM.LAST_UPDATE_TIMESTAMP, timestamp)
+                .where(and(
+                        ASBIE_BIZTERM.ASBIE_ID.eq(asbieId),
+                        ASBIE_BIZTERM.ASBIE_BIZTERM_ID.ne(valueOf(exceptAsbieBusinessTermId))
+                ))
+                .execute();
+    }
+
+    /**
+     * #1752 - M1: demote every OTHER preferred assignment on the same BBIE node, excluding the
+     * assignment row being promoted. See {@link #updateOtherAsbieBiztermToNotPrimaryByNode}.
+     */
+    private int updateOtherBbieBiztermToNotPrimaryByNode(ULong bbieId, BbieBusinessTermId exceptBbieBusinessTermId) {
+        LocalDateTime timestamp = LocalDateTime.now();
+        return dslContext().update(BBIE_BIZTERM)
+                .set(BBIE_BIZTERM.PRIMARY_INDICATOR, (byte) 0)
+                .set(BBIE_BIZTERM.LAST_UPDATED_BY, valueOf(requester().userId()))
+                .set(BBIE_BIZTERM.LAST_UPDATE_TIMESTAMP, timestamp)
+                .where(and(
+                        BBIE_BIZTERM.BBIE_ID.eq(bbieId),
+                        BBIE_BIZTERM.BBIE_BIZTERM_ID.ne(valueOf(exceptBbieBusinessTermId))
+                ))
+                .execute();
+    }
+
     @Override
     public boolean updateAssignment(AsbieBusinessTermId asbieBusinessTermId,
                                     String typeCode, Boolean primaryIndicator) {
@@ -396,7 +433,9 @@ public class JooqBusinessTermCommandRepository extends JooqBaseRepository implem
             record.setPrimaryIndicator((byte) (primaryIndicator ? 1 : 0));
             changedField.add(ASBIE_BIZTERM.PRIMARY_INDICATOR);
             if (primaryIndicator) {
-                updateOtherBieBiztermToNotPrimary(asbieBusinessTermId);
+                // #1752 - M1: record.getAsbieId() is the node id; asbieBusinessTermId is this
+                // assignment's PK, which must be excluded from the demotion.
+                updateOtherAsbieBiztermToNotPrimaryByNode(record.getAsbieId(), asbieBusinessTermId);
             }
         }
         if (!changedField.isEmpty()) {
@@ -431,7 +470,8 @@ public class JooqBusinessTermCommandRepository extends JooqBaseRepository implem
             record.setPrimaryIndicator((byte) (primaryIndicator ? 1 : 0));
             changedField.add(BBIE_BIZTERM.PRIMARY_INDICATOR);
             if (primaryIndicator) {
-                updateOtherBieBiztermToNotPrimary(bbieBusinessTermId);
+                // #1752 - M1: demote OTHER preferred assignments on the same BBIE node, excluding this one.
+                updateOtherBbieBiztermToNotPrimaryByNode(record.getBbieId(), bbieBusinessTermId);
             }
         }
         if (!changedField.isEmpty()) {

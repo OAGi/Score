@@ -35,13 +35,20 @@ public class BusinessTermCommandService {
     private ApplicationConfigurationQueryService applicationConfigurationQueryService;
 
     /**
-     * #1752 - H1: enforce the Business Term feature flag server-side. The Angular UI hides the
-     * Business Term area when the flag is off, but the REST endpoints must not trust the UI:
-     * a direct API call when the feature is disabled is rejected with 403.
+     * #1752 - H1: enforce the Business Term access policy server-side. The Angular UI hides the
+     * Business Term area when the tenant feature flag is off <em>and</em> from developer-role
+     * users (navbar + BIE-editor both gate on {@code isBusinessTermEnabled && !isDeveloper}), but
+     * the REST endpoints must not trust the UI. A direct API call is rejected with 403 when either
+     * (a) the feature is disabled for the tenant, or (b) the requester is a developer — Business
+     * Term is an end-user-only feature, so the gate covers reads and writes alike.
      */
     private void assertBusinessTermEnabled(ScoreUser requester) {
         if (!applicationConfigurationQueryService.isBusinessTermEnabled(requester)) {
             throw new DataAccessForbiddenException("Business Term management is not enabled.");
+        }
+        if (requester.isDeveloper()) {
+            throw new DataAccessForbiddenException(
+                    "Business Term management is not available to developer-role users.");
         }
     }
 

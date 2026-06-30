@@ -30,14 +30,20 @@ public class BusinessTermQueryService {
     private ApplicationConfigurationQueryService applicationConfigurationQueryService;
 
     /**
-     * #1752 - H1: enforce the Business Term feature flag server-side on read endpoints too, so that
-     * a tenant with the feature disabled cannot read business-term data via a direct API call.
+     * #1752 - H1: enforce the Business Term access policy server-side on read endpoints too. A
+     * tenant with the feature disabled, or a developer-role user, cannot read business-term data
+     * via a direct API call (the navbar + BIE-editor hide the whole BT area on
+     * {@code isBusinessTermEnabled && !isDeveloper}, so reads are out of scope for developers too).
      * Public so endpoints that don't otherwise touch the repository (e.g. the CSV template
      * download) can apply the same gate.
      */
     public void assertBusinessTermEnabled(ScoreUser requester) {
         if (!applicationConfigurationQueryService.isBusinessTermEnabled(requester)) {
             throw new DataAccessForbiddenException("Business Term management is not enabled.");
+        }
+        if (requester.isDeveloper()) {
+            throw new DataAccessForbiddenException(
+                    "Business Term management is not available to developer-role users.");
         }
     }
 

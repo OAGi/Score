@@ -8,6 +8,7 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.condition.DisabledIfBusinessTermProperty;
+import org.oagi.score.e2e.impl.AuthenticatedApiClient;
 import org.oagi.score.e2e.impl.page.bie.EditBIEPageImpl;
 import org.oagi.score.e2e.impl.page.business_term.AssignBusinessTermBTPageImpl;
 import org.oagi.score.e2e.impl.page.business_term.BusinessTermAssignmentPageImpl;
@@ -726,6 +727,135 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         assertTrue(getDriver().getCurrentUrl().contains("bieId="),
                 "Expected the assignment list to be scoped to the created BIE, but the URL was: "
                         + getDriver().getCurrentUrl());
+    }
+
+    @Test
+    @DisabledIfBusinessTermProperty(value = false)
+    @DisplayName("TC_42_2_13")
+    public void setting_a_business_term_preferred_demotes_the_previous_preferred_on_the_same_node() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(library, "Source Activity. Source Activity", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, endUser, "WIP");
+        String path = "/" + asccp.getPropertyTerm() + "/Note";
+        BusinessTermObject firstPreferredTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+        BusinessTermObject secondTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+
+        loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        // Two assignments on the SAME BBIE node: the first preferred, the second not. Set up
+        // deterministically via the DB so the test isolates the behaviour under test (the demotion
+        // performed by the update path), not the two-step assign wizard.
+        createAssignedBusinessTermForBbieUsingDb(firstPreferredTerm, topLevelASBIEP, path, endUser, null, true);
+        createAssignedBusinessTermForBbieUsingDb(secondTerm, topLevelASBIEP, path, endUser, null, false);
+
+        BigInteger firstBiztermId = findBbieBiztermId(firstPreferredTerm.getBusinessTermId());
+        BigInteger secondBiztermId = findBbieBiztermId(secondTerm.getBusinessTermId());
+
+        // #1752 - M1: set the second assignment preferred via the assignment detail page. The fix must
+        // demote the previously preferred sibling on the SAME node (one-preferred-per-node, #1381) —
+        // before the fix the demotion used the assignment PK as a node id and demoted nothing.
+        String detailUrl = getConfig().getBaseUrl()
+                .resolve("/business_term_management/assign_business_term/details/" + secondBiztermId
+                        + "?type=BBIE&id=" + secondBiztermId).toString();
+        getDriver().get(detailUrl);
+        click(elementToBeClickable(getDriver(), By.xpath("//mat-checkbox[contains(., \"Preferred Business Term\")]")));
+        click(elementToBeClickable(getDriver(), By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        // confirm the overwrite of the previously preferred term
+        click(elementToBeClickable(getDriver(), By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        assertEquals("Updated", getSnackBarMessage(getDriver()));
+
+        assertEquals(1L, countByLong(
+                "select primary_indicator from bbie_bizterm where bbie_bizterm_id = ?", secondBiztermId));
+        assertEquals(0L, countByLong(
+                "select primary_indicator from bbie_bizterm where bbie_bizterm_id = ?", firstBiztermId));
+    }
+
+    @Test
+    @DisabledIfBusinessTermProperty(value = false)
+    @DisplayName("TC_42_2_14")
+    public void assigning_the_same_business_term_twice_does_not_create_a_duplicate() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(library, "Source Activity. Source Activity", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, endUser, "WIP");
+        String path = "/" + asccp.getPropertyTerm() + "/Note";
+        BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+
+        loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ensureBbiePersisted(topLevelASBIEP, endUser, path);
+        BigInteger bbieId = findBieId("bbie", topLevelASBIEP.getTopLevelAsbiepId(), path);
+
+        AuthenticatedApiClient api = new AuthenticatedApiClient(getDriver(), getConfig().getBaseUrl());
+        String assignBody = "{\"biesToAssign\":[{\"bieId\":" + bbieId + ",\"bieType\":\"BBIE\"}],"
+                + "\"primaryIndicator\":false,\"typeCode\":\"Synonym\"}";
+        // #1752 - M3: the asbie/bbie_bizterm assignment is find-or-create, so assigning the identical
+        // (node, business term, type code) twice must not create a duplicate row.
+        assertEquals(204, api.postJson("/api/business-terms/" + randomBusinessTerm.getBusinessTermId() + "/assign", assignBody).statusCode());
+        assertEquals(204, api.postJson("/api/business-terms/" + randomBusinessTerm.getBusinessTermId() + "/assign", assignBody).statusCode());
+        assertEquals(1L, countByLong(
+                "select count(*) from bbie_bizterm bbt join bcc_bizterm bcbt on bbt.bcc_bizterm_id = bcbt.bcc_bizterm_id where bcbt.business_term_id = ?",
+                randomBusinessTerm.getBusinessTermId()));
+    }
+
+    @Test
+    @DisabledIfBusinessTermProperty(value = false)
+    @DisplayName("TC_42_2_15")
+    public void assigning_to_a_nonexistent_bie_returns_a_clean_400() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+
+        loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        AuthenticatedApiClient api = new AuthenticatedApiClient(getDriver(), getConfig().getBaseUrl());
+        // #1752 - M8: a nonexistent BIE id resolves to no CC and must yield a clean 400, not an NPE/500.
+        String assignBody = "{\"biesToAssign\":[{\"bieId\":999999999,\"bieType\":\"BBIE\"}],"
+                + "\"primaryIndicator\":false,\"typeCode\":null}";
+        AuthenticatedApiClient.ApiResponse resp =
+                api.postJson("/api/business-terms/" + randomBusinessTerm.getBusinessTermId() + "/assign", assignBody);
+        assertEquals(400, resp.statusCode());
+    }
+
+    @Test
+    @DisabledIfBusinessTermProperty(value = false)
+    @DisplayName("TC_42_2_16")
+    public void batch_discard_rolls_back_when_one_term_is_in_use() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(library, "Source Activity. Source Activity", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, endUser, "WIP");
+        String path = "/" + asccp.getPropertyTerm() + "/Note";
+        BusinessTermObject unusedTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+        BusinessTermObject usedTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+
+        loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        // Make usedTerm in-use by assigning it to a BBIE node.
+        createAssignedBusinessTermForBbie(usedTerm, topLevelASBIEP, path, endUser, null, false);
+
+        AuthenticatedApiClient api = new AuthenticatedApiClient(getDriver(), getConfig().getBaseUrl());
+        String batchBody = "{\"businessTermIdList\":[" + unusedTerm.getBusinessTermId()
+                + "," + usedTerm.getBusinessTermId() + "]}";
+        // #1752 - M9: the batch discard runs in a single transaction, so a mid-batch in-use failure
+        // rolls back the whole batch (neither term is deleted) and returns a clean 400.
+        assertEquals(400, api.deleteJson("/api/business-terms", batchBody).statusCode());
+        assertEquals(1L, countByLong(
+                "select count(*) from business_term where business_term_id = ?", unusedTerm.getBusinessTermId()));
+        assertEquals(1L, countByLong(
+                "select count(*) from business_term where business_term_id = ?", usedTerm.getBusinessTermId()));
     }
 
     @AfterEach

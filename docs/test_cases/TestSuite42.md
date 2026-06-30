@@ -32,13 +32,28 @@ The end user cannot change the `Definition` field on the `Edit Business Term` pa
 The end user cannot create or save a Business Term when another Business Term already exists with the same term and external reference URI.
 
 #### Test Assertion #42.1.9
-The end user cannot discard a Business Term on the `Edit Business Term` page if it is used in assignments.
+The end user cannot discard a Business Term that is used in assignments: while the term is in use the `Discard` control is hidden on the `Edit Business Term` page (the server populates the in-use flag instead of letting the delete fail with a foreign-key error).
 
 #### Test Assertion #42.1.10
-The end user can discard a Business Term after its existing assignments have been removed.
+The end user can discard a Business Term after its existing assignments have been removed: once the term is no longer used the `Discard` control reappears and the term is removed successfully.
 
 #### Test Assertion #42.1.11
 The end user can save an `External Reference URI` longer than 45 characters on the `Edit Business Term` page, and the full value is persisted (regression guard for the edit-form URI truncation).
+
+#### Test Assertion #42.1.12
+The Business Term REST endpoints reject a developer-role user with HTTP 403 for both reads and writes; the server enforces the same gate the navbar applies and does not trust the UI.
+
+#### Test Assertion #42.1.13
+A list filter such as `External Reference URI` survives a page reload/bookmark: the filter round-trips through the URL, so both the filter value and the filtered result are preserved after reloading.
+
+#### Test Assertion #42.1.14
+Creating a Business Term with a malformed `External Reference URI` is rejected server-side with a clear validation error, even though the create form performs no URI format check.
+
+#### Test Assertion #42.1.15
+A CSV import reports a created/updated summary: a row whose `External Reference URI` already exists is counted as updated and a row with a new URI is counted as created (e.g. `Imported: 1 created, 1 updated.`).
+
+#### Test Assertion #42.1.16
+`PUT /business-terms/{id}` honors the path id and rejects a request body that targets a different id with HTTP 400; a body whose id matches the path succeeds.
 
 ### Test Step Pre-condition:
 1. Business Term is enabled in Application Settings in connectCenter.
@@ -63,12 +78,21 @@ The end user can save an `External Reference URI` longer than 45 characters on t
 15. The end user attempts to create another Business Term using the same `Business Term` and `External Reference URI` as an existing record.
 16. Verify that the application rejects the duplicate combination. (Assertion [#8](#test-assertion-4218))
 17. The end user prepares a Business Term that is assigned to a BIE node and opens that Business Term on the edit page.
-18. The end user attempts to discard the record.
-19. Verify that connectCenter blocks the discard operation because the Business Term is used in assignments. (Assertion [#9](#test-assertion-4219))
-20. The end user removes the Business Term assignment from the related BIE node, returns to `View/Edit Business Term`, and discards the same Business Term again.
-21. Verify that the Business Term is removed successfully after it is no longer assigned. (Assertion [#10](#test-assertion-42110))
-22. The end user opens a Business Term on the `Edit Business Term` page, enters an `External Reference URI` longer than 45 characters, and saves the record.
-23. Verify that the full URI is persisted when the record is reopened. (Assertion [#11](#test-assertion-42111))
+18. Verify that the `Discard` control is not shown while the Business Term is used in assignments. (Assertion [#9](#test-assertion-4219))
+19. The end user removes the Business Term assignment from the related BIE node and returns to the same Business Term on the edit page.
+20. Verify that the `Discard` control reappears once the term is no longer assigned and the Business Term is removed successfully. (Assertion [#10](#test-assertion-42110))
+21. The end user opens a Business Term on the `Edit Business Term` page, enters an `External Reference URI` longer than 45 characters, and saves the record.
+22. Verify that the full URI is persisted when the record is reopened. (Assertion [#11](#test-assertion-42111))
+23. As a developer-role user, an authorized tester issues a direct API read and a direct API write to the Business Term endpoints.
+24. Verify that both the read and the write are rejected with HTTP 403. (Assertion [#12](#test-assertion-42112))
+25. The end user applies an `External Reference URI` filter on the list, runs the search, and reloads the page.
+26. Verify that the filter value and the filtered result are preserved after the reload. (Assertion [#13](#test-assertion-42113))
+27. The end user creates a Business Term with a malformed `External Reference URI`.
+28. Verify that the create request is rejected with a validation error. (Assertion [#14](#test-assertion-42114))
+29. The end user imports a CSV containing one row with an already-existing `External Reference URI` and one row with a new `External Reference URI`.
+30. Verify that the import reports one created and one updated. (Assertion [#15](#test-assertion-42115))
+31. An authorized tester issues `PUT /business-terms/{id}` with a body id different from the path id, then with a matching id.
+32. Verify that the mismatched request is rejected with HTTP 400 and the matching update succeeds. (Assertion [#16](#test-assertion-42116))
 
 ## Test Case 42.2
 **Business Term Assignment**
@@ -118,6 +142,18 @@ Discarding a Business Term assignment from the assignment detail page removes on
 #### Test Assertion #42.2.12
 After creating a single Business Term assignment for one selected BIE, connectCenter opens the assignment list scoped to that BIE.
 
+#### Test Assertion #42.2.13
+Setting a Business Term assignment as preferred on a node that already has a preferred assignment demotes the previously preferred assignment, preserving the one-preferred-per-node rule.
+
+#### Test Assertion #42.2.14
+Assigning the identical Business Term to the same BIE node with the same type code twice does not create a duplicate assignment row (server-side find-or-create).
+
+#### Test Assertion #42.2.15
+Assigning a Business Term to a nonexistent BIE id is rejected with a clean HTTP 400 rather than a server error.
+
+#### Test Assertion #42.2.16
+A batch discard that includes a Business Term still in use rolls back the entire batch — no term in the batch is deleted — and returns HTTP 400.
+
 ### Test Step Pre-condition:
 1. Business Term is enabled in Application Settings in connectCenter.
 2. The users, branches, releases, and records needed to exercise this test case are available in connectCenter.
@@ -156,6 +192,14 @@ After creating a single Business Term assignment for one selected BIE, connectCe
 29. Verify that the assignment is removed while the catalog Business Term still exists in `View/Edit Business Term`. (Assertion [#11](#test-assertion-42211))
 30. The end user clicks `Assign Business Term` for a single selected BIE node and creates one assignment.
 31. Verify that connectCenter opens the assignment list scoped to the selected BIE (the BIE filter is applied). (Assertion [#12](#test-assertion-42212))
+32. The end user assigns two Business Terms to the same BIE node, marks the first preferred, then opens the second assignment's detail page and sets it preferred (confirming the overwrite).
+33. Verify that the second assignment becomes preferred and the previously preferred assignment is demoted. (Assertion [#13](#test-assertion-42213))
+34. An authorized tester assigns the identical Business Term to the same BIE node with the same type code twice via the API.
+35. Verify that only one assignment row exists for that Business Term and node. (Assertion [#14](#test-assertion-42214))
+36. An authorized tester assigns a Business Term to a nonexistent BIE id via the API.
+37. Verify that the response is HTTP 400. (Assertion [#15](#test-assertion-42215))
+38. An authorized tester batch-discards a list that contains one unused Business Term and one Business Term that is still in use, via the API.
+39. Verify that the response is HTTP 400 and that both Business Terms still exist. (Assertion [#16](#test-assertion-42216))
 
 ## Test Case 42.3
 **Business Term from BIE Detail Page**
