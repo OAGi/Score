@@ -70,6 +70,13 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
                         // response select (requests carry no HTTP status code). Renders as a NULL literal.
                         castNull(SQLDataType.INTEGER).as("http_status_code"),
                         OAS_DOC.as("oas_doc").OAS_DOC_ID.as("oas_doc_id"),
+                        // Issue #1519: surface the document title + version so the BIE-root panel can label
+                        // each binding by document (two documents can share a title).
+                        OAS_DOC.as("oas_doc").TITLE.as("oas_doc_title"),
+                        OAS_DOC.as("oas_doc").VERSION.as("oas_doc_version"),
+                        // Issue #1610: the OpenAPI spec version so the BIE-root panel can warn (read-only)
+                        // that a DELETE Request body is ignored when the document targets OpenAPI 3.0.x.
+                        OAS_DOC.as("oas_doc").OPEN_API_VERSION.as("oas_doc_open_api_version"),
                         OAS_OPERATION.as("oas_operation").VERB.as("verb"),
                         OAS_TAG.as("oas_tag").NAME.as("tag_name"),
                         OAS_REQUEST.MAKE_ARRAY_INDICATOR.as("array_indicator"),
@@ -124,6 +131,13 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
                         // Issue #1730: HTTP status code drives bodyless (202/204) response generation.
                         OAS_RESPONSE.HTTP_STATUS_CODE.as("http_status_code"),
                         OAS_DOC.as("oas_doc").OAS_DOC_ID.as("oas_doc_id"),
+                        // Issue #1519: surface the document title + version so the BIE-root panel can label
+                        // each binding by document (two documents can share a title).
+                        OAS_DOC.as("oas_doc").TITLE.as("oas_doc_title"),
+                        OAS_DOC.as("oas_doc").VERSION.as("oas_doc_version"),
+                        // Issue #1610: the OpenAPI spec version so the BIE-root panel can warn (read-only)
+                        // that a DELETE Request body is ignored when the document targets OpenAPI 3.0.x.
+                        OAS_DOC.as("oas_doc").OPEN_API_VERSION.as("oas_doc_open_api_version"),
                         OAS_OPERATION.as("oas_operation").VERB.as("verb"),
                         OAS_TAG.as("oas_tag").NAME.as("tag_name"),
                         OAS_RESPONSE.MAKE_ARRAY_INDICATOR.as("array_indicator"),
@@ -181,6 +195,11 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
             ULong oasDocId = record.get(OAS_DOC.as("oas_doc").OAS_DOC_ID.as("oas_doc_id"));
             if (oasDocId != null) {
                 bieForOasDoc.setOasDocId(new OasDocId(oasDocId.toBigInteger()));
+                // Issue #1519: title + version for the BIE-root "OpenAPI Document Information" panel's
+                // Document label (version disambiguates documents that share a title).
+                bieForOasDoc.setOasDocTitle(record.get(field("oas_doc_title", String.class)));
+                bieForOasDoc.setOasDocVersion(record.get(field("oas_doc_version", String.class)));
+                bieForOasDoc.setOpenAPIVersion(record.get(field("oas_doc_open_api_version", String.class)));
             }
             bieForOasDoc.setVerb(record.get(OAS_OPERATION.as("oas_operation").VERB.as("verb")));
             Byte arrayIndicator = record.get(OAS_REQUEST.MAKE_ARRAY_INDICATOR.as("array_indicator"));
@@ -362,10 +381,18 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
     @Override
     @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public GetBieForOasDocResponse getBieForOasDoc(GetBieForOasDocRequest request) throws ScoreDataAccessException {
+        // Issue #1519: each half scans every oas_message_body and LEFT-joins its own body table
+        // (oas_request / oas_response), so a body of the OPPOSITE kind produces a row whose
+        // request/response — and therefore operation, resource and document — are all null. Doc-centric
+        // callers filter those phantom rows out implicitly via the oasDocId predicate (their oas_doc is
+        // null), but a BIE-only query (oasDocId == null, used by the BIE-root panel) has no such predicate.
+        // Constrain each half to rows whose own body actually matched so only real bindings are returned.
         SelectOrderByStep orderByStep = selectForRequest()
                 .where(getConditions(request))
+                .and(OAS_REQUEST.OAS_REQUEST_ID.isNotNull())
                 .unionAll(selectForResponse()
-                        .where(getConditions(request)));
+                        .where(getConditions(request))
+                        .and(OAS_RESPONSE.OAS_RESPONSE_ID.isNotNull()));
 
         List<SortField<?>> sortFields = getSortFields(request);
         int length = dslContext().fetchCount(orderByStep);

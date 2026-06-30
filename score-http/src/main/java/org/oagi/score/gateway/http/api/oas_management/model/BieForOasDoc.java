@@ -16,6 +16,15 @@ public class BieForOasDoc extends Auditable {
     private TopLevelAsbiepId topLevelAsbiepId;
     private ReleaseId releaseId;
     private OasDocId oasDocId;
+    // Issue #1519: the owning OpenAPI Document's title and version, so the BIE-root "OpenAPI Document
+    // Information" panel can label each binding by document (title + version) when one BIE participates in
+    // several documents — two documents can share a title, so the version helps disambiguate.
+    private String oasDocTitle;
+    private String oasDocVersion;
+    // Issue #1610: the owning OpenAPI Document's OpenAPI spec version (e.g. "3.0.3" / "3.1.1"). The BIE-root
+    // panel uses it (read-only) to warn that a DELETE Request body is ignored when the document targets
+    // OpenAPI 3.0.x; the version itself is changed on the OpenAPI Document screen, not the BIE screen.
+    private String openAPIVersion;
     private OasResourceId oasResourceId;
     private OasOperationId oasOperationId;
     private String den;
@@ -79,6 +88,30 @@ public class BieForOasDoc extends Auditable {
 
     public void setOasDocId(OasDocId oasDocId) {
         this.oasDocId = oasDocId;
+    }
+
+    public String getOasDocTitle() {
+        return oasDocTitle;
+    }
+
+    public void setOasDocTitle(String oasDocTitle) {
+        this.oasDocTitle = oasDocTitle;
+    }
+
+    public String getOasDocVersion() {
+        return oasDocVersion;
+    }
+
+    public void setOasDocVersion(String oasDocVersion) {
+        this.oasDocVersion = oasDocVersion;
+    }
+
+    public String getOpenAPIVersion() {
+        return openAPIVersion;
+    }
+
+    public void setOpenAPIVersion(String openAPIVersion) {
+        this.openAPIVersion = openAPIVersion;
     }
 
     public String getDen() {

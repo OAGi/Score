@@ -531,11 +531,203 @@
                             </mat-form-field>
                           </div>
                         </div>
+                        <!-- Issue #1519: OpenAPI Document Information — one card per binding (cross-document
+                             union of this BIE's OpenAPI bindings), in an expandable panel above Supporting Documentation. -->
+                        @if (showOasDocPanel()) {
+                          <div class="row pb-4">
+                            <div class="col-12">
+                              <mat-expansion-panel #oasInfoPanel [expanded]="hasOasDocInformation()">
+                                <mat-expansion-panel-header class="info-panel-header">
+                                  <mat-panel-title style="flex-grow: 0.5;">OpenAPI Document Information</mat-panel-title>
+                                  <mat-panel-description class="d-block text-truncate align-content-center" style="flex-grow: 1.5;">
+                                    @if (!oasInfoPanel.expanded && hasOasDocInformation()) {
+                                      <span [matTooltip]="oasDocBindingTooltip()">{{ oasDocBindingSummary() }}</span>
+                                    }
+                                  </mat-panel-description>
+                                  <!-- '+' sits in the header, just left of the expand/collapse chevron, only while
+                                       the panel is expanded. stopPropagation keeps the click from toggling the panel. -->
+                                  @if (oasInfoPanel.expanded && isOasDocEditable()) {
+                                    <button mat-icon-button type="button" class="info-panel-header-add"
+                                            matTooltip="Add to an OpenAPI Document"
+                                            (click)="$event.stopPropagation(); openAddOasDocDialog()">
+                                      <mat-icon>add</mat-icon>
+                                    </button>
+                                  }
+                                </mat-expansion-panel-header>
+                                <div class="oas-doc-information">
+                                  @if (hasOasDocInformation()) {
+                                    @for (binding of rootNode.bieForOasDocList; track $index) {
+                                      <div class="oas-binding-card">
+                                        <div class="oas-binding-card-header">
+                                          <!-- One cohesive chip-link for the bound OpenAPI Document: a leading "api"
+                                               glyph marks it as an OpenAPI Document, then title · version, then the
+                                               open-in-new affordance — all one colour/affordance. Two documents can
+                                               share a title (and version), so the link is the only reliable way to
+                                               tell them apart. -->
+                                          <a class="oas-doc-chip"
+                                             href="/profile_bie/express/oas_doc/{{ binding.oasDocId }}"
+                                             target="_blank" rel="noopener"
+                                             matTooltip="Open this OpenAPI Document">
+                                            <span class="oas-doc-chip-text">{{ binding.oasDocTitle }}@if (binding.oasDocVersion) {<span class="oas-doc-chip-version">&nbsp;·&nbsp;{{ binding.oasDocVersion }}</span>}</span>
+                                            <mat-icon class="oas-doc-chip-open">open_in_new</mat-icon>
+                                          </a>
+                                          @if (isOasDocEditable()) {
+                                            <button mat-icon-button type="button" class="oas-binding-discard"
+                                                    matTooltip="Remove this operation from the OpenAPI Document"
+                                                    (click)="unbindOasBinding(binding)">
+                                              <mat-icon>remove</mat-icon>
+                                            </button>
+                                          }
+                                        </div>
+                                        <div class="oas-binding-card-body">
+                                          <!-- Issue #1610: a DELETE Request body is honored only from OpenAPI 3.1.1. When THIS
+                                               binding's document targets 3.0.x the body is dropped on generation, so warn per card
+                                               (the panel spans documents) — shown right under the document title, above Verb /
+                                               Message Body. Read-only here — the OpenAPI Version is changed on the OpenAPI
+                                               Document screen, not the BIE screen. -->
+                                          @if (isOasBindingDeleteBodyIgnored(binding)) {
+                                            <div class="oas-delete-body-warning d-flex align-items-center">
+                                              <mat-icon class="oas-delete-body-warning-icon">warning</mat-icon>
+                                              <span>A Request Body on a DELETE operation is ignored in OpenAPI 3.0.3. Set this OpenAPI Document's Version to 3.1.1 on the OpenAPI Document screen to include it in the generated document.</span>
+                                            </div>
+                                          }
+                                          <!-- Rows 1 & 2 share one 4-column grid (1fr 1fr 2fr 2fr) so the second row
+                                               lines up with the first: Security under Verb, Error Response under Message
+                                               Body, Tag under Resource Name (the Operation ID column is empty on row 2). -->
+                                          <div class="oas-binding-grid">
+                                            <mat-form-field>
+                                              <mat-label>Verb</mat-label>
+                                              <mat-select [(ngModel)]="binding.verb" [panelWidth]="null"
+                                                          [disabled]="!isOasDocEditable()"
+                                                          (ngModelChange)="onOasVerbChange(binding)">
+                                                <mat-option value="GET">GET</mat-option>
+                                                <mat-option value="PUT">PUT</mat-option>
+                                                <mat-option value="POST">POST</mat-option>
+                                                <mat-option value="DELETE">DELETE</mat-option>
+                                                <mat-option value="PATCH">PATCH</mat-option>
+                                              </mat-select>
+                                            </mat-form-field>
+                                            <mat-form-field>
+                                              <mat-label>Message Body</mat-label>
+                                              <mat-select [(ngModel)]="binding.messageBody" [panelWidth]="null"
+                                                          [disabled]="!isOasDocEditable()"
+                                                          (ngModelChange)="recomputeOasValidation()">
+                                                <mat-option value="Request" [disabled]="binding.verb === 'GET'">Request</mat-option>
+                                                <mat-option value="Response">Response</mat-option>
+                                              </mat-select>
+                                            </mat-form-field>
+                                            <mat-form-field>
+                                              <mat-label>Resource Name</mat-label>
+                                              <input matInput [(ngModel)]="binding.resourceName"
+                                                     [readonly]="!isOasDocEditable()"
+                                                     (ngModelChange)="recomputeOasValidation()"
+                                                     [errorStateMatcher]="oasBodySlotErrorStateMatcher(binding)">
+                                              <mat-error>Each (Resource Name, Verb) can have only one Request and one Response body.</mat-error>
+                                            </mat-form-field>
+                                            <mat-form-field>
+                                              <mat-label>Operation ID</mat-label>
+                                              <input matInput [(ngModel)]="binding.operationId"
+                                                     [readonly]="!isOasDocEditable()"
+                                                     (ngModelChange)="recomputeOasValidation()"
+                                                     [errorStateMatcher]="oasOperationIdErrorStateMatcher(binding)">
+                                              @if (!binding.operationId || !binding.operationId.trim()) {
+                                                <mat-error>Operation ID is required.</mat-error>
+                                              } @else {
+                                                <mat-error>Operation ID must be unique within the document.</mat-error>
+                                              }
+                                            </mat-form-field>
+                                            <!-- Security is a real mat-form-field so its label and value line up with the
+                                                 other fields. Value mirrors the OpenAPI Document editor's Security column:
+                                                 '—' when the document defines no schemes (and not overridden), else the
+                                                 requirement summary ('Inherited' / 'Public' / scheme names). The suffix
+                                                 pencil opens the same per-operation Security dialog. -->
+                                            <mat-form-field>
+                                              <mat-label>Security</mat-label>
+                                              <input matInput readonly
+                                                     [value]="showOasSecurityDash(binding) ? '—' : operationSecuritySummary(binding)"
+                                                     [matTooltip]="showOasSecurityDash(binding) ? 'Add a Security Scheme to the document to configure operation security' : operationSecuritySummary(binding)">
+                                              @if (isOasDocEditable() && !showOasSecurityDash(binding)) {
+                                                <button matSuffix mat-icon-button type="button"
+                                                        class="oas-binding-edit-button"
+                                                        matTooltip="Edit operation security"
+                                                        (click)="openOasOperationSecurityDialog(binding)">
+                                                  <mat-icon>edit</mat-icon>
+                                                </button>
+                                              }
+                                            </mat-form-field>
+                                            <mat-form-field subscriptSizing="dynamic">
+                                              <mat-label>Error Response</mat-label>
+                                              <mat-select [(ngModel)]="binding.errorResponseBodyType" [panelWidth]="null"
+                                                          [disabled]="!isOasDocEditable()"
+                                                          (ngModelChange)="onOasErrorResponseBodyTypeChange(binding)">
+                                                @for (opt of oasErrorResponseBodyTypeOptions; track opt.value) {
+                                                  <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+                                                }
+                                              </mat-select>
+                                              <!-- Issue #1347/#1519: when CONFIRM_MESSAGE is chosen, show a "Selected Confirm Message" link
+                                                   under this selector that opens the picked BIE in a new tab. The selector already names the
+                                                   body type, so the DEN would be redundant — it rides in the link's tooltip instead. The pencil
+                                                   re-opens the BIE picker. Indigo = picked, red = none picked yet. -->
+                                              @if (binding.errorResponseBodyType === 'CONFIRM_MESSAGE') {
+                                                <mat-hint class="oas-confirm-message-hint" [class.unset]="!binding.confirmMessageTopLevelAsbiepId">
+                                                  @if (binding.confirmMessageTopLevelAsbiepId) {
+                                                    <a class="oas-confirm-message-hint-link"
+                                                       href="/profile_bie/{{ binding.confirmMessageTopLevelAsbiepId }}"
+                                                       target="_blank" rel="noopener"
+                                                       [matTooltip]="binding.confirmMessageDen"
+                                                       (click)="$event.stopPropagation()">
+                                                      <span class="oas-confirm-message-hint-text">Selected Confirm Message</span>
+                                                      <mat-icon class="oas-confirm-message-hint-open">open_in_new</mat-icon>
+                                                    </a>
+                                                  } @else {
+                                                    <span class="oas-confirm-message-hint-text">Pick a Confirm Message…</span>
+                                                  }
+                                                  @if (isOasDocEditable()) {
+                                                    <mat-icon class="oas-confirm-message-hint-edit" role="button" tabindex="0"
+                                                              matTooltip="Pick ConfirmMessage BIE"
+                                                              (click)="openOasConfirmMessageBiePicker(binding, $event)"
+                                                              (keydown.enter)="openOasConfirmMessageBiePicker(binding, $event)"
+                                                              (keydown.space)="openOasConfirmMessageBiePicker(binding, $event)">edit</mat-icon>
+                                                  }
+                                                </mat-hint>
+                                              }
+                                            </mat-form-field>
+                                            <mat-form-field>
+                                              <mat-label>Tag</mat-label>
+                                              <input matInput [(ngModel)]="binding.tagName" [readonly]="!isOasDocEditable()">
+                                            </mat-form-field>
+                                          </div>
+                                          <!-- Row 3: array / suppress-root toggles -->
+                                          <div class="oas-binding-checkboxes">
+                                            <mat-checkbox [(ngModel)]="binding.arrayIndicator"
+                                                          [disabled]="!isOasDocEditable()"
+                                                          (ngModelChange)="onOasArrayChange(binding)">Make as an array</mat-checkbox>
+                                            <mat-checkbox [(ngModel)]="binding.suppressRootIndicator"
+                                                          [disabled]="!isOasDocEditable()">Suppress a root property</mat-checkbox>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    }
+                                  } @else {
+                                    <div class="oas-doc-information-empty">This BIE is not used in any OpenAPI Document yet.</div>
+                                  }
+                                  @if (isOasDocEditable() && hasOasDocInformation()) {
+                                    <div class="oas-doc-information-actions">
+                                      <button mat-flat-button color="primary" type="button"
+                                              [disabled]="!hasOasChanges() || hasOasErrors()"
+                                              (click)="updateOasDocInformation()">Update OpenAPI Information</button>
+                                    </div>
+                                  }
+                                </div>
+                              </mat-expansion-panel>
+                            </div>
+                          </div>
+                        }
                         <div class="row pb-4">
                           <div class="col-12">
                             <mat-expansion-panel #supportDoc
                               [expanded]="asAbieDetail().asbiep.supportDocList?.length > 0">
-                              <mat-expansion-panel-header>
+                              <mat-expansion-panel-header class="info-panel-header">
                                 <mat-panel-title style="flex-grow: 0.5;">Supporting Documentation</mat-panel-title>
                                 <mat-panel-description class="d-block text-truncate align-content-center" style="flex-grow: 1.5;">
                                   @if (!supportDoc.expanded && asAbieDetail().asbiep.supportDocList?.length > 0) {
@@ -544,9 +736,18 @@
                                     </span>
                                   }
                                 </mat-panel-description>
+                                <!-- '+' sits in the header, just left of the expand/collapse chevron, only while
+                                     the panel is expanded. stopPropagation keeps the click from toggling the panel. -->
+                                @if (supportDoc.expanded && isEditable(selectedNode)) {
+                                  <button mat-icon-button type="button" class="info-panel-header-add"
+                                          matTooltip="Add supporting documentation"
+                                          (click)="$event.stopPropagation(); addAsbiepSupportDoc(asAbieDetail().asbiep)">
+                                    <mat-icon>add</mat-icon>
+                                  </button>
+                                }
                               </mat-expansion-panel-header>
                               <div class="container-fluid p-0">
-                                @for (supportDoc of asAbieDetail().asbiep.supportDocList; track supportDoc; let i = $index) {
+                                @for (supportDoc of asAbieDetail().asbiep.supportDocList; track supportDoc) {
                                   <div class="d-flex align-items-center pb-2" style="gap: 10px;">
                                     <div style="flex: 1;">
                                       <mat-form-field class="w-100 no-subscript">
@@ -575,17 +776,9 @@
                                     <div style="flex: 0 0 40px; text-align: center;">
                                       @if (isEditable(selectedNode)) {
                                         <button mat-icon-button
+                                          matTooltip="Remove this supporting documentation"
                                           (click)="removeAsbiepSupportDoc(asAbieDetail().asbiep, supportDoc)">
                                           <mat-icon>remove</mat-icon>
-                                        </button>
-                                      }
-                                    </div>
-                                    <div style="flex: 0 0 40px; text-align: center;"
-                                      [style.visibility]="i == (asAbieDetail().asbiep.supportDocList.length - 1) ? 'visible' : 'hidden'">
-                                      @if (isEditable(selectedNode)) {
-                                        <button mat-icon-button
-                                          (click)="addAsbiepSupportDoc(asAbieDetail().asbiep)">
-                                          <mat-icon>add</mat-icon>
                                         </button>
                                       }
                                     </div>

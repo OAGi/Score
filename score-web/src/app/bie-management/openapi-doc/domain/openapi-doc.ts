@@ -316,6 +316,14 @@ export class BieForOasDocListRequest {
 
 export class BieForOasDoc {
   oasDocId: number;
+  // Issue #1519: title + version of the owning OpenAPI Document, used to label each binding in the BIE-root
+  // panel (the version disambiguates documents that share a title).
+  oasDocTitle: string;
+  oasDocVersion: string;
+  // Issue #1610: the owning OpenAPI Document's OpenAPI spec version (3.0.x / 3.1.x). Read-only on the
+  // BIE-root panel, which uses it to warn that a DELETE Request body is ignored when the document targets
+  // OpenAPI 3.0.x; the version is changed on the OpenAPI Document screen, not here.
+  openAPIVersion: string;
   topLevelAsbiepId: number;
   oasResourceId: number;
   oasOperationId: number;
@@ -360,6 +368,9 @@ export class BieForOasDoc {
 
   constructor(obj?: BieForOasDoc) {
     this.oasDocId = obj && obj.oasDocId || 0;
+    this.oasDocTitle = obj && obj.oasDocTitle || '';
+    this.oasDocVersion = obj && obj.oasDocVersion || '';
+    this.openAPIVersion = obj && obj.openAPIVersion || '';
     this.topLevelAsbiepId = obj && obj.topLevelAsbiepId || 0;
     this.den = obj && obj.den || '';
     this.propertyTerm = obj && obj.propertyTerm || '';

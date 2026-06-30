@@ -8,6 +8,7 @@ import org.oagi.score.gateway.http.api.oas_management.model.BieForOasDoc;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 
 import java.math.BigInteger;
+import java.util.List;
 
 @Data
 public class BieEditNode {
@@ -42,7 +43,8 @@ public class BieEditNode {
     // Issue #1635
     private BigInteger basedTopLevelAsbiepId;
 
-    // Issue #1519
-    private BieForOasDoc bieForOasDoc;
+    // Issue #1519: a BIE may bind to several OpenAPI Documents/operations (M:N). The BIE-root editor
+    // surfaces the full cross-document union of bindings, not just the first one.
+    private List<BieForOasDoc> bieForOasDocList;
 
 }

@@ -188,25 +188,50 @@ describe('OasDocAssignDialogComponent.addBieForOasDoc serialized adds (#1492 Opt
     expect(ctx.loading).toBe(false);
   });
 
-  it('blocks the whole batch (no POST) when a selection duplicates an existing body slot', () => {
+  it('skips the only selection when it duplicates an existing body slot (no POST, dialog stays open, notice shown)', () => {
     const existing = [{propertyTerm: 'Alpha', resourceName: 'alpha', verb: 'POST', messageBody: 'Request'}];
     const a = bie(1, 'Alpha');
     const ctx = batchCtx([a], {1: 'POST'}, {1: 'Request'}, existing);
     ctx.addBieForOasDoc();
 
+    // The only selection already exists on the document, so nothing is POSTed and the dialog stays open so
+    // the user can adjust the selection. (Issue #1492 Option 2 SKIPS duplicates rather than aborting the
+    // whole batch; the prior "abort + 'This endpoint already has a Request body.'" behavior was removed.)
     expect(ctx.openAPIService.assignBieForOasDoc).not.toHaveBeenCalled();
     expect(ctx.dialogRef.close).not.toHaveBeenCalled();
-    expect(ctx.snackBar.open).toHaveBeenCalledWith('This endpoint already has a Request body.', '', {duration: 5000});
+    expect(ctx.snackBar.open).toHaveBeenCalledWith(
+      'The selected BIE(s) already have that message body on this document.', '', {duration: 5000});
   });
 
-  it('blocks the batch when two selections collide on the same (propertyTerm, verb, messageBody)', () => {
+  it('ADDS both selections that share a property term but are distinct BIEs (different Business Contexts)', () => {
+    // Issue #1492 multi-add fix: two profiles of one ASCCP under different Business Contexts share a DEN /
+    // property term but resolve to different resource paths (the backend derives the path from the Business
+    // Context), so BOTH must be added. (Previously the batch was de-duplicated on the shared property term
+    // and silently added nothing.)
     const a = bie(1, 'Alpha');
     const a2 = bie(2, 'Alpha');
     const ctx = batchCtx([a, a2], {1: 'POST', 2: 'POST'}, {1: 'Request', 2: 'Request'});
     ctx.addBieForOasDoc();
 
-    expect(ctx.openAPIService.assignBieForOasDoc).not.toHaveBeenCalled();
-    expect(ctx.snackBar.open).toHaveBeenCalledWith('This endpoint already has a Request body.', '', {duration: 5000});
+    expect(ctx.openAPIService.assignBieForOasDoc).toHaveBeenCalledTimes(2);
+    expect(ctx._order).toEqual(['assign:Alpha', 'assign:Alpha']);
+    expect(ctx.dialogRef.close).toHaveBeenCalledTimes(1);
+    expect(ctx.snackBar.open).toHaveBeenCalledWith('Added', '', {duration: 3000});
+  });
+
+  it('skips a selection already on the document but still adds the remaining new selection', () => {
+    const existing = [{propertyTerm: 'Alpha', resourceName: 'alpha', verb: 'POST', messageBody: 'Request'}];
+    const a = bie(1, 'Alpha');   // duplicates the existing slot -> skipped
+    const b = bie(2, 'Beta');    // new -> added
+    const ctx = batchCtx([a, b], {1: 'POST', 2: 'POST'}, {1: 'Request', 2: 'Request'}, existing);
+    ctx.addBieForOasDoc();
+
+    expect(ctx._order).toEqual(['assign:Beta']);
+    expect(ctx.openAPIService.assignBieForOasDoc).toHaveBeenCalledTimes(1);
+    expect(ctx.snackBar.open).toHaveBeenCalledWith(
+      '1 selection(s) skipped — that message body already exists on this document.', '', {duration: 5000});
+    expect(ctx.snackBar.open).toHaveBeenCalledWith('Added', '', {duration: 3000});
+    expect(ctx.dialogRef.close).toHaveBeenCalledTimes(1);
   });
 
   it('skips a BIE flagged by checkBIEReusedAcrossMultipleOperations but still adds the others', () => {

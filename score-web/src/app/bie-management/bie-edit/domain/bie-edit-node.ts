@@ -10,6 +10,7 @@ import {
   ChangeListener
 } from '../../domain/bie-flat-tree';
 import {hashCode4Array} from '../../../common/utility';
+import {BieForOasDoc} from '../../openapi-doc/domain/openapi-doc';
 
 export class BieEditNode {
   ccManifestId: number;
@@ -98,6 +99,10 @@ export class BieEditAbieNode extends BieEditNode {
   asccpManifestId: number;
   accManifestId: number;
   businessContexts: BusinessContext[] = [];
+  // Issue #1519: the full cross-document union of this BIE's OpenAPI bindings (M:N). Empty when the BIE
+  // does not participate in any OpenAPI Document; the BIE-root "OpenAPI Document Information" panel is
+  // shown only when this is non-empty.
+  bieForOasDocList: BieForOasDoc[] = [];
 
   access: string;
   deprecatedReason: string;
@@ -114,6 +119,11 @@ export class BieEditAbieNode extends BieEditNode {
       this.asccpManifestId = abie.asccpManifestId;
       this.accManifestId = abie.accManifestId;
       this.businessContexts = abie.businessContexts;
+      this.bieForOasDocList = (abie.bieForOasDocList || []).map(e => {
+        const binding = new BieForOasDoc(e);
+        binding.reset(); // start clean so isChanged only reflects edits made in the BIE-root panel
+        return binding;
+      });
 
       this.access = abie.access;
       this.topLevelAsbiepState = abie.topLevelAsbiepState;

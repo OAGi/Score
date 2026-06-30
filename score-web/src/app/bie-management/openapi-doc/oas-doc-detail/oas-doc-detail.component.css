@@ -146,39 +146,57 @@
   color: #bdbdbd;
 }
 
-/* Issue #1347: the re-pickable ConfirmMessage BIE chip shown under the Error Response selector when
-   CONFIRM_MESSAGE is chosen. Clicking it re-opens the BIE-selection dialog. */
+/* Issue #1347/#1519: under the Error Response selector when CONFIRM_MESSAGE is chosen — a "Selected Confirm
+   Message" link that opens the picked BIE in a new tab (the DEN would just restate the selector, so it rides
+   in the link tooltip), plus a pencil to re-pick. Indigo = picked, red = none picked yet. */
 .oas-confirm-message-chip {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  /* Icon-only: keep the click/focus target at the 24px minimum (18px glyph + 3px padding each side). */
-  min-width: 24px;
-  min-height: 24px;
+  gap: 4px;
+  max-width: 100%;
   margin-top: 4px;
-  padding: 3px;
-  border-radius: 4px;
-  cursor: pointer;
   color: #3f51b5;
-}
-
-.oas-confirm-message-chip:hover {
-  background: #f5f5f5;
-}
-
-.oas-confirm-message-chip:focus-visible {
-  outline: 2px solid #3f51b5;
-  outline-offset: 1px;
 }
 
 .oas-confirm-message-chip.unset {
   color: #c62828;
 }
 
+.oas-confirm-message-chip-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.oas-confirm-message-chip-link:hover .oas-confirm-message-chip-text,
+.oas-confirm-message-chip-link:focus-visible .oas-confirm-message-chip-text {
+  text-decoration: underline;
+}
+
+.oas-confirm-message-chip-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.oas-confirm-message-chip-open {
+  flex: 0 0 auto;
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+  line-height: 14px;
+}
+
 .oas-confirm-message-chip-edit {
-  font-size: 18px;
-  width: 18px;
-  height: 18px;
+  flex: 0 0 auto;
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  cursor: pointer;
   color: inherit;
 }
 

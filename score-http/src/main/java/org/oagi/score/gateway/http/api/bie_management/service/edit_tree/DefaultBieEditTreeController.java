@@ -213,13 +213,13 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
         rootNode.setHasChild(hasChild(rootNode));
         rootNode.setAccess(accessPrivilege);
 
-        // Issue #1519
+        // Issue #1519: surface the FULL cross-document union of this BIE's OAS bindings (querying by
+        // topLevelAsbiepId only returns every Request+Response binding across all documents), instead of
+        // truncating to the first one. The BIE-root "OpenAPI Document Information" panel renders the list.
         GetBieForOasDocResponse getBieForOasDocResponse = openAPIDocService.getBieForOasDoc(requester,
                 new GetBieForOasDocRequest(requester)
                         .withTopLevelAsbiepId(topLevelAsbiepId));
-        if (getBieForOasDocResponse.getLength() > 0) {
-            rootNode.setBieForOasDoc(getBieForOasDocResponse.getResults().get(0));
-        }
+        rootNode.setBieForOasDocList(getBieForOasDocResponse.getResults());
         return rootNode;
     }
 

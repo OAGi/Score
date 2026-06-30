@@ -394,17 +394,27 @@
                   }
                 </mat-select>
                 @if (element.errorResponseBodyType === 'CONFIRM_MESSAGE') {
-                  <!-- Space is tight, so show only the edit icon; the picked DEN (or the 'pick' prompt)
-                       lives in the tooltip/aria-label, and the icon stays color-coded: indigo = picked,
-                       red = none picked yet. Clicking re-opens the BIE-selection dialog. -->
-                  <div class="oas-confirm-message-chip" [class.unset]="!element.confirmMessageDen"
-                       role="button" tabindex="0"
-                       [matTooltip]="confirmMessageChipLabel(element)"
-                       [attr.aria-label]="confirmMessageChipLabel(element)"
-                       (click)="openConfirmMessageBiePicker(element, $event)"
-                       (keydown.enter)="openConfirmMessageBiePicker(element, $event)"
-                       (keydown.space)="openConfirmMessageBiePicker(element, $event)">
-                    <mat-icon class="oas-confirm-message-chip-edit">edit</mat-icon>
+                  <!-- A "Selected Confirm Message" link opens the picked BIE in a new tab (the DEN would just
+                       restate the selector, so it rides in the link tooltip); the pencil re-opens the
+                       BIE-selection dialog. Color-coded: indigo = picked, red = none picked yet. -->
+                  <div class="oas-confirm-message-chip" [class.unset]="!element.confirmMessageTopLevelAsbiepId">
+                    @if (element.confirmMessageTopLevelAsbiepId) {
+                      <a class="oas-confirm-message-chip-link"
+                         href="/profile_bie/{{ element.confirmMessageTopLevelAsbiepId }}"
+                         target="_blank" rel="noopener"
+                         [matTooltip]="element.confirmMessageDen"
+                         (click)="$event.stopPropagation()">
+                        <span class="oas-confirm-message-chip-text">Selected Confirm Message</span>
+                        <mat-icon class="oas-confirm-message-chip-open">open_in_new</mat-icon>
+                      </a>
+                    } @else {
+                      <span class="oas-confirm-message-chip-text">Pick a Confirm Message…</span>
+                    }
+                    <mat-icon class="oas-confirm-message-chip-edit" role="button" tabindex="0"
+                              matTooltip="Pick ConfirmMessage BIE"
+                              (click)="openConfirmMessageBiePicker(element, $event)"
+                              (keydown.enter)="openConfirmMessageBiePicker(element, $event)"
+                              (keydown.space)="openConfirmMessageBiePicker(element, $event)">edit</mat-icon>
                   </div>
                 }
               </td>

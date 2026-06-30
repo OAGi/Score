@@ -1,0 +1,39 @@
+.oas-add-form {
+  display: flex;
+  flex-direction: column;
+  min-width: 480px;
+  padding-top: 8px;
+}
+
+.oas-add-full-width {
+  width: 100%;
+}
+
+.oas-add-row {
+  display: flex;
+  gap: 16px;
+}
+
+.oas-add-row mat-form-field {
+  flex: 1;
+}
+
+.oas-add-checkboxes {
+  display: flex;
+  gap: 24px;
+  margin: 4px 0 12px;
+}
+
+/* Same hue as the title — only lighter weight sets the version apart. */
+.oas-add-option-version {
+  font-weight: 400;
+  opacity: 0.85;
+}
+
+/* Issue #1492: inline duplicate-body error, mirroring the mat-error treatment in the OpenAPI Document
+   editor's Add dialog. */
+.oas-add-duplicate-error {
+  color: #ba1a1a;
+  font-size: 12px;
+  margin: -4px 0 8px;
+}

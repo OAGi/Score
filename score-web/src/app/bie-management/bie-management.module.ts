@@ -33,6 +33,7 @@ import {BieUpliftProfileBieComponent} from './bie-uplift/bie-uplift-profile-bie.
 import {ReportDialogComponent} from './bie-uplift/report-dialog/report-dialog.component';
 import {BieEditComponent} from './bie-edit/bie-edit.component';
 import {ReuseBieDialogComponent} from './bie-edit/reuse-bie-dialog/reuse-bie-dialog.component';
+import {BieOasDocAddDialogComponent} from './bie-edit/bie-oas-doc-add-dialog/bie-oas-doc-add-dialog.component';
 import {BieEditService} from './bie-edit/domain/bie-edit.service';
 import {MatDialogModule} from '@angular/material/dialog';
 import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
@@ -180,6 +181,7 @@ const routes: Routes = [
     BieEditComponent,
     BieDeprecateDialogComponent,
     ReuseBieDialogComponent,
+    BieOasDocAddDialogComponent,
     BieDiagramDialogComponent,
     BieStateDependencyDialogComponent
   ],

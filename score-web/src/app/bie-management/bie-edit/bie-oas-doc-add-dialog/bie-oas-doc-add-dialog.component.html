@@ -1,0 +1,67 @@
+<h2 mat-dialog-title>Add to OpenAPI Document</h2>
+<mat-dialog-content>
+  <div class="oas-add-form">
+    <mat-form-field class="oas-add-full-width">
+      <mat-label>OpenAPI Document</mat-label>
+      <mat-select [(ngModel)]="selectedOasDoc" [panelWidth]="null">
+        <mat-option>
+          <ngx-mat-select-search [formControl]="oasDocFilterCtrl"
+            [placeholderLabel]="'Search...'"
+            [noEntriesFoundLabel]="'No matching OpenAPI Document found.'"></ngx-mat-select-search>
+        </mat-option>
+        @for (doc of filteredOasDocs | async; track doc.oasDocId) {
+          <!-- title · version — the version disambiguates documents that share a title. -->
+          <mat-option [value]="doc">{{ doc.title }}@if (doc.version) {<span class="oas-add-option-version">&nbsp;·&nbsp;{{ doc.version }}</span>}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <div class="oas-add-row">
+      <mat-form-field>
+        <mat-label>Verb</mat-label>
+        <mat-select [(ngModel)]="verb" (ngModelChange)="onVerbChange()" [panelWidth]="null">
+          <mat-option value="GET">GET</mat-option>
+          <mat-option value="PUT">PUT</mat-option>
+          <mat-option value="POST">POST</mat-option>
+          <mat-option value="DELETE">DELETE</mat-option>
+          <mat-option value="PATCH">PATCH</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Message Body</mat-label>
+        <mat-select [(ngModel)]="messageBody" [panelWidth]="null">
+          <mat-option value="Request" [disabled]="verb === 'GET'">Request</mat-option>
+          <mat-option value="Response">Response</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Issue #1492: the chosen (Verb, Message Body) would duplicate a body the BIE already has on the
+         selected document. Mirrors the OpenAPI Document editor's Add dialog: shown inline and blocks Add. -->
+    @if (isDuplicateBodySlot()) {
+      <div class="oas-add-duplicate-error">This endpoint already has a {{ messageBody }} body.</div>
+    }
+
+    <!-- Resource Name and Operation ID are derived the same way the OpenAPI Document editor does
+         (read-only preview of what will be created); the array toggle affects both. -->
+    <mat-form-field class="oas-add-full-width">
+      <mat-label>Resource Name</mat-label>
+      <input matInput [value]="resourcePath" [readonly]="true">
+    </mat-form-field>
+
+    <mat-form-field class="oas-add-full-width">
+      <mat-label>Operation ID</mat-label>
+      <input matInput [value]="operationId" [readonly]="true">
+    </mat-form-field>
+
+    <div class="oas-add-checkboxes">
+      <mat-checkbox [(ngModel)]="arrayIndicator">Make as an array</mat-checkbox>
+      <mat-checkbox [(ngModel)]="suppressRootIndicator">Suppress a root property</mat-checkbox>
+    </div>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">Cancel</button>
+  <button mat-flat-button color="primary" type="button" [disabled]="!isValid" (click)="add()">Add</button>
+</mat-dialog-actions>

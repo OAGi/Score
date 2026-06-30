@@ -320,3 +320,257 @@
   height: 100%;
   padding-right: 64px;
 }
+
+/* Issue #1519: BIE-root "OpenAPI Document Information" panel — one card per OAS binding */
+.oas-doc-information {
+  margin-top: 4px;
+}
+
+:host ::ng-deep .info-panel-header > .mat-content {
+  align-items: center;
+}
+
+:host ::ng-deep .info-panel-header > .mat-expansion-indicator {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  --mat-expansion-header-indicator-display: none;
+  --mat-expansion-legacy-header-indicator-display: block;
+}
+
+:host ::ng-deep .info-panel-header > .mat-expansion-indicator::after {
+  display: block;
+}
+
+:host ::ng-deep .info-panel-header > .mat-expansion-indicator svg {
+  display: none;
+}
+
+.info-panel-header-add.mat-mdc-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  margin-right: 24px;
+  align-self: center;
+  flex: 0 0 auto;
+  --mat-icon-button-state-layer-size: 28px;
+  --mdc-icon-button-state-layer-size: 28px;
+  --mdc-icon-button-icon-size: 20px;
+  --mat-icon-button-icon-size: 20px;
+}
+
+.info-panel-header-add .mat-icon {
+  font-size: 20px !important;
+  width: 20px !important;
+  height: 20px !important;
+  line-height: 20px !important;
+}
+
+.oas-doc-information-empty {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.6);
+  padding: 8px 0;
+}
+
+.oas-doc-information-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.oas-binding-card {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+}
+
+.oas-binding-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+/* Issue #1519: the bound OpenAPI Document rendered as one cohesive chip-link (api glyph · title · version ·
+   open-in-new). A single neutral colour with a subtle border that lifts to the primary blue on hover/focus —
+   instead of a blue title + grey version + bare external icon + underline. */
+.oas-doc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  min-width: 0;
+  padding: 3px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 16px;
+  color: rgba(0, 0, 0, 0.74);
+  text-decoration: none;
+  font-weight: 500;
+  line-height: 22px;
+  transition: color 120ms ease, background-color 120ms ease, border-color 120ms ease;
+}
+
+.oas-doc-chip:hover,
+.oas-doc-chip:focus-visible {
+  color: #1565c0;
+  background-color: rgba(21, 101, 192, 0.08);
+  border-color: rgba(21, 101, 192, 0.4);
+}
+
+.oas-doc-chip-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Same hue as the title (inherits the chip colour) — only lighter weight sets it apart. */
+.oas-doc-chip-version {
+  font-weight: 400;
+  opacity: 0.85;
+}
+
+.oas-doc-chip-icon {
+  flex: 0 0 auto;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.oas-doc-chip-open {
+  flex: 0 0 auto;
+  font-size: 15px;
+  width: 15px;
+  height: 15px;
+  opacity: 0.7;
+}
+
+.oas-binding-discard {
+  /* keep the per-card discard compact and pinned to the top-right of the card */
+  margin: -8px -8px -8px 0;
+}
+
+/* Both field rows share this 4-column grid so row 2 lines up with row 1:
+   col1 (1fr) Verb / Security · col2 (1fr) Message Body / Error Response · col3 (2fr) Resource Name / Tag ·
+   col4 (2fr) Operation ID (empty on row 2). */
+.oas-binding-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr 2fr;
+  gap: 0 16px;
+  align-items: start;
+}
+
+.oas-binding-grid > mat-form-field {
+  width: 100%;
+}
+
+.oas-binding-checkboxes {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  padding: 4px 0 8px;
+}
+
+/* Issue #1519: shrink the inline edit pencils in an OAS binding card (Security suffix + ConfirmMessage
+   picker) to the OpenAPI Document editor's Security-column size (oas-doc-detail.component.css
+   .oas-security-edit, 16px). The default mat-icon-button renders a 24px glyph in a ~40px target,
+   which dwarfs the field. */
+.oas-binding-edit-button.mat-mdc-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  --mat-icon-button-state-layer-size: 24px;
+  --mdc-icon-button-state-layer-size: 24px;
+  --mdc-icon-button-icon-size: 16px;
+  --mat-icon-button-icon-size: 16px;
+}
+
+.oas-binding-edit-button .mat-icon {
+  font-size: 16px !important;
+  width: 16px !important;
+  height: 16px !important;
+  line-height: 16px !important;
+}
+
+/* Issue #1347/#1519: under the Error Response selector when CONFIRM_MESSAGE is chosen — a "Selected Confirm
+   Message" link that opens the picked BIE in a new tab (the selector already names the body type, so the
+   DEN rides in the link tooltip rather than being printed), plus a pencil to re-pick. Mirrors the OpenAPI
+   Document editor (oas-doc-detail.component.css .oas-confirm-message-chip). Indigo = picked, red = unset. */
+.oas-confirm-message-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  color: #3f51b5;
+}
+
+.oas-confirm-message-hint.unset {
+  color: #c62828;
+}
+
+.oas-confirm-message-hint-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.oas-confirm-message-hint-link:hover .oas-confirm-message-hint-text,
+.oas-confirm-message-hint-link:focus-visible .oas-confirm-message-hint-text {
+  text-decoration: underline;
+}
+
+.oas-confirm-message-hint-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.oas-confirm-message-hint-open {
+  flex: 0 0 auto;
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+  line-height: 14px;
+}
+
+.oas-confirm-message-hint-edit {
+  flex: 0 0 auto;
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  cursor: pointer;
+  color: inherit;
+}
+
+/* Issue #1610: amber per-card warning shown when a binding is DELETE + Request and its owning OpenAPI
+   Document targets OpenAPI 3.0.x (the Request body is dropped on generation). Mirrors the OpenAPI Document
+   editor's banner (oas-doc-detail.component.css). Read-only here — the version is changed on that screen. */
+.oas-delete-body-warning {
+  margin: 4px 0 8px;
+  padding: 8px 12px;
+  border: 1px solid #ffe082;
+  border-left: 4px solid #f9a825;
+  border-radius: 4px;
+  background: #fff8e1;
+  color: #6d4c00;
+  font-size: 13px;
+}
+
+.oas-delete-body-warning-icon {
+  color: #f9a825;
+  margin-right: 8px;
+}

@@ -68,6 +68,23 @@ import {BieStateTransitionFlowService} from '../domain/bie-state-transition-flow
 import {StateDependencySelection} from '../domain/state-dependency-target';
 import {Title} from '@angular/platform-browser';
 import {setAppTitleIfPresent} from '../../common/app-title.strategy';
+import {
+  AssignBieForOasDoc,
+  BieForOasDoc,
+  BieForOasDocDeleteRequest,
+  BieForOasDocUpdateRequest,
+  OasDocListRequest,
+  OasSecurityRequirement,
+  OasSecurityScheme,
+  recomputeOperationId
+} from '../openapi-doc/domain/openapi-doc';
+import {OpenAPIService} from '../openapi-doc/domain/openapi.service';
+import {BieOasDocAddDialogComponent} from './bie-oas-doc-add-dialog/bie-oas-doc-add-dialog.component';
+import {OasDocSecurityRequirementDialogComponent} from '../openapi-doc/oas-doc-security-requirement-dialog/oas-doc-security-requirement-dialog.component';
+import {
+  OasDocConfirmMessageDialogComponent,
+  OasDocConfirmMessageDialogResult
+} from '../openapi-doc/oas-doc-confirm-message-dialog/oas-doc-confirm-message-dialog.component';
 
 
 @Component({
@@ -98,6 +115,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   private titleService = inject(Title);
   webPageInfo = inject(WebPageInfoService);
   private stateTransitionFlowService = inject(BieStateTransitionFlowService);
+  private openAPIService = inject(OpenAPIService);
 
 
   BROWSER_SCHEMES = ['http:', 'https:', 'ftp:', 'file:', 'data:'];
@@ -418,6 +436,12 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     this.rootNode = new BieEditAbieNode(rootNode);
     setAppTitleIfPresent(this.titleService, this.rootNode.name, 'BIE');
     this.rootNode.reset();
+    // Issue #1519: seed the per-document uniqueness sets + the committed Error Response types, and pre-fetch
+    // each bound document's security schemes for the Security cell.
+    this.recomputeOasValidation();
+    this.seedOasCommittedErrorTypes();
+    this.loadOasDocSecuritySchemes();
+    this.loadOasDocExistence();
     const that = this;
 
     const onVersionChange = (version: string) => {
@@ -756,7 +780,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   get sizeOfChanges(): number {
-    return this.dataSource.getChanged().length;
+    // Issue #1519: include the OpenAPI Document Information edits so the badge reflects everything the main
+    // Update will commit.
+    return this.dataSource.getChanged().length + this.oasBindings.filter(b => b.isChanged).length;
   }
 
   toggleTreeUsed(node: BieFlatNode, $event?: MouseEvent) {
@@ -2304,11 +2330,25 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   get updateDisabled(): boolean {
-    return this.isUpdating || !this.isChanged || !this.isValid;
+    if (this.isUpdating) {
+      return true;
+    }
+    // Issue #1519: the main Update is enabled when the BIE tree has valid changes OR the OpenAPI Document
+    // Information panel has savable changes, so pressing Update also commits the OAS edits.
+    const bieSavable = this.isChanged && this.isValid;
+    const oasSavable = this.hasOasChanges() && !this.hasOasErrors();
+    return !(bieSavable || oasSavable);
   }
 
   updateDetails(include?: BieFlatNode[], callbackFn?) {
-    if (this.updateDisabled) {
+    // Issue #1519: the main Update button also commits OpenAPI Document Information edits (the standalone
+    // "Update OpenAPI Information" button, by contrast, never touches the BIE tree). Only the user-initiated
+    // Update (no `include`) triggers the OAS save.
+    if (!include && this.hasOasChanges() && !this.hasOasErrors()) {
+      this.updateOasDocInformation();
+    }
+    // The BIE tree itself is saved only when it has valid changes of its own.
+    if (this.isUpdating || !this.isChanged || !this.isValid) {
       if (callbackFn === undefined) {
         return;
       } else {
@@ -2625,6 +2665,539 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       node = this.selectedNode;
     }
     return node.detail as BieEditAbieNodeDetail;
+  }
+
+  /**
+   * Issue #1519: the BIE-root "OpenAPI Document Information" panel is shown only when the BIE root (level 0)
+   * is selected and the BIE participates in at least one OpenAPI Document. OAS bindings attach to the
+   * top-level ASBIEP only, so nested ABIE nodes never show the panel.
+   */
+  hasOasDocInformation(): boolean {
+    return this.isAbieDetail() && !!this.selectedNode && this.selectedNode.level === 0
+      && !!this.rootNode && (this.rootNode.bieForOasDocList?.length || 0) > 0;
+  }
+
+  /**
+   * Issue #1519: whether the OpenAPI panel is rendered at all. It is shown for the BIE root (level 0) only
+   * when at least one OpenAPI Document exists (see oasDocExists) — there is nothing to surface or bind to
+   * otherwise — and then either when there is at least one binding (read-only or editable) or when the BIE
+   * is editable (so the first binding can be added from here). Nested ABIE nodes never participate.
+   */
+  showOasDocPanel(): boolean {
+    return this.isAbieDetail() && !!this.selectedNode && this.selectedNode.level === 0
+      && this.oasDocExists
+      && (this.hasOasDocInformation() || this.isOasDocEditable());
+  }
+
+  // Issue #1519: whether any OpenAPI Document exists at all. The BIE-root panel (and its "+" add action) is
+  // pointless when there are no documents to bind to, so it stays hidden until at least one exists. Loaded
+  // once when the BIE root loads; a BIE already bound to a document trivially implies one exists.
+  oasDocExists = false;
+
+  private loadOasDocExistence(): void {
+    if ((this.rootNode?.bieForOasDocList?.length || 0) > 0) {
+      this.oasDocExists = true;
+      return;
+    }
+    const request = new OasDocListRequest();
+    request.page.sortActives = ['title'];
+    request.page.sortDirections = ['asc'];
+    request.page.pageIndex = 0;
+    request.page.pageSize = 1;
+    this.openAPIService.getOasDocList(request).subscribe(resp => {
+      this.oasDocExists = !!resp && ((resp.length || 0) > 0 || (resp.list?.length || 0) > 0);
+    });
+  }
+
+  // Issue #1519: a binding's document label = title + version (version omitted when blank). Two documents
+  // can share a title, so the version disambiguates them in the collapsed summary and tooltip.
+  oasDocLabel(b: BieForOasDoc): string {
+    const title = b.oasDocTitle || 'OpenAPI Document';
+    const version = (b.oasDocVersion || '').trim();
+    return version ? `${title} ${version}` : title;
+  }
+
+  // Issue #1519: flatten this BIE's bindings to distinct OpenAPI operations — one per (document, verb,
+  // path); a Request/Response pair on the same operation counts once. Each keeps its document label.
+  private oasOperations(): { title: string; op: string }[] {
+    const seen = new Set<string>();
+    const operations: { title: string; op: string }[] = [];
+    this.oasBindings.forEach(b => {
+      const op = [b.verb, b.resourceName].map(s => (s || '').trim()).filter(s => !!s).join(' ')
+        || (b.operationId || '').trim();
+      const key = b.oasDocId + '|' + op;
+      if (seen.has(key)) {
+        return;
+      }
+      seen.add(key);
+      operations.push({title: this.oasDocLabel(b), op});
+    });
+    return operations;
+  }
+
+  private oasOperationLabel(e: { title: string; op: string }): string {
+    return e.op ? `${e.title}: ${e.op}` : e.title;
+  }
+
+  /**
+   * Issue #1519: compact one-line summary for the collapsed panel header — the first operation in full, then
+   * "+ N operations" for the rest, so the header stays short. The full list is in oasDocBindingTooltip().
+   */
+  oasDocBindingSummary(): string {
+    const operations = this.oasOperations();
+    if (operations.length === 0) {
+      return '';
+    }
+    const firstLabel = this.oasOperationLabel(operations[0]);
+    const rest = operations.length - 1;
+    return rest > 0 ? `${firstLabel} + ${rest} operation${rest > 1 ? 's' : ''}` : firstLabel;
+  }
+
+  /** Issue #1519: full per-operation list for the collapsed header tooltip (the summary shows only the first). */
+  oasDocBindingTooltip(): string {
+    return this.oasOperations().map(e => this.oasOperationLabel(e)).join(' · ');
+  }
+
+  /** Issue #1519: OAS bindings are editable from the BIE root only while the BIE root itself is editable. */
+  isOasDocEditable(): boolean {
+    return this.isEditable(this.selectedNode);
+  }
+
+  /**
+   * Issue #1610 (parity with the OpenAPI Document editor): a DELETE Request body is honored only from
+   * OpenAPI 3.1; a binding whose owning document targets OpenAPI 3.0.x has that body dropped on generation.
+   * Because the BIE-root panel spans documents with possibly different OpenAPI versions, the warning is
+   * per binding card. This is read-only here — the OpenAPI Version itself is changed on the OpenAPI
+   * Document screen, not on the BIE screen.
+   */
+  isOasBindingDeleteBodyIgnored(b: BieForOasDoc): boolean {
+    return b.verb === 'DELETE' && b.messageBody === 'Request'
+      && !(b.openAPIVersion || '').trim().startsWith('3.1');
+  }
+
+  get oasBindings(): BieForOasDoc[] {
+    return (this.rootNode && this.rootNode.bieForOasDocList) || [];
+  }
+
+  // Issue #1519: per-document uniqueness sets, recomputed on every edit. Operation IDs must be unique
+  // within a document (#1732) and each (resource path, verb) owns at most one Request and one Response
+  // body (#1492). Keys are prefixed with oasDocId because the panel spans multiple documents.
+  oasDuplicateOperationIds: Set<string> = new Set<string>();
+  oasDuplicateBodySlots: Set<string> = new Set<string>();
+
+  private oasOperationIdKey(b: BieForOasDoc): string {
+    return b.oasDocId + '|' + (b.operationId || '').trim();
+  }
+
+  private oasBodySlotKey(b: BieForOasDoc): string {
+    return b.oasDocId + '|' + (b.resourceName || '').trim() + '|' + (b.verb || '') + '|' + (b.messageBody || '');
+  }
+
+  recomputeOasValidation(): void {
+    const bindings = this.oasBindings;
+    // Operation ID must be unique within a document: count DISTINCT operations sharing an operation id.
+    const opsByOperationId = new Map<string, Set<number>>();
+    bindings.forEach(b => {
+      const key = this.oasOperationIdKey(b);
+      if (!opsByOperationId.has(key)) {
+        opsByOperationId.set(key, new Set<number>());
+      }
+      opsByOperationId.get(key).add(b.oasOperationId);
+    });
+    this.oasDuplicateOperationIds = new Set<string>();
+    opsByOperationId.forEach((ops, key) => {
+      if (ops.size > 1) {
+        this.oasDuplicateOperationIds.add(key);
+      }
+    });
+    // Each (resource path, verb, message body) may appear at most once within a document.
+    const slotCount = new Map<string, number>();
+    bindings.forEach(b => {
+      const key = this.oasBodySlotKey(b);
+      slotCount.set(key, (slotCount.get(key) || 0) + 1);
+    });
+    this.oasDuplicateBodySlots = new Set<string>();
+    slotCount.forEach((count, key) => {
+      if (count > 1) {
+        this.oasDuplicateBodySlots.add(key);
+      }
+    });
+  }
+
+  isOasOperationIdDuplicate(b: BieForOasDoc): boolean {
+    return this.oasDuplicateOperationIds.has(this.oasOperationIdKey(b));
+  }
+
+  isOasBodySlotDuplicate(b: BieForOasDoc): boolean {
+    return this.oasDuplicateBodySlots.has(this.oasBodySlotKey(b));
+  }
+
+  oasOperationIdErrorStateMatcher(b: BieForOasDoc): ErrorStateMatcher {
+    return {
+      isErrorState: (): boolean =>
+        !b.operationId || !b.operationId.trim() || this.isOasOperationIdDuplicate(b)
+    };
+  }
+
+  oasBodySlotErrorStateMatcher(b: BieForOasDoc): ErrorStateMatcher {
+    return {
+      isErrorState: (): boolean => this.isOasBodySlotDuplicate(b)
+    };
+  }
+
+  // A request body is never valid for GET, so revert it to Response; then resync the operation id's leading
+  // verb word (#1732) while preserving the manually edited BIE-name segment.
+  onOasVerbChange(b: BieForOasDoc): void {
+    if (b.messageBody === 'Request' && b.verb === 'GET') {
+      b.messageBody = 'Response';
+    }
+    b.operationId = recomputeOperationId(b.verb, b.operationId, b.arrayIndicator);
+    this.recomputeOasValidation();
+  }
+
+  // The array indicator rewrites both the operation id ('List') and the resource path ('-list') suffixes.
+  onOasArrayChange(b: BieForOasDoc): void {
+    b.operationId = this.applyOasSuffix(b.operationId, 'List', b.arrayIndicator);
+    b.resourceName = this.applyOasSuffix(b.resourceName, '-list', b.arrayIndicator);
+    this.recomputeOasValidation();
+  }
+
+  private applyOasSuffix(value: string, suffix: string, present: boolean): string {
+    const current = value || '';
+    if (present) {
+      return current.endsWith(suffix) ? current : current + suffix;
+    }
+    return current.endsWith(suffix) ? current.substring(0, current.length - suffix.length) : current;
+  }
+
+  hasOasChanges(): boolean {
+    return this.oasBindings.some(b => b.isChanged);
+  }
+
+  hasOasErrors(): boolean {
+    return this.oasBindings.some(b =>
+      !b.operationId || !b.operationId.trim() || this.isOasOperationIdDuplicate(b) || this.isOasBodySlotDuplicate(b));
+  }
+
+  /**
+   * Issue #1519: reload this BIE's OpenAPI bindings from the server (used after a save and on discard). The
+   * fresh BieForOasDoc objects are reset() in the node constructor, so change tracking starts clean.
+   */
+  private reloadOasBindings(done?: () => void): void {
+    this.service.getRootNode(this.topLevelAsbiepId).subscribe(rootNode => {
+      this.rootNode.bieForOasDocList = new BieEditAbieNode(rootNode).bieForOasDocList;
+      this.recomputeOasValidation();
+      this.seedOasCommittedErrorTypes();
+      this.loadOasDocSecuritySchemes();
+      if (done) {
+        done();
+      }
+    });
+  }
+
+  /**
+   * Issue #1519: unbind a single binding — remove this BIE from the operation in that OpenAPI Document
+   * (the per-card '−'). Reuses the same delete endpoint as the OpenAPI Document editor's "Remove" action,
+   * with a confirmation, then reloads the panel.
+   */
+  unbindOasBinding(b: BieForOasDoc): void {
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Remove this operation from the OpenAPI Document?';
+    dialogConfig.data.content = [
+      'This unbinds the BIE from "' + b.oasDocTitle + '" (' + b.verb + ' ' + b.resourceName + ').',
+      'Are you sure you want to remove it?'
+    ];
+    dialogConfig.data.action = 'Remove';
+    this.confirmDialogService.open(dialogConfig).afterClosed().subscribe(result => {
+      if (!result) {
+        return;
+      }
+      const request = new BieForOasDocDeleteRequest();
+      request.oasDocId = b.oasDocId;
+      request.bieForOasDocList = [b];
+      this.loading = true;
+      this.openAPIService.removeBieForOasDoc(request).pipe(finalize(() => this.loading = false)).subscribe({
+        next: () => {
+          this.snackBar.open('Removed from OpenAPI Document.', '', {duration: 3000});
+          this.reloadOasBindings();
+        },
+        error: (err: HttpErrorResponse) => {
+          const message = (err && err.error && err.error.message)
+            ? err.error.message : 'Failed to remove from OpenAPI Document.';
+          this.snackBar.open(message, '', {duration: 5000});
+        }
+      });
+    });
+  }
+
+  /**
+   * Issue #1519: persist the edited OpenAPI bindings. OAS documents are the source of truth, so writes go
+   * through the existing per-document endpoint (PUT /api/oas_doc/{id}/bie_list/detail), which preserves the
+   * #1492 (one Request/one Response per path+verb), #1732 (operation id) and #1728 (schema naming) rules
+   * inside a single @Transactional unit. Because one BIE can bind to several documents, the bindings are
+   * grouped by document and one request is sent per document that has a change.
+   */
+  updateOasDocInformation(): void {
+    if (!this.hasOasChanges() || this.hasOasErrors()) {
+      return;
+    }
+    const bindings = this.oasBindings;
+    const changedDocIds = Array.from(new Set(bindings.filter(b => b.isChanged).map(b => b.oasDocId)));
+    if (changedDocIds.length === 0) {
+      return;
+    }
+    // Each document is its own @Transactional unit, so save them independently and report per document.
+    // A document that fails keeps its in-memory edits (so the user can correct and retry just that one)
+    // while documents that did persist are marked clean; the panel only fully reloads when all succeeded.
+    const requests = changedDocIds.map(oasDocId => {
+      const request = new BieForOasDocUpdateRequest();
+      request.oasDocId = oasDocId;
+      // Send only the changed rows of this document, exactly as the OpenAPI Document editor does (so an
+      // unchanged operation's per-op security/error response is never needlessly re-persisted). Cross-row
+      // duplicate detection happens client-side over the full union (recomputeOasValidation / hasOasErrors).
+      request.bieForOasDocList = bindings.filter(b => b.oasDocId === oasDocId && b.isChanged);
+      return this.openAPIService.updateDetails(request).pipe(
+        map(() => ({oasDocId, ok: true, error: null as HttpErrorResponse})),
+        catchError((error: HttpErrorResponse) => of({oasDocId, ok: false, error}))
+      );
+    });
+    this.loading = true;
+    forkJoin(requests).pipe(finalize(() => this.loading = false)).subscribe(resultsByDoc => {
+      const failures = resultsByDoc.filter(r => !r.ok);
+      if (failures.length === 0) {
+        this.snackBar.open('Updated OpenAPI Document information.', '', {duration: 3000});
+        this.reloadOasBindings();
+        return;
+      }
+      // Mark the documents that did persist as clean (their in-memory state equals what was saved) and leave
+      // the failed documents' rows dirty so only those remain editable/resubmittable.
+      resultsByDoc.filter(r => r.ok).forEach(r =>
+        bindings.filter(b => b.oasDocId === r.oasDocId).forEach(b => b.reset()));
+      this.recomputeOasValidation();
+      const firstError = failures[0].error;
+      const message = (firstError && firstError.error && firstError.error.message)
+        ? firstError.error.message : 'Failed to update OpenAPI Document information.';
+      this.snackBar.open(message, '', {duration: 5000});
+    });
+  }
+
+  /**
+   * Issue #1519: open the "Add to OpenAPI Document" dialog (Phase 3). It returns an AssignBieForOasDoc
+   * payload; the actual bind reuses the existing assign endpoint so the resource/operation/body chain and
+   * the #1492 (one body per path+verb) / #1732 (operation id) rules are honored by the backend.
+   */
+  openAddOasDocDialog(): void {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.data = {
+      topLevelAsbiepId: this.topLevelAsbiepId,
+      propertyTerm: this.rootNode.name,
+      // The backend derives the resource path from the BIE's first business context (matches the
+      // OpenAPI Document editor's Add flow); pass it so the dialog can preview the same path.
+      businessContextName: (this.businessContexts && this.businessContexts.length > 0)
+        ? this.businessContexts[0].name : '',
+      // Issue #1492: hand the dialog this BIE's current bindings so it can pre-check (client-side, like the
+      // OpenAPI Document editor's Add dialog) that the chosen (Verb, Message Body) does not duplicate a body
+      // the BIE already has on the selected document.
+      existingBindings: this.oasBindings
+    };
+    this.dialog.open(BieOasDocAddDialogComponent, dialogConfig).afterClosed()
+      .subscribe((payload: AssignBieForOasDoc) => {
+        if (!payload) {
+          return;
+        }
+        this.loading = true;
+        this.openAPIService.assignBieForOasDoc(payload).pipe(finalize(() => this.loading = false)).subscribe({
+          next: () => {
+            this.snackBar.open('Added to OpenAPI Document.', '', {duration: 3000});
+            this.reloadOasBindings();
+          },
+          error: (err: HttpErrorResponse) => {
+            const message = (err && err.error && err.error.message)
+              ? err.error.message : 'Failed to add to OpenAPI Document.';
+            this.snackBar.open(message, '', {duration: 5000});
+          }
+        });
+      });
+  }
+
+  // ----- Issue #1519: per-operation Error Response (#1347), Security (#1729) and Tag on the BIE-root cards.
+  // These reuse the OpenAPI Document editor's dialogs and persist through the same save path.
+
+  oasErrorResponseBodyTypeOptions: { value: string; label: string }[] = [
+    {value: 'NONE', label: 'No Response Body'},
+    {value: 'PROBLEM_DETAILS', label: 'IETF Problem Details'},
+    {value: 'CONFIRM_MESSAGE', label: 'OAGi Confirm Message'}
+  ];
+  // Remembers each binding's last committed Error Response type so a cancelled ConfirmMessage pick reverts.
+  private oasCommittedErrorType = new WeakMap<BieForOasDoc, string>();
+
+  private seedOasCommittedErrorTypes(): void {
+    this.oasBindings.forEach(b => this.oasCommittedErrorType.set(b, b.errorResponseBodyType || 'NONE'));
+  }
+
+
+  // NONE / PROBLEM_DETAILS commit immediately; CONFIRM_MESSAGE opens the BIE picker. Cancelling with no BIE
+  // (and none previously chosen) reverts the selector. The body type is per operation, so it is applied to
+  // every binding sharing the oasOperationId.
+  onOasErrorResponseBodyTypeChange(b: BieForOasDoc): void {
+    const newType = b.errorResponseBodyType;
+    const previousType = this.oasCommittedErrorType.get(b) || 'NONE';
+    if (newType !== 'CONFIRM_MESSAGE') {
+      this.applyOasErrorResponseBodyType(b, newType, undefined, undefined);
+      return;
+    }
+    this.openOasConfirmMessageDialog(b, result => {
+      if (result) {
+        this.applyOasErrorResponseBodyType(b, 'CONFIRM_MESSAGE', result.topLevelAsbiepId, result.den);
+      } else if (b.confirmMessageTopLevelAsbiepId) {
+        this.applyOasErrorResponseBodyType(b, 'CONFIRM_MESSAGE', b.confirmMessageTopLevelAsbiepId, b.confirmMessageDen);
+      } else {
+        this.applyOasErrorResponseBodyType(b, previousType, undefined, undefined);
+      }
+    });
+  }
+
+  openOasConfirmMessageBiePicker(b: BieForOasDoc, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+    this.openOasConfirmMessageDialog(b, result => {
+      if (result) {
+        this.applyOasErrorResponseBodyType(b, 'CONFIRM_MESSAGE', result.topLevelAsbiepId, result.den);
+      }
+    });
+  }
+
+  private openOasConfirmMessageDialog(b: BieForOasDoc,
+                                      handler: (result: OasDocConfirmMessageDialogResult | undefined) => void): void {
+    // The OpenAPI Document has no release of its own; each connected BIE carries its release, so lock the
+    // ConfirmMessage picker to this binding's release.
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.data = {
+      title: 'Select ConfirmMessage BIE',
+      releaseId: b.releaseId,
+      releaseNum: b.releaseNum
+    };
+    dialogConfig.width = window.innerWidth + 'px';
+    dialogConfig.autoFocus = false;
+    this.dialog.open(OasDocConfirmMessageDialogComponent, dialogConfig)
+      .afterClosed().subscribe((result: OasDocConfirmMessageDialogResult | undefined) => handler(result));
+  }
+
+  // The Error Response body type is per operation, so apply it to every binding sharing the oasOperationId
+  // (a not-yet-persisted row has oasOperationId 0 and must never be treated as a sibling).
+  private applyOasErrorResponseBodyType(b: BieForOasDoc, bodyType: string,
+                                        confirmTopLevelAsbiepId: number, confirmDen: string): void {
+    const siblings = this.oasBindings.filter(r => !!r.oasOperationId && r.oasOperationId === b.oasOperationId);
+    const targets = siblings.length > 0 ? siblings : [b];
+    const clearConfirm = bodyType !== 'CONFIRM_MESSAGE';
+    targets.forEach(r => {
+      r.errorResponseBodyType = bodyType;
+      r.confirmMessageTopLevelAsbiepId = clearConfirm ? undefined : confirmTopLevelAsbiepId;
+      r.confirmMessageDen = clearConfirm ? '' : (confirmDen || '');
+      this.oasCommittedErrorType.set(r, bodyType);
+    });
+  }
+
+  // Issue #1729: the Security cell mirrors the OpenAPI Document editor's per-operation Security column. The
+  // scheme catalog lives on the document, so each bound document's schemes are pre-fetched (and cached) so
+  // the cell can decide between the em-dash placeholder (no schemes, not overridden) and the clickable
+  // summary, and so the Edit dialog lists exactly the schemes defined on that document.
+  private oasDocSecuritySchemes = new Map<number, OasSecurityScheme[]>();
+
+  private loadOasDocSecuritySchemes(): void {
+    const docIds = Array.from(new Set(this.oasBindings.map(b => b.oasDocId).filter(id => !!id)));
+    docIds.forEach(docId => {
+      if (this.oasDocSecuritySchemes.has(docId)) {
+        return;
+      }
+      this.openAPIService.getOasDoc(docId).subscribe(oasDoc => {
+        this.oasDocSecuritySchemes.set(docId, (oasDoc && oasDoc.securitySchemes) ? oasDoc.securitySchemes : []);
+      });
+    });
+  }
+
+  oasSecuritySchemesFor(b: BieForOasDoc): OasSecurityScheme[] {
+    return this.oasDocSecuritySchemes.get(b.oasDocId) || [];
+  }
+
+  // Mirrors the doc editor: with no document schemes and no operation override there is nothing to choose,
+  // so the cell shows an em dash rather than a clickable summary.
+  showOasSecurityDash(b: BieForOasDoc): boolean {
+    return this.oasSecuritySchemesFor(b).length === 0 && !b.securityOverridden;
+  }
+
+  // Same text the doc editor's Security column shows: 'Inherited' / 'Public' / the requirement summary.
+  operationSecuritySummary(b: BieForOasDoc): string {
+    if (!b.securityOverridden) {
+      return 'Inherited';
+    }
+    const summary = this.securityRequirementSummary(b.securityRequirements);
+    return summary === 'No Security' ? 'Public' : summary;
+  }
+
+  private securityRequirementSummary(requirements: OasSecurityRequirement[]): string {
+    if (!requirements || requirements.length === 0) {
+      return 'No Security';
+    }
+    return requirements.map(req => {
+      if (req.anonymous) {
+        return 'anonymous';
+      }
+      return (req.schemes || [])
+        .filter(scheme => !!scheme.schemeName)
+        .map(scheme => {
+          const scopes = scheme.scopes && scheme.scopes.length > 0 ? ` (${scheme.scopes.join(', ')})` : '';
+          return `${scheme.schemeName}${scopes}`;
+        })
+        .join(' + ');
+    }).filter(text => !!text).join(' OR ');
+  }
+
+  // Edit per-operation Security (#1729), reusing the same dialog as the doc editor's Security column. Uses
+  // the pre-fetched scheme catalog (falls back to a fetch on a cache miss). The result is applied to every
+  // binding sharing the operation.
+  openOasOperationSecurityDialog(b: BieForOasDoc): void {
+    if (!this.isOasDocEditable()) {
+      return;
+    }
+    const cached = this.oasDocSecuritySchemes.get(b.oasDocId);
+    if (cached !== undefined) {
+      this.openOasSecurityDialogWithSchemes(b, cached);
+      return;
+    }
+    this.openAPIService.getOasDoc(b.oasDocId).subscribe(oasDoc => {
+      const schemes = (oasDoc && oasDoc.securitySchemes) ? oasDoc.securitySchemes : [];
+      this.oasDocSecuritySchemes.set(b.oasDocId, schemes);
+      this.openOasSecurityDialogWithSchemes(b, schemes);
+    });
+  }
+
+  private openOasSecurityDialogWithSchemes(b: BieForOasDoc, schemes: OasSecurityScheme[]): void {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.data = {
+      title: 'Operation Security',
+      securitySchemes: schemes,
+      securityOverridden: b.securityOverridden,
+      securityRequirements: JSON.parse(JSON.stringify(b.securityRequirements || [])),
+      allowInherit: true
+    };
+    dialogConfig.width = '760px';
+    dialogConfig.maxHeight = '85vh';
+    dialogConfig.autoFocus = false;
+    this.dialog.open(OasDocSecurityRequirementDialogComponent, dialogConfig)
+      .afterClosed().subscribe(result => {
+        if (!result) {
+          return;
+        }
+        const siblings = this.oasBindings.filter(r => !!r.oasOperationId && r.oasOperationId === b.oasOperationId);
+        const targets = siblings.length > 0 ? siblings : [b];
+        targets.forEach(r => {
+          r.securityOverridden = result.securityOverridden;
+          r.securityRequirements = JSON.parse(JSON.stringify(result.securityRequirements || []));
+        });
+      });
   }
 
   isAsbiepDetail(node?: BieFlatNode): boolean {
