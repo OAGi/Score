@@ -24,7 +24,7 @@
         <junit.platform.version>1.14.2</junit.platform.version>
         <junit4.version>4.13.2</junit4.version>
         <slf4j.version>2.0.17</slf4j.version>
-        <jackson-bom.version>2.21.1</jackson-bom.version>
+        <jackson-bom.version>2.22.0</jackson-bom.version>
         <commons-lang.version>3.20.0</commons-lang.version>
         <commons-math3.version>3.6.1</commons-math3.version>
         <commons-io.version>2.21.0</commons-io.version>
