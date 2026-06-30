@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
 import static org.jooq.impl.DSL.count;
+import static org.jooq.impl.DSL.or;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.*;
 import static org.oagi.score.gateway.http.common.util.ScoreGuidUtils.randomGuid;
 
@@ -154,6 +155,10 @@ public class JooqBusinessTermCommandRepository extends JooqBaseRepository implem
         List<BigInteger> assignedBizTermIds = request.biesToAssign().stream().map(bieToAssign -> {
             if (bieToAssign.getBieType().equals("ASBIE")) {
                 BigInteger asccId = findCcIdByBie(bieToAssign);
+                if (asccId == null) {
+                    // #1752 - M8: a nonexistent/invalid ASBIE id resolves to no CC -> clear 400.
+                    throw new IllegalArgumentException("No ASBIE found for id " + bieToAssign.getBieId() + ".");
+                }
                 AsccBiztermRecord asccBiztermRecord = new AsccBiztermRecord();
                 asccBiztermRecord.setAsccId(ULong.valueOf(asccId));
                 asccBiztermRecord.setBusinessTermId(valueOf(businessTermId));
@@ -174,23 +179,43 @@ public class JooqBusinessTermCommandRepository extends JooqBaseRepository implem
                 if (request.primaryIndicator()) {
                     updateOtherBieBiztermToNotPrimary(new AsbieBusinessTermId(bieToAssign.getBieId()));
                 }
-                AsbieBiztermRecord asbieBiztermRecord = new AsbieBiztermRecord();
-                asbieBiztermRecord.setAsbieId(ULong.valueOf(bieToAssign.getBieId()));
-                asbieBiztermRecord.setAsccBiztermId(asccBizTermRecordId);
-                asbieBiztermRecord.setPrimaryIndicator((byte) (request.primaryIndicator() ? 1 : 0));
-                asbieBiztermRecord.setTypeCode(request.typeCode());
-                asbieBiztermRecord.setCreatedBy(valueOf(requester().userId()));
-                asbieBiztermRecord.setLastUpdatedBy(valueOf(requester().userId()));
-                asbieBiztermRecord.setCreationTimestamp(timestamp);
-                asbieBiztermRecord.setLastUpdateTimestamp(timestamp);
 
-                ULong asbieBizTermRecordId = dslContext().insertInto(ASBIE_BIZTERM)
-                        .set(asbieBiztermRecord)
-                        .returning(ASBIE_BIZTERM.ASBIE_BIZTERM_ID)
-                        .fetchOne().getAsbieBiztermId();
+                // #1752 - M3: find-or-create the asbie_bizterm so an identical (asbie, business term,
+                // type code) assignment is not inserted twice on retries/races.
+                ULong asbieBizTermRecordId = getAsbieBizTermRecordId(
+                        ULong.valueOf(bieToAssign.getBieId()), asccBizTermRecordId, request.typeCode());
+                if (asbieBizTermRecordId == null) {
+                    AsbieBiztermRecord asbieBiztermRecord = new AsbieBiztermRecord();
+                    asbieBiztermRecord.setAsbieId(ULong.valueOf(bieToAssign.getBieId()));
+                    asbieBiztermRecord.setAsccBiztermId(asccBizTermRecordId);
+                    asbieBiztermRecord.setPrimaryIndicator((byte) (request.primaryIndicator() ? 1 : 0));
+                    asbieBiztermRecord.setTypeCode(request.typeCode());
+                    asbieBiztermRecord.setCreatedBy(valueOf(requester().userId()));
+                    asbieBiztermRecord.setLastUpdatedBy(valueOf(requester().userId()));
+                    asbieBiztermRecord.setCreationTimestamp(timestamp);
+                    asbieBiztermRecord.setLastUpdateTimestamp(timestamp);
+
+                    asbieBizTermRecordId = dslContext().insertInto(ASBIE_BIZTERM)
+                            .set(asbieBiztermRecord)
+                            .returning(ASBIE_BIZTERM.ASBIE_BIZTERM_ID)
+                            .fetchOne().getAsbieBiztermId();
+                } else if (request.primaryIndicator()) {
+                    // The assignment already exists; honor the "preferred" request on it
+                    // (siblings were just demoted above).
+                    dslContext().update(ASBIE_BIZTERM)
+                            .set(ASBIE_BIZTERM.PRIMARY_INDICATOR, (byte) 1)
+                            .set(ASBIE_BIZTERM.LAST_UPDATED_BY, valueOf(requester().userId()))
+                            .set(ASBIE_BIZTERM.LAST_UPDATE_TIMESTAMP, timestamp)
+                            .where(ASBIE_BIZTERM.ASBIE_BIZTERM_ID.eq(asbieBizTermRecordId))
+                            .execute();
+                }
                 return asbieBizTermRecordId.toBigInteger();
             } else if (bieToAssign.getBieType().equals("BBIE")) {
                 BigInteger bccId = findCcIdByBie(bieToAssign);
+                if (bccId == null) {
+                    // #1752 - M8: a nonexistent/invalid BBIE id resolves to no CC -> clear 400.
+                    throw new IllegalArgumentException("No BBIE found for id " + bieToAssign.getBieId() + ".");
+                }
                 BccBiztermRecord bccBiztermRecord = new BccBiztermRecord();
                 bccBiztermRecord.setBccId(ULong.valueOf(bccId));
                 bccBiztermRecord.setBusinessTermId(valueOf(businessTermId));
@@ -212,20 +237,33 @@ public class JooqBusinessTermCommandRepository extends JooqBaseRepository implem
                     updateOtherBieBiztermToNotPrimary(new BbieBusinessTermId(bieToAssign.getBieId()));
                 }
 
-                BbieBiztermRecord bbieBizTermRecord = new BbieBiztermRecord();
-                bbieBizTermRecord.setBbieId(ULong.valueOf(bieToAssign.getBieId()));
-                bbieBizTermRecord.setBccBiztermId(bccBizTermRecordId);
-                bbieBizTermRecord.setPrimaryIndicator((byte) (request.primaryIndicator() ? 1 : 0));
-                bbieBizTermRecord.setTypeCode(request.typeCode());
-                bbieBizTermRecord.setCreatedBy(valueOf(requester().userId()));
-                bbieBizTermRecord.setLastUpdatedBy(valueOf(requester().userId()));
-                bbieBizTermRecord.setCreationTimestamp(timestamp);
-                bbieBizTermRecord.setLastUpdateTimestamp(timestamp);
+                // #1752 - M3: find-or-create the bbie_bizterm so an identical (bbie, business term,
+                // type code) assignment is not inserted twice on retries/races.
+                ULong bbieBiztermRecordId = getBbieBizTermRecordId(
+                        ULong.valueOf(bieToAssign.getBieId()), bccBizTermRecordId, request.typeCode());
+                if (bbieBiztermRecordId == null) {
+                    BbieBiztermRecord bbieBizTermRecord = new BbieBiztermRecord();
+                    bbieBizTermRecord.setBbieId(ULong.valueOf(bieToAssign.getBieId()));
+                    bbieBizTermRecord.setBccBiztermId(bccBizTermRecordId);
+                    bbieBizTermRecord.setPrimaryIndicator((byte) (request.primaryIndicator() ? 1 : 0));
+                    bbieBizTermRecord.setTypeCode(request.typeCode());
+                    bbieBizTermRecord.setCreatedBy(valueOf(requester().userId()));
+                    bbieBizTermRecord.setLastUpdatedBy(valueOf(requester().userId()));
+                    bbieBizTermRecord.setCreationTimestamp(timestamp);
+                    bbieBizTermRecord.setLastUpdateTimestamp(timestamp);
 
-                ULong bbieBiztermRecordId = dslContext().insertInto(BBIE_BIZTERM)
-                        .set(bbieBizTermRecord)
-                        .returning(BBIE_BIZTERM.BBIE_BIZTERM_ID)
-                        .fetchOne().getBbieBiztermId();
+                    bbieBiztermRecordId = dslContext().insertInto(BBIE_BIZTERM)
+                            .set(bbieBizTermRecord)
+                            .returning(BBIE_BIZTERM.BBIE_BIZTERM_ID)
+                            .fetchOne().getBbieBiztermId();
+                } else if (request.primaryIndicator()) {
+                    dslContext().update(BBIE_BIZTERM)
+                            .set(BBIE_BIZTERM.PRIMARY_INDICATOR, (byte) 1)
+                            .set(BBIE_BIZTERM.LAST_UPDATED_BY, valueOf(requester().userId()))
+                            .set(BBIE_BIZTERM.LAST_UPDATE_TIMESTAMP, timestamp)
+                            .where(BBIE_BIZTERM.BBIE_BIZTERM_ID.eq(bbieBiztermRecordId))
+                            .execute();
+                }
                 return bbieBiztermRecordId.toBigInteger();
             } else throw new IllegalArgumentException("Wrong BIE type");
         }).collect(Collectors.toList());
@@ -253,6 +291,45 @@ public class JooqBusinessTermCommandRepository extends JooqBaseRepository implem
                 ))
                 .fetchOne();
         return (bccBiztermRecord == null) ? null : bccBiztermRecord.getBccBiztermId();
+    }
+
+    /**
+     * #1752 - M3: returns the id of an existing asbie_bizterm assignment matching
+     * (asbie, ascc_bizterm, type code), or null if none exists. The (asbie, ascc_bizterm) pair
+     * already encodes the business term, so this is the natural identity of an assignment.
+     */
+    private ULong getAsbieBizTermRecordId(ULong asbieId, ULong asccBizTermId, String typeCode) {
+        return dslContext()
+                .select(ASBIE_BIZTERM.ASBIE_BIZTERM_ID)
+                .from(ASBIE_BIZTERM)
+                .where(and(
+                        ASBIE_BIZTERM.ASBIE_ID.eq(asbieId),
+                        ASBIE_BIZTERM.ASCC_BIZTERM_ID.eq(asccBizTermId),
+                        (typeCode == null || typeCode.isEmpty())
+                                ? or(ASBIE_BIZTERM.TYPE_CODE.isNull(), ASBIE_BIZTERM.TYPE_CODE.eq(""))
+                                : ASBIE_BIZTERM.TYPE_CODE.eq(typeCode)
+                ))
+                .limit(1)
+                .fetchOne(ASBIE_BIZTERM.ASBIE_BIZTERM_ID);
+    }
+
+    /**
+     * #1752 - M3: returns the id of an existing bbie_bizterm assignment matching
+     * (bbie, bcc_bizterm, type code), or null if none exists.
+     */
+    private ULong getBbieBizTermRecordId(ULong bbieId, ULong bccBizTermId, String typeCode) {
+        return dslContext()
+                .select(BBIE_BIZTERM.BBIE_BIZTERM_ID)
+                .from(BBIE_BIZTERM)
+                .where(and(
+                        BBIE_BIZTERM.BBIE_ID.eq(bbieId),
+                        BBIE_BIZTERM.BCC_BIZTERM_ID.eq(bccBizTermId),
+                        (typeCode == null || typeCode.isEmpty())
+                                ? or(BBIE_BIZTERM.TYPE_CODE.isNull(), BBIE_BIZTERM.TYPE_CODE.eq(""))
+                                : BBIE_BIZTERM.TYPE_CODE.eq(typeCode)
+                ))
+                .limit(1)
+                .fetchOne(BBIE_BIZTERM.BBIE_BIZTERM_ID);
     }
 
     private BigInteger findCcIdByBie(BieToAssign bieToAssign) {

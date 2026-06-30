@@ -12,6 +12,7 @@ public record BusinessTermListEntryRecord(
         String externalReferenceId,
         String externalReferenceUri,
         WhoAndWhen created,
-        WhoAndWhen lastUpdated) {
+        WhoAndWhen lastUpdated,
+        boolean used) {
 
 }

@@ -331,6 +331,30 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         });
     }
 
+    @Test
+    @DisplayName("TC_42_1_11")
+    public void end_user_can_save_a_long_external_reference_uri_on_the_edit_page() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        EditBusinessTermPage editBusinessTermPage = bieMenu.openViewEditBusinessTermSubMenu()
+                .openEditBusinessTermPageByTerm(randomBusinessTerm.getBusinessTerm());
+
+        // #1752 - M6: a URI longer than the old 45-character edit-form limit must be stored in full
+        // (regression guard for #1458, where the create form was fixed but the edit form was not).
+        String longUri = "https://example.com/resources/articles/" + RandomStringUtils.secure().nextAlphanumeric(30);
+        assertTrue(longUri.length() > 45);
+        randomBusinessTerm.setExternalReferenceUri(longUri);
+        editBusinessTermPage.updateBusinessTerm(randomBusinessTerm);
+
+        editBusinessTermPage = bieMenu.openViewEditBusinessTermSubMenu()
+                .openEditBusinessTermPageByTerm(randomBusinessTerm.getBusinessTerm());
+        assertEquals(longUri, editBusinessTermPage.getExternalReferenceURIFieldText());
+    }
+
     @AfterEach
     public void tearDown() {
         super.tearDown();

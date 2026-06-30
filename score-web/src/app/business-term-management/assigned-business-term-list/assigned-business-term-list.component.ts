@@ -383,7 +383,7 @@ export class AssignedBusinessTermListComponent implements OnInit {
     this.confirmDialogService.open(dialogConfig).afterClosed()
       .subscribe(result => {
         if (result) {
-          this.service.makeAsPrimary(assignedBusinessTerm.bieId).subscribe(_ => {
+          this.service.makeAsPrimary(assignedBusinessTerm).subscribe(_ => {
             this.snackBar.open('Set to Preferred', '', {
               duration: 3000,
             });

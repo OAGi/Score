@@ -451,6 +451,10 @@ public class BusinessTermQueryController {
     public ResponseEntity getTemplateFile(
             @AuthenticationPrincipal AuthenticatedPrincipal user) {
 
+        // #1752 - H1: apply the same feature-flag gate as the other endpoints, even though this one
+        // serves a static classpath resource rather than touching the repository.
+        businessTermQueryService.assertBusinessTermEnabled(sessionService.asScoreUser(user));
+
         String templateName = "businessTermTemplateWithExample.csv";
         Resource resource = resourceLoader.getResource("classpath:" + templateName);
         return ResponseEntity.ok()

@@ -172,9 +172,10 @@
                   href="{{ element.externalReferenceUri }}">
                   <span class="score-line-clamp-2 score-break-word">{{ element.externalReferenceUri }}</span>
                 </a>
-              </ng-container>
+              </td>
+            </ng-container>
 
-              <ng-container matColumnDef="externalReferenceId">
+            <ng-container matColumnDef="externalReferenceId">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
                 score-table-column-resize [defaultWidth]="width('External Reference ID')" (onResize)="onResizeWidth($event)"> External Reference ID</th>
                 <td mat-cell *matCellDef="let element">

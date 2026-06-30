@@ -296,8 +296,17 @@ export class BusinessTermService {
     }
   }
 
-  makeAsPrimary(...assignedBizTermId): Observable<any> {
-    return this.http.put('/api/assigned_business_term/primary', { assignedBizTermId } );
+  /**
+   * #1752 - M1: set an existing assignment as the preferred (primary) term.
+   * Previously this PUT a non-existent `/api/assigned_business_term/primary` route with the
+   * wrong id. It now routes through the real assignment-update endpoint, which also demotes
+   * the sibling preferred term on the same BIE node.
+   */
+  makeAsPrimary(assignedBusinessTerm: AssignedBusinessTermDetails | AssignedBusinessTermListEntry): Observable<any> {
+    const updated = new AssignedBusinessTermDetails();
+    Object.assign(updated, assignedBusinessTerm);
+    updated.primaryIndicator = true;
+    return this.updateAssignment(updated);
   }
 
   checkUniqueness(businessTermId: number, businessTerm: string, externalReferenceUri: string): Observable<boolean> {
@@ -353,7 +362,7 @@ export class BusinessTermService {
       req.page = new PageRequest('lastUpdateTimestamp', 'desc', 0, 10);
       req.filters.typeCode = typeCode;
       req.filters.primaryIndicator = primaryIndicator;
-      req.filters.searchByCC = 'true';
+      req.filters.searchByCC = true;
       req.filters.bieTypes = [bieType];
       req.filters.bieId = bieId;
       return this.getAssignedBusinessTermList(req);

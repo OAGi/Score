@@ -13,6 +13,7 @@ import org.oagi.score.gateway.http.api.business_term_management.repository.Busin
 import org.oagi.score.gateway.http.api.business_term_management.repository.criteria.AsbieBbieListFilterCriteria;
 import org.oagi.score.gateway.http.api.business_term_management.repository.criteria.AssignedBusinessTermListFilterCriteria;
 import org.oagi.score.gateway.http.api.business_term_management.repository.criteria.BusinessTermListFilterCriteria;
+import org.oagi.score.gateway.http.api.context_management.business_context.model.BusinessContextSummaryRecord;
 import org.oagi.score.gateway.http.common.filter.ContainsFilterBuilder;
 import org.oagi.score.gateway.http.common.model.*;
 import org.oagi.score.gateway.http.common.repository.jooq.JooqBaseRepository;
@@ -44,6 +45,33 @@ public class JooqBusinessTermQueryRepository
         super(dslContext, requester, repositoryFactory);
     }
 
+    /**
+     * #1752 - H2: a correlated boolean field that is {@code true} when the BUSINESS_TERM row is
+     * referenced by any CC-level link (ascc_bizterm/bcc_bizterm). Selected into list/details
+     * so the UI can disable discarding a term that is in use — no per-row extra query.
+     */
+    private Field<Boolean> usedField() {
+        return field(
+                exists(selectOne().from(ASCC_BIZTERM)
+                        .where(ASCC_BIZTERM.BUSINESS_TERM_ID.eq(BUSINESS_TERM.BUSINESS_TERM_ID)))
+                        .or(exists(selectOne().from(BCC_BIZTERM)
+                                .where(BCC_BIZTERM.BUSINESS_TERM_ID.eq(BUSINESS_TERM.BUSINESS_TERM_ID))))
+        ).as("used");
+    }
+
+    @Override
+    public boolean isBusinessTermUsed(BusinessTermId businessTermId) {
+        if (businessTermId == null) {
+            return false;
+        }
+        return dslContext().fetchExists(
+                selectOne().from(ASCC_BIZTERM)
+                        .where(ASCC_BIZTERM.BUSINESS_TERM_ID.eq(valueOf(businessTermId))))
+                || dslContext().fetchExists(
+                selectOne().from(BCC_BIZTERM)
+                        .where(BCC_BIZTERM.BUSINESS_TERM_ID.eq(valueOf(businessTermId))));
+    }
+
     @Override
     public ResultAndCount<BusinessTermListEntryRecord> getBusinessTermList(
             BusinessTermListFilterCriteria filterCriteria, PageRequest pageRequest) {
@@ -68,7 +96,8 @@ public class JooqBusinessTermQueryRepository
                             BUSINESS_TERM.EXTERNAL_REF_ID,
                             BUSINESS_TERM.EXTERNAL_REF_URI,
                             BUSINESS_TERM.CREATION_TIMESTAMP,
-                            BUSINESS_TERM.LAST_UPDATE_TIMESTAMP
+                            BUSINESS_TERM.LAST_UPDATE_TIMESTAMP,
+                            usedField()
                     ), creatorFields(), updaterFields()))
                     .from(BUSINESS_TERM)
                     .join(creatorTable()).on(BUSINESS_TERM.CREATED_BY.eq(creatorTablePk()))
@@ -187,7 +216,8 @@ public class JooqBusinessTermQueryRepository
                     new WhoAndWhen(
                             fetchUpdaterSummary(record),
                             toDate(record.get(BUSINESS_TERM.LAST_UPDATE_TIMESTAMP))
-                    )
+                    ),
+                    Boolean.TRUE.equals(record.get("used", Boolean.class))
             );
         }
     }
@@ -289,7 +319,8 @@ public class JooqBusinessTermQueryRepository
                             BUSINESS_TERM.EXTERNAL_REF_ID,
                             BUSINESS_TERM.EXTERNAL_REF_URI,
                             BUSINESS_TERM.CREATION_TIMESTAMP,
-                            BUSINESS_TERM.LAST_UPDATE_TIMESTAMP
+                            BUSINESS_TERM.LAST_UPDATE_TIMESTAMP,
+                            usedField()
                     ), creatorFields(), updaterFields()))
                     .from(BUSINESS_TERM)
                     .join(creatorTable()).on(BUSINESS_TERM.CREATED_BY.eq(creatorTablePk()))
@@ -312,7 +343,8 @@ public class JooqBusinessTermQueryRepository
                     new WhoAndWhen(
                             fetchUpdaterSummary(record),
                             toDate(record.get(BUSINESS_TERM.LAST_UPDATE_TIMESTAMP))
-                    )
+                    ),
+                    Boolean.TRUE.equals(record.get("used", Boolean.class))
             );
         }
     }
@@ -1242,13 +1274,16 @@ public class JooqBusinessTermQueryRepository
         }
 
         private RecordMapper<org.jooq.Record, AsbieBbieListEntryRecord> mapper() {
+            // #1752 - M4: memoize the business-context lookup per top-level BIE. A candidate page
+            // typically contains many ASBIE/BBIE rows under the same BIE, so this turns N
+            // per-row lookups into one lookup per distinct top-level BIE.
+            var bizCtxQuery = repositoryFactory().businessContextQueryRepository(requester());
+            Map<TopLevelAsbiepId, List<BusinessContextSummaryRecord>> bizCtxCache = new HashMap<>();
             return record -> {
                 TopLevelAsbiepId topLevelAsbiepId = new TopLevelAsbiepId(record.get(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID).toBigInteger());
                 BigInteger bieId = record.getValue("bie_id", BigInteger.class);
                 BieState state = BieState.valueOf(record.get(TOP_LEVEL_ASBIEP.STATE));
                 UserSummaryRecord owner = fetchOwnerSummary(record);
-
-                var bizCtxQuery = repositoryFactory().businessContextQueryRepository(requester());
 
                 return new AsbieBbieListEntryRecord(
                         record.getValue("type", String.class),
@@ -1266,7 +1301,7 @@ public class JooqBusinessTermQueryRepository
                         record.get(TOP_LEVEL_ASBIEP.STATUS),
                         record.getValue("biz_term", String.class),
                         record.getValue("remark", String.class),
-                        bizCtxQuery.getBusinessContextSummaryList(topLevelAsbiepId),
+                        bizCtxCache.computeIfAbsent(topLevelAsbiepId, bizCtxQuery::getBusinessContextSummaryList),
                         state,
                         AccessPrivilege.toAccessPrivilege(requester(), owner.userId(), state),
 

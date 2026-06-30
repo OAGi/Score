@@ -17,8 +17,9 @@
         <mat-form-field>
           <mat-label>External Reference URI</mat-label>
           <div class="d-flex align-items-center">
-            <input matInput required placeholder="External Reference URI" [(ngModel)]="businessTerm.externalReferenceUri" maxlength="45"/>
-            <button mat-icon-button mat-small-icon-button aria-label="Clear" (click)="followTheExternalUri()">
+            <input matInput required placeholder="External Reference URI" [(ngModel)]="businessTerm.externalReferenceUri" maxlength="65535"/>
+            <button mat-icon-button mat-small-icon-button aria-label="Follow external reference URI"
+              matTooltip="Open the external reference URI in a new tab" (click)="followTheExternalUri()">
               <mat-icon>link</mat-icon>
             </button>
           </div>

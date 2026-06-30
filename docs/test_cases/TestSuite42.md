@@ -37,6 +37,9 @@ The end user cannot discard a Business Term on the `Edit Business Term` page if 
 #### Test Assertion #42.1.10
 The end user can discard a Business Term after its existing assignments have been removed.
 
+#### Test Assertion #42.1.11
+The end user can save an `External Reference URI` longer than 45 characters on the `Edit Business Term` page, and the full value is persisted (regression guard for the edit-form URI truncation).
+
 ### Test Step Pre-condition:
 1. Business Term is enabled in Application Settings in connectCenter.
 2. The users, branches, releases, and records needed to exercise this test case are available in connectCenter.
@@ -64,6 +67,8 @@ The end user can discard a Business Term after its existing assignments have bee
 19. Verify that connectCenter blocks the discard operation because the Business Term is used in assignments. (Assertion [#9](#test-assertion-4219))
 20. The end user removes the Business Term assignment from the related BIE node, returns to `View/Edit Business Term`, and discards the same Business Term again.
 21. Verify that the Business Term is removed successfully after it is no longer assigned. (Assertion [#10](#test-assertion-42110))
+22. The end user opens a Business Term on the `Edit Business Term` page, enters an `External Reference URI` longer than 45 characters, and saves the record.
+23. Verify that the full URI is persisted when the record is reopened. (Assertion [#11](#test-assertion-42111))
 
 ## Test Case 42.2
 **Business Term Assignment**
@@ -107,6 +112,9 @@ Different | Different | Allow
 #### Test Assertion #42.2.10
 For each selected BIE, creating another preferred Business Term assignment prompts the user to overwrite the previous preferred assignment.
 
+#### Test Assertion #42.2.11
+Discarding a Business Term assignment from the assignment detail page removes only that assignment; the underlying catalog Business Term remains in the registry.
+
 ### Test Step Pre-condition:
 1. Business Term is enabled in Application Settings in connectCenter.
 2. The users, branches, releases, and records needed to exercise this test case are available in connectCenter.
@@ -141,6 +149,8 @@ For each selected BIE, creating another preferred Business Term assignment promp
 25. Verify that the assignment is allowed. (Assertion [#9](#test-assertion-4229))
 26. The end user creates a preferred Business Term assignment for the selected BIE and then attempts to create another preferred assignment for the same BIE.
 27. Verify that connectCenter shows an overwrite warning for the existing preferred assignment. (Assertion [#10](#test-assertion-42210))
+28. The end user creates a Business Term assignment, opens that assignment on its detail page, and discards it.
+29. Verify that the assignment is removed while the catalog Business Term still exists in `View/Edit Business Term`. (Assertion [#11](#test-assertion-42211))
 
 ## Test Case 42.3
 **Business Term from BIE Detail Page**

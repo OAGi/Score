@@ -88,9 +88,9 @@ public class BusinessTermCommandController {
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @RequestBody BusinessTermDiscardRequest request) {
 
-        for (BusinessTermId businessTermId : request.businessTermIdList()) {
-            businessTermCommandService.discard(sessionService.asScoreUser(user), businessTermId);
-        }
+        // #1752 - M9: discard the whole batch in a single transaction so a mid-batch failure
+        // (e.g. a term in use) rolls back rather than leaving partial deletions.
+        businessTermCommandService.discard(sessionService.asScoreUser(user), request.businessTermIdList());
 
         return ResponseEntity.noContent().build();
     }

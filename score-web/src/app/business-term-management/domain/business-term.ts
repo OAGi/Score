@@ -44,7 +44,7 @@ export class BusinessTermListRequest {
     definition: string;
     bieId: number;
     bieType: string;
-    searchByCC: string;
+    searchByCC: boolean;
     typeCode: string;
     primaryIndicator: boolean;
   };
@@ -79,9 +79,11 @@ export class BusinessTermListRequest {
     }
 
     this.updaterUsernameList = (params.get('updaterUsernameList')) ? Array.from(params.get('updaterUsernameList').split(',')) : [];
+    // #1752 - M2: read the same `updateStart`/`updateEnd` (epoch-millis) keys that toParams() writes,
+    // so the date-range filter round-trips through the base64 `q` param on reload/bookmark.
     this.updatedDate = {
-      start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
-      end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
+      start: (params.get('updateStart')) ? new Date(Number(params.get('updateStart'))) : null,
+      end: (params.get('updateEnd')) ? new Date(Number(params.get('updateEnd'))) : null
     };
     this.filters = {
       businessTerm: params.get('businessTerm') || '',
@@ -90,9 +92,9 @@ export class BusinessTermListRequest {
       definition: params.get('definition') || '',
       bieType: params.get('bieType') || '',
       bieId: Number(params.get('bieId')),
-      searchByCC: params.get('searchByCC') || '',
+      searchByCC: params.get('searchByCC') === 'true',
       typeCode: params.get('typeCode') || '',
-      primaryIndicator: Boolean(params.get('primaryIndicator')) || false
+      primaryIndicator: params.get('primaryIndicator') === 'true'
     };
   }
 
@@ -115,8 +117,18 @@ export class BusinessTermListRequest {
     if (this.filters.businessTerm && this.filters.businessTerm.length > 0) {
       params = params.set('businessTerm', '' + this.filters.businessTerm);
     }
+    // #1752 - M2: serialize the external-reference filters so they round-trip through the `q` param.
+    if (this.filters.externalReferenceUri && this.filters.externalReferenceUri.length > 0) {
+      params = params.set('externalReferenceUri', '' + this.filters.externalReferenceUri);
+    }
+    if (this.filters.externalReferenceId && this.filters.externalReferenceId.length > 0) {
+      params = params.set('externalReferenceId', '' + this.filters.externalReferenceId);
+    }
     if (this.filters.definition && this.filters.definition.length > 0) {
       params = params.set('definition', '' + this.filters.definition);
+    }
+    if (this.filters.bieType && this.filters.bieType.length > 0) {
+      params = params.set('bieType', '' + this.filters.bieType);
     }
     if (this.filters.bieId) {
       params = params.set('bieId', '' + this.filters.bieId);
@@ -147,7 +159,7 @@ export class AssignedBtListRequest {
     bieTypes: string[];
     bieId: number;
     bieDen: string;
-    searchByCC: string;
+    searchByCC: boolean;
     typeCode: string;
     primaryIndicator: boolean;
   };
@@ -182,9 +194,10 @@ export class AssignedBtListRequest {
     }
 
     this.updaterUsernameList = (params.get('updaterUsernameList')) ? Array.from(params.get('updaterUsernameList').split(',')) : [];
+    // #1752 - M2: read the same `updateStart`/`updateEnd` (epoch-millis) keys that toParams() writes.
     this.updatedDate = {
-      start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
-      end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
+      start: (params.get('updateStart')) ? new Date(Number(params.get('updateStart'))) : null,
+      end: (params.get('updateEnd')) ? new Date(Number(params.get('updateEnd'))) : null
     };
     this.filters = {
       businessTerm: params.get('businessTerm') || '',
@@ -192,9 +205,9 @@ export class AssignedBtListRequest {
       bieTypes: (params.get('bieTypes')) ? Array.from(params.get('bieTypes').split(',')) : [],
       bieDen: params.get('bieDen') || '',
       bieId: Number(params.get('bieId')),
-      searchByCC: params.get('searchByCC') || '',
+      searchByCC: params.get('searchByCC') === 'true',
       typeCode: params.get('typeCode') || '',
-      primaryIndicator: Boolean(params.get('primaryIndicator')) || false
+      primaryIndicator: params.get('primaryIndicator') === 'true'
     };
   }
 

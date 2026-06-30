@@ -213,8 +213,12 @@ export class AssignBusinessTermBtComponent implements OnInit {
       const httpParams = (q) ? new HttpParams({fromString: base64Decode(q)}) : new HttpParams();
       str = httpParams.get(paramName);
     }
-    const arr = str.split(',');
-    return arr;
+    // #1752 - M7: guard against a missing param (null) — split() would throw a TypeError otherwise,
+    // breaking step 2 of the assign wizard when navigated without bieIds/bieTypes.
+    if (!str) {
+      return [];
+    }
+    return str.split(',');
   }
 
   onPageChange(event: PageEvent) {
@@ -308,8 +312,8 @@ export class AssignBusinessTermBtComponent implements OnInit {
               const dialogConfig = this.confirmDialogService.newConfig();
               dialogConfig.data.header = 'Overwrite previous preferred business terms?';
               dialogConfig.data.content = [
-                ' The preferred business term already exists for ' +
-                ((this.postAssignBtObj.biesToAssign.length === 1) ? 'selected BIE and type code.' : 'some of the selected BIEs and type code.') +
+                'The preferred business term already exists for ' +
+                ((this.postAssignBtObj.biesToAssign.length === 1) ? 'the selected BIE and type code.' : 'some of the selected BIEs and type code.') +
                 ' Are you sure you want to proceed and overwrite the previous preferred business term assignment?'
               ];
               dialogConfig.data.action = 'Create';

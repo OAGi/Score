@@ -168,7 +168,10 @@ export class AssignedBusinessTermDetailComponent implements OnInit {
     this.confirmDialogService.open(dialogConfig).afterClosed()
       .subscribe(result => {
         if (result) {
-          this.service.delete(this.assignedBusinessTerm.assignedBizTermId).subscribe(_ => {
+          // #1752 - C1: discard the *assignment* (asbie_bizterm/bbie_bizterm), not the catalog
+          // business term. The single-arg delete() targets the catalog DELETE keyed by
+          // business_term_id; deleteAssignments() targets DELETE /assign/{type}/{id}.
+          this.service.deleteAssignments([this.assignedBusinessTerm]).subscribe(_ => {
             this.snackBar.open('Discarded', '', {
               duration: 3000,
             });

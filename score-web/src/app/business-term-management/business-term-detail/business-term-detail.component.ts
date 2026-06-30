@@ -95,7 +95,11 @@ export class BusinessTermDetailComponent implements OnInit {
 
   update() {
     this.checkUniqueness(this.businessTerm, (_) => {
+      // #1752 - L2: also run the name-uniqueness check that Create runs, so a duplicate business-term
+      // name cannot be introduced silently via Edit (it warns with an "Update anyway" option).
+      this.checkBusinessTermName(this.businessTerm, (__) => {
         this.doUpdate();
+      });
     });
   }
 
@@ -139,7 +143,7 @@ export class BusinessTermDetailComponent implements OnInit {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Invalid parameters';
     dialogConfig.data.content = [
-      'Another business term with the same business term and external reference URI already exist!'
+      'Another business term with the same business term and external reference URI already exists!'
     ];
 
     this.confirmDialogService.open(dialogConfig).afterClosed().subscribe(_ => {});

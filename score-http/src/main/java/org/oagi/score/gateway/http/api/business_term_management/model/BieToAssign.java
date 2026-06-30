@@ -40,7 +40,9 @@ public class BieToAssign extends Auditable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BieToAssign that = (BieToAssign) o;
-        return bieId == that.bieId && bieType.equals(that.bieType);
+        // #1752 - L1: BigInteger must be compared by value, not reference identity, to stay
+        // consistent with hashCode() (which uses Objects.hash).
+        return Objects.equals(bieId, that.bieId) && Objects.equals(bieType, that.bieType);
     }
 
     @Override

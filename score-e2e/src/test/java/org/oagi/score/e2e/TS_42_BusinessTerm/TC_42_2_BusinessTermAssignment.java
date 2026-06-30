@@ -30,6 +30,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.oagi.score.e2e.impl.PageHelper.click;
+import static org.oagi.score.e2e.impl.PageHelper.elementToBeClickable;
 import static org.oagi.score.e2e.impl.PageHelper.getSnackBarMessage;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
 
@@ -643,6 +644,48 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
                 "//*[contains(text(), \"Overwrite previous preferred business terms?\")]")).isDisplayed());
     }
 
+    @Test
+    @DisabledIfBusinessTermProperty(value = false)
+    @DisplayName("TC_42_2_11")
+    public void end_user_discarding_an_assignment_from_the_detail_page_removes_the_assignment_not_the_catalog_term() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        //use pre-existing BBIE node
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(library, "Source Activity. Source Activity", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, endUser, "WIP");
+
+        loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        String path = "/" + asccp.getPropertyTerm() + "/Note";
+        BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+        createAssignedBusinessTermForBbie(randomBusinessTerm, topLevelASBIEP, path, endUser, null, false);
+
+        BigInteger bbieBiztermId = findBbieBiztermId(randomBusinessTerm.getBusinessTermId());
+
+        // Open the assignment detail page directly and discard the assignment.
+        String detailUrl = getConfig().getBaseUrl().resolve(
+                "/business_term_management/assign_business_term/details/" + bbieBiztermId
+                        + "?type=BBIE&id=" + bbieBiztermId).toString();
+        getDriver().get(detailUrl);
+        click(elementToBeClickable(getDriver(),
+                By.xpath("//span[contains(text(), \"Discard\")]//ancestor::button[1]")));
+        click(elementToBeClickable(getDriver(),
+                By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]")));
+        assertEquals("Discarded", getSnackBarMessage(getDriver()));
+
+        // #1752 - C1: the assignment row must be removed, while the catalog business term remains.
+        assertEquals(0L, countByLong(
+                "select count(*) from bbie_bizterm where bbie_bizterm_id = ?", bbieBiztermId));
+        assertEquals(1L, countByLong(
+                "select count(*) from business_term where business_term_id = ?",
+                randomBusinessTerm.getBusinessTermId()));
+    }
+
     @AfterEach
     public void tearDown() {
         super.tearDown();
@@ -651,6 +694,36 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         this.randomAccounts.forEach(randomAccount -> {
             getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(randomAccount.getLoginId());
         });
+    }
+
+    private BigInteger findBbieBiztermId(BigInteger businessTermId) {
+        String sql = "select bbt.bbie_bizterm_id from bbie_bizterm bbt " +
+                "join bcc_bizterm bcbt on bbt.bcc_bizterm_id = bcbt.bcc_bizterm_id " +
+                "where bcbt.business_term_id = ? order by bbt.bbie_bizterm_id desc limit 1";
+        try (Connection connection = newConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, businessTermId.longValueExact());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBigDecimal(1).toBigInteger();
+                }
+            }
+        } catch (SQLException e) {
+            throw new IllegalStateException("Failed to find bbie_bizterm id for business term " + businessTermId, e);
+        }
+        throw new IllegalStateException("Unable to find bbie_bizterm id for business term " + businessTermId);
+    }
+
+    private long countByLong(String sql, BigInteger param) {
+        try (Connection connection = newConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, param.longValueExact());
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getLong(1) : 0L;
+            }
+        } catch (SQLException e) {
+            throw new IllegalStateException("Failed to count rows: " + sql, e);
+        }
     }
 
     private BusinessTermAssignmentPage openBusinessTermAssignmentPage(String... bieTypes) {

@@ -24,6 +24,12 @@ public interface BusinessTermQueryRepository {
 
     boolean checkNameUniqueness(BusinessTermId businessTermId, String businessTerm);
 
+    /**
+     * #1752 - H2: returns {@code true} when the business term is referenced by any CC-level link
+     * ({@code ascc_bizterm}/{@code bcc_bizterm}), i.e. it is assigned and cannot be discarded.
+     */
+    boolean isBusinessTermUsed(BusinessTermId businessTermId);
+
     BusinessTermDetailsRecord getBusinessTermDetails(BusinessTermId businessTermId);
 
     ResultAndCount<AssignedBusinessTermListEntryRecord> getAssignedBusinessTermList(

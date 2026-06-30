@@ -41,6 +41,10 @@ export class BusinessTermUploadFileComponent implements OnInit {
       const formData = new FormData();
       formData.append('file', file);
 
+      // #1752 - L4: clear the native input value once the File is captured so that selecting the
+      // *same* file again still fires a `change` event (e.g. to retry after an error).
+      event.target.value = '';
+
       const upload$ = this.service.uploadFromFile(formData)
         .pipe(
           finalize(() => this.reset())
