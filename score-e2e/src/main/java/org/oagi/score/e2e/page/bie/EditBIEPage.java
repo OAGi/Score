@@ -73,6 +73,22 @@ public interface EditBIEPage extends Page {
     TopLevelASBIEPPanel getTopLevelASBIEPPanel();
 
     /**
+     * Return {@code true} if the BIE-root 'OpenAPI Document Information' panel (Issue #1519) is shown for the
+     * currently selected node, otherwise {@code false}. The panel surfaces only on the BIE root and only when
+     * at least one OpenAPI Document exists.
+     *
+     * @return {@code true} if the 'OpenAPI Document Information' panel is displayed, otherwise {@code false}
+     */
+    boolean isOpenAPIDocumentInformationPanelDisplayed();
+
+    /**
+     * Expand and return the BIE-root 'OpenAPI Document Information' panel (Issue #1519).
+     *
+     * @return the 'OpenAPI Document Information' panel
+     */
+    OpenAPIDocumentInformationPanel openOpenAPIDocumentInformationPanel();
+
+    /**
      * Expand the tree using the given node name.
      *
      * @param nodeName node name
@@ -435,6 +451,161 @@ public interface EditBIEPage extends Page {
          */
         TopLevelASBIEPPanel getBaseTopLevelASBIEPPanel();
 
+    }
+
+    /**
+     * An interface of the BIE-root 'OpenAPI Document Information' panel (Issue #1519).
+     *
+     * <p>The panel surfaces the cross-document union of a BIE's OpenAPI bindings (one card per binding) and
+     * lets the user add, edit, and remove them in place. Every edit flows through the SAME backend endpoints
+     * as the OpenAPI Document editor, so a change made here has the identical effect on the database (and the
+     * generated OpenAPI document) as the same change made on the OpenAPI Document screen.</p>
+     */
+    interface OpenAPIDocumentInformationPanel {
+
+        /**
+         * Return {@code true} if the empty-state message ("This BIE is not used in any OpenAPI Document yet.")
+         * is shown — i.e. the BIE has no binding yet.
+         *
+         * @return {@code true} if the empty state is shown, otherwise {@code false}
+         */
+        boolean isEmptyStateDisplayed();
+
+        /**
+         * Return {@code true} if the header '+' (Add to an OpenAPI Document) button is present.
+         *
+         * @return {@code true} if the add button is present, otherwise {@code false}
+         */
+        boolean isAddButtonDisplayed();
+
+        /**
+         * Return the number of binding cards currently rendered.
+         *
+         * @return the number of binding cards
+         */
+        int getBindingCardCount();
+
+        /**
+         * Return the binding card whose document chip links to the given OpenAPI Document id.
+         *
+         * @param oasDocId the OpenAPI Document id
+         * @return the binding card element
+         */
+        WebElement getBindingCard(java.math.BigInteger oasDocId);
+
+        /**
+         * Return the binding card whose Operation ID field equals the given value.
+         *
+         * @param operationId the Operation ID
+         * @return the binding card element
+         */
+        WebElement getBindingCardByOperationId(String operationId);
+
+        /**
+         * Return the document chip text (title [· version]) of a binding card.
+         *
+         * @param card the binding card
+         * @return the document chip text
+         */
+        String getDocumentChipText(WebElement card);
+
+        String getVerb(WebElement card);
+
+        void setVerb(WebElement card, String verb);
+
+        String getMessageBody(WebElement card);
+
+        void setMessageBody(WebElement card, String messageBody);
+
+        String getResourceName(WebElement card);
+
+        void setResourceName(WebElement card, String resourceName);
+
+        /**
+         * Return the inline duplicate-body error on the Resource Name field (empty if none).
+         *
+         * @param card the binding card
+         * @return the error text, or an empty string
+         */
+        String getResourceNameError(WebElement card);
+
+        String getOperationId(WebElement card);
+
+        void setOperationId(WebElement card, String operationId);
+
+        /**
+         * Return the inline error on the Operation ID field (empty if none).
+         *
+         * @param card the binding card
+         * @return the error text, or an empty string
+         */
+        String getOperationIdError(WebElement card);
+
+        String getTag(WebElement card);
+
+        void setTag(WebElement card, String tag);
+
+        boolean isArrayChecked(WebElement card);
+
+        void setArray(WebElement card, boolean checked);
+
+        boolean isSuppressRootChecked(WebElement card);
+
+        void setSuppressRoot(WebElement card, boolean checked);
+
+        /**
+         * Return the selected 'Error Response' body-type label of a binding card (Issue #1347).
+         *
+         * @param card the binding card
+         * @return the error-response body-type label
+         */
+        String getErrorResponseBodyType(WebElement card);
+
+        /**
+         * Set the 'Error Response' body type of a binding card (Issue #1347).
+         *
+         * @param card  the binding card
+         * @param label the body-type label ('No Response Body', 'IETF Problem Details', 'OAGi Confirm Message')
+         */
+        void setErrorResponseBodyType(WebElement card, String label);
+
+        /**
+         * Return {@code true} if the per-card amber "A Request Body on a DELETE operation is ignored in
+         * OpenAPI 3.0.3 ..." warning (Issue #1610) is shown on the given binding card. It appears only when
+         * the binding is a {@code DELETE} + {@code Request} and its owning OpenAPI Document targets an OpenAPI
+         * version earlier than 3.1. The warning is read-only on the BIE screen — the OpenAPI Version is
+         * changed on the OpenAPI Document screen.
+         *
+         * @param card the binding card
+         * @return {@code true} if the DELETE-body warning is displayed on the card, otherwise {@code false}
+         */
+        boolean isDeleteRequestBodyIgnoredWarningDisplayed(WebElement card);
+
+        /**
+         * Unbind a binding (the per-card '−'): removes this BIE from that operation, confirming the dialog.
+         *
+         * @param card the binding card
+         */
+        void unbind(WebElement card);
+
+        /**
+         * Open the header '+' 'Add to OpenAPI Document' dialog.
+         *
+         * @return the add dialog
+         */
+        BieOpenAPIDocumentAddDialog openAddDialog();
+
+        /**
+         * Return {@code true} if the 'Update OpenAPI Information' button is enabled.
+         *
+         * @return {@code true} if enabled, otherwise {@code false}
+         */
+        boolean isUpdateButtonEnabled();
+
+        /**
+         * Click the 'Update OpenAPI Information' button and wait for the success snackbar.
+         */
+        void hitUpdateButton();
     }
 
     /**

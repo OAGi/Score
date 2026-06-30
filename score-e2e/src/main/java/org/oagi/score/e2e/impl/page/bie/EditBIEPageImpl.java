@@ -10,6 +10,7 @@ import org.oagi.score.e2e.obj.ACCObject;
 import org.oagi.score.e2e.obj.BusinessContextObject;
 import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.BasePage;
+import org.oagi.score.e2e.page.bie.BieOpenAPIDocumentAddDialog;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.SelectBaseProfileBIEDialog;
 import org.oagi.score.e2e.page.bie.SelectProfileBIEToReuseDialog;
@@ -385,6 +386,34 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
                 "//mat-tab-header//div[@role=\"tab\"][1]"));
         click(tab);
         return new TopLevelASBIEPPanelImpl();
+    }
+
+    // Issue #1519: the BIE-root 'OpenAPI Document Information' panel, scoped by its panel title so it is never
+    // confused with the sibling 'Supporting Documentation' panel (both carry the 'info-panel-header-add' '+').
+    private static final String OAS_INFO_PANEL_XPATH =
+            "//mat-expansion-panel[.//mat-panel-title[normalize-space(.) = \"OpenAPI Document Information\"]]";
+
+    @Override
+    public boolean isOpenAPIDocumentInformationPanelDisplayed() {
+        // The panel renders on the BIE root only after the detail has loaded AND the asynchronous
+        // "does any OpenAPI Document exist" check has resolved, so settle before deciding (an absent panel
+        // returns immediately from findElements without a long wait).
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1500L));
+        return !getDriver().findElements(By.xpath(OAS_INFO_PANEL_XPATH)).isEmpty();
+    }
+
+    @Override
+    public EditBIEPage.OpenAPIDocumentInformationPanel openOpenAPIDocumentInformationPanel() {
+        invisibilityOfLoadingContainerElement(getDriver());
+        WebElement header = visibilityOfElementLocated(getDriver(),
+                By.xpath(OAS_INFO_PANEL_XPATH + "//mat-expansion-panel-header"));
+        if (!"true".equals(header.getAttribute("aria-expanded"))) {
+            click(getDriver(), visibilityOfElementLocated(getDriver(),
+                    By.xpath(OAS_INFO_PANEL_XPATH + "//mat-panel-title[normalize-space(.) = \"OpenAPI Document Information\"]")));
+            waitFor(ofMillis(500L));
+        }
+        return new OpenAPIDocumentInformationPanelImpl();
     }
 
     @Override
@@ -1501,6 +1530,239 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
                     "//mat-tab-header//div[@role=\"tab\"][2]"));
             click(tab);
             return this;
+        }
+    }
+
+    /**
+     * Issue #1519: drives the BIE-root 'OpenAPI Document Information' panel — one card per binding. Every
+     * setter reuses the same Angular Material controls the OpenAPI Document editor uses, and the panel saves
+     * through the same backend endpoints, so an edit here lands in the database exactly as it would on the
+     * OpenAPI Document screen.
+     */
+    private class OpenAPIDocumentInformationPanelImpl implements EditBIEPage.OpenAPIDocumentInformationPanel {
+
+        // Exact class-token match: a substring contains() would also catch the child 'oas-binding-card-header'
+        // and 'oas-binding-card-body' divs, inflating the card count.
+        private static final String CARD =
+                "//div[contains(concat(\" \", normalize-space(@class), \" \"), \" oas-binding-card \")]";
+
+        private WebElement fieldSelect(WebElement card, String label) {
+            return card.findElement(By.xpath(
+                    ".//mat-form-field[.//mat-label[normalize-space(.) = \"" + label + "\"]]//mat-select"));
+        }
+
+        private WebElement fieldInput(WebElement card, String label) {
+            return card.findElement(By.xpath(
+                    ".//mat-form-field[.//mat-label[normalize-space(.) = \"" + label + "\"]]//input"));
+        }
+
+        private WebElement checkbox(WebElement card, String label) {
+            return card.findElement(By.xpath(
+                    ".//mat-checkbox[contains(normalize-space(.), \"" + label + "\")]"));
+        }
+
+        private void chooseOption(String optionText) {
+            WebElement option = elementToBeClickable(getDriver(),
+                    By.xpath("//mat-option[.//span[normalize-space(.) = \"" + optionText + "\"]]"));
+            click(getDriver(), option);
+            waitFor(ofMillis(300L));
+        }
+
+        private String fieldError(WebElement card, String label) {
+            try {
+                return getText(card.findElement(By.xpath(
+                        ".//mat-form-field[.//mat-label[normalize-space(.) = \"" + label + "\"]]//mat-error")));
+            } catch (NoSuchElementException e) {
+                return "";
+            }
+        }
+
+        @Override
+        public boolean isEmptyStateDisplayed() {
+            List<WebElement> empties = getDriver().findElements(By.xpath(
+                    OAS_INFO_PANEL_XPATH + "//div[contains(@class, \"oas-doc-information-empty\")]"));
+            return !empties.isEmpty() && empties.get(0).isDisplayed();
+        }
+
+        @Override
+        public boolean isAddButtonDisplayed() {
+            return !getDriver().findElements(By.xpath(OAS_INFO_PANEL_XPATH +
+                    "//mat-expansion-panel-header//button[contains(@class, \"info-panel-header-add\")]")).isEmpty();
+        }
+
+        @Override
+        public int getBindingCardCount() {
+            return getDriver().findElements(By.xpath(OAS_INFO_PANEL_XPATH + CARD)).size();
+        }
+
+        @Override
+        public WebElement getBindingCard(BigInteger oasDocId) {
+            return visibilityOfElementLocated(getDriver(), By.xpath(OAS_INFO_PANEL_XPATH + CARD +
+                    "[.//a[substring-after(@href, \"/oas_doc/\") = \"" + oasDocId + "\"]]"));
+        }
+
+        @Override
+        public WebElement getBindingCardByOperationId(String operationId) {
+            for (WebElement card : getDriver().findElements(By.xpath(OAS_INFO_PANEL_XPATH + CARD))) {
+                if (operationId.equals(getOperationId(card))) {
+                    return card;
+                }
+            }
+            throw new NoSuchElementException("No binding card with Operation ID: " + operationId);
+        }
+
+        @Override
+        public String getDocumentChipText(WebElement card) {
+            return getText(card.findElement(By.xpath(".//span[contains(@class, \"oas-doc-chip-text\")]")));
+        }
+
+        @Override
+        public String getVerb(WebElement card) {
+            return getText(fieldSelect(card, "Verb"));
+        }
+
+        @Override
+        public void setVerb(WebElement card, String verb) {
+            click(getDriver(), fieldSelect(card, "Verb"));
+            chooseOption(verb);
+        }
+
+        @Override
+        public String getMessageBody(WebElement card) {
+            return getText(fieldSelect(card, "Message Body"));
+        }
+
+        @Override
+        public void setMessageBody(WebElement card, String messageBody) {
+            click(getDriver(), fieldSelect(card, "Message Body"));
+            chooseOption(messageBody);
+        }
+
+        @Override
+        public String getResourceName(WebElement card) {
+            return fieldInput(card, "Resource Name").getAttribute("value");
+        }
+
+        @Override
+        public void setResourceName(WebElement card, String resourceName) {
+            WebElement input = fieldInput(card, "Resource Name");
+            clear(input);
+            sendKeys(input, resourceName);
+        }
+
+        @Override
+        public String getResourceNameError(WebElement card) {
+            return fieldError(card, "Resource Name");
+        }
+
+        @Override
+        public String getOperationId(WebElement card) {
+            return fieldInput(card, "Operation ID").getAttribute("value");
+        }
+
+        @Override
+        public void setOperationId(WebElement card, String operationId) {
+            WebElement input = fieldInput(card, "Operation ID");
+            clear(input);
+            sendKeys(input, operationId);
+        }
+
+        @Override
+        public String getOperationIdError(WebElement card) {
+            return fieldError(card, "Operation ID");
+        }
+
+        @Override
+        public String getTag(WebElement card) {
+            return fieldInput(card, "Tag").getAttribute("value");
+        }
+
+        @Override
+        public void setTag(WebElement card, String tag) {
+            WebElement input = fieldInput(card, "Tag");
+            clear(input);
+            sendKeys(input, tag);
+        }
+
+        @Override
+        public boolean isArrayChecked(WebElement card) {
+            return isChecked(checkbox(card, "Make as an array"));
+        }
+
+        @Override
+        public void setArray(WebElement card, boolean checked) {
+            WebElement box = checkbox(card, "Make as an array");
+            if (isChecked(box) != checked) {
+                click(getDriver(), box.findElement(By.tagName("input")));
+                waitFor(ofMillis(300L));
+            }
+        }
+
+        @Override
+        public boolean isSuppressRootChecked(WebElement card) {
+            return isChecked(checkbox(card, "Suppress a root property"));
+        }
+
+        @Override
+        public void setSuppressRoot(WebElement card, boolean checked) {
+            WebElement box = checkbox(card, "Suppress a root property");
+            if (isChecked(box) != checked) {
+                click(getDriver(), box.findElement(By.tagName("input")));
+                waitFor(ofMillis(300L));
+            }
+        }
+
+        @Override
+        public String getErrorResponseBodyType(WebElement card) {
+            return getText(fieldSelect(card, "Error Response"));
+        }
+
+        @Override
+        public void setErrorResponseBodyType(WebElement card, String label) {
+            click(getDriver(), fieldSelect(card, "Error Response"));
+            chooseOption(label);
+        }
+
+        @Override
+        public boolean isDeleteRequestBodyIgnoredWarningDisplayed(WebElement card) {
+            List<WebElement> warnings = card.findElements(
+                    By.xpath(".//div[contains(@class, \"oas-delete-body-warning\")]"));
+            return !warnings.isEmpty() && warnings.get(0).isDisplayed();
+        }
+
+        @Override
+        public void unbind(WebElement card) {
+            click(getDriver(), card.findElement(By.xpath(".//button[contains(@class, \"oas-binding-discard\")]")));
+            WebElement confirmRemoveButton = elementToBeClickable(getDriver(), By.xpath(
+                    "//mat-dialog-container//span[contains(text(), \"Remove\")]//ancestor::button[1]"));
+            click(getDriver(), confirmRemoveButton);
+            invisibilityOfLoadingContainerElement(getDriver());
+            assert "Removed from OpenAPI Document.".equals(getSnackBarMessage(getDriver()));
+        }
+
+        @Override
+        public BieOpenAPIDocumentAddDialog openAddDialog() {
+            click(getDriver(), elementToBeClickable(getDriver(), By.xpath(OAS_INFO_PANEL_XPATH +
+                    "//mat-expansion-panel-header//button[contains(@class, \"info-panel-header-add\")]")));
+            waitFor(ofMillis(1000L));
+            BieOpenAPIDocumentAddDialog dialog = new BieOpenAPIDocumentAddDialogImpl(EditBIEPageImpl.this);
+            assert dialog.isOpened();
+            return dialog;
+        }
+
+        @Override
+        public boolean isUpdateButtonEnabled() {
+            List<WebElement> buttons = getDriver().findElements(By.xpath(OAS_INFO_PANEL_XPATH +
+                    "//button[normalize-space(.) = \"Update OpenAPI Information\"]"));
+            return !buttons.isEmpty() && buttons.get(0).isEnabled();
+        }
+
+        @Override
+        public void hitUpdateButton() {
+            click(getDriver(), elementToBeClickable(getDriver(), By.xpath(OAS_INFO_PANEL_XPATH +
+                    "//button[normalize-space(.) = \"Update OpenAPI Information\"]")));
+            invisibilityOfLoadingContainerElement(getDriver());
+            assert "Updated OpenAPI Document information.".equals(getSnackBarMessage(getDriver()));
         }
     }
 

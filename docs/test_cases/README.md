@@ -213,6 +213,7 @@
 	- [Test Case 43.11 - Configure the Error Response Body Type](/docs/test_cases/TestSuite43.md#test-case-4311)
 	- [Test Case 43.12 - Request and Response on a Single Operation](/docs/test_cases/TestSuite43.md#test-case-4312)
 	- [Test Case 43.13 - Multi-select Add and OpenAPI Document Uniqueness](/docs/test_cases/TestSuite43.md#test-case-4313)
+	- [Test Case 43.14 - Manage a BIE's OpenAPI Document Bindings from the BIE Root](/docs/test_cases/TestSuite43.md#test-case-4314)
 - [Test Suite 44 - BIE Inheritance](/docs/test_cases/TestSuite44.md)
 	- [Test Case 44.1 - Create Inherited BIE](/docs/test_cases/TestSuite44.md#test-case-441)
 	- [Test Case 44.2 - Use Base BIE](/docs/test_cases/TestSuite44.md#test-case-442)

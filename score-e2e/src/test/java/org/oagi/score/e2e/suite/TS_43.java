@@ -16,6 +16,7 @@ import org.oagi.score.e2e.TS_43_OpenAPIDocument.TC_43_10_DeleteRequestBody;
 import org.oagi.score.e2e.TS_43_OpenAPIDocument.TC_43_11_ConfigureErrorResponseBodyType;
 import org.oagi.score.e2e.TS_43_OpenAPIDocument.TC_43_12_RequestAndResponseOnOneOperation;
 import org.oagi.score.e2e.TS_43_OpenAPIDocument.TC_43_13_MultiSelectAddAndDocumentUniqueness;
+import org.oagi.score.e2e.TS_43_OpenAPIDocument.TC_43_14_ManageBIEOpenAPIBindingsFromBIERoot;
 
 @Suite
 @SuiteDisplayName("Test Suite 43")
@@ -32,7 +33,8 @@ import org.oagi.score.e2e.TS_43_OpenAPIDocument.TC_43_13_MultiSelectAddAndDocume
         TC_43_10_DeleteRequestBody.class,
         TC_43_11_ConfigureErrorResponseBodyType.class,
         TC_43_12_RequestAndResponseOnOneOperation.class,
-        TC_43_13_MultiSelectAddAndDocumentUniqueness.class
+        TC_43_13_MultiSelectAddAndDocumentUniqueness.class,
+        TC_43_14_ManageBIEOpenAPIBindingsFromBIERoot.class
 })
 public class TS_43 {
 }
