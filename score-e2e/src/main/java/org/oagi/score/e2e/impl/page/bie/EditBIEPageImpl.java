@@ -10,6 +10,7 @@ import org.oagi.score.e2e.obj.ACCObject;
 import org.oagi.score.e2e.obj.BusinessContextObject;
 import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.BasePage;
+import org.oagi.score.e2e.page.bie.BieBusinessTermAssignDialog;
 import org.oagi.score.e2e.page.bie.BieOpenAPIDocumentAddDialog;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.SelectBaseProfileBIEDialog;
@@ -733,6 +734,127 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         return visibilityOfElementLocated(getDriver(), locator);
     }
 
+    // --- Issue #1754: in-place 'Business Terms' chip field helpers (shared by ASBIE/BBIE panels) ---
+    //
+    // The chip field is a mat-chip-grid.bt-chip-set carrying data-bie-type. For the CURRENT (editable)
+    // tab it lives inside a .bt-badges-field that is NOT .bt-badges-field-readonly; the base
+    // (inherited) tab renders a second, read-only copy. Scoping the current-tab lookups to the
+    // non-readonly wrapper keeps them off the base-tab copy.
+
+    private WebElement getBusinessTermChipFieldByType(String bieType, boolean readonly) {
+        String readonlyPredicate = readonly
+                ? "[contains(concat(\" \", normalize-space(@class), \" \"), \" bt-badges-field-readonly \")]"
+                : "[not(contains(concat(\" \", normalize-space(@class), \" \"), \" bt-badges-field-readonly \"))]";
+        return visibilityOfElementLocated(getDriver(), By.xpath(
+                "//mat-form-field[contains(concat(\" \", normalize-space(@class), \" \"), \" bt-badges-field \")]"
+                        + readonlyPredicate
+                        + "//mat-chip-grid[contains(concat(\" \", normalize-space(@class), \" \"), \" bt-chip-set \")]"
+                        + "[@data-bie-type=\"" + bieType + "\"]"));
+    }
+
+    private List<WebElement> getBusinessTermChips(WebElement chipField) {
+        return chipField.findElements(By.xpath(
+                ".//mat-chip-row[contains(concat(\" \", normalize-space(@class), \" \"), \" bt-chip \")]"));
+    }
+
+    private WebElement getBusinessTermChipByTerm(WebElement chipField, String businessTerm) {
+        return chipField.findElement(By.xpath(
+                ".//mat-chip-row[contains(concat(\" \", normalize-space(@class), \" \"), \" bt-chip \")]"
+                        + "[.//span[contains(concat(\" \", normalize-space(@class), \" \"), \" bt-chip-term \")]"
+                        + "[normalize-space(.)=\"" + businessTerm + "\"]]"));
+    }
+
+    private WebElement getPreferredStar(WebElement chip) {
+        return chip.findElement(By.xpath(
+                ".//mat-icon[contains(concat(\" \", normalize-space(@class), \" \"), \" bt-chip-star \")]"));
+    }
+
+    private boolean isChipPreferred(WebElement chip) {
+        String klass = getPreferredStar(chip).getAttribute("class");
+        return klass != null && klass.contains("bt-chip-star-on");
+    }
+
+    private void clickPreferredStar(WebElement chip) {
+        click(getDriver(), getPreferredStar(chip));
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+    }
+
+    private String getChipTypeCode(WebElement chip) {
+        List<WebElement> pills = chip.findElements(By.xpath(
+                ".//span[contains(concat(\" \", normalize-space(@class), \" \"), \" bt-chip-type \")]"));
+        return pills.isEmpty() ? null : getText(pills.get(0));
+    }
+
+    private void startTypeCodeInlineEdit(WebElement chip) {
+        // Clicking the chip body (not the star/remove) opens the inline Type Code edit input.
+        click(getDriver(), chip.findElement(By.xpath(
+                ".//span[contains(concat(\" \", normalize-space(@class), \" \"), \" bt-chip-term \")]")));
+        waitFor(ofMillis(500L));
+    }
+
+    private void setTypeCodeInlineEditValue(String typeCode) {
+        WebElement input = visibilityOfElementLocated(getDriver(), By.xpath(
+                "//input[contains(concat(\" \", normalize-space(@class), \" \"), \" bt-chip-type-input \")]"));
+        sendKeys(input, typeCode);
+    }
+
+    private void saveTypeCodeInlineEdit() {
+        click(getDriver(), elementToBeClickable(getDriver(), By.xpath(
+                "//button[contains(concat(\" \", normalize-space(@class), \" \"), \" bt-chip-type-action \")]")));
+        waitFor(ofMillis(500L));
+    }
+
+    private String getTypeCodeInlineError(WebElement chipField) {
+        // The mat-error lives on the same .bt-badges-field wrapper as the chip grid.
+        List<WebElement> errors = chipField.findElements(By.xpath(
+                "ancestor::mat-form-field[1]//mat-error"));
+        if (errors.isEmpty()) {
+            return "";
+        }
+        String text = getText(errors.get(0));
+        return text == null ? "" : text;
+    }
+
+    private WebElement getAddBusinessTermButton(String bieType) {
+        // The '+' button is a matSuffix sibling of the chip grid within the same .bt-badges-field.
+        return visibilityOfElementLocated(getDriver(), By.xpath(
+                "//mat-form-field[contains(concat(\" \", normalize-space(@class), \" \"), \" bt-badges-field \")]"
+                        + "[not(contains(concat(\" \", normalize-space(@class), \" \"), \" bt-badges-field-readonly \"))]"
+                        + "[.//mat-chip-grid[@data-bie-type=\"" + bieType + "\"]]"
+                        + "//button[contains(concat(\" \", normalize-space(@class), \" \"), \" bt-add-btn \")]"));
+    }
+
+    private BieBusinessTermAssignDialog openBusinessTermAssignDialog(String bieType) {
+        click(getDriver(), elementToBeClickable(getDriver(), By.xpath(
+                "//mat-form-field[contains(concat(\" \", normalize-space(@class), \" \"), \" bt-badges-field \")]"
+                        + "[not(contains(concat(\" \", normalize-space(@class), \" \"), \" bt-badges-field-readonly \"))]"
+                        + "[.//mat-chip-grid[@data-bie-type=\"" + bieType + "\"]]"
+                        + "//button[contains(concat(\" \", normalize-space(@class), \" \"), \" bt-add-btn \")]")));
+        waitFor(ofMillis(1000L));
+        BieBusinessTermAssignDialog dialog = new BieBusinessTermAssignDialogImpl(this);
+        assert dialog.isOpened();
+        return dialog;
+    }
+
+    private void removeBusinessTermChip(WebElement chip) {
+        click(getDriver(), chip.findElement(By.xpath(".//button[@matChipRemove]")));
+        // A confirmation dialog appears; confirm it. The confirm action button label is "Discard"
+        // (matching the standalone assignment-discard confirm the in-editor flow reuses).
+        WebElement confirm = elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]"));
+        click(getDriver(), confirm);
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+    }
+
+    private WebElement getBusinessTermHoverCard(WebElement chip) {
+        new Actions(getDriver()).moveToElement(chip).perform();
+        waitFor(ofMillis(500L));
+        return visibilityOfElementLocated(getDriver(), By.xpath(
+                "//mat-card[contains(concat(\" \", normalize-space(@class), \" \"), \" bt-hover-card \")]"));
+    }
+
     private void switchToNewWindow(Set<String> windowHandlesBeforeClick) {
         PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L))
                 .until(driver -> driver.getWindowHandles().size() > windowHandlesBeforeClick.size());
@@ -1075,6 +1197,83 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             return getButtonInActiveDetailTab(ACTIVE_ASBIE_DETAIL_TAB_XPATH, "Assign Business Term", enabled);
         }
 
+        // --- Issue #1754: in-place 'Business Terms' chip field ---
+
+        @Override
+        public WebElement getBusinessTermChipField() {
+            return getBusinessTermChipFieldByType("ASBIE", false);
+        }
+
+        @Override
+        public List<WebElement> getBusinessTermChips() {
+            return EditBIEPageImpl.this.getBusinessTermChips(getBusinessTermChipField());
+        }
+
+        @Override
+        public WebElement getBusinessTermChipByTerm(String businessTerm) {
+            return EditBIEPageImpl.this.getBusinessTermChipByTerm(getBusinessTermChipField(), businessTerm);
+        }
+
+        @Override
+        public WebElement getPreferredStar(WebElement chip) {
+            return EditBIEPageImpl.this.getPreferredStar(chip);
+        }
+
+        @Override
+        public boolean isChipPreferred(WebElement chip) {
+            return EditBIEPageImpl.this.isChipPreferred(chip);
+        }
+
+        @Override
+        public void clickPreferredStar(WebElement chip) {
+            EditBIEPageImpl.this.clickPreferredStar(chip);
+        }
+
+        @Override
+        public String getChipTypeCode(WebElement chip) {
+            return EditBIEPageImpl.this.getChipTypeCode(chip);
+        }
+
+        @Override
+        public void startTypeCodeInlineEdit(WebElement chip) {
+            EditBIEPageImpl.this.startTypeCodeInlineEdit(chip);
+        }
+
+        @Override
+        public void setTypeCodeInlineEditValue(String typeCode) {
+            EditBIEPageImpl.this.setTypeCodeInlineEditValue(typeCode);
+        }
+
+        @Override
+        public void saveTypeCodeInlineEdit() {
+            EditBIEPageImpl.this.saveTypeCodeInlineEdit();
+        }
+
+        @Override
+        public String getTypeCodeInlineError() {
+            return EditBIEPageImpl.this.getTypeCodeInlineError(getBusinessTermChipField());
+        }
+
+        @Override
+        public WebElement getAddBusinessTermButton() {
+            return EditBIEPageImpl.this.getAddBusinessTermButton("ASBIE");
+        }
+
+        @Override
+        public BieBusinessTermAssignDialog openBusinessTermAssignDialog() {
+            return EditBIEPageImpl.this.openBusinessTermAssignDialog("ASBIE");
+        }
+
+        @Override
+        public void removeBusinessTermChip(WebElement chip) {
+            EditBIEPageImpl.this.removeBusinessTermChip(chip);
+        }
+
+        @Override
+        public WebElement getBusinessTermHoverCard(WebElement chip) {
+            return EditBIEPageImpl.this.getBusinessTermHoverCard(chip);
+        }
+
         @Override
         public WebElement getResetDetailButton() {
             return getIconButtonByName("refresh");
@@ -1117,6 +1316,83 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         @Override
         public WebElement getAssignBusinessTermButton(boolean enabled) {
             return getButtonInActiveDetailTab(ACTIVE_BBIE_DETAIL_TAB_XPATH, "Assign Business Term", enabled);
+        }
+
+        // --- Issue #1754: in-place 'Business Terms' chip field ---
+
+        @Override
+        public WebElement getBusinessTermChipField() {
+            return getBusinessTermChipFieldByType("BBIE", false);
+        }
+
+        @Override
+        public List<WebElement> getBusinessTermChips() {
+            return EditBIEPageImpl.this.getBusinessTermChips(getBusinessTermChipField());
+        }
+
+        @Override
+        public WebElement getBusinessTermChipByTerm(String businessTerm) {
+            return EditBIEPageImpl.this.getBusinessTermChipByTerm(getBusinessTermChipField(), businessTerm);
+        }
+
+        @Override
+        public WebElement getPreferredStar(WebElement chip) {
+            return EditBIEPageImpl.this.getPreferredStar(chip);
+        }
+
+        @Override
+        public boolean isChipPreferred(WebElement chip) {
+            return EditBIEPageImpl.this.isChipPreferred(chip);
+        }
+
+        @Override
+        public void clickPreferredStar(WebElement chip) {
+            EditBIEPageImpl.this.clickPreferredStar(chip);
+        }
+
+        @Override
+        public String getChipTypeCode(WebElement chip) {
+            return EditBIEPageImpl.this.getChipTypeCode(chip);
+        }
+
+        @Override
+        public void startTypeCodeInlineEdit(WebElement chip) {
+            EditBIEPageImpl.this.startTypeCodeInlineEdit(chip);
+        }
+
+        @Override
+        public void setTypeCodeInlineEditValue(String typeCode) {
+            EditBIEPageImpl.this.setTypeCodeInlineEditValue(typeCode);
+        }
+
+        @Override
+        public void saveTypeCodeInlineEdit() {
+            EditBIEPageImpl.this.saveTypeCodeInlineEdit();
+        }
+
+        @Override
+        public String getTypeCodeInlineError() {
+            return EditBIEPageImpl.this.getTypeCodeInlineError(getBusinessTermChipField());
+        }
+
+        @Override
+        public WebElement getAddBusinessTermButton() {
+            return EditBIEPageImpl.this.getAddBusinessTermButton("BBIE");
+        }
+
+        @Override
+        public BieBusinessTermAssignDialog openBusinessTermAssignDialog() {
+            return EditBIEPageImpl.this.openBusinessTermAssignDialog("BBIE");
+        }
+
+        @Override
+        public void removeBusinessTermChip(WebElement chip) {
+            EditBIEPageImpl.this.removeBusinessTermChip(chip);
+        }
+
+        @Override
+        public WebElement getBusinessTermHoverCard(WebElement chip) {
+            return EditBIEPageImpl.this.getBusinessTermHoverCard(chip);
         }
 
         @Override

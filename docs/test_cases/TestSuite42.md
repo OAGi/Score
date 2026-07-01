@@ -55,6 +55,9 @@ An import reports a created/updated summary on the import dialog's result step: 
 #### Test Assertion #42.1.16
 `PUT /business-terms/{id}` honors the path id and rejects a request body that targets a different id with HTTP 400; a body whose id matches the path succeeds.
 
+#### Test Assertion #42.1.17
+Catalog uniqueness is enforced server-side, not only in the UI. A Business Term is uniquely identified by the (`Business Term` name + `External Reference URI`) pair: a direct create or update that duplicates that pair is rejected with HTTP 400, while a term that reuses an existing name with a different `External Reference URI` is a distinct term and is accepted. The server does not trust the form checks.
+
 ### Test Step Pre-condition:
 1. Business Term is enabled in Application Settings in connectCenter.
 2. The users, branches, releases, and records needed to exercise this test case are available in connectCenter.
@@ -93,6 +96,8 @@ An import reports a created/updated summary on the import dialog's result step: 
 30. Verify that the import reports one created and one updated. (Assertion [#15](#test-assertion-42115))
 31. An authorized tester issues `PUT /business-terms/{id}` with a body id different from the path id, then with a matching id.
 32. Verify that the mismatched request is rejected with HTTP 400 and the matching update succeeds. (Assertion [#16](#test-assertion-42116))
+33. An authorized tester issues a direct create duplicating an existing (`Business Term` name + `External Reference URI`) pair, a create that reuses the name with a different `External Reference URI`, and an update that points one record at another record's (name + `External Reference URI`) pair.
+34. Verify that the duplicate-pair create and update are rejected with HTTP 400 while the same-name/different-URI create is accepted. (Assertion [#17](#test-assertion-42117))
 
 ## Test Case 42.2
 **Business Term Assignment**
@@ -300,6 +305,25 @@ synthesized as `<base URL><id>` and the rows import.
 The import can be cancelled at any step before the result step via the top-right close (X) button, and
 cancelling imports nothing.
 
+#### Test Assertion #42.4.11
+Within one import, a later row whose `External Reference URI` repeats one already claimed by a selected
+row in the same import is flagged as a duplicate and left unselected, so it is not imported and two
+rows in one file cannot silently overwrite the same record.
+
+#### Test Assertion #42.4.12
+An import containing one invalid row alongside several valid rows imports the valid rows and reports the
+single failure: a bad row is isolated per-row and does not roll back the good rows.
+
+#### Test Assertion #42.4.13
+An oversized (over 10 MB) or unsupported file is rejected. When a valid file is already selected the
+rejection is reported via a snackbar and the valid selection is kept, while an unsupported file chosen
+as the first selection shows the inline drop-zone error.
+
+#### Test Assertion #42.4.14
+Re-importing a row whose `External Reference URI` matches an existing Business Term but omits the
+`Definition`, `Comment`, and `External Reference ID` columns updates the term without blanking those
+existing fields (blank-clobber guard).
+
 ### Test Step Pre-condition:
 1. Business Term is enabled in Application Settings in connectCenter.
 2. The users, branches, releases, and records needed to exercise this test case are available in connectCenter.
@@ -327,7 +351,96 @@ cancelling imports nothing.
 19. Verify that each imported Business Term's External Reference URI is the base URL followed by the row's id. (Assertion [#9](#test-assertion-4249))
 20. The end user opens the import dialog, advances past the upload step, and clicks the top-right close (X) button.
 21. Verify that the dialog closes and nothing is imported. (Assertion [#10](#test-assertion-42410))
+22. The end user uploads a file that contains two selected rows sharing the same `External Reference URI` and reaches the `Review & select` step.
+23. Verify that the later duplicate row is flagged as a duplicate and left unselected, and that it is not imported. (Assertion [#11](#test-assertion-42411))
+24. The end user uploads a file that contains one invalid row alongside several valid rows and imports the selection.
+25. Verify that the valid rows are imported and that the result step reports the single failure without rolling back the good rows. (Assertion [#12](#test-assertion-42412))
+26. The end user, with a valid file already selected, attempts to select an oversized (over 10 MB) or unsupported replacement file; the end user also opens a fresh dialog and chooses an unsupported file as the first selection.
+27. Verify that the replacement rejection is reported via a snackbar and keeps the valid selection, and that the unsupported first selection shows the inline drop-zone error. (Assertion [#13](#test-assertion-42413))
+28. With a Business Term already present for a given `External Reference URI`, the end user re-imports a row carrying that same URI but omitting the `Definition`, `Comment`, and `External Reference ID` columns, and imports it.
+29. Verify that the existing term is updated without blanking its `Definition`, `Comment`, and `External Reference ID` values. (Assertion [#14](#test-assertion-42414))
 
-> Note: within a single import, a later row that repeats an external reference URI already used by a
-> selected row is flagged as a duplicate and left unselected, so two rows in one file cannot silently
-> overwrite the same record.
+## Test Case 42.5
+**In-place Business Term Management in the BIE Editor**
+
+Business Terms are managed directly in the BIE editor through a `Business Terms` chip field shown beside
+`Remark` on used ASBIE/BBIE nodes. This chip field replaces the standalone `Business Term Assignment`
+and `Assign Business Term` pages. Each assigned term is shown as a chip; the `+` (Assign a Business
+Term) button opens a multi-select `Assign Business Term` dialog, a chip can be set preferred or removed,
+its optional Type Code can be edited inline, and hovering a chip shows a preview card.
+
+### Test Assertion:
+
+#### Test Assertion #42.5.1
+The `Business Terms` chip field appears beside `Remark` on used ASBIE/BBIE nodes for an end user when
+Business Term is enabled; a developer-role user (or a tenant with Business Term disabled) sees the
+legacy `Business Term` text input instead of the chip field.
+
+#### Test Assertion #42.5.2
+Business Terms are editable via the chip field regardless of BIE state (WIP, QA, or Production): there is
+no ownership or edit-state gate on business-term editing, and editability requires only that the node is
+used and not locked or cyclic.
+
+#### Test Assertion #42.5.3
+The `+` (Assign a Business Term) button is disabled until the BIE node has been saved (has a persisted
+id).
+
+#### Test Assertion #42.5.4
+The `Assign Business Term` dialog supports multi-select: a master checkbox selects or clears all
+available terms (indeterminate when the selection is partial), the action button reads `Assign (N)`, and
+all selected terms are assigned at once.
+
+#### Test Assertion #42.5.5
+The optional Type Code lets the same Business Term be assigned to the same BIE more than once when the
+Type Code differs; editing a chip's Type Code to one that collides with another assignment on the same
+BIE shows the non-blocking inline error `Another business term assignment for the same BIE and type code already exists!`
+(not a modal), and the duplicate check ignores the row being edited.
+
+#### Test Assertion #42.5.6
+A Business Term already used by another component is still selectable and assignable from the in-place
+dialog: the `used` state guards catalog discard, not assignment.
+
+#### Test Assertion #42.5.7
+Setting a chip as preferred demotes the previously preferred assignment on the same BIE node, preserving
+the one-preferred-per-node rule independent of Type Code.
+
+#### Test Assertion #42.5.8
+Removing a chip prompts a confirmation dialog; on confirm only that assignment is removed while the
+catalog Business Term remains in the registry, and cancelling removes nothing.
+
+#### Test Assertion #42.5.9
+Hovering a chip shows a preview card containing the term link (which opens the Business Term), the
+`External Reference URI`, the `External Reference ID`, the `Definition`, and the `Comment`; empty fields
+are omitted.
+
+#### Test Assertion #42.5.10
+On the base (inherited) tab the chip field is read-only and non-interactive.
+
+### Test Step Pre-condition:
+1. Business Term is enabled in Application Settings in connectCenter.
+2. The users, branches, releases, and records needed to exercise this test case are available in connectCenter.
+3. At least one BBIE node and one ASBIE node can be marked as used for in-place management.
+4. Multiple Business Terms are available so the test can verify multi-select assignment, Type Code, preferred, and preview behavior.
+5. BIE nodes in WIP, QA, and Production states are available so the test can confirm the absence of an edit-state gate.
+
+### Test Step:
+1. The end user signs in to connectCenter, opens a BIE detail page, and selects a used ASBIE or BBIE node.
+2. Verify that the `Business Terms` chip field appears beside `Remark`, and that a developer-role user (or a tenant with Business Term disabled) sees the legacy `Business Term` text input instead. (Assertion [#1](#test-assertion-4251))
+3. The end user opens BIE nodes that are in WIP, QA, and Production states and inspects the chip field on each.
+4. Verify that Business Terms remain editable via the chip field in every state, with no ownership or edit-state gate, as long as the node is used and not locked or cyclic. (Assertion [#2](#test-assertion-4252))
+5. The end user selects a used BIE node that has not yet been saved and inspects the `+` (Assign a Business Term) button, then saves the node.
+6. Verify that the `+` button is disabled until the node has a persisted id and becomes enabled after the save. (Assertion [#3](#test-assertion-4253))
+7. The end user clicks `+` (Assign a Business Term), uses the master checkbox to select and clear all available terms, selects a partial set, then selects several terms and clicks the action button.
+8. Verify that the master checkbox selects, clears, and shows an indeterminate state for a partial selection, that the action button reads `Assign (N)`, and that all selected terms are assigned at once. (Assertion [#4](#test-assertion-4254))
+9. The end user assigns the same Business Term to the same BIE twice using different Type Codes, then edits one chip's Type Code to collide with another assignment on the same BIE.
+10. Verify that the two assignments with different Type Codes are allowed, and that the colliding edit shows the non-blocking inline error `Another business term assignment for the same BIE and type code already exists!` while the row being edited is ignored by the duplicate check. (Assertion [#5](#test-assertion-4255))
+11. The end user opens the `Assign Business Term` dialog for a node and searches for a Business Term already used by another component.
+12. Verify that the term is still selectable and assignable from the in-place dialog. (Assertion [#6](#test-assertion-4256))
+13. The end user assigns two Business Terms to the same BIE node, marks the first preferred, then marks the second preferred.
+14. Verify that the second chip becomes preferred and the previously preferred chip is demoted, independent of Type Code. (Assertion [#7](#test-assertion-4257))
+15. The end user removes a chip, cancels the confirmation dialog, then removes the chip again and confirms.
+16. Verify that cancelling removes nothing, that confirming removes only that assignment, and that the catalog Business Term still exists in `View/Edit Business Term`. (Assertion [#8](#test-assertion-4258))
+17. The end user hovers over an assigned chip whose term has an `External Reference URI`, `External Reference ID`, `Definition`, and `Comment`, and also over a chip whose optional fields are empty.
+18. Verify that the preview card shows the term link that opens the Business Term along with the populated fields, and that empty fields are omitted. (Assertion [#9](#test-assertion-4259))
+19. The end user opens the base (inherited) tab of a BIE node and inspects the chip field.
+20. Verify that the chip field is read-only and non-interactive on the base tab. (Assertion [#10](#test-assertion-42510))

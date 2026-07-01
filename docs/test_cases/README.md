@@ -199,6 +199,7 @@
 	- [Test Case 42.2 - Business Term Assignment](/docs/test_cases/TestSuite42.md#test-case-422)
 	- [Test Case 42.3 - Business Term from BIE detail page](/docs/test_cases/TestSuite42.md#test-case-423)
 	- [Test Case 42.4 - Load Business Terms from an External Source](/docs/test_cases/TestSuite42.md#test-case-424)
+	- [Test Case 42.5 - In-place Business Term Management in the BIE Editor](/docs/test_cases/TestSuite42.md#test-case-425)
 - [Test Suite 43 - OpenAPI Document Management](/docs/test_cases/TestSuite43.md)
 	- [Test Case 43.1 - Define OpenAPI Document Definition](/docs/test_cases/TestSuite43.md#test-case-431)
 	- [Test Case 43.2 - Add BIE To OpenAPI Document](/docs/test_cases/TestSuite43.md#test-case-432)

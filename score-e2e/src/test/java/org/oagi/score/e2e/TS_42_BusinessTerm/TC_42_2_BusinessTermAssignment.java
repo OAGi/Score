@@ -35,7 +35,19 @@ import static org.oagi.score.e2e.impl.PageHelper.elementToBeClickable;
 import static org.oagi.score.e2e.impl.PageHelper.getSnackBarMessage;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
 
+/**
+ * Superseded by Issue #1754.
+ *
+ * <p>These cases drove Business Term assignment through the standalone 'Business Term Assignment' /
+ * 'Assign Business Term' pages (opened from a BIE node's detail pane via
+ * {@code clickShowBusinessTermsButton()} / {@code clickAssignBusinessTermButton()}). #1754 moved
+ * Business Term management into the BIE editor's in-place 'Business Terms' chip field, so those
+ * buttons are no longer rendered when the chip field is shown. The in-editor coverage now lives in
+ * {@link TC_42_5_InPlaceBusinessTermManagement}. This class is kept compiling (bodies intact) for
+ * reference but is disabled.
+ */
 @Execution(ExecutionMode.SAME_THREAD)
+@org.junit.jupiter.api.Disabled("#1754: standalone Business Term Assignment pages superseded by the in-editor chip flow — see TC_42_5")
 public class TC_42_2_BusinessTermAssignment extends BaseTest {
 
     private final List<AppUserObject> randomAccounts = new ArrayList<>();

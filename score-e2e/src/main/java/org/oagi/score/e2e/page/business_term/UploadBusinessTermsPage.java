@@ -154,6 +154,13 @@ public interface UploadBusinessTermsPage extends Page {
     String getSnackBarMessage();
 
     /**
+     * @return the inline drop-zone/upload-step error text ({@code .import-error}), shown when an
+     * unsupported or oversized file is chosen as the first (no valid file yet) selection; an empty
+     * string when no such error is shown
+     */
+    String getDropZoneErrorText();
+
+    /**
      * Enter the base URL used to synthesize the External Reference URI on the map step (visible only
      * in the 'Build from base URL + ID' strategy).
      *

@@ -15,6 +15,7 @@ import org.oagi.score.e2e.impl.AuthenticatedApiClient;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.bie.BieBusinessTermAssignDialog;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.business_term.*;
 import org.openqa.selenium.By;
@@ -241,20 +242,16 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
 
         bbiePanel.toggleUsed();
         editBIEPage.hitUpdateButton();
-        //Assign business term to pre-existing, used BBIE node
-        assertTrue(bbiePanel.getAssignBusinessTermButton(true).isEnabled());
-        BusinessTermAssignmentPage businessTermAssignmentPage = bbiePanel.clickShowBusinessTermsButton();
-        assertTrue(businessTermAssignmentPage.getTurnOffButton().isEnabled()); // check Selected BIE is enabled
-        AssignBusinessTermBIEPage assignBusinessTermBIEPage = businessTermAssignmentPage.assignBusinessTerm();
-        assignBusinessTermBIEPage.setBIEDenField(topLevelASBIEP.getDen());
-        assignBusinessTermBIEPage.hitSearchButton();
-        click(assignBusinessTermBIEPage.getSelectCheckboxAtIndex(1));
-
-        AssignBusinessTermBTPage assignBusinessTermBTPage = assignBusinessTermBIEPage.hitNextButton();
-        assignBusinessTermBTPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
-        assignBusinessTermBTPage.hitSearchButton();
-        click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(1));
-        click(assignBusinessTermBTPage.getCreateButton());
+        // #1754: assign the business term in place via the BIE editor's 'Business Terms' chip field
+        // (the standalone 'Assign Business Term' page was removed). The '+' button is enabled once the
+        // used node is saved.
+        assertTrue(bbiePanel.getAddBusinessTermButton().isEnabled());
+        BieBusinessTermAssignDialog assignDialog = editBIEPage.getBBIEPanel(editBIEPage.getNodeByPath(path))
+                .openBusinessTermAssignDialog();
+        assignDialog.setSearchBusinessTerm(randomBusinessTerm.getBusinessTerm());
+        assignDialog.hitSearch();
+        click(assignDialog.getRowCheckboxByTerm(randomBusinessTerm.getBusinessTerm()));
+        assignDialog.hitAssign();
 
         BIEMenu bieMenu = homePage.getBIEMenu();
         EditBusinessTermPage editBusinessTermPage = bieMenu.openViewEditBusinessTermSubMenu().openEditBusinessTermPageByTerm(randomBusinessTerm.getBusinessTerm());
@@ -292,20 +289,15 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
 
         bbiePanel.toggleUsed();
         editBIEPage.hitUpdateButton();
-        //Assign business term to pre-existing, used BBIE node
-        assertTrue(bbiePanel.getAssignBusinessTermButton(true).isEnabled());
-        BusinessTermAssignmentPage businessTermAssignmentPage = bbiePanel.clickShowBusinessTermsButton();
-        assertTrue(businessTermAssignmentPage.getTurnOffButton().isEnabled()); // check Selected BIE is enabled
-        AssignBusinessTermBIEPage assignBusinessTermBIEPage = businessTermAssignmentPage.assignBusinessTerm();
-        assignBusinessTermBIEPage.setBIEDenField(topLevelASBIEP.getDen());
-        assignBusinessTermBIEPage.hitSearchButton();
-        click(assignBusinessTermBIEPage.getSelectCheckboxAtIndex(1));
-
-        AssignBusinessTermBTPage assignBusinessTermBTPage = assignBusinessTermBIEPage.hitNextButton();
-        assignBusinessTermBTPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
-        assignBusinessTermBTPage.hitSearchButton();
-        click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(1));
-        click(assignBusinessTermBTPage.getCreateButton());
+        // #1754: assign the business term in place via the BIE editor's 'Business Terms' chip field
+        // (the standalone 'Assign Business Term' page was removed).
+        assertTrue(bbiePanel.getAddBusinessTermButton().isEnabled());
+        BieBusinessTermAssignDialog assignDialog = editBIEPage.getBBIEPanel(editBIEPage.getNodeByPath(path))
+                .openBusinessTermAssignDialog();
+        assignDialog.setSearchBusinessTerm(randomBusinessTerm.getBusinessTerm());
+        assignDialog.hitSearch();
+        click(assignDialog.getRowCheckboxByTerm(randomBusinessTerm.getBusinessTerm()));
+        assignDialog.hitAssign();
 
         BIEMenu bieMenu = homePage.getBIEMenu();
         EditBusinessTermPage editBusinessTermPage = bieMenu.openViewEditBusinessTermSubMenu().openEditBusinessTermPageByTerm(randomBusinessTerm.getBusinessTerm());
@@ -314,18 +306,13 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         assertEquals(randomBusinessTerm.getBusinessTerm(), editBusinessTermPage.getBusinessTermFieldText());
         assertFalse(editBusinessTermPage.isDiscardButtonPresent());
 
-        // Remove the assignment through the BIE node's "Show Business Terms" list.
+        // #1754: remove the assignment in place via the BIE editor's chip field (unassign the chip and
+        // confirm the confirmation dialog).
         EditBIEPage editBIEPageForDiscard = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
         WebElement bbieNodeForDiscard = editBIEPageForDiscard.getNodeByPath(path);
         EditBIEPage.BBIEPanel bbiePanelForDiscard = editBIEPageForDiscard.getBBIEPanel(bbieNodeForDiscard);
-        BusinessTermAssignmentPage businessTermAssignmentPageForDiscard = bbiePanelForDiscard.clickShowBusinessTermsButton();
-        businessTermAssignmentPageForDiscard.showAdvancedSearchPanel();
-        businessTermAssignmentPageForDiscard.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
-        businessTermAssignmentPageForDiscard.hitSearchButton();
-        click(businessTermAssignmentPageForDiscard.getSelectCheckboxAtIndex(1));
-        click(businessTermAssignmentPageForDiscard.getDiscardButton(true));
-        WebElement confirmDiscardAssignmentButton = elementToBeClickable(getDriver(), By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]"));
-        click(confirmDiscardAssignmentButton);
+        WebElement chipForDiscard = bbiePanelForDiscard.getBusinessTermChipByTerm(randomBusinessTerm.getBusinessTerm());
+        bbiePanelForDiscard.removeBusinessTermChip(chipForDiscard);
 
         // #1752 - H2: once the assignment is gone the term is no longer used, so the Discard button
         // reappears on the edit page and the term can be discarded with a clean success.
@@ -486,6 +473,44 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
                 + ",\"businessTerm\":\"" + randomBusinessTerm.getBusinessTerm()
                 + "\",\"externalReferenceUri\":\"" + randomBusinessTerm.getExternalReferenceUri() + "\"}";
         assertEquals(204, api.putJson("/api/business-terms/" + id, matchBody).statusCode());
+    }
+
+    @Test
+    @DisplayName("TC_42_1_17")
+    public void catalog_uniqueness_is_enforced_server_side() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        BusinessTermObject existing = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+        BusinessTermObject other = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+
+        loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        AuthenticatedApiClient api = new AuthenticatedApiClient(getDriver(), getConfig().getBaseUrl());
+
+        // #1754 - catalog uniqueness is enforced server-side, not only in the UI. A business term is
+        // uniquely identified by the (name + External Reference URI) pair, so a direct create that
+        // duplicates that pair is rejected with HTTP 400.
+        String duplicatePairBody = "{\"businessTerm\":\"" + existing.getBusinessTerm()
+                + "\",\"externalReferenceUri\":\"" + existing.getExternalReferenceUri() + "\"}";
+        assertEquals(400, api.postJson("/api/business-terms", duplicatePairBody).statusCode());
+
+        // A create that reuses an existing name but supplies a DIFFERENT External Reference URI is a
+        // distinct term and is accepted (name alone is not a uniqueness key).
+        String sameNameNewUriBody = "{\"businessTerm\":\"" + existing.getBusinessTerm()
+                + "\",\"externalReferenceUri\":\"https://example.org/"
+                + RandomStringUtils.secure().nextAlphanumeric(10) + "\"}";
+        assertEquals(200, api.postJson("/api/business-terms", sameNameNewUriBody).statusCode());
+
+        // An update that points one record at another's (name + URI) pair is rejected with HTTP 400.
+        String updateToDuplicatePair = "{\"businessTermId\":" + other.getBusinessTermId()
+                + ",\"businessTerm\":\"" + existing.getBusinessTerm()
+                + "\",\"externalReferenceUri\":\"" + existing.getExternalReferenceUri() + "\"}";
+        assertEquals(400, api.putJson("/api/business-terms/" + other.getBusinessTermId(), updateToDuplicatePair).statusCode());
+
+        // An update that collides only on name while keeping its own distinct URI is accepted.
+        String updateSameNameOwnUri = "{\"businessTermId\":" + other.getBusinessTermId()
+                + ",\"businessTerm\":\"" + existing.getBusinessTerm()
+                + "\",\"externalReferenceUri\":\"" + other.getExternalReferenceUri() + "\"}";
+        assertEquals(204, api.putJson("/api/business-terms/" + other.getBusinessTermId(), updateSameNameOwnUri).statusCode());
     }
 
     @AfterEach

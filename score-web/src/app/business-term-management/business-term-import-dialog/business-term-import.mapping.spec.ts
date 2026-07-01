@@ -29,6 +29,7 @@ describe('autoDetect — commercial Business Glossary exports', () => {
     expect(mapping.fieldToColumn.businessTerm).toBe('Name');       // not 'Full name'
     expect(mapping.fieldToColumn.externalReferenceId).toBe('ID');
     expect(mapping.fieldToColumn.definition).toBe('Definition');
+    expect(mapping.fieldToColumn.comment).toBe('Descriptive Example'); // #1754: comment <- Descriptive Example
     expect(mapping.uriMode).toBe('SYNTHESIZE');
     expect(mapping.uriIdColumn).toBe('ID');
   });

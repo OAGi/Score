@@ -7,6 +7,7 @@ import org.oagi.score.e2e.TS_42_BusinessTerm.TC_42_1_EndUserViewOrEditBusinessTe
 import org.oagi.score.e2e.TS_42_BusinessTerm.TC_42_2_BusinessTermAssignment;
 import org.oagi.score.e2e.TS_42_BusinessTerm.TC_42_3_BusinessTermFromBIEDetailPage;
 import org.oagi.score.e2e.TS_42_BusinessTerm.TC_42_4_LoadBusinessTermsFromExternalSource;
+import org.oagi.score.e2e.TS_42_BusinessTerm.TC_42_5_InPlaceBusinessTermManagement;
 
 @Suite
 @SuiteDisplayName("Test Suite 42")
@@ -14,7 +15,8 @@ import org.oagi.score.e2e.TS_42_BusinessTerm.TC_42_4_LoadBusinessTermsFromExtern
         TC_42_1_EndUserViewOrEditBusinessTerm.class,
         TC_42_2_BusinessTermAssignment.class,
         TC_42_3_BusinessTermFromBIEDetailPage.class,
-        TC_42_4_LoadBusinessTermsFromExternalSource.class
+        TC_42_4_LoadBusinessTermsFromExternalSource.class,
+        TC_42_5_InPlaceBusinessTermManagement.class
 })
 public class TS_42 {
 }

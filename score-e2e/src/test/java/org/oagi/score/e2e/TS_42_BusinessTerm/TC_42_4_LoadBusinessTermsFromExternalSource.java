@@ -523,6 +523,208 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
         }
     }
 
+    @Test
+    @DisplayName("TC_42_4_11")
+    public void intra_batch_duplicate_external_reference_uri_is_flagged_and_not_imported() throws IOException {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditBusinessTermPage viewEditBusinessTermPage = homePage.getBIEMenu().openViewEditBusinessTermSubMenu();
+        UploadBusinessTermsPage uploadBusinessTermsPage = viewEditBusinessTermPage.hitUploadBusinessTermsButton();
+
+        // Two rows share the SAME External Reference URI within one import. The first is valid; the
+        // second (later) row repeating that URI must be flagged as a duplicate and left unselected so
+        // two rows in one file cannot silently overwrite the same record.
+        String sharedUri = "http://test." + RandomStringUtils.secure().nextAlphabetic(5) + ".com";
+        String firstName = "bt_" + RandomStringUtils.secure().nextAlphanumeric(8);
+        String secondName = "bt_" + RandomStringUtils.secure().nextAlphanumeric(8);
+
+        File targetFolder = new File(System.getProperty("user.home"), "Downloads");
+        File csvFileForUpload = new File(targetFolder, "businessTermIntraDup_" + RandomStringUtils.secure().nextAlphabetic(5, 10) + ".csv");
+        if (csvFileForUpload.exists()) {
+            csvFileForUpload.delete();
+        }
+        try {
+            try (BufferedWriter writer = Files.newBufferedWriter(csvFileForUpload.toPath());
+                 CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT
+                         .withHeader("businessTerm", "externalReferenceUri", "externalReferenceId", "definition", "comment"))) {
+                csvPrinter.printRecord(firstName, sharedUri, "1", "first definition", "first comment");
+                csvPrinter.printRecord(secondName, sharedUri, "2", "second definition", "second comment");
+                csvPrinter.flush();
+            }
+
+            uploadBusinessTermsPage.uploadFile(csvFileForUpload.getAbsolutePath());
+            uploadBusinessTermsPage.proceedToPreview();
+
+            // The later duplicate is flagged for review and unselected; only the first row is ready.
+            assertTrue(uploadBusinessTermsPage.getNeedReviewChipText().contains("1"));
+            assertTrue(uploadBusinessTermsPage.getReadyChipText().contains("1"));
+            uploadBusinessTermsPage.hitImportButton();
+
+            // Only one record exists for the shared URI (the first row); the duplicate never imported.
+            viewEditBusinessTermPage.openPage();
+            viewEditBusinessTermPage.showAdvancedSearchPanel();
+            viewEditBusinessTermPage.setExternalReferenceURI(sharedUri);
+            viewEditBusinessTermPage.hitSearchButton();
+            assertEquals(1, viewEditBusinessTermPage.getTotalNumberOfItems());
+        } finally {
+            csvFileForUpload.delete();
+        }
+    }
+
+    @Test
+    @DisplayName("TC_42_4_12")
+    public void one_invalid_row_alongside_valid_rows_imports_the_valid_rows_and_reports_a_single_failure() throws IOException {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditBusinessTermPage viewEditBusinessTermPage = homePage.getBIEMenu().openViewEditBusinessTermSubMenu();
+        UploadBusinessTermsPage uploadBusinessTermsPage = viewEditBusinessTermPage.hitUploadBusinessTermsButton();
+
+        // Three valid rows and one invalid row (invalid URI). The valid rows import; the bad row is
+        // isolated per-row (reported as a failure) and does NOT roll back the good rows.
+        List<BusinessTermObject> validTerms = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            validTerms.add(BusinessTermObject.createRandomBusinessTerm(endUser, "bt"));
+        }
+        String invalidUri = "http://api.google.com/q?exp=a|b";
+
+        File targetFolder = new File(System.getProperty("user.home"), "Downloads");
+        File csvFileForUpload = new File(targetFolder, "businessTermPartialFail_" + RandomStringUtils.secure().nextAlphabetic(5, 10) + ".csv");
+        if (csvFileForUpload.exists()) {
+            csvFileForUpload.delete();
+        }
+        try {
+            try (BufferedWriter writer = Files.newBufferedWriter(csvFileForUpload.toPath());
+                 CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT
+                         .withHeader("businessTerm", "externalReferenceUri", "externalReferenceId", "definition", "comment"))) {
+                for (BusinessTermObject bt : validTerms) {
+                    csvPrinter.printRecord(bt.getBusinessTerm(), bt.getExternalReferenceUri(),
+                            bt.getExternalReferenceId(), bt.getDefinition(), bt.getComment());
+                }
+                csvPrinter.printRecord("bt_invalid_" + RandomStringUtils.secure().nextAlphanumeric(6), invalidUri, "9", "def", "com");
+                csvPrinter.flush();
+            }
+
+            uploadBusinessTermsPage.uploadFile(csvFileForUpload.getAbsolutePath());
+            uploadBusinessTermsPage.proceedToPreview();
+
+            // The invalid row is flagged for review (unselected); the three valid rows are ready.
+            assertTrue(uploadBusinessTermsPage.getReadyChipText().contains("3"));
+            assertTrue(uploadBusinessTermsPage.getNeedReviewChipText().contains("1"));
+            uploadBusinessTermsPage.hitImportButton();
+
+            // The valid rows imported ...
+            assertTrue(uploadBusinessTermsPage.getResultSummaryText().contains("3 created"));
+
+            // ... and each valid row is present (no rollback of the good rows).
+            for (BusinessTermObject bt : validTerms) {
+                viewEditBusinessTermPage.openPage();
+                viewEditBusinessTermPage.showAdvancedSearchPanel();
+                viewEditBusinessTermPage.setExternalReferenceURI(bt.getExternalReferenceUri());
+                viewEditBusinessTermPage.hitSearchButton();
+                assertEquals(1, viewEditBusinessTermPage.getTotalNumberOfItems());
+            }
+        } finally {
+            csvFileForUpload.delete();
+        }
+    }
+
+    @Test
+    @DisplayName("TC_42_4_13")
+    public void oversized_or_unsupported_replacement_keeps_valid_selection_while_first_unsupported_pick_shows_inline_error() throws IOException {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        UploadBusinessTermsPage uploadBusinessTermsPage =
+                homePage.getBIEMenu().openViewEditBusinessTermSubMenu().hitUploadBusinessTermsButton();
+
+        File csvFileForUpload = writeNativeCsv(List.of(BusinessTermObject.createRandomBusinessTerm(endUser, "bt")));
+        // An unsupported replacement file (.txt) that must be rejected without discarding the CSV.
+        File txtFile = new File(new File(System.getProperty("user.home"), "Downloads"),
+                "not-a-table_" + RandomStringUtils.secure().nextAlphabetic(5, 10) + ".txt");
+        Files.write(txtFile.toPath(), "just some text".getBytes(StandardCharsets.UTF_8));
+        try {
+            // With a valid file already selected, an unsupported/oversized replacement is reported via a
+            // snackbar and the valid selection is kept.
+            uploadBusinessTermsPage.uploadFile(csvFileForUpload.getAbsolutePath());
+            uploadBusinessTermsPage.hitBackButton(); // return to the upload step to attempt a replacement
+            assertEquals(csvFileForUpload.getName(), uploadBusinessTermsPage.getSelectedFileName());
+
+            uploadBusinessTermsPage.sendFileToInput(txtFile.getAbsolutePath());
+            assertTrue(uploadBusinessTermsPage.getSnackBarMessage().contains("Unsupported file type"));
+            assertTrue(uploadBusinessTermsPage.isFileTileVisible());
+            assertEquals(csvFileForUpload.getName(), uploadBusinessTermsPage.getSelectedFileName());
+        } finally {
+            csvFileForUpload.delete();
+            txtFile.delete();
+        }
+
+        // An unsupported file chosen as the FIRST selection (no valid file yet) shows the inline
+        // drop-zone error instead of a snackbar.
+        UploadBusinessTermsPage freshDialog =
+                homePage.getBIEMenu().openViewEditBusinessTermSubMenu().hitUploadBusinessTermsButton();
+        File txtFileFirst = new File(new File(System.getProperty("user.home"), "Downloads"),
+                "first-pick_" + RandomStringUtils.secure().nextAlphabetic(5, 10) + ".txt");
+        Files.write(txtFileFirst.toPath(), "just some text".getBytes(StandardCharsets.UTF_8));
+        try {
+            freshDialog.sendFileToInput(txtFileFirst.getAbsolutePath());
+            assertTrue(freshDialog.getDropZoneErrorText().toLowerCase().contains("unsupported"));
+        } finally {
+            txtFileFirst.delete();
+        }
+    }
+
+    @Test
+    @DisplayName("TC_42_4_14")
+    public void reimport_omitting_optional_columns_does_not_blank_existing_fields() throws IOException {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        // Seed an existing term with a full set of optional fields.
+        BusinessTermObject existing = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser, "bt");
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditBusinessTermPage viewEditBusinessTermPage = homePage.getBIEMenu().openViewEditBusinessTermSubMenu();
+        UploadBusinessTermsPage uploadBusinessTermsPage = viewEditBusinessTermPage.hitUploadBusinessTermsButton();
+
+        // Re-import a row carrying the SAME External Reference URI but a header set that OMITS the
+        // definition, comment, and externalReferenceId columns entirely. The upsert-by-URI update must
+        // NOT blank those existing values (blank-clobber guard). Only the business term name changes.
+        String updatedName = "bt_" + RandomStringUtils.secure().nextAlphanumeric(8);
+
+        File targetFolder = new File(System.getProperty("user.home"), "Downloads");
+        File csvFileForUpload = new File(targetFolder, "businessTermReimport_" + RandomStringUtils.secure().nextAlphabetic(5, 10) + ".csv");
+        if (csvFileForUpload.exists()) {
+            csvFileForUpload.delete();
+        }
+        try {
+            try (BufferedWriter writer = Files.newBufferedWriter(csvFileForUpload.toPath());
+                 CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT
+                         .withHeader("businessTerm", "externalReferenceUri"))) {
+                csvPrinter.printRecord(updatedName, existing.getExternalReferenceUri());
+                csvPrinter.flush();
+            }
+
+            uploadBusinessTermsPage.uploadFile(csvFileForUpload.getAbsolutePath());
+            uploadBusinessTermsPage.proceedToPreview();
+            uploadBusinessTermsPage.hitImportButton();
+            assertTrue(uploadBusinessTermsPage.getResultSummaryText().contains("1 updated"));
+
+            // Verify via the DB API: the omitted columns keep their original values; only the name changed.
+            BusinessTermObject reloaded = getAPIFactory().getBusinessTermAPI().getBusinessTermByName(updatedName);
+            assertEquals(existing.getExternalReferenceUri(), reloaded.getExternalReferenceUri());
+            assertEquals(existing.getDefinition(), reloaded.getDefinition());
+            assertEquals(existing.getComment(), reloaded.getComment());
+            assertEquals(existing.getExternalReferenceId(), reloaded.getExternalReferenceId());
+        } finally {
+            csvFileForUpload.delete();
+        }
+    }
+
     /** Write the given business terms to a native-template CSV in the Downloads folder for upload. */
     private File writeNativeCsv(List<BusinessTermObject> businessTerms) throws IOException {
         File targetFolder = new File(System.getProperty("user.home"), "Downloads");

@@ -706,6 +706,116 @@ public interface EditBIEPage extends Page {
 
         WebElement getAssignBusinessTermButton(boolean enabled);
 
+        // --- Issue #1754: in-place 'Business Terms' chip field ---
+
+        /**
+         * Return the in-place 'Business Terms' chip field ({@code mat-chip-grid.bt-chip-set}) for
+         * this node's detail pane.
+         *
+         * @return the chip-field element
+         */
+        WebElement getBusinessTermChipField();
+
+        /**
+         * Return the assigned-business-term chips ({@code mat-chip-row.bt-chip}) in this node's chip
+         * field.
+         *
+         * @return the list of chip elements (possibly empty)
+         */
+        java.util.List<WebElement> getBusinessTermChips();
+
+        /**
+         * Return the chip whose term equals the given Business Term name.
+         *
+         * @param businessTerm the Business Term name
+         * @return the chip element
+         */
+        WebElement getBusinessTermChipByTerm(String businessTerm);
+
+        /**
+         * Return the preferred-star icon of the given chip.
+         *
+         * @param chip the chip element
+         * @return the star icon element
+         */
+        WebElement getPreferredStar(WebElement chip);
+
+        /**
+         * @param chip the chip element
+         * @return whether the chip is marked preferred (its star is on)
+         */
+        boolean isChipPreferred(WebElement chip);
+
+        /**
+         * Click the given chip's preferred star (toggles preferred).
+         *
+         * @param chip the chip element
+         */
+        void clickPreferredStar(WebElement chip);
+
+        /**
+         * @param chip the chip element
+         * @return the chip's Type Code text, or {@code null} if none
+         */
+        String getChipTypeCode(WebElement chip);
+
+        /**
+         * Begin the inline Type Code edit on the given chip (opens its inline input).
+         *
+         * @param chip the chip element
+         */
+        void startTypeCodeInlineEdit(WebElement chip);
+
+        /**
+         * Set the value of the currently-open inline Type Code edit input.
+         *
+         * @param typeCode the type code to type
+         */
+        void setTypeCodeInlineEditValue(String typeCode);
+
+        /**
+         * Save the currently-open inline Type Code edit.
+         */
+        void saveTypeCodeInlineEdit();
+
+        /**
+         * @return the field-level inline error text on the chip field ({@code mat-error}), or an
+         * empty string when none
+         */
+        String getTypeCodeInlineError();
+
+        /**
+         * Return the '+' (Assign a Business Term) button of this node's chip field (may be disabled
+         * until the node has a persisted id).
+         *
+         * @return the add button element
+         */
+        WebElement getAddBusinessTermButton();
+
+        /**
+         * Click the '+' (Assign a Business Term) button and return the multi-select assign dialog.
+         *
+         * @return the assign dialog
+         */
+        BieBusinessTermAssignDialog openBusinessTermAssignDialog();
+
+        /**
+         * Remove (unassign) the given chip via its {@code matChipRemove} control, then confirm the
+         * confirmation dialog.
+         *
+         * @param chip the chip element
+         */
+        void removeBusinessTermChip(WebElement chip);
+
+        /**
+         * Hover the given chip and return the resulting hover preview card
+         * ({@code mat-card.bt-hover-card}).
+         *
+         * @param chip the chip element
+         * @return the hover-card element
+         */
+        WebElement getBusinessTermHoverCard(WebElement chip);
+
         /**
          * Return the UI element of the 'Reset detail' button.
          *
@@ -810,6 +920,116 @@ public interface EditBIEPage extends Page {
         WebElement getShowBusinessTermsButton();
 
         WebElement getAssignBusinessTermButton(boolean enabled);
+
+        // --- Issue #1754: in-place 'Business Terms' chip field ---
+
+        /**
+         * Return the in-place 'Business Terms' chip field ({@code mat-chip-grid.bt-chip-set}) for
+         * this node's detail pane.
+         *
+         * @return the chip-field element
+         */
+        WebElement getBusinessTermChipField();
+
+        /**
+         * Return the assigned-business-term chips ({@code mat-chip-row.bt-chip}) in this node's chip
+         * field.
+         *
+         * @return the list of chip elements (possibly empty)
+         */
+        java.util.List<WebElement> getBusinessTermChips();
+
+        /**
+         * Return the chip whose term equals the given Business Term name.
+         *
+         * @param businessTerm the Business Term name
+         * @return the chip element
+         */
+        WebElement getBusinessTermChipByTerm(String businessTerm);
+
+        /**
+         * Return the preferred-star icon of the given chip.
+         *
+         * @param chip the chip element
+         * @return the star icon element
+         */
+        WebElement getPreferredStar(WebElement chip);
+
+        /**
+         * @param chip the chip element
+         * @return whether the chip is marked preferred (its star is on)
+         */
+        boolean isChipPreferred(WebElement chip);
+
+        /**
+         * Click the given chip's preferred star (toggles preferred).
+         *
+         * @param chip the chip element
+         */
+        void clickPreferredStar(WebElement chip);
+
+        /**
+         * @param chip the chip element
+         * @return the chip's Type Code text, or {@code null} if none
+         */
+        String getChipTypeCode(WebElement chip);
+
+        /**
+         * Begin the inline Type Code edit on the given chip (opens its inline input).
+         *
+         * @param chip the chip element
+         */
+        void startTypeCodeInlineEdit(WebElement chip);
+
+        /**
+         * Set the value of the currently-open inline Type Code edit input.
+         *
+         * @param typeCode the type code to type
+         */
+        void setTypeCodeInlineEditValue(String typeCode);
+
+        /**
+         * Save the currently-open inline Type Code edit.
+         */
+        void saveTypeCodeInlineEdit();
+
+        /**
+         * @return the field-level inline error text on the chip field ({@code mat-error}), or an
+         * empty string when none
+         */
+        String getTypeCodeInlineError();
+
+        /**
+         * Return the '+' (Assign a Business Term) button of this node's chip field (may be disabled
+         * until the node has a persisted id).
+         *
+         * @return the add button element
+         */
+        WebElement getAddBusinessTermButton();
+
+        /**
+         * Click the '+' (Assign a Business Term) button and return the multi-select assign dialog.
+         *
+         * @return the assign dialog
+         */
+        BieBusinessTermAssignDialog openBusinessTermAssignDialog();
+
+        /**
+         * Remove (unassign) the given chip via its {@code matChipRemove} control, then confirm the
+         * confirmation dialog.
+         *
+         * @param chip the chip element
+         */
+        void removeBusinessTermChip(WebElement chip);
+
+        /**
+         * Hover the given chip and return the resulting hover preview card
+         * ({@code mat-card.bt-hover-card}).
+         *
+         * @param chip the chip element
+         * @return the hover-card element
+         */
+        WebElement getBusinessTermHoverCard(WebElement chip);
 
         void toggleUsed();
 

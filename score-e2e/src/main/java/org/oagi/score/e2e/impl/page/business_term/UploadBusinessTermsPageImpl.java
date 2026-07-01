@@ -71,6 +71,9 @@ public class UploadBusinessTermsPageImpl extends BasePageImpl implements UploadB
     private static final By CLOSE_BUTTON_LOCATOR =
             By.xpath("//mat-dialog-container//button[@aria-label=\"Cancel and close\"]");
 
+    private static final By IMPORT_ERROR_LOCATOR =
+            By.xpath("//mat-dialog-container//div[contains(@class, \"import-error\")]");
+
     private static final By DIALOG_CONTAINER_LOCATOR = By.cssSelector("mat-dialog-container");
 
     private final ViewEditBusinessTermPageImpl parent;
@@ -253,6 +256,15 @@ public class UploadBusinessTermsPageImpl extends BasePageImpl implements UploadB
     public String getSnackBarMessage() {
         // Fully qualified: a same-named no-arg member method would otherwise shadow the static import.
         return org.oagi.score.e2e.impl.PageHelper.getSnackBarMessage(getDriver());
+    }
+
+    @Override
+    public String getDropZoneErrorText() {
+        try {
+            return getText(visibilityOfElementLocated(getDriver(), IMPORT_ERROR_LOCATOR));
+        } catch (TimeoutException e) {
+            return "";
+        }
     }
 
     @Override
