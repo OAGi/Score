@@ -1893,6 +1893,11 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         }
 
         @Override
+        public List<WebElement> getBindingCards() {
+            return getDriver().findElements(By.xpath(OAS_INFO_PANEL_XPATH + CARD));
+        }
+
+        @Override
         public String getDocumentChipText(WebElement card) {
             return getText(card.findElement(By.xpath(".//span[contains(@class, \"oas-doc-chip-text\")]")));
         }

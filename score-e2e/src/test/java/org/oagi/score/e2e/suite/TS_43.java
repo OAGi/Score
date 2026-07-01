@@ -17,6 +17,7 @@ import org.oagi.score.e2e.TS_43_OpenAPIDocument.TC_43_11_ConfigureErrorResponseB
 import org.oagi.score.e2e.TS_43_OpenAPIDocument.TC_43_12_RequestAndResponseOnOneOperation;
 import org.oagi.score.e2e.TS_43_OpenAPIDocument.TC_43_13_MultiSelectAddAndDocumentUniqueness;
 import org.oagi.score.e2e.TS_43_OpenAPIDocument.TC_43_14_ManageBIEOpenAPIBindingsFromBIERoot;
+import org.oagi.score.e2e.TS_43_OpenAPIDocument.TC_43_15_LegacySplitOperationOperationIdUniqueness;
 
 @Suite
 @SuiteDisplayName("Test Suite 43")
@@ -34,7 +35,8 @@ import org.oagi.score.e2e.TS_43_OpenAPIDocument.TC_43_14_ManageBIEOpenAPIBinding
         TC_43_11_ConfigureErrorResponseBodyType.class,
         TC_43_12_RequestAndResponseOnOneOperation.class,
         TC_43_13_MultiSelectAddAndDocumentUniqueness.class,
-        TC_43_14_ManageBIEOpenAPIBindingsFromBIERoot.class
+        TC_43_14_ManageBIEOpenAPIBindingsFromBIERoot.class,
+        TC_43_15_LegacySplitOperationOperationIdUniqueness.class
 })
 public class TS_43 {
 }

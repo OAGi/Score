@@ -512,6 +512,17 @@ public interface EditBIEPage extends Page {
         WebElement getBindingCardByOperationId(String operationId);
 
         /**
+         * Return every binding card currently rendered, in document order. Unlike {@link #getBindingCard}
+         * (keyed by document id) and {@link #getBindingCardByOperationId}, this returns ALL cards — needed
+         * when one OpenAPI Document contributes more than one card that cannot be told apart by either key,
+         * e.g. the legacy split-operation shape where an endpoint's Request and Response live on two separate
+         * operations that share a single document, Operation ID, and (Resource Name, Verb) (Issue #1757).
+         *
+         * @return all binding cards
+         */
+        java.util.List<WebElement> getBindingCards();
+
+        /**
          * Return the document chip text (title [· version]) of a binding card.
          *
          * @param card the binding card

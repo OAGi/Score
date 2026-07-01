@@ -840,3 +840,33 @@ Issue #1492 parity on the BIE-root `Add to OpenAPI Document` dialog: choosing a 
 22. Verify that, while the document targets `3.0.3`, the card shows the amber warning `A Request Body on a DELETE operation is ignored in OpenAPI 3.0.3. Set this OpenAPI Document's Version to 3.1.1 on the OpenAPI Document screen to include it in the generated document.`, and that after the document is switched to `3.1.1` (on the OpenAPI Document screen) the card no longer shows the warning. (Assertion [#11](#test-assertion-431411))
 23. Bind a BIE to an OpenAPI Document as `GET` + `Response`, then open the BIE root panel's header `+` `Add to OpenAPI Document` dialog, select that same document, and set `Verb` `GET` and `Message Body` `Response`; then change the `Verb` to `POST`.
 24. Verify that, with `GET` + `Response` selected (already on the document), the dialog shows the inline error `This endpoint already has a Response body.` and disables `Add`, and that switching the `Verb` to `POST` clears the error and re-enables `Add`. (Assertion [#12](#test-assertion-431412))
+
+## Test Case 43.15
+
+**A Legacy Split Operation Does Not Trigger a False Operation ID Uniqueness Error**
+
+Pre-condition: An end-user account that can access the BIE menu exists, and the end user can create top-level BIEs (each under its own Business Context) and OpenAPI Documents. Before Issue #1492 (Option 2) collapsed exactly one `oas_operation` per `(path, verb)`, a single endpoint's Request and Response could be stored on TWO separate `oas_operation` rows that share one `operation_id` — the legacy "split operation" shape. On such imported data the BIE-root `OpenAPI Document Information` panel (Issue #1519) raised a false `Operation ID must be unique within the document.` inline error, because its duplicate check keyed the distinct-operation set on the `oas_operation_id` row primary key rather than on the `(Resource Name, Verb)` operation identity, so the endpoint's two rows looked like two operations sharing one Operation ID. Issue #1757 extracts a single shared validator (`OasOperationValidator`) that BOTH the OpenAPI Document editor and the BIE-root panel delegate to, whose distinct-operation identity is ALWAYS `(Resource Name, Verb)` and never the row primary key; the operation's Request row and Response row therefore collapse to one operation and share their Operation ID legitimately. Because the OpenAPI Document editor can no longer create the split shape (Issue #1492 find-or-creates one operation), the split rows are seeded directly into the database for this test. (Generation of un-migrated legacy split data is a separate, out-of-scope concern — the collision guard still rejects it at `Generate` time — so this test exercises only the editor's validation UX, which is what Issue #1757 corrects.)
+
+### Test Assertion:
+
+#### Test Assertion #43.15.1
+For a BIE bound to a legacy split operation — one `POST` endpoint whose Request and Response live on two separate operations that share one `(path, verb, operationId)` — the BIE-root `OpenAPI Document Information` panel surfaces both rows as two binding cards (one Request, one Response) that carry the shared `Operation ID`, and NEITHER card flags that `Operation ID` with the `Operation ID must be unique within the document.` error, nor its Resource Name with the `Each (Resource Name, Verb) can have only one Request and one Response body.` duplicate-body error; a benign edit (setting a `Tag`) leaves the `Update OpenAPI Information` button ENABLED, proving no false error blocks the panel (Issues #1757, #1519).
+
+#### Test Assertion #43.15.2
+The OpenAPI Document editor reads the SAME seeded split operation back with the SAME non-error verdict: its Endpoint Details grid shows the Request row and the Response row carrying the shared `Operation ID`, and neither row is flagged with the `Operation ID must be unique within the document.` error or the duplicate-body warning. This confirms that the BIE-root panel and the OpenAPI Document editor delegate to one shared validator (Issues #1757, #1492).
+
+#### Test Assertion #43.15.3
+The narrowed `(Resource Name, Verb)` key does NOT stop flagging a genuine collision: for a BIE bound to two DISTINCT operations on DIFFERENT resource paths that share one hand-set `Operation ID`, both binding cards ARE flagged with `Operation ID must be unique within the document.`, and a benign edit (setting a `Tag`) leaves the `Update OpenAPI Information` button DISABLED — the real duplicate, not the absence of a change, blocks the save (Issue #1757).
+
+### Test Step Pre-condition:
+1. An end-user account that can access the BIE menu is available in connectCenter.
+2. The end user can create top-level BIEs (each under its own Business Context) and OpenAPI Documents.
+3. The environment allows seeding raw OpenAPI operation rows directly into the database (the OpenAPI Document editor can no longer create the legacy split shape).
+
+### Test Step:
+1. Create a WIP top-level BIE and an OpenAPI Document. Seed a legacy split operation: two `oas_operation` rows under the same resource path, both `POST` and sharing one `operationId`, one owning an `oas_request` and the other an `oas_response`, both message bodies pointing at the BIE. Sign in as the end user and open the BIE into the Edit BIE page; open the `OpenAPI Document Information` panel.
+2. Verify that the panel shows two binding cards (one Request, one Response) that carry the shared `Operation ID`, that neither card flags the `Operation ID` (`Operation ID must be unique within the document.`) nor the Resource Name (`Each (Resource Name, Verb) can have only one Request and one Response body.`), and that after setting a `Tag` the `Update OpenAPI Information` button is enabled. (Assertion [#1](#test-assertion-43151))
+3. On a fresh WIP BIE and OpenAPI Document, seed the same legacy split operation, sign in, and open the OpenAPI Document into the Edit OpenAPI Document page.
+4. Verify that the Endpoint Details grid shows the Request row and the Response row carrying the shared `Operation ID`, and that neither row is flagged with the uniqueness error or the duplicate-body warning. (Assertion [#2](#test-assertion-43152))
+5. On a fresh WIP BIE and OpenAPI Document, seed two DISTINCT operations on two different resource paths, both `GET` + `Response`, that share one hand-set `operationId`. Sign in, open the BIE into the Edit BIE page, and open the `OpenAPI Document Information` panel.
+6. Verify that both binding cards are flagged with `Operation ID must be unique within the document.`, and that after setting a `Tag` the `Update OpenAPI Information` button remains disabled. (Assertion [#3](#test-assertion-43153))
