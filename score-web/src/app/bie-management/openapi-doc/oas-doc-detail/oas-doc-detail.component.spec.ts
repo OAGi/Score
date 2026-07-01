@@ -1,5 +1,6 @@
 import {vi} from 'vitest';
 import {OasDocDetailComponent} from './oas-doc-detail.component';
+import {OasOperationValidator} from '../domain/oas-operation-validation';
 import {hashCode} from 'src/app/common/utility';
 
 /**
@@ -290,161 +291,13 @@ describe('OasDocDetailComponent.resolveOasDocRelease locks to the connected BIE 
   });
 });
 
-describe('OasDocDetailComponent body-slot uniqueness (#1492 Option 2)', () => {
-  type SlotRow = {resourceName: string; verb: string; messageBody: string};
-
-  // A `this` context exposing the body-slot guard methods over a shared row list.
-  function slotCtx(rows: SlotRow[] = []): any {
-    const ctx: any = {
-      table: {dataSource: {data: rows}},
-      duplicateBodySlots: new Set<string>(),
-    };
-    ctx.bodySlotKey = OasDocDetailComponent.prototype.bodySlotKey;
-    ctx.isDuplicateBodySlot = OasDocDetailComponent.prototype.isDuplicateBodySlot;
-    ctx.bodySlotErrorStateMatcher = OasDocDetailComponent.prototype.bodySlotErrorStateMatcher;
-    ctx.recomputeDuplicateBodySlots = OasDocDetailComponent.prototype.recomputeDuplicateBodySlots;
-    return ctx;
-  }
-
-  it('bodySlotKey is the resourceName|verb|messageBody triple (trimmed)', () => {
-    const ctx = slotCtx();
-    expect(ctx.bodySlotKey({resourceName: '  /orders ', verb: 'POST', messageBody: 'Request'}))
-      .toBe('/orders|POST|Request');
-  });
-
-  it('does NOT flag a legitimate Request + Response on one endpoint (different message bodies)', () => {
-    const ctx = slotCtx([
-      {resourceName: '/orders', verb: 'POST', messageBody: 'Request'},
-      {resourceName: '/orders', verb: 'POST', messageBody: 'Response'},
-    ]);
-    ctx.recomputeDuplicateBodySlots();
-    expect(ctx.duplicateBodySlots.size).toBe(0);
-    expect(ctx.isDuplicateBodySlot(ctx.table.dataSource.data[0])).toBe(false);
-    expect(ctx.isDuplicateBodySlot(ctx.table.dataSource.data[1])).toBe(false);
-  });
-
-  it('flags a true duplicate (a 2nd Request on the same (path, verb))', () => {
-    const dupA = {resourceName: '/orders', verb: 'POST', messageBody: 'Request'};
-    const dupB = {resourceName: '/orders', verb: 'POST', messageBody: 'Request'};
-    const other = {resourceName: '/orders', verb: 'POST', messageBody: 'Response'};
-    const ctx = slotCtx([dupA, dupB, other]);
-    ctx.recomputeDuplicateBodySlots();
-    expect(ctx.duplicateBodySlots.has('/orders|POST|Request')).toBe(true);
-    expect(ctx.isDuplicateBodySlot(dupA)).toBe(true);
-    expect(ctx.isDuplicateBodySlot(dupB)).toBe(true);
-    expect(ctx.isDuplicateBodySlot(other)).toBe(false); // the Response sibling is fine
-  });
-
-  it('does not collide across DIFFERENT verbs on the same resource', () => {
-    const ctx = slotCtx([
-      {resourceName: '/orders', verb: 'POST', messageBody: 'Request'},
-      {resourceName: '/orders', verb: 'PUT', messageBody: 'Request'},
-    ]);
-    ctx.recomputeDuplicateBodySlots();
-    expect(ctx.duplicateBodySlots.size).toBe(0);
-  });
-
-  it('ignores rows with no verb or no message body when counting', () => {
-    const ctx = slotCtx([
-      {resourceName: '/orders', verb: '', messageBody: ''},
-      {resourceName: '/orders', verb: '', messageBody: ''},
-    ]);
-    ctx.recomputeDuplicateBodySlots();
-    expect(ctx.duplicateBodySlots.size).toBe(0);
-  });
-
-  it('bodySlotErrorStateMatcher returns a per-row matcher reflecting the duplicate set', () => {
-    const dup = {resourceName: '/orders', verb: 'POST', messageBody: 'Request'};
-    const ok = {resourceName: '/orders', verb: 'POST', messageBody: 'Response'};
-    const ctx = slotCtx([dup, dup, ok]);
-    ctx.recomputeDuplicateBodySlots();
-    expect(ctx.bodySlotErrorStateMatcher(dup).isErrorState()).toBe(true);
-    expect(ctx.bodySlotErrorStateMatcher(ok).isErrorState()).toBe(false);
-  });
-});
-
-describe('OasDocDetailComponent operationId uniqueness (#1732 / #1492)', () => {
-  type OpRow = {resourceName: string; verb: string; messageBody: string; operationId: string};
-
-  // A `this` context exposing recomputeDuplicateOperationIds() over a shared row list. The check keys
-  // on the OPERATION (resourceName|verb) — NOT on operationId, and NOT on messageBody — so a single
-  // operation's Request + Response rows (which legitimately share one operationId) collapse to one
-  // operation and are not a duplicate.
-  function opIdCtx(rows: OpRow[] = []): any {
-    const ctx: any = {
-      table: {dataSource: {data: rows}},
-      duplicateOperationIds: new Set<string>(),
-    };
-    ctx.recomputeDuplicateOperationIds = OasDocDetailComponent.prototype.recomputeDuplicateOperationIds;
-    return ctx;
-  }
-
-  // S1: the exact reported case — one DELETE /test/1/expense-report operation with a Request BIE and a
-  // Response BIE shows as two rows sharing operationId 'deleteExpenseReport'. Must NOT be flagged.
-  it('does NOT flag a Request + Response of one operation sharing one operationId', () => {
-    const ctx = opIdCtx([
-      {resourceName: '/test/1/expense-report', verb: 'DELETE', messageBody: 'Request', operationId: 'deleteExpenseReport'},
-      {resourceName: '/test/1/expense-report', verb: 'DELETE', messageBody: 'Response', operationId: 'deleteExpenseReport'},
-    ]);
-    ctx.recomputeDuplicateOperationIds();
-    expect(ctx.duplicateOperationIds.size).toBe(0);
-  });
-
-  // S2: the same operationId on two DIFFERENT endpoints (different path) is a real OpenAPI violation.
-  it('flags one operationId reused on two different endpoints (different resourceName)', () => {
-    const ctx = opIdCtx([
-      {resourceName: '/a', verb: 'DELETE', messageBody: 'Request', operationId: 'deleteThing'},
-      {resourceName: '/b', verb: 'DELETE', messageBody: 'Request', operationId: 'deleteThing'},
-    ]);
-    ctx.recomputeDuplicateOperationIds();
-    expect(ctx.duplicateOperationIds.has('deleteThing')).toBe(true);
-  });
-
-  // S3: still a real duplicate when the two colliding rows differ in messageBody but belong to two
-  // distinct operations — proves messageBody must be EXCLUDED from the operation key.
-  it('flags one operationId across two different operations even when message bodies differ', () => {
-    const ctx = opIdCtx([
-      {resourceName: '/a', verb: 'DELETE', messageBody: 'Request', operationId: 'deleteThing'},
-      {resourceName: '/b', verb: 'DELETE', messageBody: 'Response', operationId: 'deleteThing'},
-    ]);
-    ctx.recomputeDuplicateOperationIds();
-    expect(ctx.duplicateOperationIds.has('deleteThing')).toBe(true);
-  });
-
-  it('does not flag distinct operationIds on different endpoints', () => {
-    const ctx = opIdCtx([
-      {resourceName: '/a', verb: 'DELETE', messageBody: 'Request', operationId: 'deleteA'},
-      {resourceName: '/b', verb: 'DELETE', messageBody: 'Request', operationId: 'deleteB'},
-    ]);
-    ctx.recomputeDuplicateOperationIds();
-    expect(ctx.duplicateOperationIds.size).toBe(0);
-  });
-
-  it('ignores rows with a blank operationId (the required check owns empties, not uniqueness)', () => {
-    const ctx = opIdCtx([
-      {resourceName: '/a', verb: 'DELETE', messageBody: 'Request', operationId: ''},
-      {resourceName: '/b', verb: 'DELETE', messageBody: 'Request', operationId: '   '},
-    ]);
-    ctx.recomputeDuplicateOperationIds();
-    expect(ctx.duplicateOperationIds.size).toBe(0);
-  });
-
-  it('uses a trimmed (resourceName, verb) operation key so one endpoint is not split by whitespace', () => {
-    const ctx = opIdCtx([
-      {resourceName: ' /orders ', verb: 'POST', messageBody: 'Request', operationId: 'createOrder'},
-      {resourceName: '/orders', verb: 'POST', messageBody: 'Response', operationId: 'createOrder'},
-    ]);
-    ctx.recomputeDuplicateOperationIds();
-    expect(ctx.duplicateOperationIds.size).toBe(0);
-  });
-});
-
 describe('OasDocDetailComponent.doUpdate gates duplicate body slots (#1492 Option 2)', () => {
   function updateCtx(rows: any[], changed: any[]): any {
     const oasDoc = {oasDocId: 1};
     const ctx: any = {
       table: {dataSource: {data: rows}},
-      duplicateBodySlots: new Set<string>(),
+      // The duplicate-body gate now lives in the shared validator (delegated to by recomputeOasValidation).
+      oasValidator: new OasOperationValidator(),
       // Match the baseline so docChanged is false; with no changed rows, doUpdate returns after the gate.
       hashCodeForOasDoc: hashCode(oasDoc),
       oasDoc,
@@ -452,8 +305,7 @@ describe('OasDocDetailComponent.doUpdate gates duplicate body slots (#1492 Optio
       getChanged: () => changed,
       updateDetails: vi.fn(),
     };
-    ctx.bodySlotKey = OasDocDetailComponent.prototype.bodySlotKey;
-    ctx.recomputeDuplicateBodySlots = OasDocDetailComponent.prototype.recomputeDuplicateBodySlots;
+    ctx.recomputeOasValidation = OasDocDetailComponent.prototype.recomputeOasValidation;
     ctx.doUpdate = OasDocDetailComponent.prototype.doUpdate;
     return ctx;
   }

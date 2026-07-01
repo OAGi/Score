@@ -83,6 +83,7 @@ import {
   OasSecurityScheme,
   recomputeOperationId
 } from '../openapi-doc/domain/openapi-doc';
+import {applyOasSuffix, OasOperationValidator} from '../openapi-doc/domain/oas-operation-validation';
 import {OpenAPIService} from '../openapi-doc/domain/openapi.service';
 import {BieOasDocAddDialogComponent} from './bie-oas-doc-add-dialog/bie-oas-doc-add-dialog.component';
 import {OasDocSecurityRequirementDialogComponent} from '../openapi-doc/oas-doc-security-requirement-dialog/oas-doc-security-requirement-dialog.component';
@@ -3247,70 +3248,31 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     return (this.rootNode && this.rootNode.bieForOasDocList) || [];
   }
 
-  // Issue #1519: per-document uniqueness sets, recomputed on every edit. Operation IDs must be unique
-  // within a document (#1732) and each (resource path, verb) owns at most one Request and one Response
-  // body (#1492). Keys are prefixed with oasDocId because the panel spans multiple documents.
-  oasDuplicateOperationIds: Set<string> = new Set<string>();
-  oasDuplicateBodySlots: Set<string> = new Set<string>();
-
-  private oasOperationIdKey(b: BieForOasDoc): string {
-    return b.oasDocId + '|' + (b.operationId || '').trim();
-  }
-
-  private oasBodySlotKey(b: BieForOasDoc): string {
-    return b.oasDocId + '|' + (b.resourceName || '').trim() + '|' + (b.verb || '') + '|' + (b.messageBody || '');
-  }
+  // Issue #1519 / #1757: operationId uniqueness + one-Request/one-Response-per-(Resource Name, Verb)
+  // are enforced by the SHARED OasOperationValidator (same rules as the OpenAPI Document editor). The
+  // panel spans multiple documents, but the validator's keys already include the document id, so a
+  // legitimate Request+Response pair — even one whose bodies live in two separate oas_operation rows —
+  // collapses to one operation and is never a false duplicate.
+  readonly oasValidator = new OasOperationValidator();
 
   recomputeOasValidation(): void {
-    const bindings = this.oasBindings;
-    // Operation ID must be unique within a document: count DISTINCT operations sharing an operation id.
-    const opsByOperationId = new Map<string, Set<number>>();
-    bindings.forEach(b => {
-      const key = this.oasOperationIdKey(b);
-      if (!opsByOperationId.has(key)) {
-        opsByOperationId.set(key, new Set<number>());
-      }
-      opsByOperationId.get(key).add(b.oasOperationId);
-    });
-    this.oasDuplicateOperationIds = new Set<string>();
-    opsByOperationId.forEach((ops, key) => {
-      if (ops.size > 1) {
-        this.oasDuplicateOperationIds.add(key);
-      }
-    });
-    // Each (resource path, verb, message body) may appear at most once within a document.
-    const slotCount = new Map<string, number>();
-    bindings.forEach(b => {
-      const key = this.oasBodySlotKey(b);
-      slotCount.set(key, (slotCount.get(key) || 0) + 1);
-    });
-    this.oasDuplicateBodySlots = new Set<string>();
-    slotCount.forEach((count, key) => {
-      if (count > 1) {
-        this.oasDuplicateBodySlots.add(key);
-      }
-    });
+    this.oasValidator.recompute(this.oasBindings);
   }
 
   isOasOperationIdDuplicate(b: BieForOasDoc): boolean {
-    return this.oasDuplicateOperationIds.has(this.oasOperationIdKey(b));
+    return this.oasValidator.isDuplicateOperationId(b);
   }
 
   isOasBodySlotDuplicate(b: BieForOasDoc): boolean {
-    return this.oasDuplicateBodySlots.has(this.oasBodySlotKey(b));
+    return this.oasValidator.isDuplicateBodySlot(b);
   }
 
   oasOperationIdErrorStateMatcher(b: BieForOasDoc): ErrorStateMatcher {
-    return {
-      isErrorState: (): boolean =>
-        !b.operationId || !b.operationId.trim() || this.isOasOperationIdDuplicate(b)
-    };
+    return this.oasValidator.operationIdErrorStateMatcher(b);
   }
 
   oasBodySlotErrorStateMatcher(b: BieForOasDoc): ErrorStateMatcher {
-    return {
-      isErrorState: (): boolean => this.isOasBodySlotDuplicate(b)
-    };
+    return this.oasValidator.bodySlotErrorStateMatcher(b);
   }
 
   // A request body is never valid for GET, so revert it to Response; then resync the operation id's leading
@@ -3325,17 +3287,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   // The array indicator rewrites both the operation id ('List') and the resource path ('-list') suffixes.
   onOasArrayChange(b: BieForOasDoc): void {
-    b.operationId = this.applyOasSuffix(b.operationId, 'List', b.arrayIndicator);
-    b.resourceName = this.applyOasSuffix(b.resourceName, '-list', b.arrayIndicator);
+    b.operationId = applyOasSuffix(b.operationId, 'List', b.arrayIndicator);
+    b.resourceName = applyOasSuffix(b.resourceName, '-list', b.arrayIndicator);
     this.recomputeOasValidation();
-  }
-
-  private applyOasSuffix(value: string, suffix: string, present: boolean): string {
-    const current = value || '';
-    if (present) {
-      return current.endsWith(suffix) ? current : current + suffix;
-    }
-    return current.endsWith(suffix) ? current.substring(0, current.length - suffix.length) : current;
   }
 
   hasOasChanges(): boolean {
