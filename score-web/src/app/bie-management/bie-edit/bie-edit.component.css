@@ -574,3 +574,233 @@
   color: #f9a825;
   margin-right: 8px;
 }
+
+/* In-place Business Term badges — Angular Material chips in the same form-grid slot as Remark. Composition per
+   shadcn Badge: a leading preferred-star toggle kept tight to the term, the term label, an optional Type Code
+   sub-pill, and a trailing remove. Hovering a chip previews it in a Material card (see .bt-hover-card). */
+.bt-badges-field-wrapper,
+.bt-badges-field {
+  width: 100%;
+}
+
+:host ::ng-deep .bt-badges-field .mat-mdc-form-field-infix {
+  align-items: center;
+  display: flex;
+}
+
+:host ::ng-deep .bt-badges-field.bt-badges-field-disabled.bt-badges-field-empty .mdc-floating-label--float-above {
+  transform: translateY(0) scale(1);
+}
+
+/* Read-only Business Terms (the node can't take a business term — it is unused, or locked/inherited or cyclic;
+   Business Terms otherwise mirror Business Contexts and are editable in any BIE state, see isBusinessTermEditable):
+   keep the chips fully readable and hoverable, so we do NOT disable the chip-grid (a disabled MDC chip-set greys
+   the labels and sets pointer-events:none, killing the hover card). Instead only dim the underline to match an
+   adjacent disabled field such as Remark, by pointing every active-indicator colour at the M2 filled *disabled*
+   indicator colour (on-surface @ 12%) across resting/hover/focus so the line never reads as active. */
+:host ::ng-deep .bt-badges-field.bt-badges-field-readonly {
+  --mat-form-field-filled-active-indicator-color: var(--mat-form-field-filled-disabled-active-indicator-color, rgba(0, 0, 0, 0.12));
+  --mat-form-field-filled-hover-active-indicator-color: var(--mat-form-field-filled-disabled-active-indicator-color, rgba(0, 0, 0, 0.12));
+  --mat-form-field-filled-focus-active-indicator-color: var(--mat-form-field-filled-disabled-active-indicator-color, rgba(0, 0, 0, 0.12));
+  /* The chip-grid stays focusable (it is not disabled), so also flatten the focus indicator to the resting 1px
+     height — otherwise a focused read-only field would show a 2px line, thicker than the truly-disabled Remark. */
+  --mat-form-field-filled-focus-active-indicator-height: var(--mat-form-field-filled-active-indicator-height, 1px);
+}
+
+.bt-chip-set {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+}
+
+.bt-chip-input-anchor {
+  background: transparent;
+  border: 0;
+  flex: 1 1 auto;
+  height: 1px;
+  min-width: 1px;
+  outline: 0;
+  padding: 0;
+  width: 1px;
+}
+
+:host ::ng-deep .bt-chip-set.mat-mdc-chip-set .mdc-evolution-chip-set__chips {
+  margin-left: 0;
+  min-width: 0;
+}
+
+:host ::ng-deep .bt-chip-set.mat-mdc-chip-set .mdc-evolution-chip {
+  margin: 4px 8px 4px 0;
+}
+
+:host ::ng-deep .bt-chip.mat-mdc-chip.mat-mdc-standard-chip {
+  --mat-chip-elevated-container-color: transparent;
+  --mat-chip-label-text-color: #44474e;
+  --mat-chip-outline-color: #74777f;
+  --mat-chip-outline-width: 1px;
+  --mat-chip-with-icon-icon-color: #44474e;
+  --mat-chip-with-trailing-icon-trailing-icon-color: #44474e;
+  background-color: transparent !important;
+}
+
+:host ::ng-deep .bt-chip.bt-chip-error.mat-mdc-chip.mat-mdc-standard-chip {
+  --mat-chip-outline-color: #ba1a1a;
+  --mat-chip-label-text-color: #410002;
+  --mat-chip-with-icon-icon-color: #ba1a1a;
+  --mat-chip-with-trailing-icon-trailing-icon-color: #ba1a1a;
+}
+
+:host ::ng-deep .bt-chip.mat-mdc-chip .mdc-evolution-chip__graphic {
+  pointer-events: auto;
+}
+
+:host ::ng-deep .bt-chip.mat-mdc-chip.mdc-evolution-chip--with-avatar .mdc-evolution-chip__graphic {
+  padding-right: 2px;
+}
+
+:host ::ng-deep .bt-chip.mat-mdc-chip .mat-mdc-chip-action-label {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+
+/* Preferred-star toggle: keep it snug against the term (override the avatar's default gap) and colour it only
+   when preferred, so the outline star reads as an affordance. MDC sets pointer-events:none on chip avatars, so
+   re-enable them here or the star's click never fires. */
+.bt-chip.mat-mdc-chip .bt-chip-star.mat-mdc-chip-avatar {
+  pointer-events: auto;
+  cursor: pointer;
+  margin-right: 0;
+  color: rgba(0, 0, 0, 0.38);
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.bt-chip.mat-mdc-chip .bt-chip-star.bt-chip-star-on.mat-mdc-chip-avatar {
+  color: #f9a825 !important;
+}
+
+.bt-chip-term {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+}
+
+/* Type Code as a small secondary sub-pill inside the chip. */
+.bt-chip-type {
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 8px;
+  font-size: 11px;
+  line-height: 16px;
+  background: rgba(0, 0, 0, 0.1);
+  color: rgba(0, 0, 0, 0.72);
+  white-space: nowrap;
+}
+
+.bt-chip-type-input {
+  box-sizing: border-box;
+  width: 86px;
+  height: 22px;
+  margin-left: 6px;
+  padding: 0 6px;
+  border: 1px solid #74777f;
+  border-radius: 4px;
+  background: #fff;
+  color: #333;
+  font: inherit;
+  line-height: 20px;
+  outline: none;
+  vertical-align: middle;
+}
+
+.bt-chip-type-input:focus {
+  border-color: #607d8b;
+}
+
+.bt-chip.bt-chip-error .bt-chip-type-input,
+.bt-chip.bt-chip-error .bt-chip-type-input:focus {
+  border-color: #ba1a1a;
+}
+
+.bt-chip-type-action.mat-mdc-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  margin-left: 2px;
+  --mat-icon-button-state-layer-size: 22px;
+  --mdc-icon-button-state-layer-size: 22px;
+  --mdc-icon-button-icon-size: 16px;
+  --mat-icon-button-icon-size: 16px;
+}
+
+.bt-chip-type-action .mat-icon {
+  font-size: 16px !important;
+  width: 16px !important;
+  height: 16px !important;
+  line-height: 16px !important;
+}
+
+.bt-add-btn.mat-mdc-icon-button {
+  width: 32px;
+  height: 32px;
+  padding: 4px;
+}
+
+/* Business Term hover-card — a Material outlined card (shadcn HoverCard composition). */
+.bt-hover-card.mat-mdc-card {
+  min-width: 260px;
+  max-width: 380px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.bt-hover-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bt-hover-title a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+  text-decoration: none;
+  min-width: 0;
+}
+
+.bt-hover-term {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bt-hover-open {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.bt-hover-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+.bt-hover-key {
+  color: rgba(0, 0, 0, 0.6);
+  min-width: 140px;
+  flex-shrink: 0;
+}
+
+.bt-hover-val {
+  word-break: break-word;
+}

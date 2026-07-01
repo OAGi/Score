@@ -22,6 +22,8 @@ import {SettingsPreferencesService} from '../../settings-management/settings-pre
 import {AuthService} from '../../authentication/auth.service';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
+import {BusinessTermImportDialogComponent} from '../business-term-import-dialog/business-term-import-dialog.component';
+import {BatchImportResult} from '../business-term-import-dialog/business-term-import.model';
 
 @Component({
   standalone: false,
@@ -280,6 +282,22 @@ export class BusinessTermListComponent implements OnInit {
 
   isSelected(row: BusinessTermListEntry) {
     return this.selection.isSelected(row.businessTermId);
+  }
+
+  openImportDialog() {
+    const ref = this.dialog.open(BusinessTermImportDialogComponent, {
+      width: '80vw',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      panelClass: 'score-centered-dialog-panel',
+      autoFocus: false,
+      disableClose: false
+    });
+    ref.afterClosed().subscribe((result?: BatchImportResult) => {
+      if (result && (result.createdCount + result.updatedCount) > 0) {
+        this.loadBusinessTermList();
+      }
+    });
   }
 
   discard() {

@@ -1,8 +1,6 @@
 package org.oagi.score.gateway.http.api.business_term_management.service;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.csv.QuoteMode;
+import org.jooq.exception.DataAccessException;
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationQueryService;
 import org.oagi.score.gateway.http.api.business_term_management.controller.payload.*;
@@ -11,28 +9,47 @@ import org.oagi.score.gateway.http.api.business_term_management.model.BbieBusine
 import org.oagi.score.gateway.http.api.business_term_management.model.BusinessTermId;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import static org.oagi.score.gateway.http.common.util.Utility.isValidURI;
 import static org.springframework.util.StringUtils.hasLength;
 
 @Service
 @Transactional
 public class BusinessTermCommandService {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    /**
+     * Upper bound on the number of rows a single batch import may carry. The Angular dialog also
+     * guards the source file at 10 MB, but this server-side cap is the authoritative protection for
+     * the JSON {@code /batch} payload (which is not bounded by the multipart limits).
+     */
+    public static final int MAX_IMPORT_ROWS = 50000;
+
     @Autowired
     private RepositoryFactory repositoryFactory;
 
     @Autowired
     private ApplicationConfigurationQueryService applicationConfigurationQueryService;
+
+    @Autowired
+    private BusinessTermRowImporter rowImporter;
+
+    @Autowired
+    private BusinessTermImportFileParser importFileParser;
 
     /**
      * #1752 - H1: enforce the Business Term access policy server-side. The Angular UI hides the
@@ -52,28 +69,10 @@ public class BusinessTermCommandService {
         }
     }
 
-    /**
-     * #1752 - M5: validate the JSON create/update input the same way the CSV import already does
-     * (name required and ≤255 chars; external reference URI required and well-formed).
-     */
-    private void validateBusinessTermInput(String businessTerm, String externalReferenceUri) {
-        if (!hasLength(businessTerm)) {
-            throw new IllegalArgumentException("The business term is required.");
-        }
-        if (businessTerm.length() > 255) {
-            throw new IllegalArgumentException(businessTerm + " is longer than 255 characters limit.");
-        }
-        if (!hasLength(externalReferenceUri)) {
-            throw new IllegalArgumentException("The external reference URI is required.");
-        }
-        if (!isValidURI(externalReferenceUri)) {
-            throw new IllegalArgumentException(externalReferenceUri + " is not a valid URI.");
-        }
-    }
-
     public BusinessTermId create(ScoreUser requester, BusinessTermCreateRequest request) {
         assertBusinessTermEnabled(requester);
-        validateBusinessTermInput(request.businessTerm(), request.externalReferenceUri());
+        BusinessTermInputValidator.validate(
+                request.businessTerm(), request.externalReferenceId(), request.externalReferenceUri());
 
         var command = repositoryFactory.businessTermCommandRepository(requester);
         return command.create(
@@ -84,118 +83,93 @@ public class BusinessTermCommandService {
                 request.comment());
     }
 
-    public BusinessTermCsvImportResult create(ScoreUser requester, InputStream inputStream) throws IOException {
+    /**
+     * Parses an uploaded CSV/TSV/XLSX file into headers + rows WITHOUT persisting anything, for the
+     * import dialog's column-mapping and preview steps. Gated like the rest of the feature; runs
+     * without an ambient transaction since it only reads the uploaded file.
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public BusinessTermParseResult parse(ScoreUser requester, String filename,
+                                         InputStream inputStream, String sheetName) throws IOException {
         assertBusinessTermEnabled(requester);
+        return importFileParser.parse(filename, inputStream, sheetName);
+    }
 
-        var query = repositoryFactory.businessTermQueryRepository(requester);
-        try (Reader reader = new BufferedReader(
-                new InputStreamReader(inputStream, "UTF-8"), ',')) {
-            String errorMessage;
-            List<BusinessTermId> businessTermIdList = new ArrayList<>();
-            int createdCount = 0;
-            int updatedCount = 0;
-            // Track URIs already handled in this import so an intra-file duplicate URI is not
-            // counted twice in the created/updated summary (review finding #1).
-            java.util.Set<String> urisSeenInThisImport = new java.util.HashSet<>();
-            BusinessTermTemplateParser templateParser = new BusinessTermTemplateParser(reader);
-            while (templateParser.hasNext()) {
-                errorMessage = null;
-                BusinessTermTemplateRecord record = templateParser.next();
-                String businessTerm = record.businessTerm();
-                if (!hasLength(businessTerm)) {
-                    errorMessage = "The business term is required.";
-                } else if (businessTerm.length() > 255) {
-                    errorMessage = businessTerm + " is longer than 255 characters limit.";
-                }
+    /**
+     * Best-effort batch import for the redesigned Business Term import dialog. Each row is validated
+     * and upserted in its OWN transaction (via {@link BusinessTermRowImporter}) so a failing row
+     * does not roll back the rows that succeeded; the per-row outcome (created / updated / failed)
+     * is returned so the dialog can show a summary and let the user fix and retry only the failures.
+     *
+     * <p>The access gate is applied once up front, and an intra-batch duplicate external-reference
+     * URI is rejected (mirroring the dialog's preview), so two rows targeting the same record cannot
+     * silently overwrite each other within a single import. This method runs WITHOUT an ambient
+     * transaction so the per-row {@code REQUIRES_NEW} boundaries are the only commit points.</p>
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public BusinessTermBatchImportResult createBatch(ScoreUser requester, List<BusinessTermImportRow> rows) {
+        assertBusinessTermEnabled(requester);
+        if (rows == null) {
+            throw new IllegalArgumentException("No rows were provided for import.");
+        }
+        if (rows.size() > MAX_IMPORT_ROWS) {
+            throw new IllegalArgumentException(
+                    "The import exceeds the maximum of " + MAX_IMPORT_ROWS + " rows.");
+        }
 
-                String externalReferenceUri = record.externalReferenceUri();
-                if (!hasLength(externalReferenceUri)) {
-                    errorMessage = "The external reference URI is required.";
-                } else if (!isValidURI(externalReferenceUri)) {
-                    errorMessage = externalReferenceUri + " is not a valid URI.";
-                }
+        Set<String> urisSeenInThisImport = new HashSet<>();
+        List<BusinessTermBatchImportRowResult> results = new ArrayList<>();
+        int createdCount = 0;
+        int updatedCount = 0;
+        int failedCount = 0;
 
-                if (errorMessage != null) {
-                    throw new IllegalArgumentException("Fail to parse CSV file: " + errorMessage);
-                }
-
-                // #1753 - L6: import is an upsert keyed by external reference URI. Classify each
-                // DISTINCT URI exactly once, by whether it existed in the DB *before* this
-                // import — so a URI introduced by an earlier row of the same file is not later
-                // miscounted as "updated" (review finding #1).
-                if (urisSeenInThisImport.add(externalReferenceUri)) {
-                    if (query.existsByExternalReferenceUri(externalReferenceUri)) {
-                        updatedCount++;
-                    } else {
-                        createdCount++;
-                    }
-                }
-
-                BusinessTermId businessTermId = create(requester, new BusinessTermCreateRequest(
-                        businessTerm,
-                        record.externalReferenceId(),
-                        externalReferenceUri,
-                        record.definition(),
-                        record.comment()
-                ));
-                businessTermIdList.add(businessTermId);
+        for (BusinessTermImportRow row : rows) {
+            String uri = row.externalReferenceUri();
+            if (hasLength(uri) && !urisSeenInThisImport.add(uri)) {
+                failedCount++;
+                results.add(failed(row, "Duplicate external reference URI in this import."));
+                continue;
             }
-
-            return new BusinessTermCsvImportResult(businessTermIdList, createdCount, updatedCount);
+            try {
+                BusinessTermRowImporter.Outcome outcome = rowImporter.importOne(requester, row);
+                if (outcome == BusinessTermRowImporter.Outcome.UPDATED) {
+                    updatedCount++;
+                    results.add(new BusinessTermBatchImportRowResult(
+                            row.rowIndex(), row.businessTerm(), uri,
+                            BusinessTermBatchImportRowResult.OUTCOME_UPDATED, null));
+                } else {
+                    createdCount++;
+                    results.add(new BusinessTermBatchImportRowResult(
+                            row.rowIndex(), row.businessTerm(), uri,
+                            BusinessTermBatchImportRowResult.OUTCOME_CREATED, null));
+                }
+            } catch (IllegalArgumentException e) {
+                failedCount++;
+                results.add(failed(row, e.getMessage()));
+            } catch (DataAccessException e) {
+                // A row-level persistence failure (e.g. a value that slipped past validation) must
+                // not abort the whole import; report it and move on. Its REQUIRES_NEW transaction
+                // has already been rolled back independently.
+                logger.warn("Failed to import business term row {} ({}): {}",
+                        row.rowIndex(), uri, e.getMessage());
+                failedCount++;
+                results.add(failed(row, "Could not be saved due to a data error."));
+            }
         }
 
+        return new BusinessTermBatchImportResult(createdCount, updatedCount, failedCount, results);
     }
 
-    private class BusinessTermTemplateParser {
-
-        private static final String BUSINESS_TERM_HEADER_NAME = "businessTerm";
-        private static final String EXTERNAL_REFERENCE_URI_HEADER_NAME = "externalReferenceUri";
-        private static final String EXTERNAL_REFERENCE_ID_HEADER_NAME = "externalReferenceId";
-        private static final String DEFINITION_HEADER_NAME = "definition";
-        private static final String COMMENT_HEADER_NAME = "comment";
-
-        private Iterator<CSVRecord> records;
-
-        BusinessTermTemplateParser(Reader reader) throws IOException {
-            records = CSVFormat.DEFAULT
-                    .builder()
-                    .setEscape('\\')
-                    .setQuoteMode(QuoteMode.ALL)
-                    .setHeader(BUSINESS_TERM_HEADER_NAME,
-                            EXTERNAL_REFERENCE_URI_HEADER_NAME,
-                            EXTERNAL_REFERENCE_ID_HEADER_NAME,
-                            DEFINITION_HEADER_NAME,
-                            COMMENT_HEADER_NAME)
-                    .setSkipHeaderRecord(true)
-                    .get().parse(reader).iterator();
-        }
-
-        public boolean hasNext() {
-            return records.hasNext();
-        }
-
-        public BusinessTermTemplateRecord next() {
-            CSVRecord record = records.next();
-            return new BusinessTermTemplateRecord(
-                    record.get(BUSINESS_TERM_HEADER_NAME),
-                    record.get(EXTERNAL_REFERENCE_URI_HEADER_NAME),
-                    record.get(EXTERNAL_REFERENCE_ID_HEADER_NAME),
-                    record.get(DEFINITION_HEADER_NAME),
-                    record.get(COMMENT_HEADER_NAME));
-        }
-    }
-
-    private record BusinessTermTemplateRecord(
-            String businessTerm,
-            String externalReferenceUri,
-            String externalReferenceId,
-            String definition,
-            String comment) {
+    private static BusinessTermBatchImportRowResult failed(BusinessTermImportRow row, String message) {
+        return new BusinessTermBatchImportRowResult(
+                row.rowIndex(), row.businessTerm(), row.externalReferenceUri(),
+                BusinessTermBatchImportRowResult.OUTCOME_FAILED, message);
     }
 
     public boolean update(ScoreUser requester, BusinessTermUpdateRequest request) {
         assertBusinessTermEnabled(requester);
-        validateBusinessTermInput(request.businessTerm(), request.externalReferenceUri());
+        BusinessTermInputValidator.validate(
+                request.businessTerm(), request.externalReferenceId(), request.externalReferenceUri());
 
         var command = repositoryFactory.businessTermCommandRepository(requester);
         return command.update(

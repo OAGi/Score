@@ -93,20 +93,20 @@ public class BusinessTermQueryService {
 
     public boolean checkAssignmentUniqueness(
             ScoreUser requester, AsbieId asbieId, BusinessTermId businessTermId,
-            String typeCode, Boolean primaryIndicator) {
+            String typeCode, AsbieBusinessTermId exceptAsbieBusinessTermId) {
 
         assertBusinessTermEnabled(requester);
         var businessTermQuery = repositoryFactory.businessTermQueryRepository(requester);
-        return businessTermQuery.checkAssignmentUniqueness(asbieId, businessTermId, typeCode, primaryIndicator);
+        return businessTermQuery.checkAssignmentUniqueness(asbieId, businessTermId, typeCode, exceptAsbieBusinessTermId);
     }
 
     public boolean checkAssignmentUniqueness(
             ScoreUser requester, BbieId bbieId, BusinessTermId businessTermId,
-            String typeCode, Boolean primaryIndicator) {
+            String typeCode, BbieBusinessTermId exceptBbieBusinessTermId) {
 
         assertBusinessTermEnabled(requester);
         var businessTermQuery = repositoryFactory.businessTermQueryRepository(requester);
-        return businessTermQuery.checkAssignmentUniqueness(bbieId, businessTermId, typeCode, primaryIndicator);
+        return businessTermQuery.checkAssignmentUniqueness(bbieId, businessTermId, typeCode, exceptBbieBusinessTermId);
     }
 
     public ResultAndCount<AsbieBbieListEntryRecord> getAsbieBbieList(

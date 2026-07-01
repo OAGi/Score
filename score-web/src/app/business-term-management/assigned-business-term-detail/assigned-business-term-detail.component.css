@@ -1,0 +1,13 @@
+.preferred-field {
+  margin-top: 8px;
+}
+
+/* Match the look of Angular Material's mat-hint for the standalone checkbox caption. */
+.field-hint {
+  display: block;
+  margin-top: 4px;
+  font-size: 75%;
+  line-height: 1.4;
+  color: rgba(0, 0, 0, 0.6);
+  max-width: 80ch;
+}

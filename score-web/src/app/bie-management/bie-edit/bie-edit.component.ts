@@ -49,6 +49,9 @@ import {MatPaginator} from '@angular/material/paginator';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {BusinessTermService} from '../../business-term-management/domain/business-term.service';
+import {AssignedBtListRequest, AssignedBusinessTermDetails, AssignedBusinessTermListEntry} from '../../business-term-management/domain/business-term';
+import {BieBusinessTermAssignDialogComponent} from './bie-business-term-assign-dialog/bie-business-term-assign-dialog.component';
+import {CdkOverlayOrigin, ConnectedPosition} from '@angular/cdk/overlay';
 import {AuthService} from '../../authentication/auth.service';
 import {loadBooleanProperty, saveBooleanProperty, UnboundedPipe} from '../../common/utility';
 import {PageRequest} from '../../basis/basis';
@@ -58,6 +61,7 @@ import {Clipboard} from '@angular/cdk/clipboard';
 import {RxStompService} from '../../common/score-rx-stomp';
 import {MatMenuTrigger} from '@angular/material/menu';
 import {ErrorStateMatcher} from '@angular/material/core';
+import {MatChipGrid} from '@angular/material/chips';
 import {MultiActionsSnackBarComponent} from '../../common/multi-actions-snack-bar/multi-actions-snack-bar.component';
 import {BieListDialogComponent} from '../bie-list-dialog/bie-list-dialog.component';
 import {WebPageInfoService} from '../../basis/basis.service';
@@ -239,7 +243,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   filteredValueDomains: ReplaySubject<ValueDomain[]> = new ReplaySubject<ValueDomain[]>(1);
   valueDomainTypes = [ValueDomainType.Primitive, ValueDomainType.Code, ValueDomainType.Agency];
 
-  /* business term management */
+  /* business term management (in-place BIE-editor Business Terms — Issue #1754) */
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
@@ -258,6 +262,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   contextMenuItem: BieFlatNode;
   @ViewChild('businessContextInput') businessContextInput: ElementRef<HTMLInputElement>;
   @ViewChild('matAutocomplete') matAutocomplete: MatAutocomplete;
+  @ViewChildren('businessTermChipGrid') businessTermChipGrids: QueryList<MatChipGrid>;
+  @ViewChildren('businessTermChipGrid', {read: ElementRef}) businessTermChipGridElements: QueryList<ElementRef<HTMLElement>>;
 
   preferencesInfo: PreferencesInfo;
   HIDE_CARDINALITY_PROPERTY_KEY = 'BIE-Settings-Hide-Cardinality';
@@ -486,6 +492,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       this.initFixedOrDefault(detailNode);
       this.valueDomainFilterValues(detailNode);
       this.assignVersionToVersionIdIfPossible(node);
+      // Load the selected node's assigned Business Terms into the in-place panel (no tree reload).
+      this.refreshBusinessTermsForSelected();
 
       if (node.bieType.toUpperCase() === 'ASBIEP' && node.reused) {
         forkJoin([
@@ -703,6 +711,21 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       return false;
     }
     return this.canEdit && node.used === true && !node.locked && !node.isCycle;
+  }
+
+  /**
+   * Business Terms mirror Business Contexts (Issue #1618): they persist via immediate assign/unassign REST calls,
+   * are release-neutral, and — exactly like Business Contexts — the frontend applies NO BIE ownership/state gate,
+   * so they may be assigned/edited in ANY state (WIP/QA/Production) by anyone who can open the editor. Ownership
+   * authorization is left to the server (which, like the Business Context assign endpoints, currently enforces
+   * only the tenant Business-Term feature + not-developer role via assertBusinessTermEnabled). Only the structural
+   * per-node constraints remain here: the node must be used and not locked (inherited/reused) or cyclic.
+   */
+  isBusinessTermEditable(node: BieFlatNode): boolean {
+    if (!node) {
+      return false;
+    }
+    return node.used === true && !node.locked && !node.isCycle;
   }
 
   isTreeEditable(node: BieFlatNode): boolean {
@@ -1605,42 +1628,455 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     return !(this.isDeveloper && state === 'Production');
   }
 
-  goToBusinessTermsForBie(bieId: number, bieType: string) {
-    if (bieType === 'ASBIE') {
-      const link = this.router.serializeUrl(
-        this.router.createUrlTree(['/business_term_management/assign_business_term/'],
-          {queryParams: {bieId, bieType}}));
-      window.open(link, '_blank');
-    } else if (bieType === 'BBIE') {
-      const link = this.router.serializeUrl(
-        this.router.createUrlTree(['/business_term_management/assign_business_term/'],
-          {queryParams: {bieId, bieType}}));
-      window.open(link, '_blank');
-    } else {
-      this.snackBar.open('Error occurred. Unrecognized BIE type: ' + bieType);
+  /**
+   * In-place Business Term panel state. Keyed by `${bieType}:${bieId}` (bieType is 'ASBIE'|'BBIE'; bieId is
+   * the asbieId/bbieId). Populated lazily on node selection, after a save, and after each mutation — the panel
+   * renders from this map and refreshes a single node's list without ever reloading the tree.
+   */
+  private assignedBusinessTerms = new Map<string, AssignedBusinessTermListEntry[]>();
+  // Stable empty reference so the template's businessTermsFor() does not allocate a new array on each change
+  // detection when a node has no assignments.
+  private readonly EMPTY_BUSINESS_TERMS: AssignedBusinessTermListEntry[] = [];
+
+  // Hover-card ("preview") state for the Business Term badges (composition à la shadcn HoverCard, rendered as a
+  // Material card in a CDK overlay). hoverCardItem is the previewed assignment, hoverCardEditable gates its
+  // Preferred checkbox (current tab only), hoverCardOrigin anchors the overlay to the hovered chip. Open/close
+  // are debounced so moving the cursor from a chip into the card keeps it open.
+  hoverCardItem: AssignedBusinessTermListEntry | null = null;
+  hoverCardOrigin: CdkOverlayOrigin | null = null;
+  hoverCardOpen = false;
+  hoverCardPositions: ConnectedPosition[] = [
+    {originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top', offsetY: 6},
+    {originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'bottom', offsetY: -6},
+    {originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top', offsetY: 6}
+  ];
+  private hoverOpenTimer: ReturnType<typeof setTimeout> | null = null;
+  private hoverCloseTimer: ReturnType<typeof setTimeout> | null = null;
+  typeCodeEditAssignedBizTermId: number | null = null;
+  typeCodeEditValue = '';
+  typeCodeEditSaving = false;
+  typeCodeEditErrorKey = '';
+  typeCodeEditErrorMessage = '';
+  private businessTermErrorStateMatchers = new Map<string, ErrorStateMatcher>();
+  private readonly duplicateTypeCodeErrorMessage =
+    'Another business term assignment for the same BIE and type code already exists!';
+
+  private businessTermKey(bieId: number, bieType: string): string {
+    return bieType + ':' + bieId;
+  }
+
+  businessTermsFor(bieId: number, bieType: string): AssignedBusinessTermListEntry[] {
+    if (!bieId) {
+      return this.EMPTY_BUSINESS_TERMS;
+    }
+    return this.assignedBusinessTerms.get(this.businessTermKey(bieId, bieType)) || this.EMPTY_BUSINESS_TERMS;
+  }
+
+  private sortBusinessTermsForDisplay(list: AssignedBusinessTermListEntry[]): AssignedBusinessTermListEntry[] {
+    return [...list].sort((a, b) => {
+      if (a.primaryIndicator !== b.primaryIndicator) {
+        return a.primaryIndicator ? -1 : 1;
+      }
+
+      const createdDiff = this.businessTermCreatedTime(a) - this.businessTermCreatedTime(b);
+      if (createdDiff !== 0) {
+        return createdDiff;
+      }
+
+      return this.businessTermAssignmentId(a) - this.businessTermAssignmentId(b);
+    });
+  }
+
+  private businessTermCreatedTime(item: AssignedBusinessTermListEntry): number {
+    const when = item.created?.when;
+    return when ? new Date(when).getTime() : Number.MAX_SAFE_INTEGER;
+  }
+
+  private businessTermAssignmentId(item: AssignedBusinessTermListEntry): number {
+    return (typeof item.assignedBizTermId === 'number') ? item.assignedBizTermId : Number.MAX_SAFE_INTEGER;
+  }
+
+  /**
+   * Refresh a single BIE node's assigned Business Terms from the server (the Business Term analogue of
+   * reloadOasBindings). Only this node's list is refetched — the tree, its expansion state, and the selection
+   * are untouched.
+   */
+  private reloadBusinessTerms(bieId: number, bieType: string, done?: () => void): void {
+    if (!bieId) {
+      return;
+    }
+    const request = new AssignedBtListRequest(undefined,
+      new PageRequest(['primaryIndicator', 'creationTimestamp', 'assignedBizTermId'], ['desc', 'asc', 'asc'], 0, 100));
+    request.filters.bieId = bieId;
+    request.filters.bieTypes = [bieType];
+    this.businessTermService.getAssignedBusinessTermList(request).subscribe(resp => {
+      this.assignedBusinessTerms.set(
+        this.businessTermKey(bieId, bieType),
+        this.sortBusinessTermsForDisplay(resp.list)
+      );
+      if (done) {
+        done();
+      }
+    });
+  }
+
+  /**
+   * Refresh the Business Term panel(s) for the currently selected node — its own (current-tab) assignment and,
+   * when present, its base (inherited-tab) assignment. Called on selection and after a save writes the node's
+   * id back. No-op for developers / BT-disabled tenants and node types without Business Term support.
+   */
+  private refreshBusinessTermsForSelected(): void {
+    if (!this.isBusinessTermEnabled || this.isDeveloper || !this.selectedNode) {
+      return;
+    }
+    const type = this.selectedNode.bieType ? this.selectedNode.bieType.toUpperCase() : '';
+    if (type === 'ASBIEP') {
+      const detail = this.asAsbiepDetail(this.selectedNode);
+      this.reloadBusinessTerms(detail.asbie.asbieId, 'ASBIE');
+      if (detail.base && detail.base.asbie) {
+        this.reloadBusinessTerms(detail.base.asbie.asbieId, 'ASBIE');
+      }
+    } else if (type === 'BBIEP') {
+      const detail = this.asBbiepDetail(this.selectedNode);
+      this.reloadBusinessTerms(detail.bbie.bbieId, 'BBIE');
+      if (detail.base && detail.base.bbie) {
+        this.reloadBusinessTerms(detail.base.bbie.bbieId, 'BBIE');
+      }
     }
   }
 
-  goToAssignBusinessTermsForBie(detailNode: BieEditNodeDetail, bieType: string) {
-    let bieId: number;
-    if (bieType === 'ASBIE') {
-      bieId = (detailNode as BieEditAsbiepNodeDetail).asbie.asbieId;
-    } else if (bieType === 'BBIE') {
-      bieId = (detailNode as BieEditBbiepNodeDetail).bbie.bbieId;
-    } else {
-      this.snackBar.open('Error occurred. Unrecognized BIE type: ' + bieType);
+  /**
+   * Open the in-place "Assign Business Term" picker for a node. Replaces the old new-tab navigation. When the
+   * node has not been saved yet (no id) the panel '+' is disabled with a hint, so this stays a no-op guard.
+   */
+  openBusinessTermDialog(bieId: number, bieType: string): void {
+    if (!bieId) {
+      return;
     }
+    const den = this.selectedNode
+      ? (this.selectedNode.displayName || this.selectedNode.name)
+      : '';
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.data = {bieId, bieType, den};
+    dialogConfig.autoFocus = false;
+    dialogConfig.width = '90vw';
+    dialogConfig.maxWidth = '90vw';
+    this.dialog.open(BieBusinessTermAssignDialogComponent, dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (result && result.changed) {
+          this.reloadBusinessTerms(bieId, bieType);
+        }
+      });
+  }
 
-    if (bieId) {
-      const link = this.router.serializeUrl(
-        this.router.createUrlTree(['/business_term_management/assign_business_term/create/bt'],
-          {queryParams: {bieIds: [bieId], bieTypes: [bieType]}}));
-      window.open(link, '_blank');
-    } else {
-      this.snackBar.open('Please save the current state to assign the business terms to this BIE.', '', {
-        duration: 3000,
+  /**
+   * Remove a single Business Term assignment from a node (the per-row '−'), with a confirmation, then refresh
+   * just that node's list. Re-fetches rather than optimistically splicing (DELETE returns 204 even for a row
+   * that no longer exists).
+   */
+  removeBusinessTerm(assigned: AssignedBusinessTermListEntry): void {
+    this.cancelTypeCodeEdit();
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Remove this business term assignment?';
+    dialogConfig.data.content = [
+      'This unassigns "' + assigned.businessTerm + '" from this BIE.',
+      'Are you sure you want to remove it?'
+    ];
+    dialogConfig.data.action = 'Remove';
+    this.confirmDialogService.open(dialogConfig).afterClosed().subscribe(result => {
+      if (!result) {
+        return;
+      }
+      this.businessTermService.deleteAssignments([assigned]).subscribe({
+        next: () => {
+          this.snackBar.open('Business term assignment removed.', '', {duration: 3000});
+          this.reloadBusinessTerms(assigned.bieId, assigned.bieType);
+        },
+        error: (err: HttpErrorResponse) => {
+          const message = (err && err.error && err.error.message)
+            ? err.error.message : 'Failed to remove the business term assignment.';
+          this.snackBar.open(message, '', {duration: 5000});
+        }
+      });
+    });
+  }
+
+  /**
+   * Toggle the preferred (primary) flag from the detail popover's checkbox. Setting it demotes any sibling
+   * preferred term on the same BIE node (server-side); clearing it just unsets this one. Re-fetches afterwards
+   * so the chips reflect the demotion. No-op when the checkbox already matches the stored state.
+   */
+  togglePreferred(assigned: AssignedBusinessTermListEntry, checked: boolean): void {
+    if (checked === !!assigned.primaryIndicator) {
+      return;
+    }
+    const updated = new AssignedBusinessTermDetails();
+    Object.assign(updated, assigned);
+    updated.primaryIndicator = checked;
+    this.businessTermService.updateAssignment(updated).subscribe({
+      next: () => {
+        // Reflect immediately in the open popover, then refresh the chips (a demoted sibling loses its star).
+        assigned.primaryIndicator = checked;
+        this.snackBar.open(checked ? 'Set as the preferred business term.' : 'Cleared the preferred business term.',
+          '', {duration: 3000});
+        this.reloadBusinessTerms(assigned.bieId, assigned.bieType);
+      },
+      error: (err: HttpErrorResponse) => {
+        const message = (err && err.error && err.error.message)
+          ? err.error.message : 'Failed to update the preferred business term.';
+        this.snackBar.open(message, '', {duration: 5000});
+      }
+    });
+  }
+
+  isTypeCodeEditing(assigned: AssignedBusinessTermListEntry): boolean {
+    return this.typeCodeEditAssignedBizTermId === assigned.assignedBizTermId;
+  }
+
+  hasTypeCodeEditError(assigned: AssignedBusinessTermListEntry): boolean {
+    return !!this.typeCodeEditErrorMessage &&
+      this.typeCodeEditErrorKey === this.businessTermAssignmentKey(assigned);
+  }
+
+  typeCodeEditErrorFor(bieId: number, bieType: string): string {
+    if (!this.typeCodeEditErrorMessage) {
+      return '';
+    }
+    return this.businessTermsFor(bieId, bieType).some(bt => this.hasTypeCodeEditError(bt))
+      ? this.typeCodeEditErrorMessage : '';
+  }
+
+  businessTermErrorStateMatcher(bieId: number, bieType: string): ErrorStateMatcher {
+    const key = this.businessTermKey(bieId, bieType);
+    if (!this.businessTermErrorStateMatchers.has(key)) {
+      this.businessTermErrorStateMatchers.set(key, {
+        isErrorState: (): boolean => !!this.typeCodeEditErrorFor(bieId, bieType)
       });
     }
+    return this.businessTermErrorStateMatchers.get(key);
+  }
+
+  clearTypeCodeEditError(): void {
+    this.typeCodeEditErrorKey = '';
+    this.typeCodeEditErrorMessage = '';
+    this.queueBusinessTermChipGridErrorStateSync();
+  }
+
+  startTypeCodeEdit(assigned: AssignedBusinessTermListEntry, editable: boolean, event?: MouseEvent): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    if (!editable || this.typeCodeEditSaving) {
+      return;
+    }
+    this.closeBusinessTermHoverCard();
+    if (this.isTypeCodeEditing(assigned)) {
+      this.focusTypeCodeEditInput(assigned.assignedBizTermId);
+      return;
+    }
+    this.clearTypeCodeEditError();
+    this.typeCodeEditAssignedBizTermId = assigned.assignedBizTermId;
+    this.typeCodeEditValue = assigned.typeCode || '';
+    this.cdr.detectChanges();
+    this.focusTypeCodeEditInput(assigned.assignedBizTermId);
+  }
+
+  cancelTypeCodeEdit(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    if (this.typeCodeEditSaving) {
+      return;
+    }
+    this.typeCodeEditAssignedBizTermId = null;
+    this.typeCodeEditValue = '';
+    this.clearTypeCodeEditError();
+  }
+
+  onTypeCodeEditKeydown(event: KeyboardEvent): void {
+    event.stopPropagation();
+  }
+
+  saveTypeCodeEdit(assigned: AssignedBusinessTermListEntry, event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    if (!this.isTypeCodeEditing(assigned) || this.typeCodeEditSaving) {
+      return;
+    }
+
+    const nextTypeCode = (this.typeCodeEditValue || '').trim();
+    const currentTypeCode = (assigned.typeCode || '').trim();
+    if (nextTypeCode === currentTypeCode) {
+      this.cancelTypeCodeEdit();
+      return;
+    }
+    if (nextTypeCode.length > 30) {
+      this.snackBar.open('Type Code must be 30 characters or fewer.', '', {duration: 5000});
+      return;
+    }
+
+    this.typeCodeEditSaving = true;
+    this.businessTermService.checkAssignmentUniqueness(assigned.bieId, assigned.bieType,
+      assigned.businessTermId, nextTypeCode, assigned.primaryIndicator, assigned.assignedBizTermId).subscribe({
+      next: isUnique => {
+        if (!isUnique) {
+          this.typeCodeEditSaving = false;
+          this.setTypeCodeEditError(assigned, this.duplicateTypeCodeErrorMessage);
+          this.focusTypeCodeEditInput(assigned.assignedBizTermId);
+          return;
+        }
+        const updated = new AssignedBusinessTermDetails();
+        Object.assign(updated, assigned);
+        updated.typeCode = nextTypeCode;
+        this.businessTermService.updateAssignment(updated).subscribe({
+          next: () => {
+            assigned.typeCode = nextTypeCode;
+            this.typeCodeEditSaving = false;
+            this.typeCodeEditAssignedBizTermId = null;
+            this.typeCodeEditValue = '';
+            this.clearTypeCodeEditError();
+            this.snackBar.open('Type Code updated.', '', {duration: 3000});
+            this.reloadBusinessTerms(assigned.bieId, assigned.bieType);
+          },
+          error: (err: HttpErrorResponse) => {
+            this.typeCodeEditSaving = false;
+            const message = (err && err.error && err.error.message)
+              ? err.error.message : 'Failed to update the Type Code.';
+            if (this.isDuplicateTypeCodeError(message)) {
+              this.setTypeCodeEditError(assigned, message);
+              this.focusTypeCodeEditInput(assigned.assignedBizTermId);
+              return;
+            }
+            this.snackBar.open(message, '', {duration: 5000});
+          }
+        });
+      },
+      error: (err: HttpErrorResponse) => {
+        this.typeCodeEditSaving = false;
+        const message = (err && err.error && err.error.message)
+          ? err.error.message : 'Failed to validate the Type Code.';
+        this.snackBar.open(message, '', {duration: 5000});
+      }
+    });
+  }
+
+  private businessTermAssignmentKey(assigned: AssignedBusinessTermListEntry): string {
+    return assigned.bieType + ':' + assigned.assignedBizTermId;
+  }
+
+  private setTypeCodeEditError(assigned: AssignedBusinessTermListEntry, message: string): void {
+    this.typeCodeEditErrorKey = this.businessTermAssignmentKey(assigned);
+    this.typeCodeEditErrorMessage = message;
+    this.cdr.detectChanges();
+    this.syncBusinessTermChipGridErrorStates();
+    this.cdr.detectChanges();
+  }
+
+  private queueBusinessTermChipGridErrorStateSync(): void {
+    setTimeout(() => {
+      this.syncBusinessTermChipGridErrorStates();
+      this.cdr.detectChanges();
+    });
+  }
+
+  private syncBusinessTermChipGridErrorStates(): void {
+    if (!this.businessTermChipGrids || !this.businessTermChipGridElements) {
+      return;
+    }
+
+    const grids = this.businessTermChipGrids.toArray();
+    const elements = this.businessTermChipGridElements.toArray();
+    grids.forEach((grid, index) => {
+      const element = elements[index]?.nativeElement;
+      const bieId = Number(element?.dataset.bieId);
+      const bieType = element?.dataset.bieType || '';
+      const hasError = !!this.typeCodeEditErrorFor(bieId, bieType);
+
+      if (grid.errorState !== hasError) {
+        grid.errorState = hasError;
+      }
+      grid.stateChanges.next();
+    });
+  }
+
+  private isDuplicateTypeCodeError(message: string): boolean {
+    return message.indexOf('Another business term assignment for the same BIE and type code already exists') >= 0;
+  }
+
+  private focusTypeCodeEditInput(assignedBizTermId: number): void {
+    setTimeout(() => {
+      const input = this.el.nativeElement.querySelector(
+        '.bt-chip-type-input[data-assigned-biz-term-id="' + assignedBizTermId + '"]');
+      if (input) {
+        this.renderer.selectRootElement(input).focus();
+        this.renderer.selectRootElement(input).select();
+      }
+    });
+  }
+
+  /** Open the badge hover-card after a short delay (shadcn HoverCard-style preview), anchored to the chip. */
+  onBadgeHover(bt: AssignedBusinessTermListEntry, origin: CdkOverlayOrigin): void {
+    if (this.isTypeCodeEditing(bt)) {
+      return;
+    }
+    if (this.hoverCloseTimer) {
+      clearTimeout(this.hoverCloseTimer);
+      this.hoverCloseTimer = null;
+    }
+    if (this.hoverOpenTimer) {
+      clearTimeout(this.hoverOpenTimer);
+    }
+    this.hoverOpenTimer = setTimeout(() => {
+      this.hoverCardItem = bt;
+      this.hoverCardOrigin = origin;
+      this.hoverCardOpen = true;
+    }, 350);
+  }
+
+  /** Cursor left the chip — cancel a pending open and schedule a close (kept open if the card is entered). */
+  onBadgeLeave(): void {
+    if (this.hoverOpenTimer) {
+      clearTimeout(this.hoverOpenTimer);
+      this.hoverOpenTimer = null;
+    }
+    this.scheduleHoverCardClose();
+  }
+
+  /** Cursor entered the hover-card itself — keep it open so its Preferred checkbox is clickable. */
+  onHoverCardEnter(): void {
+    if (this.hoverCloseTimer) {
+      clearTimeout(this.hoverCloseTimer);
+      this.hoverCloseTimer = null;
+    }
+  }
+
+  onHoverCardLeave(): void {
+    this.scheduleHoverCardClose();
+  }
+
+  private scheduleHoverCardClose(): void {
+    if (this.hoverCloseTimer) {
+      clearTimeout(this.hoverCloseTimer);
+    }
+    this.hoverCloseTimer = setTimeout(() => {
+      this.hoverCardOpen = false;
+    }, 250);
+  }
+
+  private closeBusinessTermHoverCard(): void {
+    if (this.hoverOpenTimer) {
+      clearTimeout(this.hoverOpenTimer);
+      this.hoverOpenTimer = null;
+    }
+    if (this.hoverCloseTimer) {
+      clearTimeout(this.hoverCloseTimer);
+      this.hoverCloseTimer = null;
+    }
+    this.hoverCardOpen = false;
   }
 
   onChange(entity: BieFlatNode, propertyName: string, val: any) {
@@ -2472,6 +2908,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       this.service.getUsedBieList(this.topLevelAsbiepId).subscribe(usedBieList => {
         this.dataSource.database.setUsedBieList(usedBieList);
       });
+      // The save writes freshly-created asbie/bbie ids back into the selected node's detail in place (no
+      // reloadTree here), so refresh its Business Term panel now that it has a stable id.
+      this.refreshBusinessTermsForSelected();
       if (callbackFn === undefined) {
         this.snackBar.open('Updated', '', {
           duration: 3000,

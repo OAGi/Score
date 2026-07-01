@@ -65,6 +65,16 @@ public class JooqBusinessTermCommandRepository extends JooqBaseRepository implem
                             .returning(BUSINESS_TERM.BUSINESS_TERM_ID)
                             .fetchOne().getBusinessTermId().toBigInteger());
         } else {
+            // external_ref_uri has no unique constraint, so more than one row may share this URI.
+            // Resolve the lowest matching id and update exactly THAT row, so an upsert never silently
+            // mutates a whole group of duplicate-URI rows and the returned id matches the row written.
+            ULong targetId = dslContext().select(BUSINESS_TERM.BUSINESS_TERM_ID)
+                    .from(BUSINESS_TERM)
+                    .where(BUSINESS_TERM.EXTERNAL_REF_URI.eq(externalReferenceUri))
+                    .orderBy(BUSINESS_TERM.BUSINESS_TERM_ID.asc())
+                    .limit(1)
+                    .fetchOne(BUSINESS_TERM.BUSINESS_TERM_ID);
+
             dslContext().update(BUSINESS_TERM)
                     .set(BUSINESS_TERM.BUSINESS_TERM_, businessTerm)
                     .set(BUSINESS_TERM.EXTERNAL_REF_ID, externalReferenceId)
@@ -72,14 +82,10 @@ public class JooqBusinessTermCommandRepository extends JooqBaseRepository implem
                     .set(BUSINESS_TERM.COMMENT, comment)
                     .set(BUSINESS_TERM.LAST_UPDATE_TIMESTAMP, LocalDateTime.now())
                     .set(BUSINESS_TERM.LAST_UPDATED_BY, valueOf(requester().userId()))
-                    .where(BUSINESS_TERM.EXTERNAL_REF_URI.eq(externalReferenceUri))
+                    .where(BUSINESS_TERM.BUSINESS_TERM_ID.eq(targetId))
                     .execute();
 
-            return new BusinessTermId(
-                    dslContext().select(BUSINESS_TERM.BUSINESS_TERM_ID)
-                            .from(BUSINESS_TERM)
-                            .where(BUSINESS_TERM.EXTERNAL_REF_URI.eq(externalReferenceUri))
-                            .fetchOneInto(BigInteger.class));
+            return new BusinessTermId(targetId.toBigInteger());
         }
     }
 
@@ -426,6 +432,10 @@ public class JooqBusinessTermCommandRepository extends JooqBaseRepository implem
 
         List<Field<?>> changedField = new ArrayList();
         if (!StringUtils.equals(typeCode, record.getTypeCode())) {
+            if (existsDuplicateAsbieAssignment(record, asbieBusinessTermId, typeCode)) {
+                throw new IllegalArgumentException(
+                        "Another business term assignment for the same BIE and type code already exists.");
+            }
             record.setTypeCode(typeCode);
             changedField.add(ASBIE_BIZTERM.TYPE_CODE);
         }
@@ -452,6 +462,28 @@ public class JooqBusinessTermCommandRepository extends JooqBaseRepository implem
         return false;
     }
 
+    private boolean existsDuplicateAsbieAssignment(
+            AsbieBiztermRecord record, AsbieBusinessTermId asbieBusinessTermId, String typeCode) {
+        ULong businessTermId = dslContext()
+                .select(ASCC_BIZTERM.BUSINESS_TERM_ID)
+                .from(ASCC_BIZTERM)
+                .where(ASCC_BIZTERM.ASCC_BIZTERM_ID.eq(record.getAsccBiztermId()))
+                .fetchOne(ASCC_BIZTERM.BUSINESS_TERM_ID);
+
+        return dslContext().fetchExists(
+                dslContext().selectOne()
+                        .from(ASBIE_BIZTERM)
+                        .join(ASCC_BIZTERM)
+                        .on(ASBIE_BIZTERM.ASCC_BIZTERM_ID.eq(ASCC_BIZTERM.ASCC_BIZTERM_ID))
+                        .where(and(
+                                ASBIE_BIZTERM.ASBIE_ID.eq(record.getAsbieId()),
+                                ASBIE_BIZTERM.ASBIE_BIZTERM_ID.ne(valueOf(asbieBusinessTermId)),
+                                ASCC_BIZTERM.BUSINESS_TERM_ID.eq(businessTermId),
+                                typeCodeCondition(ASBIE_BIZTERM.TYPE_CODE, typeCode)
+                        ))
+        );
+    }
+
     @Override
     public boolean updateAssignment(BbieBusinessTermId bbieBusinessTermId,
                                     String typeCode, Boolean primaryIndicator) {
@@ -463,6 +495,10 @@ public class JooqBusinessTermCommandRepository extends JooqBaseRepository implem
         }
         List<Field<?>> changedField = new ArrayList();
         if (!StringUtils.equals(typeCode, record.getTypeCode())) {
+            if (existsDuplicateBbieAssignment(record, bbieBusinessTermId, typeCode)) {
+                throw new IllegalArgumentException(
+                        "Another business term assignment for the same BIE and type code already exists.");
+            }
             record.setTypeCode(typeCode);
             changedField.add(BBIE_BIZTERM.TYPE_CODE);
         }
@@ -486,6 +522,34 @@ public class JooqBusinessTermCommandRepository extends JooqBaseRepository implem
         }
 
         return false;
+    }
+
+    private boolean existsDuplicateBbieAssignment(
+            BbieBiztermRecord record, BbieBusinessTermId bbieBusinessTermId, String typeCode) {
+        ULong businessTermId = dslContext()
+                .select(BCC_BIZTERM.BUSINESS_TERM_ID)
+                .from(BCC_BIZTERM)
+                .where(BCC_BIZTERM.BCC_BIZTERM_ID.eq(record.getBccBiztermId()))
+                .fetchOne(BCC_BIZTERM.BUSINESS_TERM_ID);
+
+        return dslContext().fetchExists(
+                dslContext().selectOne()
+                        .from(BBIE_BIZTERM)
+                        .join(BCC_BIZTERM)
+                        .on(BBIE_BIZTERM.BCC_BIZTERM_ID.eq(BCC_BIZTERM.BCC_BIZTERM_ID))
+                        .where(and(
+                                BBIE_BIZTERM.BBIE_ID.eq(record.getBbieId()),
+                                BBIE_BIZTERM.BBIE_BIZTERM_ID.ne(valueOf(bbieBusinessTermId)),
+                                BCC_BIZTERM.BUSINESS_TERM_ID.eq(businessTermId),
+                                typeCodeCondition(BBIE_BIZTERM.TYPE_CODE, typeCode)
+                        ))
+        );
+    }
+
+    private org.jooq.Condition typeCodeCondition(Field<String> typeCodeField, String typeCode) {
+        return (typeCode == null || typeCode.isEmpty())
+                ? or(typeCodeField.isNull(), typeCodeField.eq(""))
+                : typeCodeField.eq(typeCode);
     }
 
     @Override

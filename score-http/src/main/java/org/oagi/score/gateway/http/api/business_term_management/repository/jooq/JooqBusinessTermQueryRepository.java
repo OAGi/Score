@@ -432,6 +432,14 @@ public class JooqBusinessTermQueryRepository
                         field = field("type_code");
                         break;
 
+                    case "creationTimestamp":
+                        field = field("creation_timestamp");
+                        break;
+
+                    case "assignedBizTermId":
+                        field = field("assigned_business_term_id");
+                        break;
+
                     case "lastUpdateTimestamp":
                         field = field("last_update_timestamp");
                         break;
@@ -482,6 +490,9 @@ public class JooqBusinessTermQueryRepository
                         record.getValue("type_code", String.class),
                         record.getValue("business_term_id", BigInteger.class),
                         record.getValue("business_term", String.class),
+                        record.getValue("definition", String.class),
+                        record.getValue("comment", String.class),
+                        record.getValue("external_reference_id", String.class),
                         record.getValue("external_reference_uri", String.class),
                         Collections.emptyList(),
                         new WhoAndWhen(
@@ -515,6 +526,9 @@ public class JooqBusinessTermQueryRepository
                             ASCC_MANIFEST.DEN.as("den"),
                             BUSINESS_TERM.BUSINESS_TERM_ID,
                             BUSINESS_TERM.BUSINESS_TERM_,
+                            BUSINESS_TERM.DEFINITION,
+                            BUSINESS_TERM.COMMENT,
+                            BUSINESS_TERM.EXTERNAL_REF_ID.as("external_reference_id"),
                             BUSINESS_TERM.EXTERNAL_REF_URI.as("external_reference_uri"),
                             RELEASE.RELEASE_ID,
                             RELEASE.RELEASE_NUM,
@@ -593,6 +607,9 @@ public class JooqBusinessTermQueryRepository
                             BCC_MANIFEST.DEN.as("den"),
                             BUSINESS_TERM.BUSINESS_TERM_ID,
                             BUSINESS_TERM.BUSINESS_TERM_,
+                            BUSINESS_TERM.DEFINITION,
+                            BUSINESS_TERM.COMMENT,
+                            BUSINESS_TERM.EXTERNAL_REF_ID.as("external_reference_id"),
                             BUSINESS_TERM.EXTERNAL_REF_URI.as("external_reference_uri"),
                             RELEASE.RELEASE_ID,
                             RELEASE.RELEASE_NUM,
@@ -655,37 +672,45 @@ public class JooqBusinessTermQueryRepository
 
     @Override
     public boolean checkAssignmentUniqueness(
-            AsbieId asbieId, BusinessTermId businessTermId, String typeCode, boolean primaryIndicator) {
+            AsbieId asbieId, BusinessTermId businessTermId, String typeCode,
+            AsbieBusinessTermId exceptAsbieBusinessTermId) {
+
+        List<Condition> conditions = new ArrayList<>();
+        conditions.add(ASBIE_BIZTERM.ASBIE_ID.eq(valueOf(asbieId)));
+        conditions.add(ASCC_BIZTERM.BUSINESS_TERM_ID.eq(valueOf(businessTermId)));
+        conditions.add((hasLength(typeCode)) ?
+                ASBIE_BIZTERM.TYPE_CODE.eq(typeCode) :
+                or(ASBIE_BIZTERM.TYPE_CODE.isNull(), ASBIE_BIZTERM.TYPE_CODE.eq("")));
+        if (exceptAsbieBusinessTermId != null) {
+            conditions.add(ASBIE_BIZTERM.ASBIE_BIZTERM_ID.ne(valueOf(exceptAsbieBusinessTermId)));
+        }
 
         return dslContext().selectCount()
                 .from(ASBIE_BIZTERM)
                 .join(ASCC_BIZTERM).on(ASBIE_BIZTERM.ASCC_BIZTERM_ID.eq(ASCC_BIZTERM.ASCC_BIZTERM_ID))
-                .where(and(
-                        ASBIE_BIZTERM.ASBIE_ID.eq(valueOf(asbieId))),
-                        ASCC_BIZTERM.BUSINESS_TERM_ID.eq(valueOf(businessTermId)),
-                        ((hasLength(typeCode)) ?
-                                ASBIE_BIZTERM.TYPE_CODE.eq(typeCode) :
-                                or(ASBIE_BIZTERM.TYPE_CODE.isNull(), ASBIE_BIZTERM.TYPE_CODE.eq(""))),
-                        ASBIE_BIZTERM.PRIMARY_INDICATOR.eq((byte) (primaryIndicator ? 1 : 0))
-                )
+                .where(conditions)
                 .fetchOneInto(Integer.class) == 0;
     }
 
     @Override
     public boolean checkAssignmentUniqueness(
-            BbieId bbieId, BusinessTermId businessTermId, String typeCode, boolean primaryIndicator) {
+            BbieId bbieId, BusinessTermId businessTermId, String typeCode,
+            BbieBusinessTermId exceptBbieBusinessTermId) {
+
+        List<Condition> conditions = new ArrayList<>();
+        conditions.add(BBIE_BIZTERM.BBIE_ID.eq(valueOf(bbieId)));
+        conditions.add(BCC_BIZTERM.BUSINESS_TERM_ID.eq(valueOf(businessTermId)));
+        conditions.add((hasLength(typeCode)) ?
+                BBIE_BIZTERM.TYPE_CODE.eq(typeCode) :
+                or(BBIE_BIZTERM.TYPE_CODE.isNull(), BBIE_BIZTERM.TYPE_CODE.eq("")));
+        if (exceptBbieBusinessTermId != null) {
+            conditions.add(BBIE_BIZTERM.BBIE_BIZTERM_ID.ne(valueOf(exceptBbieBusinessTermId)));
+        }
 
         return dslContext().selectCount()
                 .from(BBIE_BIZTERM)
                 .join(BCC_BIZTERM).on(BBIE_BIZTERM.BCC_BIZTERM_ID.eq(BCC_BIZTERM.BCC_BIZTERM_ID))
-                .where(and(
-                        BBIE_BIZTERM.BBIE_ID.eq(valueOf(bbieId))),
-                        BCC_BIZTERM.BUSINESS_TERM_ID.eq(valueOf(businessTermId)),
-                        ((hasLength(typeCode)) ?
-                                BBIE_BIZTERM.TYPE_CODE.eq(typeCode) :
-                                or(BBIE_BIZTERM.TYPE_CODE.isNull(), BBIE_BIZTERM.TYPE_CODE.eq(""))),
-                        BBIE_BIZTERM.PRIMARY_INDICATOR.eq((byte) (primaryIndicator ? 1 : 0))
-                )
+                .where(conditions)
                 .fetchOneInto(Integer.class) == 0;
     }
 
@@ -710,6 +735,9 @@ public class JooqBusinessTermQueryRepository
                             ASCC_MANIFEST.DEN.as("den"),
                             BUSINESS_TERM.BUSINESS_TERM_ID,
                             BUSINESS_TERM.BUSINESS_TERM_,
+                            BUSINESS_TERM.DEFINITION,
+                            BUSINESS_TERM.COMMENT,
+                            BUSINESS_TERM.EXTERNAL_REF_ID.as("external_reference_id"),
                             BUSINESS_TERM.EXTERNAL_REF_URI.as("external_reference_uri"),
                             RELEASE.RELEASE_ID,
                             RELEASE.RELEASE_NUM,
@@ -741,6 +769,9 @@ public class JooqBusinessTermQueryRepository
                     record.getValue("type_code", String.class),
                     record.getValue("business_term_id", BigInteger.class),
                     record.getValue("business_term", String.class),
+                    record.getValue("definition", String.class),
+                    record.getValue("comment", String.class),
+                    record.getValue("external_reference_id", String.class),
                     record.getValue("external_reference_uri", String.class),
                     Collections.emptyList(),
                     new WhoAndWhen(
@@ -776,6 +807,9 @@ public class JooqBusinessTermQueryRepository
                             BCC_MANIFEST.DEN.as("den"),
                             BUSINESS_TERM.BUSINESS_TERM_ID,
                             BUSINESS_TERM.BUSINESS_TERM_,
+                            BUSINESS_TERM.DEFINITION,
+                            BUSINESS_TERM.COMMENT,
+                            BUSINESS_TERM.EXTERNAL_REF_ID.as("external_reference_id"),
                             BUSINESS_TERM.EXTERNAL_REF_URI.as("external_reference_uri"),
                             RELEASE.RELEASE_ID,
                             RELEASE.RELEASE_NUM,
@@ -807,6 +841,9 @@ public class JooqBusinessTermQueryRepository
                     record.getValue("type_code", String.class),
                     record.getValue("business_term_id", BigInteger.class),
                     record.getValue("business_term", String.class),
+                    record.getValue("definition", String.class),
+                    record.getValue("comment", String.class),
+                    record.getValue("external_reference_id", String.class),
                     record.getValue("external_reference_uri", String.class),
                     Collections.emptyList(),
                     new WhoAndWhen(

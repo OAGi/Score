@@ -861,6 +861,14 @@ mat-checkbox.hide-unused > .mat-checkbox-layout {
   max-width: 100% !important;
 }
 
+.cdk-overlay-pane.score-centered-dialog-panel {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%);
+  margin: 0 !important;
+}
+
 score-confirm-dialog > div {
   min-width: 500px !important;
   padding: 8px 16px;

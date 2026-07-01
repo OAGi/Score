@@ -1,0 +1,621 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* Title row + close button mirror the app-wide dialog convention (see confirm-dialog). */
+.header {
+  width: 100%;
+  padding-top: 8px;
+  font-family: 'Google Sans', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: .1px;
+  line-height: 24px;
+}
+
+.import-title {
+  margin-bottom: 0;
+}
+
+.close {
+  position: relative;
+  margin-left: auto;
+  left: 12px;
+}
+
+.close button {
+  outline: none;
+}
+
+/* Let each step size to its own content (Material supplies padding + scroll); no fixed
+   min-height/width so short steps and short tables no longer leave large empty gaps.
+   overflow-x is clipped so nothing (e.g. a wide table) can push out and de-center the dialog. */
+.import-content {
+  display: block;
+  max-height: calc(90vh - 120px);
+  overflow: auto;
+  overflow-x: hidden;
+}
+
+.import-stepper {
+  width: 100%;
+  background: transparent;
+}
+
+:host ::ng-deep .import-stepper {
+  .mat-horizontal-stepper-wrapper {
+    width: 100%;
+  }
+
+  .mat-horizontal-stepper-header-container {
+    margin-bottom: 1rem;
+  }
+
+  .mat-horizontal-content-container {
+    width: 100%;
+    padding: 0;
+  }
+
+  .mat-horizontal-stepper-content-current {
+    width: 100%;
+  }
+
+  .mat-horizontal-stepper-content-current > * {
+    width: 100%;
+  }
+
+  .mat-mdc-text-field-wrapper {
+    border-radius: 6px;
+  }
+}
+
+.upload-pane,
+.map-pane,
+.preview-pane,
+.result-pane {
+  width: 100%;
+}
+
+.import-card-container {
+  width: 100%;
+  padding: 2px 16px;
+  box-sizing: border-box;
+}
+
+.upload-pane {
+  display: block;
+}
+
+.upload-pane .import-card-container {
+  display: block;
+}
+
+/* ----- step 1: upload ----- */
+.drop-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 185px;
+  box-sizing: border-box;
+  background: #fff;
+  border: 2px dashed rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+  padding: 2.5rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:hover {
+    border-color: var(--mat-sys-primary, #3f51b5);
+    background: #f8fafc;
+  }
+
+  &.drag-over {
+    border-color: var(--mat-sys-primary, #3f51b5);
+    background: rgba(63, 81, 181, 0.06);
+  }
+
+  .drop-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: rgba(0, 0, 0, 0.4);
+  }
+
+  .drop-text {
+    margin-top: 0.5rem;
+  }
+}
+
+/* Selected file shown as a standalone desktop-style tile in place of the drop-zone
+   (no surrounding box — only one file is ever allowed). */
+.file-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.file-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 140px;
+  padding: 0.85rem 0.6rem 0.7rem;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.15s, border-color 0.15s;
+
+  &:hover {
+    border-color: rgba(0, 0, 0, 0.18);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  }
+}
+
+.file-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.06);
+  color: rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+  }
+
+  &:hover {
+    background: #fdecea;
+    color: #b00020;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary, #3f51b5);
+    outline-offset: 1px;
+  }
+}
+
+.file-thumb {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  width: 88px;
+  height: 88px;
+  border-radius: 10px;
+  color: #607d8b;
+  background: rgba(96, 125, 139, 0.1);
+
+  .file-thumb-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .file-type-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  &.file-thumb--xlsx {
+    color: #217346; /* Excel green */
+    background: rgba(33, 115, 70, 0.12);
+  }
+
+  &.file-thumb--csv {
+    color: #1257b8;
+    background: rgba(18, 87, 184, 0.1);
+  }
+
+  &.file-thumb--tsv {
+    color: #8a4baf;
+    background: rgba(138, 75, 175, 0.1);
+  }
+}
+
+.file-name {
+  margin-top: 0.55rem;
+  width: 100%;
+  font-size: 0.85rem;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.72);
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.upload-actions-inline {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.upload-status {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.sheet-select {
+  margin-top: 1rem;
+  width: 320px;
+  max-width: 100%;
+}
+
+.import-error {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+  color: #b00020;
+
+  mat-icon {
+    vertical-align: middle;
+  }
+}
+
+.import-info {
+  margin-top: 1rem;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.upload-hint {
+  margin-top: 0.5rem;
+  color: rgba(0, 0, 0, 0.55);
+  font-size: 0.85rem;
+}
+
+.import-hint-inline {
+  margin-top: 0.5rem;
+  color: rgba(0, 0, 0, 0.55);
+  font-size: 0.85rem;
+}
+
+/* ----- step 2: map ----- */
+// Amber "please verify" notice: prompt the user to check the auto-mapping before continuing
+// (the auto-detected source is intentionally not surfaced).
+.detected-format {
+  display: flex;
+  align-items: center;
+  background: #fff8e1;
+  border: 1px solid #ffe082;
+  border-left: 4px solid #ffb300;
+  border-radius: 6px;
+  padding: 0.75rem 0.9rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+  color: #6d4c00;
+
+  mat-icon {
+    color: #ff8f00;
+  }
+}
+
+.map-form {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  gap: 0.75rem 1rem;
+}
+
+.map-field {
+  width: 100%;
+}
+
+.uri-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  gap: 0.75rem 1rem;
+}
+
+.uri-section {
+  display: flex;
+  flex-direction: column;
+  grid-column: 1 / -1;
+  gap: 0.65rem;
+  margin-top: 0.25rem;
+
+  .uri-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 0;
+  }
+
+  .uri-section-label {
+    flex: 0 0 220px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.7);
+  }
+
+  .uri-toggle {
+    flex: 0 0 auto;
+    background: #fff;
+    border: 1px solid #000;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .synthesize-fields {
+    .uri-base {
+      grid-column: span 2;
+      min-width: 0;
+    }
+
+    .map-field {
+      min-width: 0;
+    }
+  }
+}
+
+:host ::ng-deep .uri-toggle {
+  .mat-button-toggle {
+    border: 0;
+    border-right: 1px solid #000;
+    font-size: 0.8rem;
+    font-weight: 400;
+  }
+
+  .mat-button-toggle:last-child {
+    border-right: 0;
+  }
+
+  .mat-button-toggle-button {
+    height: 30px;
+  }
+
+  .mat-button-toggle-label-content {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    line-height: 30px;
+    padding: 0 9px;
+  }
+
+  .mat-pseudo-checkbox,
+  .mat-icon {
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .map-form,
+  .uri-fields-grid,
+  .uri-section .synthesize-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .uri-section .uri-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .uri-section .uri-section-label {
+    flex-basis: auto;
+  }
+
+  .uri-section .synthesize-fields .uri-base {
+    grid-column: auto;
+  }
+}
+
+.required {
+  color: #b00020;
+  margin-left: 2px;
+}
+
+/* ----- step 3: preview ----- */
+.preview-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.chip {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.chip-valid {
+  background: #e6f4ea;
+  color: #1e7e34;
+}
+
+.chip-updated {
+  background: #e7f0fd;
+  color: #1257b8;
+}
+
+.chip-selected {
+  background: rgba(0, 0, 0, 0.07);
+  color: rgba(0, 0, 0, 0.75);
+}
+
+.chip-review {
+  background: #fdecea;
+  color: #b00020;
+
+  &.zero {
+    background: #eee;
+    color: rgba(0, 0, 0, 0.5);
+  }
+}
+
+.preview-table,
+.result-table {
+  margin-top: 0.25rem;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* The table scrolls horizontally WITHIN the dialog when columns exceed the width,
+   instead of overflowing the dialog (which would also de-center it). The paginator
+   stays put below the scroll area. */
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+}
+
+tr.mat-mdc-row:hover {
+  background: #f5f5f5;
+}
+
+.col-select {
+  width: 48px;
+}
+
+.col-status {
+  width: 40px;
+  text-align: center;
+}
+
+/* Cells render as real, always-visible editable inputs (not hover-to-reveal text). */
+.cell-input {
+  width: 100%;
+  box-sizing: border-box;
+  min-width: 140px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  background: #fff;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  &:hover {
+    border-color: rgba(0, 0, 0, 0.38);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--mat-sys-primary, #3f51b5);
+    box-shadow: 0 0 0 1px var(--mat-sys-primary, #3f51b5);
+  }
+}
+
+.cell-name {
+  min-width: 150px;
+}
+
+.cell-uri {
+  min-width: 190px;
+}
+
+.cell-id {
+  min-width: 90px;
+}
+
+.cell-wide {
+  min-width: 210px;
+}
+
+.row-invalid {
+  background: #fdecea;
+
+  &:hover {
+    background: #fbe0dc;
+  }
+
+  .cell-input {
+    border-color: #e3a6a0;
+    background: #fff;
+  }
+}
+
+.status-ok {
+  color: #4caf50;
+}
+
+.status-warn {
+  color: #f0a000;
+  cursor: help;
+}
+
+/* ----- step 4: result ----- */
+.result-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.result-detail {
+  color: rgba(0, 0, 0, 0.7);
+  font-size: 0.85rem;
+}
+
+.outcome-badge {
+  display: inline-block;
+  padding: 0.1rem 0.55rem;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background: rgba(0, 0, 0, 0.06);
+  color: rgba(0, 0, 0, 0.6);
+
+  &.created {
+    background: #e6f4ea;
+    color: #1e7e34;
+  }
+
+  &.updated {
+    background: #e7f0fd;
+    color: #1257b8;
+  }
+
+  &.failed {
+    background: #fdecea;
+    color: #b00020;
+  }
+}
+
+.btn-spinner {
+  display: inline-block;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.import-actions {
+  flex: 0 0 auto;
+  padding: 8px 40px 18px;
+}
+
+::ng-deep .multiline-tooltip {
+  white-space: pre-line;
+}

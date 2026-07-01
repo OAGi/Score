@@ -269,7 +269,7 @@ export class AssignBusinessTermBtComponent implements OnInit {
   /** Whether the number of selected elements matches the total number of rows. */
   isAllSelected() {
     const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.filter(row => !row.used).length;
+    const numRows = this.dataSource.data.length;
     return numSelected === numRows;
   }
 
@@ -281,9 +281,8 @@ export class AssignBusinessTermBtComponent implements OnInit {
   }
 
   select(row: BusinessTermListEntry) {
-    if (!row.used) {
-      this.selection.select(row.businessTermId);
-    }
+    // `used` only protects the Business Term catalog row from discard; it does not prevent reuse in assignments.
+    this.selection.select(row.businessTermId);
   }
 
   toggle(row: BusinessTermListEntry) {
@@ -304,7 +303,7 @@ export class AssignBusinessTermBtComponent implements OnInit {
         forkJoin(this.postAssignBtObj.biesToAssign
           .map(bie => (
             this.businessTermService.findIfPrimaryExist(bie.bieId, bie.bieType,
-              this.postAssignBtObj.primaryIndicator, this.postAssignBtObj.typeCode)
+              this.postAssignBtObj.primaryIndicator)
               .pipe(map(resp => (resp && resp.length > 0))
               ))))
           .subscribe((ifPrimaries: boolean[]) => {
@@ -313,7 +312,7 @@ export class AssignBusinessTermBtComponent implements OnInit {
               dialogConfig.data.header = 'Overwrite previous preferred business terms?';
               dialogConfig.data.content = [
                 'The preferred business term already exists for ' +
-                ((this.postAssignBtObj.biesToAssign.length === 1) ? 'the selected BIE and type code.' : 'some of the selected BIEs and type code.') +
+                ((this.postAssignBtObj.biesToAssign.length === 1) ? 'the selected BIE.' : 'some of the selected BIEs.') +
                 ' Are you sure you want to proceed and overwrite the previous preferred business term assignment?'
               ];
               dialogConfig.data.action = 'Create';

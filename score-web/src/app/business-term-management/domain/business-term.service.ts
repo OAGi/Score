@@ -14,6 +14,11 @@ import {
 } from './business-term';
 import {BieListRequest} from '../../bie-management/bie-list/domain/bie-list';
 import {map} from 'rxjs/operators';
+import {
+  BatchImportResult,
+  BusinessTermImportRowRequest,
+  ParsedFile
+} from '../business-term-import-dialog/business-term-import.model';
 
 @Injectable()
 export class BusinessTermService {
@@ -23,8 +28,12 @@ export class BusinessTermService {
   getBusinessTermList(request: BusinessTermListRequest, byAssignedBies: BieToAssign[]): Observable<PageResponse<BusinessTermListEntry>> {
     let params = new HttpParams();
 
-    if (!!request.page.sortActive && !!request.page.sortDirection) {
-      params = params.set('orderBy', ((request.page.sortDirection === 'desc') ? '-' : '+') + request.page.sortActive);
+    const {sortActives, sortDirections} = request.page;
+    if (sortActives?.length && sortDirections?.length) {
+      params = params.set('orderBy', sortActives.map((sortActive, index) => {
+        const sortDirection = sortDirections[index] || sortDirections[0];
+        return ((sortDirection === 'desc') ? '-' : '+') + sortActive;
+      }).join(','));
     }
     if (request.page.pageIndex >= 0) {
       params = params.set('pageIndex', request.page.pageIndex);
@@ -187,6 +196,16 @@ export class BusinessTermService {
 
   getAssignedBusinessTermList(request: AssignedBtListRequest): Observable<PageResponse<AssignedBusinessTermListEntry>> {
     let params = request.toParams();
+    const {sortActives, sortDirections} = request.page;
+    if (sortActives?.length && sortDirections?.length) {
+      params = params
+        .delete('sortActive')
+        .delete('sortDirection')
+        .set('orderBy', sortActives.map((sortActive, index) => {
+          const sortDirection = sortDirections[index] || sortDirections[0];
+          return ((sortDirection === 'desc') ? '-' : '+') + sortActive;
+        }).join(','));
+    }
     if (request.updaterUsernameList && request.updaterUsernameList.length > 0) {
       params = params.delete('updaterUsernameList')
         .set('updaterLoginIdList', request.updaterUsernameList.join(','));
@@ -246,11 +265,20 @@ export class BusinessTermService {
     });
   }
 
-  uploadFromFile(formData: FormData): Observable<any> {
-    return this.http.post('/api/business-terms/csv', formData, {
-      reportProgress: true,
-      observe: 'events'
-    });
+  /**
+   * Parse an uploaded CSV/TSV/XLSX file server-side into headers + rows, without persisting, for the
+   * import dialog's column-mapping and preview steps.
+   */
+  parseFile(formData: FormData): Observable<ParsedFile> {
+    return this.http.post<ParsedFile>('/api/business-terms/parse', formData);
+  }
+
+  /**
+   * Import the rows the user selected (and possibly inline-edited) in the import dialog. Returns a
+   * best-effort per-row result (created / updated / failed).
+   */
+  importBatch(rows: BusinessTermImportRowRequest[]): Observable<BatchImportResult> {
+    return this.http.post<BatchImportResult>('/api/business-terms/batch', {rows});
   }
 
   update(businessTerm: BusinessTermDetails): Observable<any> {
@@ -337,12 +365,16 @@ export class BusinessTermService {
   }
 
   checkAssignmentUniqueness(bieId: number, bieType: string, businessTermId: number,
-                            typeCode: string, primaryIndicator: boolean): Observable<boolean> {
+                            typeCode: string, primaryIndicator: boolean,
+                            assignedBizTermId?: number): Observable<boolean> {
     let params = new HttpParams()
         .set('businessTermId', '' + businessTermId)
         .set('primaryIndicator', (!!primaryIndicator) ? primaryIndicator : false);
     if (!!typeCode) {
       params = params.set('typeCode', typeCode);
+    }
+    if (assignedBizTermId) {
+      params = params.set('assignedBizTermId', '' + assignedBizTermId);
     }
 
     if (bieType === 'ASBIE') {
@@ -356,11 +388,14 @@ export class BusinessTermService {
     });
   }
 
-  findIfPrimaryExist(bieId: number, bieType: string, primaryIndicator: boolean, typeCode: string): Observable<PageResponse<AssignedBusinessTermListEntry>> {
+  // #1381: the preferred flag is one-per-BIE-node; Type Code does NOT scope it. This "does a
+  // preferred already exist?" check must therefore be node-scoped (bieId only) to match the
+  // node-scoped backend demotion. Filtering by typeCode here would let a preferred term under a
+  // different Type Code be silently demoted on assign/update with no overwrite warning.
+  findIfPrimaryExist(bieId: number, bieType: string, primaryIndicator: boolean): Observable<PageResponse<AssignedBusinessTermListEntry>> {
     if (primaryIndicator) {
       const req = new AssignedBtListRequest();
       req.page = new PageRequest('lastUpdateTimestamp', 'desc', 0, 10);
-      req.filters.typeCode = typeCode;
       req.filters.primaryIndicator = primaryIndicator;
       req.filters.searchByCC = true;
       req.filters.bieTypes = [bieType];

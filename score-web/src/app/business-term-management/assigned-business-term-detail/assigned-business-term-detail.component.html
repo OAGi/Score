@@ -37,12 +37,16 @@
 
         <mat-form-field>
           <mat-label>Type Code</mat-label>
-          <input matInput [(ngModel)]="assignedBusinessTerm.typeCode" maxlength="45"/>
+          <input matInput [(ngModel)]="assignedBusinessTerm.typeCode" maxlength="30"/>
+          <mat-hint>Optional free-text label for this assignment. The same business term can be assigned to this BIE more than once only when the Type Code differs. No predefined list &mdash; max 30 characters.</mat-hint>
         </mat-form-field>
 
-        <mat-checkbox [(ngModel)]="assignedBusinessTerm.primaryIndicator">
-          Preferred Business Term
-        </mat-checkbox>
+        <div class="preferred-field">
+          <mat-checkbox [(ngModel)]="assignedBusinessTerm.primaryIndicator">
+            Preferred Business Term
+          </mat-checkbox>
+          <div class="field-hint">Marks this as the primary business term for this BIE. Only one term can be preferred per BIE &mdash; selecting this clears the Preferred flag on the other terms assigned to this BIE.</div>
+        </div>
       </mat-card-content>
     </mat-card>
   </div>

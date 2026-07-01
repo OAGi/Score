@@ -280,14 +280,17 @@ public class BusinessTermQueryController {
             @RequestParam(name = "bbieId", required = false) BbieId bbieId,
             @RequestParam(name = "businessTermId", required = false) BusinessTermId businessTermId,
             @RequestParam(name = "typeCode", required = false) String typeCode,
+            @RequestParam(name = "assignedBizTermId", required = false) BigInteger assignedBizTermId,
             @RequestParam(name = "primaryIndicator", required = false) Boolean primaryIndicator) {
 
         if (asbieId != null) {
             return businessTermQueryService.checkAssignmentUniqueness(sessionService.asScoreUser(user),
-                    asbieId, businessTermId, typeCode, (primaryIndicator != null) ? primaryIndicator : false);
+                    asbieId, businessTermId, typeCode,
+                    (assignedBizTermId != null) ? new AsbieBusinessTermId(assignedBizTermId) : null);
         } else if (bbieId != null) {
             return businessTermQueryService.checkAssignmentUniqueness(sessionService.asScoreUser(user),
-                    bbieId, businessTermId, typeCode, (primaryIndicator != null) ? primaryIndicator : false);
+                    bbieId, businessTermId, typeCode,
+                    (assignedBizTermId != null) ? new BbieBusinessTermId(assignedBizTermId) : null);
         } else {
             throw new IllegalArgumentException();
         }

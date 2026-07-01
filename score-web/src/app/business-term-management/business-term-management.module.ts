@@ -14,7 +14,7 @@ import {AssignedBusinessTermListComponent} from './assigned-business-term-list/a
 import {AssignBusinessTermBtComponent} from './assign-business-term/assign-business-term-bt.component';
 import {AssignBusinessTermBieComponent} from './assign-business-term/assign-business-term-bie.component';
 import {AssignedBusinessTermDetailComponent} from './assigned-business-term-detail/assigned-business-term-detail.component';
-import {BusinessTermUploadFileComponent} from './business-term-upload-file/business-term-upload-file.component';
+import {BusinessTermImportDialogComponent} from './business-term-import-dialog/business-term-import-dialog.component';
 import {TranslateModule} from '@ngx-translate/core';
 import {SearchBarModule} from '../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../common/column-selector/column-selector.module';
@@ -35,12 +35,6 @@ const routes: Routes = [
         component: BusinessTermCreateComponent,
         canActivate: [AuthService],
         title: 'Create Business Term'
-      },
-      {
-        path: 'business_term/upload',
-        component: BusinessTermUploadFileComponent,
-        canActivate: [AuthService],
-        title: 'Upload Business Term'
       },
       {
         path: 'business_term/:id',
@@ -104,7 +98,7 @@ const routes: Routes = [
     BusinessTermListComponent,
     BusinessTermCreateComponent,
     BusinessTermDetailComponent,
-    BusinessTermUploadFileComponent,
+    BusinessTermImportDialogComponent,
     AssignedBusinessTermListComponent,
     AssignBusinessTermBtComponent,
     AssignBusinessTermBieComponent,

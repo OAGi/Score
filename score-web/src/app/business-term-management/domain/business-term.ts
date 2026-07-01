@@ -302,6 +302,7 @@ export class AssignedBusinessTermListEntry {
   businessTermId: number;
   guid: string;
   businessTerm: string;
+  definition: string;
   comment: string;
   externalReferenceUri: string;
   externalReferenceId: string;
@@ -320,6 +321,7 @@ export class AssignedBusinessTermDetails {
   businessTermId: number;
   guid: string;
   businessTerm: string;
+  definition: string;
   comment: string;
   externalReferenceUri: string;
   externalReferenceId: string;
@@ -339,6 +341,5 @@ export class BieToAssign {
   bieId: number;
   bieType: string;
 }
-
 
 

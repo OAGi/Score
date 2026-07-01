@@ -4,6 +4,125 @@
   </mat-sidenav>
 
   <mat-sidenav-content (click)="sidenav.close();">
+    <!-- In-place Business Term badges (Issue #1754), reused for the ASBIE/BBIE current and base tabs. It uses a Material
+         mat-form-field + mat-chip-grid so disabled/empty state aligns with adjacent fields such as Remark.
+         `enabled` follows the node Used state; `editable` toggles the preferred-star, remove action, and '+'. -->
+    <ng-template #businessTermBadges let-id="id" let-bieType="bieType" let-enabled="enabled" let-editable="editable">
+      <div class="bt-badges-field-wrapper">
+        <mat-form-field class="bt-badges-field"
+                        [class.bt-badges-field-disabled]="!enabled"
+                        [class.bt-badges-field-readonly]="!editable"
+                        [class.bt-badges-field-empty]="businessTermsFor(id, bieType).length === 0">
+          <mat-label>Business Terms</mat-label>
+          <mat-chip-grid #businessTermChipGrid class="bt-chip-set" aria-label="Assigned business terms"
+                         [attr.data-bie-id]="id"
+                         [attr.data-bie-type]="bieType"
+                         [errorStateMatcher]="businessTermErrorStateMatcher(id, bieType)"
+                         [disabled]="!enabled">
+            @for (bt of businessTermsFor(id, bieType); track bt.assignedBizTermId) {
+              <mat-chip-row class="bt-chip" [removable]="editable" (removed)="removeBusinessTerm(bt)"
+                            [class.bt-chip-editing]="isTypeCodeEditing(bt)"
+                            [class.bt-chip-error]="hasTypeCodeEditError(bt)"
+                            [disableRipple]="true"
+                            cdkOverlayOrigin #chipOrigin="cdkOverlayOrigin"
+                            (click)="startTypeCodeEdit(bt, editable, $event)"
+                            (mouseenter)="onBadgeHover(bt, chipOrigin)" (mouseleave)="onBadgeLeave()">
+                @if (editable) {
+                  <mat-icon matChipAvatar class="bt-chip-star" [class.bt-chip-star-on]="bt.primaryIndicator"
+                            role="button" tabindex="0"
+                            [matTooltip]="bt.primaryIndicator ? 'Unset preferred' : 'Set as preferred'"
+                            (click)="$event.stopPropagation(); togglePreferred(bt, !bt.primaryIndicator)"
+                            (keydown.enter)="togglePreferred(bt, !bt.primaryIndicator)">{{ bt.primaryIndicator ? 'star' : 'star_border' }}</mat-icon>
+                } @else if (bt.primaryIndicator) {
+                  <mat-icon matChipAvatar class="bt-chip-star bt-chip-star-on"
+                            matTooltip="Preferred business term">star</mat-icon>
+                }
+                <span class="bt-chip-term">{{ bt.businessTerm }}</span>
+                @if (isTypeCodeEditing(bt)) {
+                  <input class="bt-chip-type-input"
+                         [attr.data-assigned-biz-term-id]="bt.assignedBizTermId"
+                         [(ngModel)]="typeCodeEditValue"
+                         [disabled]="typeCodeEditSaving"
+                         maxlength="30"
+                         aria-label="Type Code"
+                         (ngModelChange)="clearTypeCodeEditError()"
+                         (click)="$event.stopPropagation()"
+                         (blur)="cancelTypeCodeEdit()"
+                         (keydown)="onTypeCodeEditKeydown($event)"
+                         (keydown.enter)="$event.preventDefault(); saveTypeCodeEdit(bt, $event)"
+                         (keydown.escape)="$event.preventDefault(); cancelTypeCodeEdit($event)"/>
+                  <button mat-icon-button type="button" class="bt-chip-type-action"
+                          [disabled]="typeCodeEditSaving"
+                          matTooltip="Save Type Code"
+                          (mousedown)="$event.preventDefault()"
+                          (click)="saveTypeCodeEdit(bt, $event)">
+                    <mat-icon>check</mat-icon>
+                  </button>
+                } @else if (bt.typeCode) {
+                  <span class="bt-chip-type">{{ bt.typeCode }}</span>
+                }
+                @if (editable) {
+                  <button matChipRemove type="button" matTooltip="Unassign">
+                    <mat-icon>cancel</mat-icon>
+                  </button>
+                }
+              </mat-chip-row>
+            }
+            <input class="bt-chip-input-anchor"
+                   [matChipInputFor]="businessTermChipGrid"
+                   [disabled]="!enabled"
+                   readonly>
+          </mat-chip-grid>
+          @if (editable) {
+            <button mat-icon-button matSuffix type="button" class="bt-add-btn" [disabled]="!id"
+                    [matTooltip]="id ? 'Assign a Business Term' : 'Save the BIE to assign business terms'"
+                    (click)="openBusinessTermDialog(id, bieType)">
+              <mat-icon>add</mat-icon>
+            </button>
+          }
+          <mat-error>
+            @if (typeCodeEditErrorFor(id, bieType); as typeCodeError) {
+              {{ typeCodeError }}
+            }
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </ng-template>
+
+    <!-- Business Term hover-card (shadcn HoverCard composition — preview only, no controls; rendered as a
+         Material card in a CDK overlay), shared by every badge. Opens on hover of a chip and stays open while
+         the card is hovered so its links/values can be read. Reads the previewed assignment (hoverCardItem). -->
+    <ng-template cdkConnectedOverlay
+                 [cdkConnectedOverlayOrigin]="hoverCardOrigin"
+                 [cdkConnectedOverlayOpen]="hoverCardOpen && !!hoverCardItem && !!hoverCardOrigin"
+                 [cdkConnectedOverlayPositions]="hoverCardPositions"
+                 [cdkConnectedOverlayHasBackdrop]="false"
+                 [cdkConnectedOverlayViewportMargin]="8">
+      @if (hoverCardItem) {
+        <mat-card class="bt-hover-card mat-elevation-z4" appearance="outlined"
+                  (mouseenter)="onHoverCardEnter()" (mouseleave)="onHoverCardLeave()">
+          <div class="bt-hover-title">
+            <a href="/business_term_management/business_term/{{ hoverCardItem.businessTermId }}"
+               target="_blank" rel="noopener">
+              <span class="bt-hover-term">{{ hoverCardItem.businessTerm }}</span>
+              <mat-icon class="bt-hover-open">open_in_new</mat-icon>
+            </a>
+          </div>
+          @if (hoverCardItem.externalReferenceUri) {
+            <div class="bt-hover-row"><span class="bt-hover-key">External Reference URI</span><span class="bt-hover-val">{{ hoverCardItem.externalReferenceUri }}</span></div>
+          }
+          @if (hoverCardItem.externalReferenceId) {
+            <div class="bt-hover-row"><span class="bt-hover-key">External Reference ID</span><span class="bt-hover-val">{{ hoverCardItem.externalReferenceId }}</span></div>
+          }
+          @if (hoverCardItem.definition) {
+            <div class="bt-hover-row"><span class="bt-hover-key">Definition</span><span class="bt-hover-val">{{ hoverCardItem.definition }}</span></div>
+          }
+          @if (hoverCardItem.comment) {
+            <div class="bt-hover-row"><span class="bt-hover-key">Comment</span><span class="bt-hover-val">{{ hoverCardItem.comment }}</span></div>
+          }
+        </mat-card>
+      }
+    </ng-template>
     @if (loading) {
       <div class="main-content-loading-overlay">
         <mat-progress-bar mode="indeterminate"></mat-progress-bar>
@@ -1125,19 +1244,9 @@
                           <div class="row">
                             <div class="col-md-6 col-sm-12">
                               @if (isBusinessTermEnabled && !isDeveloper) {
-                                <div class="actions">
-                                  <button class="hover-button" mat-raised-button color="primary"
-                                    (click)="goToBusinessTermsForBie(asAsbiepDetail().asbie.asbieId, 'ASBIE')">
-                                    Show Business Terms
-                                  </button>
-                                  <button mat-raised-button
-                                    [disabled]="!isEditable(selectedNode)"
-                                    (click)="goToAssignBusinessTermsForBie(selectedNode.detail, 'ASBIE')">
-                                    Assign Business Term
-                                  </button>
-                                </div>
-                              }
-                              @if (!isBusinessTermEnabled || isDeveloper) {
+                                <ng-container [ngTemplateOutlet]="businessTermBadges"
+                                  [ngTemplateOutletContext]="{id: asAsbiepDetail().asbie.asbieId, bieType: 'ASBIE', enabled: selectedNode.used, editable: isBusinessTermEditable(selectedNode)}"></ng-container>
+                              } @else {
                                 <mat-form-field>
                                   <mat-label>Legacy Business Term</mat-label>
                                   <input matInput placeholder="Legacy Business Term" maxlength="225"
@@ -1418,14 +1527,9 @@
                             <div class="row">
                               <div class="col-md-6 col-sm-12">
                                 @if (isBusinessTermEnabled && !isDeveloper) {
-                                  <div class="actions">
-                                    <button class="hover-button" mat-raised-button color="primary"
-                                      (click)="goToBusinessTermsForBie(asAsbiepDetail().base.asbie.asbieId, 'ASBIE')">
-                                      Show Business Terms
-                                    </button>
-                                  </div>
-                                }
-                                @if (!isBusinessTermEnabled || isDeveloper) {
+                                  <ng-container [ngTemplateOutlet]="businessTermBadges"
+                                    [ngTemplateOutletContext]="{id: asAsbiepDetail().base.asbie.asbieId, bieType: 'ASBIE', enabled: false, editable: false}"></ng-container>
+                                } @else {
                                   <mat-form-field>
                                     <mat-label>Legacy Business Term</mat-label>
                                     <input matInput placeholder="Legacy Business Term" maxlength="225"
@@ -1741,19 +1845,9 @@
                         <div class="row">
                           <div class="col-md-6 col-sm-12">
                             @if (isBusinessTermEnabled && !isDeveloper) {
-                              <div class="actions">
-                                <button class="hover-button" mat-raised-button color="primary"
-                                  (click)="goToBusinessTermsForBie(asBbiepDetail().bbie.bbieId, 'BBIE')">
-                                  Show Business Terms
-                                </button>
-                                <button mat-raised-button
-                                  [disabled]="!isEditable(selectedNode)"
-                                  (click)="goToAssignBusinessTermsForBie(selectedNode.detail, 'BBIE')">
-                                  Assign Business Term
-                                </button>
-                              </div>
-                            }
-                            @if (!isBusinessTermEnabled || isDeveloper) {
+                              <ng-container [ngTemplateOutlet]="businessTermBadges"
+                                [ngTemplateOutletContext]="{id: asBbiepDetail().bbie.bbieId, bieType: 'BBIE', enabled: selectedNode.used, editable: isBusinessTermEditable(selectedNode)}"></ng-container>
+                            } @else {
                               <mat-form-field>
                                 <mat-label>Legacy Business Term</mat-label>
                                 <input matInput placeholder="Legacy Business Term" maxlength="225"
@@ -2149,14 +2243,9 @@
                           <div class="row">
                             <div class="col-md-6 col-sm-12">
                               @if (isBusinessTermEnabled && !isDeveloper) {
-                                <div class="actions">
-                                  <button class="hover-button" mat-raised-button color="primary"
-                                    (click)="goToBusinessTermsForBie(asBbiepDetail().base.bbie.bbieId, 'BBIE')">
-                                    Show Business Terms
-                                  </button>
-                                </div>
-                              }
-                              @if (!isBusinessTermEnabled || isDeveloper) {
+                                <ng-container [ngTemplateOutlet]="businessTermBadges"
+                                  [ngTemplateOutletContext]="{id: asBbiepDetail().base.bbie.bbieId, bieType: 'BBIE', enabled: false, editable: false}"></ng-container>
+                              } @else {
                                 <mat-form-field>
                                   <mat-label>Legacy Business Term</mat-label>
                                   <input matInput placeholder="Legacy Business Term" maxlength="225"

@@ -15,6 +15,9 @@ public record AssignedBusinessTermDetailsRecord(
         String typeCode,
         BigInteger businessTermId,
         String businessTerm,
+        String definition,
+        String comment,
+        String externalReferenceId,
         String externalReferenceUri,
         List<BusinessContextSummaryRecord> businessContextList,
 

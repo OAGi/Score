@@ -1,0 +1,132 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.header {
+  width: 100%;
+  padding-top: 8px;
+  font-family: 'Google Sans', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: .1px;
+  line-height: 24px;
+}
+
+.assign-title {
+  margin-bottom: 0;
+}
+
+.close {
+  position: relative;
+  margin-left: auto;
+  left: 12px;
+}
+
+.close button {
+  outline: none;
+}
+
+.assign-content {
+  display: block;
+  max-height: calc(90vh - 120px);
+  overflow: auto;
+  overflow-x: hidden;
+}
+
+.assign-card-container {
+  width: 100%;
+  padding: 2px 16px;
+  box-sizing: border-box;
+}
+
+.bt-assign-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.bt-assign-search-bar {
+  display: block;
+}
+
+.bt-assign-advanced-search {
+  padding-left: 3rem;
+}
+
+.bt-assign-loading {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0;
+}
+
+.table-container {
+  width: 100%;
+}
+
+.bt-assign-table-wrapper {
+  margin-top: 12px;
+  overflow: hidden;
+}
+
+.bt-assign-table-scroll {
+  max-height: 46vh;
+  overflow: auto;
+}
+
+.bt-assign-table-wrapper table {
+  width: 100%;
+}
+
+.bt-assign-table-wrapper th,
+.bt-assign-table-wrapper td {
+  vertical-align: middle;
+}
+
+.bt-assign-table-wrapper .mat-mdc-row {
+  cursor: pointer;
+}
+
+.bt-col-select {
+  width: 72px;
+  min-width: 72px;
+  max-width: 72px;
+}
+
+.bt-assign-empty {
+  padding: 16px;
+  text-align: center;
+  opacity: 0.7;
+}
+
+.bt-assign-meta {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  margin-top: 16px;
+}
+
+.bt-assign-typecode {
+  flex: 1;
+}
+
+.bt-assign-table-wrapper .description {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.assign-actions {
+  margin: 0;
+  padding: 8px 40px 16px;
+}
+
+@media (max-width: 900px) {
+  .assign-actions {
+    padding-right: 24px;
+    padding-left: 24px;
+  }
+
+  .bt-assign-advanced-search {
+    padding-left: 0;
+  }
+}

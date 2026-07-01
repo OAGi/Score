@@ -35,8 +35,6 @@ public class BusinessTermCommandController {
     @Autowired
     private SessionService sessionService;
 
-    private static String DEFAULT_ALLOWED_CONTENT_TYPE = "text/csv";
-
     @PostMapping()
     public BusinessTermCreateResponse create(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
@@ -46,28 +44,33 @@ public class BusinessTermCommandController {
         return new BusinessTermCreateResponse(businessTermId);
     }
 
-    @PostMapping(value = "/csv")
-    public ResponseEntity createFromFile(
+    /**
+     * Parses an uploaded CSV/TSV/XLSX file into headers + rows for the import dialog's column-mapping
+     * and preview steps. Nothing is persisted here — the user confirms the selected rows separately
+     * via {@link #importBatch}.
+     */
+    @PostMapping(value = "/parse")
+    public BusinessTermParseResult parse(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @RequestParam("file") MultipartFile file) throws IOException {
-        if (DEFAULT_ALLOWED_CONTENT_TYPE.equals(file.getContentType())) {
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "sheet", required = false) String sheet) throws IOException {
 
-            BusinessTermCsvImportResult result =
-                    businessTermCommandService.create(sessionService.asScoreUser(user), file.getInputStream());
-            if (result != null && result.totalCount() > 0) {
-                logger.debug("Uploaded the file successfully: " + file.getOriginalFilename()
-                        + " (created=" + result.createdCount() + ", updated=" + result.updatedCount() + ")");
-                // #1753 - L6: report a created/updated summary via headers so the UI can show it.
-                return ResponseEntity.noContent()
-                        .header("X-Import-Created-Count", String.valueOf(result.createdCount()))
-                        .header("X-Import-Updated-Count", String.valueOf(result.updatedCount()))
-                        .build();
-            } else {
-                return ResponseEntity.status(200).build();
-            }
-        } else {
-            return ResponseEntity.status(415).body("Unsupported content type: " + file.getContentType());
-        }
+        return businessTermCommandService.parse(
+                sessionService.asScoreUser(user), file.getOriginalFilename(), file.getInputStream(), sheet);
+    }
+
+    /**
+     * Imports the rows the user selected (and possibly inline-edited) in the import dialog. This is a
+     * best-effort upsert keyed by external reference URI: good rows are committed and bad rows are
+     * reported per row, so the response always carries a created/updated/failed breakdown rather than
+     * aborting the whole import on the first bad row.
+     */
+    @PostMapping(value = "/batch")
+    public BusinessTermBatchImportResult importBatch(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @RequestBody BusinessTermBatchImportRequest request) {
+
+        return businessTermCommandService.createBatch(sessionService.asScoreUser(user), request.rows());
     }
 
     @PutMapping(value = "/{businessTermId:[\\d]+}")

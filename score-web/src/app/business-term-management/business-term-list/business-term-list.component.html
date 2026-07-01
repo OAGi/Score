@@ -6,7 +6,7 @@
       <button mat-raised-button class="ms-2" color="primary" routerLink="create">
         New Business Term
       </button>
-      <button mat-raised-button class="ms-2" color="primary" routerLink="upload">
+      <button mat-raised-button class="ms-2" color="primary" (click)="openImportDialog()">
         Upload Business Terms
       </button>
       <button mat-raised-button class="ms-2" color="warn" (click)="discard()"

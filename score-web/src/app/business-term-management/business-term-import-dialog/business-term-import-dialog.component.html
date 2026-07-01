@@ -1,0 +1,372 @@
+<div class="header d-flex align-items-center" mat-dialog-title>
+  <span class="import-title">Upload Business Terms</span>
+  <!-- Top-right cancel (mirrors the app-wide dialog close button, see confirm-dialog): available on
+       every step up to (but not including) the Result step, so the user can back out any time before
+       the import has run. The Result step already offers Close. -->
+  @if (phase !== 'result') {
+    <div class="close pe-2">
+      <button mat-icon-button mat-small-icon-button type="button"
+              aria-label="Cancel and close" matTooltip="Cancel" (click)="close()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  }
+</div>
+
+<mat-dialog-content class="import-content">
+  <mat-stepper class="import-stepper"
+               linear
+               (selectionChange)="onStepSelectionChange($event.selectedIndex)">
+
+  <!-- ============ Step 1: Upload ============ -->
+    <mat-step [label]="phases[0].label"
+              [completed]="canProceedFromUpload"
+              [editable]="isStepEditable(0)">
+    <div class="upload-pane">
+      <mat-card-content class="mat-card-container import-card-container">
+        <!-- Kept outside the drop-zone so Browse and the tile keep working once the
+             drop-zone is hidden (a selected file replaces the zone with a tile). -->
+        <input #fileInput type="file" class="file-input" hidden
+               [accept]="acceptTypes" (change)="onFileInput($event)"/>
+
+        @if (!selectedFile) {
+          <div class="drop-zone"
+               [class.drag-over]="isDragOver"
+               (dragover)="onDragOver($event)"
+               (dragleave)="onDragLeave($event)"
+               (drop)="onDrop($event)"
+               (click)="fileInput.click()">
+            <mat-icon class="drop-icon">cloud_upload</mat-icon>
+            <div class="drop-text">
+              <strong>Drag &amp; drop</strong> a file here, or click to browse.
+            </div>
+          </div>
+        } @else {
+          <div class="file-tiles">
+            <div class="file-tile">
+              <button type="button" class="file-remove" aria-label="Remove file"
+                      matTooltip="Remove file" (click)="removeFile()">
+                <mat-icon>close</mat-icon>
+              </button>
+              <div class="file-thumb" [ngClass]="'file-thumb--' + fileTypeClass">
+                <mat-icon class="file-thumb-icon">{{ fileTypeIcon }}</mat-icon>
+                <span class="file-type-label">{{ fileTypeLabel }}</span>
+              </div>
+              <div class="file-name" [matTooltip]="fileName">{{ fileName }}</div>
+            </div>
+          </div>
+        }
+
+        @if (!selectedFile) {
+          <div class="upload-actions-inline">
+            <button mat-stroked-button type="button" (click)="fileInput.click()">
+              <mat-icon>attach_file</mat-icon>
+              <span class="ps-1">Browse</span>
+            </button>
+            <button mat-stroked-button type="button" (click)="downloadTemplate()">
+              <mat-icon>file_download</mat-icon>
+              <span class="ps-1">Download template</span>
+            </button>
+          </div>
+        }
+
+        @if (parsing) {
+          <div class="upload-status">
+            <mat-spinner [diameter]="20"></mat-spinner>
+            <span class="ps-2">Reading file…</span>
+          </div>
+        }
+
+        @if (parsedFile && parsedFile.sheetNames.length > 1) {
+          <mat-form-field class="sheet-select" appearance="fill">
+            <mat-label>Worksheet</mat-label>
+            <mat-select [(ngModel)]="selectedSheet" (selectionChange)="onSheetChange()">
+              @for (sheet of parsedFile.sheetNames; track sheet) {
+                <mat-option [value]="sheet">{{ sheet }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        }
+
+        @if (parseError) {
+          <div class="import-error">
+            <mat-icon>error</mat-icon>
+            <span class="ps-1">{{ parseError }}</span>
+          </div>
+        }
+
+        @if (parsedFile && !parseError) {
+          <div class="import-info">
+            Found <strong>{{ parsedFile.rows.length }}</strong> row(s) and
+            <strong>{{ parsedFile.headers.length }}</strong> column(s).
+          </div>
+        }
+
+        <div class="upload-hint">
+          Max upload file size: {{ maxUploadSizeMb }} MB. Accepted formats: CSV, TSV, Excel (.xlsx).
+        </div>
+      </mat-card-content>
+    </div>
+    </mat-step>
+
+  <!-- ============ Step 2: Map columns ============ -->
+    <mat-step [label]="phases[1].label"
+              [completed]="canProceedFromMapping"
+              [editable]="isStepEditable(1)">
+  @if (mapping) {
+    <div class="map-pane">
+      <mat-card-content class="mat-card-container import-card-container">
+        <div class="detected-format">
+          <mat-icon>warning_amber</mat-icon>
+          <span class="ps-1"><strong>Review the column mapping below before continuing.</strong>
+            Confirm that each source column maps to the correct Business Term field.</span>
+        </div>
+
+        <div class="map-form">
+          @for (field of targetFields; track field.key) {
+            <mat-form-field appearance="fill" class="map-field">
+              <mat-label>{{ field.label }}</mat-label>
+              <mat-select [(ngModel)]="mapping.fieldToColumn[field.key]" [required]="!!field.required">
+                <mat-option [value]="null">(none)</mat-option>
+                @for (header of sourceHeaders; track header) {
+                  <mat-option [value]="header">{{ header }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          }
+
+          <!-- External Reference URI strategy (required) -->
+          <div class="uri-section">
+            <div class="uri-header">
+              <div class="uri-section-label">External Reference URI<span class="required">*</span></div>
+              <mat-button-toggle-group class="uri-toggle" [value]="mapping.uriMode"
+                                       (change)="setUriMode($event.value)">
+                <mat-button-toggle value="COLUMN">Map a column</mat-button-toggle>
+                <mat-button-toggle value="SYNTHESIZE">Build from base URL + ID</mat-button-toggle>
+              </mat-button-toggle-group>
+            </div>
+
+            @if (mapping.uriMode === 'COLUMN') {
+              <div class="uri-fields-grid">
+                <mat-form-field appearance="fill" class="map-field">
+                  <mat-label>URI column</mat-label>
+                  <mat-select [(ngModel)]="mapping.uriColumn">
+                    <mat-option [value]="null">(none)</mat-option>
+                    @for (header of sourceHeaders; track header) {
+                      <mat-option [value]="header">{{ header }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            } @else {
+              <div class="uri-fields-grid synthesize-fields">
+                <mat-form-field appearance="fill" class="uri-base">
+                  <mat-label>Base URL</mat-label>
+                  <input matInput [(ngModel)]="mapping.uriBase" placeholder="https://glossary.example.com/term/">
+                  @if (uriBaseInvalid) {
+                    <mat-error>Enter a valid base URL.</mat-error>
+                  }
+                </mat-form-field>
+                <mat-form-field appearance="fill" class="map-field">
+                  <mat-label>ID column</mat-label>
+                  <mat-select [(ngModel)]="mapping.uriIdColumn">
+                    <mat-option [value]="null">(none)</mat-option>
+                    @for (header of sourceHeaders; track header) {
+                      <mat-option [value]="header">{{ header }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            }
+          </div>
+        </div>
+
+        @if (!canProceedFromMapping) {
+          <div class="import-hint-inline">
+            Map a column to <strong>Business Term</strong> and provide the <strong>External Reference URI</strong>
+            (choose a column, or a valid base URL plus an ID column) to continue.
+          </div>
+        }
+      </mat-card-content>
+    </div>
+  }
+    </mat-step>
+
+  <!-- ============ Step 3: Review & select ============ -->
+    <mat-step [label]="phases[2].label"
+              [completed]="!!result"
+              [editable]="isStepEditable(2)">
+    <div class="preview-pane">
+      <mat-card-content class="mat-card-container import-card-container">
+        <div class="preview-summary">
+          <span class="chip chip-valid">{{ validCount }} ready</span>
+          <span class="chip chip-review" [class.zero]="reviewCount === 0">{{ reviewCount }} need review</span>
+          <span class="chip chip-selected">{{ selectedCount }} selected</span>
+        </div>
+
+        <div class="table-container">
+          <div class="mat-elevation-z1 table-wrapper mt-3 preview-table">
+            <div class="table-scroll">
+            <table mat-table matSort matSortStart="asc" [dataSource]="dataSource" [trackBy]="trackByRowId">
+
+              <ng-container matColumnDef="select">
+                <th mat-header-cell *matHeaderCellDef class="col-select">
+                  <mat-checkbox (change)="masterToggle()"
+                                [checked]="selectedCount > 0 && isAllValidSelected()"
+                                [indeterminate]="selectedCount > 0 && !isAllValidSelected()">
+                  </mat-checkbox>
+                </th>
+                <td mat-cell *matCellDef="let row" class="col-select">
+                  <mat-checkbox [checked]="selection.isSelected(row)"
+                                [disabled]="isRowInvalid(row)"
+                                matTooltip="Fix the highlighted issues to import this row."
+                                [matTooltipDisabled]="!isRowInvalid(row)"
+                                (change)="toggleRow(row)">
+                  </mat-checkbox>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef class="col-status"></th>
+                <td mat-cell *matCellDef="let row" class="col-status">
+                  @if (isRowInvalid(row)) {
+                    <mat-icon class="status-warn" [matTooltip]="rowTooltip(row)" matTooltipClass="multiline-tooltip">warning</mat-icon>
+                  } @else {
+                    <mat-icon class="status-ok">check_circle</mat-icon>
+                  }
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="businessTerm">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Business Term</th>
+                <td mat-cell *matCellDef="let row">
+                  <input class="cell-input cell-name" [(ngModel)]="row.businessTerm" (ngModelChange)="onRowEdited()">
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="externalReferenceUri">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>External Reference URI</th>
+                <td mat-cell *matCellDef="let row">
+                  <input class="cell-input cell-uri" [(ngModel)]="row.externalReferenceUri" (ngModelChange)="onRowEdited()">
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="externalReferenceId">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>External Reference ID</th>
+                <td mat-cell *matCellDef="let row">
+                  <input class="cell-input cell-id" [(ngModel)]="row.externalReferenceId" (ngModelChange)="onRowEdited()">
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="definition">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Definition</th>
+                <td mat-cell *matCellDef="let row">
+                  <input class="cell-input cell-wide" [(ngModel)]="row.definition" (ngModelChange)="onRowEdited()">
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="comment">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Comment</th>
+                <td mat-cell *matCellDef="let row">
+                  <input class="cell-input cell-wide" [(ngModel)]="row.comment" (ngModelChange)="onRowEdited()">
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                  [class.row-invalid]="isRowInvalid(row)"></tr>
+            </table>
+            </div>
+
+            <mat-paginator [pageSizeOptions]="[10, 25, 50, 100]" [pageSize]="10" showFirstLastButtons></mat-paginator>
+          </div>
+        </div>
+      </mat-card-content>
+    </div>
+    </mat-step>
+
+  <!-- ============ Step 4: Result ============ -->
+    <mat-step [label]="phases[3].label"
+              [completed]="!!result"
+              [editable]="false">
+  @if (phase === 'result' && result) {
+    <div class="result-pane">
+      <mat-card-content class="mat-card-container import-card-container">
+        <div class="result-summary">
+          <span class="chip chip-valid">{{ result.createdCount }} created</span>
+          <span class="chip chip-updated">{{ result.updatedCount }} updated</span>
+          <span class="chip chip-review" [class.zero]="result.failedCount === 0">{{ result.failedCount }} failed</span>
+        </div>
+
+        <div class="table-container">
+          <div class="mat-elevation-z1 table-wrapper mt-3 result-table">
+            <div class="table-scroll">
+            <table mat-table [dataSource]="result.results">
+              <ng-container matColumnDef="businessTerm">
+                <th mat-header-cell *matHeaderCellDef>Business Term</th>
+                <td mat-cell *matCellDef="let r">
+                  <span class="score-line-clamp-2 score-break-word">{{ r.businessTerm }}</span>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="externalReferenceUri">
+                <th mat-header-cell *matHeaderCellDef>External Reference URI</th>
+                <td mat-cell *matCellDef="let r">
+                  <span class="score-line-clamp-2 score-break-word">{{ r.externalReferenceUri }}</span>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="outcome">
+                <th mat-header-cell *matHeaderCellDef>Outcome</th>
+                <td mat-cell *matCellDef="let r">
+                  <span class="outcome-badge"
+                        [class.created]="r.outcome === 'CREATED'"
+                        [class.updated]="r.outcome === 'UPDATED'"
+                        [class.failed]="r.outcome === 'FAILED'">{{ r.outcome }}</span>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="message">
+                <th mat-header-cell *matHeaderCellDef>Detail</th>
+                <td mat-cell *matCellDef="let r">
+                  <span class="score-line-clamp-2 score-break-word result-detail">{{ r.message }}</span>
+                </td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="resultColumns"></tr>
+              <tr mat-row *matRowDef="let r; columns: resultColumns;"></tr>
+            </table>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </div>
+  }
+    </mat-step>
+
+  </mat-stepper>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="import-actions">
+  @switch (phase) {
+    @case ('upload') {
+      <button mat-button type="button" (click)="close()">Cancel</button>
+      <button mat-flat-button color="primary" type="button"
+              [disabled]="!canProceedFromUpload" (click)="goToMap()">Next</button>
+    }
+    @case ('map') {
+      <button mat-button type="button" (click)="backToUpload()">Back</button>
+      <button mat-flat-button color="primary" type="button"
+              [disabled]="!canProceedFromMapping" (click)="goToPreview()">Next</button>
+    }
+    @case ('preview') {
+      <button mat-button type="button" (click)="backToMap()">Back</button>
+      <button mat-flat-button color="primary" type="button"
+              [disabled]="selectedCount === 0 || importing" (click)="importSelected()">
+        @if (importing) {
+          <mat-spinner [diameter]="18" class="btn-spinner"></mat-spinner>
+        }
+        Import {{ selectedCount }} selected
+      </button>
+    }
+    @case ('result') {
+      <button mat-flat-button color="primary" type="button" (click)="close()">Close</button>
+    }
+  }
+</mat-dialog-actions>

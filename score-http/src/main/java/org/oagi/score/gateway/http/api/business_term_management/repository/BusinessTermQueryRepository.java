@@ -42,10 +42,12 @@ public interface BusinessTermQueryRepository {
             AssignedBusinessTermListFilterCriteria filterCriteria, PageRequest pageRequest);
 
     boolean checkAssignmentUniqueness(
-            AsbieId asbieId, BusinessTermId businessTermId, String typeCode, boolean primaryIndicator);
+            AsbieId asbieId, BusinessTermId businessTermId, String typeCode,
+            AsbieBusinessTermId exceptAsbieBusinessTermId);
 
     boolean checkAssignmentUniqueness(
-            BbieId bbieId, BusinessTermId businessTermId, String typeCode, boolean primaryIndicator);
+            BbieId bbieId, BusinessTermId businessTermId, String typeCode,
+            BbieBusinessTermId exceptBbieBusinessTermId);
 
     AssignedBusinessTermDetailsRecord getAssignedBusinessTermDetails(AsbieBusinessTermId asbieBusinessTermId);
 
