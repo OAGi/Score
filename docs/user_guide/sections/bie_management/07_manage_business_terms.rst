@@ -38,6 +38,12 @@ To create a business term:
 
 5. Click the "Create" button.
 
+.. note::
+   A business term is identified by the combination of its *Business Term* name and *External
+   Reference URI*. connectCenter does not let you create or save a business term when another
+   business term already has the same *Business Term* + *External Reference URI* pair. Two business
+   terms may share the same name as long as their *External Reference URI* values differ.
+
 Edit a Business Term
 ~~~~~~~~~~~~~~~~~~~~
 To edit a business term:
@@ -56,6 +62,11 @@ To edit a business term:
 5. You cannot change the *Definition* field, which is only updated through upload from external file.
 
 6. Click the "Update" button.
+
+.. note::
+   The same uniqueness rule applies when saving edits: the *Business Term* + *External Reference URI*
+   pair must not duplicate another business term. Reusing an existing name with a different *External
+   Reference URI* is allowed.
 
 
 Discard a Business Term
