@@ -192,6 +192,12 @@ Some nodes are enabled by default because it is a mandatory node.
 
 **Tips:** Toggle the "Hide unused" checkbox at the top-right corner of the page to hide or display the unused nodes of a BIE.
 
+**Note:** Because the *Used* checkbox sits right next to the expand/collapse triangle, it is easy to click the checkbox by mistake when you only meant to expand or collapse a node.
+Un-checking (disabling) a node also clears *Used* on every enabled node beneath it, and if the node was collapsed you may not notice.
+To prevent accidental loss, connectCenter shows a confirmation dialog before you un-check a node that has descendants.
+Click *Cancel* to leave the tree unchanged (the node stays enabled), or *Uncheck anyway* to proceed.
+Disabling a leaf node (one with no fields beneath it) stays silent.
+
 **Important:** After the node is already enabled, **BE SURE** to click on the node in the BIE tree you want to customize its details.
 The *Details* pane display details of the node highlighted in the tree.
 Just clicking the checkbox on a node does not bring up the details of the node on the right-side; it is still showing the details of the last node selected, **be careful** with that as you might end up editing the details of the previous node you selected and not the last node you enabled (Note that this behavior allows the UI to work faster.

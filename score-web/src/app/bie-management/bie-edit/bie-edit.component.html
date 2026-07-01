@@ -311,10 +311,11 @@
 
                         @if (node.level > 0) {
                           <mat-checkbox class="bie-checkbox"
+                            #usedCheckbox="matCheckbox"
                             [checked]="used(node)"
                             [disabled]="!isUsable(node)"
                             [color]="(node.used === undefined) ? 'warn' : undefined"
-                            (click)="toggleTreeUsed(node, $event)"
+                            (click)="toggleTreeUsed(node, $event, usedCheckbox)"
                             [matTooltip]="getNodeTooltip(node)"
                             [matTooltipDisabled]="getNodeTooltip(node) === ''">
                           </mat-checkbox>
@@ -1131,9 +1132,10 @@
                           <div class="col-3">
                             <div class="checkbox">
                               <mat-checkbox color="primary"
+                                #detailUsedCheckbox="matCheckbox"
                                 [disabled]="!isUsable(selectedNode)"
                                 [checked]="used(selectedNode)"
-                                (click)="toggleDetailUsed(selectedNode, $event)"
+                                (click)="toggleDetailUsed(selectedNode, $event, detailUsedCheckbox)"
                                 matTooltip="This component is required."
                                 [matTooltipDisabled]="!selectedNode.required">
                                 Used
@@ -1733,8 +1735,9 @@
                           <div class="col-3">
                             <div class="checkbox">
                               <mat-checkbox color="primary"
+                                #detailUsedCheckbox="matCheckbox"
                                 [checked]="used(selectedNode)"
-                                (click)="toggleDetailUsed(selectedNode, $event)"
+                                (click)="toggleDetailUsed(selectedNode, $event, detailUsedCheckbox)"
                                 [disabled]="!isUsable(selectedNode)"
                                 matTooltip="This component is required."
                                 [matTooltipDisabled]="!selectedNode.required">
@@ -2495,8 +2498,9 @@
                           <div class="col-3">
                             <div class="checkbox">
                               <mat-checkbox color="primary"
+                                #detailUsedCheckbox="matCheckbox"
                                 [checked]="used(selectedNode)"
-                                (click)="toggleDetailUsed(selectedNode, $event)"
+                                (click)="toggleDetailUsed(selectedNode, $event, detailUsedCheckbox)"
                                 [disabled]="!isUsable(selectedNode)"
                                 matTooltip="This component is required."
                                 [matTooltipDisabled]="!selectedNode.required">

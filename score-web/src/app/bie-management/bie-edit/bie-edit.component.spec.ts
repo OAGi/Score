@@ -1,5 +1,5 @@
 import {vi} from 'vitest';
-import {Subject} from 'rxjs';
+import {of, Subject} from 'rxjs';
 import {BieEditComponent} from './bie-edit.component';
 import {BusinessContext} from '../../context-management/business-context/domain/business-context';
 
@@ -158,5 +158,106 @@ describe('BieEditComponent business context assignment', () => {
 
     expect(ctx.businessContextUpdating).toBe(false);
     expect(ctx.businessContexts.map((e: BusinessContext) => e.businessContextId)).toEqual([1]);
+  });
+});
+
+/**
+ * Issue #1755: warn before an "Used" un-check clears descendants. The un-check guard is pure enough
+ * to test by binding the prototype method to a plain fake `this` (no Angular wiring), matching the
+ * fixtures used above. The dialog fires on un-check of any node that HAS descendants (`expandable`)
+ * — we intentionally do not count/list the affected fields, since the tree lazy-loads children and a
+ * count would change depending on whether the subtree had been expanded.
+ */
+describe('BieEditComponent.toggleTreeUsed un-check guard (#1755)', () => {
+  function toggleCtx(overrides: any = {}): any {
+    const afterClosed$ = overrides.afterClosed$ ?? of(true);
+    const dialogConfig = {data: {}};
+    const ctx: any = {
+      isUsable: () => true,
+      used: BieEditComponent.prototype.used,
+      assignVersionToVersionIdIfPossible: vi.fn(),
+      confirmDialogService: {
+        newConfig: vi.fn().mockReturnValue(dialogConfig),
+        open: vi.fn().mockReturnValue({afterClosed: () => afterClosed$})
+      },
+      _dialogConfig: dialogConfig,
+      ...overrides
+    };
+    ctx.toggleTreeUsed = BieEditComponent.prototype.toggleTreeUsed;
+    return ctx;
+  }
+
+  it('does nothing when the node is not usable', () => {
+    const ctx = toggleCtx({isUsable: () => false});
+    const node: any = {name: 'Messages', used: true, inverseMode: false, expandable: true};
+
+    ctx.toggleTreeUsed(node);
+
+    expect(node.used).toBe(true);
+    expect(ctx.confirmDialogService.open).not.toHaveBeenCalled();
+    expect(ctx.assignVersionToVersionIdIfPossible).not.toHaveBeenCalled();
+  });
+
+  it('checks (used=true) without a dialog and re-assigns the version', () => {
+    const ctx = toggleCtx();
+    const node: any = {name: 'Messages', used: false, inverseMode: false, expandable: true};
+
+    ctx.toggleTreeUsed(node);
+
+    expect(node.used).toBe(true);
+    expect(ctx.confirmDialogService.open).not.toHaveBeenCalled();
+    expect(ctx.assignVersionToVersionIdIfPossible).toHaveBeenCalledTimes(1);
+  });
+
+  it('un-checks a leaf node (no descendants) silently', () => {
+    const ctx = toggleCtx();
+    const node: any = {name: 'Message Identifier', used: true, inverseMode: false, expandable: false};
+
+    ctx.toggleTreeUsed(node);
+
+    expect(node.used).toBe(false);
+    expect(ctx.confirmDialogService.open).not.toHaveBeenCalled();
+  });
+
+  it('opens a simple confirm dialog (no count/list) before un-checking a node with descendants', () => {
+    const ctx = toggleCtx({afterClosed$: of(true)});
+    const node: any = {name: 'Messages', used: true, inverseMode: false, expandable: true};
+
+    ctx.toggleTreeUsed(node);
+
+    expect(ctx.confirmDialogService.open).toHaveBeenCalledTimes(1);
+    const data = ctx._dialogConfig.data;
+    expect(data.header).toBe('Unchecking will clear used descendants');
+    expect(data.content).toEqual([
+      'Unchecking "Messages" will also clear "Used" on its used descendants.',
+      'Do you want to continue?'
+    ]);
+    expect(data.list).toBeUndefined(); // no enumeration
+    expect(data.action).toBe('Uncheck anyway');
+    // Confirmed => the cascade runs.
+    expect(node.used).toBe(false);
+  });
+
+  it('leaves the tree untouched when the user cancels the dialog', () => {
+    const ctx = toggleCtx({afterClosed$: of(false)});
+    const node: any = {name: 'Messages', used: true, inverseMode: false, expandable: true};
+
+    ctx.toggleTreeUsed(node);
+
+    expect(ctx.confirmDialogService.open).toHaveBeenCalledTimes(1);
+    expect(node.used).toBe(true); // model unchanged
+    expect(ctx.assignVersionToVersionIdIfPossible).not.toHaveBeenCalled();
+  });
+
+  it('restores the clicked checkbox on cancel (mat-checkbox already flipped itself visually)', () => {
+    const ctx = toggleCtx({afterClosed$: of(false)});
+    const node: any = {name: 'Messages', used: true, inverseMode: false, expandable: true};
+    // Material toggled the checkbox to unchecked on click; the model stayed true.
+    const checkbox: any = {checked: false};
+
+    ctx.toggleTreeUsed(node, undefined, checkbox);
+
+    expect(node.used).toBe(true);
+    expect(checkbox.checked).toBe(true); // re-synced to the (unchanged) model value
   });
 });

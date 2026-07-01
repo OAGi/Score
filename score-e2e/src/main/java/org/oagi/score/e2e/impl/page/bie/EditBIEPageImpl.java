@@ -464,6 +464,11 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     }
 
     @Override
+    public WebElement getUsedCheckboxAtNode(WebElement node) {
+        return node.findElement(By.xpath(".//mat-checkbox[contains(@class, \"bie-checkbox\")]"));
+    }
+
+    @Override
     public boolean isDeprecated(WebElement node) {
         try {
             return node.findElement(By.xpath("//*[contains(@class, \"deprecated\")]")).isDisplayed();

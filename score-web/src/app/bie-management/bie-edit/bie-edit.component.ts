@@ -62,6 +62,7 @@ import {RxStompService} from '../../common/score-rx-stomp';
 import {MatMenuTrigger} from '@angular/material/menu';
 import {ErrorStateMatcher} from '@angular/material/core';
 import {MatChipGrid} from '@angular/material/chips';
+import {MatCheckbox} from '@angular/material/checkbox';
 import {MultiActionsSnackBarComponent} from '../../common/multi-actions-snack-bar/multi-actions-snack-bar.component';
 import {BieListDialogComponent} from '../bie-list-dialog/bie-list-dialog.component';
 import {WebPageInfoService} from '../../basis/basis.service';
@@ -808,7 +809,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     return this.dataSource.getChanged().length + this.oasBindings.filter(b => b.isChanged).length;
   }
 
-  toggleTreeUsed(node: BieFlatNode, $event?: MouseEvent) {
+  toggleTreeUsed(node: BieFlatNode, $event?: MouseEvent, checkbox?: MatCheckbox) {
     if (!!$event) {
       // Using $event.preventDefault() prevents the [checked] behavior from functioning correctly.
       $event.stopPropagation();
@@ -818,15 +819,43 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       return;
     }
 
+    // Issue #1755: the "Used" checkbox sits right next to the expand/collapse chevron, so a misclick
+    // can un-check a node and clear "Used" on its whole subtree — silently when the node is collapsed.
+    // Confirm before un-checking a node that has descendants. We deliberately do NOT enumerate the
+    // affected fields: the tree lazy-loads children, so a count/list would change depending on whether
+    // the subtree had been expanded, which is confusing; a simple, consistent warning is clearer.
+    if (this.used(node) === true && node.expandable) {
+      const dialogConfig = this.confirmDialogService.newConfig();
+      dialogConfig.data.header = 'Unchecking will clear used descendants';
+      dialogConfig.data.content = [
+        'Unchecking "' + node.name + '" will also clear "Used" on its used descendants.',
+        'Do you want to continue?'
+      ];
+      dialogConfig.data.action = 'Uncheck anyway';
+      this.confirmDialogService.open(dialogConfig).afterClosed().subscribe(result => {
+        if (!result) {
+          // Cancel: the mat-checkbox already flipped its own visual state on click, but the model
+          // did not change, so the one-way [checked] binding won't re-write it. Restore the checkbox
+          // to the model value so it stays checked.
+          if (!!checkbox) {
+            checkbox.checked = this.used(node);
+          }
+          return;
+        }
+        node.used = false;
+      });
+      return;
+    }
+
     node.used = !this.used(node);
     if (node.used) {
       this.assignVersionToVersionIdIfPossible();
     }
   }
 
-  toggleDetailUsed(detailNode?: BieFlatNode, $event?: MouseEvent) {
+  toggleDetailUsed(detailNode?: BieFlatNode, $event?: MouseEvent, checkbox?: MatCheckbox) {
     if (detailNode !== undefined) {
-      this.toggleTreeUsed(this.selectedNode, $event);
+      this.toggleTreeUsed(this.selectedNode, $event, checkbox);
     }
   }
 

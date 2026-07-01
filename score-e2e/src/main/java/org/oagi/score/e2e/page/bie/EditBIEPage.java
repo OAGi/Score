@@ -113,6 +113,16 @@ public interface EditBIEPage extends Page {
     WebElement getNodeByPath(String path, int retry);
 
     /**
+     * Return the tree-node 'Used' checkbox (the {@code bie-checkbox} rendered next to the
+     * expand/collapse chevron) for the given tree node. This is the checkbox whose misclick
+     * issue #1755 guards against.
+     *
+     * @param node the tree node (as returned by {@link #getNodeByPath(String)})
+     * @return the UI element of the tree-node 'Used' checkbox
+     */
+    WebElement getUsedCheckboxAtNode(WebElement node);
+
+    /**
      * Return {@code true} if the node is deprecated, otherwise {@code false}.
      *
      * @param node the node
