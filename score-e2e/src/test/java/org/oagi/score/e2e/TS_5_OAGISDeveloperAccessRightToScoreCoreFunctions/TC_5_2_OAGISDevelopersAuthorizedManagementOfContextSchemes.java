@@ -1098,9 +1098,14 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
         EditContextSchemePage editContextSchemePage =
                 contextMenu.openViewEditContextSchemeSubMenu()
                         .openEditContextSchemePageByContextSchemeName(randomContextScheme.getSchemeName());
-        assertThrows(ElementClickInterceptedException.class, () -> {
+        // The in-use value's checkbox is rendered but disabled ([disabled]="row.used"), so it cannot be
+        // selected for removal. Selenium surfaces a disabled control either as a click interception or,
+        // when waiting via elementToBeClickable, as a timeout; accept either — both prove removal is blocked.
+        Throwable thrown = assertThrows(WebDriverException.class, () -> {
             editContextSchemePage.removeContextSchemeValue(randomContextSchemeValue);
         });
+        assertTrue(thrown instanceof ElementClickInterceptedException || thrown instanceof TimeoutException,
+                "Removing an in-use context scheme value should be blocked by its disabled checkbox, but got: " + thrown);
     }
 
     @Test
