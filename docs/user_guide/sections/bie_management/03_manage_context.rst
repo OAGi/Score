@@ -16,7 +16,7 @@ The dependency between these three concepts and the BIE is that in order for a B
 Hence, from the user’s perspective it is easier for him to understand these concepts if they are described in sequence starting with Business Context first, then Context Scheme, and finally Context Category.
 
 The intent of a Business Context is to define the situation in which a BIE should be used.
-Therefore, a Business Context must be specified in order to create a BIE (as a BIE is a usage of a CC in a particular Business Context.
+Therefore, a Business Context must be specified in order to create a BIE (as a BIE is a usage of a CC in a particular Business Context).
 A Business Context is specified by a combination of Context Scheme values.
 
 As the name suggests, Context Scheme values within a Business Context are provided from one or more Context Schemes, each typically from different Context Categories.
@@ -167,7 +167,7 @@ To create a Business Context:
 5. Click the "Add" button near the bottom of the page to add one or more
    Business Context Values, although this is optional.
 
-6. Once finish with the business context values, click the "Create"
+6. Once finished with the business context values, click the "Create"
    button at the bottom of the page.
 
 Update a Context Category
@@ -200,7 +200,7 @@ To update a Context Scheme:
 
 3. Locate the Context Scheme you want to update. You may search by using
    the *Name* (see `How to use the Search field in
-   general <#how-to-use-the-search-field-in-general>`__) *Updater*,
+   general <#how-to-use-the-search-field-in-general>`__), *Updater*,
    *Updated start date*, or *Updated end date* search filters (see `How
    to use Search Filters <#how-to-use-search-filters>`__). Click on the
    Name or GUID of the Context Scheme to open its editing page.
@@ -261,7 +261,7 @@ To update a Business Context:
    Filters <#how-to-use-search-filters>`__). Click on its Name or GUID
    to open its "Edit Business Context" page.
 
-4. The "Edit Business Context" page is returned where the followings
+4. The "Edit Business Context" page is returned where the following
    actions can be performed:
 
    1. Change the *Name* of the Business Context.
@@ -344,7 +344,7 @@ The first discards a Context Scheme individually:
 
 3. Locate the Context Scheme you want to discard. Use the Name (`How to
    use the Search field in
-   general <#how-to-use-the-search-field-in-general>`__), *Updater*\ ",
+   general <#how-to-use-the-search-field-in-general>`__), *Updater*,
    *Updated start date*, and *Updated end date* search filters (see `How
    to use Search Filters <#how-to-use-search-filters>`__) to help locate
    the desired Context Scheme. Click on its Name or GUID to open its
@@ -383,7 +383,7 @@ The first one discards a Context Category individually:
 
 3. Locate the Context Category you want to discard. Use the Name (`How
    to use the Search field in
-   general <#how-to-use-the-search-field-in-general>`__), *Updater*\ ",
+   general <#how-to-use-the-search-field-in-general>`__), *Updater*,
    *Updated start date*, and *Updated end date* search filters (see `How
    to use Search Filters <#how-to-use-search-filters>`__) to help locate
    the desired Context Category. Click on its Name or GUID to open its
@@ -453,10 +453,10 @@ To retrieve a Business Context:
 
 2. Choose "View/Edit Business Context" from the drop-down list.
 
-3. Locate the desired Context Scheme using the pagination at the bottom
+3. Locate the desired Business Context using the pagination at the bottom
    or use the *Name* (`How to use the Search field in
    general <#how-to-use-the-search-field-in-general>`__), *Updater*,
    *Updated start date*, and *Updated end date* search filters (see `How
    to use Search Filters <#how-to-use-search-filters>`__). Click on the
-   Name or the GUID of the Context Scheme to open the "Edit Context
-   Scheme" page where its detail can be viewed.
+   Name or the GUID of the Business Context to open the "Edit Business
+   Context" page where its detail can be viewed.

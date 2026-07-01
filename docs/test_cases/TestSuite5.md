@@ -162,6 +162,9 @@ The developer can select a context scheme from the Context Scheme List page, nav
 #### Test Assertion #5.2.25
 The developer can search the Context Scheme List by an exact `Name` value and reliably retrieve the matching context scheme.
 
+#### Test Assertion #5.2.26
+The developer can update an existing context scheme without changing its `Scheme ID`, `Agency ID`, and `Version`, for example by adding a context scheme value, and the uniqueness check does not treat the scheme as a duplicate of itself.
+
 ### Test Step Pre-condition:
 
 1. The test creates developer, developer admin, end user, and end user admin accounts and their context schemes as needed.
@@ -192,6 +195,7 @@ The developer can search the Context Scheme List by an exact `Name` value and re
 21. The developer attempts to use `Load from Code List` for a context scheme whose value is already used by a business context and verifies that the action is blocked. (Assertion [#23](#test-assertion-5223))
 22. The developer selects a context scheme in the list, navigates to another paginator page and back, and verifies that the selection is retained. (Assertion [#24](#test-assertion-5224))
 23. The developer searches the Context Scheme List using the exact `Name` of a saved context scheme and verifies that the correct matching row is returned reliably. (Assertion [#25](#test-assertion-5225))
+24. The developer opens an existing context scheme, keeps the same `Scheme ID`, `Agency ID`, and `Version`, adds a new context scheme value, updates the scheme, and verifies that the update succeeds without a self-duplicate uniqueness error. (Assertion [#26](#test-assertion-5226))
 
 ## Test Case 5.3
 
@@ -850,6 +854,9 @@ Changed cardinalities of the nodes must be correctly shown in the BIE tree and r
 #### Test Assertion #5.5.57
 When a BIE is created from adjacent releases where a related BCCP was renamed between releases, the BBIE node must preserve the correct default-value and value-constraint behavior for each release.
 
+#### Test Assertion #5.5.58
+The developer can assign a distinct Business Context to a BIE even when another assigned Business Context has the same `Name`; duplicate-assignment prevention must be based on the Business Context identity, not only on the display name.
+
 ### Test Step Pre-condition:
 
 1. The test provisions the developer, business contexts, top-level concepts, releases, BIEs, and related core components that it needs for each assertion.
@@ -938,6 +945,7 @@ When a BIE is created from adjacent releases where a related BCCP was renamed be
 78. The developer toggles `Hide cardinality` and verifies that the cardinality labels are hidden and shown again. This covers Assertion [#5.5.56.a](#test-assertion-5556a).
 79. The developer changes node cardinalities, updates the BIE, reopens the page, and verifies that the cardinality labels in the tree reflect the saved values. This covers Assertion [#5.5.56.b](#test-assertion-5556b).
 80. The developer creates BIEs from adjacent releases where a related BCCP has been renamed between releases and verifies that the earlier-release BBIE node keeps the revised default value while the later-release node keeps the correct `Value Constraint` state. This covers Assertion [#5.5.57](#test-assertion-5557).
+81. The developer opens a BIE that already has one Business Context assigned, creates a second distinct Business Context with the same `Name`, assigns it from the BIE edit page, refreshes the page, and verifies that both assignments remain. This covers Assertion [#5.5.58](#test-assertion-5558).
 
 ## Test Case 5.6
 

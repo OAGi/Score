@@ -137,6 +137,38 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
     }
 
     @Test
+    @DisplayName("TC_5_2_TA_26")
+    public void developer_can_update_existing_context_scheme_without_changing_unique_triplet() {
+        ContextCategoryObject randomContextCategory =
+                getAPIFactory().getContextCategoryAPI().createRandomContextCategory(appUser);
+        ContextSchemeObject contextScheme =
+                getAPIFactory().getContextSchemeAPI().createRandomContextScheme(randomContextCategory, appUser);
+        ContextSchemeValueObject newContextSchemeValue =
+                ContextSchemeValueObject.createRandomContextSchemeValue(contextScheme);
+
+        HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
+        ContextMenu contextMenu = homePage.getContextMenu();
+        ViewEditContextSchemePage viewEditContextSchemePage = contextMenu.openViewEditContextSchemeSubMenu();
+
+        EditContextSchemePage editContextSchemePage =
+                viewEditContextSchemePage.openEditContextSchemePageByContextSchemeName(contextScheme.getSchemeName());
+        editContextSchemePage.openContextSchemeValueDialog()
+                .addContextSchemeValue(newContextSchemeValue);
+        editContextSchemePage.hitUpdateButton();
+
+        viewEditContextSchemePage = contextMenu.openViewEditContextSchemeSubMenu();
+        editContextSchemePage =
+                viewEditContextSchemePage.openEditContextSchemePageByContextSchemeName(contextScheme.getSchemeName());
+
+        assertEquals(randomContextCategory.getName(), editContextSchemePage.getContextCategorySelectField().getText());
+        assertEquals(contextScheme.getSchemeName(), editContextSchemePage.getNameField().getAttribute("value"));
+        assertEquals(contextScheme.getSchemeId(), editContextSchemePage.getSchemeIDField().getAttribute("value"));
+        assertEquals(contextScheme.getSchemeAgencyId(), editContextSchemePage.getAgencyIDField().getAttribute("value"));
+        assertEquals(contextScheme.getSchemeVersionId(), editContextSchemePage.getVersionField().getAttribute("value"));
+        assertContextSchemeValue(editContextSchemePage, newContextSchemeValue);
+    }
+
+    @Test
     @DisplayName("TC_5_2_TA_3")
     public void developer_can_add_and_remove_context_scheme_values_during_creation() {
         ContextCategoryObject randomContextCategory =

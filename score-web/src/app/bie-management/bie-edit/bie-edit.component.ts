@@ -3686,8 +3686,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   _filter(value?: string | BusinessContext) {
-    const prevBizCtxNames = this.businessContexts.map(e => e.name);
-    let l = this.allBusinessContexts.filter(e => !prevBizCtxNames.includes(e.name));
+    const prevBizCtxIds = this.businessContexts.map(e => e.businessContextId);
+    let l = this.allBusinessContexts.filter(e => !prevBizCtxIds.includes(e.businessContextId));
     if (!!value) {
       let name;
       if (typeof value === 'object') {
@@ -3701,6 +3701,10 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   removeBusinessContext(businessContext: BusinessContext) {
+    if (this.businessContextUpdating || this.businessContexts.length <= 1) {
+      return;
+    }
+
     this.businessContextUpdating = true;
     this.bizCtxService.unassign(this.topLevelAsbiepId, businessContext)
       .subscribe(_ => {
@@ -3718,6 +3722,12 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   addBusinessContext(event: MatAutocompleteSelectedEvent): void {
     const selectedBusinessContext: BusinessContext = event.option.value;
+    if (this.businessContextUpdating ||
+        this.businessContexts.some(e => e.businessContextId === selectedBusinessContext.businessContextId)) {
+      return;
+    }
+
+    this.businessContextUpdating = true;
     this.bizCtxService.assign(this.topLevelAsbiepId, selectedBusinessContext)
       .subscribe(_ => {
         this.businessContexts = this.businessContexts.concat(selectedBusinessContext);

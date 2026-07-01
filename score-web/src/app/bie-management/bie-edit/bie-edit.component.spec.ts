@@ -1,4 +1,7 @@
+import {vi} from 'vitest';
+import {Subject} from 'rxjs';
 import {BieEditComponent} from './bie-edit.component';
+import {BusinessContext} from '../../context-management/business-context/domain/business-context';
 
 describe('BieEditComponent', () => {
   it('should be defined', () => {
@@ -43,5 +46,83 @@ describe('BieEditComponent.isOasBindingDeleteBodyIgnored (#1610 per-card warning
   it('warns when the version is missing/blank (not a 3.1 prefix)', () => {
     expect(deleteBodyIgnored('DELETE', 'Request', '')).toBe(true);
     expect(deleteBodyIgnored('DELETE', 'Request', undefined)).toBe(true);
+  });
+});
+
+function businessContext(businessContextId: number, name: string): BusinessContext {
+  return {businessContextId, name, guid: 'bc-' + businessContextId} as BusinessContext;
+}
+
+describe('BieEditComponent business context assignment', () => {
+  function businessContextCtx(overrides: any = {}): any {
+    const ctx: any = {
+      topLevelAsbiepId: 1001,
+      businessContexts: [businessContext(1, 'Shared Context')],
+      allBusinessContexts: [
+        businessContext(1, 'Shared Context'),
+        businessContext(2, 'Shared Context'),
+        businessContext(3, 'Trading Partner')
+      ],
+      businessContextUpdating: false,
+      businessContextCtrl: {setValue: vi.fn()},
+      businessContextInput: {nativeElement: {value: 'Shared Context'}},
+      bizCtxService: {
+        assign: vi.fn(),
+        unassign: vi.fn()
+      },
+      snackBar: {open: vi.fn()},
+      ...overrides
+    };
+    ctx._filter = BieEditComponent.prototype._filter;
+    ctx.addBusinessContext = BieEditComponent.prototype.addBusinessContext;
+    ctx.removeBusinessContext = BieEditComponent.prototype.removeBusinessContext;
+    return ctx;
+  }
+
+  it('filters already assigned business contexts by id, not by name', () => {
+    const ctx = businessContextCtx();
+
+    expect(ctx._filter().map((e: BusinessContext) => e.businessContextId)).toEqual([2, 3]);
+    expect(ctx._filter('Shared').map((e: BusinessContext) => e.businessContextId)).toEqual([2]);
+  });
+
+  it('sets the updating flag while an assignment request is in flight', () => {
+    const selected = businessContext(2, 'Shared Context');
+    const assignment$ = new Subject<void>();
+    const ctx = businessContextCtx();
+    ctx.bizCtxService.assign.mockReturnValue(assignment$);
+
+    ctx.addBusinessContext({option: {value: selected}});
+
+    expect(ctx.bizCtxService.assign).toHaveBeenCalledWith(1001, selected);
+    expect(ctx.businessContextUpdating).toBe(true);
+    expect(ctx.businessContexts.map((e: BusinessContext) => e.businessContextId)).toEqual([1]);
+
+    assignment$.next();
+
+    expect(ctx.businessContexts.map((e: BusinessContext) => e.businessContextId)).toEqual([1, 2]);
+    expect(ctx.businessContextUpdating).toBe(false);
+    expect(ctx.businessContextInput.nativeElement.value).toBe('');
+    expect(ctx.businessContextCtrl.setValue).toHaveBeenCalledWith(null);
+    expect(ctx.snackBar.open).toHaveBeenCalledWith('Updated', '', {duration: 3000});
+  });
+
+  it('ignores duplicate assignment requests for the same business context id', () => {
+    const ctx = businessContextCtx();
+
+    ctx.addBusinessContext({option: {value: businessContext(1, 'Shared Context')}});
+
+    expect(ctx.bizCtxService.assign).not.toHaveBeenCalled();
+    expect(ctx.businessContexts.map((e: BusinessContext) => e.businessContextId)).toEqual([1]);
+  });
+
+  it('does not unassign the last remaining business context', () => {
+    const ctx = businessContextCtx();
+
+    ctx.removeBusinessContext(ctx.businessContexts[0]);
+
+    expect(ctx.bizCtxService.unassign).not.toHaveBeenCalled();
+    expect(ctx.businessContexts.map((e: BusinessContext) => e.businessContextId)).toEqual([1]);
+    expect(ctx.businessContextUpdating).toBe(false);
   });
 });

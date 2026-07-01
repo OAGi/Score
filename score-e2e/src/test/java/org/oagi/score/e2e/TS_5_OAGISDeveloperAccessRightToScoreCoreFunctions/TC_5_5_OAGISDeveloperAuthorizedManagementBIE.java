@@ -3448,6 +3448,45 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_5_5_TA_58")
+    public void developer_can_assign_distinct_business_contexts_with_same_name_to_BIE() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        String releaseNum = "10.8.5";
+        BusinessContextObject assignedBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        BusinessContextObject duplicateNameBusinessContext =
+                BusinessContextObject.createRandomBusinessContext(developer);
+        duplicateNameBusinessContext.setName(assignedBusinessContext.getName());
+        duplicateNameBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createBusinessContext(duplicateNameBusinessContext);
+
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        TopLevelASBIEPObject topLevelASBIEP_WIP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(assignedBusinessContext),
+                        getAPIFactory().getCoreComponentAPI()
+                                .getASCCPByDENAndReleaseNum(library, "Customer Price List Price. Price", releaseNum),
+                        developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu()
+                .openEditBIEPage(topLevelASBIEP_WIP);
+        EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+        topLevelASBIEPPanel.addBusinessContext(duplicateNameBusinessContext);
+        assertEquals("Updated", getSnackBarMessage(getDriver()));
+
+        editBIEPage.openPage();
+        topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+        List<String> businessContextTexts = topLevelASBIEPPanel.getBusinessContextList().stream()
+                .map(e -> getText(e).replaceAll("cancel", "").trim())
+                .collect(Collectors.toList());
+        assertEquals(2L, businessContextTexts.stream()
+                .filter(assignedBusinessContext.getName()::equals)
+                .count());
+    }
+
+    @Test
     @DisplayName("TC_5_5_TA_40")
     public void developer_can_remove_an_assigned_business_context_from_BIE_in_WIP_state_he_owns() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
