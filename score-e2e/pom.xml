@@ -42,6 +42,9 @@
         <hikariCP.version>6.3.3</hikariCP.version>
         <jOOQ.version>3.20.17</jOOQ.version>
         <json.version>20250517</json.version>
+        <!-- Matches the score-http poi.version: e2e generates multi-worksheet .xlsx upload
+             fixtures at runtime with the same library the production parser reads them with. -->
+        <poi.version>5.5.1</poi.version>
     </properties>
 
     <dependencies>
@@ -64,6 +67,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-csv</artifactId>
             <version>${commons-csv.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${poi.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>

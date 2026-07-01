@@ -444,7 +444,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         BIEMenu bieMenu = homePage.getBIEMenu();
 
         // #1753 - L6: one row reuses an existing external reference URI (-> updated) and one is new
-        // (-> created); the import must report "Imported: 1 created, 1 updated.".
+        // (-> created); the import dialog's result step must report 1 created and 1 updated.
         String newName = "bt_" + RandomStringUtils.secure().nextAlphanumeric(8);
         String newUri = "https://example.org/" + RandomStringUtils.secure().nextAlphanumeric(12);
         String csv = "\"businessTerm\",\"externalReferenceUri\",\"externalReferenceId\",\"definition\",\"comment\"\n"
@@ -454,8 +454,12 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         Files.write(csvFile, csv.getBytes(StandardCharsets.UTF_8));
 
         UploadBusinessTermsPage uploadBusinessTermsPage = bieMenu.openViewEditBusinessTermSubMenu().hitUploadBusinessTermsButton();
-        uploadBusinessTermsPage.getFileUploadInput().sendKeys(csvFile.toAbsolutePath().toString());
-        assertEquals("Imported: 1 created, 1 updated.", getSnackBarMessage(getDriver()));
+        uploadBusinessTermsPage.uploadFile(csvFile.toAbsolutePath().toString());
+        uploadBusinessTermsPage.proceedToPreview();
+        uploadBusinessTermsPage.hitImportButton();
+        String summary = uploadBusinessTermsPage.getResultSummaryText();
+        assertTrue(summary.contains("1 created"));
+        assertTrue(summary.contains("1 updated"));
     }
 
     @Test

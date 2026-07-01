@@ -858,6 +858,59 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
                 "select count(*) from business_term where business_term_id = ?", usedTerm.getBusinessTermId()));
     }
 
+    @Test
+    @DisabledIfBusinessTermProperty(value = false)
+    @DisplayName("TC_42_2_17")
+    public void setting_preferred_with_a_different_type_code_warns_and_demotes_the_previous_preferred_on_the_same_node() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(library, "Source Activity. Source Activity", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, endUser, "WIP");
+        String path = "/" + asccp.getPropertyTerm() + "/Note";
+        BusinessTermObject firstPreferredTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+        BusinessTermObject secondTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+
+        loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        // #1381: "preferred" is one-per-BIE-node; Type Code does NOT scope it. Seed two assignments on
+        // the SAME BBIE node with DIFFERENT type codes: the first preferred, the second not. Promoting
+        // the second to preferred must warn (a preferred already exists on the BIE) and demote the
+        // first, even though the type codes differ. Before the fix the frontend "does a preferred
+        // already exist?" check filtered by type code, so it fired no warning and the previous
+        // preferred term (a different type code) was silently demoted.
+        createAssignedBusinessTermForBbieUsingDb(firstPreferredTerm, topLevelASBIEP, path, endUser, "type code A", true);
+        createAssignedBusinessTermForBbieUsingDb(secondTerm, topLevelASBIEP, path, endUser, "type code B", false);
+
+        BigInteger firstBiztermId = findBbieBiztermId(firstPreferredTerm.getBusinessTermId());
+        BigInteger secondBiztermId = findBbieBiztermId(secondTerm.getBusinessTermId());
+
+        // Promote the second assignment to preferred via the assignment detail page.
+        String detailUrl = getConfig().getBaseUrl()
+                .resolve("/business_term_management/assign_business_term/details/" + secondBiztermId
+                        + "?type=BBIE&id=" + secondBiztermId).toString();
+        getDriver().get(detailUrl);
+        click(elementToBeClickable(getDriver(), By.xpath("//mat-checkbox[contains(., \"Preferred Business Term\")]")));
+        click(elementToBeClickable(getDriver(), By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        // #1381: the overwrite warning MUST fire even though the existing preferred term has a
+        // different Type Code (the "preferred already exists?" check is node-scoped, matching the
+        // node-scoped backend demotion).
+        assertTrue(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//*[contains(text(), \"Overwrite previous preferred business term?\")]")).isDisplayed());
+        // confirm the overwrite of the previously preferred term
+        click(elementToBeClickable(getDriver(), By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        assertEquals("Updated", getSnackBarMessage(getDriver()));
+
+        // The second (type code B) is now preferred; the first (type code A) has been demoted.
+        assertEquals(1L, countByLong(
+                "select primary_indicator from bbie_bizterm where bbie_bizterm_id = ?", secondBiztermId));
+        assertEquals(0L, countByLong(
+                "select primary_indicator from bbie_bizterm where bbie_bizterm_id = ?", firstBiztermId));
+    }
+
     @AfterEach
     public void tearDown() {
         super.tearDown();

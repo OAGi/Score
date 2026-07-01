@@ -1,0 +1,4 @@
+businessTerm,externalReferenceUri,externalReferenceId,definition,comment
+Purchase Order,https://glossary.example.com/term/PO-001,PO-001,A buyer's offer to purchase goods or services under stated terms.,Maps to OAGIS ProcessPurchaseOrder.
+Invoice,https://glossary.example.com/term/INV-002,INV-002,A seller's request for payment for goods or services delivered.,
+Ship Notice,https://glossary.example.com/term/ASN-003,ASN-003,Advance notice that goods have been shipped to the buyer.,Also called ASN.

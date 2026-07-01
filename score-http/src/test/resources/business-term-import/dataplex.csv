@@ -1,0 +1,5 @@
+term_display_name,description,steward,tagged_assets,synonyms,related_terms,belongs_to_category
+Customer ID,Unique identifier assigned to each customer record.,Data Team<datateam@example.com>,project.dataset.customers:customer_id,"Cust ID, Client Number","Account ID, Customer Name",Customer Data
+Profit,Revenue remaining after all costs and expenses are deducted.,Finance Steward<finance@example.com>,project.finance.income_statement,Earnings,"Revenue, Margin",Financial Metrics
+Annual Recurring Revenue,Normalized yearly value of recurring subscription revenue.,RevOps<revops@example.com>,project.sales.subscriptions,ARR,"Profit, Churn Rate",Financial Metrics
+Email Address,Primary electronic mail address used to contact a customer.,Data Team<datateam@example.com>,project.dataset.customers:email,"Email, E-mail",Customer ID,Customer Data

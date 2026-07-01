@@ -1,0 +1,5 @@
+Name,Artifact Type,Category,Artifact ID,Description,Tags,Stewards,Classifications,Related Terms,Business Start,Business End
+Account claim tracking,glossary_term,Insurance >> Business Area >> Claim,f1c2e3a4-5b67-48d9-90ab-cdef01234567,Tracks the lifecycle and status of an insurance claim.,insurance,jdoe@example.com,Insurance >> property,Insurance >> Business Area >> Account >> Account,2020-10-07 16:00+00:00,2025-12-31 23:59+00:00
+Blue,glossary_term,Colors,a0b1c2d3-e4f5-6789-abcd-ef0123456789,A primary color used for status flags.,reference,msmith@example.com,,,2021-01-01 00:00+00:00,
+Policy holder,glossary_term,Insurance >> Business Area >> Account,9z8y7x6w-5v4u-3t2s-1r0q-ponmlkjihgfe,The person or entity that owns an insurance policy.,insurance,jdoe@example.com,Insurance >> PII,Insurance >> Business Area >> Claim >> Account claim tracking,,
+Premium,glossary_term,Insurance >> Business Area >> Account,11111111-2222-3333-4444-555555555555,The amount paid by the policy holder for insurance coverage.,finance,afinance@example.com,Insurance >> property,,,

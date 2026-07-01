@@ -1,0 +1,384 @@
+[
+  {
+    "file": "collibra.xlsx",
+    "sheets": [
+      {
+        "name": "Business Terms",
+        "headers": [
+          "ID",
+          "Name",
+          "Full name",
+          "Asset type",
+          "Domain",
+          "Community",
+          "Status",
+          "Definition",
+          "Descriptive Example",
+          "Generalization"
+        ],
+        "rows": [
+          [
+            "bc40c085-352c-4a8c-8ee7-494fe821308e",
+            "Customer",
+            "Customer",
+            "Business Term",
+            "Customer Glossary",
+            "Data Governance Council",
+            "Accepted",
+            "A person or organization that purchases goods or services.",
+            "Acme Corp placed an order in 2025.",
+            ""
+          ],
+          [
+            "a1f3c2d4-9b8e-4c1a-8f2d-1122334455aa",
+            "Net Revenue",
+            "Net Revenue",
+            "Business Term",
+            "Finance Glossary",
+            "Data Governance Council",
+            "Candidate",
+            "Gross revenue less returns, allowances and discounts.",
+            "Q4 net revenue was $4.2M after $0.3M returns.",
+            "Revenue"
+          ],
+          [
+            "d4e5f6a7-1234-4abc-9def-66778899ccdd",
+            "Active Customer",
+            "Active Customer",
+            "Business Term",
+            "Customer Glossary",
+            "Data Governance Council",
+            "Accepted",
+            "A customer with at least one transaction in the trailing 12 months.",
+            "A buyer who purchased in the last year is an active customer.",
+            "Customer"
+          ],
+          [
+            "f0e1d2c3-5566-4778-9900-aabbccddeeff",
+            "Churn Rate",
+            "Churn Rate",
+            "Business Term",
+            "Customer Glossary",
+            "Data Governance Council",
+            "Under Review",
+            "The percentage of customers who stop using the product in a period.",
+            "Monthly churn rate of 2% means 2 of 100 customers left.",
+            ""
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "file": "informatica.xlsx",
+    "sheets": [
+      {
+        "name": "Business Term",
+        "headers": [
+          "Core: Reference ID",
+          "Core: Name",
+          "Business: Description",
+          "Parent Reference Id"
+        ],
+        "rows": [
+          [
+            "BT-CUSTOMER-0001",
+            "Customer Identifier",
+            "A unique number assigned to each customer to identify them across all systems.",
+            "SD-PARTY-0002"
+          ],
+          [
+            "BT-EMAIL-0007",
+            "Email Address",
+            "The primary electronic mail address used to contact a party.",
+            "SD-CONTACT-0005"
+          ],
+          [
+            "BT-REVENUE-0021",
+            "Net Revenue",
+            "Total revenue recognized after deductions for returns, allowances, and discounts.",
+            "SD-FINANCE-0010"
+          ],
+          [
+            "BT-DOB-0033",
+            "Date of Birth",
+            "The calendar date on which an individual was born, used for identity verification and age checks.",
+            "SD-PARTY-0002"
+          ]
+        ]
+      },
+      {
+        "name": "Relationship",
+        "headers": [
+          "From Reference ID",
+          "Relationship",
+          "To Reference ID"
+        ],
+        "rows": [
+          [
+            "BT-CUSTOMER-0001",
+            "child of",
+            "SD-PARTY-0002"
+          ]
+        ]
+      },
+      {
+        "name": "Annexure",
+        "headers": [
+          "Attribute",
+          "Allowed Values"
+        ],
+        "rows": [
+          [
+            "Status",
+            "Draft; Published"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "file": "erwin.xlsx",
+    "sheets": [
+      {
+        "name": "Business Terms",
+        "headers": [
+          "Catalog Name",
+          "Path",
+          "Business Term",
+          "Definition",
+          "Description",
+          "Notes",
+          "Acronym",
+          "Governance Responsibilities",
+          "Classification",
+          "User Defined 1",
+          "User Defined 2"
+        ],
+        "rows": [
+          [
+            "Business and Management",
+            "Business and Management\\Finance\\Accounts",
+            "Account",
+            "An Account contains data for a party.",
+            "Account contains data for posting, payments, debt recovery, and taxes.",
+            "The data for posting, payments, debt recovery, and taxes was imported from the Account.xlsx file.",
+            "No",
+            "Data Stewards: Jane Doe",
+            "",
+            "Gold",
+            "Reviewed-2026"
+          ],
+          [
+            "Business and Management",
+            "Business and Management\\Customer",
+            "Customer",
+            "A party that purchases goods or services from the organization.",
+            "Master record describing an individual or organization customer.",
+            "Aligned with CRM master data.",
+            "No",
+            "Data Stewards: Robert King",
+            "PII",
+            "Silver",
+            "Reviewed-2026"
+          ],
+          [
+            "Business and Management",
+            "Business and Management\\Finance",
+            "SLA",
+            "Service Level Agreement defining committed service targets.",
+            "Contractual metric agreement between provider and consumer.",
+            "Sourced from contracts repository.",
+            "Yes",
+            "Data Stewards: Jane Doe",
+            "",
+            "Bronze",
+            ""
+          ],
+          [
+            "Business and Management",
+            "Business and Management\\Healthcare",
+            "Patient Record",
+            "Clinical record holding a patient's medical information.",
+            "Protected clinical dataset for a single patient.",
+            "Subject to HIPAA controls.",
+            "No",
+            "Data Stewards: Robert King",
+            "PHI",
+            "Gold",
+            "Reviewed-2026"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "file": "dataworld.xlsx",
+    "sheets": [
+      {
+        "name": "Overview",
+        "rows": [
+          [
+            "This Overview tab is informational. Edit term rows on the per-type tabs; do not edit this tab."
+          ],
+          [
+            "Generated by data.world business glossary export."
+          ]
+        ]
+      },
+      {
+        "name": "Business Term",
+        "headers": [
+          "Name",
+          "Description",
+          "Summary",
+          "Status",
+          "Resource (IRI)"
+        ],
+        "rows": [
+          [
+            "Assets Under Management",
+            "The total market value of the investments that an entity manages on behalf of clients.",
+            "Total client investments managed by the firm.",
+            "Approved",
+            ""
+          ],
+          [
+            "Customer Lifetime Value",
+            "The total net profit attributed to the entire future relationship with a customer.",
+            "Projected net profit over a customer relationship.",
+            "Draft",
+            ""
+          ],
+          [
+            "Net Revenue Retention",
+            "Recurring revenue retained from existing customers over a period, including expansion and net of churn.",
+            "Recurring revenue kept from existing customers.",
+            "Approved",
+            "https://mycorp.linked.data.world/d/ddw-catalogs/tbl.5b1db321bb66ec93ef3a3c417c1d0520"
+          ],
+          [
+            "Personally Identifiable Information",
+            "Any data that could identify a specific individual, subject to privacy regulation.",
+            "Data that can identify an individual.",
+            "Deprecated",
+            ""
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "file": "sap.xlsx",
+    "sheets": [
+      {
+        "name": "Version",
+        "headers": [
+          "Export Version",
+          "Export Date",
+          "Source"
+        ],
+        "rows": [
+          [
+            "1.0",
+            "2026-06-30",
+            "SAP Information Steward Metapedia"
+          ]
+        ]
+      },
+      {
+        "name": "Business Terms",
+        "headers": [
+          "Technical Name",
+          "Name",
+          "Categories",
+          "Description",
+          "Keywords",
+          "Synonyms",
+          "Author",
+          "Approver",
+          "Observer",
+          "Status",
+          "Related Terms",
+          "Name Paths of Associated Objects",
+          "Type Paths of Associated Objects"
+        ],
+        "rows": [
+          [
+            "fin_net_revenue",
+            "Net Revenue",
+            "Finance,Revenue Recognition",
+            "Total revenue after returns, allowances, and discounts are deducted.",
+            "revenue,sales,turnover",
+            "Net Sales,Net Turnover",
+            "jdoe",
+            "Metapedia Approver",
+            "",
+            "Approved",
+            "Gross Revenue,Operating Income",
+            "DWH_PROD\\HANA01\\SALES\\FIN\\FACT_REVENUE",
+            "Connection\\Server\\Database\\Schema\\Table"
+          ],
+          [
+            "cust_churn_rate",
+            "Customer Churn Rate",
+            "Customer Analytics",
+            "Percentage of customers who stopped using the product during a given period.",
+            "churn,attrition,retention",
+            "Attrition Rate",
+            "asmith",
+            "Metapedia Approver",
+            "dwatch",
+            "Editing",
+            "Customer Lifetime Value,Active Customer",
+            "DWH_PROD\\HANA01\\CRM\\CUST\\DIM_CUSTOMER",
+            "Connection\\Server\\Database\\Schema\\Table"
+          ],
+          [
+            "hr_headcount",
+            "Headcount",
+            "Human Resources",
+            "The total number of active employees at a point in time.",
+            "employees,fte,workforce",
+            "Employee Count,FTE Count",
+            "mbrown",
+            "HR Approver",
+            "",
+            "Submitted",
+            "Full-Time Equivalent,Attrition",
+            "",
+            ""
+          ],
+          [
+            "ops_otif",
+            "On-Time In-Full",
+            "Supply Chain,Logistics KPIs",
+            "Share of orders delivered both on the promised date and in the full requested quantity.",
+            "otif,delivery,fulfillment",
+            "Perfect Order Rate",
+            "kchen",
+            "Metapedia Approver",
+            "",
+            "Rejected",
+            "Order Fill Rate,Lead Time",
+            "DWH_PROD\\HANA01\\SCM\\OPS\\FACT_DELIVERY",
+            "Connection\\Server\\Database\\Schema\\Table"
+          ]
+        ]
+      },
+      {
+        "name": "Business Categories",
+        "headers": [
+          "Technical Name",
+          "Name"
+        ],
+        "rows": [
+          [
+            "fin",
+            "Finance"
+          ]
+        ]
+      }
+    ]
+  }
+]

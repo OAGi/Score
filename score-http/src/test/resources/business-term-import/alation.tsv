@@ -1,0 +1,5 @@
+id	title	description	glossaries	template	steward:groupprofile	Status	action
+2133	Annual Recurring Revenue	The total yearly value of recurring subscription revenue normalized to a one-year period.	Finance Glossary	Business Term	Finance Data Stewards	Endorsed	
+2134	Monthly Recurring Revenue	Predictable subscription revenue a company expects each month.	Finance Glossary;Sales Glossary	Business Term	Finance Data Stewards	Endorsed	
+	Customer Churn Rate	Percentage of customers who cancel within a given period.	Sales Glossary	Business Term	Revenue Ops Group	Draft	
+2098	Deprecated KPI	Legacy metric no longer reported.	Finance Glossary	Business Term	Finance Data Stewards	Deprecated	delete

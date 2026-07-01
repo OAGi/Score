@@ -1,0 +1,5 @@
+﻿Name,Nick Name,Status,Definition,IsDefinitionRichText,Acronym,Resources,Related Terms,Synonyms,Stewards,Experts,Parent Term
+Customer,Cust,Approved,A person or organization that purchases goods or services.,false,CUST,Docs|https://www.contoso.com/customer,Account,Client,jane.steward@contoso.com,john.expert@contoso.com,Party
+Account,Acct,Draft,A financial record of a customer relationship.,false,ACCT,Policy|https://www.contoso.com/account-policy,Customer,,jane.steward@contoso.com,,Party
+Net Revenue,NetRev,Approved,"Total revenue after deductions, returns, and allowances.",true,NETREV,KPI Def|https://www.contoso.com/kpis;GL Map|https://www.contoso.com/gl,Gross Revenue,Net Sales,finance.steward@contoso.com,cfo.office@contoso.com,Revenue
+Customer ID,CustID,Approved,Unique identifier assigned to a customer record.,false,CID,Data Dictionary|https://www.contoso.com/dd,Customer,Customer Number,data.steward@contoso.com,john.expert@contoso.com,Customer

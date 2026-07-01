@@ -50,7 +50,7 @@ A list filter such as `External Reference URI` survives a page reload/bookmark: 
 Creating a Business Term with a malformed `External Reference URI` is rejected server-side with a clear validation error, even though the create form performs no URI format check.
 
 #### Test Assertion #42.1.15
-A CSV import reports a created/updated summary: a row whose `External Reference URI` already exists is counted as updated and a row with a new URI is counted as created (e.g. `Imported: 1 created, 1 updated.`).
+An import reports a created/updated summary on the import dialog's result step: a row whose `External Reference URI` already exists is counted as updated and a row with a new URI is counted as created (e.g. `1 created`, `1 updated`).
 
 #### Test Assertion #42.1.16
 `PUT /business-terms/{id}` honors the path id and rejects a request body that targets a different id with HTTP 400; a body whose id matches the path succeeds.
@@ -154,6 +154,9 @@ Assigning a Business Term to a nonexistent BIE id is rejected with a clean HTTP 
 #### Test Assertion #42.2.16
 A batch discard that includes a Business Term still in use rolls back the entire batch — no term in the batch is deleted — and returns HTTP 400.
 
+#### Test Assertion #42.2.17
+Preferred is one-per-BIE-node and independent of Type Code: setting an assignment preferred while another preferred assignment with a *different* Type Code already exists on the same node still prompts the overwrite warning and demotes the previously preferred assignment.
+
 ### Test Step Pre-condition:
 1. Business Term is enabled in Application Settings in connectCenter.
 2. The users, branches, releases, and records needed to exercise this test case are available in connectCenter.
@@ -200,6 +203,8 @@ A batch discard that includes a Business Term still in use rolls back the entire
 37. Verify that the response is HTTP 400. (Assertion [#15](#test-assertion-42215))
 38. An authorized tester batch-discards a list that contains one unused Business Term and one Business Term that is still in use, via the API.
 39. Verify that the response is HTTP 400 and that both Business Terms still exist. (Assertion [#16](#test-assertion-42216))
+40. The end user assigns two Business Terms to the same BIE node with *different* type codes, marks the first preferred, then opens the second assignment's detail page and sets it preferred.
+41. Verify that connectCenter still shows the overwrite warning and that, after confirming, the second assignment becomes preferred while the previously preferred assignment (with the different type code) is demoted. (Assertion [#17](#test-assertion-42217))
 
 ## Test Case 42.3
 **Business Term from BIE Detail Page**
@@ -235,37 +240,94 @@ The end user can assign Business Terms to a descendant BIE node from the BIE det
 ## Test Case 42.4
 **Load Business Terms from an External Source**
 
+`Upload Business Terms` opens a modal **import dialog** (it is no longer a separate page). The dialog
+walks through four steps — **Upload file** (drag &amp; drop or browse a `.csv`, `.tsv`, or `.xlsx` file,
+up to 10 MB; the chosen file is shown as a removable tile, and a single-worksheet file advances
+automatically to **Map columns** once it is parsed, so no extra `Next` click is needed on the upload
+step, whereas a multi-worksheet workbook stays on the upload step and shows a **worksheet picker** so
+the user can choose which sheet holds the terms), **Map columns** (the dialog auto-detects the
+connectCenter template as well as common commercial Business Glossary exports — Collibra, Alation, and
+others — shows an amber notice ("Review the column mapping below before continuing.") prompting the
+user to confirm the auto-mapping,
+and lets the user remap any column or synthesize the required External Reference URI from a base URL
+plus an ID column), **Review &amp; select** (parsed rows are shown in a table; valid rows are
+pre-checked, rows that need review are unchecked, flagged, and inline-editable with live
+re-validation), and **Result** (a per-row created / updated / failed summary). The file is parsed
+server-side without persisting; only the rows the user selects are imported, upserting by External
+Reference URI. A top-right close (**X**) button cancels the import at any step before the result step,
+and choosing an unsupported/oversized replacement file keeps the file already selected rather than
+discarding it.
+
 ### Test Assertion:
 
 #### Test Assertion #42.4.1
-The end user can download a template for the external CSV file to be uploaded from the `Business Term` page.
+The end user can download a template for the external CSV file from the import dialog.
 
 #### Test Assertion #42.4.2
-The end user can upload a CSV file that follows the template format from the `Business Term` page.
+The end user can upload a file that follows the template format and import all of its valid rows.
 
 #### Test Assertion #42.4.3
-No new Business Term is created when the uploaded CSV file does not obey the required template format.
+Rows that violate the required format (missing business term, invalid URI, …) are flagged for review
+and left unselected, and are not imported; the remaining valid rows in the same file can still be
+imported.
 
 #### Test Assertion #42.4.4
-For bulk upload through `Upload Business Terms`, if a row is uploaded with a new external reference URI, a new Business Term is created.
+When a selected row carries a new External Reference URI, a new Business Term is created.
 
 #### Test Assertion #42.4.5
-For bulk upload through `Upload Business Terms`, if a row is uploaded with an existing external reference URI, the previously uploaded Business Term for that URI is updated instead of creating another record.
+When a selected row carries an already-existing External Reference URI, the existing Business Term for
+that URI is updated (reported as `updated`) instead of creating another record.
+
+#### Test Assertion #42.4.6
+A multi-worksheet workbook does not auto-advance: the upload step keeps a worksheet picker visible, and
+selecting the worksheet that holds the terms re-parses the file so its rows can be reviewed and imported.
+
+#### Test Assertion #42.4.7
+Removing the selected file via the file tile's remove control resets the dialog to the drag-and-drop
+zone so a different file can be chosen.
+
+#### Test Assertion #42.4.8
+Choosing an unsupported (or oversized) replacement file while a valid file is already selected reports a
+message and keeps the existing valid selection instead of discarding it.
+
+#### Test Assertion #42.4.9
+A commercial Business Glossary export that has no single URI column (e.g. a Collibra-style export)
+auto-maps the term column and selects the "build from base URL + ID" strategy; the map step shows the
+amber "Review the column mapping" notice, and once a base URL is supplied each row's External Reference URI is
+synthesized as `<base URL><id>` and the rows import.
+
+#### Test Assertion #42.4.10
+The import can be cancelled at any step before the result step via the top-right close (X) button, and
+cancelling imports nothing.
 
 ### Test Step Pre-condition:
 1. Business Term is enabled in Application Settings in connectCenter.
 2. The users, branches, releases, and records needed to exercise this test case are available in connectCenter.
-3. The local execution environment can download files and upload CSV files through the browser.
+3. The local execution environment can download files and upload files through the browser.
 
 ### Test Step:
 1. The end user signs in to connectCenter and opens `BIE > View/Edit Business Term`.
-2. The end user clicks `Upload Business Terms` and then clicks `Download template`.
+2. The end user clicks `Upload Business Terms` to open the import dialog, then clicks `Download template`.
 3. Verify that the CSV template file is downloaded successfully. (Assertion [#1](#test-assertion-4241))
-4. The end user prepares a CSV file that follows the required template format and uploads it.
-5. Verify that the upload succeeds and the uploaded Business Terms can be found from the `Business Term` page. (Assertion [#2](#test-assertion-4242))
-6. The end user uploads a CSV file that violates the required template format, such as missing required values or invalid URI content.
-7. Verify that connectCenter rejects the upload and no records from that invalid file are created. (Assertion [#3](#test-assertion-4243))
-8. The end user uploads a CSV file containing rows with new external reference URIs.
+4. The end user uploads a file that follows the template format; the dialog auto-advances to `Map columns`. The end user advances through the auto-mapped preview and imports the rows.
+5. Verify that the result step reports the rows as created and that the imported Business Terms can be found from the `Business Term` page. (Assertion [#2](#test-assertion-4242))
+6. The end user uploads a file containing some malformed rows (missing required values, invalid URI) alongside a valid row.
+7. Verify that the malformed rows are flagged for review and unselected, that they are not imported, and that the valid row is imported. (Assertion [#3](#test-assertion-4243))
+8. The end user uploads a file containing rows with new external reference URIs and imports them.
 9. Verify that new Business Terms are created for those URIs. (Assertion [#4](#test-assertion-4244))
-10. The end user uploads a CSV file where a later row reuses an external reference URI that already appears in the file but provides new Business Term details.
-11. Verify that only one record remains for that URI and that the stored Business Term data reflects the later uploaded row. (Assertion [#5](#test-assertion-4245))
+10. With a Business Term already present for a given external reference URI, the end user uploads a row carrying that same URI but new Business Term details, and imports it.
+11. Verify that the result reports one `updated` row, that only one record remains for that URI, and that its stored data reflects the uploaded row. (Assertion [#5](#test-assertion-4245))
+12. The end user uploads a multi-worksheet `.xlsx` workbook whose terms live on a sheet other than the default one.
+13. Verify that the dialog stays on the upload step with a worksheet picker, and that selecting the worksheet holding the terms re-parses the file and lets its rows be imported. (Assertion [#6](#test-assertion-4246))
+14. The end user selects a file and then removes it using the file tile's remove control.
+15. Verify that the dialog returns to the drag-and-drop zone. (Assertion [#7](#test-assertion-4247))
+16. With a valid file already selected, the end user attempts to select an unsupported file.
+17. Verify that a message is shown and the previously selected valid file remains selected. (Assertion [#8](#test-assertion-4248))
+18. The end user uploads a commercial Business Glossary export that has no URI column, confirms the auto-mapping (the map step shows the amber "Review the column mapping" notice), supplies a base URL, and imports the rows.
+19. Verify that each imported Business Term's External Reference URI is the base URL followed by the row's id. (Assertion [#9](#test-assertion-4249))
+20. The end user opens the import dialog, advances past the upload step, and clicks the top-right close (X) button.
+21. Verify that the dialog closes and nothing is imported. (Assertion [#10](#test-assertion-42410))
+
+> Note: within a single import, a later row that repeats an external reference URI already used by a
+> selected row is flagged as a duplicate and left unselected, so two rows in one file cannot silently
+> overwrite the same record.

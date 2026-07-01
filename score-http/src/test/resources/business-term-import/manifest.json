@@ -1,0 +1,224 @@
+[
+  {
+    "tool": "connectCenter (native template)",
+    "key": "native",
+    "file": "native.csv",
+    "fileType": "csv",
+    "expectedRowCount": 3,
+    "expectedHeaders": [
+      "businessTerm",
+      "externalReferenceUri",
+      "externalReferenceId",
+      "definition",
+      "comment"
+    ],
+    "defaultUriBase": null,
+    "notes": "Baseline: download-template format. Auto-detects NATIVE and maps with zero clicks."
+  },
+  {
+    "tool": "Collibra Data Intelligence Cloud (Business Glossary — asset CSV/XLSX export &amp; import)",
+    "key": "collibra",
+    "file": "collibra.xlsx",
+    "fileType": "xlsx",
+    "expectedRowCount": 4,
+    "expectedHeaders": [
+      "ID",
+      "Name",
+      "Full name",
+      "Asset type",
+      "Domain",
+      "Community",
+      "Status",
+      "Definition",
+      "Descriptive Example",
+      "Generalization"
+    ],
+    "defaultUriBase": "https://myorg.collibra.com/asset",
+    "notes": "Excel export with reimport identifier columns; URL = host/asset/{ID}. No URI column (synthesize)."
+  },
+  {
+    "tool": "Alation Data Catalog — Business Glossary term export/import (Bulk Utility \"use_this_for_upload\" spreadsheet; underlying data-dictionary CSV/TSV)",
+    "key": "alation",
+    "file": "alation.tsv",
+    "fileType": "tsv",
+    "expectedRowCount": 4,
+    "expectedHeaders": [
+      "id",
+      "title",
+      "description",
+      "glossaries",
+      "template",
+      "steward:groupprofile",
+      "Status",
+      "action"
+    ],
+    "defaultUriBase": "https://alation.example.com/article",
+    "notes": "Bulk Utility TSV; title/description/id; no URI column (synthesize from id)."
+  },
+  {
+    "tool": "Microsoft Purview Data Catalog (classic) — Business Glossary term import/export",
+    "key": "purview",
+    "file": "purview.csv",
+    "fileType": "csv",
+    "expectedRowCount": 4,
+    "expectedHeaders": [
+      "Name",
+      "Nick Name",
+      "Status",
+      "Definition",
+      "IsDefinitionRichText",
+      "Acronym",
+      "Resources",
+      "Related Terms",
+      "Synonyms",
+      "Stewards",
+      "Experts",
+      "Parent Term"
+    ],
+    "defaultUriBase": "https://purview.example.com/glossary",
+    "notes": "CSV UTF-8 (BOM). No id and no URL column -> nothing to synthesize a URI from (GAP)."
+  },
+  {
+    "tool": "Informatica Cloud Data Governance & Catalog (CDGC) — Business Glossary bulk Import/Export template (Data Governance and Catalog → New → Import Assets → Download Import Template, and the matching bulk Export). Legacy on-prem Informatica Analyst-tool Business Glossary (historically paired with Axon) export noted as an alternative.",
+    "key": "informatica",
+    "file": "informatica.xlsx",
+    "fileType": "xlsx",
+    "expectedRowCount": 4,
+    "expectedHeaders": [
+      "Core: Reference ID",
+      "Core: Name",
+      "Business: Description",
+      "Parent Reference Id"
+    ],
+    "defaultUriBase": "https://cdgc.example.com/term",
+    "notes": "Multi-sheet; data sheet first. \"Core:\"/\"Business:\" prefixed headers defeat alias matching (GAP)."
+  },
+  {
+    "tool": "IBM Knowledge Catalog (Cloud Pak for Data) / Watson Knowledge Catalog — business glossary term CSV import/export (governance artifact CSV format). Legacy variant: InfoSphere Information Governance Catalog (IGC) sectioned glossary CSV.",
+    "key": "ibm",
+    "file": "ibm.csv",
+    "fileType": "csv",
+    "expectedRowCount": 4,
+    "expectedHeaders": [
+      "Name",
+      "Artifact Type",
+      "Category",
+      "Artifact ID",
+      "Description",
+      "Tags",
+      "Stewards",
+      "Classifications",
+      "Related Terms",
+      "Business Start",
+      "Business End"
+    ],
+    "defaultUriBase": "https://cpd.example.com/glossary",
+    "notes": "CSV; Artifact ID is a GUID; id column header \"Artifact ID\" not auto-mapped to id field."
+  },
+  {
+    "tool": "erwin Data Intelligence (Quest) — Business Glossary Manager (Business Terms import/export)",
+    "key": "erwin",
+    "file": "erwin.xlsx",
+    "fileType": "xlsx",
+    "expectedRowCount": 4,
+    "expectedHeaders": [
+      "Catalog Name",
+      "Path",
+      "Business Term",
+      "Definition",
+      "Description",
+      "Notes",
+      "Acronym",
+      "Governance Responsibilities",
+      "Classification",
+      "User Defined 1",
+      "User Defined 2"
+    ],
+    "defaultUriBase": "https://erwin.example.com/term",
+    "notes": "Both Definition AND Description present (ambiguous definition); no id/URL (synthesize gap)."
+  },
+  {
+    "tool": "Atlan — Asset Export (basic) with \"Glossaries only\" scope produces a Glossary CSV (glossaries, categories, terms; one object per row) in the SAME schema the Asset Import for glossaries app consumes, so it round-trips. Headers are backend Atlas attribute names (typeName, name, qualifiedName, anchor, userDescription, certificateStatus, ownerUsers, atlanTags, categories, term-relationship columns, ...). A separate, simpler in-glossary \"Bulk Upload\" path downloads a dynamic per-glossary {glossary_name}.xlsx with human-friendly headers (Name, Type, Categories, Description, Business name, User owners, Group owners, Certification, Certification message, Tags) and uses DIFFERENT conventions (comma multi-value separator, title-case certification).",
+    "key": "atlan",
+    "file": "atlan.csv",
+    "fileType": "csv",
+    "expectedRowCount": 4,
+    "expectedHeaders": [
+      "typeName",
+      "name",
+      "qualifiedName",
+      "anchor",
+      "userDescription",
+      "categories",
+      "certificateStatus",
+      "certificateStatusMessage",
+      "ownerUsers",
+      "ownerGroups",
+      "atlanTags",
+      "links",
+      "readme",
+      "synonyms",
+      "seeAlso"
+    ],
+    "defaultUriBase": "https://atlan.example.com/glossary",
+    "notes": "userDescription not mapped to definition; qualifiedName is the natural id; links holds JSON."
+  },
+  {
+    "tool": "data.world (Business Glossary / metadata catalog — Enterprise)",
+    "key": "dataworld",
+    "file": "dataworld.xlsx",
+    "fileType": "xlsx",
+    "expectedRowCount": 4,
+    "expectedHeaders": [
+      "Name",
+      "Description",
+      "Summary",
+      "Status",
+      "Resource (IRI)"
+    ],
+    "defaultUriBase": "",
+    "notes": "Leading Overview sheet -> default sheet pick is WRONG (GAP). Resource (IRI) is a real URL but often blank."
+  },
+  {
+    "tool": "SAP Information Steward — Metapedia \"Import and export with Excel\" (Business Terms worksheet). Alternative: SAP Datasphere catalog glossary term import (Excel, attributes mapped at import).",
+    "key": "sap",
+    "file": "sap.xlsx",
+    "fileType": "xlsx",
+    "expectedRowCount": 4,
+    "expectedHeaders": [
+      "Technical Name",
+      "Name",
+      "Categories",
+      "Description",
+      "Keywords",
+      "Synonyms",
+      "Author",
+      "Approver",
+      "Observer",
+      "Status",
+      "Related Terms",
+      "Name Paths of Associated Objects",
+      "Type Paths of Associated Objects"
+    ],
+    "defaultUriBase": "https://infosteward.example.com/term",
+    "notes": "Leading Version sheet -> default sheet pick is WRONG (GAP). Technical Name is the unique id."
+  },
+  {
+    "tool": "Google Cloud Dataplex Universal Catalog (now \"Knowledge Catalog\") — Business Glossary",
+    "key": "dataplex",
+    "file": "dataplex.csv",
+    "fileType": "csv",
+    "expectedRowCount": 4,
+    "expectedHeaders": [
+      "term_display_name",
+      "description",
+      "steward",
+      "tagged_assets",
+      "synonyms",
+      "related_terms",
+      "belongs_to_category"
+    ],
+    "defaultUriBase": "https://dataplex.example.com/glossary",
+    "notes": "term_display_name not auto-mapped to business term (GAP); no id/URL."
+  }
+]
