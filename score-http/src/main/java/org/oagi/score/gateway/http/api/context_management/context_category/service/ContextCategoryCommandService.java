@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.springframework.util.StringUtils.hasLength;
+import static org.springframework.util.StringUtils.hasText;
 
 /**
  * Service class for managing context categories.
@@ -47,7 +47,7 @@ public class ContextCategoryCommandService {
      */
     public ContextCategoryId create(ScoreUser requester, CreateContextCategoryRequest request) {
 
-        if (!hasLength(request.name())) {
+        if (!hasText(request.name())) {
             throw new IllegalArgumentException("Context category name cannot be empty.");
         }
 
@@ -69,7 +69,7 @@ public class ContextCategoryCommandService {
         if (request.contextCategoryId() == null) {
             throw new IllegalArgumentException("Context category ID must not be null.");
         }
-        if (!hasLength(request.name())) {
+        if (!hasText(request.name())) {
             throw new IllegalArgumentException("Context category name cannot be empty.");
         }
 
@@ -86,8 +86,8 @@ public class ContextCategoryCommandService {
      * @param requester         The user making the request.
      * @param contextCategoryId The ID of the context category to discard.
      * @return true if the discard operation was successful, false otherwise.
-     * @throws IllegalArgumentException if the context category ID is null.
-     * @throws IllegalStateException    if the context category is in use by any context schemes.
+     * @throws IllegalArgumentException if the context category ID is null, or if the context category
+     *                                  is in use by any context schemes.
      */
     public boolean discard(ScoreUser requester, ContextCategoryId contextCategoryId) {
 
@@ -95,7 +95,7 @@ public class ContextCategoryCommandService {
             throw new IllegalArgumentException("Context category ID must not be null.");
         }
         if (isContextCategoryInUse(requester, contextCategoryId)) {
-            throw new IllegalStateException(
+            throw new IllegalArgumentException(
                     "Context category (ID: " + contextCategoryId + ") is in use. " +
                             "Update or remove related context schemes before deletion.");
         }
@@ -110,8 +110,8 @@ public class ContextCategoryCommandService {
      * @param requester             The user making the request.
      * @param contextCategoryIdList A collection of context category IDs to discard.
      * @return The number of context categories successfully discarded.
-     * @throws IllegalArgumentException if the context category ID list is null or empty.
-     * @throws IllegalStateException    if all provided context categories are in use.
+     * @throws IllegalArgumentException if the context category ID list is null or empty, or if all
+     *                                  provided context categories are in use.
      */
     public int discard(ScoreUser requester, Collection<ContextCategoryId> contextCategoryIdList) {
 
@@ -125,7 +125,7 @@ public class ContextCategoryCommandService {
                 .collect(Collectors.toList());
 
         if (deletableCategories.isEmpty()) {
-            throw new IllegalStateException(
+            throw new IllegalArgumentException(
                     "All provided context categories are in use. " +
                             "Update or remove related context schemes before deletion.");
         }

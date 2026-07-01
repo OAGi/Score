@@ -169,6 +169,36 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
     }
 
     @Test
+    @DisplayName("TC_5_2_TA_27")
+    public void developer_can_edit_context_scheme_value_meaning_without_self_duplicate_error() {
+        ContextCategoryObject randomContextCategory =
+                getAPIFactory().getContextCategoryAPI().createRandomContextCategory(appUser);
+        ContextSchemeObject contextScheme =
+                getAPIFactory().getContextSchemeAPI().createRandomContextScheme(randomContextCategory, appUser);
+        ContextSchemeValueObject contextSchemeValue =
+                getAPIFactory().getContextSchemeValueAPI().createRandomContextSchemeValue(contextScheme);
+
+        HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
+        ContextMenu contextMenu = homePage.getContextMenu();
+        ViewEditContextSchemePage viewEditContextSchemePage = contextMenu.openViewEditContextSchemeSubMenu();
+        EditContextSchemePage editContextSchemePage =
+                viewEditContextSchemePage.openEditContextSchemePageByContextSchemeName(contextScheme.getSchemeName());
+
+        // Edit the existing value in place: keep the same Value, change only the Meaning.
+        // Before the Issue #1744-class fix, this was wrongly rejected as a duplicate of itself.
+        contextSchemeValue.setMeaning("updated meaning " + contextSchemeValue.getValue());
+        editContextSchemePage.openContextSchemeValueDialogByValue(contextSchemeValue.getValue())
+                .updateContextSchemeValue(contextSchemeValue);
+        editContextSchemePage.hitUpdateButton();
+
+        // Re-open and verify the meaning was actually persisted (proving the in-place edit was accepted).
+        viewEditContextSchemePage = contextMenu.openViewEditContextSchemeSubMenu();
+        editContextSchemePage =
+                viewEditContextSchemePage.openEditContextSchemePageByContextSchemeName(contextScheme.getSchemeName());
+        assertContextSchemeValue(editContextSchemePage, contextSchemeValue);
+    }
+
+    @Test
     @DisplayName("TC_5_2_TA_3")
     public void developer_can_add_and_remove_context_scheme_values_during_creation() {
         ContextCategoryObject randomContextCategory =

@@ -116,4 +116,24 @@ public interface ContextSchemeQueryRepository {
     boolean hasDuplicateNameExcludingCurrent(ContextSchemeId contextSchemeId,
                                              String schemeName, String schemeId, String schemeAgencyId, String schemeVersionId);
 
+    /**
+     * Checks whether a context scheme is currently referenced by any business context value
+     * (i.e. any of its context scheme values is used by a {@code biz_ctx_value} row).
+     *
+     * @param contextSchemeId The ID of the context scheme.
+     * @return true if the context scheme is in use, false otherwise.
+     */
+    boolean isContextSchemeUsed(ContextSchemeId contextSchemeId);
+
+    /**
+     * Returns the subset of the given context scheme value IDs that are referenced by at least one
+     * business context value. Used to guard value removals during an update so a referenced value is
+     * not deleted (which would otherwise raise a raw foreign-key violation).
+     *
+     * @param contextSchemeValueIds The candidate context scheme value IDs.
+     * @return The IDs that are in use (empty if none, or if the input is null/empty).
+     */
+    java.util.Set<ContextSchemeValueId> findUsedContextSchemeValueIds(
+            java.util.Collection<ContextSchemeValueId> contextSchemeValueIds);
+
 }

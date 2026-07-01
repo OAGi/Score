@@ -168,6 +168,36 @@ public class JooqBusinessContextQueryRepository extends JooqBaseRepository imple
     }
 
     @Override
+    public boolean isBusinessContextUsed(BusinessContextId businessContextId) {
+        if (businessContextId == null) {
+            return false;
+        }
+        return isUsed(businessContextId);
+    }
+
+    @Override
+    public boolean isBusinessContextAssigned(BusinessContextId businessContextId, TopLevelAsbiepId topLevelAsbiepId) {
+        if (businessContextId == null || topLevelAsbiepId == null) {
+            return false;
+        }
+        return dslContext().selectCount().from(BIZ_CTX_ASSIGNMENT)
+                .where(and(
+                        BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID.eq(valueOf(businessContextId)),
+                        BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID.eq(valueOf(topLevelAsbiepId))))
+                .fetchOptionalInto(Integer.class).orElse(0) > 0;
+    }
+
+    @Override
+    public int countAssignments(TopLevelAsbiepId topLevelAsbiepId) {
+        if (topLevelAsbiepId == null) {
+            return 0;
+        }
+        return dslContext().selectCount().from(BIZ_CTX_ASSIGNMENT)
+                .where(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID.eq(valueOf(topLevelAsbiepId)))
+                .fetchOptionalInto(Integer.class).orElse(0);
+    }
+
+    @Override
     public List<BusinessContextValueRecord> getBusinessContextValueList(
             BusinessContextId businessContextId) {
 

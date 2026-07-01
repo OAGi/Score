@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.springframework.util.StringUtils.hasText;
+
 /**
  * Service class for managing business contexts.
  * This service includes methods for creating, updating, and discarding business contexts.
@@ -49,6 +51,10 @@ public class BusinessContextCommandService {
      */
     public BusinessContextId create(ScoreUser requester, CreateBusinessContextRequest request) {
 
+        if (!hasText(request.name())) {
+            throw new IllegalArgumentException("Business context name cannot be empty.");
+        }
+
         var command = command(requester);
 
         BusinessContextId businessContextId = command.create(request.name());
@@ -68,6 +74,10 @@ public class BusinessContextCommandService {
      * @param request   The request containing the updated business context details.
      */
     public void update(ScoreUser requester, UpdateBusinessContextRequest request) {
+
+        if (!hasText(request.name())) {
+            throw new IllegalArgumentException("Business context name cannot be empty.");
+        }
 
         var command = command(requester);
 
@@ -112,6 +122,11 @@ public class BusinessContextCommandService {
         if (businessContextId == null) {
             throw new IllegalArgumentException("Business context ID must not be null.");
         }
+        if (query(requester).isBusinessContextUsed(businessContextId)) {
+            throw new IllegalArgumentException(
+                    "Business context (ID: " + businessContextId + ") is in use by one or more BIEs. " +
+                            "Remove its assignments before deletion.");
+        }
 
         return discard(requester, Arrays.asList(businessContextId)) == 1;
     }
@@ -131,8 +146,20 @@ public class BusinessContextCommandService {
             throw new IllegalArgumentException("Business context ID list must not be null or empty.");
         }
 
+        // Filter out business contexts that are in use by any BIE.
+        var query = query(requester);
+        List<BusinessContextId> deletableBusinessContexts = businessContextIdList.stream()
+                .filter(id -> !query.isBusinessContextUsed(id))
+                .collect(Collectors.toList());
+
+        if (deletableBusinessContexts.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "All provided business contexts are in use by one or more BIEs. " +
+                            "Remove their assignments before deletion.");
+        }
+
         return command(requester).delete(
-                List.copyOf(businessContextIdList)
+                List.copyOf(deletableBusinessContexts)
         );
     }
 
@@ -146,6 +173,11 @@ public class BusinessContextCommandService {
     public void assignBusinessContext(
             ScoreUser requester, BusinessContextId businessContextId, TopLevelAsbiepId topLevelAsbiepId) {
 
+        // Idempotent: if the assignment already exists, do nothing (avoids a duplicate-key failure).
+        if (query(requester).isBusinessContextAssigned(businessContextId, topLevelAsbiepId)) {
+            return;
+        }
+
         command(requester).createAssignment(businessContextId, topLevelAsbiepId);
     }
 
@@ -158,6 +190,12 @@ public class BusinessContextCommandService {
      */
     public void unassignBusinessContext(
             ScoreUser requester, BusinessContextId businessContextId, TopLevelAsbiepId topLevelAsbiepId) {
+
+        // A BIE must retain at least one business context; refuse to remove the last one.
+        if (query(requester).countAssignments(topLevelAsbiepId) <= 1) {
+            throw new IllegalArgumentException(
+                    "A BIE must have at least one business context; the last business context cannot be removed.");
+        }
 
         command(requester).deleteAssignment(businessContextId, topLevelAsbiepId);
     }

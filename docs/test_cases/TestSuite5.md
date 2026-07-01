@@ -165,6 +165,9 @@ The developer can search the Context Scheme List by an exact `Name` value and re
 #### Test Assertion #5.2.26
 The developer can update an existing context scheme without changing its `Scheme ID`, `Agency ID`, and `Version`, for example by adding a context scheme value, and the uniqueness check does not treat the scheme as a duplicate of itself.
 
+#### Test Assertion #5.2.27
+The developer can edit an existing context scheme value in place — for example, changing only its `Meaning` while keeping the same `Value` — and the value is not incorrectly flagged as a duplicate of itself (Issue #1744 class). This is verified on both the New Context Scheme page and the Edit Context Scheme page.
+
 ### Test Step Pre-condition:
 
 1. The test creates developer, developer admin, end user, and end user admin accounts and their context schemes as needed.
@@ -196,6 +199,7 @@ The developer can update an existing context scheme without changing its `Scheme
 22. The developer selects a context scheme in the list, navigates to another paginator page and back, and verifies that the selection is retained. (Assertion [#24](#test-assertion-5224))
 23. The developer searches the Context Scheme List using the exact `Name` of a saved context scheme and verifies that the correct matching row is returned reliably. (Assertion [#25](#test-assertion-5225))
 24. The developer opens an existing context scheme, keeps the same `Scheme ID`, `Agency ID`, and `Version`, adds a new context scheme value, updates the scheme, and verifies that the update succeeds without a self-duplicate uniqueness error. (Assertion [#26](#test-assertion-5226))
+25. On both the New Context Scheme page and the Edit Context Scheme page, the developer edits an existing context scheme value by changing only its `Meaning` (keeping the same `Value`), saves, and verifies that the edit is accepted without a "already exist" self-duplicate error. (Assertion [#27](#test-assertion-5227))
 
 ## Test Case 5.3
 
@@ -257,6 +261,9 @@ The all-information business context creation scenario verifies that all busines
 #### Test Assertion #5.3.17
 The all-information business context creation scenario verifies that the Business Context Value dialog displays all details of the selected Context Category, Context Scheme, and Context Scheme Value.
 
+#### Test Assertion #5.3.18
+In the BIE editor, the developer can assign and unassign business contexts to a BIE with the change persisted immediately (no separate `Update` click). The last remaining business context of a BIE cannot be removed (a BIE must always have at least one), and re-assigning an already-assigned business context is a harmless no-op (no duplicate assignment).
+
 ### Test Step Pre-condition:
 
 1. The test creates developer, developer admin, end user, and end user admin accounts and their business contexts as needed.
@@ -279,6 +286,7 @@ The all-information business context creation scenario verifies that the Busines
 13. The developer updates BIE-referenced business contexts created by different user types and verifies that the new business context name is reflected in related BIE search results. (Assertion [#13](#test-assertion-5313))
 14. The developer verifies that search works with the `Name` filter. (Assertion [#14](#test-assertion-5314))
 15. The developer selects a business context in the list, navigates to another paginator page and back, and verifies that the selection is retained. (Assertion [#15](#test-assertion-5315))
+16. In the BIE editor, the developer assigns an additional business context to a BIE and then unassigns it, verifying that each change is persisted immediately without clicking `Update`; verifies that the last remaining business context cannot be removed; and verifies that re-assigning an already-assigned business context does not create a duplicate assignment. (Assertion [#18](#test-assertion-5318))
 
 ## Test Case 5.4
 

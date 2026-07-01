@@ -62,4 +62,29 @@ public interface BusinessContextQueryRepository {
     ResultAndCount<BusinessContextListEntryRecord> getBusinessContextList(
             BusinessContextListFilterCriteria filterCriteria, PageRequest pageRequest);
 
+    /**
+     * Checks whether a business context is currently assigned to at least one BIE (top-level ASBIEP).
+     *
+     * @param businessContextId The ID of the business context.
+     * @return true if the business context is in use, false otherwise.
+     */
+    boolean isBusinessContextUsed(BusinessContextId businessContextId);
+
+    /**
+     * Checks whether a specific business context is already assigned to a specific top-level ASBIEP.
+     *
+     * @param businessContextId The business context ID.
+     * @param topLevelAsbiepId  The top-level ASBIEP ID.
+     * @return true if the assignment already exists, false otherwise.
+     */
+    boolean isBusinessContextAssigned(BusinessContextId businessContextId, TopLevelAsbiepId topLevelAsbiepId);
+
+    /**
+     * Counts how many business contexts are currently assigned to a given top-level ASBIEP.
+     *
+     * @param topLevelAsbiepId The top-level ASBIEP ID.
+     * @return The number of assigned business contexts.
+     */
+    int countAssignments(TopLevelAsbiepId topLevelAsbiepId);
+
 }

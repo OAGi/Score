@@ -215,8 +215,8 @@ Below, we explain the fields in the detail pane of the few types of nodes descri
      - The state of the BIE (e.g., WIP, QA or Production).
    * - *Owner*
      - The user that currently owns the BIE.
-   * - *Business Context* (Mandatory)
-     - At least one Business Context must be assigned to a BIE. Multiple different business contexts can also be assigned to a BIE. These business contexts are joined by the logical connective OR so that it means the BIE can be used in multiple contexts. Add a business context by starting to type the business context name. A list of matching business context will appear for selection. Remove a business context by clicking on the X mark next to the business context. There is no need to click the "Update" button.
+   * - *Business Contexts* (Mandatory)
+     - At least one Business Context must be assigned to a BIE. Multiple different business contexts can also be assigned to a BIE. These business contexts are joined by the logical connective OR so that it means the BIE can be used in multiple contexts. Add a business context by starting to type the business context name. A list of matching business context will appear for selection. Assigning and removing a business context is saved immediately (there is no need to click the "Update" button). The last remaining business context cannot be removed, since a BIE must always have at least one.
    * - *Version* (Optional)
      - Version number you want to assign to the root BIE. It can be in any format your organization chooses. When the *Version* is set and there is a "Version Identifier" direct child in the root BIE, the *Fixed Value Constraint* is automatically assigned to the "Version Identifier" node. The Fixed Value Constraint of the "Version Identifier" node is also set to be the same as the Version field, but it can still be changed. The value of the Version field of the root node drives the Fixed Value Constraint of the "Version Identifier" node, but not the opposite.
    * - *Status* (Optional)

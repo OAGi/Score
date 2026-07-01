@@ -63,4 +63,19 @@ describe('ContextSchemeService uniqueness checks', () => {
       request.params.get('schemeVersionId') === '1.0');
     req.flush(false);
   });
+
+  it('deletes a single context scheme by path', () => {
+    service.delete(7).subscribe();
+    const req = httpTesting.expectOne('/api/context-schemes/7');
+    expect(req.request.method).toBe('DELETE');
+    req.flush({});
+  });
+
+  it('deletes multiple context schemes via a body id list', () => {
+    service.delete(7, 8).subscribe();
+    const req = httpTesting.expectOne('/api/context-schemes');
+    expect(req.request.method).toBe('DELETE');
+    expect(req.request.body).toEqual({contextSchemeIdList: [7, 8]});
+    req.flush({});
+  });
 });

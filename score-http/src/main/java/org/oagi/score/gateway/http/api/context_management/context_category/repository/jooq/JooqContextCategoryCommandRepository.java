@@ -76,7 +76,7 @@ public class JooqContextCategoryCommandRepository extends JooqBaseRepository imp
             }
         }
         if (!StringUtils.equals(description, details.description())) {
-            if (StringUtils.hasLength(name)) {
+            if (StringUtils.hasLength(description)) {
                 step = update.set(CTX_CATEGORY.DESCRIPTION, description);
             } else {
                 step = update.setNull(CTX_CATEGORY.DESCRIPTION);

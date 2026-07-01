@@ -112,7 +112,9 @@ To create a Context Scheme:
 ..
 
    It should be noted that the combination of the *Scheme ID*, *Agency
-   ID*, and *Version* has to be unique in the database.
+   ID*, and *Version* must be unique. The application rejects an attempt
+   to create or update a Context Scheme that would duplicate an existing
+   combination.
 
    The application will also give a warning if the user tries to create
    a Context Scheme which has the *Scheme ID* and *Agency ID* the same
@@ -127,7 +129,7 @@ To create a Context Scheme:
 Load from a Code List
 ^^^^^^^^^^^^^^^^^^^^^
 
-The button "Load from a Code List" is used to automatically load Context Scheme information with information from a Code List including *Scheme ID*, *Agency ID*, *Version*, and Code List values.
+The button "Load from Code List" is used to automatically load Context Scheme information with information from a Code List including *Scheme ID*, *Agency ID*, *Version*, and Code List values.
 When the button is clicked, a dialog for selecting a Code List appears.
 Note that only a code list in Published or Production state is allowed.
 
@@ -234,7 +236,9 @@ To update a Context Scheme:
 
    3. Remove a Context Scheme Value by clicking the checkbox in front of
       the row of the Context Scheme Value you want to remove and then
-      click the "Remove" button.
+      click the "Remove" button. Note that a Context Scheme Value that is
+      in use by a Business Context cannot be removed; the update is
+      rejected until the referencing Business Contexts are updated.
 
    4. Update a Context Scheme Value by clicking on its Value. The dialog
       pop-up where you can edit the *Value* (mandatory) and *Meaning*
@@ -310,12 +314,15 @@ The first one is discarding a Business Context individually:
    Filters <#how-to-use-search-filters>`__). Click on the Name or GUID
    to open its "Edit Business Context" page.
 
-4. Click the "Discard" button.
+4. Click the "Discard" button. Note that the "Discard" button is only
+   available when the Business Context is not used by any BIE. If it is
+   in use, unassign it from those BIEs first (from the BIE editor). In
+   the list view, the checkbox of an in-use Business Context is likewise
+   disabled so it cannot be selected for discard.
 
-5. A dialog is open where you can confirm or cancel the request. If the
-   Business Context is used by a BIE, the system will not remove it. All
-   BIEs using it has to be removed first. However, if BIEs are already
-   published, they cannot be removed either.
+5. A dialog is open where you can confirm or cancel the request. The
+   server also rejects (with an error message) any attempt to discard a
+   Business Context that is still assigned to a BIE.
 
 The second method can discard multiple Business Contexts simultaneously:
 
@@ -350,11 +357,15 @@ The first discards a Context Scheme individually:
    the desired Context Scheme. Click on its Name or GUID to open its
    "Edit Context Scheme" page.
 
-4. Click the "Discard" button.
+4. Click the "Discard" button. Note that the "Discard" button is only
+   available when no Business Context uses the Context Scheme. Otherwise,
+   update or remove the referencing Business Contexts first. In the list
+   view, the checkbox of an in-use Context Scheme is likewise disabled so
+   it cannot be selected for discard.
 
-5. A dialog is open where you can confirm or cancel the request. If
-   there is a Business Context using the Context Scheme, the application
-   will not remove it.
+5. A dialog is open where you can confirm or cancel the request. The
+   server also rejects (with an error message) any attempt to discard a
+   Context Scheme that is still referenced by a Business Context.
 
 The second method can discard multiple Context Schemes simultaneously:
 

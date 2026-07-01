@@ -125,4 +125,38 @@ describe('BieEditComponent business context assignment', () => {
     expect(ctx.businessContexts.map((e: BusinessContext) => e.businessContextId)).toEqual([1]);
     expect(ctx.businessContextUpdating).toBe(false);
   });
+
+  it('unassigns a non-last business context and removes it from the chip list on success', () => {
+    const unassign$ = new Subject<void>();
+    const ctx = businessContextCtx({
+      businessContexts: [businessContext(1, 'Shared Context'), businessContext(2, 'Trading Partner')]
+    });
+    ctx.bizCtxService.unassign.mockReturnValue(unassign$);
+
+    ctx.removeBusinessContext(businessContext(1, 'Shared Context'));
+
+    expect(ctx.bizCtxService.unassign).toHaveBeenCalledWith(1001,
+      expect.objectContaining({businessContextId: 1}));
+    expect(ctx.businessContextUpdating).toBe(true);
+
+    unassign$.next();
+
+    expect(ctx.businessContexts.map((e: BusinessContext) => e.businessContextId)).toEqual([2]);
+    expect(ctx.businessContextUpdating).toBe(false);
+    expect(ctx.snackBar.open).toHaveBeenCalledWith('Updated', '', {duration: 3000});
+  });
+
+  it('resets the updating flag and does not append the context when the assign request errors', () => {
+    const assignment$ = new Subject<void>();
+    const ctx = businessContextCtx();
+    ctx.bizCtxService.assign.mockReturnValue(assignment$);
+
+    ctx.addBusinessContext({option: {value: businessContext(2, 'Shared Context')}});
+    expect(ctx.businessContextUpdating).toBe(true);
+
+    assignment$.error(new Error('assign failed'));
+
+    expect(ctx.businessContextUpdating).toBe(false);
+    expect(ctx.businessContexts.map((e: BusinessContext) => e.businessContextId)).toEqual([1]);
+  });
 });

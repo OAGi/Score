@@ -235,14 +235,12 @@ export class ContextSchemeCreateComponent implements OnInit {
     const dialogRef = this.dialog.open(ContextSchemeValueDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
       if (result !== undefined && result.value !== undefined && result.value !== '') {
-        for (const value of this.dataSource.data) {
-          if (value.value === result.value) {
-            this.snackBar.open(result.value + ' already exist', '', {
-              duration: 3000,
-            });
-            this.disabled = false;
-            return;
-          }
+        if (this.isDuplicateContextSchemeValue(result)) {
+          this.snackBar.open(result.value + ' already exist', '', {
+            duration: 3000,
+          });
+          this.disabled = false;
+          return;
         }
         if (isAddAction) {
           const data = this.dataSource.data;
@@ -263,6 +261,16 @@ export class ContextSchemeCreateComponent implements OnInit {
       }
       this.disabled = false;
     });
+  }
+
+  /**
+   * Whether the given (possibly edited) value collides with another row's value.
+   * The row being edited is excluded via its guid; otherwise editing a value in place
+   * (e.g. changing only its Meaning) is wrongly flagged as a duplicate of itself. (Issue #1744 class)
+   * A newly added value has no guid yet, so it is compared against every existing row.
+   */
+  isDuplicateContextSchemeValue(result: ContextSchemeValue): boolean {
+    return this.dataSource.data.some(value => value.guid !== result.guid && value.value === result.value);
   }
 
   _updateDataSource(data: ContextSchemeValue[]) {

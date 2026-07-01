@@ -166,6 +166,29 @@ public class JooqContextSchemeQueryRepository extends JooqBaseRepository impleme
     }
 
     @Override
+    public boolean isContextSchemeUsed(ContextSchemeId contextSchemeId) {
+        if (contextSchemeId == null) {
+            return false;
+        }
+        return isUsed(contextSchemeId);
+    }
+
+    @Override
+    public java.util.Set<ContextSchemeValueId> findUsedContextSchemeValueIds(
+            java.util.Collection<ContextSchemeValueId> contextSchemeValueIds) {
+        if (contextSchemeValueIds == null || contextSchemeValueIds.isEmpty()) {
+            return java.util.Collections.emptySet();
+        }
+        return dslContext().select(BIZ_CTX_VALUE.CTX_SCHEME_VALUE_ID)
+                .from(BIZ_CTX_VALUE)
+                .where(BIZ_CTX_VALUE.CTX_SCHEME_VALUE_ID.in(valueOf(contextSchemeValueIds)))
+                .fetchSet(BIZ_CTX_VALUE.CTX_SCHEME_VALUE_ID)
+                .stream()
+                .map(ul -> new ContextSchemeValueId(ul.toBigInteger()))
+                .collect(java.util.stream.Collectors.toSet());
+    }
+
+    @Override
     public ResultAndCount<ContextSchemeListEntryRecord> getContextSchemeList(
             ContextSchemeListFilterCriteria filterCriteria, PageRequest pageRequest) {
 

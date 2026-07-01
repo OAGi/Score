@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -109,6 +110,18 @@ public class ScoreResponseEntityExceptionHandler extends ResponseEntityException
         logger.debug(ex.getMessage(), ex);
         return errorResponse(HttpStatus.FORBIDDEN, ex.getMessage(),
                 ex.getErrorMessageId() != null ? ex.getErrorMessageId().toString() : null);
+    }
+
+    /**
+     * Defense-in-depth safety net: any foreign-key / integrity violation that is not pre-empted by an
+     * explicit in-use guard is surfaced as a clean 409 CONFLICT instead of a raw 500.
+     */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity handleDataIntegrityViolationException(
+            DataIntegrityViolationException ex, WebRequest webRequest) {
+        logger.debug(ex.getMessage(), ex);
+        return errorResponse(HttpStatus.CONFLICT,
+                "The operation could not be completed because the record is referenced by other data.");
     }
 
     @ExceptionHandler(BadSqlGrammarException.class)
