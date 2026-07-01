@@ -26,6 +26,7 @@ import static org.jooq.impl.DSL.count;
 import static org.jooq.impl.DSL.or;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.*;
 import static org.oagi.score.gateway.http.common.util.ScoreGuidUtils.randomGuid;
+import static org.springframework.util.StringUtils.hasLength;
 
 public class JooqBusinessTermCommandRepository extends JooqBaseRepository implements BusinessTermCommandRepository {
 
@@ -75,14 +76,25 @@ public class JooqBusinessTermCommandRepository extends JooqBaseRepository implem
                     .limit(1)
                     .fetchOne(BUSINESS_TERM.BUSINESS_TERM_ID);
 
-            dslContext().update(BUSINESS_TERM)
+            // #1754 - blank-clobber guard: on the upsert UPDATE branch, overwrite the OPTIONAL
+            // external_ref_id / definition / comment only when the incoming value is non-blank, so a
+            // re-import whose source file lacks one of those columns does not wipe the existing
+            // catalog term's value. The required business_term is always written. To CLEAR a field a
+            // user edits the term on the Edit screen (which routes through update(), not this upsert).
+            var update = dslContext().update(BUSINESS_TERM)
                     .set(BUSINESS_TERM.BUSINESS_TERM_, businessTerm)
-                    .set(BUSINESS_TERM.EXTERNAL_REF_ID, externalReferenceId)
-                    .set(BUSINESS_TERM.DEFINITION, definition)
-                    .set(BUSINESS_TERM.COMMENT, comment)
                     .set(BUSINESS_TERM.LAST_UPDATE_TIMESTAMP, LocalDateTime.now())
-                    .set(BUSINESS_TERM.LAST_UPDATED_BY, valueOf(requester().userId()))
-                    .where(BUSINESS_TERM.BUSINESS_TERM_ID.eq(targetId))
+                    .set(BUSINESS_TERM.LAST_UPDATED_BY, valueOf(requester().userId()));
+            if (hasLength(externalReferenceId)) {
+                update = update.set(BUSINESS_TERM.EXTERNAL_REF_ID, externalReferenceId);
+            }
+            if (hasLength(definition)) {
+                update = update.set(BUSINESS_TERM.DEFINITION, definition);
+            }
+            if (hasLength(comment)) {
+                update = update.set(BUSINESS_TERM.COMMENT, comment);
+            }
+            update.where(BUSINESS_TERM.BUSINESS_TERM_ID.eq(targetId))
                     .execute();
 
             return new BusinessTermId(targetId.toBigInteger());

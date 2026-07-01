@@ -252,6 +252,11 @@ public class JooqBusinessTermQueryRepository
     }
 
     @Override
+    public boolean checkUniqueness(String businessTerm, String externalReferenceUri) {
+        return checkUniqueness(null, businessTerm, externalReferenceUri);
+    }
+
+    @Override
     public boolean checkUniqueness(BusinessTermId businessTermId, String businessTerm, String externalReferenceUri) {
 
         if (!hasLength(businessTerm)) {
@@ -265,25 +270,6 @@ public class JooqBusinessTermQueryRepository
         List<Condition> conditions = new ArrayList<>();
         conditions.add(BUSINESS_TERM.BUSINESS_TERM_.eq(businessTerm));
         conditions.add(BUSINESS_TERM.EXTERNAL_REF_URI.eq(externalReferenceUri));
-        if (businessTermId != null) {
-            conditions.add(BUSINESS_TERM.BUSINESS_TERM_ID.ne(valueOf(businessTermId)));
-        }
-
-        return dslContext().selectCount()
-                .from(BUSINESS_TERM)
-                .where(conditions)
-                .fetchOneInto(Integer.class) == 0;
-    }
-
-    @Override
-    public boolean checkNameUniqueness(BusinessTermId businessTermId, String businessTerm) {
-
-        if (!hasLength(businessTerm)) {
-            throw new IllegalArgumentException("`businessTerm` parameter must not be empty.");
-        }
-
-        List<Condition> conditions = new ArrayList<>();
-        conditions.add(BUSINESS_TERM.BUSINESS_TERM_.eq(businessTerm));
         if (businessTermId != null) {
             conditions.add(BUSINESS_TERM.BUSINESS_TERM_ID.ne(valueOf(businessTermId)));
         }

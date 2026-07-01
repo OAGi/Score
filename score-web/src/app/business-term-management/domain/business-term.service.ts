@@ -351,19 +351,6 @@ export class BusinessTermService {
     });
   }
 
-  checkNameUniqueness(businessTermId: number, businessTerm: string): Observable<boolean> {
-    let params = new HttpParams()
-        .set('businessTerm', businessTerm);
-
-    if (!!businessTermId) {
-      params = params.set('businessTermId', '' + businessTermId);
-    }
-
-    return this.http.get<boolean>('/api/business-terms/check-name-uniqueness', {
-      params
-    });
-  }
-
   checkAssignmentUniqueness(bieId: number, bieType: string, businessTermId: number,
                             typeCode: string, primaryIndicator: boolean,
                             assignedBizTermId?: number): Observable<boolean> {

@@ -94,12 +94,10 @@ export class BusinessTermDetailComponent implements OnInit {
   }
 
   update() {
+    // Uniqueness is the (name + external reference URI) pair only; a same-name term with a
+    // different URI is a distinct term, so it is not treated as a duplicate.
     this.checkUniqueness(this.businessTerm, (_) => {
-      // #1752 - L2: also run the name-uniqueness check that Create runs, so a duplicate business-term
-      // name cannot be introduced silently via Edit (it warns with an "Update anyway" option).
-      this.checkBusinessTermName(this.businessTerm, (__) => {
-        this.doUpdate();
-      });
+      this.doUpdate();
     });
   }
 
@@ -110,18 +108,6 @@ export class BusinessTermDetailComponent implements OnInit {
         businessTerm.externalReferenceUri).subscribe(resp => {
       if (!resp) {
         this.openDialogBusinessTermUpdate();
-        return;
-      }
-      return callbackFn && callbackFn();
-    });
-  }
-
-  checkBusinessTermName(businessTerm: BusinessTermDetails, callbackFn?) {
-    this.service.checkNameUniqueness(
-        businessTerm.businessTermId,
-        businessTerm.businessTerm).subscribe(resp => {
-      if (!resp) {
-        this.openDialogBusinessTermUpdateIgnore();
         return;
       }
       return callbackFn && callbackFn();
@@ -147,22 +133,6 @@ export class BusinessTermDetailComponent implements OnInit {
     ];
 
     this.confirmDialogService.open(dialogConfig).afterClosed().subscribe(_ => {});
-  }
-
-  openDialogBusinessTermUpdateIgnore() {
-    const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = 'Another business term with the same name already exists';
-    dialogConfig.data.content = [
-      'Are you sure you want to update the business term?'
-    ];
-    dialogConfig.data.action = 'Update anyway';
-
-    this.confirmDialogService.open(dialogConfig).afterClosed()
-      .subscribe(result => {
-        if (result) {
-          this.doUpdate();
-        }
-      });
   }
 
   discard() {

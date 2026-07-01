@@ -69,10 +69,49 @@ public class BusinessTermCommandService {
         }
     }
 
+    /**
+     * #1754 - close the catalog-uniqueness gap. The {@code /check-uniqueness} endpoint is advisory
+     * only, and the Angular create/edit forms call it, but a direct API POST/PUT previously bypassed
+     * it entirely (there is no DB unique constraint on {@code business_term} either). These guards
+     * enforce the SAME contract the UI applies, server-side.
+     *
+     * <p>A business term is uniquely identified by the (name + external reference URI) pair, so that
+     * pair is the only collision that is blocked. Two terms may share a name as long as their
+     * external reference URIs differ &mdash; a same-name/different-URI term is a distinct term, not a
+     * duplicate.</p>
+     *
+     * <ul>
+     *   <li><b>Create</b> hard-blocks a duplicate (name + external reference URI) pair.</li>
+     *   <li><b>Update</b> hard-blocks a duplicate (name + external reference URI) pair, excluding the
+     *       record being edited.</li>
+     * </ul>
+     *
+     * <p>The batch import path upserts by external reference URI through the repository directly and
+     * is intentionally NOT subject to this gate.</p>
+     */
+    private void assertCatalogUniqueOnCreate(
+            ScoreUser requester, String businessTerm, String externalReferenceUri) {
+        var query = repositoryFactory.businessTermQueryRepository(requester);
+        if (!query.checkUniqueness(businessTerm, externalReferenceUri)) {
+            throw new IllegalArgumentException(
+                    "Another business term with the same business term and external reference URI already exists.");
+        }
+    }
+
+    private void assertCatalogUniqueOnUpdate(
+            ScoreUser requester, BusinessTermId businessTermId, String businessTerm, String externalReferenceUri) {
+        var query = repositoryFactory.businessTermQueryRepository(requester);
+        if (!query.checkUniqueness(businessTermId, businessTerm, externalReferenceUri)) {
+            throw new IllegalArgumentException(
+                    "Another business term with the same business term and external reference URI already exists.");
+        }
+    }
+
     public BusinessTermId create(ScoreUser requester, BusinessTermCreateRequest request) {
         assertBusinessTermEnabled(requester);
         BusinessTermInputValidator.validate(
                 request.businessTerm(), request.externalReferenceId(), request.externalReferenceUri());
+        assertCatalogUniqueOnCreate(requester, request.businessTerm(), request.externalReferenceUri());
 
         var command = repositoryFactory.businessTermCommandRepository(requester);
         return command.create(
@@ -170,6 +209,8 @@ public class BusinessTermCommandService {
         assertBusinessTermEnabled(requester);
         BusinessTermInputValidator.validate(
                 request.businessTerm(), request.externalReferenceId(), request.externalReferenceUri());
+        assertCatalogUniqueOnUpdate(
+                requester, request.businessTermId(), request.businessTerm(), request.externalReferenceUri());
 
         var command = repositoryFactory.businessTermCommandRepository(requester);
         return command.update(

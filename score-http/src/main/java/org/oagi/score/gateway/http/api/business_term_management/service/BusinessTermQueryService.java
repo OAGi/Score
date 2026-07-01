@@ -68,14 +68,6 @@ public class BusinessTermQueryService {
         return businessTermQuery.checkUniqueness(businessTermId, businessTerm, externalReferenceUri);
     }
 
-    public boolean checkNameUniqueness(
-            ScoreUser requester, BusinessTermId businessTermId, String businessTerm) {
-
-        assertBusinessTermEnabled(requester);
-        var businessTermQuery = repositoryFactory.businessTermQueryRepository(requester);
-        return businessTermQuery.checkNameUniqueness(businessTermId, businessTerm);
-    }
-
     public BusinessTermDetailsRecord getBusinessTermDetails(ScoreUser requester, BusinessTermId businessTermId) {
 
         assertBusinessTermEnabled(requester);

@@ -20,9 +20,17 @@ public interface BusinessTermQueryRepository {
     ResultAndCount<BusinessTermListEntryRecord> getBusinessTermListByAssignedBieList(
             BusinessTermListFilterCriteria filterCriteria, PageRequest pageRequest);
 
-    boolean checkUniqueness(BusinessTermId businessTermId, String businessTerm, String externalReferenceUri);
+    /**
+     * Returns {@code true} when no business term has this (name + external reference URI) pair.
+     * Use on CREATE, where there is no record to exclude.
+     */
+    boolean checkUniqueness(String businessTerm, String externalReferenceUri);
 
-    boolean checkNameUniqueness(BusinessTermId businessTermId, String businessTerm);
+    /**
+     * Returns {@code true} when no OTHER business term (excluding {@code businessTermId}) has this
+     * (name + external reference URI) pair. Use on UPDATE.
+     */
+    boolean checkUniqueness(BusinessTermId businessTermId, String businessTerm, String externalReferenceUri);
 
     /**
      * #1753 - L6: returns {@code true} when a business term with the given external reference URI

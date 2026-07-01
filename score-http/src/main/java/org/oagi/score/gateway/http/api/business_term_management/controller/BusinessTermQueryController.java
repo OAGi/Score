@@ -157,16 +157,6 @@ public class BusinessTermQueryController {
                 businessTermId, businessTerm, externalReferenceUri);
     }
 
-    @GetMapping(value = "/check-name-uniqueness")
-    public boolean checkNameUniqueness(
-            @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @RequestParam(name = "businessTermId", required = false) BusinessTermId businessTermId,
-            @RequestParam(name = "businessTerm", required = false) String businessTerm) {
-
-        return businessTermQueryService.checkNameUniqueness(sessionService.asScoreUser(user),
-                businessTermId, businessTerm);
-    }
-
     @GetMapping(value = "/{businessTermId:[\\d]+}")
     public BusinessTermDetailsRecord getBusinessTermDetails(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
