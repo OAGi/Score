@@ -6,7 +6,7 @@ CREATE TABLE `bie_usage_rule`
     `target_asbie_id`        bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the ASBIE table indicating the ASBIE, to which the usage rule is applied.',
     `target_asbiep_id`       bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the ASBIEP table indicating the ASBIEP, to which the usage rule is applied.',
     `target_bbie_id`         bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the BBIE table indicating the BBIE, to which the usage rule is applied.',
-    `target_bbiep_id`        bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the BBIEP table indicating the ABIEP, to which the usage rule is applied.',
+    `target_bbiep_id`        bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the BBIEP table indicating the BBIEP, to which the usage rule is applied.',
     PRIMARY KEY (`bie_usage_rule_id`),
     KEY                      `bie_usage_rule_assigned_usage_rule_id_fk` (`assigned_usage_rule_id`),
     KEY                      `bie_usage_rule_target_abie_id_fk` (`target_abie_id`),

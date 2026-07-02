@@ -1,0 +1,26 @@
+CREATE TABLE `oas_operation`
+(
+    `oas_operation_id`                  bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'The primary key of the record.',
+    `oas_resource_id`                   bigint(20) unsigned NOT NULL COMMENT 'A reference of the resource record.',
+    `verb`                              varchar(30) NOT NULL COMMENT 'verbs, list of values droplist: get, put , post, delete, options, head, patch, trace;',
+    `operation_id`                      varchar(1024) NOT NULL COMMENT 'Unique string used to identify the operation. The id MUST be unique among all operations described in the API. The operationId value is case-sensitive. Tools and libraries MAY use the operationId to uniquely identify an operation, therefore, it is RECOMMENDED to follow common programming naming conventions.',
+    `summary`                           text DEFAULT NULL COMMENT 'A short summary of what the operation does.',
+    `description`                       text DEFAULT NULL COMMENT 'A verbose explanation of the operation behavior. CommonMark syntax MAY be used for rich text representation.',
+    `deprecated`                        tinyint(1) DEFAULT 0 COMMENT 'Declares this operation to be deprecated. Consumers SHOULD refrain from usage of the declared operation. Default value is false.',
+    `security_overridden`               tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 = this operation overrides the document-level security (0 rows => security: []; rows => the operation array). 0 = inherit the root security.',
+    `error_response_body_type`          varchar(20) NOT NULL DEFAULT 'NONE' COMMENT 'PROBLEM_DETAILS | CONFIRM_MESSAGE | NONE -- body for this operation''s defaulted 4xx/5xx error responses (issue #1347).',
+    `error_confirm_top_level_asbiep_id` bigint(20) unsigned DEFAULT NULL COMMENT 'When error_response_body_type = CONFIRM_MESSAGE, the ConfirmMessage BIE to emit (issue #1347).',
+    `created_by`                        bigint(20) unsigned NOT NULL COMMENT 'The user who creates the record.',
+    `last_updated_by`                   bigint(20) unsigned NOT NULL COMMENT 'The user who last updates the record.',
+    `creation_timestamp`                datetime(6) NOT NULL COMMENT 'The timestamp when the record is created.',
+    `last_update_timestamp`             datetime(6) NOT NULL COMMENT 'The timestamp when the record is last updated.',
+    PRIMARY KEY (`oas_operation_id`),
+    KEY                                 `oas_operation_created_by_fk` (`created_by`),
+    KEY                                 `oas_operation_last_updated_by_fk` (`last_updated_by`),
+    KEY                                 `oas_operation_oas_resource_id_fk` (`oas_resource_id`),
+    KEY                                 `oas_operation_error_confirm_tla_fk` (`error_confirm_top_level_asbiep_id`),
+    CONSTRAINT `oas_operation_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
+    CONSTRAINT `oas_operation_error_confirm_tla_fk` FOREIGN KEY (`error_confirm_top_level_asbiep_id`) REFERENCES `top_level_asbiep` (`top_level_asbiep_id`),
+    CONSTRAINT `oas_operation_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
+    CONSTRAINT `oas_operation_oas_resource_id_fk` FOREIGN KEY (`oas_resource_id`) REFERENCES `oas_resource` (`oas_resource_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci COMMENT='OpenAPI Operation Object; a single HTTP verb (get, put, post, delete, etc.) exposed on an OAS_RESOURCE path item, carrying its operationId, summary, description, deprecation flag, and defaulted error-response body settings, with any per-operation security overrides captured in OAS_OPERATION_SECURITY.';

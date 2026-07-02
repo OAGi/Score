@@ -1,11 +1,11 @@
 CREATE TABLE `bbie_bizterm`
 (
     `bbie_bizterm_id`       bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'An internal, primary database key of an bbie_bizterm record.',
-    `bcc_bizterm_id`        bigint(20) unsigned NOT NULL COMMENT 'An internal ID of the bbie_bizterm record.',
+    `bcc_bizterm_id`        bigint(20) unsigned NOT NULL COMMENT 'An internal ID of the bcc_bizterm record.',
     `bbie_id`               bigint(20) unsigned NOT NULL COMMENT 'An internal ID of the associated BBIE',
     `primary_indicator`     tinyint(1) NOT NULL DEFAULT 0 COMMENT 'The indicator shows if the business term is primary for the assigned BBIE.',
     `type_code`             char(30) DEFAULT NULL COMMENT 'The type code of the assignment.',
-    `created_by`            bigint(20) unsigned NOT NULL COMMENT 'A foreign key referring to the user who creates the bbie_bizterm record. The creator of the asbie_bizterm is also its owner by default.',
+    `created_by`            bigint(20) unsigned NOT NULL COMMENT 'A foreign key referring to the user who creates the bbie_bizterm record. The creator of the bbie_bizterm is also its owner by default.',
     `last_updated_by`       bigint(20) unsigned NOT NULL COMMENT 'A foreign key referring to the last user who has updated the bbie_bizterm record. This may be the user who is in the same group as the creator.',
     `creation_timestamp`    datetime(6) NOT NULL COMMENT 'Timestamp when the bbie_bizterm record was first created.',
     `last_update_timestamp` datetime(6) NOT NULL COMMENT 'The timestamp when the bbie_bizterm was last updated.',

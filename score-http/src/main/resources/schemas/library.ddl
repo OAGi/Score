@@ -9,6 +9,7 @@ CREATE TABLE `library`
     `domain`                varchar(100) DEFAULT NULL COMMENT 'Specifies the area of focus or application domain of the library (e.g., agriculture, finance, or aerospace).',
     `state`                 varchar(20)  DEFAULT NULL COMMENT 'Current state of the library.',
     `is_read_only`          tinyint(1) DEFAULT 0 COMMENT 'Indicates if the library is read-only (0 = False, 1 = True).',
+    `is_default`            tinyint(1) DEFAULT 0 COMMENT 'Indicates if the library is the default (0 = False, 1 = True). The default library is shown first if the user has no preference.',
     `created_by`            bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table referring to the user who creates the record.',
     `last_updated_by`       bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table referring to the last user who updated the record.',
     `creation_timestamp`    datetime(6) NOT NULL COMMENT 'Timestamp when the record was created.',
@@ -18,4 +19,4 @@ CREATE TABLE `library`
     KEY                     `library_last_updated_by_fk` (`last_updated_by`),
     CONSTRAINT `library_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
     CONSTRAINT `library_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='This table stores information about a library, the top-level workspace that groups the components, code lists, and releases managed within it. It captures the library''s name, type, owning organization, description, application domain, and state, and flags whether the library is read-only or the default shown to users without a preference.';

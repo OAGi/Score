@@ -1,16 +1,16 @@
 CREATE TABLE `ascc_manifest`
 (
-    `ascc_manifest_id`             bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-    `release_id`                   bigint(20) unsigned DEFAULT NULL,
-    `ascc_id`                      bigint(20) unsigned NOT NULL,
-    `seq_key_id`                   bigint(20) unsigned DEFAULT NULL,
-    `from_acc_manifest_id`         bigint(20) unsigned NOT NULL,
-    `to_asccp_manifest_id`         bigint(20) unsigned NOT NULL,
+    `ascc_manifest_id`             bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'An internal, primary database key of an ASCC_MANIFEST record.',
+    `release_id`                   bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the RELEASE table.',
+    `ascc_id`                      bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the ASCC table.',
+    `seq_key_id`                   bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the SEQ_KEY table, which records the order of this association among its siblings.',
+    `from_acc_manifest_id`         bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the ACC_MANIFEST table pointing to the parent ACC (the FROM end of the association) of the TO_ASCCP_MANIFEST_ID.',
+    `to_asccp_manifest_id`         bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the ASCCP_MANIFEST table pointing to the child ASCCP (the TO end of the association) of the FROM_ACC_MANIFEST_ID.',
     `den`                          varchar(304) NOT NULL COMMENT 'DEN (dictionary entry name) of the ASCC. This column can be derived from Qualifier and OBJECT_CLASS_TERM of the FROM_ACC_ID and DEN of the TO_ASCCP_ID as Qualifier + "_ " + OBJECT_CLASS_TERM + ". " + DEN.',
     `conflict`                     tinyint(1) NOT NULL DEFAULT 0 COMMENT 'This indicates that there is a conflict between self and relationship.',
     `replacement_ascc_manifest_id` bigint(20) unsigned DEFAULT NULL COMMENT 'This refers to a replacement manifest if the record is deprecated.',
-    `prev_ascc_manifest_id`        bigint(20) unsigned DEFAULT NULL,
-    `next_ascc_manifest_id`        bigint(20) unsigned DEFAULT NULL,
+    `prev_ascc_manifest_id`        bigint(20) unsigned DEFAULT NULL COMMENT 'A self-reference to the corresponding ASCC_MANIFEST record in the previous release (revision chain). NULL for the first revision.',
+    `next_ascc_manifest_id`        bigint(20) unsigned DEFAULT NULL COMMENT 'A self-reference to the corresponding ASCC_MANIFEST record in the next release (revision chain). NULL for the latest revision.',
     PRIMARY KEY (`ascc_manifest_id`),
     KEY                            `ascc_manifest_ascc_id_fk` (`ascc_id`),
     KEY                            `ascc_manifest_release_id_fk` (`release_id`),
@@ -28,4 +28,4 @@ CREATE TABLE `ascc_manifest`
     CONSTRAINT `ascc_manifest_seq_key_id_fk` FOREIGN KEY (`seq_key_id`) REFERENCES `seq_key` (`seq_key_id`),
     CONSTRAINT `ascc_manifest_to_asccp_manifest_id_fk` FOREIGN KEY (`to_asccp_manifest_id`) REFERENCES `asccp_manifest` (`asccp_manifest_id`),
     CONSTRAINT `ascc_replacement_ascc_manifest_id_fk` FOREIGN KEY (`replacement_ascc_manifest_id`) REFERENCES `ascc_manifest` (`ascc_manifest_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='A release-specific handle to an ASCC record, which represents a relationship/association between two ACCs through an ASCCP. It pins the ASCC to a RELEASE, resolves the association''s FROM_ACC_MANIFEST_ID and TO_ASCCP_MANIFEST_ID ends, and carries the revision chain (PREV/NEXT_ASCC_MANIFEST_ID) across releases.';

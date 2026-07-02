@@ -1,0 +1,27 @@
+CREATE TABLE `oas_doc`
+(
+    `oas_doc_id`            bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'The primary key of the record.',
+    `guid`                  varchar(41) NOT NULL COMMENT 'The GUID of the record.',
+    `open_api_version`      varchar(20) NOT NULL COMMENT 'REQUIRED. This string MUST be the semantic version number of the OpenAPI Specification version that the OpenAPI document uses. The openapi field SHOULD be used by tooling specifications and clients to interpret the OpenAPI document. This is not related to the API info.version string.',
+    `title`                 text NOT NULL COMMENT 'The title of the API.',
+    `description`           text DEFAULT NULL COMMENT 'A short description of the API. CommonMark syntax MAY be used for rich text representation.',
+    `terms_of_service`      varchar(250) DEFAULT NULL COMMENT 'A URL to the Terms of Service for the API. MUST be in the format of a URL.',
+    `version`               varchar(20) NOT NULL COMMENT 'REQUIRED. The version of the OpenAPI document (which is distinct from the OpenAPI Specification version or the API implementation version).',
+    `contact_name`          text DEFAULT NULL COMMENT 'The identifying name of the contact person/organization.',
+    `contact_url`           varchar(250) DEFAULT NULL COMMENT 'The URL pointing to the contact information. MUST be in the format of a URL.',
+    `contact_email`         text DEFAULT NULL COMMENT 'The email address of the contact person/organization. MUST be in the format of an email address.',
+    `license_name`          varchar(100) DEFAULT NULL COMMENT 'REQUIRED if the license used for the API. The license name used for the API.',
+    `license_url`           varchar(250) DEFAULT NULL COMMENT 'A URL to the license used for the API. MUST be in the format of a URL.',
+    `owner_user_id`         bigint(20) unsigned NOT NULL COMMENT 'The user who owns the record.',
+    `created_by`            bigint(20) unsigned NOT NULL COMMENT 'The user who creates the record.',
+    `last_updated_by`       bigint(20) unsigned NOT NULL COMMENT 'The user who last updates the record.',
+    `creation_timestamp`    datetime(6) NOT NULL COMMENT 'The timestamp when the record is created.',
+    `last_update_timestamp` datetime(6) NOT NULL COMMENT 'The timestamp when the record is last updated.',
+    PRIMARY KEY (`oas_doc_id`),
+    KEY                     `oas_doc_created_by_fk` (`created_by`),
+    KEY                     `oas_doc_last_updated_by_fk` (`last_updated_by`),
+    KEY                     `oas_doc_owner_user_id_fk` (`owner_user_id`),
+    CONSTRAINT `oas_doc_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
+    CONSTRAINT `oas_doc_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
+    CONSTRAINT `oas_doc_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci COMMENT='The root of the OpenAPI Specification document object model that the other OAS_* tables hang off; each row is an OpenAPI Object holding the openapi version string together with the Info Object metadata (title, description, terms of service, version, and contact and license details).';

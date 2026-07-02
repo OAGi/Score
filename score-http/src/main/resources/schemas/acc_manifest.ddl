@@ -1,15 +1,15 @@
 CREATE TABLE `acc_manifest`
 (
-    `acc_manifest_id`             bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-    `release_id`                  bigint(20) unsigned NOT NULL,
-    `acc_id`                      bigint(20) unsigned NOT NULL,
-    `based_acc_manifest_id`       bigint(20) unsigned DEFAULT NULL,
+    `acc_manifest_id`             bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'An internal, primary database key of a ACC_MANIFEST record.',
+    `release_id`                  bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the RELEASE table.',
+    `acc_id`                      bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the ACC table.',
+    `based_acc_manifest_id`       bigint(20) unsigned DEFAULT NULL COMMENT 'A self-reference to the ACC_MANIFEST record that this record is based on (its base/supertype from which it was derived).',
     `den`                         varchar(200) NOT NULL COMMENT 'DEN (dictionary entry name) of the ACC. It can be derived as OBJECT_CLASS_QUALIFIER + "_ " + OBJECT_CLASS_TERM + ". Details".',
     `conflict`                    tinyint(1) NOT NULL DEFAULT 0 COMMENT 'This indicates that there is a conflict between self and relationship.',
     `log_id`                      bigint(20) unsigned DEFAULT NULL COMMENT 'A foreign key pointed to a log for the current record.',
     `replacement_acc_manifest_id` bigint(20) unsigned DEFAULT NULL COMMENT 'This refers to a replacement manifest if the record is deprecated.',
-    `prev_acc_manifest_id`        bigint(20) unsigned DEFAULT NULL,
-    `next_acc_manifest_id`        bigint(20) unsigned DEFAULT NULL,
+    `prev_acc_manifest_id`        bigint(20) unsigned DEFAULT NULL COMMENT 'A self-reference to the corresponding ACC_MANIFEST record in the previous release (revision chain). NULL for the first revision.',
+    `next_acc_manifest_id`        bigint(20) unsigned DEFAULT NULL COMMENT 'A self-reference to the corresponding ACC_MANIFEST record in the next release (revision chain). NULL for the latest revision.',
     PRIMARY KEY (`acc_manifest_id`),
     KEY                           `acc_manifest_acc_id_fk` (`acc_id`),
     KEY                           `acc_manifest_based_acc_manifest_id_fk` (`based_acc_manifest_id`),
@@ -25,4 +25,4 @@ CREATE TABLE `acc_manifest`
     CONSTRAINT `acc_manifest_prev_acc_manifest_id_fk` FOREIGN KEY (`prev_acc_manifest_id`) REFERENCES `acc_manifest` (`acc_manifest_id`),
     CONSTRAINT `acc_manifest_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`),
     CONSTRAINT `acc_replacement_acc_manifest_id_fk` FOREIGN KEY (`replacement_acc_manifest_id`) REFERENCES `acc_manifest` (`acc_manifest_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='The ACC_MANIFEST table is a release-specific handle to an ACC record, pinning a particular ACC (a complex data structured concept such as OAGIS''s Components, Nouns, and BODs) to a RELEASE. It carries the revision chain via the PREV_ACC_MANIFEST_ID and NEXT_ACC_MANIFEST_ID self-references across releases, and also records the based (supertype) and replacement manifests for the ACC in that release.';

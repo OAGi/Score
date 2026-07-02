@@ -1,15 +1,15 @@
 CREATE TABLE `bccp_manifest`
 (
-    `bccp_manifest_id`             bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-    `release_id`                   bigint(20) unsigned NOT NULL,
-    `bccp_id`                      bigint(20) unsigned NOT NULL,
-    `bdt_manifest_id`              bigint(20) unsigned NOT NULL,
+    `bccp_manifest_id`             bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'An internal, primary database key of a BCCP_MANIFEST record.',
+    `release_id`                   bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the RELEASE table.',
+    `bccp_id`                      bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the BCCP table.',
+    `bdt_manifest_id`              bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the DT_MANIFEST table for the BDT (business data type) that specifies the data format of the BCCP. Only a DT whose type is BDT can be used.',
     `den`                          varchar(249) NOT NULL COMMENT 'The dictionary entry name of the BCCP. It is derived by PROPERTY_TERM + ". " + REPRESENTATION_TERM.',
     `conflict`                     tinyint(1) NOT NULL DEFAULT 0 COMMENT 'This indicates that there is a conflict between self and relationship.',
     `log_id`                       bigint(20) unsigned DEFAULT NULL COMMENT 'A foreign key pointed to a log for the current record.',
     `replacement_bccp_manifest_id` bigint(20) unsigned DEFAULT NULL COMMENT 'This refers to a replacement manifest if the record is deprecated.',
-    `prev_bccp_manifest_id`        bigint(20) unsigned DEFAULT NULL,
-    `next_bccp_manifest_id`        bigint(20) unsigned DEFAULT NULL,
+    `prev_bccp_manifest_id`        bigint(20) unsigned DEFAULT NULL COMMENT 'A self-reference to the corresponding BCCP_MANIFEST record in the previous release (revision chain). NULL for the first revision.',
+    `next_bccp_manifest_id`        bigint(20) unsigned DEFAULT NULL COMMENT 'A self-reference to the corresponding BCCP_MANIFEST record in the next release (revision chain). NULL for the latest revision.',
     PRIMARY KEY (`bccp_manifest_id`),
     KEY                            `bccp_manifest_bccp_id_fk` (`bccp_id`),
     KEY                            `bccp_manifest_bdt_manifest_id_fk` (`bdt_manifest_id`),
@@ -25,4 +25,4 @@ CREATE TABLE `bccp_manifest`
     CONSTRAINT `bccp_manifest_prev_bccp_manifest_id_fk` FOREIGN KEY (`prev_bccp_manifest_id`) REFERENCES `bccp_manifest` (`bccp_manifest_id`),
     CONSTRAINT `bccp_manifest_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`),
     CONSTRAINT `bccp_replacement_bccp_manifest_id_fk` FOREIGN KEY (`replacement_bccp_manifest_id`) REFERENCES `bccp_manifest` (`bccp_manifest_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='A BCCP_MANIFEST is a release-specific handle to a BCCP record, pinning it to a RELEASE and carrying the revision chain to the corresponding BCCP_MANIFEST in the previous and next releases. A BCCP specifies a property concept and the data type associated with it, which can then be added as a property of an ACC; the manifest also binds the BCCP to the BDT that specifies its data format through BDT_MANIFEST_ID (DT_MANIFEST).';

@@ -16,7 +16,7 @@ CREATE TABLE `ascc`
     `last_updated_by`       bigint(20) unsigned NOT NULL COMMENT 'A foreign key to the APP_USER table referring to the last user who has updated the record. \n\nIn the history record, this should always be the user who is editing the entity (perhaps except when the ownership has just been changed).',
     `creation_timestamp`    datetime(6) NOT NULL COMMENT 'Timestamp when the revision of the ASCC was created. \n\nThis never change for a revision.',
     `last_update_timestamp` datetime(6) NOT NULL COMMENT 'The timestamp when the record was last updated.\n\nThe value of this column in the latest history record should be the same as that of the current record. This column keeps the record of when the change has occurred.',
-    `state`                 varchar(20)  DEFAULT NULL COMMENT 'Deleted, WIP, Draft, QA, Candidate, Production, Release Draft, Published. This the revision life cycle state of the BCC.\n\nState change can''t be undone. But the history record can still keep the records of when the state was changed.',
+    `state`                 varchar(20)  DEFAULT NULL COMMENT 'Deleted, WIP, Draft, QA, Candidate, Production, Release Draft, Published. This the revision life cycle state of the ASCC.\n\nState change can''t be undone. But the history record can still keep the records of when the state was changed.',
     `prev_ascc_id`          bigint(20) unsigned DEFAULT NULL COMMENT 'A self-foreign key to indicate the previous history record.',
     `next_ascc_id`          bigint(20) unsigned DEFAULT NULL COMMENT 'A self-foreign key to indicate the next history record.',
     PRIMARY KEY (`ascc_id`),

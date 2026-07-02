@@ -3,7 +3,7 @@ CREATE TABLE `asbiep`
     `asbiep_id`                 bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'A internal, primary database key of an ASBIEP.',
     `guid`                      char(32) CHARACTER SET ascii COLLATE ascii_general_ci    NOT NULL COMMENT 'A globally unique identifier (GUID).',
     `based_asccp_manifest_id`   bigint(20) unsigned NOT NULL COMMENT 'A foreign key pointing to the ASCCP_MANIFEST record. It is the ASCCP, on which the ASBIEP contextualizes.',
-    `path`                      text CHARACTER SET ascii COLLATE ascii_general_ci DEFAULT NULL,
+    `path`                      text CHARACTER SET ascii COLLATE ascii_general_ci DEFAULT NULL COMMENT 'The path of this node within the component graph; used together with HASH_PATH to locate the node.',
     `hash_path`                 varchar(64) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL COMMENT 'hash_path generated from the path of the component graph using hash function, so that it is unique in the graph.',
     `role_of_abie_id`           bigint(20) unsigned NOT NULL COMMENT 'A foreign key pointing to the ABIE record. It is the ABIE, which the property term in the based ASCCP qualifies. Note that the ABIE has to be derived from the ACC used by the based ASCCP.',
     `definition`                text         DEFAULT NULL COMMENT 'A definition to override the ASCCP''s definition. If NULL, it means that the definition should be derived from the based ASCCP on the UI, expression generation, and any API.',

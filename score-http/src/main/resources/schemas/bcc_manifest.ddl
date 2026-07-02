@@ -1,16 +1,16 @@
 CREATE TABLE `bcc_manifest`
 (
-    `bcc_manifest_id`             bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-    `release_id`                  bigint(20) unsigned DEFAULT NULL,
-    `bcc_id`                      bigint(20) unsigned NOT NULL,
-    `seq_key_id`                  bigint(20) unsigned DEFAULT NULL,
-    `from_acc_manifest_id`        bigint(20) unsigned NOT NULL,
-    `to_bccp_manifest_id`         bigint(20) unsigned NOT NULL,
+    `bcc_manifest_id`             bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'An internal, primary database key of a BCC_MANIFEST record.',
+    `release_id`                  bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the RELEASE table.',
+    `bcc_id`                      bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the BCC table.',
+    `seq_key_id`                  bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the SEQ_KEY table, which records the order of this association among its siblings.',
+    `from_acc_manifest_id`        bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the ACC_MANIFEST table pointing to the parent ACC (the FROM end of the association) of the TO_BCCP_MANIFEST_ID.',
+    `to_bccp_manifest_id`         bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the BCCP_MANIFEST table pointing to the child BCCP (the TO end of the association) of the FROM_ACC_MANIFEST_ID.',
     `den`                         varchar(351) NOT NULL COMMENT 'DEN (dictionary entry name) of the BCC. This column can be derived from QUALIFIER and OBJECT_CLASS_TERM of the FROM_ACC_ID and DEN of the TO_BCCP_ID as QUALIFIER + "_ " + OBJECT_CLASS_TERM + ". " + DEN.',
     `conflict`                    tinyint(1) NOT NULL DEFAULT 0 COMMENT 'This indicates that there is a conflict between self and relationship.',
     `replacement_bcc_manifest_id` bigint(20) unsigned DEFAULT NULL COMMENT 'This refers to a replacement manifest if the record is deprecated.',
-    `prev_bcc_manifest_id`        bigint(20) unsigned DEFAULT NULL,
-    `next_bcc_manifest_id`        bigint(20) unsigned DEFAULT NULL,
+    `prev_bcc_manifest_id`        bigint(20) unsigned DEFAULT NULL COMMENT 'A self-reference to the corresponding BCC_MANIFEST record in the previous release (revision chain). NULL for the first revision.',
+    `next_bcc_manifest_id`        bigint(20) unsigned DEFAULT NULL COMMENT 'A self-reference to the corresponding BCC_MANIFEST record in the next release (revision chain). NULL for the latest revision.',
     PRIMARY KEY (`bcc_manifest_id`),
     KEY                           `bcc_manifest_bcc_id_fk` (`bcc_id`),
     KEY                           `bcc_manifest_release_id_fk` (`release_id`),
@@ -28,4 +28,4 @@ CREATE TABLE `bcc_manifest`
     CONSTRAINT `bcc_manifest_seq_key_id_fk` FOREIGN KEY (`seq_key_id`) REFERENCES `seq_key` (`seq_key_id`),
     CONSTRAINT `bcc_manifest_to_bccp_manifest_id_fk` FOREIGN KEY (`to_bccp_manifest_id`) REFERENCES `bccp_manifest` (`bccp_manifest_id`),
     CONSTRAINT `bcc_replacement_bcc_manifest_id_fk` FOREIGN KEY (`replacement_bcc_manifest_id`) REFERENCES `bcc_manifest` (`bcc_manifest_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='BCC_MANIFEST is a release-specific handle to a BCC, which represents a relationship/association between an ACC and a BCCP that creates a data element for an ACC. It pins the BCC to a RELEASE (linking the FROM_ACC_MANIFEST and TO_BCCP_MANIFEST ends within that release) and carries the revision chain to the corresponding records in the previous and next releases.';

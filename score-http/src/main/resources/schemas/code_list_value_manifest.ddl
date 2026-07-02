@@ -1,14 +1,14 @@
 CREATE TABLE `code_list_value_manifest`
 (
-    `code_list_value_manifest_id`             bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-    `release_id`                              bigint(20) unsigned NOT NULL,
-    `code_list_value_id`                      bigint(20) unsigned NOT NULL,
-    `code_list_manifest_id`                   bigint(20) unsigned NOT NULL,
-    `based_code_list_value_manifest_id`       bigint(20) unsigned DEFAULT NULL,
+    `code_list_value_manifest_id`             bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'An internal, primary database key of a CODE_LIST_VALUE_MANIFEST record.',
+    `release_id`                              bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the RELEASE table.',
+    `code_list_value_id`                      bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the CODE_LIST_VALUE table.',
+    `code_list_manifest_id`                   bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the CODE_LIST_MANIFEST table.',
+    `based_code_list_value_manifest_id`       bigint(20) unsigned DEFAULT NULL COMMENT 'A self-reference to the CODE_LIST_VALUE_MANIFEST record that this record is based on (its base/supertype from which it was derived).',
     `conflict`                                tinyint(1) NOT NULL DEFAULT 0 COMMENT 'This indicates that there is a conflict between self and relationship.',
     `replacement_code_list_value_manifest_id` bigint(20) unsigned DEFAULT NULL COMMENT 'This refers to a replacement manifest if the record is deprecated.',
-    `prev_code_list_value_manifest_id`        bigint(20) unsigned DEFAULT NULL,
-    `next_code_list_value_manifest_id`        bigint(20) unsigned DEFAULT NULL,
+    `prev_code_list_value_manifest_id`        bigint(20) unsigned DEFAULT NULL COMMENT 'A self-reference to the corresponding CODE_LIST_VALUE_MANIFEST record in the previous release (revision chain). NULL for the first revision.',
+    `next_code_list_value_manifest_id`        bigint(20) unsigned DEFAULT NULL COMMENT 'A self-reference to the corresponding CODE_LIST_VALUE_MANIFEST record in the next release (revision chain). NULL for the latest revision.',
     PRIMARY KEY (`code_list_value_manifest_id`),
     KEY                                       `code_list_value_manifest_code_list_value_id_fk` (`code_list_value_id`),
     KEY                                       `code_list_value_manifest_release_id_fk` (`release_id`),
@@ -24,4 +24,4 @@ CREATE TABLE `code_list_value_manifest`
     CONSTRAINT `code_list_value_manifest_prev_code_list_value_manifest_id_fk` FOREIGN KEY (`prev_code_list_value_manifest_id`) REFERENCES `code_list_value_manifest` (`code_list_value_manifest_id`),
     CONSTRAINT `code_list_value_manifest_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`),
     CONSTRAINT `code_list_value_replacement_code_list_value_manifest_id_fk` FOREIGN KEY (`replacement_code_list_value_manifest_id`) REFERENCES `code_list_value_manifest` (`code_list_value_manifest_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='A release-specific handle to a CODE_LIST_VALUE record, pinning a code list value of a code list to a RELEASE (and to its owning CODE_LIST_MANIFEST) and carrying the revision chain via the PREV/NEXT self-references across releases.';

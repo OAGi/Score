@@ -3,7 +3,7 @@ CREATE TABLE `abie`
     `abie_id`                   bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'A internal, primary database key of an ABIE.',
     `guid`                      char(32) CHARACTER SET ascii COLLATE ascii_general_ci    NOT NULL COMMENT 'A globally unique identifier (GUID).',
     `based_acc_manifest_id`     bigint(20) unsigned NOT NULL COMMENT 'A foreign key to the ACC_MANIFEST table referring to the ACC, on which the business context has been applied to derive this ABIE.',
-    `path`                      text CHARACTER SET ascii COLLATE ascii_general_ci DEFAULT NULL,
+    `path`                      text CHARACTER SET ascii COLLATE ascii_general_ci DEFAULT NULL COMMENT 'The path of this node within the component graph; used together with HASH_PATH to locate the node.',
     `hash_path`                 varchar(64) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL COMMENT 'hash_path generated from the path of the component graph using hash function, so that it is unique in the graph.',
     `biz_ctx_id`                bigint(20) unsigned DEFAULT NULL COMMENT '(Deprecated) A foreign key to the BIZ_CTX table. This column stores the business context assigned to the ABIE.',
     `definition`                text         DEFAULT NULL COMMENT 'Definition to override the ACC''s definition. If NULL, it means that the definition should be inherited from the based CC.',

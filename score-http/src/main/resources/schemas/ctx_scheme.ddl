@@ -7,7 +7,7 @@ CREATE TABLE `ctx_scheme`
     `description`           text         DEFAULT NULL COMMENT 'Description of the context scheme.',
     `scheme_agency_id`      varchar(45)                                           NOT NULL COMMENT 'Identification of the agency maintaining the scheme. This column currently does not use the AGENCY_ID_LIST table. It is just a free form text at this point.',
     `scheme_version_id`     varchar(45)                                           NOT NULL COMMENT 'Version number of the context scheme.',
-    `ctx_category_id`       bigint(20) unsigned NOT NULL COMMENT 'This the foreign key to the CTX_CATEGORY table. It identifies the context category associated with this context scheme.',
+    `ctx_category_id`       bigint(20) unsigned NOT NULL COMMENT 'This is the foreign key to the CTX_CATEGORY table. It identifies the context category associated with this context scheme.',
     `code_list_id`          bigint(20) unsigned DEFAULT NULL COMMENT 'This is the foreign key to the CODE_LIST table. It identifies the code list associated with this context scheme.',
     `created_by`            bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table. It indicates the user who created this context scheme.',
     `last_updated_by`       bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table. It identifies the user who last updated the context scheme.',

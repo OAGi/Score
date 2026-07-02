@@ -15,4 +15,4 @@ CREATE TABLE `app_oauth2_user`
     KEY                  `app_oauth2_user_app_user_id_fk` (`app_user_id`),
     CONSTRAINT `app_oauth2_user_app_user_id_fk` FOREIGN KEY (`app_user_id`) REFERENCES `app_user` (`app_user_id`),
     CONSTRAINT `app_oauth2_user_oauth2_app_id_fk` FOREIGN KEY (`oauth2_app_id`) REFERENCES `oauth2_app` (`oauth2_app_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci COMMENT='This table captures the OpenID Connect claims (such as the sub, name, and email) of a user authenticated through an external OAuth2 provider registered in OAUTH2_APP, linking that identity to a record in APP_USER. When the APP_USER reference is not set, the record is treated as a pending one that has not yet been associated with an application user.';

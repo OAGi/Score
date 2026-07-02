@@ -1,15 +1,15 @@
 CREATE TABLE `asccp_manifest`
 (
-    `asccp_manifest_id`             bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-    `release_id`                    bigint(20) unsigned NOT NULL,
-    `asccp_id`                      bigint(20) unsigned NOT NULL,
-    `role_of_acc_manifest_id`       bigint(20) unsigned NOT NULL,
+    `asccp_manifest_id`             bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'An internal, primary database key of a ASCCP_MANIFEST record.',
+    `release_id`                    bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the RELEASE table.',
+    `asccp_id`                      bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the ASCCP table.',
+    `role_of_acc_manifest_id`       bigint(20) unsigned NOT NULL COMMENT 'A foreign key to the ACC_MANIFEST record for the ACC from which this ASCCP is created (ASCCP applies role to the ACC).',
     `den`                           varchar(202) DEFAULT NULL COMMENT 'The dictionary entry name of the ASCCP.',
     `conflict`                      tinyint(1) NOT NULL DEFAULT 0 COMMENT 'This indicates that there is a conflict between self and relationship.',
     `log_id`                        bigint(20) unsigned DEFAULT NULL COMMENT 'A foreign key pointed to a log for the current record.',
     `replacement_asccp_manifest_id` bigint(20) unsigned DEFAULT NULL COMMENT 'This refers to a replacement manifest if the record is deprecated.',
-    `prev_asccp_manifest_id`        bigint(20) unsigned DEFAULT NULL,
-    `next_asccp_manifest_id`        bigint(20) unsigned DEFAULT NULL,
+    `prev_asccp_manifest_id`        bigint(20) unsigned DEFAULT NULL COMMENT 'A self-reference to the corresponding ASCCP_MANIFEST record in the previous release (revision chain). NULL for the first revision.',
+    `next_asccp_manifest_id`        bigint(20) unsigned DEFAULT NULL COMMENT 'A self-reference to the corresponding ASCCP_MANIFEST record in the next release (revision chain). NULL for the latest revision.',
     PRIMARY KEY (`asccp_manifest_id`),
     KEY                             `asccp_manifest_asccp_id_fk` (`asccp_id`),
     KEY                             `asccp_manifest_role_of_acc_manifest_id_fk` (`role_of_acc_manifest_id`),
@@ -25,4 +25,4 @@ CREATE TABLE `asccp_manifest`
     CONSTRAINT `asccp_manifest_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`),
     CONSTRAINT `asccp_manifest_role_of_acc_manifest_id_fk` FOREIGN KEY (`role_of_acc_manifest_id`) REFERENCES `acc_manifest` (`acc_manifest_id`),
     CONSTRAINT `asccp_replacement_asccp_manifest_id_fk` FOREIGN KEY (`replacement_asccp_manifest_id`) REFERENCES `asccp_manifest` (`asccp_manifest_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='A release-specific handle to an ASCCP, which specifies a role (or property) an ACC may play under another ACC; it pins the ASCCP to a RELEASE and carries the revision chain to the corresponding ASCCP_MANIFEST records in the previous and next releases.';

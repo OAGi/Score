@@ -10,4 +10,4 @@ CREATE TABLE `exception`
     KEY                  `exception_created_by_fk` (`created_by`),
     KEY                  `exception_tag_idx` (`tag`),
     CONSTRAINT `exception_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci COMMENT='This table logs exceptions raised by the application, capturing the exception message, its serialized stacktrace, and a searchable tag, along with the APP_USER who was working when the exception occurred and the time it was created.';

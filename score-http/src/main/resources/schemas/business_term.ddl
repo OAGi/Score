@@ -1,6 +1,6 @@
 CREATE TABLE `business_term`
 (
-    `business_term_id`      bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'A internal, primary database key of an Business term.',
+    `business_term_id`      bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'An internal, primary database key of a Business term.',
     `guid`                  char(32) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL COMMENT 'A globally unique identifier (GUID).',
     `business_term`         varchar(255)                                          NOT NULL COMMENT 'A main name of the business term',
     `definition`            text         DEFAULT NULL COMMENT 'Definition of the business term.',

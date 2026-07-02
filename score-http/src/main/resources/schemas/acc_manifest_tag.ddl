@@ -1,7 +1,7 @@
 CREATE TABLE `acc_manifest_tag`
 (
-    `acc_manifest_id`    bigint(20) unsigned NOT NULL,
-    `tag_id`             bigint(20) unsigned NOT NULL,
+    `acc_manifest_id`    bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the ACC_MANIFEST table.',
+    `tag_id`             bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the TAG table.',
     `created_by`         bigint(20) unsigned NOT NULL COMMENT 'A foreign key referring to the user who creates the record.',
     `creation_timestamp` datetime(6) NOT NULL COMMENT 'Timestamp when the record was first created.',
     PRIMARY KEY (`acc_manifest_id`, `tag_id`),
@@ -11,4 +11,4 @@ CREATE TABLE `acc_manifest_tag`
     CONSTRAINT `acc_manifest_tag_acc_manifest_id_fk` FOREIGN KEY (`acc_manifest_id`) REFERENCES `acc_manifest` (`acc_manifest_id`),
     CONSTRAINT `acc_manifest_tag_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
     CONSTRAINT `acc_manifest_tag_tag_id_fk` FOREIGN KEY (`tag_id`) REFERENCES `tag` (`tag_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci COMMENT='This is a many-to-many join table that assigns TAG rows to ACC_MANIFEST rows, associating tags with a release-specific ACC.';

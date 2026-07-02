@@ -1,14 +1,14 @@
 CREATE TABLE `dt_sc_manifest`
 (
-    `dt_sc_manifest_id`             bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-    `release_id`                    bigint(20) unsigned NOT NULL,
-    `dt_sc_id`                      bigint(20) unsigned NOT NULL,
-    `owner_dt_manifest_id`          bigint(20) unsigned NOT NULL,
-    `based_dt_sc_manifest_id`       bigint(20) unsigned DEFAULT NULL,
+    `dt_sc_manifest_id`             bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'An internal, primary database key of a DT_SC_MANIFEST record.',
+    `release_id`                    bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the RELEASE table.',
+    `dt_sc_id`                      bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the DT_SC table.',
+    `owner_dt_manifest_id`          bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the DT_MANIFEST table representing the data type that owns this supplementary component.',
+    `based_dt_sc_manifest_id`       bigint(20) unsigned DEFAULT NULL COMMENT 'A self-reference to the DT_SC_MANIFEST record that this record is based on (its base/supertype from which it was derived).',
     `conflict`                      tinyint(1) NOT NULL DEFAULT 0 COMMENT 'This indicates that there is a conflict between self and relationship.',
     `replacement_dt_sc_manifest_id` bigint(20) unsigned DEFAULT NULL COMMENT 'This refers to a replacement manifest if the record is deprecated.',
-    `prev_dt_sc_manifest_id`        bigint(20) unsigned DEFAULT NULL,
-    `next_dt_sc_manifest_id`        bigint(20) unsigned DEFAULT NULL,
+    `prev_dt_sc_manifest_id`        bigint(20) unsigned DEFAULT NULL COMMENT 'A self-reference to the corresponding DT_SC_MANIFEST record in the previous release (revision chain). NULL for the first revision.',
+    `next_dt_sc_manifest_id`        bigint(20) unsigned DEFAULT NULL COMMENT 'A self-reference to the corresponding DT_SC_MANIFEST record in the next release (revision chain). NULL for the latest revision.',
     PRIMARY KEY (`dt_sc_manifest_id`),
     KEY                             `dt_sc_manifest_dt_sc_id_fk` (`dt_sc_id`),
     KEY                             `dt_sc_manifest_release_id_fk` (`release_id`),
@@ -24,4 +24,4 @@ CREATE TABLE `dt_sc_manifest`
     CONSTRAINT `dt_sc_next_dt_sc_manifest_id_fk` FOREIGN KEY (`next_dt_sc_manifest_id`) REFERENCES `dt_sc_manifest` (`dt_sc_manifest_id`),
     CONSTRAINT `dt_sc_prev_dt_sc_manifest_id_fk` FOREIGN KEY (`prev_dt_sc_manifest_id`) REFERENCES `dt_sc_manifest` (`dt_sc_manifest_id`),
     CONSTRAINT `dt_sc_replacement_dt_sc_manifest_id_fk` FOREIGN KEY (`replacement_dt_sc_manifest_id`) REFERENCES `dt_sc_manifest` (`dt_sc_manifest_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='A release-specific handle to a DT_SC record, pinning the supplementary component (SC) of a data type to a RELEASE and linking it to the owning DT_MANIFEST. It carries the revision chain to the corresponding DT_SC_MANIFEST in the previous and next releases (PREV_DT_SC_MANIFEST_ID/NEXT_DT_SC_MANIFEST_ID), though as noted for DT_SC the supplementary component is an intrinsic part of the DT and is re-created with each new revision of the data type.';

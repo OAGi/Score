@@ -1,15 +1,15 @@
 CREATE TABLE `dt_manifest`
 (
-    `dt_manifest_id`             bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-    `release_id`                 bigint(20) unsigned NOT NULL,
-    `dt_id`                      bigint(20) unsigned NOT NULL,
-    `based_dt_manifest_id`       bigint(20) unsigned DEFAULT NULL,
+    `dt_manifest_id`             bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'An internal, primary database key of a DT_MANIFEST record.',
+    `release_id`                 bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the RELEASE table.',
+    `dt_id`                      bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the DT table.',
+    `based_dt_manifest_id`       bigint(20) unsigned DEFAULT NULL COMMENT 'A self-reference to the DT_MANIFEST record that this record is based on (its base/supertype from which it was derived).',
     `den`                        varchar(200) NOT NULL COMMENT 'Dictionary Entry Name of the data type.',
     `conflict`                   tinyint(1) NOT NULL DEFAULT 0 COMMENT 'This indicates that there is a conflict between self and relationship.',
     `log_id`                     bigint(20) unsigned DEFAULT NULL COMMENT 'A foreign key pointed to a log for the current record.',
     `replacement_dt_manifest_id` bigint(20) unsigned DEFAULT NULL COMMENT 'This refers to a replacement manifest if the record is deprecated.',
-    `prev_dt_manifest_id`        bigint(20) unsigned DEFAULT NULL,
-    `next_dt_manifest_id`        bigint(20) unsigned DEFAULT NULL,
+    `prev_dt_manifest_id`        bigint(20) unsigned DEFAULT NULL COMMENT 'A self-reference to the corresponding DT_MANIFEST record in the previous release (revision chain). NULL for the first revision.',
+    `next_dt_manifest_id`        bigint(20) unsigned DEFAULT NULL COMMENT 'A self-reference to the corresponding DT_MANIFEST record in the next release (revision chain). NULL for the latest revision.',
     PRIMARY KEY (`dt_manifest_id`),
     KEY                          `dt_manifest_dt_id_fk` (`dt_id`),
     KEY                          `dt_manifest_release_id_fk` (`release_id`),
@@ -25,4 +25,4 @@ CREATE TABLE `dt_manifest`
     CONSTRAINT `dt_manifest_prev_dt_manifest_id_fk` FOREIGN KEY (`prev_dt_manifest_id`) REFERENCES `dt_manifest` (`dt_manifest_id`),
     CONSTRAINT `dt_manifest_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`),
     CONSTRAINT `dt_replacement_dt_manifest_id_fk` FOREIGN KEY (`replacement_dt_manifest_id`) REFERENCES `dt_manifest` (`dt_manifest_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='The DT_MANIFEST table is a release-specific handle to a DT record (both CDT and BDT, as stored in the DT table), pinning it to a particular RELEASE. It carries the revision chain across releases through the PREV_DT_MANIFEST_ID and NEXT_DT_MANIFEST_ID self-references, and records the DT''s base/supertype via BASED_DT_MANIFEST_ID.';

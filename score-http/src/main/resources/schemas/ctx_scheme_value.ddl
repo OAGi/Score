@@ -3,7 +3,7 @@ CREATE TABLE `ctx_scheme_value`
     `ctx_scheme_value_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary, internal database key.',
     `guid`                char(32) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL COMMENT 'A globally unique identifier (GUID).',
     `value`               varchar(100)                                          NOT NULL DEFAULT '' COMMENT 'A short value for the scheme value similar to the code list value.',
-    `meaning`             text                                                           DEFAULT NULL COMMENT 'The description, explanatiion of the scheme value.',
+    `meaning`             text                                                           DEFAULT NULL COMMENT 'The description, explanation of the scheme value.',
     `owner_ctx_scheme_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the CTX_SCHEME table. It identifies the context scheme, to which this scheme value belongs.',
     PRIMARY KEY (`ctx_scheme_value_id`),
     UNIQUE KEY `ctx_scheme_value_uk1` (`guid`),

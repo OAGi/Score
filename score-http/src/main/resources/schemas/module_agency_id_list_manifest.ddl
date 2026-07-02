@@ -2,7 +2,7 @@ CREATE TABLE `module_agency_id_list_manifest`
 (
     `module_agency_id_list_manifest_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary key.',
     `module_set_release_id`             bigint(20) unsigned NOT NULL COMMENT 'A foreign key of the module set release record.',
-    `agency_id_list_manifest_id`        bigint(20) unsigned NOT NULL COMMENT 'A foreign key of the code list manifest record.',
+    `agency_id_list_manifest_id`        bigint(20) unsigned NOT NULL COMMENT 'A foreign key of the agency id list manifest record.',
     `module_id`                         bigint(20) unsigned NOT NULL COMMENT 'This indicates a module.',
     `created_by`                        bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table. It indicates the user who created this record.',
     `last_updated_by`                   bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table referring to the last user who updated the record.',
@@ -19,4 +19,4 @@ CREATE TABLE `module_agency_id_list_manifest`
     CONSTRAINT `module_agency_id_list_manifest_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
     CONSTRAINT `module_agency_id_list_manifest_module_id_fk` FOREIGN KEY (`module_id`) REFERENCES `module` (`module_id`),
     CONSTRAINT `module_agency_id_list_manifest_module_set_release_id_fk` FOREIGN KEY (`module_set_release_id`) REFERENCES `module_set_release` (`module_set_release_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci COMMENT='This table assigns an AGENCY_ID_LIST_MANIFEST to a MODULE within a MODULE_SET_RELEASE, indicating the physical file into which the agency identification list will be generated during the expression generation.';

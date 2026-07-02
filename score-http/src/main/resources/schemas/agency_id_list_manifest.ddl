@@ -1,15 +1,15 @@
 CREATE TABLE `agency_id_list_manifest`
 (
-    `agency_id_list_manifest_id`             bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-    `release_id`                             bigint(20) unsigned NOT NULL,
-    `agency_id_list_id`                      bigint(20) unsigned NOT NULL,
-    `agency_id_list_value_manifest_id`       bigint(20) unsigned DEFAULT NULL,
-    `based_agency_id_list_manifest_id`       bigint(20) unsigned DEFAULT NULL,
+    `agency_id_list_manifest_id`             bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'An internal, primary database key of a AGENCY_ID_LIST_MANIFEST record.',
+    `release_id`                             bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the RELEASE table.',
+    `agency_id_list_id`                      bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the AGENCY_ID_LIST table.',
+    `agency_id_list_value_manifest_id`       bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the AGENCY_ID_LIST_VALUE_MANIFEST table. It identifies the agency or organization that developed and/or maintains this agency ID list.',
+    `based_agency_id_list_manifest_id`       bigint(20) unsigned DEFAULT NULL COMMENT 'A self-reference to the AGENCY_ID_LIST_MANIFEST record that this record is based on (its base/supertype from which it was derived).',
     `conflict`                               tinyint(1) NOT NULL DEFAULT 0 COMMENT 'This indicates that there is a conflict between self and relationship.',
     `log_id`                                 bigint(20) unsigned DEFAULT NULL COMMENT 'A foreign key pointed to a log for the current record.',
     `replacement_agency_id_list_manifest_id` bigint(20) unsigned DEFAULT NULL COMMENT 'This refers to a replacement manifest if the record is deprecated.',
-    `prev_agency_id_list_manifest_id`        bigint(20) unsigned DEFAULT NULL,
-    `next_agency_id_list_manifest_id`        bigint(20) unsigned DEFAULT NULL,
+    `prev_agency_id_list_manifest_id`        bigint(20) unsigned DEFAULT NULL COMMENT 'A self-reference to the corresponding AGENCY_ID_LIST_MANIFEST record in the previous release (revision chain). NULL for the first revision.',
+    `next_agency_id_list_manifest_id`        bigint(20) unsigned DEFAULT NULL COMMENT 'A self-reference to the corresponding AGENCY_ID_LIST_MANIFEST record in the next release (revision chain). NULL for the latest revision.',
     PRIMARY KEY (`agency_id_list_manifest_id`),
     KEY                                      `agency_id_list_manifest_agency_id_list_id_fk` (`agency_id_list_id`),
     KEY                                      `agency_id_list_manifest_based_agency_id_list_manifest_id_fk` (`based_agency_id_list_manifest_id`),
@@ -27,4 +27,4 @@ CREATE TABLE `agency_id_list_manifest`
     CONSTRAINT `agency_id_list_manifest_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`),
     CONSTRAINT `agency_id_list_replacement_agency_id_list_manifest_id_fk` FOREIGN KEY (`replacement_agency_id_list_manifest_id`) REFERENCES `agency_id_list_manifest` (`agency_id_list_manifest_id`),
     CONSTRAINT `agency_id_list_value_manifest_id_fk` FOREIGN KEY (`agency_id_list_value_manifest_id`) REFERENCES `agency_id_list_value_manifest` (`agency_id_list_value_manifest_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='The AGENCY_ID_LIST_MANIFEST table is a release-specific handle to an AGENCY_ID_LIST record; it pins the agency identification list to a RELEASE and carries the revision chain (prev/next manifest) across releases.';

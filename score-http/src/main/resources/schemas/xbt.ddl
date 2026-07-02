@@ -3,7 +3,7 @@ CREATE TABLE `xbt`
     `xbt_id`                bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary, internal database key.',
     `guid`                  char(32) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL COMMENT 'A globally unique identifier (GUID).',
     `name`                  varchar(45)  DEFAULT NULL COMMENT 'Human understandable name of the built-in type.',
-    `builtIn_type`          varchar(45)  DEFAULT NULL COMMENT 'Built-in type as it should appear in the XML schema including the namespace prefix. Namespace prefix for the XML schema namespace is assumed to be ''xsd'' and a default prefix for the OAGIS built-int type.',
+    `builtIn_type`          varchar(45)  DEFAULT NULL COMMENT 'Built-in type as it should appear in the XML schema including the namespace prefix. Namespace prefix for the XML schema namespace is assumed to be ''xsd'' and a default prefix for the OAGIS built-in type.',
     `jbt_draft05_map`       varchar(500) DEFAULT NULL COMMENT 'Mapping from XML built-in datatype to JSON Schema Draft-05 type definition (JSON text).',
     `jbt_202012_map`        varchar(500) DEFAULT NULL COMMENT 'Mapping from XML built-in datatype to JSON Schema 2020-12 type definition (JSON text).',
     `openapi30_map`         varchar(500) DEFAULT NULL COMMENT 'Mapping from XML built-in datatype to OpenAPI 3.0.3 schema type definition (JSON text).',

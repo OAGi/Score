@@ -1,7 +1,7 @@
 CREATE TABLE `tag`
 (
     `tag_id`                bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'An internal, primary database key of a tag record.',
-    `name`                  varchar(100) NOT NULL COMMENT 'The meaning of the tag.',
+    `name`                  varchar(100) NOT NULL COMMENT 'The name of the tag.',
     `description`           text DEFAULT NULL COMMENT 'The description of the tag.',
     `text_color`            varchar(10)  NOT NULL COMMENT 'The text color of the tag.',
     `background_color`      varchar(10)  NOT NULL COMMENT 'The background color of the tag.',
@@ -14,4 +14,4 @@ CREATE TABLE `tag`
     KEY                     `tag_last_updated_by_fk` (`last_updated_by`),
     CONSTRAINT `tag_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
     CONSTRAINT `tag_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci COMMENT='The TAG table stores the tags (each with a name, description, and text and background color) that can be attached to core component and data type manifests through the intersection tables ACC_MANIFEST_TAG, ASCCP_MANIFEST_TAG, BCCP_MANIFEST_TAG, and DT_MANIFEST_TAG.';

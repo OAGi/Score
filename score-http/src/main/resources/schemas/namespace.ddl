@@ -5,7 +5,7 @@ CREATE TABLE `namespace`
     `uri`                   varchar(100) NOT NULL COMMENT 'This is the URI of the namespace.',
     `prefix`                varchar(45) DEFAULT NULL COMMENT 'This is a default short name to represent the URI. It may be overridden during the expression generation. Null or empty means the same thing like the default prefix in an XML schema.',
     `description`           text        DEFAULT NULL COMMENT 'Description or explanation about the namespace or use of the namespace.',
-    `is_std_nmsp`           tinyint(1) NOT NULL DEFAULT 0 COMMENT 'This indicates whether the namespace is reserved for standard used (i.e., whether it is an OAGIS namespace). If it is true, then end users cannot user the namespace for the end user CCs.',
+    `is_std_nmsp`           tinyint(1) NOT NULL DEFAULT 0 COMMENT 'This indicates whether the namespace is reserved for standard use (i.e., whether it is an OAGIS namespace). If it is true, then end users cannot use the namespace for the end user CCs.',
     `owner_user_id`         bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table identifying the user who can update or delete the record.',
     `created_by`            bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table identifying user who created the namespace.',
     `last_updated_by`       bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table identifying the user who last updated the record.',

@@ -4,7 +4,7 @@ CREATE TABLE `bccp`
     `guid`                  char(32) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL COMMENT 'A globally unique identifier (GUID).',
     `property_term`         varchar(100)                                          NOT NULL COMMENT 'The property concept that the BCCP models.',
     `representation_term`   varchar(20)                                           NOT NULL COMMENT 'The representation term convey the format of the data the BCCP can take. The value is derived from the DT.DATA_TYPE_TERM of the associated BDT as referred to by the BDT_ID column.',
-    `bdt_id`                bigint(20) unsigned NOT NULL COMMENT 'Foreign key pointing to the DT table indicating the data typye or data format of the BCCP. Only DT_ID which DT_Type is BDT can be used.',
+    `bdt_id`                bigint(20) unsigned NOT NULL COMMENT 'Foreign key pointing to the DT table indicating the data type or data format of the BCCP. Only DT_ID which DT_Type is BDT can be used.',
     `definition`            text         DEFAULT NULL COMMENT 'Description of the BCCP.',
     `definition_source`     varchar(100) DEFAULT NULL COMMENT 'This is typically a URL identifying the source of the DEFINITION column.',
     `namespace_id`          bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the NAMESPACE table. This is the namespace to which the entity belongs. This namespace column is primarily used in the case the component is a user''s component because there is also a namespace assigned at the release level.',
