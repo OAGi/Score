@@ -272,10 +272,12 @@ public class ReleaseQueryController {
     @GetMapping(value = "/{releaseId:[\\d]+}/generate_migration_script")
     public ResponseEntity<DeleteOnCloseFileSystemResource> generateMigrationScript(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @PathVariable("releaseId") ReleaseId releaseId) throws Exception {
+            @PathVariable("releaseId") ReleaseId releaseId,
+            @RequestParam(name = "includeViewOrder", required = false, defaultValue = "false") boolean includeViewOrder)
+            throws Exception {
 
         GenerateMigrationScriptResponse response =
-                releaseQueryService.generateMigrationScript(sessionService.asScoreUser(user), releaseId);
+                releaseQueryService.generateMigrationScript(sessionService.asScoreUser(user), releaseId, includeViewOrder);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + response.getFilename() + "\"")

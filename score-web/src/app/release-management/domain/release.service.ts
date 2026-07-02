@@ -140,8 +140,13 @@ export class ReleaseService {
     return this.http.post<ReleaseValidationResponse>('/api/releases/' + releaseId + '/state', {state});
   }
 
-  generateMigrationScript(releaseId: number): Observable<HttpResponse<Blob>> {
+  generateMigrationScript(releaseId: number, includeViewOrder = false): Observable<HttpResponse<Blob>> {
+    let params = new HttpParams();
+    if (includeViewOrder) {
+      params = params.set('includeViewOrder', 'true');
+    }
     return this.http.get('/api/releases/' + releaseId + '/generate_migration_script', {
+      params,
       observe: 'response',
       responseType: 'blob'
     });

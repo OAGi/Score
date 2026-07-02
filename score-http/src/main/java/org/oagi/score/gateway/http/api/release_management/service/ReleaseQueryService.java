@@ -127,11 +127,12 @@ public class ReleaseQueryService {
         return query(requester).getAssignComponents(releaseId);
     }
 
-    public GenerateMigrationScriptResponse generateMigrationScript(ScoreUser requester, ReleaseId releaseId) throws IOException {
+    public GenerateMigrationScriptResponse generateMigrationScript(ScoreUser requester, ReleaseId releaseId,
+                                                                   boolean includeBieViewOrder) throws IOException {
         ReleaseSummaryRecord release = query(requester).getReleaseSummary(releaseId);
 
         MigrationScriptGenerator generator = new MigrationScriptGenerator(dslContext, resourceLoader,
-                BigInteger.valueOf(100000000L));
+                BigInteger.valueOf(100000000L), includeBieViewOrder);
         File file = generator.generate(requester, release);
 
         String fileName = release.releaseNum().replace(".", "_") + ".zip";

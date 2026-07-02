@@ -94,6 +94,10 @@
               (click)="generateMigrationScript()">
               Generate Migration Script
             </button>
+            <mat-checkbox [(ngModel)]="includeViewOrder"
+                          matTooltip="Include the model-browser / BIE-editor sibling ordering in the migration script.">
+              Include sibling view order
+            </mat-checkbox>
           }
         </div>
       </div>

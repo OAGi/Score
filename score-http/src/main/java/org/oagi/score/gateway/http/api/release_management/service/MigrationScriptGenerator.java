@@ -37,10 +37,18 @@ public class MigrationScriptGenerator {
 
     private int defaultMaximumRowsInStatement = 1000;
 
+    private boolean includeBieViewOrder;
+
     public MigrationScriptGenerator(DSLContext dslContext, ResourceLoader resourceLoader, BigInteger delta) {
+        this(dslContext, resourceLoader, delta, false);
+    }
+
+    public MigrationScriptGenerator(DSLContext dslContext, ResourceLoader resourceLoader, BigInteger delta,
+                                    boolean includeBieViewOrder) {
         this.dslContext = dslContext;
         this.resourceLoader = resourceLoader;
         this.delta = delta;
+        this.includeBieViewOrder = includeBieViewOrder;
     }
 
     public File generate(ScoreUser user, ReleaseSummaryRecord release) throws IOException {
@@ -146,6 +154,9 @@ public class MigrationScriptGenerator {
         writer.println("DROP TABLE IF EXISTS `module_set`;");
         writer.println("DROP TABLE IF EXISTS `module_set_release`;");
         writer.println("DROP TABLE IF EXISTS `module_xbt_manifest`;");
+        if (includeBieViewOrder) {
+            writer.println("DROP TABLE IF EXISTS `bie_view_order`;");
+        }
         writer.println("");
         writer.println("-- End of 'Clean developer data' --");
         writer.println("");
@@ -223,6 +234,10 @@ public class MigrationScriptGenerator {
                 "SELECT `bccp_manifest_tag`.* FROM `bccp_manifest_tag` WHERE `bccp_manifest_id` < " + delta));
         dumpData(writer, "dt_manifest_tag", false, () -> dslContext.resultQuery(
                 "SELECT `dt_manifest_tag`.* FROM `dt_manifest_tag` WHERE `dt_manifest_id` < " + delta));
+        if (includeBieViewOrder) {
+            // After its FK parents acc_manifest / app_user / ascc_manifest / bcc_manifest (all dumped above).
+            dumpData(writer, "bie_view_order", true);
+        }
 
         writer.println("/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;");
         writer.println("");

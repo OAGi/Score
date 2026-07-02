@@ -49,6 +49,9 @@ export class ReleaseDetailComponent implements OnInit {
   assignable: string[];
   assigned: string[];
 
+  // Issue #1638: opt-in to dump bie_view_order (sibling view order) into the migration script.
+  includeViewOrder = false;
+
   ngOnInit() {
     this.isLoading = true;
     this.route.paramMap.pipe(
@@ -227,7 +230,7 @@ export class ReleaseDetailComponent implements OnInit {
 
   generateMigrationScript() {
     this.isLoading = true;
-    this.service.generateMigrationScript(this.releaseDetail.releaseId).subscribe(resp => {
+    this.service.generateMigrationScript(this.releaseDetail.releaseId, this.includeViewOrder).subscribe(resp => {
       saveAsBlobResponse(resp);
       this.isLoading = false;
     }, err => {
