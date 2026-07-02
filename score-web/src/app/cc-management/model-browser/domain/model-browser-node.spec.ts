@@ -251,3 +251,47 @@ describe('ModelBrowserNodeDataSource.nodeExpanded$ (#1638 lazy-fetch trigger)', 
     expect(parent.expanded).toBe(false);
   });
 });
+
+describe('ModelBrowserNodeDataSource.hideOrderWeights (#1638 follow-up — order-weight badge visibility)', () => {
+  // The order-weight badge display is a per-user preference gated on this flag (default hidden for
+  // end-users, shown for developers). The flag lives on the data source so the template reacts to it,
+  // and change listeners are notified (same wiring as hideCardinality).
+  function newDs(): ModelBrowserNodeDataSource<any> {
+    return new ModelBrowserNodeDataSource<any>(newDb(), null as any);
+  }
+
+  it('defaults to false (shown) until explicitly set', () => {
+    expect(newDs().hideOrderWeights).toBe(false);
+  });
+
+  it('setting true then false round-trips the getter', () => {
+    const ds = newDs();
+    ds.hideOrderWeights = true;
+    expect(ds.hideOrderWeights).toBe(true);
+    ds.hideOrderWeights = false;
+    expect(ds.hideOrderWeights).toBe(false);
+  });
+
+  it('notifies registered listeners on an actual change', () => {
+    const ds = newDs();
+    const seen: Array<{prop: string, val: any}> = [];
+    ds.addListener({onChange: (_entity, prop, val) => seen.push({prop, val})});
+
+    ds.hideOrderWeights = true;
+
+    expect(seen).toEqual([{prop: 'hideOrderWeights', val: true}]);
+  });
+
+  it('is idempotent — setting the same value does NOT re-notify', () => {
+    const ds = newDs();
+    const seen: any[] = [];
+    ds.addListener({onChange: (_entity, prop, val) => seen.push({prop, val})});
+
+    ds.hideOrderWeights = false; // same as the default
+    expect(seen).toEqual([]);
+
+    ds.hideOrderWeights = true;
+    ds.hideOrderWeights = true; // no-op, must not fire again
+    expect(seen).toEqual([{prop: 'hideOrderWeights', val: true}]);
+  });
+});

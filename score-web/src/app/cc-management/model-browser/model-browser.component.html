@@ -93,6 +93,11 @@
                             <span>Hide cardinality</span>
                           </mat-checkbox>
                         </button>
+                        <button mat-menu-item [id]="'bie-settings-hide-order-weights'">
+                          <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="hideOrderWeights">
+                            <span>Hide order weights</span>
+                          </mat-checkbox>
+                        </button>
                       </mat-menu>
                     </div>
                   </div>
@@ -188,9 +193,11 @@
                             </span>
                           }
 
-                          <!-- Issue #1638: a reorderable node with a custom sibling order weight shows it as a
-                               small badge (developer-only / ACC view parent, mirroring the drag handle gate). -->
-                          @if (canReorder(node) && orderWeight !== undefined && orderWeight !== null) {
+                          <!-- Issue #1638: a sibling with a custom order weight shows it as a small badge.
+                               Follow-up: badge display is a per-user preference (dataSource.hideOrderWeights),
+                               defaulting hidden for end-users and shown for developers. Managing weights
+                               (drag handle / Order Weight / Reset) stays developer-only via canReorder. -->
+                          @if (!dataSource.hideOrderWeights && orderWeight !== undefined && orderWeight !== null) {
                             <span class="order-weight-badge ms-4" matTooltip="Order weight">{{ orderWeight }}</span>
                           }
 

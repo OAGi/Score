@@ -1302,6 +1302,7 @@ export class ModelBrowserNodeDataSource<T extends ModelBrowserNode> implements D
 
   _hideUnused = false;
   _hideCardinality = false;
+  _hideOrderWeights = false;
 
   get data(): T[] {
     return this.dataChange.value;
@@ -1349,6 +1350,19 @@ export class ModelBrowserNodeDataSource<T extends ModelBrowserNode> implements D
 
     this._hideCardinality = hideCardinality;
     this._listeners.forEach(e => e.onChange(this, 'hideCardinality', hideCardinality));
+  }
+
+  get hideOrderWeights(): boolean {
+    return this._hideOrderWeights;
+  }
+
+  set hideOrderWeights(hideOrderWeights: boolean) {
+    if (this._hideOrderWeights === hideOrderWeights) {
+      return;
+    }
+
+    this._hideOrderWeights = hideOrderWeights;
+    this._listeners.forEach(e => e.onChange(this, 'hideOrderWeights', hideOrderWeights));
   }
 
   constructor(

@@ -103,6 +103,7 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
 
   preferencesInfo: PreferencesInfo;
   HIDE_CARDINALITY_PROPERTY_KEY = 'ModelBrowser-Settings-Hide-Cardinality';
+  HIDE_ORDER_WEIGHTS_PROPERTY_KEY = 'ModelBrowser-Settings-Hide-Order-Weights';
 
   get hideCardinality(): boolean {
     return this.dataSource.hideCardinality;
@@ -111,6 +112,15 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
   set hideCardinality(hideCardinality: boolean) {
     this.dataSource.hideCardinality = hideCardinality;
     saveBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, hideCardinality);
+  }
+
+  get hideOrderWeights(): boolean {
+    return this.dataSource.hideOrderWeights;
+  }
+
+  set hideOrderWeights(hideOrderWeights: boolean) {
+    this.dataSource.hideOrderWeights = hideOrderWeights;
+    saveBooleanProperty(this.auth.getUserToken(), this.HIDE_ORDER_WEIGHTS_PROPERTY_KEY, hideOrderWeights);
   }
 
   ngOnInit(): void {
@@ -138,6 +148,10 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
       this.searcher = new ModelBrowserNodeDataSourceSearcher<ModelBrowserNode>(this.dataSource, database);
       this.dataSource.init();
       this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
+      // Issue #1638 follow-up: order weights are developer-managed, so the display defaults to hidden
+      // for end-users and shown for developers — still a per-user, persisted preference either way.
+      this.dataSource.hideOrderWeights = loadBooleanProperty(
+        this.auth.getUserToken(), this.HIDE_ORDER_WEIGHTS_PROPERTY_KEY, !this.auth.isDeveloper());
 
       this.onClick(this.dataSource.data[0]);
 
