@@ -107,6 +107,7 @@
 	- [Test Case 18.2 - Code List Access](/docs/test_cases/TestSuite18.md#test-case-182)
 - [Test Suite 19 - Release Management](/docs/test_cases/TestSuite19.md)
 	- [Test Case 19.1 - Release management](/docs/test_cases/TestSuite19.md#test-case-191)
+	- [Test Case 19.2 - View-order forwarding across releases](/docs/test_cases/TestSuite19.md#test-case-192)
 - [Test Suite 20 - Namespace Management](/docs/test_cases/TestSuite20.md)
 	- [Test Case 20.1 - Developer management of namespaces](/docs/test_cases/TestSuite20.md#test-case-201)
 	- [Test Case 20.2 - End user management of namespaces](/docs/test_cases/TestSuite20.md#test-case-202)

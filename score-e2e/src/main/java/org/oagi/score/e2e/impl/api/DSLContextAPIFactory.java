@@ -140,6 +140,11 @@ public class DSLContextAPIFactory implements APIFactory {
     }
 
     @Override
+    public BieViewOrderAPI getBieViewOrderAPI() {
+        return new DSLContextBieViewOrderAPIImpl(dslContext);
+    }
+
+    @Override
     public void close() throws Exception {
         if (dataSource != null) {
             dataSource.close();

@@ -159,4 +159,11 @@ public interface APIFactory extends AutoCloseable {
      */
     OpenAPIDocumentAPI getOpenAPIDocumentAPI();
 
+    /**
+     * Return the BIE view-order API.
+     *
+     * @return the BIE view-order API.
+     */
+    BieViewOrderAPI getBieViewOrderAPI();
+
 }

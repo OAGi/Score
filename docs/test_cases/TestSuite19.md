@@ -94,3 +94,29 @@ in the external data loader to update other instances to the recent published re
 4. Verify the successful and cancelled draft-release flows: when validation succeeds, create the draft release, verify that Release Draft content appears read-only in the branch selector for Core Components but is excluded from BIE branch selection, and verify that moving the draft back to Initialized restores the CC state. (Assertions [#19.1.3](#test-assertion-1913), [#19.1.6](#test-assertion-1916), [#19.1.7](#test-assertion-1917), [#19.1.8](#test-assertion-1918))
 5. Publish a draft release, verify that draft release details can still be updated before publishing, verify that assigned CCs move to Published, and verify that the published release becomes read-only. (Assertions [#19.1.9](#test-assertion-1919), [#19.1.10](#test-assertion-19110), [#19.1.11](#test-assertion-19111))
 6. Sign in as an end user and verify that release-management actions are unavailable while release details remain viewable. (Assertions [#19.1.12](#test-assertion-19112), [#19.1.13](#test-assertion-19113))
+
+## Test Case 19.2
+
+**View-order forwarding across releases**
+
+Pre-condition: N/A
+
+> Sibling view-order weights (the browse / BIE-edit sort order, issue #1638) are authored on the 'Working' release. This case verifies that those weights forward onto the corresponding manifests of a newly drafted release, and that they are removed again — and only for that release — when the draft is rolled back to Initialized.
+
+### Test Assertion:
+
+#### Test Assertion #19.2.1
+When a Release Draft is created from an Initialized Release, the view-order weights applied on the 'Working' release are copied onto the corresponding manifests of the new release. Each copied weight is re-anchored so that both its view-parent ACC and its reordered ASCC/BCC child point to the new release's copied manifests (not the 'Working' ones), and the weight value is preserved. The 'Working' weights are left unchanged.
+
+#### Test Assertion #19.2.2
+When the Release Draft is rolled back to the Initialized state, the view-order weights that were forwarded onto that release are removed, and only those; the weights on the 'Working' release survive.
+
+### Test Step Pre-condition:
+1. A developer account and a developer namespace are available in connectCenter.
+2. A self-consistent set of Candidate Working-branch CCs exists so that "Assign All" and "Validate" succeed: a view-parent ACC that owns one ASCC child (an ASCCP whose role is a second ACC) and one BCC child.
+3. Distinct view-order weights are stored on the 'Working' release for the ACC child and the BCC child of the view-parent ACC.
+
+### Test Step:
+1. A developer signs in to connectCenter after view-order weights have been authored on the two 'Working' children of the view-parent ACC.
+2. Create an initialized release, create a draft from it, assign all candidate content, validate, and create the draft. After the release reaches the Draft state, verify that both weights were forwarded onto the new release: the forwarded rows are keyed on the new release's copied view-parent ACC, the ASCC/BCC child manifests are the new release's copies (not the 'Working' ones), and the weights are preserved. Verify the 'Working' weights are unchanged. (Assertion [#19.2.1](#test-assertion-1921))
+3. Move the draft release back to the Initialized state and verify that the release's forwarded weights are removed while the 'Working' weights remain. (Assertion [#19.2.2](#test-assertion-1922))
