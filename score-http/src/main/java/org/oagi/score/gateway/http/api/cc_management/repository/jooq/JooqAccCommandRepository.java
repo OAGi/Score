@@ -1299,6 +1299,19 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
                 .where(SEQ_KEY.FROM_ACC_MANIFEST_ID.eq(valueOf(accManifestId)))
                 .execute();
 
+        // discard corresponding sibling view-order weights (issue #1638) BEFORE the ACC and its ASCC/BCC
+        // children are deleted, so bie_view_order's RESTRICT FKs are not violated. Covers this ACC used as
+        // a view parent and any of its structural ASCC/BCC children reordered under any view parent.
+        dslContext().deleteFrom(BIE_VIEW_ORDER)
+                .where(BIE_VIEW_ORDER.FROM_ACC_MANIFEST_ID.eq(valueOf(accManifestId))
+                        .or(BIE_VIEW_ORDER.ASCC_MANIFEST_ID.in(
+                                dslContext().select(ASCC_MANIFEST.ASCC_MANIFEST_ID).from(ASCC_MANIFEST)
+                                        .where(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(valueOf(accManifestId)))))
+                        .or(BIE_VIEW_ORDER.BCC_MANIFEST_ID.in(
+                                dslContext().select(BCC_MANIFEST.BCC_MANIFEST_ID).from(BCC_MANIFEST)
+                                        .where(BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(valueOf(accManifestId))))))
+                .execute();
+
         // discard ASCCs
         List<AsccSummaryRecord> asccList = query.getAsccSummaryList(accManifestId);
 
@@ -1374,6 +1387,11 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
                 .setNull(ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID)
                 .where(ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID.eq(valueOf(asccManifestId)))
                 .execute();
+        // discard the corresponding sibling view-order weight (issue #1638) before the ASCC manifest is
+        // deleted, so bie_view_order's RESTRICT FK is not violated.
+        dslContext().deleteFrom(BIE_VIEW_ORDER)
+                .where(BIE_VIEW_ORDER.ASCC_MANIFEST_ID.eq(valueOf(asccManifestId)))
+                .execute();
         int numOfDeletedRecords = dslContext().deleteFrom(ASCC_MANIFEST)
                 .where(ASCC_MANIFEST.ASCC_MANIFEST_ID.eq(valueOf(asccManifestId)))
                 .execute();
@@ -1418,6 +1436,11 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
         dslContext().update(BCC_MANIFEST)
                 .setNull(BCC_MANIFEST.PREV_BCC_MANIFEST_ID)
                 .where(BCC_MANIFEST.PREV_BCC_MANIFEST_ID.eq(valueOf(bccManifestId)))
+                .execute();
+        // discard the corresponding sibling view-order weight (issue #1638) before the BCC manifest is
+        // deleted, so bie_view_order's RESTRICT FK is not violated.
+        dslContext().deleteFrom(BIE_VIEW_ORDER)
+                .where(BIE_VIEW_ORDER.BCC_MANIFEST_ID.eq(valueOf(bccManifestId)))
                 .execute();
         int numOfDeletedRecords = dslContext().deleteFrom(BCC_MANIFEST)
                 .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(valueOf(bccManifestId)))

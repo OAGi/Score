@@ -318,6 +318,11 @@ public class ReleaseCommandService implements InitializingBean {
                 repositoryFactory.gitHubIssueLinkCommandRepository(requester)
                         .deleteLinksByRelease(release.releaseId());
 
+                // Remove the drafted release's forwarded view-order rows before their ACC/ASCC/BCC
+                // manifests are deleted, so those FKs are never violated (issue #1638).
+                repositoryFactory.bieViewOrderCommandRepository(requester)
+                        .deleteByRelease(release.releaseId());
+
                 var ccCommand = repositoryFactory.ccCommandRepository(requester);
 
                 // Remove replacement
@@ -510,6 +515,11 @@ public class ReleaseCommandService implements InitializingBean {
             // resolves the library's 'Working' release internally from the target release.
             repositoryFactory.gitHubIssueLinkCommandRepository(requester)
                     .copyLinksFromWorking(releaseId);
+
+            // Forward the 'Working' release's sibling view-order weights onto the corresponding new-release
+            // manifests, so ordering authored on 'Working' carries into each new release (issue #1638).
+            repositoryFactory.bieViewOrderCommandRepository(requester)
+                    .copyFromWorking(releaseId);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }

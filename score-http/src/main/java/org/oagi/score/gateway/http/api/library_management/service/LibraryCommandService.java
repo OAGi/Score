@@ -535,6 +535,9 @@ public class LibraryCommandService {
         // Remove GitHub issue links before the CCs they reference are deleted (issue #1533).
         repositoryFactory.gitHubIssueLinkCommandRepository(requester).deleteLinksByRelease(workingReleaseId);
 
+        // Remove sibling view-order weights before the CCs they reference are deleted (issue #1638).
+        repositoryFactory.bieViewOrderCommandRepository(requester).deleteByRelease(workingReleaseId);
+
         var ccCommand = repositoryFactory.ccCommandRepository(requester);
         ccCommand.clearReplacement(workingReleaseId);
         ccCommand.cleanUp(workingReleaseId);

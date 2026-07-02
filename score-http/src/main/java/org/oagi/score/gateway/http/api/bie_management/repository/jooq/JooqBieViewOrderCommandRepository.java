@@ -6,15 +6,20 @@ import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.bie_management.model.BieViewOrderEntry;
 import org.oagi.score.gateway.http.api.bie_management.repository.BieViewOrderCommandRepository;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
+import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.JooqBaseRepository;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AccManifest;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AsccManifest;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BccManifest;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.BieViewOrderRecord;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.BIE_VIEW_ORDER;
+import static org.jooq.impl.DSL.and;
+import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.*;
 
 public class JooqBieViewOrderCommandRepository extends JooqBaseRepository implements BieViewOrderCommandRepository {
 
@@ -78,6 +83,97 @@ public class JooqBieViewOrderCommandRepository extends JooqBaseRepository implem
     public void deleteByFromAccManifestId(AccManifestId fromAccManifestId) {
         dslContext().deleteFrom(BIE_VIEW_ORDER)
                 .where(BIE_VIEW_ORDER.FROM_ACC_MANIFEST_ID.eq(valueOf(fromAccManifestId)))
+                .execute();
+    }
+
+    // ----- Release carry-over (issue #1638) -----
+    //
+    // View order is authored on the 'Working' release; a drafted-release manifest records the Working
+    // manifest it was copied from in its NEXT_*_MANIFEST_ID column (see JooqCcCommandRepository
+    // #copyWorkingManifests). A view-order row is re-anchored onto the new release by remapping BOTH its
+    // view-parent ACC (from_acc_manifest_id) and its ASCC/BCC child through that pointer. This mirrors how
+    // GitHub issue links are carried over (issue #1533), but needs two joins because a row references two
+    // manifests. The audit columns are copied from the source row to preserve authorship/timestamps.
+
+    @Override
+    public void copyFromWorking(ReleaseId targetReleaseId) {
+        ULong target = valueOf(targetReleaseId);
+        AccManifest targetAcc = ACC_MANIFEST.as("target_acc");
+        AsccManifest targetAscc = ASCC_MANIFEST.as("target_ascc");
+        BccManifest targetBcc = BCC_MANIFEST.as("target_bcc");
+
+        // ASCC-typed rows. The join to the target ASCC (NULL never equals) already excludes BCC rows;
+        // the bcc_manifest_id column is omitted from the insert so it defaults to NULL.
+        dslContext().insertInto(BIE_VIEW_ORDER,
+                        BIE_VIEW_ORDER.FROM_ACC_MANIFEST_ID,
+                        BIE_VIEW_ORDER.ASCC_MANIFEST_ID,
+                        BIE_VIEW_ORDER.WEIGHT,
+                        BIE_VIEW_ORDER.CREATED_BY,
+                        BIE_VIEW_ORDER.LAST_UPDATED_BY,
+                        BIE_VIEW_ORDER.CREATION_TIMESTAMP,
+                        BIE_VIEW_ORDER.LAST_UPDATE_TIMESTAMP)
+                .select(dslContext().select(
+                                targetAcc.ACC_MANIFEST_ID,
+                                targetAscc.ASCC_MANIFEST_ID,
+                                BIE_VIEW_ORDER.WEIGHT,
+                                BIE_VIEW_ORDER.CREATED_BY,
+                                BIE_VIEW_ORDER.LAST_UPDATED_BY,
+                                BIE_VIEW_ORDER.CREATION_TIMESTAMP,
+                                BIE_VIEW_ORDER.LAST_UPDATE_TIMESTAMP)
+                        .from(BIE_VIEW_ORDER)
+                        .join(targetAcc).on(and(
+                                targetAcc.NEXT_ACC_MANIFEST_ID.eq(BIE_VIEW_ORDER.FROM_ACC_MANIFEST_ID),
+                                targetAcc.RELEASE_ID.eq(target)))
+                        .join(targetAscc).on(and(
+                                targetAscc.NEXT_ASCC_MANIFEST_ID.eq(BIE_VIEW_ORDER.ASCC_MANIFEST_ID),
+                                targetAscc.RELEASE_ID.eq(target)))
+                        .where(BIE_VIEW_ORDER.ASCC_MANIFEST_ID.isNotNull()))
+                .execute();
+
+        // BCC-typed rows (symmetric; ascc_manifest_id omitted -> NULL).
+        dslContext().insertInto(BIE_VIEW_ORDER,
+                        BIE_VIEW_ORDER.FROM_ACC_MANIFEST_ID,
+                        BIE_VIEW_ORDER.BCC_MANIFEST_ID,
+                        BIE_VIEW_ORDER.WEIGHT,
+                        BIE_VIEW_ORDER.CREATED_BY,
+                        BIE_VIEW_ORDER.LAST_UPDATED_BY,
+                        BIE_VIEW_ORDER.CREATION_TIMESTAMP,
+                        BIE_VIEW_ORDER.LAST_UPDATE_TIMESTAMP)
+                .select(dslContext().select(
+                                targetAcc.ACC_MANIFEST_ID,
+                                targetBcc.BCC_MANIFEST_ID,
+                                BIE_VIEW_ORDER.WEIGHT,
+                                BIE_VIEW_ORDER.CREATED_BY,
+                                BIE_VIEW_ORDER.LAST_UPDATED_BY,
+                                BIE_VIEW_ORDER.CREATION_TIMESTAMP,
+                                BIE_VIEW_ORDER.LAST_UPDATE_TIMESTAMP)
+                        .from(BIE_VIEW_ORDER)
+                        .join(targetAcc).on(and(
+                                targetAcc.NEXT_ACC_MANIFEST_ID.eq(BIE_VIEW_ORDER.FROM_ACC_MANIFEST_ID),
+                                targetAcc.RELEASE_ID.eq(target)))
+                        .join(targetBcc).on(and(
+                                targetBcc.NEXT_BCC_MANIFEST_ID.eq(BIE_VIEW_ORDER.BCC_MANIFEST_ID),
+                                targetBcc.RELEASE_ID.eq(target)))
+                        .where(BIE_VIEW_ORDER.BCC_MANIFEST_ID.isNotNull()))
+                .execute();
+    }
+
+    @Override
+    public void deleteByRelease(ReleaseId releaseId) {
+        ULong release = valueOf(releaseId);
+        // Delete every row referencing ANY manifest in this release. The three refs of a row live in the
+        // same release, so matching from_acc alone would suffice, but covering all three is unambiguously
+        // FK-safe against the ACC/ASCC/BCC manifest deletes that follow.
+        dslContext().deleteFrom(BIE_VIEW_ORDER)
+                .where(BIE_VIEW_ORDER.FROM_ACC_MANIFEST_ID.in(
+                                dslContext().select(ACC_MANIFEST.ACC_MANIFEST_ID).from(ACC_MANIFEST)
+                                        .where(ACC_MANIFEST.RELEASE_ID.eq(release)))
+                        .or(BIE_VIEW_ORDER.ASCC_MANIFEST_ID.in(
+                                dslContext().select(ASCC_MANIFEST.ASCC_MANIFEST_ID).from(ASCC_MANIFEST)
+                                        .where(ASCC_MANIFEST.RELEASE_ID.eq(release))))
+                        .or(BIE_VIEW_ORDER.BCC_MANIFEST_ID.in(
+                                dslContext().select(BCC_MANIFEST.BCC_MANIFEST_ID).from(BCC_MANIFEST)
+                                        .where(BCC_MANIFEST.RELEASE_ID.eq(release)))))
                 .execute();
     }
 }
