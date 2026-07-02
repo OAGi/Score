@@ -1,10 +1,16 @@
 import {
-  applyOasSuffix,
+  applyResourceArrayMarker,
+  buildOperationId,
+  buildResourcePath,
+  extractBieName,
   oasBodySlotKey,
   oasOperationIdKey,
   oasOperationKey,
   OasOperationRow,
   OasOperationValidator,
+  operationIdVerbWord,
+  recomputeOperationId,
+  resourcePathLeaf,
 } from './oas-operation-validation';
 
 /**
@@ -43,20 +49,95 @@ describe('oas-operation-validation key builders', () => {
   });
 });
 
-describe('applyOasSuffix', () => {
-  it('adds the suffix when present and not already there', () => {
-    expect(applyOasSuffix('createOrder', 'List', true)).toBe('createOrderList');
-    expect(applyOasSuffix('createOrderList', 'List', true)).toBe('createOrderList'); // idempotent
+describe('operationId construction (#1732 / #1610)', () => {
+  it('maps verbs to their operationId words', () => {
+    expect(operationIdVerbWord('GET')).toBe('query');
+    expect(operationIdVerbWord('DELETE')).toBe('delete');
+    expect(operationIdVerbWord('PATCH')).toBe('update');
+    expect(operationIdVerbWord('BOGUS')).toBe('');
   });
 
-  it('removes the suffix when absent', () => {
-    expect(applyOasSuffix('createOrderList', 'List', false)).toBe('createOrder');
-    expect(applyOasSuffix('createOrder', 'List', false)).toBe('createOrder'); // idempotent
+  it('builds <verb><Name> for a single resource and appends List for an array', () => {
+    expect(buildOperationId('DELETE', 'Purchase Order', false)).toBe('deletePurchaseOrder');
+    expect(buildOperationId('DELETE', 'Purchase Order', true)).toBe('deletePurchaseOrderList');
   });
 
-  it('tolerates a null/undefined value', () => {
-    expect(applyOasSuffix(undefined as any, 'List', true)).toBe('List');
-    expect(applyOasSuffix(null as any, 'List', false)).toBe('');
+  it('returns "" for an unknown verb', () => {
+    expect(buildOperationId('BOGUS', 'Purchase Order', true)).toBe('');
+  });
+
+  // Issue #1732 edge case: a property term that itself ends in "List" (spaces removed -> "PriceList").
+  // The array marker is still appended, so the array form doubles to keep it distinct from the single
+  // form — and it is now consistent across the Add dialogs, the array toggle and the verb change.
+  it('keeps the array marker distinct for a name ending in "List"', () => {
+    expect(buildOperationId('GET', 'Price List', false)).toBe('queryPriceList');
+    expect(buildOperationId('GET', 'Price List', true)).toBe('queryPriceListList');
+  });
+});
+
+describe('recomputeOperationId (#1732)', () => {
+  it('rebuilds from the property term (preferred name source) on a verb change', () => {
+    expect(recomputeOperationId('DELETE', 'queryPurchaseOrder', false, 'Purchase Order'))
+      .toBe('deletePurchaseOrder');
+    expect(recomputeOperationId('DELETE', 'createPurchaseOrderList', true, 'Purchase Order'))
+      .toBe('deletePurchaseOrderList');
+  });
+
+  // The core fix: with the property term as the name source, a name ending in "List" is never
+  // truncated (previously "Price List" lost its own "List" -> "createPrice").
+  it('preserves a property term ending in "List" across a verb change', () => {
+    expect(recomputeOperationId('POST', 'queryPriceList', false, 'Price List')).toBe('createPriceList');
+    expect(recomputeOperationId('POST', 'queryPriceListList', true, 'Price List')).toBe('createPriceListList');
+  });
+
+  // Issue #1730 bodyless operations have no property term: fall back to swapping only the verb word of
+  // the manually entered id (the name — including a trailing "List" — survives when not an array).
+  it('falls back to parsing the id when there is no property term', () => {
+    expect(recomputeOperationId('PATCH', 'deleteProductionOrder', false)).toBe('updateProductionOrder');
+    expect(recomputeOperationId('DELETE', 'updateShoppingList', false)).toBe('deleteShoppingList');
+  });
+
+  it('leaves the id untouched for an unknown verb', () => {
+    expect(recomputeOperationId('BOGUS', 'queryThing', false, 'Thing')).toBe('queryThing');
+  });
+});
+
+describe('extractBieName strips the array marker only when the array indicator says so', () => {
+  it('keeps a trailing "List" that is part of the name (not an array)', () => {
+    expect(extractBieName('queryPriceList', false)).toBe('PriceList');
+  });
+
+  it('strips exactly one trailing "List" as the marker when it is an array', () => {
+    expect(extractBieName('queryPriceListList', true)).toBe('PriceList');
+    expect(extractBieName('deletePurchaseOrderList', true)).toBe('PurchaseOrder');
+  });
+
+  it('drops a legacy "<businessContext>_" prefix and the verb word', () => {
+    expect(extractBieName('ctx_createOrder', false)).toBe('Order');
+  });
+});
+
+describe('resource path construction (#1732)', () => {
+  it('builds the leaf from the property term and appends -list for an array', () => {
+    expect(resourcePathLeaf('Purchase Order', false)).toBe('purchase-order');
+    expect(resourcePathLeaf('Purchase Order', true)).toBe('purchase-order-list');
+  });
+
+  it('keeps -list distinct for a term ending in "list"', () => {
+    expect(resourcePathLeaf('Price List', false)).toBe('price-list');
+    expect(resourcePathLeaf('Price List', true)).toBe('price-list-list');
+  });
+
+  it('buildResourcePath includes the version segment only when present', () => {
+    expect(buildResourcePath('My Company', '1.0', 'Purchase Order', false)).toBe('/my-company/1.0/purchase-order');
+    expect(buildResourcePath('My Company', '', 'Price List', true)).toBe('/my-company/price-list-list');
+  });
+
+  it('applyResourceArrayMarker rebuilds only the last segment, preserving the prefix', () => {
+    expect(applyResourceArrayMarker('/bc/1.0/price-list', 'Price List', true)).toBe('/bc/1.0/price-list-list');
+    expect(applyResourceArrayMarker('/bc/1.0/price-list-list', 'Price List', false)).toBe('/bc/1.0/price-list');
+    expect(applyResourceArrayMarker('/bc/1.0/purchase-order', 'Purchase Order', true)).toBe('/bc/1.0/purchase-order-list');
+    expect(applyResourceArrayMarker('purchase-order', 'Purchase Order', true)).toBe('purchase-order-list');
   });
 });
 

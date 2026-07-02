@@ -7,10 +7,14 @@ import {
   OasDoc,
   OasSecurityRequirement,
   OasSecurityScheme,
-  recomputeOperationId,
   SimpleOasDoc
 } from '../domain/openapi-doc';
-import {applyOasSuffix, OasOperationValidator} from '../domain/oas-operation-validation';
+import {
+  applyResourceArrayMarker,
+  buildOperationId,
+  OasOperationValidator,
+  recomputeOperationId
+} from '../domain/oas-operation-validation';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {OpenAPIService} from '../domain/openapi.service';
 import {Location} from '@angular/common';
@@ -1118,21 +1122,27 @@ export class OasDocDetailComponent implements OnInit {
     this.oasValidator.recompute(this.table?.dataSource?.data || []);
   }
 
-  // Issue #1732: keep the Operation ID's verb word in sync when the Verb changes. Swaps only the
-  // leading verb word, preserving the BIE-name segment (so a manually edited name survives), and
-  // re-applies the 'List' suffix from the array indicator. The frontend owns the operationId; the
-  // backend stores it verbatim on save.
+  // Issue #1732: keep the Operation ID's verb word in sync when the Verb changes. Rebuilds from the
+  // BIE's property term (the immutable name source), so a name that itself ends in "List" is not
+  // mistaken for the array marker; for a bodyless operation (no property term, issue #1730) it falls
+  // back to swapping only the leading verb word of the manually entered id. The frontend owns the
+  // operationId; the backend stores it verbatim on save.
   updateOperationIdForVerb(element: BieForOasDoc): void {
-    element.operationId = recomputeOperationId(element.verb, element.operationId, element.arrayIndicator);
+    element.operationId = recomputeOperationId(
+      element.verb, element.operationId, element.arrayIndicator, element.propertyTerm);
     this.recomputeOasValidation();
   }
 
-  // Issue #1732: when the Array Indicator toggles, keep the 'List' suffix on operationId and the
-  // '-list' suffix on resourceName in sync. The frontend owns these; the backend stores them as-is.
-  // Only the suffix is touched (the verb word / name are preserved).
+  // Issue #1732: when the Array Indicator toggles, rebuild the operationId's 'List' marker and the
+  // resource path's '-list' marker from the property term + the new indicator (the array checkbox is
+  // BIE-only, so a property term is always present here). Driving the marker from the boolean — not by
+  // inspecting the string — keeps the marker correct even for a term ending in "List" (e.g.
+  // "Price List" -> queryPriceListList / .../price-list-list). The frontend owns these; the backend
+  // stores them as-is.
   updateOperationIdForArray(element: BieForOasDoc): void {
-    element.operationId = applyOasSuffix(element.operationId, 'List', element.arrayIndicator);
-    element.resourceName = applyOasSuffix(element.resourceName, '-list', element.arrayIndicator);
+    element.operationId = buildOperationId(element.verb, element.propertyTerm, element.arrayIndicator);
+    element.resourceName = applyResourceArrayMarker(
+      element.resourceName, element.propertyTerm, element.arrayIndicator);
     this.recomputeOasValidation();
   }
 

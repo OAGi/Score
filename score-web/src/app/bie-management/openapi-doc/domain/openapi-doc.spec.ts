@@ -1,4 +1,4 @@
-import {BieForOasDoc, buildOperationId, operationIdVerbWord, recomputeOperationId} from './openapi-doc';
+import {BieForOasDoc} from './openapi-doc';
 
 /**
  * Issue #1610 domain-level coverage of DELETE operation handling.
@@ -6,9 +6,9 @@ import {BieForOasDoc, buildOperationId, operationIdVerbWord, recomputeOperationI
  *  - BieForOasDoc change detection underpins the editor's generate() guard: switching an operation to
  *    DELETE and/or giving it a Request body must register as an unsaved change, otherwise the guard
  *    would let the user generate a stale (pre-edit) document.
- *  - operationId construction for the DELETE verb ('delete<Name>[List]').
  *
- * Pure domain logic — no Angular TestBed (see bie-flat-tree.spec.ts).
+ * operationId / resource-path construction now lives in oas-operation-validation.spec.ts alongside the
+ * rule itself. Pure domain logic — no Angular TestBed (see bie-flat-tree.spec.ts).
  */
 
 describe('BieForOasDoc change detection for DELETE edits (#1610)', () => {
@@ -72,24 +72,5 @@ describe('BieForOasDoc error-response body type (#1347)', () => {
     bie.confirmMessageTopLevelAsbiepId = 42;
     expect(bie.isChanged).toBe(true);
     expect(bie.json.confirmMessageTopLevelAsbiepId).toBe(42);
-  });
-});
-
-describe('operationId construction for DELETE (#1610 DELETE operations)', () => {
-  it('maps the DELETE verb to the "delete" word', () => {
-    expect(operationIdVerbWord('DELETE')).toBe('delete');
-  });
-
-  it('builds delete<Name> for a single resource', () => {
-    expect(buildOperationId('DELETE', 'Purchase Order', false)).toBe('deletePurchaseOrder');
-  });
-
-  it('appends List for an array resource', () => {
-    expect(buildOperationId('DELETE', 'Purchase Order', true)).toBe('deletePurchaseOrderList');
-  });
-
-  it('swaps an existing verb word to delete while preserving the BIE name', () => {
-    expect(recomputeOperationId('DELETE', 'queryPurchaseOrder', false)).toBe('deletePurchaseOrder');
-    expect(recomputeOperationId('DELETE', 'createPurchaseOrderList', true)).toBe('deletePurchaseOrderList');
   });
 });

@@ -3,7 +3,8 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
 import {OpenAPIService} from '../../openapi-doc/domain/openapi.service';
-import {AssignBieForOasDoc, BieForOasDoc, buildOperationId, OasDoc, OasDocListRequest} from '../../openapi-doc/domain/openapi-doc';
+import {AssignBieForOasDoc, BieForOasDoc, OasDoc, OasDocListRequest} from '../../openapi-doc/domain/openapi-doc';
+import {buildOperationId, buildResourcePath} from '../../openapi-doc/domain/oas-operation-validation';
 import {initFilter} from '../../../common/utility';
 
 export interface BieOasDocAddDialogData {
@@ -76,11 +77,8 @@ export class BieOasDocAddDialogComponent implements OnInit {
   // /<business-context>/<document-version>/<property-term>[-list]  (all lowercased, spaces -> dashes).
   // The document version segment is omitted only when the selected document has no version.
   get resourcePath(): string {
-    const bc = (this.data.businessContextName || '').toLowerCase().replace(/ /g, '-');
-    const term = (this.data.propertyTerm || '').replace(/\s/g, '-').toLowerCase();
-    const name = this.arrayIndicator ? term + '-list' : term;
     const version = this.selectedOasDoc && this.selectedOasDoc.version ? this.selectedOasDoc.version : '';
-    return version ? `/${bc}/${version}/${name}` : `/${bc}/${name}`;
+    return buildResourcePath(this.data.businessContextName, version, this.data.propertyTerm, this.arrayIndicator);
   }
 
   // Issue #1492: the (path, verb, bodyType) slot the chosen selection would occupy. The backend derives the

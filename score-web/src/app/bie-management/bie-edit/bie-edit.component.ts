@@ -80,10 +80,14 @@ import {
   BieForOasDocUpdateRequest,
   OasDocListRequest,
   OasSecurityRequirement,
-  OasSecurityScheme,
-  recomputeOperationId
+  OasSecurityScheme
 } from '../openapi-doc/domain/openapi-doc';
-import {applyOasSuffix, OasOperationValidator} from '../openapi-doc/domain/oas-operation-validation';
+import {
+  applyResourceArrayMarker,
+  buildOperationId,
+  OasOperationValidator,
+  recomputeOperationId
+} from '../openapi-doc/domain/oas-operation-validation';
 import {OpenAPIService} from '../openapi-doc/domain/openapi.service';
 import {BieOasDocAddDialogComponent} from './bie-oas-doc-add-dialog/bie-oas-doc-add-dialog.component';
 import {OasDocSecurityRequirementDialogComponent} from '../openapi-doc/oas-doc-security-requirement-dialog/oas-doc-security-requirement-dialog.component';
@@ -3275,20 +3279,24 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     return this.oasValidator.bodySlotErrorStateMatcher(b);
   }
 
-  // A request body is never valid for GET, so revert it to Response; then resync the operation id's leading
-  // verb word (#1732) while preserving the manually edited BIE-name segment.
+  // A request body is never valid for GET, so revert it to Response; then resync the operation id's
+  // leading verb word (#1732). Rebuilds from the BIE's property term (the immutable name source) so a
+  // name ending in "List" is never confused with the array marker.
   onOasVerbChange(b: BieForOasDoc): void {
     if (b.messageBody === 'Request' && b.verb === 'GET') {
       b.messageBody = 'Response';
     }
-    b.operationId = recomputeOperationId(b.verb, b.operationId, b.arrayIndicator);
+    b.operationId = recomputeOperationId(b.verb, b.operationId, b.arrayIndicator, b.propertyTerm);
     this.recomputeOasValidation();
   }
 
-  // The array indicator rewrites both the operation id ('List') and the resource path ('-list') suffixes.
+  // The array indicator rebuilds both the operation id ('List') and the resource path ('-list') markers
+  // from the property term + the new indicator (a BIE binding always has a property term). Driving the
+  // marker from the boolean — not by inspecting the string — keeps it correct even for a term ending in
+  // "List" (e.g. "Price List" -> queryPriceListList / .../price-list-list).
   onOasArrayChange(b: BieForOasDoc): void {
-    b.operationId = applyOasSuffix(b.operationId, 'List', b.arrayIndicator);
-    b.resourceName = applyOasSuffix(b.resourceName, '-list', b.arrayIndicator);
+    b.operationId = buildOperationId(b.verb, b.propertyTerm, b.arrayIndicator);
+    b.resourceName = applyResourceArrayMarker(b.resourceName, b.propertyTerm, b.arrayIndicator);
     this.recomputeOasValidation();
   }
 
