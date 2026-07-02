@@ -3,7 +3,11 @@ package org.oagi.score.gateway.http.api.context_management.business_context.serv
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
+import org.oagi.score.gateway.http.api.account_management.model.UserSummaryRecord;
+import org.oagi.score.gateway.http.api.bie_management.model.BieState;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
+import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummaryRecord;
+import org.oagi.score.gateway.http.api.bie_management.repository.TopLevelAsbiepQueryRepository;
 import org.oagi.score.gateway.http.api.context_management.business_context.controller.payload.CreateBusinessContextRequest;
 import org.oagi.score.gateway.http.api.context_management.business_context.controller.payload.UpdateBusinessContextRequest;
 import org.oagi.score.gateway.http.api.context_management.business_context.model.BusinessContextId;
@@ -51,6 +55,18 @@ class BusinessContextCommandServiceTest {
 
         when(repositoryFactory.businessContextCommandRepository(any())).thenReturn(command);
         when(repositoryFactory.businessContextQueryRepository(any())).thenReturn(query);
+
+        // Issue #1312 assign/unassign owner+WIP guard: make the requester the owner so these
+        // assignment-logic tests exercise their original concern (idempotency / last-context).
+        TopLevelAsbiepQueryRepository topLevelAsbiepQuery = mock(TopLevelAsbiepQueryRepository.class);
+        UserSummaryRecord owner = new UserSummaryRecord(requester.userId(), "tester", "Tester",
+                List.of(ScoreRole.DEVELOPER));
+        TopLevelAsbiepSummaryRecord ownedByRequester = new TopLevelAsbiepSummaryRecord(
+                null, null, TLA_ID, null, null, null,
+                "den", "propertyTerm", "displayName", "1.0", "status",
+                BieState.WIP, false, false, owner, null, null);
+        lenient().when(repositoryFactory.topLevelAsbiepQueryRepository(any())).thenReturn(topLevelAsbiepQuery);
+        lenient().when(topLevelAsbiepQuery.getTopLevelAsbiepSummary(any())).thenReturn(ownedByRequester);
     }
 
     // ----- name validation (B9) -----

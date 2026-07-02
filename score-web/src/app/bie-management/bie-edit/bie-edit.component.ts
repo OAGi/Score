@@ -323,8 +323,10 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
       this.initRootNode(rootNode);
 
-      if (this.state === 'WIP' && (this.access !== 'CanEdit' && !this.auth.isAdmin())) {
-        this.snackBar.open('Only the owner can access BIE in this state.', '', {
+      // Issue #1312: non-owners may open a WIP BIE read-only (access === 'CanView'), like QA/Production.
+      // Only redirect when the requester can neither edit nor view (Prohibited / Unprepared).
+      if (BieEditComponent.shouldRedirectFromWipEditor(this.state, this.access, this.auth.isAdmin())) {
+        this.snackBar.open('You do not have access to this BIE.', '', {
           duration: 3000
         });
         this.router.navigateByUrl('/profile_bie');
@@ -648,6 +650,12 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   copyToDefinition(sourceStr: string, targetObj: object) {
+    // Issue #1312: "Copy to Context Definition" writes the selected node's (change-tracked) Context
+    // Definition, so it must respect the same editability gate as that field. Without this a non-owner
+    // viewing a WIP BIE read-only could mutate the definition (and enable Update) — see isReadOnlyWipViewer.
+    if (!this.isEditable(this.selectedNode)) {
+      return;
+    }
     targetObj['definition'] = sourceStr;
     this.snackBar.open('Copied to definition', '', {
       duration: 3000
@@ -691,6 +699,30 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     return this.state === 'WIP' && this.access === 'CanEdit';
   }
 
+  /**
+   * Issue #1312: a WIP BIE opens read-only for a non-owner (access === 'CanView'), like QA/Production.
+   * Redirect out of the editor only when the requester can neither edit nor view it
+   * (access 'Prohibited' / 'Unprepared'); administrators are never redirected.
+   */
+  static shouldRedirectFromWipEditor(state: string, access: string, isAdmin: boolean): boolean {
+    return state === 'WIP' && access !== 'CanEdit' && access !== 'CanView' && !isAdmin;
+  }
+
+  /**
+   * Issue #1312: true when the current user is a NON-OWNER viewing this WIP BIE read-only.
+   * A WIP BIE returns access 'CanView' to every non-owner (owners get 'CanEdit'), so this is simply
+   * "WIP + not the owner". The Business Context / Business Term / Inverse-Mode controls and the
+   * copy-to-definition action are NOT gated by {@link canEdit}, so they use this to stay read-only for
+   * the viewer — matching how a non-owner sees a QA/Production BIE (nothing changeable).
+   *
+   * Administrators are NOT exempt: a non-owner administrator also views a WIP BIE read-only, just as the
+   * {@link canEdit}-gated fields are already read-only for them (access !== 'CanEdit'). An owner — including
+   * an owner who is an administrator — keeps full editing via access === 'CanEdit'.
+   */
+  get isReadOnlyWipViewer(): boolean {
+    return this.state === 'WIP' && this.access === 'CanView';
+  }
+
   get isValid(): boolean {
     if (this.selectedNode && this.selectedNode.bieType !== 'ABIE' && this.selectedNode.used) {
       if (!!this.bieCardinalityMin && !this.bieCardinalityMin.disabled && !this.bieCardinalityMin.valid) {
@@ -720,15 +752,15 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   /**
-   * Business Terms mirror Business Contexts (Issue #1618): they persist via immediate assign/unassign REST calls,
-   * are release-neutral, and — exactly like Business Contexts — the frontend applies NO BIE ownership/state gate,
-   * so they may be assigned/edited in ANY state (WIP/QA/Production) by anyone who can open the editor. Ownership
-   * authorization is left to the server (which, like the Business Context assign endpoints, currently enforces
-   * only the tenant Business-Term feature + not-developer role via assertBusinessTermEnabled). Only the structural
-   * per-node constraints remain here: the node must be used and not locked (inherited/reused) or cyclic.
+   * Business Terms mirror Business Contexts (Issue #1618): they persist via immediate assign/unassign REST calls
+   * and are release-neutral, so they may be assigned/edited in QA/Production as well as WIP by their owner.
+   * Ownership authorization is enforced server-side (tenant Business-Term feature + not-developer role via
+   * assertBusinessTermEnabled, plus the owner+WIP guard added in Issue #1312). The one FE gate mirrors that
+   * server guard: a non-owner viewing a WIP BIE read-only ({@link isReadOnlyWipViewer}) cannot edit. The rest are
+   * structural per-node constraints: the node must be used and not locked (inherited/reused) or cyclic.
    */
   isBusinessTermEditable(node: BieFlatNode): boolean {
-    if (!node) {
+    if (!node || this.isReadOnlyWipViewer) {
       return false;
     }
     return node.used === true && !node.locked && !node.isCycle;
@@ -1304,7 +1336,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   createBIEfromThis(node: BieFlatNode) {
-    if (!this.canCreateBIEFromThis(node)) {
+    // Issue #1312: making a BIE reusable mutates and persists it, so it stays owner-only. The context-menu
+    // item is already gated by canEdit; this mirrors that guard for a non-owner viewing a WIP BIE read-only.
+    if (!this.canEdit || !this.canCreateBIEFromThis(node)) {
       return;
     }
 
@@ -3673,7 +3707,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   get isBusinessContextRemovable(): boolean {
-    return (!this.businessContextUpdating && this.businessContexts.length > 1);
+    // Issue #1312: a non-owner viewing a WIP BIE read-only cannot remove business contexts.
+    return (!this.isReadOnlyWipViewer && !this.businessContextUpdating && this.businessContexts.length > 1);
   }
 
   _filter(value?: string | BusinessContext) {
@@ -3692,7 +3727,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   removeBusinessContext(businessContext: BusinessContext) {
-    if (this.businessContextUpdating || this.businessContexts.length <= 1) {
+    // Issue #1312: a non-owner viewing a WIP BIE read-only cannot change its business contexts.
+    if (this.isReadOnlyWipViewer || this.businessContextUpdating || this.businessContexts.length <= 1) {
       return;
     }
 
@@ -3713,7 +3749,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   addBusinessContext(event: MatAutocompleteSelectedEvent): void {
     const selectedBusinessContext: BusinessContext = event.option.value;
-    if (this.businessContextUpdating ||
+    // Issue #1312: a non-owner viewing a WIP BIE read-only cannot change its business contexts.
+    if (this.isReadOnlyWipViewer ||
+        this.businessContextUpdating ||
         this.businessContexts.some(e => e.businessContextId === selectedBusinessContext.businessContextId)) {
       return;
     }

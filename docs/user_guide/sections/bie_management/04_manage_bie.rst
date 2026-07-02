@@ -24,14 +24,15 @@ A BIE can be discarded (i.e., permanently removed from the database) when it is 
 The creator of a BIE is its first owner.
 The ownership can be transferred.
 Only the current BIE owner is authorized to change its detail and state.
-All other users can view the details of a BIE only if the BIE is in QA or Production state.
+All other users can view the details of a BIE in any state (WIP, QA, or Production), read-only;
+only the owner can make changes while the BIE is in WIP state.
 
 The table below summarizes the actions and authorizations in each BIE state.
 
 +-------------+----------------------------------------+----------------------------------------+
 | Role State  | Current Owner                          | Other Users                            |
 +=============+========================================+========================================+
-| WIP         | Restrict the BIE.                      |                                        |
+| WIP         | Restrict the BIE.                      | View its details (read-only).          |
 |             |                                        |                                        |
 |             | Change its state to QA.                |                                        |
 |             |                                        |                                        |
@@ -81,7 +82,13 @@ A Note About the BIE Visibility
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In the BIE page, users can view the list of all the BIEs that have been created so far by any user.
-However, access to a BIE depends on its state as described in the table of the `BIE States <#bie-states>`__ section.
+Any BIE can be opened to view its details, regardless of its state or owner; what a user may *change*
+depends on the state and ownership as described in the table of the `BIE States <#bie-states>`__ section.
+
+Note that the BIE state conveys the maturity of a BIE, not the freshness of what you are viewing.
+When you open a BIE that you do not own — especially a WIP or QA BIE — its owner may still be editing it,
+so the details you see are a point-in-time snapshot and may change, or the BIE may later be discarded.
+connectCenter does not currently refresh an open BIE automatically when its owner makes a change.
 
 Create a BIE
 ~~~~~~~~~~~~

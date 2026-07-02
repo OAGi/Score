@@ -258,6 +258,7 @@ public class BieStateTransitionService {
         if (state == BieState.Discard) {
             throw new IllegalArgumentException("Use the discard API for 'Discard' transitions.");
         }
+        ensureRequesterMayChangeState(requester, topLevelAsbiepId);
         validateStateChange(requester, topLevelAsbiepId, state, dependencyCodeListManifestIds);
         ensureDependencySelectionStateChange(
                 requester,
@@ -285,6 +286,8 @@ public class BieStateTransitionService {
         }
 
         request.getTopLevelAsbiepIds().forEach(topLevelAsbiepId ->
+                ensureRequesterMayChangeState(requester, topLevelAsbiepId));
+        request.getTopLevelAsbiepIds().forEach(topLevelAsbiepId ->
                 validateStateChange(requester, topLevelAsbiepId, request.getToState(), request.getDependencyCodeListManifestIds()));
         ensureDependencySelectionStateChange(
                 requester,
@@ -298,6 +301,25 @@ public class BieStateTransitionService {
             treeController.updateState(requester, request.getToState(), request.getDependencyTopLevelAsbiepIds());
         });
         updateSelectedCodeLists(requester, request.getToState(), request.getDependencyCodeListManifestIds());
+    }
+
+    /**
+     * Ensures only the BIE owner (or an administrator) may transition a BIE's state.
+     *
+     * <p>Issue #1312 lets non-owners open a WIP BIE read-only, so opening the edit-tree no
+     * longer throws for a non-owner. The state-transition write path (edit-tree
+     * {@code updateState} and the repository update) has no ownership check of its own, so this
+     * guard restores it explicitly for the root BIE — keeping the read-only view read-only.</p>
+     */
+    private void ensureRequesterMayChangeState(ScoreUser requester, TopLevelAsbiepId topLevelAsbiepId) {
+        if (requester.hasRole(ADMINISTRATOR)) {
+            return;
+        }
+        TopLevelAsbiepSummaryRecord topLevelAsbiep =
+                repositoryFactory.topLevelAsbiepQueryRepository(requester).getTopLevelAsbiepSummary(topLevelAsbiepId);
+        if (topLevelAsbiep == null || !requester.userId().equals(topLevelAsbiep.owner().userId())) {
+            throw new DataAccessForbiddenException("Only the owner can change the state of the BIE.");
+        }
     }
 
     /**

@@ -3,6 +3,7 @@ package org.oagi.score.gateway.http.api.bie_management.service;
 import org.jooq.DSLContext;
 import org.jooq.Record2;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.api.bie_management.controller.payload.*;
 import org.oagi.score.gateway.http.api.bie_management.model.BieState;
 import org.oagi.score.gateway.http.api.bie_management.model.PrimitiveRestriction;
@@ -177,8 +178,31 @@ public class BieEditService implements InitializingBean {
         return treeController.getDetail(node);
     }
 
+    /**
+     * Ensures only the BIE owner (or an administrator) may edit a WIP BIE.
+     *
+     * <p>Issue #1312 lets non-owners open a WIP BIE read-only. Opening the edit-tree no longer
+     * throws for a non-owner, and this detail-save path has no ownership check of its own, so this
+     * guard keeps the read-only view read-only. It is scoped to WIP, leaving QA/Production
+     * behavior unchanged.</p>
+     */
+    private void ensureRequesterMayEditWipBie(ScoreUser requester, TopLevelAsbiepId topLevelAsbiepId) {
+        if (requester.hasRole(ADMINISTRATOR)) {
+            return;
+        }
+        TopLevelAsbiepSummaryRecord topLevelAsbiep =
+                repositoryFactory.topLevelAsbiepQueryRepository(requester).getTopLevelAsbiepSummary(topLevelAsbiepId);
+        if (topLevelAsbiep != null && topLevelAsbiep.state() == BieState.WIP
+                && !requester.userId().equals(topLevelAsbiep.owner().userId())) {
+            throw new DataAccessForbiddenException("Only the owner can edit the BIE.");
+        }
+    }
+
     @Transactional
     public BieEditUpdateDetailResponse updateDetails(ScoreUser requester, BieEditUpdateDetailRequest request) {
+        // Issue #1312: non-owners may open a WIP BIE read-only, so guard the write here.
+        ensureRequesterMayEditWipBie(requester, request.getTopLevelAsbiepId());
+
         BieEditUpdateDetailResponse response = new BieEditUpdateDetailResponse();
         LocalDateTime timestamp = LocalDateTime.now();
 

@@ -135,6 +135,9 @@ Current automation status: not automated yet.
 If any child or descendant properties are from group and the group is not in Production state, those properties have to be locked in the BIE.
 Current automation status: not automated yet.
 
+#### Test Assertion #6.2.15
+The end user can view the details of a BIE that is in WIP state and owned by another user (developer or end user) but cannot make any change (Issue #1312).
+
 ### Test Step Pre-condition:
 
 1. The tests create end user and developer accounts, core components, BIEs, extensions, business contexts, and code lists as needed for each scenario.
@@ -154,6 +157,7 @@ Current automation status: not automated yet.
 7. The test verifies code-list selection for BBIE value domains in `Code` mode, covering compatible production developer and end-user code lists in the same release, warnings for unstable end-user code lists, deleted end-user code lists, and the no-default-code-list fallback behavior. (Assertions [#8](#test-assertion-628), [#8.a](#test-assertion-628a), [#8.b](#test-assertion-628b), [#8.c](#test-assertion-628c))
 8. The test verifies that an end user cannot create a BIE from a selectable ASCCP whose ACC has a group component type, can reset a BIE node to its initial values after confirmation, can create BIEs from production end-user ASCCPs regardless of ownership, and still cannot create a BIE when such a production end-user ASCCP is backed by a group-type ACC. (Assertions [#9](#test-assertion-629), [#10](#test-assertion-6210), [#12](#test-assertion-6212), [#13](#test-assertion-6213))
 9. The test verifies BIE editability when the end-user ASCCP is in `Production`, and then checks the locking/flagging behavior after amendment, `QA`, `Deprecated`, and non-production base-ACC scenarios. Assertions `6.2.14.e` and `6.2.14.f` are documented but not automated yet. (Assertions [#14](#test-assertion-6214), [#14.a](#test-assertion-6214a), [#14.b](#test-assertion-6214b), [#14.c](#test-assertion-6214c), [#14.d](#test-assertion-6214d), [#14.e](#test-assertion-6214e), [#14.f](#test-assertion-6214f))
+10. The test opens another user's WIP BIE (owned by a developer, then by an end user) and verifies that its details can be viewed but every field is disabled, so no change can be made. (Assertion [#15](#test-assertion-6215))
 
 ## Test Case 6.3
 

@@ -709,7 +709,8 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_6")
-    public void developer_cannot_view_details_of_BIE_that_is_in_WIP_state_and_owned_by_another_user() {
+    public void developer_can_view_details_of_BIE_that_is_in_WIP_state_and_owned_by_another_user_but_cannot_make_any_change() {
+        // Issue #1312: a non-owner may open a WIP BIE read-only, exactly like the QA case in TC_5_5_TA_7.
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -738,8 +739,24 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
             TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                     .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, appUser, "WIP");
 
-            assertThrows(NoSuchElementException.class, () -> homePage.getBIEMenu().openViewEditBIESubMenu()
-                    .openEditBIEPage(topLevelASBIEP));
+            EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+
+            EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+            assertDisabled(topLevelASBIEPPanel.getBusinessTermField());
+            assertDisabled(topLevelASBIEPPanel.getRemarkField());
+            assertDisabled(topLevelASBIEPPanel.getVersionField());
+            assertDisabled(topLevelASBIEPPanel.getStatusField());
+            assertDisabled(topLevelASBIEPPanel.getContextDefinitionField());
+
+            WebElement applicationAreaNode = editBIEPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/Application Area");
+            assertTrue(applicationAreaNode.isDisplayed());
+            EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(applicationAreaNode);
+            assertDisabled(asbiePanel.getUsedCheckbox());
+            assertDisabled(asbiePanel.getNillableCheckbox());
+            assertDisabled(asbiePanel.getCardinalityMinField());
+            assertDisabled(asbiePanel.getCardinalityMaxField());
+            assertDisabled(asbiePanel.getRemarkField());
+            assertDisabled(asbiePanel.getContextDefinitionField());
         }
     }
 

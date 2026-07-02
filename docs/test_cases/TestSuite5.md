@@ -660,7 +660,7 @@ The developer can see, in the BIE list page, all BIEs owned by any user.
 The developer can view the details of a BIE that is in WIP state and owned by him.
 
 #### Test Assertion #5.5.6
-The developer cannot view the details of a BIE that is in WIP state and owned by another user.
+The developer can view the details of a BIE that is in WIP state and owned by another user but cannot make any change.
 
 #### Test Assertion #5.5.7
 The developer can view the details of a BIE that is in QA state and owned by any user but cannot make any change.
@@ -886,7 +886,7 @@ The developer can assign a distinct Business Context to a BIE even when another 
 11. The developer opens the Create BIE flow and verifies that published release branches are available for top-level concept selection while a `Working` branch top-level concept cannot be used to create a BIE. This covers Assertion [#5.5.3](#test-assertion-553).
 12. The developer opens the BIE List page and verifies that BIEs owned by any user are listed. This covers Assertion [#5.5.4](#test-assertion-554).
 13. The developer opens his own WIP BIE and verifies that the BIE details can be viewed and edited. This covers Assertion [#5.5.5](#test-assertion-555).
-14. The developer attempts to open another user's WIP BIE and verifies that the edit view is not available. This covers Assertion [#5.5.6](#test-assertion-556).
+14. The developer opens another user's WIP BIE and verifies that the details can be viewed but cannot be changed. This covers Assertion [#5.5.6](#test-assertion-556).
 15. The developer opens QA-state BIEs owned by himself or another user and verifies that the details can be viewed but cannot be changed. This covers Assertion [#5.5.7](#test-assertion-557).
 16. The developer opens Production-state BIEs owned by himself or another user and verifies that the details can be viewed but cannot be changed. This covers Assertion [#5.5.8](#test-assertion-558).
 17. The developer saves changes to his own WIP BIE and then changes its state from WIP to QA. This covers Assertion [#5.5.9](#test-assertion-559).

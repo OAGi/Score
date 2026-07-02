@@ -3,9 +3,15 @@ package org.oagi.score.gateway.http.api.business_term_management.service;
 import org.jooq.exception.DataAccessException;
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationQueryService;
+import org.oagi.score.gateway.http.api.bie_management.model.BieState;
+import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
+import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummaryRecord;
+import org.oagi.score.gateway.http.api.bie_management.model.asbie.AsbieId;
+import org.oagi.score.gateway.http.api.bie_management.model.bbie.BbieId;
 import org.oagi.score.gateway.http.api.business_term_management.controller.payload.*;
 import org.oagi.score.gateway.http.api.business_term_management.model.AsbieBusinessTermId;
 import org.oagi.score.gateway.http.api.business_term_management.model.BbieBusinessTermId;
+import org.oagi.score.gateway.http.api.business_term_management.model.BieToAssign;
 import org.oagi.score.gateway.http.api.business_term_management.model.BusinessTermId;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
@@ -24,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.oagi.score.gateway.http.common.model.ScoreRole.ADMINISTRATOR;
 import static org.springframework.util.StringUtils.hasLength;
 
 @Service
@@ -265,6 +272,11 @@ public class BusinessTermCommandService {
     public List<BigInteger> assignBusinessTerm(
             ScoreUser requester, BusinessTermId businessTermId, AssignBusinessTermRequest request) {
         assertBusinessTermEnabled(requester);
+        if (request.biesToAssign() != null) {
+            for (BieToAssign bie : request.biesToAssign()) {
+                ensureRequesterMayEditWipBie(requester, resolveOwnerTopLevelAsbiepId(requester, bie));
+            }
+        }
 
         var command = repositoryFactory.businessTermCommandRepository(requester);
         return command.assignBusinessTerm(businessTermId, request);
@@ -273,6 +285,8 @@ public class BusinessTermCommandService {
     public boolean updateAssignment(
             ScoreUser requester, AsbieBusinessTermId asbieBusinessTermId, AssignedBusinessTermUpdateRequest request) {
         assertBusinessTermEnabled(requester);
+        ensureRequesterMayEditWipBie(requester,
+                repositoryFactory.businessTermQueryRepository(requester).getOwnerTopLevelAsbiepId(asbieBusinessTermId));
 
         var command = repositoryFactory.businessTermCommandRepository(requester);
         return command.updateAssignment(asbieBusinessTermId,
@@ -283,6 +297,8 @@ public class BusinessTermCommandService {
     public boolean updateAssignment(
             ScoreUser requester, BbieBusinessTermId bbieBusinessTermId, AssignedBusinessTermUpdateRequest request) {
         assertBusinessTermEnabled(requester);
+        ensureRequesterMayEditWipBie(requester,
+                repositoryFactory.businessTermQueryRepository(requester).getOwnerTopLevelAsbiepId(bbieBusinessTermId));
 
         var command = repositoryFactory.businessTermCommandRepository(requester);
         return command.updateAssignment(bbieBusinessTermId,
@@ -293,6 +309,13 @@ public class BusinessTermCommandService {
     public void deleteBusinessTermAssignment(
             ScoreUser requester, AssignedBusinessTermDeleteRequest request) {
         assertBusinessTermEnabled(requester);
+        var query = repositoryFactory.businessTermQueryRepository(requester);
+        for (AsbieBusinessTermId asbieBusinessTermId : request.assignedAsbieBizTermIdList()) {
+            ensureRequesterMayEditWipBie(requester, query.getOwnerTopLevelAsbiepId(asbieBusinessTermId));
+        }
+        for (BbieBusinessTermId bbieBusinessTermId : request.assignedBbieBizTermIdList()) {
+            ensureRequesterMayEditWipBie(requester, query.getOwnerTopLevelAsbiepId(bbieBusinessTermId));
+        }
 
         var command = repositoryFactory.businessTermCommandRepository(requester);
         for (AsbieBusinessTermId asbieBusinessTermId : request.assignedAsbieBizTermIdList()) {
@@ -300,6 +323,34 @@ public class BusinessTermCommandService {
         }
         for (BbieBusinessTermId bbieBusinessTermId : request.assignedBbieBizTermIdList()) {
             command.delete(bbieBusinessTermId);
+        }
+    }
+
+    private TopLevelAsbiepId resolveOwnerTopLevelAsbiepId(ScoreUser requester, BieToAssign bie) {
+        var query = repositoryFactory.businessTermQueryRepository(requester);
+        String bieType = (bie.getBieType() != null) ? bie.getBieType().toUpperCase() : "";
+        return switch (bieType) {
+            case "ASBIE" -> query.getOwnerTopLevelAsbiepId(new AsbieId(bie.getBieId()));
+            case "BBIE" -> query.getOwnerTopLevelAsbiepId(new BbieId(bie.getBieId()));
+            default -> throw new IllegalArgumentException("Unsupported BIE type: " + bie.getBieType());
+        };
+    }
+
+    /**
+     * Issue #1312: only the BIE owner (or an administrator) may change business-term assignments of a
+     * WIP BIE. Non-owners may open a WIP BIE read-only, so these assign/update/delete endpoints must
+     * enforce ownership server-side. Scoped to WIP, so QA/Production assignment behavior is unchanged;
+     * a {@code null} owner (row already gone) is treated as nothing to guard.
+     */
+    private void ensureRequesterMayEditWipBie(ScoreUser requester, TopLevelAsbiepId topLevelAsbiepId) {
+        if (topLevelAsbiepId == null || requester.hasRole(ADMINISTRATOR)) {
+            return;
+        }
+        TopLevelAsbiepSummaryRecord topLevelAsbiep =
+                repositoryFactory.topLevelAsbiepQueryRepository(requester).getTopLevelAsbiepSummary(topLevelAsbiepId);
+        if (topLevelAsbiep != null && topLevelAsbiep.state() == BieState.WIP
+                && !requester.userId().equals(topLevelAsbiep.owner().userId())) {
+            throw new DataAccessForbiddenException("Only the owner can edit the BIE.");
         }
     }
 

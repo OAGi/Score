@@ -1352,4 +1352,42 @@ public class JooqBusinessTermQueryRepository
         }
     }
 
+    @Override
+    public TopLevelAsbiepId getOwnerTopLevelAsbiepId(AsbieId asbieId) {
+        ULong ownerId = dslContext().select(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID)
+                .from(ASBIE)
+                .where(ASBIE.ASBIE_ID.eq(valueOf(asbieId)))
+                .fetchOne(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID);
+        return (ownerId != null) ? new TopLevelAsbiepId(ownerId.toBigInteger()) : null;
+    }
+
+    @Override
+    public TopLevelAsbiepId getOwnerTopLevelAsbiepId(BbieId bbieId) {
+        ULong ownerId = dslContext().select(BBIE.OWNER_TOP_LEVEL_ASBIEP_ID)
+                .from(BBIE)
+                .where(BBIE.BBIE_ID.eq(valueOf(bbieId)))
+                .fetchOne(BBIE.OWNER_TOP_LEVEL_ASBIEP_ID);
+        return (ownerId != null) ? new TopLevelAsbiepId(ownerId.toBigInteger()) : null;
+    }
+
+    @Override
+    public TopLevelAsbiepId getOwnerTopLevelAsbiepId(AsbieBusinessTermId asbieBusinessTermId) {
+        ULong ownerId = dslContext().select(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID)
+                .from(ASBIE_BIZTERM)
+                .join(ASBIE).on(ASBIE_BIZTERM.ASBIE_ID.eq(ASBIE.ASBIE_ID))
+                .where(ASBIE_BIZTERM.ASBIE_BIZTERM_ID.eq(valueOf(asbieBusinessTermId)))
+                .fetchOne(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID);
+        return (ownerId != null) ? new TopLevelAsbiepId(ownerId.toBigInteger()) : null;
+    }
+
+    @Override
+    public TopLevelAsbiepId getOwnerTopLevelAsbiepId(BbieBusinessTermId bbieBusinessTermId) {
+        ULong ownerId = dslContext().select(BBIE.OWNER_TOP_LEVEL_ASBIEP_ID)
+                .from(BBIE_BIZTERM)
+                .join(BBIE).on(BBIE_BIZTERM.BBIE_ID.eq(BBIE.BBIE_ID))
+                .where(BBIE_BIZTERM.BBIE_BIZTERM_ID.eq(valueOf(bbieBusinessTermId)))
+                .fetchOne(BBIE.OWNER_TOP_LEVEL_ASBIEP_ID);
+        return (ownerId != null) ? new TopLevelAsbiepId(ownerId.toBigInteger()) : null;
+    }
+
 }

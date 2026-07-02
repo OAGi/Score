@@ -79,7 +79,8 @@ public enum AccessPrivilege {
                 if (requester.userId().equals(bieOwnerId)) {
                     accessPrivilege = CanEdit;
                 } else {
-                    accessPrivilege = Prohibited;
+                    // Issue #1312: non-owners may view a WIP BIE read-only, like QA/Production.
+                    accessPrivilege = CanView;
                 }
                 break;
             case QA:

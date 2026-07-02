@@ -5,7 +5,6 @@ import org.jooq.Record1;
 import org.jooq.Record2;
 import org.jooq.Record4;
 import org.jooq.types.ULong;
-import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId;
 import org.oagi.score.gateway.http.api.bie_management.model.BieState;
@@ -70,7 +69,6 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toMap;
 import static org.jooq.impl.DSL.and;
 import static org.jooq.impl.DSL.inline;
-import static org.oagi.score.gateway.http.common.model.ScoreRole.ADMINISTRATOR;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.*;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
@@ -124,15 +122,10 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                 if (topLevelAsbiep.owner().userId().equals(userId)) {
                     accessPrivilege = AccessPrivilege.CanEdit;
                 } else {
-                    // Issue #1010, #1576, #1635
-                    if (hasReuseBie(requester, topLevelAsbiep.topLevelAsbiepId()) ||
-                        useAsBaseBie(requester, topLevelAsbiep.topLevelAsbiepId()) ||
-                        requester.hasRole(ADMINISTRATOR)) {
-                        accessPrivilege = AccessPrivilege.CanView;
-                    } else {
-                        throw new DataAccessForbiddenException("'" + requester.username() +
-                                "' doesn't have an access privilege.");
-                    }
+                    // Issue #1312: non-owners may open a WIP BIE read-only, like QA/Production.
+                    // This supersedes the reuse/base/administrator-only view path of
+                    // Issues #1010, #1576, #1635 (which is now a subset of "any non-owner may view").
+                    accessPrivilege = AccessPrivilege.CanView;
                 }
                 break;
 
@@ -151,16 +144,6 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
         }
 
         this.initialized = true;
-    }
-
-    public boolean hasReuseBie(ScoreUser requester, TopLevelAsbiepId topLevelAsbiepId) {
-        var topLevelAsbiepQuery = repositoryFactory.topLevelAsbiepQueryRepository(requester);
-        return !topLevelAsbiepQuery.getReusedTopLevelAsbiepSummaryList(topLevelAsbiepId).isEmpty();
-    }
-
-    public boolean useAsBaseBie(ScoreUser requester, TopLevelAsbiepId topLevelAsbiepId) {
-        var topLevelAsbiepQuery = repositoryFactory.topLevelAsbiepQueryRepository(requester);
-        return !topLevelAsbiepQuery.getDerivedTopLevelAsbiepSummaryList(topLevelAsbiepId).isEmpty();
     }
 
     private boolean isForceBieUpdate() {

@@ -204,7 +204,10 @@
                           </button>
                         </div>
                         <div class="ms-3">
-                          @if (state === 'WIP' && (access === 'CanEdit' || isAdmin)) {
+                          <!-- Issue #1312: Update commits content edits, so it is owner-only — a non-owner (incl. an
+                               admin) views a WIP BIE read-only and has nothing to commit. (Move to QA / Discard below
+                               are state transitions, not content edits, so an admin keeps them; see Issue #1576.) -->
+                          @if (state === 'WIP' && access === 'CanEdit') {
                             <button mat-raised-button color="primary" (click)="updateDetails()"
                               matBadgePosition="below after" matBadge="{{ sizeOfChanges }}"
                               [matBadgeHidden]="sizeOfChanges === 0"
@@ -212,12 +215,17 @@
                               Update
                             </button>
                           }
+                          <!-- Issue #1576: an administrator retains state-transition governance over any user's WIP BIE
+                               (a last-resort mechanism to move/hand off stranded WIP content), even though content is
+                               read-only for a non-owner (Issue #1312). -->
                           @if (state === 'WIP' && (access === 'CanEdit' || isAdmin)) {
                             <button mat-raised-button color="accent" (click)="updateState('QA')"
                               [disabled]="isUpdating || isChanged || !isValid">
                               Move to QA
                             </button>
                           }
+                          <!-- Issue #1576: an administrator retains Discard over any user's WIP BIE (last-resort cleanup),
+                               even though content is read-only for a non-owner (Issue #1312). -->
                           @if ((state === 'WIP' && access === 'CanEdit') || isAdmin) {
                             <button mat-raised-button color="warn" class="ms-2" (click)="discard()"
                               [disabled]="isUpdating || isChanged">
@@ -418,7 +426,7 @@
                         <span class="context-menu-item">Remove Base BIE</span>
                       </button>
                     }
-                    @if (canReuseBIE(contextMenuItem) || canCreateBIEFromThis(contextMenuItem)) {
+                    @if (canEdit && (canReuseBIE(contextMenuItem) || canCreateBIEFromThis(contextMenuItem))) {
                       <mat-divider></mat-divider>
                     }
                     @if (canEdit && canReuseBIE(contextMenuItem)) {
@@ -427,7 +435,7 @@
                         <span class="context-menu-item">Reuse BIE</span>
                       </button>
                     }
-                    @if (canCreateBIEFromThis(contextMenuItem)) {
+                    @if (canEdit && canCreateBIEFromThis(contextMenuItem)) {
                       <button mat-menu-item (click)="createBIEfromThis(contextMenuItem)"
                         [disabled]="isTenantEnabled">
                         <span class="context-menu-item">Make BIE reusable</span>
@@ -576,14 +584,17 @@
                                     </button>
                                   </mat-chip-row>
                                 }
-                                <input
-                                  placeholder="Business Context"
-                                  #businessContextInput
-                                  [formControl]="businessContextCtrl"
-                                  [matAutocomplete]="auto"
-                                  [matChipInputFor]="businessContextChipList"
-                                  [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                                  [matChipInputAddOnBlur]="addOnBlur">
+                                <!-- Issue #1312: a non-owner viewing a WIP BIE read-only cannot add business contexts. -->
+                                @if (!isReadOnlyWipViewer) {
+                                  <input
+                                    placeholder="Business Context"
+                                    #businessContextInput
+                                    [formControl]="businessContextCtrl"
+                                    [matAutocomplete]="auto"
+                                    [matChipInputFor]="businessContextChipList"
+                                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                                    [matChipInputAddOnBlur]="addOnBlur">
+                                }
                               </mat-chip-grid>
                               <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addBusinessContext($event)">
                                 @for (businessContext of filteredBusinessContexts | async; track businessContext.businessContextId) {
@@ -606,8 +617,10 @@
                           @if (isBIEInverseModeEnabled) {
                             <div class="col-md-3 col-sm-6">
                               <div class="checkbox">
+                                <!-- Issue #1312: read-only for a non-owner viewing a WIP BIE. -->
                                 <mat-checkbox color="primary"
                                   [(ngModel)]="rootNode.inverseMode"
+                                  [disabled]="isReadOnlyWipViewer"
                                   (change)="updateInverseMode()">
                                   Inverse Mode
                                 </mat-checkbox>
@@ -931,7 +944,8 @@
                                   placeholder="Component Definition" [readonly]="true"
                                   value="{{ asAbieDetail().asccp.definition?.content || ' ' }}">
                                 </textarea>
-                                @if (used(selectedNode)) {
+                                <!-- Issue #1312: the copy target is the read-only Context Definition, so only offer it when that field is editable (never to a non-owner WIP viewer). -->
+                                @if (isEditable(selectedNode)) {
                                   <button mat-icon-button mat-small-icon-button
                                     (click)="copyToDefinition(asAbieDetail().asccp.definition?.content, asAbieDetail().asbiep)"
                                     matTooltip="Copy to Context Definition">
@@ -951,7 +965,8 @@
                                   placeholder="Type Definition" [readonly]="true"
                                   value="{{ asAbieDetail().acc.definition?.content || ' ' }}">
                                 </textarea>
-                                @if (used(selectedNode)) {
+                                <!-- Issue #1312: the copy target is the read-only Context Definition, so only offer it when that field is editable (never to a non-owner WIP viewer). -->
+                                @if (isEditable(selectedNode)) {
                                   <button mat-icon-button mat-small-icon-button
                                     (click)="copyToDefinition(asAbieDetail().acc.definition?.content, asAbieDetail().asbiep)"
                                     matTooltip="Copy to Context Definition">
@@ -1032,7 +1047,8 @@
                               <div class="col-md-3 col-sm-6">
                                 <div class="checkbox">
                                   <mat-checkbox color="primary"
-                                    [(ngModel)]="baseNode.inverseMode">
+                                    [(ngModel)]="baseNode.inverseMode"
+                                    [disabled]="true">
                                     Inverse Mode
                                   </mat-checkbox>
                                 </div>
@@ -1392,7 +1408,8 @@
                                   placeholder="Context Definition"
                                   [value]="reusedNodeDetail.definition"
                                 [readonly]="true"></textarea>
-                                @if (used(selectedNode)) {
+                                <!-- Issue #1312: the copy target is the read-only Context Definition, so only offer it when that field is editable (never to a non-owner WIP viewer). -->
+                                @if (isEditable(selectedNode)) {
                                   <button mat-icon-button mat-small-icon-button
                                     (click)="copyToDefinition(reusedNodeDetail.definition, asAsbiepDetail().asbie)"
                                     matTooltip="Copy to Context Definition">
@@ -1412,7 +1429,8 @@
                                   placeholder="Association Definition" [readonly]="true"
                                   value="{{ asAsbiepDetail().ascc.definition?.content || ' ' }}">
                                 </textarea>
-                                @if (used(selectedNode)) {
+                                <!-- Issue #1312: the copy target is the read-only Context Definition, so only offer it when that field is editable (never to a non-owner WIP viewer). -->
+                                @if (isEditable(selectedNode)) {
                                   <button mat-icon-button mat-small-icon-button
                                     (click)="copyToDefinition(asAsbiepDetail().ascc.definition?.content, asAsbiepDetail().asbie)"
                                     matTooltip="Copy to Context Definition">
@@ -1432,7 +1450,8 @@
                                   placeholder="Component Definition" [readonly]="true"
                                   value="{{ asAsbiepDetail().asccp.definition?.content || ' ' }}">
                                 </textarea>
-                                @if (used(selectedNode)) {
+                                <!-- Issue #1312: the copy target is the read-only Context Definition, so only offer it when that field is editable (never to a non-owner WIP viewer). -->
+                                @if (isEditable(selectedNode)) {
                                   <button mat-icon-button mat-small-icon-button
                                     (click)="copyToDefinition(asAsbiepDetail().asccp.definition?.content, asAsbiepDetail().asbie)"
                                     matTooltip="Copy to Context Definition">
@@ -1452,7 +1471,8 @@
                                   placeholder="Type Definition" [readonly]="true"
                                   value="{{ asAsbiepDetail().acc.definition?.content || ' ' }}">
                                 </textarea>
-                                @if (used(selectedNode)) {
+                                <!-- Issue #1312: the copy target is the read-only Context Definition, so only offer it when that field is editable (never to a non-owner WIP viewer). -->
+                                @if (isEditable(selectedNode)) {
                                   <button mat-icon-button mat-small-icon-button
                                     (click)="copyToDefinition(asAsbiepDetail().acc.definition?.content, asAsbiepDetail().asbie)"
                                     matTooltip="Copy to Context Definition">
@@ -2150,7 +2170,8 @@
                                   placeholder="Association Definition" [readonly]="true"
                                   value="{{ asBbiepDetail().bcc.definition?.content || ' ' }}">
                                 </textarea>
-                                @if (used(selectedNode)) {
+                                <!-- Issue #1312: the copy target is the read-only Context Definition, so only offer it when that field is editable (never to a non-owner WIP viewer). -->
+                                @if (isEditable(selectedNode)) {
                                   <button mat-icon-button mat-small-icon-button
                                     (click)="copyToDefinition(asBbiepDetail().bcc.definition?.content, asBbiepDetail().bbie)"
                                     matTooltip="Copy to Context Definition">
@@ -2170,7 +2191,8 @@
                                   placeholder="Component Definition" [readonly]="true"
                                   value="{{ asBbiepDetail().bccp.definition?.content || ' ' }}">
                                 </textarea>
-                                @if (used(selectedNode)) {
+                                <!-- Issue #1312: the copy target is the read-only Context Definition, so only offer it when that field is editable (never to a non-owner WIP viewer). -->
+                                @if (isEditable(selectedNode)) {
                                   <button mat-icon-button mat-small-icon-button
                                     (click)="copyToDefinition(asBbiepDetail().bccp.definition?.content, asBbiepDetail().bbie)"
                                     matTooltip="Copy to Context Definition">
@@ -2896,7 +2918,8 @@
                                   placeholder="Component Definition" [readonly]="true"
                                   value="{{ asBbieScDetail().bdtSc.definition?.content || ' ' }}">
                                 </textarea>
-                                @if (used(selectedNode)) {
+                                <!-- Issue #1312: the copy target is the read-only Context Definition, so only offer it when that field is editable (never to a non-owner WIP viewer). -->
+                                @if (isEditable(selectedNode)) {
                                   <button mat-icon-button mat-small-icon-button
                                     (click)="copyToDefinition(asBbieScDetail().bdtSc.definition?.content, asBbieScDetail().bbieSc)"
                                     matTooltip="Copy to Context Definition">

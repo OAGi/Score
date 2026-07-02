@@ -162,6 +162,98 @@ describe('BieEditComponent business context assignment', () => {
 });
 
 /**
+ * Issue #1312: a non-owner may open a WIP BIE read-only (access === 'CanView'), like QA/Production.
+ * The editor keys read-only vs editable entirely off the backend-returned `state` + `access`, so these
+ * pure predicates/handlers are testable by binding the prototype members to a minimal fake `this`.
+ */
+describe('BieEditComponent #1312 read-only WIP view', () => {
+  const isReadOnlyWipViewer = (state: string, access: string, isAdmin = false): boolean =>
+    Object.getOwnPropertyDescriptor(BieEditComponent.prototype, 'isReadOnlyWipViewer')!.get!
+      .call({state, access, auth: {isAdmin: () => isAdmin}});
+
+  describe('shouldRedirectFromWipEditor (editor-init guard)', () => {
+    it('does NOT redirect a non-owner viewing a WIP BIE read-only (CanView)', () => {
+      expect(BieEditComponent.shouldRedirectFromWipEditor('WIP', 'CanView', false)).toBe(false);
+    });
+    it('does NOT redirect the owner (CanEdit)', () => {
+      expect(BieEditComponent.shouldRedirectFromWipEditor('WIP', 'CanEdit', false)).toBe(false);
+    });
+    it('redirects when access is Prohibited or Unprepared', () => {
+      expect(BieEditComponent.shouldRedirectFromWipEditor('WIP', 'Prohibited', false)).toBe(true);
+      expect(BieEditComponent.shouldRedirectFromWipEditor('WIP', 'Unprepared', false)).toBe(true);
+    });
+    it('never redirects an administrator', () => {
+      expect(BieEditComponent.shouldRedirectFromWipEditor('WIP', 'Prohibited', true)).toBe(false);
+    });
+    it('does not apply to non-WIP states', () => {
+      expect(BieEditComponent.shouldRedirectFromWipEditor('QA', 'CanView', false)).toBe(false);
+    });
+  });
+
+  describe('isReadOnlyWipViewer', () => {
+    it('is true for any non-owner (CanView) viewing a WIP BIE, and only then', () => {
+      expect(isReadOnlyWipViewer('WIP', 'CanView')).toBe(true);
+      expect(isReadOnlyWipViewer('WIP', 'CanEdit')).toBe(false); // owner
+      expect(isReadOnlyWipViewer('QA', 'CanView')).toBe(false);
+      expect(isReadOnlyWipViewer('Production', 'CanView')).toBe(false);
+    });
+    it('does NOT exempt administrators: a non-owner admin also views a WIP BIE read-only', () => {
+      expect(isReadOnlyWipViewer('WIP', 'CanView', /* isAdmin */ true)).toBe(true);
+      // An owner keeps editing regardless of the admin role (access === 'CanEdit').
+      expect(isReadOnlyWipViewer('WIP', 'CanEdit', /* isAdmin */ true)).toBe(false);
+    });
+  });
+
+  it('copyToDefinition is a no-op for a read-only WIP viewer (isEditable === false)', () => {
+    const copyToDefinition = BieEditComponent.prototype.copyToDefinition;
+    const target: any = {definition: 'original'};
+    // Read-only viewer: isEditable(selectedNode) is false, so nothing is copied.
+    copyToDefinition.call({selectedNode: {}, isEditable: () => false, snackBar: {open: vi.fn()}},
+      'copied', target);
+    expect(target.definition).toBe('original');
+    // Owner/editor: isEditable true, so the copy proceeds.
+    const snackBar = {open: vi.fn()};
+    copyToDefinition.call({selectedNode: {}, isEditable: () => true, snackBar}, 'copied', target);
+    expect(target.definition).toBe('copied');
+    expect(snackBar.open).toHaveBeenCalled();
+  });
+
+  it('isBusinessContextRemovable is false for a read-only WIP viewer even with multiple contexts', () => {
+    const get = Object.getOwnPropertyDescriptor(BieEditComponent.prototype, 'isBusinessContextRemovable')!.get!;
+    expect(get.call({isReadOnlyWipViewer: false, businessContextUpdating: false,
+      businessContexts: [businessContext(1, 'A'), businessContext(2, 'B')]})).toBe(true);
+    expect(get.call({isReadOnlyWipViewer: true, businessContextUpdating: false,
+      businessContexts: [businessContext(1, 'A'), businessContext(2, 'B')]})).toBe(false);
+  });
+
+  it('isBusinessTermEditable is false for a read-only WIP viewer', () => {
+    const editable = BieEditComponent.prototype.isBusinessTermEditable;
+    const node: any = {used: true, locked: false, isCycle: false};
+    expect(editable.call({isReadOnlyWipViewer: false}, node)).toBe(true);
+    expect(editable.call({isReadOnlyWipViewer: true}, node)).toBe(false);
+  });
+
+  it('addBusinessContext / removeBusinessContext are no-ops for a read-only WIP viewer', () => {
+    const bizCtxService = {assign: vi.fn(), unassign: vi.fn()};
+    const ctx: any = {
+      isReadOnlyWipViewer: true,
+      businessContextUpdating: false,
+      businessContexts: [businessContext(1, 'A'), businessContext(2, 'B')],
+      bizCtxService,
+      topLevelAsbiepId: 1001,
+      addBusinessContext: BieEditComponent.prototype.addBusinessContext,
+      removeBusinessContext: BieEditComponent.prototype.removeBusinessContext
+    };
+
+    ctx.addBusinessContext({option: {value: businessContext(3, 'C')}});
+    ctx.removeBusinessContext(businessContext(1, 'A'));
+
+    expect(bizCtxService.assign).not.toHaveBeenCalled();
+    expect(bizCtxService.unassign).not.toHaveBeenCalled();
+  });
+});
+
+/**
  * Issue #1755: warn before an "Used" un-check clears descendants. The un-check guard is pure enough
  * to test by binding the prototype method to a plain fake `this` (no Angular wiring), matching the
  * fixtures used above. The dialog fires on un-check of any node that HAS descendants (`expandable`)

@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.business_term_management.repository;
 
+import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.asbie.AsbieId;
 import org.oagi.score.gateway.http.api.bie_management.model.bbie.BbieId;
 import org.oagi.score.gateway.http.api.business_term_management.model.*;
@@ -67,5 +68,20 @@ public interface BusinessTermQueryRepository {
     List<AsbieBbieListEntryRecord> getAsbieBbieList(
             Collection<AsbieId> asbieIdList, Collection<BbieId> bbieIdList);
 
+    /**
+     * Issue #1312: resolves the owning top-level ASBIEP of an ASBIE node, so the service can
+     * enforce that only the BIE owner may change business-term assignments on a WIP BIE.
+     * Returns {@code null} when the ASBIE does not exist.
+     */
+    TopLevelAsbiepId getOwnerTopLevelAsbiepId(AsbieId asbieId);
+
+    /** Issue #1312: resolves the owning top-level ASBIEP of a BBIE node. */
+    TopLevelAsbiepId getOwnerTopLevelAsbiepId(BbieId bbieId);
+
+    /** Issue #1312: resolves the owning top-level ASBIEP of an ASBIE business-term assignment. */
+    TopLevelAsbiepId getOwnerTopLevelAsbiepId(AsbieBusinessTermId asbieBusinessTermId);
+
+    /** Issue #1312: resolves the owning top-level ASBIEP of a BBIE business-term assignment. */
+    TopLevelAsbiepId getOwnerTopLevelAsbiepId(BbieBusinessTermId bbieBusinessTermId);
 
 }

@@ -4198,6 +4198,59 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         }
     }
 
+    @Test
+    @DisplayName("TC_6_2_TA_15")
+    public void end_user_can_view_but_cannot_edit_another_users_wip_bie() {
+        // Issue #1312: an end user may open another user's WIP BIE read-only, like the QA/Production cases.
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        List<AppUserObject> owners = new ArrayList<>();
+
+        AppUserObject anotherUser;
+        anotherUser = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
+        owners.add(anotherUser);
+
+        anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
+        owners.add(anotherUser);
+
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+
+        for (AppUserObject owner : owners) {
+            click(homePage.getConnectCenterLogo());
+
+            BusinessContextObject randomBusinessContext =
+                    getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(owner);
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
+            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                    .getASCCPByDENAndReleaseNum(library, "Sync Response Table. Sync Response Table", release.getReleaseNumber());
+            TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                    .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, owner, "WIP");
+
+            EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+
+            EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+            assertDisabled(topLevelASBIEPPanel.getBusinessTermField());
+            assertDisabled(topLevelASBIEPPanel.getRemarkField());
+            assertDisabled(topLevelASBIEPPanel.getVersionField());
+            assertDisabled(topLevelASBIEPPanel.getStatusField());
+            assertDisabled(topLevelASBIEPPanel.getContextDefinitionField());
+
+            WebElement applicationAreaNode = editBIEPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/Application Area");
+            assertTrue(applicationAreaNode.isDisplayed());
+            EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(applicationAreaNode);
+            assertDisabled(asbiePanel.getUsedCheckbox());
+            assertDisabled(asbiePanel.getNillableCheckbox());
+            assertDisabled(asbiePanel.getCardinalityMinField());
+            assertDisabled(asbiePanel.getCardinalityMaxField());
+            assertDisabled(asbiePanel.getRemarkField());
+            assertDisabled(asbiePanel.getContextDefinitionField());
+        }
+    }
+
     @AfterEach
     public void tearDown() {
         super.tearDown();

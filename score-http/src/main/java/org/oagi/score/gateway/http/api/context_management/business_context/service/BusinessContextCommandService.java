@@ -1,6 +1,9 @@
 package org.oagi.score.gateway.http.api.context_management.business_context.service;
 
+import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
+import org.oagi.score.gateway.http.api.bie_management.model.BieState;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
+import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.context_management.business_context.controller.payload.CreateBusinessContextRequest;
 import org.oagi.score.gateway.http.api.context_management.business_context.controller.payload.UpdateBusinessContextRequest;
 import org.oagi.score.gateway.http.api.context_management.business_context.model.BusinessContextId;
@@ -21,6 +24,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.oagi.score.gateway.http.common.model.ScoreRole.ADMINISTRATOR;
 import static org.springframework.util.StringUtils.hasText;
 
 /**
@@ -173,6 +177,9 @@ public class BusinessContextCommandService {
     public void assignBusinessContext(
             ScoreUser requester, BusinessContextId businessContextId, TopLevelAsbiepId topLevelAsbiepId) {
 
+        // Issue #1312: non-owners may open a WIP BIE read-only, so guard this write.
+        ensureRequesterMayEditWipBie(requester, topLevelAsbiepId);
+
         // Idempotent: if the assignment already exists, do nothing (avoids a duplicate-key failure).
         if (query(requester).isBusinessContextAssigned(businessContextId, topLevelAsbiepId)) {
             return;
@@ -191,6 +198,9 @@ public class BusinessContextCommandService {
     public void unassignBusinessContext(
             ScoreUser requester, BusinessContextId businessContextId, TopLevelAsbiepId topLevelAsbiepId) {
 
+        // Issue #1312: non-owners may open a WIP BIE read-only, so guard this write.
+        ensureRequesterMayEditWipBie(requester, topLevelAsbiepId);
+
         // A BIE must retain at least one business context; refuse to remove the last one.
         if (query(requester).countAssignments(topLevelAsbiepId) <= 1) {
             throw new IllegalArgumentException(
@@ -198,6 +208,24 @@ public class BusinessContextCommandService {
         }
 
         command(requester).deleteAssignment(businessContextId, topLevelAsbiepId);
+    }
+
+    /**
+     * Ensures only the BIE owner (or an administrator) may change the business-context assignments
+     * of a WIP BIE. Issue #1312 lets non-owners open a WIP BIE read-only; these assign/unassign
+     * endpoints have no ownership check of their own, so this keeps the read-only view read-only.
+     * Scoped to WIP so QA/Production assignment behavior is unchanged.
+     */
+    private void ensureRequesterMayEditWipBie(ScoreUser requester, TopLevelAsbiepId topLevelAsbiepId) {
+        if (requester.hasRole(ADMINISTRATOR)) {
+            return;
+        }
+        TopLevelAsbiepSummaryRecord topLevelAsbiep =
+                repositoryFactory.topLevelAsbiepQueryRepository(requester).getTopLevelAsbiepSummary(topLevelAsbiepId);
+        if (topLevelAsbiep != null && topLevelAsbiep.state() == BieState.WIP
+                && !requester.userId().equals(topLevelAsbiep.owner().userId())) {
+            throw new DataAccessForbiddenException("Only the owner can edit the BIE.");
+        }
     }
 
     /**
