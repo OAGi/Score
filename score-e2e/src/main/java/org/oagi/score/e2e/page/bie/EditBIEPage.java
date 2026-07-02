@@ -592,7 +592,7 @@ public interface EditBIEPage extends Page {
 
         /**
          * Return {@code true} if the per-card amber "A Request Body on a DELETE operation is ignored in
-         * OpenAPI 3.0.3 ..." warning (Issue #1610) is shown on the given binding card. It appears only when
+         * OpenAPI 3.0 ..." warning (Issue #1610) is shown on the given binding card. It appears only when
          * the binding is a {@code DELETE} + {@code Request} and its owning OpenAPI Document targets an OpenAPI
          * version earlier than 3.1. The warning is read-only on the BIE screen — the OpenAPI Version is
          * changed on the OpenAPI Document screen.

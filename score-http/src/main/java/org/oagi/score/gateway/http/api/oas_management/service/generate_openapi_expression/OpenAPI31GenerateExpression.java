@@ -77,7 +77,9 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 @Scope(SCOPE_PROTOTYPE)
 public class OpenAPI31GenerateExpression implements BieGenerateOpenApiExpression, InitializingBean {
 
-    private static final String OPEN_API_VERSION = "3.1.1";
+    // Issue #1760: the OpenAPI Document stores only the minor family (3.1). The generated document pins
+    // the canonical patch release for that family (errata-only), so users never pick a patch version.
+    private static final String OPEN_API_VERSION = "3.1.2";
     static final String VERSION_PATH_PARAMETER = "{version}";
     private static final Pattern PATH_PARAMETER_PATTERN = Pattern.compile("\\{([^{}]+)}");
 
@@ -1083,7 +1085,7 @@ public class OpenAPI31GenerateExpression implements BieGenerateOpenApiExpression
 
             if (root == null) {
                 root = new LinkedHashMap<>();
-                root.put("openapi", option.getOasDoc().getOpenAPIVersion());
+                root.put("openapi", OPEN_API_VERSION);
                 ImmutableMap.Builder infoBuilder = ImmutableMap.<String, Object>builder()
                         .put("title", option.getOasDoc().getTitle());
                 if (StringUtils.hasLength(option.getOasDoc().getDescription())) {

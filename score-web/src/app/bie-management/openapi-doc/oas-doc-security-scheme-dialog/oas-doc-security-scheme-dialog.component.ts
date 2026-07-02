@@ -31,7 +31,7 @@ export class OasDocSecuritySchemeDialogComponent {
     {value: 'oauth2', label: 'OAuth 2.0'},
     {value: 'openIdConnect', label: 'OpenID Connect'}
   ];
-  // deviceAuthorization is an OpenAPI 3.2+ flow; the document targets 3.0.3, so it is not offered here
+  // deviceAuthorization is an OpenAPI 3.2+ flow; the document targets 3.0, so it is not offered here
   // (the generator also gates it on version >= 3.2). Re-add when 3.2 output is supported.
   flowTypes = [
     {value: 'authorizationCode', label: 'Authorization Code'},

@@ -1,7 +1,7 @@
 import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import {Location} from '@angular/common';
 import {SelectionModel} from '@angular/cdk/collections';
-import {OasDoc, OasDocListRequest} from '../domain/openapi-doc';
+import {OasDoc, OasDocListRequest, toMinorOpenApiVersion} from '../domain/openapi-doc';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
@@ -122,6 +122,12 @@ export class OasDocListComponent implements OnInit {
       return 0;
     }
     return this.columns.find(c => c.name === name)?.width;
+  }
+
+  // Issue #1760: the list shows only the minor family (3.0 / 3.1); fold any stored patch value
+  // (including legacy 3.0.3 / 3.1.1) so users never see a patch version on screen.
+  displayOpenApiVersion(version: string): string {
+    return toMinorOpenApiVersion(version);
   }
 
   defaultDisplayedColumns = [

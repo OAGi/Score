@@ -340,7 +340,7 @@ export class OasDocAssignDialogComponent implements OnInit {
     }
     if (property === 'verbSelection') {
       // A request body is never valid for GET, so revert it to Response. A DELETE request body is kept
-      // in any version (Issue #1610): honored in OpenAPI 3.1, dropped (with a banner) in 3.0.3.
+      // in any version (Issue #1610): honored in OpenAPI 3.1, dropped (with a banner) in 3.0.
       if (this.messageBodySelection[source] === 'Request' && this.verbSelection[source] === 'GET') {
         this.messageBodySelection[source] = 'Response';
       }

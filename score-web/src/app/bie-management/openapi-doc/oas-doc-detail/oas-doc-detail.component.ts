@@ -7,7 +7,8 @@ import {
   OasDoc,
   OasSecurityRequirement,
   OasSecurityScheme,
-  SimpleOasDoc
+  SimpleOasDoc,
+  toMinorOpenApiVersion
 } from '../domain/openapi-doc';
 import {
   applyResourceArrayMarker,
@@ -417,13 +418,17 @@ export class OasDocDetailComponent implements OnInit {
     if (!oasDoc.securityRequirements) {
       oasDoc.securityRequirements = [];
     }
+    // Issue #1760: the version selector offers only the minor family (3.0 / 3.1). Fold any stored patch
+    // value (including legacy 3.0.3 / 3.1.1) to its minor so the mat-select matches the loaded value and
+    // the baseline hashCode reflects what is displayed (no spurious "changed" state).
+    oasDoc.openAPIVersion = toMinorOpenApiVersion(oasDoc.openAPIVersion);
     this.hashCodeForOasDoc = hashCode(oasDoc);
     this.oasDoc = oasDoc;
     setAppTitleIfPresent(this.titleService, this.oasDoc.title, 'OpenAPI Document');
     this.isUpdating = false;
   }
 
-  // Issue #1729: selectable security scheme types (OpenAPI 3.0.3).
+  // Issue #1729: selectable security scheme types (OpenAPI 3.0).
   securitySchemeTypes = [
     {value: 'apiKey', label: 'API Key'},
     {value: 'http', label: 'HTTP'},
@@ -865,7 +870,7 @@ export class OasDocDetailComponent implements OnInit {
     }
     if (property === 'verb') {
       // A request body is never valid for GET, so revert it to Response. A DELETE request body is kept
-      // in any version (Issue #1610): it is honored in OpenAPI 3.1 and dropped (with a banner) in 3.0.3.
+      // in any version (Issue #1610): it is honored in OpenAPI 3.1 and dropped (with a banner) in 3.0.
       if (source.messageBody === 'Request' && source.verb === 'GET') {
         source.messageBody = 'Response';
       }
@@ -879,8 +884,8 @@ export class OasDocDetailComponent implements OnInit {
   }
 
   // Issue #1610: a DELETE request body is honored only from OpenAPI 3.1. When the document targets an
-  // earlier version (3.0.3), the body is dropped from the generated document, so a banner above the
-  // Endpoint Details table prompts the user to switch to 3.1.1. (The list is server-paginated, so this
+  // earlier version (3.0), the body is dropped from the generated document, so a banner above the
+  // Endpoint Details table prompts the user to switch to 3.1. (The list is server-paginated, so this
   // reflects the operations currently loaded on this page.)
   hasIgnoredDeleteRequestBody(): boolean {
     if (this.isOpenApi31()) {
@@ -1181,7 +1186,7 @@ export class OasDocDetailComponent implements OnInit {
 
   generate() {
     // Issue #1610: the document is generated from the persisted record, so any pending edit (e.g. an
-    // OpenAPI Version change from 3.0.3 to 3.1.1, or a new DELETE Request body) would NOT be reflected.
+    // OpenAPI Version change from 3.0 to 3.1, or a new DELETE Request body) would NOT be reflected.
     // Block generation while there are unsaved changes and prompt the user to Update first.
     if (this.isChanged()) {
       this.snackBar.open('There are unsaved changes. Please click Update before generating the document.', '', {

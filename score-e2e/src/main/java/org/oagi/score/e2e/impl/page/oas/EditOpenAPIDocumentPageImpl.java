@@ -145,7 +145,7 @@ public class EditOpenAPIDocumentPageImpl extends BasePageImpl implements EditOpe
 
     @Override
     public void setOpenAPIVersion(String openAPIVersion) {
-        // The OpenAPI Version control is a plain mat-select (static 3.0.3 / 3.1.1 options) with no
+        // The OpenAPI Version control is a plain mat-select (static 3.0 / 3.1 options) with no
         // ngx-mat-select-search box, so select the option directly instead of typing into a search field.
         click(getOpenAPIVersionSelectField());
         WebElement optionField = visibilityOfElementLocated(getDriver(),

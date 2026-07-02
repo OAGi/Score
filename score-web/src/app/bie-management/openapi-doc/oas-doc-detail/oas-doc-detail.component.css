@@ -201,7 +201,7 @@
 }
 
 /* Issue #1610: amber banner shown above the Endpoint Details table when the document targets
-   OpenAPI 3.0.3 and a DELETE operation still carries a Request body (which is dropped on generation). */
+   OpenAPI 3.0 and a DELETE operation still carries a Request body (which is dropped on generation). */
 .oas-delete-body-warning {
   margin-bottom: 12px;
   padding: 8px 12px;

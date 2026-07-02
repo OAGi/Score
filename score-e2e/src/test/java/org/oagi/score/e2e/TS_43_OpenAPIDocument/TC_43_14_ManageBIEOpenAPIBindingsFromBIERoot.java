@@ -451,32 +451,32 @@ public class TC_43_14_ManageBIEOpenAPIBindingsFromBIERoot extends BaseTest {
     public void delete_request_body_ignored_warning_surfaces_on_the_bie_root_for_a_3_0_document() {
         // Issue #1610 parity: the BIE-root panel warns (read-only), per card, that a DELETE Request body is
         // ignored when the binding's OpenAPI Document targets OpenAPI 3.0.x — and clears it once the document
-        // is switched to 3.1.1 on the OpenAPI Document screen (the BIE screen never edits the OpenAPI Version).
+        // is switched to 3.1 on the OpenAPI Document screen (the BIE screen never edits the OpenAPI Version).
         Ctx ctx = newContext();
         TopLevelASBIEPObject bie = createBie(ctx, "oas_1519_11_bc", "WIP");
-        OpenAPIDocumentObject doc = createDoc(ctx);   // created at OpenAPI Version 3.0.3
+        OpenAPIDocumentObject doc = createDoc(ctx);   // created at OpenAPI Version 3.0
 
         HomePage homePage = signIn(ctx.endUser);
         EditOpenAPIDocumentPage editOasPage = openOasEditor(homePage, doc);
         assignBie(editOasPage, bie, "DELETE", "Request");
 
-        // 3.0.3 + DELETE + Request -> the per-card warning surfaces on the BIE root.
+        // 3.0 + DELETE + Request -> the per-card warning surfaces on the BIE root.
         EditBIEPage editBIEPage = openBieEditor(homePage, bie);
         EditBIEPage.OpenAPIDocumentInformationPanel panel = editBIEPage.openOpenAPIDocumentInformationPanel();
         WebElement card = panel.getBindingCard(doc.getOasDocId());
         assertTrue(panel.isDeleteRequestBodyIgnoredWarningDisplayed(card),
-                "A 3.0.3 document with a DELETE + Request binding must warn on the BIE root that the body is ignored");
+                "A 3.0 document with a DELETE + Request binding must warn on the BIE root that the body is ignored");
 
-        // Switch the document to OpenAPI 3.1.1 on the OpenAPI Document screen -> the body is honored, warning clears.
+        // Switch the document to OpenAPI 3.1 on the OpenAPI Document screen -> the body is honored, warning clears.
         editOasPage = openOasEditor(homePage, doc);
-        editOasPage.setOpenAPIVersion("3.1.1");
+        editOasPage.setOpenAPIVersion("3.1");
         editOasPage.hitUpdateButton();
 
         editBIEPage = openBieEditor(homePage, bie);
         panel = editBIEPage.openOpenAPIDocumentInformationPanel();
         card = panel.getBindingCard(doc.getOasDocId());
         assertFalse(panel.isDeleteRequestBodyIgnoredWarningDisplayed(card),
-                "Switching the document to OpenAPI 3.1.1 must clear the BIE-root DELETE-body warning");
+                "Switching the document to OpenAPI 3.1 must clear the BIE-root DELETE-body warning");
     }
 
     /* ===================================== Requirement #1492: add-time duplicate-body guard ===================================== */

@@ -228,7 +228,7 @@ public interface EditOpenAPIDocumentPage extends Page {
     void clickGenerateButton();
 
     /**
-     * Return whether the amber "A Request Body on a DELETE operation is ignored in OpenAPI 3.0.3 ..."
+     * Return whether the amber "A Request Body on a DELETE operation is ignored in OpenAPI 3.0 ..."
      * banner (Issue #1610) is shown above the 'Endpoint Details' table. It appears only when the document
      * targets an OpenAPI version earlier than 3.1 and at least one loaded operation is a {@code DELETE}
      * carrying a {@code Request} message body.

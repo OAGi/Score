@@ -211,10 +211,10 @@ public class TC_43_12_RequestAndResponseOnOneOperation extends BaseTest {
     public void delete_with_request_stays_valid_and_removing_one_body_keeps_the_sibling() {
         Fixture fixture = newDocumentWithBie();
 
-        // #1610: a DELETE may carry a Request body. In OpenAPI 3.1.1 it is honored (requestBody emitted),
+        // #1610: a DELETE may carry a Request body. In OpenAPI 3.1 it is honored (requestBody emitted),
         // paired with a status-only 202 success. Add both a Request and a Response on the same DELETE
         // endpoint (one operation, two bodies).
-        fixture.editPage.setOpenAPIVersion("3.1.1");
+        fixture.editPage.setOpenAPIVersion("3.1");
         fixture.editPage.hitUpdateButton();
         assignBie(fixture.editPage, fixture.bie, "DELETE", "Request");
         assignBie(fixture.editPage, fixture.bie, "DELETE", "Response");
@@ -226,28 +226,28 @@ public class TC_43_12_RequestAndResponseOnOneOperation extends BaseTest {
         assertEquals(1, countPathsWithVerb(export311, "delete"),
                 "The DELETE Request + Response pair must collapse into exactly one DELETE path-item");
         assertTrue(export311.operationHasRequestBody(deletePath, "delete"),
-                "OpenAPI 3.1.1 emits a requestBody for a DELETE + Request operation");
+                "OpenAPI 3.1 emits a requestBody for a DELETE + Request operation");
         assertTrue(export311.operationResponseCodes(deletePath, "delete").contains("200"),
                 "The DELETE + Response body should be carried in a 200 response");
 
-        // #1610 in 3.0.3: the DELETE request body is dropped (the amber banner appears), while the Response
+        // #1610 in 3.0: the DELETE request body is dropped (the amber banner appears), while the Response
         // body's 200 survives. Switch versions, save, and verify the banner + generated shape.
-        fixture.editPage.setOpenAPIVersion("3.0.3");
+        fixture.editPage.setOpenAPIVersion("3.0");
         fixture.editPage.hitUpdateButton();
         assertTrue(fixture.editPage.isDeleteRequestBodyIgnoredWarningDisplayed(),
-                "An OpenAPI 3.0.3 document drops a DELETE request body, so the amber banner is shown");
+                "An OpenAPI 3.0 document drops a DELETE request body, so the amber banner is shown");
         OpenAPIDocumentExport export303 =
                 OpenAPIDocumentExport.from(fixture.editPage.clickGenerateAndDownload());
         String deletePath303 = findPathForVerb(export303, "delete");
-        assertNotNull(deletePath303, "A DELETE operation should still be emitted in 3.0.3");
+        assertNotNull(deletePath303, "A DELETE operation should still be emitted in 3.0");
         assertFalse(export303.operationHasRequestBody(deletePath303, "delete"),
-                "OpenAPI 3.0.3 drops the request body of a DELETE + Request operation");
+                "OpenAPI 3.0 drops the request body of a DELETE + Request operation");
         assertTrue(export303.operationResponseCodes(deletePath303, "delete").contains("200"),
-                "The DELETE + Response body's 200 response survives in 3.0.3");
+                "The DELETE + Response body's 200 response survives in 3.0");
 
         // H1 regression: remove ONE body (the Request row) of the two-body operation. The sibling Response
         // body must remain intact (the old delete path orphaned/FK-violated the survivor).
-        fixture.editPage.setOpenAPIVersion("3.1.1");
+        fixture.editPage.setOpenAPIVersion("3.1");
         fixture.editPage.hitUpdateButton();
         WebElement requestRow = rowByDenAndMessageBody(fixture.editPage, fixture.bie.getDen(), "Request");
         fixture.editPage.toggleSelect(requestRow);

@@ -163,7 +163,7 @@
               <td mat-cell *matCellDef="let element">
                 <a target="_blank" rel="noopener noreferrer"
                   href="{{ element.openAPIVersion }}">
-                  <span class="score-line-clamp-2 score-break-word">{{ element.openAPIVersion }}</span>
+                  <span class="score-line-clamp-2 score-break-word">{{ displayOpenApiVersion(element.openAPIVersion) }}</span>
                 </a>
               </ng-container>
 

@@ -211,7 +211,7 @@
 	- [Test Case 43.6 - Operation Identifier Naming](/docs/test_cases/TestSuite43.md#test-case-436)
 	- [Test Case 43.7 - Avoid Duplicate BIE Schema in the Generated OpenAPI Document](/docs/test_cases/TestSuite43.md#test-case-437)
 	- [Test Case 43.8 - Configure OpenAPI Security Schemes](/docs/test_cases/TestSuite43.md#test-case-438)
-	- [Test Case 43.9 - Generate an OpenAPI 3.1.1 Document](/docs/test_cases/TestSuite43.md#test-case-439)
+	- [Test Case 43.9 - Generate an OpenAPI 3.1 Document](/docs/test_cases/TestSuite43.md#test-case-439)
 	- [Test Case 43.10 - DELETE Operation Request Body Across OpenAPI Versions](/docs/test_cases/TestSuite43.md#test-case-4310)
 	- [Test Case 43.11 - Configure the Error Response Body Type](/docs/test_cases/TestSuite43.md#test-case-4311)
 	- [Test Case 43.12 - Request and Response on a Single Operation](/docs/test_cases/TestSuite43.md#test-case-4312)

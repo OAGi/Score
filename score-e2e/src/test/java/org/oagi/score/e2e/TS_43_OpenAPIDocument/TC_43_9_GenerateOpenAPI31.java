@@ -49,14 +49,15 @@ import static org.oagi.score.e2e.impl.PageHelper.getSnackBarMessage;
 import static org.oagi.score.e2e.impl.PageHelper.sendKeys;
 
 /**
- * Test Case 43.9 - Generate an OpenAPI 3.1.1 Document (Issue #1610).
+ * Test Case 43.9 - Generate an OpenAPI 3.1 Document (Issue #1610).
  * <p>
- * Verifies that an OpenAPI Document whose OpenAPI Version is set to 3.1.1 generates a document that
- * is shaped for OpenAPI 3.1 / JSON Schema 2020-12: the root {@code openapi} field reflects the
- * configured version, the 3.0-only {@code nullable: true} construct is NOT used, and BIE-backed
- * operations still contribute component schemas referenced via {@code $ref}. The companion case
- * confirms a 3.0.3 document round-trips its version into the generated output (the generator branches
- * on the stored OpenAPI Version), and DELETE request-body handling is covered by Test Case 43.10.
+ * Verifies that an OpenAPI Document whose OpenAPI Version is set to the 3.1 family generates a document
+ * that is shaped for OpenAPI 3.1 / JSON Schema 2020-12: the root {@code openapi} field is the canonical
+ * 3.1.2 patch (Issue #1760 — the UI stores only the 3.1 family; the backend pins the patch), the 3.0-only
+ * {@code nullable: true} construct is NOT used, and BIE-backed operations still contribute component
+ * schemas referenced via {@code $ref}. The companion case confirms a 3.0 document emits the canonical
+ * 3.0.4 patch (the generator branches on the 3.0/3.1 family), and DELETE request-body handling is covered
+ * by Test Case 43.10.
  */
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_43_9_GenerateOpenAPI31 extends BaseTest {
@@ -76,10 +77,10 @@ public class TC_43_9_GenerateOpenAPI31 extends BaseTest {
 
     @Test
     @DisplayName("TC_43_9_1")
-    public void document_set_to_3_1_1_generates_a_3_1_1_shaped_document() throws IOException {
+    public void document_set_to_3_1_generates_a_3_1_shaped_document() throws IOException {
         Fixture fixture = newDocumentWithBie();
-        // Switch the document to OpenAPI 3.1.1 and persist (generation runs against the saved document).
-        fixture.editPage.setOpenAPIVersion("3.1.1");
+        // Switch the document to OpenAPI 3.1 and persist (generation runs against the saved document).
+        fixture.editPage.setOpenAPIVersion("3.1");
         fixture.editPage.hitUpdateButton();
         // A BIE-backed operation contributes a component schema (and a request body) to inspect.
         assignBie(fixture.editPage, fixture.bie, "POST", "Request");
@@ -88,8 +89,8 @@ public class TC_43_9_GenerateOpenAPI31 extends BaseTest {
         String yaml = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
         OpenAPIDocumentExport export = OpenAPIDocumentExport.from(file);
 
-        assertEquals("3.1.1", String.valueOf(export.raw().get("openapi")),
-                "The generated document's openapi field should be the configured 3.1.1");
+        assertEquals("3.1.2", String.valueOf(export.raw().get("openapi")),
+                "The generated document's openapi field should be the canonical 3.1.2 patch for the configured 3.1 family");
         assertFalse(yaml.contains("nullable: true"),
                 "An OpenAPI 3.1 document must not use the 3.0-only 'nullable: true' keyword "
                         + "(3.1 expresses nullability with a JSON Schema 2020-12 type union or anyOf null)");
@@ -101,18 +102,19 @@ public class TC_43_9_GenerateOpenAPI31 extends BaseTest {
 
     @Test
     @DisplayName("TC_43_9_2")
-    public void document_left_at_3_0_3_round_trips_its_version_into_the_generated_output() throws IOException {
-        // A document created through the API defaults to OpenAPI Version 3.0.3, so this exercises the
-        // 3.0.3 generator branch. The openapi field equalling 3.0.3 also asserts the default is honored.
+    public void document_left_at_3_0_pins_the_canonical_patch_in_the_generated_output() throws IOException {
+        // A document created through the API defaults to the OpenAPI 3.0 family, so this exercises the
+        // 3.0 generator branch. The openapi field equalling the canonical 3.0.4 patch also asserts the
+        // default is honored.
         Fixture fixture = newDocumentWithBie();
         assignBie(fixture.editPage, fixture.bie, "POST", "Request");
 
         OpenAPIDocumentExport export =
                 OpenAPIDocumentExport.from(fixture.editPage.clickGenerateAndDownload());
 
-        assertEquals("3.0.3", String.valueOf(export.raw().get("openapi")),
-                "The generated document's openapi field should reflect the document's OpenAPI Version (3.0.3), "
-                        + "confirming the generator branches on the configured version");
+        assertEquals("3.0.4", String.valueOf(export.raw().get("openapi")),
+                "The generated document's openapi field should be the canonical 3.0.4 patch for the document's 3.0 family, "
+                        + "confirming the generator pins the patch per family");
     }
 
     @Test
@@ -125,17 +127,17 @@ public class TC_43_9_GenerateOpenAPI31 extends BaseTest {
         // Change the OpenAPI Version but do NOT click Update: the document now has unsaved changes.
         // The document is generated from its persisted record, so generation must be blocked until the
         // edit is saved (Issue #1610).
-        fixture.editPage.setOpenAPIVersion("3.1.1");
+        fixture.editPage.setOpenAPIVersion("3.1");
         fixture.editPage.clickGenerateButton();
         assertEquals("There are unsaved changes. Please click Update before generating the document.",
                 getSnackBarMessage(getDriver()),
                 "Generate must be blocked while an unsaved OpenAPI Version change is pending");
 
-        // After Update, Generate succeeds and reflects the newly saved version (3.1.1).
+        // After Update, Generate succeeds and reflects the newly saved version (3.1).
         fixture.editPage.hitUpdateButton();
         OpenAPIDocumentExport export =
                 OpenAPIDocumentExport.from(fixture.editPage.clickGenerateAndDownload());
-        assertEquals("3.1.1", String.valueOf(export.raw().get("openapi")),
+        assertEquals("3.1.2", String.valueOf(export.raw().get("openapi")),
                 "After Update, the generated document reflects the saved OpenAPI Version");
     }
 
@@ -147,17 +149,17 @@ public class TC_43_9_GenerateOpenAPI31 extends BaseTest {
             + "API seed for BBIE.FIXED_VALUE (e.g. BusinessInformationEntityAPI.seedAllBbieFixedValue).")
     public void bbie_fixed_value_emits_const_in_3_1_1_and_single_element_enum_in_3_0_3() throws IOException {
         // Issue #1610 B7: a fixed-value BBIE is expressed with JSON Schema 2020-12 'const' in an
-        // OpenAPI 3.1.1 document and with a single-element 'enum' in an OpenAPI 3.0.3 document.
+        // OpenAPI 3.1 document and with a single-element 'enum' in an OpenAPI 3.0 document.
         // The fixed value is set through the BIE editor (the supported product path; there is no
         // API seed for BBIE.FIXED_VALUE), then the same BIE is generated under both versions.
         String fixedValue = "test value";
         FixedValueBie fixedValueBie = newFixedValueBie(fixedValue);
 
-        // --- OpenAPI 3.1.1: the fixed value must surface as `const` (and never as `enum`). ---
+        // --- OpenAPI 3.1: the fixed value must surface as `const` (and never as `enum`). ---
         OpenAPIDocumentObject document31 =
                 getAPIFactory().getOpenAPIDocumentAPI().createRandomOpenAPIDocument(fixedValueBie.owner);
         EditOpenAPIDocumentPage editPage31 = openEditOpenAPIDocumentPage(fixedValueBie.owner, document31);
-        editPage31.setOpenAPIVersion("3.1.1");
+        editPage31.setOpenAPIVersion("3.1");
         editPage31.hitUpdateButton();
         assignBie(editPage31, fixedValueBie.bie, "POST", "Request");
 
@@ -165,28 +167,28 @@ public class TC_43_9_GenerateOpenAPI31 extends BaseTest {
                 OpenAPIDocumentExport.from(editPage31.clickGenerateAndDownload());
         SchemaProperty const31 = findPropertyWithConst(export31, fixedValue);
         assertNotNull(const31,
-                "An OpenAPI 3.1.1 document must express a fixed-value BBIE with `const: " + fixedValue + "`");
+                "An OpenAPI 3.1 document must express a fixed-value BBIE with `const: " + fixedValue + "`");
         assertEquals(fixedValue, export31.schemaConst(const31.schemaName, const31.propertyName),
-                "The 3.1.1 fixed-value property's `const` must equal the configured fixed value");
+                "The 3.1 fixed-value property's `const` must equal the configured fixed value");
         assertNull(export31.schemaProperty(const31.schemaName, const31.propertyName).get("enum"),
-                "An OpenAPI 3.1.1 document must not also emit the 3.0-only single-value `enum`");
+                "An OpenAPI 3.1 document must not also emit the 3.0-only single-value `enum`");
 
-        // --- OpenAPI 3.0.3: the same fixed value must surface as a single-element `enum`. ---
+        // --- OpenAPI 3.0: the same fixed value must surface as a single-element `enum`. ---
         OpenAPIDocumentObject document30 =
                 getAPIFactory().getOpenAPIDocumentAPI().createRandomOpenAPIDocument(fixedValueBie.owner);
         EditOpenAPIDocumentPage editPage30 = openEditOpenAPIDocumentPage(fixedValueBie.owner, document30);
-        // A document created through the API defaults to OpenAPI Version 3.0.3 (the 3.0 generator branch).
+        // A document created through the API defaults to OpenAPI Version 3.0 (the 3.0 generator branch).
         assignBie(editPage30, fixedValueBie.bie, "POST", "Request");
 
         OpenAPIDocumentExport export30 =
                 OpenAPIDocumentExport.from(editPage30.clickGenerateAndDownload());
         SchemaProperty enum30 = findPropertyWithEnum(export30, fixedValue);
         assertNotNull(enum30,
-                "An OpenAPI 3.0.3 document must express a fixed-value BBIE with a single-element `enum`");
+                "An OpenAPI 3.0 document must express a fixed-value BBIE with a single-element `enum`");
         assertEquals(Arrays.asList(fixedValue), export30.schemaProperty(enum30.schemaName, enum30.propertyName).get("enum"),
-                "The 3.0.3 fixed-value property's `enum` must be exactly [" + fixedValue + "]");
+                "The 3.0 fixed-value property's `enum` must be exactly [" + fixedValue + "]");
         assertNull(export30.schemaConst(enum30.schemaName, enum30.propertyName),
-                "An OpenAPI 3.0.3 document must not emit the 3.1-only `const`");
+                "An OpenAPI 3.0 document must not emit the 3.1-only `const`");
     }
 
     /**

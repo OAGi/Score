@@ -53,9 +53,9 @@ CREATE TABLE `bie_view_order`
   COLLATE = utf8mb4_general_ci
   ROW_FORMAT = DYNAMIC COMMENT ='Instance-level, release-decoupled sibling sort weights for model browsing and BIE editing (Issue #1638). NOT used for generated output.';
 
--- ------------------------------------------------------------------
+-- -------------------------------------------------------------------------
 -- Issue #1347 - OAS Doc default error responses + Error Response Body Type
--- ------------------------------------------------------------------
+-- -------------------------------------------------------------------------
 --
 -- Per-operation selection of the body carried by the defaulted 4xx/5xx error
 -- responses emitted into every generated operation. Stored on oas_operation (the
@@ -78,9 +78,9 @@ ALTER TABLE `oas_operation`
     ADD CONSTRAINT `oas_operation_error_confirm_tla_fk`
           FOREIGN KEY (`error_confirm_top_level_asbiep_id`) REFERENCES `top_level_asbiep` (`top_level_asbiep_id`);
 
--- ------------------------------------------------------------------
--- Column comment corrections & fill-ins (schema re-sync)
--- ------------------------------------------------------------------
+-- ---------------------------------------------------------------------
+-- Issue #1759 - Column comment corrections & fill-ins (schema re-sync)
+-- ---------------------------------------------------------------------
 --
 -- Comment-only synchronization surfaced while re-syncing resources/schemas/*.ddl
 -- to the database. Grouped by kind of change; within each group statements are
@@ -459,5 +459,18 @@ ALTER TABLE `seq_key` COMMENT = 'This table stores the ordering of the associati
 ALTER TABLE `tag` COMMENT = 'The TAG table stores the tags (each with a name, description, and text and background color) that can be attached to core component and data type manifests through the intersection tables ACC_MANIFEST_TAG, ASCCP_MANIFEST_TAG, BCCP_MANIFEST_TAG, and DT_MANIFEST_TAG.';
 ALTER TABLE `text_template` COMMENT = 'This table stores named text templates, each with a subject, content type, and body containing placeholders that are substituted at rendering time. Templates are looked up by name to compose output such as email messages.';
 ALTER TABLE `xbt_manifest` COMMENT = 'A release-specific handle to an XBT record, pinning an XML schema built-in type or OAGIS built-in type to a RELEASE and carrying the revision chain (PREV_XBT_MANIFEST_ID and NEXT_XBT_MANIFEST_ID) across releases. It also records how the built-in type maps to an allowed CDT primitive via CDT_PRI.';
+
+-- ----------------------------------------------------------------------------
+-- Issue #1760 - Normalize stored OpenAPI Document version to the minor family
+-- ----------------------------------------------------------------------------
+--
+-- The OpenAPI Document UI now offers and stores only the minor family (3.0 / 3.1); the
+-- generated document pins the canonical patch release for that family (3.0.4 / 3.1.2, both
+-- errata-only) at generation time. Fold existing rows created under the old UI (which stored
+-- the full patch 3.0.3 / 3.1.1) down to their minor family so every row uses the same
+-- representation the current UI writes. The LIKE '3.0.%' / '3.1.%' predicates match the old
+-- patch values but NOT an already-minor bare '3.0' / '3.1'.
+UPDATE `oas_doc` SET `open_api_version` = '3.0' WHERE `open_api_version` LIKE '3.0.%';
+UPDATE `oas_doc` SET `open_api_version` = '3.1' WHERE `open_api_version` LIKE '3.1.%';
 
 SET FOREIGN_KEY_CHECKS = @OLD_FOREIGN_KEY_CHECKS;

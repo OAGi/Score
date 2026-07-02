@@ -138,6 +138,18 @@ export class OasSecurityRequirement {
   schemes?: OasSecurityRequirementScheme[];
 }
 
+// Issue #1760: the OpenAPI Document exposes and stores only the minor family (3.0 / 3.1); the backend
+// pins the canonical patch (3.0.4 / 3.1.2) when generating. Fold any stored value — including legacy
+// patch values such as 3.0.3 / 3.1.1 — to its minor family, for display and for matching the version
+// selector's options. Values that are already minor (or empty/blank) pass through unchanged.
+export function toMinorOpenApiVersion(version: string): string {
+  if (!version) {
+    return version;
+  }
+  const parts = version.trim().split('.');
+  return (parts.length >= 2) ? parts[0] + '.' + parts[1] : version.trim();
+}
+
 export class OasDoc {
   oasDocId: number;
   guid: string;

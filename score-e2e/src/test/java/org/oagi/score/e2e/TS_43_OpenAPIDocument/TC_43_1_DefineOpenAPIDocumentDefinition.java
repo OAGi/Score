@@ -69,7 +69,7 @@ public class TC_43_1_DefineOpenAPIDocumentDefinition extends BaseTest {
         OpenAPIDocumentPage openAPIDocumentPage = bieMenu.openOpenAPIDocumentSubMenu();
         CreateOpenAPIDocumentPage createOpenAPIDocumentPage = openAPIDocumentPage.openCreateOpenAPIDocumentPage();
 
-        String openApiVersion = "3.0.3";
+        String openApiVersion = "3.0";
         String randomTitle = "oas_doc_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         String randomDocumentVersion = "oas_doc_ver_" + RandomUtils.secure().randomInt(3, 7);
 
@@ -303,7 +303,7 @@ public class TC_43_1_DefineOpenAPIDocumentDefinition extends BaseTest {
 
     @Test
     @DisplayName("TC_43_1_11")
-    public void create_dialog_defaults_openapi_version_to_3_1_1() {
+    public void create_dialog_defaults_openapi_version_to_3_1() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -312,8 +312,8 @@ public class TC_43_1_DefineOpenAPIDocumentDefinition extends BaseTest {
         OpenAPIDocumentPage openAPIDocumentPage = bieMenu.openOpenAPIDocumentSubMenu();
         CreateOpenAPIDocumentPage createOpenAPIDocumentPage = openAPIDocumentPage.openCreateOpenAPIDocumentPage();
 
-        // Issue #1610: the Create dialog must default the OpenAPI Version to "3.1.1".
-        assertEquals("3.1.1", getText(createOpenAPIDocumentPage.getOpenAPIVersionSelectField()));
+        // Issue #1610 / #1760: the Create dialog must default the OpenAPI Version to the "3.1" family.
+        assertEquals("3.1", getText(createOpenAPIDocumentPage.getOpenAPIVersionSelectField()));
     }
 
     @AfterEach

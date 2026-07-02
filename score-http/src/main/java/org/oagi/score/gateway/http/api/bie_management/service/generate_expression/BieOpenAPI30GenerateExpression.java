@@ -66,7 +66,8 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 @Scope(SCOPE_PROTOTYPE)
 public class BieOpenAPI30GenerateExpression implements BieGenerateExpression, InitializingBean {
 
-    private static final String OPEN_API_VERSION = "3.0.3";
+    // Issue #1760: pin the canonical 3.0 patch release (errata-only); the OpenAPI 3.1 sibling emits 3.1.2.
+    private static final String OPEN_API_VERSION = "3.0.4";
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private ObjectMapper mapper;

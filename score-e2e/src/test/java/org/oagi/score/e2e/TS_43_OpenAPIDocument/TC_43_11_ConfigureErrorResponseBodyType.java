@@ -309,17 +309,17 @@ public class TC_43_11_ConfigureErrorResponseBodyType extends BaseTest {
         editPage.setRowErrorResponseBodyType(editPage.getTableRecordAtIndex(2), "IETF Problem Details");
         pickConfirmMessageViaSelector(editPage, editPage.getTableRecordAtIndex(3), fixture.businessContext);
 
-        // Target OpenAPI 3.0.3 (the document defaults to 3.1.1) and persist version + operations + body
+        // Target OpenAPI 3.0 (the document defaults to 3.1) and persist version + operations + body
         // types together in one save. (Setting the version and updating on a freshly-loaded empty document,
         // before any operation exists, is timing-fragile; the passing cases change the version on a warmed
         // page that already has content.)
-        editPage.setOpenAPIVersion("3.0.3");
+        editPage.setOpenAPIVersion("3.0");
         editPage.hitUpdateButton();
         OpenAPIDocumentExport export = OpenAPIDocumentExport.from(editPage.clickGenerateAndDownload());
 
-        // The generated document targets OpenAPI 3.0.3.
-        assertEquals("3.0.3", export.raw().get("openapi"),
-                "The generated document should target OpenAPI 3.0.3");
+        // The generated document targets OpenAPI 3.0.
+        assertEquals("3.0.4", export.raw().get("openapi"),
+                "The generated document should target OpenAPI 3.0");
 
         // 500 (Internal Server Error) is in the matrix for every verb and is array-independent, so it is
         // the version-independent anchor for each body type.
@@ -334,7 +334,7 @@ public class TC_43_11_ConfigureErrorResponseBodyType extends BaseTest {
         assertEquals("Internal Server Error", export.responseDescription(pathNone, "delete", "500"));
 
         // PROBLEM_DETAILS: $ref to a reusable components.responses entry + ProblemDetails schema (the
-        // ProblemDetails body type renders identically in 3.0.3 and 3.1.1).
+        // ProblemDetails body type renders identically in 3.0 and 3.1).
         assertEquals("#/components/responses/500_InternalServerError",
                 export.responseRef(pathPd, "delete", "500"),
                 "A PROBLEM_DETAILS error response should $ref the reusable response component");

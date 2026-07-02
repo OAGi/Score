@@ -1,4 +1,4 @@
-import {BieForOasDoc} from './openapi-doc';
+import {BieForOasDoc, toMinorOpenApiVersion} from './openapi-doc';
 
 /**
  * Issue #1610 domain-level coverage of DELETE operation handling.
@@ -43,6 +43,29 @@ describe('BieForOasDoc change detection for DELETE edits (#1610)', () => {
     bie.messageBody = 'Request';
     bie.reset();
     expect(bie.isChanged).toBe(false);
+  });
+});
+
+describe('toMinorOpenApiVersion (#1760)', () => {
+  it('folds a legacy patch version to its minor family', () => {
+    expect(toMinorOpenApiVersion('3.0.3')).toBe('3.0');
+    expect(toMinorOpenApiVersion('3.1.1')).toBe('3.1');
+    expect(toMinorOpenApiVersion('3.1.2')).toBe('3.1');
+  });
+
+  it('passes an already-minor version through unchanged', () => {
+    expect(toMinorOpenApiVersion('3.0')).toBe('3.0');
+    expect(toMinorOpenApiVersion('3.1')).toBe('3.1');
+  });
+
+  it('trims surrounding whitespace', () => {
+    expect(toMinorOpenApiVersion('  3.1.1 ')).toBe('3.1');
+  });
+
+  it('leaves empty / undefined values untouched', () => {
+    expect(toMinorOpenApiVersion('')).toBe('');
+    expect(toMinorOpenApiVersion(undefined as any)).toBeUndefined();
+    expect(toMinorOpenApiVersion(null as any)).toBeNull();
   });
 });
 

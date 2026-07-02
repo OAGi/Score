@@ -700,7 +700,7 @@
                                           }
                                         </div>
                                         <div class="oas-binding-card-body">
-                                          <!-- Issue #1610: a DELETE Request body is honored only from OpenAPI 3.1.1. When THIS
+                                          <!-- Issue #1610: a DELETE Request body is honored only from OpenAPI 3.1. When THIS
                                                binding's document targets 3.0.x the body is dropped on generation, so warn per card
                                                (the panel spans documents) — shown right under the document title, above Verb /
                                                Message Body. Read-only here — the OpenAPI Version is changed on the OpenAPI
@@ -708,7 +708,7 @@
                                           @if (isOasBindingDeleteBodyIgnored(binding)) {
                                             <div class="oas-delete-body-warning d-flex align-items-center">
                                               <mat-icon class="oas-delete-body-warning-icon">warning</mat-icon>
-                                              <span>A Request Body on a DELETE operation is ignored in OpenAPI 3.0.3. Set this OpenAPI Document's Version to 3.1.1 on the OpenAPI Document screen to include it in the generated document.</span>
+                                              <span>A Request Body on a DELETE operation is ignored in OpenAPI 3.0. Set this OpenAPI Document's Version to 3.1 on the OpenAPI Document screen to include it in the generated document.</span>
                                             </div>
                                           }
                                           <!-- Rows 1 & 2 share one 4-column grid (1fr 1fr 2fr 2fr) so the second row

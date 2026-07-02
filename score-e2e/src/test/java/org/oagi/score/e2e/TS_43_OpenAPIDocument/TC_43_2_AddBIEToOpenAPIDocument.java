@@ -161,7 +161,7 @@ public class TC_43_2_AddBIEToOpenAPIDocument extends BaseTest {
         assertTrue(dialog.isMessageBodyOptionDisabled(row, "Request"),
                 "Request must not be selectable for a GET (a GET never carries a request body)");
 
-        // Issue #1610: a DELETE may carry a Request body (honored in OpenAPI 3.1.1, dropped in 3.0.3),
+        // Issue #1610: a DELETE may carry a Request body (honored in OpenAPI 3.1, dropped in 3.0),
         // so unlike GET the Request option must remain selectable when the Verb is DELETE.
         dialog.setVerb(row, "DELETE");
         assertFalse(dialog.isMessageBodyOptionDisabled(row, "Request"),

@@ -49,7 +49,7 @@ public class OpenAPIDocumentObject {
     public static OpenAPIDocumentObject createRandomOpenAPIDocument(AppUserObject creator) {
         OpenAPIDocumentObject openAPIDocument = new OpenAPIDocumentObject();
         openAPIDocument.setGuid(UUID.randomUUID().toString().replaceAll("-", ""));
-        openAPIDocument.setOpenApiVersion("3.0.3");
+        openAPIDocument.setOpenApiVersion("3.0");
         openAPIDocument.setTitle(randomAlphanumeric(5, 10));
         openAPIDocument.setDescription(randomPrint(50, 100).trim());
         String contactDomain = randomAlphanumeric(5, 10);

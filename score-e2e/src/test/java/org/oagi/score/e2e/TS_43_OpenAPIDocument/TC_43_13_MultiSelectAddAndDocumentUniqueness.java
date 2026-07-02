@@ -141,7 +141,7 @@ public class TC_43_13_MultiSelectAddAndDocumentUniqueness extends BaseTest {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
-        // Two distinct documents; both default to OpenAPI Version 3.0.3.
+        // Two distinct documents; both default to OpenAPI Version 3.0.
         OpenAPIDocumentObject existing =
                 getAPIFactory().getOpenAPIDocumentAPI().createRandomOpenAPIDocument(endUser);
         OpenAPIDocumentObject target =

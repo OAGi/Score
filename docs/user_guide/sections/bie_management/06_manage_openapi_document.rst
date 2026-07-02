@@ -21,7 +21,9 @@ To create an OpenAPI document:
 
 4. On the returned "Create OpenAPI Document" page, fill out the following fields:
 
-   1. OpenAPI Version (Mandatory) Note, "3.1.1" is selected as default.
+   1. OpenAPI Version (Mandatory) Note, "3.1" is selected as default. You select the minor version
+      ("3.0" or "3.1"); the generated document declares the corresponding canonical patch release
+      ("3.0.4" for "3.0" and "3.1.2" for "3.1").
    2. Title (Mandatory)
    3. Document Version (Mandatory)
    4. Terms of Service A URI to the terms of service for the API
@@ -249,19 +251,19 @@ A ``DELETE`` operation backed by a BIE can carry a *Message Body*:
 - ``Request`` — the generated ``DELETE`` operation carries the BIE as a request body. Whether the
   request body is kept depends on the document's *OpenAPI Version*:
 
-  - In **OpenAPI 3.1.1**, a request body on ``DELETE`` is honored: the generated operation includes a
+  - In **OpenAPI 3.1**, a request body on ``DELETE`` is honored: the generated operation includes a
     ``requestBody`` paired with a status-only ``202`` (Accepted) success response.
-  - In **OpenAPI 3.0.3**, the specification does not permit a request body on ``DELETE``, so it is
+  - In **OpenAPI 3.0**, the specification does not permit a request body on ``DELETE``, so it is
     dropped during generation: the generated operation has no ``requestBody`` (and leaves no orphan
     request schema behind), keeping only the status-only ``202`` (Accepted) success response.
 
-When a ``3.0.3`` document contains a ``DELETE`` operation with a ``Request`` message body, an amber
+When a ``3.0`` document contains a ``DELETE`` operation with a ``Request`` message body, an amber
 warning banner appears above the *Endpoint Details* table:
 
-   *A Request Body on a DELETE operation is ignored in OpenAPI 3.0.3. Change the OpenAPI Version to
-   3.1.1 to include it in the generated document.*
+   *A Request Body on a DELETE operation is ignored in OpenAPI 3.0. Change the OpenAPI Version to
+   3.1 to include it in the generated document.*
 
-To keep the request body, change the document's *OpenAPI Version* to ``3.1.1`` and click the "Update"
+To keep the request body, change the document's *OpenAPI Version* to ``3.1`` and click the "Update"
 button. (You can change the *OpenAPI Version* at the top of the "Edit OpenAPI Document" page.)
 
 
@@ -336,14 +338,18 @@ To remove BIEs from an OpenAPI Document:
 OpenAPI YML Expression generation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The end user uses OpenAPI document to represent the selected BIEs into OpenAPI 3.0.3 or 3.1.1 syntax.
+The end user uses OpenAPI document to represent the selected BIEs into OpenAPI 3.0 or 3.1 syntax.
 The *OpenAPI Version* chosen on the document determines the syntax of the generated file:
 
-- **3.1.1** (the default) generates JSON Schema 2020-12 shapes — for example, nullability is expressed
+- **3.1** (the default) generates JSON Schema 2020-12 shapes — for example, nullability is expressed
   with a type union or an ``anyOf`` null branch rather than the OpenAPI 3.0-only ``nullable: true``
   keyword — and honors a request body on a ``DELETE`` operation.
-- **3.0.3** generates OpenAPI 3.0 shapes and drops any request body on a ``DELETE`` operation (see
+- **3.0** generates OpenAPI 3.0 shapes and drops any request body on a ``DELETE`` operation (see
   `DELETE operations with a request body <#delete-operations-with-a-request-body>`__).
+
+You choose the minor version; the generated file's root ``openapi`` field declares the corresponding
+canonical patch release — ``3.1.2`` for **3.1** and ``3.0.4`` for **3.0** (these are errata-only patch
+releases of the OpenAPI Specification).
 
 To generate an OpenAPI YML file:
 
