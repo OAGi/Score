@@ -13,7 +13,7 @@
              score-e2e has no VERSION file of its own; keep this in sync with the
              score-http VERSION file (single source of truth). score-http/docker/build.sh
              verifies this matches before building. -->
-        <revision>3.5.2-rc1</revision>
+        <revision>3.5.2-rc2</revision>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
