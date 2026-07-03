@@ -226,7 +226,11 @@ public final class ErrorResponseSchemas {
     public static Map<String, Object> problemDetailsSchema(boolean is31) {
         Map<String, Object> schema = new LinkedHashMap<>();
         schema.put("type", "object");
-        schema.put("required", List.of("status", "title"));
+        // Issue #1347 (dubnemo, 2026-07-02): a stricter OAGi profile of RFC 9457 — only `type` and
+        // `instance` are optional; `status`, `title`, and `detail` are required. (RFC 9457 §3.1 itself
+        // makes all members optional; this profile is deliberately tighter. The illustrative example
+        // populates all three required members, so it remains valid against this schema.)
+        schema.put("required", List.of("status", "title", "detail"));
         Map<String, Object> properties = new LinkedHashMap<>();
         properties.put("type", orderedMap("type", "string", "format", "uri-reference", "default", "about:blank"));
         properties.put("title", orderedMap("type", "string"));

@@ -218,6 +218,7 @@
 	- [Test Case 43.13 - Multi-select Add and OpenAPI Document Uniqueness](/docs/test_cases/TestSuite43.md#test-case-4313)
 	- [Test Case 43.14 - Manage a BIE's OpenAPI Document Bindings from the BIE Root](/docs/test_cases/TestSuite43.md#test-case-4314)
 	- [Test Case 43.15 - A Legacy Split Operation Does Not Trigger a False Operation ID Uniqueness Error](/docs/test_cases/TestSuite43.md#test-case-4315)
+	- [Test Case 43.16 - Apply the Error Response Body Type to All Operations and Inherit It on New Operations](/docs/test_cases/TestSuite43.md#test-case-4316)
 - [Test Suite 44 - BIE Inheritance](/docs/test_cases/TestSuite44.md)
 	- [Test Case 44.1 - Create Inherited BIE](/docs/test_cases/TestSuite44.md#test-case-441)
 	- [Test Case 44.2 - Use Base BIE](/docs/test_cases/TestSuite44.md#test-case-442)

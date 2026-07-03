@@ -3,7 +3,7 @@ package org.oagi.score.e2e.page.oas;
 import org.oagi.score.e2e.page.Dialog;
 
 /**
- * The 'Select ConfirmMessage BIE' dialog (Issue #1347). It opens from the Edit OpenAPI Document page
+ * The 'Select Confirm Message BIE' dialog (Issue #1347). It opens from the Edit OpenAPI Document page
  * when an operation's inline Error Response selector is set to {@code ConfirmMessage}. Modeled on the
  * 'Include Meta Header' / 'Pagination Response' BIE pickers, it is locked to a single well-known BIE:
  * the DEN filter is fixed to {@code 'Confirm Message. Confirm Message'} and the search box is disabled,
@@ -45,6 +45,23 @@ public interface OasDocConfirmMessageDialog extends Dialog {
      * @return {@code true} when enabled
      */
     boolean isSelectEnabled();
+
+    /**
+     * Return whether the Branch field is an ENABLED selector (document-level "apply to all", or a bodyless
+     * operation in a multi-release document — Issue #1347). In the per-operation single-release case the
+     * Branch is a locked, disabled input instead.
+     *
+     * @return {@code true} when the Branch is a selectable dropdown
+     */
+    boolean isBranchSelectorEnabled();
+
+    /**
+     * Switch the (enabled) Branch selector to the given release number and wait for the candidate list to
+     * reload for that release.
+     *
+     * @param releaseNum the release number to select
+     */
+    void selectBranch(String releaseNum);
 
     /**
      * Confirm the dialog by clicking 'Select' and wait for it to close.

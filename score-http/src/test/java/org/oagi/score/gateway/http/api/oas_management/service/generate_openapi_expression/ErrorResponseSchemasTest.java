@@ -93,7 +93,8 @@ class ErrorResponseSchemasTest {
     void problemDetailsSchema_isRfc9457Shape() {
         Map<String, Object> schema = ErrorResponseSchemas.problemDetailsSchema(false);
         assertEquals("object", schema.get("type"));
-        assertEquals(List.of("status", "title"), schema.get("required"));
+        // Issue #1347 (dubnemo, 2026-07-02): stricter OAGi profile — status, title, detail required.
+        assertEquals(List.of("status", "title", "detail"), schema.get("required"));
         Map<String, Object> props = (Map<String, Object>) schema.get("properties");
         assertEquals(List.of("type", "title", "status", "detail", "instance"),
                 List.copyOf(props.keySet()));
@@ -362,7 +363,12 @@ class ErrorResponseSchemasTest {
         Map<String, Object> props = (Map<String, Object>) schema.get("properties");
         Map<String, Object> statusProp = (Map<String, Object>) props.get("status");
         assertEquals("integer", statusProp.get("type"), "status is an integer per RFC 9457 §3.1.2");
-        assertFalse(((List<String>) schema.get("required")).contains("type"),
-                "'type' defaults to about:blank, so it is not required");
+        List<String> required = (List<String>) schema.get("required");
+        // Issue #1347 (dubnemo, 2026-07-02): only `type` and `instance` are optional.
+        assertFalse(required.contains("type"), "'type' defaults to about:blank, so it is not required");
+        assertFalse(required.contains("instance"), "'instance' is optional");
+        assertTrue(required.contains("status"));
+        assertTrue(required.contains("title"));
+        assertTrue(required.contains("detail"), "'detail' is required in the OAGi profile");
     }
 }

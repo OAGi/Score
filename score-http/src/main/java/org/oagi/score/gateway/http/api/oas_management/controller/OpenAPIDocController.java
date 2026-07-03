@@ -336,6 +336,18 @@ public class OpenAPIDocController {
 
     }
 
+    // The document's distinct BIE releases, computed by a single SELECT DISTINCT query. The Error Response
+    // "apply to all" ConfirmMessage Branch selector uses this instead of fetching the whole paginated BIE
+    // list to combine releases client-side. The literal path segment "releases" cannot collide with the
+    // sibling {topLevelAsbiepId:[\\d]+} route (constrained to digits).
+    @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list/releases", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<OasDocReleaseSummary> getReleasesForOasDoc(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("id") OasDocId oasDocId) {
+        return oasDocService.getDistinctReleasesForOasDoc(sessionService.asScoreUser(user), oasDocId);
+    }
+
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list/{topLevelAsbiepId:[\\d]+}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public BieForOasDoc getBieForOasDoc(
@@ -659,6 +671,32 @@ public class OpenAPIDocController {
         }
 
         UpdateBieForOasDocResponse response = oasDocService.updateDetails(requester, updateBieForOasDocRequest);
+
+        if (response.getOasDocId() != null) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    // Issue #1347: document-level "apply Error Response Body Type to all operations". Applies across ALL
+    // of the document's operations (the grid is server-paginated), so a client that only holds one page
+    // still updates every operation.
+    @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list/error_response", method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity applyBulkErrorResponse(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("id") OasDocId oasDocId,
+            @RequestBody BulkErrorResponseRequest request) {
+
+        ScoreUser requester = sessionService.asScoreUser(user);
+        BulkUpdateErrorResponseRequest bulkRequest = new BulkUpdateErrorResponseRequest(requester);
+        bulkRequest.setOasDocId(oasDocId);
+        bulkRequest.setErrorResponseBodyType(request.getErrorResponseBodyType());
+        bulkRequest.setConfirmTopLevelAsbiepId(request.getConfirmMessageTopLevelAsbiepId());
+        bulkRequest.setReleaseId(request.getReleaseId());
+
+        BulkUpdateErrorResponseResponse response = oasDocService.bulkUpdateErrorResponse(requester, bulkRequest);
 
         if (response.getOasDocId() != null) {
             return ResponseEntity.noContent().build();

@@ -22,6 +22,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.OasResourceTagRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.OasTagRecord;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -44,6 +45,90 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
                                            ScoreUser requester,
                                            RepositoryFactory repositoryFactory) {
         super(dslContext, requester, repositoryFactory);
+    }
+
+    // Issue #1347: lightweight per-body rows for a whole document — operation id, its body's release, and
+    // the operation's error-response body type + ConfirmMessage BIE — with NO per-row security /
+    // ConfirmMessage-DEN subqueries. Feeds the bulk-apply targeting and new-operation inheritance so those
+    // paths never trigger the heavyweight getBieForOasDoc listing (avoids an O(N) per-add scan).
+    @Override
+    public List<OperationErrorResponseSummary> getOperationErrorResponseSummaries(OasDocId oasDocId)
+            throws ScoreDataAccessException {
+        ULong docId = ULong.valueOf(oasDocId.value());
+        Result<Record4<ULong, ULong, String, ULong>> records = dslContext()
+                .select(OAS_OPERATION.OAS_OPERATION_ID, TOP_LEVEL_ASBIEP.RELEASE_ID,
+                        OAS_OPERATION.ERROR_RESPONSE_BODY_TYPE, OAS_OPERATION.ERROR_CONFIRM_TOP_LEVEL_ASBIEP_ID)
+                .from(OAS_REQUEST)
+                .join(OAS_OPERATION).on(OAS_REQUEST.OAS_OPERATION_ID.eq(OAS_OPERATION.OAS_OPERATION_ID))
+                .join(OAS_RESOURCE).on(OAS_OPERATION.OAS_RESOURCE_ID.eq(OAS_RESOURCE.OAS_RESOURCE_ID))
+                .join(OAS_MESSAGE_BODY).on(OAS_REQUEST.OAS_MESSAGE_BODY_ID.eq(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID))
+                .leftJoin(TOP_LEVEL_ASBIEP).on(OAS_MESSAGE_BODY.TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
+                .where(OAS_RESOURCE.OAS_DOC_ID.eq(docId))
+                .unionAll(dslContext()
+                        .select(OAS_OPERATION.OAS_OPERATION_ID, TOP_LEVEL_ASBIEP.RELEASE_ID,
+                                OAS_OPERATION.ERROR_RESPONSE_BODY_TYPE, OAS_OPERATION.ERROR_CONFIRM_TOP_LEVEL_ASBIEP_ID)
+                        .from(OAS_RESPONSE)
+                        .join(OAS_OPERATION).on(OAS_RESPONSE.OAS_OPERATION_ID.eq(OAS_OPERATION.OAS_OPERATION_ID))
+                        .join(OAS_RESOURCE).on(OAS_OPERATION.OAS_RESOURCE_ID.eq(OAS_RESOURCE.OAS_RESOURCE_ID))
+                        .join(OAS_MESSAGE_BODY).on(OAS_RESPONSE.OAS_MESSAGE_BODY_ID.eq(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID))
+                        .leftJoin(TOP_LEVEL_ASBIEP).on(OAS_MESSAGE_BODY.TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
+                        .where(OAS_RESOURCE.OAS_DOC_ID.eq(docId)))
+                .fetch();
+
+        List<OperationErrorResponseSummary> summaries = new ArrayList<>();
+        for (Record4<ULong, ULong, String, ULong> record : records) {
+            ULong opId = record.value1();
+            ULong releaseId = record.value2();
+            ULong confirmId = record.value4();
+            summaries.add(new OperationErrorResponseSummary(
+                    (opId != null) ? opId.toBigInteger() : null,
+                    (releaseId != null) ? releaseId.toBigInteger() : null,
+                    record.value3(),
+                    (confirmId != null) ? confirmId.toBigInteger() : null));
+        }
+        return summaries;
+    }
+
+    // Package-private (see selectForRequest): testable so a SQL-render test can assert the distinct/union
+    // shape. Both halves join oas_resource on its FK (oas_operation.oas_resource_id) — never PK=PK — and
+    // INNER-join TOP_LEVEL_ASBIEP + RELEASE so bodyless bodies (no BIE, no release) are excluded, matching
+    // the former client-side uniqueReleasesOf that dropped rows with no releaseId. UNION (not UNION ALL)
+    // deduplicates a release shared by Request and Response bodies.
+    Select<Record2<ULong, String>> selectDistinctReleases(ULong docId) {
+        return dslContext()
+                .select(TOP_LEVEL_ASBIEP.RELEASE_ID, RELEASE.RELEASE_NUM)
+                .from(OAS_REQUEST)
+                .join(OAS_OPERATION).on(OAS_REQUEST.OAS_OPERATION_ID.eq(OAS_OPERATION.OAS_OPERATION_ID))
+                .join(OAS_RESOURCE).on(OAS_OPERATION.OAS_RESOURCE_ID.eq(OAS_RESOURCE.OAS_RESOURCE_ID))
+                .join(OAS_MESSAGE_BODY).on(OAS_REQUEST.OAS_MESSAGE_BODY_ID.eq(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID))
+                .join(TOP_LEVEL_ASBIEP).on(OAS_MESSAGE_BODY.TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
+                .join(RELEASE).on(RELEASE.RELEASE_ID.eq(TOP_LEVEL_ASBIEP.RELEASE_ID))
+                .where(OAS_RESOURCE.OAS_DOC_ID.eq(docId))
+                .union(dslContext()
+                        .select(TOP_LEVEL_ASBIEP.RELEASE_ID, RELEASE.RELEASE_NUM)
+                        .from(OAS_RESPONSE)
+                        .join(OAS_OPERATION).on(OAS_RESPONSE.OAS_OPERATION_ID.eq(OAS_OPERATION.OAS_OPERATION_ID))
+                        .join(OAS_RESOURCE).on(OAS_OPERATION.OAS_RESOURCE_ID.eq(OAS_RESOURCE.OAS_RESOURCE_ID))
+                        .join(OAS_MESSAGE_BODY).on(OAS_RESPONSE.OAS_MESSAGE_BODY_ID.eq(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID))
+                        .join(TOP_LEVEL_ASBIEP).on(OAS_MESSAGE_BODY.TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
+                        .join(RELEASE).on(RELEASE.RELEASE_ID.eq(TOP_LEVEL_ASBIEP.RELEASE_ID))
+                        .where(OAS_RESOURCE.OAS_DOC_ID.eq(docId)))
+                // ORDER BY the union's output column (name, not table-qualified) so it stays UNION-legal.
+                .orderBy(field("release_num"));
+    }
+
+    @Override
+    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
+    public List<OasDocReleaseSummary> getDistinctReleases(OasDocId oasDocId) throws ScoreDataAccessException {
+        Result<Record2<ULong, String>> records = selectDistinctReleases(ULong.valueOf(oasDocId.value())).fetch();
+        List<OasDocReleaseSummary> releases = new ArrayList<>();
+        for (Record2<ULong, String> record : records) {
+            ULong releaseId = record.value1();
+            releases.add(new OasDocReleaseSummary(
+                    (releaseId != null) ? releaseId.toBigInteger() : null,
+                    record.value2()));
+        }
+        return releases;
     }
 
     // Package-private (not private) so a jOOQ MockDataProvider unit test can assert the emitted join SQL

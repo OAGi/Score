@@ -148,24 +148,48 @@
       </div>
     }
     <mat-card-header class="align-items-baseline">
-      <mat-toolbar class="bg-white p-0" style="box-shadow: none;">
+      <mat-toolbar class="bg-white p-0 oas-endpoint-toolbar" style="box-shadow: none;">
         <span class="title">Endpoint Details</span>
-        <div style="padding: 8px 12px 8px 24px;">
-          <button mat-raised-button class="me-2" (click)="openDialog($event)" color="primary">
+        <div class="oas-endpoint-actions">
+          <button mat-raised-button (click)="openDialog($event)" color="primary">
             <mat-icon>add</mat-icon>
             Add BIE
           </button>
-          <button mat-raised-button class="me-2" (click)="openAddOperationDialog($event)" color="primary">
+          <button mat-raised-button (click)="openAddOperationDialog($event)" color="primary">
             <mat-icon>add</mat-icon>
             Add Operation
           </button>
-          <button mat-raised-button class="me-2" (click)="removeBieForOasDoc()"
+          <button mat-raised-button (click)="removeBieForOasDoc()"
                   [hidden]="table.dataSource.data.length == 0"
                   [disabled]="isDisabled(oasDoc) || this.selection.selected.length == 0"
                   color="warn">
             <mat-icon>delete</mat-icon>
             Remove
           </button>
+          <!-- Issue #1347: document-level "apply Error Response to all operations". Sits next to Remove
+               as a compact label + selector + Apply group. NONE / IETF Problem Details apply
+               to every operation regardless of release; OAGi Confirm Message prompts for a release
+               (the whole document's releases) and a ConfirmMessage BIE, then applies to that release's
+               operations plus bodyless operations. The per-operation Error Response column still allows
+               individual overrides afterwards. -->
+          <div class="oas-error-response-bulk">
+            <div class="oas-error-response-bulk-controls">
+              <mat-form-field class="oas-error-response-bulk-select">
+                <mat-label class="oas-error-response-bulk-label">Set Error Responses</mat-label>
+                <mat-select [(ngModel)]="bulkErrorResponseBodyType" [disabled]="isDisabled(oasDoc)">
+                  @for (opt of errorResponseBodyTypeOptions; track opt.value) {
+                    <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <button mat-raised-button color="primary" class="oas-error-response-bulk-apply"
+                      matTooltip="Apply selected Error Response to every operation"
+                      [disabled]="isDisabled(oasDoc) || table.dataSource.data.length == 0"
+                      (click)="applyErrorResponseBodyTypeToAll()">
+                Apply
+              </button>
+            </div>
+          </div>
           <button mat-raised-button color="primary" (click)="generate()"
                   [disabled]="isDisabled(oasDoc) || table.dataSource.data.length == 0">
             Generate

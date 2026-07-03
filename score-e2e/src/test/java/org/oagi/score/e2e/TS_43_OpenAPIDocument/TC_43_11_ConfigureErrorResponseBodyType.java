@@ -101,7 +101,7 @@ public class TC_43_11_ConfigureErrorResponseBodyType extends BaseTest {
 
         WebElement row = editPage.getTableRecordAtIndex(1);
         OasDocConfirmMessageDialog dialog = editPage.openConfirmMessageDialogViaSelector(row);
-        assertEquals("Select ConfirmMessage BIE", getText(dialog.getTitle()),
+        assertEquals("Select Confirm Message BIE", getText(dialog.getTitle()),
                 "The ConfirmMessage selection dialog should open");
         assertFalse(dialog.isSelectEnabled(), "Select is disabled until a BIE is chosen");
 
@@ -128,9 +128,10 @@ public class TC_43_11_ConfigureErrorResponseBodyType extends BaseTest {
 
         row = editPage.getTableRecordAtIndex(1);
         assertEquals("OAGi Confirm Message", editPage.getRowErrorResponseBodyType(row));
-        assertTrue(editPage.isRowConfirmMessageChipDisplayed(row), "The DEN chip should be shown");
-        assertTrue(editPage.getRowConfirmMessageChipText(row).contains(fixture.confirmBie.getDen()),
-                "The chip should carry the picked DEN (was: " + editPage.getRowConfirmMessageChipText(row) + ")");
+        assertTrue(editPage.isRowConfirmMessagePicked(row),
+                "The picked-BIE chip (a 'Selected Confirm Message' link) should be shown");
+        assertEquals(fixture.confirmBie.getTopLevelAsbiepId(), editPage.getRowConfirmMessagePickedBieId(row),
+                "The chip should link the picked ConfirmMessage BIE");
 
         editPage.hitUpdateButton();
         // Reopen the document and verify the body type + picked BIE survived the round-trip.
@@ -138,7 +139,7 @@ public class TC_43_11_ConfigureErrorResponseBodyType extends BaseTest {
         WebElement reopened = editPage.getTableRecordAtIndex(1);
         assertEquals("OAGi Confirm Message", editPage.getRowErrorResponseBodyType(reopened),
                 "The ConfirmMessage body type should persist across Update + reopen");
-        assertTrue(editPage.getRowConfirmMessageChipText(reopened).contains(fixture.confirmBie.getDen()),
+        assertEquals(fixture.confirmBie.getTopLevelAsbiepId(), editPage.getRowConfirmMessagePickedBieId(reopened),
                 "The picked ConfirmMessage BIE should persist across Update + reopen");
     }
 
@@ -176,9 +177,9 @@ public class TC_43_11_ConfigureErrorResponseBodyType extends BaseTest {
 
         WebElement row = editPage.getTableRecordAtIndex(1);
         pickConfirmMessageViaSelector(editPage, row, fixture.businessContext);
-        assertTrue(editPage.getRowConfirmMessageChipText(editPage.getTableRecordAtIndex(1))
-                        .contains(fixture.confirmBie.getDen()),
-                "The chip should first carry the original BIE");
+        assertEquals(fixture.confirmBie.getTopLevelAsbiepId(),
+                editPage.getRowConfirmMessagePickedBieId(editPage.getTableRecordAtIndex(1)),
+                "The chip should first link the original BIE");
 
         // Re-pick the second BIE (different Business Context) from the chip.
         OasDocConfirmMessageDialog dialog = editPage.openConfirmMessageDialogViaChip(editPage.getTableRecordAtIndex(1));
@@ -189,11 +190,11 @@ public class TC_43_11_ConfigureErrorResponseBodyType extends BaseTest {
 
         WebElement updated = editPage.getTableRecordAtIndex(1);
         assertEquals("OAGi Confirm Message", editPage.getRowErrorResponseBodyType(updated), "Re-pick keeps the body type");
-        // Both BIEs share the locked DEN, so the chip text alone cannot distinguish them; the re-pick is
-        // exercised by selecting the second Business Context's row above.
-        assertTrue(editPage.getRowConfirmMessageChipText(updated).contains(secondBie.getDen()),
-                "The chip should carry the Confirm Message DEN (was: "
-                        + editPage.getRowConfirmMessageChipText(updated) + ")");
+        // Both BIEs share the locked DEN, so the chip's tooltip text cannot distinguish them; the picked
+        // BIE's top-level ASBIEP id (from the chip link's href) does, proving the re-pick actually swapped
+        // the BIE.
+        assertEquals(secondBie.getTopLevelAsbiepId(), editPage.getRowConfirmMessagePickedBieId(updated),
+                "The chip should link the re-picked (second) ConfirmMessage BIE");
     }
 
     @Test
@@ -212,7 +213,7 @@ public class TC_43_11_ConfigureErrorResponseBodyType extends BaseTest {
         WebElement kept = editPage.getTableRecordAtIndex(1);
         assertEquals("OAGi Confirm Message", editPage.getRowErrorResponseBodyType(kept),
                 "Cancelling the chip picker keeps ConfirmMessage");
-        assertTrue(editPage.getRowConfirmMessageChipText(kept).contains(fixture.confirmBie.getDen()),
+        assertEquals(fixture.confirmBie.getTopLevelAsbiepId(), editPage.getRowConfirmMessagePickedBieId(kept),
                 "Cancelling the chip picker keeps the existing BIE");
     }
 

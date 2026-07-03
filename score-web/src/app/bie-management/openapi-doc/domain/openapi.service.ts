@@ -13,6 +13,7 @@ import {
 } from './openapi-doc';
 import {Observable} from 'rxjs';
 import {PageRequest, PageResponse} from '../../../basis/basis';
+import {ReleaseSummary} from '../../../release-management/domain/release';
 
 @Injectable()
 export class OpenAPIService {
@@ -66,6 +67,17 @@ export class OpenAPIService {
 
   updateDetails(request: BieForOasDocUpdateRequest): Observable<any> {
     return this.http.put('/api/oas_doc/' + request.oasDocId + '/bie_list/detail', request.json);
+  }
+
+  // Issue #1347: document-level "apply Error Response Body Type to all operations". The backend applies
+  // across every operation of the document (the grid is server-paginated). For CONFIRM_MESSAGE the
+  // payload carries the chosen releaseId + confirmMessageTopLevelAsbiepId.
+  applyErrorResponseBodyTypeToAll(oasDocId: number, request: {
+    errorResponseBodyType: string;
+    confirmMessageTopLevelAsbiepId?: number;
+    releaseId?: number;
+  }): Observable<any> {
+    return this.http.post('/api/oas_doc/' + oasDocId + '/bie_list/error_response', request);
   }
 
   delete(...oasDocIds): Observable<any> {
@@ -191,6 +203,13 @@ export class OpenAPIService {
       params = params.set('ownedByDeveloper', request.ownedByDeveloper.toString());
     }
     return this.http.get<PageResponse<BieForOasDoc>>('/api/oas_doc/' + oasDoc.oasDocId + '/bie_list', {params});
+  }
+
+  // Issue #1347: the document's distinct BIE releases, computed by the backend in a single SELECT DISTINCT
+  // query. The Error Response "apply to all" ConfirmMessage Branch selector uses this instead of fetching
+  // the whole paginated BIE list only to derive its releases client-side.
+  getReleasesForOasDoc(oasDoc: OasDoc): Observable<ReleaseSummary[]> {
+    return this.http.get<ReleaseSummary[]>('/api/oas_doc/' + oasDoc.oasDocId + '/bie_list/releases');
   }
 
   selectBieForOasDocListWithRequest(request: BieForOasDocListRequest, oasDoc: OasDoc): Observable<PageResponse<BieForOasDoc>> {

@@ -14,7 +14,18 @@
         <div branchSelector class="branch-selector d-flex" style="width: 8rem; padding: 0 0.5rem 0 1rem;">
           <mat-form-field appearance="outline">
             <mat-label>Branch</mat-label>
-            <input matInput [disabled]="true" [value]="release ? release.releaseNum : ''"/>
+            <!-- Issue #1347: "apply to all" mode offers the releases present in the Endpoint Details
+                 grid; per-op mode leaves the field locked to the operation's own release. -->
+            @if (selectableReleases && selectableReleases.length > 0) {
+              <mat-select [ngModel]="release" (ngModelChange)="onBranchChange($event)"
+                          [compareWith]="compareRelease">
+                @for (r of selectableReleases; track r.releaseId) {
+                  <mat-option [value]="r">{{ r.releaseNum }}</mat-option>
+                }
+              </mat-select>
+            } @else {
+              <input matInput [disabled]="true" [value]="release ? release.releaseNum : ''"/>
+            }
           </mat-form-field>
           <mat-divider [vertical]="true" style="padding-left: 1.5rem;"/>
         </div>

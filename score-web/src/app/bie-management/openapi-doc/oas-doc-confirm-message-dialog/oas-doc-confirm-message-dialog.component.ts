@@ -26,6 +26,10 @@ import {LibraryService} from '../../../library-management/domain/library.service
 export interface OasDocConfirmMessageDialogResult {
   topLevelAsbiepId: number;
   den: string;
+  // Issue #1347: the release the picked ConfirmMessage BIE belongs to. Per-op callers ignore it; the
+  // document-level "apply to all" caller uses it to target only operations in that release.
+  releaseId?: number;
+  releaseNum?: string;
 }
 
 // Issue #1347: the DEN of the standard 'Confirm Message' component. Like the 'Include Meta Header'
@@ -183,6 +187,10 @@ export class OasDocConfirmMessageDialogComponent implements OnInit {
   // connected BIE — there are no selectors for either (see the class doc).
   library: LibrarySummary;
   release: ReleaseSummary;
+  // Issue #1347: in document-level "apply to all" mode the caller supplies the releases present among
+  // the Endpoint Details BIEs; when set, the Branch field becomes an enabled selector limited to them
+  // (per-op callers leave this empty, so the Branch field stays locked as before).
+  selectableReleases: ReleaseSummary[];
 
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
@@ -191,7 +199,7 @@ export class OasDocConfirmMessageDialogComponent implements OnInit {
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
 
   constructor() {
-    this.title = (this.data && this.data.title) || 'Select ConfirmMessage BIE';
+    this.title = (this.data && this.data.title) || 'Select Confirm Message BIE';
   }
 
   ngOnInit() {
@@ -202,12 +210,29 @@ export class OasDocConfirmMessageDialogComponent implements OnInit {
     this.request.filters.den = CONFIRM_MESSAGE_DEN;
     this.request.access = 'CanView';
 
+    // Issue #1347: document-level "apply to all" mode — the caller passes the distinct releases of the
+    // Endpoint Details BIEs; the Branch field then offers exactly those (see the template).
+    if (this.data && Array.isArray(this.data.selectableReleases) && this.data.selectableReleases.length > 0) {
+      this.selectableReleases = this.data.selectableReleases.map((r: any) => {
+        const rs = new ReleaseSummary();
+        rs.releaseId = r.releaseId;
+        rs.releaseNum = r.releaseNum;
+        return rs;
+      });
+    }
+
     // The OpenAPI Document has no release of its own; the picker is locked to the release of the
-    // document's connected BIE, passed in by the caller. releaseNum drives the disabled Branch field.
+    // document's connected BIE, passed in by the caller. releaseNum drives the (disabled) Branch field.
+    // In "apply to all" mode the default lands on the matching selectable release (else the first).
     if (this.data && this.data.releaseId) {
-      this.release = new ReleaseSummary();
-      this.release.releaseId = this.data.releaseId;
-      this.release.releaseNum = this.data.releaseNum;
+      this.release = (this.selectableReleases || []).find(r => r.releaseId === this.data.releaseId);
+      if (!this.release) {
+        this.release = new ReleaseSummary();
+        this.release.releaseId = this.data.releaseId;
+        this.release.releaseNum = this.data.releaseNum;
+      }
+    } else if (this.selectableReleases && this.selectableReleases.length > 0) {
+      this.release = this.selectableReleases[0];
     }
 
     this.paginator.pageIndex = this.request.page.pageIndex;
@@ -267,6 +292,22 @@ export class OasDocConfirmMessageDialogComponent implements OnInit {
 
   onChange(property?: string, source?) {
   }
+
+  // Issue #1347: "apply to all" mode only — switch the Branch, then reload the ConfirmMessage BIE list
+  // for that release (clearing any prior selection, which belonged to the previous release).
+  onBranchChange(release: ReleaseSummary): void {
+    this.release = release;
+    this.selection.clear();
+    this.selectedEntry = undefined;
+    this.paginator.pageIndex = 0;
+    this.loadBieList();
+  }
+
+  // Compare selectable releases by id so the Branch mat-select reflects the current release regardless
+  // of object identity.
+  compareRelease = (a: ReleaseSummary, b: ReleaseSummary): boolean => {
+    return (!!a && !!b) ? a.releaseId === b.releaseId : a === b;
+  };
 
   reset(type: string) {
     switch (type) {
@@ -347,7 +388,9 @@ export class OasDocConfirmMessageDialogComponent implements OnInit {
     }
     this.dialogRef.close({
       topLevelAsbiepId: this.selectedEntry.topLevelAsbiepId,
-      den: this.selectedEntry.den
+      den: this.selectedEntry.den,
+      releaseId: this.release ? this.release.releaseId : undefined,
+      releaseNum: this.release ? this.release.releaseNum : undefined
     } as OasDocConfirmMessageDialogResult);
   }
 }

@@ -19,6 +19,7 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -837,7 +838,10 @@ public class EditOpenAPIDocumentPageImpl extends BasePageImpl implements EditOpe
     public OasDocConfirmMessageDialog openConfirmMessageDialogViaChip(WebElement tableRecord) {
         retry(() -> {
             WebElement cell = getColumnByName(tableRecord, "errorResponse");
-            click(getDriver(), cell.findElement(By.cssSelector("div.oas-confirm-message-chip")));
+            // Issue #1519 redesigned the chip: the "Selected Confirm Message" link navigates to the BIE in
+            // a new tab, so the picker re-opens from the pencil edit icon (openConfirmMessageBiePicker),
+            // NOT from clicking the chip body.
+            click(getDriver(), cell.findElement(By.cssSelector("div.oas-confirm-message-chip .oas-confirm-message-chip-edit")));
             waitFor(ofMillis(1000L));
         });
         OasDocConfirmMessageDialog dialog = new OasDocConfirmMessageDialogImpl(this);
@@ -861,5 +865,108 @@ public class EditOpenAPIDocumentPageImpl extends BasePageImpl implements EditOpe
         // chip's aria-label (= its tooltip text) rather than by visible text.
         String label = cell.findElement(By.cssSelector("div.oas-confirm-message-chip")).getAttribute("aria-label");
         return label == null ? "" : label.trim();
+    }
+
+    @Override
+    public boolean isRowConfirmMessagePicked(WebElement tableRecord) {
+        // Issue #1519 redesigned the chip: a PICKED BIE renders the "Selected Confirm Message" link
+        // (a.oas-confirm-message-chip-link -> /profile_bie/<id>); an unset chip shows only the
+        // "Pick a Confirm Message…" placeholder span. So the link's presence == a BIE is picked.
+        WebElement cell = getColumnByName(tableRecord, "errorResponse");
+        return !cell.findElements(By.cssSelector("a.oas-confirm-message-chip-link")).isEmpty();
+    }
+
+    @Override
+    public BigInteger getRowConfirmMessagePickedBieId(WebElement tableRecord) {
+        WebElement cell = getColumnByName(tableRecord, "errorResponse");
+        var links = cell.findElements(By.cssSelector("a.oas-confirm-message-chip-link"));
+        if (links.isEmpty()) {
+            return null;
+        }
+        // href resolves to e.g. http://host:4200/profile_bie/12345 — the trailing number is the picked
+        // ConfirmMessage BIE's top-level ASBIEP id, which uniquely identifies it (the DEN can be shared).
+        String href = links.get(0).getAttribute("href");
+        if (href == null) {
+            return null;
+        }
+        int idx = href.lastIndexOf("/profile_bie/");
+        if (idx < 0) {
+            return null;
+        }
+        String tail = href.substring(idx + "/profile_bie/".length()).replaceAll("[^0-9].*$", "");
+        return tail.isEmpty() ? null : new BigInteger(tail);
+    }
+
+    /* --------------------------- Issue #1347: document-level "apply Error Response to all operations" */
+
+    private WebElement bulkErrorResponseSelect() {
+        return visibilityOfElementLocated(getDriver(),
+                By.cssSelector(".oas-error-response-bulk-select mat-select"));
+    }
+
+    private WebElement bulkErrorResponseApplyButton() {
+        return visibilityOfElementLocated(getDriver(),
+                By.cssSelector("button.oas-error-response-bulk-apply"));
+    }
+
+    @Override
+    public String getBulkErrorResponseBodyType() {
+        String text = getText(bulkErrorResponseSelect());
+        return text == null ? "" : text.trim();
+    }
+
+    @Override
+    public boolean isBulkErrorResponseSelectorEnabled() {
+        WebElement select = bulkErrorResponseSelect();
+        return !"true".equals(select.getAttribute("aria-disabled"))
+                && !select.getAttribute("class").contains("mat-mdc-select-disabled");
+    }
+
+    @Override
+    public void setBulkErrorResponseBodyType(String label) {
+        click(getDriver(), bulkErrorResponseSelect());
+        WebElement option = elementToBeClickable(getDriver(),
+                By.xpath("//mat-option[normalize-space(.) = " + xpathLiteral(label) + "]"));
+        click(getDriver(), option);
+        waitFor(ofMillis(400L));
+    }
+
+    @Override
+    public boolean isBulkErrorResponseApplyEnabled() {
+        WebElement button = bulkErrorResponseApplyButton();
+        String klass = button.getAttribute("class");
+        return button.isEnabled() && (klass == null || !klass.contains("mat-mdc-button-disabled"));
+    }
+
+    @Override
+    public void applyBulkErrorResponseBodyType() {
+        click(getDriver(), elementToBeClickable(getDriver(),
+                By.cssSelector("button.oas-error-response-bulk-apply")));
+        // NONE / IETF Problem Details apply straight away (no dialog): the server updates every operation
+        // and raises the 'Applied "<label>" to all operations.' snackbar; waiting on it synchronizes with
+        // the completed apply. The grid then reloads, so allow it a moment to settle.
+        getSnackBarMessage(getDriver());
+        waitFor(ofMillis(1000L));
+    }
+
+    @Override
+    public OasDocConfirmMessageDialog applyBulkErrorResponseBodyTypeForConfirmMessage() {
+        click(getDriver(), elementToBeClickable(getDriver(),
+                By.cssSelector("button.oas-error-response-bulk-apply")));
+        // Apply first persists any pending edits and fetches the document's releases before opening the
+        // 'Select Confirm Message BIE' dialog, so rely on the dialog's own explicit wait (isOpened) rather
+        // than a fixed sleep.
+        OasDocConfirmMessageDialog dialog = new OasDocConfirmMessageDialogImpl(this);
+        assert dialog.isOpened();
+        return dialog;
+    }
+
+    @Override
+    public void confirmBulkErrorResponseApplied() {
+        // Confirming the dialog POSTs the bulk apply and, on success, raises the
+        // 'Applied "<label>" to all operations.' snackbar; waiting on it synchronizes with the completed
+        // apply. The grid then reloads, so allow it a moment to settle before the caller reads the rows.
+        getSnackBarMessage(getDriver());
+        waitFor(ofMillis(1000L));
     }
 }

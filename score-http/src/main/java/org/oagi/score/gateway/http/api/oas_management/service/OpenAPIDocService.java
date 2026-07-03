@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -128,6 +129,12 @@ public class OpenAPIDocService {
     public GetBieForOasDocResponse getBieForOasDoc(ScoreUser requester, GetBieForOasDocRequest request) {
         GetBieForOasDocResponse response = bieForOasDocQuery(requester).getBieForOasDoc(request);
         return response;
+    }
+
+    // The document's distinct BIE releases, resolved in a single DB query. Feeds the Error Response
+    // "apply to all" ConfirmMessage Branch selector (replaces fetching the whole paginated BIE list).
+    public List<OasDocReleaseSummary> getDistinctReleasesForOasDoc(ScoreUser requester, OasDocId oasDocId) {
+        return bieForOasDocQuery(requester).getDistinctReleases(oasDocId);
     }
 
     public PageResponse<BieForOasDoc> selectBieForOasDoc(ScoreUser requester, BieForOasDocListRequest request) {
@@ -261,6 +268,14 @@ public class OpenAPIDocService {
                     .setTimestamp(millis)
                     .execute();
         }
+        // Issue #1347: a NEWLY created operation inherits the document's prevailing error-response body
+        // type (all-PROBLEM_DETAILS -> PROBLEM_DETAILS; all-CONFIRM_MESSAGE -> the release-matched
+        // ConfirmMessage BIE if unambiguous; otherwise No Response Body). Reusing an existing operation
+        // (e.g. adding a Response to an op that already has a Request) keeps its current value untouched.
+        if (!operationExisted) {
+            applyInheritedErrorResponse(requester, request.getOasDocId(), oasOperationId);
+        }
+
         return new AddBieForOasDocResponse(oasRequestId != null ? oasRequestId : null,
                 oasResponseId != null ? oasResponseId : null);
     }
@@ -370,6 +385,13 @@ public class OpenAPIDocService {
                     .setIncludeMetaHeaderIndicator(false)
                     .setTimestamp(millis)
                     .execute();
+        }
+
+        // Issue #1347: a NEWLY created (bodyless) operation inherits the document's prevailing
+        // error-response body type. A bodyless operation has no release, so it can only inherit
+        // PROBLEM_DETAILS, or a single unambiguous ConfirmMessage BIE used across the document.
+        if (!operationExisted) {
+            applyInheritedErrorResponse(requester, request.getOasDocId(), oasOperationId);
         }
 
         return new AddBieForOasDocResponse(oasRequestId, oasResponseId);
@@ -687,6 +709,106 @@ public class OpenAPIDocService {
         UpdateBieForOasDocResponse response =
                 bieForOasDocCommand(requester).updateBieForOasDoc(request);
         return response;
+    }
+
+    /**
+     * Issue #1347: document-level "apply Error Response Body Type to all operations". The Endpoint
+     * Details grid is server-paginated, so this operates on ALL of the document's operations (not just a
+     * page). NONE / PROBLEM_DETAILS apply to every operation regardless of release; CONFIRM_MESSAGE
+     * applies to the chosen release's operations plus bodyless operations (operations in other releases
+     * are left unchanged, since a ConfirmMessage BIE is release-bound).
+     */
+    @Transactional
+    public BulkUpdateErrorResponseResponse bulkUpdateErrorResponse(ScoreUser requester,
+                                                                   BulkUpdateErrorResponseRequest request) {
+        if (request.getOasDocId() == null) {
+            throw new IllegalArgumentException("`oasDocId` parameter must not be null.");
+        }
+        List<OperationErrorResponseAssignment> assignments = resolveBulkAssignments(requester,
+                request.getOasDocId(), request.getErrorResponseBodyType(),
+                request.getReleaseId(), request.getConfirmTopLevelAsbiepId());
+        return bieForOasDocCommand(requester).bulkUpdateErrorResponse(request.getOasDocId(), assignments);
+    }
+
+    // Issue #1347: which operations get which value for a bulk apply — delegated to the pure policy.
+    private List<OperationErrorResponseAssignment> resolveBulkAssignments(ScoreUser requester, OasDocId oasDocId,
+                                                                          String bodyType, BigInteger releaseId,
+                                                                          BigInteger confirmTopLevelAsbiepId) {
+        List<OperationErrorResponseSummary> rows = bieForOasDocQuery(requester).getOperationErrorResponseSummaries(oasDocId);
+        return ErrorResponseBulkPolicy.resolveBulkAssignments(
+                releasesByOperation(rows), bodyType, releaseId, confirmTopLevelAsbiepId);
+    }
+
+    // Issue #1347: group summary rows by oas_operation_id -> the set of (non-null) release ids of its
+    // bodies. An operation with an empty set is bodyless (#1730).
+    private Map<BigInteger, Set<BigInteger>> releasesByOperation(List<OperationErrorResponseSummary> rows) {
+        Map<BigInteger, Set<BigInteger>> releasesByOp = new LinkedHashMap<>();
+        for (OperationErrorResponseSummary row : rows) {
+            if (row.getOasOperationId() == null) {
+                continue;
+            }
+            Set<BigInteger> releases = releasesByOp.computeIfAbsent(row.getOasOperationId(), k -> new HashSet<>());
+            if (row.getReleaseId() != null) {
+                releases.add(row.getReleaseId());
+            }
+        }
+        return releasesByOp;
+    }
+
+    /**
+     * Issue #1347: a newly-created operation inherits the document's prevailing error-response body type.
+     * <ul>
+     *   <li>All existing operations PROBLEM_DETAILS -> PROBLEM_DETAILS.</li>
+     *   <li>All existing operations CONFIRM_MESSAGE -> the ConfirmMessage BIE of the new operation's own
+     *       release (for a BIE-backed op), or the single doc-wide ConfirmMessage (for a bodyless op),
+     *       but only when that BIE is unambiguous; otherwise No Response Body.</li>
+     *   <li>Otherwise (all NONE, or a mix) -> No Response Body (the DB default, so nothing is written).</li>
+     * </ul>
+     * The new operation's own release is read from its just-created rows, so no separate BIE-release
+     * lookup is needed.
+     */
+    private void applyInheritedErrorResponse(ScoreUser requester, OasDocId oasDocId, OasOperationId newOasOperationId) {
+        if (newOasOperationId == null) {
+            return;
+        }
+        BigInteger newOpId = newOasOperationId.value();
+        List<OperationErrorResponseSummary> rows =
+                bieForOasDocQuery(requester).getOperationErrorResponseSummaries(oasDocId);
+
+        Set<BigInteger> newOpReleases = new HashSet<>();
+        Map<BigInteger, String> typeByOp = new LinkedHashMap<>();
+        Map<BigInteger, BigInteger> confirmByOp = new LinkedHashMap<>();
+        Map<BigInteger, Set<BigInteger>> releasesByOp = new LinkedHashMap<>();
+        for (OperationErrorResponseSummary row : rows) {
+            if (row.getOasOperationId() == null) {
+                continue;
+            }
+            BigInteger opId = row.getOasOperationId();
+            BigInteger releaseId = row.getReleaseId();
+            if (opId.equals(newOpId)) {
+                if (releaseId != null) {
+                    newOpReleases.add(releaseId);
+                }
+                continue;
+            }
+            typeByOp.put(opId, row.getErrorResponseBodyType());
+            if (row.getConfirmTopLevelAsbiepId() != null) {
+                confirmByOp.put(opId, row.getConfirmTopLevelAsbiepId());
+            }
+            Set<BigInteger> releases = releasesByOp.computeIfAbsent(opId, k -> new HashSet<>());
+            if (releaseId != null) {
+                releases.add(releaseId);
+            }
+        }
+
+        ErrorResponseBulkPolicy.Inherited inherited =
+                ErrorResponseBulkPolicy.computeInherited(typeByOp, confirmByOp, releasesByOp, newOpReleases);
+        if (OpenAPIErrorResponseBodyType.from(inherited.bodyType()) == OpenAPIErrorResponseBodyType.NONE) {
+            return; // No Response Body -> the new operation already defaults to NONE
+        }
+        bieForOasDocCommand(requester).bulkUpdateErrorResponse(oasDocId,
+                List.of(new OperationErrorResponseAssignment(newOpId, inherited.bodyType(),
+                        inherited.confirmTopLevelAsbiepId())));
     }
 
     @Transactional

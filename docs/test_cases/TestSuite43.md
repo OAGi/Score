@@ -602,7 +602,7 @@ In an OpenAPI Version `3.0` document, a `DELETE` operation with Message Body `Re
 
 **Configure the Error Response Body Type**
 
-Pre-condition: An end-user account that can access the BIE menu exists, and the environment allows downloading the generated OpenAPI document file (YAML) for inspection. On the Edit OpenAPI Document page, every operation row in the Endpoint Details table carries an inline `Error Response` selector offering `No Response Body`, `IETF Problem Details`, and `OAGi Confirm Message`. The body type lives on the operation and controls only the body of the defaulted 4xx/5xx error responses; the status codes are always emitted. Choosing `OAGi Confirm Message` opens a dedicated `Select ConfirmMessage BIE` dialog — a clone of the BIE-Express `Include Meta Header` and `Pagination Response` pickers, locked to the standard `Confirm Message` BIE: the DEN filter is fixed to `Confirm Message. Confirm Message` and the search box is disabled, the library is fixed to `connectSpec` (no Library selector), and the Branch is locked (disabled) to the release of the document's connected BIE. The listed candidates therefore share that DEN and are distinguished by their Business Context. For the `OAGi Confirm Message` cases a `Confirm Message. Confirm Message` BIE is available in that release.
+Pre-condition: An end-user account that can access the BIE menu exists, and the environment allows downloading the generated OpenAPI document file (YAML) for inspection. On the Edit OpenAPI Document page, every operation row in the Endpoint Details table carries an inline `Error Response` selector offering `No Response Body`, `IETF Problem Details`, and `OAGi Confirm Message`. The body type lives on the operation and controls only the body of the defaulted 4xx/5xx error responses; the status codes are always emitted. Choosing `OAGi Confirm Message` opens a dedicated `Select Confirm Message BIE` dialog — a clone of the BIE-Express `Include Meta Header` and `Pagination Response` pickers, locked to the standard `Confirm Message` BIE: the DEN filter is fixed to `Confirm Message. Confirm Message` and the search box is disabled, the library is fixed to `connectSpec` (no Library selector), and the Branch is locked (disabled) to the release of the document's connected BIE. The listed candidates therefore share that DEN and are distinguished by their Business Context. For the `OAGi Confirm Message` cases a `Confirm Message. Confirm Message` BIE is available in that release.
 
 ### Test Assertion:
 
@@ -613,13 +613,13 @@ The `Error Response` cell of every operation is an inline selector offering exac
 Selecting `IETF Problem Details` from the selector commits immediately without opening any dialog, the cell reads `IETF Problem Details`, and no Confirm Message chip is shown.
 
 #### Test Assertion #43.11.3
-Selecting `OAGi Confirm Message` opens a dialog titled `Select ConfirmMessage BIE` whose `Select` button is disabled until a BIE is chosen. After selecting a Confirm Message BIE (identified by its Business Context, since the picker is locked to `Confirm Message. Confirm Message` in the connected BIE's release) and clicking `Select`, the selector reads `OAGi Confirm Message` and an icon-only chip whose tooltip carries the picked BIE's DEN appears beneath it. The chosen body type and BIE persist after `Update` and reopening the document.
+Selecting `OAGi Confirm Message` opens a dialog titled `Select Confirm Message BIE` whose `Select` button is disabled until a BIE is chosen. After selecting a Confirm Message BIE (identified by its Business Context, since the picker is locked to `Confirm Message. Confirm Message` in the connected BIE's release) and clicking `Select`, the selector reads `OAGi Confirm Message` and an icon-only chip whose tooltip carries the picked BIE's DEN appears beneath it. The chosen body type and BIE persist after `Update` and reopening the document.
 
 #### Test Assertion #43.11.4
-Opening the `Select ConfirmMessage BIE` dialog and cancelling it without choosing a BIE — when the operation had no previously-picked Confirm Message BIE — reverts the selector to its previously committed body type (for example, back to `IETF Problem Details`), and no Confirm Message chip remains.
+Opening the `Select Confirm Message BIE` dialog and cancelling it without choosing a BIE — when the operation had no previously-picked Confirm Message BIE — reverts the selector to its previously committed body type (for example, back to `IETF Problem Details`), and no Confirm Message chip remains.
 
 #### Test Assertion #43.11.5
-Once `OAGi Confirm Message` is set with a picked BIE, clicking the chip reopens the `Select ConfirmMessage BIE` dialog; picking a different Confirm Message BIE (a different Business Context) keeps the body type `OAGi Confirm Message` and the chip, while cancelling that dialog keeps the existing BIE.
+Once `OAGi Confirm Message` is set with a picked BIE, clicking the chip reopens the `Select Confirm Message BIE` dialog; picking a different Confirm Message BIE (a different Business Context) keeps the body type `OAGi Confirm Message` and the chip, while cancelling that dialog keeps the existing BIE.
 
 #### Test Assertion #43.11.6
 Changing an operation's `Error Response` selector from `OAGi Confirm Message` back to `No Response Body` clears the picked Confirm Message BIE and removes the chip.
@@ -646,8 +646,8 @@ Changing an operation row's `Error Response` body type to `No Response Body` and
 4. Set the operation's `Error Response` selector to `IETF Problem Details`.
 5. Verify that `IETF Problem Details` commits straight from the selector with no dialog and shows no Confirm Message chip. (Assertion [#2](#test-assertion-43112))
 6. Set the selector to `OAGi Confirm Message`, observe the dialog, select the Confirm Message BIE by its Business Context, and click `Select`; then click `Update`, reopen the document, and re-inspect the operation.
-7. Verify that the `Select ConfirmMessage BIE` dialog opens with `Select` disabled until a BIE is chosen, that after picking a BIE the selector reads `OAGi Confirm Message` with a chip, and that the body type and picked BIE persist across `Update` and reopen. (Assertion [#3](#test-assertion-43113))
-8. On an operation set to `IETF Problem Details`, set the selector to `OAGi Confirm Message`, then cancel the `Select ConfirmMessage BIE` dialog without choosing a BIE.
+7. Verify that the `Select Confirm Message BIE` dialog opens with `Select` disabled until a BIE is chosen, that after picking a BIE the selector reads `OAGi Confirm Message` with a chip, and that the body type and picked BIE persist across `Update` and reopen. (Assertion [#3](#test-assertion-43113))
+8. On an operation set to `IETF Problem Details`, set the selector to `OAGi Confirm Message`, then cancel the `Select Confirm Message BIE` dialog without choosing a BIE.
 9. Verify that the selector reverts to `IETF Problem Details` and no Confirm Message chip remains. (Assertion [#4](#test-assertion-43114))
 10. On an operation already set to `OAGi Confirm Message` with a picked BIE, click the chip, pick a different Confirm Message BIE (a different Business Context), and click `Select`; then click the chip again and cancel the dialog.
 11. Verify that re-picking a different Confirm Message BIE keeps the body type `OAGi Confirm Message` (the chip carries the shared DEN), and that cancelling the chip dialog keeps the existing BIE. (Assertion [#5](#test-assertion-43115))
@@ -870,3 +870,59 @@ The narrowed `(Resource Name, Verb)` key does NOT stop flagging a genuine collis
 4. Verify that the Endpoint Details grid shows the Request row and the Response row carrying the shared `Operation ID`, and that neither row is flagged with the uniqueness error or the duplicate-body warning. (Assertion [#2](#test-assertion-43152))
 5. On a fresh WIP BIE and OpenAPI Document, seed two DISTINCT operations on two different resource paths, both `GET` + `Response`, that share one hand-set `operationId`. Sign in, open the BIE into the Edit BIE page, and open the `OpenAPI Document Information` panel.
 6. Verify that both binding cards are flagged with `Operation ID must be unique within the document.`, and that after setting a `Tag` the `Update OpenAPI Information` button remains disabled. (Assertion [#3](#test-assertion-43153))
+
+## Test Case 43.16
+
+**Apply the Error Response Body Type to All Operations and Inherit It on New Operations**
+
+Pre-condition: An end-user account that can access the BIE menu exists, and the environment allows downloading the generated OpenAPI document file (YAML) for inspection. Besides the per-operation `Error Response` selector (Test Case 43.11), the Endpoint Details toolbar carries a document-level `Set Error Responses` selector (offering the same `No Response Body`, `IETF Problem Details`, and `OAGi Confirm Message` options and defaulting to `No Response Body`) next to an `Apply` button. Because the Endpoint Details grid is server-paginated, `Apply` is a SERVER-SIDE action that updates EVERY operation of the document, not just the operations on the visible page: `No Response Body` and `IETF Problem Details` apply to every operation regardless of release, while `OAGi Confirm Message` opens the `Select Confirm Message BIE` dialog — whose `Branch` field, in this document-level mode, is an enabled selector spanning the whole document's releases (in per-operation mode it stays locked) — and applies the picked Confirm Message BIE to that release's operations plus bodyless operations (operations in other releases are left unchanged). The `Apply` button is disabled while the document has no operations. In addition, a NEWLY created operation (added by `Add BIE` or `Add Operation`) inherits the document's prevailing error-response body type at creation time: when every existing operation is `IETF Problem Details` the new operation inherits `IETF Problem Details`; when every existing operation is `OAGi Confirm Message` and the document has a single unambiguous Confirm Message BIE the new operation inherits `OAGi Confirm Message` with that BIE; otherwise (a mix of body types, or all `No Response Body`) the new operation is `No Response Body`. The per-operation `Error Response` selector still allows individual overrides afterwards. For the `OAGi Confirm Message` cases a `Confirm Message. Confirm Message` BIE is available in the connectSpec library's latest release (Issue #1347).
+
+### Test Assertion:
+
+#### Test Assertion #43.16.1
+The document-level `Set Error Responses` selector on the Endpoint Details toolbar is enabled on an editable document and defaults to `No Response Body`. Its `Apply` button is disabled while the document has no operations and becomes enabled once the document has at least one operation.
+
+#### Test Assertion #43.16.2
+Setting the `Set Error Responses` selector to `IETF Problem Details` and clicking `Apply` makes EVERY operation of the document read `IETF Problem Details`. Because the apply is server-side, reopening the document shows every operation still reading `IETF Problem Details` (a client-only apply would not survive the reopen).
+
+#### Test Assertion #43.16.3
+Setting the `Set Error Responses` selector to `No Response Body` and clicking `Apply` resets EVERY operation to `No Response Body`, and no operation shows a Confirm Message chip.
+
+#### Test Assertion #43.16.4
+Setting the `Set Error Responses` selector to `OAGi Confirm Message` and clicking `Apply` opens the `Select Confirm Message BIE` dialog with its `Select` button disabled until a BIE is chosen. After picking a Confirm Message BIE (by its Business Context) and clicking `Select`, EVERY operation reads `OAGi Confirm Message` and shows the Confirm Message DEN chip, and that body type and picked BIE persist on every operation after reopening the document.
+
+#### Test Assertion #43.16.5
+When every existing operation of a document is `IETF Problem Details` (applied document-wide), adding a new operation makes that new operation read `IETF Problem Details` — it inherits the document's prevailing body type at creation time.
+
+#### Test Assertion #43.16.6
+When every existing operation of a document is `OAGi Confirm Message` with a single unambiguous Confirm Message BIE (applied document-wide), adding a new operation makes that new operation read `OAGi Confirm Message` and show the document's Confirm Message DEN chip — it inherits both the body type and the Confirm Message BIE.
+
+#### Test Assertion #43.16.7
+When a document holds a MIX of error-response body types (for example one operation `IETF Problem Details` and another `No Response Body`), adding a new operation makes that new operation read `No Response Body` (no unambiguous value to inherit), and it shows no Confirm Message chip.
+
+#### Test Assertion #43.16.8
+After applying `IETF Problem Details` to all operations (a server-side apply that persists immediately, so no `Update` is needed) and clicking `Generate`, the downloaded YAML emits the Problem Details error matrix for EVERY operation the bulk apply touched: each operation's version-independent `500` (Internal Server Error) response is a `$ref` to the reusable `#/components/responses/500_InternalServerError` component, which references the shared `#/components/schemas/ProblemDetails` schema (both materialized in `components`).
+
+### Test Step Pre-condition:
+1. An end-user account that can access the BIE menu is available in connectCenter.
+2. A `Confirm Message. Confirm Message` BIE that the end user can pick (in the connectSpec library's latest release, under a known Business Context) exists for the `OAGi Confirm Message` cases.
+3. An OpenAPI Document exists that the end user can open into the Edit OpenAPI Document page.
+4. The environment allows downloading the generated OpenAPI document file (YAML) for inspection.
+
+### Test Step:
+1. Sign in to connectCenter as the end user and open a freshly created OpenAPI Document into the Edit OpenAPI Document page. Inspect the toolbar-level `Set Error Responses` selector and its `Apply` button, then add one bodyless operation (for example a `DELETE` operation with path `/a1`).
+2. Verify that the `Set Error Responses` selector is enabled and reads `No Response Body`, that `Apply` is disabled before any operation exists, and that `Apply` becomes enabled after the operation is added. (Assertion [#1](#test-assertion-43161))
+3. On a fresh document, add three bodyless operations, set the `Set Error Responses` selector to `IETF Problem Details`, and click `Apply`; then reopen the document.
+4. Verify that all three operations read `IETF Problem Details` after `Apply`, and that all three still read `IETF Problem Details` after reopening the document. (Assertion [#2](#test-assertion-43162))
+5. On a document whose operations are all `IETF Problem Details`, set the `Set Error Responses` selector to `No Response Body` and click `Apply`.
+6. Verify that every operation reads `No Response Body` and shows no Confirm Message chip. (Assertion [#3](#test-assertion-43163))
+7. On a fresh document with two bodyless operations, set the `Set Error Responses` selector to `OAGi Confirm Message`, click `Apply`, pick the Confirm Message BIE (by its Business Context) in the `Select Confirm Message BIE` dialog, and click `Select`; then reopen the document.
+8. Verify that the dialog opens with `Select` disabled until a BIE is chosen, that after `Select` every operation reads `OAGi Confirm Message` with the Confirm Message DEN chip, and that the body type and picked BIE persist on every operation across reopen. (Assertion [#4](#test-assertion-43164))
+9. On a fresh document with one bodyless operation, apply `IETF Problem Details` to all operations, then add a second bodyless operation.
+10. Verify that the newly added operation reads `IETF Problem Details` (inherited). (Assertion [#5](#test-assertion-43165))
+11. On a fresh document with one bodyless operation, apply `OAGi Confirm Message` (picking the Confirm Message BIE) to all operations, then add a second bodyless operation.
+12. Verify that the newly added operation reads `OAGi Confirm Message` and shows the document's Confirm Message DEN chip (inherited). (Assertion [#6](#test-assertion-43166))
+13. On a fresh document with two bodyless operations, apply `IETF Problem Details` to all operations, change ONE operation's `Error Response` selector back to `No Response Body`, click `Update`, then add a third bodyless operation.
+14. Verify that the newly added operation reads `No Response Body` and shows no Confirm Message chip. (Assertion [#7](#test-assertion-43167))
+15. On a fresh document with two bodyless operations, apply `IETF Problem Details` to all operations, then click `Generate` (the bulk apply already persisted, so no `Update` is needed) and open the downloaded YAML file.
+16. Verify that every operation's `500` response is a `$ref` to `#/components/responses/500_InternalServerError`, that the reusable `500` response component is emitted and its `application/problem+json` content references `#/components/schemas/ProblemDetails`, and that the shared `ProblemDetails` schema is emitted. (Assertion [#8](#test-assertion-43168))

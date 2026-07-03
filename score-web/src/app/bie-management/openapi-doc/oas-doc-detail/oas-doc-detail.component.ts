@@ -53,6 +53,7 @@ import {ScoreTableColumnResizeDirective} from '../../../common/score-table-colum
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {Title} from '@angular/platform-browser';
 import {setAppTitleIfPresent} from '../../../common/app-title.strategy';
+import {ReleaseSummary} from '../../../release-management/domain/release';
 
 @Component({
   standalone: false,
@@ -130,7 +131,7 @@ export class OasDocDetailComponent implements OnInit {
     if (entry) {
       columns.splice(columns.indexOf(entry), 1);
     } else {
-      entry = {name: 'Error Response', selected: true, width: 200};
+      entry = {name: 'Error Response', selected: true, width: 260};
     }
     const idx = columns.findIndex(c => c.name === 'Security');
     if (idx >= 0) {
@@ -302,6 +303,10 @@ export class OasDocDetailComponent implements OnInit {
   ];
   private committedErrorResponseBodyType = new WeakMap<BieForOasDoc, string>();
 
+  // Issue #1347: the document-level "apply to all" selector shown above the grid. Its value is applied
+  // to every operation at once via applyErrorResponseBodyTypeToAll().
+  bulkErrorResponseBodyType = 'NONE';
+
   // Issue #1732 / #1492 / #1757: operationId must be unique within a document, and each (Resource
   // Name, Verb) owns at most one Request + one Response body. Both rules live in the shared
   // OasOperationValidator (reused by the BIE-root OpenAPI panel) so they stay identical. User-entered
@@ -377,8 +382,6 @@ export class OasDocDetailComponent implements OnInit {
       }
 
       this.preferencesInfo = preferencesInfo;
-      this.ensureSecurityColumn();
-      this.ensureErrorResponseColumn();
       this.onColumnsChange(this.preferencesInfo.tableColumnsInfo.columnsOfBieForOasDocPage);
 
       this.oasDoc = simpleOasDoc;
@@ -691,34 +694,49 @@ export class OasDocDetailComponent implements OnInit {
 
   private openConfirmMessageDialog(row: BieForOasDoc,
                                    handler: (result: OasDocConfirmMessageDialogResult | undefined) => void): void {
-    // Lock the picker to the release of the document's connected BIE (the document has no release of
-    // its own). Like the 'Include Meta Header' / 'Pagination Response' pickers, the dialog fixes the
-    // library (connectSpec) and Branch (this release) and lists only 'Confirm Message' BIEs.
-    const release = this.resolveOasDocRelease(row);
+    // A BIE-backed operation carries its own release, so lock the picker's Branch to it (as before).
+    if (row.releaseId) {
+      this.openConfirmMessageDialogWith(row, handler, undefined,
+        {releaseId: row.releaseId, releaseNum: row.releaseNum});
+      return;
+    }
+    // A bodyless operation has no release of its own. In a document that spans MULTIPLE releases a single
+    // locked release cannot reach every release's Confirm Message BIE (the BIE-list query is release-bound
+    // — e.g. a 10.11 Confirm Message BIE is invisible while locked to 10.12.7), so offer the enabled Branch
+    // selector over the whole document's releases — the same mechanism the document-level "apply to all"
+    // mode uses. With one release there is nothing to choose (lock to it); with none, the dialog falls back
+    // to the connectSpec library's latest release.
+    this.fetchAllOasDocReleasesThen(selectableReleases => {
+      if (selectableReleases.length > 1) {
+        this.openConfirmMessageDialogWith(row, handler, selectableReleases, selectableReleases[0]);
+      } else {
+        const only = selectableReleases[0];
+        this.openConfirmMessageDialogWith(row, handler, undefined,
+          {releaseId: only ? only.releaseId : undefined, releaseNum: only ? only.releaseNum : undefined});
+      }
+    });
+  }
+
+  // Issue #1347: open the ConfirmMessage BIE picker. When `selectableReleases` is set the dialog's Branch
+  // becomes an enabled selector over those releases (document-level / bodyless-multi-release mode); when it
+  // is undefined the Branch is locked to `defaultRelease`. Like the 'Include Meta Header' / 'Pagination
+  // Response' pickers, the dialog fixes the library (connectSpec) and lists only 'Confirm Message' BIEs.
+  private openConfirmMessageDialogWith(row: BieForOasDoc,
+                                       handler: (result: OasDocConfirmMessageDialogResult | undefined) => void,
+                                       selectableReleases: ReleaseSummary[] | undefined,
+                                       defaultRelease: { releaseId: number; releaseNum: string } | undefined): void {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.data = {
-      title: 'Select ConfirmMessage BIE',
-      releaseId: release.releaseId,
-      releaseNum: release.releaseNum
+      title: 'Select Confirm Message BIE',
+      selectableReleases,
+      releaseId: defaultRelease ? defaultRelease.releaseId : undefined,
+      releaseNum: defaultRelease ? defaultRelease.releaseNum : undefined
     };
     // Full-width like the BIE-Express 'Include Meta Header' / 'Pagination Response' BIE pickers.
     dialogConfig.width = window.innerWidth + 'px';
     dialogConfig.autoFocus = false;
     this.dialog.open(OasDocConfirmMessageDialogComponent, dialogConfig)
       .afterClosed().subscribe((result: OasDocConfirmMessageDialogResult | undefined) => handler(result));
-  }
-
-  // Issue #1347: resolve the release the ConfirmMessage picker is locked to. The OpenAPI Document
-  // carries no release; its connected BIEs all share one release, so prefer the acted-on row's release
-  // and fall back to any BIE-backed row (a document with only bodyless operations has none, in which
-  // case the dialog defaults to the connectSpec library's latest release).
-  private resolveOasDocRelease(row: BieForOasDoc): { releaseId: number; releaseNum: string } {
-    const rows = this.table.dataSource.data || [];
-    const withRelease = rows.find(r => !!r.releaseId);
-    return {
-      releaseId: row.releaseId || (withRelease ? withRelease.releaseId : undefined),
-      releaseNum: row.releaseNum || (withRelease ? withRelease.releaseNum : undefined)
-    };
   }
 
   // Issue #1347: apply an error-response body type (and ConfirmMessage BIE, if any) to an operation.
@@ -737,6 +755,136 @@ export class OasDocDetailComponent implements OnInit {
       r.confirmMessageDen = clearConfirm ? '' : (confirmDen || '');
       this.committedErrorResponseBodyType.set(r, bodyType);
     });
+  }
+
+  private bulkBodyTypeLabel(value: string): string {
+    return (this.errorResponseBodyTypeOptions.find(o => o.value === value) || {label: value}).label;
+  }
+
+  // Issue #1347: document-level "apply to all" of the Error Response Body Type. This is a SERVER-SIDE
+  // action, so it covers EVERY operation of the document (the grid is server-paginated — a client-side
+  // apply would silently miss off-page operations). Any unsaved inline edits are persisted first (so
+  // they are not lost and the server state the bulk apply reads is consistent), then the bulk applies
+  // and the grid is reloaded to reflect it. NONE / IETF Problem Details apply to all operations
+  // regardless of release; OAGi Confirm Message prompts for a release (from the whole document's unique
+  // releases) + a ConfirmMessage BIE, and the server applies it to that release's operations plus
+  // bodyless operations.
+  applyErrorResponseBodyTypeToAll(): void {
+    if ((this.table.dataSource.data || []).length === 0 && this.paginator.length === 0) {
+      return;
+    }
+    const bodyType = this.bulkErrorResponseBodyType;
+    this.persistChangesThen(() => {
+      if (bodyType !== 'CONFIRM_MESSAGE') {
+        this.sendBulkErrorResponse({errorResponseBodyType: bodyType});
+        return;
+      }
+      // Confirm Message is release-bound: fetch the whole document's releases (without disturbing the
+      // paginated grid), then pick a release + ConfirmMessage BIE.
+      this.fetchAllOasDocReleasesThen(selectableReleases => {
+        const dialogConfig = new MatDialogConfig();
+        dialogConfig.data = {
+          title: 'Select Confirm Message BIE',
+          selectableReleases,
+          // Default to the first release. A document with only bodyless operations has none, so the
+          // dialog falls back to the connectSpec library's latest Published release.
+          releaseId: selectableReleases.length > 0 ? selectableReleases[0].releaseId : undefined,
+          releaseNum: selectableReleases.length > 0 ? selectableReleases[0].releaseNum : undefined
+        };
+        dialogConfig.width = window.innerWidth + 'px';
+        dialogConfig.autoFocus = false;
+        this.dialog.open(OasDocConfirmMessageDialogComponent, dialogConfig)
+          .afterClosed().subscribe((result: OasDocConfirmMessageDialogResult | undefined) => {
+            if (!result || !result.topLevelAsbiepId) {
+              // Cancelled — refresh the grid so it reflects any edits persisted above.
+              this.loadBieListForOasDoc(true);
+              return;
+            }
+            this.sendBulkErrorResponse({
+              errorResponseBodyType: 'CONFIRM_MESSAGE',
+              confirmMessageTopLevelAsbiepId: result.topLevelAsbiepId,
+              releaseId: result.releaseId
+            });
+          });
+      });
+    });
+  }
+
+  // Issue #1347: fetch the document's distinct BIE releases for the "apply to all" ConfirmMessage Branch
+  // selector. The backend derives them in a single SELECT DISTINCT query (bodyless operations carry no
+  // release and are excluded server-side), so the whole paginated BIE list is no longer fetched only to
+  // combine releases client-side, and the visible grid's pagination/filters are left untouched.
+  private fetchAllOasDocReleasesThen(done: (releases: ReleaseSummary[]) => void): void {
+    this.loading = true;
+    this.openAPIService.getReleasesForOasDoc(this.oasDoc)
+      .pipe(finalize(() => this.loading = false))
+      .subscribe(
+        releases => done(releases || []),
+        _ => done([]));
+  }
+
+  // Issue #1347: persist any unsaved inline edits before a document-level bulk apply, so those edits are
+  // not lost (the bulk apply + reload would otherwise overwrite them) and the server state the bulk
+  // reads is consistent. Mirrors doUpdate's validation + doc/details save, but chains `onDone` to run
+  // only after the LAST server write completes. No unsaved changes -> onDone runs immediately.
+  private persistChangesThen(onDone: () => void): void {
+    if (!this.isChanged()) {
+      onDone();
+      return;
+    }
+    if (this.getChanged().some(e => !e.operationId || !e.operationId.trim())) {
+      this.snackBar.open('Operation ID is required.', '', {duration: 3000});
+      return;
+    }
+    this.recomputeOasValidation();
+    if (this.oasValidator.duplicateBodySlots.size > 0) {
+      this.snackBar.open('Each (Resource Name, Verb) can have only one Request and one Response body.', '', {duration: 5000});
+      return;
+    }
+    const persistDetailsThen = (next: () => void) => {
+      if (this.getChanged().length === 0) {
+        next();
+        return;
+      }
+      const request = new BieForOasDocUpdateRequest();
+      request.oasDocId = this.oasDoc.oasDocId;
+      request.bieForOasDocList = this.getChanged();
+      this.loading = true;
+      this.openAPIService.updateDetails(request).pipe(finalize(() => this.loading = false))
+        .subscribe(() => next());
+    };
+    if (this.hashCodeForOasDoc !== hashCode(this.oasDoc)) {
+      // A doc-level change (title/version/security) must be saved first (mirrors doUpdate), then details.
+      this.openAPIService.updateOasDoc(this.oasDoc).subscribe(() => {
+        this.openAPIService.getOasDoc(this.oasDoc.oasDocId).subscribe(reloaded => {
+          if (reloaded) {
+            this.oasDoc.securitySchemes = reloaded.securitySchemes || [];
+            this.oasDoc.securityRequirements = reloaded.securityRequirements || [];
+          }
+          this.init(this.oasDoc);
+          persistDetailsThen(onDone);
+        });
+      });
+    } else {
+      persistDetailsThen(onDone);
+    }
+  }
+
+  // Issue #1347: POST the document-level bulk error-response apply, then reload the grid so it reflects
+  // the server-applied state across all operations.
+  private sendBulkErrorResponse(payload: {
+    errorResponseBodyType: string;
+    confirmMessageTopLevelAsbiepId?: number;
+    releaseId?: number;
+  }): void {
+    this.loading = true;
+    this.openAPIService.applyErrorResponseBodyTypeToAll(this.oasDoc.oasDocId, payload)
+      .pipe(finalize(() => this.loading = false))
+      .subscribe(() => {
+        this.snackBar.open('Applied "' + this.bulkBodyTypeLabel(payload.errorResponseBodyType) + '" to all operations.',
+          '', {duration: 3000});
+        this.loadBieListForOasDoc(true);
+      });
   }
 
   private securityRequirementSummary(requirements: OasSecurityRequirement[], inherit: boolean): string {

@@ -4,6 +4,7 @@ import org.oagi.score.e2e.page.Page;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
+import java.math.BigInteger;
 
 /**
  * An interface of 'Edit OpenAPI Document' page.
@@ -612,7 +613,7 @@ public interface EditOpenAPIDocumentPage extends Page {
 
     /**
      * Select the {@code OAGi Confirm Message} option on an operation row's Error Response selector, which
-     * opens the 'Select ConfirmMessage BIE' dialog.
+     * opens the 'Select Confirm Message BIE' dialog.
      *
      * @param tableRecord the operation row
      * @return the opened dialog
@@ -620,7 +621,7 @@ public interface EditOpenAPIDocumentPage extends Page {
     OasDocConfirmMessageDialog openConfirmMessageDialogViaSelector(WebElement tableRecord);
 
     /**
-     * Re-open the 'Select ConfirmMessage BIE' dialog from an operation row's ConfirmMessage DEN chip
+     * Re-open the 'Select Confirm Message BIE' dialog from an operation row's ConfirmMessage DEN chip
      * (shown once CONFIRM_MESSAGE is selected).
      *
      * @param tableRecord the operation row
@@ -644,5 +645,83 @@ public interface EditOpenAPIDocumentPage extends Page {
      * @return the chip text
      */
     String getRowConfirmMessageChipText(WebElement tableRecord);
+
+    /**
+     * Return whether an operation row's ConfirmMessage chip shows a PICKED BIE (the "Selected Confirm
+     * Message" link) rather than the "Pick a Confirm Message…" placeholder. The picked BIE's DEN rides in
+     * the link's tooltip (not a stable DOM attribute), so a specific BIE's identity is verified via
+     * {@link #getRowConfirmMessagePickedBieId(WebElement)} instead of by DEN text.
+     *
+     * @param tableRecord the operation row
+     * @return {@code true} when a ConfirmMessage BIE is picked
+     */
+    boolean isRowConfirmMessagePicked(WebElement tableRecord);
+
+    /**
+     * Return the top-level ASBIEP id of the ConfirmMessage BIE picked on an operation row, parsed from the
+     * chip link's {@code /profile_bie/<id>} href, or {@code null} when no BIE is picked.
+     *
+     * @param tableRecord the operation row
+     * @return the picked BIE's top-level ASBIEP id, or {@code null}
+     */
+    BigInteger getRowConfirmMessagePickedBieId(WebElement tableRecord);
+
+    /* --------------------------- Issue #1347: document-level "apply Error Response to all operations" */
+
+    /**
+     * Return the body-type label currently shown on the toolbar-level {@code Set Error Responses}
+     * selector ({@code No Response Body} | {@code IETF Problem Details} | {@code OAGi Confirm Message}).
+     * This selector applies its value to EVERY operation of the document (server-side) when Apply is hit.
+     *
+     * @return the selected bulk body-type label
+     */
+    String getBulkErrorResponseBodyType();
+
+    /**
+     * Return whether the toolbar-level {@code Set Error Responses} selector is enabled.
+     *
+     * @return {@code true} when enabled
+     */
+    boolean isBulkErrorResponseSelectorEnabled();
+
+    /**
+     * Set the toolbar-level {@code Set Error Responses} selector to the given label. This only stages the
+     * value; nothing is applied until {@link #applyBulkErrorResponseBodyType()} (or, for
+     * {@code OAGi Confirm Message}, {@link #applyBulkErrorResponseBodyTypeForConfirmMessage()}) is called.
+     *
+     * @param label {@code No Response Body}, {@code IETF Problem Details}, or {@code OAGi Confirm Message}
+     */
+    void setBulkErrorResponseBodyType(String label);
+
+    /**
+     * Return whether the toolbar-level {@code Apply} button (next to the {@code Set Error Responses}
+     * selector) is enabled (it is disabled when the document has no operations).
+     *
+     * @return {@code true} when enabled
+     */
+    boolean isBulkErrorResponseApplyEnabled();
+
+    /**
+     * Click the toolbar-level {@code Apply} button for a {@code No Response Body} / {@code IETF Problem
+     * Details} bulk selection (which does NOT open a dialog); waits for the server-side apply + grid
+     * reload to complete.
+     */
+    void applyBulkErrorResponseBodyType();
+
+    /**
+     * Click the toolbar-level {@code Apply} button with {@code OAGi Confirm Message} selected, which opens
+     * the {@code Select Confirm Message BIE} dialog (whose Branch selector spans the whole document's
+     * releases). The caller picks a ConfirmMessage BIE and confirms with {@code Select}.
+     *
+     * @return the opened dialog
+     */
+    OasDocConfirmMessageDialog applyBulkErrorResponseBodyTypeForConfirmMessage();
+
+    /**
+     * After confirming the {@code Select Confirm Message BIE} dialog for a bulk {@code OAGi Confirm
+     * Message} apply, wait for the {@code Applied "..." to all operations.} snackbar and the subsequent
+     * grid reload to complete, so the caller can read the updated rows deterministically.
+     */
+    void confirmBulkErrorResponseApplied();
 
 }

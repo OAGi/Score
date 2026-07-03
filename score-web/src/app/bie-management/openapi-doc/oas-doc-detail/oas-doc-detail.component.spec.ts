@@ -1,4 +1,5 @@
 import {vi} from 'vitest';
+import {of} from 'rxjs';
 import {OasDocDetailComponent} from './oas-doc-detail.component';
 import {OasOperationValidator} from '../domain/oas-operation-validation';
 import {hashCode} from 'src/app/common/utility';
@@ -262,32 +263,172 @@ describe('OasDocDetailComponent error-response selector (#1347)', () => {
   });
 });
 
-describe('OasDocDetailComponent.resolveOasDocRelease locks to the connected BIE release (#1347)', () => {
-  // The ConfirmMessage picker is locked to the release of the document's connected BIE. The document has
-  // no release of its own, so resolveOasDocRelease derives it from the table rows.
-  function ctxWith(rows: any[]): any {
-    return {
-      table: {dataSource: {data: rows}},
-      resolveOasDocRelease: OasDocDetailComponent.prototype['resolveOasDocRelease'],
+describe('OasDocDetailComponent.openConfirmMessageDialog release resolution (#1347)', () => {
+  // The ConfirmMessage picker locks a BIE-backed operation's Branch to its own release; a BODYLESS
+  // operation (no release of its own) in a document spanning MULTIPLE releases instead gets an enabled
+  // Branch selector over all of the document's releases (else it locks to the single/none release).
+  // openConfirmMessageDialog delegates the release list to fetchAllOasDocReleasesThen and the dialog open
+  // to openConfirmMessageDialogWith, so both are stubbed to capture how the picker is configured.
+  function ctxWith(fetchedReleases: any[]): { ctx: any; captured: any } {
+    const captured: any = {};
+    const ctx: any = {
+      openConfirmMessageDialog: OasDocDetailComponent.prototype['openConfirmMessageDialog'],
+      openConfirmMessageDialogWith: (_row: any, _handler: any, selectableReleases: any, defaultRelease: any) => {
+        captured.selectableReleases = selectableReleases;
+        captured.defaultRelease = defaultRelease;
+      },
+      fetchAllOasDocReleasesThen: (done: (r: any[]) => void) => done(fetchedReleases),
     };
+    return {ctx, captured};
   }
 
-  it('uses the acted-on row release when present', () => {
-    const ctx = ctxWith([{releaseId: 5, releaseNum: '10.8'}, {releaseId: 9, releaseNum: '10.9'}]);
-    expect(ctx.resolveOasDocRelease({releaseId: 9, releaseNum: '10.9'}))
-      .toEqual({releaseId: 9, releaseNum: '10.9'});
+  it('locks a BIE-backed operation to its own release (no Branch selector)', () => {
+    const {ctx, captured} = ctxWith([]);
+    ctx.openConfirmMessageDialog({releaseId: 9, releaseNum: '10.9'}, () => {});
+    expect(captured.selectableReleases).toBeUndefined();
+    expect(captured.defaultRelease).toEqual({releaseId: 9, releaseNum: '10.9'});
   });
 
-  it('falls back to any BIE-backed row when the acted-on row is bodyless (no release)', () => {
-    const ctx = ctxWith([{releaseId: 0, releaseNum: ''}, {releaseId: 7, releaseNum: '10.7'}]);
-    expect(ctx.resolveOasDocRelease({releaseId: 0, releaseNum: ''}))
-      .toEqual({releaseId: 7, releaseNum: '10.7'});
+  it('offers an enabled Branch selector for a bodyless op in a multi-release document', () => {
+    const releases = [{releaseId: 5, releaseNum: '10.11'}, {releaseId: 9, releaseNum: '10.12'}];
+    const {ctx, captured} = ctxWith(releases);
+    ctx.openConfirmMessageDialog({releaseId: 0, releaseNum: ''}, () => {});
+    expect(captured.selectableReleases).toBe(releases);
+    expect(captured.defaultRelease).toEqual(releases[0]);
   });
 
-  it('returns an undefined release for a document with no connected BIE', () => {
-    const ctx = ctxWith([{releaseId: 0, releaseNum: ''}]);
-    expect(ctx.resolveOasDocRelease({releaseId: 0, releaseNum: ''}))
-      .toEqual({releaseId: undefined, releaseNum: undefined});
+  it('locks a bodyless op to the single release when the document has exactly one', () => {
+    const {ctx, captured} = ctxWith([{releaseId: 7, releaseNum: '10.7'}]);
+    ctx.openConfirmMessageDialog({releaseId: 0, releaseNum: ''}, () => {});
+    expect(captured.selectableReleases).toBeUndefined();
+    expect(captured.defaultRelease).toEqual({releaseId: 7, releaseNum: '10.7'});
+  });
+
+  it('falls back to no release for a bodyless-only document (dialog then uses the latest release)', () => {
+    const {ctx, captured} = ctxWith([]);
+    ctx.openConfirmMessageDialog({releaseId: 0, releaseNum: ''}, () => {});
+    expect(captured.selectableReleases).toBeUndefined();
+    expect(captured.defaultRelease).toEqual({releaseId: undefined, releaseNum: undefined});
+  });
+});
+
+describe('OasDocDetailComponent document-level "apply to all" error response (#1347)', () => {
+  type BulkRow = {
+    oasOperationId: number;
+    releaseId: number;
+    releaseNum?: string;
+    errorResponseBodyType: string;
+    confirmMessageTopLevelAsbiepId?: number;
+    confirmMessageDen?: string;
+  };
+
+  const OPTIONS = [
+    {value: 'NONE', label: 'No Response Body'},
+    {value: 'PROBLEM_DETAILS', label: 'IETF Problem Details'},
+    {value: 'CONFIRM_MESSAGE', label: 'OAGi Confirm Message'}
+  ];
+
+  // A `this` context exposing the SERVER-DRIVEN bulk-apply wiring. openAPIService + the ConfirmMessage
+  // dialog are stubbed with synchronous observables so the persist -> apply -> reload chain runs inline.
+  // The release-scoping/inheritance decision logic now lives (and is unit-tested) on the backend; these
+  // tests assert the client wiring (correct payload, persist-first, reload).
+  function bulkCtx(bodyType: string, rows: BulkRow[],
+                   opts: {dialogResult?: any; changed?: boolean; changedRows?: any[]; releases?: any[]} = {}): any {
+    const svc: any = {
+      applyErrorResponseBodyTypeToAll: vi.fn(() => of(null)),
+      updateDetails: vi.fn(() => of(null)),
+      updateOasDoc: vi.fn(() => of(null)),
+      getOasDoc: vi.fn(() => of(null)),
+    };
+    const oasDoc = {oasDocId: 7};
+    const ctx: any = {
+      table: {dataSource: {data: rows}},
+      paginator: {length: rows.length},
+      bulkErrorResponseBodyType: bodyType,
+      errorResponseBodyTypeOptions: OPTIONS,
+      oasDoc,
+      loading: false,
+      snackBar: {open: vi.fn()},
+      openAPIService: svc,
+      dialog: {open: vi.fn(() => ({afterClosed: () => of(opts.dialogResult)}))},
+      isChanged: () => !!opts.changed,
+      getChanged: () => (opts.changed ? (opts.changedRows || []) : []),
+      recomputeOasValidation: vi.fn(),
+      oasValidator: {duplicateBodySlots: new Set()},
+      // no doc-level change -> persist takes the details-only branch
+      hashCodeForOasDoc: hashCode(oasDoc),
+      loadBieListForOasDoc: vi.fn(),
+      fetchAllOasDocReleasesThen: vi.fn((done: (releases: any[]) => void) => done(opts.releases || [])),
+      bulkBodyTypeLabel: OasDocDetailComponent.prototype['bulkBodyTypeLabel'],
+      persistChangesThen: OasDocDetailComponent.prototype['persistChangesThen'],
+      sendBulkErrorResponse: OasDocDetailComponent.prototype['sendBulkErrorResponse'],
+      applyErrorResponseBodyTypeToAll: OasDocDetailComponent.prototype.applyErrorResponseBodyTypeToAll,
+    };
+    return ctx;
+  }
+
+  it('fetchAllOasDocReleasesThen fetches the document releases from the backend in ONE call (no BIE-list scan)', () => {
+    // The distinct-release derivation moved server-side (a single SELECT DISTINCT query). The client just
+    // requests /bie_list/releases and passes the result through — it no longer fetches the paginated BIE
+    // list and combines releases itself, so the visible grid's pagination is left untouched.
+    const releases = [{releaseId: 5, releaseNum: '10.8'}, {releaseId: 9, releaseNum: '10.9'}];
+    const svc: any = {
+      getReleasesForOasDoc: vi.fn(() => of(releases)),
+      getBieForOasDocListWithRequest: vi.fn(),
+    };
+    const ctx: any = {
+      oasDoc: {oasDocId: 7},
+      loading: false,
+      openAPIService: svc,
+      fetchAllOasDocReleasesThen: OasDocDetailComponent.prototype['fetchAllOasDocReleasesThen'],
+    };
+    let received: any;
+    ctx.fetchAllOasDocReleasesThen((r: any) => received = r);
+    expect(svc.getReleasesForOasDoc).toHaveBeenCalledWith(ctx.oasDoc);
+    expect(svc.getBieForOasDocListWithRequest).not.toHaveBeenCalled(); // no full BIE-list scan
+    expect(received).toBe(releases);
+  });
+
+  it('NONE / IETF Problem Details POST to the server for all operations (no dialog), then reload', () => {
+    const ctx = bulkCtx('PROBLEM_DETAILS', [{oasOperationId: 1, releaseId: 5, errorResponseBodyType: 'NONE'}]);
+    ctx.applyErrorResponseBodyTypeToAll();
+    expect(ctx.dialog.open).not.toHaveBeenCalled();
+    expect(ctx.openAPIService.applyErrorResponseBodyTypeToAll)
+      .toHaveBeenCalledWith(7, {errorResponseBodyType: 'PROBLEM_DETAILS'});
+    expect(ctx.loadBieListForOasDoc).toHaveBeenCalled();
+  });
+
+  it('Confirm Message loads all operations, picks release+BIE, then POSTs that release + BIE', () => {
+    const ctx = bulkCtx('CONFIRM_MESSAGE', [{oasOperationId: 1, releaseId: 7, errorResponseBodyType: 'NONE'}],
+      {dialogResult: {topLevelAsbiepId: 42, den: 'Confirm Message. Confirm Message', releaseId: 7},
+       releases: [{releaseId: 7, releaseNum: '10.7'}]});
+    ctx.applyErrorResponseBodyTypeToAll();
+    expect(ctx.fetchAllOasDocReleasesThen).toHaveBeenCalledTimes(1); // full-doc release list
+    expect(ctx.dialog.open).toHaveBeenCalledTimes(1);
+    expect(ctx.openAPIService.applyErrorResponseBodyTypeToAll).toHaveBeenCalledWith(7, {
+      errorResponseBodyType: 'CONFIRM_MESSAGE', confirmMessageTopLevelAsbiepId: 42, releaseId: 7,
+    });
+    expect(ctx.loadBieListForOasDoc).toHaveBeenCalled();
+  });
+
+  it('Confirm Message cancelled does NOT POST, but reloads to restore pagination', () => {
+    const ctx = bulkCtx('CONFIRM_MESSAGE', [{oasOperationId: 1, releaseId: 7, errorResponseBodyType: 'NONE'}],
+      {dialogResult: undefined, releases: [{releaseId: 7, releaseNum: '10.7'}]});
+    ctx.applyErrorResponseBodyTypeToAll();
+    expect(ctx.openAPIService.applyErrorResponseBodyTypeToAll).not.toHaveBeenCalled();
+    expect(ctx.loadBieListForOasDoc).toHaveBeenCalled();
+  });
+
+  it('persists unsaved inline edits BEFORE the bulk apply', () => {
+    const ctx = bulkCtx('PROBLEM_DETAILS', [{oasOperationId: 1, releaseId: 5, errorResponseBodyType: 'NONE'}],
+      {changed: true, changedRows: [{operationId: 'queryThing'}]});
+    ctx.applyErrorResponseBodyTypeToAll();
+    // details saved first, then the bulk apply, then reload
+    expect(ctx.openAPIService.updateDetails).toHaveBeenCalledTimes(1);
+    expect(ctx.openAPIService.applyErrorResponseBodyTypeToAll).toHaveBeenCalledTimes(1);
+    const saveOrder = ctx.openAPIService.updateDetails.mock.invocationCallOrder[0];
+    const bulkOrder = ctx.openAPIService.applyErrorResponseBodyTypeToAll.mock.invocationCallOrder[0];
+    expect(saveOrder).toBeLessThan(bulkOrder);
   });
 });
 

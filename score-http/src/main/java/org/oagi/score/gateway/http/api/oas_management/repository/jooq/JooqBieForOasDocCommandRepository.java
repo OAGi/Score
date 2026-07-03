@@ -9,6 +9,7 @@ import org.oagi.score.gateway.http.api.oas_management.model.BieForOasDoc;
 import org.oagi.score.gateway.http.api.oas_management.model.OasDocId;
 import org.oagi.score.gateway.http.api.oas_management.model.OasSecurityRequirement;
 import org.oagi.score.gateway.http.api.oas_management.model.OpenAPIErrorResponseBodyType;
+import org.oagi.score.gateway.http.api.oas_management.model.OperationErrorResponseAssignment;
 import org.oagi.score.gateway.http.api.oas_management.repository.BieForOasDocCommandRepository;
 import org.oagi.score.gateway.http.common.model.AccessControl;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
@@ -522,6 +523,32 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
                     .execute();
         }
         return changed || flagChanged;
+    }
+
+    // Issue #1347: document-level bulk apply. The service has already resolved which operations to touch
+    // (all for NONE/PROBLEM_DETAILS; the chosen release's operations + bodyless operations for
+    // CONFIRM_MESSAGE) and with which value; here we just persist each assignment via the same
+    // only-on-change writer used by inline edits.
+    @Override
+    public BulkUpdateErrorResponseResponse bulkUpdateErrorResponse(
+            OasDocId oasDocId, List<OperationErrorResponseAssignment> assignments) throws ScoreDataAccessException {
+        UserId requesterId = requester().userId();
+        LocalDateTime timestamp = LocalDateTime.now();
+        boolean changed = false;
+        if (assignments != null) {
+            for (OperationErrorResponseAssignment assignment : assignments) {
+                if (assignment.getOasOperationId() == null) {
+                    continue;
+                }
+                changed |= saveOperationErrorResponseBody(
+                        ULong.valueOf(assignment.getOasOperationId()),
+                        assignment.getErrorResponseBodyType(),
+                        assignment.getConfirmTopLevelAsbiepId(),
+                        valueOf(requesterId),
+                        timestamp);
+            }
+        }
+        return new BulkUpdateErrorResponseResponse(oasDocId, changed);
     }
 
     // Issue #1347: persist an operation's error-response body type (and, for CONFIRM_MESSAGE, the picked

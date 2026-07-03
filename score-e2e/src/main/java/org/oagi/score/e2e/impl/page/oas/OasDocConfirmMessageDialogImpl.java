@@ -99,6 +99,26 @@ public class OasDocConfirmMessageDialogImpl implements OasDocConfirmMessageDialo
         return button.isEnabled() && (klass == null || !klass.contains("mat-mdc-button-disabled"));
     }
 
+    // Issue #1347: the Branch field is an enabled mat-select only in "apply to all" / bodyless-multi-release
+    // mode; otherwise it is a disabled <input> locked to the operation's release.
+    private static final By BRANCH_SELECT_LOCATOR =
+            By.xpath(BASE_XPATH + "//div[contains(@class, \"branch-selector\")]//mat-select");
+
+    @Override
+    public boolean isBranchSelectorEnabled() {
+        return isElementPresent(getDriver(), BRANCH_SELECT_LOCATOR);
+    }
+
+    @Override
+    public void selectBranch(String releaseNum) {
+        click(getDriver(), visibilityOfElementLocated(getDriver(), BRANCH_SELECT_LOCATOR));
+        WebElement option = elementToBeClickable(getDriver(),
+                By.xpath("//mat-option[normalize-space(.) = " + xpathLiteral(releaseNum) + "]"));
+        click(getDriver(), option);
+        // Switching the Branch reloads the ConfirmMessage BIE list for that release.
+        waitFor(ofMillis(1000L));
+    }
+
     @Override
     public void hitSelect() {
         click(getDriver(), elementToBeClickable(getDriver(), SELECT_BUTTON_LOCATOR));
