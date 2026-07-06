@@ -200,6 +200,75 @@ To set the security of an operation:
 4. Click the "Update" button on the "Edit OpenAPI Document" page to save the changes.
 
 
+Configure Error Responses
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In addition to its success response, every operation that connectCenter generates is given a
+default set of ``4xx``/``5xx`` error responses. By default these error responses are
+*description only* — a status code and a human-readable description with no response body. You
+can attach a structured error body to an operation through the *Error Response* column of the
+*Endpoint Details* table.
+
+The set of default error codes generated for an operation depends on its *Verb*, its
+*Array Indicator*, and the document's *OpenAPI Version*:
+
+- ``401``, ``403``, ``500``, ``502``, ``503`` and ``504`` are generated for every operation.
+- ``400`` (Bad Request) is generated for ``POST``, ``PUT`` and ``PATCH``, and for a ``GET`` that
+  returns a collection (*Array Indicator* checked).
+- ``404`` (Not Found) is generated for ``PUT``, ``PATCH`` and ``DELETE``, and for a ``GET`` that
+  returns a single item (*Array Indicator* unchecked).
+- ``409`` (Conflict) is generated for ``POST``, ``PUT``, ``PATCH`` and ``DELETE``.
+- ``415`` (Unsupported Media Type) and ``422`` (Unprocessable Content) are generated for the
+  body-bearing verbs ``POST``, ``PUT`` and ``PATCH`` — and for ``DELETE`` only when the document
+  is **OpenAPI 3.1**, because a ``DELETE`` carries a request body only in 3.1 (see
+  `DELETE operations with a request body <#delete-operations-with-a-request-body>`__).
+
+The *Error Response* column of each operation offers three body types:
+
+1. *No Response Body* (the default) — the generated error responses carry only the status code
+   and a description, with no body. Existing documents keep this behavior until you opt in.
+2. *IETF Problem Details* — each generated error response carries an ``application/problem+json``
+   body that references a shared RFC 9457 ``ProblemDetails`` schema (with ``status``, ``title``
+   and ``detail`` required, and ``type`` and ``instance`` optional) together with an illustrative
+   example for the status.
+3. *OAGi Confirm Message* — each generated error response carries an ``application/json`` body
+   that references a Confirm Message BIE that you pick. When you select this body type a
+   *Pick a Confirm Message…* prompt appears in the cell; click the edit icon to choose the
+   Confirm Message BIE. Once picked, the cell shows a *Selected Confirm Message* link that opens
+   the chosen BIE in a new tab.
+
+To set the Error Response body type of a single operation:
+
+1. Open the desired OpenAPI Document's "Edit OpenAPI Document" page.
+
+2. In the *Endpoint Details* table, open the *Error Response* selector of the desired operation
+   and choose *No Response Body*, *IETF Problem Details* or *OAGi Confirm Message*.
+
+3. For *OAGi Confirm Message*, click the edit icon in the cell, pick the Confirm Message BIE and
+   confirm.
+
+4. Click the "Update" button.
+
+To apply one Error Response body type to every operation at once, use the *Set Error Responses*
+control above the *Endpoint Details* table:
+
+1. Above the *Endpoint Details* table, choose a body type in the *Set Error Responses* selector.
+
+2. Click the "Apply" button.
+
+   - *No Response Body* and *IETF Problem Details* are applied to every operation.
+   - *OAGi Confirm Message* first prompts you to select a *Branch* (one of the releases present in
+     the document) and a Confirm Message BIE, then applies it to that release's operations
+     together with any operation that carries no message body.
+
+3. Click the "Update" button.
+
+A newly added operation inherits the document's prevailing Error Response setting: when every
+existing operation uses the same body type — all *IETF Problem Details*, or all *OAGi Confirm
+Message* with a single Confirm Message BIE that is unambiguous for the new operation's release —
+the new operation adopts it; otherwise the new operation defaults to *No Response Body*.
+
+
 Add Operations without a BIE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
