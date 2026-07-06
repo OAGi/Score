@@ -849,11 +849,9 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     private void removeBusinessTermChip(WebElement chip) {
         click(getDriver(), chip.findElement(By.xpath(".//button[@matChipRemove]")));
-        // A confirmation dialog appears; confirm it. The confirm action button label is "Discard"
-        // (matching the standalone assignment-discard confirm the in-editor flow reuses).
-        WebElement confirm = elementToBeClickable(getDriver(), By.xpath(
-                "//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]"));
-        click(getDriver(), confirm);
+        // A "Remove this business term assignment?" confirmation dialog appears; its confirm action
+        // button is labelled "Remove" (bie-edit.component.ts, dialogConfig.data.action = 'Remove').
+        click(getDriver(), getDialogButtonByName(getDriver(), "Remove"));
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofMillis(500L));
     }
