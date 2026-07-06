@@ -113,8 +113,14 @@ public class BieBusinessTermAssignDialogImpl implements BieBusinessTermAssignDia
     public boolean isMasterIndeterminate() {
         WebElement checkbox = visibilityOfElementLocated(getDriver(), MASTER_CHECKBOX_LOCATOR);
         String klass = checkbox.getAttribute("class");
-        return "mixed".equals(checkbox.getAttribute("aria-checked"))
-                || (klass != null && klass.contains("mat-mdc-checkbox-indeterminate"));
+        if (klass != null && klass.contains("indeterminate")) {
+            return true;
+        }
+        // Material MDC surfaces the indeterminate ("mixed") state as aria-checked="mixed" on the inner
+        // <input>; Material 21 no longer carries the state on the <mat-checkbox> host, so reading the
+        // host's aria-checked / *-indeterminate class alone misses it.
+        WebElement input = checkbox.findElement(By.cssSelector("input[type=\"checkbox\"]"));
+        return "mixed".equals(input.getAttribute("aria-checked"));
     }
 
     @Override

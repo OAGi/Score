@@ -799,9 +799,14 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     }
 
     private void setTypeCodeInlineEditValue(String typeCode) {
-        WebElement input = visibilityOfElementLocated(getDriver(), By.xpath(
-                "//input[contains(concat(\" \", normalize-space(@class), \" \"), \" bt-chip-type-input \")]"));
-        sendKeys(input, typeCode);
+        // Entering inline-edit re-renders the chip, so an input reference can go stale between the find
+        // and the sendKeys; re-find inside a retry to ride out the re-render.
+        retry(() -> {
+            WebElement input = visibilityOfElementLocated(getDriver(), By.xpath(
+                    "//input[contains(concat(\" \", normalize-space(@class), \" \"), \" bt-chip-type-input \")]"));
+            sendKeys(input, typeCode);
+            return input;
+        });
     }
 
     private void saveTypeCodeInlineEdit() {

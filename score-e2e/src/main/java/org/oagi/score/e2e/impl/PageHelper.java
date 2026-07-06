@@ -73,7 +73,12 @@ public abstract class PageHelper {
     }
 
     public static Wait<WebDriver> defaultWait(WebDriver driver) {
-        return wait(driver, Duration.ofSeconds(5L), ofMillis(100L));
+        // 12s (was 5s): the unoptimized `ng serve` dev server renders/serves noticeably slower than a
+        // production build, so 5s FluentWaits flake on multi-step async flows (e.g. a create that runs a
+        // check-uniqueness GET then a create POST before its snackbar, or a dialog button that only
+        // becomes clickable once the dialog finishes rendering). A longer ceiling is env-robust and does
+        // not slow the happy path (found elements return immediately).
+        return wait(driver, Duration.ofSeconds(12L), ofMillis(100L));
     }
 
     public static Wait<WebDriver> shortWait(WebDriver driver) {
