@@ -256,17 +256,23 @@ describe('BieEditComponent #1312 read-only WIP view', () => {
 /**
  * Issue #1755: warn before an "Used" un-check clears descendants. The un-check guard is pure enough
  * to test by binding the prototype method to a plain fake `this` (no Angular wiring), matching the
- * fixtures used above. The dialog fires on un-check of any node that HAS descendants (`expandable`)
- * — we intentionally do not count/list the affected fields, since the tree lazy-loads children and a
- * count would change depending on whether the subtree had been expanded.
+ * fixtures used above. The dialog fires ONLY when un-checking would actually clear a used descendant
+ * (hasUsedDescendant), not merely because the node is expandable; children lazy-load, so the guard
+ * materializes them on demand. We still keep the message generic (no count/list of affected fields).
  */
 describe('BieEditComponent.toggleTreeUsed un-check guard (#1755)', () => {
+  function leaf(name: string, used: boolean): any {
+    return {name, used, inverseMode: false, expandable: false, isGroup: false, children: []};
+  }
+
   function toggleCtx(overrides: any = {}): any {
     const afterClosed$ = overrides.afterClosed$ ?? of(true);
     const dialogConfig = {data: {}};
     const ctx: any = {
       isUsable: () => true,
       used: BieEditComponent.prototype.used,
+      hasUsedDescendant: (BieEditComponent.prototype as any).hasUsedDescendant,
+      dataSource: {database: {loadChildren: vi.fn()}},
       assignVersionToVersionIdIfPossible: vi.fn(),
       confirmDialogService: {
         newConfig: vi.fn().mockReturnValue(dialogConfig),
@@ -311,9 +317,10 @@ describe('BieEditComponent.toggleTreeUsed un-check guard (#1755)', () => {
     expect(ctx.confirmDialogService.open).not.toHaveBeenCalled();
   });
 
-  it('opens a simple confirm dialog (no count/list) before un-checking a node with descendants', () => {
+  it('opens a simple confirm dialog (no count/list) before un-checking a node with a used descendant', () => {
     const ctx = toggleCtx({afterClosed$: of(true)});
-    const node: any = {name: 'Messages', used: true, inverseMode: false, expandable: true};
+    const node: any = {name: 'Messages', used: true, inverseMode: false, expandable: true,
+      isGroup: false, children: [leaf('Message Identifier', true)]};
 
     ctx.toggleTreeUsed(node);
 
@@ -332,7 +339,8 @@ describe('BieEditComponent.toggleTreeUsed un-check guard (#1755)', () => {
 
   it('leaves the tree untouched when the user cancels the dialog', () => {
     const ctx = toggleCtx({afterClosed$: of(false)});
-    const node: any = {name: 'Messages', used: true, inverseMode: false, expandable: true};
+    const node: any = {name: 'Messages', used: true, inverseMode: false, expandable: true,
+      isGroup: false, children: [leaf('Message Identifier', true)]};
 
     ctx.toggleTreeUsed(node);
 
@@ -343,7 +351,8 @@ describe('BieEditComponent.toggleTreeUsed un-check guard (#1755)', () => {
 
   it('restores the clicked checkbox on cancel (mat-checkbox already flipped itself visually)', () => {
     const ctx = toggleCtx({afterClosed$: of(false)});
-    const node: any = {name: 'Messages', used: true, inverseMode: false, expandable: true};
+    const node: any = {name: 'Messages', used: true, inverseMode: false, expandable: true,
+      isGroup: false, children: [leaf('Message Identifier', true)]};
     // Material toggled the checkbox to unchecked on click; the model stayed true.
     const checkbox: any = {checked: false};
 
@@ -351,5 +360,32 @@ describe('BieEditComponent.toggleTreeUsed un-check guard (#1755)', () => {
 
     expect(node.used).toBe(true);
     expect(checkbox.checked).toBe(true); // re-synced to the (unchanged) model value
+  });
+
+  it('un-checks a node whose descendants are all unused silently (no dialog) (#1755)', () => {
+    const ctx = toggleCtx();
+    // Expandable, but every descendant is already un-used, so nothing would be cleared.
+    const node: any = {name: 'Messages', used: true, inverseMode: false, expandable: true,
+      isGroup: false, children: [leaf('Message Identifier', false), leaf('Note', false)]};
+
+    ctx.toggleTreeUsed(node);
+
+    expect(ctx.confirmDialogService.open).not.toHaveBeenCalled();
+    expect(node.used).toBe(false);
+  });
+
+  it('materializes collapsed children on demand and warns when a used descendant is found (#1755)', () => {
+    const usedChild = leaf('Message Identifier', true);
+    const loadChildren = vi.fn().mockImplementation((n: any) => { n.children = [usedChild]; });
+    const ctx = toggleCtx({dataSource: {database: {loadChildren}}, afterClosed$: of(true)});
+    // Collapsed: children not loaded yet (empty), so the guard must load them to find the used one.
+    const node: any = {name: 'Messages', used: true, inverseMode: false, expandable: true,
+      isGroup: false, children: []};
+
+    ctx.toggleTreeUsed(node);
+
+    expect(loadChildren).toHaveBeenCalledWith(node);
+    expect(ctx.confirmDialogService.open).toHaveBeenCalledTimes(1);
+    expect(node.used).toBe(false);
   });
 });

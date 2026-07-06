@@ -858,10 +858,11 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
     // Issue #1755: the "Used" checkbox sits right next to the expand/collapse chevron, so a misclick
     // can un-check a node and clear "Used" on its whole subtree — silently when the node is collapsed.
-    // Confirm before un-checking a node that has descendants. We deliberately do NOT enumerate the
-    // affected fields: the tree lazy-loads children, so a count/list would change depending on whether
-    // the subtree had been expanded, which is confusing; a simple, consistent warning is clearer.
-    if (this.used(node) === true && node.expandable) {
+    // Warn ONLY when un-checking would actually clear a used descendant — not merely because the node
+    // is expandable: hasUsedDescendant() materializes lazy-loaded children on demand so the answer is
+    // accurate whether or not the subtree was ever expanded. We still keep the message generic (no
+    // live count/list): enumerating the affected fields adds little over a clear, consistent warning.
+    if (this.used(node) === true && node.expandable && this.hasUsedDescendant(node)) {
       const dialogConfig = this.confirmDialogService.newConfig();
       dialogConfig.data.header = 'Unchecking will clear used descendants';
       dialogConfig.data.content = [
@@ -888,6 +889,30 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     if (node.used) {
       this.assignVersionToVersionIdIfPossible();
     }
+  }
+
+  /**
+   * Issue #1755: does un-checking {@code node} actually clear "Used" on at least one descendant?
+   * Un-checking a node cascades "Used = false" down its whole subtree, so only groups and
+   * already-used children can lead to a used descendant; this walk prunes everything else and stops
+   * at the first used descendant it finds. Children lazy-load, so it materializes them on demand
+   * (mirroring the uplift traversal) to stay accurate whether or not the subtree was expanded.
+   */
+  private hasUsedDescendant(node: BieFlatNode): boolean {
+    const stack: BieFlatNode[] = [node];
+    while (stack.length > 0) {
+      const item = stack.shift();
+      if (item.expandable && item.children.length === 0) {
+        this.dataSource.database.loadChildren(item);
+      }
+      if (item !== node && !item.isGroup && this.used(item) === true) {
+        return true;
+      }
+      (item.children as BieFlatNode[])
+        .filter(child => child.isGroup || this.used(child) === true)
+        .forEach(child => stack.push(child));
+    }
+    return false;
   }
 
   toggleDetailUsed(detailNode?: BieFlatNode, $event?: MouseEvent, checkbox?: MatCheckbox) {
