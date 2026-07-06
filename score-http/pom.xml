@@ -56,7 +56,7 @@
         <!-- CI-friendly version (used by <version>${revision}</version> above).
              Keep this in sync with the VERSION file, which is the single source of truth.
              docker/build.sh overrides it for release builds via -Drevision="$(cat VERSION)". -->
-        <revision>3.5.2-rc2</revision>
+        <revision>3.5.2</revision>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
