@@ -102,6 +102,12 @@ Catalog uniqueness is enforced server-side, not only in the UI. A Business Term 
 ## Test Case 42.2
 **Business Term Assignment**
 
+> **Superseded by #1754.** The standalone `Business Term Assignment` and `Assign Business Term`
+> pages were replaced by the in-editor `Business Terms` chip field, so the automated test class
+> `TC_42_2_BusinessTermAssignment` is disabled (`@Disabled`); its bodies are kept for reference
+> only. The assertions below are retained for historical context — the active coverage now lives
+> in [Test Case 42.5](#test-case-425).
+
 ### Test Assertion:
 
 #### Test Assertion #42.2.1
@@ -213,6 +219,11 @@ Preferred is one-per-BIE-node and independent of Type Code: setting an assignmen
 
 ## Test Case 42.3
 **Business Term from BIE Detail Page**
+
+> **Superseded by #1754.** The `Show Business Terms` / `Assign Business Term` buttons on the BIE
+> detail page were replaced by the in-editor `Business Terms` chip field, so the automated test
+> class `TC_42_3_BusinessTermFromBIEDetailPage` is disabled (`@Disabled`); its bodies are kept for
+> reference only. The active coverage now lives in [Test Case 42.5](#test-case-425).
 
 ### Test Assertion:
 
