@@ -296,4 +296,8 @@ The script contains all developer records, including core components, code lists
 
 1. `Open the detail page of the new release <#find-a-release>`__.
 
-2. Click the "Generate Migration Script" button.
+2. If you also want the developer-defined sibling ordering (see `Order sibling components in the
+   tree <#order-sibling-components-in-the-tree>`__) to be reproduced when the script is applied,
+   check the *Include sibling view order* checkbox next to the button.
+
+3. Click the "Generate Migration Script" button.

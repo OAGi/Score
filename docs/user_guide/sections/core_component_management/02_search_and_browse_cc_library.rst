@@ -220,6 +220,38 @@ The following five (5) formats are used to distinguish different types of compon
 
 5. Regular red font is for Supplementary Components (SC).
 
+Order sibling components in the tree
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In the Core Component tree, a developer can control the order in which sibling nodes (the
+attributes and associations under an aggregate node) are displayed. This ordering is a *view*
+preference only: it changes how the siblings appear in the model browser and in the BIE editor,
+but it does **not** change the order of elements in a generated schema or BIE expression (those
+follow the components' sequence keys).
+
+Each sibling has an *order weight*, and siblings are shown by **order weight descending, then by
+name**. A sibling that has not been given a weight uses a default of ``0``, so a positive weight
+moves it above the unweighted siblings and a negative weight below them. Weights need not be
+unique or sequential. Reordering is available to developers only.
+
+There are two ways to reorder siblings:
+
+- **Drag and drop** — hover a sibling to reveal its drag handle, then drag it above or below its
+  siblings. connectCenter spaces the affected weights by 10 and rewrites only the weights that
+  actually changed.
+- **Set an explicit weight** — open a sibling's context menu and choose *Order Weight*. On the
+  "Set order weight" dialog, type an integer weight and save. If the sibling already has a weight,
+  the dialog shows it and lets you reset to the default.
+
+A sibling that has a custom weight shows a small order-weight badge next to its name. To hide these
+badges, open the tree's settings menu (the same menu as *Hide cardinality*) and toggle
+*Hide order weights*. To clear the custom order of a group of siblings, open the context menu of
+one of them and choose *Reset Order Weights*.
+
+The sibling order is stored per release. It is carried forward when a new release is drafted from
+the working branch, and it can be included in a release's migration script (see
+`Generate the migration script <#generate-the-migration-script>`__).
+
 Search within a Core Component Tree
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
