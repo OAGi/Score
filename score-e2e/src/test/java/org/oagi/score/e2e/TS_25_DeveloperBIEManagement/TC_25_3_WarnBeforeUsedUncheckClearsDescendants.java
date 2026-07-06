@@ -39,9 +39,10 @@ import static org.oagi.score.e2e.impl.PageHelper.waitFor;
  *
  * The BIE editor tree's left "Used" checkbox sits right next to the expand/collapse chevron, so a
  * misclick can un-check a node and cascade-clear "Used" across its whole subtree — silently when the
- * node is collapsed. A confirmation dialog now guards the un-check of a node that has descendants
- * (an expandable node). The warning is intentionally generic (it names the node but does not
- * enumerate the descendants, because the tree lazy-loads children).
+ * node is collapsed. A confirmation dialog guards the un-check of a node that has at least one USED
+ * descendant (i.e. an un-check that would actually clear something); un-checking an expandable node
+ * whose descendants are all un-used proceeds silently. The warning is intentionally generic (it names
+ * the node but does not enumerate the descendants, because the tree lazy-loads children).
  *
  * See docs/test_cases/TestSuite25.md (Test Case 25.3).
  */
@@ -81,7 +82,7 @@ public class TC_25_3_WarnBeforeUsedUncheckClearsDescendants extends BaseTest {
     public void warn_before_used_uncheck_clears_used_descendants() {
         AppUserObject developer;
         ASCCPObject rootAsccp, childAsccp;
-        BCCPObject leafBccp;
+        BCCPObject leafBccp, grandChildBccp;
 
         LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         String currentRelease = "10.8.8";
@@ -106,11 +107,13 @@ public class TC_25_3_WarnBeforeUsedUncheckClearsDescendants extends BaseTest {
             leafBccp = cc.createRandomBCCP(release, noScBdt, developer, namespace, "Published");
             cc.appendBCC(rootAcc, leafBccp, "Published"); // cardinality 0..-1 => optional => usable
 
-            // (b) An OPTIONAL ASBIE under the root whose target ACC has a child -> it is expandable
-            //     (has descendants), which is the case the #1755 warning guards.
+            // (b) An OPTIONAL ASBIE under the root whose target ACC has an OPTIONAL child BBIE -> it is
+            //     expandable (has a descendant). Because the descendant is optional it starts un-used, so
+            //     it exercises BOTH #1755 cases: un-check with no used descendant (silent) and, once the
+            //     descendant is marked Used, un-check that would clear it (warns).
             ACCObject childAcc = cc.createRandomACC(developer, release, namespace, "Published");
-            BCCPObject grandChildBccp = cc.createRandomBCCP(release, noScBdt, developer, namespace, "Published");
-            cc.appendBCC(childAcc, grandChildBccp, "Published"); // gives childAcc a descendant
+            grandChildBccp = cc.createRandomBCCP(release, noScBdt, developer, namespace, "Published");
+            cc.appendBCC(childAcc, grandChildBccp, "Published"); // optional 0..-1 => starts un-used
             childAsccp = cc.createRandomASCCP(childAcc, developer, namespace, "Published");
             cc.appendASCC(rootAcc, childAsccp, "Published"); // optional ASBIE with descendants
 
@@ -125,11 +128,13 @@ public class TC_25_3_WarnBeforeUsedUncheckClearsDescendants extends BaseTest {
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(developerBIE);
 
         String expandablePath = "/" + rootAsccp.getPropertyTerm() + "/" + childAsccp.getPropertyTerm();
+        String grandChildPath = expandablePath + "/" + grandChildBccp.getPropertyTerm();
         String leafPath = "/" + rootAsccp.getPropertyTerm() + "/" + leafBccp.getPropertyTerm();
 
         // ---------------------------------------------------------------------------------------
         // Baseline: make the expandable node "Used". Checking a node ON never prompts (check
         // direction is silent), regardless of whether the node has descendants. (Assertion #25.3.5)
+        // The cascade leaves its OPTIONAL descendant BBIE un-used.
         // ---------------------------------------------------------------------------------------
         WebElement expandableCheckbox = getTreeUsedCheckbox(editBIEPage, expandablePath);
         if (!isChecked(expandableCheckbox)) {
@@ -140,9 +145,31 @@ public class TC_25_3_WarnBeforeUsedUncheckClearsDescendants extends BaseTest {
         assertChecked(expandableCheckbox);
 
         // ---------------------------------------------------------------------------------------
-        // Assertion #25.3.1: un-checking a used, expandable node raises the confirmation dialog,
-        // titled and worded as specified, naming the node.
+        // Assertion #25.3.6 (Issue #1755): un-checking a used, expandable node whose descendants are
+        // all un-used proceeds SILENTLY — the guard fires only when the un-check would actually clear a
+        // used descendant, not merely because the node is expandable.
         // ---------------------------------------------------------------------------------------
+        click(expandableCheckbox);
+        assertNoConfirmationDialog();
+        expandableCheckbox = getTreeUsedCheckbox(editBIEPage, expandablePath);
+        assertNotChecked(expandableCheckbox);
+
+        // Re-arm: re-use the node, then mark its descendant "Used" so an un-check now HAS something to
+        // clear. (Checking a node ON is always silent.)
+        click(expandableCheckbox);
+        assertNoConfirmationDialog();
+        WebElement grandChildCheckbox = getTreeUsedCheckbox(editBIEPage, grandChildPath);
+        if (!isChecked(grandChildCheckbox)) {
+            click(grandChildCheckbox);
+            assertNoConfirmationDialog();
+        }
+        assertChecked(getTreeUsedCheckbox(editBIEPage, grandChildPath));
+
+        // ---------------------------------------------------------------------------------------
+        // Assertion #25.3.1: un-checking a used node that HAS a used descendant raises the
+        // confirmation dialog, titled and worded as specified, naming the node.
+        // ---------------------------------------------------------------------------------------
+        expandableCheckbox = getTreeUsedCheckbox(editBIEPage, expandablePath);
         click(expandableCheckbox);
         assertEquals(CONFIRM_DIALOG_HEADER, getDialogTitle(getDriver()));
         String firstLine = getText(visibilityOfElementLocated(getDriver(),

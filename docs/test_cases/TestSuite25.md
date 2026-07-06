@@ -121,7 +121,7 @@ The new top-level BIE is owned by the developer invoking the creation.
 
 **Warn before an "Used" un-check clears used descendants**
 
-> In the BIE editor tree, the "Used" checkbox sits immediately next to the expand/collapse chevron, so a misclick can un-check a node and cascade-clear "Used" across its entire subtree — silently when the node is collapsed. A confirmation dialog guards this. The warning is deliberately generic (it names the node but does not enumerate the affected descendants) because the tree lazy-loads its children, so an enumerated count would vary with whether the subtree had been expanded.
+> In the BIE editor tree, the "Used" checkbox sits immediately next to the expand/collapse chevron, so a misclick can un-check a node and cascade-clear "Used" across its entire subtree — silently when the node is collapsed. A confirmation dialog guards an un-check that would actually clear a used descendant; un-checking an expandable node whose descendants are all un-used proceeds silently. The warning is deliberately generic (it names the node but does not enumerate the affected descendants) because the tree lazy-loads its children, so an enumerated count would vary with whether the subtree had been expanded.
 
 Pre-condition: N/A
 
@@ -129,7 +129,7 @@ Pre-condition: N/A
 ### Test Assertion:
 
 #### Test Assertion #25.3.1
-When the developer un-checks the "Used" checkbox of a BIE node that has descendants (an expandable node) while it is currently used, a confirmation dialog appears — titled "Unchecking will clear used descendants" and warning that unchecking the node will also clear "Used" on its used descendants — before the change is applied. The dialog names the un-checked node.
+When the developer un-checks the "Used" checkbox of a BIE node that has at least one used descendant while it is currently used, a confirmation dialog appears — titled "Unchecking will clear used descendants" and warning that unchecking the node will also clear "Used" on its used descendants — before the change is applied. The dialog names the un-checked node.
 
 #### Test Assertion #25.3.2
 If the developer confirms (via "Uncheck anyway"), the node is un-checked and its used descendants are cleared.
@@ -143,6 +143,9 @@ Un-checking a leaf node (a node without descendants) does not trigger the confir
 #### Test Assertion #25.3.5
 Checking a node's "Used" on (i.e., the check direction) never triggers the confirmation dialog and is applied immediately, regardless of whether the node has descendants.
 
+#### Test Assertion #25.3.6
+Un-checking a used, expandable node whose descendants are all un-used does not trigger the confirmation dialog (nothing would be cleared) and is applied immediately.
+
 ### Test Step Pre-condition:
 1. A developer-owned top-level BIE in `WIP` (editing) state exists in the latest release branch, with at least one expandable, optional descendant node (an ASBIE whose ACC has a child) and at least one optional leaf node (a BBIE whose data type has no supplementary components).
 2. The top-level BIE can be opened by the developer in the BIE editor.
@@ -150,8 +153,9 @@ Checking a node's "Used" on (i.e., the check direction) never triggers the confi
 
 ### Test Step:
 1. A developer signs in to connectCenter and opens a developer-owned top-level BIE in the BIE editor.
-2. On an expandable descendant node, ensure its "Used" checkbox is checked (checking it on must not raise any dialog), then un-check it and verify the confirmation dialog appears with the expected title and message naming the node. (Assertions [#25.3.1](#test-assertion-2531), [#25.3.5](#test-assertion-2535))
-3. Cancel the dialog and verify the node's "Used" checkbox is restored to checked. (Assertion [#25.3.3](#test-assertion-2533))
-4. Un-check the same node again, confirm the dialog via "Uncheck anyway", and verify the node is now un-checked (its used descendants cleared). (Assertion [#25.3.2](#test-assertion-2532))
-5. Check the same node's "Used" on again and verify no confirmation dialog appears and it becomes checked immediately. (Assertion [#25.3.5](#test-assertion-2535))
-6. On a leaf node whose "Used" is checked, un-check it and verify no confirmation dialog appears and the change is applied immediately. (Assertion [#25.3.4](#test-assertion-2534))
+2. On an expandable descendant node whose own descendants are all un-used, ensure its "Used" checkbox is checked (checking it on must not raise any dialog), then un-check it and verify NO confirmation dialog appears and it becomes un-checked immediately. (Assertions [#25.3.5](#test-assertion-2535), [#25.3.6](#test-assertion-2536))
+3. Re-check the node, mark one of its descendants "Used", then un-check the node and verify the confirmation dialog appears with the expected title and message naming the node. (Assertion [#25.3.1](#test-assertion-2531))
+4. Cancel the dialog and verify the node's "Used" checkbox is restored to checked. (Assertion [#25.3.3](#test-assertion-2533))
+5. Un-check the same node again, confirm the dialog via "Uncheck anyway", and verify the node is now un-checked (its used descendants cleared). (Assertion [#25.3.2](#test-assertion-2532))
+6. Check the same node's "Used" on again and verify no confirmation dialog appears and it becomes checked immediately. (Assertion [#25.3.5](#test-assertion-2535))
+7. On a leaf node whose "Used" is checked, un-check it and verify no confirmation dialog appears and the change is applied immediately. (Assertion [#25.3.4](#test-assertion-2534))
