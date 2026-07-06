@@ -94,7 +94,14 @@ public class BusinessTermCommandService {
      * </ul>
      *
      * <p>The batch import path upserts by external reference URI through the repository directly and
-     * is intentionally NOT subject to this gate.</p>
+     * is intentionally NOT subject to this gate: keying the upsert on the URI already keeps at most
+     * one row per URI, so it cannot introduce a (name + external reference URI) duplicate.</p>
+     *
+     * <p><b>Accepted limitation (by design, no DB change — #1754):</b> with no unique constraint on
+     * {@code business_term}, this check is best-effort — two truly concurrent creates of the same
+     * (name + external reference URI) pair could each pass {@code checkUniqueness} and then both
+     * insert. That narrow race is accepted in exchange for not adding a schema constraint; the guards
+     * close the common direct-API bypass that the UI's advisory check alone did not.</p>
      */
     private void assertCatalogUniqueOnCreate(
             ScoreUser requester, String businessTerm, String externalReferenceUri) {
