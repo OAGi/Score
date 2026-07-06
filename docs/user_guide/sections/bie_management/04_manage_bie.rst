@@ -878,6 +878,56 @@ Once the creation process is finished, the BIE goes to the WIP state (refresh th
 This BIE inherits the Business Contexts and release association of its source top-level BIE.
 At this stage, the user can still make changes to the BIE.
 
+Manage OpenAPI Document bindings from the BIE root
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When you select the top-level (root) node of a BIE on the "View/Edit BIE" page, an
+*OpenAPI Document Information* panel appears (above *Supporting Documentation*) whenever at least
+one OpenAPI Document exists. The panel lists every operation that binds this BIE across all
+OpenAPI Documents — one card per binding — so you can review and manage a BIE's OpenAPI usage
+without leaving the BIE editor. If the BIE is not yet used in any OpenAPI Document, the panel
+reads "This BIE is not used in any OpenAPI Document yet."
+
+Each binding card shows the bound OpenAPI Document as a *title · version* chip that opens the
+document in a new tab and, when your BIE is editable, exposes the same operation fields as the
+OpenAPI Document editor:
+
+- *Verb* — ``GET``, ``PUT``, ``POST``, ``DELETE`` or ``PATCH``.
+- *Message Body* — ``Request`` or ``Response`` (a ``Request`` body is not available for a ``GET``).
+- *Resource Name* and *Operation ID* — validated exactly as in the OpenAPI Document editor (see
+  `Operation ID naming and validation <#operation-id-naming-and-validation>`__); each
+  (*Resource Name*, *Verb*) can have only one *Request* and one *Response* body.
+- *Security* — mirrors the OpenAPI Document editor's *Security* column; the pencil opens the same
+  per-operation dialog (see `Set Operation Security <#set-operation-security>`__).
+- *Error Response* — the operation's error-response body type; when *OAGi Confirm Message* is
+  chosen, a *Selected Confirm Message* link and picker appear (see
+  `Configure Error Responses <#configure-error-responses>`__).
+- *Tag*.
+- *Make as an array* and *Suppress a root property* checkboxes.
+
+When a binding's OpenAPI Document targets **OpenAPI 3.0** and the binding is a ``DELETE`` with a
+``Request`` message body, an amber warning appears on that card because the request body is dropped
+on generation; change that document's *OpenAPI Version* to ``3.1`` on the OpenAPI Document screen
+to keep it (see `DELETE operations with a request body <#delete-operations-with-a-request-body>`__).
+
+To add this BIE to an OpenAPI Document from the BIE root:
+
+1. `Search and retrieve a BIE <#search-and-retrieve-a-bie>`__ and select its top-level (root) node.
+
+2. Expand the *OpenAPI Document Information* panel and click the add (``+``) button in its header.
+
+3. On the returned "Add to OpenAPI Document" dialog, select the target *OpenAPI Document*, choose
+   the *Verb* and *Message Body*, and check *Make as an array* or *Suppress a root property* if
+   needed. The *Resource Name* and *Operation ID* are shown read-only as a preview. If the chosen
+   (*Verb*, *Message Body*) would duplicate a body the BIE already has on that document, an inline
+   message blocks the "Add" button.
+
+4. Click the "Add" button.
+
+To change a binding, edit its fields on the card and click the "Update OpenAPI Information" button.
+To remove a binding, click the trash icon on its card ("Remove this operation from the OpenAPI
+Document").
+
 BIE Expression generation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
