@@ -83,11 +83,16 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
                     .add(submitted.getMessageBody());
         }
 
-        List<Field<?>> oasResourceChangedField = new ArrayList();
-        List<Field<?>> oasOperationChangedField = new ArrayList();
-        List<Field<?>> oasRequestChangedField = new ArrayList();
-        List<Field<?>> oasResponseChangedField = new ArrayList();
-        List<Field<?>> oasTagChangeField = new ArrayList<>();
+        // Per-entity "did anything change" accumulators. These mirror the previous per-field-list
+        // emptiness checks used to build the response's `changed` flag: resource -> a path change,
+        // operation -> any present operation row (always audit-touched), request/response -> an EXISTING
+        // body updated in place (an INSERT from a Message Body flip does NOT flag changed, matching the
+        // prior behavior), tag -> a tag RENAME (insert/clear did not flag changed before either).
+        boolean resourceChanged = false;
+        boolean operationChanged = false;
+        boolean requestChanged = false;
+        boolean responseChanged = false;
+        boolean tagChanged = false;
         boolean securityChanged = false;
         // Issue #1729: resolve each Security Requirement scheme (carried by name) to its
         // oas_security_scheme_id FK; the doc's schemes are persisted via the OasDoc create/update path.
@@ -97,309 +102,21 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
         // Issue #1347: the same twin-row guard also covers the per-operation error-response body type.
         Set<ULong> securityProcessedOps = new HashSet<>();
         for (BieForOasDoc bieForOasDoc : request.getBieForOasDocList()) {
+            // The Request and Response branches persist the same set of entities (tag, resource,
+            // operation, then the body of their own type); each is extracted to a shared helper. The
+            // per-branch call order is preserved to keep the emitted statement sequence unchanged.
             if (bieForOasDoc.getMessageBody().equals("Request")) {
-                //update oasTag
-                OasResourceTagRecord req_oasResourceTagRecord = dslContext().selectFrom(OAS_RESOURCE_TAG.as("req_oas_resource_tag"))
-                        .where(OAS_RESOURCE_TAG.as("req_oas_resource_tag").OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId())))
-                        .fetchOptional().orElse(null);
-                if (req_oasResourceTagRecord == null) {
-                    if (StringUtils.hasLength(bieForOasDoc.getTagName())) {
-                        ULong oasTagId = dslContext().insertInto(OAS_TAG)
-                                .set(OAS_TAG.GUID, randomGuid())
-                                .set(OAS_TAG.NAME, bieForOasDoc.getTagName())
-                                .set(OAS_TAG.CREATED_BY, valueOf(requesterId))
-                                .set(OAS_TAG.LAST_UPDATED_BY, valueOf(requesterId))
-                                .set(OAS_TAG.CREATION_TIMESTAMP, timestamp)
-                                .set(OAS_TAG.LAST_UPDATE_TIMESTAMP, timestamp)
-                                .returningResult(OAS_TAG.OAS_TAG_ID)
-                                .fetchOne().value1();
-                        dslContext().insertInto(OAS_RESOURCE_TAG)
-                                .set(OAS_RESOURCE_TAG.CREATED_BY, valueOf(requesterId))
-                                .set(OAS_RESOURCE_TAG.LAST_UPDATED_BY, valueOf(requesterId))
-                                .set(OAS_RESOURCE_TAG.CREATION_TIMESTAMP, timestamp)
-                                .set(OAS_RESOURCE_TAG.LAST_UPDATE_TIMESTAMP, timestamp)
-                                .set(OAS_RESOURCE_TAG.OAS_TAG_ID, oasTagId)
-                                .set(OAS_RESOURCE_TAG.OAS_OPERATION_ID, valueOf(bieForOasDoc.getOasOperationId()))
-                                .returningResult(OAS_RESOURCE_TAG.OAS_TAG_ID).fetchOne().value1();
-                    }
-                } else {
-                    ULong oasTagId = req_oasResourceTagRecord.getOasTagId();
-                    if (!StringUtils.hasLength(bieForOasDoc.getTagName())) {
-                        // The tag was cleared: drop the association and the now-orphan tag so generation
-                        // does not emit an empty `tags: [""]`.
-                        dslContext().deleteFrom(OAS_RESOURCE_TAG)
-                                .where(OAS_RESOURCE_TAG.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId())))
-                                .execute();
-                        dslContext().deleteFrom(OAS_TAG).where(OAS_TAG.OAS_TAG_ID.eq(oasTagId)).execute();
-                    } else {
-                        OasTagRecord oasTagRecord = dslContext().selectFrom(OAS_TAG.as("req_oas_tag"))
-                                .where(OAS_TAG.as("req_oas_tag").OAS_TAG_ID.eq(oasTagId)).fetchOptional().orElse(null);
-                        if (oasTagRecord != null && !StringUtils.equals(oasTagRecord.getName(), bieForOasDoc.getTagName())) {
-                            oasTagChangeField.add(OAS_TAG.NAME);
-                            oasTagRecord.setName(bieForOasDoc.getTagName());
-                            int affectedRows = oasTagRecord.update(oasTagChangeField);
-                            if (affectedRows != 1) {
-                                throw new ScoreDataAccessException(new IllegalStateException());
-                            }
-                        }
-                    }
-                }
-
-                //update oas_resource
-                OasResourceRecord oasResourceRecord = dslContext().selectFrom(OAS_RESOURCE.as("req_oas_resource")).where(and(OAS_RESOURCE.as("req_oas_resource").OAS_RESOURCE_ID.eq(valueOf(bieForOasDoc.getOasResourceId())),
-                        OAS_RESOURCE.as("req_oas_resource").OAS_DOC_ID.eq(valueOf(oasDocId)))).fetchOptional().orElse(null);
-                if (oasResourceRecord == null) {
-                    throw new ScoreDataAccessException(new IllegalArgumentException());
-                }
-                if (oasResourceRecord != null && !StringUtils.equals(bieForOasDoc.getResourceName(), oasResourceRecord.getPath())) {
-                    oasResourceChangedField.add(OAS_RESOURCE.as("req_oas_resource").PATH);
-                    oasResourceRecord.setPath(bieForOasDoc.getResourceName());
-                    oasResourceChangedField.add(OAS_RESOURCE.as("req_oas_resource").LAST_UPDATED_BY);
-                    oasResourceRecord.setLastUpdatedBy(valueOf(requesterId));
-                    oasResourceChangedField.add(OAS_RESOURCE.as("req_oas_resource").LAST_UPDATE_TIMESTAMP);
-                    oasResourceRecord.setLastUpdateTimestamp(timestamp);
-                    int affectedRows = oasResourceRecord.update(oasResourceChangedField);
-                    if (affectedRows != 1) {
-                        throw new ScoreDataAccessException(new IllegalStateException());
-                    }
-                }
-                //update oas_operation
-                OasOperationRecord oasOperationRecord = dslContext().selectFrom(OAS_OPERATION.as("req_oas_operation")).where(and(OAS_OPERATION.as("req_oas_operation").OAS_RESOURCE_ID.eq(valueOf(bieForOasDoc.getOasResourceId())),
-                        OAS_OPERATION.as("req_oas_operation").OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId())))).fetchOptional().orElse(null);
-                if (oasOperationRecord != null) {
-                    if (!StringUtils.equals(bieForOasDoc.getOperationId(), oasOperationRecord.getOperationId())) {
-                        oasOperationChangedField.add(OAS_OPERATION.as("req_oas_operation").OPERATION_ID);
-                        oasOperationRecord.setOperationId(bieForOasDoc.getOperationId());
-                    }
-
-                    if (!StringUtils.equals(bieForOasDoc.getVerb(), oasOperationRecord.getVerb())) {
-                        oasOperationChangedField.add(OAS_OPERATION.as("req_oas_operation").VERB);
-                        oasOperationRecord.setVerb(bieForOasDoc.getVerb());
-                    }
-                    oasOperationRecord.setLastUpdatedBy(valueOf(requesterId));
-                    oasOperationChangedField.add(OAS_OPERATION.as("req_oas_operation").LAST_UPDATED_BY);
-                    oasOperationChangedField.add(OAS_OPERATION.as("req_oas_operation").LAST_UPDATE_TIMESTAMP);
-                    oasResourceRecord.setLastUpdateTimestamp(timestamp);
-                    int affectedRows = oasOperationRecord.update(oasOperationChangedField);
-                    if (affectedRows != 1) {
-                        throw new ScoreDataAccessException(new IllegalStateException());
-                    }
-                }
-                //update arrayIndicator and SuppressRootIndicator
-                ULong oasRequestId = null;
-                ULong oasResponseId = null;
-                OasRequestRecord oasRequestRecord = dslContext().selectFrom(OAS_REQUEST).where(OAS_REQUEST.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
-                // Issue #1492: the Request branch no longer deletes the operation's Response
-                // body. One operation owns at most one Request AND one Response; editing the Request must
-                // leave the sibling Response intact (the old delete-opposite-body behavior is removed).
-                if (oasRequestRecord == null) {
-                    ULong oasMessageBodyId = dslContext().insertInto(OAS_MESSAGE_BODY)
-                            .set(OAS_MESSAGE_BODY.CREATED_BY, valueOf(requesterId))
-                            .set(OAS_MESSAGE_BODY.LAST_UPDATED_BY, valueOf(requesterId))
-                            .set(OAS_MESSAGE_BODY.TOP_LEVEL_ASBIEP_ID, valueOf(bieForOasDoc.getTopLevelAsbiepId()))
-                            .set(OAS_MESSAGE_BODY.CREATION_TIMESTAMP, timestamp)
-                            .set(OAS_MESSAGE_BODY.LAST_UPDATE_TIMESTAMP, timestamp)
-                            .returningResult(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID)
-                            .fetchOne().value1();
-
-                    oasRequestId = dslContext().insertInto(OAS_REQUEST)
-                            .set(OAS_REQUEST.CREATED_BY, valueOf(requesterId))
-                            .set(OAS_REQUEST.LAST_UPDATED_BY, valueOf(requesterId))
-                            .set(OAS_REQUEST.CREATION_TIMESTAMP, timestamp)
-                            .set(OAS_REQUEST.LAST_UPDATE_TIMESTAMP, timestamp)
-                            .set(OAS_REQUEST.OAS_MESSAGE_BODY_ID, oasMessageBodyId)
-                            .set(OAS_REQUEST.OAS_OPERATION_ID, valueOf(bieForOasDoc.getOasOperationId()))
-                            .set(OAS_REQUEST.SUPPRESS_ROOT_INDICATOR, (byte) (bieForOasDoc.isSuppressRootIndicator() ? 1 : 0))
-                            .set(OAS_REQUEST.MAKE_ARRAY_INDICATOR, (byte) (bieForOasDoc.isArrayIndicator() ? 1 : 0))
-                            .set(OAS_REQUEST.IS_CALLBACK, (byte) 0)
-                            .set(OAS_REQUEST.REQUIRED, (byte) (1))
-                            .returningResult(OAS_REQUEST.OAS_REQUEST_ID)
-                            .fetchOne().value1();
-
-                    // Message Body flipped Response->Request: a new Request was just INSERTed in an UPDATE,
-                    // which only happens for an in-place body-type flip. Convert in place by removing the
-                    // now-replaced Response body, unless the payload still carries a Response row for this
-                    // operation (a kept dual-body endpoint).
-                    if (!submittedBodyTypesByOp
-                            .getOrDefault(valueOf(bieForOasDoc.getOasOperationId()), Collections.emptySet())
-                            .contains("Response")) {
-                        deleteResponseBodyOnly(valueOf(bieForOasDoc.getOasOperationId()));
-                    }
-                } else {
-
-                    if (BooleanToByte(bieForOasDoc.isArrayIndicator()) != oasRequestRecord.getMakeArrayIndicator()) {
-                        oasRequestChangedField.add(OAS_REQUEST.MAKE_ARRAY_INDICATOR);
-                        oasRequestRecord.setMakeArrayIndicator(BooleanToByte(bieForOasDoc.isArrayIndicator()));
-                    }
-
-                    if (BooleanToByte(bieForOasDoc.isSuppressRootIndicator()) != oasRequestRecord.getSuppressRootIndicator()) {
-                        oasRequestChangedField.add(OAS_REQUEST.SUPPRESS_ROOT_INDICATOR);
-                        oasRequestRecord.setSuppressRootIndicator(BooleanToByte(bieForOasDoc.isSuppressRootIndicator()));
-                    }
-
-                    oasRequestChangedField.add(OAS_REQUEST.LAST_UPDATED_BY);
-                    oasRequestRecord.setLastUpdatedBy(valueOf(requesterId));
-                    oasRequestChangedField.add(OAS_REQUEST.LAST_UPDATE_TIMESTAMP);
-                    oasRequestRecord.setLastUpdateTimestamp(timestamp);
-                    int affectedRows = oasRequestRecord.update(oasRequestChangedField);
-                    if (affectedRows != 1) {
-                        throw new ScoreDataAccessException(new IllegalStateException());
-                    }
-                }
-
+                tagChanged |= saveOperationTag(bieForOasDoc, requesterId, timestamp);
+                resourceChanged |= updateResourcePath(bieForOasDoc, valueOf(oasDocId), requesterId, timestamp);
+                operationChanged |= updateOperationMeta(bieForOasDoc, requesterId, timestamp);
+                requestChanged |= upsertRequestBody(bieForOasDoc, submittedBodyTypesByOp, requesterId, timestamp);
             }
 
             if (bieForOasDoc.getMessageBody().equals("Response")) {
-                //update oas_resource
-                OasResourceRecord oasResourceRecord = dslContext().selectFrom(OAS_RESOURCE.as("res_oas_resource")).where(and(OAS_RESOURCE.as("res_oas_resource").OAS_RESOURCE_ID.eq(valueOf(bieForOasDoc.getOasResourceId())),
-                        OAS_RESOURCE.as("res_oas_resource").OAS_DOC_ID.eq(valueOf(oasDocId)))).fetchOptional().orElse(null);
-                if (oasResourceRecord == null) {
-                    throw new ScoreDataAccessException(new IllegalArgumentException());
-                }
-                if (oasResourceRecord != null && !StringUtils.equals(bieForOasDoc.getResourceName(), oasResourceRecord.getPath())) {
-                    oasResourceChangedField.add(OAS_RESOURCE.as("res_oas_resource").PATH);
-                    oasResourceRecord.setPath(bieForOasDoc.getResourceName());
-                    oasResourceChangedField.add(OAS_RESOURCE.as("res_oas_resource").LAST_UPDATED_BY);
-                    oasResourceRecord.setLastUpdatedBy(valueOf(requesterId));
-                    oasResourceChangedField.add(OAS_RESOURCE.as("res_oas_resource").LAST_UPDATE_TIMESTAMP);
-                    oasResourceRecord.setLastUpdateTimestamp(timestamp);
-                    int affectedRows = oasResourceRecord.update(oasResourceChangedField);
-                    if (affectedRows != 1) {
-                        throw new ScoreDataAccessException(new IllegalStateException());
-                    }
-                }
-                //update oas_operation
-                OasOperationRecord oasOperationRecord = dslContext().selectFrom(OAS_OPERATION.as("res_oas_operation")).where(and(OAS_OPERATION.as("res_oas_operation").OAS_RESOURCE_ID.eq(valueOf(bieForOasDoc.getOasResourceId())),
-                        OAS_OPERATION.as("res_oas_operation").OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId())))).fetchOptional().orElse(null);
-                if (oasOperationRecord != null) {
-                    if (!StringUtils.equals(bieForOasDoc.getVerb(), oasOperationRecord.getVerb())) {
-                        oasOperationChangedField.add(OAS_OPERATION.as("res_oas_operation").VERB);
-                        oasOperationRecord.setVerb(bieForOasDoc.getVerb());
-                    }
-
-                    if (!StringUtils.equals(bieForOasDoc.getOperationId(), oasOperationRecord.getOperationId())) {
-                        oasOperationChangedField.add(OAS_OPERATION.as("res_oas_operation").OPERATION_ID);
-                        oasOperationRecord.setOperationId(bieForOasDoc.getOperationId());
-                    }
-                    // Issue #1729: security_overridden + operation security rows are persisted once per
-                    // oas_operation (deduped) in saveOperationSecurityRequirements below, so the flag stays
-                    // consistent with the rows regardless of the Request/Response branch.
-                    oasOperationChangedField.add(OAS_OPERATION.as("res_oas_operation").LAST_UPDATED_BY);
-                    oasOperationRecord.setLastUpdatedBy(valueOf(requesterId));
-                    oasOperationChangedField.add(OAS_OPERATION.as("res_oas_operation").LAST_UPDATE_TIMESTAMP);
-                    oasResourceRecord.setLastUpdateTimestamp(timestamp);
-                    int affectedRows = oasOperationRecord.update(oasOperationChangedField);
-                    if (affectedRows != 1) {
-                        throw new ScoreDataAccessException(new IllegalStateException());
-                    }
-                }
-                //update oasTag
-                OasResourceTagRecord res_oasResourceTagRecord = dslContext().selectFrom(OAS_RESOURCE_TAG.as("res_oas_resource_tag"))
-                        .where(OAS_RESOURCE_TAG.as("res_oas_resource_tag").OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId())))
-                        .fetchOptional().orElse(null);
-                if (res_oasResourceTagRecord == null) {
-                    if (StringUtils.hasLength(bieForOasDoc.getTagName())) {
-                        ULong oasTagId = dslContext().insertInto(OAS_TAG)
-                                .set(OAS_TAG.GUID, randomGuid())
-                                .set(OAS_TAG.NAME, bieForOasDoc.getTagName())
-                                .set(OAS_TAG.CREATED_BY, valueOf(requesterId))
-                                .set(OAS_TAG.LAST_UPDATED_BY, valueOf(requesterId))
-                                .set(OAS_TAG.CREATION_TIMESTAMP, timestamp)
-                                .set(OAS_TAG.LAST_UPDATE_TIMESTAMP, timestamp)
-                                .returningResult(OAS_TAG.OAS_TAG_ID)
-                                .fetchOne().value1();
-                        dslContext().insertInto(OAS_RESOURCE_TAG)
-                                .set(OAS_RESOURCE_TAG.CREATED_BY, valueOf(requesterId))
-                                .set(OAS_RESOURCE_TAG.LAST_UPDATED_BY, valueOf(requesterId))
-                                .set(OAS_RESOURCE_TAG.CREATION_TIMESTAMP, timestamp)
-                                .set(OAS_RESOURCE_TAG.LAST_UPDATE_TIMESTAMP, timestamp)
-                                .set(OAS_RESOURCE_TAG.OAS_TAG_ID, oasTagId)
-                                .set(OAS_RESOURCE_TAG.OAS_OPERATION_ID, valueOf(bieForOasDoc.getOasOperationId()))
-                                .returningResult(OAS_RESOURCE_TAG.OAS_TAG_ID).fetchOne().value1();
-                    }
-                } else {
-                    ULong oasTagId = res_oasResourceTagRecord.getOasTagId();
-                    if (!StringUtils.hasLength(bieForOasDoc.getTagName())) {
-                        // The tag was cleared: drop the association and the now-orphan tag so generation
-                        // does not emit an empty `tags: [""]`.
-                        dslContext().deleteFrom(OAS_RESOURCE_TAG)
-                                .where(OAS_RESOURCE_TAG.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId())))
-                                .execute();
-                        dslContext().deleteFrom(OAS_TAG).where(OAS_TAG.OAS_TAG_ID.eq(oasTagId)).execute();
-                    } else {
-                        OasTagRecord oasTagRecord = dslContext().selectFrom(OAS_TAG.as("res_oas_tag"))
-                                .where(OAS_TAG.as("res_oas_tag").OAS_TAG_ID.eq(oasTagId)).fetchOptional().orElse(null);
-                        if (oasTagRecord != null && !StringUtils.equals(oasTagRecord.getName(), bieForOasDoc.getTagName())) {
-                            oasTagChangeField.add(OAS_TAG.NAME);
-                            oasTagRecord.setName(bieForOasDoc.getTagName());
-                            int affectedRows = oasTagRecord.update(oasTagChangeField);
-                            if (affectedRows != 1) {
-                                throw new ScoreDataAccessException(new IllegalStateException());
-                            }
-                        }
-                    }
-                }
-
-                //update arrayIndicator and SuppressRootIndicator
-                ULong oasRequestId = null;
-                ULong oasResponseId = null;
-                OasResponseRecord oasResponseRecord = dslContext().selectFrom(OAS_RESPONSE).where(OAS_RESPONSE.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
-                // Issue #1492: the Response branch no longer deletes the operation's Request
-                // body. One operation owns at most one Request AND one Response; editing the Response must
-                // leave the sibling Request intact (the old delete-opposite-body behavior is removed).
-                if (oasResponseRecord == null) {
-                    ULong oasMessageBodyId = dslContext().insertInto(OAS_MESSAGE_BODY)
-                            .set(OAS_MESSAGE_BODY.CREATED_BY, valueOf(requesterId))
-                            .set(OAS_MESSAGE_BODY.LAST_UPDATED_BY, valueOf(requesterId))
-                            .set(OAS_MESSAGE_BODY.TOP_LEVEL_ASBIEP_ID, valueOf(bieForOasDoc.getTopLevelAsbiepId()))
-                            .set(OAS_MESSAGE_BODY.CREATION_TIMESTAMP, timestamp)
-                            .set(OAS_MESSAGE_BODY.LAST_UPDATE_TIMESTAMP, timestamp)
-                            .returningResult(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID)
-                            .fetchOne().value1();
-
-                    oasResponseId = dslContext().insertInto(OAS_RESPONSE)
-                            .set(OAS_RESPONSE.CREATED_BY, valueOf(requesterId))
-                            .set(OAS_RESPONSE.LAST_UPDATED_BY, valueOf(requesterId))
-                            .set(OAS_RESPONSE.CREATION_TIMESTAMP, timestamp)
-                            .set(OAS_RESPONSE.LAST_UPDATE_TIMESTAMP, timestamp)
-                            .set(OAS_RESPONSE.OAS_MESSAGE_BODY_ID, oasMessageBodyId)
-                            .set(OAS_RESPONSE.OAS_OPERATION_ID, valueOf(bieForOasDoc.getOasOperationId()))
-                            .set(OAS_RESPONSE.SUPPRESS_ROOT_INDICATOR, (byte) (bieForOasDoc.isSuppressRootIndicator() ? 1 : 0))
-                            .set(OAS_RESPONSE.MAKE_ARRAY_INDICATOR, (byte) (bieForOasDoc.isArrayIndicator() ? 1 : 0))
-                            .set(OAS_RESPONSE.INCLUDE_CONFIRM_INDICATOR, (byte) 0)
-                            .returningResult(OAS_RESPONSE.OAS_RESPONSE_ID)
-                            .fetchOne().value1();
-
-                    // Message Body flipped Request->Response (the reported bug): a new Response was just
-                    // INSERTed in an UPDATE, which only happens for an in-place body-type flip. Convert in
-                    // place by removing the now-replaced Request body, unless the payload still carries a
-                    // Request row for this operation (a kept dual-body endpoint).
-                    if (!submittedBodyTypesByOp
-                            .getOrDefault(valueOf(bieForOasDoc.getOasOperationId()), Collections.emptySet())
-                            .contains("Request")) {
-                        deleteRequestBodyOnly(valueOf(bieForOasDoc.getOasOperationId()));
-                    }
-                } else {
-                    if (BooleanToByte(bieForOasDoc.isArrayIndicator()) != oasResponseRecord.getMakeArrayIndicator()) {
-                        oasResponseChangedField.add(OAS_RESPONSE.MAKE_ARRAY_INDICATOR);
-                        oasResponseRecord.setMakeArrayIndicator(BooleanToByte(bieForOasDoc.isArrayIndicator()));
-                    }
-
-                    if (BooleanToByte(bieForOasDoc.isSuppressRootIndicator()) != oasResponseRecord.getSuppressRootIndicator()) {
-                        oasResponseChangedField.add(OAS_RESPONSE.SUPPRESS_ROOT_INDICATOR);
-                        oasResponseRecord.setSuppressRootIndicator(BooleanToByte(bieForOasDoc.isSuppressRootIndicator()));
-                    }
-
-                    oasResponseChangedField.add(OAS_RESPONSE.LAST_UPDATED_BY);
-                    oasResponseRecord.setLastUpdatedBy(valueOf(requesterId));
-                    oasResponseChangedField.add(OAS_RESPONSE.LAST_UPDATE_TIMESTAMP);
-                    oasResponseRecord.setLastUpdateTimestamp(timestamp);
-                    int affectedRows = oasResponseRecord.update(oasResponseChangedField);
-                    if (affectedRows != 1) {
-                        throw new ScoreDataAccessException(new IllegalStateException());
-                    }
-
-                }
+                resourceChanged |= updateResourcePath(bieForOasDoc, valueOf(oasDocId), requesterId, timestamp);
+                operationChanged |= updateOperationMeta(bieForOasDoc, requesterId, timestamp);
+                tagChanged |= saveOperationTag(bieForOasDoc, requesterId, timestamp);
+                responseChanged |= upsertResponseBody(bieForOasDoc, submittedBodyTypesByOp, requesterId, timestamp);
             }
 
             if (bieForOasDoc.getOasOperationId() != null
@@ -421,9 +138,262 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
                         timestamp);
             }
         }
-        return new UpdateBieForOasDocResponse(oasDocId, !oasResourceChangedField.isEmpty() || !oasOperationChangedField.isEmpty()
-                || !oasRequestChangedField.isEmpty() || !oasResponseChangedField.isEmpty() || !oasTagChangeField.isEmpty()
-                || securityChanged);
+        return new UpdateBieForOasDocResponse(oasDocId, resourceChanged || operationChanged
+                || requestChanged || responseChanged || tagChanged || securityChanged);
+    }
+
+    /**
+     * Find-or-create / rename / clear the tag attached to an operation. Returns {@code true} only when an
+     * existing tag was RENAMED (mirroring the prior code, where a tag insert or clear did not set the
+     * response's {@code changed} flag; only a rename did).
+     */
+    private boolean saveOperationTag(BieForOasDoc bieForOasDoc, UserId requesterId, LocalDateTime timestamp) {
+        OasResourceTagRecord oasResourceTagRecord = dslContext().selectFrom(OAS_RESOURCE_TAG)
+                .where(OAS_RESOURCE_TAG.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId())))
+                .fetchOptional().orElse(null);
+        if (oasResourceTagRecord == null) {
+            if (StringUtils.hasLength(bieForOasDoc.getTagName())) {
+                ULong oasTagId = dslContext().insertInto(OAS_TAG)
+                        .set(OAS_TAG.GUID, randomGuid())
+                        .set(OAS_TAG.NAME, bieForOasDoc.getTagName())
+                        .set(OAS_TAG.CREATED_BY, valueOf(requesterId))
+                        .set(OAS_TAG.LAST_UPDATED_BY, valueOf(requesterId))
+                        .set(OAS_TAG.CREATION_TIMESTAMP, timestamp)
+                        .set(OAS_TAG.LAST_UPDATE_TIMESTAMP, timestamp)
+                        .returningResult(OAS_TAG.OAS_TAG_ID)
+                        .fetchOne().value1();
+                dslContext().insertInto(OAS_RESOURCE_TAG)
+                        .set(OAS_RESOURCE_TAG.CREATED_BY, valueOf(requesterId))
+                        .set(OAS_RESOURCE_TAG.LAST_UPDATED_BY, valueOf(requesterId))
+                        .set(OAS_RESOURCE_TAG.CREATION_TIMESTAMP, timestamp)
+                        .set(OAS_RESOURCE_TAG.LAST_UPDATE_TIMESTAMP, timestamp)
+                        .set(OAS_RESOURCE_TAG.OAS_TAG_ID, oasTagId)
+                        .set(OAS_RESOURCE_TAG.OAS_OPERATION_ID, valueOf(bieForOasDoc.getOasOperationId()))
+                        .returningResult(OAS_RESOURCE_TAG.OAS_TAG_ID).fetchOne().value1();
+            }
+            return false;
+        }
+        ULong oasTagId = oasResourceTagRecord.getOasTagId();
+        if (!StringUtils.hasLength(bieForOasDoc.getTagName())) {
+            // The tag was cleared: drop the association and the now-orphan tag so generation does not
+            // emit an empty `tags: [""]`.
+            dslContext().deleteFrom(OAS_RESOURCE_TAG)
+                    .where(OAS_RESOURCE_TAG.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId())))
+                    .execute();
+            dslContext().deleteFrom(OAS_TAG).where(OAS_TAG.OAS_TAG_ID.eq(oasTagId)).execute();
+            return false;
+        }
+        OasTagRecord oasTagRecord = dslContext().selectFrom(OAS_TAG)
+                .where(OAS_TAG.OAS_TAG_ID.eq(oasTagId)).fetchOptional().orElse(null);
+        if (oasTagRecord != null && !StringUtils.equals(oasTagRecord.getName(), bieForOasDoc.getTagName())) {
+            List<Field<?>> oasTagChangeField = new ArrayList<>();
+            oasTagChangeField.add(OAS_TAG.NAME);
+            oasTagRecord.setName(bieForOasDoc.getTagName());
+            int affectedRows = oasTagRecord.update(oasTagChangeField);
+            if (affectedRows != 1) {
+                throw new ScoreDataAccessException(new IllegalStateException());
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Update the operation's resource path (and audit columns) when the submitted resource name differs.
+     * The resource must exist for the (oas_resource_id, oas_doc_id) pair. Returns {@code true} when the
+     * path was changed.
+     */
+    private boolean updateResourcePath(BieForOasDoc bieForOasDoc, ULong oasDocId,
+                                       UserId requesterId, LocalDateTime timestamp) {
+        OasResourceRecord oasResourceRecord = dslContext().selectFrom(OAS_RESOURCE)
+                .where(and(OAS_RESOURCE.OAS_RESOURCE_ID.eq(valueOf(bieForOasDoc.getOasResourceId())),
+                        OAS_RESOURCE.OAS_DOC_ID.eq(oasDocId))).fetchOptional().orElse(null);
+        if (oasResourceRecord == null) {
+            throw new ScoreDataAccessException(new IllegalArgumentException());
+        }
+        if (!StringUtils.equals(bieForOasDoc.getResourceName(), oasResourceRecord.getPath())) {
+            List<Field<?>> oasResourceChangedField = new ArrayList<>();
+            oasResourceChangedField.add(OAS_RESOURCE.PATH);
+            oasResourceRecord.setPath(bieForOasDoc.getResourceName());
+            oasResourceChangedField.add(OAS_RESOURCE.LAST_UPDATED_BY);
+            oasResourceRecord.setLastUpdatedBy(valueOf(requesterId));
+            oasResourceChangedField.add(OAS_RESOURCE.LAST_UPDATE_TIMESTAMP);
+            oasResourceRecord.setLastUpdateTimestamp(timestamp);
+            int affectedRows = oasResourceRecord.update(oasResourceChangedField);
+            if (affectedRows != 1) {
+                throw new ScoreDataAccessException(new IllegalStateException());
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Update the operation's operationId/verb (when changed) and audit columns. Returns {@code true}
+     * when the operation row is present (the prior code always audit-touched a present operation).
+     *
+     * <p>The operation's {@code last_update_timestamp} is written back UNCHANGED: the prior inline code
+     * set the timestamp on the resource record by mistake, so the operation timestamp was never actually
+     * advanced. That no-op is preserved here (the field is in the update but its value is not
+     * reassigned) to keep byte-for-byte parity — {@code last_updated_by} is still advanced.</p>
+     */
+    private boolean updateOperationMeta(BieForOasDoc bieForOasDoc, UserId requesterId, LocalDateTime timestamp) {
+        OasOperationRecord oasOperationRecord = dslContext().selectFrom(OAS_OPERATION)
+                .where(and(OAS_OPERATION.OAS_RESOURCE_ID.eq(valueOf(bieForOasDoc.getOasResourceId())),
+                        OAS_OPERATION.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId()))))
+                .fetchOptional().orElse(null);
+        if (oasOperationRecord == null) {
+            return false;
+        }
+        List<Field<?>> oasOperationChangedField = new ArrayList<>();
+        if (!StringUtils.equals(bieForOasDoc.getOperationId(), oasOperationRecord.getOperationId())) {
+            oasOperationChangedField.add(OAS_OPERATION.OPERATION_ID);
+            oasOperationRecord.setOperationId(bieForOasDoc.getOperationId());
+        }
+        if (!StringUtils.equals(bieForOasDoc.getVerb(), oasOperationRecord.getVerb())) {
+            oasOperationChangedField.add(OAS_OPERATION.VERB);
+            oasOperationRecord.setVerb(bieForOasDoc.getVerb());
+        }
+        // Issue #1729: security_overridden + operation security rows are persisted once per oas_operation
+        // (deduped) in saveOperationSecurityRequirements, so the flag stays consistent with the rows
+        // regardless of the Request/Response branch.
+        oasOperationRecord.setLastUpdatedBy(valueOf(requesterId));
+        oasOperationChangedField.add(OAS_OPERATION.LAST_UPDATED_BY);
+        oasOperationChangedField.add(OAS_OPERATION.LAST_UPDATE_TIMESTAMP);
+        int affectedRows = oasOperationRecord.update(oasOperationChangedField);
+        if (affectedRows != 1) {
+            throw new ScoreDataAccessException(new IllegalStateException());
+        }
+        return true;
+    }
+
+    /**
+     * Insert or update the operation's Request body. On INSERT (only reachable via a Message Body flip),
+     * the now-replaced Response body is removed UNLESS the same payload still carries a Response row for
+     * the operation (a kept dual-body endpoint). Editing an existing Request never touches the sibling
+     * Response (Issue #1492). Returns {@code true} only when an EXISTING Request body was updated.
+     */
+    private boolean upsertRequestBody(BieForOasDoc bieForOasDoc, Map<ULong, Set<String>> submittedBodyTypesByOp,
+                                      UserId requesterId, LocalDateTime timestamp) {
+        OasRequestRecord oasRequestRecord = dslContext().selectFrom(OAS_REQUEST)
+                .where(OAS_REQUEST.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId())))
+                .fetchOptional().orElse(null);
+        if (oasRequestRecord == null) {
+            ULong oasMessageBodyId = dslContext().insertInto(OAS_MESSAGE_BODY)
+                    .set(OAS_MESSAGE_BODY.CREATED_BY, valueOf(requesterId))
+                    .set(OAS_MESSAGE_BODY.LAST_UPDATED_BY, valueOf(requesterId))
+                    .set(OAS_MESSAGE_BODY.TOP_LEVEL_ASBIEP_ID, valueOf(bieForOasDoc.getTopLevelAsbiepId()))
+                    .set(OAS_MESSAGE_BODY.CREATION_TIMESTAMP, timestamp)
+                    .set(OAS_MESSAGE_BODY.LAST_UPDATE_TIMESTAMP, timestamp)
+                    .returningResult(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID)
+                    .fetchOne().value1();
+
+            dslContext().insertInto(OAS_REQUEST)
+                    .set(OAS_REQUEST.CREATED_BY, valueOf(requesterId))
+                    .set(OAS_REQUEST.LAST_UPDATED_BY, valueOf(requesterId))
+                    .set(OAS_REQUEST.CREATION_TIMESTAMP, timestamp)
+                    .set(OAS_REQUEST.LAST_UPDATE_TIMESTAMP, timestamp)
+                    .set(OAS_REQUEST.OAS_MESSAGE_BODY_ID, oasMessageBodyId)
+                    .set(OAS_REQUEST.OAS_OPERATION_ID, valueOf(bieForOasDoc.getOasOperationId()))
+                    .set(OAS_REQUEST.SUPPRESS_ROOT_INDICATOR, (byte) (bieForOasDoc.isSuppressRootIndicator() ? 1 : 0))
+                    .set(OAS_REQUEST.MAKE_ARRAY_INDICATOR, (byte) (bieForOasDoc.isArrayIndicator() ? 1 : 0))
+                    .set(OAS_REQUEST.IS_CALLBACK, (byte) 0)
+                    .set(OAS_REQUEST.REQUIRED, (byte) (1))
+                    .returningResult(OAS_REQUEST.OAS_REQUEST_ID)
+                    .fetchOne().value1();
+
+            // Message Body flipped Response->Request: convert in place by removing the now-replaced
+            // Response body, unless the payload still carries a Response row for this operation.
+            if (!submittedBodyTypesByOp
+                    .getOrDefault(valueOf(bieForOasDoc.getOasOperationId()), Collections.emptySet())
+                    .contains("Response")) {
+                deleteResponseBodyOnly(valueOf(bieForOasDoc.getOasOperationId()));
+            }
+            return false;
+        }
+
+        List<Field<?>> oasRequestChangedField = new ArrayList<>();
+        if (BooleanToByte(bieForOasDoc.isArrayIndicator()) != oasRequestRecord.getMakeArrayIndicator()) {
+            oasRequestChangedField.add(OAS_REQUEST.MAKE_ARRAY_INDICATOR);
+            oasRequestRecord.setMakeArrayIndicator(BooleanToByte(bieForOasDoc.isArrayIndicator()));
+        }
+        if (BooleanToByte(bieForOasDoc.isSuppressRootIndicator()) != oasRequestRecord.getSuppressRootIndicator()) {
+            oasRequestChangedField.add(OAS_REQUEST.SUPPRESS_ROOT_INDICATOR);
+            oasRequestRecord.setSuppressRootIndicator(BooleanToByte(bieForOasDoc.isSuppressRootIndicator()));
+        }
+        oasRequestChangedField.add(OAS_REQUEST.LAST_UPDATED_BY);
+        oasRequestRecord.setLastUpdatedBy(valueOf(requesterId));
+        oasRequestChangedField.add(OAS_REQUEST.LAST_UPDATE_TIMESTAMP);
+        oasRequestRecord.setLastUpdateTimestamp(timestamp);
+        int affectedRows = oasRequestRecord.update(oasRequestChangedField);
+        if (affectedRows != 1) {
+            throw new ScoreDataAccessException(new IllegalStateException());
+        }
+        return true;
+    }
+
+    /**
+     * Insert or update the operation's Response body. On INSERT (only reachable via a Message Body flip),
+     * the now-replaced Request body is removed UNLESS the same payload still carries a Request row for the
+     * operation. Editing an existing Response never touches the sibling Request (Issue #1492). Returns
+     * {@code true} only when an EXISTING Response body was updated.
+     */
+    private boolean upsertResponseBody(BieForOasDoc bieForOasDoc, Map<ULong, Set<String>> submittedBodyTypesByOp,
+                                       UserId requesterId, LocalDateTime timestamp) {
+        OasResponseRecord oasResponseRecord = dslContext().selectFrom(OAS_RESPONSE)
+                .where(OAS_RESPONSE.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId())))
+                .fetchOptional().orElse(null);
+        if (oasResponseRecord == null) {
+            ULong oasMessageBodyId = dslContext().insertInto(OAS_MESSAGE_BODY)
+                    .set(OAS_MESSAGE_BODY.CREATED_BY, valueOf(requesterId))
+                    .set(OAS_MESSAGE_BODY.LAST_UPDATED_BY, valueOf(requesterId))
+                    .set(OAS_MESSAGE_BODY.TOP_LEVEL_ASBIEP_ID, valueOf(bieForOasDoc.getTopLevelAsbiepId()))
+                    .set(OAS_MESSAGE_BODY.CREATION_TIMESTAMP, timestamp)
+                    .set(OAS_MESSAGE_BODY.LAST_UPDATE_TIMESTAMP, timestamp)
+                    .returningResult(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID)
+                    .fetchOne().value1();
+
+            dslContext().insertInto(OAS_RESPONSE)
+                    .set(OAS_RESPONSE.CREATED_BY, valueOf(requesterId))
+                    .set(OAS_RESPONSE.LAST_UPDATED_BY, valueOf(requesterId))
+                    .set(OAS_RESPONSE.CREATION_TIMESTAMP, timestamp)
+                    .set(OAS_RESPONSE.LAST_UPDATE_TIMESTAMP, timestamp)
+                    .set(OAS_RESPONSE.OAS_MESSAGE_BODY_ID, oasMessageBodyId)
+                    .set(OAS_RESPONSE.OAS_OPERATION_ID, valueOf(bieForOasDoc.getOasOperationId()))
+                    .set(OAS_RESPONSE.SUPPRESS_ROOT_INDICATOR, (byte) (bieForOasDoc.isSuppressRootIndicator() ? 1 : 0))
+                    .set(OAS_RESPONSE.MAKE_ARRAY_INDICATOR, (byte) (bieForOasDoc.isArrayIndicator() ? 1 : 0))
+                    .set(OAS_RESPONSE.INCLUDE_CONFIRM_INDICATOR, (byte) 0)
+                    .returningResult(OAS_RESPONSE.OAS_RESPONSE_ID)
+                    .fetchOne().value1();
+
+            // Message Body flipped Request->Response: convert in place by removing the now-replaced
+            // Request body, unless the payload still carries a Request row for this operation.
+            if (!submittedBodyTypesByOp
+                    .getOrDefault(valueOf(bieForOasDoc.getOasOperationId()), Collections.emptySet())
+                    .contains("Request")) {
+                deleteRequestBodyOnly(valueOf(bieForOasDoc.getOasOperationId()));
+            }
+            return false;
+        }
+
+        List<Field<?>> oasResponseChangedField = new ArrayList<>();
+        if (BooleanToByte(bieForOasDoc.isArrayIndicator()) != oasResponseRecord.getMakeArrayIndicator()) {
+            oasResponseChangedField.add(OAS_RESPONSE.MAKE_ARRAY_INDICATOR);
+            oasResponseRecord.setMakeArrayIndicator(BooleanToByte(bieForOasDoc.isArrayIndicator()));
+        }
+        if (BooleanToByte(bieForOasDoc.isSuppressRootIndicator()) != oasResponseRecord.getSuppressRootIndicator()) {
+            oasResponseChangedField.add(OAS_RESPONSE.SUPPRESS_ROOT_INDICATOR);
+            oasResponseRecord.setSuppressRootIndicator(BooleanToByte(bieForOasDoc.isSuppressRootIndicator()));
+        }
+        oasResponseChangedField.add(OAS_RESPONSE.LAST_UPDATED_BY);
+        oasResponseRecord.setLastUpdatedBy(valueOf(requesterId));
+        oasResponseChangedField.add(OAS_RESPONSE.LAST_UPDATE_TIMESTAMP);
+        oasResponseRecord.setLastUpdateTimestamp(timestamp);
+        int affectedRows = oasResponseRecord.update(oasResponseChangedField);
+        if (affectedRows != 1) {
+            throw new ScoreDataAccessException(new IllegalStateException());
+        }
+        return true;
     }
 
     // Issue #1492: an inline edit must not produce, within one document, two bodies of the same type on a

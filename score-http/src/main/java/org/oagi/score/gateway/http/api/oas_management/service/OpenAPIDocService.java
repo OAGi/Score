@@ -202,44 +202,22 @@ public class OpenAPIDocService {
                 .setTimestamp(millis)
                 .execute();
 
-        // Issue #1492: find-or-create the (oasDocId, path) resource and the
-        // (resourceId, verb) operation so a Request BIE and a Response BIE for one endpoint share
-        // ONE oas_operation instead of minting two distinct operations on the same (path, verb).
-        OasResourceId oasResourceId = command.findOrCreateOasResource(new InsertOasResourceArguments(command)
-                .setUserId(userId)
-                .setOasDocId(request.getOasDocId())
-                .setPath(request.getPath())
-                .setRef(request.getRef())
-                .setTimestamp(millis));
-
-        boolean operationExisted = command.findOasOperationId(oasResourceId, request.getVerb()) != null;
-        OasOperationId oasOperationId = command.findOrCreateOasOperation(new InsertOasOperationArguments(command)
-                .setUserId(userId)
-                .setOperationId(request.getOperationId())
-                .setOasResourceId(oasResourceId)
-                .setVerb(request.getVerb())
-                .setSummary(request.getSummary())
-                .setDescription(request.getDescriptionForOperation())
-                .setDeprecated(request.isDeprecatedForOperation())
-                .setTimestamp(millis));
+        // Issue #1492: find-or-create the (oasDocId, path) resource and the (resourceId, verb) operation
+        // so a Request BIE and a Response BIE for one endpoint share ONE oas_operation instead of minting
+        // two distinct operations on the same (path, verb).
+        OperationShell shell = ensureOperationShell(command, userId, millis,
+                request.getOasDocId(), request.getPath(), request.getRef(), request.getVerb(),
+                request.getOperationId(), request.getSummary(),
+                request.getDescriptionForOperation(), request.isDeprecatedForOperation());
+        OasOperationId oasOperationId = shell.operationId();
 
         // Issue #1492: reject a 2nd Request (or 2nd Response) on a (path, verb) that already has one.
         assertOperationHasNoBodyOfType(command, oasOperationId, request.isOasRequest(),
                 request.getVerb(), request.getPath());
 
         // Issue #1492: only tag a NEWLY created operation; do not duplicate tags on an existing op.
-        if (!operationExisted && request.getTagName() != null && !request.getTagName().isBlank()) {
-            OasTagId oasTagId = new InsertOasTagArguments(command)
-                    .setUserId(userId)
-                    .setGuid(randomGuid())
-                    .setName(request.getTagName())
-                    .execute();
-            new InsertOasResourceTagArguments(command)
-                    .setUserId(userId)
-                    .setOasOperationId(oasOperationId)
-                    .setOasTagId(oasTagId)
-                    .execute();
-        }
+        attachTagIfNew(command, userId, shell.operationExisted(), request.getTagName(), oasOperationId);
+
         OasRequestId oasRequestId = null;
         OasResponseId oasResponseId = null;
         if (request.isOasRequest()) {
@@ -272,9 +250,7 @@ public class OpenAPIDocService {
         // type (all-PROBLEM_DETAILS -> PROBLEM_DETAILS; all-CONFIRM_MESSAGE -> the release-matched
         // ConfirmMessage BIE if unambiguous; otherwise No Response Body). Reusing an existing operation
         // (e.g. adding a Response to an op that already has a Request) keeps its current value untouched.
-        if (!operationExisted) {
-            applyInheritedErrorResponse(requester, request.getOasDocId(), oasOperationId);
-        }
+        applyInheritedErrorResponseIfNew(requester, shell.operationExisted(), request.getOasDocId(), oasOperationId);
 
         return new AddBieForOasDocResponse(oasRequestId != null ? oasRequestId : null,
                 oasResponseId != null ? oasResponseId : null);
@@ -314,41 +290,17 @@ public class OpenAPIDocService {
 
         // Issue #1492: find-or-create the (oasDocId, path) resource + (resourceId, verb)
         // operation so a bodyless add attaches to the SAME operation that a sibling body uses.
-        OasResourceId oasResourceId = command.findOrCreateOasResource(new InsertOasResourceArguments(command)
-                .setUserId(userId)
-                .setOasDocId(request.getOasDocId())
-                .setPath(request.getPath())
-                .setRef(request.getRef())
-                .setTimestamp(millis));
-
-        boolean operationExisted = command.findOasOperationId(oasResourceId, request.getVerb()) != null;
-        OasOperationId oasOperationId = command.findOrCreateOasOperation(new InsertOasOperationArguments(command)
-                .setUserId(userId)
-                .setOperationId(request.getOperationId())
-                .setOasResourceId(oasResourceId)
-                .setVerb(request.getVerb())
-                .setSummary(request.getSummary())
-                .setDescription(request.getDescription())
-                .setDeprecated(false)
-                .setTimestamp(millis));
+        OperationShell shell = ensureOperationShell(command, userId, millis,
+                request.getOasDocId(), request.getPath(), request.getRef(), request.getVerb(),
+                request.getOperationId(), request.getSummary(), request.getDescription(), false);
+        OasOperationId oasOperationId = shell.operationId();
 
         // Issue #1492: reject a 2nd Request (or 2nd Response) on a (path, verb) that already has one.
         assertOperationHasNoBodyOfType(command, oasOperationId, request.isOasRequest(),
                 request.getVerb(), request.getPath());
 
         // Issue #1492: only tag a NEWLY created operation; do not duplicate tags on an existing op.
-        if (!operationExisted && request.getTagName() != null && !request.getTagName().isBlank()) {
-            OasTagId oasTagId = new InsertOasTagArguments(command)
-                    .setUserId(userId)
-                    .setGuid(randomGuid())
-                    .setName(request.getTagName())
-                    .execute();
-            new InsertOasResourceTagArguments(command)
-                    .setUserId(userId)
-                    .setOasOperationId(oasOperationId)
-                    .setOasTagId(oasTagId)
-                    .execute();
-        }
+        attachTagIfNew(command, userId, shell.operationExisted(), request.getTagName(), oasOperationId);
 
         OasRequestId oasRequestId = null;
         OasResponseId oasResponseId = null;
@@ -390,9 +342,7 @@ public class OpenAPIDocService {
         // Issue #1347: a NEWLY created (bodyless) operation inherits the document's prevailing
         // error-response body type. A bodyless operation has no release, so it can only inherit
         // PROBLEM_DETAILS, or a single unambiguous ConfirmMessage BIE used across the document.
-        if (!operationExisted) {
-            applyInheritedErrorResponse(requester, request.getOasDocId(), oasOperationId);
-        }
+        applyInheritedErrorResponseIfNew(requester, shell.operationExisted(), request.getOasDocId(), oasOperationId);
 
         return new AddBieForOasDocResponse(oasRequestId, oasResponseId);
     }
@@ -411,6 +361,77 @@ public class OpenAPIDocService {
             throw new IllegalArgumentException(
                     "This operation (" + verbLabel + " " + path + ") already has a " + bodyType
                             + " body. An operation can have at most one Request and one Response body.");
+        }
+    }
+
+    /**
+     * The (resource, verb) operation an add attaches to, plus whether that operation already existed.
+     * Shared by {@link #addBieForOasDoc} (BIE-backed body) and {@link #addOperationForOasDoc}
+     * (bodyless #1730), since both find-or-create the same (oasDocId, path) resource and
+     * (resourceId, verb) operation before persisting their body.
+     */
+    private record OperationShell(OasOperationId operationId, boolean operationExisted) {
+    }
+
+    /**
+     * Issue #1492: find-or-create the (oasDocId, path) resource and the (resourceId, verb) operation so a
+     * Request and a Response for one endpoint share ONE oas_operation. The operation-level fields
+     * (summary/description/deprecated) differ between the BIE-backed and bodyless add paths, so they are
+     * passed in; {@code operationExisted} is captured BEFORE the find-or-create so callers can gate the
+     * NEW-operation-only steps (tagging, inherited error response).
+     */
+    private OperationShell ensureOperationShell(OasDocCommandRepository command, UserId userId, long millis,
+                                                OasDocId oasDocId, String path, String ref, String verb,
+                                                String operationId, String summary, String description,
+                                                boolean deprecated) {
+        OasResourceId oasResourceId = command.findOrCreateOasResource(new InsertOasResourceArguments(command)
+                .setUserId(userId)
+                .setOasDocId(oasDocId)
+                .setPath(path)
+                .setRef(ref)
+                .setTimestamp(millis));
+
+        boolean operationExisted = command.findOasOperationId(oasResourceId, verb) != null;
+        OasOperationId oasOperationId = command.findOrCreateOasOperation(new InsertOasOperationArguments(command)
+                .setUserId(userId)
+                .setOperationId(operationId)
+                .setOasResourceId(oasResourceId)
+                .setVerb(verb)
+                .setSummary(summary)
+                .setDescription(description)
+                .setDeprecated(deprecated)
+                .setTimestamp(millis));
+        return new OperationShell(oasOperationId, operationExisted);
+    }
+
+    /**
+     * Issue #1492: attach a tag to a NEWLY created operation only — reusing an existing operation must not
+     * duplicate its tag. No-op when the operation already existed or the tag name is blank.
+     */
+    private void attachTagIfNew(OasDocCommandRepository command, UserId userId, boolean operationExisted,
+                                String tagName, OasOperationId oasOperationId) {
+        if (!operationExisted && tagName != null && !tagName.isBlank()) {
+            OasTagId oasTagId = new InsertOasTagArguments(command)
+                    .setUserId(userId)
+                    .setGuid(randomGuid())
+                    .setName(tagName)
+                    .execute();
+            new InsertOasResourceTagArguments(command)
+                    .setUserId(userId)
+                    .setOasOperationId(oasOperationId)
+                    .setOasTagId(oasTagId)
+                    .execute();
+        }
+    }
+
+    /**
+     * Issue #1347: apply the document's inherited error-response body type to a NEWLY created operation
+     * only. Reusing an existing operation keeps its current value untouched.
+     */
+    private void applyInheritedErrorResponseIfNew(ScoreUser requester, boolean operationExisted,
+                                                  OasDocId oasDocId, OasOperationId oasOperationId) {
+        if (!operationExisted) {
+            applyInheritedErrorResponse(requester, oasDocId, oasOperationId);
         }
     }
 

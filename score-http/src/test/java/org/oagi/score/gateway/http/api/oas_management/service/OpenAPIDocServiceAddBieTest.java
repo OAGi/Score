@@ -8,6 +8,7 @@ import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.oas_management.controller.payload.AddBieForOasDocRequest;
 import org.oagi.score.gateway.http.api.oas_management.controller.payload.AddBieForOasDocResponse;
 import org.oagi.score.gateway.http.api.oas_management.model.*;
+import org.oagi.score.gateway.http.api.oas_management.repository.BieForOasDocQueryRepository;
 import org.oagi.score.gateway.http.api.oas_management.repository.OasDocCommandRepository;
 import org.oagi.score.gateway.http.api.oas_management.repository.criteria.InsertOasOperationArguments;
 import org.oagi.score.gateway.http.common.model.ScoreRole;
@@ -39,6 +40,7 @@ class OpenAPIDocServiceAddBieTest {
     private OpenAPIDocService service;
     private RepositoryFactory repositoryFactory;
     private OasDocCommandRepository command;
+    private BieForOasDocQueryRepository bieForOasDocQuery;
 
     private static final OasDocId OAS_DOC_ID = new OasDocId(BigInteger.valueOf(1));
     private static final OasResourceId RESOURCE_ID = new OasResourceId(BigInteger.valueOf(100));
@@ -57,6 +59,12 @@ class OpenAPIDocServiceAddBieTest {
                 "tester@example.com", true, List.of(ScoreRole.DEVELOPER));
 
         when(repositoryFactory.oasDocCommandRepository(any())).thenReturn(command);
+        // Issue #1347: a newly-created operation reads the doc's operation error-response summaries to
+        // inherit a body type. With no existing operations the policy resolves to NONE (a no-op), so an
+        // empty summary list lets the reuse-operation add paths run without hitting the inherit branch.
+        bieForOasDocQuery = mock(BieForOasDocQueryRepository.class);
+        when(repositoryFactory.bieForOasDocQueryRepository(any())).thenReturn(bieForOasDocQuery);
+        when(bieForOasDocQuery.getOperationErrorResponseSummaries(any())).thenReturn(List.of());
         when(command.insertOasMessageBody(any())).thenReturn(new OasMessageBodyId(BigInteger.valueOf(300)));
         when(command.findOrCreateOasResource(any())).thenReturn(RESOURCE_ID);
         when(command.findOrCreateOasOperation(any())).thenReturn(OPERATION_ID);
