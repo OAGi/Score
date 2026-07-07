@@ -1,0 +1,15 @@
+# Business-term import fixtures (#1754) reproduce real exports from commercial Business Glossary tools
+# byte-for-byte, INCLUDING their original CRLF line endings (Alation/Atlan/Dataplex/IBM/Purview are
+# Windows-tool exports) and trailing empty columns. That fidelity is the point of
+# BusinessTermImportFileParserCommercialExportTest — it proves the parser handles messy real-world
+# exports, so the whitespace must NOT be "cleaned up".
+#
+#   -text                        -> Git never normalizes their line endings, so the CRLF / trailing-column
+#                                   parser coverage cannot be silently dropped on checkout/commit.
+#   whitespace=-trailing-space   -> `git diff --check` does not flag the intentional trailing whitespace
+#                                   (the CR of CRLF and the trailing empty column), while the files stay
+#                                   textually diffable.
+*.csv  -text whitespace=-trailing-space
+*.tsv  -text whitespace=-trailing-space
+# XLSX fixtures are ZIP binaries.
+*.xlsx binary
