@@ -128,12 +128,12 @@ public class BusinessTermCommandService {
         assertCatalogUniqueOnCreate(requester, request.businessTerm(), request.externalReferenceUri());
 
         var command = repositoryFactory.businessTermCommandRepository(requester);
-        return command.create(
+        return command.upsertByExternalReferenceUri(
                 request.businessTerm(),
                 request.externalReferenceId(),
                 request.externalReferenceUri(),
                 request.definition(),
-                request.comment());
+                request.comment()).businessTermId();
     }
 
     /**

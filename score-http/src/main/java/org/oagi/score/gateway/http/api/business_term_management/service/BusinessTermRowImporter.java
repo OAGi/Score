@@ -1,6 +1,7 @@
 package org.oagi.score.gateway.http.api.business_term_management.service;
 
 import org.oagi.score.gateway.http.api.business_term_management.controller.payload.BusinessTermImportRow;
+import org.oagi.score.gateway.http.api.business_term_management.model.BusinessTermUpsertResult;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,17 +41,16 @@ public class BusinessTermRowImporter {
         BusinessTermInputValidator.validate(
                 row.businessTerm(), row.externalReferenceId(), row.externalReferenceUri());
 
-        var query = repositoryFactory.businessTermQueryRepository(requester);
-        boolean existed = query.existsByExternalReferenceUri(row.externalReferenceUri());
-
+        // The repository upsert already probes the external reference URI to decide insert-vs-update, so
+        // it reports the created/updated outcome directly — no separate existence query per row is needed.
         var command = repositoryFactory.businessTermCommandRepository(requester);
-        command.create(
+        BusinessTermUpsertResult result = command.upsertByExternalReferenceUri(
                 row.businessTerm(),
                 row.externalReferenceId(),
                 row.externalReferenceUri(),
                 row.definition(),
                 row.comment());
 
-        return existed ? Outcome.UPDATED : Outcome.CREATED;
+        return result.created() ? Outcome.CREATED : Outcome.UPDATED;
     }
 }

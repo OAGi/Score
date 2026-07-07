@@ -11,6 +11,7 @@ import org.oagi.score.gateway.http.api.business_term_management.controller.paylo
 import org.oagi.score.gateway.http.api.business_term_management.controller.payload.BusinessTermImportRow;
 import org.oagi.score.gateway.http.api.business_term_management.controller.payload.BusinessTermUpdateRequest;
 import org.oagi.score.gateway.http.api.business_term_management.model.BusinessTermId;
+import org.oagi.score.gateway.http.api.business_term_management.model.BusinessTermUpsertResult;
 import org.oagi.score.gateway.http.api.business_term_management.repository.BusinessTermCommandRepository;
 import org.oagi.score.gateway.http.api.business_term_management.repository.BusinessTermQueryRepository;
 import org.oagi.score.gateway.http.common.model.ScoreRole;
@@ -85,7 +86,8 @@ class BusinessTermCommandServiceTest {
         when(repositoryFactory.businessTermQueryRepository(any())).thenReturn(query);
         when(query.checkUniqueness(any(), any())).thenReturn(true);          // create: (name + URI)
         when(query.checkUniqueness(any(), any(), any())).thenReturn(true);   // update: (id + name + URI)
-        when(command.create(any(), any(), any(), any(), any())).thenReturn(CREATED_ID);
+        when(command.upsertByExternalReferenceUri(any(), any(), any(), any(), any()))
+                .thenReturn(new BusinessTermUpsertResult(CREATED_ID, true));
     }
 
     private static BusinessTermCreateRequest createRequest() {
@@ -106,14 +108,14 @@ class BusinessTermCommandServiceTest {
     @Test
     void create_rejectsDeveloperWith403() {
         assertThrows(DataAccessForbiddenException.class, () -> service.create(developer, createRequest()));
-        verify(command, never()).create(any(), any(), any(), any(), any());
+        verify(command, never()).upsertByExternalReferenceUri(any(), any(), any(), any(), any());
     }
 
     @Test
     void create_rejectsWhenFeatureDisabledWith403() {
         when(applicationConfigurationQueryService.isBusinessTermEnabled(any())).thenReturn(false);
         assertThrows(DataAccessForbiddenException.class, () -> service.create(endUser, createRequest()));
-        verify(command, never()).create(any(), any(), any(), any(), any());
+        verify(command, never()).upsertByExternalReferenceUri(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -137,7 +139,7 @@ class BusinessTermCommandServiceTest {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                 () -> service.create(endUser, createRequest()));
         assertTrue(ex.getMessage().contains("external reference URI"));
-        verify(command, never()).create(any(), any(), any(), any(), any());
+        verify(command, never()).upsertByExternalReferenceUri(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -146,14 +148,15 @@ class BusinessTermCommandServiceTest {
         // create must succeed (there is no name-only check).
         BusinessTermId id = service.create(endUser, createRequest());
         assertEquals(CREATED_ID, id);
-        verify(command).create(any(), any(), any(), any(), any());
+        verify(command).upsertByExternalReferenceUri(any(), any(), any(), any(), any());
     }
 
     @Test
     void create_succeedsWhenUnique() {
         BusinessTermId id = service.create(endUser, createRequest());
         assertEquals(CREATED_ID, id);
-        verify(command).create(eq("Ship To"), eq("id-1"), eq("http://ref/1"), eq("def"), eq("comment"));
+        verify(command).upsertByExternalReferenceUri(
+                eq("Ship To"), eq("id-1"), eq("http://ref/1"), eq("def"), eq("comment"));
     }
 
     @Test

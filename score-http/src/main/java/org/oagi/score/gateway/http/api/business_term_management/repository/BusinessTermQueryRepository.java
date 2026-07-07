@@ -34,12 +34,6 @@ public interface BusinessTermQueryRepository {
     boolean checkUniqueness(BusinessTermId businessTermId, String businessTerm, String externalReferenceUri);
 
     /**
-     * #1753 - L6: returns {@code true} when a business term with the given external reference URI
-     * already exists. Used to classify CSV-import rows as created vs. updated (upsert-by-URI).
-     */
-    boolean existsByExternalReferenceUri(String externalReferenceUri);
-
-    /**
      * #1752 - H2: returns {@code true} when the business term is referenced by any CC-level link
      * ({@code ascc_bizterm}/{@code bcc_bizterm}), i.e. it is assigned and cannot be discarded.
      */

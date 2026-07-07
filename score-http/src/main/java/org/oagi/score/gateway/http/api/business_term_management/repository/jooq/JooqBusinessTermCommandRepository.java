@@ -8,6 +8,7 @@ import org.oagi.score.gateway.http.api.business_term_management.model.AsbieBusin
 import org.oagi.score.gateway.http.api.business_term_management.model.BbieBusinessTermId;
 import org.oagi.score.gateway.http.api.business_term_management.model.BieToAssign;
 import org.oagi.score.gateway.http.api.business_term_management.model.BusinessTermId;
+import org.oagi.score.gateway.http.api.business_term_management.model.BusinessTermUpsertResult;
 import org.oagi.score.gateway.http.api.business_term_management.repository.BusinessTermCommandRepository;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.JooqBaseRepository;
@@ -35,17 +36,23 @@ public class JooqBusinessTermCommandRepository extends JooqBaseRepository implem
     }
 
     @Override
-    public BusinessTermId create(
+    public BusinessTermUpsertResult upsertByExternalReferenceUri(
             String businessTerm, String externalReferenceId, String externalReferenceUri,
             String definition, String comment) {
 
-        var query = repositoryFactory().businessTermQueryRepository(requester());
-
-        boolean exists = dslContext().selectCount()
+        // external_ref_uri has no unique constraint, so more than one row may share this URI. Resolve the
+        // lowest matching id in ONE query: a null result means no row exists (INSERT); otherwise that id
+        // is the exact row the upsert UPDATEs — so an upsert never silently mutates a whole group of
+        // duplicate-URI rows, the returned id matches the row written, and the existence probe and the
+        // target lookup are a single round-trip instead of two.
+        ULong targetId = dslContext().select(BUSINESS_TERM.BUSINESS_TERM_ID)
                 .from(BUSINESS_TERM)
                 .where(BUSINESS_TERM.EXTERNAL_REF_URI.eq(externalReferenceUri))
-                .fetchOptionalInto(Integer.class).orElse(0) > 0;
-        if (!exists) {
+                .orderBy(BUSINESS_TERM.BUSINESS_TERM_ID.asc())
+                .limit(1)
+                .fetchOne(BUSINESS_TERM.BUSINESS_TERM_ID);
+
+        if (targetId == null) {
             BusinessTermRecord record = new BusinessTermRecord();
 
             record.setGuid(randomGuid());
@@ -60,45 +67,36 @@ public class JooqBusinessTermCommandRepository extends JooqBaseRepository implem
             record.setCreationTimestamp(timestamp);
             record.setLastUpdateTimestamp(timestamp);
 
-            return new BusinessTermId(
+            BusinessTermId businessTermId = new BusinessTermId(
                     dslContext().insertInto(BUSINESS_TERM)
                             .set(record)
                             .returning(BUSINESS_TERM.BUSINESS_TERM_ID)
                             .fetchOne().getBusinessTermId().toBigInteger());
-        } else {
-            // external_ref_uri has no unique constraint, so more than one row may share this URI.
-            // Resolve the lowest matching id and update exactly THAT row, so an upsert never silently
-            // mutates a whole group of duplicate-URI rows and the returned id matches the row written.
-            ULong targetId = dslContext().select(BUSINESS_TERM.BUSINESS_TERM_ID)
-                    .from(BUSINESS_TERM)
-                    .where(BUSINESS_TERM.EXTERNAL_REF_URI.eq(externalReferenceUri))
-                    .orderBy(BUSINESS_TERM.BUSINESS_TERM_ID.asc())
-                    .limit(1)
-                    .fetchOne(BUSINESS_TERM.BUSINESS_TERM_ID);
-
-            // #1754 - blank-clobber guard: on the upsert UPDATE branch, overwrite the OPTIONAL
-            // external_ref_id / definition / comment only when the incoming value is non-blank, so a
-            // re-import whose source file lacks one of those columns does not wipe the existing
-            // catalog term's value. The required business_term is always written. To CLEAR a field a
-            // user edits the term on the Edit screen (which routes through update(), not this upsert).
-            var update = dslContext().update(BUSINESS_TERM)
-                    .set(BUSINESS_TERM.BUSINESS_TERM_, businessTerm)
-                    .set(BUSINESS_TERM.LAST_UPDATE_TIMESTAMP, LocalDateTime.now())
-                    .set(BUSINESS_TERM.LAST_UPDATED_BY, valueOf(requester().userId()));
-            if (hasLength(externalReferenceId)) {
-                update = update.set(BUSINESS_TERM.EXTERNAL_REF_ID, externalReferenceId);
-            }
-            if (hasLength(definition)) {
-                update = update.set(BUSINESS_TERM.DEFINITION, definition);
-            }
-            if (hasLength(comment)) {
-                update = update.set(BUSINESS_TERM.COMMENT, comment);
-            }
-            update.where(BUSINESS_TERM.BUSINESS_TERM_ID.eq(targetId))
-                    .execute();
-
-            return new BusinessTermId(targetId.toBigInteger());
+            return new BusinessTermUpsertResult(businessTermId, true);
         }
+
+        // #1754 - blank-clobber guard: on the upsert UPDATE branch, overwrite the OPTIONAL
+        // external_ref_id / definition / comment only when the incoming value is non-blank, so a
+        // re-import whose source file lacks one of those columns does not wipe the existing
+        // catalog term's value. The required business_term is always written. To CLEAR a field a
+        // user edits the term on the Edit screen (which routes through update(), not this upsert).
+        var update = dslContext().update(BUSINESS_TERM)
+                .set(BUSINESS_TERM.BUSINESS_TERM_, businessTerm)
+                .set(BUSINESS_TERM.LAST_UPDATE_TIMESTAMP, LocalDateTime.now())
+                .set(BUSINESS_TERM.LAST_UPDATED_BY, valueOf(requester().userId()));
+        if (hasLength(externalReferenceId)) {
+            update = update.set(BUSINESS_TERM.EXTERNAL_REF_ID, externalReferenceId);
+        }
+        if (hasLength(definition)) {
+            update = update.set(BUSINESS_TERM.DEFINITION, definition);
+        }
+        if (hasLength(comment)) {
+            update = update.set(BUSINESS_TERM.COMMENT, comment);
+        }
+        update.where(BUSINESS_TERM.BUSINESS_TERM_ID.eq(targetId))
+                .execute();
+
+        return new BusinessTermUpsertResult(new BusinessTermId(targetId.toBigInteger()), false);
     }
 
     @Override

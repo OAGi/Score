@@ -281,16 +281,6 @@ public class JooqBusinessTermQueryRepository
     }
 
     @Override
-    public boolean existsByExternalReferenceUri(String externalReferenceUri) {
-        if (!hasLength(externalReferenceUri)) {
-            return false;
-        }
-        return dslContext().fetchExists(
-                selectOne().from(BUSINESS_TERM)
-                        .where(BUSINESS_TERM.EXTERNAL_REF_URI.eq(externalReferenceUri)));
-    }
-
-    @Override
     public BusinessTermDetailsRecord getBusinessTermDetails(BusinessTermId businessTermId) {
 
         if (businessTermId == null) {
