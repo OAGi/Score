@@ -1,6 +1,7 @@
 import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
+import type {PluginOptions as SearchLocalPluginOptions} from '@easyops-cn/docusaurus-search-local';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
@@ -41,7 +42,25 @@ const config: Config = {
     },
   },
 
-  themes: ['@docusaurus/theme-mermaid'],
+  themes: [
+    '@docusaurus/theme-mermaid',
+    // Offline/local search: the index is generated at build time and served as
+    // static files, so it works on GitHub Pages without an external service
+    // (unlike Algolia DocSearch). The search box only functions on a production
+    // build (`npm run build && npm run serve`), not with `npm run start`.
+    [
+      '@easyops-cn/docusaurus-search-local',
+      {
+        // Docs are served at the site root (see routeBasePath above).
+        docsRouteBasePath: '/',
+        // The blog is disabled; without this the plugin fails to resolve it.
+        indexBlog: false,
+        // Content-hash the index files so browsers can cache them long-term.
+        hashed: true,
+        highlightSearchTermsOnTargetPage: true,
+      } satisfies SearchLocalPluginOptions,
+    ],
+  ],
 
   // Even if you don't use internationalization, this sets useful metadata (html lang).
   i18n: {
