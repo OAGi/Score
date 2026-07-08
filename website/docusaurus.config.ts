@@ -122,8 +122,11 @@ const config: Config = {
         {to: '/reference/whats-new', label: "What's New", position: 'left'},
         {
           href: 'https://github.com/OAGi/Score',
-          label: 'GitHub',
           position: 'right',
+          // Icon-only link; the glyph is drawn by .header-github-link in
+          // custom.css, so the accessible name must come from aria-label.
+          className: 'header-github-link',
+          'aria-label': 'GitHub repository',
         },
       ],
     },
