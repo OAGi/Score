@@ -1,0 +1,39 @@
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+/*
+ * Palette matched to the Sphinx user guide (docs/user_guide), which uses the
+ * stock sphinx_rtd_theme: primary/link blue #2980b9, dark gray #343131 for
+ * the nav chrome.
+ */
+:root {
+  --ifm-color-primary: #2980b9;
+  --ifm-color-primary-dark: #2573a7;
+  --ifm-color-primary-darker: #236c9d;
+  --ifm-color-primary-darkest: #1c5982;
+  --ifm-color-primary-light: #2d8ccc;
+  --ifm-color-primary-lighter: #3292d2;
+  --ifm-color-primary-lightest: #4ea1d8;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --ifm-footer-background-color: #343131;
+}
+
+/* For readability concerns, you should choose a lighter palette in dark mode. */
+[data-theme='dark'] {
+  --ifm-color-primary: #60abdc;
+  --ifm-color-primary-dark: #4b9fd8;
+  --ifm-color-primary-darker: #3e99d5;
+  --ifm-color-primary-darkest: #2b86c2;
+  --ifm-color-primary-light: #70b3e0;
+  --ifm-color-primary-lighter: #7ab8e2;
+  --ifm-color-primary-lightest: #94c6e7;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+/* The navbar brand is the product's own wordmark image (blue on transparent,
+   the same asset score-web renders in its toolbar), so the navbar stays on the
+   default light background — like the app's toolbar — instead of RTD blue. */

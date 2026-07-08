@@ -1,0 +1,8 @@
+{
+  "label": "Core Component Management",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "Developer and end-user management of Core Components (ACC, ASCCP, BCCP, DT), code lists, agency ID lists, and releases."
+  }
+}
