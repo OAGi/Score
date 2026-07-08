@@ -26,15 +26,18 @@ jobs:
       run:
         working-directory: website
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: website/package-lock.json
       - run: npm ci
       - run: npm run build
-      - uses: actions/upload-pages-artifact@v3
+      # upload-pages-artifact v4+ drops hidden files from the artifact; the only
+      # dotfile in the Docusaurus build is .nojekyll, which artifact-based Pages
+      # deployments don't need (no Jekyll pass).
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: website/build
 
@@ -46,4 +49,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
