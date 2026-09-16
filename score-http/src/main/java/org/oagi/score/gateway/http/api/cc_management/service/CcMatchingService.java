@@ -12,7 +12,7 @@ import java.util.function.BiFunction;
 @Transactional(readOnly = true)
 public class CcMatchingService {
 
-    public <T extends Object, U extends CoreComponent> CcMatchingScore<T> score(
+    public <T, U extends CoreComponent<?>> CcMatchingScore<T> score(
             CcDocument sourceDoc, T source,
             CcDocument targetDoc, T target,
             BiFunction<CcDocument, T, U> mapper) {
@@ -25,17 +25,17 @@ public class CcMatchingService {
         return new CcMatchingScore(score, source, target);
     }
 
-    public <T extends CoreComponent> double score(CcDocument sourceDoc, T source,
+    public <T extends CoreComponent<?>> double score(CcDocument sourceDoc, T source,
                                                   CcDocument targetDoc, T target) {
-        assert source != null;
-        assert target != null;
-
-        double score = 0.0d;
-        if (source.guid().equals(target.guid())) {
-            score = 1.0d;
+        if (source == null || target == null || source.guid() == null || target.guid() == null) {
+            return 0.0d;
         }
 
-        return score;
+        return source.guid().equals(target.guid()) ? 1.0d : 0.0d;
+    }
+
+    public <T extends CoreComponent<?>> double score(T source, T target) {
+        return score(null, source, null, target);
     }
 
 }

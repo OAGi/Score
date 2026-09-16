@@ -3,9 +3,11 @@ import {
   AsbiepFlatNode,
   BbiepFlatNode,
   BieFlatNodeDatabase,
-  BieFlatNodeDataSource
+  BieFlatNodeDataSource,
+  BiePathLikeExpressionEvaluator
 } from './bie-flat-tree';
 import {BieViewOrderEntry} from '../../cc-management/model-browser/domain/bie-view-order';
+import {of} from 'rxjs';
 
 /**
  * #1638 BIE-editor wiring tests. The editor reads the SAME instance-level sibling order as the model
@@ -97,6 +99,135 @@ describe('BieFlatNodeDatabase view-order store (#1638)', () => {
 
     expect(db.getViewOrderWeight(738304, asbiep)).toBeUndefined();
     expect(db.getViewOrderWeight(7383040, asbiep)).toBe(2);
+  });
+});
+
+describe('BieFlatNode inherited identity', () => {
+  it('rejects inherited nodes without a based top-level BIE id', () => {
+    const node = new AsbiepFlatNode();
+
+    expect(() => node.inherited = true).toThrow(/basedTopLevelAsbiepId/);
+  });
+
+  it('accepts an inherited node with a positive based top-level BIE id', () => {
+    const node = new AsbiepFlatNode();
+    node.basedTopLevelAsbiepId = 27;
+
+    node.inherited = true;
+
+    expect(node.inherited).toBe(true);
+  });
+
+  it('rejects clearing the base id while the node is inherited', () => {
+    const node = new AsbiepFlatNode();
+    node.basedTopLevelAsbiepId = 27;
+    node.inherited = true;
+
+    expect(() => node.basedTopLevelAsbiepId = undefined).toThrow(/basedTopLevelAsbiepId/);
+    expect(node.inherited).toBe(true);
+    expect(node.basedTopLevelAsbiepId).toBe(27);
+  });
+
+  it('allows clearing the base id after inheritance is disabled', () => {
+    const node = new AsbiepFlatNode();
+    node.basedTopLevelAsbiepId = 27;
+    node.inherited = true;
+
+    node.inherited = false;
+    node.basedTopLevelAsbiepId = undefined;
+
+    expect(node.inherited).toBe(false);
+    expect(node.basedTopLevelAsbiepId).toBeUndefined();
+  });
+});
+
+describe('BieFlatNodeDataSource inherited reused details', () => {
+  it.each([undefined, 40])('loads the incoming association in its owner family (owner base %s)', ownerBaseId => {
+    const parent = abieParent(43);
+    parent.topLevelAsbiepId = 43;
+    parent.basedTopLevelAsbiepId = ownerBaseId;
+    const node = asbiepChild('Reused', 11);
+    node.parent = parent;
+    node.reused = true;
+    node.topLevelAsbiepId = 29;
+    node.basedTopLevelAsbiepId = 17;
+    node.inherited = true;
+
+    const asbieDetails = {
+      asbieId: 1,
+      toAsbiepId: 29,
+      basedAscc: {},
+      cardinality: {min: 0, max: 1},
+      ownerTopLevelAsbiep: {topLevelAsbiepId: 43, version: '1.0', status: 'Published'}
+    };
+    const basedAsbieDetails = {
+      ...asbieDetails,
+      asbieId: 4,
+      toAsbiepId: 18,
+      ownerTopLevelAsbiep: {topLevelAsbiepId: 40, version: '0.9', status: 'Published'}
+    };
+    const asbiepDetails = {
+      asbiepId: 2,
+      basedAsccp: {},
+      roleOfAbieId: 3,
+      ownerTopLevelAsbiep: {topLevelAsbiepId: 29, version: '1.0', status: 'Published'}
+    };
+    const basedAsbiepDetails = {
+      ...asbiepDetails,
+      asbiepId: 18,
+      roleOfAbieId: 19,
+      ownerTopLevelAsbiep: {topLevelAsbiepId: 17, version: '0.9', status: 'Published'}
+    };
+    const abieDetails = {
+      abieId: 3,
+      basedAcc: {},
+      ownerTopLevelAsbiep: {topLevelAsbiepId: 29, version: '1.0', status: 'Published'}
+    };
+    const basedAbieDetails = {
+      ...abieDetails,
+      abieId: 19,
+      ownerTopLevelAsbiep: {topLevelAsbiepId: 17, version: '0.9', status: 'Published'}
+    };
+    const service = {
+      getAsbieDetailsByPath: vi.fn((ownerId: number, manifestId: number, path: string) => {
+        // BOM's incoming ASCC does not exist inside the referenced child BIE.
+        expect([43, 40]).toContain(ownerId);
+        expect(path).toBe('ASCCP-90043>ACC-43>ASCC-11');
+        return of(ownerId === 40 ? basedAsbieDetails : asbieDetails);
+      }),
+      getAsbiepDetailsByPath: vi.fn(() => of(asbiepDetails)),
+      getAbieDetailsByPath: vi.fn(() => of(abieDetails)),
+      getAsbiepDetails: vi.fn(() => of(basedAsbiepDetails)),
+      getAbieDetails: vi.fn(() => of(basedAbieDetails))
+    };
+    const dataSource = new BieFlatNodeDataSource(newDb(), service as any, null as any);
+    const callback = vi.fn();
+
+    dataSource.loadDetails(node, callback);
+
+    expect(service.getAsbieDetailsByPath.mock.calls.map(([ownerId]) => ownerId)).toEqual([43, ownerBaseId ?? 43]);
+    if (ownerBaseId) {
+      expect(service.getAsbiepDetails).toHaveBeenCalledWith(18);
+      expect(service.getAbieDetails).toHaveBeenCalledWith(19);
+    } else {
+      expect(service.getAsbiepDetails).not.toHaveBeenCalled();
+      expect(service.getAbieDetails).not.toHaveBeenCalled();
+    }
+    expect(callback).toHaveBeenCalledWith(node);
+    expect(node.detail.isLoaded).toBe(true);
+    expect((node.detail as any).base).toBeDefined();
+  });
+});
+
+describe('BiePathLikeExpressionEvaluator', () => {
+  it('matches path segments exactly so Party does not resolve to Manufacturing Party', () => {
+    const parent = {name: 'BOM Item Data', parent: undefined, isGroup: false} as any;
+    const party = {name: 'Party', parent, isGroup: false} as any;
+    const manufacturingParty = {name: 'Manufacturing Party', parent, isGroup: false} as any;
+    const evaluator = new BiePathLikeExpressionEvaluator('/BOM Item Data/Party');
+
+    expect(evaluator.eval(party)).toBe(true);
+    expect(evaluator.eval(manufacturingParty)).toBe(false);
   });
 });
 
@@ -208,5 +339,95 @@ describe('BieFlatNodeDataSource.nodeExpanded$ (#1638 lazy-fetch trigger)', () =>
 
     // childB must be inserted AFTER parentB (index 2), not after the colliding parentA (index 1).
     expect(ds.data).toEqual([parentA, parentB, childB]);
+  });
+});
+
+describe('BBIE supplementary-component expansion', () => {
+  it.each(['Attribute', 'Element'])('uses positive SC cardinality for %s BBIEs', entityType => {
+    const node = bbiepChild('Field', 1);
+    node.bccNode.entityType = entityType;
+    expect(node.expandable).toBe(false);
+    node.children = [{cardinalityMax: 0} as any];
+    expect(node.expandable).toBe(false);
+    node.children = [{cardinalityMax: 0} as any, {cardinalityMax: 1} as any];
+    expect(node.expandable).toBe(true);
+    node.expandable = undefined;
+    expect(node.expandable).toBe(true);
+    node.children[1].cardinalityMax = 0;
+    expect(node.expandable).toBe(false);
+  });
+
+  it('loads the immediate SC list before deciding whether a lazy BBIE expands', () => {
+    const node = bbiepChild('Identifier', 2);
+    const loadChildren = vi.fn((parent: BbiepFlatNode) => {
+      parent.children = [{cardinalityMax: 1} as any];
+    });
+    node.dataSource = {database: {loadChildren}, hideUnused: false} as any;
+    expect(node.expandable).toBe(true);
+    expect(node.expandable).toBe(true);
+    expect(loadChildren).toHaveBeenCalledTimes(1);
+    expect(loadChildren).toHaveBeenCalledWith(node);
+  });
+});
+
+
+describe('Hide unused bounded traversal', () => {
+  it('filters unused branches without materializing their CC descendants', () => {
+    const db = newDb();
+    const used = asbiepChild('Used', 1);
+    const unused = asbiepChild('Unused', 2);
+    const parent = abieParent(10, [used, unused]);
+    used.used = true;
+    unused.used = false;
+    parent.used = true;
+    const ds = new BieFlatNodeDataSource<any>(db, null as any, null as any);
+    ds.data = [parent, used, unused];
+    const load = vi.spyOn(db, 'loadChildren').mockImplementation(() => {});
+
+    ds.hideUnused = true;
+
+    expect(ds.data).toEqual([parent, used]);
+    expect(load).not.toHaveBeenCalled();
+    expect(unused.getChildren()).toEqual([]);
+  });
+
+  it('retains loaded inherited descendants and reflects later usage changes', () => {
+    const db = newDb();
+    const child = asbiepChild('Inherited', 1);
+    child.basedTopLevelAsbiepId = 27;
+    child.inherited = true;
+    const parent = abieParent(10, [child]);
+    parent.used = false;
+    expect(db.hasUsedOrInheritedDescendant(parent)).toBe(true);
+    child.inherited = false;
+    child.used = false;
+    expect(db.hasUsedOrInheritedDescendant(parent)).toBe(false);
+    child.used = true;
+    expect(db.hasUsedOrInheritedDescendant(parent)).toBe(true);
+  });
+
+  it('keeps repeated occurrences independent even when their persisted paths match', () => {
+    const db = newDb();
+    const first = abieParent(10);
+    const second = abieParent(10);
+    first.used = false;
+    second.used = true;
+    expect(first.path).toBe(second.path);
+    expect(db.hasUsedOrInheritedDescendant(first)).toBe(false);
+    expect(db.hasUsedOrInheritedDescendant(second)).toBe(true);
+  });
+
+  it('terminates for cycles in loaded children without dropping a used sibling', () => {
+    const db = newDb();
+    const parent = abieParent(10);
+    parent.used = false;
+    const used = asbiepChild('Used', 1);
+    used.parent = parent;
+    // Model loaded flags without the editor setter propagating usage to ancestors.
+    Object.defineProperty(used, 'used', {value: true, writable: true});
+    parent.children = [parent as any, used];
+    expect(db.hasUsedOrInheritedDescendant(parent)).toBe(true);
+    used.used = false;
+    expect(db.hasUsedOrInheritedDescendant(parent)).toBe(false);
   });
 });

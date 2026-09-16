@@ -2749,9 +2749,14 @@ export class CcGraph {
 export class CcGraphNode {
   type: string;
   manifestId: number;
+  /** Stable component id shared by revisions/releases of the component. */
+  componentId?: number;
+  basedManifestId?: number;
+  linkedManifestId?: number;
+  prevManifestId?: number;
   state: string;
   deprecated: boolean;
-  guid: string;
+  guid?: string;
   objectClassTerm?: string;
   den?: string;
   propertyTerm?: string;

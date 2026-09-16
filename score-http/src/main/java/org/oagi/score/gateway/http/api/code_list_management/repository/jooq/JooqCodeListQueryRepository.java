@@ -185,9 +185,6 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
     @Override
     public List<CodeListSummaryRecord> availableCodeListByDtManifestId(DtManifestId dtManifestId, List<CcState> states) {
 
-        var dtQuery = repositoryFactory().dtQueryRepository(requester());
-        DtSummaryRecord dt = dtQuery.getDtSummary(dtManifestId);
-
         Result<Record2<ULong, ULong>> result = dslContext().selectDistinct(
                         CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID,
                         DT_MANIFEST.RELEASE_ID)
@@ -214,16 +211,12 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
                     .sorted(Comparator.comparing(CodeListSummaryRecord::name))
                     .collect(Collectors.toList());
 
-        } else {
-            return availableCodeListByReleaseId(dt.release().releaseId(), states);
         }
+        return Collections.emptyList();
     }
 
     @Override
     public List<CodeListSummaryRecord> availableCodeListByDtScManifestId(DtScManifestId dtScManifestId, List<CcState> states) {
-
-        var dtQuery = repositoryFactory().dtQueryRepository(requester());
-        DtScSummaryRecord dtSc = dtQuery.getDtScSummary(dtScManifestId);
 
         Result<Record2<ULong, ULong>> result = dslContext().selectDistinct(
                         CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID,
@@ -239,7 +232,7 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
                 ))
                 .join(CODE_LIST).on(and(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID),
                         states.isEmpty() ? trueCondition() : CODE_LIST.STATE.in(states)))
-                .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(valueOf(dtSc.dtScManifestId())))
+                .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(valueOf(dtScManifestId)))
                 .fetch();
 
         if (result.size() > 0) {
@@ -251,9 +244,28 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
                     .sorted(Comparator.comparing(CodeListSummaryRecord::name))
                     .collect(Collectors.toList());
 
-        } else {
-            return availableCodeListByReleaseId(dtSc.release().releaseId(), states);
         }
+        return Collections.emptyList();
+    }
+
+    @Override
+    public boolean hasCodeListAvailabilityByDtManifestId(DtManifestId dtManifestId) {
+        return dtManifestId != null && dslContext().fetchExists(
+                selectOne().from(DT_MANIFEST).join(DT_AWD_PRI).on(and(
+                        DT_MANIFEST.RELEASE_ID.eq(DT_AWD_PRI.RELEASE_ID),
+                        DT_MANIFEST.DT_ID.eq(DT_AWD_PRI.DT_ID)))
+                        .where(DT_MANIFEST.DT_MANIFEST_ID.eq(valueOf(dtManifestId)))
+                        .and(DT_AWD_PRI.CODE_LIST_MANIFEST_ID.isNotNull()));
+    }
+
+    @Override
+    public boolean hasCodeListAvailabilityByDtScManifestId(DtScManifestId dtScManifestId) {
+        return dtScManifestId != null && dslContext().fetchExists(
+                selectOne().from(DT_SC_MANIFEST).join(DT_SC_AWD_PRI).on(and(
+                        DT_SC_MANIFEST.RELEASE_ID.eq(DT_SC_AWD_PRI.RELEASE_ID),
+                        DT_SC_MANIFEST.DT_SC_ID.eq(DT_SC_AWD_PRI.DT_SC_ID)))
+                        .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(valueOf(dtScManifestId)))
+                        .and(DT_SC_AWD_PRI.CODE_LIST_MANIFEST_ID.isNotNull()));
     }
 
     /**
@@ -349,21 +361,6 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
 
         mergedCodeLists.addAll(baseCodeLists);
         return mergedCodeLists.stream().distinct().collect(Collectors.toList());
-    }
-
-    private List<CodeListSummaryRecord> availableCodeListByReleaseId(ReleaseId releaseId, List<CcState> states) {
-
-        List<Condition> conditions = new ArrayList();
-
-        conditions.add(CODE_LIST_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)));
-        if (!states.isEmpty()) {
-            conditions.add(CODE_LIST.STATE.in(states));
-        }
-
-        var queryBuilder = new GetCodeListSummaryQueryBuilder();
-        return queryBuilder.select()
-                .where(conditions)
-                .fetch(queryBuilder.mapper());
     }
 
     private List<CodeListValueSummaryRecord> getCodeListValueSummaryList(

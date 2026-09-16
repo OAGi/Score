@@ -92,11 +92,17 @@ public class CreateBIEForSelectTopLevelConceptPageImpl extends BaseSearchBarPage
     @Override
     public void setBranch(String branch) {
         retry(() -> {
-            click(getDriver(), getBranchSelectField());
+            WebElement selectField = getBranchSelectField();
+            try {
+                click(getDriver(), selectField.findElement(By.xpath(".//div[contains(@class, \"mat-mdc-select-trigger\")]")));
+            } catch (Exception ignored) {
+                click(getDriver(), selectField);
+            }
             sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), branch);
             WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//div[@class = \"cdk-overlay-container\"]//mat-option//span[text() = \"" + branch + "\"]"));
-            click(optionField);
+                    By.xpath("//mat-option//span[contains(text(), \"" + branch + "\")]"));
+            click(getDriver(), optionField);
+            escape(getDriver());
         });
     }
 

@@ -96,7 +96,7 @@ public class TC_46_2_BackwardCompatibilityIndicator extends BaseTest {
                 bieAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, user, "Production");
         // generateRandomTopLevelASBIEP creates only the root ABIE/ASBIEP; materialize the child BBIE(s)
         // from the ACC's element BCC so a single per-element profiling diff can be seeded (issue #1733).
-        bieAPI().materializeUsedBbieChildren(bie.getTopLevelAsbiepId(), user.getAppUserId());
+        bieAPI().createBbieNodesForUsedElements(bie.getTopLevelAsbiepId(), user.getAppUserId());
         return bie;
     }
 

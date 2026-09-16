@@ -11,6 +11,9 @@ import java.util.*;
 @JsonSerialize(using = NodeSerializer.class)
 public class Node {
 
+    public static final String COMPONENT_ID_PROPERTY = "componentId";
+    public static final String GUID_PROPERTY = "guid";
+
     public enum NodeType {
         ACC,
         ASCC,

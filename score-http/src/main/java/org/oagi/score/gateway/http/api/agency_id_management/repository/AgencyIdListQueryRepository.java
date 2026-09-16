@@ -30,11 +30,25 @@ public interface AgencyIdListQueryRepository {
 
     List<AgencyIdListSummaryRecord> getAgencyIdListSummaryList(LibraryId libraryId, String releaseNum, CcState state);
 
+    /**
+     * Returns Agency ID Lists explicitly linked to the DT, including their
+     * related manifests. Callers must consult {@link #hasAgencyIdListAvailabilityByDtManifestId}
+     * before treating an empty result as an unrestricted release-wide lookup.
+     */
     List<AgencyIdListSummaryRecord> availableAgencyIdListByDtManifestId(
             DtManifestId dtManifestId, List<CcState> states);
 
+    /**
+     * Returns Agency ID Lists explicitly linked to the DT_SC, including their
+     * related manifests. Callers must consult {@link #hasAgencyIdListAvailabilityByDtScManifestId}
+     * before treating an empty result as an unrestricted release-wide lookup.
+     */
     List<AgencyIdListSummaryRecord> availableAgencyIdListByDtScManifestId(
             DtScManifestId dtScManifestId, List<CcState> states);
+
+    boolean hasAgencyIdListAvailabilityByDtManifestId(DtManifestId dtManifestId);
+
+    boolean hasAgencyIdListAvailabilityByDtScManifestId(DtScManifestId dtScManifestId);
 
     List<AgencyIdListSummaryRecord> getAgencyIdListSummaryListInStates(
             ReleaseId releaseId, List<CcState> states);

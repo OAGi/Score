@@ -1266,6 +1266,73 @@ div.mat-form-field-wrapper div.mat-form-field-flex div.mat-form-field-infix {
   margin-bottom: 7px;
 }
 
+/* Shared by the CC detail, model browser, and BIE tree search toolbars. */
+.tree-search-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.tree-search-input {
+  flex: 1 1 160px;
+  min-width: 0;
+}
+
+.tree-search-input .mat-mdc-form-field {
+  width: 100%;
+}
+
+.tree-search-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Match the input text center within the 40px field with 14px top padding. */
+.tree-search-buttons,
+.tree-search-settings {
+  padding-block-start: 8px;
+}
+
+.tree-search-buttons > button {
+  flex: 0 0 auto;
+}
+
+/* Keep the search action's hit area while making its icon slightly smaller. */
+.tree-search-buttons .tree-search-submit > .mat-icon {
+  width: 18px !important;
+  height: 18px !important;
+  font-size: 18px !important;
+}
+
+/* Keep the clear action's hit area while reducing its visual weight. */
+.tree-search-buttons .tree-search-clear > .mat-icon {
+  width: 20px !important;
+  height: 20px !important;
+  font-size: 20px !important;
+}
+
+/* The sizing library uses display: inline-flex !important on icon buttons. */
+.tree-search-buttons > button[hidden],
+.tree-search-buttons .search-progress-bar[hidden] {
+  display: none !important;
+}
+
+.tree-search-buttons .search-progress-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 24px;
+  height: 32px;
+}
+
+.tree-search-buttons .search-progress-bar {
+  margin: 0;
+  flex: 0 0 20px;
+}
+
 .tree-search-box .mat-mdc-form-field-subscript-wrapper {
   height: 0;
 }

@@ -293,10 +293,10 @@ public class SelectAssociationDialogImpl extends SearchBarPageImpl implements Se
 
         retry(() -> {
             WebElement tr;
-            WebElement td;
             try {
-                tr = getTableRecordAtIndex(1);
-                td = getColumnByName(tr, "den");
+                tr = visibilityOfElementLocated(getDriver(), By.xpath(
+                        "//mat-dialog-container//tbody/tr[.//td[contains(@class, 'mat-column-den')]"
+                                + "//a[normalize-space(.) = " + xpathLiteral(den) + "]]"));
             } catch (TimeoutException e) {
                 throw new NoSuchElementException("Cannot locate an association using " + den, e);
             }

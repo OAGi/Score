@@ -22,6 +22,10 @@ import {ReleaseSummary} from '../../release-management/domain/release';
 import {CcNodeService} from '../../cc-management/domain/core-component-node.service';
 import {applyViewOrder, asccViewOrderKey, bccViewOrderKey, BieViewOrderEntry} from '../../cc-management/model-browser/domain/bie-view-order';
 
+export function isValidBasedTopLevelAsbiepId(id: number | undefined | null): id is number {
+  return Number.isInteger(id) && id > 0;
+}
+
 
 export interface BieFlatNode extends FlatNode {
 
@@ -30,7 +34,7 @@ export interface BieFlatNode extends FlatNode {
   bieType: string;
   displayName: string;
   topLevelAsbiepId: number;
-  basedTopLevelAsbiepId: number;
+  basedTopLevelAsbiepId?: number;
   deprecated: boolean;
   ccDeprecated: boolean;
   rootNode: BieEditAbieNode;
@@ -206,6 +210,9 @@ export abstract class BieFlatNodeImpl implements BieFlatNode {
   }
 
   set inherited(inherited: boolean) {
+    if (inherited && !isValidBasedTopLevelAsbiepId(this.basedTopLevelAsbiepId)) {
+      throw new Error('An inherited BIE node must have a valid basedTopLevelAsbiepId.');
+    }
     this._inherited = inherited;
   }
 
@@ -266,7 +273,18 @@ export abstract class BieFlatNodeImpl implements BieFlatNode {
   level: number;
   bieType: string;
   topLevelAsbiepId: number;
-  basedTopLevelAsbiepId: number;
+  private _basedTopLevelAsbiepId?: number;
+
+  get basedTopLevelAsbiepId(): number | undefined {
+    return this._basedTopLevelAsbiepId;
+  }
+
+  set basedTopLevelAsbiepId(value: number | undefined) {
+    if (this._inherited && !isValidBasedTopLevelAsbiepId(value)) {
+      throw new Error('An inherited BIE node must have a valid basedTopLevelAsbiepId.');
+    }
+    this._basedTopLevelAsbiepId = value;
+  }
 
   _bieId: number = undefined;
   _used: boolean = undefined;
@@ -342,9 +360,15 @@ export abstract class BieFlatNodeImpl implements BieFlatNode {
 
   getChildren(options?: any | undefined): BieFlatNode[] {
     if (!!options && options.hideUnused) {
-      return this._children.filter(e => e.used);
+      return this._children.filter(e => this.hasVisibleChild(e));
     }
     return this._children;
+  }
+
+  private hasVisibleChild(child: BieFlatNode): boolean {
+    return !!child && (!!child.used || !!child.inherited ||
+      !!this.dataSource?.hasUsedOrInheritedDescendant(child) ||
+      !!this.dataSource?.searcher?.isSearchResult(child));
   }
 
   get children(): BieFlatNode[] {
@@ -361,13 +385,17 @@ export abstract class BieFlatNodeImpl implements BieFlatNode {
     if (this._expandable !== undefined) {
       return this._expandable;
     }
-    if (this._children.length === 0) {
-      this.dataSource.database.loadChildren(this);
+    if (this.bieType === 'BBIE_SC') {
+      this._expandable = false;
+      return false;
     }
-    this._expandable = this._children.length !== 0;
-    // for 'hideUnused'
-    this._expandable = this.dataSource.database.children(this).length > 0;
-    return this._expandable;
+    if (this._children.length > 0) {
+      if (this.dataSource && this.dataSource.hideUnused) {
+        return this._children.some(e => this.hasVisibleChild(e));
+      }
+      return true;
+    }
+    return true;
   }
 
   set expandable(expandable: boolean) {
@@ -611,6 +639,19 @@ export class BbiepFlatNode extends BieFlatNodeImpl {
     return this.bccNode.entityType;
   }
 
+  get expandable(): boolean {
+    // BBIE children are a bounded SC list, not another association subtree.
+    // Resolve it before deciding whether the lazy node has anything to expand.
+    if (this.getChildren().length === 0 && this.dataSource) {
+      this.dataSource.database.loadChildren(this);
+    }
+    return this.children.some(child => child.cardinalityMax > 0) && super.expandable;
+  }
+
+  set expandable(expandable: boolean) {
+    super.expandable = expandable;
+  }
+
   get bbiePath(): string {
     if (!this._bbiePath) {
       let arr;
@@ -783,6 +824,8 @@ export class BbieScFlatNode extends BieFlatNodeImpl {
 
 export class WrappedBieFlatNode implements BieFlatNode {
   _node: BieFlatNode;
+  private _childrenOverride: FlatNode[];
+  private _hasChildrenOverride = false;
 
   constructor(node: BieFlatNode) {
     this._node = node;
@@ -805,15 +848,19 @@ export class WrappedBieFlatNode implements BieFlatNode {
   }
 
   get typeClass(): string {
-    switch (this.type.toUpperCase()) {
+    const type = this.type;
+    if (!type) {
+      return this._node?.bieType || '';
+    }
+    switch (type.toUpperCase()) {
       case 'ASBIEP':
-        return (this._node as AsbiepFlatNode).type;
+        return (this._node as AsbiepFlatNode).type || this._node.bieType || '';
       case 'BBIEP':
-        return (this._node as BbiepFlatNode).type;
+        return (this._node as BbiepFlatNode).type || this._node.bieType || '';
       case 'BBIE_SC':
-        return (this._node as BbieScFlatNode).type;
+        return (this._node as BbieScFlatNode).type || this._node.bieType || '';
       default:
-        return this._node.bieType;
+        return this._node?.bieType || '';
     }
   }
 
@@ -821,7 +868,7 @@ export class WrappedBieFlatNode implements BieFlatNode {
     return this._node.topLevelAsbiepId;
   }
 
-  get basedTopLevelAsbiepId(): number {
+  get basedTopLevelAsbiepId(): number | undefined {
     return this._node.basedTopLevelAsbiepId;
   }
 
@@ -910,21 +957,36 @@ export class WrappedBieFlatNode implements BieFlatNode {
   }
 
   getChildren(options?: any | undefined): FlatNode[] {
-    return this._node.getChildren(options);
+    const children = this._hasChildrenOverride ? this._childrenOverride :
+      (this._node.getChildren ? this._node.getChildren() : this._node.children || []);
+    if (options?.hideUnused) {
+      const dataSource = (this._node as BieFlatNodeImpl).dataSource;
+      return children.filter(child => (child as BieFlatNode).used || (child as BieFlatNode).inherited ||
+        !!dataSource?.hasUsedOrInheritedDescendant?.(child as BieFlatNode) ||
+        !!dataSource?.searcher?.isSearchResult?.(child as BieFlatNode));
+    }
+    return children;
   }
 
   get children(): FlatNode[] {
-    return this._node.children;
+    return this.getChildren({hideUnused: !!(this._node as BieFlatNodeImpl).dataSource?.hideUnused});
   }
 
   set children(children: FlatNode[]) {
-    this._node.children = children;
+    this._childrenOverride = children || [];
+    this._hasChildrenOverride = true;
   }
 
   get parents(): WrappedBieFlatNode[] {
     let node: WrappedBieFlatNode = this;
     const result: WrappedBieFlatNode[] = [node];
+    const visited = new Set<FlatNode>();
+    visited.add(node);
     while (node.parent) {
+      if (visited.has(node.parent)) {
+        break;
+      }
+      visited.add(node.parent);
       if (!(node.parent as WrappedBieFlatNode).isGroup) {
         result.push(node.parent as WrappedBieFlatNode);
       }
@@ -2423,6 +2485,10 @@ export class BiePathLikeExpressionEvaluator<T extends BieFlatNode> extends PathL
   }
 
   protected doEval(node: T, token: string): boolean {
+    if (this.isRootPathExpression()) {
+      const names = [node.name, node.displayName].filter(name => !!name);
+      return names.some(name => this.caseSensitive ? name === token : name.toLowerCase() === token.toLowerCase());
+    }
     const result = super.doEval(node, token);
     if (result || !node.displayName) {
       return result;
@@ -2451,6 +2517,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
   private _baseUsedBbieScMap = {};
 
   private _usedBieList: UsedBie[] = [];
+  private _baseUsedBieList: UsedBie[] = [];
   private _refBieList: RefBie[] = [];
   // Issue #1638: instance-level sibling sort weights, keyed "<viewParentAcc>:ASCC|BCC:<child>".
   // Shared CC-level order with the model browser; empty by default => children() is a stable no-op.
@@ -2538,23 +2605,32 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
   }
 
   setBaseUsedBieList(baseUsedBieList: UsedBie[]) {
-    this._baseUsedAsbieMap = baseUsedBieList.filter(e => e.type === 'ASBIE').reduce((r, a) => {
+    const usedBieList = baseUsedBieList || [];
+    this._baseUsedBieList = usedBieList;
+    this._baseUsedAsbieMap = usedBieList.filter(e => e.type === 'ASBIE').reduce((r, a) => {
       r[a.manifestId] = [...r[a.manifestId] || [], a];
       return r;
     }, {});
-    this._baseUsedBbieMap = baseUsedBieList.filter(e => e.type === 'BBIE').reduce((r, a) => {
+    this._baseUsedBbieMap = usedBieList.filter(e => e.type === 'BBIE').reduce((r, a) => {
       r[a.manifestId] = [...r[a.manifestId] || [], a];
       return r;
     }, {});
-    this._baseUsedBbieScMap = baseUsedBieList.filter(e => e.type === 'BBIE_SC').reduce((r, a) => {
+    this._baseUsedBbieScMap = usedBieList.filter(e => e.type === 'BBIE_SC').reduce((r, a) => {
       r[a.manifestId] = [...r[a.manifestId] || [], a];
       return r;
     }, {});
   }
 
+  appendBaseUsedBieList(baseUsedBieList: UsedBie[]) {
+    this.setBaseUsedBieList(this._baseUsedBieList.concat(baseUsedBieList || []));
+  }
+
   children(node: T): T[] {
-    if (!node.expandable) {
+    if (!node) {
       return [];
+    }
+    if (node.getChildren().length === 0) {
+      this.loadChildren(node);
     }
 
     // Flatten groups first (no sorting), then apply the view order ONCE at this expanded node using
@@ -2566,17 +2642,79 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
       .concat(this.sortByViewOrder(viewParentAccManifestId, nodes));
   }
 
+  private unwrapNode<N extends BieFlatNode>(node: N): N {
+    let raw = node;
+    let next = raw?.self as N;
+    while (next && next !== raw) {
+      raw = next;
+      next = raw.self as N;
+    }
+    return raw;
+  }
+
+  hasUsedOrInheritedDescendant(node: T, visited: Set<unknown> = new Set()): boolean {
+    const rawNode = node ? this.unwrapNode(node) : node;
+    if (!rawNode || visited.has(rawNode)) {
+      return false;
+    }
+    visited.add(rawNode);
+    if (rawNode.used || rawNode.inherited) {
+      return true;
+    }
+
+    // Filtering must not materialize unused CC branches. Persisted usage is
+    // resolved when a node is loaded; presentation groups are loaded with their
+    // parent. Inspect existing descendants to retain their visible ancestors.
+    // Use object identity because separate reuse occurrences can share a path,
+    // and read live flags so edits cannot leave cached visibility behind.
+    const children = rawNode.getChildren ? rawNode.getChildren() : rawNode.children;
+    return children.some(child => this.hasUsedOrInheritedDescendant(child as T, visited));
+  }
+
+  private isCycleNode(node: BieFlatNode): boolean {
+    if (!node || node.isCycle) {
+      return !!node?.isCycle;
+    }
+
+    const self = ((node as any).self || node) as AsbiepFlatNode;
+    const asccpManifestId = self?.asccpNode?.manifestId;
+    if (asccpManifestId === undefined || asccpManifestId === null) {
+      return false;
+    }
+
+    let parent = node.parent as BieFlatNode;
+    const visitedParents = new Set<BieFlatNode>();
+    while (parent) {
+      if (visitedParents.has(parent)) {
+        break;
+      }
+      visitedParents.add(parent);
+      const parentSelf = ((parent as any).self || parent) as AsbiepFlatNode;
+      if (parentSelf?.bieType === 'ASBIEP' && parentSelf.asccpNode?.manifestId === asccpManifestId) {
+        return true;
+      }
+      parent = parent.parent as BieFlatNode;
+    }
+    return false;
+  }
+
   /**
    * Recursively flatten a node's children into the attributes-first partition WITHOUT sorting.
    * Preserves the exact pre-#1638 partitioning (attribute groups + attribute BBIEs => attributes).
    */
-  private flatten(node: T): {attributes: T[], nodes: T[]} {
+  private flatten(node: T, active: Set<BieFlatNode> = new Set()): {attributes: T[], nodes: T[]} {
     const nodes: T[] = [];
     const attributes: T[] = [];
-    node.children.map(e => e as T).forEach(e => {
+    const identity = node?.self || node;
+    if (!identity || active.has(identity)) {
+      return {attributes, nodes};
+    }
+    active.add(identity);
+    const children = node.getChildren ? node.getChildren() : node.children;
+    children.map(e => e as T).forEach(e => {
       const _node = e.self; // in case of it is WrappedBieFlatNode
       if (_node.isGroup) {
-        const sub = this.flatten(e);
+        const sub = this.flatten(e, active);
         const combined = sub.attributes.concat(sub.nodes);
         if ((_node as AsbiepFlatNode).accNode.componentType === 'AttributeGroup') {
           attributes.push(...combined);
@@ -2591,6 +2729,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
         }
       }
     });
+    active.delete(identity);
     return {attributes, nodes};
   }
 
@@ -2628,28 +2767,37 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
   }
 
   loadChildren(node: T) {
-    if (node.children.length > 0) {
+    // `children` is hide-unused aware and can therefore be empty even after
+    // the raw child list has been materialized. Use the unfiltered list to
+    // make loading idempotent when the data source hides unused nodes.
+    if (node.getChildren().length > 0 || this.isCycleNode(node)) {
       return;
     }
 
     let children = [];
     const nodeBieType = node.bieType;
-    const _node = node.self; // in case of it is WrappedBieFlatNode
+    const _node = this.unwrapNode(node).self; // in case of it is WrappedBieFlatNode
     if (nodeBieType === 'ABIE' || nodeBieType === 'ASBIEP') {
       children = this.getAssociations((_node as AsbiepFlatNode).accNode);
       node.children = children.map((e: Association) => {
         if (e.assocNode.type === 'ASCC') {
           const asbiepNode: AsbiepFlatNode = this.toAsbiepNode(e, _node as AsbiepFlatNode);
+          if (!asbiepNode) {
+            return undefined;
+          }
           this.afterAsbiepFlatNode(asbiepNode);
           asbiepNode.reset();
           return asbiepNode;
         } else {
           const bbiepNode: BbiepFlatNode = this.toBbiepNode(e, _node as AsbiepFlatNode);
+          if (!bbiepNode) {
+            return undefined;
+          }
           this.afterBbiepFlatNode(bbiepNode);
           bbiepNode.reset();
           return bbiepNode;
         }
-      });
+      }).filter(e => !!e);
 
       node.children.map(e => e as T).forEach(e => {
         if (e.isGroup) {
@@ -2660,10 +2808,13 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
       children = this.getChildren((_node as BbiepFlatNode).bdtNode);
       node.children = children.map(e => {
         const bbieScNode = this.toBbieScNode((_node as BbiepFlatNode).bccNode, e, node);
+        if (!bbieScNode) {
+          return undefined;
+        }
         this.afterBbieScFlatNode(bbieScNode);
         bbieScNode.reset();
         return bbieScNode;
-      }).sort((a, b) => a.name.localeCompare(b.name));
+      }).filter(e => !!e).sort((a, b) => a.name.localeCompare(b.name));
     }
   }
 
@@ -2683,10 +2834,16 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
        * If the Reuse BIE has a Base BIE, it retrieves the Base of the Reuse BIE;
        * otherwise, it retrieves the Base of the current BIE.
        */
-      node.basedTopLevelAsbiepId = reused[0].refBasedTopLevelAsbiepId;
+      // A reference may point to a normal BIE even when the owner BIE is
+      // inherited. In that case the referenced subtree still belongs to the
+      // owner's inheritance family and must use the owner's base identity.
+      node.basedTopLevelAsbiepId = isValidBasedTopLevelAsbiepId(reused[0].refBasedTopLevelAsbiepId)
+        ? reused[0].refBasedTopLevelAsbiepId
+        : reused[0].basedTopLevelAsbiepId;
+      node.inherited = isValidBasedTopLevelAsbiepId(node.basedTopLevelAsbiepId);
       node.rootNode = new BieEditAbieNode();
       node.rootNode.topLevelAsbiepId = reused[0].refTopLevelAsbiepId;
-      node.rootNode.basedTopLevelAsbiepId = reused[0].refBasedTopLevelAsbiepId;
+      node.rootNode.basedTopLevelAsbiepId = node.basedTopLevelAsbiepId;
       node.rootNode.inverseMode = reused[0].refInverseMode;
     }
 
@@ -2724,7 +2881,8 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
             u.hashPath === node.asbieHashPath;
         }
       });
-      if (!!baseUsed && baseUsed.length > 0 && baseUsed[0].used) {
+      if (!!baseUsed && baseUsed.length > 0 && baseUsed[0].used &&
+          isValidBasedTopLevelAsbiepId(node.basedTopLevelAsbiepId)) {
         node.inherited = true;
       }
     }
@@ -2753,7 +2911,8 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
     let baseUsed = this._baseUsedBbieMap[node.bccNode.manifestId];
     if (!!baseUsed && baseUsed.length > 0) {
       baseUsed = baseUsed.filter(u => u.ownerTopLevelAsbiepId === node.basedTopLevelAsbiepId && u.hashPath === node.bbieHashPath);
-      if (!!baseUsed && baseUsed.length > 0 && baseUsed[0].used) {
+      if (!!baseUsed && baseUsed.length > 0 && baseUsed[0].used &&
+          isValidBasedTopLevelAsbiepId(node.basedTopLevelAsbiepId)) {
         node.inherited = true;
       }
     }
@@ -2782,7 +2941,8 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
     let baseUsed = this._baseUsedBbieScMap[node.bdtScNode.manifestId];
     if (!!baseUsed && baseUsed.length > 0) {
       baseUsed = baseUsed.filter(u => u.ownerTopLevelAsbiepId === node.basedTopLevelAsbiepId && u.hashPath === node.hashPath);
-      if (!!baseUsed && baseUsed.length > 0 && baseUsed[0].used) {
+      if (!!baseUsed && baseUsed.length > 0 && baseUsed[0].used &&
+          isValidBasedTopLevelAsbiepId(node.basedTopLevelAsbiepId)) {
         node.inherited = true;
       }
     }
@@ -2793,6 +2953,9 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
   }
 
   getChildren(node: CcGraphNode): CcGraphNode[] {
+    if (!node) {
+      return [];
+    }
     const nodes = this._ccGraph.graph.nodes;
     const edges = this._ccGraph.graph.edges;
 
@@ -2810,20 +2973,26 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
       case 'BCC':
       case 'ASCCP':
       case 'BCCP':
-        return [nodes[targets[0]], ];
+        return nodes[targets[0]] ? [nodes[targets[0]], ] : [];
 
       case 'DT':
-        return targets.map(e => nodes[e]).filter(e => e.cardinalityMax > 0);
+        return targets.map(e => nodes[e]).filter(e => e && e.cardinalityMax > 0);
 
       case 'DT_SC':
         return [];
     }
   }
 
-  getAssociations(node: CcGraphNode, intermediates?: CcGraphNode[]): Association[] {
+  getAssociations(node: CcGraphNode, intermediates?: CcGraphNode[], visited: Set<string> = new Set()): Association[] {
     if (!node || node.type !== 'ACC') {
       return [];
     }
+
+    const nodeKey = getKey(node);
+    if (visited.has(nodeKey)) {
+      return [];
+    }
+    visited.add(nodeKey);
 
     const nodes = this._ccGraph.graph.nodes;
     const edges = this._ccGraph.graph.edges;
@@ -2841,7 +3010,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
       if (!intermediates) {
         intermediates = [node];
       }
-      children = this.getAssociations(basedAcc, intermediates.concat(basedAcc));
+      children = this.getAssociations(basedAcc, intermediates.concat(basedAcc), visited);
       startIdx = 1;
     }
 
@@ -2879,7 +3048,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
     node.basedTopLevelAsbiepId = this._abieNode.basedTopLevelAsbiepId;
     node.rootNode = this._abieNode;
     node.deprecated = this._abieNode.deprecated;
-    node.inherited = (!!node.basedTopLevelAsbiepId);
+    node.inherited = isValidBasedTopLevelAsbiepId(node.basedTopLevelAsbiepId);
     node.displayName = this._abieNode.displayName;
     return node as unknown as T;
   }
@@ -2898,11 +3067,18 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
   }
 
   toAsbiepNode(ascc: Association, parent: AsbiepFlatNode) {
+    parent = this.unwrapNode(parent) as AsbiepFlatNode;
     const node = new AsbiepFlatNode();
     node.asccNode = ascc.assocNode;
     node.required = node.asccNode.cardinalityMin > 0;
     node.asccpNode = this.getChildren(node.asccNode)[0];
+    if (!node.asccpNode) {
+      return undefined;
+    }
     node.accNode = this.getChildren(node.asccpNode)[0];
+    if (!node.accNode || !parent.accNode) {
+      return undefined;
+    }
     node.name = node.asccpNode.propertyTerm;
     if (parent.isGroup) {
       node.level = parent.level;
@@ -2923,20 +3099,25 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
     }
     node.topLevelAsbiepId = parent.topLevelAsbiepId;
     node.basedTopLevelAsbiepId = parent.basedTopLevelAsbiepId;
-    if (!node.isGroup) {
-      node.isCycle = this.detectCycle(node);
-    }
+    node.isCycle = this.detectCycle(node);
     node.deprecated = node.ccDeprecated;
     node.dataSource = this.dataSource;
     return node;
   }
 
   toBbiepNode(bcc: Association, parent: AsbiepFlatNode) {
+    parent = this.unwrapNode(parent) as AsbiepFlatNode;
     const node = new BbiepFlatNode();
     node.bccNode = bcc.assocNode;
     node.required = node.bccNode.cardinalityMin > 0;
     node.bccpNode = this.getChildren(node.bccNode)[0];
+    if (!node.bccpNode) {
+      return undefined;
+    }
     node.bdtNode = this.getChildren(node.bccpNode)[0];
+    if (!node.bdtNode || !parent.accNode) {
+      return undefined;
+    }
     node.name = node.bccpNode.propertyTerm;
     if (parent.isGroup) {
       node.level = parent.level;
@@ -2963,11 +3144,21 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
   }
 
   toBbieScNode(bccNode: CcGraphNode, bdtScNode: CcGraphNode, parent: T) {
+    parent = this.unwrapNode(parent);
     const node = new BbieScFlatNode();
     node.bccNode = bccNode;
     node.bdtScNode = this._ccGraph.graph.nodes[getKey(bdtScNode)];
+    if (!node.bccNode || !node.bdtScNode) {
+      return undefined;
+    }
     const bccpNode = this.getChildren(node.bccNode)[0];
+    if (!bccpNode) {
+      return undefined;
+    }
     node.bdtNode = this.getChildren(bccpNode)[0];
+    if (!node.bdtNode) {
+      return undefined;
+    }
     node.required = node.bdtScNode.cardinalityMin > 0;
     node.name = node.bdtScNode.propertyTerm + ' ' + node.bdtScNode.representationTerm;
     node.level = parent.level + 1;
@@ -2987,10 +3178,18 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
   }
 
   detectCycle(node: AsbiepFlatNode): boolean {
-    const asccpManifestId = node.asccpNode.manifestId;
+    const asccpManifestId = node?.asccpNode?.manifestId;
+    if (asccpManifestId === undefined || asccpManifestId === null) {
+      return false;
+    }
     let cur = node.parent;
+    const visitedParents = new Set<BieFlatNode>();
     while (cur) {
-      if ((cur as AbieFlatNode).asccpNode.manifestId === asccpManifestId) {
+      if (visitedParents.has(cur)) {
+        break;
+      }
+      visitedParents.add(cur);
+      if ((cur as AbieFlatNode).asccpNode?.manifestId === asccpManifestId) {
         return true;
       }
       cur = cur.parent as BieFlatNode;
@@ -3009,6 +3208,7 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
 
   _hideUnused = false;
   _hideCardinality = false;
+  searcher: BieFlatNodeDataSourceSearcher<T>;
 
   get data(): T[] {
     return this.dataChange.value;
@@ -3029,10 +3229,15 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
     this.data = [this._database.rootNode as unknown as T, ];
 
     // pre-expanding nodes to recognize required elements.
+    const visited = new Set<BieFlatNode>();
     let nodes = [this.data[0], ];
     while (nodes.length > 0) {
       const node = nodes.shift();
-      if (node.required && node.expandable && node.children.length === 0) {
+      if (visited.has(node)) {
+        continue;
+      }
+      visited.add(node);
+      if (node.required && node.expandable && node.children.length === 0 && !(node as any).isCycle) {
         this._database.loadChildren(node);
       }
       nodes = node.children.concat(nodes) as T[];
@@ -3153,7 +3358,7 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
       e.expandable = undefined;
     });
     if (hideUnused) {
-      this.data = this.data.filter(e => e.used);
+      this.data = this.data.filter(e => e.used || e.inherited || this.database.hasUsedOrInheritedDescendant(e));
     } else {
       const expandedData = this.data.filter(e => this.isExpanded(e));
       this.collapse(this.data[0] as T);
@@ -3178,6 +3383,10 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
 
   get database(): BieFlatNodeDatabase<T> {
     return this._database;
+  }
+
+  hasUsedOrInheritedDescendant(node: BieFlatNode): boolean {
+    return this._database.hasUsedOrInheritedDescendant(node as T);
   }
 
   isExpanded(node: T): boolean {
@@ -3277,14 +3486,14 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
 
     let children = this._database.children(node);
     if (this.hideUnused) {
-      children = children.filter(e => e.used);
+      children = children.filter(e => e.used || e.inherited ||
+        this._database.hasUsedOrInheritedDescendant(e) ||
+        (this.searcher && this.searcher.isSearchResult(e)));
     }
-    // Use 'queryPath' (parent-chain name-based path) to locate the row.
-    // 'hashPath' collides for descendants of two ASBIEPs that share the same reused
-    // TopLevelAsbiep (their 'asbiepPath' collapses to 'ASCCP-<id>' by design), so
-    // indexOf(hashPath) returns the first match and inserts children at the wrong row.
-    // 'queryPath' walks the actual parent chain so it stays unique per tree position.
-    const index = this.data.map(e => e.queryPath).indexOf(node.queryPath);
+    // Prefer object identity so repeated occurrences with identical names remain
+    // independent. The query path is only a compatibility fallback when a
+    // wrapper instance has been recreated, and is rejected when ambiguous.
+    const index = this.getNodeIndex(node);
 
     if (!children || index < 0) {
       // If no children, or cannot find the node, no op
@@ -3296,7 +3505,9 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
         e.expanded = false;
         e.addChangeListener(this);
       });
-      this.data.splice(index + 1, 0, ...children);
+      const data = this.data;
+      data.splice(index + 1, 0, ...children);
+      this.data = data;
     } else {
       let count = 0;
       for (
@@ -3305,14 +3516,18 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
         i++, count++
       ) {
       }
-      this.data.splice(index + 1, count).forEach(e => {
+      const data = this.data;
+      data.splice(index + 1, count).forEach(e => {
         e.expanded = false;
         e.removeChangeListener(this);
       });
+      this.data = data;
 
-      // Too many nodes in BIE tree.
+      // Release an unchanged BBIEP subtree after collapse. Changed children
+      // must remain materialized so edits (including uplift mappings held by
+      // wrapped nodes) are not lost.
       if (node.bieType === 'BBIEP') {
-        if (children.filter(e => !e.isChanged).length === 0) {
+        if (children.length > 0 && children.every(e => !e.isChanged)) {
           node.children = [];
         }
       }
@@ -3326,6 +3541,26 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
     if (expand) {
       this.nodeExpanded$.next(node);
     }
+  }
+
+  getNodeIndex(node: T): number {
+    const directIndex = this.data.indexOf(node);
+    if (directIndex > -1) {
+      return directIndex;
+    }
+
+    const rawNode = node?.self;
+    const rawIndex = rawNode
+      ? this.data.findIndex(candidate => candidate.self === rawNode)
+      : -1;
+    if (rawIndex > -1) {
+      return rawIndex;
+    }
+
+    const queryPathMatches = this.data
+      .map((candidate, index) => candidate.queryPath === node?.queryPath ? index : -1)
+      .filter(index => index > -1);
+    return queryPathMatches.length === 1 ? queryPathMatches[0] : -1;
   }
 
   loadDetails(node: T, callbackFn?) {
@@ -3430,13 +3665,18 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
             return doAfterAsbiep(asbieDetails, asbiepDetails, abieDetailss);
           });
         } else {
+          // The incoming ASBIE path belongs to its containing BIE, even when
+          // the referenced BIE has its own inheritance family. Without an
+          // inherited owner, the current association is the comparison baseline.
+          const associationOwner = node.reused ? (node.parent as BieFlatNode) : node;
+          const basedTopLevelAsbiepId = associationOwner.basedTopLevelAsbiepId
+            ?? associationOwner.topLevelAsbiepId;
           forkJoin([
             this.service.getAsbieDetailsByPath((node.reused) ? (node.parent as AsbiepFlatNode).topLevelAsbiepId : node.topLevelAsbiepId,
                 asbiepNode.asccNode.manifestId, asbiepNode.asbiePath),
             this.service.getAsbiepDetailsByPath(node.topLevelAsbiepId, asbiepNode.asccpNode.manifestId, asbiepNode.asbiepPath),
             this.service.getAbieDetailsByPath(node.topLevelAsbiepId, asbiepNode.accNode.manifestId, asbiepNode.abiePath),
-            this.service.getAsbieDetailsByPath((node.reused) ? (node.parent as AsbiepFlatNode).basedTopLevelAsbiepId :
-                    (node.basedTopLevelAsbiepId ? node.basedTopLevelAsbiepId : node.topLevelAsbiepId),
+            this.service.getAsbieDetailsByPath(basedTopLevelAsbiepId,
                 asbiepNode.asccNode.manifestId, asbiepNode.asbiePath)
           ]).subscribe(([asbieDetails, asbiepDetails, abieDetails, basedAsbieDetails]) => {
             if (asbieDetails.toAsbiepId === basedAsbieDetails.toAsbiepId) {
@@ -3600,6 +3840,7 @@ export class BieFlatNodeDataSourceSearcher<T extends BieFlatNode>
   constructor(private dataSource: BieFlatNodeDataSource<T>,
               private database: BieFlatNodeDatabase<T>) {
     dataSource.addListener(this);
+    dataSource.searcher = this;
   }
 
   get inputKeyword(): string {
@@ -3663,15 +3904,22 @@ export class BieFlatNodeDataSourceSearcher<T extends BieFlatNode>
       return empty();
     }
 
+    if (this._inputKeyword !== inputKeyword || force) {
+      this.resetSearch();
+      this._inputKeyword = inputKeyword;
+    }
     this.isSearching = true;
     if (!this.fullSearched || force) {
       const searchResult = [];
       const evaluator = this.getEvaluator(inputKeyword);
 
-      const threshold = 100;
-      let expandingLimit = 1000;
+      const isPathSearch = inputKeyword.charAt(0) === '/';
+      const threshold = isPathSearch ? 1 : 100;
+      let expandingLimit = isPathSearch ? 1000 : 10000;
+      const normalizedPath = inputKeyword.replace(/\s+/g, '').toLowerCase();
+
       let data = (!this.searchedData || this.searchedData.length === 0) ?
-        ((this.inputKeyword.charAt(0) === '/') ? [this.dataSource.data[0], ] : [selectedNode, ]) :
+        ((inputKeyword.charAt(0) === '/' || !selectedNode) ? [this.dataSource.data[0], ] : [selectedNode, ]) :
         this.searchedData;
       while (searchResult.length < threshold && expandingLimit > 0 && data.length > 0) {
         const item = data.shift();
@@ -3679,12 +3927,18 @@ export class BieFlatNodeDataSourceSearcher<T extends BieFlatNode>
         if (!item.isGroup && evaluator.eval(item)) {
           searchResult.push(item);
         }
-        if (item.expandable) {
-          expandingLimit--;
-        }
+        const canDescendantsMatch = !isPathSearch ||
+          normalizedPath.startsWith('/' + (item.queryPath || '').toLowerCase()) ||
+          item.isGroup;
 
-        if (item.children.length > 0) {
-          data = data.concat(item.children as T[]);
+        if (item.expandable && canDescendantsMatch) {
+          expandingLimit--;
+          if (item.children.length === 0) {
+            this.database.loadChildren(item);
+          }
+          if (item.children.length > 0) {
+            data = data.concat(item.children as T[]);
+          }
         }
       }
 
@@ -3728,10 +3982,28 @@ export class BieFlatNodeDataSourceSearcher<T extends BieFlatNode>
 
   sort(searchResult: T[]): T[] {
     return searchResult.sort((a, b) => {
-      const aIdx = this.dataSource.data.indexOf(a);
-      const bIdx = this.dataSource.data.indexOf(b);
+      const aIdx = this.getNodeIndex(a);
+      const bIdx = this.getNodeIndex(b);
       return aIdx - bIdx;
     });
+  }
+
+  isSearchResult(node: T): boolean {
+    if (!this.searchResult || this.searchResult.length === 0 || !node) {
+      return false;
+    }
+    return this.searchResult.some(e => e === node || (e.self && node.self && e.self === node.self) || (e.queryPath && e.queryPath === node.queryPath));
+  }
+
+  isCurrentSearchIndex(node: T): boolean {
+    if (!this.searchResult || this.searchResult.length === 0 || !node) {
+      return false;
+    }
+    const current = this.searchResult[this.searchIndex];
+    if (!current) {
+      return false;
+    }
+    return current === node || (current.self && node.self && current.self === node.self) || (current.queryPath && current.queryPath === node.queryPath);
   }
 
   resetSearch() {
@@ -3750,7 +4022,7 @@ export class BieFlatNodeDataSourceSearcher<T extends BieFlatNode>
     if (!this.dataSource.isExpanded(node)) {
       this.dataSource.expand(node);
     }
-    return this.dataSource.data.indexOf(node);
+    return this.dataSource.getNodeIndex(node);
   }
 
   protected getEvaluator(expr: string): ExpressionEvaluator<T> {

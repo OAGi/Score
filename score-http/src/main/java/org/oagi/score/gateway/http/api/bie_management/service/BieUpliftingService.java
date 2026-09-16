@@ -1,10 +1,11 @@
 package org.oagi.score.gateway.http.api.bie_management.service;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.jooq.DSLContext;
-import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.controller.payload.*;
+import org.oagi.score.gateway.http.api.bie_management.service.BieAssociationPaths.Association;
+
 import org.oagi.score.gateway.http.api.bie_management.model.*;
 import org.oagi.score.gateway.http.api.bie_management.model.abie.Abie;
 import org.oagi.score.gateway.http.api.bie_management.model.abie.AbieId;
@@ -27,6 +28,7 @@ import org.oagi.score.gateway.http.api.cc_management.model.CcAssociation;
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocument;
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocumentImpl;
 import org.oagi.score.gateway.http.api.cc_management.model.CcMatchingScore;
+import org.oagi.score.gateway.http.api.cc_management.model.CoreComponent;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.ascc.AsccManifestId;
@@ -35,18 +37,24 @@ import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpManifestId
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.bcc.BccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.bcc.BccSummaryRecord;
+import org.oagi.score.gateway.http.api.cc_management.model.bccp.BccpManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.bccp.BccpSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.*;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.*;
 import org.oagi.score.gateway.http.api.cc_management.service.CcMatchingService;
+import org.oagi.score.gateway.http.api.code_list_management.model.CodeListManifestId;
 import org.oagi.score.gateway.http.api.code_list_management.model.CodeListSummaryRecord;
+import org.oagi.score.gateway.http.api.code_list_management.service.CodeListQueryService;
+import org.oagi.score.gateway.http.api.agency_id_management.service.AgencyIdListQueryService;
 import org.oagi.score.gateway.http.api.context_management.business_context.model.BusinessContextId;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
+import org.oagi.score.gateway.http.api.release_management.model.ReleaseSummaryRecord;
+import org.oagi.score.gateway.http.api.release_management.service.ReleaseQueryService;
 import org.oagi.score.gateway.http.api.xbt_management.model.XbtSummaryRecord;
+import org.oagi.score.gateway.http.api.xbt_management.model.XbtManifestId;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.model.base.ScoreDataAccessException;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.ReleaseRecord;
 import org.oagi.score.gateway.http.common.util.ScoreGuidUtils;
 import org.oagi.score.gateway.http.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,16 +62,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.math.BigInteger;
+import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.groupingBy;
+import static org.oagi.score.gateway.http.api.bie_management.service.BieAssociationPaths.getAssociationsRegardingBases;
 import static org.oagi.score.gateway.http.api.bie_management.model.BieUpliftingCustomMappingTable.extractManifestId;
 import static org.oagi.score.gateway.http.api.bie_management.model.BieUpliftingCustomMappingTable.getLastTag;
-import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.RELEASE;
-import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.TOP_LEVEL_ASBIEP;
 import static org.oagi.score.gateway.http.common.util.ScoreDigestUtils.sha256;
 import static org.oagi.score.gateway.http.common.util.StringUtils.hasLength;
 
@@ -86,112 +95,91 @@ public class BieUpliftingService {
     private BieReadService bieReadService;
 
     @Autowired
-    private CcMatchingService ccMatchingService;
+    private CodeListQueryService codeListQueryService;
 
     @Autowired
-    private DSLContext dslContext;
+    private AgencyIdListQueryService agencyIdListQueryService;
 
-    private class Association {
+    @Autowired
+    private ReleaseQueryService releaseQueryService;
 
-        private String parentPath;
-        private CcAssociation ccAssociation;
+    private final CcMatchingService ccMatchingService;
 
-        public Association(String parentPath, CcAssociation ccAssociation) {
-            this.parentPath = parentPath;
-            int ch = parentPath.lastIndexOf('>');
-            if (ch >= 0) {
-                if (!parentPath.substring(ch).contains("ACC")) {
-                    throw new IllegalStateException();
-                }
-            }
-            this.ccAssociation = ccAssociation;
+    @Autowired
+    BieUpliftingService(CcMatchingService ccMatchingService) {
+        this.ccMatchingService = Objects.requireNonNull(ccMatchingService);
+    }
+
+    private String appendPath(String parentPath, String segment) {
+        return hasLength(parentPath) ? parentPath + ">" + segment : segment;
+    }
+
+    /**
+     * Selects the highest scoring target from a set of candidates.
+     *
+     * The analysis and generation traversals intentionally use the same matching
+     * semantics.  Keeping candidate filtering, scoring, and empty-result handling
+     * here prevents the two traversals from drifting apart.
+     *
+     * @param candidates non-null candidates in the same order used by the caller;
+     *                   an empty collection produces the existing zero-score result
+     */
+    private <T, U extends CoreComponent<?>> CcMatchingScore<T> bestMatch(
+            CcDocument sourceDocument,
+            T source,
+            CcDocument targetDocument,
+            Collection<T> candidates,
+            Predicate<T> candidateFilter,
+            BiFunction<CcDocument, T, U> componentMapper) {
+        Objects.requireNonNull(candidates, "candidates");
+        return candidates.stream()
+                .filter(candidateFilter)
+                .map(candidate -> ccMatchingService.score(
+                        sourceDocument, source, targetDocument, candidate, componentMapper))
+                .max(Comparator.comparing(CcMatchingScore::getScore))
+                .orElse(new CcMatchingScore<>(0.0d, null, null));
+    }
+
+    /** One state per immutable source occurrence path; target paths may change during assembly. */
+    private static final class UpliftOccurrence {
+        private String targetPath;
+        private AsccpSummaryRecord targetAsccp;
+        private BccpSummaryRecord targetBccp;
+        private List<Association> targetAssociations = List.of();
+        private List<DtScSummaryRecord> targetDtSc = List.of();
+        private WrappedAsbie asbie;
+        private WrappedAsbiep asbiep;
+        private Abie abie;
+        private WrappedBbie bbie;
+        private WrappedBbieSc bbieSc;
+        private AsbiepId sourceAsbiepId;
+    }
+
+    private abstract class UpliftTraversal implements BieVisitor {
+        protected final Map<String, UpliftOccurrence> occurrences = new LinkedHashMap<>();
+
+        protected UpliftOccurrence occurrence(BieVisitContext context) {
+            return occurrences.computeIfAbsent(context.getOccurrencePath(), path -> new UpliftOccurrence());
         }
 
-        public String getParentPath() {
-            return parentPath;
+        protected UpliftOccurrence parent(BieVisitContext context) {
+            String path = context.getParentOccurrencePath();
+            return path == null ? null : occurrences.computeIfAbsent(path, ignored -> new UpliftOccurrence());
         }
 
-        public String getPath() {
-            return parentPath + ">" + ((this.ccAssociation.isAscc()) ?
-                    "ASCC-" + ((AsccSummaryRecord) this.ccAssociation).asccManifestId() :
-                    "BCC-" + ((BccSummaryRecord) this.ccAssociation).bccManifestId());
-        }
-
-        public CcAssociation getCcAssociation() {
-            return ccAssociation;
-        }
-
-        public boolean isMatched(CcAssociation ccAssociation) {
-            return this.ccAssociation.equals(ccAssociation);
+        protected Association sourceAssociation(BieVisitContext context, CcAssociation association) {
+            String path = context.getOccurrencePath();
+            return new Association(path.substring(0, path.lastIndexOf('>')), association);
         }
     }
 
-    private List<Association> getAssociationsRegardingBases(String path, CcDocument ccDocument, AccSummaryRecord acc) {
-        Stack<AccSummaryRecord> accStack = new Stack();
-        while (acc != null) {
-            accStack.push(acc);
-            acc = ccDocument.getAcc(acc.basedAccManifestId());
-        }
-
-        List<Association> associations = new ArrayList();
-        while (!accStack.isEmpty()) {
-            String parentPath = path + ">" + String.join(">", accStack.stream()
-                    .map(e -> "ACC-" + e.accManifestId()).collect(Collectors.toList()));
-            acc = accStack.pop();
-            associations.addAll(getAssociationsRegardingGroup(parentPath, ccDocument, acc));
-        }
-
-        return associations;
-    }
-
-    private List<Association> getAssociationsRegardingGroup(String parentPath, CcDocument ccDocument, AccSummaryRecord acc) {
-        Collection<CcAssociation> ccAssociations = ccDocument.getAssociations(acc);
-        List<Association> associations = new ArrayList();
-        for (CcAssociation ccAssociation : ccAssociations) {
-            if (ccAssociation.isAscc()) {
-                AsccSummaryRecord ascc = (AsccSummaryRecord) ccAssociation;
-                AsccpSummaryRecord asccp = ccDocument.getAsccp(ascc.toAsccpManifestId());
-                AccSummaryRecord roleOfAcc = ccDocument.getAcc(asccp.roleOfAccManifestId());
-                if (roleOfAcc.isGroup()) {
-                    associations.addAll(
-                            getAssociationsRegardingGroup(
-                                    String.join(">",
-                                            Arrays.asList(parentPath,
-                                                    "ASCC-" + ascc.asccManifestId(),
-                                                    "ASCCP-" + asccp.asccpManifestId(),
-                                                    "ACC-" + roleOfAcc.accManifestId())
-                                    ),
-                                    ccDocument, roleOfAcc)
-                    );
-                    continue;
-                }
-            }
-
-            associations.add(new Association(parentPath, ccAssociation));
-        }
-
-        return associations;
-    }
-
-    private class BieDiff implements BieVisitor {
+    private class BieDiff extends UpliftTraversal {
 
         private List<BieUpliftingListener> listeners = new ArrayList();
 
         private BieDocument sourceBieDocument;
         private CcDocument targetCcDocument;
         private AsccpManifestId targetAsccpManifestId;
-
-        private Queue<AsccpSummaryRecord> targetAsccpQueue = new LinkedBlockingQueue();
-        private Queue<AccSummaryRecord> targetAccQueue = new LinkedBlockingQueue();
-        private Bbie previousBbie;
-        private Queue<BccpSummaryRecord> targetBccpQueue = new LinkedBlockingQueue();
-
-        private String currentSourcePath;
-        private String currentTargetPath;
-
-        private Map<AbieId, List<Association>> abieSourceAssociationsMap = new HashMap();
-        private Map<AbieId, List<Association>> abieTargetAssociationsMap = new HashMap();
-        private Map<BbieId, List<DtScSummaryRecord>> bbieTargetDtScMap = new HashMap();
 
         BieDiff(BieDocument sourceBieDocument, CcDocument targetCcDocument,
                 AsccpManifestId targetAsccpManifestId) {
@@ -210,8 +198,6 @@ public class BieUpliftingService {
 
         @Override
         public void visitStart(TopLevelAsbiepSummaryRecord topLevelAsbiep, BieVisitContext context) {
-            AsccpSummaryRecord targetAsccp = targetCcDocument.getAsccp(targetAsccpManifestId);
-            targetAsccpQueue.offer(targetAsccp);
         }
 
         @Override
@@ -221,23 +207,14 @@ public class BieUpliftingService {
 
         @Override
         public BieVisitResult visitAbie(Abie abie, BieVisitContext context) {
-            CcDocument sourceCcDocument = context.getBieDocument().getCcDocument();
-            // Defensive: no ABIE to descend into (getAbie returned null). Poll the
-            // matching target ACC to keep the queue balanced, then continue.
-            if (abie == null) {
-                targetAccQueue.poll();
-                return BieVisitResult.CONTINUE;
-            }
-            AccSummaryRecord sourceAcc = sourceCcDocument.getAcc(abie.getBasedAccManifestId());
-            List<Association> sourceAssociations =
-                    getAssociationsRegardingBases(currentSourcePath, sourceCcDocument, sourceAcc);
-            abieSourceAssociationsMap.put(abie.getAbieId(), sourceAssociations);
 
-            AccSummaryRecord targetAcc = targetAccQueue.poll();
+            AsccpSummaryRecord parentAsccp = parent(context).targetAsccp;
+            AccSummaryRecord targetAcc = parentAsccp == null ? null : targetCcDocument.getAcc(parentAsccp.roleOfAccManifestId());
             if (targetAcc != null) { // found matched acc
+                String targetPath = parent(context).targetPath;
                 List<Association> targetAssociations =
-                        getAssociationsRegardingBases(currentTargetPath, targetCcDocument, targetAcc);
-                abieTargetAssociationsMap.put(abie.getAbieId(), targetAssociations);
+                        getAssociationsRegardingBases(targetPath, targetCcDocument, targetAcc);
+                occurrence(context).targetAssociations = targetAssociations;
             }
             return BieVisitResult.CONTINUE;
         }
@@ -246,22 +223,18 @@ public class BieUpliftingService {
         public BieVisitResult visitAsbie(Asbie asbie, BieVisitContext context) {
             CcDocument sourceCcDocument = context.getBieDocument().getCcDocument();
             AsccSummaryRecord sourceAscc = sourceCcDocument.getAscc(asbie.getBasedAsccManifestId());
-            List<Association> sourceAssociations =
-                    abieSourceAssociationsMap.getOrDefault(asbie.getFromAbieId(), Collections.emptyList());
-            Association sourceAssociation = sourceAssociations.stream()
-                    .filter(e -> e.isMatched(sourceAscc)).findAny().orElse(null);
+            Association sourceAssociation = sourceAssociation(context, sourceAscc);
 
             List<Association> targetAssociations =
-                    abieTargetAssociationsMap.getOrDefault(asbie.getFromAbieId(), Collections.emptyList());
-            CcMatchingScore matchingScore = targetAssociations.stream().filter(e -> e.getCcAssociation().isAscc())
-                    .map(e -> ccMatchingService.score(
-                            sourceCcDocument,
-                            sourceAssociation,
-                            targetCcDocument,
-                            e,
-                            (ccDocument, association) -> ccDocument.getAscc(((AsccSummaryRecord) association.getCcAssociation()).asccManifestId())))
-                    .max(Comparator.comparing(CcMatchingScore::getScore))
-                    .orElse(new CcMatchingScore(0.0d, null, null));
+                    parent(context).targetAssociations;
+            CcMatchingScore<Association> matchingScore = bestMatch(
+                    sourceCcDocument,
+                    sourceAssociation,
+                    targetCcDocument,
+                    targetAssociations,
+                    e -> e.getCcAssociation().isAscc(),
+                    (ccDocument, association) -> ccDocument.getAscc(
+                            ((AsccSummaryRecord) association.getCcAssociation()).asccManifestId()));
 
             if (matchingScore.getScore() == 0.0d || matchingScore.getTarget() == null) {
                 this.listeners.forEach(listener -> {
@@ -269,8 +242,7 @@ public class BieUpliftingService {
                             (AsccSummaryRecord) sourceAssociation.getCcAssociation(), sourceAssociation.getPath(), asbie.getDefinition());
                 });
 
-                currentSourcePath = sourceAssociation.getPath();
-                currentTargetPath = null;
+                occurrence(context).targetPath = null;
             } else {
                 Association targetAssociation = (Association) matchingScore.getTarget();
                 this.listeners.forEach(listener -> {
@@ -279,12 +251,11 @@ public class BieUpliftingService {
                             (AsccSummaryRecord) targetAssociation.getCcAssociation(), targetAssociation.getPath());
                 });
 
-                currentSourcePath = sourceAssociation.getPath();
-                currentTargetPath = targetAssociation.getPath();
+                occurrence(context).targetPath = targetAssociation.getPath();
 
                 AsccpSummaryRecord toAsccp = targetCcDocument.getAsccp(
                         ((AsccSummaryRecord) targetAssociation.getCcAssociation()).toAsccpManifestId());
-                targetAsccpQueue.offer(toAsccp);
+                occurrence(context).targetAsccp = toAsccp;
             }
 
             return BieVisitResult.CONTINUE;
@@ -294,22 +265,18 @@ public class BieUpliftingService {
         public BieVisitResult visitBbie(Bbie bbie, BieVisitContext context) {
             CcDocument sourceCcDocument = context.getBieDocument().getCcDocument();
             BccSummaryRecord sourceBcc = sourceCcDocument.getBcc(bbie.getBasedBccManifestId());
-            List<Association> sourceAssociations =
-                    abieSourceAssociationsMap.getOrDefault(bbie.getFromAbieId(), Collections.emptyList());
-            Association sourceAssociation = sourceAssociations.stream()
-                    .filter(e -> e.isMatched(sourceBcc)).findAny().orElse(null);
+            Association sourceAssociation = sourceAssociation(context, sourceBcc);
 
             List<Association> targetAssociations =
-                    abieTargetAssociationsMap.getOrDefault(bbie.getFromAbieId(), Collections.emptyList());
-            CcMatchingScore matchingScore = targetAssociations.stream().filter(e -> e.getCcAssociation().isBcc())
-                    .map(e -> ccMatchingService.score(
-                            sourceCcDocument,
-                            sourceAssociation,
-                            targetCcDocument,
-                            e,
-                            (ccDocument, association) -> ccDocument.getBcc(((BccSummaryRecord) association.getCcAssociation()).bccManifestId())))
-                    .max(Comparator.comparing(CcMatchingScore::getScore))
-                    .orElse(new CcMatchingScore(0.0d, null, null));
+                    parent(context).targetAssociations;
+            CcMatchingScore<Association> matchingScore = bestMatch(
+                    sourceCcDocument,
+                    sourceAssociation,
+                    targetCcDocument,
+                    targetAssociations,
+                    e -> e.getCcAssociation().isBcc(),
+                    (ccDocument, association) -> ccDocument.getBcc(
+                            ((BccSummaryRecord) association.getCcAssociation()).bccManifestId()));
 
             if (matchingScore.getScore() == 0.0d || matchingScore.getTarget() == null) {
                 this.listeners.forEach(listener -> {
@@ -317,8 +284,7 @@ public class BieUpliftingService {
                             (BccSummaryRecord) sourceAssociation.getCcAssociation(), sourceAssociation.getPath(), bbie.getDefinition());
                 });
 
-                currentSourcePath = sourceAssociation.getPath();
-                currentTargetPath = null;
+                occurrence(context).targetPath = null;
             } else {
                 Association targetAssociation = (Association) matchingScore.getTarget();
                 this.listeners.forEach(listener -> {
@@ -327,59 +293,44 @@ public class BieUpliftingService {
                             (BccSummaryRecord) targetAssociation.getCcAssociation(), targetAssociation.getPath());
                 });
 
-                currentSourcePath = sourceAssociation.getPath();
-                currentTargetPath = targetAssociation.getPath();
+                occurrence(context).targetPath = targetAssociation.getPath();
 
                 BccpSummaryRecord toBccp = targetCcDocument.getBccp(
                         ((BccSummaryRecord) targetAssociation.getCcAssociation()).toBccpManifestId());
-                this.previousBbie = bbie;
-                targetBccpQueue.offer(toBccp);
+                occurrence(context).targetBccp = toBccp;
             }
             return BieVisitResult.CONTINUE;
         }
 
         @Override
         public BieVisitResult visitAsbiep(Asbiep asbiep, BieVisitContext context) {
-            CcDocument sourceCcDocument = context.getBieDocument().getCcDocument();
-            // Defensive: no ASBIEP to descend into (getAsbiep returned null). Poll the
-            // matching target ASCCP to keep the queue balanced, then continue.
-            if (asbiep == null) {
-                targetAsccpQueue.poll();
-                return BieVisitResult.CONTINUE;
-            }
-            AsccpSummaryRecord sourceAsccp = sourceCcDocument.getAsccp(asbiep.getBasedAsccpManifestId());
-
-            currentSourcePath = (hasLength(currentSourcePath)) ?
-                    currentSourcePath + ">" + "ASCCP-" + sourceAsccp.asccpManifestId() :
-                    "ASCCP-" + sourceAsccp.asccpManifestId();
-
-            AsccpSummaryRecord targetAsccp = targetAsccpQueue.poll();
+            AsccpSummaryRecord targetAsccp = context.getParentOccurrencePath() == null
+                    ? targetCcDocument.getAsccp(targetAsccpManifestId) : parent(context).targetAsccp;
+            occurrence(context).targetAsccp = targetAsccp;
             if (targetAsccp != null) { // found matched asccp
-                AccSummaryRecord targetRoleOfAcc = targetCcDocument.getAcc(targetAsccp.roleOfAccManifestId());
-                targetAccQueue.offer(targetRoleOfAcc);
-                currentTargetPath = (hasLength(currentTargetPath)) ?
-                        currentTargetPath + ">" + "ASCCP-" + targetAsccp.asccpManifestId() :
-                        "ASCCP-" + targetAsccp.asccpManifestId();
+                occurrence(context).targetPath = appendPath(
+                        parent(context) == null ? null : parent(context).targetPath,
+                        "ASCCP-" + targetAsccp.asccpManifestId());
+            } else {
+                occurrence(context).targetPath = null;
             }
             return BieVisitResult.CONTINUE;
         }
 
         @Override
         public BieVisitResult visitBbiep(Bbiep bbiep, BieVisitContext context) {
-            CcDocument sourceCcDocument = context.getBieDocument().getCcDocument();
-            BccpSummaryRecord sourceBccp = sourceCcDocument.getBccp(bbiep.getBasedBccpManifestId());
-            DtSummaryRecord sourceDt = sourceCcDocument.getDt(sourceBccp.dtManifestId());
-            currentSourcePath = currentSourcePath + ">" + "BCCP-" + sourceBccp.bccpManifestId() + ">" +
-                    "DT-" + sourceDt.dtManifestId();
 
-            BccpSummaryRecord targetBccp = targetBccpQueue.poll();
+            BccpSummaryRecord targetBccp = occurrence(context).targetBccp;
             if (targetBccp != null) {
                 DtManifestId targetBdtManifestId = targetBccp.dtManifestId();
                 DtSummaryRecord targetDt = targetCcDocument.getDt(targetBdtManifestId);
-                bbieTargetDtScMap.put(previousBbie.getBbieId(),
-                        targetCcDocument.getDtScList(targetDt.dtManifestId()));
-                currentTargetPath = currentTargetPath + ">" + "BCCP-" + targetBccp.bccpManifestId() + ">" +
-                        "DT-" + targetDt.dtManifestId();
+                occurrence(context).targetDtSc =
+                        targetCcDocument.getDtScList(targetDt.dtManifestId());
+                occurrence(context).targetPath = appendPath(
+                        occurrence(context).targetPath,
+                        "BCCP-" + targetBccp.bccpManifestId());
+            } else {
+                occurrence(context).targetPath = null;
             }
             return BieVisitResult.CONTINUE;
         }
@@ -388,26 +339,24 @@ public class BieUpliftingService {
         public BieVisitResult visitBbieSc(BbieSc bbieSc, BieVisitContext context) {
             CcDocument sourceCcDocument = context.getBieDocument().getCcDocument();
             DtScSummaryRecord sourceDtSc = sourceCcDocument.getDtSc(bbieSc.getBasedDtScManifestId());
-
-            String sourcePath = currentSourcePath + ">" + "DT_SC-" + sourceDtSc.dtScManifestId();
-            CcMatchingScore matchingScore =
-                    bbieTargetDtScMap.getOrDefault(bbieSc.getBbieId(), Collections.emptyList()).stream()
-                            .map(e -> ccMatchingService.score(
-                                    sourceCcDocument,
-                                    sourceDtSc,
-                                    targetCcDocument,
-                                    e,
-                                    (ccDocument, dtScManifest) -> ccDocument.getDtSc(dtScManifest.dtScManifestId())))
-                            .max(Comparator.comparing(CcMatchingScore::getScore))
-                            .orElse(new CcMatchingScore(0.0d, null, null));
+            UpliftOccurrence owner = parent(context);
+            String sourcePath = context.getOccurrencePath();
+            CcMatchingScore<DtScSummaryRecord> matchingScore = bestMatch(
+                    sourceCcDocument,
+                    sourceDtSc,
+                    targetCcDocument,
+                    owner.targetDtSc,
+                    ignored -> true,
+                    (ccDocument, dtScManifest) -> ccDocument.getDtSc(dtScManifest.dtScManifestId()));
 
             if (matchingScore.getScore() == 0.0d || matchingScore.getTarget() == null) {
                 this.listeners.forEach(listener -> {
-                    listener.notFoundMatchedBbieSc(bbieSc, sourceDtSc, sourcePath, bbieSc.getDefinition());
+                            listener.notFoundMatchedBbieSc(bbieSc, sourceDtSc, sourcePath, bbieSc.getDefinition());
                 });
             } else {
                 DtScSummaryRecord targetDtSc = (DtScSummaryRecord) matchingScore.getTarget();
-                String targetPath = currentTargetPath + ">" + "DT_SC-" + targetDtSc.dtScManifestId();
+                String targetPath = appendPath(owner.targetPath,
+                        "DT-" + targetDtSc.ownerDtManifestId() + ">DT_SC-" + targetDtSc.dtScManifestId());
 
                 this.listeners.forEach(listener -> {
                     listener.foundBestMatchedBbieSc(bbieSc,
@@ -419,22 +368,6 @@ public class BieUpliftingService {
         }
     }
 
-    private ReleaseRecord getReleaseRecordByTopLevelAsbiepId(TopLevelAsbiepId topLevelAsbiepId) {
-        // @TODO: it will be replaced with ReleaseQueryRepository
-        return dslContext.select(RELEASE.fields())
-                .from(RELEASE)
-                .join(TOP_LEVEL_ASBIEP).on(TOP_LEVEL_ASBIEP.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId.value())))
-                .fetchOneInto(ReleaseRecord.class);
-    }
-
-    private ReleaseRecord getReleaseRecordByReleaseId(ReleaseId releaseId) {
-        // @TODO: it will be replaced with ReleaseQueryRepository
-        return dslContext.selectFrom(RELEASE)
-                .where(RELEASE.RELEASE_ID.eq(ULong.valueOf(releaseId.value())))
-                .fetchOneInto(ReleaseRecord.class);
-    }
-
     public AsccpSummaryRecord findTargetAsccpManifest(
             ScoreUser requester, TopLevelAsbiepId topLevelAsbiepId, ReleaseId targetReleaseId) {
 
@@ -443,14 +376,32 @@ public class BieUpliftingService {
 
     private Pair<AsccpSummaryRecord, BieDocument> findTargetAsccp(
             ScoreUser requester, TopLevelAsbiepId topLevelAsbiepId, ReleaseId targetReleaseId) {
-        ReleaseRecord sourceRelease = getReleaseRecordByTopLevelAsbiepId(topLevelAsbiepId);
-        ReleaseRecord targetRelease = getReleaseRecordByReleaseId(targetReleaseId);
+        if (topLevelAsbiepId == null || targetReleaseId == null) {
+            throw new IllegalArgumentException("Source BIE and target release are required.");
+        }
+        var topLevelAsbiep = repositoryFactory.topLevelAsbiepQueryRepository(requester)
+                .getTopLevelAsbiepSummary(topLevelAsbiepId);
+        var releaseQuery = repositoryFactory.releaseQueryRepository(requester);
+        ReleaseSummaryRecord sourceRelease = (topLevelAsbiep == null || topLevelAsbiep.release() == null)
+                ? null : releaseQuery.getReleaseSummary(topLevelAsbiep.release().releaseId());
+        ReleaseSummaryRecord targetRelease = releaseQuery.getReleaseSummary(targetReleaseId);
 
-        if (sourceRelease.getReleaseId().toBigInteger().compareTo(targetRelease.getReleaseId().toBigInteger()) >= 0) {
+        if (sourceRelease == null || sourceRelease.releaseId() == null) {
+            throw new IllegalArgumentException("Source BIE release record not found.");
+        }
+        if (targetRelease == null || targetRelease.releaseId() == null) {
+            throw new IllegalArgumentException("Target release record not found.");
+        }
+
+        if (!releaseQueryService.isLaterRelease(requester,
+                sourceRelease.releaseId(), targetRelease.releaseId())) {
             throw new IllegalArgumentException();
         }
 
         BieDocument sourceBieDocument = bieReadService.getBieDocument(requester, topLevelAsbiepId);
+        if (sourceBieDocument == null || sourceBieDocument.getRootAsbiep() == null) {
+            throw new IllegalArgumentException("Source BIE record not found.");
+        }
         AsccpSummaryRecord findNextAsccp = repositoryFactory.asccpQueryRepository(requester)
                 .findNextAsccpManifest(
                         sourceBieDocument.getRootAsbiep().getBasedAsccpManifestId(),
@@ -483,7 +434,7 @@ public class BieUpliftingService {
         return response;
     }
 
-    private class BieUpliftingHandler implements BieVisitor {
+    private class BieUpliftingHandler extends UpliftTraversal {
 
         private ScoreUser requester;
         private List<BusinessContextId> bizCtxIds;
@@ -492,18 +443,6 @@ public class BieUpliftingService {
         private BieDocument sourceBieDocument;
         private CcDocument targetCcDocument;
         private AsccpManifestId targetAsccpManifestId;
-
-        private Queue<AsccpSummaryRecord> targetAsccpQueue = new LinkedBlockingQueue();
-        private Queue<AccSummaryRecord> targetAccQueue = new LinkedBlockingQueue();
-        private Bbie previousBbie;
-        private Queue<BccpSummaryRecord> targetBccpQueue = new LinkedBlockingQueue();
-
-        private String currentSourcePath;
-        private String currentTargetPath;
-
-        private Map<AbieId, List<Association>> abieSourceAssociationsMap = new HashMap();
-        private Map<AbieId, List<Association>> abieTargetAssociationsMap = new HashMap();
-        private Map<BbieId, List<DtScSummaryRecord>> bbieTargetDtScMap = new HashMap();
 
         private List<XbtSummaryRecord> sourceXbtList;
         private List<XbtSummaryRecord> targetXbtList;
@@ -514,36 +453,21 @@ public class BieUpliftingService {
         private List<AgencyIdListSummaryRecord> sourceAgencyIdListList;
         private List<AgencyIdListSummaryRecord> targetAgencyIdListList;
 
-        private Map<DtAwdPriId, DtAwdPriSummaryRecord> sourceDtAwdPriMap = new HashMap();
-        private Map<DtId, List<DtAwdPriSummaryRecord>> targetDtAwdPriByDtIdMap = new HashMap();
-        private Map<DtScAwdPriId, DtScAwdPriSummaryRecord> sourceDtScAwdPriMap = new HashMap();
-        private Map<DtScId, List<DtScAwdPriSummaryRecord>> targetDtScAwdPriByDtScIdMap = new HashMap();
-
-        private Map<AsbiepId, WrappedAsbiep> asbiepMap;
-        private Map<AbieId, WrappedAsbiep> roleOfAbieToAsbiepMap;
-        private Map<AbieId, Abie> abieIdToAbieMap;
-        private Map<AsbiepId, List<WrappedAsbie>> toAsbiepToAsbieMap;
-        private Map<BbiepId, WrappedBbie> toBbiepToBbieMap;
-        private Map<BbieId, Bbie> bbieMap;
-        private List<WrappedBbieSc> bbieScList;
-
+        private final Map<String, Abie> targetAbies = new LinkedHashMap<>();
+        private final Map<String, Bbie> targetBbies = new LinkedHashMap<>();
+        private WrappedAsbiep rootAsbiep;
         private TopLevelAsbiepId targetTopLevelAsbiepId;
 
         BieUpliftingHandler(ScoreUser requester, List<BusinessContextId> bizCtxIds,
                             BieUpliftingCustomMappingTable customMappingTable,
                             BieDocument sourceBieDocument, CcDocument targetCcDocument,
                             AsccpManifestId targetAsccpManifestId,
-                            Map<DtAwdPriId, DtAwdPriSummaryRecord> sourceDtAwdPriMap,
-                            Map<DtId, List<DtAwdPriSummaryRecord>> targetDtAwdPriByDtIdMap,
-                            Map<DtScAwdPriId, DtScAwdPriSummaryRecord> sourceDtScAwdPriMap,
-                            Map<DtScId, List<DtScAwdPriSummaryRecord>> targetDtScAwdPriByDtScIdMap,
                             List<XbtSummaryRecord> sourceXbtList,
                             List<XbtSummaryRecord> targetXbtList,
                             List<CodeListSummaryRecord> sourceCodeListList,
                             List<CodeListSummaryRecord> targetCodeListList,
                             List<AgencyIdListSummaryRecord> sourceAgencyIdListList,
                             List<AgencyIdListSummaryRecord> targetAgencyIdListList) {
-
             this.requester = requester;
             this.bizCtxIds = bizCtxIds;
             this.customMappingTable = customMappingTable;
@@ -551,19 +475,6 @@ public class BieUpliftingService {
             this.sourceBieDocument = sourceBieDocument;
             this.targetCcDocument = targetCcDocument;
             this.targetAsccpManifestId = targetAsccpManifestId;
-
-            this.asbiepMap = new HashMap();
-            this.roleOfAbieToAsbiepMap = new HashMap();
-            this.abieIdToAbieMap = new HashMap();
-            this.toAsbiepToAsbieMap = new HashMap();
-            this.toBbiepToBbieMap = new HashMap();
-            this.bbieMap = new HashMap();
-            this.bbieScList = new ArrayList();
-
-            this.sourceDtAwdPriMap = sourceDtAwdPriMap;
-            this.targetDtAwdPriByDtIdMap = targetDtAwdPriByDtIdMap;
-            this.sourceDtScAwdPriMap = sourceDtScAwdPriMap;
-            this.targetDtScAwdPriByDtScIdMap = targetDtScAwdPriByDtScIdMap;
 
             this.sourceXbtList = sourceXbtList;
             this.targetXbtList = targetXbtList;
@@ -582,8 +493,6 @@ public class BieUpliftingService {
 
         @Override
         public void visitStart(TopLevelAsbiepSummaryRecord topLevelAsbiep, BieVisitContext context) {
-            AsccpSummaryRecord targetAsccp = targetCcDocument.getAsccp(targetAsccpManifestId);
-            targetAsccpQueue.offer(targetAsccp);
         }
 
         private String extractAbiePath(String assocPath) {
@@ -624,64 +533,34 @@ public class BieUpliftingService {
 
         @Override
         public void visitEnd(TopLevelAsbiepSummaryRecord topLevelAsbiep, BieVisitContext context) {
-            List<Abie> emptySourceAbieList = new ArrayList();
             List<WrappedAsbie> emptySourceAsbieList = new ArrayList();
             List<WrappedBbie> emptySourceBbieList = new ArrayList();
-            List<WrappedAsbiep> emptySourceAsbiepList = new ArrayList();
-            List<Bbiep> emptySourceBbiepList = new ArrayList();
             List<WrappedBbieSc> emptySourceBbieScList = new ArrayList();
 
-            Function<String, Abie> getAbieIfExist = (path) -> {
-                Abie abie = abieIdToAbieMap.values().stream()
-                        .filter(e -> e.getPath().equals(path))
-                        .findAny().orElse(null);
-                if (abie == null) {
-                    abie = emptySourceAbieList.stream()
-                            .filter(e -> e.getPath().equals(path))
-                            .findAny().orElse(null);
-                }
+            Function<String, Abie> getOrCreateAbie = path -> targetAbies.computeIfAbsent(path, key -> {
+                AccSummaryRecord targetAcc = targetCcDocument.getAcc(
+                        new AccManifestId(extractManifestId(getLastTag(key))));
+                Abie abie = new Abie();
+                abie.setGuid(ScoreGuidUtils.randomGuid());
+                abie.setBasedAccManifestId(targetAcc.accManifestId());
+                abie.setPath(key);
+                abie.setHashPath(sha256(key));
                 return abie;
-            };
-
-            Function<String, Bbie> getBbieIfExist = (path) -> {
-                Bbie bbie = bbieMap.values().stream()
-                        .filter(e -> e.getPath().equals(path))
-                        .findAny().orElse(null);
-                if (bbie == null) {
-                    bbie = emptySourceBbieList.stream()
-                            .map(e -> e.getBbie())
-                            .filter(e -> e.getPath().equals(path))
-                            .findAny().orElse(null);
-                }
-                return bbie;
-            };
+            });
 
             this.customMappingTable.getMappingList().stream()
                     .filter(e -> !hasLength(e.getSourcePath()))
                     .forEach(mapping -> {
-                        switch (mapping.getBieType()) {
+                        String mappingType = mapping.getBieType().toUpperCase(Locale.ROOT);
+                        switch (mappingType) {
                             case "ASBIE":
                             case "BBIE":
                                 String targetFromAbiePath = extractAbiePath(mapping.getTargetPath());
-                                Abie targetFromAbie = getAbieIfExist.apply(targetFromAbiePath);
-
-                                if (targetFromAbie == null) {
-                                    AccManifestId targetAccManifestId = new AccManifestId(extractManifestId(getLastTag(targetFromAbiePath)));
-                                    AccSummaryRecord targetAcc = targetCcDocument.getAcc(targetAccManifestId);
-
-                                    targetFromAbie = new Abie();
-                                    targetFromAbie.setGuid(ScoreGuidUtils.randomGuid());
-                                    targetFromAbie.setBasedAccManifestId(targetAcc.accManifestId());
-                                    targetFromAbie.setPath(targetFromAbiePath);
-                                    targetFromAbie.setHashPath(sha256(targetFromAbie.getPath()));
-
-                                    emptySourceAbieList.add(targetFromAbie);
-                                }
-
+                                getOrCreateAbie.apply(targetFromAbiePath);
                                 break;
                         }
 
-                        switch (mapping.getBieType()) {
+                        switch (mappingType) {
                             case "ASBIE":
                                 AsccSummaryRecord targetAscc =
                                         targetCcDocument.getAscc(new AsccManifestId(mapping.getTargetManifestId()));
@@ -714,19 +593,10 @@ public class BieUpliftingService {
                                 WrappedAsbiep wrappedAsbiep = new WrappedAsbiep();
                                 wrappedAsbie.setToAsbiep(wrappedAsbiep);
                                 wrappedAsbiep.setAsbiep(targetAsbiep);
-                                emptySourceAsbiepList.add(wrappedAsbiep);
+
 
                                 String targetRoleOfAccPath = targetAsbiep.getPath() + ">" + "ACC-" + targetRoleOfAcc.accManifestId();
-                                Abie targetRoleOfAbie = getAbieIfExist.apply(targetRoleOfAccPath);
-                                if (targetRoleOfAbie == null) {
-                                    targetRoleOfAbie = new Abie();
-                                    targetRoleOfAbie.setGuid(ScoreGuidUtils.randomGuid());
-                                    targetRoleOfAbie.setBasedAccManifestId(targetRoleOfAcc.accManifestId());
-                                    targetRoleOfAbie.setPath(targetRoleOfAccPath);
-                                    targetRoleOfAbie.setHashPath(sha256(targetRoleOfAbie.getPath()));
-
-                                    emptySourceAbieList.add(targetRoleOfAbie);
-                                }
+                                getOrCreateAbie.apply(targetRoleOfAccPath);
 
                                 break;
 
@@ -738,9 +608,10 @@ public class BieUpliftingService {
                                 DtSummaryRecord targetDtManifest =
                                         targetCcDocument.getDt(targetBccp.dtManifestId());
                                 DtAwdPriSummaryRecord targetDefaultDtAwdPri =
-                                        targetCcDocument.getDtAwdPriList(targetDtManifest.dtManifestId()).stream()
+                                targetCcDocument.getDtAwdPriList(targetDtManifest.dtManifestId()).stream()
+                                                .filter(Objects::nonNull)
                                                 .filter(e -> e.isDefault())
-                                                .findFirst().get();
+                                                .findFirst().orElseThrow(() -> new IllegalStateException("Target DT has no default primitive."));
 
                                 Bbie targetBbie = new Bbie();
                                 targetBbie.setGuid(ScoreGuidUtils.randomGuid());
@@ -763,6 +634,7 @@ public class BieUpliftingService {
                                 WrappedBbie wrappedBbie = new WrappedBbie();
                                 wrappedBbie.setBbie(targetBbie);
                                 emptySourceBbieList.add(wrappedBbie);
+                                targetBbies.put(targetBbie.getPath(), targetBbie);
 
                                 Bbiep targetBbiep = new Bbiep();
                                 targetBbiep.setGuid(ScoreGuidUtils.randomGuid());
@@ -771,7 +643,7 @@ public class BieUpliftingService {
                                 targetBbiep.setHashPath(sha256(targetBbiep.getPath()));
 
                                 wrappedBbie.setToBbiep(targetBbiep);
-                                emptySourceBbiepList.add(targetBbiep);
+
 
                                 break;
 
@@ -779,9 +651,10 @@ public class BieUpliftingService {
                                 DtScSummaryRecord targetDtSc =
                                         targetCcDocument.getDtSc(new DtScManifestId(mapping.getTargetManifestId()));
                                 DtScAwdPriSummaryRecord targetDefaultDtScAwdPri =
-                                        targetCcDocument.getDtScAwdPriList(targetDtSc.dtScManifestId()).stream()
+                                targetCcDocument.getDtScAwdPriList(targetDtSc.dtScManifestId()).stream()
+                                                .filter(Objects::nonNull)
                                                 .filter(e -> e.isDefault())
-                                                .findFirst().get();
+                                                .findFirst().orElseThrow(() -> new IllegalStateException("Target DT_SC has no default primitive."));
 
                                 BbieSc targetBbieSc = new BbieSc();
                                 targetBbieSc.setGuid(ScoreGuidUtils.randomGuid());
@@ -812,28 +685,20 @@ public class BieUpliftingService {
             createBieRequest.setBizCtxIds(bizCtxIds);
             createBieRequest.setStatus(topLevelAsbiep.status());
             createBieRequest.setVersion(topLevelAsbiep.version());
-            createBieRequest.setTopLevelAsbiep(this.asbiepMap.get(topLevelAsbiep.asbiepId()));
-            List<WrappedAsbie> wrappedAsbieList = new ArrayList<WrappedAsbie>();
-            toAsbiepToAsbieMap.values().forEach(list -> {
-                wrappedAsbieList.addAll(list);
-            });
-            wrappedAsbieList.addAll(emptySourceAsbieList);
+            createBieRequest.setTopLevelAsbiep(rootAsbiep);
             createBieRequest.setAsbieList(
-                    wrappedAsbieList.stream()
+                    Stream.concat(occurrences.values().stream().map(e -> e.asbie).filter(Objects::nonNull), emptySourceAsbieList.stream())
                             .map(asbie -> {
                                 if (asbie.getFromAbie() == null) {
                                     String targetFromAbiePath = extractAbiePath(asbie.getAsbie().getPath());
-                                    Abie targetFromAbie = getAbieIfExist.apply(targetFromAbiePath);
-                                    if (targetFromAbie == null) {
-                                        throw new IllegalStateException();
-                                    }
+                                    Abie targetFromAbie = getOrCreateAbie.apply(targetFromAbiePath);
                                     asbie.setFromAbie(targetFromAbie);
                                 }
 
                                 WrappedAsbiep asbiep = asbie.getToAsbiep();
                                 if (asbiep == null) {
                                     String path = asbie.getAsbie().getPath();
-                                    BieUpliftingMapping mapping = customMappingTable.getTargetAsccMappingByTargetPath(path);
+                                    BieUpliftingMapping mapping = customMappingTable.getMappingByTargetPath(path);
                                     if (mapping != null) {
                                         asbie.setRefTopLevelAsbiepId(mapping.getRefTopLevelAsbiepId());
                                     } else {
@@ -845,10 +710,7 @@ public class BieUpliftingService {
                                                 targetCcDocument.getAsccp(asbiep.getAsbiep().getBasedAsccpManifestId());
                                         String targetRoleOfAbiePath = asbiep.getAsbiep().getPath() + ">" + "ACC-" +
                                                 targetAsccp.roleOfAccManifestId();
-                                        Abie targetRoleOfAbie = getAbieIfExist.apply(targetRoleOfAbiePath);
-                                        if (targetRoleOfAbie == null) {
-                                            throw new IllegalStateException();
-                                        }
+                                        Abie targetRoleOfAbie = getOrCreateAbie.apply(targetRoleOfAbiePath);
                                         asbiep.setRoleOfAbie(targetRoleOfAbie);
                                     }
                                 }
@@ -858,15 +720,12 @@ public class BieUpliftingService {
                             .filter(e -> e != null)
                             .collect(Collectors.toList()));
             createBieRequest.setBbieList(
-                    Stream.concat(toBbiepToBbieMap.values().stream(),
+                    Stream.concat(occurrences.values().stream().map(e -> e.bbie).filter(Objects::nonNull),
                                     emptySourceBbieList.stream())
                             .map(bbie -> {
                                 if (bbie.getFromAbie() == null) {
                                     String targetFromAbiePath = extractAbiePath(bbie.getBbie().getPath());
-                                    Abie targetFromAbie = getAbieIfExist.apply(targetFromAbiePath);
-                                    if (targetFromAbie == null) {
-                                        throw new IllegalStateException();
-                                    }
+                                    Abie targetFromAbie = getOrCreateAbie.apply(targetFromAbiePath);
                                     bbie.setFromAbie(targetFromAbie);
                                 }
 
@@ -874,12 +733,12 @@ public class BieUpliftingService {
                             })
                             .collect(Collectors.toList()));
             createBieRequest.setBbieScList(
-                    Stream.concat(bbieScList.stream(),
+                    Stream.concat(occurrences.values().stream().map(e -> e.bbieSc).filter(Objects::nonNull),
                                     emptySourceBbieScList.stream())
                             .map(bbieSc -> {
                                 if (bbieSc.getBbie() == null) {
                                     String targetBbiePath = extractBbiePath(bbieSc.getBbieSc().getPath());
-                                    Bbie targetBbie = getBbieIfExist.apply(targetBbiePath);
+                                    Bbie targetBbie = targetBbies.get(targetBbiePath);
                                     if (targetBbie == null) {
                                         throw new IllegalStateException();
                                     }
@@ -898,44 +757,39 @@ public class BieUpliftingService {
                     .getTopLevelAsbiepId();
 
             // Issue #1659
-            for (Map.Entry<AsbiepId, WrappedAsbiep> asbiepEntry : this.asbiepMap.entrySet()) {
-                repositoryFactory.asbiepCommandRepository(requester)
-                        .copyAsbiepSupportingDocumentation(asbiepEntry.getKey(), asbiepEntry.getValue().getAsbiep().getAsbiepId());
-            }
+            occurrences.values().stream().filter(e -> e.asbiep != null).forEach(e ->
+                    repositoryFactory.asbiepCommandRepository(requester)
+                            .copyAsbiepSupportingDocumentation(e.sourceAsbiepId, e.asbiep.getAsbiep().getAsbiepId()));
         }
 
         @Override
         public BieVisitResult visitAbie(Abie abie, BieVisitContext context) {
-            CcDocument sourceCcDocument = context.getBieDocument().getCcDocument();
-            // Defensive: no ABIE to descend into (getAbie returned null). Poll the
-            // matching target ACC to keep the queue balanced, then continue.
-            if (abie == null) {
-                targetAccQueue.poll();
-                return BieVisitResult.CONTINUE;
-            }
-            AccSummaryRecord sourceAcc = sourceCcDocument.getAcc(abie.getBasedAccManifestId());
-            List<Association> sourceAssociations =
-                    getAssociationsRegardingBases(currentSourcePath, sourceCcDocument, sourceAcc);
-            abieSourceAssociationsMap.put(abie.getAbieId(), sourceAssociations);
 
-            AccSummaryRecord targetAcc = targetAccQueue.poll();
+            AsccpSummaryRecord parentAsccp = parent(context).targetAsccp;
+            AccSummaryRecord targetAcc = parentAsccp == null ? null : targetCcDocument.getAcc(parentAsccp.roleOfAccManifestId());
             if (targetAcc != null) { // found matched acc
+                String targetPath = parent(context).targetPath;
                 List<Association> targetAssociations =
-                        getAssociationsRegardingBases(currentTargetPath, targetCcDocument, targetAcc);
-                abieTargetAssociationsMap.put(abie.getAbieId(), targetAssociations);
+                        getAssociationsRegardingBases(targetPath, targetCcDocument, targetAcc);
+                occurrence(context).targetAssociations = targetAssociations;
 
-                currentTargetPath = currentTargetPath + ">" + "ACC-" + targetAcc.accManifestId();
+                targetPath = appendPath(targetPath, "ACC-" + targetAcc.accManifestId());
                 Abie targetAbie = new Abie();
                 targetAbie.setGuid(ScoreGuidUtils.randomGuid());
                 targetAbie.setBasedAccManifestId(targetAcc.accManifestId());
-                targetAbie.setPath(currentTargetPath);
-                targetAbie.setHashPath(sha256(currentTargetPath));
+                targetAbie.setPath(targetPath);
+                targetAbie.setHashPath(sha256(targetPath));
                 targetAbie.setDefinition(abie.getDefinition());
                 targetAbie.setRemark(abie.getRemark());
                 targetAbie.setBizTerm(abie.getBizTerm());
 
-                this.roleOfAbieToAsbiepMap.get(abie.getAbieId()).setRoleOfAbie(targetAbie);
-                this.abieIdToAbieMap.put(abie.getAbieId(), targetAbie);
+                WrappedAsbiep targetAsbiep = parent(context).asbiep;
+                if (targetAsbiep != null) {
+                    targetAsbiep.setRoleOfAbie(targetAbie);
+                }
+                targetAbies.put(targetAbie.getPath(), targetAbie);
+                occurrence(context).abie = targetAbie;
+                occurrence(context).targetPath = targetPath;
             }
             return BieVisitResult.CONTINUE;
         }
@@ -944,33 +798,32 @@ public class BieUpliftingService {
         public BieVisitResult visitAsbie(Asbie asbie, BieVisitContext context) {
             CcDocument sourceCcDocument = context.getBieDocument().getCcDocument();
             AsccSummaryRecord sourceAsccManifest = sourceCcDocument.getAscc(asbie.getBasedAsccManifestId());
-            List<Association> sourceAssociations =
-                    abieSourceAssociationsMap.getOrDefault(asbie.getFromAbieId(), Collections.emptyList());
-            Association sourceAssociation = sourceAssociations.stream()
-                    .filter(e -> e.isMatched(sourceAsccManifest)).findAny().orElse(null);
+            Association sourceAssociation = sourceAssociation(context, sourceAsccManifest);
 
-            currentSourcePath = sourceAssociation.getPath();
             AsccSummaryRecord targetAscc = null;
             BieUpliftingMapping targetAsccMapping =
-                    this.customMappingTable.getTargetAsccMappingBySourcePath(currentSourcePath);
+                    this.customMappingTable.getMapping(context.getOccurrencePath());
+            if (targetAsccMapping == null &&
+                    this.customMappingTable.isAutoMappingSuppressed(context.getOccurrencePath())) {
+                return BieVisitResult.CONTINUE;
+            }
             if (targetAsccMapping != null) {
-                currentTargetPath = targetAsccMapping.getTargetPath();
+                occurrence(context).targetPath = targetAsccMapping.getTargetPath();
                 targetAscc = targetCcDocument.getAscc(new AsccManifestId(targetAsccMapping.getTargetManifestId()));
             } else {
                 List<Association> targetAssociations =
-                        abieTargetAssociationsMap.getOrDefault(asbie.getFromAbieId(), Collections.emptyList());
-                CcMatchingScore matchingScore = targetAssociations.stream().filter(e -> e.getCcAssociation().isAscc())
-                        .map(e -> ccMatchingService.score(
-                                sourceCcDocument,
-                                sourceAssociation,
-                                targetCcDocument,
-                                e,
-                                (ccDocument, association) -> ccDocument.getAscc(((AsccSummaryRecord) association.getCcAssociation()).asccManifestId())))
-                        .max(Comparator.comparing(CcMatchingScore::getScore))
-                        .orElse(new CcMatchingScore(0.0d, null, null));
+                    parent(context).targetAssociations;
+                CcMatchingScore<Association> matchingScore = bestMatch(
+                        sourceCcDocument,
+                        sourceAssociation,
+                        targetCcDocument,
+                        targetAssociations,
+                        e -> e.getCcAssociation().isAscc(),
+                        (ccDocument, association) -> ccDocument.getAscc(
+                                ((AsccSummaryRecord) association.getCcAssociation()).asccManifestId()));
                 if (matchingScore.getScore() > 0.0d) {
                     Association targetAssociation = (Association) matchingScore.getTarget();
-                    currentTargetPath = targetAssociation.getPath();
+                    occurrence(context).targetPath = targetAssociation.getPath();
                     targetAscc = (AsccSummaryRecord) targetAssociation.getCcAssociation();
                 }
             }
@@ -979,23 +832,20 @@ public class BieUpliftingService {
                 // Issue #1735: when the ASBIE is uplifted as a reuse reference
                 // (the user mapped it to another top-level BIE via the reuse '!'),
                 // create the reference ASBIE but do NOT descend into its subtree.
-                // The subtree lives in the referenced BIE; re-traversing it both
-                // corrupts the source-id-keyed maps (duplicate visits -> orphaned
-                // BBIE with null from_abie_id) and overwrites the reference with a
-                // private copy. Skipping the queue offer keeps the target-path queues
-                // balanced, since the matching visitAsbiep poll will not run.
+                // The subtree lives in the referenced BIE; re-traversing it would
+                // create an inline copy in addition to the selected reference.
                 boolean reuseReference =
                         (targetAsccMapping != null && targetAsccMapping.getRefTopLevelAsbiepId() != null);
                 if (!reuseReference) {
                     AsccpSummaryRecord toAsccp = targetCcDocument.getAsccp(
                             targetAscc.toAsccpManifestId());
-                    targetAsccpQueue.offer(toAsccp);
+                    occurrence(context).targetAsccp = toAsccp;
                 }
 
                 Asbie targetAsbie = new Asbie();
                 targetAsbie.setGuid(ScoreGuidUtils.randomGuid());
                 targetAsbie.setBasedAsccManifestId(targetAscc.asccManifestId());
-                targetAsbie.setPath(currentTargetPath);
+                targetAsbie.setPath(occurrence(context).targetPath);
                 targetAsbie.setHashPath(sha256(targetAsbie.getPath()));
                 targetAsbie.setCardinalityMin(asbie.getCardinalityMin());
                 targetAsbie.setCardinalityMax(asbie.getCardinalityMax());
@@ -1006,10 +856,10 @@ public class BieUpliftingService {
                 targetAsbie.setUsed(asbie.isUsed());
 
                 WrappedAsbie upliftingAsbie = new WrappedAsbie();
-                Abie fromAbie = this.abieIdToAbieMap.get(asbie.getFromAbieId());
-
-                if (fromAbie != null && currentTargetPath.contains(fromAbie.getPath())) {
-                    upliftingAsbie.setFromAbie(fromAbie);
+                // A custom target may belong to a different branch. Resolve its owner
+                // from the target path after all target occurrences have been assembled.
+                if (targetAsccMapping == null) {
+                    upliftingAsbie.setFromAbie(parent(context).abie);
                 }
 
                 upliftingAsbie.setAsbie(targetAsbie);
@@ -1017,15 +867,7 @@ public class BieUpliftingService {
                 if (targetAsccMapping != null) {
                     upliftingAsbie.setRefTopLevelAsbiepId(targetAsccMapping.getRefTopLevelAsbiepId());
                 }
-                List<WrappedAsbie> wrappedAsbieList = this.toAsbiepToAsbieMap.get(asbie.getToAsbiepId());
-                if (wrappedAsbieList != null && wrappedAsbieList.size() > 0) {
-                    wrappedAsbieList.add(upliftingAsbie);
-                    this.toAsbiepToAsbieMap.put(asbie.getToAsbiepId(), wrappedAsbieList);
-                } else {
-                    List<WrappedAsbie> newWrappedAsbieList = new ArrayList<>();
-                    newWrappedAsbieList.add(upliftingAsbie);
-                    this.toAsbiepToAsbieMap.put(asbie.getToAsbiepId(), newWrappedAsbieList);
-                }
+                occurrence(context).asbie = upliftingAsbie;
 
                 // Skip descent into the reuse target's subtree; descend otherwise.
                 return reuseReference ? BieVisitResult.SKIP_SUBTREE : BieVisitResult.CONTINUE;
@@ -1038,35 +880,34 @@ public class BieUpliftingService {
         public BieVisitResult visitBbie(Bbie bbie, BieVisitContext context) {
             CcDocument sourceCcDocument = context.getBieDocument().getCcDocument();
             BccSummaryRecord sourceBcc = sourceCcDocument.getBcc(bbie.getBasedBccManifestId());
-            List<Association> sourceAssociations =
-                    abieSourceAssociationsMap.getOrDefault(bbie.getFromAbieId(), Collections.emptyList());
-            Association sourceAssociation = sourceAssociations.stream()
-                    .filter(e -> e.isMatched(sourceBcc)).findAny().orElse(null);
+            Association sourceAssociation = sourceAssociation(context, sourceBcc);
 
-            currentSourcePath = sourceAssociation.getPath();
             BccSummaryRecord targetBcc = null;
             BieUpliftingMapping targetBccMapping =
-                    this.customMappingTable.getTargetBccMappingBySourcePath(currentSourcePath);
+                    this.customMappingTable.getMapping(context.getOccurrencePath());
+            if (targetBccMapping == null &&
+                    this.customMappingTable.isAutoMappingSuppressed(context.getOccurrencePath())) {
+                return BieVisitResult.CONTINUE;
+            }
             if (targetBccMapping != null) {
-                currentTargetPath = targetBccMapping.getTargetPath();
+                occurrence(context).targetPath = targetBccMapping.getTargetPath();
                 targetBcc = targetCcDocument.getBcc(
                         new BccManifestId(targetBccMapping.getTargetManifestId()));
             } else {
                 List<Association> targetAssociations =
-                        abieTargetAssociationsMap.getOrDefault(bbie.getFromAbieId(), Collections.emptyList());
-                CcMatchingScore matchingScore = targetAssociations.stream().filter(e -> e.getCcAssociation().isBcc())
-                        .map(e -> ccMatchingService.score(
-                                sourceCcDocument,
-                                sourceAssociation,
-                                targetCcDocument,
-                                e,
-                                (ccDocument, association) -> ccDocument.getBcc(((BccSummaryRecord) association.getCcAssociation()).bccManifestId())))
-                        .max(Comparator.comparing(CcMatchingScore::getScore))
-                        .orElse(new CcMatchingScore(0.0d, null, null));
+                    parent(context).targetAssociations;
+                CcMatchingScore<Association> matchingScore = bestMatch(
+                        sourceCcDocument,
+                        sourceAssociation,
+                        targetCcDocument,
+                        targetAssociations,
+                        e -> e.getCcAssociation().isBcc(),
+                        (ccDocument, association) -> ccDocument.getBcc(
+                                ((BccSummaryRecord) association.getCcAssociation()).bccManifestId()));
 
                 if (matchingScore.getScore() > 0.0d) {
                     Association targetAssociation = (Association) matchingScore.getTarget();
-                    currentTargetPath = targetAssociation.getPath();
+                    occurrence(context).targetPath = targetAssociation.getPath();
                     targetBcc = (BccSummaryRecord) targetAssociation.getCcAssociation();
                 }
             }
@@ -1074,13 +915,12 @@ public class BieUpliftingService {
             if (targetBcc != null) {
                 BccpSummaryRecord toBccp = targetCcDocument.getBccp(
                         targetBcc.toBccpManifestId());
-                this.previousBbie = bbie;
-                targetBccpQueue.offer(toBccp);
+                occurrence(context).targetBccp = toBccp;
 
                 Bbie targetBbie = new Bbie();
                 targetBbie.setGuid(ScoreGuidUtils.randomGuid());
                 targetBbie.setBasedBccManifestId(targetBcc.bccManifestId());
-                targetBbie.setPath(currentTargetPath);
+                targetBbie.setPath(occurrence(context).targetPath);
                 targetBbie.setHashPath(sha256(targetBbie.getPath()));
                 targetBbie.setDefaultValue(bbie.getDefaultValue());
                 targetBbie.setFixedValue(bbie.getFixedValue());
@@ -1102,47 +942,31 @@ public class BieUpliftingService {
                         sourceAgencyIdListList);
 
                 WrappedBbie upliftingBbie = new WrappedBbie();
-                Abie fromAbie = this.abieIdToAbieMap.get(bbie.getFromAbieId());
-
-                if (fromAbie != null && currentTargetPath.contains(fromAbie.getPath())) {
-                    upliftingBbie.setFromAbie(fromAbie);
+                if (targetBccMapping == null) {
+                    upliftingBbie.setFromAbie(parent(context).abie);
                 }
                 upliftingBbie.setBbie(targetBbie);
 
-                this.toBbiepToBbieMap.put(bbie.getToBbiepId(), upliftingBbie);
-                this.bbieMap.put(bbie.getBbieId(), targetBbie);
+                occurrence(context).bbie = upliftingBbie;
+                targetBbies.put(targetBbie.getPath(), targetBbie);
             }
             return BieVisitResult.CONTINUE;
         }
 
         @Override
         public BieVisitResult visitAsbiep(Asbiep asbiep, BieVisitContext context) {
-            CcDocument sourceCcDocument = context.getBieDocument().getCcDocument();
-            // Defensive: no ASBIEP to descend into (getAsbiep returned null). Poll the
-            // matching target ASCCP to keep the queue balanced, then continue.
-            if (asbiep == null) {
-                targetAsccpQueue.poll();
-                return BieVisitResult.CONTINUE;
-            }
-            AsccpSummaryRecord sourceAsccp = sourceCcDocument.getAsccp(
-                    asbiep.getBasedAsccpManifestId());
-
-            currentSourcePath = (hasLength(currentSourcePath)) ?
-                    currentSourcePath + ">" + "ASCCP-" + sourceAsccp.asccpManifestId() :
-                    "ASCCP-" + sourceAsccp.asccpManifestId();
-
-            AsccpSummaryRecord targetAsccp = targetAsccpQueue.poll();
+            AsccpSummaryRecord targetAsccp = context.getParentOccurrencePath() == null
+                    ? targetCcDocument.getAsccp(targetAsccpManifestId) : parent(context).targetAsccp;
+            occurrence(context).targetAsccp = targetAsccp;
             if (targetAsccp != null) { // found matched asccp
-                AccSummaryRecord targetRoleOfAcc = targetCcDocument.getAcc(targetAsccp.roleOfAccManifestId());
-                targetAccQueue.offer(targetRoleOfAcc);
-                currentTargetPath = (hasLength(currentTargetPath)) ?
-                        currentTargetPath + ">" + "ASCCP-" + targetAsccp.asccpManifestId() :
-                        "ASCCP-" + targetAsccp.asccpManifestId();
+                occurrence(context).targetPath = appendPath(
+                        parent(context) == null ? null : parent(context).targetPath,
+                        "ASCCP-" + targetAsccp.asccpManifestId());
 
                 Asbiep targetAsbiep = new Asbiep();
                 targetAsbiep.setGuid(ScoreGuidUtils.randomGuid());
                 targetAsbiep.setBasedAsccpManifestId(targetAsccp.asccpManifestId());
-                targetAsbiep.setPath(currentTargetPath);
+                targetAsbiep.setPath(occurrence(context).targetPath);
                 targetAsbiep.setHashPath(sha256(targetAsbiep.getPath()));
                 targetAsbiep.setDefinition(asbiep.getDefinition());
                 targetAsbiep.setRemark(asbiep.getRemark());
@@ -1152,44 +976,47 @@ public class BieUpliftingService {
                 WrappedAsbiep upliftingAsbiep = new WrappedAsbiep();
                 upliftingAsbiep.setAsbiep(targetAsbiep);
 
-                List<WrappedAsbie> upliftingAsbieList = this.toAsbiepToAsbieMap.get(asbiep.getAsbiepId());
-                if (upliftingAsbieList != null) {
-                    upliftingAsbieList.forEach(upliftingAsbie -> {
-                        upliftingAsbie.setToAsbiep(upliftingAsbiep);
-                    });
+                WrappedAsbie parentAsbie = parent(context) == null ? null : parent(context).asbie;
+                if (parentAsbie != null) {
+                    parentAsbie.setToAsbiep(upliftingAsbiep);
                 }
-                this.asbiepMap.put(asbiep.getAsbiepId(), upliftingAsbiep);
-                this.roleOfAbieToAsbiepMap.put(asbiep.getRoleOfAbieId(), upliftingAsbiep);
+                occurrence(context).asbiep = upliftingAsbiep;
+                occurrence(context).sourceAsbiepId = asbiep.getAsbiepId();
+                if (context.getParentOccurrencePath() == null) {
+                    rootAsbiep = upliftingAsbiep;
+                }
             }
             return BieVisitResult.CONTINUE;
         }
 
         @Override
         public BieVisitResult visitBbiep(Bbiep bbiep, BieVisitContext context) {
-            CcDocument sourceCcDocument = context.getBieDocument().getCcDocument();
-            BccpSummaryRecord sourceBccp = sourceCcDocument.getBccp(bbiep.getBasedBccpManifestId());
-            currentSourcePath = currentSourcePath + ">" + "BCCP-" + sourceBccp.bccpManifestId();
 
-            BccpSummaryRecord targetBccp = targetBccpQueue.poll();
+            BccpSummaryRecord targetBccp = occurrence(context).targetBccp;
             if (targetBccp != null) {
-                currentTargetPath = currentTargetPath + ">" + "BCCP-" + targetBccp.bccpManifestId();
+                occurrence(context).targetPath = appendPath(
+                        occurrence(context).targetPath,
+                        "BCCP-" + targetBccp.bccpManifestId());
 
                 DtManifestId targetBdtManifestId = targetBccp.dtManifestId();
                 DtSummaryRecord targetDt = targetCcDocument.getDt(targetBdtManifestId);
-                bbieTargetDtScMap.put(previousBbie.getBbieId(),
-                        targetCcDocument.getDtScList(targetDt.dtManifestId()));
+                occurrence(context).targetDtSc =
+                        targetCcDocument.getDtScList(targetDt.dtManifestId());
 
                 Bbiep targetBbiep = new Bbiep();
                 targetBbiep.setGuid(ScoreGuidUtils.randomGuid());
                 targetBbiep.setBasedBccpManifestId(targetBccp.bccpManifestId());
-                targetBbiep.setPath(currentTargetPath);
+                targetBbiep.setPath(occurrence(context).targetPath);
                 targetBbiep.setHashPath(sha256(targetBbiep.getPath()));
                 targetBbiep.setDefinition(bbiep.getDefinition());
                 targetBbiep.setRemark(bbiep.getRemark());
                 targetBbiep.setBizTerm(bbiep.getBizTerm());
                 targetBbiep.setDisplayName(bbiep.getDisplayName());
 
-                this.toBbiepToBbieMap.get(bbiep.getBbiepId()).setToBbiep(targetBbiep);
+                WrappedBbie targetBbie = occurrence(context).bbie;
+                if (targetBbie != null) {
+                    targetBbie.setToBbiep(targetBbiep);
+                }
             }
             return BieVisitResult.CONTINUE;
         }
@@ -1198,34 +1025,33 @@ public class BieUpliftingService {
         public BieVisitResult visitBbieSc(BbieSc bbieSc, BieVisitContext context) {
             CcDocument sourceCcDocument = context.getBieDocument().getCcDocument();
             DtScSummaryRecord sourceDtSc = sourceCcDocument.getDtSc(bbieSc.getBasedDtScManifestId());
-            DtSummaryRecord sourceDt = sourceCcDocument.getDt(sourceDtSc.ownerDtManifestId());
-
-            String sourcePath = currentSourcePath + ">" + "DT-" + sourceDt.dtManifestId() +
-                    ">" + "DT_SC-" + sourceDtSc.dtScManifestId();
+            UpliftOccurrence owner = parent(context);
+            String sourcePath = context.getOccurrencePath();
             DtScSummaryRecord targetDtSc = null;
             String targetPath = null;
             BieUpliftingMapping targetDtScMapping =
-                    this.customMappingTable.getTargetDtScMappingBySourcePath(sourcePath);
+                    this.customMappingTable.getMapping(sourcePath);
+            if (targetDtScMapping == null &&
+                    this.customMappingTable.isAutoMappingSuppressed(sourcePath)) {
+                return BieVisitResult.CONTINUE;
+            }
             if (targetDtScMapping != null) {
                 targetDtSc = targetCcDocument.getDtSc(
                         new DtScManifestId(targetDtScMapping.getTargetManifestId()));
                 targetPath = targetDtScMapping.getTargetPath();
             } else {
-                CcMatchingScore matchingScore =
-                        bbieTargetDtScMap.getOrDefault(bbieSc.getBbieId(), Collections.emptyList()).stream()
-                                .map(e -> ccMatchingService.score(
-                                        sourceCcDocument,
-                                        sourceDtSc,
-                                        targetCcDocument,
-                                        e,
-                                        (ccDocument, dtScManifest) -> ccDocument.getDtSc(dtScManifest.dtScManifestId())))
-                                .max(Comparator.comparing(CcMatchingScore::getScore))
-                                .orElse(new CcMatchingScore(0.0d, null, null));
+                CcMatchingScore<DtScSummaryRecord> matchingScore = bestMatch(
+                        sourceCcDocument,
+                        sourceDtSc,
+                        targetCcDocument,
+                        owner.targetDtSc,
+                        ignored -> true,
+                        (ccDocument, dtScManifest) -> ccDocument.getDtSc(dtScManifest.dtScManifestId()));
                 if (matchingScore.getScore() > 0.0d) {
                     targetDtSc = (DtScSummaryRecord) matchingScore.getTarget();
                     DtSummaryRecord targetDt = targetCcDocument.getDt(targetDtSc.ownerDtManifestId());
-                    targetPath = currentTargetPath + ">" + "DT-" + targetDt.dtManifestId() +
-                            ">" + "DT_SC-" + targetDtSc.dtScManifestId();
+                    targetPath = appendPath(owner.targetPath,
+                            "DT-" + targetDt.dtManifestId() + ">DT_SC-" + targetDtSc.dtScManifestId());
                 }
             }
 
@@ -1257,10 +1083,17 @@ public class BieUpliftingService {
                         sourceAgencyIdListList);
 
                 WrappedBbieSc upliftingBbieSc = new WrappedBbieSc();
-                upliftingBbieSc.setBbie(this.bbieMap.get(bbieSc.getBbieId()));
+                if (targetDtScMapping == null) {
+                    if (owner.bbie == null) {
+                        return BieVisitResult.CONTINUE;
+                    }
+                    upliftingBbieSc.setBbie(owner.bbie.getBbie());
+                }
+                // Explicit SC mappings resolve their target BBIE in visitEnd,
+                // including when it belongs to a later source occurrence.
                 upliftingBbieSc.setBbieSc(targetBbieSc);
 
-                this.bbieScList.add(upliftingBbieSc);
+                occurrence(context).bbieSc = upliftingBbieSc;
             }
             return BieVisitResult.CONTINUE;
         }
@@ -1276,27 +1109,33 @@ public class BieUpliftingService {
             DtSummaryRecord targetDt = targetCcDocument.getDt(targetDtManifestId);
 
             if (sourceBbie.getXbtManifestId() != null) {
-                XbtSummaryRecord sourceXbt = sourceXbtList.stream().filter(e -> e.xbtManifestId().equals(sourceBbie.getXbtManifestId())).findAny().orElse(null);
+                XbtSummaryRecord sourceXbt = sourceXbtList.stream().filter(Objects::nonNull).filter(e -> Objects.equals(e.xbtManifestId(), sourceBbie.getXbtManifestId())).findAny().orElse(null);
                 XbtSummaryRecord targetXbt = getTargetXbtManifest(sourceXbt, targetXbtList);
                 // Only carry the source primitive if it is ALLOWED on the target node (its DT approved-primitive
                 // list); otherwise leave it null so the default-primitive block below assigns the target node's
                 // default. See the BBIE_SC branch for rationale (#29.1.9.c "default disallowed values").
                 if (targetXbt != null &&
                         targetCcDocument.getDtAwdPriList(targetDt.dtManifestId()).stream()
-                                .anyMatch(e -> targetXbt.xbtManifestId().equals(e.xbtManifestId()))) {
+                                .filter(Objects::nonNull)
+                                .anyMatch(e -> Objects.equals(targetXbt.xbtManifestId(), e.xbtManifestId()))) {
                     targetBbie.setXbtManifestId(targetXbt.xbtManifestId());
                 }
             } else if (sourceBbie.getCodeListManifestId() != null) {
-                CodeListSummaryRecord sourceCodeList = sourceCodeListList.stream().filter(e -> e.codeListManifestId().equals(sourceBbie.getCodeListManifestId())).findAny().orElse(null);
-                CodeListSummaryRecord targetCodeList = getTargetCodeListManifest(
-                        sourceCodeList, targetCodeListList);
+                CodeListSummaryRecord sourceCodeList = sourceCodeListList.stream().filter(Objects::nonNull).filter(e -> Objects.equals(e.codeListManifestId(), sourceBbie.getCodeListManifestId())).findAny().orElse(null);
+                // The availability service applies the target DT restriction and
+                // includes permitted derived lists; a release-wide cache would
+                // incorrectly bypass both rules.
+                List<CodeListSummaryRecord> candidates = availableCodeLists(targetDt.dtManifestId());
+                CodeListSummaryRecord targetCodeList = findTargetCodeListMatch(
+                        sourceCodeList, candidates).target();
                 if (targetCodeList != null) {
                     targetBbie.setCodeListManifestId(targetCodeList.codeListManifestId());
                 }
             } else if (sourceBbie.getAgencyIdListManifestId() != null) {
-                AgencyIdListSummaryRecord sourceAgencyIdList = sourceAgencyIdListList.stream().filter(e -> e.agencyIdListManifestId().equals(sourceBbie.getAgencyIdListManifestId())).findFirst().orElse(null);
-                AgencyIdListSummaryRecord targetAgencyIdList = getTargetAgencyIdListManifest(
-                        sourceAgencyIdList, targetAgencyIdListList);
+                AgencyIdListSummaryRecord sourceAgencyIdList = sourceAgencyIdListList.stream().filter(Objects::nonNull).filter(e -> Objects.equals(e.agencyIdListManifestId(), sourceBbie.getAgencyIdListManifestId())).findFirst().orElse(null);
+                List<AgencyIdListSummaryRecord> candidates = availableAgencyIdLists(targetDt.dtManifestId());
+                AgencyIdListSummaryRecord targetAgencyIdList = findTargetAgencyIdListMatch(
+                        sourceAgencyIdList, candidates).target();
                 if (targetAgencyIdList != null) {
                     targetBbie.setAgencyIdListManifestId(targetAgencyIdList.agencyIdListManifestId());
                 }
@@ -1306,25 +1145,29 @@ public class BieUpliftingService {
                     targetBbie.getCodeListManifestId() == null &&
                     targetBbie.getAgencyIdListManifestId() == null) {
                 if ("Date Time".equals(targetDt.dataTypeTerm())) {
-                    targetDefaultDtAwdPri =
+                            targetDefaultDtAwdPri =
                             targetCcDocument.getDtAwdPriList(targetDt.dtManifestId()).stream()
-                                    .filter(e -> targetCcDocument.getXbt(e.xbtManifestId()).name().equalsIgnoreCase("date time"))
-                                    .findFirst().get();
+                                    .filter(Objects::nonNull)
+                                    .filter(e -> isXbtNamed(targetCcDocument, e.xbtManifestId(), "date time"))
+                                    .findFirst().orElseThrow(() -> new IllegalStateException("Target DT has no compatible default primitive."));
                 } else if ("Date".equals(targetDt.dataTypeTerm())) {
-                    targetDefaultDtAwdPri =
+                            targetDefaultDtAwdPri =
                             targetCcDocument.getDtAwdPriList(targetDt.dtManifestId()).stream()
-                                    .filter(e -> targetCcDocument.getXbt(e.xbtManifestId()).name().equalsIgnoreCase("date"))
-                                    .findFirst().get();
+                                    .filter(Objects::nonNull)
+                                    .filter(e -> isXbtNamed(targetCcDocument, e.xbtManifestId(), "date"))
+                                    .findFirst().orElseThrow(() -> new IllegalStateException("Target DT has no compatible default primitive."));
                 } else if ("Time".equals(targetDt.dataTypeTerm())) {
-                    targetDefaultDtAwdPri =
+                            targetDefaultDtAwdPri =
                             targetCcDocument.getDtAwdPriList(targetDt.dtManifestId()).stream()
-                                    .filter(e -> targetCcDocument.getXbt(e.xbtManifestId()).name().equalsIgnoreCase("time"))
-                                    .findFirst().get();
+                                    .filter(Objects::nonNull)
+                                    .filter(e -> isXbtNamed(targetCcDocument, e.xbtManifestId(), "time"))
+                                    .findFirst().orElseThrow(() -> new IllegalStateException("Target DT has no compatible default primitive."));
                 } else {
-                    targetDefaultDtAwdPri =
+                            targetDefaultDtAwdPri =
                             targetCcDocument.getDtAwdPriList(targetDt.dtManifestId()).stream()
+                                    .filter(Objects::nonNull)
                                     .filter(e -> e.isDefault())
-                                    .findFirst().get();
+                                    .findFirst().orElseThrow(() -> new IllegalStateException("Target DT has no default primitive."));
                 }
                 targetBbie.setXbtManifestId(targetDefaultDtAwdPri.xbtManifestId());
             }
@@ -1342,7 +1185,7 @@ public class BieUpliftingService {
             DtScSummaryRecord targetDtSc = targetCcDocument.getDtSc(dtScManifestId);
 
             if (sourceBbieSc.getXbtManifestId() != null) {
-                XbtSummaryRecord sourceXbt = sourceXbtList.stream().filter(e -> e.xbtManifestId().equals(sourceBbieSc.getXbtManifestId())).findAny().orElse(null);
+                XbtSummaryRecord sourceXbt = sourceXbtList.stream().filter(Objects::nonNull).filter(e -> Objects.equals(e.xbtManifestId(), sourceBbieSc.getXbtManifestId())).findAny().orElse(null);
                 XbtSummaryRecord targetXbt = getTargetXbtManifest(sourceXbt, targetXbtList);
                 // Only carry the source primitive if it is ALLOWED on the target node (its DT_SC approved-primitive
                 // list). If it is not allowed (or absent in the target release), leave it null so the default-primitive
@@ -1351,20 +1194,24 @@ public class BieUpliftingService {
                 // allowed on this specific node, so without this gate a disallowed primitive would be carried verbatim.
                 if (targetXbt != null &&
                         targetCcDocument.getDtScAwdPriList(targetDtSc.dtScManifestId()).stream()
-                                .anyMatch(e -> targetXbt.xbtManifestId().equals(e.xbtManifestId()))) {
+                                .filter(Objects::nonNull)
+                                .anyMatch(e -> Objects.equals(targetXbt.xbtManifestId(), e.xbtManifestId()))) {
                     targetBbieSc.setXbtManifestId(targetXbt.xbtManifestId());
                 }
             } else if (sourceBbieSc.getCodeListManifestId() != null) {
-                CodeListSummaryRecord sourceCodeList = sourceCodeListList.stream().filter(e -> e.codeListManifestId().equals(sourceBbieSc.getCodeListManifestId())).findAny().orElse(null);
-                CodeListSummaryRecord targetCodeList = getTargetCodeListManifest(
-                        sourceCodeList, targetCodeListList);
+                CodeListSummaryRecord sourceCodeList = sourceCodeListList.stream().filter(Objects::nonNull).filter(e -> Objects.equals(e.codeListManifestId(), sourceBbieSc.getCodeListManifestId())).findAny().orElse(null);
+                // DT_SC follows the same candidate policy as DT.
+                List<CodeListSummaryRecord> candidates = availableCodeLists(targetDtSc.dtScManifestId());
+                CodeListSummaryRecord targetCodeList = findTargetCodeListMatch(
+                        sourceCodeList, candidates).target();
                 if (targetCodeList != null) {
                     targetBbieSc.setCodeListManifestId(targetCodeList.codeListManifestId());
                 }
             } else if (sourceBbieSc.getAgencyIdListManifestId() != null) {
-                AgencyIdListSummaryRecord sourceAgencyIdList = sourceAgencyIdListList.stream().filter(e -> e.agencyIdListManifestId().equals(sourceBbieSc.getAgencyIdListManifestId())).findFirst().orElse(null);
-                AgencyIdListSummaryRecord targetAgencyIdListManifest = getTargetAgencyIdListManifest(
-                        sourceAgencyIdList, targetAgencyIdListList);
+                AgencyIdListSummaryRecord sourceAgencyIdList = sourceAgencyIdListList.stream().filter(Objects::nonNull).filter(e -> Objects.equals(e.agencyIdListManifestId(), sourceBbieSc.getAgencyIdListManifestId())).findFirst().orElse(null);
+                List<AgencyIdListSummaryRecord> candidates = availableAgencyIdLists(targetDtSc.dtScManifestId());
+                AgencyIdListSummaryRecord targetAgencyIdListManifest = findTargetAgencyIdListMatch(
+                        sourceAgencyIdList, candidates).target();
                 if (targetAgencyIdListManifest != null) {
                     targetBbieSc.setAgencyIdListManifestId(targetAgencyIdListManifest.agencyIdListManifestId());
                 }
@@ -1374,43 +1221,91 @@ public class BieUpliftingService {
                     targetBbieSc.getCodeListManifestId() == null &&
                     targetBbieSc.getAgencyIdListManifestId() == null) {
                 if ("Date Time".equals(targetDtSc.representationTerm())) {
-                    targetDefaultDtScAwdPri =
+                            targetDefaultDtScAwdPri =
                             targetCcDocument.getDtScAwdPriList(targetDtSc.dtScManifestId()).stream()
-                                    .filter(e -> targetCcDocument.getXbt(e.xbtManifestId()).name().equalsIgnoreCase("date time"))
-                                    .findFirst().get();
+                                    .filter(Objects::nonNull)
+                                    .filter(e -> isXbtNamed(targetCcDocument, e.xbtManifestId(), "date time"))
+                                    .findFirst().orElseThrow(() -> new IllegalStateException("Target DT_SC has no compatible default primitive."));
                 } else if ("Date".equals(targetDtSc.representationTerm())) {
-                    targetDefaultDtScAwdPri =
+                            targetDefaultDtScAwdPri =
                             targetCcDocument.getDtScAwdPriList(targetDtSc.dtScManifestId()).stream()
-                                    .filter(e -> targetCcDocument.getXbt(e.xbtManifestId()).name().equalsIgnoreCase("date"))
-                                    .findFirst().get();
+                                    .filter(Objects::nonNull)
+                                    .filter(e -> isXbtNamed(targetCcDocument, e.xbtManifestId(), "date"))
+                                    .findFirst().orElseThrow(() -> new IllegalStateException("Target DT_SC has no compatible default primitive."));
                 } else if ("Time".equals(targetDtSc.representationTerm())) {
-                    targetDefaultDtScAwdPri =
+                            targetDefaultDtScAwdPri =
                             targetCcDocument.getDtScAwdPriList(targetDtSc.dtScManifestId()).stream()
-                                    .filter(e -> targetCcDocument.getXbt(e.xbtManifestId()).name().equalsIgnoreCase("time"))
-                                    .findFirst().get();
+                                    .filter(Objects::nonNull)
+                                    .filter(e -> isXbtNamed(targetCcDocument, e.xbtManifestId(), "time"))
+                                    .findFirst().orElseThrow(() -> new IllegalStateException("Target DT_SC has no compatible default primitive."));
                 } else {
-                    targetDefaultDtScAwdPri =
+                            targetDefaultDtScAwdPri =
                             targetCcDocument.getDtScAwdPriList(targetDtSc.dtScManifestId()).stream()
+                                    .filter(Objects::nonNull)
                                     .filter(e -> e.isDefault())
-                                    .findFirst().get();
+                                    .findFirst().orElseThrow(() -> new IllegalStateException("Target DT_SC has no default primitive."));
                 }
                 targetBbieSc.setXbtManifestId(targetDefaultDtScAwdPri.xbtManifestId());
             }
             return targetBbieSc;
         }
+
+        private List<CodeListSummaryRecord> availableCodeLists(DtManifestId dtManifestId) {
+            if (targetCodeListList == null) {
+                return codeListQueryService.availableCodeListListByDtManifestId(requester, dtManifestId);
+            }
+            return codeListQueryService.availableCodeListListByDtManifestId(
+                    requester, dtManifestId, targetCodeListList,
+                    targetCcDocument.getDtAwdPriList(dtManifestId));
+        }
+
+        private List<CodeListSummaryRecord> availableCodeLists(DtScManifestId dtScManifestId) {
+            if (targetCodeListList == null) {
+                return codeListQueryService.availableCodeListListByDtScManifestId(requester, dtScManifestId);
+            }
+            return codeListQueryService.availableCodeListListByDtScManifestId(
+                    requester, dtScManifestId, targetCodeListList,
+                    targetCcDocument.getDtScAwdPriList(dtScManifestId));
+        }
+
+        private List<AgencyIdListSummaryRecord> availableAgencyIdLists(DtManifestId dtManifestId) {
+            if (targetAgencyIdListList == null) {
+                return agencyIdListQueryService.availableAgencyIdListListByDtManifestId(requester, dtManifestId);
+            }
+            return agencyIdListQueryService.availableAgencyIdListListByDtManifestId(
+                    requester, dtManifestId, targetAgencyIdListList,
+                    targetCcDocument.getDtAwdPriList(dtManifestId));
+        }
+
+        private List<AgencyIdListSummaryRecord> availableAgencyIdLists(DtScManifestId dtScManifestId) {
+            if (targetAgencyIdListList == null) {
+                return agencyIdListQueryService.availableAgencyIdListListByDtScManifestId(requester, dtScManifestId);
+            }
+            return agencyIdListQueryService.availableAgencyIdListListByDtScManifestId(
+                    requester, dtScManifestId, targetAgencyIdListList,
+                    targetCcDocument.getDtScAwdPriList(dtScManifestId));
+        }
+
     }
 
     @Transactional
     public UpliftBieResponse upliftBie(ScoreUser requester, UpliftBieRequest request) {
 
+        if (request == null || request.getTopLevelAsbiepId() == null ||
+                (request.getTargetAsccpManifestId() == null && request.getTargetReleaseId() == null)) {
+            throw new IllegalArgumentException("Source BIE and target release/ASCCP are required.");
+        }
+
         var asccpQuery = repositoryFactory.asccpQueryRepository(requester);
 
         AsccpManifestId targetAsccpManifestId = request.getTargetAsccpManifestId();
         if (targetAsccpManifestId == null) {
-            targetAsccpManifestId = asccpQuery.findNextAsccpManifest(
-                            request.getTopLevelAsbiepId(),
-                            request.getTargetReleaseId())
-                    .asccpManifestId();
+            AsccpSummaryRecord nextTargetAsccp = asccpQuery.findNextAsccpManifest(
+                    request.getTopLevelAsbiepId(), request.getTargetReleaseId());
+            if (nextTargetAsccp == null) {
+                throw new IllegalArgumentException("No target ASCCP exists in the requested release.");
+            }
+            targetAsccpManifestId = nextTargetAsccp.asccpManifestId();
         }
 
         AsccpSummaryRecord targetAsccp = asccpQuery.getAsccpSummary(targetAsccpManifestId);
@@ -1419,19 +1314,39 @@ public class BieUpliftingService {
         }
 
         BieDocument sourceBieDocument = bieReadService.getBieDocument(request.getRequester(), request.getTopLevelAsbiepId());
+        if (sourceBieDocument == null || sourceBieDocument.getRootAsbiep() == null
+                || sourceBieDocument.getCcDocument() == null
+                || sourceBieDocument.getCcDocument().getAsccp(sourceBieDocument.getRootAsbiep().getBasedAsccpManifestId()) == null) {
+            throw new IllegalArgumentException("Source BIE record not found.");
+        }
+        if (targetAsccp.release() == null || targetAsccp.release().releaseId() == null) {
+            throw new IllegalArgumentException("Target ASCCP release record not found.");
+        }
         CcDocument targetCcDocument = new CcDocumentImpl(requester, repositoryFactory, targetAsccp.release().releaseId());
 
         List<BusinessContextId> bizCtxIds = repositoryFactory.topLevelAsbiepQueryRepository(requester)
                 .getAssignedBusinessContextList(request.getTopLevelAsbiepId());
 
         List<BieUpliftingMapping> mappingList = request.getCustomMappingTable();
-        BieUpliftingCustomMappingTable customMappingTable = new BieUpliftingCustomMappingTable(
-                sourceBieDocument.getCcDocument(),
-                targetCcDocument,
-                mappingList);
+        validateTargetManifestIds(mappingList);
+        validateTargetMappingShapes(targetCcDocument, mappingList);
+        validateReuseMappings(requester, targetAsccp.release().releaseId(), targetCcDocument, mappingList);
+        validateSourceMappings(sourceBieDocument, mappingList);
+        BieUpliftingCustomMappingTable customMappingTable = new BieUpliftingCustomMappingTable(mappingList);
 
-        ReleaseId sourceReleaseId = sourceBieDocument.getCcDocument().getAsccp(sourceBieDocument.getRootAsbiep().getBasedAsccpManifestId()).release().releaseId();
-        ReleaseId targetReleaseId = targetCcDocument.getAsccp(targetAsccpManifestId).release().releaseId();
+        AsccpSummaryRecord sourceRootAsccp = sourceBieDocument.getCcDocument()
+                .getAsccp(sourceBieDocument.getRootAsbiep().getBasedAsccpManifestId());
+        if (sourceRootAsccp.release() == null || sourceRootAsccp.release().releaseId() == null) {
+            throw new IllegalArgumentException("Source BIE release record not found.");
+        }
+        ReleaseId sourceReleaseId = sourceRootAsccp.release().releaseId();
+        ReleaseId targetReleaseId = targetAsccp.release().releaseId();
+        if (!releaseQueryService.isLaterRelease(requester, sourceReleaseId, targetReleaseId)) {
+            throw new IllegalArgumentException("A BIE can only be uplifted to a newer release.");
+        }
+        if (request.getTargetReleaseId() != null && !request.getTargetReleaseId().equals(targetReleaseId)) {
+            throw new IllegalArgumentException("Target ASCCP does not belong to the requested release.");
+        }
 
         var xbtQuery = repositoryFactory.xbtQueryRepository(requester);
 
@@ -1441,29 +1356,16 @@ public class BieUpliftingService {
         var codeListQuery = repositoryFactory.codeListQueryRepository(requester);
 
         List<CodeListSummaryRecord> sourceCodeListList = codeListQuery.getCodeListSummaryList(sourceReleaseId);
-        List<CodeListSummaryRecord> targetCodeListList = codeListQuery.getCodeListSummaryList(targetReleaseId);
+        List<CodeListSummaryRecord> targetCodeListList = codeListQuery.getCodeListSummaryList(targetAsccp.release().releaseId());
 
         var agencyIdListQuery = repositoryFactory.agencyIdListQueryRepository(requester);
 
         List<AgencyIdListSummaryRecord> sourceAgencyIdListList = agencyIdListQuery.getAgencyIdListSummaryList(sourceReleaseId);
-        List<AgencyIdListSummaryRecord> targetAgencyIdListList = agencyIdListQuery.getAgencyIdListSummaryList(targetReleaseId);
-
-        var dtQuery = repositoryFactory.dtQueryRepository(requester);
-        Map<DtAwdPriId, DtAwdPriSummaryRecord> sourceDtAwdPriMap = dtQuery.getDtAwdPriSummaryList(sourceReleaseId).stream()
-                .collect(Collectors.toMap(DtAwdPriSummaryRecord::dtAwdPriId, Function.identity()));
-        Map<DtId, List<DtAwdPriSummaryRecord>> targetDtAwdPriByDtIdMap = dtQuery.getDtAwdPriSummaryList(targetReleaseId).stream()
-                .collect(groupingBy(DtAwdPriSummaryRecord::dtId));
-
-        Map<DtScAwdPriId, DtScAwdPriSummaryRecord> sourceDtScAwdPriMap = dtQuery.getDtScAwdPriSummaryList(sourceReleaseId).stream()
-                .collect(Collectors.toMap(DtScAwdPriSummaryRecord::dtScAwdPriId, Function.identity()));
-        Map<DtScId, List<DtScAwdPriSummaryRecord>> targetDtScAwdPriByDtScIdMap = dtQuery.getDtScAwdPriSummaryList(targetReleaseId).stream()
-                .collect(groupingBy(DtScAwdPriSummaryRecord::dtScId));
+        List<AgencyIdListSummaryRecord> targetAgencyIdListList = agencyIdListQuery.getAgencyIdListSummaryList(targetAsccp.release().releaseId());
 
         BieUpliftingHandler upliftingHandler =
                 new BieUpliftingHandler(request.getRequester(), bizCtxIds, customMappingTable,
                         sourceBieDocument, targetCcDocument, targetAsccpManifestId,
-                        sourceDtAwdPriMap, targetDtAwdPriByDtIdMap,
-                        sourceDtScAwdPriMap, targetDtScAwdPriByDtScIdMap,
                         sourceXbtList, targetXbtList,
                         sourceCodeListList, targetCodeListList,
                         sourceAgencyIdListList, targetAgencyIdListList);
@@ -1474,53 +1376,301 @@ public class BieUpliftingService {
         return response;
     }
 
+    static void validateTargetManifestIds(List<BieUpliftingMapping> mappings) {
+        if (mappings == null) {
+            return; // Required-list validation belongs to the request/mapping table.
+        }
+        for (BieUpliftingMapping mapping : mappings) {
+            // Root ABIE is path metadata; the request's target ASCCP determines its ACC.
+            if (mapping != null && !"ABIE".equalsIgnoreCase(mapping.getBieType())
+                    && hasLength(mapping.getTargetPath()) && mapping.getTargetManifestId() == null) {
+                throw new IllegalArgumentException("Mapped target paths require a target manifest ID.");
+            }
+        }
+    }
+
+    private void validateMappingTypes(List<BieUpliftingMapping> mappings) {
+        for (BieUpliftingMapping mapping : mappings) {
+            if (mapping == null || !hasLength(mapping.getBieType()) ||
+                    !Set.of("ABIE", "ASBIE", "BBIE", "BBIE_SC")
+                            .contains(mapping.getBieType().toUpperCase(Locale.ROOT))) {
+                throw new IllegalArgumentException("Unsupported BIE mapping type: " +
+                        (mapping == null ? null : mapping.getBieType()));
+            }
+        }
+    }
+
+    private void validateTargetMappingShapes(CcDocument targetCcDocument,
+                                             List<BieUpliftingMapping> mappings) {
+        if (mappings == null) {
+            return;
+        }
+        for (BieUpliftingMapping mapping : mappings) {
+            if (mapping == null || !hasLength(mapping.getBieType())) {
+                throw new IllegalArgumentException("Each uplift mapping requires a BIE type.");
+            }
+            String bieType = mapping.getBieType().toUpperCase(Locale.ROOT);
+            if (!Set.of("ABIE", "ASBIE", "BBIE", "BBIE_SC").contains(bieType)) {
+                throw new IllegalArgumentException("Unsupported BIE mapping type: " + mapping.getBieType());
+            }
+            if (mapping == null || !hasLength(mapping.getTargetPath()) ||
+                    mapping.getTargetManifestId() == null ||
+                    "ABIE".equals(bieType)) {
+                continue;
+            }
+            String lastTag = BieUpliftingCustomMappingTable.getLastTag(mapping.getTargetPath());
+            BigInteger pathId;
+            try {
+                pathId = BieUpliftingCustomMappingTable.extractManifestId(lastTag);
+            } catch (RuntimeException e) {
+                throw new IllegalArgumentException("Target mapping path is malformed.", e);
+            }
+            validateTargetPathComponents(targetCcDocument, mapping.getTargetPath());
+            if (!pathId.equals(mapping.getTargetManifestId())) {
+                throw new IllegalArgumentException("Target mapping path and manifest ID must refer to the same component.");
+            }
+            boolean exists = false;
+            switch (bieType) {
+                case "ASBIE":
+                    exists = lastTag.startsWith("ASCC-")
+                            && targetCcDocument.getAscc(new AsccManifestId(mapping.getTargetManifestId())) != null;
+                    break;
+                case "BBIE":
+                    exists = lastTag.startsWith("BCC-")
+                            && targetCcDocument.getBcc(new BccManifestId(mapping.getTargetManifestId())) != null;
+                    break;
+                case "BBIE_SC":
+                    exists = lastTag.startsWith("DT_SC-")
+                            && targetCcDocument.getDtSc(new DtScManifestId(mapping.getTargetManifestId())) != null;
+                    break;
+            }
+            if (!exists) {
+                throw new IllegalArgumentException("Target mapping component does not exist or has the wrong type.");
+            }
+        }
+    }
+
+    private void validateTargetPathComponents(CcDocument targetCcDocument, String path) {
+        String[] tags = path.split(">");
+        for (String tag : tags) {
+            try {
+                BigInteger id = BieUpliftingCustomMappingTable.extractManifestId(tag);
+                boolean exists;
+                if (tag.startsWith("ASCCP-")) {
+                    exists = targetCcDocument.getAsccp(new AsccpManifestId(id)) != null;
+                } else if (tag.startsWith("ACC-")) {
+                    exists = targetCcDocument.getAcc(new AccManifestId(id)) != null;
+                } else if (tag.startsWith("ASCC-")) {
+                    exists = targetCcDocument.getAscc(new AsccManifestId(id)) != null;
+                } else if (tag.startsWith("BCC-")) {
+                    exists = targetCcDocument.getBcc(new BccManifestId(id)) != null;
+                } else if (tag.startsWith("BCCP-")) {
+                    exists = targetCcDocument.getBccp(new BccpManifestId(id)) != null;
+                } else if (tag.startsWith("DT_SC-")) {
+                    exists = targetCcDocument.getDtSc(new DtScManifestId(id)) != null;
+                } else if (tag.startsWith("DT-")) {
+                    exists = targetCcDocument.getDt(new DtManifestId(id)) != null;
+                } else {
+                    throw new IllegalArgumentException("Target mapping path contains an unknown component.");
+                }
+                if (!exists) {
+                    throw new IllegalArgumentException("Target mapping path contains a missing component.");
+                }
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Target mapping path contains an invalid manifest ID.", e);
+            }
+        }
+        for (int i = 0; i + 1 < tags.length; i++) {
+            String current = tags[i];
+            String next = tags[i + 1];
+            BigInteger currentId = extractManifestId(current);
+            BigInteger nextId = extractManifestId(next);
+            // Every path edge must be one of the canonical component relationships
+            // below.  Starting with false prevents an otherwise valid pair of
+            // existing components (for example ASCCP>BCC) from being accepted
+            // merely because the pair was not recognized.
+            boolean related = false;
+            if (current.startsWith("ASCCP-") && next.startsWith("ACC-")) {
+                AsccpSummaryRecord asccp = targetCcDocument.getAsccp(new AsccpManifestId(currentId));
+                related = asccp != null && asccp.roleOfAccManifestId() != null && nextId.equals(asccp.roleOfAccManifestId().value());
+            } else if (current.startsWith("ACC-") && next.startsWith("ACC-")) {
+                // Inherited and group ACCs are represented as a chain of ACC
+                // segments before the leaf ASCC/BCC.  The later ACC is based
+                // on the preceding ACC in the canonical server path.  The
+                // uplift UI may expose the same lineage from the concrete ACC
+                // toward its base ACC, so accept either direction while still
+                // requiring a direct based-ACC relationship.
+                AccSummaryRecord currentAcc = targetCcDocument.getAcc(new AccManifestId(currentId));
+                AccSummaryRecord nextAcc = targetCcDocument.getAcc(new AccManifestId(nextId));
+                related = (nextAcc != null && nextAcc.basedAccManifestId() != null
+                        && currentId.equals(nextAcc.basedAccManifestId().value()))
+                        || (currentAcc != null && currentAcc.basedAccManifestId() != null
+                        && nextId.equals(currentAcc.basedAccManifestId().value()));
+            } else if (current.startsWith("ACC-") && next.startsWith("ASCC-")) {
+                AsccSummaryRecord ascc = targetCcDocument.getAscc(new AsccManifestId(nextId));
+                related = ascc != null && ascc.fromAccManifestId() != null && currentId.equals(ascc.fromAccManifestId().value());
+            } else if (current.startsWith("ASCC-") && next.startsWith("ASCCP-")) {
+                AsccSummaryRecord ascc = targetCcDocument.getAscc(new AsccManifestId(currentId));
+                related = ascc != null && ascc.toAsccpManifestId() != null && nextId.equals(ascc.toAsccpManifestId().value());
+            } else if (current.startsWith("ACC-") && next.startsWith("BCC-")) {
+                BccSummaryRecord bcc = targetCcDocument.getBcc(new BccManifestId(nextId));
+                related = bcc != null && bcc.fromAccManifestId() != null && currentId.equals(bcc.fromAccManifestId().value());
+            } else if (current.startsWith("BCC-") && next.startsWith("BCCP-")) {
+                BccSummaryRecord bcc = targetCcDocument.getBcc(new BccManifestId(currentId));
+                related = bcc != null && bcc.toBccpManifestId() != null && nextId.equals(bcc.toBccpManifestId().value());
+            } else if (current.startsWith("BCCP-") && next.startsWith("DT-")) {
+                BccpSummaryRecord bccp = targetCcDocument.getBccp(new BccpManifestId(currentId));
+                related = bccp != null && bccp.dtManifestId() != null && nextId.equals(bccp.dtManifestId().value());
+            } else if (current.startsWith("DT-") && next.startsWith("DT_SC-")) {
+                DtScSummaryRecord dtSc = targetCcDocument.getDtSc(new DtScManifestId(nextId));
+                related = dtSc != null && dtSc.ownerDtManifestId() != null && currentId.equals(dtSc.ownerDtManifestId().value());
+            }
+            if (!related) {
+                throw new IllegalArgumentException("Target mapping path contains unrelated components.");
+            }
+        }
+    }
+
+    private void validateReuseMappings(ScoreUser requester, ReleaseId targetReleaseId,
+                                       CcDocument targetCcDocument,
+                                       List<BieUpliftingMapping> mappings) {
+        if (mappings == null) {
+            return;
+        }
+        for (BieUpliftingMapping mapping : mappings) {
+            if (mapping == null || mapping.getRefTopLevelAsbiepId() == null) {
+                continue;
+            }
+            if (!"ASBIE".equalsIgnoreCase(mapping.getBieType()) ||
+                    mapping.getTargetManifestId() == null) {
+                throw new IllegalArgumentException("Reuse references require an ASBIE target mapping.");
+            }
+            AsccSummaryRecord targetAscc = targetCcDocument.getAscc(
+                    new AsccManifestId(mapping.getTargetManifestId()));
+            if (targetAscc == null || targetAscc.toAsccpManifestId() == null) {
+                throw new IllegalArgumentException("Reuse target association was not found.");
+            }
+            var referenced = repositoryFactory.topLevelAsbiepQueryRepository(requester)
+                    .getTopLevelAsbiepSummary(mapping.getRefTopLevelAsbiepId());
+            if (referenced == null || referenced.release() == null ||
+                    referenced.release().releaseId() == null ||
+                    !targetReleaseId.equals(referenced.release().releaseId())) {
+                throw new IllegalArgumentException("Reuse BIE must belong to the target release.");
+            }
+            BieDocument referencedDocument = bieReadService.getBieDocument(
+                    requester, mapping.getRefTopLevelAsbiepId());
+            if (referencedDocument == null || referencedDocument.getRootAsbiep() == null ||
+                    !targetAscc.toAsccpManifestId().equals(
+                            referencedDocument.getRootAsbiep().getBasedAsccpManifestId())) {
+                throw new IllegalArgumentException("Reuse BIE is not compatible with the target ASCCP.");
+            }
+        }
+    }
+
+    private void validateSourceMappings(BieDocument sourceBieDocument,
+                                        List<BieUpliftingMapping> mappings) {
+        if (mappings == null) {
+            return;
+        }
+        Map<String, String> sourceTypes = new HashMap<>();
+        Map<String, BigInteger> sourceIds = new HashMap<>();
+        sourceBieDocument.accept(new BieVisitor() {
+            @Override
+            public BieVisitResult visitAsbie(Asbie value, BieVisitContext context) {
+                sourceTypes.put(context.getOccurrencePath(), "ASBIE");
+                sourceIds.put(context.getOccurrencePath(), value.getAsbieId().value());
+                return BieVisitResult.CONTINUE;
+            }
+
+            @Override
+            public BieVisitResult visitBbie(Bbie value, BieVisitContext context) {
+                sourceTypes.put(context.getOccurrencePath(), "BBIE");
+                sourceIds.put(context.getOccurrencePath(), value.getBbieId().value());
+                return BieVisitResult.CONTINUE;
+            }
+
+            @Override
+            public BieVisitResult visitBbieSc(BbieSc value, BieVisitContext context) {
+                sourceTypes.put(context.getOccurrencePath(), "BBIE_SC");
+                sourceIds.put(context.getOccurrencePath(), value.getBbieScId().value());
+                return BieVisitResult.CONTINUE;
+            }
+        });
+        for (BieUpliftingMapping mapping : mappings) {
+            if (mapping == null || !hasLength(mapping.getSourcePath()) ||
+                    mapping.getBieId() == null || "ABIE".equalsIgnoreCase(mapping.getBieType())) {
+                continue;
+            }
+            String path = mapping.getSourcePath();
+            String type = sourceTypes.get(path);
+            if (type == null || !type.equalsIgnoreCase(mapping.getBieType()) ||
+                    !mapping.getBieId().equals(sourceIds.get(path))) {
+                throw new IllegalArgumentException("Source mapping path, type, and BIE ID do not match.");
+            }
+        }
+    }
+
     public UpliftValidationResponse validateBieUplifting(ScoreUser requester, UpliftValidationRequest request) {
+        if (request == null || request.getTopLevelAsbiepId() == null ||
+                request.getTargetReleaseId() == null || request.getMappingList() == null) {
+            throw new IllegalArgumentException("Source BIE, target release, and mapping list are required.");
+        }
+        if (request.getMappingList().stream().anyMatch(mapping -> mapping == null
+                || !hasLength(mapping.getBieType()) || mapping.getBieId() == null)) {
+            throw new IllegalArgumentException("Each uplift mapping requires a BIE type and BIE ID.");
+        }
+        validateMappingTypes(request.getMappingList());
+        validateTargetManifestIds(request.getMappingList());
         UpliftValidationResponse response = new UpliftValidationResponse();
         List<BieUpliftingValidation> validations = new ArrayList<>();
 
-        ReleaseRecord sourceRelease = getReleaseRecordByTopLevelAsbiepId(request.getTopLevelAsbiepId());
-        ReleaseRecord targetRelease = getReleaseRecordByReleaseId(request.getTargetReleaseId());
+        var topLevelAsbiep = repositoryFactory.topLevelAsbiepQueryRepository(requester)
+                .getTopLevelAsbiepSummary(request.getTopLevelAsbiepId());
+        var releaseQuery = repositoryFactory.releaseQueryRepository(requester);
+        ReleaseSummaryRecord sourceRelease = (topLevelAsbiep == null || topLevelAsbiep.release() == null)
+                ? null : releaseQuery.getReleaseSummary(topLevelAsbiep.release().releaseId());
+        ReleaseSummaryRecord targetRelease = releaseQuery.getReleaseSummary(request.getTargetReleaseId());
+        if (sourceRelease == null || sourceRelease.releaseId() == null) {
+            throw new IllegalArgumentException("Source BIE release record not found.");
+        }
+        if (targetRelease == null || targetRelease.releaseId() == null) {
+            throw new IllegalArgumentException("Target release record not found.");
+        }
 
-        if (sourceRelease.getReleaseId().toBigInteger().compareTo(targetRelease.getReleaseId().toBigInteger()) >= 0) {
+        if (!releaseQueryService.isLaterRelease(requester,
+                sourceRelease.releaseId(), targetRelease.releaseId())) {
             throw new IllegalArgumentException();
         }
 
         BieDocument sourceBieDocument = bieReadService.getBieDocument(request.getRequester(), request.getTopLevelAsbiepId());
+        if (sourceBieDocument == null || sourceBieDocument.getCcDocument() == null) {
+            throw new IllegalArgumentException("Source BIE record not found.");
+        }
         CcDocument targetCcDocument = new CcDocumentImpl(requester, repositoryFactory, request.getTargetReleaseId());
+        validateTargetMappingShapes(targetCcDocument, request.getMappingList());
+        validateReuseMappings(requester, request.getTargetReleaseId(), targetCcDocument, request.getMappingList());
+        validateSourceMappings(sourceBieDocument, request.getMappingList());
 
         var xbtQuery = repositoryFactory.xbtQueryRepository(requester);
 
-        List<XbtSummaryRecord> sourceXbtList = xbtQuery.getXbtSummaryList(new ReleaseId(sourceRelease.getReleaseId().toBigInteger()));
-        List<XbtSummaryRecord> targetXbtList = xbtQuery.getXbtSummaryList(new ReleaseId(targetRelease.getReleaseId().toBigInteger()));
+        List<XbtSummaryRecord> sourceXbtList = xbtQuery.getXbtSummaryList(sourceRelease.releaseId());
+        List<XbtSummaryRecord> targetXbtList = xbtQuery.getXbtSummaryList(targetRelease.releaseId());
 
         var codeListQuery = repositoryFactory.codeListQueryRepository(requester);
 
-        List<CodeListSummaryRecord> sourceCodeListList = codeListQuery.getCodeListSummaryList(new ReleaseId(sourceRelease.getReleaseId().toBigInteger()));
-        List<CodeListSummaryRecord> targetCodeListList = codeListQuery.getCodeListSummaryList(new ReleaseId(targetRelease.getReleaseId().toBigInteger()));
+        List<CodeListSummaryRecord> sourceCodeListList = codeListQuery.getCodeListSummaryList(sourceRelease.releaseId());
+        List<CodeListSummaryRecord> targetCodeListList = codeListQuery.getCodeListSummaryList(targetRelease.releaseId());
 
         var agencyIdListQuery = repositoryFactory.agencyIdListQueryRepository(requester);
 
-        List<AgencyIdListSummaryRecord> sourceAgencyIdListList = agencyIdListQuery.getAgencyIdListSummaryList(new ReleaseId(sourceRelease.getReleaseId().toBigInteger()));
-        List<AgencyIdListSummaryRecord> targetAgencyIdListList = agencyIdListQuery.getAgencyIdListSummaryList(request.getTargetReleaseId());
-
-        ReleaseId sourceReleaseId = new ReleaseId(sourceRelease.getReleaseId().toBigInteger());
-        ReleaseId targetReleaseId = request.getTargetReleaseId();
-
-        var dtQuery = repositoryFactory.dtQueryRepository(requester);
-        Map<DtAwdPriId, DtAwdPriSummaryRecord> sourceDtAwdPriMap = dtQuery.getDtAwdPriSummaryList(sourceReleaseId).stream()
-                .collect(Collectors.toMap(DtAwdPriSummaryRecord::dtAwdPriId, Function.identity()));
-        Map<DtId, List<DtAwdPriSummaryRecord>> targetDtAwdPriByDtIdMap = dtQuery.getDtAwdPriSummaryList(targetReleaseId).stream()
-                .collect(groupingBy(DtAwdPriSummaryRecord::dtId));
-
-        Map<DtScAwdPriId, DtScAwdPriSummaryRecord> sourceDtScAwdPriMap = dtQuery.getDtScAwdPriSummaryList(sourceReleaseId).stream()
-                .collect(Collectors.toMap(DtScAwdPriSummaryRecord::dtScAwdPriId, Function.identity()));
-        Map<DtScId, List<DtScAwdPriSummaryRecord>> targetDtScAwdPriByDtScIdMap = dtQuery.getDtScAwdPriSummaryList(targetReleaseId).stream()
-                .collect(groupingBy(DtScAwdPriSummaryRecord::dtScId));
+        List<AgencyIdListSummaryRecord> sourceAgencyIdListList = agencyIdListQuery.getAgencyIdListSummaryList(sourceRelease.releaseId());
+        List<AgencyIdListSummaryRecord> targetAgencyIdListList = agencyIdListQuery.getAgencyIdListSummaryList(targetRelease.releaseId());
 
         request.getMappingList().forEach(mapping -> {
             BieUpliftingValidation validation = new BieUpliftingValidation();
             validation.setBieId(mapping.getBieId());
             validation.setBieType(mapping.getBieType());
+            validation.setSourcePath(mapping.getSourcePath());
             switch (mapping.getBieType().toUpperCase()) {
                 case "ABIE":
                     validation.setValid(true);
@@ -1530,58 +1680,100 @@ public class BieUpliftingService {
                     break;
                 case "BBIE":
                     Bbie bbie = sourceBieDocument.getBbie(new BbieId(mapping.getBieId()));
+                    if (bbie == null) {
+                        throw new IllegalArgumentException("Source BBIE mapping record not found.");
+                    }
                     BccManifestId bccManifestId = (mapping.getTargetManifestId() != null) ? new BccManifestId(mapping.getTargetManifestId()) : null;
                     if (bccManifestId == null) {
                         validation.setValid(true);
                         break;
                     }
                     BccSummaryRecord bcc = targetCcDocument.getBcc(bccManifestId);
+                    if (bcc == null || bcc.toBccpManifestId() == null) {
+                        throw new IllegalArgumentException("Target BBIE mapping record not found.");
+                    }
                     BccpSummaryRecord bccp = targetCcDocument.getBccp(bcc.toBccpManifestId());
+                    if (bccp == null || bccp.dtManifestId() == null) {
+                        throw new IllegalArgumentException("Target BBIE property record not found.");
+                    }
                     DtSummaryRecord dt = targetCcDocument.getDt(bccp.dtManifestId());
+                    if (dt == null) {
+                        throw new IllegalArgumentException("Target data type record not found.");
+                    }
 
                     if (bbie.getXbtManifestId() != null) {
-                        XbtSummaryRecord sourceXbt = sourceXbtList.stream().filter(xbt -> xbt.xbtManifestId().equals(bbie.getXbtManifestId())).findFirst().orElse(null);
+                        XbtSummaryRecord sourceXbt = sourceXbtList.stream().filter(Objects::nonNull).filter(xbt -> Objects.equals(xbt.xbtManifestId(), bbie.getXbtManifestId())).findFirst().orElse(null);
                         validation.setMessage(checkBdtPriRestriIdMappable(
-                                sourceXbt, dt.dtManifestId(), targetDtAwdPriByDtIdMap, targetXbtList));
+                                sourceXbt, targetCcDocument.getDtAwdPriList(dt.dtManifestId()), targetXbtList,
+                                DtAwdPriSummaryRecord::xbtManifestId));
                         validation.setValid(validation.getMessage().isEmpty());
                     } else if (bbie.getCodeListManifestId() != null) {
-                        CodeListSummaryRecord sourceCodeList = sourceCodeListList.stream().filter(codeList -> codeList.codeListManifestId().equals(bbie.getCodeListManifestId())).findFirst().orElse(null);
-                        validation.setMessage(checkBdtCodeListManifestIdMappable(
-                                sourceCodeList, dt.dtManifestId(), targetDtAwdPriByDtIdMap, targetCodeListList));
-                        validation.setValid(validation.getMessage().isEmpty());
+                        CodeListSummaryRecord sourceCodeList = sourceCodeListList.stream().filter(Objects::nonNull).filter(codeList -> Objects.equals(codeList.codeListManifestId(), bbie.getCodeListManifestId())).findFirst().orElse(null);
+                        ValueDomainValidationResult result = checkBdtCodeListMappable(
+                                sourceCodeList,
+                                codeListQueryService.availableCodeListListByDtManifestId(
+                                        requester, dt.dtManifestId(), targetCodeListList,
+                                        targetCcDocument.getDtAwdPriList(dt.dtManifestId())));
+                        validation.setMessage(result.issue());
+                        validation.setStatus(result.status());
+                        validation.setValid(result.valid());
                     } else {
-                        AgencyIdListSummaryRecord sourceAgencyIdList = sourceAgencyIdListList.stream().filter(agencyIdList -> agencyIdList.agencyIdListManifestId().equals(bbie.getAgencyIdListManifestId())).findFirst().orElse(null);
-                        validation.setMessage(checkBdtAgencyIdListManifestIdMappable(
-                                sourceAgencyIdList, dt.dtManifestId(), targetDtAwdPriByDtIdMap, targetAgencyIdListList));
-                        validation.setValid(validation.getMessage().isEmpty());
+                        AgencyIdListSummaryRecord sourceAgencyIdList = sourceAgencyIdListList.stream().filter(Objects::nonNull).filter(agencyIdList -> Objects.equals(agencyIdList.agencyIdListManifestId(), bbie.getAgencyIdListManifestId())).findFirst().orElse(null);
+                        ValueDomainValidationResult result = checkBdtAgencyIdListMappable(
+                                sourceAgencyIdList,
+                                agencyIdListQueryService.availableAgencyIdListListByDtManifestId(
+                                        requester, dt.dtManifestId(), targetAgencyIdListList,
+                                        targetCcDocument.getDtAwdPriList(dt.dtManifestId())));
+                        validation.setMessage(result.issue());
+                        validation.setStatus(result.status());
+                        validation.setValid(result.valid());
                     }
                     break;
                 case "BBIE_SC":
                     BbieSc bbieSc = sourceBieDocument.getBbieSc(new BbieScId(mapping.getBieId()));
+                    if (bbieSc == null) {
+                        throw new IllegalArgumentException("Source BBIE_SC mapping record not found.");
+                    }
                     DtScManifestId dtScManifestId = (mapping.getTargetManifestId() != null) ? new DtScManifestId(mapping.getTargetManifestId()) : null;
                     if (dtScManifestId == null) {
                         validation.setValid(true);
                         break;
                     }
                     DtScSummaryRecord dtSc = targetCcDocument.getDtSc(dtScManifestId);
+                    if (dtSc == null) {
+                        throw new IllegalArgumentException("Target supplementary data type record not found.");
+                    }
 
                     if (bbieSc.getXbtManifestId() != null) {
-                        XbtSummaryRecord sourceXbt = sourceXbtList.stream().filter(xbt -> xbt.xbtManifestId().equals(bbieSc.getXbtManifestId())).findFirst().orElse(null);
-                        validation.setMessage(checkBdtScPriRestriIdMappable(
-                                sourceXbt, dtSc.dtScManifestId(), targetDtScAwdPriByDtScIdMap, targetXbtList));
+                        XbtSummaryRecord sourceXbt = sourceXbtList.stream().filter(Objects::nonNull).filter(xbt -> Objects.equals(xbt.xbtManifestId(), bbieSc.getXbtManifestId())).findFirst().orElse(null);
+                        validation.setMessage(checkBdtPriRestriIdMappable(
+                                sourceXbt, targetCcDocument.getDtScAwdPriList(dtSc.dtScManifestId()), targetXbtList,
+                                DtScAwdPriSummaryRecord::xbtManifestId));
                         validation.setValid(validation.getMessage().isEmpty());
                     } else if (bbieSc.getCodeListManifestId() != null) {
-                        CodeListSummaryRecord sourceCodeList = sourceCodeListList.stream().filter(codeList -> codeList.codeListManifestId().equals(bbieSc.getCodeListManifestId())).findFirst().orElse(null);
-                        validation.setMessage(checkBdtScCodeListIdMappable(
-                                sourceCodeList, dtSc.dtScManifestId(), targetDtScAwdPriByDtScIdMap, targetCodeListList));
-                        validation.setValid(validation.getMessage().isEmpty());
+                        CodeListSummaryRecord sourceCodeList = sourceCodeListList.stream().filter(Objects::nonNull).filter(codeList -> Objects.equals(codeList.codeListManifestId(), bbieSc.getCodeListManifestId())).findFirst().orElse(null);
+                        ValueDomainValidationResult result = checkBdtCodeListMappable(
+                                sourceCodeList,
+                                codeListQueryService.availableCodeListListByDtScManifestId(
+                                        requester, dtSc.dtScManifestId(), targetCodeListList,
+                                        targetCcDocument.getDtScAwdPriList(dtSc.dtScManifestId())));
+                        validation.setMessage(result.issue());
+                        validation.setStatus(result.status());
+                        validation.setValid(result.valid());
                     } else {
-                        AgencyIdListSummaryRecord sourceAgencyIdList = sourceAgencyIdListList.stream().filter(agencyIdList -> agencyIdList.agencyIdListManifestId().equals(bbieSc.getAgencyIdListManifestId())).findFirst().orElse(null);
-                        validation.setMessage(checkBdtScAgencyIdListIdMappable(
-                                sourceAgencyIdList, dtSc.dtScManifestId(), targetDtScAwdPriByDtScIdMap, targetAgencyIdListList));
-                        validation.setValid(validation.getMessage().isEmpty());
+                        AgencyIdListSummaryRecord sourceAgencyIdList = sourceAgencyIdListList.stream().filter(Objects::nonNull).filter(agencyIdList -> Objects.equals(agencyIdList.agencyIdListManifestId(), bbieSc.getAgencyIdListManifestId())).findFirst().orElse(null);
+                        ValueDomainValidationResult result = checkBdtAgencyIdListMappable(
+                                sourceAgencyIdList,
+                                agencyIdListQueryService.availableAgencyIdListListByDtScManifestId(
+                                        requester, dtSc.dtScManifestId(), targetAgencyIdListList,
+                                        targetCcDocument.getDtScAwdPriList(dtSc.dtScManifestId())));
+                        validation.setMessage(result.issue());
+                        validation.setStatus(result.status());
+                        validation.setValid(result.valid());
                     }
                     break;
+                default:
+                    throw new IllegalArgumentException("Unsupported BIE mapping type: " + mapping.getBieType());
             }
             validations.add(validation);
         });
@@ -1589,157 +1781,206 @@ public class BieUpliftingService {
         return response;
     }
 
-    private String checkBdtPriRestriIdMappable(XbtSummaryRecord sourceXbt,
-                                               DtManifestId targetDtManifestId,
-                                               Map<DtId, List<DtAwdPriSummaryRecord>> targetMap,
-                                               List<XbtSummaryRecord> targetXbtList) {
+    private <P> String checkBdtPriRestriIdMappable(XbtSummaryRecord sourceXbt,
+                                                   List<P> targetAllowedPrimitives,
+                                                   List<XbtSummaryRecord> targetXbtList,
+                                                   Function<P, XbtManifestId> xbtManifestIdExtractor) {
         XbtSummaryRecord targetXbt = getTargetXbtManifest(sourceXbt, targetXbtList);
-        if (targetXbt != null) {
+        if (targetXbt != null && targetAllowedPrimitives != null && targetAllowedPrimitives.stream()
+                .filter(Objects::nonNull)
+                .map(xbtManifestIdExtractor)
+                .anyMatch(targetXbt.xbtManifestId()::equals)) {
             return "";
         }
-        return "Primitive value '" + sourceXbt.name() + "' is not allowed in the target node. Uplifted node will use its default primitive in the domain value restriction.";
+        return "Primitive value '" + sourceName(sourceXbt) + "' is not allowed in the target node. Uplifted node will use its default primitive in the domain value restriction.";
     }
 
-    private String checkBdtScPriRestriIdMappable(XbtSummaryRecord sourceXbt,
-                                                 DtScManifestId targetDtScManifestId,
-                                                 Map<DtScId, List<DtScAwdPriSummaryRecord>> targetMap,
-                                                 List<XbtSummaryRecord> targetXbtList) {
-        XbtSummaryRecord targetXbt = getTargetXbtManifest(sourceXbt, targetXbtList);
-        if (targetXbt != null) {
-            return "";
+    private ValueDomainValidationResult checkBdtCodeListMappable(
+            CodeListSummaryRecord sourceCodeList,
+            List<CodeListSummaryRecord> targetCodeListList) {
+        CodeListMatch targetCodeListMatch = findTargetCodeListMatch(sourceCodeList, targetCodeListList);
+        if (targetCodeListMatch.target() != null) {
+            return ValueDomainValidationResult.matched(
+                    "Target Code List '" + targetCodeListMatch.target().name() + "' selected by " + targetCodeListMatch.matchType().description + ".");
         }
-        return "Primitive value '" + sourceXbt.name() + "' is not allowed in the target node. Uplifted node will use its default primitive in the domain value restriction.";
+        return ValueDomainValidationResult.unmatched(
+                "Target default primitive selected because no matching Code List is available in the target node.",
+                "Code List '" + sourceName(sourceCodeList) + "' is not allowed in the target node or the system cannot find the exact match code list in the target release, uplifted node will use a default primitive in the domain value restriction.");
     }
 
-    private String checkBdtCodeListManifestIdMappable(CodeListSummaryRecord sourceCodeList,
-                                                      DtManifestId targetBdtManifestId,
-                                                      Map<DtId, List<DtAwdPriSummaryRecord>> targetMap,
-                                                      List<CodeListSummaryRecord> targetCodeListList) {
-        CodeListSummaryRecord targetCodeListManifest = getTargetCodeListManifest(sourceCodeList, targetCodeListList);
-        if (targetCodeListManifest != null) {
-            return "";
+    private ValueDomainValidationResult checkBdtAgencyIdListMappable(
+            AgencyIdListSummaryRecord sourceAgencyIdList,
+            List<AgencyIdListSummaryRecord> targetAgencyIdListList) {
+        AgencyIdListMatch targetAgencyIdListMatch = findTargetAgencyIdListMatch(sourceAgencyIdList, targetAgencyIdListList);
+        if (targetAgencyIdListMatch.target() != null) {
+            return ValueDomainValidationResult.matched(
+                    "Target Agency ID List '" + targetAgencyIdListMatch.target().name() + "' selected by " + targetAgencyIdListMatch.matchType().description + ".");
         }
-        return "Code List '" + sourceCodeList.name() + "' is not allowed in the target node or the system cannot find the exact match code list in the target release, uplifted node will use a default primitive in the domain value restriction.";
+        return ValueDomainValidationResult.unmatched(
+                "Target default primitive selected because no matching Agency ID List is available in the target node.",
+                "Agency ID List '" + sourceName(sourceAgencyIdList) + "' is not allowed in the target node or the system cannot find the exact match agency ID list in the target release, uplifted node will use a default primitive in the domain value restriction.");
     }
 
-    private String checkBdtScCodeListIdMappable(CodeListSummaryRecord sourceCodeList,
-                                                DtScManifestId targetBdtScManifestId,
-                                                Map<DtScId, List<DtScAwdPriSummaryRecord>> targetMap,
-                                                List<CodeListSummaryRecord> targetCodeListList) {
-        CodeListSummaryRecord targetCodeListManifest = getTargetCodeListManifest(sourceCodeList, targetCodeListList);
-        if (targetCodeListManifest != null) {
-            return "";
-        }
-        return "Code List '" + sourceCodeList.name() + "' is not allowed in the target node or the system cannot find the exact match code list in the target release, uplifted node will use a default primitive in the domain value restriction.";
-    }
-
-    private String checkBdtAgencyIdListManifestIdMappable(AgencyIdListSummaryRecord sourceAgencyIdList,
-                                                          DtManifestId targetBdtManifestId,
-                                                          Map<DtId, List<DtAwdPriSummaryRecord>> targetMap,
-                                                          List<AgencyIdListSummaryRecord> targetAgencyIdListList) {
-        AgencyIdListSummaryRecord targetAgencyIdListManifest = getTargetAgencyIdListManifest(
-                sourceAgencyIdList, targetAgencyIdListList);
-        if (targetAgencyIdListManifest != null) {
-            return "";
-        }
-        return "Agency ID List '" + sourceAgencyIdList.name() + "' is not allowed in the target node or the system cannot find the exact match agency ID list in the target release, uplifted node will use a default primitive in the domain value restriction.";
-    }
-
-    private String checkBdtScAgencyIdListIdMappable(AgencyIdListSummaryRecord sourceAgencyIdList,
-                                                    DtScManifestId targetBdtScManifestId,
-                                                    Map<DtScId, List<DtScAwdPriSummaryRecord>> targetMap,
-                                                    List<AgencyIdListSummaryRecord> targetAgencyIdListList) {
-        AgencyIdListSummaryRecord targetAgencyIdListManifest =
-                getTargetAgencyIdListManifest(sourceAgencyIdList, targetAgencyIdListList);
-        if (targetAgencyIdListManifest != null) {
-            return "";
-        }
-        return "Agency ID List '" + sourceAgencyIdList.name() + "' is not allowed in the target node or the system cannot find the exact match agency ID list in the target release, uplifted node will use a default primitive in the domain value restriction.";
-    }
 
     public XbtSummaryRecord getTargetXbtManifest(
             XbtSummaryRecord sourceXbt,
             List<XbtSummaryRecord> targetXbtList) {
-        if (sourceXbt == null) {
+        if (sourceXbt == null || sourceXbt.xbtId() == null || targetXbtList == null) {
             return null;
         }
 
-        XbtSummaryRecord targetXbt = targetXbtList.stream()
-                .filter(e -> e.guid().equals(sourceXbt.guid()))
-                .findFirst().orElse(null);
-        if (targetXbt == null) {
-            return null;
-        }
-
+        // XBT_MANIFEST_ID is release-scoped. The stable identity that must be
+        // carried across releases is the shared XBT_ID.
         return targetXbtList.stream()
-                .filter(e -> e.xbtId().equals(targetXbt.xbtId()))
+                .filter(e -> e != null && sourceXbt.xbtId().equals(e.xbtId()))
                 .findFirst().orElse(null);
+    }
+
+    private enum MatchType {
+        GUID("GUID"),
+        IDENTIFIERS("name, list ID, and version ID");
+
+        private final String description;
+
+        MatchType(String description) {
+            this.description = description;
+        }
+    }
+
+    record CodeListMatch(CodeListSummaryRecord target, MatchType matchType) {
+    }
+
+    record AgencyIdListMatch(AgencyIdListSummaryRecord target, MatchType matchType) {
+    }
+
+    private record ManifestMatch<T>(T target, MatchType matchType) {
+    }
+
+    private record ValueDomainValidationResult(boolean valid, String status, String issue) {
+
+        private static ValueDomainValidationResult matched(String status) {
+            return new ValueDomainValidationResult(true, status, "");
+        }
+
+        private static ValueDomainValidationResult unmatched(String status, String issue) {
+            return new ValueDomainValidationResult(false, status, issue);
+        }
     }
 
     public CodeListSummaryRecord getTargetCodeListManifest(
             CodeListSummaryRecord sourceCodeList,
             List<CodeListSummaryRecord> targetCodeListList) {
-        if (sourceCodeList == null) {
-            return null;
-        }
+        return findTargetCodeListMatch(sourceCodeList, targetCodeListList).target();
+    }
 
-        CodeListSummaryRecord targetCodeList = targetCodeListList.stream()
-                .filter(e -> e.guid().equals(sourceCodeList.guid()))
-                .findFirst().orElse(null);
-        if (targetCodeList == null) {
-            // Issue #1356
-            // End-user code list assigned to a source BIE node can be carried into the uplifted BIE only
-            // if the end-user code list with the same name, list ID, and agency ID exists (or has been uplifted)
-            // in the target release and it is allowed by the target BIE node.
-            targetCodeList = targetCodeListList.stream()
-                    .filter(e -> StringUtils.equals(sourceCodeList.name(), e.name()) &&
-                            StringUtils.equals(sourceCodeList.listId(), e.listId()) &&
-//                            StringUtils.equals(sourceCodeList.agencyIdListValueManifestId(), e.agencyIdListValueManifestId()) &&
-                            StringUtils.equals(sourceCodeList.versionId(), e.versionId()))
-                    .findFirst().orElse(null);
-        }
+    CodeListMatch findTargetCodeListMatch(
+            CodeListSummaryRecord sourceCodeList,
+            List<CodeListSummaryRecord> targetCodeListList) {
+        return findTargetCodeListMatch(sourceCodeList, targetCodeListList, null);
+    }
 
-        if (targetCodeList == null) {
-            return null;
-        }
-
-        CodeListSummaryRecord finalTargetCodeList = targetCodeList;
-        return targetCodeListList.stream()
-                .filter(e -> e.codeListId().equals(finalTargetCodeList.codeListId()))
-                .findFirst().orElse(null);
+    CodeListMatch findTargetCodeListMatch(
+            CodeListSummaryRecord sourceCodeList,
+            List<CodeListSummaryRecord> targetCodeListList,
+            Set<CodeListManifestId> allowedManifestIds) {
+        ManifestMatch<CodeListSummaryRecord> match = findManifestMatch(
+                sourceCodeList,
+                targetCodeListList,
+                allowedManifestIds,
+                CodeListSummaryRecord::codeListId,
+                CodeListSummaryRecord::codeListManifestId,
+                e -> e.codeListId() != null,
+                (source, target) -> StringUtils.equals(source.name(), target.name()) &&
+                        StringUtils.equals(source.listId(), target.listId()) &&
+                        StringUtils.equals(source.versionId(), target.versionId()));
+        return new CodeListMatch(match.target(), match.matchType());
     }
 
     public AgencyIdListSummaryRecord getTargetAgencyIdListManifest(
             AgencyIdListSummaryRecord sourceAgencyIdList,
             List<AgencyIdListSummaryRecord> targetAgencyIdListList) {
-        if (sourceAgencyIdList == null) {
-            return null;
+        return findTargetAgencyIdListMatch(sourceAgencyIdList, targetAgencyIdListList).target();
+    }
+
+    AgencyIdListMatch findTargetAgencyIdListMatch(
+            AgencyIdListSummaryRecord sourceAgencyIdList,
+            List<AgencyIdListSummaryRecord> targetAgencyIdListList) {
+        return findTargetAgencyIdListMatch(sourceAgencyIdList, targetAgencyIdListList, null);
+    }
+
+    AgencyIdListMatch findTargetAgencyIdListMatch(
+            AgencyIdListSummaryRecord sourceAgencyIdList,
+            List<AgencyIdListSummaryRecord> targetAgencyIdListList,
+            Set<AgencyIdListManifestId> allowedManifestIds) {
+        ManifestMatch<AgencyIdListSummaryRecord> match = findManifestMatch(
+                sourceAgencyIdList,
+                targetAgencyIdListList,
+                allowedManifestIds,
+                AgencyIdListSummaryRecord::agencyIdListId,
+                AgencyIdListSummaryRecord::agencyIdListManifestId,
+                e -> e.agencyIdListId() != null,
+                (source, target) -> StringUtils.equals(source.name(), target.name()) &&
+                        StringUtils.equals(source.listId(), target.listId()) &&
+                        StringUtils.equals(source.agencyIdListValueName(), target.agencyIdListValueName()) &&
+                        StringUtils.equals(source.versionId(), target.versionId()));
+        return new AgencyIdListMatch(match.target(), match.matchType());
+    }
+
+    private <S extends CoreComponent<?>, T extends CoreComponent<?>, I, M> ManifestMatch<T> findManifestMatch(
+            S source,
+            List<T> targets,
+            Set<M> allowedManifestIds,
+            Function<T, I> logicalId,
+            Function<T, M> manifestId,
+            Predicate<T> hasLogicalId,
+            BiPredicate<S, T> fallbackMatch) {
+        if (source == null || targets == null) {
+            return new ManifestMatch<>(null, null);
         }
 
-        AgencyIdListSummaryRecord targetAgencyIdList = targetAgencyIdListList.stream()
-                .filter(e -> e.guid().equals(sourceAgencyIdList.guid()))
+        T targetCandidate = targets.stream()
+                .filter(Objects::nonNull)
+                .filter(hasLogicalId)
+                .filter(target -> ccMatchingService.score(source, target) == 1.0d)
                 .findFirst().orElse(null);
-        if (targetAgencyIdList == null) {
-            // Issue #1356
-            // End-user agency ID list assigned to a source BIE node can be carried into the uplifted BIE only
-            // if the end-user agency ID list with the list ID, agency ID, and version exists (or has been uplifted)
-            // in the target release and it is allowed by the target BIE node.
-            targetAgencyIdList = targetAgencyIdListList.stream()
-                    .filter(e -> StringUtils.equals(sourceAgencyIdList.name(), e.name()) &&
-                            StringUtils.equals(sourceAgencyIdList.listId(), e.listId()) &&
-                            StringUtils.equals(sourceAgencyIdList.agencyIdListValueName(), e.agencyIdListValueName()) &&
-                            StringUtils.equals(sourceAgencyIdList.versionId(), e.versionId()))
+        MatchType matchType = MatchType.GUID;
+        if (targetCandidate == null) {
+            targetCandidate = targets.stream()
+                    .filter(Objects::nonNull)
+                    .filter(hasLogicalId)
+                    .filter(target -> fallbackMatch.test(source, target))
                     .findFirst().orElse(null);
+            matchType = MatchType.IDENTIFIERS;
+        }
+        if (targetCandidate == null) {
+            return new ManifestMatch<>(null, null);
         }
 
-        if (targetAgencyIdList == null) {
-            return null;
-        }
-
-        AgencyIdListSummaryRecord finalTargetAgencyIdList = targetAgencyIdList;
-        return targetAgencyIdListList.stream()
-                .filter(e -> e.agencyIdListId().equals(finalTargetAgencyIdList.agencyIdListId()))
+        I targetLogicalId = logicalId.apply(targetCandidate);
+        T selected = targets.stream()
+                .filter(Objects::nonNull)
+                .filter(target -> manifestId.apply(target) != null)
+                .filter(target -> Objects.equals(logicalId.apply(target), targetLogicalId))
+                .filter(target -> allowedManifestIds == null || allowedManifestIds.contains(manifestId.apply(target)))
                 .findFirst().orElse(null);
+        return new ManifestMatch<>(selected, matchType);
+    }
+
+    private String sourceName(CodeListSummaryRecord sourceCodeList) {
+        return sourceCodeList != null ? sourceCodeList.name() : "unknown";
+    }
+
+    private String sourceName(AgencyIdListSummaryRecord sourceAgencyIdList) {
+        return sourceAgencyIdList != null ? sourceAgencyIdList.name() : "unknown";
+    }
+
+    private String sourceName(XbtSummaryRecord sourceXbt) {
+        return sourceXbt != null ? sourceXbt.name() : "unknown";
+    }
+
+    private boolean isXbtNamed(CcDocument ccDocument, XbtManifestId xbtManifestId, String name) {
+        XbtSummaryRecord xbt = xbtManifestId != null ? ccDocument.getXbt(xbtManifestId) : null;
+        return xbt != null && xbt.name() != null && xbt.name().equalsIgnoreCase(name);
     }
 
 }

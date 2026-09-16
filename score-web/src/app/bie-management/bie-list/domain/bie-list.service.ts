@@ -2,7 +2,12 @@ import {HttpClient, HttpContext, HttpParams} from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {BieListEntry, BieListRequest, SummaryBieInfo} from './bie-list';
+import {
+  BieListEntry,
+  BieListRequest,
+  normalizeBasedTopLevelAsbiepIds,
+  SummaryBieInfo
+} from './bie-list';
 import {PageResponse} from '../../../basis/basis';
 import {SUPPRESS_ERROR_ALERT} from '../../../authentication/auth.service';
 import {StateDependencySelection, StateDependencyTarget} from '../../domain/state-dependency-target';
@@ -105,8 +110,9 @@ export class BieListService {
     if (request.topLevelAsbiepIds.length > 0) {
       params = params.set('topLevelAsbiepIds', request.topLevelAsbiepIds.join(','));
     }
-    if (request.basedTopLevelAsbiepIds.length > 0) {
-      params = params.set('basedTopLevelAsbiepIds', request.basedTopLevelAsbiepIds.join(','));
+    const basedTopLevelAsbiepIds = normalizeBasedTopLevelAsbiepIds(request.basedTopLevelAsbiepIds);
+    if (basedTopLevelAsbiepIds.length > 0) {
+      params = params.set('basedTopLevelAsbiepIds', basedTopLevelAsbiepIds.join(','));
     }
     if (request.excludeTopLevelAsbiepIds.length > 0) {
       params = params.set('excludeTopLevelAsbiepIds', request.excludeTopLevelAsbiepIds.join(','));

@@ -93,12 +93,19 @@ public class ViewEditBIEPageImpl extends BaseSearchBarPageImpl implements ViewEd
 
     @Override
     public void setBranch(String branch) {
-        click(getDriver(), getBranchSelectField());
-        sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), branch);
-        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//div[@class = \"cdk-overlay-container\"]//mat-option//span[text() = \"" + branch + "\"]"));
-        click(searchedSelectField);
-        escape(getDriver());
+        retry(() -> {
+            WebElement selectField = getBranchSelectField();
+            try {
+                click(getDriver(), selectField.findElement(By.xpath(".//div[contains(@class, \"mat-mdc-select-trigger\")]")));
+            } catch (Exception ignored) {
+                click(getDriver(), selectField);
+            }
+            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), branch);
+            WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//div[@class = \"cdk-overlay-container\"]//mat-option//span[contains(text(), \"" + branch + "\")]"));
+            click(searchedSelectField);
+            escape(getDriver());
+        });
     }
 
     @Override

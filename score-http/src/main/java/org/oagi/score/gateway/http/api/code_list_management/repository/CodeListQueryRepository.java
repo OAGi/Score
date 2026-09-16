@@ -29,9 +29,23 @@ public interface CodeListQueryRepository {
 
     List<CodeListSummaryRecord> getCodeListSummaryList(LibraryId libraryId, String releaseNum, CcState state);
 
+    /**
+     * Returns code lists explicitly linked to the DT, including their related
+     * manifests. Callers must consult {@link #hasCodeListAvailabilityByDtManifestId}
+     * before treating an empty result as an unrestricted release-wide lookup.
+     */
     List<CodeListSummaryRecord> availableCodeListByDtManifestId(DtManifestId dtManifestId, List<CcState> states);
 
+    /**
+     * Returns code lists explicitly linked to the DT_SC, including their
+     * related manifests. Callers must consult {@link #hasCodeListAvailabilityByDtScManifestId}
+     * before treating an empty result as an unrestricted release-wide lookup.
+     */
     List<CodeListSummaryRecord> availableCodeListByDtScManifestId(DtScManifestId dtScManifestId, List<CcState> states);
+
+    boolean hasCodeListAvailabilityByDtManifestId(DtManifestId dtManifestId);
+
+    boolean hasCodeListAvailabilityByDtScManifestId(DtScManifestId dtScManifestId);
 
     /**
      * Returns the top-level BIEs that currently assign the given code list.

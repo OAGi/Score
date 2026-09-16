@@ -212,9 +212,10 @@ public class CoreComponentGraphContext implements GraphContext {
         }
         node.setPrevManifestId(acc.prevAccManifestId());
         node.setTagList(ccDocument.getTagListByAccManifestId(acc.accManifestId()));
+        node.put(Node.COMPONENT_ID_PROPERTY, acc.accId().value());
         node.put("state", acc.state());
         node.put("deprecated", acc.deprecated());
-        node.put("guid", acc.guid());
+        node.put(Node.GUID_PROPERTY, acc.guid());
         node.put("objectClassTerm", acc.objectClassTerm());
         node.put("den", acc.den());
         node.put("componentType", acc.componentType().name());
@@ -228,7 +229,8 @@ public class CoreComponentGraphContext implements GraphContext {
         node.setTagList(ccDocument.getTagListByAsccpManifestId(asccp.asccpManifestId()));
         node.put("state", asccp.state());
         node.put("deprecated", asccp.deprecated());
-        node.put("guid", asccp.guid());
+        node.put(Node.COMPONENT_ID_PROPERTY, asccp.asccpId().value());
+        node.put(Node.GUID_PROPERTY, asccp.guid());
         node.put("propertyTerm", asccp.propertyTerm());
         node.put("den", asccp.den());
         return node;
@@ -241,7 +243,8 @@ public class CoreComponentGraphContext implements GraphContext {
         node.setTagList(ccDocument.getTagListByBccpManifestId(bccp.bccpManifestId()));
         node.put("state", bccp.state());
         node.put("deprecated", bccp.deprecated());
-        node.put("guid", bccp.guid());
+        node.put(Node.COMPONENT_ID_PROPERTY, bccp.bccpId().value());
+        node.put(Node.GUID_PROPERTY, bccp.guid());
         node.put("propertyTerm", bccp.propertyTerm());
         node.put("den", bccp.den());
         return node;
@@ -276,8 +279,10 @@ public class CoreComponentGraphContext implements GraphContext {
         Node node = Node.toNode(Node.NodeType.DT, dt.dtManifestId(), dt.state());
         node.setPrevManifestId(dt.prevDtManifestId());
         node.setTagList(ccDocument.getTagListByDtManifestId(dt.dtManifestId()));
+        node.put(Node.COMPONENT_ID_PROPERTY, dt.dtId().value());
         node.put("state", dt.state());
         node.put("deprecated", dt.deprecated());
+        node.put(Node.GUID_PROPERTY, dt.guid());
         node.put("dataTypeTerm", dt.dataTypeTerm());
         node.put("den", dt.den());
         node.put("qualifier", dt.qualifier());
@@ -290,6 +295,8 @@ public class CoreComponentGraphContext implements GraphContext {
         if (dtSc.basedDtScManifestId() != null) {
             node.put("basedDtScManifestId", dtSc.basedDtScManifestId());
         }
+        node.put(Node.COMPONENT_ID_PROPERTY, dtSc.dtScId().value());
+        node.put(Node.GUID_PROPERTY, dtSc.guid());
         node.put("propertyTerm", dtSc.propertyTerm());
         node.put("objectClassTerm", dtSc.objectClassTerm());
         node.put("state", dtSc.state());

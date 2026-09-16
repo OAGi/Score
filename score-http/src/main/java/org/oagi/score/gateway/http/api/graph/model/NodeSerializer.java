@@ -18,6 +18,15 @@ public class NodeSerializer extends StdSerializer<Node> {
         gen.writeStartObject();
         gen.writeStringField("type", node.getTypeAsString());
         gen.writeNumberField("manifestId", node.getManifestId().value().longValue());
+        if (node.getBasedManifestId() != null) {
+            gen.writeNumberField("basedManifestId", node.getBasedManifestId().value().longValue());
+        }
+        if (node.getLinkedManifestId() != null) {
+            gen.writeNumberField("linkedManifestId", node.getLinkedManifestId().value().longValue());
+        }
+        if (node.getPrevManifestId() != null) {
+            gen.writeNumberField("prevManifestId", node.getPrevManifestId().value().longValue());
+        }
         if (!node.getTagList().isEmpty()) {
             gen.writeObjectField("tagList", node.getTagList());
         }

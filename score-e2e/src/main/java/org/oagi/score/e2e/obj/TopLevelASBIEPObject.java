@@ -15,6 +15,8 @@ public class TopLevelASBIEPObject {
 
     private BigInteger asbiepId;
 
+    private BigInteger basedTopLevelAsbiepId;
+
     private BigInteger ownerUserId;
 
     private String ownerLoginId;

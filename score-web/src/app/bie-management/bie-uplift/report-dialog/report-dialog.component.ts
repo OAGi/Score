@@ -134,16 +134,14 @@ export class ReportDialogComponent implements OnInit {
   matches: MatchInfo[];
   matchMap: Map<string, MatchInfo>;
   preferencesInfo: PreferencesInfo;
-  downloadHeader: string;
   loading = false;
 
   ngOnInit() {
     this.loading = true;
-    const {topLevelAsbiepId, releaseId, targetAsccpManifestId, sourceReleaseNum, targetReleaseNum} = this.data;
-    this.downloadHeader = `Source ${sourceReleaseNum} Path, Source Context Definition, Target ${targetReleaseNum} Path, Type, Matched, Reused, Issue\n`;
+    const {topLevelAsbiepId, releaseId, targetAsccpManifestId} = this.data;
     this.matchMap = new Map<string, MatchInfo>();
     this.matches = this.data.matches;
-    this.matches.forEach(m => this.matchMap.set(m.bieType + '-' + m.bieId, m));
+    this.matches.forEach(m => this.matchMap.set(this.validationKey(m), m));
 
     forkJoin([
       this.service.checkValidationMatches(topLevelAsbiepId, releaseId, targetAsccpManifestId, this.matches),
@@ -154,19 +152,36 @@ export class ReportDialogComponent implements OnInit {
       this.preferencesInfo = preferencesInfo;
 
       resp.validations.forEach(v => {
-        this.matchMap.get(v.bieType + '-' + v.bieId).valid = v.valid;
-        this.matchMap.get(v.bieType + '-' + v.bieId).message = v.message ? v.message : '';
+        const match = this.matchMap.get(this.validationKey(v));
+        if (!match) {
+          return;
+        }
+        match.valid = v.valid;
+        match.message = v.message ? v.message : '';
+        match.status = v.status ? v.status : '';
       });
       this.dataSource.data = this.matches.filter(r => this.show(r));
+    }, () => {
+      this.matches.forEach(match => {
+        match.valid = false;
+        match.message = 'Unable to validate this mapping.';
+      });
+      this.dataSource.data = this.matches;
     });
+  }
+
+  private validationKey(value: {bieType: string; bieId: number; sourcePath?: string}): string {
+    return value.bieType + '-' + (value.sourcePath || value.bieId);
   }
 
   show(row: MatchInfo): boolean {
     if (this.hideSystemMatched) {
-      if (row.message !== '') {
+      if (row.message !== '' || row.status !== '') {
         return true;
       }
-      return row.match === 'Unmatched' || !!(row.reuse) || row.valid === false;
+      // "Issues Only" hides clean system matches, but manual mappings are
+      // user decisions and must remain visible in the uplift report.
+      return row.match !== 'System' || !!(row.reuse) || row.valid === false;
     }
     return true;
   }
@@ -184,23 +199,36 @@ export class ReportDialogComponent implements OnInit {
   }
 
   onDownload(): void {
-    let csvContent = 'data:text/csv;charset=utf-8,';
-    csvContent += this.downloadHeader;
-    csvContent += this.dataSource.data.map(e => {
-      return [e.sourceDisplayPath, '"' + e.context + '"', e.targetDisplayPath, e.ccType, e.match, e.reuse, e.message].map(e => {
-        return (!!e) ? e : '""';
-      }).join(',');
-    }).join('\n');
-    // window.open(encodeURI(csvContent));
+    const csvContent = [this.toCsvRow([
+      `Source ${this.data.sourceReleaseNum} Path`,
+      'Source Context Definition',
+      `Target ${this.data.targetReleaseNum} Path`,
+      'Type', 'Matched', 'Reused', 'Issue'
+    ]), ...this.dataSource.data.map(e => {
+      const status = [e.status, e.message].filter(value => !!value).join(' ');
+      return this.toCsvRow([
+        e.sourceDisplayPath, e.context, e.targetDisplayPath,
+        e.ccType, e.match, e.reuse, status
+      ]);
+    })].join('\n');
 
-    const encodedUri = encodeURI(csvContent);
+    const blob = new Blob([csvContent], {type: 'text/csv;charset=utf-8'});
+    const objectUrl = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.style.visibility = 'hidden';
-    link.setAttribute('href', encodedUri);
+    link.setAttribute('href', objectUrl);
 
     link.setAttribute('download', `UpliftReport-${this.data.name}-${this.data.guid}.csv`);
     document.body.appendChild(link); // Required for FF
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(objectUrl);
+  }
+
+  private toCsvRow(values: unknown[]): string {
+    return values.map(value => {
+      const text = value === null || value === undefined ? '' : String(value);
+      return `"${text.replace(/"/g, '""')}"`;
+    }).join(',');
   }
 }
