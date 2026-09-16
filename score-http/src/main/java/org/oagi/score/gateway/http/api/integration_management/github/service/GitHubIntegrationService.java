@@ -347,6 +347,17 @@ public class GitHubIntegrationService {
      */
     public String moveIssueToFieldOption(ScoreUser user, String owner, String repo, int number,
                                   String cachedMetadata, String desiredFieldOption, boolean force) {
+        return moveIssueToFieldOption(user, owner, repo, number, cachedMetadata, desiredFieldOption, force, true);
+    }
+
+    /**
+     * Moves an issue to a fieldOption, optionally leaving an existing project card untouched. The latter is used
+     * when an issue is linked to a component: linking should add a missing card in the configured initial option,
+     * but must not overwrite a status that is already managed on the board.
+     */
+    private String moveIssueToFieldOption(ScoreUser user, String owner, String repo, int number,
+                                  String cachedMetadata, String desiredFieldOption, boolean force,
+                                  boolean moveExisting) {
         String token = getAccessToken(user);
         if (!hasText(token) || !hasText(desiredFieldOption)) {
             return null;
@@ -381,6 +392,9 @@ public class GitHubIntegrationService {
             }
             if (!hasText(itemId)) {
                 return null;
+            }
+            if (!moveExisting && item != null) {
+                return currentFieldOption;
             }
             // Anti-clobber: never undo a maintainer's review decision — unless the user explicitly
             // forced this fieldOption (an override), which is a deliberate human choice.
@@ -432,13 +446,13 @@ public class GitHubIntegrationService {
     /**
      * Places the linked issue in the initial fieldOption ({@link ProjectFieldOptions#getDefaultFieldOption}, e.g. "New") on
      * the configured board, adding it first if absent (issue #1533, Feature 2). Linking a component
-     * starts tracking the issue, so it is reset to the initial fieldOption even when it is already on the board
-     * at another fieldOption (e.g. left there by another linked component) — unless it sits in a maintainer gate
-     * fieldOption, which is left untouched. Best-effort; returns the resulting fieldOption name or {@code null}. Used
-     * when a GitHub issue is linked to a component, with the linking user's token.
+     * starts tracking the issue: a missing card is added and initialized in the initial fieldOption, while an issue
+     * already on the board is left in its current fieldOption. Best-effort; returns the resulting fieldOption name
+     * or {@code null}. Used when a GitHub issue is linked to a component, with the linking user's token.
      */
     public String addIssueToProjectOnLink(ScoreUser user, String owner, String repo, int number, String cachedMetadata) {
-        return moveIssueToFieldOption(user, owner, repo, number, cachedMetadata, projectFieldOptions.getDefaultFieldOption());
+        return moveIssueToFieldOption(user, owner, repo, number, cachedMetadata,
+                projectFieldOptions.getDefaultFieldOption(), false, false);
     }
 
     /**
