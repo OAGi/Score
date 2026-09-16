@@ -2,12 +2,6 @@
   margin-left: 30px;
 }
 
-.search-progress-bar {
-  margin-left: 5px;
-  margin-top: 10px;
-  float: left;
-}
-
 .mat-tree-node {
   font-size: 13px;
   min-height: 33px;
@@ -184,11 +178,6 @@
 .tree-search-box .mat-form-field-wrapper {
   width: 16px;
   padding-bottom: 0;
-}
-
-.tree-search-box .buttons {
-  display: flex;
-  padding-top: 6px;
 }
 
 .tree-search-box .mat-icon {

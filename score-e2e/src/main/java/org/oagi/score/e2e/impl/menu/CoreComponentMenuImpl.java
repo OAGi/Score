@@ -112,7 +112,10 @@ public class CoreComponentMenuImpl extends DelegateBasePageImpl implements CoreC
     public ViewEditCodeListPage openViewEditCodeListSubMenu() {
         retry(() -> click(getViewEditCodeListSubMenu()));
         ViewEditCodeListPage viewEditCodeListPage = new ViewEditCodeListPageImpl(this);
-        waitFor(Duration.ofMillis(2000));
+        // Route navigation and the Angular component initialization are asynchronous.  The
+        // branch selector is the first control used by the page object, so wait for that
+        // control instead of relying on a fixed delay.
+        viewEditCodeListPage.getBranchSelectField();
         assert viewEditCodeListPage.isOpened();
         return viewEditCodeListPage;
     }

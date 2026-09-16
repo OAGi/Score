@@ -123,6 +123,41 @@ public class ReleaseQueryService {
         return query(requester).getReleaseDetails(releaseId);
     }
 
+    /**
+     * Checks whether {@code targetReleaseId} occurs after {@code sourceReleaseId}
+     * in the release chain. Release IDs are database identifiers and do not define
+     * release ordering, so this follows each release's {@code next} link instead.
+     */
+    public boolean isLaterRelease(ScoreUser requester,
+                                  ReleaseId sourceReleaseId,
+                                  ReleaseId targetReleaseId) {
+        if (sourceReleaseId == null || targetReleaseId == null) {
+            throw new IllegalArgumentException("Source and target releases are required.");
+        }
+        if (sourceReleaseId.equals(targetReleaseId)) {
+            return false;
+        }
+
+        Set<ReleaseId> visited = new HashSet<>();
+        ReleaseId currentReleaseId = sourceReleaseId;
+        while (visited.add(currentReleaseId)) {
+            ReleaseDetailsRecord currentRelease = getReleaseDetails(requester, currentReleaseId);
+            if (currentRelease == null || currentRelease.next() == null) {
+                return false;
+            }
+
+            ReleaseId nextReleaseId = currentRelease.next().releaseId();
+            if (nextReleaseId == null) {
+                return false;
+            }
+            if (targetReleaseId.equals(nextReleaseId)) {
+                return true;
+            }
+            currentReleaseId = nextReleaseId;
+        }
+        return false;
+    }
+
     public AssignComponents getAssignComponents(ScoreUser requester, ReleaseId releaseId) {
         return query(requester).getAssignComponents(releaseId);
     }

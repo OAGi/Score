@@ -855,7 +855,11 @@ export class CcFlatNodeDatabase<T extends CcFlatNode> {
     });
   }
 
-  getChildren(node: T): T[] {
+  getChildren(node?: T): T[] {
+    if (!node) {
+      return [];
+    }
+
     const nodes = this._ccGraph.graph.nodes;
     const edges = this._ccGraph.graph.edges;
 
@@ -882,16 +886,13 @@ export class CcFlatNodeDatabase<T extends CcFlatNode> {
 
     targets.forEach(target => {
       if (target.startsWith('ACC-')) {
-        children.push(this.toAccNode(nodes[target], node));
+        if (nodes[target]) {
+          children.push(this.toAccNode(nodes[target], node));
+        }
       } else if (target.startsWith('ASCC-')) {
         const asccpNode = this.toAsccpNode(nodes[target], node);
         if (asccpNode.isUserExtensionGroup) {
-          const uegAccNode = this.getChildren(asccpNode as unknown as T)[0];
-          children.push(...this.getChildren(uegAccNode).map(e => {
-            e.level = node.level + 1;
-            e.parent = node;
-            return e;
-          }));
+          children.push(...this.getUserExtensionGroupChildren(asccpNode, node));
         } else {
           children.push(asccpNode);
         }
@@ -900,13 +901,28 @@ export class CcFlatNodeDatabase<T extends CcFlatNode> {
       } else if (target.startsWith('DT-')) {
         const bdtScEdges = edges[target];
         if (bdtScEdges) {
-          bdtScEdges.targets.map(e => nodes[e]).filter(e => e.cardinalityMax > 0).forEach(e => {
+          bdtScEdges.targets.map(e => nodes[e]).filter(e => e && e.cardinalityMax > 0).forEach(e => {
             children.push(this.toDtScNode(e, node));
           });
         }
       }
     });
     return children;
+  }
+
+  protected getUserExtensionGroupChildren(asccpNode: AsccpFlatNode, parent: T): T[] {
+    // UEG associations are flattened into their target ACC's children. A partially
+    // populated graph can omit that target while an extension is being updated.
+    const uegAccNode = this.getChildren(asccpNode as unknown as T)[0];
+    if (!uegAccNode) {
+      return [];
+    }
+
+    return this.getChildren(uegAccNode).map(e => {
+      e.level = parent.level + 1;
+      e.parent = parent;
+      return e;
+    });
   }
 
   toAccNode(accNode: CcGraphNode, parent: CcFlatNode): AccFlatNode {

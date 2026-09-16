@@ -39,8 +39,8 @@
       <div class="row ms-0 me-0" (window:resize)="onResize($event)">
         <div class="col-6 ps-0">
           @if (sourceSearcher && sourceDataSource) {
-            <div class="row tree-search-box">
-              <div class="col-8">
+            <div class="tree-search-box tree-search-controls">
+              <div class="tree-search-input">
                 <mat-form-field>
                   @if (!sourceSelectedNode) {
                     <mat-label>Search</mat-label>
@@ -65,37 +65,37 @@
                   }
                 </mat-form-field>
               </div>
-              <div class="col-3 buttons">
-                <button mat-icon-button mat-small-icon-button
+              <div class="tree-search-buttons">
+                <button mat-icon-button mat-medium-icon-button type="button" aria-label="Previous search result"
                   [disabled]="!sourceSearcher.searchResult || sourceSearcher.searchResult.length === 0"
                   (click)="move('source', -1)">
                   <mat-icon>keyboard_arrow_up</mat-icon>
                 </button>
-                <button mat-icon-button mat-small-icon-button
+                <button mat-icon-button mat-medium-icon-button type="button" aria-label="Next search result"
                   [disabled]="!sourceSearcher.searchResult || sourceSearcher.searchResult.length === 0"
                   (click)="move('source', 1)">
                   <mat-icon>keyboard_arrow_down</mat-icon>
                 </button>
-                <button mat-icon-button mat-small-icon-button
+                <button mat-icon-button mat-medium-icon-button type="button" class="tree-search-submit" [attr.aria-label]="(sourceSearcher.searchKeyword && !sourceSearcher.fullSearched) ? 'Search more' : 'Search'"
                   [hidden]="sourceSearcher.fullSearched"
                   [disabled]="sourceSearcher.isSearching"
                   [matTooltip]="(sourceSearcher.searchKeyword && !sourceSearcher.fullSearched) ? 'Search more...' : 'Search'"
                   (click)="search('source', false, true)">
                   <mat-icon>{{ (sourceSearcher.searchKeyword && !sourceSearcher.fullSearched) ? 'repeat' : 'search' }}</mat-icon>
                 </button>
-                <button mat-icon-button mat-small-icon-button
+                <button mat-icon-button mat-medium-icon-button type="button" class="tree-search-clear" aria-label="Clear search"
                   [hidden]="!sourceSearcher.inputKeyword"
                   (click)="sourceSearcher.resetSearch()">
                   <mat-icon>close</mat-icon>
                 </button>
-                <div style="height: 19px;">
-                  <mat-progress-spinner mode="indeterminate" [diameter]="15" class="search-progress-bar"
+                <div class="search-progress-container">
+                  <mat-progress-spinner mode="indeterminate" [diameter]="20" class="search-progress-bar" aria-label="Searching"
                   [hidden]="!sourceSearcher.isSearching"></mat-progress-spinner>
                 </div>
               </div>
-              <div class="col-1 buttons">
+              <div class="tree-search-settings">
                 <div class="actions ms-auto">
-                  <button mat-icon-button mat-small-icon-button [matMenuTriggerFor]="sourceSettingsContextMenu">
+                  <button mat-icon-button mat-medium-icon-button type="button" aria-label="Search settings" [matMenuTriggerFor]="sourceSettingsContextMenu">
                     <mat-icon>settings</mat-icon>
                   </button>
                 </div>
@@ -139,6 +139,7 @@
                   <div class="mat-tree-node d-flex align-items-center pointer"
                     tabIndex="0"
                     [attr.data-path]="node.path"
+                    [attr.data-query-path]="node.queryPath"
                     [class]="{'tree-node-selected': sourceSelectedNode === node}"
                     (click)="onSourceClick(node)"
                     [style.padding-left]="node.level * paddingPixel + 'px'">
@@ -154,19 +155,19 @@
                       <button mat-icon-button disabled></button>
                     }
 
-                    @if ((node.level > 0 && !node.fixed)) {
+                    @if (isSourceNodeCheckable(node)) {
                       <mat-checkbox
                         [checked]="node.target !== undefined"
                       [disabled]="true"></mat-checkbox>
                     }
 
                     <div class="d-inline-flex align-items-center flex-grow-1">
-                      <span [class]="[node.typeClass.toLowerCase(),
-                                      this.sourceSearcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
+                      <span [class]="[(node.typeClass || node.type || node.bieType || '').toLowerCase(),
+                                      this.sourceSearcher.isSearchResult(node) ? 'inside' : 'outside']"
                             [style.padding-right.px]="2"
                         [class.deprecated]="node.deprecated"
                         [matTooltip]="node.deprecated ? 'Deprecated' : ''"
-                        [class.search-index]="this.sourceSearcher.searchResult.indexOf(node) === this.sourceSearcher.searchIndex"
+                        [class.search-index]="this.sourceSearcher.isCurrentSearchIndex(node)"
                         [innerHTML]="(node.displayName ? node.displayName : node.name) | highlight : sourceSearcher.searchKeyword">
                       </span>
 
@@ -207,8 +208,8 @@
         </div>
         <div class="col-6 ps-0 pe-0">
           @if (targetSearcher && targetDataSource) {
-            <div class="row tree-search-box">
-              <div class="col-8">
+            <div class="tree-search-box tree-search-controls">
+              <div class="tree-search-input">
                 <mat-form-field>
                   @if (!targetSelectedNode) {
                     <mat-label>Search</mat-label>
@@ -233,37 +234,37 @@
                   }
                 </mat-form-field>
               </div>
-              <div class="col-3 buttons">
-                <button mat-icon-button mat-small-icon-button
+              <div class="tree-search-buttons">
+                <button mat-icon-button mat-medium-icon-button type="button" aria-label="Previous search result"
                   [disabled]="!targetSearcher.searchResult || targetSearcher.searchResult.length === 0"
                   (click)="move('target', -1)">
                   <mat-icon>keyboard_arrow_up</mat-icon>
                 </button>
-                <button mat-icon-button mat-small-icon-button
+                <button mat-icon-button mat-medium-icon-button type="button" aria-label="Next search result"
                   [disabled]="!targetSearcher.searchResult || targetSearcher.searchResult.length === 0"
                   (click)="move('target', 1)">
                   <mat-icon>keyboard_arrow_down</mat-icon>
                 </button>
-                <button mat-icon-button mat-small-icon-button
+                <button mat-icon-button mat-medium-icon-button type="button" class="tree-search-submit" [attr.aria-label]="(targetSearcher.searchKeyword && !targetSearcher.fullSearched) ? 'Search more' : 'Search'"
                   [hidden]="targetSearcher.fullSearched"
                   [disabled]="targetSearcher.isSearching"
                   [matTooltip]="(targetSearcher.searchKeyword && !targetSearcher.fullSearched) ? 'Search more...' : 'Search'"
                   (click)="search('target', false, true)">
                   <mat-icon>{{ (targetSearcher.searchKeyword && !targetSearcher.fullSearched) ? 'repeat' : 'search' }}</mat-icon>
                 </button>
-                <button mat-icon-button mat-small-icon-button
+                <button mat-icon-button mat-medium-icon-button type="button" class="tree-search-clear" aria-label="Clear search"
                   [hidden]="!targetSearcher.inputKeyword"
                   (click)="targetSearcher.resetSearch()">
                   <mat-icon>close</mat-icon>
                 </button>
-                <div style="height: 19px;">
-                  <mat-progress-spinner mode="indeterminate" [diameter]="15" class="search-progress-bar"
+                <div class="search-progress-container">
+                  <mat-progress-spinner mode="indeterminate" [diameter]="20" class="search-progress-bar" aria-label="Searching"
                   [hidden]="!targetSearcher.isSearching"></mat-progress-spinner>
                 </div>
               </div>
-              <div class="col-1 buttons">
+              <div class="tree-search-settings">
                 <div class="actions ms-auto">
-                  <button mat-icon-button mat-small-icon-button [matMenuTriggerFor]="targetSettingsContextMenu">
+                  <button mat-icon-button mat-medium-icon-button type="button" aria-label="Search settings" [matMenuTriggerFor]="targetSettingsContextMenu">
                     <mat-icon>settings</mat-icon>
                   </button>
                 </div>
@@ -307,6 +308,7 @@
                   <div class="mat-tree-node d-flex align-items-center pointer"
                     tabIndex="0"
                     [attr.data-path]="node.path"
+                    [attr.data-query-path]="node.queryPath"
                     [class]="{'tree-node-selected': targetSelectedNode === node}"
                     (click)="onTargetClick(node)"
                     [style.padding-left]="node.level * paddingPixel + 'px'">
@@ -322,20 +324,21 @@
                       <button mat-icon-button disabled></button>
                     }
 
-                    @if (node.level > 0) {
+                    @if (isTargetNodeCheckable(node)) {
                       <mat-checkbox
                         [checked]="node.source !== undefined"
                         (change)="checkMatch($event, node)"
-                      [disabled]="!canMatch(node)"></mat-checkbox>
+                        [disabled]="!canMatch(node)"
+                        [attr.aria-label]="canMatch(node) ? 'Map ' + node.name : getMatchDisabledReason(node)"></mat-checkbox>
                     }
 
                     <div class="d-inline-flex align-items-center flex-grow-1">
-                      <span [class]="[node.typeClass.toLowerCase(),
-                                      this.targetSearcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
+                      <span [class]="[(node.typeClass || node.type || node.bieType || '').toLowerCase(),
+                                      this.targetSearcher.isSearchResult(node) ? 'inside' : 'outside']"
                             [style.padding-right.px]="2"
                         [class.deprecated]="node.deprecated"
                         [matTooltip]="node.deprecated ? 'Deprecated' : ''"
-                        [class.search-index]="this.targetSearcher.searchResult.indexOf(node) === this.targetSearcher.searchIndex"
+                        [class.search-index]="this.targetSearcher.isCurrentSearchIndex(node)"
                         [innerHTML]="node.name | highlight : targetSearcher.searchKeyword">
                       </span>
 
@@ -345,14 +348,15 @@
                         </span>
                       }
 
-                      @if (node.source && node.source.reused && !node.reusedTopLevelAsbiepId) {
+                      @if (node.source && node.source.reused &&
+                            (node.reusedTopLevelAsbiepId === undefined || node.reusedTopLevelAsbiepId === null)) {
                         <fa-icon [icon]="faCircleExclamation"
                           matTooltip="Select BIE"
                           (click)="matchReused(node)"
                           [class]="['ps-3', 'pointer', 'warn']" class="pointer"
                         ></fa-icon>
                       }
-                      @if (node.reusedTopLevelAsbiepId) {
+                      @if (node.reusedTopLevelAsbiepId !== undefined && node.reusedTopLevelAsbiepId !== null) {
                         <fa-icon [icon]="faRecycle"
                           matTooltip="Reused"
                           (click)="matchReused(node)"

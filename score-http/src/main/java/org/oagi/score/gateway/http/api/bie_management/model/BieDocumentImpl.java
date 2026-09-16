@@ -13,14 +13,13 @@ import org.oagi.score.gateway.http.api.bie_management.model.bbie_sc.BbieScId;
 import org.oagi.score.gateway.http.api.bie_management.model.bbiep.Bbiep;
 import org.oagi.score.gateway.http.api.bie_management.model.bbiep.BbiepId;
 import org.oagi.score.gateway.http.api.bie_management.service.BieDocument;
+import org.oagi.score.gateway.http.api.bie_management.service.BieAssociationPaths;
+import org.oagi.score.gateway.http.api.bie_management.service.BieAssociationPaths.Association;
 import org.oagi.score.gateway.http.api.bie_management.service.BieVisitContext;
 import org.oagi.score.gateway.http.api.bie_management.service.BieVisitor;
 import org.oagi.score.gateway.http.api.cc_management.model.CcAssociation;
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocument;
-import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
-import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.ascc.AsccSummaryRecord;
-import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.bcc.BccSummaryRecord;
 
 import java.util.*;
@@ -88,61 +87,21 @@ public class BieDocumentImpl implements BieDocument {
             return Collections.emptyList();
         }
 
-        Map<String, BieAssociation> bieAssociations = Stream.concat(
-                this.asbieMap.getOrDefault(abie.getAbieId(), Collections.emptyList()).stream(),
-                this.bbieMap.getOrDefault(abie.getAbieId(), Collections.emptyList()).stream())
-                .collect(Collectors.toMap(e -> (e.isAsbie() ? "ASCC-" + ((Asbie) e).getBasedAsccManifestId() :
-                        "BCC-" + ((Bbie) e).getBasedBccManifestId()), Function.identity()));
-
-        List<BieAssociation> associations = new ArrayList();
-        AccManifestId basedAccManifestId = abie.getBasedAccManifestId();
-        AccSummaryRecord acc = ccDocument.getAcc(basedAccManifestId);
-        Stack<AccSummaryRecord> accStack = new Stack();
-        while (acc != null) {
-            accStack.push(acc);
-            acc = ccDocument.getAcc(acc.basedAccManifestId());
-        }
-
-        while (!accStack.isEmpty()) {
-            acc = accStack.pop();
-            getAssociations(acc).forEach(ccAssociation -> {
-                if (ccAssociation.isAscc()) {
-                    BieAssociation asbie = bieAssociations.get("ASCC-" + ((AsccSummaryRecord) ccAssociation).asccManifestId());
-                    if (asbie != null) {
-                        associations.add(asbie);
-                    }
-                } else if (ccAssociation.isBcc()) {
-                    BieAssociation bbie = bieAssociations.get("BCC-" + ((BccSummaryRecord) ccAssociation).bccManifestId());
-                    if (bbie != null) {
-                        associations.add(bbie);
-                    }
-                }
-            });
-        }
-
-        return associations;
+        Map<String, BieAssociation> bieAssociations = associationIndex(abie);
+        return BieAssociationPaths.getAssociationsRegardingBases("", ccDocument,
+                        ccDocument.getAcc(abie.getBasedAccManifestId())).stream()
+                .map(association -> bieAssociations.get(associationTag(association.getCcAssociation())))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
-    private Collection<CcAssociation> getAssociations(AccSummaryRecord acc) {
-        List<CcAssociation> associations = ccDocument.getAssociations(acc);
-        List<CcAssociation> nextAssociations = new ArrayList();
-        for (int i = 0, len = associations.size(); i < len; ++i) {
-            CcAssociation association = associations.get(i);
-            if (association.isAscc()) {
-                AsccSummaryRecord asccManifest = (AsccSummaryRecord) association;
-                AsccpSummaryRecord asccp =
-                        ccDocument.getAsccp(asccManifest.toAsccpManifestId());
-
-                AccSummaryRecord roleOfAcc =
-                        ccDocument.getAcc(asccp.roleOfAccManifestId());
-                if (roleOfAcc.isGroup()) {
-                    nextAssociations.addAll(ccDocument.getAssociations(roleOfAcc));
-                    continue;
-                }
-            }
-            nextAssociations.add(association);
-        }
-        return nextAssociations;
+    private Map<String, BieAssociation> associationIndex(Abie abie) {
+        return Stream.concat(
+                        asbieMap.getOrDefault(abie.getAbieId(), Collections.emptyList()).stream(),
+                        bbieMap.getOrDefault(abie.getAbieId(), Collections.emptyList()).stream())
+                .collect(Collectors.toMap(e -> e.isAsbie()
+                        ? "ASCC-" + ((Asbie) e).getBasedAsccManifestId()
+                        : "BCC-" + ((Bbie) e).getBasedBccManifestId(), Function.identity()));
     }
 
     @Override
@@ -186,24 +145,38 @@ public class BieDocumentImpl implements BieDocument {
 
     private class BieVisitContextImpl implements BieVisitContext {
 
-        private BieDocumentImpl bieDocument;
+        private final BieDocumentImpl bieDocument;
+        private final String occurrencePath;
+        private final String parentOccurrencePath;
 
-        BieVisitContextImpl(BieDocumentImpl bieDocument) {
+        BieVisitContextImpl(BieDocumentImpl bieDocument, String occurrencePath, String parentOccurrencePath) {
             this.bieDocument = bieDocument;
+            this.occurrencePath = occurrencePath;
+            this.parentOccurrencePath = parentOccurrencePath;
         }
 
         @Override
         public BieDocumentImpl getBieDocument() {
             return bieDocument;
         }
+
+        @Override
+        public String getOccurrencePath() {
+            return occurrencePath;
+        }
+
+        @Override
+        public String getParentOccurrencePath() {
+            return parentOccurrencePath;
+        }
+
     }
 
     @Override
     public void accept(BieVisitor visitor) {
-        BieVisitContext context = new BieVisitContextImpl(this);
-        visitor.visitStart(topLevelAsbiep, context);
-        accept(visitor, getRootAsbiep(), context);
-        visitor.visitEnd(topLevelAsbiep, context);
+        visitor.visitStart(topLevelAsbiep, new BieVisitContextImpl(this, null, null));
+        accept(visitor, getRootAsbiep(), null);
+        visitor.visitEnd(topLevelAsbiep, new BieVisitContextImpl(this, null, null));
     }
 
     @Override
@@ -220,45 +193,70 @@ public class BieDocumentImpl implements BieDocument {
         return refAsbieMap;
     }
 
-    private void accept(BieVisitor visitor, Asbiep asbiep, BieVisitContext context) {
-        if (visitor.visitAsbiep(asbiep, context) == SKIP_SUBTREE) {
+    private void accept(BieVisitor visitor, Asbiep asbiep, String parentPath) {
+        if (asbiep == null) {
             return;
         }
-        accept(visitor, getAbie(asbiep), context);
+        String path = appendPath(parentPath, "ASCCP-" + asbiep.getBasedAsccpManifestId());
+        BieVisitContextImpl context = new BieVisitContextImpl(this, path, parentPath);
+        if (visitor.visitAsbiep(asbiep, context) != SKIP_SUBTREE) {
+            accept(visitor, getAbie(asbiep), path);
+        }
     }
 
-    private void accept(BieVisitor visitor, Abie abie, BieVisitContext context) {
+    private void accept(BieVisitor visitor, Abie abie, String parentPath) {
+        if (abie == null) {
+            return;
+        }
+        String path = appendPath(parentPath, "ACC-" + abie.getBasedAccManifestId());
+        BieVisitContextImpl context = new BieVisitContextImpl(this, path, parentPath);
         if (visitor.visitAbie(abie, context) == SKIP_SUBTREE) {
             return;
         }
-        for (BieAssociation bieAssociation : getAssociations(abie)) {
-            accept(visitor, bieAssociation, context);
+        Map<String, BieAssociation> bieAssociations = associationIndex(abie);
+        for (Association source : BieAssociationPaths.getAssociationsRegardingBases(
+                parentPath, ccDocument, ccDocument.getAcc(abie.getBasedAccManifestId()))) {
+            BieAssociation association = bieAssociations.get(associationTag(source.getCcAssociation()));
+            if (association != null) {
+                accept(visitor, association, source.getPath(), path);
+            }
         }
     }
 
-    private void accept(BieVisitor visitor, BieAssociation bieAssociation, BieVisitContext context) {
-        if (bieAssociation.isAsbie()) {
-            Asbie asbie = (Asbie) bieAssociation;
-            // A reuse-reference ASBIE returns SKIP_SUBTREE: it points at another top-level
-            // BIE, so re-traversing its to_asbiep subtree would both duplicate work
-            // (corrupting the source-id-keyed maps) and overwrite the reference with a
-            // private copy.
-            if (visitor.visitAsbie(asbie, context) == SKIP_SUBTREE) {
-                return;
+    private String associationTag(CcAssociation association) {
+        return association.isAscc()
+                ? "ASCC-" + ((AsccSummaryRecord) association).asccManifestId()
+                : "BCC-" + ((BccSummaryRecord) association).bccManifestId();
+    }
+
+    private void accept(BieVisitor visitor, BieAssociation association, String path, String parentPath) {
+        BieVisitContextImpl context = new BieVisitContextImpl(this, path, parentPath);
+        if (association.isAsbie()) {
+            Asbie asbie = (Asbie) association;
+            if (visitor.visitAsbie(asbie, context) != SKIP_SUBTREE) {
+                accept(visitor, getAsbiep(asbie), path);
             }
-            accept(visitor, getAsbiep(asbie), context);
-        } else if (bieAssociation.isBbie()) {
-            Bbie bbie = (Bbie) bieAssociation;
+        } else if (association.isBbie()) {
+            Bbie bbie = (Bbie) association;
             if (visitor.visitBbie(bbie, context) == SKIP_SUBTREE) {
                 return;
             }
-            if (visitor.visitBbiep(getBbiep(bbie), context) == SKIP_SUBTREE) {
+            Bbiep bbiep = getBbiep(bbie);
+            // BBIEP enriches the same BBIE occurrence; its immutable key remains the BCC path.
+            if (visitor.visitBbiep(bbiep, context) == SKIP_SUBTREE) {
                 return;
             }
-            for (BbieSc bbieSc : getBbieScList(bbie)) {
-                visitor.visitBbieSc(bbieSc, context);
+            var bccp = ccDocument.getBccp(bbiep.getBasedBccpManifestId());
+            for (BbieSc sc : getBbieScList(bbie)) {
+                var dtSc = ccDocument.getDtSc(sc.getBasedDtScManifestId());
+                String scPath = appendPath(path, "BCCP-" + bccp.bccpManifestId()
+                        + ">DT-" + dtSc.ownerDtManifestId() + ">DT_SC-" + dtSc.dtScManifestId());
+                visitor.visitBbieSc(sc, new BieVisitContextImpl(this, scPath, path));
             }
         }
     }
 
+    private static String appendPath(String parent, String segment) {
+        return parent == null ? segment : parent + ">" + segment;
+    }
 }

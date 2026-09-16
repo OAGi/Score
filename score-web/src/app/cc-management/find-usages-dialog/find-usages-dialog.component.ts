@@ -12,7 +12,7 @@ import {SettingsPreferencesService} from '../../settings-management/settings-pre
 import {AuthService} from '../../authentication/auth.service';
 
 
-class FindUsagesCcFlatNodeDatabase<T extends CcFlatNode> extends CcFlatNodeDatabase<T> {
+export class FindUsagesCcFlatNodeDatabase<T extends CcFlatNode> extends CcFlatNodeDatabase<T> {
   toAsccpNode(asccpNode: CcGraphNode, parent: CcFlatNode) {
     const node = new AsccpFlatNode(asccpNode);
     node.state = asccpNode.state;
@@ -36,7 +36,11 @@ class FindUsagesCcFlatNodeDatabase<T extends CcFlatNode> extends CcFlatNodeDatab
     return node;
   }
 
-  getChildren(node: T): T[] {
+  getChildren(node?: T): T[] {
+    if (!node) {
+      return [];
+    }
+
     const nodes = this._ccGraph.graph.nodes;
     const edges = this._ccGraph.graph.edges;
 
@@ -55,16 +59,13 @@ class FindUsagesCcFlatNodeDatabase<T extends CcFlatNode> extends CcFlatNodeDatab
     const children = [];
     targets.forEach(target => {
       if (target.startsWith('ACC-')) {
-        children.push(this.toAccNode(nodes[target], node));
+        if (nodes[target]) {
+          children.push(this.toAccNode(nodes[target], node));
+        }
       } else if (target.startsWith('ASCCP-')) {
         const asccpNode = this.toAsccpNode(nodes[target], node);
         if (asccpNode.isUserExtensionGroup) {
-          const uegAccNode = this.getChildren(asccpNode as unknown as T)[0];
-          children.push(...this.getChildren(uegAccNode).map(e => {
-            e.level = node.level + 1;
-            e.parent = node;
-            return e;
-          }));
+          children.push(...this.getUserExtensionGroupChildren(asccpNode, node));
         } else {
           children.push(asccpNode);
         }
@@ -77,7 +78,7 @@ class FindUsagesCcFlatNodeDatabase<T extends CcFlatNode> extends CcFlatNodeDatab
       } else if (target.startsWith('DT-')) {
         const bccpEdges = edges[target];
         if (bccpEdges) {
-          bccpEdges.targets.map(e => nodes[e]).forEach(e => {
+          bccpEdges.targets.map(e => nodes[e]).filter(e => !!e).forEach(e => {
             children.push(this.toBccpNode(e, node));
           });
         }

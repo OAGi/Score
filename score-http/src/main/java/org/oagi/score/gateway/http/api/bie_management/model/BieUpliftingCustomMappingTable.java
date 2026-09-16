@@ -1,146 +1,86 @@
 package org.oagi.score.gateway.http.api.bie_management.model;
 
-import org.oagi.score.gateway.http.api.cc_management.model.CcDocument;
-import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
-import org.oagi.score.gateway.http.api.cc_management.model.ascc.AsccManifestId;
-import org.oagi.score.gateway.http.api.cc_management.model.ascc.AsccSummaryRecord;
-import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpManifestId;
-import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpSummaryRecord;
-import org.oagi.score.gateway.http.api.cc_management.model.bcc.BccManifestId;
-import org.oagi.score.gateway.http.api.cc_management.model.bcc.BccSummaryRecord;
-import org.oagi.score.gateway.http.api.cc_management.model.bccp.BccpManifestId;
-
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.oagi.score.gateway.http.common.util.StringUtils.hasLength;
 
-public class BieUpliftingCustomMappingTable {
+/**
+ * Request-local mappings keyed by the complete source occurrence path.
+ * Stored BIE paths are never rewritten; local/legacy paths are not expanded here.
+ */
+public final class BieUpliftingCustomMappingTable {
 
-    private List<BieUpliftingMapping> mappingList;
+    private final List<BieUpliftingMapping> mappingList;
+    private final Map<String, BieUpliftingMapping> bySourcePath = new LinkedHashMap<>();
+    private final Map<String, BieUpliftingMapping> byTargetPath = new LinkedHashMap<>();
+    private final Map<String, BieUpliftingMapping> suppressedBySourcePath = new LinkedHashMap<>();
 
-    private Map<String, BieUpliftingMapping> targetAsccMappingMap;
-    private Map<String, BieUpliftingMapping> targetAsccMappingByTargetPathMap;
-    private Map<String, AsccpManifestId> targetAsccpManifestIdBySourcePathMap;
-    private Map<String, AccManifestId> targetAccManifestIdBySourcePathMap;
-    private Map<String, BieUpliftingMapping> targetBccMappingMap;
-    private Map<String, BccpManifestId> targetBccpManifestIdBySourcePathMap;
-    private Map<String, BieUpliftingMapping> targetDtScMappingMap;
-
-    public BieUpliftingCustomMappingTable(CcDocument sourceCcDocument,
-                                          CcDocument targetCcDocument,
-                                          List<BieUpliftingMapping> mappingList) {
-        if (mappingList == null) {
-            throw new IllegalArgumentException();
+    public BieUpliftingCustomMappingTable(List<BieUpliftingMapping> mappings) {
+        if (mappings == null) {
+            throw new IllegalArgumentException("Custom mappings are required.");
         }
+        if (mappings.stream().anyMatch(mapping -> mapping == null)) {
+            throw new IllegalArgumentException("Custom mappings must not contain null entries.");
+        }
+        mappingList = List.copyOf(new ArrayList<>(mappings));
+        Set<String> seenSourcePaths = new HashSet<>();
+        for (BieUpliftingMapping mapping : mappingList) {
+            if (!hasLength(mapping.getSourcePath())) {
+                continue;
+            }
+            if (!seenSourcePaths.add(mapping.getSourcePath())) {
+                throw new IllegalArgumentException("Duplicate source occurrence path: " + mapping.getSourcePath());
+            }
+            if (mapping.isSuppressAutoMapping() && !hasLength(mapping.getTargetPath())) {
+                if (suppressedBySourcePath.putIfAbsent(mapping.getSourcePath(), mapping) != null) {
+                    throw new IllegalArgumentException("Duplicate suppressed source occurrence path: " + mapping.getSourcePath());
+                }
+                continue;
+            }
+            if (!hasLength(mapping.getTargetPath())) {
+                continue;
+            }
+            // Root ABIE entries do not override association mappings.
+            String tag = getLastTag(mapping.getSourcePath());
+            if (!tag.startsWith("ASCC-") && !tag.startsWith("BCC-") && !tag.startsWith("DT_SC-")) {
+                continue;
+            }
+            if (bySourcePath.putIfAbsent(mapping.getSourcePath(), mapping) != null) {
+                throw new IllegalArgumentException("Duplicate source occurrence path: " + mapping.getSourcePath());
+            }
+            if (byTargetPath.putIfAbsent(mapping.getTargetPath(), mapping) != null) {
+                throw new IllegalArgumentException("Duplicate target occurrence path: " + mapping.getTargetPath());
+            }
+        }
+    }
 
-        this.mappingList = mappingList;
+    public BieUpliftingMapping getMapping(String sourcePath) {
+        return bySourcePath.get(sourcePath);
+    }
 
-        targetAsccMappingMap = mappingList.stream()
-                .filter(e -> hasLength(e.getSourcePath()))
-                .filter(e -> getLastTag(e.getSourcePath()).contains("ASCC"))
-                .collect(Collectors.toMap(BieUpliftingMapping::getSourcePath, Function.identity(), (a1, a2) -> a2));
+    public boolean isAutoMappingSuppressed(String sourcePath) {
+        return suppressedBySourcePath.containsKey(sourcePath);
+    }
 
-        targetAsccMappingByTargetPathMap = mappingList.stream()
-                .filter(e -> hasLength(e.getSourcePath()) && hasLength(e.getTargetPath()))
-                .filter(e -> getLastTag(e.getTargetPath()).contains("ASCC"))
-                .collect(Collectors.toMap(BieUpliftingMapping::getTargetPath, Function.identity(), (a1, a2) -> a2));
+    public BieUpliftingMapping getMappingByTargetPath(String targetPath) {
+        return byTargetPath.get(targetPath);
+    }
 
-        targetAsccpManifestIdBySourcePathMap = targetAsccMappingMap.values().stream()
-                .filter(e -> hasLength(e.getSourcePath()) && hasLength(e.getTargetPath()))
-                .collect(Collectors.toMap(e -> {
-                    AsccManifestId sourceAsccManifestId = new AsccManifestId(extractManifestId(getLastTag(e.getSourcePath())));
-                    AsccSummaryRecord sourceAscc = sourceCcDocument.getAscc(sourceAsccManifestId);
-                    return e.getSourcePath() + ">" + "ASCCP-" + sourceAscc.toAsccpManifestId();
-                }, e -> {
-                    AsccManifestId targetAsccManifestId = new AsccManifestId(extractManifestId(getLastTag(e.getTargetPath())));
-                    AsccSummaryRecord targetAsccManifest = targetCcDocument.getAscc(targetAsccManifestId);
-                    return targetAsccManifest.toAsccpManifestId();
-                }, (a1, a2) -> a2));
-
-        targetAccManifestIdBySourcePathMap = targetAsccMappingMap.values().stream()
-                .filter(e -> hasLength(e.getSourcePath()) && hasLength(e.getTargetPath()))
-                .collect(Collectors.toMap(e -> {
-                    AsccManifestId sourceAsccManifestId = new AsccManifestId(extractManifestId(getLastTag(e.getSourcePath())));
-                    AsccSummaryRecord sourceAscc = sourceCcDocument.getAscc(sourceAsccManifestId);
-                    AsccpSummaryRecord sourceAsccp = sourceCcDocument.getAsccp(sourceAscc.toAsccpManifestId());
-                    return e.getSourcePath() + ">" + "ASCCP-" + sourceAscc.toAsccpManifestId() +
-                            ">" + "ACC-" + sourceAsccp.roleOfAccManifestId();
-                }, e -> {
-                    AsccManifestId targetAsccManifestId = new AsccManifestId(extractManifestId(getLastTag(e.getTargetPath())));
-                    AsccSummaryRecord targetAscc = targetCcDocument.getAscc(targetAsccManifestId);
-                    AsccpSummaryRecord targetAsccp = targetCcDocument.getAsccp(targetAscc.toAsccpManifestId());
-                    return targetAsccp.roleOfAccManifestId();
-                }, (a1, a2) -> a2));
-
-        targetBccMappingMap = mappingList.stream()
-                .filter(e -> hasLength(e.getSourcePath()))
-                .filter(e -> getLastTag(e.getSourcePath()).contains("BCC"))
-                .collect(Collectors.toMap(BieUpliftingMapping::getSourcePath, Function.identity(), (a1, a2) -> a2));
-
-        targetBccpManifestIdBySourcePathMap = targetBccMappingMap.values().stream()
-                .filter(e -> hasLength(e.getSourcePath()) && hasLength(e.getTargetPath()))
-                .collect(Collectors.toMap(e -> {
-                    BccManifestId sourceBccManifestId = new BccManifestId(extractManifestId(getLastTag(e.getSourcePath())));
-                    BccSummaryRecord sourceBcc = sourceCcDocument.getBcc(sourceBccManifestId);
-                    return e.getSourcePath() + ">" + "BCCP-" + sourceBcc.toBccpManifestId();
-                }, e -> {
-                    BccManifestId targetBccManifestId = new BccManifestId(extractManifestId(getLastTag(e.getTargetPath())));
-                    BccSummaryRecord targetBcc = targetCcDocument.getBcc(targetBccManifestId);
-                    return targetBcc.toBccpManifestId();
-                }, (a1, a2) -> a2));
-
-        targetDtScMappingMap = mappingList.stream()
-                .filter(e -> hasLength(e.getSourcePath()))
-                .filter(e -> getLastTag(e.getSourcePath()).contains("DT_SC"))
-                .collect(Collectors.toMap(BieUpliftingMapping::getSourcePath, Function.identity(), (a1, a2) -> a2));
+    public List<BieUpliftingMapping> getMappingList() {
+        return mappingList;
     }
 
     public static String getLastTag(String path) {
-        if (path == null) {
-            return null;
-        }
-        String[] tags = path.split(">");
-        return tags[tags.length - 1];
+        return path.substring(path.lastIndexOf('>') + 1);
     }
 
     public static BigInteger extractManifestId(String tag) {
         return new BigInteger(tag.substring(tag.indexOf('-') + 1));
     }
-
-    public AccManifestId getTargetAccManifestIdBySourcePath(String sourcePath) {
-        return targetAccManifestIdBySourcePathMap.get(sourcePath);
-    }
-
-    public AsccpManifestId getTargetAsccpManifestIdBySourcePath(String sourcePath) {
-        return targetAsccpManifestIdBySourcePathMap.get(sourcePath);
-    }
-
-    public BccpManifestId getTargetBccpManifestIdBySourcePath(String sourcePath) {
-        return targetBccpManifestIdBySourcePathMap.get(sourcePath);
-    }
-
-    public BieUpliftingMapping getTargetAsccMappingBySourcePath(String sourcePath) {
-        return targetAsccMappingMap.get(sourcePath);
-    }
-
-    public BieUpliftingMapping getTargetAsccMappingByTargetPath(String targetPath) {
-        return targetAsccMappingByTargetPathMap.get(targetPath);
-    }
-
-    public BieUpliftingMapping getTargetBccMappingBySourcePath(String sourcePath) {
-        return targetBccMappingMap.get(sourcePath);
-    }
-
-    public BieUpliftingMapping getTargetDtScMappingBySourcePath(String sourcePath) {
-        return targetDtScMappingMap.get(sourcePath);
-    }
-
-    public List<BieUpliftingMapping> getMappingList() {
-        return this.mappingList;
-    }
-
 }

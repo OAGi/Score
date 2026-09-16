@@ -108,6 +108,10 @@ export class PathLikeExpressionEvaluator<T extends FlatNode> implements Expressi
     this._caseSensitive = caseSensitive || false;
   }
 
+  protected isRootPathExpression(): boolean {
+    return this._root;
+  }
+
   get caseSensitive(): boolean {
     return this._caseSensitive;
   }

@@ -5,6 +5,7 @@ import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.impl.DSL;
+import org.jooq.exception.TooManyRowsException;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.api.APIFactory;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import static org.jooq.impl.DSL.and;
@@ -48,7 +50,24 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
 
     @Override
     public CodeListObject getCodeListByCodeListNameAndReleaseNum(String codeListName, String releaseNum) {
-        ULong codeListManifestId = dslContext.select(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID)
+        List<CodeListObject> codeLists = getCodeListsByCodeListNameAndReleaseNum(codeListName, releaseNum);
+        if (codeLists.size() > 1) {
+            throw new TooManyRowsException("Expected exactly one code list named '" + codeListName
+                    + "' in release '" + releaseNum + "' but found " + codeLists.size());
+        }
+        if (codeLists.isEmpty()) {
+            throw new NoSuchElementException("Cannot locate a code list named '" + codeListName
+                    + "' in release '" + releaseNum + "'");
+        }
+        return codeLists.get(0);
+    }
+
+    @Override
+    public List<CodeListObject> getCodeListsByCodeListNameAndReleaseNum(String codeListName, String releaseNum) {
+        List<Field<?>> fields = new ArrayList<>();
+        fields.addAll(Arrays.asList(CODE_LIST_MANIFEST.fields()));
+        fields.addAll(Arrays.asList(CODE_LIST.fields()));
+        return dslContext.select(fields)
                 .from(CODE_LIST_MANIFEST)
                 .join(CODE_LIST).on(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
                 .join(RELEASE).on(CODE_LIST_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
@@ -56,8 +75,8 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
                         CODE_LIST.NAME.eq(codeListName),
                         RELEASE.RELEASE_NUM.eq(releaseNum)
                 ))
-                .fetchOneInto(ULong.class);
-        return getCodeListByManifestId(codeListManifestId.toBigInteger());
+                .orderBy(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID)
+                .fetch(record -> mapper(record.into(CODE_LIST_MANIFEST), record.into(CODE_LIST)));
     }
 
     private CodeListObject mapper(CodeListManifestRecord codeListManifestRecord, CodeListRecord codeListRecord) {
@@ -67,16 +86,22 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
         if (codeListManifestRecord.getBasedCodeListManifestId() != null) {
             codeList.setBasedCodeListManifestId(codeListManifestRecord.getBasedCodeListManifestId().toBigInteger());
         }
+        if (codeListManifestRecord.getAgencyIdListValueManifestId() != null) {
+            codeList.setAgencyIdListValueManifestId(codeListManifestRecord.getAgencyIdListValueManifestId().toBigInteger());
+        }
         codeList.setGuid(codeListRecord.getGuid());
+        codeList.setEnumTypeGuid(codeListRecord.getEnumTypeGuid());
         codeList.setName(codeListRecord.getName());
         codeList.setListId(codeListRecord.getListId());
         codeList.setVersionId(codeListRecord.getVersionId());
         codeList.setDefinition(codeListRecord.getDefinition());
         codeList.setDefinitionSource(codeListRecord.getDefinitionSource());
         codeList.setRemark(codeListRecord.getRemark());
-        codeList.setNamespaceId(codeListRecord.getNamespaceId().toBigInteger());
+        if (codeListRecord.getNamespaceId() != null) {
+            codeList.setNamespaceId(codeListRecord.getNamespaceId().toBigInteger());
+        }
         codeList.setExtensibleIndicator(codeListRecord.getExtensibleIndicator() == 1);
-        codeList.setDeprecated(codeListRecord.getIsDeprecated() == 1);
+        codeList.setDeprecated(codeListRecord.getIsDeprecated() != null && codeListRecord.getIsDeprecated() == 1);
         codeList.setState(codeListRecord.getState());
         codeList.setOwnerUserId(codeListRecord.getOwnerUserId().toBigInteger());
         codeList.setCreatedBy(codeListRecord.getCreatedBy().toBigInteger());

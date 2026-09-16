@@ -13,13 +13,33 @@ public interface UpliftBIEVerificationPage extends Page {
 
     WebElement goToNodeInTargetBIE(String nodePath);
 
+    /**
+     * Expand only the ancestors named by an already-visible source path and select its node.
+     * This is intended for small fixture trees where a full virtual-tree search is unnecessary.
+     */
+    WebElement goToNodeInSourceBIEByExpandingPath(String nodePath);
+
+    /**
+     * Expand only the ancestors named by an already-visible target path and select its node.
+     * This is intended for small fixture trees where a full virtual-tree search is unnecessary.
+     */
+    WebElement goToNodeInTargetBIEByExpandingPath(String nodePath);
+
     WebElement getSearchInputOfSourceTree();
 
     WebElement getSearchInputOfTargetTree();
 
     WebElement getCheckBoxOfNodeInTargetBIE(String node);
 
+    /** Map the selected source path to the target path, accepting any compatibility confirmation. */
+    void mapNode(String sourcePath, String targetPath);
+
+    /** Attempt a mapping that requires confirmation, cancel it, and retain the previous selection. */
+    void cancelNodeMapping(String sourcePath, String targetPath);
+
     SelectProfileBIEToReuseDialog reuseBIEOnNode(String path, String nodeName);
+
+    SelectProfileBIEToReuseDialog reuseBIEOnNodeByExpandingPath(String path, String nodeName);
 
     /**
      * Return the UI element of the 'Reused' icon of the node in the target BIE.

@@ -478,7 +478,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     public WebElement getNodeByName(String name) {
         By nodeLocator = By.xpath(
-                "//*[text() = \"" + name + "\"]//ancestor::div[contains(@class, \"mat-tree-node\")]");
+                "//div[contains(@class, \"mat-tree-node\")][.//*[normalize-space(.) = \"" + name + "\" or contains(., \"" + name + "\")]]");
         return visibilityOfElementLocated(getDriver(), nodeLocator);
     }
 

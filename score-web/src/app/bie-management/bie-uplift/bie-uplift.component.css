@@ -167,11 +167,6 @@ tr.element-row:not(.expanded-row):active {
   padding-bottom: 0;
 }
 
-.tree-search-box .buttons {
-  display: flex;
-  padding-top: 6px;
-}
-
 .tree-search-box .mat-icon {
   cursor: pointer;
 }

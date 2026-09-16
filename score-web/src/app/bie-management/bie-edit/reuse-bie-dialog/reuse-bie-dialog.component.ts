@@ -198,7 +198,10 @@ export class ReuseBieDialogComponent implements OnInit {
     const release = new ReleaseSummary();
     release.releaseId = this.data.releaseId;
     this.request.releases = [release, ];
-    this.request.basedTopLevelAsbiepIds = [this.data.basedTopLevelAsbiepId, ];
+    const basedTopLevelAsbiepId = this.data.basedTopLevelAsbiepId;
+    this.request.basedTopLevelAsbiepIds = Number.isInteger(basedTopLevelAsbiepId) && basedTopLevelAsbiepId > 0
+      ? [basedTopLevelAsbiepId]
+      : [];
     this.request.excludeTopLevelAsbiepIds = [this.data.topLevelAsbiepId,];
     // Per Test Assertion #24.1.2: "The end user can reuse developer top-level BIE,"
     // this check is required only when the current user is a developer.

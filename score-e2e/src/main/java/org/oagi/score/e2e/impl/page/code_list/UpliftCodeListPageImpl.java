@@ -22,8 +22,6 @@ public class UpliftCodeListPageImpl extends BaseSearchBarPageImpl implements Upl
             By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By OWNER_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Owner\")]//ancestor::mat-form-field[1]//mat-select");
-    private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
-            By.xpath("//input[@aria-label=\"dropdown search\"]");
     private static final By UPLIFT_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
 
@@ -50,13 +48,7 @@ public class UpliftCodeListPageImpl extends BaseSearchBarPageImpl implements Upl
 
     @Override
     public void setSourceRelease(String sourceBranch) {
-        retry(() -> {
-            click(getSourceBranchSelectField());
-            WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]//mat-option//span[text() = \"" + sourceBranch + "\"]"));
-            click(searchedSelectField);
-            escape(getDriver());
-        });
+        selectBranch(SOURCE_BRANCH_SELECT_FIELD_LOCATOR, sourceBranch);
     }
 
     @Override
@@ -66,13 +58,7 @@ public class UpliftCodeListPageImpl extends BaseSearchBarPageImpl implements Upl
 
     @Override
     public void setTargetRelease(String targetBranch) {
-        retry(() -> {
-            click(getTargetBranchSelectField());
-            WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]//mat-option//span[text() = \"" + targetBranch + "\"]"));
-            click(searchedSelectField);
-            escape(getDriver());
-        });
+        selectBranch(TARGET_BRANCH_SELECT_FIELD_LOCATOR, targetBranch);
     }
 
     @Override
@@ -121,12 +107,12 @@ public class UpliftCodeListPageImpl extends BaseSearchBarPageImpl implements Upl
 
     @Override
     public void setOwner(String owner) {
-        click(getOwnerSelectField());
-        sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), owner);
-        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[contains(text(), \"" + owner + "\")]"));
-        click(searchedSelectField);
-        escape(getDriver());
+        retry(() -> {
+            WebElement ownerSelect = openMatSelect(getDriver(), OWNER_SELECT_FIELD_LOCATOR);
+            sendKeys(matSelectSearchField(getDriver(), ownerSelect), owner);
+            click(matSelectOption(getDriver(), ownerSelect, owner));
+            escape(getDriver());
+        });
     }
 
     @Override
@@ -136,18 +122,31 @@ public class UpliftCodeListPageImpl extends BaseSearchBarPageImpl implements Upl
 
     @Override
     public void setState(String state) {
-        click(getStateSelectField());
-        WebElement optionField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[contains(text(), \"" + state + "\")]"));
-        click(optionField);
-        escape(getDriver());
+        retry(() -> {
+            WebElement stateSelect = openMatSelect(getDriver(), STATE_SELECT_FIELD_LOCATOR);
+            click(matSelectOption(getDriver(), stateSelect, state));
+            escape(getDriver());
+        });
     }
 
     @Override
     public void hitSearchButton() {
         click(getSearchButton());
-        waitFor(ofMillis(500L));
+        waitFor(ofMillis(100L));
+        invisibilityOfLoadingContainerElement(getDriver());
     }
+
+    private void selectBranch(By selectLocator, String branch) {
+        retry(() -> {
+            WebElement branchSelect = openMatSelect(getDriver(), selectLocator);
+            sendKeys(matSelectSearchField(getDriver(), branchSelect), branch);
+            click(matSelectOption(getDriver(), branchSelect, branch));
+            escape(getDriver());
+            waitFor(ofMillis(100L));
+            invisibilityOfLoadingContainerElement(getDriver());
+        });
+    }
+
     @Override
     public WebElement getTableRecordAtIndex(int idx) {
         return visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + idx + "]"));

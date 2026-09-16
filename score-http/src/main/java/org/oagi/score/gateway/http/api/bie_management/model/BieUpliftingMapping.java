@@ -16,5 +16,12 @@ public class BieUpliftingMapping {
     private BigInteger targetManifestId;
     private String targetPath;
     private TopLevelAsbiepId refTopLevelAsbiepId;
+    /**
+     * Explicitly keeps the source occurrence unmatched during generation. This
+     * is needed when the UI user removes a system mapping: an absent target is
+     * otherwise indistinguishable from a legacy payload that asks the server to
+     * try automatic matching again.
+     */
+    private boolean suppressAutoMapping;
 
 }

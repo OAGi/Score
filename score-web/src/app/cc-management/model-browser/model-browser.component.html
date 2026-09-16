@@ -18,8 +18,8 @@
                 <div class="container-fluid">
                   <div class="row">
                     <div class="col-5 tree-search-box">
-                      <div class="row align-items-center">
-                        <div class="col-9">
+                      <div class="tree-search-controls">
+                        <div class="tree-search-input">
                           <mat-form-field>
                             @if (!selectedNode) {
                               <mat-label>Search</mat-label>
@@ -44,32 +44,33 @@
                             }
                           </mat-form-field>
                         </div>
-                        <div class="col-3 buttons">
-                          <button mat-icon-button mat-small-icon-button
+                        <div class="tree-search-buttons">
+                          <button mat-icon-button mat-medium-icon-button type="button" aria-label="Previous search result"
                             [disabled]="searcher.isSearching || !searcher.searchResult || searcher.searchResult.length === 0"
                             (click)="move(-1)">
                             <mat-icon>keyboard_arrow_up</mat-icon>
                           </button>
-                          <button mat-icon-button mat-small-icon-button
+                          <button mat-icon-button mat-medium-icon-button type="button" aria-label="Next search result"
                             [disabled]="searcher.isSearching || !searcher.searchResult || searcher.searchResult.length === 0"
                             (click)="move(1)">
                             <mat-icon>keyboard_arrow_down</mat-icon>
                           </button>
-                          <button mat-icon-button mat-small-icon-button
+                          <button mat-icon-button mat-medium-icon-button type="button" class="tree-search-submit" [attr.aria-label]="(searcher.searchKeyword && !searcher.fullSearched) ? 'Search more' : 'Search'"
                             [hidden]="searcher.fullSearched"
                             [disabled]="searcher.isSearching"
                             [matTooltip]="(searcher.searchKeyword && !searcher.fullSearched) ? 'Search more...' : 'Search'"
                             (click)="search(searcher.inputKeyword, false, true)">
                             <mat-icon>{{ (searcher.searchKeyword && !searcher.fullSearched) ? 'repeat' : 'search' }}</mat-icon>
                           </button>
-                          <button mat-icon-button mat-small-icon-button
+                          <button mat-icon-button mat-medium-icon-button type="button" class="tree-search-clear" aria-label="Clear search"
                             [disabled]="searcher.isSearching"
                             [hidden]="!searcher.inputKeyword"
                             (click)="searcher.inputKeyword = ''; searcher.resetSearch()">
                             <mat-icon>close</mat-icon>
                           </button>
-                          <div style="height: 19px;">
-                            <mat-progress-spinner mode="indeterminate" [diameter]="15" class="search-progress-bar"
+                          <div class="search-progress-container">
+                            <mat-progress-spinner mode="indeterminate" [diameter]="20" class="search-progress-bar"
+                            aria-label="Searching"
                             [hidden]="!searcher.isSearching"></mat-progress-spinner>
                           </div>
                         </div>

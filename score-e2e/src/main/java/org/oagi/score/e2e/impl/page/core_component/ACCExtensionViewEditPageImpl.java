@@ -42,14 +42,15 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
             By.xpath("//*[contains(text(), \"Object Class Term\")]//ancestor::mat-form-field//input");
     private static final By NAMESPACE_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
+    private static final By EDITABLE_NAMESPACE_FIELD_LOCATOR =
+            By.xpath("//*[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select"
+                    + "[not(@aria-disabled = 'true') and not(@disabled)]");
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
             By.xpath("//textarea[@placeholder=\"Definition\"]");
     private static final By SEARCH_INPUT_TEXT_FIELD_LOCATOR =
             By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-form-field//input[@type=\"search\"]");
-    private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
-            By.xpath("//input[@aria-label=\"dropdown search\"]");
     private static final By APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Append Property at Last\")]");
     private static final By UPDATE_BUTTON_LOCATOR =
@@ -207,12 +208,35 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     @Override
     public void setNamespace(NamespaceObject namespace) {
         retry(() -> {
-            click(getNamespaceField());
-            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), namespace.getUri());
-            WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//span[contains(text(), \"" + namespace.getUri() + "\")]//ancestor::mat-option[1]"));
-            click(optionField);
+            selectRootNode();
+            WebElement namespaceSelect = openNamespaceDropdown();
+            try {
+                sendKeys(PageHelper.matSelectSearchField(
+                        PageHelper.wait(getDriver(), ofSeconds(2L), ofMillis(100L)), getDriver(), namespaceSelect),
+                        namespace.getUri());
+            } catch (TimeoutException | ElementNotInteractableException e) {
+                // Some extension views render a plain namespace select without ngx-mat-select-search.
+                // The target option is still selectable, so do not make the optional search input a
+                // prerequisite for setting the namespace.
+            }
+            click(matSelectOption(getDriver(), namespaceSelect, namespace.getUri()));
         });
+    }
+
+    private void selectRootNode() {
+        if (this.acc == null || this.acc.getDen() == null) {
+            return;
+        }
+        // Click the label: the row also contains buttons that stop click propagation.
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//cdk-virtual-scroll-viewport//div[contains(@class, 'mat-tree-node')]"
+                        + "/span[normalize-space(.) = " + xpathLiteral(this.acc.getDen()) + "]")));
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+    }
+
+    private WebElement openNamespaceDropdown() {
+        return openMatSelect(getDriver(), EDITABLE_NAMESPACE_FIELD_LOCATOR);
     }
 
     @Override
@@ -265,8 +289,7 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
 
     public WebElement getNodeByName(String name) {
         return elementToBeClickable(getDriver(), By.xpath(
-                "//cdk-virtual-scroll-viewport//*[contains(text(), \"" + name + "\")]" +
-                        "//ancestor::div[contains(@class, \"mat-tree-node\")]"));
+                "//cdk-virtual-scroll-viewport//div[contains(@class, \"mat-tree-node\")][.//*[normalize-space(.) = \"" + name + "\" or contains(., \"" + name + "\")]]"));
     }
 
     @Override
@@ -276,51 +299,44 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     }
 
     public WebElement getContextMenuIcon(WebElement node) {
-        return node.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
+        return node.findElement(By.xpath(".//mat-icon[contains(text(), \"more_vert\")]"));
     }
 
     @Override
     public SelectAssociationDialog appendPropertyAtLast(String path) {
-        WebElement node = clickOnDropDownMenuByPath(path);
-        try {
-            click(elementToBeClickable(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
-        } catch (TimeoutException e) {
-            click(node);
-            new Actions(getDriver()).sendKeys("O").perform();
-            click(elementToBeClickable(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
-        }
-        SelectAssociationDialog selectAssociationDialog =
-                new SelectAssociationDialogImpl(this, "Append Property at Last");
-        assert selectAssociationDialog.isOpened();
-        return selectAssociationDialog;
+        return retry(() -> {
+            WebElement node = clickOnDropDownMenuByPath(path);
+            try {
+                click(elementToBeClickable(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
+            } catch (TimeoutException e) {
+                click(node);
+                new Actions(getDriver()).sendKeys("O").perform();
+                click(elementToBeClickable(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
+            }
+            SelectAssociationDialog selectAssociationDialog =
+                    new SelectAssociationDialogImpl(this, "Append Property at Last");
+            if (!selectAssociationDialog.isOpened()) {
+                throw new WebDriverException("Select Association dialog is not opened");
+            }
+            return selectAssociationDialog;
+        });
     }
 
     @Override
     public WebElement clickOnDropDownMenuByPath(String path) {
         WebElement node = goToNode(path);
-
         click(node);
-        new Actions(getDriver()).sendKeys("O").perform();
-        waitFor(ofMillis(1000L));
-        try {
-            if (visibilityOfElementLocated(getDriver(),
-                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
-                return node;
-            }
-        } catch (WebDriverException ignore) {
-        }
-
+        waitFor(ofMillis(500L));
         WebElement contextMenuIcon = getContextMenuIcon(node);
         click(getDriver(), contextMenuIcon);
-        waitFor(ofMillis(1000L));
-        assert visibilityOfElementLocated(getDriver(),
-                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
+        waitFor(ofMillis(500L));
         return node;
     }
 
     @Override
     public WebElement getSearchInputTextField() {
-        return elementToBeClickable(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR);
+        return elementToBeClickable(PageHelper.wait(getDriver(), Duration.ofSeconds(30L), ofMillis(100L)),
+                SEARCH_INPUT_TEXT_FIELD_LOCATOR);
     }
 
     @Override
@@ -369,11 +385,13 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
 
     @Override
     public void moveToQA() {
-        click(getMoveToQAButton(true));
-        click(elementToBeClickable(getDriver(), By.xpath(
-                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        retry(() -> {
+            click(getMoveToQAButton(true));
+            click(elementToBeClickable(getDriver(), By.xpath(
+                    "//mat-dialog-container//button[contains(., \"Update\")]")));
+        });
         invisibilityOfLoadingContainerElement(getDriver());
-        waitFor(ofMillis(1000L));
+        waitFor(ofMillis(2000L));
     }
 
     @Override
@@ -387,11 +405,13 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
 
     @Override
     public void backToWIP() {
-        click(getBackToWIPButton(true));
-        click(elementToBeClickable(getDriver(), By.xpath(
-                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        retry(() -> {
+            click(getBackToWIPButton(true));
+            click(elementToBeClickable(getDriver(), By.xpath(
+                    "//mat-dialog-container//button[contains(., \"Update\")]")));
+        });
         invisibilityOfLoadingContainerElement(getDriver());
-        waitFor(ofMillis(1000L));
+        waitFor(ofMillis(2000L));
     }
 
     @Override
@@ -405,11 +425,13 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
 
     @Override
     public void moveToProduction() {
-        click(getMoveToProductionButton(true));
-        click(elementToBeClickable(getDriver(), By.xpath(
-                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        retry(() -> {
+            click(getMoveToProductionButton(true));
+            click(elementToBeClickable(getDriver(), By.xpath(
+                    "//mat-dialog-container//button[contains(., \"Update\")]")));
+        });
         invisibilityOfLoadingContainerElement(getDriver());
-        waitFor(ofMillis(1000L));
+        waitFor(ofMillis(2000L));
     }
 
     @Override

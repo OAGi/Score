@@ -164,7 +164,9 @@ public class SelectProfileBIEToReuseDialogImpl extends SearchBarPageImpl impleme
             setVersion(bie.getVersion());
             hitSearchButton();
 
-            WebElement tr = getTableRecordByValue(bie.getPropertyTerm());
+            WebElement tr = visibilityOfElementLocated(getDriver(), By.xpath(
+                    "//score-reuse-bie-dialog//a[@href='/profile_bie/" +
+                            bie.getTopLevelAsbiepId() + "']/ancestor::tr"));
             WebElement td = getColumnByName(tr, "select");
             click(td.findElement(By.xpath("mat-checkbox")));
         });

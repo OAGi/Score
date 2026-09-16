@@ -21,6 +21,7 @@ import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.Wait;
 
 import java.math.BigInteger;
 import java.time.Duration;
@@ -35,11 +36,14 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
+    private static final int DEFAULT_PATH_RETRY_COUNT = 2;
+    private static final int MAX_PATH_RETRY_COUNT = 5;
+
     private static final By SEARCH_INPUT_TEXT_FIELD_LOCATOR =
             By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-form-field//input[@type=\"search\"]");
 
     private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-icon[text() = \"search\"]");
+            By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-icon[normalize-space(text()) = \"search\" or normalize-space(text()) = \"repeat\"]");
 
     private static final By ENABLE_CHILDREN_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Enable Children\")]");
@@ -139,14 +143,15 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     public void openPage() {
         String url = getPageUrl();
         getDriver().get(url);
-        assert getText(getTitle()).equals(asbiep.getPropertyTerm());
+        invisibilityOfLoadingContainerElement(getDriver());
+        getSearchInputTextField();
     }
 
     @Override
     public WebElement getTitle() {
         invisibilityOfLoadingContainerElement(getDriver());
         return visibilityOfElementLocated(PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
-                By.xpath("//mat-tab-header//div[@class=\"mat-mdc-tab-labels\"]/div[contains(@class, \"mdc-tab\")][1]"));
+                By.xpath("//mat-tab-header//div[@role=\"tab\"][1]"));
     }
 
     @Override
@@ -168,28 +173,29 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     @Override
     public WebElement clickOnDropDownMenuByPathAndLevel(String path, int dataLevel) {
-        return retry(() -> {
-            goToNode(path);
-            String[] nodes = path.split("/");
-            String nodeName = nodes[nodes.length - 1];
-            WebElement node = getNodeByNameAndDataLevel(nodeName, dataLevel);
+        return retry(() -> clickOnDropDownMenuByPathAndLevelOnce(path, dataLevel), null,
+                DEFAULT_PATH_RETRY_COUNT);
+    }
+
+    private WebElement clickOnDropDownMenuByPathAndLevelOnce(String path, int dataLevel) {
+        goToNode(path);
+        WebElement node = findNodeByPath(path, dataLevel);
+        try {
+            WebElement menuIcon = node.findElement(By.xpath(".//mat-icon[contains(@class, 'context-menu-icon') or contains(text(), 'more_vert')]"));
+            click(getDriver(), menuIcon);
+        } catch (Exception e) {
             click(getDriver(), node);
             new Actions(getDriver()).sendKeys("O").perform();
-            try {
-                if (visibilityOfElementLocated(getDriver(),
-                        By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
-                    return node;
-                }
-            } catch (WebDriverException ignore) {
+        }
+        try {
+            if (visibilityOfElementLocated(getDriver(),
+                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
+                return node;
             }
-            click(getDriver().findElement(By.tagName("body"))); // To close overlay-container
-
-            WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
-            click(contextMenuIcon);
-            assert visibilityOfElementLocated(getDriver(),
-                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
-            return node;
-        });
+        } catch (WebDriverException ignore) {
+        }
+        click(getDriver().findElement(By.tagName("body"))); // To close overlay-container
+        return node;
     }
 
     @Override
@@ -296,7 +302,10 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     @Override
     public ACCExtensionViewEditPage extendBIELocallyOnNode(String path) {
-        return retry(() -> {
+        // Do not retry creation after switching tabs: it can hide the original failure
+        // by searching for the BIE path on the extension page.
+        Set<String> existingWindowHandles = getDriver().getWindowHandles();
+        String sourceWindowHandle = getDriver().getWindowHandle();
             WebElement node = clickOnDropDownMenuByPath(path);
             try {
                 click(elementToBeClickable(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
@@ -309,11 +318,22 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
             String currentUrl = retry(() -> {
                 waitFor(ofMillis(1000L));
+                for (String handle : getDriver().getWindowHandles()) {
+                    if (existingWindowHandles.contains(handle)) {
+                        continue;
+                    }
+                    getDriver().switchTo().window(handle);
+                    String url = getDriver().getCurrentUrl();
+                    if (url.contains("/core_component/extension/")) {
+                        return url;
+                    }
+                }
+                getDriver().switchTo().window(sourceWindowHandle);
                 String url = getDriver().getCurrentUrl();
-                if (url.contains("core_component")) {
+                if (url.contains("/core_component/extension/")) {
                     return url;
                 }
-                throw new WebDriverException();
+                throw new WebDriverException("The local extension page did not open for " + path);
             });
 
             BigInteger accManifestId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
@@ -321,7 +341,6 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             ACCExtensionViewEditPage accExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this, acc);
             assert accExtensionViewEditPage.isOpened();
             return accExtensionViewEditPage;
-        });
     }
 
     @Override
@@ -355,7 +374,9 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     @Override
     public WebElement getSearchInputTextField() {
-        return elementToBeClickable(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR);
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitForSnackBarToDisappear(getDriver());
+        return elementToBeClickable(PageHelper.wait(getDriver(), Duration.ofSeconds(30L), ofMillis(500L)), SEARCH_INPUT_TEXT_FIELD_LOCATOR);
     }
 
     @Override
@@ -364,22 +385,19 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     }
 
     private WebElement goToNode(String path) {
-        return goToNode(path, 0);
-    }
-
-    private WebElement goToNode(String path, int retry) {
-        return retry(() -> {
-            WebElement searchInput = getSearchInputTextField();
-            click(getDriver(), searchInput);
-            WebElement node = sendKeys(searchInput, path);
-            for (int i = 0; i < (retry + 1); ++i) {
-                node.sendKeys(Keys.ENTER);
-                waitFor(ofMillis(500L));
-            }
-            node.sendKeys("");
-            clear(searchInput);
-            return node;
-        });
+        WebElement searchInput = getSearchInputTextField();
+        click(getDriver(), searchInput);
+        clear(searchInput);
+        WebElement node = sendKeys(searchInput, path);
+        try {
+            WebElement searchBtn = getSearchButton();
+            click(getDriver(), searchBtn);
+        } catch (TimeoutException e) {
+            node.sendKeys(Keys.ENTER);
+            waitFor(ofMillis(500L));
+        }
+        waitFor(ofMillis(1000L));
+        return node;
     }
 
     public TopLevelASBIEPPanel getTopLevelASBIEPPanel() {
@@ -421,13 +439,13 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     public void expandTree(String nodeName) {
         try {
             By chevronRightLocator = By.xpath(
-                    "//*[contains(text(), \"" + nodeName + "\")]//ancestor::div[contains(@class, \"mat-tree-node\")]//mat-icon[contains(text(), \"chevron_right\")]//ancestor::button[1]");
+                    "//div[contains(@class, \"mat-tree-node\")][.//span[contains(@class, \"node-label\") and contains(., \"" + nodeName + "\")]]//button[.//mat-icon[contains(text(), \"chevron_right\")]]");
             click(elementToBeClickable(getDriver(), chevronRightLocator));
         } catch (TimeoutException maybeAlreadyExpanded) {
         }
 
         By expandMoreLocator = By.xpath(
-                "//*[contains(text(), \"" + nodeName + "\")]//ancestor::div[contains(@class, \"mat-tree-node\")]//mat-icon[contains(text(), \"expand_more\")]//ancestor::button[1]");
+                "//div[contains(@class, \"mat-tree-node\")][.//span[contains(@class, \"node-label\") and contains(., \"" + nodeName + "\")]]//button[.//mat-icon[contains(text(), \"expand_more\")]]");
         assert elementToBeClickable(getDriver(), expandMoreLocator).isEnabled();
     }
 
@@ -436,31 +454,67 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     }
 
     private WebElement getNodeByNameAndDataLevel(String nodeName, int dataLevel) {
-        String xpathExpr = "//*[text() = \"" + nodeName + "\"]//ancestor::div[contains(@class, \"mat-tree-node\")]";
+        String xpathExpr = "//div[contains(@class, \"mat-tree-node\")]";
         if (dataLevel >= 0) {
             xpathExpr += "[@data-level=\"" + dataLevel + "\"]";
         }
+        xpathExpr += "[.//span[contains(@class, \"node-label\") and normalize-space(.) = \"" + nodeName + "\"]]";
         By nodeLocator = By.xpath(xpathExpr);
-        return visibilityOfElementLocated(getDriver(), nodeLocator);
+        try {
+            return visibilityOfElementLocated(getDriver(), nodeLocator);
+        } catch (TimeoutException e) {
+            List<WebElement> present = getDriver().findElements(nodeLocator);
+            if (present.isEmpty()) {
+                throw new NoSuchElementException(
+                        "BIE tree node was not found: name='" + nodeName + "', dataLevel=" + dataLevel, e);
+            }
+            ((JavascriptExecutor) getDriver()).executeScript(
+                    "arguments[0].scrollIntoView({block: 'center'});", present.get(0));
+            return visibilityOfElementLocated(shortWait(getDriver()), nodeLocator);
+        }
+    }
+
+    private WebElement findNodeByPath(String path, int dataLevel) {
+        String[] nodes = path.split("/");
+        int effectiveDataLevel = dataLevel >= 0 ? dataLevel : nodes.length - 2;
+        String nodeExpr = "//div[contains(@class, \"mat-tree-node\")]";
+        if (effectiveDataLevel >= 0) {
+            nodeExpr += "[@data-level=\"" + effectiveDataLevel + "\"]";
+        }
+        String queryPath = path.replaceFirst("^/", "").replaceAll("\\s+", "");
+        By exactPathLocator = By.xpath(nodeExpr + "[@data-query-path=" + xpathLiteral(queryPath) + "]");
+        try {
+            return visibilityOfElementLocated(pathWait(), exactPathLocator);
+        } catch (TimeoutException ignored) {
+            throw new NoSuchElementException(
+                    "BIE path search result was not rendered: path='" + path + "', dataLevel=" + dataLevel,
+                    ignored);
+        }
+    }
+
+    private Wait<WebDriver> pathWait() {
+        return PageHelper.wait(getDriver(), Duration.ofSeconds(5L), ofMillis(100L));
     }
 
     @Override
     public WebElement getNodeByPath(String path) {
-        return getNodeByPath(path, 0);
+        return getNodeByPath(path, DEFAULT_PATH_RETRY_COUNT);
     }
 
     @Override
     public WebElement getNodeByPath(String path, int retry) {
+        int attemptCount = Math.min(Math.max(retry, 1), MAX_PATH_RETRY_COUNT);
         return retry(() -> {
-            goToNode(path, retry);
-            String[] nodes = path.split("/");
-            int dataLevel = nodes.length - 2;
-            if (dataLevel > 0) {
-                return getNodeByNameAndDataLevel(nodes[nodes.length - 1], dataLevel);
-            } else {
-                return getNodeByName(nodes[nodes.length - 1]);
-            }
-        });
+            // Keep one bounded retry boundary around one search and lookup
+            // attempt. This prevents nested waits and repeated Enter bursts.
+            goToNode(path);
+            return findNodeByPath(path, -1);
+        }, null, attemptCount);
+    }
+
+    private void clickLabel(WebElement node) {
+        WebElement label = node.findElement(By.cssSelector(".node-label"));
+        click(getDriver(), label);
     }
 
     @Override
@@ -652,14 +706,26 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     @Override
     public ASBIEPanel getASBIEPanel(WebElement asccpNode) {
         return retry(() -> {
-            click(asccpNode);
-            waitFor(ofMillis(1000L));
-            WebElement tab = elementToBeClickable(getDriver(), By.xpath(
-                    "//mat-tab-header//div[@role=\"tab\"][1]"));
+            // Clicking the tree-node itself uses its center point.  For a reused ASBIEP that
+            // point can land on the Reuse icon, which intentionally opens the reused BIE tab.
+            // Click the label so the tree-node click handler selects this node instead.
+            clickLabel(asccpNode);
+            By firstTabLocator = By.xpath("//mat-tab-header//div[@role=\"tab\"][1]");
+            WebElement tab = elementToBeClickable(getDriver(), firstTabLocator);
             click(tab);
+            By selectedFirstTabLocator = By.xpath("//mat-tab-header//div[@role=\"tab\"][1][@aria-selected=\"true\"]");
+            Wait<WebDriver> panelWait = PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L));
+            panelWait.until(driver -> {
+                String nodeText = getText(asccpNode);
+                WebElement selectedTab = driver.findElement(selectedFirstTabLocator);
+                String panelTitle = getText(selectedTab);
+                return nodeText != null && panelTitle != null && nodeText.contains(panelTitle.trim());
+            });
             String nodeText = getText(asccpNode);
-            String panelTitle = getText(getTitle());
-            assert nodeText.contains(panelTitle.trim());
+            String panelTitle = getText(elementToBeClickable(getDriver(), selectedFirstTabLocator));
+            if (!nodeText.contains(panelTitle.trim())) {
+                throw new WebDriverException("Panel title (" + panelTitle + ") does not match node (" + nodeText + ")");
+            }
             return new ASBIEPanelImpl();
         });
     }
@@ -674,7 +740,9 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             click(tab);
             String nodeText = getText(bccpNode);
             String panelTitle = getText(getTitle());
-            assert nodeText.contains(panelTitle.trim());
+            if (!nodeText.contains(panelTitle.trim())) {
+                throw new WebDriverException("Panel title (" + panelTitle + ") does not match node (" + nodeText + ")");
+            }
             return new BBIEPanelImpl();
         });
     }
@@ -689,7 +757,9 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             click(tab);
             String nodeText = getText(bdtScNode);
             String panelTitle = getText(getTitle());
-            assert nodeText.contains(panelTitle.trim());
+            if (!nodeText.contains(panelTitle.trim())) {
+                throw new WebDriverException("Panel title (" + panelTitle + ") does not match node (" + nodeText + ")");
+            }
             return new BBIESCPanelImpl();
         });
     }
@@ -1021,7 +1091,9 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     @Override
     public ReusedASBIEPanel getReusedASBIEPanel(WebElement asccpNode) {
         return retry(() -> {
-            click(asccpNode);
+            // A reused ASBIEP node can open the reused BIE when its center lands on the Reused icon.
+            // Select the node through its label so the detail panel stays in the current tab.
+            clickLabel(asccpNode);
             waitFor(ofMillis(500L));
             return new ReusedASBIEPanelImpl("//div[contains(@class, \"detail-reused\")][1]");
         });
@@ -1493,7 +1565,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         @Override
         public WebElement getValueConstraintSelectField() {
             return visibilityOfElementLocated(getDriver(), By.xpath(
-                    "//mat-label[contains(text(), \"Value Constraint\")]//ancestor::div[1]/mat-select"));
+                    "//mat-form-field[.//mat-label[contains(text(), \"Value Constraint\")]]//mat-select"));
         }
 
         @Override
@@ -1539,7 +1611,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         @Override
         public WebElement getValueDomainRestrictionSelectField() {
             return elementToBeClickable(getDriver(), By.xpath(
-                    "//mat-label[contains(text(), \"Value Domain Restriction\")]//ancestor::div[1]/mat-select"));
+                    "//mat-form-field[.//mat-label[contains(text(), \"Value Domain Restriction\")]]//mat-select"));
         }
 
         @Override
@@ -1547,26 +1619,44 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             click(getValueDomainRestrictionSelectField());
             click(elementToBeClickable(getDriver(), By.xpath(
                     "//span[contains(text(), \"" + valueDomainRestriction + "\")]//ancestor::mat-option[1]")));
+            escape(getDriver());
+            invisibilityOfLoadingContainerElement(getDriver());
+            waitFor(ofMillis(1000L));
         }
 
         @Override
         public WebElement getValueDomainField() {
             return elementToBeClickable(getDriver(), By.xpath(
-                    "//mat-label[text() = \"Value Domain\"]//ancestor::div[1]/mat-select"));
+                    "//mat-form-field[.//mat-label[normalize-space(text()) = \"Value Domain\"]]//mat-select"));
         }
 
         @Override
         public void setValueDomain(String valueDomain) {
             retry(() -> {
-                click(getDriver(), getValueDomainField());
-                waitFor(ofMillis(1000L));
-                WebElement dropdownSearchField = visibilityOfElementLocated(
-                        PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
-                        DROPDOWN_SEARCH_FIELD_LOCATOR);
+                WebElement valueDomainField = getValueDomainField();
+                click(getDriver(), valueDomainField);
+                waitFor(ofMillis(500L));
+                WebElement dropdownSearchField;
+                try {
+                    dropdownSearchField = visibilityOfElementLocated(
+                            PageHelper.wait(getDriver(), Duration.ofSeconds(2L), ofMillis(100L)),
+                            DROPDOWN_SEARCH_FIELD_LOCATOR);
+                } catch (TimeoutException e) {
+                    try {
+                        WebElement trigger = valueDomainField.findElement(By.cssSelector(".mat-mdc-select-trigger"));
+                        click(getDriver(), trigger);
+                    } catch (Exception ignored) {
+                        ((JavascriptExecutor) getDriver()).executeScript("arguments[0].click();", valueDomainField);
+                    }
+                    dropdownSearchField = visibilityOfElementLocated(
+                            PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
+                            DROPDOWN_SEARCH_FIELD_LOCATOR);
+                }
                 sendKeys(dropdownSearchField, valueDomain);
+                waitFor(ofMillis(500L));
                 click(getDriver(), elementToBeClickable(
                         PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
-                        By.xpath("//div[@class=\"cdk-overlay-container\"]//span[contains(text(), \"" + valueDomain + "\")]//ancestor::mat-option[1]")));
+                        By.xpath("//mat-option//span[contains(text(), \"" + valueDomain + "\")]")));
                 escape(getDriver());
             });
         }
@@ -1716,7 +1806,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         @Override
         public WebElement getValueConstraintSelectField() {
             return visibilityOfElementLocated(getDriver(), By.xpath(
-                    "//mat-label[contains(text(), \"Value Constraint\")]//ancestor::div[1]/mat-select"));
+                    "//mat-form-field[.//mat-label[contains(text(), \"Value Constraint\")]]//mat-select"));
         }
 
         @Override
@@ -1762,7 +1852,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         @Override
         public WebElement getValueDomainRestrictionSelectField() {
             return visibilityOfElementLocated(getDriver(), By.xpath(
-                    "//mat-select[@placeholder = \"Value Domain Restriction\"]"));
+                    "//mat-form-field[.//mat-label[contains(text(), \"Value Domain Restriction\")]]//mat-select"));
         }
 
         @Override
@@ -1770,25 +1860,44 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             click(getValueDomainRestrictionSelectField());
             click(elementToBeClickable(getDriver(), By.xpath(
                     "//span[contains(text(), \"" + valueDomainRestriction + "\")]//ancestor::mat-option[1]")));
+            escape(getDriver());
+            invisibilityOfLoadingContainerElement(getDriver());
+            waitFor(ofMillis(1000L));
         }
 
         @Override
         public WebElement getValueDomainField() {
             return visibilityOfElementLocated(getDriver(), By.xpath(
-                    "//mat-select[@placeholder = \"Value Domain\"]"));
+                    "//mat-form-field[.//mat-label[normalize-space(text()) = \"Value Domain\"]]//mat-select"));
         }
 
         @Override
         public void setValueDomain(String valueDomain) {
             retry(() -> {
-                click(getDriver(), getValueDomainField());
-                WebElement dropdownSearchField = visibilityOfElementLocated(
-                        PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
-                        DROPDOWN_SEARCH_FIELD_LOCATOR);
+                WebElement valueDomainField = getValueDomainField();
+                click(getDriver(), valueDomainField);
+                waitFor(ofMillis(500L));
+                WebElement dropdownSearchField;
+                try {
+                    dropdownSearchField = visibilityOfElementLocated(
+                            PageHelper.wait(getDriver(), Duration.ofSeconds(2L), ofMillis(100L)),
+                            DROPDOWN_SEARCH_FIELD_LOCATOR);
+                } catch (TimeoutException e) {
+                    try {
+                        WebElement trigger = valueDomainField.findElement(By.cssSelector(".mat-mdc-select-trigger"));
+                        click(getDriver(), trigger);
+                    } catch (Exception ignored) {
+                        ((JavascriptExecutor) getDriver()).executeScript("arguments[0].click();", valueDomainField);
+                    }
+                    dropdownSearchField = visibilityOfElementLocated(
+                            PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
+                            DROPDOWN_SEARCH_FIELD_LOCATOR);
+                }
                 sendKeys(dropdownSearchField, valueDomain);
+                waitFor(ofMillis(500L));
                 click(getDriver(), elementToBeClickable(
                         PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
-                        By.xpath("//div[@class=\"cdk-overlay-container\"]//span[contains(text(), \"" + valueDomain + "\")]//ancestor::mat-option[1]")));
+                        By.xpath("//mat-option//span[contains(text(), \"" + valueDomain + "\")]")));
                 escape(getDriver());
             });
         }

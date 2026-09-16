@@ -43,6 +43,7 @@ import org.springframework.util.StringUtils;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.*;
@@ -215,7 +216,14 @@ public class JooqBieQueryRepository extends JooqBaseRepository implements BieQue
                 List<ULong> result = filterCriteria.basedTopLevelAsbiepIdList().stream()
                         .map(e -> ULong.valueOf(e.value())).collect(Collectors.toList());
                 List<ULong> allInheritedTopLevelAsbiepIds = new ArrayList<>();
+                Set<ULong> visited = new HashSet<>();
                 while (!result.isEmpty()) {
+                    result = result.stream()
+                            .filter(visited::add)
+                            .collect(Collectors.toList());
+                    if (result.isEmpty()) {
+                        break;
+                    }
                     allInheritedTopLevelAsbiepIds.addAll(result);
                     result = dslContext().select(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID)
                             .from(TOP_LEVEL_ASBIEP)
@@ -797,32 +805,16 @@ public class JooqBieQueryRepository extends JooqBaseRepository implements BieQue
         bieSet.setTopLevelAsbiep(topLevelAsbiep);
 
         // Find all reused BIEs
-        Set<TopLevelAsbiepId> topLevelAsbiepIds = new HashSet<>();
-        topLevelAsbiepIds.add(topLevelAsbiepId);
-
-        Queue<TopLevelAsbiepId> queue = new LinkedList<>();
-        queue.offer(topLevelAsbiepId);
-
-        while (!queue.isEmpty()) {
-            topLevelAsbiepId = queue.poll();
-
-            List<TopLevelAsbiepId> reusedTopLevelAsbiepIds =
-                    dslContext().selectDistinct(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID)
-                            .from(ASBIE)
-                            .join(ASBIEP).on(ASBIE.TO_ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
-                            .where(and(
-                                    ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(valueOf(topLevelAsbiepId)),
-                                    ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.notIn(valueOf(topLevelAsbiepIds)))
-                            )
-                            .fetchStreamInto(BigInteger.class).map(e -> new TopLevelAsbiepId(e))
-                            .collect(Collectors.toList());
-            if (reusedTopLevelAsbiepIds.isEmpty()) {
-                break;
-            }
-
-            topLevelAsbiepIds.addAll(reusedTopLevelAsbiepIds);
-            queue.addAll(reusedTopLevelAsbiepIds);
-        }
+        Set<TopLevelAsbiepId> topLevelAsbiepIds = collectReusedTopLevelAsbiepIds(
+                topLevelAsbiepId,
+                id -> dslContext().selectDistinct(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID)
+                        .from(ASBIE)
+                        .join(ASBIEP).on(ASBIE.TO_ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
+                        .where(and(
+                                ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(valueOf(id)))
+                        )
+                        .fetchStreamInto(BigInteger.class).map(TopLevelAsbiepId::new)
+                        .collect(Collectors.toList()));
 
         if (topLevelAsbiep.state() != BieState.Initiating) {
             List<Condition> conditions;
@@ -874,6 +866,28 @@ public class JooqBieQueryRepository extends JooqBaseRepository implements BieQue
         }
 
         return bieSet;
+    }
+
+    /**
+     * Breadth-first closure over reused BIEs. A leaf is skipped while queued
+     * siblings are still visited; stopping at the first leaf loses nested
+     * reuses in the remaining branches.
+     */
+    static Set<TopLevelAsbiepId> collectReusedTopLevelAsbiepIds(
+            TopLevelAsbiepId root, Function<TopLevelAsbiepId, List<TopLevelAsbiepId>> childrenOf) {
+        Set<TopLevelAsbiepId> result = new LinkedHashSet<>();
+        Queue<TopLevelAsbiepId> queue = new ArrayDeque<>();
+        result.add(root);
+        queue.add(root);
+        while (!queue.isEmpty()) {
+            TopLevelAsbiepId current = queue.remove();
+            for (TopLevelAsbiepId child : childrenOf.apply(current)) {
+                if (result.add(child)) {
+                    queue.add(child);
+                }
+            }
+        }
+        return result;
     }
 
 }

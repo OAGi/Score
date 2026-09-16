@@ -618,18 +618,19 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       return;
     }
 
-    if (delay) {
-      setTimeout(() => {
-        this.virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
-      }, delay);
-    } else {
-      this.virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
-    }
+    setTimeout(() => {
+      if (this.virtualScroll) {
+        this.virtualScroll.scrollToOffset(index * this.virtualScrollItemSize);
+        this.virtualScroll.checkViewportSize();
+      }
+      this.cdr.detectChanges();
+    }, delay);
   }
 
   search(inputKeyword, backward?: boolean, force?: boolean) {
     this.searcher.search(inputKeyword, this.selectedNode, backward, force).subscribe(index => {
-      this.scrollTree(index, 500);
+      this.scrollTree(index);
+      this.cdr.detectChanges();
     });
   }
 

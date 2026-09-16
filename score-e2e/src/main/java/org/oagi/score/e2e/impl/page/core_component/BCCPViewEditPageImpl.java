@@ -419,7 +419,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
 
     private WebElement getNodeByName(String nodeName) {
         By nodeLocator = By.xpath(
-                "//*[text() = \"" + nodeName + "\"]//ancestor::div[contains(@class, \"mat-tree-node\")]");
+                "//div[contains(@class, \"mat-tree-node\")][.//*[normalize-space(.) = \"" + nodeName + "\" or contains(., \"" + nodeName + "\")]]");
         return visibilityOfElementLocated(getDriver(), nodeLocator);
     }
 

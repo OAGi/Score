@@ -7,6 +7,31 @@ describe('BieEditComponent', () => {
   it('should be defined', () => {
     expect(BieEditComponent).toBeTruthy();
   });
+
+  it('scrolls to a node after the requested delay and refreshes the viewport', () => {
+    vi.useFakeTimers();
+    try {
+      const virtualScroll = {
+        scrollToOffset: vi.fn(),
+        checkViewportSize: vi.fn()
+      };
+      const context = {
+        virtualScroll,
+        virtualScrollItemSize: 33,
+        cdr: {detectChanges: vi.fn()}
+      } as any;
+
+      BieEditComponent.prototype.scrollTree.call(context, 2, 100);
+
+      expect(virtualScroll.scrollToOffset).not.toHaveBeenCalled();
+      vi.advanceTimersByTime(100);
+      expect(virtualScroll.scrollToOffset).toHaveBeenCalledWith(66);
+      expect(virtualScroll.checkViewportSize).toHaveBeenCalledTimes(1);
+      expect(context.cdr.detectChanges).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });
 
 /**
