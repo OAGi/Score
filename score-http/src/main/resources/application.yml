@@ -18,6 +18,11 @@ spring:
     url: jdbc:mariadb://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_DATABASE:oagi}?useSSL=false&allowMultiQueries=true
     username: ${DB_USERNAME:oagi}
     password: ${DB_PASSWORD:oagi}
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAXIMUM_POOL_SIZE:50}
+      minimum-idle: ${DB_POOL_MINIMUM_IDLE:10}
+      connection-timeout: ${DB_POOL_CONNECTION_TIMEOUT:30000}
+      max-lifetime: ${DB_POOL_MAX_LIFETIME:1800000}
 
   flyway:
     enabled: ${FLYWAY_ENABLED:true}
@@ -56,12 +61,12 @@ spring:
 
 logging:
   level:
-    org.springframework: INFO
-    org.springframework.security: DEBUG
-    org.springframework.websocket: DEBUG
-    org.springframework.messaging: DEBUG
-    org.jooq: DEBUG
-    org.oagi.score: DEBUG
+    org.springframework: ${LOG_LEVEL_SPRING:INFO}
+    org.springframework.websocket: ${LOG_LEVEL_SPRING:INFO}
+    org.springframework.messaging: ${LOG_LEVEL_SPRING:INFO}
+    org.springframework.security: ${LOG_LEVEL_SPRING_SECURITY:INFO}
+    org.jooq: ${LOG_LEVEL_JOOQ:INFO}
+    org.oagi.score: ${LOG_LEVEL_SCORE:INFO}
 
 management:
   endpoint:

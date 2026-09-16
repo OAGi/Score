@@ -13,3 +13,9 @@ spring:
 logging:
   level:
     org.springframework.boot.devtools: INFO
+    org.springframework: INFO
+    org.springframework.security: DEBUG
+    org.springframework.websocket: DEBUG
+    org.springframework.messaging: DEBUG
+    org.jooq: DEBUG
+    org.oagi.score: DEBUG
